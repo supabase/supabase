@@ -1,0 +1,23 @@
+{
+  "name": "supabase-monorepo",
+  "private": true,
+  "description": "Supabase Monorepo",
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=10.15.1",
+    "yarn": "1.x"
+  },
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail \"yarn dev:web\" \"yarn dev:docs\" ",
+    "dev:docs": "yarn workspace @supabase/docs dev",
+    "dev:web": "yarn workspace @supabase/web dev"
+  },
+  "dependencies": {
+    "concurrently": "^5.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^1.18.2"
+  }
+}

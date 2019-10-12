@@ -1,0 +1,29 @@
+{
+  "name": "@supabase/web",
+  "version": "0.1.0",
+  "description": "Supabase Main Website",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "export": "next export",
+    "static": "next build && next export"
+  },
+  "dependencies": {
+    "@mdx-js/loader": "^1.3.1",
+    "@zeit/next-mdx": "^1.2.0",
+    "@zeit/next-sass": "^1.0.0",
+    "bulma": "^0.7.5",
+    "mobx": "^5.13.0",
+    "mobx-react": "^6.1.3",
+    "mobx-state-tree": "^3.14.1",
+    "next": "^9.0.5-canary.2",
+    "node-sass": "^4.7.2",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-decorators": "^7.4.4",
+    "babel-plugin-module-resolver": "^3.2.0"
+  }
+}
