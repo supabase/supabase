@@ -1,39 +1,41 @@
-import MainLayout from '~/components/MainLayout'
+import MainLayout from '~/components/layouts/MainLayout'
 import Link from 'next/link'
+import SignUpForm from '~/components/SignUpForm'
 
-import { inject, observer } from 'mobx-react'
 
-@inject('store')
-@observer
 export default class Home extends React.Component {
   render() {
     return (
       <MainLayout>
-        <div className="hero">
-          <div className="hero-body">
-            <div className="columns">
-              <div className="column has-text-centered">
-                <h1 className="title is-1">Supabase</h1>
-                <p className="subtitle">Supercharge Postgres without a single line of code.</p>
-              </div>
+        <div className="section container">
+          <div className="columns">
+            <div className="column" style={{ maxWidth: 450 }}>
+              <h1 className="title is-1">Supabase</h1>
+              <p className="subtitle">Supercharge PostgreSQL.</p>
+              <SignUpForm />
             </div>
           </div>
         </div>
 
         <div className="section container m-b-lg">
           <a name="pricing" id="pricing" />
-          <h3 className="title is-3 has-underline ">Apps</h3>
+          <h3 className="title is-3 has-underline ">Products</h3>
+          <p className="subtitle">
+            Extend your existing Postgres Database with opensource products.
+          </p>
           <div className="columns is-multiline">
             <div className="column is-4">
               <a className="box deep-hover" style={{ height: '100%' }}>
                 <h4 className="title is-4">Realtime</h4>
-                <p>Subscribe to all changes to your database over websockets.</p>
+                <p>Listen to your database updates, inserts, and deletes over websockets.</p>
               </a>
             </div>
             <div className="column is-4">
               <a className="box deep-hover" style={{ height: '100%' }}>
-                <h4 className="title is-4">Restful API</h4>
-                <p>Add a fully documented Restful API, without a line of code.</p>
+                <h4 className="title is-4">Restful</h4>
+                <p>
+                  Using introspection, Add a fully documented Restful API, without a line of code.
+                </p>
               </a>
             </div>
             <div className="column is-4">
@@ -42,73 +44,40 @@ export default class Home extends React.Component {
                 <p>Add a fully documented GraphQL API, without a line of code.</p>
               </a>
             </div>
-            <div className="column is-4">
-              <a className="box deep-hover" style={{ height: '100%' }}>
-                <h4 className="title is-4">Admin API</h4>
-                <p>Manage your database with a Restful API rather than SQL.</p>
-              </a>
-            </div>
-            <div className="column is-4">
-              <a className="box deep-hover" style={{ height: '100%' }}>
-                <h4 className="title is-4">Forms</h4>
-                <p>Embeddable and customizable forms, fully validated and secure. <span className="tag is-small">COMING SOON</span></p>
-              </a>
-            </div>
-            <div className="column is-4">
-              <a className="box deep-hover" style={{ height: '100%' }}>
-                <h4 className="title is-4">Dashboard</h4>
-                <p>Manage your database with a Restful API rather than SQL. <span className="tag is-small">COMING SOON</span></p>
-              
-              </a>
-            </div>
           </div>
         </div>
 
         <div className="section container m-b-lg">
           <a name="pricing" id="pricing" />
-          <h3 className="title is-3 has-underline ">Pricing</h3>
-          <div className="columns has-text-centered">
-            <div className="column">
-              <Link href="/docs?page=hosting">
-                <a className="box">
-                  <div className="title is-3">Free</div>
-                  <ul>
-                    <li>Feature</li>
-                    <li>Feature</li>
-                  </ul>
-                </a>
-              </Link>
-            </div>
-            <div className="column">
-              <a className="box">
-                <div className="title is-3">Free</div>
-                <ul>
-                  <li>Feature</li>
-                  <li>Feature</li>
-                </ul>
+          <h3 className="title is-3 has-underline ">Launch</h3>
+          <p className="subtitle">
+            Whether you're a DB expert, or just a beginner, Supabase makes it ridiculously easy to get started with PostgreSQL.
+          </p>
+          <div className="columns is-multiline">
+            <div className="column is-4">
+              <a className="box deep-hover" style={{ height: '100%' }}>
+                <h4 className="title is-4">Packaged PostgreSQL</h4>
+                <p>
+                  We've packaged PostgreSQL with a bunch of plugins and goodies that we think you'll
+                  like.
+                </p>
               </a>
             </div>
-            <div className="column">
-              <a className="box">
-                <div className="title is-3">Free</div>
-                <ul>
-                  <li>Feature</li>
-                  <li>Feature</li>
-                </ul>
+            <div className="column is-4">
+              <a className="box deep-hover" style={{ height: '100%' }}>
+                <h4 className="title is-4">Admin API</h4>
+                <p>Manage your PostgreSQL database with a well documented Restful API.</p>
               </a>
             </div>
-          </div>
-        </div>
-
-        <div className="section container">
-          <h3 className="title is-3 has-underline">Section title</h3>
-          <div className="content">
-            <h1>Heading 1</h1>
-            <h2>Heading 2</h2>
-            <h3>Heading 3</h3>
-            <p>
-              This is what a paragraph looks like with <a href="#">a linky link.</a>
-            </p>
+            <div className="column is-4">
+              <a className="box deep-hover" style={{ height: '100%' }}>
+                <h4 className="title is-4">Baseless</h4>
+                <p>
+                  We're building a serverless PostgreSQL so you can get started in seconds. Export
+                  your database to a fully native PostgreSQL instance at any time.
+                </p>
+              </a>
+            </div>
           </div>
         </div>
       </MainLayout>

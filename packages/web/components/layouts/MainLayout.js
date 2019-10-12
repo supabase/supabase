@@ -1,8 +1,7 @@
-import '../styles/style.scss'
-import Navbar from './Navbar'
-import Footer from './Footer'
+import '~/styles/style.scss'
+import Navbar from '../Navbar'
+import Footer from '../Footer'
 import Head from 'next/head'
-
 
 export default function MainLaout(props) {
   return (

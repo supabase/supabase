@@ -20,6 +20,7 @@ $grey-300: #7f7f7f;
 $grey-200: #8f8f8f;
 $grey-100: #eeeeee;
 $background: $grey-900;
+$background: $grey-900;
 $border-color: $grey-400;
 $primary: $green;
 $link: $green;
@@ -239,9 +240,7 @@ h3.has-underline {
   border: 1px solid $primary !important;
 }
 .button {
-  text-transform: uppercase;
   text-shadow: $text-shallow;
-  font-size: 0.8em;
   font-weight: bold;
   &.is-primary {
     // color: $background;
@@ -257,18 +256,6 @@ h3.has-underline {
   &.is-dark {
     color: $grey-200 !important;
     border: 1px solid transparent;
-  }
-  &.is-medium {
-    font-size: 1rem;
-    padding-left: 1.5rem;
-    padding-right: 1.2rem;
-  }
-}
-.field.has-addons {
-  .button {
-    padding-top: 14.5px;
-    padding-bottom: 15px;
-    border: 1px solid $border-color;
   }
 }
 pre {
