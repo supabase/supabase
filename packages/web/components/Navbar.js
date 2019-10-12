@@ -69,11 +69,11 @@ export default function Navbar() {
               <a className="">Blog</a>
             </Link>
           </div> */}
-          <div className="navbar-item">
+          {/* <div className="navbar-item">
             <Link href="/">
               <a className="button is-primary">Sign up</a>
             </Link>
-          </div>
+          </div> */}
         </div>
       </div>
       </div>
