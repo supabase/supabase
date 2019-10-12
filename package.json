@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build": "yarn run build:docs && yarn run build:web",
-    "d": "yarn workspace @supabase/docs build",
+    "build:docs": "yarn workspace @supabase/docs build",
     "build:web": "yarn workspace @supabase/web build",
     "dev": "concurrently --kill-others-on-fail \"yarn dev:web\" \"yarn dev:docs\" ",
     "dev:docs": "yarn workspace @supabase/docs dev",
