@@ -15,6 +15,7 @@ export default {
       ],
     },
   },
+  menu: ['Supabase', 'Realtime', 'Documents'],
   themeConfig: {
     mode: 'dark',
     codemirrorTheme: 'blackboard',
