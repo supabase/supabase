@@ -34,7 +34,7 @@ export default class Home extends React.Component {
               <a className="box deep-hover" style={{ height: '100%' }}>
                 <h4 className="title is-4">Restful</h4>
                 <p>
-                  Using introspection, Add a fully documented Restful API, without a line of code.
+                  Add a fully documented Restful API, simply by introspecting the schema.
                 </p>
               </a>
             </div>

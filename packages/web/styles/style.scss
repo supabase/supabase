@@ -167,9 +167,6 @@ body {
 hr {
   border: 1px solid $border-color;
 }
-.navbar {
-  box-shadow: $shadow;
-}
 .navbar-item {
   a {
     color: $text;
@@ -238,6 +235,26 @@ h3.has-underline {
 }
 .has-border-primary {
   border: 1px solid $primary !important;
+}
+.DocsMenuColumn {
+  border-right: 2px solid $border-color !important;
+
+  .menu-label {
+    padding: 1rem 1rem 0 1rem;
+  }
+  .menu-list {
+    li a {
+      border-radius: 0;
+      border-left: 3px solid $background;
+      color: $grey-200;
+
+      &.is-active {
+        background: none;
+        color: $text;
+        border-left: 3px solid $primary;
+      }
+    }
+  }
 }
 .button {
   text-shadow: $text-shallow;
