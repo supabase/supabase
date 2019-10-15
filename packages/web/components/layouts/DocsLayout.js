@@ -8,21 +8,18 @@ export default function DocsLayout(props) {
   return (
     <>
       <Head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Supabase | Docs</title>
-        <link rel="shortcut icon" type="image/png" href="/favicon.png" />
       </Head>
       <div className="">
         <Navbar isFullwidth={true} />
         <NavbarDocs />
         <div className="columns m-none is-gapless">
           <div className="DocsMenuColumn column is-narrow is-hidden-mobile" style={{ width: 250 }}>
-            <p class="menu-label">Documentation</p>
-            <ul class="menu-list">
-              <li><a class="">Manage Your Team</a></li>
-              <li><a class="is-active">Manage Your Team</a></li>
-              <li><a class="">Manage Your Team</a></li>
+            <p className="menu-label">Documentation</p>
+            <ul className="menu-list">
+              <li><a className="">Manage Your Team</a></li>
+              <li><a className="is-active">Manage Your Team</a></li>
+              <li><a className="">Manage Your Team</a></li>
             </ul>
           </div>
           <div className="column">{props.children}</div>

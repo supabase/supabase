@@ -16,6 +16,7 @@
     "@zeit/next-sass": "^1.0.0",
     "bulma": "^0.7.5",
     "next": "^9.0.5-canary.2",
+    "next-compose-plugins": "^2.2.0",
     "node-sass": "^4.7.2",
     "react": "^16.7.0",
     "react-dom": "^16.7.0"

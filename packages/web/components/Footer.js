@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import SignUpForm from '~/components/SignUpForm'
 import WidthWrapper from '~/components/WidthWrapper'
+import {version} from '~/package.json'
 
 export default function Footer({ isFullwidth }) {
   return (
@@ -34,7 +35,7 @@ export default function Footer({ isFullwidth }) {
         <div className="level">
           <div className="level-left ">
             <div className="level-item ">
-              <small className="has-text-weight-bold">© Supabase</small>
+              <small className="has-text-weight-bold">© Supabase. v{version}</small>
             </div>
           </div>
           <div className="level-right">
