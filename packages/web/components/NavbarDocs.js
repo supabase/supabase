@@ -28,17 +28,17 @@ export default function Navbar({activeCategory}) {
           </Link>
         </li>
         <li className={activeCategory == 'rest' ? 'is-active' : ''}>
-          <Link href={`/docs/[category]/[slug]`} as={`/docs/realtime/getting-started`}>
-            <a className="">Rest</a>
+          <Link href={`/docs/[category]/[slug]`} as={`/docs/restful/getting-started`}>
+            <a className="">Restful</a>
           </Link>
         </li>
         <li className={activeCategory == 'graphql' ? 'is-active' : ''}>
-          <Link href={`/docs/[category]/[slug]`} as={`/docs/realtime/getting-started`}>
+          <Link href={`/docs/[category]/[slug]`} as={`/docs/graphql/getting-started`}>
             <a className="">GraphQL</a>
           </Link>
         </li>
         <li className={activeCategory == 'baseless' ? 'is-active' : ''}>
-          <Link href={`/docs/[category]/[slug]`} as={`/docs/realtime/getting-started`}>
+          <Link href={`/docs/[category]/[slug]`} as={`/docs/baseless/getting-started`}>
             <a className="">Baseless</a>
           </Link>
         </li>
