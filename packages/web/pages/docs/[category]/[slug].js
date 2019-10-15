@@ -27,10 +27,12 @@ Sidebars['packaged'] = {
   introduction: ['getting-started'],
 }
 Sidebars['admin-api'] = {
-  introduction: ['getting-started', 'schemas'],
+  introduction: ['getting-started'],
+  API: ['schemas', 'tables'],
 }
 Sidebars['realtime'] = {
-  introduction: ['getting-started'],
+  introduction: ['getting-started', 'installation'],
+  'Client libraries': ['realtime-js'],
 }
 Sidebars['restful'] = {
   introduction: ['getting-started'],
