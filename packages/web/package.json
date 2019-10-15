@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "description": "Supabase Main Website",
   "scripts": {
-    "dev": "next",
     "build": "next build",
-    "start": "next start",
+    "deploy": "now",
+    "dev": "next",
     "export": "next export",
+    "start": "next start",
     "static": "next build && next export"
   },
   "dependencies": {

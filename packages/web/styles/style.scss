@@ -102,8 +102,7 @@ $menu-item-hover-color: $primary;
 $menu-item-active-color: $text-invert;
 
 // Import only what you need from Bulma
-@import '../../../node_modules/bulma/bulma.sass';
-// @import '@base/node_modules/bulma/bulma.sass';
+@import '../node_modules/bulma/bulma.sass';
 
 // SPACING CSS - see usage: https://github.com/jgthms/bulma/issues/451#issuecomment-331758839
 $sizeUnit: rem;

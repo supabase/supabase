@@ -2,9 +2,10 @@
   "name": "supabase-monorepo",
   "private": true,
   "description": "Supabase Monorepo",
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": ["packages/*"],
+    "nohoist": ["**/bulma", "**/bulma/**"]
+  },
   "engines": {
     "node": ">=10.15.1",
     "yarn": "1.x"
@@ -13,6 +14,7 @@
     "build": "yarn run build:docs && yarn run build:web",
     "build:docs": "yarn workspace @supabase/docs build",
     "build:web": "yarn workspace @supabase/web build",
+    "deploy:web": "yarn workspace @supabase/web deploy",
     "dev": "concurrently --kill-others-on-fail \"yarn dev:web\" \"yarn dev:docs\" ",
     "dev:docs": "yarn workspace @supabase/docs dev",
     "dev:web": "yarn workspace @supabase/web dev",

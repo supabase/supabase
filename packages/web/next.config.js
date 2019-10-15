@@ -12,7 +12,9 @@ module.exports = withSass(
     exportPathMap: function() {
       return {
         '/': { page: '/' },
-        '/blog': { page: '/blog' },
+        // '/blog': { page: '/blog' },
+        // '/docs/admin-api/getting-started': { page: '/docs/[product]/[slug]', query: { product: 'admin-api', slug: 'getting-started' } },
+        // '/docs/packaged/getting-started': { page: '/docs/packaged/getting-started' },
       }
     },
   })
