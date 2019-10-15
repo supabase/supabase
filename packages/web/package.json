@@ -1,10 +1,10 @@
 {
   "name": "@supabase/web",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Supabase Main Website",
   "scripts": {
     "build": "next build",
-    "deploy": "now",
+    "deploy": "yarn version && now --prod",
     "dev": "next",
     "export": "next export",
     "start": "next start",
