@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router'
 import Layout from '~/components/layouts/DocsLayout'
+import Loading from '~/components/Loading'
+import PropTypes from 'prop-types'
 
 const importReducer = ctx => {
   let keys = ctx.keys()
@@ -28,10 +30,10 @@ Sidebars['realtime'] = {
   documentation: ['getting-started'],
 }
 
-export default function CategoryDocs() {
+const CategoryDocs = (props) => {
   const router = useRouter()
   let { category, slug } = router.query
-  if (!category || !slug) return <div></div>
+  if (!category || !slug) return <Loading />
 
   const categoryDocs = Docs[category]
   const categorySidebar = enrichSidebar(Sidebars[category], categoryDocs)
@@ -71,6 +73,13 @@ export default function CategoryDocs() {
     </Layout>
   )
 }
+
+CategoryDocs.propTypes = {
+  category: PropTypes.string.isRequired,
+  slug: PropTypes.string.isRequired,
+}
+
+export default CategoryDocs
 
 /**
  * Fills the sidebar array with relevant metadata,

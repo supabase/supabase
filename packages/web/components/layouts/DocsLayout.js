@@ -30,16 +30,16 @@ export default function DocsLayout(props) {
 const Sidebar = sidebar => {
   return Object.entries(sidebar || []).map(([heading, pages]) => {
     return (
-      <>
+      <div key={heading}>
         <p className="menu-label">{heading}</p>
         <ul className="menu-list">{pages.map(x => SidebarLink(x))}</ul>
-      </>
+      </div>
     )
   })
 }
 
 const SidebarLink = page => (
-  <li>
+  <li key={page.slug}>
     <a className="">{page.title}</a>
   </li>
 )

@@ -7,7 +7,7 @@
     "nohoist": ["**/bulma", "**/bulma/**"]
   },
   "engines": {
-    "node": ">=10.15.1",
+    "node": ">=10.13.0",
     "yarn": "1.x"
   },
   "scripts": {
@@ -21,6 +21,7 @@
     "concurrently": "^5.0.0"
   },
   "devDependencies": {
+    "now": "^16.3.1",
     "prettier": "^1.18.2"
   }
 }
