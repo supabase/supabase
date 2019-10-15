@@ -27,7 +27,7 @@ Sidebars['packaged'] = {
   introduction: ['getting-started'],
 }
 Sidebars['admin-api'] = {
-  introduction: ['getting-started'],
+  introduction: ['getting-started', 'schemas'],
 }
 Sidebars['realtime'] = {
   introduction: ['getting-started'],

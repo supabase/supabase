@@ -3,9 +3,11 @@ import Navbar from '../Navbar'
 import NavbarDocs from '../NavbarDocs'
 import Footer from '../Footer'
 import Head from 'next/head'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 export default function DocsLayout(props) {
-  const { sidebar, activeCategory } = props
+  const { sidebar } = props
   return (
     <>
       <Head>
@@ -13,7 +15,7 @@ export default function DocsLayout(props) {
       </Head>
       <div className="">
         <Navbar isFullwidth={true} />
-        <NavbarDocs activeCategory={activeCategory}/>
+        <NavbarDocs />
         <div className="columns m-none is-gapless">
           <div className="DocsMenuColumn column is-narrow is-hidden-mobile" style={{ width: 250 }}>
             {Sidebar(sidebar)}
@@ -38,8 +40,14 @@ const Sidebar = sidebar => {
   })
 }
 
-const SidebarLink = page => (
-  <li key={page.slug}>
-    <a className="">{page.title}</a>
-  </li>
-)
+const SidebarLink = page => {
+  const router = useRouter()
+  let { category, slug } = router.query
+  return (
+    <li key={page.slug}>
+      <Link href={`/docs/[category]/[slug]`} as={`/docs/${category}/${page.slug}`}>
+        <a className={slug == page.slug ? 'is-active' : ''}>{page.title}</a>
+      </Link>
+    </li>
+  )
+}
