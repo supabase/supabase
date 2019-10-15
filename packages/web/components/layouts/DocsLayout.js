@@ -5,7 +5,7 @@ import Footer from '../Footer'
 import Head from 'next/head'
 
 export default function DocsLayout(props) {
-  const { sidebar } = props
+  const { sidebar, activeCategory } = props
   return (
     <>
       <Head>
@@ -13,7 +13,7 @@ export default function DocsLayout(props) {
       </Head>
       <div className="">
         <Navbar isFullwidth={true} />
-        <NavbarDocs />
+        <NavbarDocs activeCategory={activeCategory}/>
         <div className="columns m-none is-gapless">
           <div className="DocsMenuColumn column is-narrow is-hidden-mobile" style={{ width: 250 }}>
             {Sidebar(sidebar)}
@@ -28,7 +28,7 @@ export default function DocsLayout(props) {
 }
 
 const Sidebar = sidebar => {
-  return Object.entries(sidebar).map(([heading, pages]) => {
+  return Object.entries(sidebar || []).map(([heading, pages]) => {
     return (
       <>
         <p className="menu-label">{heading}</p>

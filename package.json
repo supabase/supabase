@@ -11,14 +11,11 @@
     "yarn": "1.x"
   },
   "scripts": {
-    "build": "yarn run build:docs && yarn run build:web",
-    "build:docs": "yarn workspace @supabase/docs build",
+    "build": "yarn run build:web",
     "build:web": "yarn workspace @supabase/web build",
     "deploy:web": "yarn workspace @supabase/web deploy",
-    "dev": "concurrently --kill-others-on-fail \"yarn dev:web\" \"yarn dev:docs\" ",
-    "dev:docs": "yarn workspace @supabase/docs dev",
-    "dev:web": "yarn workspace @supabase/web dev",
-    "static:web": "yarn workspace @supabase/web static"
+    "dev": "concurrently --kill-others-on-fail \"yarn dev:web\" ",
+    "dev:web": "yarn workspace @supabase/web dev"
   },
   "dependencies": {
     "concurrently": "^5.0.0"

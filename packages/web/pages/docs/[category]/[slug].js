@@ -28,20 +28,20 @@ Sidebars['realtime'] = {
   documentation: ['getting-started'],
 }
 
-export default function ProductDocs() {
+export default function CategoryDocs() {
   const router = useRouter()
-  let { product, slug } = router.query
-  if (!product || !slug) return <div></div>
+  let { category, slug } = router.query
+  if (!category || !slug) return <div></div>
 
-  const productDocs = Docs[product]
-  const productSidebar = enrichSidebar(Sidebars[product], productDocs)
-  const documentation = productDocs[`./${slug}.mdx`]
+  const categoryDocs = Docs[category]
+  const categorySidebar = enrichSidebar(Sidebars[category], categoryDocs)
+  const documentation = categoryDocs[`./${slug}.mdx`]
   const Content = documentation.default
   const { metadata } = documentation
   const { title, description } = metadata
 
   return (
-    <Layout sidebar={productSidebar} category>
+    <Layout sidebar={categorySidebar} activeCategory={category}>
       <div className="has-background-dark">
         <div className="content w-m-800 p-md p-t-xl p-b-xl">
           <h1 className="title">{title}</h1>
@@ -75,10 +75,10 @@ export default function ProductDocs() {
 /**
  * Fills the sidebar array with relevant metadata,
  */
-const enrichSidebar = (sidebar, productDocs) => {
+const enrichSidebar = (sidebar, categoryDocs) => {
   return Object.keys(sidebar).reduce((acc, heading) => {
     acc[heading] = sidebar[heading].map(slug => {
-      const documentation = productDocs[`./${slug}.mdx`]
+      const documentation = categoryDocs[`./${slug}.mdx`]
       const { metadata } = documentation
       const { title, sidebarLabel } = metadata
       return { slug, title: sidebarLabel || title }
