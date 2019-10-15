@@ -101,6 +101,10 @@ $dropdown-item-active-color: $background;
 $menu-item-hover-color: $primary;
 $menu-item-active-color: $text-invert;
 
+// Menu
+$tabs-border-bottom-color: $border-color;
+$tabs-link-color: $grey-200;
+
 // Import only what you need from Bulma
 @import '../node_modules/bulma/bulma.sass';
 
@@ -146,6 +150,37 @@ $positions: (('t', 'top'), ('r', 'right'), ('b', 'bottom'), ('l', 'left'));
   }
 }
 // end spacing
+
+
+$widths: (
+  ('100', 100),
+  ('200', 200),
+  ('300', 300),
+  ('400', 400),
+  ('500', 500),
+  ('600', 600),
+  ('700', 700),
+  ('800', 800),
+  ('900', 900),
+  ('1000', 1000),
+  ('1100', 1100),
+  ('1200', 1200),
+);
+
+
+@each $width in $widths {
+  $widthKey: nth($width, 1);
+  $widthValue: nth($width, 2);
+  .w-#{$widthKey} {
+    width: #{$widthValue}px !important;
+    margin: 0 auto;
+  }
+  // Set max widths
+  .w-m-#{$widthKey} {
+    max-width: #{$widthValue}px !important;
+    margin: 0 auto;
+  }
+}
 
 //
 // Custom CSS
@@ -297,5 +332,11 @@ code {
   transition: all 0.2s ease;
   &:hover {
     box-shadow: 0 30px 60px 0 rgba(0,0,0,0.5), 0 0 0 1px $primary !important;
+  }
+}
+@media only screen and (min-width: 769px) {
+  .reverse-row-order {
+    display: flex;
+    flex-direction: row-reverse;
   }
 }

@@ -51,7 +51,7 @@ export default class Home extends React.Component {
           <a name="pricing" id="pricing" />
           <h3 className="title is-3 has-underline ">Launch</h3>
           <p className="subtitle">
-            Whether you're a DB expert, or just a beginner, Supabase makes it ridiculously easy to get started with PostgreSQL.
+            Whether you're a DB expert or just a beginner, Supabase makes it ridiculously easy to get started with PostgreSQL.
           </p>
           <div className="columns is-multiline">
             <div className="column is-4">

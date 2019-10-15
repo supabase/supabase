@@ -5,6 +5,7 @@ import Footer from '../Footer'
 import Head from 'next/head'
 
 export default function DocsLayout(props) {
+  const { sidebar } = props
   return (
     <>
       <Head>
@@ -15,12 +16,7 @@ export default function DocsLayout(props) {
         <NavbarDocs />
         <div className="columns m-none is-gapless">
           <div className="DocsMenuColumn column is-narrow is-hidden-mobile" style={{ width: 250 }}>
-            <p className="menu-label">Documentation</p>
-            <ul className="menu-list">
-              <li><a className="">Manage Your Team</a></li>
-              <li><a className="is-active">Manage Your Team</a></li>
-              <li><a className="">Manage Your Team</a></li>
-            </ul>
+            {Sidebar(sidebar)}
           </div>
           <div className="column">{props.children}</div>
         </div>
@@ -30,3 +26,20 @@ export default function DocsLayout(props) {
     </>
   )
 }
+
+const Sidebar = sidebar => {
+  return Object.entries(sidebar).map(([heading, pages]) => {
+    return (
+      <>
+        <p className="menu-label">{heading}</p>
+        <ul className="menu-list">{pages.map(x => SidebarLink(x))}</ul>
+      </>
+    )
+  })
+}
+
+const SidebarLink = page => (
+  <li>
+    <a className="">{page.title}</a>
+  </li>
+)
