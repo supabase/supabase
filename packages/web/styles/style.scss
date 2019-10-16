@@ -7,9 +7,9 @@
 // Set your brand colors
 // $green: #45d092;
 $green: #45d092;
-$blue: #0069FF;
-$yellow: #F8C945;
-$orange: #EC6E2D;
+$blue: #0069ff;
+$yellow: #f8c945;
+$orange: #ec6e2d;
 $grey-900: #1f1f1f;
 $grey-800: #2a2a2a;
 $grey-700: #3b3b3b;
@@ -151,7 +151,6 @@ $positions: (('t', 'top'), ('r', 'right'), ('b', 'bottom'), ('l', 'left'));
 }
 // end spacing
 
-
 $widths: (
   ('100', 100),
   ('200', 200),
@@ -164,9 +163,8 @@ $widths: (
   ('900', 900),
   ('1000', 1000),
   ('1100', 1100),
-  ('1200', 1200),
+  ('1200', 1200)
 );
-
 
 @each $width in $widths {
   $widthKey: nth($width, 1);
@@ -201,6 +199,8 @@ body {
 hr {
   border: 1px solid $border-color;
 }
+
+// Navbar
 .navbar-item {
   a {
     color: $text;
@@ -209,6 +209,14 @@ hr {
     }
   }
 }
+@media (max-width: 769px) {
+  .navbar {
+    .section.container {
+      padding: 00px !important;
+    }
+  }
+}
+
 .footer {
   box-shadow: inset 0px 5px 5px 0px rgba(0, 0, 0, 0.3);
   .heading {
@@ -252,7 +260,7 @@ hr {
 
   a {
     box-shadow: inset 0 -3px 0 -1px $primary;
-    transition: box-shadow .15s ease-in-out;
+    transition: box-shadow 0.15s ease-in-out;
     color: $text;
     padding-bottom: 2px;
     &:hover {
@@ -340,7 +348,7 @@ code {
 .deep-hover {
   transition: all 0.2s ease;
   &:hover {
-    box-shadow: 0 30px 60px 0 rgba(0,0,0,0.5), 0 0 0 1px $primary !important;
+    box-shadow: 0 30px 60px 0 rgba(0, 0, 0, 0.5), 0 0 0 1px $primary !important;
   }
 }
 @media only screen and (min-width: 769px) {
