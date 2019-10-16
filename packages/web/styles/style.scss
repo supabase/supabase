@@ -211,6 +211,15 @@ hr {
 }
 .footer {
   box-shadow: inset 0px 5px 5px 0px rgba(0, 0, 0, 0.3);
+  .heading {
+    color: $grey-200;
+  }
+  a {
+    color: $text;
+    &:hover {
+      color: $primary;
+    }
+  }
 }
 .has-flex-start {
   justify-content: flex-start;
