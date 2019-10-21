@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router'
 import Layout from '~/components/layouts/DocsLayout'
+import Loading from '~/components/Loading'
+import PropTypes from 'prop-types'
 
 const importReducer = ctx => {
   let keys = ctx.keys()
@@ -15,23 +17,37 @@ var Docs = []
 Docs['packaged'] = importReducer(require.context('../../../content/docs/packaged', true, /.mdx$/))
 Docs['admin-api'] = importReducer(require.context('../../../content/docs/admin-api', true, /.mdx$/))
 Docs['realtime'] = importReducer(require.context('../../../content/docs/realtime', true, /.mdx$/))
+Docs['restful'] = importReducer(require.context('../../../content/docs/restful', true, /.mdx$/))
+Docs['graphql'] = importReducer(require.context('../../../content/docs/graphql', true, /.mdx$/))
+Docs['baseless'] = importReducer(require.context('../../../content/docs/baseless', true, /.mdx$/))
 
 // Set up all sidebars
 var Sidebars = []
 Sidebars['packaged'] = {
-  documentation: ['getting-started'],
+  introduction: ['getting-started'],
 }
 Sidebars['admin-api'] = {
-  documentation: ['getting-started'],
+  introduction: ['getting-started'],
+  API: ['schemas', 'tables'],
 }
 Sidebars['realtime'] = {
-  documentation: ['getting-started'],
+  introduction: ['getting-started', 'installation'],
+  'Client libraries': ['realtime-js'],
+}
+Sidebars['restful'] = {
+  introduction: ['getting-started'],
+}
+Sidebars['graphql'] = {
+  introduction: ['getting-started'],
+}
+Sidebars['baseless'] = {
+  introduction: ['getting-started'],
 }
 
-export default function CategoryDocs() {
+const CategoryDocs = props => {
   const router = useRouter()
   let { category, slug } = router.query
-  if (!category || !slug) return <div></div>
+  if (!category || !slug) return <Loading />
 
   const categoryDocs = Docs[category]
   const categorySidebar = enrichSidebar(Sidebars[category], categoryDocs)
@@ -43,7 +59,7 @@ export default function CategoryDocs() {
   return (
     <Layout sidebar={categorySidebar} activeCategory={category}>
       <div className="has-background-dark">
-        <div className="content w-m-800 p-md p-t-xl p-b-xl">
+        <div className="content w-m-800 p-md p-t-xl p-b-xl m-b-lg">
           <h1 className="title">{title}</h1>
           <p className="subtitle">{description}</p>
         </div>
@@ -71,6 +87,13 @@ export default function CategoryDocs() {
     </Layout>
   )
 }
+
+CategoryDocs.propTypes = {
+  category: PropTypes.string.isRequired,
+  slug: PropTypes.string.isRequired,
+}
+
+export default CategoryDocs
 
 /**
  * Fills the sidebar array with relevant metadata,

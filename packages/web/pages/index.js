@@ -25,24 +25,28 @@ export default class Home extends React.Component {
           </p>
           <div className="columns is-multiline">
             <div className="column is-4">
-              <a className="box deep-hover" style={{ height: '100%' }}>
-                <h4 className="title is-4">Realtime</h4>
-                <p>Listen to your database updates, inserts, and deletes over websockets.</p>
-              </a>
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/realtime/getting-started`}>
+                <a className="box deep-hover" style={{ height: '100%' }}>
+                  <h4 className="title is-4">Realtime</h4>
+                  <p>Listen to your database updates, inserts, and deletes over websockets.</p>
+                </a>
+              </Link>
             </div>
             <div className="column is-4">
-              <a className="box deep-hover" style={{ height: '100%' }}>
-                <h4 className="title is-4">Restful</h4>
-                <p>
-                  Add a fully documented Restful API, simply by introspecting the schema.
-                </p>
-              </a>
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/restful/getting-started`}>
+                <a className="box deep-hover" style={{ height: '100%' }}>
+                  <h4 className="title is-4">Restful</h4>
+                  <p>Add a fully documented Restful API, simply by introspecting the schema.</p>
+                </a>
+              </Link>
             </div>
             <div className="column is-4">
-              <a className="box deep-hover" style={{ height: '100%' }}>
-                <h4 className="title is-4">GraphQL</h4>
-                <p>Add a fully documented GraphQL API, without a line of code.</p>
-              </a>
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/graphql/getting-started`}>
+                <a className="box deep-hover" style={{ height: '100%' }}>
+                  <h4 className="title is-4">GraphQL</h4>
+                  <p>Extend your database with a fully functional GraphQL API, without a line of code.</p>
+                </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -51,32 +55,39 @@ export default class Home extends React.Component {
           <a name="pricing" id="pricing" />
           <h3 className="title is-3 has-underline ">Launch</h3>
           <p className="subtitle">
-            Whether you're a DB expert or just a beginner, Supabase makes it ridiculously easy to get started with PostgreSQL.
+            Whether you're a DB expert or just a beginner, Supabase makes it ridiculously easy to
+            get started with PostgreSQL.
           </p>
           <div className="columns is-multiline">
             <div className="column is-4">
-              <a className="box deep-hover" style={{ height: '100%' }}>
-                <h4 className="title is-4">Packaged PostgreSQL</h4>
-                <p>
-                  We've packaged PostgreSQL with a bunch of plugins and goodies that we think you'll
-                  like.
-                </p>
-              </a>
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/packaged/getting-started`}>
+                <a className="box deep-hover" style={{ height: '100%' }}>
+                  <h4 className="title is-4">Packaged PostgreSQL</h4>
+                  <p>
+                    We've packaged PostgreSQL with a bunch of plugins and goodies that we think
+                    you'll like.
+                  </p>
+                </a>
+              </Link>
             </div>
             <div className="column is-4">
-              <a className="box deep-hover" style={{ height: '100%' }}>
-                <h4 className="title is-4">Admin API</h4>
-                <p>Manage your PostgreSQL database with a well documented Restful API.</p>
-              </a>
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/admin-api/getting-started`}>
+                <a className="box deep-hover" style={{ height: '100%' }}>
+                  <h4 className="title is-4">Admin API</h4>
+                  <p>Manage your PostgreSQL database with a well documented Restful API.</p>
+                </a>
+              </Link>
             </div>
             <div className="column is-4">
-              <a className="box deep-hover" style={{ height: '100%' }}>
-                <h4 className="title is-4">Baseless</h4>
-                <p>
-                  We're building a serverless PostgreSQL so you can get started in seconds. Export
-                  your database to a fully native PostgreSQL instance at any time.
-                </p>
-              </a>
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/baseless/getting-started`}>
+                <a className="box deep-hover" style={{ height: '100%' }}>
+                  <h4 className="title is-4">Baseless</h4>
+                  <p>
+                    We're building a serverless PostgreSQL so you can get started in seconds. Export
+                    your database to a fully native PostgreSQL instance at any time.
+                  </p>
+                </a>
+              </Link>
             </div>
           </div>
         </div>
