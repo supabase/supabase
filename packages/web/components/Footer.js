@@ -19,7 +19,9 @@ export default function Footer({ isFullwidth }) {
             <div className="column is-2">
               <p className="heading">Products</p>
               <p>
-                <a href="https://docs.supabase.io">Docs</a>
+              <Link href="/docs">
+                <a className="">Docs</a>
+              </Link>
               </p>
             </div>
             <div className="column is-2">
