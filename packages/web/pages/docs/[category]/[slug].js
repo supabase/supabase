@@ -14,6 +14,7 @@ const importReducer = ctx => {
 
 // Import all docs
 var Docs = []
+Docs['-'] = importReducer(require.context('../../../content/docs/-', true, /.mdx$/))
 Docs['packaged'] = importReducer(require.context('../../../content/docs/packaged', true, /.mdx$/))
 Docs['admin-api'] = importReducer(require.context('../../../content/docs/admin-api', true, /.mdx$/))
 Docs['realtime'] = importReducer(require.context('../../../content/docs/realtime', true, /.mdx$/))
@@ -23,6 +24,9 @@ Docs['baseless'] = importReducer(require.context('../../../content/docs/baseless
 
 // Set up all sidebars
 var Sidebars = []
+Sidebars['-'] = {
+  introduction: ['about'],
+}
 Sidebars['packaged'] = {
   introduction: ['getting-started'],
 }

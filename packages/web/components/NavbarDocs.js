@@ -15,6 +15,11 @@ export default function Navbar({}) {
             </span>
           </a>
         </li>
+        <li className={category == '-' ? 'is-active' : ''}>
+          <Link href={`/docs/[category]/[slug]`} as={`/docs/-/about`}>
+            <a className="">Home</a>
+          </Link>
+        </li>
         <li className={category == 'packaged' ? 'is-active' : ''}>
           <Link href={`/docs/[category]/[slug]`} as={`/docs/packaged/getting-started`}>
             <a className="">Packaged</a>
