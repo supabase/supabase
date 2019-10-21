@@ -209,7 +209,7 @@ hr {
     }
   }
 }
-@media (max-width: 769px) {
+@media only screen and (max-width: 1023px) {
   .navbar {
     .section.container {
       padding: 00px !important;
