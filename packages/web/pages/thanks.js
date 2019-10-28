@@ -4,7 +4,7 @@ export default class Thanks extends React.Component {
   render() {
     return (
       <MainLayout>
-        <div className="section container m-xxl ">
+        <div className="section container m-t-xxl m-b-xxl ">
           <div className="columns is-centered">
             <div className="column" style={{ maxWidth: 450 }}>
               <h1 className="title is-1">Thanks!</h1>

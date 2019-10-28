@@ -84,7 +84,7 @@ const CategoryDocs = props => {
           <div className="column ">
             {!!nextDoc && (
               <Link href={`/docs/[category]/[slug]`} as={`/docs/${category}/${nextDocSlug}`}>
-                <a className="box p-md has-text-right">
+                <a className="box p-md">
                   <p className="heading has-text-grey">Next</p>
                   <p>{nextDoc.metadata.sidebarLabel || nextDoc.metadata.title}</p>
                 </a>

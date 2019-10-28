@@ -6,14 +6,9 @@ export const metadata = {
 
 Supabase Realtime is an elixir server that allows you to listen to PostgreSQL inserts/updates/deletes over websockets.
 
-## Motivation
-
-Change data capture solves a lot of tough engineering problems related to stale data. On top of that, some systems (like chat apps) require realtime data. 
-Supabase Realtime is designed to solve these problems and be usable anywhere from mobile, web, and other servers.
-
 ## How it works
 
-The server is built with [Phoenix](https://phoenixframework.org/), which is an Elixir framework that's amazing for listening via websockets. 
+Realtime is built with [Phoenix](https://phoenixframework.org/), which is an Elixir framework that's amazing for listening via websockets. 
 The Phoenix server listens to PostgreSQL's replication functionality and converts the byte stream into JSON. It then broadcasts the JSON over websockets. 
 
 The great thing about this implementation is that you can make changes to your database from anywhere - your api, directly in the DB, via a console etc - 
@@ -30,4 +25,12 @@ Supabase Realtime is a passive listen/broadcast system. You don't use it to make
 
 ## Features
 
+- 100% open source
+- Accessible by mobile and web
 - Works without wal2json :)
+
+## Benefits
+
+- You own your data. Realtime can be pointed at any PostgreSQL database that has replication enabled.
+- Build chat apps and other systems that require realtime functionality.
+- Listening to data changes on client side solves stale data problems and update collisions.
