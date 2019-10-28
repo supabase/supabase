@@ -11,7 +11,7 @@ export default class MyDocument extends Document {
           <title>Supabase</title>
         </head>
         <Head />
-        <body>
+        <body className="has-navbar-fixed-bottom ">
           <Main />
           <NextScript />
         </body>

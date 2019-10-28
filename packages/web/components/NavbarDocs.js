@@ -2,19 +2,12 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-export default function Navbar({}) {
+export default function Navbar({ }) {
   const router = useRouter()
   let { category } = router.query
   return (
     <nav className="tabs m-none">
       <ul>
-        <li className="is-hidden-tablet">
-          <a>
-            <span className="icon">
-              <i className="fas fa-bars"></i>
-            </span>
-          </a>
-        </li>
         <li className={category == '-' ? 'is-active' : ''}>
           <Link href={`/docs/[category]/[slug]`} as={`/docs/-/about`}>
             <a className="">Supabase</a>
