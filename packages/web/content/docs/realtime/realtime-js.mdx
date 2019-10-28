@@ -6,13 +6,32 @@ export const metadata = {
 
 ## Install
 
-
 ```sh
 npm install --save @supabase/realtime-js
 ```
 
 ## Usage 
 
+#### Connect to the server
+
 ```js
-// @TODO
+import { Socket } = '@supabase/realtime-js'
+
+var API_SOCKET = process.env.SOCKET_URL
+var socket = new Socket(API_SOCKET)
+var realtimeChannel = this.socket.channel('realtime')
+
+socket.connect()
+if (realtimeChannel.state !== 'joined') {
+  realtimeChannel
+    .join()
+    .receive('ok', resp => console.log('Joined successfully', resp))
+    .receive('error', resp => console.log('Unable to join', resp))
+    .receive('timeout', () => console.log('Networking issue. Still waiting...'))
+
+  // Listen to all changes in the database
+  realtimeChannel.on('shout', payload => {
+    console.log('Update received!', payload)
+  })
+}
 ```
