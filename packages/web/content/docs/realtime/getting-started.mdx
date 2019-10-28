@@ -14,11 +14,12 @@ Supabase Realtime is designed to solve these problems and be usable anywhere fro
 ## How it works
 
 The server is built with [Phoenix](https://phoenixframework.org/), which is an Elixir framework that's amazing for listening via websockets. 
-The Phoenix server listens to PostgreSQL's replication functionality and converts the byte stream into JSON. Tt then broadcasts the JSON over websockets. 
-This is great since you can scale the Phoenix servers without any additional load on your DB. 
+The Phoenix server listens to PostgreSQL's replication functionality and converts the byte stream into JSON. It then broadcasts the JSON over websockets. 
 
 The great thing about this implementation is that you can make changes to your database from anywhere - your api, directly in the DB, via a console etc - 
 and you will still receive the changes via Realtime.
+
+You can also scale the Phoenix servers without any additional load on your DB.
 
 ## What this isn't 
 
