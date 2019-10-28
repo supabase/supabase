@@ -1,0 +1,22 @@
+{
+  "name": "@supabase/realtime-js",
+  "version": "0.1.0",
+  "description": "Listen to realtime updates to your PostgreSQL database.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha \"test/**/*_spec.js\"",
+    "push": "npm version patch; npm publish"
+  },
+  "keywords": [
+    "supabase",
+    "realtime"
+  ],
+  "author": "@kiwicopple",
+  "license": "Apache 2.0",
+  "devDependencies": {
+  },
+  "dependencies": {
+    "@types/node": "^12.6.8",
+    "phoenix-channels": "^0.19.0"
+  }
+}
