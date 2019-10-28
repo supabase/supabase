@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import Layout from '~/components/layouts/DocsLayout'
 import Loading from '~/components/Loading'
+import Link from 'next/link'
 import PropTypes from 'prop-types'
 
 const importReducer = ctx => {
@@ -59,6 +60,13 @@ const CategoryDocs = props => {
   const Content = documentation.default
   const { metadata } = documentation
   const { title, description } = metadata
+  const pages = Object.values(Sidebars[category]) // array of arrays
+  const pageArray = pages.concat.apply([], pages) // flatten
+  const sidebarIndex = pageArray.indexOf(slug)
+  const nextDocSlug = pageArray[sidebarIndex + 1]
+  const nextDoc = nextDocSlug ? categoryDocs[`./${nextDocSlug}.mdx`] : null
+  const previousDocSlug = pageArray[sidebarIndex - 1]
+  const previousDoc = previousDocSlug ? categoryDocs[`./${previousDocSlug}.mdx`] : null
 
   return (
     <Layout sidebar={categorySidebar} activeCategory={category}>
@@ -74,27 +82,30 @@ const CategoryDocs = props => {
       <div className="w-m-800 p-md p-b-lg">
         <nav className="columns reverse-row-order">
           <div className="column ">
-            <a className="box p-md">
-              <p className="heading has-text-grey">Next</p>
-              <p className="">Some post</p>
-            </a>
+            {!!nextDoc && (
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/${category}/${nextDocSlug}`}>
+                <a className="box p-md has-text-right">
+                  <p className="heading has-text-grey">Next</p>
+                  <p>{nextDoc.metadata.sidebarLabel || nextDoc.metadata.title}</p>
+                </a>
+              </Link>
+            )}
           </div>
           <div className="column is-hidden-mobile "></div>
           <div className="column">
-            <a className="box p-md has-text-right">
-              <p className="heading has-text-grey">Previous</p>
-              <p className="">Some post</p>
-            </a>
+            {!!previousDoc && (
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/${category}/${previousDocSlug}`}>
+                <a className="box p-md has-text-right">
+                  <p className="heading has-text-grey">Previous</p>
+                  <p>{previousDoc.metadata.sidebarLabel || previousDoc.metadata.title}</p>
+                </a>
+              </Link>
+            )}
           </div>
         </nav>
       </div>
     </Layout>
   )
-}
-
-CategoryDocs.propTypes = {
-  category: PropTypes.string.isRequired,
-  slug: PropTypes.string.isRequired,
 }
 
 export default CategoryDocs
