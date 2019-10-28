@@ -1,6 +1,6 @@
 {
   "name": "@supabase/realtime-js",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Listen to realtime updates to your PostgreSQL database.",
   "repository": "https://github.com/supabase/monorepo",
   "main": "src/index.js",

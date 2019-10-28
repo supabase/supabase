@@ -1,6 +1,14 @@
 # Supabase
 
-Supercharge your database.
+Supercharge PostgreSQL. [https://supabase.io](https://supabase.io)
+
+## About
+
+Supabase provide opensource tools that make PostgreSQL even better.
+
+## Docs
+
+All of our documeentation is stored in this repo as a single source of truth. You can view it online at [https://supabase.io/docs/-/about](https://supabase.io/docs/-/about).
 
 ## Development
 
