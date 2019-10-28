@@ -25,7 +25,7 @@ Docs['baseless'] = importReducer(require.context('../../../content/docs/baseless
 // Set up all sidebars
 var Sidebars = []
 Sidebars['-'] = {
-  introduction: ['about'],
+  introduction: ['about', 'contributing'],
 }
 Sidebars['packaged'] = {
   introduction: ['getting-started'],

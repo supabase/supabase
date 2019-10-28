@@ -17,7 +17,7 @@ export default function Navbar({}) {
         </li>
         <li className={category == '-' ? 'is-active' : ''}>
           <Link href={`/docs/[category]/[slug]`} as={`/docs/-/about`}>
-            <a className="">Home</a>
+            <a className="">Supabase</a>
           </Link>
         </li>
         <li className={category == 'packaged' ? 'is-active' : ''}>
