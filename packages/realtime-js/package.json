@@ -2,10 +2,11 @@
   "name": "@supabase/realtime-js",
   "version": "0.1.0",
   "description": "Listen to realtime updates to your PostgreSQL database.",
+  "repository": "https://github.com/supabase/monorepo",
   "main": "src/index.js",
   "scripts": {
     "test": "mocha \"test/**/*_spec.js\"",
-    "push": "npm version patch; npm publish"
+    "deploy": "npm version patch; npm publish --access=public"
   },
   "keywords": [
     "supabase",
@@ -13,8 +14,7 @@
   ],
   "author": "@kiwicopple",
   "license": "Apache 2.0",
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "dependencies": {
     "@types/node": "^12.6.8",
     "phoenix-channels": "^0.19.0"
