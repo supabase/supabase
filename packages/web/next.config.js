@@ -5,9 +5,9 @@ const nextConfig = {
   experimental: { publicDirectory: true },
 }
 
-// CSS
-const withCSS = require('@zeit/next-css')
-const withCssConfig = {}
+// // CSS
+// const withCSS = require('@zeit/next-css')
+// const withCssConfig = {}
 
 // SASS
 const withSass = require('@zeit/next-sass')
@@ -28,6 +28,10 @@ const withMDX = require('@zeit/next-mdx')({
 const withMdxConfig = {}
 
 module.exports = withPlugins(
-  [[withCSS, withCssConfig], [withSass, withSassConfig], [withMDX, withMdxConfig]],
+  [
+    // [withCSS, withCssConfig],
+    [withSass, withSassConfig],
+    [withMDX, withMdxConfig],
+  ],
   nextConfig
 )

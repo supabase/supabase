@@ -1,4 +1,3 @@
-import 'prismjs/themes/prism-tomorrow.css'
 import { useRouter } from 'next/router'
 import Layout from '~/components/layouts/DocsLayout'
 import Loading from '~/components/Loading'
