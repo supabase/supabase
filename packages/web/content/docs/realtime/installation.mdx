@@ -12,7 +12,7 @@ We have tried to keep the requirements to use this as simple as possible. Howeve
 
 Make sure your database has replication turned on:
 
-```sh
+```bash
 SHOW wal_level; # This should be "logical"
 SHOW max_replication_slots; # You need at least one free slot for Supabase
 ```
@@ -21,7 +21,7 @@ SHOW max_replication_slots; # You need at least one free slot for Supabase
 
 Create a publication for Supabase to listen to on all of your tables.
 
-```sh
+```bash
 CREATE PUBLICATION supabase_realtime FOR ALL TABLES;
 ```
 
@@ -30,7 +30,7 @@ CREATE PUBLICATION supabase_realtime FOR ALL TABLES;
 
 If you want to receive the data the previous data (i.e. what the fields were *before* updates), then you need to set each table to have a full replica identity:
 
-```sh
+```bash
 ALTER TABLE YOUR_TABLE_NAME replica identity full; # Change YOUR_TABLE_NAME
 ```
 

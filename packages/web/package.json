@@ -11,13 +11,16 @@
     "static": "next build && next export"
   },
   "dependencies": {
+    "@mapbox/rehype-prism": "^0.3.1",
     "@mdx-js/loader": "^1.3.1",
+    "@zeit/next-css": "^1.0.1",
     "@zeit/next-mdx": "^1.2.0",
     "@zeit/next-sass": "^1.0.0",
     "bulma": "^0.7.5",
     "next": "^9.0.5-canary.2",
     "next-compose-plugins": "^2.2.0",
     "node-sass": "^4.7.2",
+    "prismjs": "^1.17.1",
     "react": "^16.7.0",
     "react-dom": "^16.7.0"
   },

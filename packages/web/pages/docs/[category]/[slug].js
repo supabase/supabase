@@ -1,8 +1,8 @@
+import 'prismjs/themes/prism-tomorrow.css'
 import { useRouter } from 'next/router'
 import Layout from '~/components/layouts/DocsLayout'
 import Loading from '~/components/Loading'
 import Link from 'next/link'
-import PropTypes from 'prop-types'
 
 const importReducer = ctx => {
   let keys = ctx.keys()
@@ -26,34 +26,34 @@ Docs['baseless'] = importReducer(require.context('../../../content/docs/baseless
 // Set up all sidebars
 var Sidebars = []
 Sidebars['-'] = {
-  introduction: ['about', 'contributing'],
+  Introduction: ['about', 'contributing'],
 }
 Sidebars['packaged'] = {
-  introduction: ['getting-started'],
+  Introduction: ['getting-started'],
 }
 Sidebars['admin-api'] = {
-  introduction: ['getting-started'],
+  Introduction: ['getting-started'],
   API: ['schemas', 'tables'],
 }
 Sidebars['realtime'] = {
-  introduction: ['getting-started', 'installation'],
-  'Client libraries': ['realtime-js'],
+  Introduction: ['getting-started', 'installation'],
+  'Client Libraries': ['realtime-js'],
 }
 Sidebars['restful'] = {
-  introduction: ['getting-started'],
+  Introduction: ['getting-started'],
 }
 Sidebars['graphql'] = {
-  introduction: ['getting-started'],
+  Introduction: ['getting-started'],
 }
 Sidebars['baseless'] = {
-  introduction: ['getting-started'],
+  Introduction: ['getting-started'],
 }
 
 const CategoryDocs = props => {
   const router = useRouter()
-  let { category, slug } = router.query
-  if (!category || !slug) return <Loading />
+  if (!router.query.category || !router.query.slug) return <Loading />
 
+  const { category, slug } = router.query
   const categoryDocs = Docs[category]
   const categorySidebar = enrichSidebar(Sidebars[category], categoryDocs)
   const documentation = categoryDocs[`./${slug}.mdx`]

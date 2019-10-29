@@ -1,11 +1,11 @@
 import '~/styles/style.scss'
-import Navbar from '../Navbar'
-import NavbarDocs from '../NavbarDocs'
-import Footer from '../Footer'
-import Head from 'next/head'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import React, { useState, useEffect } from 'react'
+import Navbar       from '../Navbar'
+import NavbarDocs   from '../NavbarDocs'
+import Footer       from '../Footer'
+import Head         from 'next/head'
+import Link         from 'next/link'
+import { useRouter }                    from 'next/router'
+import React, { useState, useEffect }   from 'react'
 
 export default function DocsLayout(props) {
   const [sidebarVisible, toggleSidebar] = useState(false)

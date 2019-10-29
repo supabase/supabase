@@ -3,8 +3,13 @@
   "private": true,
   "description": "Supabase Monorepo",
   "workspaces": {
-    "packages": ["packages/*"],
-    "nohoist": ["**/bulma", "**/bulma/**"]
+    "packages": [
+      "packages/*"
+    ],
+    "nohoist": [
+      "**/bulma",
+      "**/bulma/**"
+    ]
   },
   "engines": {
     "node": ">=10.13.0",

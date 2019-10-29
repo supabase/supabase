@@ -17,6 +17,6 @@
   "devDependencies": {},
   "dependencies": {
     "@types/node": "^12.6.8",
-    "phoenix-channels": "^0.19.0"
+    "phoenix-channels": "^1.0.0"
   }
 }
