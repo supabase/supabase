@@ -35,7 +35,7 @@ export default function Navbar({ isFullwidth }) {
 
           <div className="navbar-end p-r-sm">
             <div className="navbar-item">
-              <Link href={`/docs/[category]/[slug]`} as={`/docs/realtime/introduction`}>
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/-/about`}>
                 <a className="">Docs</a>
               </Link>
             </div>
