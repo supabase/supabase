@@ -14,32 +14,32 @@ export default function Navbar({ }) {
           </Link>
         </li>
         <li className={category == 'packaged' ? 'is-active' : ''}>
-          <Link href={`/docs/[category]/[slug]`} as={`/docs/packaged/getting-started`}>
+          <Link href={`/docs/[category]/[slug]`} as={`/docs/packaged/introduction`}>
             <a className="">Packaged</a>
           </Link>
         </li>
         <li className={category == 'admin-api' ? 'is-active' : ''}>
-          <Link href={`/docs/[category]/[slug]`} as={`/docs/admin-api/getting-started`}>
+          <Link href={`/docs/[category]/[slug]`} as={`/docs/admin-api/introduction`}>
             <a className="">Admin API</a>
           </Link>
         </li>
         <li className={category == 'realtime' ? 'is-active' : ''}>
-          <Link href={`/docs/[category]/[slug]`} as={`/docs/realtime/getting-started`}>
+          <Link href={`/docs/[category]/[slug]`} as={`/docs/realtime/introduction`}>
             <a className="">Realtime</a>
           </Link>
         </li>
-        <li className={category == 'rest' ? 'is-active' : ''}>
-          <Link href={`/docs/[category]/[slug]`} as={`/docs/restful/getting-started`}>
+        <li className={category == 'restful' ? 'is-active' : ''}>
+          <Link href={`/docs/[category]/[slug]`} as={`/docs/restful/introduction`}>
             <a className="">Restful</a>
           </Link>
         </li>
         <li className={category == 'graphql' ? 'is-active' : ''}>
-          <Link href={`/docs/[category]/[slug]`} as={`/docs/graphql/getting-started`}>
+          <Link href={`/docs/[category]/[slug]`} as={`/docs/graphql/introduction`}>
             <a className="">GraphQL</a>
           </Link>
         </li>
         <li className={category == 'baseless' ? 'is-active' : ''}>
-          <Link href={`/docs/[category]/[slug]`} as={`/docs/baseless/getting-started`}>
+          <Link href={`/docs/[category]/[slug]`} as={`/docs/baseless/introduction`}>
             <a className="">Baseless</a>
           </Link>
         </li>

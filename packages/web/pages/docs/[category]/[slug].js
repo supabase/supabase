@@ -29,10 +29,10 @@ Sidebars['-'] = {
   Introduction: ['about', 'contributing'],
 }
 Sidebars['packaged'] = {
-  Introduction: ['getting-started'],
+  Introduction: ['introduction'],
 }
 Sidebars['admin-api'] = {
-  Introduction: ['getting-started'],
+  Introduction: ['introduction'],
   API: ['schemas', 'tables'],
 }
 Sidebars['realtime'] = {
@@ -41,13 +41,13 @@ Sidebars['realtime'] = {
   Guides: ['docker-nextjs'],
 }
 Sidebars['restful'] = {
-  Introduction: ['getting-started'],
+  Introduction: ['introduction'],
 }
 Sidebars['graphql'] = {
-  Introduction: ['getting-started'],
+  Introduction: ['introduction'],
 }
 Sidebars['baseless'] = {
-  Introduction: ['getting-started'],
+  Introduction: ['introduction'],
 }
 
 const CategoryDocs = props => {

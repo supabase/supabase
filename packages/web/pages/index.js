@@ -25,7 +25,7 @@ export default class Home extends React.Component {
           </p>
           <div className="columns is-multiline">
             <div className="column is-4">
-              <Link href={`/docs/[category]/[slug]`} as={`/docs/realtime/getting-started`}>
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/realtime/introduction`}>
                 <a className="box deep-hover" style={{ height: '100%' }}>
                   <h4 className="title is-4">Realtime</h4>
                   <p>Listen to your database updates, inserts, and deletes over websockets.</p>
@@ -33,7 +33,7 @@ export default class Home extends React.Component {
               </Link>
             </div>
             <div className="column is-4">
-              <Link href={`/docs/[category]/[slug]`} as={`/docs/restful/getting-started`}>
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/restful/introduction`}>
                 <a className="box deep-hover" style={{ height: '100%' }}>
                   <h4 className="title is-4">Restful</h4>
                   <p>Add a fully documented Restful API, simply by introspecting the schema.</p>
@@ -41,7 +41,7 @@ export default class Home extends React.Component {
               </Link>
             </div>
             <div className="column is-4">
-              <Link href={`/docs/[category]/[slug]`} as={`/docs/graphql/getting-started`}>
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/graphql/introduction`}>
                 <a className="box deep-hover" style={{ height: '100%' }}>
                   <h4 className="title is-4">GraphQL</h4>
                   <p>Extend your database with a fully functional GraphQL API, without a line of code.</p>
@@ -60,7 +60,7 @@ export default class Home extends React.Component {
           </p>
           <div className="columns is-multiline">
             <div className="column is-4">
-              <Link href={`/docs/[category]/[slug]`} as={`/docs/packaged/getting-started`}>
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/packaged/introduction`}>
                 <a className="box deep-hover" style={{ height: '100%' }}>
                   <h4 className="title is-4">Packaged PostgreSQL</h4>
                   <p>
@@ -71,7 +71,7 @@ export default class Home extends React.Component {
               </Link>
             </div>
             <div className="column is-4">
-              <Link href={`/docs/[category]/[slug]`} as={`/docs/admin-api/getting-started`}>
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/admin-api/introduction`}>
                 <a className="box deep-hover" style={{ height: '100%' }}>
                   <h4 className="title is-4">Admin API</h4>
                   <p>Manage your PostgreSQL database with a well documented Restful API.</p>
@@ -79,7 +79,7 @@ export default class Home extends React.Component {
               </Link>
             </div>
             <div className="column is-4">
-              <Link href={`/docs/[category]/[slug]`} as={`/docs/baseless/getting-started`}>
+              <Link href={`/docs/[category]/[slug]`} as={`/docs/baseless/introduction`}>
                 <a className="box deep-hover" style={{ height: '100%' }}>
                   <h4 className="title is-4">Baseless</h4>
                   <p>
