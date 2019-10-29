@@ -8,6 +8,10 @@ export const metadata = {
 
 Supabase Realtime is an elixir server that allows you to listen to PostgreSQL inserts/updates/deletes over websockets.
 
+### Where it is 
+
+All code is hosted at [https://github.com/supabase/realtime](https://github.com/supabase/realtime).
+
 ### How it works
 
 Realtime listens to PostgreSQL's replication functionality and converts the byte stream into JSON. It then broadcasts the JSON over websockets. 
@@ -21,7 +25,7 @@ It is built with [Phoenix](https://phoenixframework.org/), an Elixir framework t
 
 ### Features
 
-- 100% open source
+- 100% open source under the Apache 2.0 License
 - Accessible by mobile and web
 - Works without wal2json :)
 
