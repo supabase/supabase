@@ -1,0 +1,37 @@
+export const metadata = {
+  title: 'Quick start',
+  description: 'From zero to Realtime in 5 minutes.'
+}
+
+> Draft 
+
+### Introduction
+
+You can find the code for this @todo
+
+## Running the server
+
+The easiest way to use this is to set up a docker compose:
+
+```yml
+# docker-compose.yml
+version: '3'
+services:
+  realtime:
+    image: supabase/realtime
+    ports:
+      - "4000:4000"
+    environment:
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=postgres
+    - POSTGRES_DB=db
+    - POSTGRES_HOST=localhost
+    - POSTGRES_PORT=5432
+  db:
+    image: supabase/packaged
+    ports:
+      - "5432:5432"
+```
+
+Once you are set up you can run `docker-compose up`
+

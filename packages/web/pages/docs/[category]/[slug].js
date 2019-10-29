@@ -36,8 +36,9 @@ Sidebars['admin-api'] = {
   API: ['schemas', 'tables'],
 }
 Sidebars['realtime'] = {
-  Introduction: ['getting-started', 'installation'],
-  'Client Libraries': ['realtime-js'],
+  Introduction: ['introduction', 'quick-start'],
+  Reference: ['realtime-server', 'realtime-js'],
+  Guides: ['docker-nextjs'],
 }
 Sidebars['restful'] = {
   Introduction: ['getting-started'],
