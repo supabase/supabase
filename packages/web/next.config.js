@@ -22,7 +22,7 @@ const rehypePrism = require('@mapbox/rehype-prism')
 const withMDX = require('@zeit/next-mdx')({
   extension: /\.(md|mdx)?$/,
   options: {
-    hastPlugins: [rehypePrism],
+    rehypePlugins: [rehypePrism],
   },
 })
 const withMdxConfig = {}
