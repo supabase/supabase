@@ -10,7 +10,7 @@ export default function SignUpForm() {
       name="mc-embedded-subscribe-form"
       className="field is-grouped"
       target="_blank"
-      novalidate
+      noValidate
     >
       <p className="control is-expanded">
         <input
@@ -25,7 +25,7 @@ export default function SignUpForm() {
         />
       </p>
       <div style={{ position: 'absolute', left: '-5000px' }} aria-hidden="true">
-        <input type="text" name="b_c6785f4e1c9c77f231e367f6e_18cccc8b62" tabindex="-1" value="" />
+        <input type="text" name="b_c6785f4e1c9c77f231e367f6e_18cccc8b62" tabIndex="-1" />
       </div>
       <div className="control">
         <input
