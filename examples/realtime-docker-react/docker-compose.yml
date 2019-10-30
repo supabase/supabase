@@ -12,11 +12,19 @@ services:
     depends_on:
       - realtime
     ports:
-      - "3000:3000"
+      - "80:3000"
   realtime:
     image: supabase/realtime
     ports:
       - "4000:4000"
+    env_file: .env.sample
+    depends_on:
+      - db
+  rest:
+    image: postgrest/postgrest
+    restart: always
+    ports:
+      - "3000:3000"
     env_file: .env.sample
     depends_on:
       - db
