@@ -1,3 +1,15 @@
+/* 
+Note that including this file in DocsLayout.js (even with a CSS loader) 
+seems to break the documentation links, but only in production.
+Steps to replicate:
+
+- Uncomment the CSS loader from next.config.js
+- Add `import '~/styles/prism-tomorrow.css'` to DocsLayout.js
+- Run in dev: Go to homepage -> click on a links to the docs -> success
+- Deploy to Prod
+- Run in prod: Go to homepage -> click on a links to the docs -> location doesn't change
+*/
+
 /**
  * prism.js tomorrow night eighties for JavaScript, CoffeeScript, CSS and HTML
  * Based on https://github.com/chriskempson/tomorrow-theme

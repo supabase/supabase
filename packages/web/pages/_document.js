@@ -7,7 +7,7 @@ export default class MyDocument extends Document {
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="shortcut icon" type="image/png" href="/favicon.png" />
-          <link rel="sty" type="image/png" href="/favicon.png" />
+          <link rel="stylesheet" type="text/css" href="/css/prism-tomorrow.css" />
           <title>Supabase</title>
         </head>
         <Head />

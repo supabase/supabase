@@ -1,5 +1,4 @@
 import '~/styles/style.scss'
-import '~/styles/prism-tomorrow.scss'
 import Navbar       from '../Navbar'
 import NavbarDocs   from '../NavbarDocs'
 import Footer       from '../Footer'
