@@ -1,6 +1,6 @@
 {
   "name": "@supabase/web",
-  "version": "0.1.22",
+  "version": "0.1.23",
   "description": "Supabase Main Website",
   "scripts": {
     "build": "next build",
