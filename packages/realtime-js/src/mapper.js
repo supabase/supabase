@@ -80,6 +80,7 @@ export const convertCell = (type, stringValue) => {
       case 'cidr':
         return noop(stringValue)
       case 'date':
+        return noop(stringValue) // PostgREST uses string
         return toDate(stringValue)
       case 'daterange':
         return toDateRange(stringValue)
@@ -120,8 +121,10 @@ export const convertCell = (type, stringValue) => {
       case 'time':
         return noop(stringValue)
       case 'timestamp':
+        return noop(stringValue) // PostgREST uses string
         return toDate(stringValue)
       case 'timestamptz':
+        return noop(stringValue) // PostgREST uses string
         return toDate(stringValue)
       case 'timetz':
         return noop(stringValue)
