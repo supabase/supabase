@@ -14,6 +14,14 @@ export default class Realtime {
     })
   }
 
+  /**
+   * Starts socket and all of its channels/ listeners
+   * 
+   * @param {Array} listeners
+   * @param {Object} listeners[n]
+   * @param {String} listener.channel The name of channel
+   * @param {Function} listener.callback The callback function to fire when the channel receives a change
+   */
   start(listeners) {
     this.socket.connect()
     if (this.channel.state !== 'joined'){
@@ -29,41 +37,49 @@ export default class Realtime {
     }
   }
 
+  /**
+   * Stops socket and all of its channels/ listeners
+   */
   stop(){
-    this.listeners.forEach(({ messageName, messagae }) => {
-      this.channel.off(messageName, message)
+    this.listeners.forEach(({ channel, callback }) => {
+      this.channel.off(channel, callback)
     })
     this.socket.disconnect()
   }
 
   /**
-   * takes in an object with keys
-   * - messageName
-   * - messgage 
-   * to:
-   * 1. add to this.listener
-   * 2. turn channel on
-   * @param {object} listener
+   * Adds a listener to the socket and activates it
+   * 
+   * @param {Object} listener
+   * @param {String} listener.channel The name of channel
+   * @param {Function} listener.callback The callback function to fire when the channel receives a change
+   * 
+   * @example
+   * addListener({channel: 'shout', callback: () => {}})
    */
   addListener(listener){
     this.listeners.push(listener)
-    let { messageName, message } = listener
+    let { channel, callback } = listener
     
-    this.channel.on(messageName, message)
+    this.channel.on(channel, callback)
   }
 
   /**
-   * Takes in messageName string to:
+   * Takes in String channel to:
    * 1. turn channel off
    * 2. remove specific listener from this.listener
-   * @param {string} messageName 
+   * 
+   * @param {String} channel 
+   * 
+   * @example
+   * removeListener('shout')
    */
-  removeListener(messageName){
-    this.channel.off(mesageName)
+  removeListener(channel){
+    this.channel.off(channel)
     
     let updatedListeners = this.listeners.filter(listener => {
-      let name = listener.messageName
-      return name !== messageName
+      let channelName = listener.channel
+      return channelName !== channel
     })
     this.listeners = updatedListeners
   }

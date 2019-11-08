@@ -39,11 +39,15 @@
  * to its mapped type
  * @param {{name: String, type: String}[]} columns
  * @param {Object} records
+ * @param {Object} options The map of various options that can be applied to the mapper
+ * @param {Array} options.skipTypes The array of types that should not be converted
  */
-export const dataConverter = (columns, records) => {
+export const dataConverter = (columns, records, options = {}) => {
   let result = {}
+  let skipTypes = typeof options.skipTypes !== 'undefined' ? options.skipTypes : []
+
   Object.entries(records).map(([key, value]) => {
-    result[key] = convertColumn(key, columns, records)
+    result[key] = convertColumn(key, columns, records, skipTypes)
   })
   return result
 }
@@ -53,10 +57,13 @@ export const dataConverter = (columns, records) => {
  * @param {String} columnName The column that you want to convert
  * @param {{name: String, type: String}[]} columns All of the columns
  * @param {Object} records The map of string values
+ * @param {Array} skipTypes An array of types that should not be converted
  */
-export const convertColumn = (columnName, columns, records) => {
+export const convertColumn = (columnName, columns, records, skipTypes) => {
+  
   let column = columns.find(x => x.name == columnName)
-  return convertCell(column.type, records[columnName])
+  if(skipTypes.includes(column.type)) return noop(records[columnName])
+  else return convertCell(column.type, records[columnName])
 }
 
 /**
@@ -80,7 +87,6 @@ export const convertCell = (type, stringValue) => {
       case 'cidr':
         return noop(stringValue)
       case 'date':
-        return noop(stringValue) // PostgREST uses string
         return toDate(stringValue)
       case 'daterange':
         return toDateRange(stringValue)
@@ -121,10 +127,8 @@ export const convertCell = (type, stringValue) => {
       case 'time':
         return noop(stringValue)
       case 'timestamp':
-        return noop(stringValue) // PostgREST uses string
         return toDate(stringValue)
       case 'timestamptz':
-        return noop(stringValue) // PostgREST uses string
         return toDate(stringValue)
       case 'timetz':
         return noop(stringValue)
