@@ -1,11 +1,8 @@
-# Node-RED Flock
+# RealtimeJS
 
-Node-RED helpers for Pollygot Flock. An API on top of multiple notification services to overcome repetitive building and platform idiosyncrasies.
+Realtime PostgreSQL.
 
-## Docs
+## Docs
 
-Full documentation found at https://dev.pollygot.com
+View online at [https://supabase.io/docs/-/about](https://supabase.io/docs/-/about).
 
-## Contributing
-
-https://github.com/pollygot/flock
