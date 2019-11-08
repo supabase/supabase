@@ -21,7 +21,8 @@
     "deploy:web": "yarn workspace @supabase/web deploy",
     "deploy:realtime-js": "yarn workspace @supabase/realtime-js deploy",
     "dev": "concurrently --kill-others-on-fail \"yarn dev:web\" ",
-    "dev:web": "yarn workspace @supabase/web dev"
+    "dev:web": "yarn workspace @supabase/web dev",
+    "test:realtime-js": "yarn workspace @supabase/realtime-js test"
   },
   "dependencies": {
     "concurrently": "^5.0.0"
