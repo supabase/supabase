@@ -5,18 +5,22 @@
   "repository": "https://github.com/supabase/monorepo",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha \"test/**/*_spec.js\"",
-    "deploy": "npm version patch; npm publish --access=public"
+    "deploy": "npm version patch; npm publish --access=public",
+    "test": "mocha --require esm \"test/**/*_spec.js\""
   },
   "keywords": [
     "supabase",
     "realtime"
   ],
   "author": "@kiwicopple",
-  "license": "Apache 2.0",
-  "devDependencies": {},
+  "license": "Apache-2.0",
   "dependencies": {
     "@types/node": "^12.6.8",
     "phoenix-channels": "^1.0.0"
+  },
+  "devDependencies": {
+    "esm": "3.2.25",
+    "jsdoc-test": "0.0.10",
+    "mocha": "6.2.2"
   }
 }
