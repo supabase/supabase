@@ -1,7 +1,7 @@
 {
-  "name": "@supabase/realtime-js",
-  "version": "0.1.4",
-  "description": "Listen to realtime updates to your PostgreSQL database.",
+  "name": "@supabase/pg-admin-js",
+  "version": "0.1.0",
+  "description": "Manage your PG Database.",
   "repository": "https://github.com/supabase/monorepo",
   "main": "src/index.js",
   "scripts": {
@@ -10,7 +10,8 @@
   },
   "keywords": [
     "supabase",
-    "realtime"
+    "postgresql",
+    "postgres"
   ],
   "author": "@kiwicopple",
   "license": "Apache-2.0",
@@ -18,7 +19,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "@types/node": "^12.6.8",
-    "phoenix-channels": "^1.0.0"
+    "knex": "^0.20.1",
+    "pg": "^7.4.3"
   }
 }

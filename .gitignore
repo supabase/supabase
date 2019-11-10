@@ -4,6 +4,11 @@ node_modules
 out
 .docz
 
+coverage
+.nyc_output
+*.log
+
+package-lock.json
 
 # Logs
 logs

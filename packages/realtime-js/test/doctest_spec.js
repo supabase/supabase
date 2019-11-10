@@ -1,5 +1,5 @@
 import doctest from 'jsdoc-test'
 
-describe('Ru', () => {
+describe('Run doctests', () => {
   doctest('src/mapper.js')
 })
