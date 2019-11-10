@@ -2,6 +2,7 @@
   "name": "supabase-monorepo",
   "private": true,
   "description": "Supabase Monorepo",
+  "repository": "https://github.com/supabase/monorepo",
   "workspaces": {
     "packages": [
       "packages/*"
@@ -22,6 +23,7 @@
     "deploy:realtime-js": "yarn workspace @supabase/realtime-js deploy",
     "dev": "concurrently --kill-others-on-fail \"yarn dev:web\" ",
     "dev:web": "yarn workspace @supabase/web dev",
+    "test:pg-admin-js": "yarn workspace @supabase/pg-admin-js test",
     "test:realtime-js": "yarn workspace @supabase/realtime-js test"
   },
   "dependencies": {
@@ -29,6 +31,9 @@
   },
   "devDependencies": {
     "now": "^16.3.1",
-    "prettier": "^1.18.2"
+    "prettier": "^1.18.2",
+    "esm": "3.2.25",
+    "jsdoc-test": "0.0.10",
+    "mocha": "6.2.2"
   }
 }
