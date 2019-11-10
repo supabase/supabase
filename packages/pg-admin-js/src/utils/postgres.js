@@ -1,9 +1,7 @@
 import knex from 'knex'
 
 export function connect(config) {
-  console.log('config', config)
-  return require('knex')({ client: 'pg', config })
-  return knex({ client: 'pg', config })
+  return knex({ client: 'pg', connection: config })
 }
 
 export async function disconnect(conn) {
