@@ -9,6 +9,12 @@ export async function disconnect(conn) {
   conn.destroy(cb)
 }
 
-export function runQuery(conn, schema, query) {
-  return conn.raw(query, [schema])
+/**
+ * Executes a SQL string against the database
+ * @param conn an open Knex connection
+ * @param {string} query The SQL query
+ * @param {sting[]} params An optional array of paramaters to feed into the query
+ */
+export function runQuery(conn, query, params = {}) {
+  return conn.raw(query, params)
 }

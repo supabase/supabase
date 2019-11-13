@@ -1,9 +1,11 @@
-var assert = require('assert')
-var tables = require('../src/api/tables.js')
+import assert from 'assert'
+import * as tables from '../src/api/tables.js'
 
 describe('Tables', function() {
   it('getAll() should return an array of tables', async () => {
-    let allTables = await tables.getAll()
-    assert(Array.isArray(allTables))
+    let res = await tables.getAll()
+
+    // Check that we have a result
+    assert(Array.isArray(res))
   })
 })
