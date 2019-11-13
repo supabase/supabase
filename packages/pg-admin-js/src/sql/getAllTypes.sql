@@ -24,7 +24,7 @@ and NOT EXISTS (
 	FROM pg_catalog.pg_type el
 	WHERE el.oid = t.typelem AND el.typarray = t.oid 
 )
-AND n.nspname = ?
-AND n.nspname not in ('information_schema', 'pg_catalog')
+-- AND n.nspname = ?
+-- AND n.nspname not in ('information_schema', 'pg_catalog')
 AND pg_catalog.pg_type_is_visible ( t.oid )
 ORDER BY 1, 2; 

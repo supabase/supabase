@@ -3,7 +3,7 @@ import * as postgres from '../utils/postgres.js'
 
 var fs = require('fs')
 var path = require('path')
-var getAllSql = fs.readFileSync(path.join(__dirname, '../sql/getAllTables.sql')).toString()
+var getAllSql = fs.readFileSync(path.join(__dirname, '../sql/getAllViews.sql')).toString()
 
 /**
  * Queries a given schema for all the tables
@@ -20,7 +20,16 @@ var getAllSql = fs.readFileSync(path.join(__dirname, '../sql/getAllTables.sql'))
  * await getAll()
  * //=>
  * [
- *    { table_schema: 'public', table_name: 'users' }
+ *    {
+ *      table_schema: 'information_schema',
+ *      table_name: 'attributes',
+ *      check_option: 'NONE',
+ *      is_updatable: 'NO',
+ *      is_insertable_into: 'NO',
+ *      is_trigger_updatable: 'NO',
+ *      is_trigger_deletable: 'NO',
+ *      is_trigger_insertable_into: 'NO',
+ *    }
  * ]
  */
 export const getAll = async (config = {}, options = {}) => {

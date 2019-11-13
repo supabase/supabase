@@ -9,4 +9,5 @@ select
   is_trigger_insertable_into
   
 from information_schema.views
-where table_schema = ? and table_schema not in ('information_schema', 'pg_catalog')
+where table_schema = ?
+-- and table_schema not in ('information_schema', 'pg_catalog')
