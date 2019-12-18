@@ -7,3 +7,47 @@ export const metadata = {
 ### Coming soon
 
 We're busy making Realtime awesome right now, and we'll get around to this as soon as we can.
+
+### Draft
+
+
+
+```js
+
+import { createClient } from '@supabase/supabase-js'
+
+const base = createClient(process.env.SUPABASE_URL)
+
+base.get('/users')
+base.post('/users')
+base.patch('/users')
+base.delete('/users')
+base.options('/users')
+
+
+const userId = 1
+const user = await base.get('/users').match({id: userId})
+const userTodos = await base.get('/todos').match().eq('user_id', userId)
+
+const toods = await api
+  .get('/todos')
+  .select(`
+    title,
+    details,
+    users {
+      name,
+      email
+    }
+  `)
+  .order('start_time')
+  .range(0, 5)
+
+
+const userListener1 = base.subscribe('users').on('*', () => {})
+const userListener2 = base.subscribe('users').on('INSERT', () => {})
+const userListener3 = base.subscribe('users').on('INSERT', () => {})
+const userListener4 = base.subscribe('users').on('DELETE', () => {})
+
+userListener1.unsubscribe()
+
+```
