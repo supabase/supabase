@@ -11,10 +11,13 @@ module.exports = {
   url: 'https://supabase.io',
   baseUrl: '/',
   favicon: '/static/favicon.ico',
-  organizationName: 'kiwicopple', // Usually your GitHub org/user name.
+  organizationName: 'supabase', // Usually your GitHub org/user name.
   projectName: 'supabase', // Usually your repo name.
   themeConfig: {
     darkMode: true,
+    googleAnalytics: {
+      trackingID: 'UA-155232740-1',
+    },
     navbar: {
       classNames: 'shadow--md',
       title: '',
@@ -33,7 +36,7 @@ module.exports = {
       ],
     },
     prism: {
-      defaultLanguage: 'bash',
+      defaultLanguage: 'js',
       // https://github.com/FormidableLabs/prism-react-renderer/tree/master/src/themes
       // theme: require('prism-react-renderer/themes/vsdark'),
     },
