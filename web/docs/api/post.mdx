@@ -1,0 +1,60 @@
+---
+id: post
+title: 'Create new rows'
+---
+
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+@todo short Description
+
+## The basics
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JS', value: 'js', },
+    { label: 'Python', value: 'py', },
+  ]
+}>
+<TabItem value="js">
+
+```js
+import { createClient } from "@supabase/supabase-js";
+
+// Connect to Supabase
+const base = createClient(process.env.SUPABASE_URL, {
+  apikey: process.env.SUPABASE_KEY
+});
+
+// Subscribe to realtime updates
+const result = await base.post("users", { name: 'paul'})
+```
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# @todo
+```
+</TabItem>
+
+</Tabs>
+
+
+## Examples
+
+@todo various examples
+
+## Options
+
+| Parameter | Default | Description                                 |
+| --------- | ------- | ------------------------------------------- |
+| @todo     |         | All options  |
+
+## Returns
+
+#### 200: Success
+
+@todo: all return scenarios
