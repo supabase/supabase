@@ -6,34 +6,33 @@
  */
 
 module.exports = {
-  docs: [
-    {
-      type: "category",
-      label: "Introduction",
-      items: [
-        "about", 
-        "faq",
-      ]
-    },
-    {
-      type: "category",
-      label: "API",
-      items: [
-        "api/getting-started",
-        "api/authentication",
-        "api/subscribe",
-        "api/get",
-        "api/post",
-        "api/patch",
-        "api/delete",
-      ]
-    },
-    {
-      type: "category",
-      label: "Guides",
-      items: [
-        "guides/examples",
-      ]
-    }
-  ]
+  docs: {
+    Introduction:[
+      "about",
+      "faq"
+    ],
+    Library:[
+      "library/getting-started",
+      {
+        type: "category",
+        label: "Realtime",
+        items: [
+          "library/realtime/subscribe"
+        ]
+      },
+      {
+        type: "category",
+        label: "RESTful",
+        items: [
+          "library/restful/get",
+          "library/restful/post",
+          "library/restful/patch",
+          "library/restful/delete"
+        ]
+      }
+    ],
+    Guides:[
+      "guides/examples"
+    ]
+  }
 };
