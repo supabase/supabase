@@ -1,0 +1,39 @@
+---
+id: subscribe
+title: "Subscribe to realtime changes"
+---
+
+Our library makes it simple to listen to changes in your database.
+
+## The basics
+
+```js
+import { createClient } from "@supabase/supabase-js";
+
+// Connect to Supabase
+const base = createClient(process.env.SUPABASE_URL, {
+  apikey: process.env.SUPABASE_KEY
+});
+
+// Subscribe to realtime updates
+const todoListener = base.subscribe("todos").on("INSERT", todo => {
+  console.log("New todo!", todo);
+})
+```
+
+## Examples
+
+@todo
+
+## Options
+
+| Parameter | Default | Description                                 |
+| --------- | ------- | ------------------------------------------- |
+| @todo     |         | All options  |
+
+## Returns
+
+#### 200: Success
+
+@todo: all return scenarios
+

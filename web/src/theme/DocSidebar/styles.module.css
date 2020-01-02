@@ -1,0 +1,29 @@
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+ @media (min-width: 997px) {
+  .sidebar {
+    height: calc(100vh - var(--ifm-navbar-height));
+    overflow-y: auto;
+    padding: 0.5rem;
+    position: sticky;
+    top: var(--ifm-navbar-height);
+  }
+}
+
+.sidebarMenuIcon {
+  vertical-align: middle;
+}
+
+.sidebarMenuCloseIcon {
+  display: inline-block;
+  height: 24px;
+  font-size: 1.5rem;
+  font-weight: var(--ifm-font-weight-bold);
+  line-height: 0.9;
+  width: 24px;
+}

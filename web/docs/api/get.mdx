@@ -1,0 +1,71 @@
+---
+id: get
+title: 'Fetch your data'
+---
+
+@todo short Description
+
+## The basics
+
+@todo most simple usage
+
+
+## Examples
+
+#### Query foreign tables
+
+Get 5 open "todos" and the "users" that they belong to
+```js
+import { createClient } from '@supabase/supabase-js'
+
+// Connect to Supabase
+const base = createClient(process.env.SUPABASE_URL, { 
+  apikey: process.env.SUPABASE_KEY
+})
+
+// Get a list of todos
+const todos = await base
+  .get('todos')
+  .select(`
+    title,
+    details,
+    users { name, email }
+  `)
+  .eq('status', 'open')
+  .range(0, 5)
+```
+
+#### Advanced filtering
+
+Get a user with the username 'kiwicopple'
+```js
+import { createClient } from '@supabase/supabase-js'
+
+// Connect to Supabase
+const base = createClient(process.env.SUPABASE_URL, { 
+  apikey: process.env.SUPABASE_KEY
+})
+
+// Get the user
+const user = await base
+  .get('/users')
+  .match({ username: 'kiwicopple' })
+  .single()
+```
+
+
+
+## Options
+
+
+| Parameter | Default | Description                                 |
+| --------- | ------- | ------------------------------------------- |
+| @todo     |         | All options  |
+
+## Returns
+
+#### 200: Success
+
+@todo: all return scenarios
+
+
