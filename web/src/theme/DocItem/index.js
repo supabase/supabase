@@ -232,7 +232,7 @@ function DocItem(props) {
                       <Headings headings={DocContent.rightToc} />
                     </div>
                   )}
-                  <div className="section">
+                  {/* <div className="section">
                     <div className="title">Resources</div>
                     <ul className="contents">
                       {editUrl && (
@@ -257,7 +257,7 @@ function DocItem(props) {
                         </li>
                       )}
                     </ul>
-                  </div>
+                  </div> */}
                   {(lastUpdatedAt || lastUpdatedBy) && (
                     <div className="section">
                       Last updated{' '}
