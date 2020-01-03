@@ -22,10 +22,10 @@ const features = [
     href: "/docs/guides/examples"
   },
   {
-    title: <>Async tasks</>,
+    title: <>Event sourcing</>,
     imageUrl: "",
     description: (
-      <>Send all your database changes to AWS SQS for further processing.</>
+      <>Log all your database changes to an immutable logging system.</>
     ),
     href: "/docs/guides/examples"
   }
