@@ -1,60 +1,162 @@
 ---
 id: post
-title: 'Create New Rows'
+title: 'Create Rows'
 ---
 
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-@todo short Description
-
-## The basics
-
 <Tabs
-  defaultValue="js"
+  defaultValue="nodeJs"
   values={[
-    { label: 'JS', value: 'js', },
+    { label: 'Node.js', value: 'nodeJs', },
     { label: 'Python', value: 'py', },
   ]
 }>
-<TabItem value="js">
+<TabItem value="nodeJs">
 
 ```js
-import { createClient } from "@supabase/supabase-js";
+const fetchUsers = async () => {
+  try {
+    let users = await base
+      .post(
+        "users", 
+        [
+          { name: "Richard Hendrix" },
+          { name: "Elrich Bachman" }
+        ],
+      )
+    return users
+  } catch (error) {
+    console.log('Error:', error)
+  }
+}
 
-// Connect to Supabase
-const base = createClient(process.env.SUPABASE_URL, {
-  apikey: process.env.SUPABASE_KEY
-});
-
-// Subscribe to realtime updates
-const result = await base.post("users", { name: 'paul'})
 ```
-
 </TabItem>
+
 <TabItem value="py">
 
 ```py
-# @todo
+# TODO
+```
+</TabItem>
+</Tabs>
+
+## createClient.post(tableName, data, options?)
+Given the `options?` set, this posts `data` into the selected `tableName` in your database.
+
+## Method arguments
+#### tableName
+`required` string  
+Name of table in the database where data will be saved.
+
+#### data
+`required` array  
+Array of rows of type `object` which contain information to be saved into the selected table.
+
+
+#### options
+`optional` object
+- headers  
+`optional` object  
+Custom headers to be sent. A complete list of headers can be found [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers).
+
+- withCredentials  
+`optional` boolean  
+Determines the ability to send cookies from the origin.
+
+- timeout  
+`optional` integer   
+Specifies the amount of time in milliseconds before the request times out.
+
+- auth  
+`optional` object  
+Allows authentications through given credentials.
+
+| Parameter  | Required   | Data Type | Description |
+| ---------- | ---------- | --------- | ----------- |
+| username   | `required` | string    | Username    |
+| password   | `required` | string    | Password    |
+
+
+## Example
+
+### With all options specified
+<Tabs
+  defaultValue="nodeJs"
+  values={[
+    { label: 'Node.js', value: 'nodeJs', },
+    { label: 'Python', value: 'py', },
+  ]
+}>
+<TabItem value="nodeJs">
+
+```js
+const fetchUsers = async () => {
+  try {
+    let users = await base
+      .post(
+        "users", 
+        [
+          { name: "Richard Hendrix" },
+          { name: "Elrich Bachman" }
+        ],
+        {
+          headers:{
+
+          },
+          withCredentials: true,
+          timeout: 1000,
+          auth:{
+            username: "password"
+            password: "password"
+          }
+        }
+      )
+    return users
+  } catch (error) {
+    console.log('Error:', error)
+  }
+}
+
 ```
 </TabItem>
 
+<TabItem value="py">
+
+```py
+# TODO
+```
+</TabItem>
 </Tabs>
 
 
-## Examples
+## Responses
 
-@todo various examples
+### 201 Created
+The request has succeeded. New resource created will be returned:
 
-## Options
+```json
+{
+  "rows": [
+    { "name": "Richard Hendrix" },
+    { "name": "Elrich Bachman"}
+  ]
+}
 
-| Parameter | Default | Description                                 |
-| --------- | ------- | ------------------------------------------- |
-| @todo     |         | All options  |
+``` 
 
-## Returns
+### 400 Bad request
+An invalid syntax or configuration was sent.
 
-#### 200: Success
+### 401 Unauthorized
+Either authentication is required or invalid credentials were provided under the `auth` object.
 
-@todo: all return scenarios
+### 404 Not found
+Requested resource cannot be found.
+
+### 500 Internal Server Error
+The server was unable to encounter the situation it encountered.
+
