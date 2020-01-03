@@ -44,4 +44,4 @@ For all Restful functionality, we introspect your database to provide an out-of-
 
 ## Where it is
 
-All code is hosted at [https://github.com/supabase/realtime](https://github.com/supabase/realtime).
+All code is hosted on our GitHub org: [https://github.com/supabase](https://github.com/supabase)
