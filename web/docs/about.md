@@ -5,7 +5,13 @@ title: About
 
 ## What it is
 
-@todo
+Supabase is a service to:
+
+- listen to changes to your PostgreSQL database 
+- query your tables, including filtering, pagination, and deeply nested relationships (just like GraphQL)
+- create, update, and delete rows
+
+It does all of this without you having to write a single line of code.
 
 ## What it isn't
 
@@ -13,9 +19,9 @@ title: About
 
 ## How it works 
 
-At its core, Supabase is an elixir server that allows you to listen to PostgreSQL inserts/updates/deletes over websockets.
+At its core, Supabase is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Supabase list to PostgreSQL's built-in replication functionality, converts the replication byte stream into JSON, then broadcasts the JSON over websockets. 
 
-Realtime listens to PostgreSQL's built-in replication functionality and converts the byte stream into JSON. It then broadcasts the JSON over websockets. It is built with Phoenix, an Elixir framework that's incredibly scalable. 
+It is built with Phoenix, an Elixir framework that's incredibly scalable. 
 
 For all Restful functionality, we introspect your database to provide an out-of-the-box, fully functional API.
 
