@@ -27,7 +27,10 @@ module.exports = {
           "library/restful/post",
           "library/restful/get",
           "library/restful/patch",
-          "library/restful/delete"
+          "library/restful/delete",
+          "library/restful/filters",
+          "library/restful/options",
+          "library/restful/responses"
         ]
       }
     ],

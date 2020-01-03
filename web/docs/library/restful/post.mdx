@@ -3,7 +3,6 @@ id: post
 title: 'Create Rows'
 ---
 
-
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -17,23 +16,10 @@ import TabItem from '@theme/TabItem';
 <TabItem value="nodeJs">
 
 ```js
-const fetchUsers = async () => {
-  try {
-    let users = await base
-      .post(
-        "users", 
-        [
-          { name: "Richard Hendrix" },
-          { name: "Elrich Bachman" }
-        ],
-      )
-    return users
-  } catch (error) {
-    console.log('Error:', error)
-  }
-}
+supabase.post(tableName, data, options?)
 
 ```
+Given the `options?` set, this posts `data` into the selected `tableName` in your database.
 </TabItem>
 
 <TabItem value="py">
@@ -44,46 +30,23 @@ const fetchUsers = async () => {
 </TabItem>
 </Tabs>
 
-## createClient.post(tableName, data, options?)
-Given the `options?` set, this posts `data` into the selected `tableName` in your database.
-
 ## Method arguments
-#### tableName
+### tableName
 `required` string  
 Name of table in the database where data will be saved.
 
-#### data
+### data
 `required` array  
 Array of rows of type `object` which contain information to be saved into the selected table.
 
 
-#### options
-`optional` object
-- headers  
+### options
 `optional` object  
-Custom headers to be sent. A complete list of headers can be found [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers).
-
-- withCredentials  
-`optional` boolean  
-Determines the ability to send cookies from the origin.
-
-- timeout  
-`optional` integer   
-Specifies the amount of time in milliseconds before the request times out.
-
-- auth  
-`optional` object  
-Allows authentications through given credentials.
-
-| Parameter  | Required   | Data Type | Description |
-| ---------- | ---------- | --------- | ----------- |
-| username   | `required` | string    | Username    |
-| password   | `required` | string    | Password    |
-
+All available options and examples it their usage can be found [here](../restful/options).
 
 ## Example
 
-### With all options specified
+### Posting a Single Row
 <Tabs
   defaultValue="nodeJs"
   values={[
@@ -93,27 +56,15 @@ Allows authentications through given credentials.
 }>
 <TabItem value="nodeJs">
 
-```js
-const fetchUsers = async () => {
+```js {6-8}
+const postUsers = async () => {
   try {
-    let users = await base
+    let users = await supabase
       .post(
         "users", 
         [
-          { name: "Richard Hendrix" },
-          { name: "Elrich Bachman" }
+          { name: "Nelson Bighetti" },
         ],
-        {
-          headers:{
-
-          },
-          withCredentials: true,
-          timeout: 1000,
-          auth:{
-            username: "password"
-            password: "password"
-          }
-        }
       )
     return users
   } catch (error) {
@@ -132,9 +83,45 @@ const fetchUsers = async () => {
 </TabItem>
 </Tabs>
 
+### Posting Multiple Rows
+<Tabs
+  defaultValue="nodeJs"
+  values={[
+    { label: 'Node.js', value: 'nodeJs', },
+    { label: 'Python', value: 'py', },
+  ]
+}>
+<TabItem value="nodeJs">
+
+```js {6-9}
+const postUsers = async () => {
+  try {
+    let users = await supabase
+      .post(
+        "users", 
+        [
+          { name: "Richard Hendrix" },
+          { name: "Elrich Bachman" }
+        ],
+      )
+    return users
+  } catch (error) {
+    console.log('Error:', error)
+  }
+}
+
+```
+</TabItem>
+
+<TabItem value="py">
+
+```py
+# TODO
+```
+</TabItem>
+</Tabs>
 
 ## Responses
-
 ### 201 Created
 The request has succeeded. New resource created will be returned:
 
@@ -148,15 +135,5 @@ The request has succeeded. New resource created will be returned:
 
 ``` 
 
-### 400 Bad request
-An invalid syntax or configuration was sent.
-
-### 401 Unauthorized
-Either authentication is required or invalid credentials were provided under the `auth` object.
-
-### 404 Not found
-Requested resource cannot be found.
-
-### 500 Internal Server Error
-The server was unable to encounter the situation it encountered.
-
+### Common Responses
+Other responses can be found [here](../restful/responses).

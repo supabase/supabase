@@ -1,0 +1,146 @@
+---
+id: options
+title: 'Available Options'
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+A list of all available options that can be specified under the `options?` parameter.
+
+## headers
+`optional` object  
+Custom headers to be sent. A complete list of headers can be found [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers).
+
+### Example
+<Tabs
+  defaultValue="nodeJs"
+  values={[
+    { label: 'Node.js', value: 'nodeJs', },
+    { label: 'Python', value: 'py', },
+  ]
+}>
+<TabItem value="nodeJs">
+
+```js {9-14}
+const postUsers = async () => {
+  try {
+    let users = await supabase
+      .post(
+        "users", 
+        [
+          { name: "Nelson Bighetti" },
+        ],
+        {
+            headers:{
+                "Content-Type": "application/x-www-form-urlencoded"
+                "X-requested-With": "XMLHttpRequest"
+            }
+        }
+      )
+    return users
+  } catch (error) {
+    console.log('Error:', error)
+  }
+}
+
+```
+</TabItem>
+
+<TabItem value="py">
+
+```py
+# TODO
+```
+</TabItem>
+</Tabs>
+
+---
+
+## withCredentials
+`optional` boolean  
+Determines the ability to send cookies from origin.
+
+### Example
+Setting withCredentials with value **true** allows the request to send cookies from origin
+<Tabs
+  defaultValue="nodeJs"
+  values={[
+    { label: 'Node.js', value: 'nodeJs', },
+    { label: 'Python', value: 'py', },
+  ]
+}>
+<TabItem value="nodeJs">
+
+```js {9}
+const postUsers = async () => {
+  try {
+    let users = await supabase
+      .post(
+        "users", 
+        [
+          { name: "Nelson Bighetti" },
+        ],
+        { withCredentials: true }
+      )
+    return users
+  } catch (error) {
+    console.log('Error:', error)
+  }
+}
+
+```
+</TabItem>
+
+<TabItem value="py">
+
+```py
+# TODO
+```
+</TabItem>
+</Tabs>
+
+---
+
+## timeout
+`optional` integer  
+Specifies the amount of time in milliseconds before the request times out.
+
+### Example
+Setting a timeout of value 5000 will cause the request to time out after 5000 milliseconds.
+<Tabs
+  defaultValue="nodeJs"
+  values={[
+    { label: 'Node.js', value: 'nodeJs', },
+    { label: 'Python', value: 'py', },
+  ]
+}>
+<TabItem value="nodeJs">
+
+```js {9}
+const postUsers = async () => {
+  try {
+    let users = await supabase
+      .post(
+        "users", 
+        [
+          { name: "Nelson Bighetti" },
+        ],
+        { timeout: 5000 }
+      )
+    return users
+  } catch (error) {
+    console.log('Error:', error)
+  }
+}
+
+```
+</TabItem>
+
+<TabItem value="py">
+
+```py
+# TODO
+```
+</TabItem>
+</Tabs>
