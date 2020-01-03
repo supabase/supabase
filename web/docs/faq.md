@@ -1,6 +1,6 @@
 ---
 id: faq
-title: FAQ's
+title: FAQs
 ---
 
 @todo

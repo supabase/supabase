@@ -1,0 +1,79 @@
+---
+id: getting-started
+title: Getting Started
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Including Supabase
+---
+<Tabs
+  defaultValue="nodeJs"
+  values={[
+    { label: 'Node.js', value: 'nodeJs', },
+    { label: 'Python', value: 'py', },
+  ]
+}>
+<TabItem value="nodeJs">
+
+```js
+import { Supabase } from "@supabase/supabase-js";
+```
+</TabItem>
+
+<TabItem value="py">
+
+```py
+from supabase import Supabase
+```
+</TabItem>
+</Tabs>
+
+
+## Initializing
+---
+### Supabase(supabaseURL, supabaseKey, options?)
+This is used to initialize an instance of a Supabase object. From here, you would be able
+to access all of the features provided by Supabase.
+
+
+### Examples
+<Tabs
+  defaultValue="nodeJs"
+  values={[
+    { label: 'Node.js', value: 'nodeJs', },
+    { label: 'Python', value: 'py', },
+  ]
+}>
+<TabItem value="nodeJs">
+
+```js
+const supabase = Supabase("https://supabase.io/xyzcompany", "1a2b-3c4d-5e6f-7g8h");
+```
+</TabItem>
+
+<TabItem value="py">
+
+```py
+supabase = Supabase("https://supabase.io/xyzcompany", "1a2b-3c4d-5e6f-7g8h")
+```
+</TabItem>
+</Tabs>
+
+### Method arguments
+#### supabaseURL
+`required` string  
+Your unique Supabase URL.
+
+#### supabaseKey
+`required` string  
+Your unique Supabase Key.
+
+#### options
+`optional` object
+
+| Parameter   | Data Type | Description |
+| ----------- | --------- | ----------- |
+| @todo       |           |             |
+
