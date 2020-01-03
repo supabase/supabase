@@ -3,69 +3,166 @@ id: get
 title: 'Read Rows'
 ---
 
-@todo short Description
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-## The basics
-
-@todo most simple usage
-
-
-## Examples
-
-#### Query foreign tables
-
-Get 5 open "todos" and the "users" that they belong to
-```js
-import { createClient } from '@supabase/supabase-js'
-
-// Connect to Supabase
-const base = createClient(process.env.SUPABASE_URL, { 
-  apikey: process.env.SUPABASE_KEY
-})
-
-// Get a list of todos
-const todos = await base
-  .get('todos')
-  .select(`
-    title,
-    details,
-    users { name, email }
-  `)
-  .eq('status', 'open')
-  .range(0, 5)
+We will be using these tables as reference for our examples:
+```json
+{
+    "users": [
+      { "Id": 1, "fullName": "Richard Hendrix", "companyId": "Pied Piper" },
+      { "Id": 2, "fullName": "Gavin Belson", "companyId": "Hooli" }
+    ],
+    "companies": [
+      { "Id": 1, "name": "Pied Piper", "employeeCount": 10 },
+      { "Id": 2, "name": "Hooli", "employeeCount": 1000 },
+      { "Id": 3, "name": "Yao Net", "employeeCount": 100 },
+      { "Id": 4, "name": "See Food App", "employeeCount": null }
+    ],
+}
 ```
 
-#### Advanced filtering
+<Tabs
+  defaultValue="nodeJs"
+  values={[
+    { label: 'Node.js', value: 'nodeJs', },
+    { label: 'Python', value: 'py', },
+  ]
+}>
+<TabItem value="nodeJs">
 
-Get a user with the username 'kiwicopple'
 ```js
-import { createClient } from '@supabase/supabase-js'
+supabase.get(tableName, options?)
 
-// Connect to Supabase
-const base = createClient(process.env.SUPABASE_URL, { 
-  apikey: process.env.SUPABASE_KEY
-})
+```
+Given the `options?` set (if any), this **asynchronously** gets all rows from the specified `tableName` in your database.
+</TabItem>
 
-// Get the user
-const user = await base
-  .get('/users')
-  .match({ username: 'kiwicopple' })
-  .single()
+<TabItem value="py">
+
+```py
+# TODO
+```
+</TabItem>
+</Tabs>
+
+## Method arguments
+### tableName
+`required` string  
+Name of table in the database that will be read from.
+
+### options
+`optional` object  
+All available options and examples it their usage can be found [here](../restful/options).
+
+## Additional filtering
+### Select
+```js
+select(columnArray)
+```
+
+Returns an array of rows with only columns specified in `columnArray`.
+
+#### Method arguments
+##### columnArray
+`required` array
+```json
+// From the 'users' table
+[
+  "Id",
+  "fullName",
+  "companyId"
+]
+```
+Array of values representing column names found in the table. Typical data type would be string.
+If a foreign key constraint exists between this table and another, information from
+the other table can be requested as well. This is shown below:
+```json
+// From the 'users' table
+[
+  "fullName",
+  {
+    "companies": [
+      "name",
+      "employeeCount"
+    ]
+  }
+]
+```
+Instead of a string data type, the column that has the foreign key constraint is now represented 
+as an object with the name of the other table as the key and the desired columns from the other 
+table as the value in the form of an array of column names of data type string.
+
+##### Example
+Click [here](../restful/get#using-select) view some examples.
+
+
+### Common Filters
+Other common filters can be found [here](../restful/filters).
+
+## Example
+
+### Generic
+Get all companies and return all columns available
+```js
+supabase.get("companies")
+```
+The following will be returned with status code `200 OK`:
+```json
+[
+  { "Id": 1, "name": "Pied Piper", "employeeCount": 10 },
+  { "Id": 2, "name": "Hooli", "employeeCount": 1000 },
+  { "Id": 3, "name": "Yao Net", "employeeCount": 100 },
+  { "Id": 4, "name": "See Food App", "employeeCount": null }
+]
+```
+
+### Using Select
+Get all users but only return the column fullName.
+```js
+supabase.get("users").select(["fullName"])
+```
+The following will be returned with the status code `200 OK`:
+```json
+[
+  { "fullName": "Richard Hendrix" },
+  { "fullName": "Gavin Belson" }
+]
 ```
 
 
+### Using Select with Foreign Key Constraints
+Get all users and return all information about them and the companies they belong to.
+```js
+supabase.get("users").select([
+  "fullName",
+  {
+    "companies": [
+      "name",
+      "employeeCount"
+    ]
+  }
+])
+```
+The following will be returned with the status code `200 OK`:
+```json
+[
+  {
+    "fullName": "Richard Hendrix",
+    "companies": {
+      "name": "Pied Piper",
+      "employeeCount": 10
+    }
+  },
+  {
+    "fullName": "Gavin Belson",
+    "companies": {
+      "name": "Hooli",
+      "employeeCount": 1000 
+    }
+  }
+]
+```
 
-## Options
-
-
-| Parameter | Default | Description                                 |
-| --------- | ------- | ------------------------------------------- |
-| @todo     |         | All options  |
-
-## Returns
-
-#### 200: Success
-
-@todo: all return scenarios
-
-
+## Responses
+Aside from the status code `200 OK`, other common responses can be found [here](../restful/responses).

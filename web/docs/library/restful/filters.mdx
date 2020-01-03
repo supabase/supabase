@@ -41,7 +41,7 @@ Determines whether null values will be displayed first or not. Default value wil
 ```js
 supabase.get("companies").order("employeeCount", true, true)
 ```
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 [
     { "name": "See Food App", "employeeCount": null },
@@ -75,7 +75,7 @@ Index or position of the end of the specified range. If not stated, all remainin
 ```js
 supabase.get("companies").range(0,2)
 ```
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 [
     { "name": "Pied Piper", "employeeCount": 10 },
@@ -89,7 +89,7 @@ The following will be returned:
 ```js
 supabase.get("companies").range(1)
 ```
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 [
     { "name": "Yao Net", "employeeCount": 100 },
@@ -110,7 +110,7 @@ Returns the first row of the table as an object and **not** as an array.
 ```js
 supabase.get("companies").single()
 ```
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 { "name": "Pied Piper", "employeeCount": 10 }
 ```
@@ -133,7 +133,7 @@ Object contains column names and the desired values.
 ```js
 supabase.get("companies").match({ "name": "Pied Piper", "employeeCount": 10 })
 ```
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 [
     { "name": "Pied Piper", "employeeCount": 10 }
@@ -144,7 +144,7 @@ The following will be returned:
 ```js
 supabase.get("companies").match({ "name": "Pied Piper", "employeeCount": 50 })
 ```
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 []
 ```
@@ -173,7 +173,7 @@ Value to match. Data type is dependent on the columnName specified.
 supabase.get("companies").eq("name", "Hooli")
 ```
 
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 [
     { "name": "Hooli", "employeeCount": 1000 }
@@ -203,7 +203,7 @@ Value to compare to. Data type is dependent on the columnName specified.
 supabase.get("companies").gt("employeeCount", 10)
 ```
 
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 [
     { "name": "Hooli", "employeeCount": 1000 },
@@ -234,7 +234,7 @@ Value to compare to. Data type is dependent on the columnName specified.
 supabase.get("companies").lt("employeeCount", "1000")
 ```
 
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 [
     { "name": "Pied Piper", "employeeCount": 10 },
@@ -265,7 +265,7 @@ Value to compare to. Data type is dependent on the columnName specified.
 supabase.get("companies").gte("employeeCount", 10)
 ```
 
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 [
     { "name": "Pied Piper", "employeeCount": 10 },
@@ -297,7 +297,7 @@ Value to compare to. Data type is dependent on the columnName specified.
 supabase.get("companies").lte("employeeCount", "1000")
 ```
 
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 [
     { "name": "Pied Piper", "employeeCount": 10 },
@@ -329,7 +329,7 @@ String pattern to compare to. A comprehensive guide on how to form proper patter
 supabase.get("companies").like("name", "%ao%")
 ```
 
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 [
     { "name": "Yao Net", "employeeCount": 100 }
@@ -360,7 +360,7 @@ String pattern to compare to. A comprehensive guide on how to form patterns can 
 supabase.get("companies").like("name", "_pi%")
 ```
 
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 []
 ```
@@ -370,7 +370,7 @@ The following will be returned:
 supabase.get("companies").ilike("name", "_pi%")
 ```
 
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 [
     { "name": "Pied Piper", "employeeCount": 10}
@@ -400,7 +400,7 @@ Value to match.
 supabase.get("companies").is("employeeCount", null)
 ```
 
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 [
     { "name": "See Food App", "employeeCount": null }
@@ -430,7 +430,7 @@ Array of values to find a match. Data type of values is dependent on the columnN
 supabase.get("companies").in("name", ["Hooli", "Pied Piper", "Google"])
 ```
 
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 [
     { "name": "Pied Piper", "employeeCount": 10 },
@@ -461,7 +461,7 @@ Value to **not** match. Data type is dependent on the columnName specified.
 supabase.get("companies").not("name", "See Food App")
 ```
 
-The following will be returned:
+The following will be returned with status code `200 OK`:
 ```json
 [
     { "name": "Pied Piper", "employeeCount": 10 },
