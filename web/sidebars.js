@@ -24,8 +24,8 @@ module.exports = {
         type: "category",
         label: "RESTful",
         items: [
-          "library/restful/get",
           "library/restful/post",
+          "library/restful/get",
           "library/restful/patch",
           "library/restful/delete"
         ]
