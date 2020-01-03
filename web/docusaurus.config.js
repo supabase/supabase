@@ -35,7 +35,7 @@ module.exports = {
         // },
         {
           href: 'https://app.supabase.io',
-          label: 'Get Early Access →',
+          label: 'Request Early Access →',
           position: 'right',
         },
       ],
