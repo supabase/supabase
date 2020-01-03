@@ -20,7 +20,7 @@ module.exports = {
     },
     navbar: {
       classNames: 'shadow--md',
-      title: '',
+      title: 'supabase',
       logo: {
         alt: 'Supabase',
         src: '/supabase-logo.svg',

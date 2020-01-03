@@ -224,10 +224,10 @@ li + li {
 
 .navbar__brand strong {
   font-family: var(--ifm-heading-font-family);
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.03rem;
-  padding-top: 4px;
+  /* font-style: italic; */
 }
 
 .navbar,
