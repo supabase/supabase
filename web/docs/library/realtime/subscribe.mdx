@@ -1,24 +1,11 @@
 ---
-id: post
-title: 'Create new rows'
+id: subscribe
+title: "Subscribe to Realtime Changes"
 ---
 
-
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-@todo short Description
+Our library makes it simple to listen to changes in your database.
 
 ## The basics
-
-<Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JS', value: 'js', },
-    { label: 'Python', value: 'py', },
-  ]
-}>
-<TabItem value="js">
 
 ```js
 import { createClient } from "@supabase/supabase-js";
@@ -29,23 +16,14 @@ const base = createClient(process.env.SUPABASE_URL, {
 });
 
 // Subscribe to realtime updates
-const result = await base.post("users", { name: 'paul'})
+const todoListener = base.subscribe("todos").on("INSERT", todo => {
+  console.log("New todo!", todo);
+})
 ```
-
-</TabItem>
-<TabItem value="py">
-
-```py
-# @todo
-```
-</TabItem>
-
-</Tabs>
-
 
 ## Examples
 
-@todo various examples
+@todo
 
 ## Options
 
@@ -58,3 +36,4 @@ const result = await base.post("users", { name: 'paul'})
 #### 200: Success
 
 @todo: all return scenarios
+
