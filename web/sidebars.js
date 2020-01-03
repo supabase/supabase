@@ -33,6 +33,10 @@ module.exports = {
     ],
     Guides:[
       "guides/examples"
+    ],
+    Handbook:[
+      "handbook/introduction",
+      "handbook/contributing"
     ]
   }
 };
