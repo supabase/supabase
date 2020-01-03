@@ -1,0 +1,472 @@
+---
+id: filters
+title: 'Query Filters'
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+We will be using this table as reference for our examples:
+```json
+{
+    "companies":[
+        { "name": "Pied Piper", "employeeCount": 10 },
+        { "name": "Hooli", "employeeCount": 1000 },
+        { "name": "Yao Net", "employeeCount": 100 },
+        { "name": "See Food App", "employeeCount": null }
+    ]
+}
+```
+## Order
+```js
+order(columnName, ascending=false, nullsFirst=false)
+```  
+
+Returns an ordered array of rows based on stated preferences.
+
+### Method arguments
+#### columnName
+`required` string  
+Name of chosen column to base the order on.
+
+#### ascending
+`optional` boolean  
+Determines whether the order will be ascending or descending. Default value will be **false**.
+
+#### nullsFirst
+`optional` boolean  
+Determines whether null values will be displayed first or not. Default value will be **false**.
+
+### Example
+```js
+supabase.get("companies").order("employeeCount", true, true)
+```
+The following will be returned:
+```json
+[
+    { "name": "See Food App", "employeeCount": null },
+    { "name": "Pied Piper", "employeeCount": 10 },
+    { "name": "Yao Net", "employeeCount": 100 },
+    { "name": "Hooli", "employeeCount": 1000 }
+]
+```
+
+---
+
+## Range
+```js
+range(from, to?)
+```
+
+Returns an array of rows based on specified range and position of rows with regards to the table.
+
+### Method arguments
+#### from
+`required` integer  
+Index or position of the start of the specified range.
+
+
+#### to
+`optional` integer  
+Index or position of the end of the specified range. If not stated, all remaining rows after the starting index will be returned.
+
+### Example
+#### With both `from` and `to` specified
+```js
+supabase.get("companies").range(0,2)
+```
+The following will be returned:
+```json
+[
+    { "name": "Pied Piper", "employeeCount": 10 },
+    { "name": "Hooli", "employeeCount": 1000 },
+    { "name": "Yao Net", "employeeCount": 100 }
+]
+
+```
+
+#### With `from` only specified
+```js
+supabase.get("companies").range(1)
+```
+The following will be returned:
+```json
+[
+    { "name": "Yao Net", "employeeCount": 100 },
+    { "name": "See Food App", "employeeCount": null }
+]
+
+```
+
+---
+
+## Single
+```js
+single()
+```
+Returns the first row of the table as an object and **not** as an array.
+
+### Example
+```js
+supabase.get("companies").single()
+```
+The following will be returned:
+```json
+{ "name": "Pied Piper", "employeeCount": 10 }
+```
+---
+
+## Match
+```js
+match(filterObject)
+```
+
+Returns an array of rows that exactly match the specified filterObject.
+
+### Method arguments
+#### filterObject
+`required` object  
+Object contains column names and the desired values.
+
+### Example
+#### Generic
+```js
+supabase.get("companies").match({ "name": "Pied Piper", "employeeCount": 10 })
+```
+The following will be returned:
+```json
+[
+    { "name": "Pied Piper", "employeeCount": 10 }
+]
+```
+
+#### No matches
+```js
+supabase.get("companies").match({ "name": "Pied Piper", "employeeCount": 50 })
+```
+The following will be returned:
+```json
+[]
+```
+
+---
+
+# Advanced Filtering
+
+## Equals 
+```js
+eq(columnName, filterValue)
+```
+Returns an array of rows whose value on the stated columnName exactly matches the specified filterValue.
+
+### Method arguments
+#### columnName
+`required` string  
+Name of chosen column to base the match on.
+
+#### filterValue
+`required`  
+Value to match. Data type is dependent on the columnName specified.
+
+### Example
+```js
+supabase.get("companies").eq("name", "Hooli")
+```
+
+The following will be returned:
+```json
+[
+    { "name": "Hooli", "employeeCount": 1000 }
+]
+```
+
+---
+
+## Greater Than 
+```js
+gt(columnName, filterValue)
+```
+
+Returns an array of rows whose value on the stated columName is greater than the specified filterValue.
+
+### Method arguments
+#### columnName
+`required` string  
+Name of chosen column to base the comparison on.
+
+#### filterValue
+`required`  
+Value to compare to. Data type is dependent on the columnName specified.
+
+### Example
+```js
+supabase.get("companies").gt("employeeCount", 10)
+```
+
+The following will be returned:
+```json
+[
+    { "name": "Hooli", "employeeCount": 1000 },
+    { "name": "Yao Net", "employeeCount": 100 }
+]
+```
+
+---
+
+## Less Than 
+```js
+lt(columnName, filterValue)
+```
+
+Returns an array of rows whose value on the stated columnName is less than the specified filterValue.
+
+### Method arguments
+#### columnName
+`required` string  
+Name of chosen column to base the comparison on.
+
+#### filterValue
+`required`  
+Value to compare to. Data type is dependent on the columnName specified.
+
+### Example
+```js
+supabase.get("companies").lt("employeeCount", "1000")
+```
+
+The following will be returned:
+```json
+[
+    { "name": "Pied Piper", "employeeCount": 10 },
+    { "name": "Yao Net", "employeeCount": 100 }
+]
+```
+
+---
+
+## Greater Than or Equal
+```js
+gte(columnName, filterValue)
+```
+
+Returns an array of rows whose value on the stated columName is greater than or equal to the specified filterValue.
+
+### Method arguments
+#### columnName
+`required` string  
+Name of chosen column to base the comparison on.
+
+#### filterValue
+`required`  
+Value to compare to. Data type is dependent on the columnName specified.
+
+### Example
+```js
+supabase.get("companies").gte("employeeCount", 10)
+```
+
+The following will be returned:
+```json
+[
+    { "name": "Pied Piper", "employeeCount": 10 },
+    { "name": "Hooli", "employeeCount": 1000 },
+    { "name": "Yao Net", "employeeCount": 100 }
+]
+```
+
+---
+
+## Less Than or Equal
+```js
+lte(columnName, filterValue)
+```
+
+Returns an array of rows whose value on the stated columnName is less than or equal to the specified filterValue.
+
+### Method arguments
+#### columnName
+`required` string  
+Name of chosen column to base the comparison on.
+
+#### filterValue
+`required`  
+Value to compare to. Data type is dependent on the columnName specified.
+
+### Example
+```js
+supabase.get("companies").lte("employeeCount", "1000")
+```
+
+The following will be returned:
+```json
+[
+    { "name": "Pied Piper", "employeeCount": 10 },
+    { "name": "Hooli", "employeeCount": 1000 },
+    { "name": "Yao Net", "employeeCount": 100 }
+]
+```
+
+---
+
+## Like 
+```js
+like(columnName, stringPattern)
+```
+
+Returns an array of rows whose value in the stated columnName matches the supplied pattern.
+
+### Method arguments
+#### columnName
+`required` string  
+Name of chosen column to base the comparison on.
+
+#### stringPattern
+`required` string  
+String pattern to compare to. A comprehensive guide on how to form proper patterns can be found [here](https://www.postgresql.org/docs/current/functions-matching.html).
+
+### Example
+```js
+supabase.get("companies").like("name", "%ao%")
+```
+
+The following will be returned:
+```json
+[
+    { "name": "Yao Net", "employeeCount": 100 }
+]
+```
+
+---
+
+## Ilike 
+```js
+ilike(columnName, filterValue)
+```
+
+A case-insensitive version of [like(columnName, filterValue)](../restful/filters#like).
+
+### Method arguments
+#### columnName
+`required` string  
+Name of chosen column to base the match on.
+
+#### stringPattern
+`required` string
+String pattern to compare to. A comprehensive guide on how to form patterns can be found [here](https://www.postgresql.org/docs/current/functions-matching.html).
+
+### Example
+#### Using like
+```js
+supabase.get("companies").like("name", "_pi%")
+```
+
+The following will be returned:
+```json
+[]
+```
+
+#### Using ilike
+```js
+supabase.get("companies").ilike("name", "_pi%")
+```
+
+The following will be returned:
+```json
+[
+    { "name": "Pied Piper", "employeeCount": 10}
+]
+```
+
+---
+
+## Is 
+```js
+is(columnName, filterValue)
+```
+
+A check for exact equality (**null**, **true**, **false**), returns an array of rows whose value on the stated columnName exactly match the specified filterValue.
+
+### Method arguments
+#### columnName
+`required` string  
+Name of chosen column to base the match on.
+
+#### filterValue
+`required` boolean **OR** null  
+Value to match.
+
+### Example
+```js
+supabase.get("companies").is("employeeCount", null)
+```
+
+The following will be returned:
+```json
+[
+    { "name": "See Food App", "employeeCount": null }
+]
+```
+
+---
+
+## In 
+```js
+in(columnName, filterArray)
+```
+
+Returns an array of rows whose value on the stated columnName is found on the specified filterArray.
+
+### Method arguments
+#### columnName
+`required` string  
+Name of chosen column to base the match on.
+
+#### filterArray
+`required` array  
+Array of values to find a match. Data type of values is dependent on the columnName specified.
+
+### Example
+```js
+supabase.get("companies").in("name", ["Hooli", "Pied Piper", "Google"])
+```
+
+The following will be returned:
+```json
+[
+    { "name": "Pied Piper", "employeeCount": 10 },
+    { "name": "Hooli", "employeeCount": 1000 }
+]
+```
+
+---
+
+## Not 
+```js
+not(columnName, filterValue)
+```
+
+Returns of array of rows whose value on the stated columnName is **not** equal to the specified value.
+
+### Method arguments
+#### columnName
+`required` string  
+Name of chosen column to base the match on.
+
+#### filterValue
+`required`  
+Value to **not** match. Data type is dependent on the columnName specified.
+
+### Example
+```js
+supabase.get("companies").not("name", "See Food App")
+```
+
+The following will be returned:
+```json
+[
+    { "name": "Pied Piper", "employeeCount": 10 },
+    { "name": "Hooli", "employeeCount": 1000 },
+    { "name": "Yao Net", "employeeCount": 100 }
+]
+```
+
