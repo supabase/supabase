@@ -45,14 +45,15 @@ function Feature({ imageUrl, title, description, href }) {
     </div>
   )
 }
-function HowCard({ title, heading, description }) {
+function CodeButton({ title, description }) {
   return (
-    <div className={classnames('col', styles.howCard)}>
-      <div className="">
-        <h3>{title}</h3>
-        <h4>{heading}</h4>
-        <p>{description}</p>
-      </div>
+    <div className={classnames('col', styles.feature)}>
+      <a className={classnames('card', styles.featureCard)} >
+        <div className="card__body">
+          <h3>{title}</h3>
+          <p>{description}</p>
+        </div>
+      </a>
     </div>
   )
 }
@@ -109,23 +110,29 @@ function Home() {
             </div>
           </section>
         )}
-        <section className={styles.features}>
+
+        <section className={styles.forDevelopers}>
           <div className="container">
-            <h2 className="with-underline">How it works</h2>
+            <div class="row">
+              <div class="col col--8 col--offset-2">
+                <h2 className="with-underline text--center">For Developers</h2>
+                <p className="text--center">
+                  We're a bunch of developers, building tools for developers. Tools that we even use
+                  ourselves. This means we are obsessed with solving your problems, because they
+                  solve our problems too. We prioritise the intrinsic features first - features like
+                  performance and simplicity. We believe that sometimes, doing less is better.
+                </p>
+              </div>
+            </div>
             <div className="row">
-              <HowCard
-                title="1."
-                heading="Connect Supabase to PostgreSQL"
-                description={
-                  <>Login to Supabase to connect to your your existing PostgreSQL database.</>
-                }
-              />
-              <HowCard
-                title="2."
-                heading="@todo"
-                description={<>We introspect your database and provide an instant realtime API.</>}
-              />
-              <HowCard title="3." heading="@todo" description={<>@todo</>} />
+              <div class="col col--9">
+                <p>Code here</p>
+              </div>
+              <div class="col col--3">
+                <button class="button button--block button--primary">Realtime</button>
+                <button class="button button--block button--link">Get records</button>
+                <button class="button button--block button--link">Create Records</button>
+              </div>
             </div>
           </div>
         </section>

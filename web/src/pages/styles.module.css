@@ -37,11 +37,22 @@
 
 .features {
   display: flex;
+  margin-top: 5rem;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
+}
+.forDevelopers {
+  display: flex;
+  margin-top: 5rem;
   align-items: center;
   padding: 2rem 0;
   width: 100%;
 }
 
+.forDevelopers .button {
+  margin-top: 10px;
+}
 .featureCard {
   height: 100%;
 }
