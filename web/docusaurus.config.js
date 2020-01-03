@@ -28,9 +28,14 @@ module.exports = {
       links: [
         { to: '/docs/about', label: 'Docs', position: 'right' },
         { to: '/docs/guides/examples', label: 'Guides', position: 'right' },
+        // {
+        //   href: 'https://github.com/supabase/monorepo',
+        //   label: 'GitHub',
+        //   position: 'right',
+        // },
         {
-          href: 'https://github.com/supabase/monorepo',
-          label: 'GitHub',
+          href: 'https://app.supabase.io',
+          label: 'Get Early Access →',
           position: 'right',
         },
       ],
@@ -41,35 +46,47 @@ module.exports = {
       // theme: require('prism-react-renderer/themes/vsdark'),
     },
     footer: {
-      // links: [
-      //   {
-      //     title: "Docs",
-      //     items: [
-      //       {
-      //         label: "Docs",
-      //         to: "docs/doc1"
-      //       }
-      //     ]
-      //   },
-      //   {
-      //     title: "Community",
-      //     items: [
-      //       {
-      //         label: "Discord",
-      //         href: "https://discordapp.com/invite/docusaurus"
-      //       }
-      //     ]
-      //   },
-      //   {
-      //     title: "Social",
-      //     items: [
-      //       {
-      //         label: "Blog",
-      //         to: "blog"
-      //       }
-      //     ]
-      //   }
-      // ],
+      links: [
+        {
+          title: "Company",
+          items: [
+            {
+              label: "Docs",
+              to: "/docs/about"
+            },
+            {
+              label: "Guides",
+              to: "/docs/guides/examples"
+            },
+            {
+              label: "Blog",
+              to: "/blog"
+            }
+          ]
+        },
+        {
+          title: "Community",
+          items: [
+            {
+              label: "GitHub",
+              href: "https://github.com/supabase/monorepo"
+            },
+            // {
+            //   label: "Discord",
+            //   href: "https://discordapp.com/invite/docusaurus"
+            // }
+          ]
+        },
+        // {
+        //   title: "Social",
+        //   items: [
+        //     {
+        //       label: "Blog",
+        //       to: "blog"
+        //     }
+        //   ]
+        // }
+      ],
       // logo: {
       //   alt: "Flock",
       //   src: "/img/logo-white.svg",
