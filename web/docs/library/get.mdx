@@ -91,7 +91,7 @@ Instead of stating the column name with the foreign key constraint, the name of 
 along with the desired column names from that table.
 
 ##### Example
-Click [here](../library/get#using-select) view some examples.
+Click [here](../library/get#using-select) to view some examples.
 
 
 ### Common Filters
@@ -101,8 +101,15 @@ Other common filters can be found [here](../library/filters).
 
 ### Generic
 Get all companies and return all columns available
-```js
-supabase.get("companies")
+```js {3}
+const getCompanies = async () => {
+  try {
+    let companies = await supabase.get("companies")
+    return companies
+  } catch (error) {
+    console.log("Error: ", error)
+  }
+}
 ```
 The following will be returned with status code `200 OK`:
 ```json
@@ -116,8 +123,15 @@ The following will be returned with status code `200 OK`:
 
 ### Using Select
 Get all users but only return the column fullName.
-```js
-supabase.get("users").select(`fullName`)
+```js {3}
+const getUsers = async () => {
+  try {
+    let users = await supabase.get("users").select("fullName")
+    return users
+  } catch (error) {
+    console.log("Error: ", error)
+  }
+}
 ```
 The following will be returned with the status code `200 OK`:
 ```json
@@ -130,15 +144,22 @@ The following will be returned with the status code `200 OK`:
 
 ### Using Select with Foreign Key Constraints
 Get all users and return all information about them and the companies they belong to.
-```js
-supabase.get("users")
-        .select(`
-          fullName,
-          companies {
-            name,
-            employeeCount
-          }
-        `)
+```js {3-10}
+const getUsers = async () => {
+  try {
+    let users = await supabase.get("users")
+      .select(`
+        fullName,
+        companies {
+          name,
+          employeeCount
+        }
+      `)
+    return users
+  } catch (error) {
+    console.log("Error: ", error)
+  }
+}
 ```
 The following will be returned with the status code `200 OK`:
 ```json

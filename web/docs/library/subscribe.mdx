@@ -1,39 +1,178 @@
 ---
 id: subscribe
-title: "Subscribe to Realtime Changes"
+title: "Subscribe to Realtime"
 ---
 
-Our library makes it simple to listen to changes in your database.
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-## The basics
+Our library makes it simple to listen to changes in your database in realtime.  
+
+We will be using these tables as reference for our examples:
+```json
+{
+    "companies": [
+      { "Id": 1, "name": "Pied Piper", "employeeCount": 10 },
+      { "Id": 2, "name": "Hooli", "employeeCount": 1000 },
+      { "Id": 3, "name": "Yao Net", "employeeCount": 100 },
+      { "Id": 4, "name": "See Food App", "employeeCount": null }
+    ],
+}
+```
+
+<Tabs
+  defaultValue="nodeJs"
+  values={[
+    { label: 'Node.js', value: 'nodeJs', },
+    { label: 'Python', value: 'py', },
+  ]
+}>
+<TabItem value="nodeJs">
 
 ```js
-import { createClient } from "@supabase/supabase-js";
+supabase.subscribe(channel)
 
-// Connect to Supabase
-const base = createClient(process.env.SUPABASE_URL, {
-  apikey: process.env.SUPABASE_KEY
-});
-
-// Subscribe to realtime updates
-const todoListener = base.subscribe("todos").on("INSERT", todo => {
-  console.log("New todo!", todo);
-})
 ```
+Supabase subscribes to a specified `channel` to listen to.
+</TabItem>
+
+<TabItem value="py">
+
+```py
+# TODO
+```
+</TabItem>
+</Tabs>
+
+## Method arguments
+### channel
+`required` string  
+Channel for Supabase to listen to. The channel can either subscribe to the pre-determined schema (`public` by default)
+or a specific table within that schema. Indicating `"*"` will subscribe the channel to the pre-determined schema.
+
+## Hooks
+
+```js
+on(event, callback)
+```
+Call a specified `callback` function once a specified event occurs.
+
+### Method arguments
+#### event
+`required` string  
+The event to hook will listen for. This could either be:
+- CREATE
+- UPDATE
+- DELETE    
+
+Alternatively, indicating `"*"` will let the hook listen for everything.
+
+#### callback
+`required` function  
+A function that will be called when an event that the hook is subscribed to occurs.
 
 ## Examples
 
-@todo
+### Listening to the entire schema
+```js
+supabase.subscribe("*")
+```
 
-## Options
+### Listening to a specific table
+```js
+supabase.subscribe("companies")
+```
 
-| Parameter | Default | Description                                 |
-| --------- | ------- | ------------------------------------------- |
-| @todo     |         | All options  |
+### Adding hooks
+```js
+supabase.subscribe("companies").on("INSERT", company => {
+  console.log("New company: ", company)
+})
+```
 
-## Returns
+## Responses
 
-#### 200: Success
+### CREATE
+```js
+const postCompany = async () => {
+  try {
+    let company = await supabase
+      .post(
+        "companies",
+        [
+          { name: "Galloo Games", employeeCount: 25 }
+        ],
+      )
+    return company
+  } catch (error) {
+    console.log('Error: ', error)
+  }
+}
+```
+... will be returned by our listener:
 
-@todo: all return scenarios
+```json
+{
+  "new": [
+    { "name": "Galloo Games", "employeeCount": 25 }
+  ]
+}
+```
+
+### UPDATE
+```js
+const updateCompany = async () => {
+  try {
+    let company = await supabase
+      .patch(
+        "companies",
+        [
+          { employeeCount: 75 }
+        ] 
+      )
+      .eq("name", "See Food App")
+    return company
+  } catch (error) {
+    console.log('Error: ', error)
+  }
+}
+```
+
+... insert description here
+
+```json
+{
+  "old": [
+    { "name": "See Food App", "employeeCount": null }
+  ],
+  "new": [
+    { "name": "See Food App", "employeeCount": 75 }
+  ]
+}
+```
+
+### DELETE
+```js
+const deleteCompany =  async () => {
+    try {
+    let company = await supabase
+      .delete("companies",)
+      .eq("name", "Hooli")
+    return company
+  } catch (error) {
+    console.log('Error: ', error)
+  }
+}
+```
+
+... insert description here
+
+```json
+{
+  "old": [
+    { "name": "Hooli", "employeeCount": 1000 }
+  ]
+}
+```
+
 
