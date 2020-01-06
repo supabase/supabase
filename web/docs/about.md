@@ -30,7 +30,7 @@ For all Restful functionality, we introspect your database to provide an out-of-
 - Fast. Performance and simplicity are our two most important features.
 - 100% open source under the Apache 2.0 License.
 - Accessible by mobile and web with simple client libraries.
-- Works without any major changes to your database (like adding `NOTIFY` functions) or additional plugins (like `wal2json`). By using PostgreSQL's replication functionality we overcome many their limitations. For example, `NOTIFY` has a 8000 byte payload limit, making it hard to listen to bulk changes.
+- Works without any major changes to your database (like adding `NOTIFY` functions) or additional plugins (like `wal2json`). By using PostgreSQL's replication functionality we overcome many of their limitations. For example, `NOTIFY` has a 8000 byte payload limit, making it hard to listen to bulk changes.
 
 ## Benefits
 
