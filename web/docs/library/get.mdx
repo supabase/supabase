@@ -58,40 +58,37 @@ All available options and examples it their usage can be found [here](../restful
 ## Additional filtering
 ### Select
 ```js
-select(columnArray)
+select(columnQuery)
 ```
 
-Returns an array of rows with only columns specified in `columnArray`.
+Returns an array of rows with only columns specified in `columnQuery`.
 
 #### Method arguments
-##### columnArray
+##### columnQuery
 `required` array
-```json
+```js
 // From the 'users' table
-[
-  "Id",
-  "fullName",
-  "companyId"
-]
+`
+  Id,
+  fullName,
+  companyId
+`
 ```
-Array of values representing column names found in the table. Typical data type would be string.
+String containing column names that are found in the table. The pattern/ syntax would be as shown above.
 If a foreign key constraint exists between this table and another, information from
-the other table can be requested as well. This is shown below:
-```json
+the other table can be requested as well. The pattern/ syntax is shown below:
+```js
 // From the 'users' table
-[
-  "fullName",
-  {
-    "companies": [
-      "name",
-      "employeeCount"
-    ]
+`
+  fullName,
+  companies {
+    name,
+    employeeCount
   }
-]
+`
 ```
-Instead of a string data type, the column that has the foreign key constraint is now represented 
-as an object with the name of the other table as the key and the desired columns from the other 
-table as the value in the form of an array of column names of data type string.
+Instead of stating the column name with the foreign key constraint, the name of the other table is mentioned instead 
+along with the desired column names from that table.
 
 ##### Example
 Click [here](../restful/get#using-select) view some examples.
@@ -120,7 +117,7 @@ The following will be returned with status code `200 OK`:
 ### Using Select
 Get all users but only return the column fullName.
 ```js
-supabase.get("users").select(["fullName"])
+supabase.get("users").select(`fullName`)
 ```
 The following will be returned with the status code `200 OK`:
 ```json
@@ -134,15 +131,14 @@ The following will be returned with the status code `200 OK`:
 ### Using Select with Foreign Key Constraints
 Get all users and return all information about them and the companies they belong to.
 ```js
-supabase.get("users").select([
-  "fullName",
-  {
-    "companies": [
-      "name",
-      "employeeCount"
-    ]
-  }
-])
+supabase.get("users")
+        .select(`
+          fullName,
+          companies {
+            name,
+            employeeCount
+          }
+        `)
 ```
 The following will be returned with the status code `200 OK`:
 ```json
