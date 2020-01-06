@@ -13,26 +13,14 @@ module.exports = {
     ],
     Library:[
       "library/getting-started",
-      {
-        type: "category",
-        label: "Realtime",
-        items: [
-          "library/realtime/subscribe"
-        ]
-      },
-      {
-        type: "category",
-        label: "RESTful",
-        items: [
-          "library/restful/post",
-          "library/restful/get",
-          "library/restful/patch",
-          "library/restful/delete",
-          "library/restful/filters",
-          "library/restful/options",
-          "library/restful/responses"
-        ]
-      }
+      "library/subscribe",
+      "library/post",
+      "library/get",
+      "library/patch",
+      "library/delete",
+      "library/filters",
+      "library/options",
+      "library/responses"
     ],
     Guides:[
       "guides/examples"
