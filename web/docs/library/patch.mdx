@@ -91,7 +91,16 @@ They can be found [here](../library/filters).
 
 ### Mass update
 Updating employeeCount for all companies.
-```js
+```js {3}
+const updateCompanies = async () => {
+  try{
+    let companies = await supabse.patch("companies", { employeeCount: 50 })
+    return companies
+  } catch (error) {
+    console.log("Error: ", error)
+  }
+}
+
 supabase.patch("companies", { employeeCount: 50 })
 ```
 
@@ -107,8 +116,16 @@ The following will be returned with the status code `200 OK`:
 
 ### Using filters
 Updating employeeCount for companies where its columnName "name" is equal to "See Food App".
-```js
-supabase.patch("companies", { employeeCount: 50 }).eq("name", "See Food App")
+```js {3-4}
+const updateCompany = async () => {
+  try{
+    let company = await supabase.patch("companies", {employeeCount: 25 })
+      .eq("name", "See Food App")
+    return company
+  } catch (error) {
+    console.log("Error: ", error)
+  }
+}
 ```
 
 The following will be returned with the status code `200 OK`:
