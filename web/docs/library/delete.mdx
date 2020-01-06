@@ -3,24 +3,94 @@ id: delete
 title: 'Delete Rows'
 ---
 
-@todo short Description
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-## The basics
+We will be using these tables as reference for our examples:
+```json
+{
+    "companies": [
+      { "Id": 1, "name": "Pied Piper", "employeeCount": 10 },
+      { "Id": 2, "name": "Hooli", "employeeCount": 1000 },
+      { "Id": 3, "name": "Yao Net", "employeeCount": 100 },
+      { "Id": 4, "name": "See Food App", "employeeCount": null }
+    ],
+}
+```
 
-@todo most simple usage
+<Tabs
+  defaultValue="nodeJs"
+  values={[
+    { label: 'Node.js', value: 'nodeJs', },
+    { label: 'Python', value: 'py', },
+  ]
+}>
+<TabItem value="nodeJs">
 
-## Examples
+```js
+supabase.delete(tableName, options?)
 
-@todo various examples
+```
+Given the `options?` set (if any), this delete all rows from the specified `tableName`.
+</TabItem>
 
-## Options
+<TabItem value="py">
 
-| Parameter | Default | Description                                 |
-| --------- | ------- | ------------------------------------------- |
-| @todo     |         | All options  |
+```py
+# TODO
+```
+</TabItem>
+</Tabs>
 
-## Returns
+## Method arguments
+### tableName
+`required` string  
+Name of table in the database that will have its rows deleted.
 
-#### 200: Success
+### options
+`optional` object  
+All available options and examples it their usage can be found [here](../library/options).
 
-@todo: all return scenarios
+## Additional filtering
+To specifically indicate which resources are to be deleted, additional filters can be used.
+They can be found [here](../library/filters).
+
+## Example
+
+### Mass delete
+Updating employeeCount for all companies.
+```js
+supabase.delete("companies")
+```
+
+Upon a successful deletion, the status code `204 Accepted` will be returned.
+
+```js
+supabase.get("companies")
+```
+When getting all companies again, as shown above, the following will be returned with the status code `200 OK`:
+```json
+[]
+```
+
+### Using filters
+Deleting companies where its columnName "name" is equal to "See Food App".
+```js
+supabase.delete("companies").eq("name", "See Food App")
+```
+
+Upon a successful deletion, the status code `204 Accepted` will be returned.
+```js
+supabase.get("companies")
+```
+When getting all companies again, as shown above, the following will be returned with the status code `200 OK`:
+```json
+[
+  { "Id": 1, "name": "Pied Piper", "employeeCount": 10 },
+  { "Id": 2, "name": "Hooli", "employeeCount": 1000 },
+  { "Id": 3, "name": "Yao Net", "employeeCount": 100 }
+]
+```
+
+## Responses
+Aside from the status code `204 Accepted`, other common responses can be found [here](../library/responses).
