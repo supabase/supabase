@@ -3,73 +3,44 @@ id: getting-started
 title: Getting Started
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 
-## Including Supabase
-<Tabs
-  defaultValue="nodeJs"
-  values={[
-    { label: 'Node.js', value: 'nodeJs', },
-    { label: 'Python', value: 'py', },
-  ]
-}>
-<TabItem value="nodeJs">
+## Installing
 
-```js
-import { createClient } from "@supabase/supabase-js";
+```bash
+npm install --save @supabase/supabase-js
+# OR
+yarn install @supabase/supabase-js
 ```
-</TabItem>
-
-<TabItem value="py">
-
-```py
-from supabase import createClient
-```
-</TabItem>
-</Tabs>
 
 
 ## Initializing
 
-<Tabs
-  defaultValue="nodeJs"
-  values={[
-    { label: 'Node.js', value: 'nodeJs', },
-    { label: 'Python', value: 'py', },
-  ]
-}>
-<TabItem value="nodeJs">
-
 ```js
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supbase client for interacting with your database 
 const supabase = createClient("https://xyzcompany.supabase.io", "1a2b-3c4d-5e6f-7g8h");
 ```
-</TabItem>
 
-<TabItem value="py">
 
-```py
-supabase = createClient("https://xyzcompany.supabase.io", "1a2b-3c4d-5e6f-7g8h")
+
+## Reference
+
+### `createClient()`
+
+```js 
+createClient('supabaseURL', 'supabaseKey', OPTIONS)
 ```
-</TabItem>
-</Tabs>
 
-### createClient(supabaseURL, supabaseKey, options?)
-This is used to initialize an instance of a `createClient` object. From here, you would be able
-invoke all the other features and functions provided by Supabase.
-
-### Method arguments
-#### supabaseURL
-`required` string  
+###### supabaseURL `:string` 
 Your unique Supabase URL.
 
-#### supabaseKey
-`required` string  
+###### supabaseKey `:string`
 Your unique Supabase Key.
 
-#### options
-`optional` object
-- @tbc
+###### OPTIONS `:object?`
+@todo
+
 
 | Parameter   | Data Type | Description |
 | ----------- | --------- | ----------- |

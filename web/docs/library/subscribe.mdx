@@ -1,203 +1,198 @@
 ---
 id: subscribe
-title: "Subscribe to Realtime"
+title: 'Listen for realtime changes'
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import DummyData from '../common/DummyData.mdx'
 
-Our library makes it simple to listen to changes in your database in realtime.  
+Our library makes it simple to listen to changes in your database in realtime.
 
-We will be using these tables as reference for our examples:
-```json
-{
-    "companies": [
-      { "Id": 1, "name": "Pied Piper", "employeeCount": 10 },
-      { "Id": 2, "name": "Hooli", "employeeCount": 1000 },
-      { "Id": 3, "name": "Yao Net", "employeeCount": 100 },
-      { "Id": 4, "name": "See Food App", "employeeCount": null }
-    ],
-}
-```
+We will be using these tables as reference for our examples.
 
-<Tabs
-  defaultValue="nodeJs"
-  values={[
-    { label: 'Node.js', value: 'nodeJs', },
-    { label: 'Python', value: 'py', },
-  ]
-}>
-<TabItem value="nodeJs">
+<DummyData />
 
-```js
-supabase.subscribe(channel)
+### Listen to all database changes
 
-```
-Supabase subscribes to a specified `channel` to listen to.
-</TabItem>
+<!-- prettier-ignore -->
+```js {8}
+import { createClient } from '@supabase/supabase-js'
 
-<TabItem value="py">
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
 
-```py
-# TODO
-```
-</TabItem>
-</Tabs>
-
-## Method arguments
-### channel
-`required` string  
-Channel for Supabase to listen to. The channel can either subscribe to the pre-determined schema (`public` by default)
-or a specific table within that schema. Indicating `"*"` will subscribe the channel to the pre-determined schema.
-
-## Hooks
-
-```js
-on(event, callback)
-```
-Call a specified `callback` function once a specified `event` occurs.
-
-### Method arguments
-#### event
-`required` string  
-The event to hook will listen for. This could either be:
-- CREATE
-- UPDATE
-- DELETE    
-
-Alternatively, indicating `"*"` will let the hook listen for everything.
-
-#### callback
-`required` function  
-A function that will be called when an event that the hook is subscribed to occurs.
-
-## Examples
-
-### Listening to the entire schema
-```js
-supabase.subscribe("*")
+// Listen to changes
+const listener = supabase
+  .subscribe('*')
+  .on('*', payload => {
+    console.log('Change received!', payload)
+  })
+  .join()
 ```
 
 ### Listening to a specific table
-```js
-supabase.subscribe("companies")
+
+<!-- prettier-ignore -->
+```js {8}
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+// Listen to changes
+const listener = supabase
+  .subscribe('countries')
+  .on('*', payload => {
+    console.log('Change received!', payload)
+  })
+  .join()
 ```
 
-### Adding hooks
-```js
-supabase.subscribe("companies").on("INSERT", company => {
-  console.log("New company: ", company)
-})
+### Listening only to INSERTS
+
+<!-- prettier-ignore -->
+```js {9}
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+// Listen to changes
+const listener = supabase
+  .subscribe('countries')
+  .on('INSERT', payload => {
+    console.log('Change received!', payload)
+  })
+  .join()
 ```
-Whenever a new company is inserted into the `companies` table, the client will be notified.
-```js
-const postCompany = async () => {
-  try{
-    let company = await supabase
-      .post(
-        "companies",
-        [
-          { name: "Raviga Capital Management", employeeCount: 500 }
-        ]
-      )
-    return company
-  } catch (error) {
-    console.log('Error', error)
-  }
-}
+
+### Listening only to UPDATES
+
+<!-- prettier-ignore -->
+```js {9}
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+// Listen to changes
+const listener = supabase
+  .subscribe('countries')
+  .on('UPDATE', payload => {
+    console.log('Change received!', payload)
+  })
+  .join()
 ```
-In the example above, once the new company has been inserted into the table, the client 
-will be provided with this:
-```
-$ New company: Raviga Capital Management
+
+### Listening only to DELETES
+
+<!-- prettier-ignore -->
+```js {9}
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+// Listen to changes
+const listener = supabase
+  .subscribe('countries')
+  .on('DELETE', payload => {
+    console.log('Change received!', payload)
+  })
+  .join()
 ```
 
 
 
-## Responses
 
-### CREATE
-```js
-const postCompany = async () => {
-  try {
-    let company = await supabase
-      .post(
-        "companies",
-        [
-          { name: "Galloo Games", employeeCount: 25 }
-        ],
-      )
-    return company
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+## Reference
+
+### `subscribe()`
+
+<!-- prettier-ignore -->
+```js {2}
+supabase
+  .subscribe('tableName')
 ```
+
+###### tableName `REQUIRED`  
+The database table that you want to subscribe to. Using the wildcard `"*"` will listen all tables in your database.
+
+
+----
+
+### `join()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .subscribe('tableName')
+  .join()
+```
+
+
+----
+
+### `on()`
+
+<!-- prettier-ignore -->
+```js {4}
+supabase
+  .subscribe('tableName')
+  .join()
+  .on('eventName', callbackFunction)
+```
+
+
+###### eventName `REQUIRED`  
+Can be either a table in your database, or you can use the special wildcard `*` to listen to all changes.
+
+###### callbackFunction `REQUIRED`  
+A callback that will handle the payload that is sent whenever your database changes. See all Change Events below to understand all the possible payloads.
+
+
+----
+
+## Change Events
+
+@TODO what happens on bulk insert/update/delete?
+
+### New record created
 
 Upon inserting or creating a new row, the following will be returned by our listener:
 
 ```json
 {
   "new": [
-    { "name": "Galloo Games", "employeeCount": 25 }
+    { "name": "Middle Earth", "country_id": "554" }
   ]
 }
 ```
 
-### UPDATE
-```js
-const updateCompany = async () => {
-  try {
-    let company = await supabase
-      .patch(
-        "companies",
-        [
-          { employeeCount: 75 }
-        ] 
-      )
-      .eq("name", "See Food App")
-    return company
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-```
+### Existing record updated
+
 
 Upon updating a row, the following will be returned by our listener:
 
 ```json
 {
   "old": [
-    { "name": "See Food App", "employeeCount": null }
+    { "name": "Middle Earth", "country_id": "554" }
   ],
   "new": [
-    { "name": "See Food App", "employeeCount": 75 }
+    { "name": "Wellington", "country_id": "554" }
   ]
 }
 ```
 
-### DELETE
-```js
-const deleteCompany =  async () => {
-    try {
-    let company = await supabase
-      .delete("companies",)
-      .eq("name", "Hooli")
-    return company
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-```
+### Existing record deleted
+
 
 Upon deleting a row, the following will be returned by our listener:
 
 ```json
 {
   "old": [
-    { "name": "Hooli", "employeeCount": 1000 }
+    { "name": "Mordor", "country_id": "554" }
   ]
 }
 ```
-
-
