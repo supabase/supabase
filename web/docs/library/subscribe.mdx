@@ -55,7 +55,7 @@ or a specific table within that schema. Indicating `"*"` will subscribe the chan
 ```js
 on(event, callback)
 ```
-Call a specified `callback` function once a specified event occurs.
+Call a specified `callback` function once a specified `event` occurs.
 
 ### Method arguments
 #### event
@@ -89,6 +89,30 @@ supabase.subscribe("companies").on("INSERT", company => {
   console.log("New company: ", company)
 })
 ```
+Whenever a new company is inserted into the `companies` table, the client will be notified.
+```js
+const postCompany = async () => {
+  try{
+    let company = await supabase
+      .post(
+        "companies",
+        [
+          { name: "Raviga Capital Management", employeeCount: 500 }
+        ]
+      )
+    return company
+  } catch (error) {
+    console.log('Error', error)
+  }
+}
+```
+In the example above, once the new company has been inserted into the table, the client 
+will be provided with this:
+```
+$ New company: Raviga Capital Management
+```
+
+
 
 ## Responses
 
@@ -109,7 +133,8 @@ const postCompany = async () => {
   }
 }
 ```
-... will be returned by our listener:
+
+Upon inserting or creating a new row, the following will be returned by our listener:
 
 ```json
 {
@@ -138,7 +163,7 @@ const updateCompany = async () => {
 }
 ```
 
-... insert description here
+Upon updating a row, the following will be returned by our listener:
 
 ```json
 {
@@ -165,7 +190,7 @@ const deleteCompany =  async () => {
 }
 ```
 
-... insert description here
+Upon deleting a row, the following will be returned by our listener:
 
 ```json
 {
