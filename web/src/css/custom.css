@@ -18,7 +18,7 @@
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial',
     sans-serif;
   --custom-font-code: 'Source Code Pro', Menlo, monospace;
-  --custom-font-size-base: 14px;
+  --custom-font-size-base: 1rem;
   --custom-border-radius: 3px;
   --custom-border-radius-md: 6px;
   --custom-primary-darkest: #10633e;
@@ -451,4 +451,18 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   div[class^='sidebar_'] {
     padding: var(--ifm-spacing-vertical) var(--ifm-spacing-horizontal);
   }
+}
+
+
+
+.DummyData {
+  display: flex;
+  overflow-x: auto;
+}
+.DummyData  div{
+  padding-right: 10px;
+}
+
+summary:hover {
+  cursor: pointer;
 }

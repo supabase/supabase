@@ -1,62 +1,195 @@
 ---
 id: get
-title: 'Read Rows'
+title: 'Reading your data'
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+import DummyData from '../common/DummyData.mdx'
 
 We will be using these tables as reference for our examples:
-```json
-{
-    "users": [
-      { "Id": 1, "fullName": "Richard Hendrix", "companyId": "Pied Piper" },
-      { "Id": 2, "fullName": "Gavin Belson", "companyId": "Hooli" }
-    ],
-    "companies": [
-      { "Id": 1, "name": "Pied Piper", "employeeCount": 10 },
-      { "Id": 2, "name": "Hooli", "employeeCount": 1000 },
-      { "Id": 3, "name": "Yao Net", "employeeCount": 100 },
-      { "Id": 4, "name": "See Food App", "employeeCount": null }
-    ],
+
+<DummyData />
+
+### Getting your data
+
+This example shows how to get all the countries in our database.
+
+<!-- prettier-ignore -->
+```js {7-8}
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+const getCities = async () => {
+  try {
+    let cities = await supabase
+      .get('cities')
+    return cities
+  } catch (error) {
+    console.log('Error: ', error)
+  }
 }
 ```
 
-<Tabs
-  defaultValue="nodeJs"
-  values={[
-    { label: 'Node.js', value: 'nodeJs', },
-    { label: 'Python', value: 'py', },
-  ]
-}>
-<TabItem value="nodeJs">
+Calling `getCities()` will return the following response:
+
+```json
+[
+  { "name": "Rio de Janeiro", "country_id": 76 },
+  { "name": "Beijing", "country_id": 156 },
+  { "name": "Paris", "country_id": 250 },
+  { "name": "Auckland", "country_id": 554 },
+  { "name": "Lagos", "country_id": 556 },
+  { "name": "San Francisco", "country_id": 840 }
+]
+```
+
+### Getting specific columns
+
+Get all cities but only return the name.
+
+<!-- prettier-ignore -->
+```js {9}
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+const getCities = async () => {
+  try {
+    let cities = await supabase
+      .get('cities')
+      .select('name')
+    return cities
+  } catch (error) {
+    console.log('Error: ', error)
+  }
+}
+```
+
+Calling `getCities()` will return the following response:
+
+```json
+[
+  { "name": "Rio de Janeiro" },
+  { "name": "Beijing" },
+  { "name": "Paris" },
+  { "name": "Auckland" },
+  { "name": "Lagos" },
+  { "name": "San Francisco" }
+]
+```
+
+### Query foreign tables
+
+Get all users and return all information about them and the companies they belong to.
+
+<!-- prettier-ignore -->
+```js {9-15}
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+const getCountries = async () => {
+  try {
+    let countries = await supabase
+      .get('countries')
+      .select(`
+        name,
+        cities {
+          name
+        }
+      `)
+    return countries
+  } catch (error) {
+    console.log('Error: ', error)
+  }
+}
+```
+
+
+<details>
+  <summary><b>Show response</b></summary>
+  <div>
+
+Calling `getCountries()` will return the following response:
+
+```json
+[
+  {
+    "name": "Brazil",  
+    "cities": [
+      { "name": "Rio de Janeiro" }
+    ]
+  },
+  {
+    "name": "China", 
+    "cities": [
+      { "name": "Beijing" }
+    ]
+  },
+  {
+    "name": "France", 
+    "cities": [
+      { "name": "Paris" }
+    ]
+  },
+  {
+    "name": "New Zealand", 
+    "cities": [
+      { "name": "Auckland" }
+    ]
+  },
+  {
+    "name": "Nigeria", 
+    "cities": [
+      { "name": "Lagos" }
+    ]
+  },
+  {
+    "name": "United States", 
+    "cities": [
+      { "name": "San Francisco" }
+    ]
+  }
+]
+```
+
+  </div>
+</details>
+
+
+---
+
+---
+
+---
+
+--
 
 ```js
 supabase.get(tableName, options?)
 
 ```
+
 Given the `options?` set (if any), this **asynchronously** gets all rows from the specified `tableName` in your database.
-</TabItem>
-
-<TabItem value="py">
-
-```py
-# TODO
-```
-</TabItem>
-</Tabs>
 
 ## Method arguments
+
 ### tableName
+
 `required` string  
 Name of table in the database that will be read from.
 
 ### options
+
 `optional` object  
 All available options and examples it their usage can be found [here](../library/options).
 
 ## Additional filtering
+
 ### Select
+
 ```js
 select(columnQuery)
 ```
@@ -64,22 +197,27 @@ select(columnQuery)
 Returns an array of rows with only columns specified in `columnQuery`.
 
 #### Method arguments
+
 ##### columnQuery
+
 `required` array
+
 ```js
 // From the 'users' table
-`
+;`
   Id,
   fullName,
   companyId
 `
 ```
+
 String containing column names that are found in the table. The pattern/ syntax would be as shown above.
 If a foreign key constraint exists between this table and another, information from
 the other table can be requested as well. The pattern/ syntax is shown below:
+
 ```js
 // From the 'users' table
-`
+;`
   fullName,
   companies {
     name,
@@ -87,99 +225,18 @@ the other table can be requested as well. The pattern/ syntax is shown below:
   }
 `
 ```
-Instead of stating the column name with the foreign key constraint, the name of the other table is mentioned instead 
+
+Instead of stating the column name with the foreign key constraint, the name of the other table is mentioned instead
 along with the desired column names from that table.
 
 ##### Example
+
 Click [here](../library/get#using-select) to view some examples.
 
-
 ### Common Filters
+
 Other common filters can be found [here](../library/filters).
 
-## Example
-
-### Generic
-Get all companies and return all columns available
-```js {3}
-const getCompanies = async () => {
-  try {
-    let companies = await supabase.get("companies")
-    return companies
-  } catch (error) {
-    console.log("Error: ", error)
-  }
-}
-```
-The following will be returned with status code `200 OK`:
-```json
-[
-  { "Id": 1, "name": "Pied Piper", "employeeCount": 10 },
-  { "Id": 2, "name": "Hooli", "employeeCount": 1000 },
-  { "Id": 3, "name": "Yao Net", "employeeCount": 100 },
-  { "Id": 4, "name": "See Food App", "employeeCount": null }
-]
-```
-
-### Using Select
-Get all users but only return the column fullName.
-```js {3}
-const getUsers = async () => {
-  try {
-    let users = await supabase.get("users").select("fullName")
-    return users
-  } catch (error) {
-    console.log("Error: ", error)
-  }
-}
-```
-The following will be returned with the status code `200 OK`:
-```json
-[
-  { "fullName": "Richard Hendrix" },
-  { "fullName": "Gavin Belson" }
-]
-```
-
-
-### Using Select with Foreign Key Constraints
-Get all users and return all information about them and the companies they belong to.
-```js {3-10}
-const getUsers = async () => {
-  try {
-    let users = await supabase.get("users")
-      .select(`
-        fullName,
-        companies {
-          name,
-          employeeCount
-        }
-      `)
-    return users
-  } catch (error) {
-    console.log("Error: ", error)
-  }
-}
-```
-The following will be returned with the status code `200 OK`:
-```json
-[
-  {
-    "fullName": "Richard Hendrix",
-    "companies": {
-      "name": "Pied Piper",
-      "employeeCount": 10
-    }
-  },
-  {
-    "fullName": "Gavin Belson",
-    "companies": {
-      "name": "Hooli",
-      "employeeCount": 1000 
-    }
-  }
-]
-```
-
 ## Responses
+
 Aside from the status code `200 OK`, other common responses can be found [here](../library/responses).
