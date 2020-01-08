@@ -3,137 +3,78 @@ id: patch
 title: 'Updating your data'
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+
+import DummyData from '../common/DummyData.mdx'
+import Collapsable from '../../src/components/Collapsable'
+import CommonResponses from '../common/CommonResponses.mdx'
+import CommonFilters from '../common/CommonFilters.mdx'
+
 
 We will be using these tables as reference for our examples:
-```json
-{
-    "companies": [
-      { "Id": 1, "name": "Pied Piper", "employeeCount": 10 },
-      { "Id": 2, "name": "Hooli", "employeeCount": 1000 },
-      { "Id": 3, "name": "Yao Net", "employeeCount": 100 },
-      { "Id": 4, "name": "See Food App", "employeeCount": null }
-    ],
-}
-```
 
-<Tabs
-  defaultValue="nodeJs"
-  values={[
-    { label: 'Node.js', value: 'nodeJs', },
-    { label: 'Python', value: 'py', },
-  ]
-}>
-<TabItem value="nodeJs">
-
-```js
-supabase.patch(tableName, data, options?)
-
-```
-Given the `options?` set (if any), this **asynchronously** and partially updates all rows from the specified `tableName` in your database
-with the specified `data`.
-</TabItem>
-
-<TabItem value="py">
-
-```py
-# TODO
-```
-</TabItem>
-</Tabs>
-
-<Tabs
-  defaultValue="nodeJs"
-  values={[
-    { label: 'Node.js', value: 'nodeJs', },
-    { label: 'Python', value: 'py', },
-  ]
-}>
-<TabItem value="nodeJs">
-
-```js
-supabase.put(tableName, data, options?)
-
-```
-Given the `options?` set (if any), this **asynchronously** and fully replaces all rows from the specified `tableName` in your database
-with the specified `data`.
-</TabItem>
-
-<TabItem value="py">
-
-```py
-# TODO
-```
-</TabItem>
-</Tabs>
-
-## Method arguments
-Arguments for both types of update are the same.
-### tableName
-`required` string  
-Name of table in the database that will be updated.
-
-### data
-`required` array  
-Array of rows of type `object` which contain information to be updated into the selected table.
+<DummyData />
 
 
-### options
-`optional` object  
-All available options and examples it their usage can be found [here](../library/options).
 
-## Additional filtering
-To specifically indicate which resources are to be updated, additional filters can be used.
-They can be found [here](../library/filters).
+### Update record
 
-## Example
+This example how to update a country:
 
-### Mass update
-Updating employeeCount for all companies.
-```js {3}
-const updateCompanies = async () => {
-  try{
-    let companies = await supabse.patch("companies", { employeeCount: 50 })
-    return companies
+<!-- prettier-ignore -->
+```js {8}
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+const updateCountryName = async () => {
+  try {
+    let updates = await supabase
+      .patch('countries', { name: 'Middle Earth' })
+      .match({ name: 'New Zealand' })
+
+    return updates
   } catch (error) {
-    console.log("Error: ", error)
-  }
-}
-
-supabase.patch("companies", { employeeCount: 50 })
-```
-
-The following will be returned with the status code `200 OK`:
-```json
-[
-  { "Id": 1, "name": "Pied Piper", "employeeCount": 50 },
-  { "Id": 2, "name": "Hooli", "employeeCount": 50 },
-  { "Id": 3, "name": "Yao Net", "employeeCount": 50 },
-  { "Id": 4, "name": "See Food App", "employeeCount": 50 }
-]
-```
-
-### Using filters
-Updating employeeCount for companies where its columnName "name" is equal to "See Food App".
-```js {3-4}
-const updateCompany = async () => {
-  try{
-    let company = await supabase.patch("companies", {employeeCount: 25 })
-      .eq("name", "See Food App")
-    return company
-  } catch (error) {
-    console.log("Error: ", error)
+    console.log('Error: ', error)
   }
 }
 ```
 
-The following will be returned with the status code `200 OK`:
-```json
-[
-    { "Id": 4, "name": "See Food App", "employeeCount": 50 }
-]
+<Collapsable title="Toggle Example Response">
+
+@todo
+
+</Collapsable>
+
+
+## Reference
+
+
+### `patch()`
+```js
+supabase
+  .patch(tableName, data, options?)
 ```
+
+##### tableName `:string`  
+Name of table in the database where data will be saved.
+
+##### data `:object`   
+New record values.
+
+
+##### options `:object?`   
+@todo
+
+----
+
+
+## Filtering
+
+<CommonFilters verb="patch" />
 
 ## Responses
-Aside from the status code `200 OK`, other common responses can be found [here](../library/responses).
+
+#### 200 OK
+Successful
+
+<CommonResponses />

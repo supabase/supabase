@@ -5,7 +5,21 @@ import Link from '@docusaurus/Link'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import useBaseUrl from '@docusaurus/useBaseUrl'
 import styles from './styles.module.css'
+import CodeBlock from '@theme/CodeBlock'
 
+const subscribeExample = `
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://chat-room.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+// Listen to all new messages in your chat room
+const listener = supabase
+  .subscribe('messages')
+  .on('INSERT', chatMessage => {
+    console.log('New chat!', chatMessage)
+  })
+`
 const features = [
   {
     title: <>Chat apps</>,
@@ -38,18 +52,6 @@ function Feature({ imageUrl, title, description, href }) {
               <img className={styles.featureImage} src={imgUrl} alt={title} />
             </div>
           )}
-          <h3>{title}</h3>
-          <p>{description}</p>
-        </div>
-      </a>
-    </div>
-  )
-}
-function CodeButton({ title, description }) {
-  return (
-    <div className={classnames('col', styles.feature)}>
-      <a className={classnames('card', styles.featureCard)} >
-        <div className="card__body">
           <h3>{title}</h3>
           <p>{description}</p>
         </div>
@@ -113,8 +115,8 @@ function Home() {
 
         <section className={styles.forDevelopers}>
           <div className="container">
-            <div class="row">
-              <div class="col col--8 col--offset-2">
+            <div className="row">
+              <div className="col col--8 col--offset-2">
                 <h2 className="with-underline text--center">For Developers</h2>
                 <p className="text--center">
                   We're a bunch of developers, building tools for developers. Tools that we even use
@@ -125,13 +127,11 @@ function Home() {
               </div>
             </div>
             <div className="row">
-              <div class="col col--9">
-                <p>Code here</p>
+              <div className="col col--9">
+                <CodeBlock>{subscribeExample}</CodeBlock>
               </div>
-              <div class="col col--3">
-                <button class="button button--block button--primary">Realtime</button>
-                <button class="button button--block button--link">Get records</button>
-                <button class="button button--block button--link">Create Records</button>
+              <div className="col col--3">
+                <button className="button button--block button--primary">Realtime</button>
               </div>
             </div>
           </div>

@@ -14,13 +14,10 @@ module.exports = {
     Library:[
       "library/getting-started",
       "library/subscribe",
-      "library/post",
       "library/get",
+      "library/post",
       "library/patch",
-      "library/delete",
-      "library/filters",
-      "library/options",
-      "library/responses"
+      "library/delete"
     ],
     Guides:[
       "guides/examples"
