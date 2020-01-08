@@ -5,8 +5,21 @@ import Link from '@docusaurus/Link'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import useBaseUrl from '@docusaurus/useBaseUrl'
 import styles from './styles.module.css'
-import SubscribeExample from '../../docs/snippets/SubscribeExample.mdx'
+import CodeBlock from '@theme/CodeBlock'
 
+const subscribeExample = `
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://chat-room.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+// Listen to all new messages in your chat room
+const listener = supabase
+  .subscribe('messages')
+  .on('INSERT', chatMessage => {
+    console.log('New chat!', chatMessage)
+  })
+`
 const features = [
   {
     title: <>Chat apps</>,
@@ -114,13 +127,11 @@ function Home() {
               </div>
             </div>
             <div className="row">
-              <div class="col col--9">
-                <SubscribeExample />
+              <div className="col col--9">
+                <CodeBlock>{subscribeExample}</CodeBlock>
               </div>
               <div className="col col--3">
                 <button className="button button--block button--primary">Realtime</button>
-                <button className="button button--block button--link">Get records</button>
-                <button className="button button--block button--link">Create Records</button>
               </div>
             </div>
           </div>
