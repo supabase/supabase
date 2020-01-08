@@ -34,7 +34,7 @@ class BaseRequest extends Request {
    *
    * @param {string|object} The user, bearer token, or user/pass object.
    * @param {string|void} The pass or undefined.
-   * @returns {ApiRequest} The API request object.
+   * @returns {BaseRequest} The API request object.
    */
 
   auth (user, pass) {
@@ -56,7 +56,7 @@ class BaseRequest extends Request {
    * All values are prefixed with `eq.`.
    *
    * @param {object} The object to match against.
-   * @returns {ApiRequest} The API request object.
+   * @returns {BaseRequest} The API request object.
    */
 
   match (query) {
@@ -70,7 +70,7 @@ class BaseRequest extends Request {
    * set as a query string value. Also always forces a root @id column.
    *
    * @param {string} The unformatted select string.
-   * @returns {ApiRequest} The API request object.
+   * @returns {BaseRequest} The API request object.
    */
 
   select (select) {
@@ -87,7 +87,7 @@ class BaseRequest extends Request {
    * @param {string} The property name to order by.
    * @param {bool} True for descending results, false by default.
    * @param {bool} True for nulls first, false by default.
-   * @returns {ApiRequest} The API request object.
+   * @returns {BaseRequest} The API request object.
    */
 
   order (property, ascending = false, nullsFirst = false) {
@@ -101,7 +101,7 @@ class BaseRequest extends Request {
    *
    * @param {number} The first object to select.
    * @param {number|void} The last object to select.
-   * @returns {ApiRequest} The API request object.
+   * @returns {BaseRequest} The API request object.
    */
 
   range (from, to) {
@@ -114,7 +114,7 @@ class BaseRequest extends Request {
    * Sets the header which signifies to PostgREST the response must be a single
    * object or 404.
    *
-   * @returns {ApiRequest} The API request object.
+   * @returns {BaseRequest} The API request object.
    */
 
   single () {
@@ -135,20 +135,22 @@ class BaseRequest extends Request {
           return reject(error)
         }
 
-        const { body, headers } = response
+        const { body, headers, status, statusCode, statusText } = response
         const contentRange = headers['content-range']
 
         if (Array.isArray(body) && contentRange && contentRangeStructure.test(contentRange)) {
           body.fullLength = parseInt(contentRangeStructure.exec(contentRange)[3], 10)
         }
 
-        return resolve(body)
+        const returnBody = { body, status, statusCode, statusText}
+
+        return resolve(returnBody)
       })
     )
   }
 
   /**
-   * Makes the ApiRequest object then-able. Allows for usage with
+   * Makes the BaseRequest object then-able. Allows for usage with
    * `Promise.resolve` and async/await contexts. Just a proxy for `.then()` on
    * the promise returned from `.end()`.
    *
@@ -178,13 +180,13 @@ class BaseRequest extends Request {
  *
  * @param {string} The name of the column.
  * @param {any} The value of the column to be filtered.
- * @returns {ApiRequest} The API request object.
+ * @returns {BaseRequest} The API request object.
  */
 
 const filters = ['eq', 'gt', 'lt', 'gte', 'lte', 'like', 'ilike', 'is', 'in', 'not']
 
 filters.forEach(filter =>
-  ApiRequest.prototype[filter] = function filterValue (name, value) {
+  BaseRequest.prototype[filter] = function filterValue (name, value) {
     return this.query(`${name}=${filter}.${Array.isArray(value) ? value.join(',') : value}`)
   }
 )
