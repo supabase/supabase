@@ -5,6 +5,7 @@ import Link from '@docusaurus/Link'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import useBaseUrl from '@docusaurus/useBaseUrl'
 import styles from './styles.module.css'
+import SubscribeExample from '../../docs/snippets/SubscribeExample.mdx'
 
 const features = [
   {
@@ -38,18 +39,6 @@ function Feature({ imageUrl, title, description, href }) {
               <img className={styles.featureImage} src={imgUrl} alt={title} />
             </div>
           )}
-          <h3>{title}</h3>
-          <p>{description}</p>
-        </div>
-      </a>
-    </div>
-  )
-}
-function CodeButton({ title, description }) {
-  return (
-    <div className={classnames('col', styles.feature)}>
-      <a className={classnames('card', styles.featureCard)} >
-        <div className="card__body">
           <h3>{title}</h3>
           <p>{description}</p>
         </div>
@@ -126,7 +115,7 @@ function Home() {
             </div>
             <div className="row">
               <div class="col col--9">
-                <p>Code here</p>
+                <SubscribeExample />
               </div>
               <div class="col col--3">
                 <button class="button button--block button--primary">Realtime</button>
