@@ -3,137 +3,105 @@ id: post
 title: 'Creating data'
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 
-<Tabs
-  defaultValue="nodeJs"
-  values={[
-    { label: 'Node.js', value: 'nodeJs', },
-    { label: 'Python', value: 'py', },
-  ]
-}>
-<TabItem value="nodeJs">
+import DummyData from '../common/DummyData.mdx'
+import Collapsable from '../../src/components/Collapsable'
+import CommonResponses from '../common/CommonResponses.mdx'
 
+
+We will be using these tables as reference for our examples:
+
+<DummyData />
+
+
+
+### Create a record
+
+This example how to create a new city:
+
+<!-- prettier-ignore -->
+```js {7-8}
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+const getCities = async () => {
+  try {
+    let cities = await supabase
+      .post('cities', [
+        { name: 'The Shire', country_id: 554 }
+      ])
+    return cities
+  } catch (error) {
+    console.log('Error: ', error)
+  }
+}
+```
+
+<Collapsable title="Toggle Example Response">
+
+@todo
+
+</Collapsable>
+
+### Bulk create
+
+This example how to create multiple cities with one request:
+
+<!-- prettier-ignore -->
+```js {7-8}
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+const createCities = async () => {
+  try {
+    let cities = await supabase
+      .post('cities', [
+        { name: 'The Shire', country_id: 554 },
+        { name: 'Rohan', country_id: 554 },
+      ])
+    return cities
+  } catch (error) {
+    console.log('Error: ', error)
+  }
+}
+```
+
+<Collapsable title="Toggle Example Response">
+
+@todo
+
+</Collapsable>
+
+
+
+
+## Reference
+
+
+
+### `post()`
 ```js
-supabase.post(tableName, data, options?)
-
+supabase
+  .post(tableName, data, options?)
 ```
-Given the `options?` set (if any), this **asynchronously** posts `data` into the selected `tableName` in your database.
-</TabItem>
 
-<TabItem value="py">
-
-```py
-# TODO
-```
-</TabItem>
-</Tabs>
-
-## Method arguments
-### tableName
-`required` string  
+##### tableName `:string`  
 Name of table in the database where data will be saved.
 
-### data
-`required` array  
+##### data `:array`   
 Array of rows of type `object` which contain information to be saved into the selected table.
 
 
-### options
-`optional` object  
-All available options and examples it their usage can be found [here](../library/options).
+##### options `:object?`   
+@todo
 
-## Example
 
-### Posting a Single Row
-<Tabs
-  defaultValue="nodeJs"
-  values={[
-    { label: 'Node.js', value: 'nodeJs', },
-    { label: 'Python', value: 'py', },
-  ]
-}>
-<TabItem value="nodeJs">
-
-```js {4-9}
-const postUsers = async () => {
-  try {
-    let users = await supabase
-      .post(
-        "users", 
-        [
-          { fullName: "Nelson Bighetti" },
-        ],
-      )
-    return users
-  } catch (error) {
-    console.log('Error:', error)
-  }
-}
-
-```
-</TabItem>
-
-<TabItem value="py">
-
-```py
-# TODO
-```
-</TabItem>
-</Tabs>
-
-### Posting Multiple Rows
-<Tabs
-  defaultValue="nodeJs"
-  values={[
-    { label: 'Node.js', value: 'nodeJs', },
-    { label: 'Python', value: 'py', },
-  ]
-}>
-<TabItem value="nodeJs">
-
-```js {4-10}
-const postUsers = async () => {
-  try {
-    let users = await supabase
-      .post(
-        "users", 
-        [
-          { fullName: "Richard Hendrix" },
-          { fullName: "Elrich Bachman" }
-        ],
-      )
-    return users
-  } catch (error) {
-    console.log('Error:', error)
-  }
-}
-
-```
-</TabItem>
-
-<TabItem value="py">
-
-```py
-# TODO
-```
-</TabItem>
-</Tabs>
 
 ## Responses
-### 201 Created
-The request has succeeded. New resource created will be returned:
 
-```json
-{
-  "rows": [
-    { "fullName": "Richard Hendrix" },
-    { "fullName": "Elrich Bachman"}
-  ]
-}
+#### 201 Created
+Successful
 
-``` 
-
-### Common Responses
-Other responses can be found [here](../library/responses).
+<CommonResponses />
