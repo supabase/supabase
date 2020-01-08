@@ -1,98 +1,76 @@
 ---
 id: delete
-title: 'Deleting Rows'
+title: 'Deleting your data'
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+
+import DummyData from '../common/DummyData.mdx'
+import Collapsable from '../../src/components/Collapsable'
+import CommonResponses from '../common/CommonResponses.mdx'
+import CommonFilters from '../common/CommonFilters.mdx'
+
 
 We will be using these tables as reference for our examples:
-```json
-{
-    "companies": [
-      { "Id": 1, "name": "Pied Piper", "employeeCount": 10 },
-      { "Id": 2, "name": "Hooli", "employeeCount": 1000 },
-      { "Id": 3, "name": "Yao Net", "employeeCount": 100 },
-      { "Id": 4, "name": "See Food App", "employeeCount": null }
-    ],
-}
-```
 
-<Tabs
-  defaultValue="nodeJs"
-  values={[
-    { label: 'Node.js', value: 'nodeJs', },
-    { label: 'Python', value: 'py', },
-  ]
-}>
-<TabItem value="nodeJs">
+<DummyData />
 
-```js
-supabase.delete(tableName, options?)
 
-```
-Given the `options?` set (if any), this delete all rows from the specified `tableName`.
-</TabItem>
 
-<TabItem value="py">
+### Delete records
 
-```py
-# TODO
-```
-</TabItem>
-</Tabs>
+This example how to delete a city:
 
-## Method arguments
-### tableName
-`required` string  
-Name of table in the database that will have its rows deleted.
+<!-- prettier-ignore -->
+```js {8-10}
+import { createClient } from '@supabase/supabase-js'
 
-### options
-`optional` object  
-All available options and examples it their usage can be found [here](../library/options).
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
 
-## Additional filtering
-To specifically indicate which resources are to be deleted, additional filters can be used.
-They can be found [here](../library/filters).
+const updateCountryName = async () => {
+  try {
+    let values = await supabase
+      .delete('cities', { name: 'Mordor' })
+      .match({ id: 666 })
 
-## Example
-
-### Mass delete
-Updating employeeCount for all companies.
-```js
-const deleteCompanies = async () => {
-  try{
-    let company = await supabase.delete("companies")
-    return company
+    return values
   } catch (error) {
-    console.log("Error: ", error)
+    console.log('Error: ', error)
   }
 }
 ```
 
-Upon a successful deletion, the status code `204 Accepted` will be returned. 
-When getting all companies again, as shown [by this example](../library/get#generic), 
-the following will be returned with the status code `200 OK`:
-```json
-[]
-```
+<Collapsable title="Toggle Example Response">
 
-### Using filters
-Deleting companies where its columnName "name" is equal to "See Food App".
+@todo
+
+</Collapsable>
+
+
+## Reference
+
+
+### `delete()`
 ```js
-supabase.delete("companies").eq("name", "See Food App")
+supabase
+  .post(tableName, options?)
 ```
 
-Upon a successful deletion, the status code `204 Accepted` will be returned.
-When getting all companies again, as shown [by this example](../library/get#generic), 
-the following will be returned with the status code `200 OK`:
-```json
-[
-  { "Id": 1, "name": "Pied Piper", "employeeCount": 10 },
-  { "Id": 2, "name": "Hooli", "employeeCount": 1000 },
-  { "Id": 3, "name": "Yao Net", "employeeCount": 100 }
-]
-```
+##### tableName `:string`  
+Name of table in the database with the data that should be deleted.
+
+##### options `:object?`   
+@todo
+
+----
+
+
+## Filtering
+
+<CommonFilters verb="delete" />
 
 ## Responses
-Aside from the status code `204 Accepted`, other common responses can be found [here](../library/responses).
+
+#### 200 OK
+Successful
+
+<CommonResponses />
