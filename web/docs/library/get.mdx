@@ -6,6 +6,8 @@ title: 'Reading your data'
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 import DummyData from '../common/DummyData.mdx'
+import CommonResponses from '../common/CommonResponses.mdx'
+import Collapsable from '../../src/components/Collapsable'
 
 We will be using these tables as reference for our examples:
 
@@ -32,6 +34,10 @@ const getCities = async () => {
 }
 ```
 
+<details>
+<summary>Show response</summary>
+<div>
+
 Calling `getCities()` will return the following response:
 
 ```json
@@ -44,6 +50,9 @@ Calling `getCities()` will return the following response:
   { "name": "San Francisco", "country_id": 840 }
 ]
 ```
+
+</div>
+</details>
 
 ### Getting specific columns
 
@@ -67,6 +76,10 @@ const getCities = async () => {
 }
 ```
 
+<details>
+<summary><b>Show response</b></summary>
+<div>
+  
 Calling `getCities()` will return the following response:
 
 ```json
@@ -79,6 +92,9 @@ Calling `getCities()` will return the following response:
   { "name": "San Francisco" }
 ]
 ```
+
+</div>
+</details>
 
 ### Query foreign tables
 
@@ -109,8 +125,8 @@ const getCountries = async () => {
 
 
 <details>
-  <summary><b>Show response</b></summary>
-  <div>
+<summary><b>Show response</b></summary>
+<div>
 
 Calling `getCountries()` will return the following response:
 
@@ -155,88 +171,448 @@ Calling `getCountries()` will return the following response:
 ]
 ```
 
-  </div>
+</div>
 </details>
 
+## Reference
 
----
 
----
+### `get()`
 
----
-
---
-
-```js
-supabase.get(tableName, options?)
-
+<!-- prettier-ignore -->
+```js {2}
+supabase
+  .get(tableName)
 ```
 
-Given the `options?` set (if any), this **asynchronously** gets all rows from the specified `tableName` in your database.
-
-## Method arguments
-
-### tableName
-
-`required` string  
+##### tableName `:string`
 Name of table in the database that will be read from.
 
-### options
 
-`optional` object  
-All available options and examples it their usage can be found [here](../library/options).
+----
 
-## Additional filtering
+### `select()`
 
-### Select
-
-```js
-select(columnQuery)
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .select(columnNames)
 ```
 
-Returns an array of rows with only columns specified in `columnQuery`.
+##### columnName `:string`
+Select only the specified columns. For example `select('id, name')`. Similar to a GraphQL, if a foreign key constraint exists between this table 
+and another, information from the other table can be requested as well. For example:
 
-#### Method arguments
-
-##### columnQuery
-
-`required` array
-
+<!-- prettier-ignore -->
 ```js
-// From the 'users' table
-;`
-  Id,
-  fullName,
-  companyId
-`
-```
-
-String containing column names that are found in the table. The pattern/ syntax would be as shown above.
-If a foreign key constraint exists between this table and another, information from
-the other table can be requested as well. The pattern/ syntax is shown below:
-
-```js
-// From the 'users' table
-;`
-  fullName,
-  companies {
+supabase
+  .get('countries')
+  .select(`
     name,
-    employeeCount
-  }
-`
+    cities {
+      name,
+      population
+    }
+  `)
 ```
 
-Instead of stating the column name with the foreign key constraint, the name of the other table is mentioned instead
-along with the desired column names from that table.
 
-##### Example
+----
 
-Click [here](../library/get#using-select) to view some examples.
+### `order()`
 
-### Common Filters
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .order(columnName, sortAscending, nullsFirst)
+```
 
-Other common filters can be found [here](../library/filters).
+Orders your data before fetching.
+
+##### columnName `:string`
+Name of chosen column to base the order on.
+
+##### sortAscending `:boolean? | Default is false`
+Specifies whether the order will be ascending or descending.
+
+##### nullsFirst `:boolean? | Default is false`
+Specifies whether null values will be displayed first.
+
+----
+
+### `range()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .range(fromIndex, toIndex)
+```
+
+Paginates your request.
+
+##### fromIndex `:integer`
+Index or position of the start of the specified range.
+
+##### toIndex `:integer?`
+Index or position of the end of the specified range. If not stated, all remaining rows after the starting index will be returned.
+
+----
+
+### `single()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .single()
+```
+
+Returns the first row of the table as an object and **not** as an array.
+
+----
+
+### `match()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .match(filterObject)
+```
+
+Returns an array of rows that exactly match the specified filterObject.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .match({ 'continent': 'Asia'})
+```
+
+</Collapsable>
+
+
+##### filterObject `:object`
+An object of `{ 'columnName': 'criteria' }`
+
+----
+
+### `eq()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .eq(columnName, filterValue)
+```
+
+"Equals": Returns an array of rows whose value on the stated columnName exactly matches the specified filterValue.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .eq('name', 'New Zealand')
+```
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### filterValue `{:string|:integer|:boolean}`
+Value to match.
+
+----
+
+### `gt()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .gt(columnName, filterValue)
+```
+
+"Greater Than": Returns an array of rows whose value on the stated columnName exactly matches the specified filterValue.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .gt('id', 20)
+```
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### filterValue `{:string|:integer|:boolean}`
+Value to compare to.
+
+----
+
+
+### `lt()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .lt(columnName, filterValue)
+```
+
+"Less Than": Returns an array of rows whose value on the stated columnName is less than the specified filterValue.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .lt('id', 20)
+```
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### filterValue `{:string|:integer|:boolean}`
+Value to compare to.
+
+----
+
+### `gte()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .gte(columnName, filterValue)
+```
+
+"Greater Than or Equal": Returns an array of rows whose value on the stated columName is greater than or equal to the specified filterValue.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .gte('id', 20)
+```
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### filterValue `{:string|:integer|:boolean}`
+Value to compare to.
+
+----
+
+### `lte()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .lte(columnName, filterValue)
+```
+
+"Less Than or Equal": Returns an array of rows whose value on the stated columnName is less than or equal to the specified filterValue.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .gte('id', 20)
+```
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### filterValue `{:string|:integer|:boolean}`
+Value to compare to.
+
+----
+
+### `like()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .like(columnName, stringPattern)
+```
+
+Returns an array of rows whose value in the stated columnName matches the supplied pattern.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .like('name', '%United%')
+```
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### stringPattern `:string`
+String pattern to compare to. A comprehensive guide on how to form proper patterns can be found [here](https://www.postgresql.org/docs/current/functions-matching.html).
+
+
+----
+
+### `ilike()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .ilike(columnName, stringPattern)
+```
+
+A case-insensitive version of `like()`.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .ilike('name', '%united%')
+```
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### stringPattern `:string`
+String pattern to compare to. A comprehensive guide on how to form proper patterns can be found [here](https://www.postgresql.org/docs/current/functions-matching.html).
+
+
+----
+
+
+### `is()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .is(columnName, stringPattern)
+```
+
+A check for exact equality (**null**, **true**, **false**), returns an array of rows whose value on the stated columnName exactly match the specified filterValue.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .is('name', null)
+```
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### stringPattern `{:null|:boolean}`
+Value to match.
+
+----
+
+### `in()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .is(columnName, filterArray)
+```
+
+Returns an array of rows whose value on the stated columnName is found on the specified filterArray.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .in('name', ['China', 'France'])
+```
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### filterArray `:array`
+Array of values to find a match. Data type of values is dependent on the columnName specified.
+
+
+----
+
+### `not()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .not(columnName, filterValue)
+```
+
+Returns an array of rows whose value on the stated columnName is found on the specified filterArray.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .not('name', 'China')
+```
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### filterValue `{:string|:integer|:boolean}`
+Value to **not** match.
+
+----
+
+
+
 
 ## Responses
 
-Aside from the status code `200 OK`, other common responses can be found [here](../library/responses).
+#### 200 OK
+Successful request
+
+<CommonResponses />

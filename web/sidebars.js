@@ -17,10 +17,7 @@ module.exports = {
       "library/post",
       "library/get",
       "library/patch",
-      "library/delete",
-      "library/filters",
-      "library/options",
-      "library/responses"
+      "library/delete"
     ],
     Guides:[
       "guides/examples"
