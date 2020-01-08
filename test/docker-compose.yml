@@ -36,3 +36,17 @@ services:
       KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
   
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #    - "3333:3000"
+
+  # realtime:
+  #   image: supabase/realtime
+  #   ports:
+  #     - "4001:4000"
+  #   environment:
+  #     POSTGRES_USER: supabase
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_PORT: 5432
+  
