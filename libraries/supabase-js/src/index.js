@@ -1,53 +1,69 @@
-
+import BaseRequest from './BaseRequest'
 
 class SupabaseClient {
   constructor(supbaseUrl, supabaseKey, options) {
-    this.listeners = []
-    this.supbaseUrl = supbaseUrl
+    this.supabaseUrl = supabaseUrl
     this.supabaseKey = supabaseKey
+    
+    // this will be the case for now
+    this.restUrl = supabaseUrl
+    this.apiSocket = ''
   }
 
   /**
    * @todo
    */
-  subscribe () {
-    this.listeners.push()
+  subscribe (tableName) {
+    return new BaseChannel(tableName, this.apiSocket)
+  }
+
+  /**
+   * Convenience wrapper for starting a PostgREST request builder. Adds the
+   * API URL to the provided path.
+   *
+   * @param {string} The HTTP method of the request.
+   * @param {string} The path of the request.
+   * @returns {BaseRequest} The API request object.
+   */
+
+  request (method, path) {
+    return new BaseRequest(method, this.restUrl + path)
   }
 }
 
 /**
- * Instantiate a new Supabase Client
- * @param supbaseUrl
- * @param supabaseKey
- * @param options
+ * Basic HTTP method functions for quick chaining.
+ *
+ * @param {string} The path of the request.
+ * @returns {BaseRequest} The API request object.
  */
-const createClient = (supbaseUrl, supabaseKey, options = {}) => {
-  return new SupabaseClient(supbaseUrl, supabaseKey, options)
-} 
+
+const methods = ['POST', 'GET', 'PATCH', 'PUT', 'DELETE']
+
+methods.forEach(method =>
+  SupabaseClient.prototype[method.toLowerCase()] = tableName => {
+    path = `/${tableName}`
+    return this.request(method, path)
+  }
+)
+
+const createClient = (supabaseUrl, supabaseKey, options = {}) => {
+  return new SupabaseClient(supabseUrl, supabaseKey, options)
+}
 
 export { createClient }
 
-
-
 /**
- * 
- * 
- * 
- * 
- * REMOVE BELOW 
- * 
- * 
- * 
- * 
- * 
+ * TO BE REMOVED SOON 
  */
-const defaultAwesomeFunction = (name) => {
-  const returnStr = `I am the Default Awesome Function, fellow comrade! - ${name}`;
-  return returnStr;
-};
 
-const awesomeFunction = () => 'I am just an Awesome Function';
+// const defaultAwesomeFunction = (name) => {
+//   const returnStr = `I am the Default Awesome Function, fellow comrade! - ${name}`;
+//   return returnStr;
+// };
 
-export default defaultAwesomeFunction;
+// const awesomeFunction = () => 'I am just an Awesome Function';
 
-export { awesomeFunction };
+// export default defaultAwesomeFunction;
+
+// export { awesomeFunction };
