@@ -46,5 +46,9 @@
     "mocha": "^6.1.3",
     "nyc": "^13.3.0",
     "rimraf": "^2.6.2"
+  },
+  "dependencies": {
+    "phoenix-channels": "^1.0.0",
+    "superagent": "^5.2.1"
   }
 }
