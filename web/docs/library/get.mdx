@@ -6,6 +6,9 @@ title: 'Reading your data'
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 import DummyData from '../common/DummyData.mdx'
+import CommonResponses from '../common/CommonResponses.mdx'
+import CommonFilters from '../common/CommonFilters.mdx'
+import Collapsable from '../../src/components/Collapsable'
 
 We will be using these tables as reference for our examples:
 
@@ -13,7 +16,7 @@ We will be using these tables as reference for our examples:
 
 ### Getting your data
 
-This example shows how to get all the countries in our database.
+This example shows how to get all the countries in our database:
 
 <!-- prettier-ignore -->
 ```js {7-8}
@@ -32,6 +35,8 @@ const getCities = async () => {
 }
 ```
 
+<Collapsable title="Toggle Example Response">
+
 Calling `getCities()` will return the following response:
 
 ```json
@@ -45,9 +50,11 @@ Calling `getCities()` will return the following response:
 ]
 ```
 
+</Collapsable>
+
 ### Getting specific columns
 
-Get all cities but only return the name.
+This example shows how to get all cities but only return the name:
 
 <!-- prettier-ignore -->
 ```js {9}
@@ -67,6 +74,8 @@ const getCities = async () => {
 }
 ```
 
+<Collapsable title="Toggle Example Response">
+  
 Calling `getCities()` will return the following response:
 
 ```json
@@ -80,12 +89,15 @@ Calling `getCities()` will return the following response:
 ]
 ```
 
+</Collapsable>
+
 ### Query foreign tables
 
-Get all users and return all information about them and the companies they belong to.
+
+This example shows how to get all countries and the cities their cities:
 
 <!-- prettier-ignore -->
-```js {9-15}
+```js {9-14}
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
@@ -108,9 +120,8 @@ const getCountries = async () => {
 ```
 
 
-<details>
-  <summary><b>Show response</b></summary>
-  <div>
+
+<Collapsable title="Toggle Example Response">
 
 Calling `getCountries()` will return the following response:
 
@@ -155,88 +166,120 @@ Calling `getCountries()` will return the following response:
 ]
 ```
 
-  </div>
-</details>
+</Collapsable>
+
+## Reference
 
 
----
+### `get()`
 
----
-
----
-
---
-
-```js
-supabase.get(tableName, options?)
-
+<!-- prettier-ignore -->
+```js {2}
+supabase
+  .get(tableName)
 ```
 
-Given the `options?` set (if any), this **asynchronously** gets all rows from the specified `tableName` in your database.
-
-## Method arguments
-
-### tableName
-
-`required` string  
+##### tableName `:string`
 Name of table in the database that will be read from.
 
-### options
 
-`optional` object  
-All available options and examples it their usage can be found [here](../library/options).
+----
 
-## Additional filtering
+### `select()`
 
-### Select
-
-```js
-select(columnQuery)
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .select(columnQuery)
 ```
 
-Returns an array of rows with only columns specified in `columnQuery`.
+##### columnQuery `:string`
+A comma separated list of columns. For example `select('id, name')`
 
-#### Method arguments
+If a foreign key constraint exists between this table 
+and another, you can also query the columns of the related table. For example `select('name, cities {name}')`
 
-##### columnQuery
+<Collapsable title="Show detailed example">
 
-`required` array
-
+<!-- prettier-ignore -->
 ```js
-// From the 'users' table
-;`
-  Id,
-  fullName,
-  companyId
-`
-```
-
-String containing column names that are found in the table. The pattern/ syntax would be as shown above.
-If a foreign key constraint exists between this table and another, information from
-the other table can be requested as well. The pattern/ syntax is shown below:
-
-```js
-// From the 'users' table
-;`
-  fullName,
-  companies {
+supabase
+  .get('countries')
+  .select(`
     name,
-    employeeCount
-  }
-`
+    cities {
+      name,
+      population
+    }
+  `)
 ```
 
-Instead of stating the column name with the foreign key constraint, the name of the other table is mentioned instead
-along with the desired column names from that table.
+</Collapsable>
 
-##### Example
+----
 
-Click [here](../library/get#using-select) to view some examples.
+### `order()`
 
-### Common Filters
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .order(columnName, sortAscending, nullsFirst)
+```
 
-Other common filters can be found [here](../library/filters).
+Orders your data before fetching.
+
+##### columnName `:string`
+Name of chosen column to base the order on.
+
+##### sortAscending `:boolean? | Default is false`
+Specifies whether the order will be ascending or descending.
+
+##### nullsFirst `:boolean? | Default is false`
+Specifies whether null values will be displayed first.
+
+----
+
+### `range()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .range(fromIndex, toIndex)
+```
+
+Paginates your request.
+
+##### fromIndex `:integer`
+Index or position of the start of the specified range.
+
+##### toIndex `:integer?`
+Index or position of the end of the specified range. If not stated, all remaining rows after the starting index will be returned.
+
+----
+
+### `single()`
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .single()
+```
+
+Returns the first row of the table as an object and **not** as an array.
+
+----
+
+## Filtering
+
+<CommonFilters verb="get" />
 
 ## Responses
 
-Aside from the status code `200 OK`, other common responses can be found [here](../library/responses).
+#### 200 OK
+Successful request
+
+<CommonResponses />

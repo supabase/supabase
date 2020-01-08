@@ -462,7 +462,10 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
 .DummyData  div{
   padding-right: 10px;
 }
-
-summary:hover {
+.Collapsable summary {
+  font-size: 0.9rem;
+  margin-bottom:20px;
+}
+.Collapsable summary:hover {
   cursor: pointer;
 }
