@@ -1,20 +1,32 @@
 import BaseRequest from './BaseRequest'
+import BaseChannel from './BaseChannel'
+import { uuid } from './utils/Helpers'
 
 class SupabaseClient {
-  constructor(supbaseUrl, supabaseKey, options) {
+  constructor(supabaseUrl, supabaseKey, options) {
     this.supabaseUrl = supabaseUrl
     this.supabaseKey = supabaseKey
-    
+
     // this will be the case for now
     this.restUrl = supabaseUrl
     this.apiSocket = ''
+
+    this.subscriptions = {}
   }
 
   /**
    * @todo
    */
-  subscribe (tableName) {
-    return new BaseChannel(tableName, this.apiSocket)
+  subscribe(tableName) {
+    let uuid = uuid()
+
+    this.subscriptions[uuid] = new BaseChannel(tableName, this.apiSocket, uuid)
+    return this.subscriptions[uuid]
+  }
+
+  unsubscribe(subscription){
+    subscription.stop()
+    delete this.subscriptions[subscription.uuid]
   }
 
   /**
@@ -26,9 +38,10 @@ class SupabaseClient {
    * @returns {BaseRequest} The API request object.
    */
 
-  request (method, path) {
+  request(method, path) {
     return new BaseRequest(method, this.restUrl + path)
   }
+  
 }
 
 /**
@@ -38,23 +51,23 @@ class SupabaseClient {
  * @returns {BaseRequest} The API request object.
  */
 
-const methods = ['POST', 'GET', 'PATCH', 'PUT', 'DELETE']
+const methods = ['POST', 'GET', 'PATCH', 'DELETE']
 
-methods.forEach(method =>
-  SupabaseClient.prototype[method.toLowerCase()] = tableName => {
-    path = `/${tableName}`
+methods.forEach(method => {
+  SupabaseClient.prototype[method.toLowerCase()] = function requestMethod(tableName) {
+    let path = `/${tableName}`
     return this.request(method, path)
   }
-)
+})
 
 const createClient = (supabaseUrl, supabaseKey, options = {}) => {
-  return new SupabaseClient(supabseUrl, supabaseKey, options)
+  return new SupabaseClient(supabaseUrl, supabaseKey, options)
 }
 
 export { createClient }
 
 /**
- * TO BE REMOVED SOON 
+ * TO BE REMOVED SOON
  */
 
 // const defaultAwesomeFunction = (name) => {
