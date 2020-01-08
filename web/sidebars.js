@@ -14,8 +14,8 @@ module.exports = {
     Library:[
       "library/getting-started",
       "library/subscribe",
-      "library/post",
       "library/get",
+      "library/post",
       "library/patch",
       "library/delete"
     ],

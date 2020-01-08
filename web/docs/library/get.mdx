@@ -15,7 +15,7 @@ We will be using these tables as reference for our examples:
 
 ### Getting your data
 
-This example shows how to get all the countries in our database.
+This example shows how to get all the countries in our database:
 
 <!-- prettier-ignore -->
 ```js {7-8}
@@ -34,9 +34,7 @@ const getCities = async () => {
 }
 ```
 
-<details>
-<summary>Show response</summary>
-<div>
+<Collapsable title="Toggle Example Response">
 
 Calling `getCities()` will return the following response:
 
@@ -51,12 +49,11 @@ Calling `getCities()` will return the following response:
 ]
 ```
 
-</div>
-</details>
+</Collapsable>
 
 ### Getting specific columns
 
-Get all cities but only return the name.
+This example shows how to get all cities but only return the name:
 
 <!-- prettier-ignore -->
 ```js {9}
@@ -76,9 +73,7 @@ const getCities = async () => {
 }
 ```
 
-<details>
-<summary><b>Show response</b></summary>
-<div>
+<Collapsable title="Toggle Example Response">
   
 Calling `getCities()` will return the following response:
 
@@ -93,15 +88,15 @@ Calling `getCities()` will return the following response:
 ]
 ```
 
-</div>
-</details>
+</Collapsable>
 
 ### Query foreign tables
 
-Get all users and return all information about them and the companies they belong to.
+
+This example shows how to get all countries and the cities their cities:
 
 <!-- prettier-ignore -->
-```js {9-15}
+```js {9-14}
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
@@ -124,9 +119,8 @@ const getCountries = async () => {
 ```
 
 
-<details>
-<summary><b>Show response</b></summary>
-<div>
+
+<Collapsable title="Toggle Example Response">
 
 Calling `getCountries()` will return the following response:
 
@@ -171,8 +165,7 @@ Calling `getCountries()` will return the following response:
 ]
 ```
 
-</div>
-</details>
+</Collapsable>
 
 ## Reference
 
@@ -197,12 +190,16 @@ Name of table in the database that will be read from.
 ```js {3}
 supabase
   .get(tableName)
-  .select(columnNames)
+  .select(columnQuery)
 ```
 
-##### columnName `:string`
-Select only the specified columns. For example `select('id, name')`. Similar to a GraphQL, if a foreign key constraint exists between this table 
-and another, information from the other table can be requested as well. For example:
+##### columnQuery `:string`
+A comma separated list of columns. For example `select('id, name')`
+
+If a foreign key constraint exists between this table 
+and another, you can also query the columns of the related table. For example `select('name, cities {name}')`
+
+<Collapsable title="Show detailed example">
 
 <!-- prettier-ignore -->
 ```js
@@ -217,6 +214,7 @@ supabase
   `)
 ```
 
+</Collapsable>
 
 ----
 
