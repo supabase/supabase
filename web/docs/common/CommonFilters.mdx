@@ -1,0 +1,865 @@
+
+import Collapsable from '../../src/components/Collapsable'
+
+### `match()`
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3} 
+supabase
+  .get(tableName)
+  .match(filterObject)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3} 
+supabase
+  .patch(tableName)
+  .match(filterObject)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3} 
+supabase
+  .delete(tableName)
+  .match(filterObject)
+```
+
+</div>
+
+Finds rows that exactly match the specified filterObject.
+
+<Collapsable title="Toggle Example">
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .match({ 'continent': 'Asia' })
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .patch('countries')
+  .match({ 'continent': 'Asia' })
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .delete('countries')
+  .match({ 'name': 'Mordor' })
+```
+
+</div>
+
+</Collapsable>
+
+
+##### filterObject `:object`
+An object of `{ 'columnName': 'criteria' }`
+
+----
+
+### `eq()`
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .eq(columnName, filterValue)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .patch(tableName)
+  .eq(columnName, filterValue)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .delete(tableName)
+  .eq(columnName, filterValue)
+```
+
+</div>
+
+Finds all rows whose value on the stated columnName exactly matches the specified filterValue.
+
+<Collapsable title="Toggle Example">
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .eq('name', 'New Zealand')
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .patch('countries')
+  .eq('name', 'New Zealand')
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .delete('countries')
+  .eq('name', 'New Zealand')
+```
+
+</div>
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### filterValue `{:string|:integer|:boolean}`
+Value to match.
+
+----
+
+### `gt()`
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .gt(columnName, filterValue)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .patch(tableName)
+  .gt(columnName, filterValue)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .delete(tableName)
+  .gt(columnName, filterValue)
+```
+
+</div>
+
+Finds all rows whose value on the stated columnName exactly matches the specified filterValue.
+
+<Collapsable title="Toggle Example">
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .gt('id', 20)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .patch('countries')
+  .gt('id', 20)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .delete('countries')
+  .gt('id', 20)
+```
+
+</div>
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### filterValue `{:string|:integer|:boolean}`
+Value to compare to.
+
+----
+
+
+### `lt()`
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .lt(columnName, filterValue)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .patch(tableName)
+  .lt(columnName, filterValue)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .delete(tableName)
+  .lt(columnName, filterValue)
+```
+
+</div>
+
+Finds all rows whose value on the stated columnName is less than the specified filterValue.
+
+<Collapsable title="Toggle Example">
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .lt('id', 20)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .patch('countries')
+  .lt('id', 20)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .delete('countries')
+  .lt('id', 20)
+```
+
+</div>
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### filterValue `{:string|:integer|:boolean}`
+Value to compare to.
+
+----
+
+### `gte()`
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .gte(columnName, filterValue)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .patch(tableName)
+  .gte(columnName, filterValue)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .delete(tableName)
+  .gte(columnName, filterValue)
+```
+
+</div>
+
+Finds all rows whose value on the stated columName is greater than or equal to the specified filterValue.
+
+<Collapsable title="Toggle Example">
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .gte('id', 20)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .patch('countries')
+  .gte('id', 20)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .delete('countries')
+  .gte('id', 20)
+```
+
+</div>
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### filterValue `{:string|:integer|:boolean}`
+Value to compare to.
+
+----
+
+### `lte()`
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .lte(columnName, filterValue)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .patch(tableName)
+  .lte(columnName, filterValue)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .delete(tableName)
+  .lte(columnName, filterValue)
+```
+
+</div>
+
+Finds all rows whose value on the stated columnName is less than or equal to the specified filterValue.
+
+<Collapsable title="Toggle Example">
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .gte('id', 20)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .patch('countries')
+  .gte('id', 20)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .delete('countries')
+  .gte('id', 20)
+```
+
+</div>
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### filterValue `{:string|:integer|:boolean}`
+Value to compare to.
+
+----
+
+### `like()`
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .like(columnName, stringPattern)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .patch(tableName)
+  .like(columnName, stringPattern)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .delete(tableName)
+  .like(columnName, stringPattern)
+```
+
+</div>
+
+Finds all rows whose value in the stated columnName matches the supplied pattern.
+
+<Collapsable title="Toggle Example">
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .like('name', '%United%')
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .patch('countries')
+  .like('name', '%United%')
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .delete('countries')
+  .like('name', '%United%')
+```
+
+</div>
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### stringPattern `:string`
+String pattern to compare to. A comprehensive guide on how to form proper patterns can be found [here](https://www.postgresql.org/docs/current/functions-matching.html).
+
+
+----
+
+### `ilike()`
+
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .ilike(columnName, stringPattern)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .patch(tableName)
+  .ilike(columnName, stringPattern)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .delete(tableName)
+  .ilike(columnName, stringPattern)
+```
+
+</div>
+
+A case-insensitive version of `like()`.
+
+<Collapsable title="Toggle Example">
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .ilike('name', '%united%')
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .patch('countries')
+  .ilike('name', '%united%')
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .delete('countries')
+  .ilike('name', '%united%')
+```
+
+</div>
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### stringPattern `:string`
+String pattern to compare to. A comprehensive guide on how to form proper patterns can be found [here](https://www.postgresql.org/docs/current/functions-matching.html).
+
+
+----
+
+
+### `is()`
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .is(columnName, stringPattern)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .patch(tableName)
+  .is(columnName, stringPattern)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .delete(tableName)
+  .is(columnName, stringPattern)
+```
+
+</div>
+
+A check for exact equality (**null**, **true**, **false**), finds all rows whose value on the stated columnName exactly match the specified filterValue.
+
+<Collapsable title="Toggle Example">
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .is('name', null)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .patch('countries')
+  .is('name', null)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .delete('countries')
+  .is('name', null)
+```
+
+</div>
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### stringPattern `{:null|:boolean}`
+Value to match.
+
+----
+
+### `in()`
+
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .is(columnName, filterArray)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .patch(tableName)
+  .is(columnName, filterArray)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .delete(tableName)
+  .is(columnName, filterArray)
+```
+
+</div>
+
+Finds all rows whose value on the stated columnName is found on the specified filterArray.
+
+<Collapsable title="Toggle Example">
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .in('name', ['China', 'France'])
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .patch('countries')
+  .in('name', ['China', 'France'])
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .delete('countries')
+  .in('name', ['China', 'France'])
+```
+
+</div>
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### filterArray `:array`
+Array of values to find a match. Data type of values is dependent on the columnName specified.
+
+
+----
+
+### `not()`
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .get(tableName)
+  .not(columnName, filterValue)
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .patch(tableName)
+  .not(columnName, filterValue)
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .delete(tableName)
+  .not(columnName, filterValue)
+```
+
+</div>
+
+Returns an array of rows whose value on the stated columnName is found on the specified filterArray.
+
+<Collapsable title="Toggle Example">
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .get('countries')
+  .not('name', 'China')
+```
+
+</div>
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .patch('countries')
+  .not('name', 'China')
+```
+
+</div>
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .delete('countries')
+  .not('name', 'China')
+```
+
+</div>
+
+</Collapsable>
+
+##### columnName `:string`
+Name of database column.
+
+##### filterValue `{:string|:integer|:boolean}`
+Value to **not** match.
+
+----

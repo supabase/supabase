@@ -113,8 +113,8 @@ function Home() {
 
         <section className={styles.forDevelopers}>
           <div className="container">
-            <div class="row">
-              <div class="col col--8 col--offset-2">
+            <div className="row">
+              <div className="col col--8 col--offset-2">
                 <h2 className="with-underline text--center">For Developers</h2>
                 <p className="text--center">
                   We're a bunch of developers, building tools for developers. Tools that we even use
@@ -125,13 +125,13 @@ function Home() {
               </div>
             </div>
             <div className="row">
-              <div class="col col--9">
+              <div className="col col--9">
                 <p>Code here</p>
               </div>
-              <div class="col col--3">
-                <button class="button button--block button--primary">Realtime</button>
-                <button class="button button--block button--link">Get records</button>
-                <button class="button button--block button--link">Create Records</button>
+              <div className="col col--3">
+                <button className="button button--block button--primary">Realtime</button>
+                <button className="button button--block button--link">Get records</button>
+                <button className="button button--block button--link">Create Records</button>
               </div>
             </div>
           </div>
