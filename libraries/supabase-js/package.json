@@ -12,7 +12,7 @@
     "test:examples": "node examples/",
     "cover": "nyc --check-coverage npm run test:only",
     "build": "cross-env BABEL_ENV=production babel src --out-dir lib",
-    "prepublish": "npm run clean && npm run test && npm run build"
+    "prepublish": "npm run clean && npm run build"
   },
   "files": [
     "lib",
