@@ -1,10 +1,10 @@
 import { Socket } from 'phoenix-channels'
 
 export default class BaseChannel {
-    constructor(tableName, apiSocket){
+    constructor(tableName, apiSocket, uuid){
         this.socket = new Socket(apiSocket)
+        this.uuid = uuid
         this.channel = this.socket.channel(tableName)
-        this.listeners = {}
 
         this.start()
 
@@ -17,23 +17,7 @@ export default class BaseChannel {
     }
 
     on(eventName, callbackFunction){
-        let ref = this.channel.on(eventName, callbackFunction)
-        this.listeners[ref] = eventName
-        return ref
-    }
-
-    off(eventName, ref = null){
-        // if ref is null, we just want to remove everything that has the eventName
-        if(typeof ref === 'null'){
-            for (var ref in this.listeners){
-                let eventNameValue = this.listeners[ref]
-                if(eventName === eventNameValue){
-                    this.off(eventName, ref)
-                }
-            }
-        }
-
-        this.channel.off(eventName, ref)
+        this.channel.on(eventName, callbackFunction)
     }
 
     start(){
