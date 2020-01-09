@@ -119,10 +119,9 @@ function Home() {
               <div className="col col--8 col--offset-2">
                 <h2 className="with-underline text--center">For Developers</h2>
                 <p className="text--center">
-                  We're a bunch of developers, building tools for developers. Tools that we even use
-                  ourselves. This means we are obsessed with solving your problems, because they
-                  solve our problems too. We prioritise the intrinsic features first - features like
-                  performance and simplicity. We believe that sometimes, doing less is better.
+                  We're a bunch of developers, building tools for developers. We're obsessed with solving your problems, 
+                  because they solve our problems too. Our products prioritize performance and simplicity because sometimes 
+                  doing less is better.
                 </p>
               </div>
             </div>
