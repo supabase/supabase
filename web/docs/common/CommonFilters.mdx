@@ -18,7 +18,7 @@ supabase
 <!-- prettier-ignore -->
 ```js {3} 
 supabase
-  .patch(tableName)
+  .patch(tableName, data)
   .match(filterObject)
 ```
 
@@ -53,7 +53,7 @@ supabase
 <!-- prettier-ignore -->
 ```js
 supabase
-  .patch('countries')
+  .patch('countries', { name: 'Middle Earth' })
   .match({ 'continent': 'Asia' })
 ```
 
@@ -94,7 +94,7 @@ supabase
 <!-- prettier-ignore -->
 ```js {3}
 supabase
-  .patch(tableName)
+  .patch(tableName, data)
   .eq(columnName, filterValue)
 ```
 
@@ -129,7 +129,7 @@ supabase
 <!-- prettier-ignore -->
 ```js
 supabase
-  .patch('countries')
+  .patch('countries', { name: 'Middle Earth' })
   .eq('name', 'New Zealand')
 ```
 
@@ -172,7 +172,7 @@ supabase
 <!-- prettier-ignore -->
 ```js {3}
 supabase
-  .patch(tableName)
+  .patch(tableName, data)
   .gt(columnName, filterValue)
 ```
 
@@ -207,7 +207,7 @@ supabase
 <!-- prettier-ignore -->
 ```js
 supabase
-  .patch('countries')
+  .patch('countries', { name: 'Middle Earth' })
   .gt('id', 20)
 ```
 
@@ -251,7 +251,7 @@ supabase
 <!-- prettier-ignore -->
 ```js {3}
 supabase
-  .patch(tableName)
+  .patch(tableName, data)
   .lt(columnName, filterValue)
 ```
 
@@ -286,7 +286,7 @@ supabase
 <!-- prettier-ignore -->
 ```js
 supabase
-  .patch('countries')
+  .patch('countries', { name: 'Middle Earth' })
   .lt('id', 20)
 ```
 
@@ -329,7 +329,7 @@ supabase
 <!-- prettier-ignore -->
 ```js {3}
 supabase
-  .patch(tableName)
+  .patch(tableName, data)
   .gte(columnName, filterValue)
 ```
 
@@ -364,7 +364,7 @@ supabase
 <!-- prettier-ignore -->
 ```js
 supabase
-  .patch('countries')
+  .patch('countries', { name: 'Middle Earth' })
   .gte('id', 20)
 ```
 
@@ -407,7 +407,7 @@ supabase
 <!-- prettier-ignore -->
 ```js {3}
 supabase
-  .patch(tableName)
+  .patch(tableName, data)
   .lte(columnName, filterValue)
 ```
 
@@ -442,7 +442,7 @@ supabase
 <!-- prettier-ignore -->
 ```js
 supabase
-  .patch('countries')
+  .patch('countries', { name: 'Middle Earth' })
   .gte('id', 20)
 ```
 
@@ -485,7 +485,7 @@ supabase
 <!-- prettier-ignore -->
 ```js {3}
 supabase
-  .patch(tableName)
+  .patch(tableName, data)
   .like(columnName, stringPattern)
 ```
 
@@ -520,7 +520,7 @@ supabase
 <!-- prettier-ignore -->
 ```js
 supabase
-  .patch('countries')
+  .patch('countries', { name: 'Middle Earth' })
   .like('name', '%United%')
 ```
 
@@ -565,7 +565,7 @@ supabase
 <!-- prettier-ignore -->
 ```js {3}
 supabase
-  .patch(tableName)
+  .patch(tableName, data)
   .ilike(columnName, stringPattern)
 ```
 
@@ -600,7 +600,7 @@ supabase
 <!-- prettier-ignore -->
 ```js
 supabase
-  .patch('countries')
+  .patch('countries', { name: 'Middle Earth' })
   .ilike('name', '%united%')
 ```
 
@@ -645,7 +645,7 @@ supabase
 <!-- prettier-ignore -->
 ```js {3}
 supabase
-  .patch(tableName)
+  .patch(tableName, data)
   .is(columnName, stringPattern)
 ```
 
@@ -680,7 +680,7 @@ supabase
 <!-- prettier-ignore -->
 ```js
 supabase
-  .patch('countries')
+  .patch('countries', { name: 'Middle Earth' })
   .is('name', null)
 ```
 
@@ -724,7 +724,7 @@ supabase
 <!-- prettier-ignore -->
 ```js {3}
 supabase
-  .patch(tableName)
+  .patch(tableName, data)
   .in(columnName, filterArray)
 ```
 
@@ -759,7 +759,7 @@ supabase
 <!-- prettier-ignore -->
 ```js
 supabase
-  .patch('countries')
+  .patch('countries', { name: 'Middle Earth' })
   .in('name', ['China', 'France'])
 ```
 
@@ -803,7 +803,7 @@ supabase
 <!-- prettier-ignore -->
 ```js {3}
 supabase
-  .patch(tableName)
+  .patch(tableName, data)
   .not(columnName, filterValue)
 ```
 
@@ -838,7 +838,7 @@ supabase
 <!-- prettier-ignore -->
 ```js
 supabase
-  .patch('countries')
+  .patch('countries', { name: 'Middle Earth' })
   .not('name', 'China')
 ```
 

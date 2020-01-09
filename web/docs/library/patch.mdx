@@ -1,6 +1,6 @@
 ---
 id: patch
-title: 'Updating your data'
+title: 'Updating'
 ---
 
 
@@ -63,7 +63,12 @@ New record values.
 
 
 ##### options `:object?`   
-@todo
+
+```js
+const options = {
+  bulk: false // Protects against bulk updates. Set to true if you intend to perform a bulk change.
+}
+```
 
 ----
 

@@ -459,8 +459,8 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   display: flex;
   overflow-x: auto;
 }
-.DummyData  div{
-  padding-right: 10px;
+.DummyData div {
+  padding-right: 30px;
 }
 .Collapsable summary {
   font-size: 0.9rem;
