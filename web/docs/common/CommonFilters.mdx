@@ -715,7 +715,7 @@ Value to match.
 ```js {3}
 supabase
   .get(tableName)
-  .is(columnName, filterArray)
+  .in(columnName, filterArray)
 ```
 
 </div>
@@ -725,7 +725,7 @@ supabase
 ```js {3}
 supabase
   .patch(tableName)
-  .is(columnName, filterArray)
+  .in(columnName, filterArray)
 ```
 
 </div>
@@ -735,7 +735,7 @@ supabase
 ```js {3}
 supabase
   .delete(tableName)
-  .is(columnName, filterArray)
+  .in(columnName, filterArray)
 ```
 
 </div>
