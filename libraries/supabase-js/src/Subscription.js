@@ -4,6 +4,7 @@ export default class BaseChannel {
     constructor(tableName, apiSocket, uuid){
         this.socket = new Socket(apiSocket)
         this.uuid = uuid
+        this.tableName = tableName
         this.channel = this.socket.channel(tableName)
 
         this.start()

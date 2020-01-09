@@ -1,11 +1,12 @@
 ---
 id: subscribe
-title: 'Listen for realtime changes'
+title: 'Subscribing'
 ---
 
 import DummyData from '../common/DummyData.mdx'
+import Collapsable from '../../src/components/Collapsable'
 
-Our library makes it simple to listen to changes in your database in realtime.
+Subscribe to realtime changes in your own database.
 
 We will be using these tables as reference for our examples.
 
@@ -21,12 +22,12 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
 
 // Listen to changes
-const listener = supabase
+const mySubscription = supabase
   .subscribe('*')
   .on('*', payload => {
     console.log('Change received!', payload)
   })
-  .join()
+  .connect()
 ```
 
 ### Listening to a specific table
@@ -39,12 +40,12 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
 
 // Listen to changes
-const listener = supabase
+const mySubscription = supabase
   .subscribe('countries')
   .on('*', payload => {
     console.log('Change received!', payload)
   })
-  .join()
+  .connect()
 ```
 
 ### Listening only to INSERTS
@@ -57,12 +58,12 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
 
 // Listen to changes
-const listener = supabase
+const mySubscription = supabase
   .subscribe('countries')
   .on('INSERT', payload => {
     console.log('Change received!', payload)
   })
-  .join()
+  .connect()
 ```
 
 ### Listening only to UPDATES
@@ -75,12 +76,12 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
 
 // Listen to changes
-const listener = supabase
+const mySubscription = supabase
   .subscribe('countries')
   .on('UPDATE', payload => {
     console.log('Change received!', payload)
   })
-  .join()
+  .connect()
 ```
 
 ### Listening only to DELETES
@@ -93,12 +94,12 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
 
 // Listen to changes
-const listener = supabase
+const mySubscription = supabase
   .subscribe('countries')
   .on('DELETE', payload => {
     console.log('Change received!', payload)
   })
-  .join()
+  .connect()
 ```
 
 ### Listening to multiple events
@@ -111,11 +112,11 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
 
 // Listen to changes
-const listener = supabase
+const mySubscription = supabase
   .subscribe('countries')
   .on('INSERT', handleRecordInserted)
   .on('DELETE', handleRecordDeleted)
-  .join()
+  .connect()
 ```
 
 ### Unsubscribing
@@ -128,10 +129,10 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
 
 // Listen to changes
-const myListener = supabase.subscribe('countries')
+const mySubscription = supabase.subscribe('countries')
 
 // Unsubscribe from changes
-supabase.unsubscribe(myListener)
+supabase.unsubscribe(mySubscription)
 ```
 
 
@@ -143,7 +144,7 @@ supabase.unsubscribe(myListener)
 
 <!-- prettier-ignore -->
 ```js {2}
-supabase
+const mySubscription = supabase
   .subscribe('tableName')
 ```
 
@@ -153,25 +154,12 @@ The database table that you want to subscribe to. Using the wildcard `"*"` will 
 
 ----
 
-### `join()`
-
-<!-- prettier-ignore -->
-```js {3}
-supabase
-  .subscribe('tableName')
-  .join()
-```
-
-
-----
-
 ### `on()`
 
 <!-- prettier-ignore -->
-```js {4}
-supabase
+```js {3}
+const mySubscription = supabase
   .subscribe('tableName')
-  .join()
   .on('eventType', callbackFunction)
 ```
 
@@ -185,19 +173,94 @@ A callback that will handle the payload that is sent whenever your database chan
 ----
 
 
+### `connect()`
+
+<!-- prettier-ignore -->
+```js {4}
+const mySubscription = supabase
+  .subscribe('tableName')
+  .on('eventType', callbackFunction)
+  .connect()
+```
+Start listening to database changes.
+
+----
+
+### `disconnect()`
+
+<!-- prettier-ignore -->
+```js {2}
+mySubscription
+  .disconnect()
+```
+Stop listening to changes. At any point you can call `connect()` on the subscription to restart the listeners. 
+If you don't need to connect again in the future, use `unsubscribe()` instead.
+
+----
+
+
 ### `unsubscribe()`
 
 <!-- prettier-ignore -->
 ```js {2}
 supabase
-  .unsubscribe(yourSubscription)
+  .unsubscribe(mySubscription)
 ```
 
-###### yourSubscription `:subscription`  
-A listener that was previously created.
+Disconnects and destroys a subscription. This is the preferred method for cleaning up subscriptions which you no longer require. 
+
+###### mySubscription `:subscription`  
+A subscription that was previously created. If you don't have access to the subscription, you can always call `getSubscriptions()`.
 
 
 ----
+
+### `getSubscriptions()`
+
+<!-- prettier-ignore -->
+```js {2}
+supabase
+  .getSubscriptions()
+```
+Returns an array of all your subscriptions (including disconnected subscriptions).
+
+
+<Collapsable title="Toggle Example Response">
+
+<!-- prettier-ignore -->
+```js
+[
+  {
+    uuid: 'xxxx-xxxx-xxxx-xxxx',
+    state: 'CONNECTED',
+    tableName: 'users',
+    eventListeners: {
+      '*': null,
+      'INSERT': null,
+      'UPDATE': null,
+      'DELETE': null,
+    }
+  },
+  {
+    uuid: 'yyyy-yyyy-yyyy-yyyy',
+    state: 'DISCONNECTED',
+    tableName: 'messages',
+    eventListeners: {
+      '*': null,
+      'INSERT': null,
+      'UPDATE': null,
+      'DELETE': null,
+    }
+  }
+]
+```
+
+
+</Collapsable>
+
+
+----
+
 
 ## Change Events
 
@@ -209,6 +272,7 @@ Upon inserting or creating a new row, the following will be returned by our list
 
 ```json
 {
+  "eventType": "INSERT",
   "new": [
     { "name": "Middle Earth", "country_id": "554" }
   ]
@@ -219,9 +283,10 @@ Upon inserting or creating a new row, the following will be returned by our list
 
 
 Upon updating a row, the following will be returned by our listener:
-
+`
 ```json
 {
+  "eventType": "UPDATE",
   "old": [
     { "name": "Middle Earth", "country_id": "554" }
   ],
@@ -238,6 +303,7 @@ Upon deleting a row, the following will be returned by our listener:
 
 ```json
 {
+  "eventType": "DELETE",
   "old": [
     { "name": "Mordor", "country_id": "554" }
   ]

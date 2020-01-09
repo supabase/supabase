@@ -1,6 +1,6 @@
 ---
 id: delete
-title: 'Deleting your data'
+title: 'Deleting'
 ---
 
 
@@ -21,7 +21,7 @@ We will be using these tables as reference for our examples:
 This example how to delete a city:
 
 <!-- prettier-ignore -->
-```js {8-10}
+```js {8-9}
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
@@ -29,8 +29,8 @@ const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h'
 const updateCountryName = async () => {
   try {
     let values = await supabase
-      .delete('cities', { name: 'Mordor' })
       .match({ id: 666 })
+      .delete('cities', { name: 'Mordor' })
 
     return values
   } catch (error) {
@@ -52,14 +52,19 @@ const updateCountryName = async () => {
 ### `delete()`
 ```js
 supabase
-  .post(tableName, options?)
+  .delete(tableName, options?)
 ```
 
 ##### tableName `:string`  
 Name of table in the database with the data that should be deleted.
 
 ##### options `:object?`   
-@todo
+
+```js
+const options = {
+  bulk: false // Protects against bulk updates. Set to true if you intend to perform a bulk change.
+}
+```
 
 ----
 

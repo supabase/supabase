@@ -1,5 +1,5 @@
 import BaseRequest from './BaseRequest'
-import BaseChannel from './BaseChannel'
+import Subscription from './Subscription'
 import { uuid } from './utils/Helpers'
 
 class SupabaseClient {
@@ -20,7 +20,7 @@ class SupabaseClient {
   subscribe(tableName) {
     let uuid = uuid()
 
-    this.subscriptions[uuid] = new BaseChannel(tableName, this.apiSocket, uuid)
+    this.subscriptions[uuid] = new Subscription(tableName, this.apiSocket, uuid)
     return this.subscriptions[uuid]
   }
 
