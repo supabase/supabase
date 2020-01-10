@@ -14,7 +14,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://your-db.supabase.io', '1a2b-3c4d-5e6f-7g8h')
 
 // Receive updates when a new record is inserted into your database
-const listener = supabase
+const realtime = supabase
   .from('*')
   .on('INSERT', change => {
     console.log('Change received!', change)
@@ -116,6 +116,7 @@ function Home() {
                   Add realtime and RESTful APIs to your <strong>existing</strong> PostgreSQL
                   database without a single line of code.
                   <br />
+                  <br />
                   Forget about custom-coding relational APIs and websockets. We introspect your
                   database and provide APIs <strong>instantly</strong> so you can focus on what is
                   most important - building your products.
@@ -127,6 +128,7 @@ function Home() {
                       styles.button
                     )}
                     to={useBaseUrl('docs/about')}
+                    style={{marginLeft: 0 , marginTop: 10}}
                   >
                     Learn More
                   </Link>
@@ -136,6 +138,7 @@ function Home() {
                       styles.button
                     )}
                     to={'https://app.supabase.io'}
+                    style={{ marginTop: 10}}
                   >
                     Join the List
                   </Link>
@@ -222,10 +225,10 @@ function Home() {
         <section style={{ marginTop: 40, padding: 20 }} className="hero is--dark">
           <div className="container text--right">
             <div className="">
-              <strong>Join the waiting list</strong>
+              <strong>Join the waiting list.</strong>
               <Link
                 className={classnames(
-                  'button button--outline button--md button--primary',
+                  'button hero--button button--md button--primary',
                   styles.button
                 )}
                 to={'https://app.supabase.io'}

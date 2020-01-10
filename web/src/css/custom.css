@@ -235,7 +235,7 @@ li + li {
 .markdown h2:after {
   content: '\2501\2501';
   display: block;
-  color: var(--custom-primary);
+  color: #333;
 }
 article header {
   margin-bottom: 3rem;
@@ -298,9 +298,13 @@ article header {
 a.card {
   text-decoration: none !important;
   color: var(--ifm-color-content);
+  box-shadow: none;
+  border: 1px solid #333;
+  background-color: var(--ifm-background-color);
 }
 a.card:hover {
   transition: all 0.2s ease;
+  border: 1px solid var(--custom-primary);
   box-shadow: var(--custom-shadow-xl), 0 0 0 1px var(--custom-primary) !important;
 }
 
@@ -468,11 +472,12 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
 
 /* Hero */
 .hero--button {
-  margin: 0 10px 0 0  !important;
+  text-transform: uppercase;
+  padding: 10px 25px;
 }
 /* Hero */
 .hero--button.button--secondary {
-  border-color: #000;
+  border-color: #333;
 }
 
 /* Code */
