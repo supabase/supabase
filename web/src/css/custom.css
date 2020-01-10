@@ -182,10 +182,6 @@
 
 }
 
-:root[data-theme='dark'] .prism-code {
-  background: var(--custom-background-color-highlight) !important;
-}
-
 img.navbar__logo path {
   fill: red !important;
 }
@@ -237,7 +233,7 @@ li + li {
 
 .with-underline::after,
 .markdown h2:after {
-  content: '\2501';
+  content: '\2501\2501';
   display: block;
   color: var(--custom-primary);
 }
@@ -468,4 +464,61 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
 }
 .Collapsable summary:hover {
   cursor: pointer;
+}
+
+/* Hero */
+.hero--button {
+  margin: 0 10px 0 0  !important;
+}
+/* Hero */
+.hero--button.button--secondary {
+  border-color: #000;
+}
+
+/* Code */
+.prism-code {
+  background: #2a2a2a !important;
+  white-space: pre !important;
+  font-size: 0.8rem;
+  overflow: auto !important;
+}
+.token.keyword.module, .token.function {
+  font-style: normal !important;
+  color: #DCDCAA !important;
+}
+.token.plain, .token.parameter {
+  font-style: normal !important;
+  color: #9CDCFE !important;
+}
+.token.keyword {
+  font-style: normal !important;
+  color: #569cd6 !important;
+}
+.token.string {
+  font-style: normal !important;
+  color: #CE9178 !important;
+}
+.token.console {
+  font-style: normal !important;
+  color: #49C1AD !important;
+}
+.token.comment {
+  color: #6A9955 !important;
+}
+.token.number {
+  color: #B5CEA8 !important;
+}
+
+/* HomePage */
+.ForDevelopers .row {
+  display: flex;
+  flex-direction: row-reverse;
+}
+.ForDevelopers .button {
+  text-align: left;
+}
+.ForDevelopers .button.button--link:hover {
+  text-decoration: none;
+  transition: all 0.2s ease;
+  opacity: 0.8;
 }

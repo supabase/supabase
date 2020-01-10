@@ -7,7 +7,7 @@
 
 module.exports = {
   title: 'Supabase',
-  tagline: 'Instant Realtime API',
+  tagline: 'realtime postgres.',
   url: 'https://supabase.io',
   baseUrl: '/',
   favicon: '/static/favicon.ico',
@@ -35,7 +35,7 @@ module.exports = {
         // },
         {
           href: 'https://app.supabase.io',
-          label: 'Request Early Access →',
+          label: 'Join the List',
           position: 'right',
         },
       ],
