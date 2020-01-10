@@ -15,7 +15,7 @@ It does all of this without you having to write a single line of code.
 
 ## What it isn't
 
-@todo
+- An ORM, at least not like typical ORMs. Supabase is more like an API, since we don't require you to set up any mappings and we interact with your database through a derived schema that get from introspecting your database.
 
 ## How it works 
 
