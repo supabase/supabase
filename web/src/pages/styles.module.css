@@ -17,11 +17,6 @@
   overflow: hidden;
 } */
 
-@media screen and (max-width: 966px) {
-  .heroBanner {
-    padding: 2rem;
-  }
-}
 
 .heroBanner h2 {
   font-size: 2rem !important;
@@ -29,12 +24,9 @@
 .heroBanner p {
   font-size: 1rem !important;
 }
-
-
 .heroImage {
   max-height: 50vh;
 }
-
 .features {
   display: flex;
   margin-top: 5rem;
@@ -75,5 +67,5 @@
   margin-bottom: 20px;
 }
 .pricingCard p {
-   margin: 0;
+  margin: 0;
 }

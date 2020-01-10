@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import classnames from 'classnames'
 import Layout from '@theme/Layout'
 import Link from '@docusaurus/Link'
@@ -10,16 +10,56 @@ import CodeBlock from '@theme/CodeBlock'
 const subscribeExample = `
 import { createClient } from '@supabase/supabase-js'
 
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://chat-room.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+// Connect to your own PostgreSQL database
+const supabase = createClient('https://your-db.supabase.io', '1a2b-3c4d-5e6f-7g8h')
 
-// Listen to all new messages in your chat room
+// Receive updates when a new record is inserted into your database
 const listener = supabase
-  .subscribe('messages')
-  .on('INSERT', chatMessage => {
-    console.log('New chat!', chatMessage)
+  .from('*')
+  .on('INSERT', change => {
+    console.log('Change received!', change)
   })
+  .subscribe()
 `
+const readExample = `
+import { createClient } from '@supabase/supabase-js'
+
+// Connect to your own PostgreSQL database
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+// Get all countries and the cities with a population over 10,000 people
+const countries = await supabase
+  .from('countries')
+  .select(\`
+    name,
+    cities { name, population }
+  \`)
+  .filter('cities=popution=gte.10000')
+`
+const createExample = `
+import { createClient } from '@supabase/supabase-js'
+
+// Connect to your own PostgreSQL database
+const supabase = createClient('https://stripe.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+// Create a new employee in your 'employees' table
+const newEmployee = supabase
+  .from('employees')
+  .insert({ id: 1, name: 'Greg Brockman', salary: 5000 })
+`
+const updateExample = `
+import { createClient } from '@supabase/supabase-js'
+
+// Connect to your own PostgreSQL database
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+// Update all city names in New Zealand
+const listener = supabase
+  .from('employees')
+  .eq('country_code', 'NZ')
+  .update({ name: 'Middle Earth' })
+`
+
 const features = [
   {
     title: <>Chat apps</>,
@@ -63,43 +103,50 @@ function Feature({ imageUrl, title, description, href }) {
 function Home() {
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
+  const [visibleCodeExample, showCodeExample] = useState('SUBSCRIBE')
   return (
     <Layout title={`${siteConfig.title}`} description={siteConfig.tagline}>
-      <header className={classnames('hero shadow--md', styles.heroBanner)}>
-        <div className="container text--center">
-          <h2 className="hero__title">{siteConfig.tagline}</h2>
-          <p className="hero__subtitle">
-            Add a Realtime API to your PostgreSQL database without a single line of code.
-          </p>
-          <div>
-            {/* <img
-              src="/img/hero.png"
-              alt="Supabase"
-              className={classnames(styles.heroImage)}
-            /> */}
+      <main className="HomePage">
+        <header className={classnames('hero', styles.heroBanner)}>
+          <div className="container">
+            <div className="row">
+              <div className="col col--6">
+                <h2 className="hero__title">{siteConfig.tagline}</h2>
+                <p className="hero__subtitle">
+                  Add realtime and RESTful APIs to your <strong>existing</strong> PostgreSQL
+                  database without a single line of code.
+                  <br />
+                  Forget about custom-coding relational APIs and websockets. We introspect your
+                  database and provide APIs <strong>instantly</strong> so you can focus on what is
+                  most important - building your products.
+                </p>
+                <div>
+                  <Link
+                    className={classnames(
+                      'button hero--button button--outline button--md button--secondary',
+                      styles.button
+                    )}
+                    to={useBaseUrl('docs/about')}
+                  >
+                    Learn More
+                  </Link>
+                  <Link
+                    className={classnames(
+                      'button hero--button button--md button--primary',
+                      styles.button
+                    )}
+                    to={'https://app.supabase.io'}
+                  >
+                    Join the List
+                  </Link>
+                </div>
+              </div>
+              <div className="col col--6 codeblock-scroll">
+                <CodeBlock>{subscribeExample}</CodeBlock>
+              </div>
+            </div>
           </div>
-          <Link
-            className={classnames(
-              'button button--outline button--md button--secondary',
-              styles.button
-            )}
-            to={useBaseUrl('docs/about')}
-          >
-            Learn More
-          </Link>
-          <Link
-            className={classnames(
-              'button button--outline button--md button--primary',
-              styles.button
-            )}
-            to={'https://app.supabase.io'}
-          >
-            Request Early Access
-          </Link>
-        </div>
-      </header>
-
-      <main>
+        </header>
         {features && features.length && (
           <section className={styles.features}>
             <div className="container">
@@ -116,21 +163,57 @@ function Home() {
         <section className={styles.forDevelopers}>
           <div className="container">
             <div className="row">
-              <div className="col col--8 col--offset-2">
-                <h2 className="with-underline text--center">For Developers</h2>
-                <p className="text--center">
-                  We're a bunch of developers, building tools for developers. We're obsessed with solving your problems, 
-                  because they solve our problems too. Our products prioritize performance and simplicity because sometimes 
-                  doing less is better.
+              <div className="col col--9">
+                <h2 className="with-underline">For Developers</h2>
+                <p className="">
+                  We're a bunch of developers, building tools for developers. We're obsessed with
+                  solving your problems, because they solve our problems too. Our products
+                  prioritize performance and simplicity because sometimes doing less is better.
                 </p>
               </div>
             </div>
-            <div className="row">
-              <div className="col col--9">
-                <CodeBlock>{subscribeExample}</CodeBlock>
-              </div>
-              <div className="col col--3">
-                <button className="button button--block button--primary">Realtime</button>
+            <div className="ForDevelopers">
+              <div className="row">
+                <div className="col col--3">
+                  <button
+                    className={`button button--block button--${
+                      visibleCodeExample === 'SUBSCRIBE' ? 'primary' : 'link'
+                    }`}
+                    onClick={() => showCodeExample('SUBSCRIBE')}
+                  >
+                    Realtime subscriptions
+                  </button>
+                  <button
+                    className={`button button--block button--${
+                      visibleCodeExample === 'READ' ? 'primary' : 'link'
+                    }`}
+                    onClick={() => showCodeExample('READ')}
+                  >
+                    Get your data
+                  </button>
+                  <button
+                    className={`button button--block button--${
+                      visibleCodeExample === 'CREATE' ? 'primary' : 'link'
+                    }`}
+                    onClick={() => showCodeExample('CREATE')}
+                  >
+                    Create a record
+                  </button>
+                  <button
+                    className={`button button--block button--${
+                      visibleCodeExample === 'UPDATE' ? 'primary' : 'link'
+                    }`}
+                    onClick={() => showCodeExample('UPDATE')}
+                  >
+                    Update mulitple rows
+                  </button>
+                </div>
+                <div className="col col--9">
+                  {visibleCodeExample === 'SUBSCRIBE' && <CodeBlock>{subscribeExample}</CodeBlock>}
+                  {visibleCodeExample === 'READ' && <CodeBlock>{readExample}</CodeBlock>}
+                  {visibleCodeExample === 'CREATE' && <CodeBlock>{createExample}</CodeBlock>}
+                  {visibleCodeExample === 'UPDATE' && <CodeBlock>{updateExample}</CodeBlock>}
+                </div>
               </div>
             </div>
           </div>
@@ -139,7 +222,7 @@ function Home() {
         <section style={{ marginTop: 40, padding: 20 }} className="hero is--dark">
           <div className="container text--right">
             <div className="">
-              <strong>Try Supabase for free</strong>
+              <strong>Join the waiting list</strong>
               <Link
                 className={classnames(
                   'button button--outline button--md button--primary',
@@ -147,7 +230,7 @@ function Home() {
                 )}
                 to={'https://app.supabase.io'}
               >
-                GO
+                GO →
               </Link>
             </div>
           </div>
