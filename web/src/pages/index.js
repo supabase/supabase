@@ -124,11 +124,11 @@ function Home() {
                 <div>
                   <Link
                     className={classnames(
-                      'button hero--button button--outline button--md button--secondary',
+                      'button hero--button button--md button--secondary button--outline',
                       styles.button
                     )}
                     to={useBaseUrl('docs/about')}
-                    style={{marginLeft: 0 , marginTop: 10}}
+                    style={{ marginLeft: 0, marginTop: 10 }}
                   >
                     Learn More
                   </Link>
@@ -138,9 +138,9 @@ function Home() {
                       styles.button
                     )}
                     to={'https://app.supabase.io'}
-                    style={{ marginTop: 10}}
+                    style={{ marginTop: 10 }}
                   >
-                    Join the List
+                    Join the List →
                   </Link>
                 </div>
               </div>
@@ -223,9 +223,17 @@ function Home() {
         </section>
 
         <section style={{ marginTop: 40, padding: 20 }} className="hero is--dark">
-          <div className="container text--right">
+          <div className="container text--center">
             <div className="">
-              <strong>Join the waiting list.</strong>
+              <Link
+                className={classnames(
+                  'button hero--button button--outline button--md button--secondary',
+                  styles.button
+                )}
+                to={useBaseUrl('docs/about')}
+              >
+                Learn More
+              </Link>
               <Link
                 className={classnames(
                   'button hero--button button--md button--primary',
@@ -233,7 +241,7 @@ function Home() {
                 )}
                 to={'https://app.supabase.io'}
               >
-                GO →
+                Join the waiting list →
               </Link>
             </div>
           </div>

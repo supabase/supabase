@@ -75,18 +75,14 @@ function Navbar() {
         'navbar-sidebar--show': sidebarShown,
         [styles.navbarHideable]: hideOnScroll,
         [styles.navbarHidden]: !isNavbarVisible,
-      })}>
+      })}
+    >
       <div className="navbar__inner">
-        <div className={classnames("navbar__items", styles.navbarItems)}>
+        <div className={classnames('navbar__items', styles.navbarItems)}>
           <Link className="navbar__brand" to={baseUrl}>
-            {logo != null && (
-              <img className="navbar__logo" src={logoUrl} alt={logo.alt} />
-            )}
+            {logo != null && <img className="navbar__logo" src={logoUrl} alt={logo.alt} />}
             {title != null && (
-              <strong
-                className={isSearchBarExpanded ? styles.hideLogoText : ''}>
-                {title}
-              </strong>
+              <strong className={isSearchBarExpanded ? styles.hideLogoText : ''}>{title}</strong>
             )}
           </Link>
           <div
@@ -95,14 +91,16 @@ function Navbar() {
             role="button"
             tabIndex={0}
             onClick={showSidebar}
-            onKeyDown={showSidebar}>
+            onKeyDown={showSidebar}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="30"
               height="30"
               viewBox="0 0 30 30"
               role="img"
-              focusable="false">
+              focusable="false"
+            >
               <title>Menu</title>
               <path
                 stroke="currentColor"
@@ -120,36 +118,30 @@ function Navbar() {
             ))}
         </div>
         <div className="navbar__items navbar__items--right">
-          {links
-            .filter(linkItem => linkItem.position === 'right')
-            .map((linkItem, i) => (
-              <NavLink {...linkItem} key={i} />
-            ))}
           {!disableDarkMode && (
             <Toggle
-              className={styles.displayOnlyInLargeViewport}
+              className={classnames(styles.displayOnlyInLargeViewport, styles.toggle)}
               aria-label="Dark mode toggle"
               checked={theme === 'dark'}
               onChange={onToggleChange}
             />
           )}
+          {links
+            .filter(linkItem => linkItem.position === 'right')
+            .map((linkItem, i) => (
+              <NavLink {...linkItem} key={i} />
+            ))}
           <SearchBar
             handleSearchBarToggle={setIsSearchBarExpanded}
             isSearchBarExpanded={isSearchBarExpanded}
           />
         </div>
       </div>
-      <div
-        role="presentation"
-        className="navbar-sidebar__backdrop"
-        onClick={hideSidebar}
-      />
+      <div role="presentation" className="navbar-sidebar__backdrop" onClick={hideSidebar} />
       <div className="navbar-sidebar">
         <div className="navbar-sidebar__brand">
           <Link className="navbar__brand" onClick={hideSidebar} to={baseUrl}>
-            {logo != null && (
-              <img className="navbar__logo" src={logoUrl} alt={logo.alt} />
-            )}
+            {logo != null && <img className="navbar__logo" src={logoUrl} alt={logo.alt} />}
             {title != null && <strong>{title}</strong>}
           </Link>
           {!disableDarkMode && sidebarShown && (
@@ -165,11 +157,7 @@ function Navbar() {
             <ul className="menu__list">
               {links.map((linkItem, i) => (
                 <li className="menu__list-item" key={i}>
-                  <NavLink
-                    className="menu__link"
-                    {...linkItem}
-                    onClick={hideSidebar}
-                  />
+                  <NavLink className="menu__link" {...linkItem} onClick={hideSidebar} />
                 </li>
               ))}
             </ul>
@@ -177,7 +165,7 @@ function Navbar() {
         </div>
       </div>
     </nav>
-  );
+  )
 }
 
 export default Navbar;

@@ -23,7 +23,7 @@ At its core, Supabase is an Elixir server that allows you to listen to PostgreSQ
 
 It is built with Phoenix, an Elixir framework that's incredibly scalable. 
 
-For all Restful functionality, we introspect your database to provide an out-of-the-box, fully functional API.
+For all Restful functionality, we introspect your database to provide an instant, fully functional API.
 
 ## Features
 
@@ -41,4 +41,4 @@ For all Restful functionality, we introspect your database to provide an out-of-
 
 ## Where it is
 
-All code is hosted on our GitHub org: [https://github.com/supabase](https://github.com/supabase)
+All code is hosted on [our GitHub org](https://github.com/supabase).

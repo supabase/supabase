@@ -4,17 +4,20 @@
  * Override the default Infima variables here. These values cascade down to
  * the rest of the elements.
  */
-@import url('https://min.gitcdn.xyz/repo/kiwicopple/assets/master/public/css/circular.css');
+/* @import url('https://min.gitcdn.xyz/repo/kiwicopple/assets/master/public/css/circular.css'); */
+/* @import url('https://gitcdn.xyz/repo/kiwicopple/assets/master/public/css/gilmer.css'); */
+@import url('https://gitcdn.xyz/repo/kiwicopple/assets/master/public/css/metro.css');
 /* @import url('https://rsms.me/inter/inter.css'); */
 
-
-:root[data-theme=''], :root[data-theme='dark'] {
+:root,
+:root[data-theme=''],
+:root[data-theme='dark'] {
   /* See theme-specific "--custom" vars below  */
 
   /* 
     Customisation here for both Light and Dark themes
   */
-  --custom-font-base: 'Circular', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen',
+  --custom-font-base: 'Metro', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial',
     sans-serif;
   --custom-font-code: 'Source Code Pro', Menlo, monospace;
@@ -24,10 +27,21 @@
   --custom-primary-darkest: #10633e;
   --custom-primary-darker: #1c8656;
   --custom-primary-dark: #38bc81;
-  --custom-primary: #3ecf8e;
+  --custom-primary: #24b47e;
   --custom-primary-light: #65d9a5;
   --custom-primary-lighter: #9fe7c7;
   --custom-primary-lightest: #c5f1dd;
+  --custom-background-color: #fdfdfd;
+  --custom-background-color-highlight: #fff;
+  --custom-background-color-diff: #f5f6f7;
+  --custom-content-color: #1f1f1f;
+  --custom-content-color-light: #484848;
+  --custom-content-color-lightest: #333;
+  --custom-border-color: #e0e0e0;
+  --custom-shadow-lw: 0 3px 5px 0px rgba(0, 0, 0, 0.1);
+  --custom-shadow-md: 0 3px 5px 0px rgba(0, 0, 0, 0.1);
+  --custom-shadow-tl: 0 12px 28px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  --custom-shadow-xl: 0 30px 60px 0 rgba(0, 0, 0, 0.1);
 
   /* 
     Infirma overrides with customisation
@@ -40,7 +54,6 @@
   --ifm-color-content-secondary: var(--custom-content-color-light);
   --ifm-code-background: var(--custom-background-color-diff);
 
-
   /* Primary */
   --ifm-color-primary-darkest: var(--custom-primary-darkest);
   --ifm-color-primary-darker: var(--custom-primary-darker);
@@ -50,25 +63,27 @@
   --ifm-color-primary-lighter: var(--custom-primary-lighter);
   --ifm-color-primary-lightest: var(--custom-primary-lightest);
 
-
   /* Fonts */
   --ifm-font-base-color: var(--custom-content-color);
   --ifm-font-family-base: var(--custom-font-base);
   --ifm-font-family-monospace: var(--custom-font-code);
   --ifm-heading-font-family: var(--custom-font-base);
   --ifm-font-size-base: var(--custom-font-size-base);
-  
+  --ifm-font-weight: 800;
 
   /* Globals */
   --ifm-global-shadow-lw: var(--custom-shadow-lw);
-  --ifm-global-shadow-md:  var(--custom-shadow-md);
-  --ifm-global-shadow-tl:  var(--custom-shadow-tl);
+  --ifm-global-shadow-md: var(--custom-shadow-md);
+  --ifm-global-shadow-tl: var(--custom-shadow-tl);
   --ifm-contents-border-color: var(--custom-border-color);
   --ifm-hr-border-color: var(--custom-border-color);
   --ifm-code-border-radius: var(--custom-border-radius);
   --ifm-button-border-radius: var(--custom-border-radius);
   --ifm-col-spacing-vertical: 0.5rem;
 
+  /* Buttons */
+  --ifm-button-background-color: var(--custom-background-color);
+  
   /* Navbar */
   --ifm-navbar-background-color: var(--custom-background-color);
 
@@ -89,74 +104,29 @@
   --ifm-panel-background-solid: var(--custom-background-color);
 
   /* Card */
-  --ifm-card-background-color: var(--custom-background-color-highlight);
+  --ifm-card-background-color: var(--custom-background-color);
   --ifm-card-border-radius: var(--custom-border-radius-md);
-
 
   /* Tables */
   --ifm-table-border-color: var(--custom-border-color);
   --ifm-table-stripe-background: var(--custom-background-color-diff);
-
-  /* 
-  --ifm-background-color-rgb: 255, 255, 255;
-  --ifm-background-surface-color: var(--ifm-panel-background);
-  --ifm-badge-border-radius: 0.25em;
-  --ifm-blockquote-color: var(--ifm-color-primary-lighter);
-  --ifm-code-background: var(--ifm-color-emphasis-50);
-  --ifm-code-font-size: 85%;
-  --ifm-color-blue: #3084ff;
-  --ifm-color-blue-rgb: 48, 132 ,255;
-  --ifm-color-content: var(--ifm-color-emphasis-800);
-  --ifm-color-content-secondary: var(--ifm-color-emphasis-400);
-  --ifm-color-danger: #ff1178;
-  --ifm-color-danger-rgb: 255, 17, 120;
-  --ifm-color-pink: #f44af5;
-  --ifm-color-pink-rgb: 244, 74 ,245;
-  --ifm-color-secondary: var(--ifm-color-emphasis-100);
-  --ifm-color-success-rgb: 0, 77, 0;
-  --ifm-color-warning-rgb: 255, 186, 0;
-  --ifm-contents-padding-left: var(--ifm-spacing-horizontal);
-  --ifm-font-size-base: 16px;
-  --ifm-footer-padding-vertical: calc(var(--ifm-spacing-vertical) * 4);
-  --ifm-h2-font-size: 2em;
-  --ifm-heading-margin-bottom: calc( var(--ifm-spacing-vertical) * 3 );
-  --ifm-hero-text-color: var(--ifm-color-content);
-  --ifm-leading: calc(var(--ifm-leading-desktop) * 1em);
-  --ifm-panel-background: var(--ifm-color-emphasis-50);
-  --ifm-panel-background-rgb: 249, 249, 250;
-  --ifm-panel-background-active: rgba( var(--ifm-color-primary-rgb), 0.2 );
-  --ifm-panel-box-shadow: none;
-  --ifm-panel-box-shadow-active: var(--ifm-panel-box-shadow);
-  --ifm-panel-color: var(--ifm-color-emphasis-800);
-  --ifm-panel-color-active: var(--ifm-color-primary);
-  --ifm-pre-line-height: var(--ifm-line-height-base);
-  --ifm-table-stripe-background: var(--ifm-table-background); */
 }
-
-
-:root[data-theme='']  {
-  --custom-background-color: #fdfdfd;
-  --custom-background-color-highlight: #fff;
-  --custom-background-color-diff: #f5f6f7;
-  --custom-content-color: #1f1f1f;
-  --custom-content-color-light: #484848;
-  --custom-border-color: #e0e0e0;
-  --custom-shadow-lw: 0 3px 5px 0px rgba(0, 0, 0, 0.1);
-  --custom-shadow-md: 0 3px 5px 0px rgba(0, 0, 0, 0.1);
-  --custom-shadow-tl: 0 12px 28px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-  --custom-shadow-xl: 0 30px 60px 0 rgba(0, 0, 0, 0.1);
-
-  /* This needs more work */
-  --custom-primary: #24b47e;
-}
-
 
 :root[data-theme='dark'] {
+  --custom-primary-darkest: #10633e;
+  --custom-primary-darker: #1c8656;
+  --custom-primary-dark: #38bc81;
+  --custom-primary: #3ecf8e;
+  --custom-primary-light: #65d9a5;
+  --custom-primary-lighter: #9fe7c7;
+  --custom-primary-lightest: #c5f1dd;
+
   --custom-background-color: #1f1f1f;
   --custom-background-color-highlight: #2a2a2a;
   --custom-background-color-diff: #2a2a2a;
-  --custom-content-color: #fefefe;
+  --custom-content-color: #ddd;
   --custom-content-color-light: #aaa;
+  --custom-content-color-lightest: #fefefe;
   --custom-border-color: #444444;
   --custom-shadow-lw: 0 0 3px 3px rgba(0, 0, 0, 0.2);
   --custom-shadow-md: 0 0 5px 5px rgba(0, 0, 0, 0.3);
@@ -180,10 +150,11 @@
   --ifm-color-secondary-lighter: #313131;
   --ifm-color-secondary-lightest: #333333;
 
-}
+  /* Button */
+  --ifm-button-background-color: var(--custom-background-color-highlight);
 
-img.navbar__logo path {
-  fill: red !important;
+  /* Card */
+  --ifm-card-background-color: var(--custom-background-color-highlight);
 }
 
 .docusaurus-highlight-code-line {
@@ -203,6 +174,26 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
+.button.button--primary {
+  text-shadow: 0 1px 3px rgba(36,180,126,.4);
+}
+.button.button--secondary {
+  color: var(--custom-content-color);
+}
+.button.button--secondary.button--outline {
+  border-color: #333;
+}
+:root[data-theme='dark'] .button.button--secondary {
+  background-color: var(--custom-background-color-highlight);
+  border-color: #111;
+}
+.hero--button {
+  text-transform: uppercase;
+  padding: 10px 25px;
+  font-weight: bold;
+}
+
+
 @media screen and (min-width: 768px) {
   html,
   body {
@@ -218,6 +209,11 @@ li + li {
   text-transform: uppercase;
 }
 
+.title {
+  font-weight: bold;
+  color: var(--custom-content-color-lightest) !important;
+}
+
 .navbar__brand strong {
   font-family: var(--ifm-heading-font-family);
   font-size: 1.5rem;
@@ -231,12 +227,12 @@ li + li {
   box-shadow: var(--ifm-global-shadow-md);
 }
 
-.with-underline::after,
+/* .with-underline::after,
 .markdown h2:after {
   content: '\2501\2501';
   display: block;
   color: #333;
-}
+} */
 article header {
   margin-bottom: 3rem;
 }
@@ -278,7 +274,7 @@ article header {
   text-align: right;
 }
 .navbar-sidebar__items .menu .menu__link {
-  color: var(--ifm-heading-color);
+  color: var(--ifm-color-content);
   display: block;
 }
 .navbar-sidebar__items .menu .menu__link .badge {
@@ -300,7 +296,7 @@ a.card {
   color: var(--ifm-color-content);
   box-shadow: none;
   border: 1px solid #333;
-  background-color: var(--ifm-background-color);
+  /* background-color: var(--ifm-background-color); */
 }
 a.card:hover {
   transition: all 0.2s ease;
@@ -330,10 +326,11 @@ a.card:hover {
   justify-content: space-between;
   line-height: calc(var(--ifm-spacing-vertical) * 1.25);
   margin-top: calc(var(--ifm-spacing-vertical) * 1.5);
-  margin-bottom: calc(var(--ifm-spacing-vertical) * 0.5);
+  margin-bottom: 0;
   padding: var(--ifm-menu-link-padding-vertical) 0;
   /* font-weight: bold; */
   text-transform: uppercase;
+  font-size: 0.9em;
 }
 .menu > ul.menu__list > li.menu__list-item:first-child div.title {
   margin-top: 0;
@@ -357,7 +354,7 @@ a.card:hover {
 .menu .menu__link:hover,
 .menu .menu__link.menu__link--active:not(.menu__link--sublist) {
   background: none;
-  line-height: calc(var(--ifm-spacing-vertical) * 1.25);
+  line-height: calc(var(--ifm-spacing-vertical) * 1);
 }
 .menu .menu__link.menu__link--sublist::after {
   background-image: url('data:image/svg+xml;utf8,<svg alt="Arrow" xmlns="http://www.w3.org/2000/svg" width="14px" height="14px" viewBox="-6 -6 38 38"><path fill="rgba(0,0,0,0.3)" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg>');
@@ -453,8 +450,6 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   }
 }
 
-
-
 .DummyData {
   display: flex;
   overflow-x: auto;
@@ -464,20 +459,10 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
 }
 .Collapsable summary {
   font-size: 0.9rem;
-  margin-bottom:20px;
+  margin-bottom: 20px;
 }
 .Collapsable summary:hover {
   cursor: pointer;
-}
-
-/* Hero */
-.hero--button {
-  text-transform: uppercase;
-  padding: 10px 25px;
-}
-/* Hero */
-.hero--button.button--secondary {
-  border-color: #333;
 }
 
 /* Code */
@@ -487,13 +472,15 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   font-size: 0.8rem;
   overflow: auto !important;
 }
-.token.keyword.module, .token.function {
+.token.keyword.module,
+.token.function {
   font-style: normal !important;
-  color: #DCDCAA !important;
+  color: #dcdcaa !important;
 }
-.token.plain, .token.parameter {
+.token.plain,
+.token.parameter {
   font-style: normal !important;
-  color: #9CDCFE !important;
+  color: #9cdcfe !important;
 }
 .token.keyword {
   font-style: normal !important;
@@ -501,17 +488,18 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
 }
 .token.string {
   font-style: normal !important;
-  color: #CE9178 !important;
+  color: #ce9178 !important;
 }
 .token.console {
   font-style: normal !important;
-  color: #49C1AD !important;
+  color: #49c1ad !important;
 }
 .token.comment {
-  color: #6A9955 !important;
+  font-style: normal !important;
+  color: #6a9955 !important;
 }
 .token.number {
-  color: #B5CEA8 !important;
+  color: #b5cea8 !important;
 }
 
 /* HomePage */
@@ -526,4 +514,8 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   text-decoration: none;
   transition: all 0.2s ease;
   opacity: 0.8;
+}
+
+.react-toggle-thumb {
+  box-shadow: none !important;
 }
