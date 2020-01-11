@@ -68,6 +68,7 @@ function Navbar() {
   );
 
   const logoUrl = useBaseUrl(logo.src);
+  const logoDark = useBaseUrl(logo.dark)
   return (
     <nav
       ref={navbarRef}
@@ -80,7 +81,12 @@ function Navbar() {
       <div className="navbar__inner">
         <div className={classnames('navbar__items', styles.navbarItems)}>
           <Link className="navbar__brand" to={baseUrl}>
-            {logo != null && <img className="navbar__logo" src={logoUrl} alt={logo.alt} />}
+            {logo != null && (
+              <img className="navbar__logo logo--light" src={logoUrl} alt={logo.alt} />
+            )}
+            {logoDark != null && (
+              <img className="navbar__logo logo--dark" src={logoDark} alt={logo.alt} />
+            )}
             {title != null && (
               <strong className={isSearchBarExpanded ? styles.hideLogoText : ''}>{title}</strong>
             )}
@@ -141,7 +147,12 @@ function Navbar() {
       <div className="navbar-sidebar">
         <div className="navbar-sidebar__brand">
           <Link className="navbar__brand" onClick={hideSidebar} to={baseUrl}>
-            {logo != null && <img className="navbar__logo" src={logoUrl} alt={logo.alt} />}
+            {logo != null && (
+              <img className="navbar__logo logo--light" src={logoUrl} alt={logo.alt} />
+            )}
+            {logoDark != null && (
+              <img className="navbar__logo logo--dark" src={logoDark} alt={logo.alt} />
+            )}
             {title != null && <strong>{title}</strong>}
           </Link>
           {!disableDarkMode && sidebarShown && (

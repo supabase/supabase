@@ -20,10 +20,11 @@ module.exports = {
     },
     navbar: {
       classNames: 'shadow--md',
-      title: 'supabase',
+      // title: 'supabase',
       logo: {
         alt: 'Supabase',
-        src: '/supabase-logo.svg',
+        src: '/supabase-light.svg',
+        dark: '/supabase-dark.svg',
       },
       links: [
         { to: '/docs/about', label: 'Docs', position: 'right' },
@@ -35,7 +36,7 @@ module.exports = {
         // },
         {
           href: 'https://app.supabase.io',
-          label: 'Join the List',
+          label: 'Join the List →',
           position: 'right',
         },
       ],
@@ -48,34 +49,34 @@ module.exports = {
     footer: {
       links: [
         {
-          title: "Company",
+          title: 'Company',
           items: [
             {
-              label: "Docs",
-              to: "/docs/about"
+              label: 'Docs',
+              to: '/docs/about',
             },
             {
-              label: "Guides",
-              to: "/docs/guides/examples"
+              label: 'Guides',
+              to: '/docs/guides/examples',
             },
             {
-              label: "Blog",
-              to: "/blog"
-            }
-          ]
+              label: 'Blog',
+              to: '/blog',
+            },
+          ],
         },
         {
-          title: "Community",
+          title: 'Community',
           items: [
             {
-              label: "GitHub",
-              href: "https://github.com/supabase/monorepo"
+              label: 'GitHub',
+              href: 'https://github.com/supabase/monorepo',
             },
             // {
             //   label: "Discord",
             //   href: "https://discordapp.com/invite/docusaurus"
             // }
-          ]
+          ],
         },
         // {
         //   title: "Social",
@@ -104,7 +105,7 @@ module.exports = {
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
-        }
+        },
       },
     ],
   ],
