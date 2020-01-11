@@ -118,9 +118,9 @@ function Home() {
                   single line of code.
                   <br />
                   <br />
-                  Don't waste your time coding relational APIs and websockets. We introspect your
+                  Don't waste time creating relational APIs and websockets. We introspect your
                   database and provide APIs <strong class="has-emphasis">instantly</strong> so you
-                  can focus on what is most important - building your products.
+                  can focus on what's most important - building your products.
                 </p>
                 <div>
                   <Link
@@ -154,7 +154,7 @@ function Home() {
         {features && features.length && (
           <section className={styles.features}>
             <div className="container">
-              <h2 className="with-underline">Use Cases</h2>
+              <h2 className="with-underline">Use Cases.</h2>
               <div className="row">
                 {features.map((props, idx) => (
                   <Feature key={idx} {...props} />
@@ -168,9 +168,10 @@ function Home() {
           <div className="container">
             <div className="row">
               <div className="col col--9">
-                <h2 className="with-underline">For Developers</h2>
+                <h2 className="with-underline">For Developers.</h2>
                 <p className="">
-                  We believe developers want solid, fast, and simple products. So that's what we make.
+                  We believe developers want solid, fast, and simple products. So that's what we
+                  make.
                 </p>
               </div>
             </div>
@@ -221,14 +222,22 @@ function Home() {
           </div>
         </section>
 
-        <section style={{ marginTop: 40, padding: 20 }} className="hero is--dark">
+        <section
+          style={{ marginTop: 100, padding: '50px 0', borderTop: '1px solid var(--custom-border-color)' }}
+          className="hero is--dark"
+        >
           <div className="container text--center">
+            <div>
+              <h2>Get Early Access.</h2>
+            </div>
             <div className="">
               <Link
                 className={classnames(
                   'button hero--button button--outline button--md button--secondary',
-                  styles.button
+                  styles.button,
+                  styles.responsiveButton
                 )}
+                style={{ margin: 5 }}
                 to={useBaseUrl('docs/about')}
               >
                 Learn More
@@ -236,9 +245,11 @@ function Home() {
               <Link
                 className={classnames(
                   'button hero--button button--md button--primary',
-                  styles.button
+                  styles.button,
+                  styles.responsiveButton
                 )}
                 to={'https://app.supabase.io'}
+                style={{ margin: 5 }}
               >
                 Join the list →
               </Link>

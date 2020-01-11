@@ -43,8 +43,7 @@ module.exports = {
     },
     prism: {
       defaultLanguage: 'js',
-      // https://github.com/FormidableLabs/prism-react-renderer/tree/master/src/themes
-      // theme: require('prism-react-renderer/themes/vsdark'),
+      plugins: ['line-numbers', 'show-language']
     },
     footer: {
       links: [
