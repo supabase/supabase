@@ -33,16 +33,25 @@ createClient('supabaseURL', 'supabaseKey', OPTIONS)
 ```
 
 ###### supabaseURL `:string` 
-The unique Supabase URL which is supplied when you create a new project in [your project Dashboard](https://app.supabase.io).
+The unique Supabase URL which is supplied when you create a new project in [your project dashboard](https://app.supabase.io).
 
 ###### supabaseKey `:string`
-The unique Supabase Key which is supplied when you create a new project in [your project Dashboard](https://app.supabase.io).
+The unique Supabase Key which is supplied when you create a new project in [your project dashboard](https://app.supabase.io).
 
 ###### OPTIONS `:object?`
-@todo
 
+```js
+const options = {
+  // allowBulkUpdates :boolean
+  // If true, Supabase will not block bulk updates and deletes. 
+  // This can be overriden on individual calls to update(), 
+  // so it is recommended to keep this as false.
+  allowBulkUpdates: false, 
 
-| Parameter   | Data Type | Description |
-| ----------- | --------- | ----------- |
-| @tbc        |           |             |
-
+  // allowBulkDeletes :boolean
+  // If true, Supabase will not block bulk updates and deletes. 
+  // This can be overriden on individual calls to delete(), 
+  // so it is recommended to keep this as false.
+  allowBulkDeletes: false, 
+}
+```
