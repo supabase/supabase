@@ -20,7 +20,7 @@ const realtime = supabase
     console.log('Change received!', change)
   })
   .subscribe()
-`
+`.trim()
 const readExample = `
 import { createClient } from '@supabase/supabase-js'
 
@@ -35,7 +35,7 @@ const countries = await supabase
     cities { name, population }
   \`)
   .filter('cities=popution=gte.10000')
-`
+`.trim()
 const createExample = `
 import { createClient } from '@supabase/supabase-js'
 
@@ -46,7 +46,7 @@ const supabase = createClient('https://stripe.supabase.io', '1a2b-3c4d-5e6f-7g8h
 const newEmployee = supabase
   .from('employees')
   .insert({ id: 1, name: 'Greg Brockman', salary: 5000 })
-`
+`.trim()
 const updateExample = `
 import { createClient } from '@supabase/supabase-js'
 
@@ -58,7 +58,7 @@ const listener = supabase
   .from('employees')
   .eq('country_code', 'NZ')
   .update({ name: 'Middle Earth' })
-`
+`.trim()
 
 const features = [
   {
