@@ -10,7 +10,7 @@ module.exports = {
   tagline: 'realtime postgres.',
   url: 'https://supabase.io',
   baseUrl: '/',
-  favicon: '/static/favicon.ico',
+  favicon: '/favicon.ico',
   organizationName: 'supabase', // Usually your GitHub org/user name.
   projectName: 'supabase', // Usually your repo name.
   themeConfig: {
