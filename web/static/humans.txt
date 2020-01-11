@@ -1,0 +1,22 @@
+TEAM
+
+Paul Copplestone
+Ant Wilson
+Angelico de los Reyes
+
+____________
+
+JOBS
+
+If you are interested in working with us send an email to copple@supabase.io
+
+___________
+
+
+TECHNOLOGY
+
+Web - Docusaurus
+App - NextJS
+Reatime - Phoenix & Elixir
+Restful - PostgreSQL
+

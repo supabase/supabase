@@ -113,13 +113,14 @@ function Home() {
               <div className="col col--6">
                 <h2 className="hero__title">{siteConfig.tagline}</h2>
                 <p className="hero__subtitle">
-                  Add realtime and RESTful APIs to your <strong>existing</strong> PostgreSQL
-                  database without a single line of code.
+                  Supabase adds both realtime and RESTful APIs to your{' '}
+                  <strong class="has-emphasis">existing</strong> PostgreSQL database without a
+                  single line of code.
                   <br />
                   <br />
-                  Forget about custom-coding relational APIs and websockets. We introspect your
-                  database and provide APIs <strong>instantly</strong> so you can focus on what is
-                  most important - building your products.
+                  Don't waste your time coding relational APIs and websockets. We introspect your
+                  database and provide APIs <strong class="has-emphasis">instantly</strong> so you
+                  can focus on what is most important - building your products.
                 </p>
                 <div>
                   <Link
@@ -169,9 +170,7 @@ function Home() {
               <div className="col col--9">
                 <h2 className="with-underline">For Developers</h2>
                 <p className="">
-                  We're a bunch of developers, building tools for developers. We're obsessed with
-                  solving your problems, because they solve our problems too. Our products
-                  prioritize performance and simplicity because sometimes doing less is better.
+                  We believe developers want solid, fast, and simple products. So that's what we make.
                 </p>
               </div>
             </div>
@@ -241,7 +240,7 @@ function Home() {
                 )}
                 to={'https://app.supabase.io'}
               >
-                Join the waiting list →
+                Join the list →
               </Link>
             </div>
           </div>
