@@ -37,6 +37,7 @@
   --custom-content-color: #1f1f1f;
   --custom-content-color-light: #484848;
   --custom-content-color-lightest: #333;
+  --custom-content-color-emphasis: #000;
   --custom-border-color: #e0e0e0;
   --custom-color-subtle: #ccc;
   --custom-shadow-lw: 0 3px 5px 0px rgba(0, 0, 0, 0.1);
@@ -70,7 +71,8 @@
   --ifm-font-family-monospace: var(--custom-font-code);
   --ifm-heading-font-family: var(--custom-font-base);
   --ifm-font-size-base: var(--custom-font-size-base);
-  --ifm-font-weight: 800;
+  --ifm-heading-font-weight: 700;
+  --ifm-font-weight-bold: 700;
 
   /* Globals */
   --ifm-global-shadow-lw: var(--custom-shadow-lw);
@@ -81,10 +83,11 @@
   --ifm-code-border-radius: var(--custom-border-radius);
   --ifm-button-border-radius: var(--custom-border-radius);
   --ifm-col-spacing-vertical: 0.5rem;
+  --ifm-link-hover-decoration: none;
 
   /* Buttons */
   --ifm-button-background-color: var(--custom-background-color);
-  
+
   /* Navbar */
   --ifm-navbar-background-color: var(--custom-background-color);
 
@@ -129,6 +132,7 @@
   --custom-content-color: #ddd;
   --custom-content-color-light: #aaa;
   --custom-content-color-lightest: #fefefe;
+  --custom-content-color-emphasis: #fff;
   --custom-border-color: #444444;
   --custom-shadow-lw: 0 0 3px 3px rgba(0, 0, 0, 0.2);
   --custom-shadow-md: 0 0 5px 5px rgba(0, 0, 0, 0.3);
@@ -159,7 +163,6 @@
   --ifm-card-background-color: var(--custom-background-color-highlight);
 }
 
-
 html,
 body {
   font-smoothing: antialiased;
@@ -170,27 +173,30 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
-:root[data-theme='light'] .navbar__logo.logo--dark, 
-:root[data-theme=''] .navbar__logo.logo--dark
-{
+:root[data-theme='light'] .navbar__logo.logo--dark,
+:root[data-theme=''] .navbar__logo.logo--dark {
   display: none;
 }
-:root[data-theme='dark'] .navbar__logo.logo--light{
+:root[data-theme='dark'] .navbar__logo.logo--light {
   display: none;
 }
 
 .button.button--primary {
-  text-shadow: 0 1px 3px rgba(36,180,126,.4);
+  text-shadow: 0px 0px 6px rgba(13, 128, 86, 0.4);
 }
 .button.button--secondary {
   color: var(--custom-content-color);
+  background-color: var(--custom-background-color);
+}
+.button.button--secondary:hover {
+  background-color: var(--custom-background-color-highlight);
 }
 .button.button--secondary.button--outline {
   border-color: #333;
 }
 :root[data-theme='dark'] .button.button--secondary {
-  background-color: var(--custom-background-color-highlight);
-  border-color: #111;
+  /* background-color: var(--custom-background-color-highlight); */
+  border-color: #fff;
 }
 .hero--button {
   text-transform: uppercase;
@@ -198,14 +204,12 @@ body {
   font-weight: bold;
 }
 
-
 .docusaurus-highlight-code-line {
   background-color: rgb(72, 77, 91);
   display: block;
   margin: 0 calc(-1 * var(--ifm-pre-padding));
   padding: 0 var(--ifm-pre-padding);
 }
-
 
 @media screen and (min-width: 768px) {
   html,
@@ -243,8 +247,10 @@ li + li {
   font-weight: bold;
 }
 .navbar-sidebar__items .menu__link {
-  line-height: calc(var(--ifm-spacing-vertical) * 1.5) !important;
+  line-height: calc(var(--ifm-spacing-vertical) * 2) !important;
   font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.9em;
 }
 
 /* .with-underline::after,
@@ -414,9 +420,11 @@ a.card:hover {
 
 .menu.menu--responsive .menu__button {
   background: var(--ifm-panel-background-solid);
-  border-color: var(--custom-border-color);
-  bottom: 1rem;
-  right: 1rem;
+  bottom: 0;
+  right: 0;
+  padding: 10px;
+  border:none;
+  border-top: 1px solid var(--custom-border-color) !important;
 }
 
 div[class^='docItemContainer_'] {
@@ -472,14 +480,14 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
 .menu.menu--responsive .button.button--secondary.button--sm.menu__button {
   transition: all 0.2s ease;
   width: 100%;
-  margin:0;
+  margin: 0;
   bottom: 0;
   right: 0;
   border-radius: 0;
   text-align: right;
   opacity: 0.8;
 }
-.menu.menu--responsive .button.button--secondary.button--sm.menu__button:hover, 
+.menu.menu--responsive .button.button--secondary.button--sm.menu__button:hover,
 .menu.menu--responsive .button.button--secondary.button--sm.menu__button:active {
   opacity: 1;
   background-color: var(--custom-background-color);
@@ -558,4 +566,13 @@ a.hash-link {
   text-decoration: none;
   font-style: none;
   color: var(--custom-color-subtle);
+}
+
+.footer {
+  border-top: 1px solid var(--custom-border-color);
+  padding-bottom: 80px;
+}
+
+.has-emphasis {
+  color: var(--custom-content-color-emphasis);
 }

@@ -60,8 +60,8 @@ module.exports = {
               to: '/docs/guides/examples',
             },
             {
-              label: 'Blog',
-              to: '/blog',
+              label: 'Humans',
+              to: '/static/humans.txt',
             },
           ],
         },
