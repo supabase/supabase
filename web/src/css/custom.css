@@ -189,6 +189,9 @@ body {
   background-color: var(--custom-background-color);
 }
 .button.button--secondary:hover {
+  background-color: var(--custom-background-color-diff);
+}
+:root[data-theme='dark'] .button.button--secondary:hover {
   background-color: var(--custom-background-color-highlight);
 }
 .button.button--secondary.button--outline {
@@ -251,6 +254,7 @@ li + li {
   font-weight: bold;
   text-transform: uppercase;
   font-size: 0.9em;
+  padding: 10px !important;
 }
 
 /* .with-underline::after,

@@ -69,3 +69,10 @@
 .pricingCard p {
   margin: 0;
 }
+
+
+@media screen and (max-width: 600px) {
+  .responsiveButton {
+    width: 100%;
+  }
+}
