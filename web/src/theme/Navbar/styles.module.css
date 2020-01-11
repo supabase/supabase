@@ -27,3 +27,6 @@
 .navbarItems {
   justify-content: space-between;
 }
+.toggle {
+  margin-right: 20px
+}
