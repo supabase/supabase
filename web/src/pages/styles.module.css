@@ -78,3 +78,13 @@
     margin-right: 0;
   }
 }
+
+.responsiveCentered {
+  text-align: center;
+}
+  
+@media screen and (max-width: 999px) {
+  .responsiveCentered {
+    text-align: left;
+  }
+}

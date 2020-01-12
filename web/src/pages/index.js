@@ -64,19 +64,19 @@ const features = [
   {
     title: <>Chat apps</>,
     imageUrl: '',
-    description: <>Build a realtime chat application using PostgreSQL and Expo.</>,
+    description: <>Build a realtime chat application using PostgreSQL and Expo</>,
     href: '/docs/guides/examples',
   },
   {
     title: <>Realtime dashboards</>,
     imageUrl: '',
-    description: <>Build live dashboards using PostgreSQL and D3.js.</>,
+    description: <>Build live dashboards using PostgreSQL and D3.js</>,
     href: '/docs/guides/examples',
   },
   {
     title: <>Event sourcing</>,
     imageUrl: '',
-    description: <>Log all your database changes to an immutable logging system.</>,
+    description: <>Log all your database changes to an immutable logging system</>,
     href: '/docs/guides/examples',
   },
 ]
@@ -107,20 +107,16 @@ function Home() {
   return (
     <Layout title={`${siteConfig.title}`} description={siteConfig.tagline}>
       <main className="HomePage">
+        {/* HEARDER */}
         <header className={classnames('hero', styles.heroBanner)}>
           <div className="container">
             <div className="row">
-              <div className="col col--6">
+              <div className="col">
                 <h2 className="hero__title">{siteConfig.tagline}</h2>
                 <p className="hero__subtitle">
-                  Supabase adds both realtime and RESTful APIs to your{' '}
-                  <strong class="has-emphasis">existing</strong> PostgreSQL database without a
+                  Supabase adds realtime and RESTful APIs to your{' '}
+                  <strong className="has-emphasis">existing</strong> PostgreSQL database without a
                   single line of code.
-                  <br />
-                  <br />
-                  Don't waste time creating relational APIs and websockets. We introspect your
-                  database and provide APIs <strong class="has-emphasis">instantly</strong> so you
-                  can focus on what's most important - building your products.
                 </p>
                 <div>
                   <Link
@@ -145,71 +141,79 @@ function Home() {
                   </Link>
                 </div>
               </div>
-              <div className="col col--6 codeblock-scroll">
-                <CodeBlock>{subscribeExample}</CodeBlock>
-              </div>
             </div>
           </div>
         </header>
-        {features && features.length && (
-          <section className={styles.features}>
-            <div className="container">
-              <h2 className="with-underline">Use Cases.</h2>
-              <div className="row">
-                {features.map((props, idx) => (
-                  <Feature key={idx} {...props} />
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
 
+        <section
+          style={{
+            padding: '50px 0',
+            borderTop: '1px solid var(--custom-border-color)',
+            borderBottom: '1px solid var(--custom-border-color)',
+          }}
+          className="hero is--dark"
+        >
+          <div className="container text--center">
+            <small>CUSTOMER LOGOS</small>
+          </div>
+        </section>
+
+        {/* For Devs */}
         <section className={styles.forDevelopers}>
           <div className="container">
-            <div className="row">
-              <div className="col col--9">
-                <h2 className="with-underline">For Developers.</h2>
+            <div
+              className={classnames(
+                'row',
+                styles.responsiveCentered
+              )}
+            >
+              <div className="col col--8 col--offset-2">
+                <h2 className="with-underline">For Developers</h2>
                 <p className="">
-                  We believe developers want solid, fast, and simple products. So that's what we
-                  make.
+                  We know developers want fast, solid, and simple products. So that's what we make.
+                  Forget about building repetitive CRUD APIs. We introspect your database and
+                  provide APIs <strong className="has-emphasis">instantly</strong> so you can focus
+                  on what's most important - building your products.
                 </p>
               </div>
             </div>
             <div className="ForDevelopers">
               <div className="row">
-                <div className="col col--3">
-                  <button
-                    className={`button button--block button--${
-                      visibleCodeExample === 'SUBSCRIBE' ? 'primary' : 'link'
-                    }`}
-                    onClick={() => showCodeExample('SUBSCRIBE')}
-                  >
-                    Realtime subscriptions
-                  </button>
-                  <button
-                    className={`button button--block button--${
-                      visibleCodeExample === 'READ' ? 'primary' : 'link'
-                    }`}
-                    onClick={() => showCodeExample('READ')}
-                  >
-                    Get your data
-                  </button>
-                  <button
-                    className={`button button--block button--${
-                      visibleCodeExample === 'CREATE' ? 'primary' : 'link'
-                    }`}
-                    onClick={() => showCodeExample('CREATE')}
-                  >
-                    Create a record
-                  </button>
-                  <button
-                    className={`button button--block button--${
-                      visibleCodeExample === 'UPDATE' ? 'primary' : 'link'
-                    }`}
-                    onClick={() => showCodeExample('UPDATE')}
-                  >
-                    Update mulitple rows
-                  </button>
+                <div className="ButtonTabs col col--3">
+                  <div>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'SUBSCRIBE' ? 'info is-active' : 'info'
+                      }`}
+                      onClick={() => showCodeExample('SUBSCRIBE')}
+                    >
+                      Realtime subscriptions
+                    </button>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'READ' ? 'info is-active' : 'info '
+                      }`}
+                      onClick={() => showCodeExample('READ')}
+                    >
+                      Get your data
+                    </button>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'CREATE' ? 'info is-active' : 'info '
+                      }`}
+                      onClick={() => showCodeExample('CREATE')}
+                    >
+                      Create a record
+                    </button>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'UPDATE' ? 'info is-active' : 'info '
+                      }`}
+                      onClick={() => showCodeExample('UPDATE')}
+                    >
+                      Update mulitple rows
+                    </button>
+                  </div>
                 </div>
                 <div className="col col--9">
                   {visibleCodeExample === 'SUBSCRIBE' && <CodeBlock>{subscribeExample}</CodeBlock>}
@@ -222,13 +226,31 @@ function Home() {
           </div>
         </section>
 
+        {/* FEATURES */}
+        {features && features.length && (
+          <section className={styles.features}>
+            <div className="container">
+              <h2 className="with-underline">Use Cases</h2>
+              <div className="row">
+                {features.map((props, idx) => (
+                  <Feature key={idx} {...props} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         <section
-          style={{ marginTop: 100, padding: '50px 0', borderTop: '1px solid var(--custom-border-color)' }}
+          style={{
+            marginTop: 100,
+            padding: '50px 0',
+            borderTop: '1px solid var(--custom-border-color)',
+          }}
           className="hero is--dark"
         >
           <div className="container text--center">
             <div>
-              <h2>Get Early Access.</h2>
+              <h2>Get Early Access</h2>
             </div>
             <div className="">
               <Link
