@@ -43,7 +43,7 @@ module.exports = {
     },
     prism: {
       defaultLanguage: 'js',
-      plugins: ['line-numbers', 'show-language']
+      plugins: ['line-numbers', 'show-language'],
     },
     footer: {
       links: [
@@ -60,7 +60,7 @@ module.exports = {
             },
             {
               label: 'Humans',
-              to: '/humans.txt',
+              to: 'https://supabase.io/humans.txt',
             },
           ],
         },
