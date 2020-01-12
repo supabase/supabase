@@ -13,10 +13,12 @@ If you are interested in working with us send an email to copple@supabase.io
 ___________
 
 
-TECHNOLOGY
+TECHNOLOGIES 
+
+Just a few of the opensource technologies that make Supabase possible.
 
 Web - Docusaurus
 App - NextJS
 Reatime - Phoenix & Elixir
-Restful - PostgreSQL
+Restful - PostgREST
 
