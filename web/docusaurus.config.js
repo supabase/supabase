@@ -60,7 +60,7 @@ module.exports = {
             },
             {
               label: 'Humans',
-              to: '/static/humans.txt',
+              to: '/humans.txt',
             },
           ],
         },
