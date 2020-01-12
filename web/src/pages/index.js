@@ -34,7 +34,7 @@ const countries = await supabase
     name,
     cities { name, population }
   \`)
-  .filter('cities=popution=gte.10000')
+  .filter('cities=population=gte.10000')
 `.trim()
 const createExample = `
 import { createClient } from '@supabase/supabase-js'
@@ -55,7 +55,7 @@ const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h'
 
 // Update all city names in New Zealand
 const listener = supabase
-  .from('employees')
+  .from('cities')
   .eq('country_code', 'NZ')
   .update({ name: 'Middle Earth' })
 `.trim()
@@ -115,8 +115,7 @@ function Home() {
                 <h2 className="hero__title">{siteConfig.tagline}</h2>
                 <p className="hero__subtitle">
                   Supabase adds realtime and RESTful APIs to your{' '}
-                  <strong className="has-emphasis">existing</strong> PostgreSQL database without a
-                  single line of code.
+                  <strong className="has-emphasis">existing</strong> PostgreSQL database.
                 </p>
                 <div>
                   <Link
@@ -148,8 +147,6 @@ function Home() {
         <section
           style={{
             padding: '50px 0',
-            borderTop: '1px solid var(--custom-border-color)',
-            borderBottom: '1px solid var(--custom-border-color)',
           }}
           className="hero is--dark"
         >
