@@ -196,10 +196,10 @@ body {
 }
 .button.button--secondary {
   color: var(--custom-content-color);
-  background-color: var(--custom-background-color);
+  /* background-color: var(--custom-background-color); */
 }
 .button.button--secondary:hover {
-  background-color: var(--custom-background-color-diff);
+  background-color: var(--custom-background-color-diff-1);
 }
 :root[data-theme='dark'] .button.button--secondary:hover {
   background-color: var(--custom-background-color-highlight);

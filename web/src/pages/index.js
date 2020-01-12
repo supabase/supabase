@@ -115,7 +115,7 @@ function Home() {
                 <h2 className="hero__title">{siteConfig.tagline}</h2>
                 <p className="hero__subtitle">
                   Supabase adds realtime and RESTful APIs to your{' '}
-                  <strong className="has-emphasis">existing</strong> PostgreSQL database.
+                  <strong className="has-emphasis">existing</strong> PostgreSQL database without a single line of code.
                 </p>
                 <div>
                   <Link
@@ -167,7 +167,7 @@ function Home() {
               <div className="col col--8 col--offset-2">
                 <h2 className="with-underline">For Developers</h2>
                 <p className="">
-                  We know developers want fast, solid, and simple products. So that's what we make.
+                  We know developers want fast, solid, and simple products. So that's what we make.<br />
                   Forget about building repetitive CRUD APIs. We introspect your database and
                   provide APIs <strong className="has-emphasis">instantly</strong> so you can focus
                   on what's most important - building your products.
