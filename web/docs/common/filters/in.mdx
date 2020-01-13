@@ -1,0 +1,29 @@
+import Collapsable from '../../../src/components/Collapsable'
+
+<!-- prettier-ignore -->
+```js {3} 
+supabase
+  .from(tableName)
+  .in(columnName, filterArray)
+```
+
+Finds all rows whose value on the stated columnName is found on the specified filterArray. Equivalent of `filter(columnName, 'in', criteria)`.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .from('countries')
+  .in('name', ['China', 'France'])
+```
+
+</Collapsable>
+
+#### `columnName: string`
+Name of database column.
+
+#### `filterArray: array`
+Array of values to find a match. Data type of values is dependent on the columnName specified.
+
+---
