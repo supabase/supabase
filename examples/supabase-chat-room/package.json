@@ -1,5 +1,5 @@
 {
-  "name": "with-dotenv",
+  "name": "supabase-chat-rrom",
   "version": "1.0.0",
   "scripts": {
     "dev": "next -p 8080",
@@ -8,11 +8,10 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "file:../../../../../desktop/supabase/monorepo/libraries/supabase-js",
-    "dns": "^0.2.2",
     "dotenv": "^8.2.0",
     "next": "latest",
     "react": "^16.7.0",
     "react-dom": "^16.7.0"
   },
-  "license": "ISC"
+  "license": "MIT"
 }
