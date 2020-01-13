@@ -1,0 +1,28 @@
+import Collapsable from '../../../src/components/Collapsable'
+
+<!-- prettier-ignore -->
+```js {3} 
+supabase
+  .from(tableName)
+  .gt(columnName, filterValue)
+```
+Finds all rows whose value on the stated columnName is greater than the specified filterValue. Eqiuvalent of `filter(columnName, 'gt', criteria)`.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .from('countries')
+  .gt('id', 20)
+```
+
+</Collapsable>
+
+#### `columnName: string`
+Name of database column.
+
+#### `filterValue: { string | integer | boolean }`
+Value to compare to.
+
+---

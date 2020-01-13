@@ -1,0 +1,34 @@
+import Collapsable from '../../../src/components/Collapsable'
+
+<!-- prettier-ignore -->
+```js {3} 
+supabase
+  .from(tableName)
+  .filter(columnName, operator, criteria)
+```
+
+All in one convenience function for all filters available.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js {3-5}
+supabase
+  .from('countries')
+  .filter('name', 'in', '['China', 'France']')
+  .filter('name', 'like', '%n%')
+  .filter('id', 'gte', 20)
+```
+
+</Collapsable>
+
+#### `columnName: string`
+Name of the database column.
+
+#### `operator: string`
+Name of filter operator to be utilised.
+
+#### `criteria: { object | array | string | integer | boolean | null }`
+Value to compare to. Exact data type of criteria would depend on the operator used.
+
+---

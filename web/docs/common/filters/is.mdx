@@ -1,0 +1,31 @@
+import Collapsable from '../../../src/components/Collapsable'
+
+<!-- prettier-ignore -->
+```js {3} 
+supabase
+  .from(tableName)
+  .is(columnName, filterValue)
+```
+
+A check for exact equality (**null**, **true**, **false**), finds all rows whose value on the state columnName exactly match the specified filterValue.
+Equivalent of `filter(columnName, 'is', filterValue)`.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .from('countries')
+  .is('name', null)
+```
+
+</Collapsable>
+
+
+#### `columnName: string`
+Name of database column.
+
+#### `filterValue: { null | boolean }`
+Value to match.
+
+---
