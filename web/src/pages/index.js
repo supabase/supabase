@@ -7,7 +7,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl'
 import styles from './styles.module.css'
 import CodeBlock from '@theme/CodeBlock'
 
-const subscribeExample = `
+const heroExample = `
 import { createClient } from '@supabase/supabase-js'
 
 // Connect to your own PostgreSQL database
@@ -21,43 +21,57 @@ const realtime = supabase
   })
   .subscribe()
 `.trim()
+const subscribeExample = `
+import { createClient } from '@supabase/supabase-js'
+
+// Connect to the chat room 
+const supabase = createClient('https://chat-room.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+// Get notified of all new chat messages
+const realtime = supabase
+  .from('messages')
+  .on('INSERT', message => {
+    console.log('New message!', message)
+  })
+  .subscribe()
+`.trim()
 const readExample = `
 import { createClient } from '@supabase/supabase-js'
 
-// Connect to your own PostgreSQL database
-const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+// Connect to the chat room 
+const supabase = createClient('https://chat-room.supabase.io', '1a2b-3c4d-5e6f-7g8h')
 
-// Get all countries and the cities with a population over 10,000 people
-const countries = await supabase
-  .from('countries')
+// Get public rooms and their messages
+const publicRooms = await supabase
+  .from('rooms')
+  .eq('public', true)
   .select(\`
     name,
-    cities { name, population }
+    messages { text }
   \`)
-  .filter('cities=population=gte.10000')
 `.trim()
 const createExample = `
 import { createClient } from '@supabase/supabase-js'
 
-// Connect to your own PostgreSQL database
-const supabase = createClient('https://stripe.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+// Connect to the chat room 
+const supabase = createClient('https://chat-room.supabase.io', '1a2b-3c4d-5e6f-7g8h')
 
-// Create a new employee in your 'employees' table
-const newEmployee = supabase
-  .from('employees')
-  .insert({ id: 1, name: 'Greg Brockman', salary: 5000 })
+// Create a new chat room
+const newRoom = supabase
+  .from('rooms')
+  .insert({ name: 'Supabase Fan Club', public: true })
 `.trim()
 const updateExample = `
 import { createClient } from '@supabase/supabase-js'
 
-// Connect to your own PostgreSQL database
-const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+// Connect to the chat room 
+const supabase = createClient('https://chat-room.supabase.io', '1a2b-3c4d-5e6f-7g8h')
 
-// Update all city names in New Zealand
-const listener = supabase
-  .from('cities')
-  .eq('country_code', 'NZ')
-  .update({ name: 'Middle Earth' })
+// Update a user
+const updatedUser = supabase
+  .from('users')
+  .eq('username', 'kiwicopple')
+  .update({ status: 'Online' })
 `.trim()
 
 const features = [
@@ -115,7 +129,8 @@ function Home() {
                 <h2 className="hero__title">{siteConfig.tagline}</h2>
                 <p className="hero__subtitle">
                   Supabase adds realtime and RESTful APIs to your{' '}
-                  <strong className="has-emphasis">existing</strong> PostgreSQL database without a single line of code.
+                  <strong className="has-emphasis">existing</strong> PostgreSQL database without a
+                  single line of code.
                 </p>
                 <div>
                   <Link
@@ -140,6 +155,10 @@ function Home() {
                   </Link>
                 </div>
               </div>
+              <div className="col code-with-header">
+                <div className="code-header">Get notified of all new records in your database</div>
+                <CodeBlock>{heroExample}</CodeBlock>
+              </div>
             </div>
           </div>
         </header>
@@ -158,16 +177,12 @@ function Home() {
         {/* For Devs */}
         <section className={styles.forDevelopers}>
           <div className="container">
-            <div
-              className={classnames(
-                'row',
-                styles.responsiveCentered
-              )}
-            >
+            <div className={classnames('row', styles.responsiveCentered)}>
               <div className="col col--8 col--offset-2">
                 <h2 className="with-underline">For Developers</h2>
                 <p className="">
-                  We know developers want fast, solid, and simple products. So that's what we make.<br />
+                  We know developers want fast, solid, and simple products. So that's what we make.
+                  <br />
                   Forget about building repetitive CRUD APIs. We introspect your database and
                   provide APIs <strong className="has-emphasis">instantly</strong> so you can focus
                   on what's most important - building your products.
@@ -212,11 +227,31 @@ function Home() {
                     </button>
                   </div>
                 </div>
-                <div className="col col--9">
-                  {visibleCodeExample === 'SUBSCRIBE' && <CodeBlock>{subscribeExample}</CodeBlock>}
-                  {visibleCodeExample === 'READ' && <CodeBlock>{readExample}</CodeBlock>}
-                  {visibleCodeExample === 'CREATE' && <CodeBlock>{createExample}</CodeBlock>}
-                  {visibleCodeExample === 'UPDATE' && <CodeBlock>{updateExample}</CodeBlock>}
+                <div className="col col--9 code-with-header">
+                  {visibleCodeExample === 'SUBSCRIBE' && (
+                    <>
+                      <div className="code-header">Receive realtime messages in an example chat room</div>
+                      <CodeBlock>{subscribeExample}</CodeBlock>
+                    </>
+                  )}
+                  {visibleCodeExample === 'READ' && (
+                    <>
+                      <div className="code-header">Get all public rooms and their messages</div>
+                      <CodeBlock>{readExample}</CodeBlock>
+                    </>
+                  )}
+                  {visibleCodeExample === 'CREATE' && (
+                    <>
+                      <div className="code-header">Create a new chat room</div>
+                      <CodeBlock>{createExample}</CodeBlock>
+                    </>
+                  )}
+                  {visibleCodeExample === 'UPDATE' && (
+                    <>
+                      <div className="code-header">Update a user</div>
+                      <CodeBlock>{updateExample}</CodeBlock>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
