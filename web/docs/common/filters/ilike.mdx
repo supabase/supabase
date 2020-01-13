@@ -1,0 +1,30 @@
+import Collapsable from '../../../src/components/Collapsable'
+
+<!-- prettier-ignore -->
+```js {3} 
+supabase
+  .from(tableName)
+  .ilike(columnName, stringPattern)
+```
+
+A case-sensitive version of `like()`. Equivalent of `filter(columnName, 'ilike', stringPattern)`.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .from('countries')
+  .ilike('name', '%united%')
+```
+
+</Collapsable>
+
+
+#### `columnName: string`
+Name of database column.
+
+#### `stringPattern: string`
+String pattern to compare to. A comprehensive guide on how to form proper patterns can be found [here](https://www.postgresql.org/docs/current/functions-matching.html).
+
+---

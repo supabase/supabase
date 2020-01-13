@@ -1,0 +1,28 @@
+import Collapsable from '../../../src/components/Collapsable'
+
+<!-- prettier-ignore -->
+```js {3} 
+supabase
+  .from(tableName)
+  .lt(columnName, filterValue)
+```
+Finds all rows whose value on the stated columnName is less than the specified filterValue. Eqiuvalent of `filter(columnName, 'lt', criteria)`.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .from('countries')
+  .lt('id', 20)
+```
+
+</Collapsable>
+
+#### `columnName: string`
+Name of database column.
+
+#### `filterValue: { string | integer | boolean }`
+Value to compare to.
+
+---
