@@ -184,11 +184,20 @@ body {
 }
 
 :root[data-theme='light'] .navbar__logo.logo--dark,
-:root[data-theme=''] .navbar__logo.logo--dark {
+:root[data-theme=''] .navbar__logo.logo--dark, 
+:root .navbar__logo.logo--dark {
   display: none;
+}
+:root[data-theme='light'] .navbar__logo.logo--light,
+:root[data-theme=''] .navbar__logo.logo--light, 
+:root .navbar__logo.logo--light {
+  display: inline-block;
 }
 :root[data-theme='dark'] .navbar__logo.logo--light {
   display: none;
+}
+:root[data-theme='dark'] .navbar__logo.logo--dark {
+  display: inline-block;
 }
 
 .button.button--primary {
