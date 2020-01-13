@@ -1,0 +1,29 @@
+import Collapsable from '../../../src/components/Collapsable'
+
+<!-- prettier-ignore -->
+```js {3} 
+supabase
+  .from(tableName)
+  .not(columnName, filterValue)
+```
+
+Finds all rows whose value on the stated columnName does not match the specified filterValue. Equivalent of `filter(columnName, 'not', criteria)`.
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .from('countries')
+  .not('name', 'China')
+```
+
+</Collapsable>
+
+#### `columnName: string`
+Name of database column.
+
+#### `filterValue: { string | integer | boolean }`
+Value to **not** match.
+
+---

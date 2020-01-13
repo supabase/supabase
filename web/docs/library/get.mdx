@@ -6,9 +6,10 @@ title: 'Reading'
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 import DummyData from '../common/DummyData.mdx'
-import Match from '../common/filters/match.mdx'
+// import Index from '../common/filters/Index'
+import CommonFilters from '../common/CommonFilters'
 import CommonResponses from '../common/CommonResponses.mdx'
-import CommonFilters from '../common/CommonFilters.mdx'
+// import CommonFilters from '../common/CommonFilters.mdx'
 import Collapsable from '../../src/components/Collapsable'
 
 We will be using these tables as reference for our examples:
@@ -274,17 +275,49 @@ Returns the first row of the table as an object and **not** as an array.
 
 ----
 
-### `filter()`
 
 
 
-### `match()`
 
-<Match />
+
 
 ## Filtering
 
-<CommonFilters verb="get" />
+### `filter()`
+<CommonFilters filter='filter'/>
+
+### `match()`
+<CommonFilters filter='match'/>
+
+### `eq()`
+<CommonFilters filter='eq'/>
+
+### `gt()`
+<CommonFilters filter='gt'/>
+
+### `lt()`
+<CommonFilters filter='lt'/>
+
+### `gte()`
+<CommonFilters filter='gte'/>
+
+### `lte()`
+<CommonFilters filter='lte'/>
+
+### `like()`
+<CommonFilters filter='like'/>
+
+### `ilike()`
+<CommonFilters filter='ilike'/>
+
+### `is()`
+<CommonFilters filter='is'/>
+
+### `in()`
+<CommonFilters filter='in'/>
+
+### `not()`
+<CommonFilters filter='not'/>
 
 ## Responses
 
