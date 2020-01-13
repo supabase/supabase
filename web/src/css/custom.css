@@ -56,7 +56,8 @@
   --ifm-background-color: var(--custom-background-color);
   --ifm-sidebar-background: var(--custom-background-color);
   --ifm-color-content-secondary: var(--custom-content-color-light);
-  --ifm-code-background: #2a2a2a;
+  --ifm-code-background: var(--custom-background-color-diff);
+  --ifm-code-background-dark: #2a2a2a;
 
   /* Primary */
   --ifm-color-primary-darkest: var(--custom-primary-darkest);
@@ -533,7 +534,7 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
 
 /* Code */
 .prism-code {
-  background: var(--ifm-code-background) !important;
+  background: var(--ifm-code-background-dark) !important;
   white-space: pre !important;
   font-size: 0.8rem;
   overflow: auto !important;
@@ -542,7 +543,7 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   border-radius: 0 0 4px 4px;
 }
 .code-header {
-  background: var(--ifm-code-background);
+  background: var(--ifm-code-background-dark);
   color: #ccc;
   padding: 5px 15px;
   border-radius: 4px 4px 0 0;
