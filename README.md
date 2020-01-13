@@ -5,11 +5,11 @@
 ## Structure
 
 ```bash
-├── connectors                  # WIP: connectors for supabase
+├── connectors                  # WIP: connectors for Supabase
 ├── examples
 │   └── next-js
-├── libraries
+├── libraries                   # Client libraries
 │   └── supabase-js             # JS client library     
 └── web
-    ├── docs                    # Website docs
+    └── docs                    # Website docs
 ```
