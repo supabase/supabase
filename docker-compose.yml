@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  supabase:
+    build: ./dev/docker
+    ports:
+      - "4000:4000"
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+      APP_PORT: 4000
+      APP_HOSTNAME: localhost
+      SECRET_KEY_BASE: SOMETHING_SUPER_SECRET
+      PGRST_DB_URI: postgres://postgres:postgres@db:5432/postgres
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: postgres
+    depends_on:
+      - db
+    # command: ["sh", "-c", "/prod/rel/realtime/bin/realtime start ; exec postgrest /etc/postgrest.conf"]
+    command: ["/start.sh"]
+  db:
+    build: ./dev/postgres
+    ports:
+      - "5432:5432"
+  
+  
