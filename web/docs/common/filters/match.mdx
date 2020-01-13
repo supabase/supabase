@@ -1,0 +1,25 @@
+import Collapsable from '../../../src/components/Collapsable'
+
+<!-- prettier-ignore -->
+```js {3} 
+supabase
+  .from(tableName)
+  .match(filterObject)
+```
+
+Finds rows that exactly match the specified filterObject. Equivilent of `filter('columnName', 'eq', criteria)`. 
+
+<Collapsable title="Toggle Example">
+
+<!-- prettier-ignore -->
+```js
+supabase
+  .from('countries')
+  .match({ 'continent': 'Asia' })
+```
+
+</Collapsable>
+
+
+#### `filterObject: object`
+An object of `{ 'columnName': 'criteria' }`
