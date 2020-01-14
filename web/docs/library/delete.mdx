@@ -59,8 +59,12 @@ supabase
 #### `options: object?` 
 
 ```js
+/**
+ * @param {boolean} [bulk=false] 
+ * Protects against bulk updates. Set to true if you intend to perform a bulk change.
+ */
 const options = {
-  bulk: false // Protects against bulk updates. Set to true if you intend to perform a bulk change.
+  bulk: false 
 }
 ```
 
