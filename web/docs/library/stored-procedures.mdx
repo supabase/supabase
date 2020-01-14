@@ -1,0 +1,170 @@
+---
+id: stored-procedures
+title: 'Stored Procedures'
+---
+
+import Collapsable from '../../src/components/Collapsable'
+import CommonFilters from '../common/CommonFilters'
+import CommonResponses from '../common/CommonResponses.mdx'
+import DummyData from '../common/DummyData.mdx'
+
+We will be using these tables as reference for our examples:
+
+<DummyData />
+
+### Single call
+
+This example shows how to call a stored function that takes in a name of a city and returns it:
+
+<!-- prettier-ignore -->
+```js {7-8}
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+const echoCity = async () => {
+    try{
+        let city = await supabase
+            .rpc('echo_city', { name: 'The Shire' })
+        return cities
+    } catch (error) {
+        console.log('Error: ', error)
+    }
+}
+```
+
+<Collapsable title="Toggle Example Response">
+
+```json
+'The Shire'
+```
+
+</Collapsable>
+
+### Bulk call
+
+This example shows how to call a stored function that takes in a names of cities and returns them:
+
+<!-- prettier-ignore -->
+```js {7-11}
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+const echoCities = async () => {
+    try{
+        let cities = await supabase
+            .rpc('echo_cities', [
+                { name: 'The Shire' },
+                { name: 'Mordor' }
+            ])
+        return cities
+    } catch (error) {
+        console.log('Error: ', error)
+    }
+}
+```
+
+<Collapsable title="Toggle Example Response">
+
+```json
+[
+    'The Shire',
+    'Mordor'
+]
+```
+
+</Collapsable>
+
+### Reading data 
+
+This example shows how to call a stored function that returns a table type response:
+
+<!-- prettier-ignore -->
+```js {7-8}
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+
+const echoCities = async () => {
+    try{
+        let cities = await supabase
+            .rpc('asian_pacific_countries')
+        return cities
+    } catch (error) {
+        console.log('Error: ', error)
+    }
+}
+```
+
+<Collapsable title="Toggle Example Response">
+
+```json
+[
+    {id: 156, name: "China", iso2: "CN", continent: "Asia"},
+    {id: 554, name: "New Zealand", iso2: "NZ", continent: "Oceania"}
+]
+```
+</Collapsable>
+
+## Reference
+
+### `rpc()`
+```js {2}
+supabase   
+    .rpc(functionName, functionParameters)
+```
+
+#### `functionName: string`
+Name of stored function in the database.
+
+#### `functionParameters: { object? | array? }`
+Parameters to be passed to the stored function.
+
+---
+
+## Filtering
+If the response of the stored procedure is that of a table type response, the following filters can be utilised to further sift out the data.
+
+### `filter()`
+<CommonFilters filter='filter'/>
+
+### `match()`
+<CommonFilters filter='match'/>
+
+### `eq()`
+<CommonFilters filter='eq'/>
+
+### `gt()`
+<CommonFilters filter='gt'/>
+
+### `lt()`
+<CommonFilters filter='lt'/>
+
+### `gte()`
+<CommonFilters filter='gte'/>
+
+### `lte()`
+<CommonFilters filter='lte'/>
+
+### `like()`
+<CommonFilters filter='like'/>
+
+### `ilike()`
+<CommonFilters filter='ilike'/>
+
+### `is()`
+<CommonFilters filter='is'/>
+
+### `in()`
+<CommonFilters filter='in'/>
+
+### `not()`
+<CommonFilters filter='not'/>
+
+## Responses
+
+#### 201 Created
+Successful
+
+<CommonResponses />
