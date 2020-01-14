@@ -11,7 +11,7 @@ const heroExample = `
 import { createClient } from '@supabase/supabase-js'
 
 // Connect to your own PostgreSQL database
-const supabase = createClient('https://your-db.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+const supabase = createClient('https://your-db.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
 // Receive updates when a new record is inserted into your database
 const realtime = supabase
@@ -25,7 +25,7 @@ const subscribeExample = `
 import { createClient } from '@supabase/supabase-js'
 
 // Connect to the chat room 
-const supabase = createClient('https://chat-room.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
 // Get notified of all new chat messages
 const realtime = supabase
@@ -39,7 +39,7 @@ const readExample = `
 import { createClient } from '@supabase/supabase-js'
 
 // Connect to the chat room 
-const supabase = createClient('https://chat-room.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
 // Get public rooms and their messages
 const publicRooms = await supabase
@@ -54,7 +54,7 @@ const createExample = `
 import { createClient } from '@supabase/supabase-js'
 
 // Connect to the chat room 
-const supabase = createClient('https://chat-room.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
 // Create a new chat room
 const newRoom = supabase
@@ -65,7 +65,7 @@ const updateExample = `
 import { createClient } from '@supabase/supabase-js'
 
 // Connect to the chat room 
-const supabase = createClient('https://chat-room.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
 // Update a user
 const updatedUser = supabase

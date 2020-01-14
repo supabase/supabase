@@ -25,7 +25,7 @@ This example how to delete a city:
 ```js {7-10}
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
 const updateCountryName = async () => {
   try {
@@ -54,8 +54,9 @@ const updateCountryName = async () => {
 <FromFunction verb='delete' />
 
 ### `delete()`
-```js {2}
+```js {3}
 supabase
+  .from(tableName)
   .delete(options?)
 ```
   
