@@ -7,7 +7,7 @@ title: 'Updating'
 import DummyData from '../common/DummyData.mdx'
 import Collapsable from '../../src/components/Collapsable'
 import CommonResponses from '../common/CommonResponses.mdx'
-import CommonFilters from '../common/CommonFilters.mdx'
+import CommonFilters from '../common/CommonFilters'
 import FromFunction from '../common/FromFunction.mdx'
 
 
@@ -15,14 +15,12 @@ We will be using these tables as reference for our examples:
 
 <DummyData />
 
-
-
 ### Update record
 
 This example how to update a country:
 
 <!-- prettier-ignore -->
-```js {8}
+```js {7-10}
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
@@ -30,7 +28,8 @@ const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h'
 const updateCountryName = async () => {
   try {
     let updates = await supabase
-      .patch('countries', { name: 'Middle Earth' })
+      .from('countries')
+      .udpate({ name: 'Middle Earth' })
       .match({ name: 'New Zealand' })
 
     return updates
@@ -53,19 +52,15 @@ const updateCountryName = async () => {
 <FromFunction verb='patch' />
 
 ### `patch()`
-```js
+```js {2}
 supabase
   .patch(tableName, data, options?)
 ```
-
-##### tableName `:string`  
-Name of table in the database where data will be saved.
-
-##### data `:object`   
+   
+#### `data: object`
 New record values.
 
-
-##### options `:object?`   
+#### `options: object?`   
 
 ```js
 const options = {
@@ -75,10 +70,43 @@ const options = {
 
 ----
 
-
 ## Filtering
 
-<CommonFilters verb="patch" />
+### `filter()`
+<CommonFilters filter='filter'/>
+
+### `match()`
+<CommonFilters filter='match'/>
+
+### `eq()`
+<CommonFilters filter='eq'/>
+
+### `gt()`
+<CommonFilters filter='gt'/>
+
+### `lt()`
+<CommonFilters filter='lt'/>
+
+### `gte()`
+<CommonFilters filter='gte'/>
+
+### `lte()`
+<CommonFilters filter='lte'/>
+
+### `like()`
+<CommonFilters filter='like'/>
+
+### `ilike()`
+<CommonFilters filter='ilike'/>
+
+### `is()`
+<CommonFilters filter='is'/>
+
+### `in()`
+<CommonFilters filter='in'/>
+
+### `not()`
+<CommonFilters filter='not'/>
 
 ## Responses
 

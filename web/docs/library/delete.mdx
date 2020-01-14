@@ -7,7 +7,7 @@ title: 'Deleting'
 import DummyData from '../common/DummyData.mdx'
 import Collapsable from '../../src/components/Collapsable'
 import CommonResponses from '../common/CommonResponses.mdx'
-import CommonFilters from '../common/CommonFilters.mdx'
+import CommonFilters from '../common/CommonFilters'
 import FromFunction from '../common/FromFunction.mdx'
 
 
@@ -22,7 +22,7 @@ We will be using these tables as reference for our examples:
 This example how to delete a city:
 
 <!-- prettier-ignore -->
-```js {8-9}
+```js {7-10}
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
@@ -30,8 +30,9 @@ const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h'
 const updateCountryName = async () => {
   try {
     let values = await supabase
+      .from('cities')
       .match({ id: 666 })
-      .delete('cities', { name: 'Mordor' })
+      .delete()
 
     return values
   } catch (error) {
@@ -53,15 +54,12 @@ const updateCountryName = async () => {
 <FromFunction verb='delete' />
 
 ### `delete()`
-```js
+```js {2}
 supabase
-  .delete(tableName, options?)
+  .delete(options?)
 ```
-
-##### tableName `:string`  
-Name of table in the database with the data that should be deleted.
-
-##### options `:object?`   
+  
+#### `options: object?` 
 
 ```js
 const options = {
@@ -74,7 +72,41 @@ const options = {
 
 ## Filtering
 
-<CommonFilters verb="delete" />
+### `filter()`
+<CommonFilters filter='filter'/>
+
+### `match()`
+<CommonFilters filter='match'/>
+
+### `eq()`
+<CommonFilters filter='eq'/>
+
+### `gt()`
+<CommonFilters filter='gt'/>
+
+### `lt()`
+<CommonFilters filter='lt'/>
+
+### `gte()`
+<CommonFilters filter='gte'/>
+
+### `lte()`
+<CommonFilters filter='lte'/>
+
+### `like()`
+<CommonFilters filter='like'/>
+
+### `ilike()`
+<CommonFilters filter='ilike'/>
+
+### `is()`
+<CommonFilters filter='is'/>
+
+### `in()`
+<CommonFilters filter='in'/>
+
+### `not()`
+<CommonFilters filter='not'/>
 
 ## Responses
 
