@@ -21,7 +21,7 @@ We will be using these tables as reference for our examples:
 This example how to create a new city:
 
 <!-- prettier-ignore -->
-```js {7-8}
+```js {7-11}
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
@@ -29,7 +29,8 @@ const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h'
 const getCities = async () => {
   try {
     let cities = await supabase
-      .post('cities', [
+      .from('cities')
+      .insert([
         { name: 'The Shire', country_id: 554 }
       ])
     return cities
@@ -50,7 +51,7 @@ const getCities = async () => {
 This example how to create multiple cities with one request:
 
 <!-- prettier-ignore -->
-```js {7-8}
+```js {7-12}
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
@@ -58,7 +59,8 @@ const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h'
 const createCities = async () => {
   try {
     let cities = await supabase
-      .post('cities', [
+      .from('cities')
+      .insert([
         { name: 'The Shire', country_id: 554 },
         { name: 'Rohan', country_id: 554 },
       ])
@@ -83,23 +85,19 @@ const createCities = async () => {
 ### `from()`
 <FromFunction verb='post' />
 
-### `post()`
-```js
+### `insert()`
+```js {2}
 supabase
-  .post(tableName, data, options?)
+  .insert(data, options?)
 ```
 
-##### tableName `:string`  
-Name of table in the database where data will be saved.
-
-##### data `:array`   
+#### `data: array`
 Array of rows of type `object` which contain information to be saved into the selected table.
-
-
-##### options `:object?`   
+ 
+#### `options: object?`  
 @todo
 
-
+---
 
 ## Responses
 

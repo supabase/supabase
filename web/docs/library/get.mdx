@@ -28,7 +28,7 @@ const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h'
 const getCities = async () => {
   try {
     let cities = await supabase
-      .get('cities')
+      .from('cities')
     return cities
   } catch (error) {
     console.log('Error: ', error)
@@ -66,7 +66,7 @@ const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h'
 const getCities = async () => {
   try {
     let cities = await supabase
-      .get('cities')
+      .from('cities')
       .select('name')
     return cities
   } catch (error) {
@@ -106,7 +106,7 @@ const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h'
 const getCountries = async () => {
   try {
     let countries = await supabase
-      .get('countries')
+      .from('countries')
       .select(`
         name,
         cities {
@@ -174,30 +174,18 @@ Calling `getCountries()` will return the following response:
 ### `from()`
 <FromFunction verb='get' />
 
-### `get()`
-
-<!-- prettier-ignore -->
-```js {2}
-supabase
-  .get(tableName)
-```
-
-##### tableName `:string`
-Name of table in the database that will be read from.
-
-
-----
-
 ### `select()`
 
 <!-- prettier-ignore -->
 ```js {3}
 supabase
-  .get(tableName)
+  .from(tableName)
   .select(columnQuery)
 ```
 
-##### columnQuery `:string`
+If not used, all columns in the table will be returned.
+
+#### `columnQuery: string`
 A comma separated list of columns. For example `select('id, name')`
 
 If a foreign key constraint exists between this table 
@@ -208,7 +196,7 @@ and another, you can also query the columns of the related table. For example `s
 <!-- prettier-ignore -->
 ```js
 supabase
-  .get('countries')
+  .from('countries')
   .select(`
     name,
     cities {
@@ -227,19 +215,19 @@ supabase
 <!-- prettier-ignore -->
 ```js {3}
 supabase
-  .get(tableName)
+  .from(tableName)
   .order(columnName, sortAscending, nullsFirst)
 ```
 
 Orders your data before fetching.
 
-##### columnName `:string`
+#### `columnName: string`
 Name of chosen column to base the order on.
 
-##### sortAscending `:boolean? | Default is false`
+#### `sortAscending: boolean? | Default is false`
 Specifies whether the order will be ascending or descending.
 
-##### nullsFirst `:boolean? | Default is false`
+#### `nullsFirst: boolean? | Default is false`
 Specifies whether null values will be displayed first.
 
 ----
@@ -249,16 +237,16 @@ Specifies whether null values will be displayed first.
 <!-- prettier-ignore -->
 ```js {3}
 supabase
-  .get(tableName)
+  .from(tableName)
   .range(fromIndex, toIndex)
 ```
 
 Paginates your request.
 
-##### fromIndex `:integer`
+#### `fromIndex: integer`
 Index or position of the start of the specified range.
 
-##### toIndex `:integer?`
+#### `toIndex: integer?`
 Index or position of the end of the specified range. If not stated, all remaining rows after the starting index will be returned.
 
 ----
@@ -268,19 +256,13 @@ Index or position of the end of the specified range. If not stated, all remainin
 <!-- prettier-ignore -->
 ```js {3}
 supabase
-  .get(tableName)
+  .from(tableName)
   .single()
 ```
 
 Returns the first row of the table as an object and **not** as an array.
 
 ----
-
-
-
-
-
-
 
 ## Filtering
 
