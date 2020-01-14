@@ -41,17 +41,17 @@ The unique Supabase Key which is supplied when you create a new project in [your
 #### `OPTIONS: object?`
 
 ```js
+/**
+ * @param {boolean} [allowBulkUpdates=false] 
+ * Blocks the user from accidentally updating many rows. 
+ * Can also be overriden on individual calls to update().
+ * 
+ * @param {boolean} [allowBulkDeletes=false] 
+ * Blocks the user from accidentally deleting many rows. 
+ * Can also be overriden on individual calls to update().
+ */
 const options = {
-  // allowBulkUpdates :boolean
-  // If true, Supabase will not block bulk updates and deletes. 
-  // This can be overriden on individual calls to update(), 
-  // so it is recommended to keep this as false.
   allowBulkUpdates: false, 
-
-  // allowBulkDeletes :boolean
-  // If true, Supabase will not block bulk updates and deletes. 
-  // This can be overriden on individual calls to delete(), 
-  // so it is recommended to keep this as false.
   allowBulkDeletes: false, 
 }
 ```
