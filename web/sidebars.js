@@ -17,7 +17,8 @@ module.exports = {
       "library/get",
       "library/post",
       "library/patch",
-      "library/delete"
+      "library/delete",
+      "library/stored-procedures"
     ],
     Guides:[
       "guides/examples"
