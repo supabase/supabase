@@ -125,7 +125,7 @@ function Home() {
         <header className={classnames('hero', styles.heroBanner)}>
           <div className="container">
             <div className="row">
-              <div className="col">
+              <div className="col col--5">
                 <h2 className="hero__title">{siteConfig.tagline}</h2>
                 <p className="hero__subtitle">
                   Supabase adds realtime and RESTful APIs to your{' '}
@@ -155,7 +155,7 @@ function Home() {
                   </Link>
                 </div>
               </div>
-              <div className="col code-with-header">
+              <div className="col col--7 code-with-header">
                 <div className="code-header">Get notified of all new records in your database</div>
                 <CodeBlock>{heroExample}</CodeBlock>
               </div>

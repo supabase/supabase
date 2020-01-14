@@ -8,7 +8,10 @@ import CommonFilters from '../common/CommonFilters'
 import CommonResponses from '../common/CommonResponses.mdx'
 import DummyData from '../common/DummyData.mdx'
 
-We will be using these tables as reference for our examples:
+You can call stored procedures as a "Remote Procedure Call". 
+
+That's just a fancy way of saying that you can put some logic into your database, and then call it from anywhere. 
+This is especially useful for things like password resets, where the logic rarely changes.
 
 <DummyData />
 
@@ -43,7 +46,7 @@ const echoCity = async () => {
 
 ### Bulk call
 
-This example shows how to call a stored function that takes in a names of cities and returns them:
+This example would call a the same stored procedure above (twice), but it will also wait to receive the response only when all the calls have completed:
 
 <!-- prettier-ignore -->
 ```js {7-11}
@@ -54,7 +57,7 @@ const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h'
 const echoCities = async () => {
     try{
         let cities = await supabase
-            .rpc('echo_cities', [
+            .rpc('echo_city', [
                 { name: 'The Shire' },
                 { name: 'Mordor' }
             ])
@@ -124,7 +127,7 @@ Parameters to be passed to the stored function.
 ---
 
 ## Filtering
-If the response of the stored procedure is that of a table type response, the following filters can be utilised to further sift out the data.
+If the stored procedure returns a table, you can also apply filters to the response.
 
 ### `filter()`
 <CommonFilters filter='filter'/>
