@@ -1,0 +1,38 @@
+import Collapsable from '../../src/components/Collapsable'
+
+<!-- prettier-ignore -->
+```js {2} 
+supabase
+  .from(tableName)
+```
+<div style={{display: props.verb == 'subscribe' ? 'block' : 'none'}}>
+
+#### `tableName: string`
+Name of the database table to be listened to. Using the wildcard `"*"` will lead to all tables to be listened to.
+</div>
+
+<div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
+
+#### `tableName: string`
+Name of the database table that will be read from.
+</div>
+
+<div style={{display: props.verb == 'post' ? 'block' : 'none'}}>
+
+#### `tableName: string`
+Name of the database table where data will be saved.
+</div>
+
+<div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
+
+#### `tableName: string`
+Name of the database table where data will be udpated.
+</div>
+
+<div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
+
+#### `tableName: string`
+Name of the database table where data will be deleted.
+</div>
+
+---
