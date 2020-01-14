@@ -24,7 +24,7 @@ This example how to create a new city:
 ```js {7-11}
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
 const getCities = async () => {
   try {
@@ -54,7 +54,7 @@ This example how to create multiple cities with one request:
 ```js {7-12}
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
 const createCities = async () => {
   try {
@@ -86,8 +86,9 @@ const createCities = async () => {
 <FromFunction verb='post' />
 
 ### `insert()`
-```js {2}
+```js {3}
 supabase
+  .from(tableName)
   .insert(data, options?)
 ```
 

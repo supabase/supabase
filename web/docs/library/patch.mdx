@@ -23,7 +23,7 @@ This example how to update a country:
 ```js {7-10}
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://world.supabase.io', '1a2b-3c4d-5e6f-7g8h')
+const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
 const updateCountryName = async () => {
   try {
@@ -51,10 +51,11 @@ const updateCountryName = async () => {
 ### `from()`
 <FromFunction verb='patch' />
 
-### `patch()`
-```js {2}
+### `update()`
+```js {3}
 supabase
-  .patch(tableName, data, options?)
+  .from(tableName)
+  .udpate(data, options?)
 ```
    
 #### `data: object`
