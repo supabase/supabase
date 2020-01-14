@@ -151,7 +151,7 @@ function Home() {
                     to={'https://app.supabase.io'}
                     style={{ marginTop: 10 }}
                   >
-                    Join the List →
+                    Get early access →
                   </Link>
                 </div>
               </div>
@@ -178,14 +178,12 @@ function Home() {
         <section className={styles.forDevelopers}>
           <div className="container">
             <div className={classnames('row', styles.responsiveCentered)}>
-              <div className="col col--8 col--offset-2">
+              <div className="col col--6 col--offset-3">
                 <h2 className="with-underline">For Developers</h2>
                 <p className="">
-                  We know developers want fast, solid, and simple products. So that's what we make.
-                  <br />
-                  Forget about building repetitive CRUD APIs. We introspect your database and
-                  provide APIs <strong className="has-emphasis">instantly</strong> so you can focus
-                  on what's most important - building your products.
+                  We introspect your database and provide APIs 
+                  <strong className="has-emphasis">instantly</strong> so you can stop building
+                  repetitive CRUD APIs and focus on building your products.
                 </p>
               </div>
             </div>
@@ -230,7 +228,9 @@ function Home() {
                 <div className="col col--9 code-with-header">
                   {visibleCodeExample === 'SUBSCRIBE' && (
                     <>
-                      <div className="code-header">Receive realtime messages in an example chat room</div>
+                      <div className="code-header">
+                        Receive realtime messages in an example chat room
+                      </div>
                       <CodeBlock>{subscribeExample}</CodeBlock>
                     </>
                   )}
