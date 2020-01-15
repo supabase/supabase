@@ -13,7 +13,8 @@
     "classnames": "^2.2.6",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "react-inlinesvg": "^1.2.0"
+    "react-inlinesvg": "^1.2.0",
+    "react-perfect-scrollbar": "^1.5.3"
   },
   "browserslist": {
     "production": [
