@@ -6,12 +6,13 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import useBaseUrl from '@docusaurus/useBaseUrl'
 import styles from './styles.module.css'
 import CodeBlock from '@theme/CodeBlock'
+import CustomCodeBlock from '../components/CustomCodeBlock'
 
 const heroExample = `
 import { createClient } from '@supabase/supabase-js'
 
 // Connect to your own PostgreSQL database
-const supabase = createClient('https://your-db.supabase.co', '1a2b-3c4d-5e6f-7g8h')
+const supabase = createClient('https://your-db.supabase.co', 'api-key')
 
 // Receive updates when a new record is inserted into your database
 const realtime = supabase
@@ -57,7 +58,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
 // Create a new chat room
-const newRoom = supabase
+const newRoom = await supabase
   .from('rooms')
   .insert({ name: 'Supabase Fan Club', public: true })
 `.trim()
@@ -68,7 +69,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
 // Update a user
-const updatedUser = supabase
+const updatedUser = await supabase
   .from('users')
   .eq('username', 'kiwicopple')
   .update({ status: 'Online' })
@@ -155,9 +156,11 @@ function Home() {
                   </Link>
                 </div>
               </div>
-              <div className="col col--7 code-with-header">
-                <div className="code-header">Get notified of all new records in your database</div>
-                <CodeBlock>{heroExample}</CodeBlock>
+              <div className="col col--7">
+                <CustomCodeBlock
+                  header="Get notified of all new records in your database"
+                  js={heroExample}
+                />
               </div>
             </div>
           </div>
@@ -227,30 +230,22 @@ function Home() {
                 </div>
                 <div className="col col--9 code-with-header">
                   {visibleCodeExample === 'SUBSCRIBE' && (
-                    <>
-                      <div className="code-header">
-                        Receive realtime messages in an example chat room
-                      </div>
-                      <CodeBlock>{subscribeExample}</CodeBlock>
-                    </>
+                    <CustomCodeBlock
+                      header="Receive realtime messages in an example chat room"
+                      js={subscribeExample}
+                    />
                   )}
                   {visibleCodeExample === 'READ' && (
-                    <>
-                      <div className="code-header">Get all public rooms and their messages</div>
-                      <CodeBlock>{readExample}</CodeBlock>
-                    </>
+                    <CustomCodeBlock
+                      header="Get all public rooms and their messages"
+                      js={readExample}
+                    />
                   )}
                   {visibleCodeExample === 'CREATE' && (
-                    <>
-                      <div className="code-header">Create a new chat room</div>
-                      <CodeBlock>{createExample}</CodeBlock>
-                    </>
+                    <CustomCodeBlock header="Create a new chat room" js={createExample} />
                   )}
                   {visibleCodeExample === 'UPDATE' && (
-                    <>
-                      <div className="code-header">Update a user</div>
-                      <CodeBlock>{updateExample}</CodeBlock>
-                    </>
+                    <CustomCodeBlock header="Update a user" js={updateExample} />
                   )}
                 </div>
               </div>
