@@ -135,7 +135,7 @@ function Home() {
                 <div>
                   <Link
                     className={classnames(
-                      'button hero--button button--md button--secondary button--outline',
+                      'button hero--button button--md button--secondary button--outline responsiveButton',
                       styles.button
                     )}
                     to={useBaseUrl('docs/about')}
@@ -145,7 +145,7 @@ function Home() {
                   </Link>
                   <Link
                     className={classnames(
-                      'button hero--button button--md button--primary',
+                      'button hero--button button--md button--primary responsiveButton',
                       styles.button
                     )}
                     to={'https://app.supabase.io'}

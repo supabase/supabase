@@ -660,3 +660,10 @@ a.hash-link {
     width: auto;
   }
 }
+
+@media screen and (max-width: 600px) {
+  .responsiveButton {
+    width: 100%;
+    margin: 5px 0 !important;
+  }
+}
