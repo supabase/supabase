@@ -4,6 +4,7 @@
 */
 
 import { Request } from 'superagent'
+import * as Filters from './utils/Filters'
 
 const contentRangeStructure = /^(\d+)-(\d+)\/(\d+)$/
 
@@ -21,6 +22,19 @@ class BaseRequest extends Request {
     super(method, path)
     this.set('Accept', 'application/json')
 
+    this.filterMap = {
+      eq: (columnName, criteria) => Filters.Eq(columnName, criteria),
+      gt: (columnName, criteria) => Filters.Gt(columnName, criteria),
+      lt: (columnName, criteria) => Filters.Lt(columnName, criteria),
+      gte: (columnName, criteria) => Filters.Gte(columnName, criteria),
+      lte: (columnName, criteria) => Filters.Lte(columnName, criteria),
+      like: (columnName, criteria) => Filters.Like(columnName, criteria),
+      ilike: (columnName, criteria) => Filters.Ilike(columnName, criteria),
+      is: (columnName, criteria) => Filters.Is(columnName, criteria),
+      in: (columnName, criteria) => Filters.In(columnName, criteria),
+      not: (columnName, criteria) => Filters.Not(columnName, criteria),
+    }
+
     // Fix for superagent disconnect on client & server.
     if (!this.get) {
       this.get = this.getHeader
@@ -28,7 +42,7 @@ class BaseRequest extends Request {
   }
 
   /**
-   * Set auth using special formats. If only one string paramter is passed, it
+   * Set auth using special formats. If only one string parameter is passed, it
    * is interpreted as a bearer token. If an object and nothing else is passed,
    * `user` and `pass` keys are extracted from it and used for basic auth.
    *
@@ -49,6 +63,20 @@ class BaseRequest extends Request {
     }
 
     return super.auth(user, pass)
+  }
+
+  /**
+   * All in one conveniencd function for all filters available.
+   *
+   * @param {string} Name of the database column.
+   * @param {string} Name of filter operator be utilised.
+   * @param { object | array | string | integer | boolean | null } Value to compare to. Exact data type of criteria would depend on the operator used.
+   * @returns {BaseRequest} The API request object.
+   */
+
+  filter(columnName, operator, criteria){
+    let newQuery = this.filterMap[operator.toLowerCase()](columnName, criteria)
+    return this.query(newQuery)
   }
 
   /**
@@ -179,15 +207,15 @@ class BaseRequest extends Request {
  * For all of the PostgREST filters add a shortcut method to use it.
  *
  * @param {string} The name of the column.
- * @param {any} The value of the column to be filtered.
+ * @param { object | array | string | integer | boolean | null } The value of the column to be filtered.
  * @returns {BaseRequest} The API request object.
  */
 
 const filters = ['eq', 'gt', 'lt', 'gte', 'lte', 'like', 'ilike', 'is', 'in', 'not']
 
 filters.forEach(filter =>
-  BaseRequest.prototype[filter] = function filterValue (name, value) {
-    return this.query(`${name}=${filter}.${Array.isArray(value) ? value.join(',') : value}`)
+  BaseRequest.prototype[filter] = function filterValue (columnName, criteria) {
+    return this.filter(columnName, filter, criteria)
   }
 )
 
