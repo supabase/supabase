@@ -1,0 +1,27 @@
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  transition: var(--ifm-transition-fast) ease color;
+}
+
+body > div {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-wrapper {
+  flex: 1 0 auto;
+  margin-top: var(--ifm-navbar-height);
+}
