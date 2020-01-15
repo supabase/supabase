@@ -2,10 +2,11 @@ import { Socket } from 'phoenix-channels'
 import BaseRequest from './BaseRequest'
 
 class Base {
-  constructor(tableName, restUrl, apiSocket, uuid) {
+  constructor(tableName, restUrl, apiSocket, schema, uuid) {
     this.tableName = tableName
     this.restUrl = restUrl
     this.apiSocket = apiSocket
+    this.schema = schema
     this.uuid = uuid
 
     this.socket = null
@@ -16,8 +17,15 @@ class Base {
   }
 
   createListener() {
-    this.socket = new Socket(apiSocket)
-    this.channel = this.socket.channel(this.tableName)
+    this.socket = new Socket(this.apiSocket)
+    this.channel = this.socket.channel(`realtime:${this.schema}:${this.tableName}`)
+
+    this.socket.onOpen(() => {
+      console.log('Socket connected')
+    })
+    this.socket.onClose(() => {
+      console.log('Socket disconnected')
+    })
   }
 
   on(eventType, callbackFunction) {
@@ -25,6 +33,8 @@ class Base {
 
     var ref = this.channel.on(eventType, callbackFunction)
     this.listeners[eventType] = ref
+
+    return this
   }
 
   subscribe() {
@@ -39,15 +49,14 @@ class Base {
         .receive('error', resp => console.log('Unable to join ', resp))
         .receive('timeout', () => console.log('Networking issue. Still waiting...'))
     }
+
+    return this
   }
 
   unsubscribe() {
-    for (var ref in this.listeners) {
-      let eventName = this.listeners[ref]
-      this.off(eventName, ref)
-    }
-
     this.socket.disconnect()
+
+    return this
   }
 
   request(method) {

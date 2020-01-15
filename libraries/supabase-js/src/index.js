@@ -1,5 +1,3 @@
-import BaseRequest from './BaseRequest'
-import Subscription from './Subscription'
 import { uuid } from './utils/Helpers'
 import Base from './Base'
 
@@ -10,6 +8,7 @@ class SupabaseClient {
 
     this.restUrl = null
     this.apiSocket = null
+    this.schema = null
     this.subscriptions = {}
 
     this.authenticate(supabaseUrl, supabaseKey)
@@ -17,19 +16,21 @@ class SupabaseClient {
 
   authenticate(supabaseUrl, supabaseKey){
     // do something to utilise parameters and receive
-    // the restUrl & apiSocket
+    // the restUrl, apiSocket and schema
     
-    var restUrl = supabaseUrl
+    var restUrl = ''
     var apiSocket = ''
+    var schema = ''
 
-    this.restUrl = restUrl
-    this.apiSocket = apiSocket
+    this.restUrl = 'http://localhost:3000'
+    this.apiSocket = 'ws://localhost:4000/socket'
+    this.schema = 'public'
   }
 
   from(tableName){
     let identifier = uuid()
     
-    this.subscriptions[identifier] = new Base(tableName, this.restUrl, this.apiSocket, identifier)
+    this.subscriptions[identifier] = new Base(tableName, this.restUrl, this.apiSocket, this.schema, identifier)
     return this.subscriptions[identifier]
   }
 
