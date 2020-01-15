@@ -6,6 +6,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import useBaseUrl from '@docusaurus/useBaseUrl'
 import styles from './styles.module.css'
 import CodeBlock from '@theme/CodeBlock'
+import CustomCodeBlock from '../components/CustomCodeBlock'
 
 const heroExample = `
 import { createClient } from '@supabase/supabase-js'
@@ -57,7 +58,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
 // Create a new chat room
-const newRoom = supabase
+const newRoom = await supabase
   .from('rooms')
   .insert({ name: 'Supabase Fan Club', public: true })
 `.trim()
@@ -68,7 +69,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
 // Update a user
-const updatedUser = supabase
+const updatedUser = await supabase
   .from('users')
   .eq('username', 'kiwicopple')
   .update({ status: 'Online' })
@@ -135,7 +136,7 @@ function Home() {
                 <div>
                   <Link
                     className={classnames(
-                      'button hero--button button--md button--secondary button--outline',
+                      'button hero--button button--md button--secondary button--outline responsiveButton',
                       styles.button
                     )}
                     to={useBaseUrl('docs/about')}
@@ -145,19 +146,21 @@ function Home() {
                   </Link>
                   <Link
                     className={classnames(
-                      'button hero--button button--md button--primary',
+                      'button hero--button button--md button--primary responsiveButton',
                       styles.button
                     )}
                     to={'https://app.supabase.io'}
                     style={{ marginTop: 10 }}
                   >
-                    Join the List →
+                    Get early access →
                   </Link>
                 </div>
               </div>
-              <div className="col col--7 code-with-header">
-                <div className="code-header">Get notified of all new records in your database</div>
-                <CodeBlock>{heroExample}</CodeBlock>
+              <div className="col col--7">
+                <CustomCodeBlock
+                  header="Get notified of all new records in your database"
+                  js={heroExample}
+                />
               </div>
             </div>
           </div>
@@ -178,14 +181,12 @@ function Home() {
         <section className={styles.forDevelopers}>
           <div className="container">
             <div className={classnames('row', styles.responsiveCentered)}>
-              <div className="col col--8 col--offset-2">
+              <div className="col col--6 col--offset-3">
                 <h2 className="with-underline">For Developers</h2>
                 <p className="">
-                  We know developers want fast, solid, and simple products. So that's what we make.
-                  <br />
-                  Forget about building repetitive CRUD APIs. We introspect your database and
-                  provide APIs <strong className="has-emphasis">instantly</strong> so you can focus
-                  on what's most important - building your products.
+                  We introspect your database and provide APIs 
+                  <strong className="has-emphasis">instantly</strong> so you can stop building
+                  repetitive CRUD APIs and focus on building your products.
                 </p>
               </div>
             </div>
@@ -229,28 +230,22 @@ function Home() {
                 </div>
                 <div className="col col--9 code-with-header">
                   {visibleCodeExample === 'SUBSCRIBE' && (
-                    <>
-                      <div className="code-header">Receive realtime messages in an example chat room</div>
-                      <CodeBlock>{subscribeExample}</CodeBlock>
-                    </>
+                    <CustomCodeBlock
+                      header="Receive realtime messages in an example chat room"
+                      js={subscribeExample}
+                    />
                   )}
                   {visibleCodeExample === 'READ' && (
-                    <>
-                      <div className="code-header">Get all public rooms and their messages</div>
-                      <CodeBlock>{readExample}</CodeBlock>
-                    </>
+                    <CustomCodeBlock
+                      header="Get all public rooms and their messages"
+                      js={readExample}
+                    />
                   )}
                   {visibleCodeExample === 'CREATE' && (
-                    <>
-                      <div className="code-header">Create a new chat room</div>
-                      <CodeBlock>{createExample}</CodeBlock>
-                    </>
+                    <CustomCodeBlock header="Create a new chat room" js={createExample} />
                   )}
                   {visibleCodeExample === 'UPDATE' && (
-                    <>
-                      <div className="code-header">Update a user</div>
-                      <CodeBlock>{updateExample}</CodeBlock>
-                    </>
+                    <CustomCodeBlock header="Update a user" js={updateExample} />
                   )}
                 </div>
               </div>

@@ -70,15 +70,6 @@
   margin: 0;
 }
 
-
-@media screen and (max-width: 600px) {
-  .responsiveButton {
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
-  }
-}
-
 .responsiveCentered {
   text-align: center;
 }
