@@ -11,7 +11,7 @@ const heroExample = `
 import { createClient } from '@supabase/supabase-js'
 
 // Connect to your own PostgreSQL database
-const supabase = createClient('https://your-db.supabase.co', '1a2b-3c4d-5e6f-7g8h')
+const supabase = createClient('https://your-db.supabase.co', 'api-key')
 
 // Receive updates when a new record is inserted into your database
 const realtime = supabase
