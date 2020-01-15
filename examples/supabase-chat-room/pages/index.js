@@ -1,24 +1,39 @@
-import { createClient } from '@supabase/supabase-js'
+import Router from 'next/router'
+import cookie from 'js-cookie'
 
 export default class Index extends React.Component {
   constructor() {
     super()
-    this.supabase = createClient("http://localhost:8000/rest/v0", "")
-  }
-  componentDidMount() {
-    this.loadData()
-  }
 
-  async loadData() {
-    let countries = await this.supabase.get('countries')
-    console.log('Here are the list of countries: ', countries)
+    this.state = {
+      username: null,
+    }
   }
 
   render() {
     return (
       <div style={styles.main}>
-        <h1>Test Suite</h1>
-        <br/>
+        <label>Enter your username</label>
+        <br />
+        <input
+          type="text"
+          class="input"
+          id="username"
+          name="username"
+          value={this.state.username}
+          onChange={event => {
+            this.setState({ username: event.target.value })
+          }}
+        />
+        <br />
+        <button
+          onClick={() => {
+            cookie.set('username', this.state.username)
+            Router.push(`/chatScreen`)
+          }}
+        >
+          Join
+        </button>
       </div>
     )
   }

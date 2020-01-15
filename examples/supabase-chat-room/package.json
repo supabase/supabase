@@ -9,6 +9,8 @@
   "dependencies": {
     "@supabase/supabase-js": "file:../../../../../desktop/supabase/monorepo/libraries/supabase-js",
     "dotenv": "^8.2.0",
+    "js-cookie": "^2.2.1",
+    "moment": "^2.24.0",
     "next": "latest",
     "react": "^16.7.0",
     "react-dom": "^16.7.0"

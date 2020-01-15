@@ -22,6 +22,7 @@ class SupabaseClient {
     var apiSocket = ''
     var schema = ''
 
+    // harcoded
     this.restUrl = 'http://localhost:3000'
     this.apiSocket = 'ws://localhost:4000/socket'
     this.schema = 'public'
