@@ -64,7 +64,7 @@ function Layout(props) {
         {permalink && <meta property="og:url" content={siteUrl + permalink} />}
         <meta name="twitter:card" content="summary" />
 
-        {headerJs && <script>{headerJs}</script>}
+        {headerJs && <script async defer>{headerJs}</script>}
       </Head>
       <Navbar />
       <div className="main-wrapper">{children}</div>
