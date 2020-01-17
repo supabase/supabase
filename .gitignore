@@ -3,6 +3,7 @@ node_modules
 .next
 out
 .docz
+tmp
 
 coverage
 .nyc_output

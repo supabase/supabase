@@ -1,13 +1,14 @@
-import { Socket } from 'phoenix-channels'
+const {Socket} = require('phoenix-channels')
 import BaseRequest from './BaseRequest'
 
 class Base {
-  constructor(tableName, restUrl, apiSocket, schema, uuid) {
+  constructor(tableName, restUrl, realtimeUrl, schema, apikey, uuid) {
     this.tableName = tableName
     this.restUrl = restUrl
-    this.apiSocket = apiSocket
+    this.realtimeUrl = realtimeUrl
     this.schema = schema
     this.uuid = uuid
+    this.apikey = apikey
 
     this.socket = null
     this.channel = null
@@ -17,23 +18,28 @@ class Base {
   }
 
   createListener() {
-    this.socket = new Socket(this.apiSocket)
-    this.channel = this.socket.channel(`realtime:${this.schema}:${this.tableName}`)
+    let socketUrl = `${this.realtimeUrl}`
+    let channel = `realtime:${this.schema}:${this.tableName}`
+    this.socket = new Socket(socketUrl)
+    this.channel = this.socket.channel('realtime:*') // @TODO:
+
+    // @TODO: remove
+    // Example local config
+    // this.socket = new Socket(`ws://localhost:80/socket`)
+    // this.channel = this.socket.channel('realtime:*')
 
     this.socket.onOpen(() => {
-      console.log('Socket connected')
+      console.log('REALTIME CONNECTED')
     })
     this.socket.onClose(() => {
-      console.log('Socket disconnected')
+      console.log('REALTIME DISCONNECTED')
     })
   }
 
   on(eventType, callbackFunction) {
     if (this.socket == null) this.createListener()
-
     var ref = this.channel.on(eventType, callbackFunction)
     this.listeners[eventType] = ref
-
     return this
   }
 
@@ -60,7 +66,7 @@ class Base {
   }
 
   request(method) {
-    let path = `${this.restUrl}/${this.tableName}`
+    let path = `${this.restUrl}/${this.tableName}?apikey=${this.apikey}`
     return new BaseRequest(method, path)
   }
 
@@ -74,7 +80,6 @@ class Base {
 
     // loop through this.queryFilters
     this.queryFilters.forEach(queryFilter => {
-
       let columnName = queryFilter.columnName
       let operator = queryFilter.operator
       let criteria = queryFilter.criteria

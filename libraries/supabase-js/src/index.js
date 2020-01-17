@@ -3,35 +3,34 @@ import Base from './Base'
 
 class SupabaseClient {
   constructor(supabaseUrl, supabaseKey, options = {}) {
-    this.supabaseUrl = supabaseUrl
-    this.supabaseKey = supabaseKey
-
+    this.supabaseUrl = null
+    this.supabaseKey = null
     this.restUrl = null
-    this.apiSocket = null
-    this.schema = null
+    this.realtimeUrl = null
+    this.defaultSchema = 'public'
     this.subscriptions = {}
 
     this.authenticate(supabaseUrl, supabaseKey)
   }
 
   authenticate(supabaseUrl, supabaseKey){
-    // do something to utilise parameters and receive
-    // the restUrl, apiSocket and schema
-    
-    var restUrl = ''
-    var apiSocket = ''
-    var schema = ''
-
-    // harcoded
-    this.restUrl = 'http://localhost:3000'
-    this.apiSocket = 'ws://localhost:4000/socket'
-    this.schema = 'public'
+    this.supabaseUrl = supabaseUrl
+    this.supabaseKey = supabaseKey
+    this.restUrl = supabaseUrl + '/rest/v1'
+    this.realtimeUrl = `${supabaseUrl}/socket`.replace('http', 'ws')
   }
 
   from(tableName){
     let identifier = uuid()
     
-    this.subscriptions[identifier] = new Base(tableName, this.restUrl, this.apiSocket, this.schema, identifier)
+    this.subscriptions[identifier] = new Base(
+      tableName,
+      this.restUrl,
+      this.realtimeUrl,
+      this.defaultSchema,
+      this.supabaseKey,
+      identifier
+    )
     return this.subscriptions[identifier]
   }
 
