@@ -1,6 +1,6 @@
 # Supabase JS
 
-# Commands
+## Commands
 - `npm run clean` - Remove `lib/` directory
 - `npm test` - Run tests with linting and coverage results.
 - `npm test:only` - Run tests without linting or coverage.
@@ -12,3 +12,11 @@
 - `npm run build` - Babel will transpile ES6 => ES5 and minify the code.
 - `npm run prepublish` - Hook for npm. Do all the checks before publishing your module.
 
+
+## Publishing
+
+Bump the semver.
+
+```sh
+npm publish --access=public
+```
