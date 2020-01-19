@@ -35,11 +35,11 @@ module.exports = {
         //   label: 'GitHub',
         //   position: 'right',
         // },
-        {
-          href: 'https://app.supabase.io',
-          label: 'Join the List →',
-          position: 'right',
-        },
+        // {
+        //   href: 'https://app.supabase.io',
+        //   label: 'Join the List →',
+        //   position: 'right',
+        // },
       ],
     },
     prism: {

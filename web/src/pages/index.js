@@ -89,17 +89,58 @@ const features = [
     href: '/docs/guides/examples',
   },
   {
-    title: <>Event sourcing</>,
+    title: <>Logging</>,
     imageUrl: '',
     description: <>Log all your database changes to an immutable logging system</>,
     href: '/docs/guides/examples',
+  },
+  {
+    title: <>Realtime Games</>,
+    imageUrl: '',
+    description: <>Keep all players in-sync with game actions and leader dashboards.</>,
+    href: '/docs/guides/examples',
+  },
+  {
+    title: <>Streaming analytics</>,
+    imageUrl: '',
+    description: <>Send actions and events to your data warehouses.</>,
+    href: '/docs/guides/examples',
+  },
+  {
+    title: <>Backoffice and Admin</>,
+    imageUrl: '',
+    description: <>Build admin dashboards without stressing about conflict resolution.</>,
+    href: '/docs/guides/examples',
+  },
+]
+const repos = [
+  {
+    title: <>Monorepo</>,
+    description: <>Website, docs, and client libraries. Follow to stay updated about our public Beta.</>,
+    href: 'https://github.com/supabase/monorepo',
+    handle: 'supabase/monorepo',
+    stars: 21,
+  },
+  {
+    title: <>Realtime</>,
+    description: <>Listen to your to PostgreSQL database in realtime via websockets. Built with Elixir.</>,
+    href: 'https://github.com/supabase/realtime',
+    handle: 'supabase/realtime',
+    stars: 199,
+  },
+  {
+    title: <>Schemas</>,
+    description: <>Free and opensource database schemas with migration files to keep your DB synced.</>,
+    href: 'https://github.com/supabase/schemas',
+    handle: 'supabase/schemas',
+    stars: 2,
   },
 ]
 
 function Feature({ imageUrl, title, description, href }) {
   const imgUrl = useBaseUrl(imageUrl)
   return (
-    <div className={classnames('col', styles.feature)}>
+    <div className={classnames('col col--4 m-b-md', styles.feature)}>
       <a className={classnames('card', styles.featureCard)} href={href}>
         <div className="card__body">
           {imgUrl && (
@@ -109,6 +150,23 @@ function Feature({ imageUrl, title, description, href }) {
           )}
           <h3>{title}</h3>
           <p>{description}</p>
+        </div>
+      </a>
+    </div>
+  )
+}
+function GithubCard({ title, description, href, stars, handle }) {
+  return (
+    <div className={classnames('col', styles.feature)}>
+      <a className={classnames('card', styles.githubCard)} href={href}>
+        <div className="card__body">
+          <h3>{title}</h3>
+          <small>{description}</small>
+        </div>
+        <hr />
+        <div className={classnames(styles.cardBase)}>
+          <div>{handle}</div>
+          <div>{stars} ★</div>
         </div>
       </a>
     </div>
@@ -149,10 +207,10 @@ function Home() {
                       'button hero--button button--md button--primary responsiveButton',
                       styles.button
                     )}
-                    to={'https://app.supabase.io'}
+                    to={'https://github.com/supabase/monorepo'}
                     style={{ marginTop: 10 }}
                   >
-                    Get early access →
+                    Follow our GitHub →
                   </Link>
                 </div>
               </div>
@@ -172,9 +230,7 @@ function Home() {
           }}
           className="hero is--dark"
         >
-          <div className="container text--center">
-            <small>CUSTOMER LOGOS</small>
-          </div>
+          <div className="container text--center">{/* <small>CUSTOMER LOGOS</small> */}</div>
         </section>
 
         {/* For Devs */}
@@ -254,18 +310,37 @@ function Home() {
         </section>
 
         {/* FEATURES */}
-        {features && features.length && (
-          <section className={styles.features}>
-            <div className="container">
-              <h2 className="with-underline">Use Cases</h2>
-              <div className="row">
-                {features.map((props, idx) => (
-                  <Feature key={idx} {...props} />
-                ))}
+        <section className={styles.features}>
+          <div className="container">
+            <h2 className="with-underline">Use Cases</h2>
+            <div className="row is-multiline">
+              {features.map((props, idx) => (
+                <Feature key={idx} {...props} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* OSS */}
+        <section className={styles.forDevelopers}>
+          <div className="container">
+            <div className={classnames('row', styles.responsiveCentered)}>
+              <div className="col col--6 col--offset-3">
+                <h2 className="with-underline">Open source</h2>
+                <p className="">
+                  Follow us on GitHub. <strong>Watch</strong> the releases of each repo to get
+                  notified when we are ready for Beta launch.
+                </p>
               </div>
             </div>
-          </section>
-        )}
+
+            <div className="row">
+              {repos.map((props, idx) => (
+                <GithubCard key={idx} {...props} />
+              ))}
+            </div>
+          </div>
+        </section>
 
         <section
           style={{
@@ -276,9 +351,9 @@ function Home() {
           className="hero is--dark"
         >
           <div className="container text--center">
-            <div>
+            {/* <div>
               <h2>Get Early Access</h2>
-            </div>
+            </div> */}
             <div className="">
               <Link
                 className={classnames(
@@ -297,10 +372,10 @@ function Home() {
                   styles.button,
                   styles.responsiveButton
                 )}
-                to={'https://app.supabase.io'}
+                to={'https://github.com/supabase/monorepo'}
                 style={{ margin: 5 }}
               >
-                Join the list →
+                Follow our GitHub →
               </Link>
             </div>
           </div>
