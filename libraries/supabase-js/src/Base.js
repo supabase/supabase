@@ -1,4 +1,4 @@
-const {Socket} = require('phoenix-channels')
+const {Socket} = require('@supabase/realtime-js')
 import BaseRequest from './BaseRequest'
 
 class Base {
@@ -18,7 +18,7 @@ class Base {
   }
 
   createListener() {
-    let socketUrl = `${this.realtimeUrl}`
+    let socketUrl = `${this.realtimeUrl}?apikey=${this.apikey}`
     let channel = `realtime:${this.schema}:${this.tableName}`
     this.socket = new Socket(socketUrl)
     this.channel = this.socket.channel('realtime:*') // @TODO:

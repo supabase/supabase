@@ -1,3 +1,4 @@
+import * as ChangeMapper from './utils/ChangeMapper'
 import { uuid } from './utils/Helpers'
 import Base from './Base'
 
@@ -16,8 +17,8 @@ class SupabaseClient {
   authenticate(supabaseUrl, supabaseKey){
     this.supabaseUrl = supabaseUrl
     this.supabaseKey = supabaseKey
-    this.restUrl = supabaseUrl + '/rest/v1'
-    this.realtimeUrl = `${supabaseUrl}/socket`.replace('http', 'ws')
+    this.restUrl = `${supabaseUrl}/rest/v1`
+    this.realtimeUrl = `${supabaseUrl}/realtime/v1`.replace('http', 'ws')
   }
 
   from(tableName){
@@ -45,4 +46,4 @@ const createClient = (supabaseUrl, supabaseKey, options = {}) => {
   return new SupabaseClient(supabaseUrl, supabaseKey, options)
 }
 
-export { createClient }
+export { createClient, ChangeMapper }
