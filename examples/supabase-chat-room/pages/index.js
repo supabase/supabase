@@ -10,6 +10,11 @@ export default class Index extends React.Component {
     }
   }
 
+  logIn(){
+    cookie.set('username', this.state.username)
+    Router.push('/chatScreen')
+  }
+
   render() {
     return (
       <div style={styles.main}>
@@ -24,12 +29,16 @@ export default class Index extends React.Component {
           onChange={event => {
             this.setState({ username: event.target.value })
           }}
+          onKeyPress={event => {
+            if (event.key === 'Enter'){
+              this.logIn()
+            }
+          }}
         />
         <br />
         <button
           onClick={() => {
-            cookie.set('username', this.state.username)
-            Router.push(`/chatScreen`)
+            this.logIn()
           }}
         >
           Join

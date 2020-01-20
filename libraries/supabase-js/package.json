@@ -1,6 +1,6 @@
 {
   "name": "@supabase/supabase-js",
-  "version": "0.1.05",
+  "version": "0.1.6",
   "description": "Supabase Realtime API",
   "main": "./lib/index.js",
   "scripts": {
@@ -12,7 +12,8 @@
     "test:examples": "node examples/",
     "cover": "nyc --check-coverage npm run test:only",
     "build": "cross-env BABEL_ENV=production babel src --out-dir lib",
-    "prepublish": "npm run clean && npm run build"
+    "prepublish": "npm run clean && npm run build",
+    "deploy": "npm version patch && npm publish --access=public"
   },
   "files": [
     "lib",

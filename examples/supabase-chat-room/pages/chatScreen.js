@@ -1,11 +1,11 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, ChangeMapper } from '@supabase/supabase-js'
 import cookie from 'js-cookie'
 import moment from 'moment'
 
 export default class ChatScreen extends React.Component {
   constructor() {
     super()
-    this.supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
+    this.supabase = createClient('http://localhost:8000', 'LmT3VFkGhD')
 
     this.state = {
       username: cookie.get('username'),
@@ -21,10 +21,15 @@ export default class ChatScreen extends React.Component {
   }
 
   subscribe() {
-    let test = this.supabase
+    this.supabase
       .from('messages')
       .on('*', payload => {
         console.log('REALTIME! ', payload)
+
+        // This is meant to test out ChangeMapper
+        let change = ChangeMapper.convertChangeData(payload.columns, payload.record)
+        console.log('this is the change ', change)
+        
         let updatedMessages = this.state.messages
         updatedMessages.push(payload.record)
         
@@ -76,6 +81,9 @@ export default class ChatScreen extends React.Component {
           value={this.state.message}
           onChange={event => {
             this.setState({ message: event.target.value })
+          }}
+          onKeyPress={event => {
+            if(event.key === "Enter") this.sendMessage()
           }}
         />
         <br />
