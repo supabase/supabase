@@ -48,7 +48,7 @@
     "rimraf": "^2.6.2"
   },
   "dependencies": {
-    "phoenix-channels": "^1.0.0",
+    "@supabase/realtime-js": "^0.1.5",
     "superagent": "^5.2.1"
   }
 }
