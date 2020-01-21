@@ -1,5 +1,5 @@
-const {Socket} = require('@supabase/realtime-js')
 import BaseRequest from './BaseRequest'
+import { Socket } from '@supabase/realtime-js'
 
 class Base {
   constructor(tableName, restUrl, realtimeUrl, schema, apikey, uuid) {
@@ -17,10 +17,14 @@ class Base {
     this.queryFilters = []
   }
 
+  /**
+   * REALTIME FUNCTIONALITY
+   */
+
   createListener() {
-    let socketUrl = `${this.realtimeUrl}?apikey=${this.apikey}`
+    let socketUrl = `${this.realtimeUrl}`
     let channel = `realtime:${this.schema}:${this.tableName}`
-    this.socket = new Socket(socketUrl)
+    this.socket = new Socket(socketUrl, { params: { apikey: this.apikey } })
     this.channel = this.socket.channel('realtime:*') // @TODO:
 
     // @TODO: remove
@@ -65,6 +69,10 @@ class Base {
     return this
   }
 
+  /**
+   * REST FUNCTIONALITIES
+   */
+
   request(method) {
     let path = `${this.restUrl}/${this.tableName}?apikey=${this.apikey}`
     return new BaseRequest(method, path)
@@ -80,12 +88,78 @@ class Base {
 
     // loop through this.queryFilters
     this.queryFilters.forEach(queryFilter => {
-      let columnName = queryFilter.columnName
-      let operator = queryFilter.operator
-      let criteria = queryFilter.criteria
+      switch (queryFilter.filter) {
+        case 'filter':
+          request.filter(queryFilter.columnName, queryFilter.operator, queryFilter.criteria)
+          break
 
-      request.filter(columnName, operator, criteria)
+        case 'match':
+          request.match(queryFilter.query)
+          break
+
+        case 'order':
+          request.order(queryFilter.property, queryFilter.ascending, queryFilter.nullsFirst)
+          break
+
+        case 'range':
+          request.range(queryFilter.from, queryFilter.to)
+          break
+
+        case 'single':
+          request.single()
+          break
+
+        default:
+          break
+      }
     })
+  }
+
+  filter(columnName, operator, criteria) {
+    this.queryFilters.push({
+      filter: 'filter',
+      columnName,
+      operator,
+      criteria,
+    })
+
+    return this
+  }
+
+  match(query) {
+    this.queryFilters.push({
+      filter: 'match',
+      query,
+    })
+
+    return this
+  }
+
+  order(property, ascending = false, nullsFirst = false) {
+    this.queryFilters.push({
+      filter: 'order',
+      property,
+      ascending,
+      nullsFirst,
+    })
+
+    return this
+  }
+
+  range(from, to) {
+    this.queryFilters.push({
+      filter: 'range',
+      from,
+      to,
+    })
+
+    return this
+  }
+
+  single() {
+    this.queryFilters.push({ filter: 'single' })
+
+    return this
   }
 
   select(columnQuery = '*', options = {}) {
@@ -141,16 +215,12 @@ class Base {
 }
 
 // pre-empts if any of the filters are used before select
-const filters = ['eq', 'gt', 'lt', 'gte', 'lte', 'like', 'ilike', 'is', 'in', 'not']
+const advancedFilters = ['eq', 'gt', 'lt', 'gte', 'lte', 'like', 'ilike', 'is', 'in', 'not']
 
-filters.forEach(
+advancedFilters.forEach(
   operator =>
     (Base.prototype[operator] = function filterValue(columnName, criteria) {
-      this.queryFilters.push({
-        columnName,
-        operator,
-        criteria,
-      })
+      this.filter(columnName, operator, criteria)
       return this
     })
 )
