@@ -2,7 +2,7 @@ import BaseRequest from './BaseRequest'
 import { Socket } from '@supabase/realtime-js'
 import * as ChangeMapper from './utils/ChangeMapper'
 
-class Base {
+class Supabase {
   constructor(tableName, restUrl, realtimeUrl, schema, apikey, uuid) {
     this.tableName = tableName
     this.restUrl = restUrl
@@ -271,10 +271,10 @@ const advancedFilters = ['eq', 'gt', 'lt', 'gte', 'lte', 'like', 'ilike', 'is', 
 
 advancedFilters.forEach(
   operator =>
-    (Base.prototype[operator] = function filterValue(columnName, criteria) {
+    (Supabase.prototype[operator] = function filterValue(columnName, criteria) {
       this.filter(columnName, operator, criteria)
       return this
     })
 )
 
-export default Base
+export default Supabase
