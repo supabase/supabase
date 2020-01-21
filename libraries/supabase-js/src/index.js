@@ -1,4 +1,3 @@
-import * as ChangeMapper from './utils/ChangeMapper'
 import { uuid } from './utils/Helpers'
 import Base from './Base'
 
@@ -46,4 +45,4 @@ const createClient = (supabaseUrl, supabaseKey, options = {}) => {
   return new SupabaseClient(supabaseUrl, supabaseKey, options)
 }
 
-export { createClient, ChangeMapper }
+export { createClient }

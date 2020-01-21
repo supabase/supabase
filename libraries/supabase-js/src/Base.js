@@ -1,5 +1,6 @@
 import BaseRequest from './BaseRequest'
 import { Socket } from '@supabase/realtime-js'
+import * as ChangeMapper from './utils/ChangeMapper'
 
 class Base {
   constructor(tableName, restUrl, realtimeUrl, schema, apikey, uuid) {
@@ -42,7 +43,58 @@ class Base {
 
   on(eventType, callbackFunction) {
     if (this.socket == null) this.createListener()
-    var ref = this.channel.on(eventType, callbackFunction)
+    // var ref = this.channel.on(eventType, callbackFunction)
+
+    var ref = this.channel.on(eventType, payload => {
+      let payloadEnriched = {}
+      let newData = {}
+      let oldData = {}
+      let oldDataEnriched = {}
+
+      switch (payload.type) {
+        case 'INSERT':
+          newData = ChangeMapper.convertChangeData(payload.columns, payload.record)
+          payloadEnriched = {
+            eventType: 'INSERT',
+            new: newData,
+          }
+          break
+
+        case 'UPDATE':
+          oldData = ChangeMapper.convertChangeData(payload.columns, payload.old_record)
+          newData = ChangeMapper.convertChangeData(payload.columns, payload.record)
+
+          Object.keys(oldData).forEach(key => {
+            if (oldData[key] != null) oldDataEnriched[key] = oldData[key]
+          })
+
+          payloadEnriched = {
+            eventType: 'UPDATE',
+            old: oldDataEnriched,
+            new: newData,
+          }
+          break
+
+        case 'DELETE':
+          oldData = ChangeMapper.convertChangeData(payload.columns, payload.old_record)
+
+          Object.keys(oldData).forEach(key => {
+            if (oldData[key] != null) oldDataEnriched[key] = oldData[key]
+          })
+
+          payloadEnriched = {
+            eventType: 'DELETE',
+            old: oldDataEnriched,
+          }
+          break
+
+        default:
+          break
+      }
+
+      callbackFunction(payloadEnriched)
+    })
+
     this.listeners[eventType] = ref
     return this
   }
