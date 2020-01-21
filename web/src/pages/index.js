@@ -141,7 +141,7 @@ function Feature({ imageUrl, title, description, href }) {
   const imgUrl = useBaseUrl(imageUrl)
   return (
     <div className={classnames('col col--4 m-b-md', styles.feature)}>
-      <a className={classnames('card', styles.featureCard)} href={href}>
+      <Link className={classnames('card', styles.featureCard)} to={href}>
         <div className="card__body">
           {imgUrl && (
             <div className="">
@@ -151,7 +151,7 @@ function Feature({ imageUrl, title, description, href }) {
           <h3>{title}</h3>
           <p>{description}</p>
         </div>
-      </a>
+      </Link>
     </div>
   )
 }
@@ -194,7 +194,7 @@ function Home() {
                 <div>
                   <Link
                     className={classnames(
-                      'button hero--button button--md button--secondary button--outline responsiveButton',
+                      'button hero--button button--md button--secondary button--outline responsive-button',
                       styles.button
                     )}
                     to={useBaseUrl('docs/about')}
@@ -204,7 +204,7 @@ function Home() {
                   </Link>
                   <Link
                     className={classnames(
-                      'button hero--button button--md button--primary responsiveButton',
+                      'button hero--button button--md button--primary responsive-button',
                       styles.button
                     )}
                     to={'https://github.com/supabase/monorepo'}
@@ -357,9 +357,8 @@ function Home() {
             <div className="">
               <Link
                 className={classnames(
-                  'button hero--button button--outline button--md button--secondary',
-                  styles.button,
-                  styles.responsiveButton
+                  'button hero--button button--outline button--md button--secondary responsive-button',
+                  styles.button
                 )}
                 style={{ margin: 5 }}
                 to={useBaseUrl('docs/about')}
@@ -368,9 +367,8 @@ function Home() {
               </Link>
               <Link
                 className={classnames(
-                  'button hero--button button--md button--primary',
-                  styles.button,
-                  styles.responsiveButton
+                  'button hero--button button--md button--primary responsive-button',
+                  styles.button
                 )}
                 to={'https://github.com/supabase/monorepo'}
                 style={{ margin: 5 }}
