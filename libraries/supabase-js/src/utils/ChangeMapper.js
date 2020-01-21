@@ -80,6 +80,7 @@ export const convertChangeData = (columns, records, options = {}) => {
         case 'cidr':
           return noop(stringValue)
         case 'date':
+          return noop(stringValue) // To allow users to cast it based on Timezone
           return toDate(stringValue)
         case 'daterange':
           return toDateRange(stringValue)
@@ -120,8 +121,10 @@ export const convertChangeData = (columns, records, options = {}) => {
         case 'time':
           return noop(stringValue)
         case 'timestamp':
+          return noop(stringValue) // To allow users to cast it based on Timezone
           return toDate(stringValue)
         case 'timestamptz':
+          return noop(stringValue) // To allow users to cast it based on Timezone
           return toDate(stringValue)
         case 'timetz':
           return noop(stringValue)

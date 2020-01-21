@@ -46,7 +46,14 @@ class Supabase {
     // var ref = this.channel.on(eventType, callbackFunction)
 
     var ref = this.channel.on(eventType, payload => {
-      let payloadEnriched = {}
+      let payloadEnriched = {
+        columns: payload.columns,
+        relation: payload.relation,
+        schema: payload.schema,
+        table: payload.table,
+        type: payload.type,
+        commit_timestamp: payload.commit_timestamp,
+      }
       let newData = {}
       let oldData = {}
       let oldDataEnriched = {}
@@ -54,10 +61,9 @@ class Supabase {
       switch (payload.type) {
         case 'INSERT':
           newData = ChangeMapper.convertChangeData(payload.columns, payload.record)
-          payloadEnriched = {
-            eventType: 'INSERT',
-            new: newData,
-          }
+          payloadEnriched.eventType = 'INSERT'
+          payloadEnriched.new = newData
+
           break
 
         case 'UPDATE':
@@ -68,11 +74,10 @@ class Supabase {
             if (oldData[key] != null) oldDataEnriched[key] = oldData[key]
           })
 
-          payloadEnriched = {
-            eventType: 'UPDATE',
-            old: oldDataEnriched,
-            new: newData,
-          }
+          payloadEnriched.eventType = 'UPDATE'
+          payloadEnriched.old = oldDataEnriched
+          payloadEnriched.new = newData
+
           break
 
         case 'DELETE':
@@ -82,10 +87,9 @@ class Supabase {
             if (oldData[key] != null) oldDataEnriched[key] = oldData[key]
           })
 
-          payloadEnriched = {
-            eventType: 'DELETE',
-            old: oldDataEnriched,
-          }
+          payloadEnriched.eventType = 'DELETE'
+          payloadEnriched.old = oldDataEnriched
+
           break
 
         default:
