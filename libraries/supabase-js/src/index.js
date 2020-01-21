@@ -1,6 +1,5 @@
-import * as ChangeMapper from './utils/ChangeMapper'
 import { uuid } from './utils/Helpers'
-import Base from './Base'
+import Supabase from './Supabase'
 
 class SupabaseClient {
   constructor(supabaseUrl, supabaseKey, options = {}) {
@@ -24,7 +23,7 @@ class SupabaseClient {
   from(tableName){
     let identifier = uuid()
     
-    this.subscriptions[identifier] = new Base(
+    this.subscriptions[identifier] = new Supabase(
       tableName,
       this.restUrl,
       this.realtimeUrl,
@@ -46,4 +45,4 @@ const createClient = (supabaseUrl, supabaseKey, options = {}) => {
   return new SupabaseClient(supabaseUrl, supabaseKey, options)
 }
 
-export { createClient, ChangeMapper }
+export { createClient }
