@@ -48,7 +48,7 @@ const publicRooms = await supabase
   .eq('public', true)
   .select(\`
     name,
-    messages { text }
+    messages ( text )
   \`)
 `.trim()
 const createExample = `
