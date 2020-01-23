@@ -332,8 +332,9 @@ function Home() {
               <div className="col col--6 col--offset-3">
                 <h2 className="with-underline">Open source</h2>
                 <p className="">
-                  Follow us on GitHub. <strong>Watch</strong> the releases of each repo to get
-                  notified when we are ready for Beta launch.
+                  Follow us on <a href="https://github.com/supabase">GitHub</a>.{' '}
+                  <strong>Watch</strong> the releases of each repo to get notified when we are ready
+                  for Beta launch.
                 </p>
               </div>
             </div>
