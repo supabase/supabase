@@ -116,24 +116,28 @@ const features = [
 const repos = [
   {
     title: <>Monorepo</>,
-    description: <>Website, docs, and client libraries. Follow to stay updated about our public Beta.</>,
+    description: (
+      <>Website, docs, and client libraries. Follow to stay updated about our public Beta.</>
+    ),
     href: 'https://github.com/supabase/monorepo',
     handle: 'supabase/monorepo',
-    stars: 21,
+    stars: 49,
   },
   {
     title: <>Realtime</>,
-    description: <>Listen to your to PostgreSQL database in realtime via websockets. Built with Elixir.</>,
+    description: (
+      <>Listen to your to PostgreSQL database in realtime via websockets. Built with Elixir.</>
+    ),
     href: 'https://github.com/supabase/realtime',
     handle: 'supabase/realtime',
-    stars: 199,
+    stars: 285,
   },
   {
     title: <>Schemas</>,
-    description: <>Free and opensource database schemas with migration files to keep your DB synced.</>,
+    description: <>An opensource repository of PostgreSQL schemas to get your projects started.</>,
     href: 'https://github.com/supabase/schemas',
     handle: 'supabase/schemas',
-    stars: 2,
+    stars: 3,
   },
 ]
 
