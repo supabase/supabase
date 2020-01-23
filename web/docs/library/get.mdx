@@ -109,9 +109,9 @@ const getCountries = async () => {
       .from('countries')
       .select(`
         name,
-        cities {
+        cities (
           name
-        }
+        )
       `)
     return countries
   } catch (error) {
