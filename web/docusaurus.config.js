@@ -72,6 +72,10 @@ module.exports = {
               label: 'GitHub',
               href: 'https://github.com/supabase/monorepo',
             },
+            {
+              label: 'Twitter',
+              href: 'https://twitter.com/supabase_io',
+            },
             // {
             //   label: "Discord",
             //   href: "https://discordapp.com/invite/docusaurus"

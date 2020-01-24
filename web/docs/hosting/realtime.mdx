@@ -1,0 +1,37 @@
+---
+id: hosting-realtime
+title: Self-hosting Supabase Realtime
+---
+
+## Pre-requisites
+
+- Postgres 10+
+
+## What you will need
+
+- `DB_HOST`: defaults to `localhost`
+- `DB_NAME`: defaults to `postgres`
+- `DB_USER`: defaults to `postgres`
+- `DB_PASSWORD`: defaults to `postgres`
+- `DB_PORT`: defaults to `5432`
+
+
+## Setting up replication
+
+For us to receive the streaming data, we need the database to have a free replication slot:
+
+```sql
+ALTER SYSTEM SET wal_level = logical; -- set the replication to "logical" 
+ALTER SYSTEM SET max_replication_slots = 5; -- We need at least one replication slot to subscribe to
+CREATE PUBLICATION supabase_realtime FOR ALL TABLES; -- Set up the publication for us to listen to
+```
+
+### Optional
+
+If you want to recieve the old record (previous values) on `UDPATE` and `DELETE`, you can set the `REPLICA IDENTITY` to `FULL` like this: 
+
+```sql
+ALTER TABLE your_table SET REPLICA IDENTITY = FULL;
+```
+
+This has to be set for each table unfortunately.
