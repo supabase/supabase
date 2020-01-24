@@ -1,6 +1,6 @@
 {
   "name": "@supabase/supabase-js",
-  "version": "0.1.0",
+  "version": "0.1.10",
   "description": "Supabase Realtime API",
   "main": "./lib/index.js",
   "scripts": {
@@ -12,7 +12,8 @@
     "test:examples": "node examples/",
     "cover": "nyc --check-coverage npm run test:only",
     "build": "cross-env BABEL_ENV=production babel src --out-dir lib",
-    "prepublish": "npm run clean && npm run build"
+    "prepublish": "npm run clean && npm run build",
+    "deploy": "npm version patch && npm publish --access=public"
   },
   "files": [
     "lib",
@@ -48,7 +49,7 @@
     "rimraf": "^2.6.2"
   },
   "dependencies": {
-    "phoenix-channels": "^1.0.0",
+    "@supabase/realtime-js": "^0.1.6",
     "superagent": "^5.2.1"
   }
 }

@@ -662,8 +662,16 @@ a.hash-link {
 }
 
 @media screen and (max-width: 600px) {
-  .responsiveButton {
+  .responsive-button {
     width: 100%;
     margin: 5px 0 !important;
+  }
+}
+
+
+@media screen and (min-width: 996px) {
+  .row.is-multiline .col {
+    margin-top: var(--ifm-spacing-horizontal) !important;
+    margin-bottom: var(--ifm-spacing-horizontal) !important;
   }
 }

@@ -19,9 +19,7 @@ It does all of this without you having to write a single line of code.
 
 ## How it works 
 
-At its core, Supabase is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Supabase list to PostgreSQL's built-in replication functionality, converts the replication byte stream into JSON, then broadcasts the JSON over websockets. 
-
-It is built with Phoenix, an Elixir framework that's incredibly scalable. 
+At its core, Supabase is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Supabase listens to Postgres' built-in replication functionality, converts the replication byte stream into JSON, then broadcasts the JSON over websockets. 
 
 For all Restful functionality, we introspect your database to provide an instant, fully functional API.
 

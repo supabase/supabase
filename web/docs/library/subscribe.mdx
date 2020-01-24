@@ -291,9 +291,7 @@ Upon inserting or creating a new row, the following will be returned by our list
 ```json
 {
   "eventType": "INSERT",
-  "new": [
-    { "name": "Middle Earth", "country_id": "554" }
-  ]
+  "new": { "name": "Middle Earth", "country_id": "554" }
 }
 ```
 
@@ -305,12 +303,8 @@ Upon updating a row, the following will be returned by our listener:
 ```json
 {
   "eventType": "UPDATE",
-  "old": [
-    { "name": "Middle Earth", "country_id": "554" }
-  ],
-  "new": [
-    { "name": "Wellington", "country_id": "554" }
-  ]
+  "old": { "name": "Middle Earth", "country_id": "554" },
+  "new": { "name": "Wellington", "country_id": "554" }
 }
 ```
 
@@ -322,8 +316,6 @@ Upon deleting a row, the following will be returned by our listener:
 ```json
 {
   "eventType": "DELETE",
-  "old": [
-    { "name": "Mordor", "country_id": "554" }
-  ]
+  "old": { "name": "Mordor", "country_id": "554" }
 }
 ```
