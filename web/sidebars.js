@@ -26,6 +26,9 @@ module.exports = {
     Handbook:[
       "handbook/introduction",
       "handbook/contributing"
+    ],
+    'Self Hosting':[
+      "hosting/hosting-realtime"
     ]
   }
 };
