@@ -19,7 +19,7 @@ import DummyData from '../common/DummyData.mdx'
 This example shows how to get all the countries in our database:
 
 <!-- prettier-ignore -->
-```js {7-8}
+```js {7-9}
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
@@ -28,6 +28,7 @@ const getCities = async () => {
   try {
     let cities = await supabase
       .from('cities')
+      .select('*')
     return cities
   } catch (error) {
     console.log('Error: ', error)
@@ -108,9 +109,9 @@ const getCountries = async () => {
       .from('countries')
       .select(`
         name,
-        cities {
+        cities (
           name
-        }
+        )
       `)
     return countries
   } catch (error) {

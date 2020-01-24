@@ -5,23 +5,23 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, {useCallback, useState} from 'react';
-import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import useBaseUrl from '@docusaurus/useBaseUrl';
+import React, { useCallback, useState } from 'react'
+import Link from '@docusaurus/Link'
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
+import useBaseUrl from '@docusaurus/useBaseUrl'
 
-import SearchBar from '@theme/SearchBar';
-import Toggle from '@theme/Toggle';
+import SearchBar from '@theme/SearchBar'
+import Toggle from '@theme/Toggle'
 
-import classnames from 'classnames';
+import classnames from 'classnames'
 
-import useTheme from '@theme/hooks/useTheme';
-import useHideableNavbar from '@theme/hooks/useHideableNavbar';
+import useTheme from '@theme/hooks/useTheme'
+import useHideableNavbar from '@theme/hooks/useHideableNavbar'
 
-import styles from './styles.module.css';
+import styles from './styles.module.css'
 
-function NavLink({to, href, label, position, ...props}) {
-  const toUrl = useBaseUrl(to);
+function NavLink({ to, href, label, position, ...props }) {
+  const toUrl = useBaseUrl(to)
   return (
     <Link
       className="navbar__item navbar__link"
@@ -35,39 +35,37 @@ function NavLink({to, href, label, position, ...props}) {
             activeClassName: 'navbar__link--active',
             to: toUrl,
           })}
-      {...props}>
+      {...props}
+    >
       {label}
     </Link>
-  );
+  )
 }
 
 function Navbar() {
-  const context = useDocusaurusContext();
-  const {siteConfig = {}} = context;
-  const {baseUrl, themeConfig = {}} = siteConfig;
-  const {navbar = {}, disableDarkMode = false} = themeConfig;
-  const {title, logo = {}, links = [], hideOnScroll = false} = navbar;
-  const [sidebarShown, setSidebarShown] = useState(false);
-  const [isSearchBarExpanded, setIsSearchBarExpanded] = useState(false);
-  const [theme, setTheme] = useTheme();
+  const context = useDocusaurusContext()
+  const { siteConfig = {} } = context
+  const { baseUrl, themeConfig = {} } = siteConfig
+  const { navbar = {}, disableDarkMode = false } = themeConfig
+  const { title, logo = {}, links = [], hideOnScroll = false } = navbar
+  const [sidebarShown, setSidebarShown] = useState(false)
+  const [isSearchBarExpanded, setIsSearchBarExpanded] = useState(false)
+  const [theme, setTheme] = useTheme()
 
-  const {navbarRef, isNavbarVisible} = useHideableNavbar(hideOnScroll);
+  const { navbarRef, isNavbarVisible } = useHideableNavbar(hideOnScroll)
 
   const showSidebar = useCallback(() => {
-    document.body.style.overflow = 'hidden';
-    setSidebarShown(true);
-  }, [setSidebarShown]);
+    document.body.style.overflow = 'hidden'
+    setSidebarShown(true)
+  }, [setSidebarShown])
   const hideSidebar = useCallback(() => {
-    document.body.style.overflow = 'visible';
-    setSidebarShown(false);
-  }, [setSidebarShown]);
+    document.body.style.overflow = 'visible'
+    setSidebarShown(false)
+  }, [setSidebarShown])
 
-  const onToggleChange = useCallback(
-    e => setTheme(e.target.checked ? 'dark' : ''),
-    [setTheme],
-  );
+  const onToggleChange = useCallback(e => setTheme(e.target.checked ? 'dark' : ''), [setTheme])
 
-  const logoUrl = useBaseUrl(logo.src);
+  const logoUrl = useBaseUrl(logo.src)
   const logoDark = useBaseUrl(logo.dark)
   return (
     <nav
@@ -137,6 +135,14 @@ function Navbar() {
             .map((linkItem, i) => (
               <NavLink {...linkItem} key={i} />
             ))}
+
+          <a
+            className={classnames(styles.displayOnlyInLargeViewport, 'button button--primary', styles.button)}
+            href={'https://github.com/supabase/monorepo'}
+            style={{ margin: 0, marginLeft: 15 }}
+          >
+            GITHUB →
+          </a>
           <SearchBar
             handleSearchBarToggle={setIsSearchBarExpanded}
             isSearchBarExpanded={isSearchBarExpanded}
@@ -171,6 +177,14 @@ function Navbar() {
                   <NavLink className="menu__link" {...linkItem} onClick={hideSidebar} />
                 </li>
               ))}
+
+              <div style={{ margin: 5, marginTop: 15 }}></div>
+              <a
+                className={classnames('button button--block button--primary', styles.button)}
+                href="https://github.com/supabase/monorepo"
+              >
+                GITHUB →
+              </a>
             </ul>
           </div>
         </div>
@@ -179,4 +193,4 @@ function Navbar() {
   )
 }
 
-export default Navbar;
+export default Navbar
