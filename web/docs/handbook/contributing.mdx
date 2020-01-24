@@ -1,7 +1,14 @@
 ---
 id: contributing
 title: Contributing
+description: Want to help?
 ---
+
+import ContributorList from '../../src/components/ContributorList'
+import Contributors from '../../src/data/contributors/contributors.json'
+import IssueCreators from '../../src/data/contributors/issues.json'
+
+## How to contribute
 
 Want to contribute? Why not jump into our github and:
 
@@ -12,6 +19,18 @@ Want to contribute? Why not jump into our github and:
 - translate this website
 - [vote on a new client library](https://github.com/supabase/monorepo/issues/5) for your favourite language
 - [vote on a new connector](https://github.com/supabase/monorepo/issues/4) for a tool that you use
+- [vote on a new database](https://github.com/supabase/monorepo/issues/6)
 - spread the word if you like what we are doing
 
 Please refrain from putting us on any launch lists (like Product Hunt) until we are ready for public launch :)
+
+## Kudos
+
+### Contributors
+
+<ContributorList list={Contributors} />
+
+### Issue creators
+
+<ContributorList list={IssueCreators} />
+
