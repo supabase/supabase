@@ -10,164 +10,190 @@ import CommonResponses from '../common/CommonResponses.mdx'
 import Collapsable from '../../src/components/Collapsable'
 import FromFunction from '../common/FromFunction.mdx'
 import DummyData from '../common/DummyData.mdx'
+import CustomCodeBlock from '../../src/components/CustomCodeBlock'
+import { getSimpleJs, getColumnsJs, getForeignJs, getForeignMultipleJs } from './getExamples'
 
 
 <DummyData />
 
 ### Getting your data
 
-This example shows how to get all the countries in our database:
+<CustomCodeBlock
+  header="Shows how to get all countries from our public 'world' database"
+  js={getSimpleJs}
+  jsHighlight="{7-9}"
+  response={`{
+  body: [
+    { "name": "Rio de Janeiro", "country_id": 76 },
+    { "name": "Beijing", "country_id": 156 },
+    { "name": "Paris", "country_id": 250 },
+    { "name": "Auckland", "country_id": 554 },
+    { "name": "Lagos", "country_id": 556 },
+    { "name": "San Francisco", "country_id": 840 }
+  ],
+  status: 200,
+  statusCode: 200,
+  statusText: "OK"
+}`}
+/>
 
-<!-- prettier-ignore -->
-```js {7-9}
-import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-const getCities = async () => {
-  try {
-    let cities = await supabase
-      .from('cities')
-      .select('*')
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-```
-
-<Collapsable title="Toggle Example Response">
-
-Calling `getCities()` will return the following response:
-
-```json
-[
-  { "name": "Rio de Janeiro", "country_id": 76 },
-  { "name": "Beijing", "country_id": 156 },
-  { "name": "Paris", "country_id": 250 },
-  { "name": "Auckland", "country_id": 554 },
-  { "name": "Lagos", "country_id": 556 },
-  { "name": "San Francisco", "country_id": 840 }
-]
-```
-
-</Collapsable>
 
 ### Getting specific columns
 
-This example shows how to get all cities but only return the name:
+<CustomCodeBlock
+  header="Shows how to get all cities but only return the name"
+  js={getColumnsJs}
+  jsHighlight="{9}"
+  response={`{
+  body: [
+    { "name": "Rio de Janeiro" },
+    { "name": "Beijing" },
+    { "name": "Paris" },
+    { "name": "Auckland" },
+    { "name": "Lagos" },
+    { "name": "San Francisco" }
+  ],
+  status: 200,
+  statusCode: 200,
+  statusText: "OK"
+}`}
+/>
 
-<!-- prettier-ignore -->
-```js {9}
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-const getCities = async () => {
-  try {
-    let cities = await supabase
-      .from('cities')
-      .select('name')
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-```
-
-<Collapsable title="Toggle Example Response">
-  
-Calling `getCities()` will return the following response:
-
-```json
-[
-  { "name": "Rio de Janeiro" },
-  { "name": "Beijing" },
-  { "name": "Paris" },
-  { "name": "Auckland" },
-  { "name": "Lagos" },
-  { "name": "San Francisco" }
-]
-```
-
-</Collapsable>
 
 ### Query foreign tables
 
+<CustomCodeBlock
+  header="Shows how to get all countries and the name of each of their cities"
+  js={getForeignJs}
+  jsHighlight="{9-14}"
+  response={`{
+  body: [
+    {
+      "name": "Brazil",  
+      "cities": [
+        { "name": "Rio de Janeiro" }
+      ]
+    },
+    {
+      "name": "China", 
+      "cities": [
+        { "name": "Beijing" }
+      ]
+    },
+    {
+      "name": "France", 
+      "cities": [
+        { "name": "Paris" }
+      ]
+    },
+    {
+      "name": "New Zealand", 
+      "cities": [
+        { "name": "Auckland" }
+      ]
+    },
+    {
+      "name": "Nigeria", 
+      "cities": [
+        { "name": "Lagos" }
+      ]
+    },
+    {
+      "name": "United States", 
+      "cities": [
+        { "name": "San Francisco" }
+      ]
+    }
+  ],
+  status: 200,
+  statusCode: 200,
+  statusText: "OK"
+}`}
+/>
 
-This example shows how to get all countries and the cities their cities:
+### Query foreign tables
 
-<!-- prettier-ignore -->
-```js {9-14}
-import { createClient } from '@supabase/supabase-js'
+<CustomCodeBlock
+  header="Shows how to get all countries and the name of each of their cities"
+  js={getForeignJs}
+  jsHighlight="{9-14}"
+  response={`{
+  body: [
+    {
+      "name": "Brazil",  
+      "cities": [
+        { "name": "Rio de Janeiro" }
+      ]
+    },
+    {
+      "name": "China", 
+      "cities": [
+        { "name": "Beijing" }
+      ]
+    },
+    {
+      "name": "France", 
+      "cities": [
+        { "name": "Paris" }
+      ]
+    },
+    {
+      "name": "New Zealand", 
+      "cities": [
+        { "name": "Auckland" }
+      ]
+    },
+    {
+      "name": "Nigeria", 
+      "cities": [
+        { "name": "Lagos" }
+      ]
+    },
+    {
+      "name": "United States", 
+      "cities": [
+        { "name": "San Francisco" }
+      ]
+    }
+  ],
+  status: 200,
+  statusCode: 200,
+  statusText: "OK"
+}`}
+/>
 
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
+### Query the same foreign table multiple times
 
-const getCountries = async () => {
-  try {
-    let countries = await supabase
-      .from('countries')
-      .select(`
-        name,
-        cities (
-          name
-        )
-      `)
-    return countries
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-```
+Sometimes you will need to query the same foreign table twice. In this case, you can use the name of the joined column to identify which join you intend to use. 
+For convenience, you can also give an alias for each column. For example, if we had a shop of products, and we wanted to get 
+the supplier and the purchaser at the same time (both in the `users`) table:
 
 
+<CustomCodeBlock
+  header="Shows how to reference a foreign table when it is referenced twice"
+  js={getForeignMultipleJs}
+  jsHighlight="{9-13}"
+  response={`{
+  body: [
+    {
+      "id": 1,  
+      "purchaser": { "name": "John" },  
+      "supplier":  { "name": "Jane" }
+    },
+    {
+      "id": 2,  
+      "purchaser": { "name": "Sue" },  
+      "supplier":  { "name": "Steve" }
+    }
+  ],
+  status: 200,
+  statusCode: 200,
+  statusText: "OK"
+}`}
+/>
 
-<Collapsable title="Toggle Example Response">
 
-Calling `getCountries()` will return the following response:
-
-```json
-[
-  {
-    "name": "Brazil",  
-    "cities": [
-      { "name": "Rio de Janeiro" }
-    ]
-  },
-  {
-    "name": "China", 
-    "cities": [
-      { "name": "Beijing" }
-    ]
-  },
-  {
-    "name": "France", 
-    "cities": [
-      { "name": "Paris" }
-    ]
-  },
-  {
-    "name": "New Zealand", 
-    "cities": [
-      { "name": "Auckland" }
-    ]
-  },
-  {
-    "name": "Nigeria", 
-    "cities": [
-      { "name": "Lagos" }
-    ]
-  },
-  {
-    "name": "United States", 
-    "cities": [
-      { "name": "San Francisco" }
-    ]
-  }
-]
-```
-
-</Collapsable>
 
 ## Reference
 
