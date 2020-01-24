@@ -542,6 +542,9 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
 .code-with-header pre {
   border-radius: 0 0 4px 4px;
 }
+.code-with-response pre {
+  border-radius: 0;
+}
 .code-header {
   background: var(--ifm-code-background-dark);
   color: #ccc;
@@ -674,4 +677,8 @@ a.hash-link {
     margin-top: var(--ifm-spacing-horizontal) !important;
     margin-bottom: var(--ifm-spacing-horizontal) !important;
   }
+}
+
+.has-hover-pointer:hover {
+  cursor: pointer;
 }
