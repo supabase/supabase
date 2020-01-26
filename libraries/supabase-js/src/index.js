@@ -1,5 +1,6 @@
 import { uuid } from './utils/Helpers'
 import Supabase from './Supabase'
+import BaseRequest from './BaseRequest'
 
 class SupabaseClient {
   constructor(supabaseUrl, supabaseKey, options = {}) {
@@ -32,6 +33,15 @@ class SupabaseClient {
       identifier
     )
     return this.subscriptions[identifier]
+  }
+
+  rpc(functionName, functionParameters){
+    let path =`${this.restUrl}/rpc/${functionName}?apikey=${this.supabaseKey}`
+    let request = new BaseRequest('post', path)
+
+    request.send(functionParameters)
+
+    return request
   }
 
   removeSubscription(mySubscription){
