@@ -35,11 +35,11 @@ class SupabaseClient {
     return this.subscriptions[identifier]
   }
 
-  rpc(functionName, functionParameters){
+  rpc(functionName, functionParameters = null){
     let path =`${this.restUrl}/rpc/${functionName}?apikey=${this.supabaseKey}`
     let request = new BaseRequest('post', path)
 
-    request.send(functionParameters)
+    if(functionParameters != null) request.send(functionParameters)
 
     return request
   }
