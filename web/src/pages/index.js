@@ -313,7 +313,7 @@ function Home() {
         </section>
 
         {/* FEATURES */}
-        <section className={styles.features}>
+        <section className={'section-lg'}>
           <div className="container">
             <h2 className="with-underline">Use Cases</h2>
             <div className="row is-multiline">
@@ -325,7 +325,7 @@ function Home() {
         </section>
 
         {/* OSS */}
-        <section className={styles.forDevelopers}>
+        <section className={'section-lg'}>
           <div className="container">
             <div className={classnames('row', styles.responsiveCentered)}>
               <div className="col col--6 col--offset-3">

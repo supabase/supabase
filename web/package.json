@@ -14,7 +14,8 @@
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-inlinesvg": "^1.2.0",
-    "react-perfect-scrollbar": "^1.5.3"
+    "react-perfect-scrollbar": "^1.5.3",
+    "recharts": "^2.0.0-beta.1"
   },
   "browserslist": {
     "production": [

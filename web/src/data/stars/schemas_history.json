@@ -1,0 +1,42 @@
+[
+  {
+    "repo": "@supabase/schemas",
+    "starred_at": "2020-01-16T06:32:23Z",
+    "user": {
+      "login": "awalias",
+      "id": 458736,
+      "avatar_url": "https://avatars3.githubusercontent.com/u/458736?v=4",
+      "url": "https://api.github.com/users/awalias"
+    }
+  },
+  {
+    "repo": "@supabase/schemas",
+    "starred_at": "2020-01-16T07:19:24Z",
+    "user": {
+      "login": "kiwicopple",
+      "id": 10214025,
+      "avatar_url": "https://avatars0.githubusercontent.com/u/10214025?v=4",
+      "url": "https://api.github.com/users/kiwicopple"
+    }
+  },
+  {
+    "repo": "@supabase/schemas",
+    "starred_at": "2020-01-23T02:16:26Z",
+    "user": {
+      "login": "ganeshan",
+      "id": 115037,
+      "avatar_url": "https://avatars0.githubusercontent.com/u/115037?v=4",
+      "url": "https://api.github.com/users/ganeshan"
+    }
+  },
+  {
+    "repo": "@supabase/schemas",
+    "starred_at": "2020-01-23T11:08:46Z",
+    "user": {
+      "login": "jgwconsulting",
+      "id": 1101369,
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1101369?v=4",
+      "url": "https://api.github.com/users/jgwconsulting"
+    }
+  }
+]
