@@ -6,6 +6,8 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import useBaseUrl from '@docusaurus/useBaseUrl'
 import styles from './styles.module.css'
 import CustomCodeBlock from '../components/CustomCodeBlock'
+import GithubCard from '../components/GithubCard'
+import repos from '../data/repos.json'
 
 const heroExample = `
 import { createClient } from '@supabase/supabase-js'
@@ -112,33 +114,6 @@ const features = [
     href: '/docs/guides/examples',
   },
 ]
-const repos = [
-  {
-    title: <>Monorepo</>,
-    description: (
-      <>Website, docs, and client libraries. Follow to stay updated about our public Beta.</>
-    ),
-    href: 'https://github.com/supabase/monorepo',
-    handle: 'supabase/monorepo',
-    stars: 49,
-  },
-  {
-    title: <>Realtime</>,
-    description: (
-      <>Listen to your to PostgreSQL database in realtime via websockets. Built with Elixir.</>
-    ),
-    href: 'https://github.com/supabase/realtime',
-    handle: 'supabase/realtime',
-    stars: 285,
-  },
-  {
-    title: <>Schemas</>,
-    description: <>An opensource repository of PostgreSQL schemas to get your projects started.</>,
-    href: 'https://github.com/supabase/schemas',
-    handle: 'supabase/schemas',
-    stars: 3,
-  },
-]
 
 function Feature({ imageUrl, title, description, href }) {
   const imgUrl = useBaseUrl(imageUrl)
@@ -155,23 +130,6 @@ function Feature({ imageUrl, title, description, href }) {
           <p>{description}</p>
         </div>
       </Link>
-    </div>
-  )
-}
-function GithubCard({ title, description, href, stars, handle }) {
-  return (
-    <div className={classnames('col', styles.feature)}>
-      <a className={classnames('card', styles.githubCard)} href={href}>
-        <div className="card__body">
-          <h3>{title}</h3>
-          <small>{description}</small>
-        </div>
-        <hr />
-        <div className={classnames(styles.cardBase)}>
-          <div>{handle}</div>
-          <div>{stars} ★</div>
-        </div>
-      </a>
     </div>
   )
 }
@@ -313,7 +271,7 @@ function Home() {
         </section>
 
         {/* FEATURES */}
-        <section className={styles.features}>
+        <section className={'section-lg'}>
           <div className="container">
             <h2 className="with-underline">Use Cases</h2>
             <div className="row is-multiline">
@@ -325,7 +283,7 @@ function Home() {
         </section>
 
         {/* OSS */}
-        <section className={styles.forDevelopers}>
+        <section className={'section-lg'}>
           <div className="container">
             <div className={classnames('row', styles.responsiveCentered)}>
               <div className="col col--6 col--offset-3">

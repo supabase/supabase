@@ -682,3 +682,12 @@ a.hash-link {
 .has-hover-pointer:hover {
   cursor: pointer;
 }
+.section-md {
+  margin: 2rem 0;
+}
+.section-lg {
+  margin: 5rem 0;
+}
+.hidden {
+  display: none;
+}
