@@ -7,7 +7,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl'
 import styles from './styles.module.css'
 import CustomCodeBlock from '../components/CustomCodeBlock'
 import GithubCard from '../components/GithubCard'
-import repos from '../data/repos.json'
+import { repos } from '../data/github'
 
 const heroExample = `
 import { createClient } from '@supabase/supabase-js'
@@ -298,7 +298,16 @@ function Home() {
 
             <div className="row">
               {repos.map((props, idx) => (
-                <GithubCard key={idx} {...props} />
+                <div className={'col'}>
+                  <GithubCard
+                    key={idx}
+                    title={props.name}
+                    description={props.description}
+                    href={props.html_url}
+                    stars={props.stargazers_count}
+                    handle={props.full_name}
+                  />
+                </div>
               ))}
             </div>
           </div>

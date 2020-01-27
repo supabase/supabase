@@ -2,19 +2,17 @@ import React from 'react'
 
 export default function GithubCard({ title, description, href, stars, handle }) {
   return (
-    <div className={'col'}>
       <a className={'card'} href={href}>
         <div className="card__body">
-          <h3 style={styles.h2}>{title}</h3>
+          <h3 style={styles.h3}>{title}</h3>
           <small>{description}</small>
         </div>
         <hr style={styles.hr} />
         <div style={styles.cardBase}>
-          <div>{handle}</div>
+          <div>@{handle}</div>
           <div>{stars} ★</div>
         </div>
       </a>
-    </div>
   )
 }
 
@@ -24,6 +22,7 @@ const styles = {
   },
   h3: {
     margin: 0,
+    textTransform: 'capitalize'
   },
   cardBase: {
     display: 'flex',

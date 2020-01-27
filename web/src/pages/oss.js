@@ -3,9 +3,8 @@ import Layout from '@theme/Layout'
 import { AreaChart, Area, Tooltip, ResponsiveContainer } from 'recharts'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import stargazers from '../data/stars/stargazers.json'
-import repos from '../data/repos.json'
 import GithubCard from '../components/GithubCard'
-import classnames from 'classnames'
+import { repos } from '../data/github'
 
 export default function Oss() {
   const context = useDocusaurusContext()
@@ -19,7 +18,8 @@ export default function Oss() {
             <div className="col">
               <h2 className="with-underline">Open source</h2>
               <p className="">
-                Supabase is an opensource company. Follow us on <a href="https://github.com/supabase">GitHub</a>.
+                Supabase is an opensource company. Follow us on{' '}
+                <a href="https://github.com/supabase">GitHub</a>.
               </p>
             </div>
           </div>
@@ -74,7 +74,16 @@ export default function Oss() {
         <div className="container">
           <div className="row">
             {repos.map((props, idx) => (
-              <GithubCard key={idx} {...props} />
+              <div className={'col'}>
+                <GithubCard
+                  key={idx}
+                  title={props.name}
+                  description={props.description}
+                  href={props.html_url}
+                  stars={props.stargazers_count}
+                  handle={props.full_name}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -82,7 +91,6 @@ export default function Oss() {
     </Layout>
   )
 }
-
 
 /**
  * Hijacked from recharts as the labels don't show up properly without the XAxis component
