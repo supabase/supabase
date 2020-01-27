@@ -1,6 +1,7 @@
 ---
 id: faq
 title: FAQs
+description: 'Most frequently asked questions regarding Supabase'
 ---
 
 ## Do you support (some other database)?
