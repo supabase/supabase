@@ -80,21 +80,3 @@
     text-align: left;
   }
 }
-
-.cardBase {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 0 15px 10px 15px;
-  font-size: 0.8em;
-}
-.githubCard h3 {
-  margin: 0;
-}
-.githubCard hr {
-  margin: 15px 0 10px 0;
-  /* border: none;
-  height: 1px;
-  color: #333; 
-  background-color: #333; */
-}
