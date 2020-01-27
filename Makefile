@@ -4,6 +4,7 @@ help:
 	@echo "\SCRIPTS\n"
 	@echo "make github.contributors        # pull a list of all contributors"
 	@echo "make github.issues       	   # pull a list of all issue creators"
+	@echo "make github.repos       	   	   # pull a list of our repos"
 	@echo "make github.traction       	   # get a history of stargazers for our individual repos"
 
 github.users:
@@ -19,6 +20,16 @@ github.issues:
 	| unique \
 	| sort_by(.username)' \
 	> $(REPO_DIR)/web/src/data/contributors/issues.json
+
+.PHONY: github.repos
+github.repos: \
+	github.repos.monorepo \
+	github.repos.realtime  \
+	github.repos.schemas
+
+github.repos.%:
+	curl -sS https://api.github.com/repos/supabase/$* \
+	> $(REPO_DIR)/web/src/data/repos/$*.json
 
 github.traction: \
 	cd web && npm run traction
