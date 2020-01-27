@@ -1,11 +1,12 @@
 {
   "name": "supabase",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "start": "docusaurus start",
     "build": "docusaurus build",
-    "swizzle": "docusaurus swizzle"
+    "swizzle": "docusaurus swizzle",
+    "traction": "node traction.js"
   },
   "dependencies": {
     "@docusaurus/core": "^2.0.0-alpha.40",
@@ -28,5 +29,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "axios": "^0.19.2"
   }
 }

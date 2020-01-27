@@ -688,3 +688,6 @@ a.hash-link {
 .section-lg {
   margin: 5rem 0;
 }
+.hidden {
+  display: none;
+}

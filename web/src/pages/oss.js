@@ -1,62 +1,71 @@
 import React from 'react'
 import Layout from '@theme/Layout'
-import { AreaChart, Area, Tooltip, XAxis, ResponsiveContainer } from 'recharts'
+import { AreaChart, Area, Tooltip, XAxis, YAxis, ResponsiveContainer } from 'recharts'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
-import monorepo_history from '../data/stars/monorepo_history.json'
-import realtime_history from '../data/stars/realtime_history.json'
-import schemas_history from '../data/stars/schemas_history.json'
+import stargazers from '../data/stars/stargazers.json'
 
-const history = []
-  .concat(monorepo_history)
-  .concat(realtime_history)
-  .concat(schemas_history)
+const CustomTooltip = props => {
+  const renderContent = () => {
+    const { payload, separator, formatter, itemStyle, itemSorter } = props
 
-// const now = new Date()
-// var data = []
-// // console.log('history', history)
-// for (var d = new Date(2019, 10, 1); d <= now; d.setDate(d.getDate() + 1)) {
-//   let dateString = d.toISOString().split('T')[0]
-//   data.push({
-//     name: dateString,
-//     '@supabase/monorepo': 1,
-//     '@supabase/realtime': 2,
-//     '@supabase/schemas': 3,
-//   })
-// }
-
-// this gives an object with dates as keys
-const groups = history.reduce((groups, event) => {
-  const date = event.starred_at.split('T')[0]
-  if (!groups[date]) {
-    groups[date] = []
-  }
-  groups[date].push(event)
-  return groups
-}, {})
-
-var tally = {
-  '@supabase/monorepo': 0,
-  '@supabase/realtime': 0,
-  '@supabase/schemas': 0,
-}
-const data = Object.keys(groups)
-  .sort((a, b) => a > b)
-  .map(date => {
-    let monorepo = groups[date].filter(x => x.repo === '@supabase/monorepo').length
-    let realtime = groups[date].filter(x => x.repo === '@supabase/realtime').length
-    let schemas = groups[date].filter(x => x.repo === '@supabase/schemas').length
-    tally['@supabase/monorepo'] += monorepo
-    tally['@supabase/realtime'] += realtime
-    tally['@supabase/schemas'] += schemas
-    return {
-      name: date,
-      '@supabase/monorepo': tally['@supabase/monorepo'],
-      '@supabase/realtime': tally['@supabase/realtime'],
-      '@supabase/schemas': tally['@supabase/schemas'],
+    if (payload && payload.length) {
+      const listStyle = { padding: 0, margin: 0 }
+      const items = payload.sort(itemSorter).map((entry, i) => {
+        const finalItemStyle = {
+          display: 'block',
+          paddingTop: 4,
+          paddingBottom: 4,
+          color: entry.color || '#000',
+          ...itemStyle,
+        }
+        const hasName = entry.name
+        const finalFormatter = entry.formatter || formatter || (() => {})
+        return (
+          <li className="recharts-tooltip-item" key={`tooltip-item-${i}`} style={finalItemStyle}>
+            {hasName ? <span className="recharts-tooltip-item-name">{entry.name}</span> : null}
+            {hasName ? <span className="recharts-tooltip-item-separator">{separator}</span> : null}
+            <span className="recharts-tooltip-item-value">
+              {finalFormatter ? finalFormatter(entry.value, entry.name, entry, i) : entry.value}
+            </span>
+            <span className="recharts-tooltip-item-unit">{entry.value || '0'}</span>
+          </li>
+        )
+      })
+      return (
+        <ul className="recharts-tooltip-item-list" style={listStyle}>
+          {items}
+        </ul>
+      )
     }
-  })
+  }
+  if (props.active) {
+    const { labelStyle, label, wrapperStyle } = props
+    const finalStyle = {
+      margin: 0,
+      padding: 10,
+      backgroundColor: '#fff',
+      border: '1px solid #ccc',
+      whiteSpace: 'nowrap',
+      ...wrapperStyle,
+    }
+    const finalLabelStyle = {
+      margin: 0,
+      ...labelStyle,
+    }
+    let finalLabel = stargazers[label].name
 
-// console.log('groupArrays', groupArrays)
+    return (
+      <div className="recharts-default-tooltip" style={finalStyle}>
+        <p className="recharts-tooltip-label" style={finalLabelStyle}>
+          {finalLabel}
+        </p>
+        {renderContent()}
+      </div>
+    )
+  }
+
+  return null
+}
 
 export default function Oss() {
   const context = useDocusaurusContext()
@@ -74,7 +83,7 @@ export default function Oss() {
                   <AreaChart
                     width={600}
                     height={400}
-                    data={data}
+                    data={stargazers}
                     margin={{
                       top: 0,
                       right: 0,
@@ -82,9 +91,7 @@ export default function Oss() {
                       bottom: 0,
                     }}
                   >
-                    {/* Need this to make the Tooltip show the correct "name"? */}
-                    <XAxis dataKey="name" style={{ display: 'none' }} />
-                    <Tooltip />
+                    <Tooltip content={<CustomTooltip />} />
                     <Area
                       type="monotone"
                       dataKey="@supabase/schemas"
