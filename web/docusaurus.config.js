@@ -60,6 +60,10 @@ module.exports = {
               to: '/docs/guides/examples',
             },
             {
+              label: 'Opensource',
+              to: '/oss',
+            },
+            {
               label: 'Humans',
               to: 'https://supabase.io/humans.txt',
             },

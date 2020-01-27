@@ -33,7 +33,6 @@ const fetchAllEvents = (repo, totalStars) => {
 }
 
 const formatResults = (repo, githubResponse) => {
-  console.log('githubResponse', githubResponse)
   return githubResponse.map(x => ({
     repo,
     starred_at: x.starred_at,
@@ -46,9 +45,10 @@ const main = async () => {
   const realtime = await fetchAllEvents('realtime', 400)
   const monorepo = await fetchAllEvents('monorepo', 100)
 
-  const history = [].concat(formatResults('@supabase/schemas', schemas))
-  .concat(formatResults('@supabase/realtime', realtime))
-  .concat(formatResults('@supabase/monorepo', monorepo))
+  const history = []
+    .concat(formatResults('@supabase/schemas', schemas))
+    .concat(formatResults('@supabase/realtime', realtime))
+    .concat(formatResults('@supabase/monorepo', monorepo))
 
   const groups = history.reduce((groups, event) => {
     const date = event.starred_at.split('T')[0]
@@ -65,7 +65,7 @@ const main = async () => {
     '@supabase/schemas': 0,
   }
   const data = Object.keys(groups)
-    .sort((a, b) => a > b)
+    .sort((a, b) => a.localeCompare(b))
     .map(date => {
       let monorepo = groups[date].filter(x => x.repo === '@supabase/monorepo').length
       let realtime = groups[date].filter(x => x.repo === '@supabase/realtime').length
