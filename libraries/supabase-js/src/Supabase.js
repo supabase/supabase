@@ -1,5 +1,5 @@
-import BaseRequest from './BaseRequest'
 import { Socket } from '@supabase/realtime-js'
+import { PostgrestClient } from '@supabase/postgrest-js'
 import * as ChangeMapper from './utils/ChangeMapper'
 
 class Supabase {
@@ -14,8 +14,6 @@ class Supabase {
     this.socket = null
     this.channel = null
     this.listeners = {}
-
-    this.queryFilters = []
   }
 
   /**
@@ -26,12 +24,7 @@ class Supabase {
     let socketUrl = `${this.realtimeUrl}`
     let channel = `realtime:${this.schema}:${this.tableName}`
     this.socket = new Socket(socketUrl, { params: { apikey: this.apikey } })
-    this.channel = this.socket.channel('realtime:*') // @TODO:
-
-    // @TODO: remove
-    // Example local config
-    // this.socket = new Socket(`ws://localhost:80/socket`)
-    // this.channel = this.socket.channel('realtime:*')
+    this.channel = this.socket.channel(channel)
 
     this.socket.onOpen(() => {
       console.log('REALTIME CONNECTED')
@@ -43,7 +36,6 @@ class Supabase {
 
   on(eventType, callbackFunction) {
     if (this.socket == null) this.createListener()
-    // var ref = this.channel.on(eventType, callbackFunction)
 
     var ref = this.channel.on(eventType, payload => {
       let payloadEnriched = {
@@ -129,144 +121,56 @@ class Supabase {
    * REST FUNCTIONALITIES
    */
 
-  request(method) {
-    let path = `${this.restUrl}/${this.tableName}?apikey=${this.apikey}`
-    return new BaseRequest(method, path)
-  }
+  initClient() {
+    let rest = new PostgrestClient(this.restUrl, { apikey: this.apikey })
+    let api = rest.from(this.tableName)
 
-  addFilters(request, options) {
-    if (Object.keys(options).length != 0) {
-      Object.keys(options).forEach(option => {
-        let setting = options[option]
-        request.set(option, setting)
-      })
-    }
-
-    // loop through this.queryFilters
-    this.queryFilters.forEach(queryFilter => {
-      switch (queryFilter.filter) {
-        case 'filter':
-          request.filter(queryFilter.columnName, queryFilter.operator, queryFilter.criteria)
-          break
-
-        case 'match':
-          request.match(queryFilter.query)
-          break
-
-        case 'order':
-          request.order(queryFilter.property, queryFilter.ascending, queryFilter.nullsFirst)
-          break
-
-        case 'range':
-          request.range(queryFilter.from, queryFilter.to)
-          break
-
-        case 'single':
-          request.single()
-          break
-
-        default:
-          break
-      }
-    })
-  }
-
-  filter(columnName, operator, criteria) {
-    this.queryFilters.push({
-      filter: 'filter',
-      columnName,
-      operator,
-      criteria,
-    })
-
-    return this
-  }
-
-  match(query) {
-    this.queryFilters.push({
-      filter: 'match',
-      query,
-    })
-
-    return this
-  }
-
-  order(property, ascending = false, nullsFirst = false) {
-    this.queryFilters.push({
-      filter: 'order',
-      property,
-      ascending,
-      nullsFirst,
-    })
-
-    return this
-  }
-
-  range(from, to) {
-    this.queryFilters.push({
-      filter: 'range',
-      from,
-      to,
-    })
-
-    return this
-  }
-
-  single() {
-    this.queryFilters.push({ filter: 'single' })
-
-    return this
+    return api
   }
 
   select(columnQuery = '*', options = {}) {
-    let method = 'get'
-    let request = this.request(method)
-
-    request.select(columnQuery)
-    this.addFilters(request, options)
-
-    return request
+    let api = this.initClient()
+    return api.select(columnQuery, options)
   }
 
   insert(data, options = {}) {
-    let method = 'post'
-    let request = this.request(method)
-
-    if (!Array.isArray(data)) {
-      return {
-        body: null,
-        status: 400,
-        statusCode: 400,
-        statusText: 'Data type should be an array.',
-      }
-    }
-
-    data.forEach(datum => {
-      request.send(datum)
-    })
-
-    this.addFilters(request, options)
-
-    return request
+    let api = this.initClient()
+    return api.insert(data, options)
   }
 
   update(data, options = {}) {
-    let method = 'patch'
-    let request = this.request(method)
-
-    request.send(data)
-    this.addFilters(request, options)
-
-    return request
+    let api = this.initClient()
+    return api.update(data, options)
   }
 
   delete(options = {}) {
-    let method = 'delete'
-    let request = this.request(method)
+    let api = this.initClient()
+    return api.delete(options)
+  }
 
-    this.addFilters(request, options)
+  filter(columnName, operator, criteria) {
+    let api = this.initClient()
+    return api.filter(columnName, operator, criteria)
+  }
 
-    return request
+  match(query) {
+    let api = this.initClient()
+    return api.match(query)
+  }
+
+  order(property, ascending = false, nullsFirst = false) {
+    let api = this.initClient()
+    return api.order(property, ascending, nullsFirst)
+  }
+
+  range(from, to) {
+    let api = this.initClient()
+    return api.range(from, to)
+  }
+
+  single() {
+    let api = this.initClient()
+    return api.single()
   }
 }
 
@@ -276,8 +180,7 @@ const advancedFilters = ['eq', 'gt', 'lt', 'gte', 'lte', 'like', 'ilike', 'is', 
 advancedFilters.forEach(
   operator =>
     (Supabase.prototype[operator] = function filterValue(columnName, criteria) {
-      this.filter(columnName, operator, criteria)
-      return this
+      return this.filter(columnName, operator, criteria)
     })
 )
 
