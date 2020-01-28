@@ -22,7 +22,7 @@ class Supabase {
 
   createListener() {
     let socketUrl = `${this.realtimeUrl}`
-    let channel = `realtime:${this.schema}:${this.tableName}`
+    let channel = this.tableName == "*" ? 'realtime:*' : `realtime:${this.schema}:${this.tableName}`
     this.socket = new Socket(socketUrl, { params: { apikey: this.apikey } })
     this.channel = this.socket.channel(channel)
 
