@@ -39,11 +39,8 @@ class Supabase {
 
     var ref = this.channel.on(eventType, payload => {
       let payloadEnriched = {
-        columns: payload.columns,
-        relation: payload.relation,
         schema: payload.schema,
         table: payload.table,
-        type: payload.type,
         commit_timestamp: payload.commit_timestamp,
       }
       let newData = {}
