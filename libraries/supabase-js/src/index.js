@@ -1,6 +1,6 @@
 import { uuid } from './utils/Helpers'
 import Supabase from './Supabase'
-import BaseRequest from './BaseRequest'
+import { PostgrestClient } from '@supabase/postgrest-js'
 
 class SupabaseClient {
   constructor(supabaseUrl, supabaseKey, options = {}) {
@@ -14,16 +14,16 @@ class SupabaseClient {
     this.authenticate(supabaseUrl, supabaseKey)
   }
 
-  authenticate(supabaseUrl, supabaseKey){
+  authenticate(supabaseUrl, supabaseKey) {
     this.supabaseUrl = supabaseUrl
     this.supabaseKey = supabaseKey
     this.restUrl = `${supabaseUrl}/rest/v1`
     this.realtimeUrl = `${supabaseUrl}/realtime/v1`.replace('http', 'ws')
   }
 
-  from(tableName){
+  from(tableName) {
     let identifier = uuid()
-    
+
     this.subscriptions[identifier] = new Supabase(
       tableName,
       this.restUrl,
@@ -35,20 +35,15 @@ class SupabaseClient {
     return this.subscriptions[identifier]
   }
 
-  rpc(functionName, functionParameters = null){
-    let path =`${this.restUrl}/rpc/${functionName}?apikey=${this.supabaseKey}`
-    let request = new BaseRequest('post', path)
-
-    if(functionParameters != null) request.send(functionParameters)
-
-    return request
+  rpc(functionName, functionParameters = null) {
+    let rest = new PostgrestClient(this.restUrl, { apikey: this.supabaseKey })
+    return rest.rpc(functionName, functionParameters)
   }
 
-  removeSubscription(mySubscription){
+  removeSubscription(mySubscription) {
     mySubscription.unsubscribe()
     delete this.subscriptions[mySubscription.uuid]
   }
-  
 }
 
 const createClient = (supabaseUrl, supabaseKey, options = {}) => {
