@@ -9,6 +9,8 @@ import DummyData from '../common/DummyData.mdx'
 import Collapsable from '../../src/components/Collapsable'
 import CommonResponses from '../common/CommonResponses.mdx'
 import FromFunction from '../common/FromFunction.mdx'
+import CustomCodeBlock from '../../src/components/CustomCodeBlock'
+import { postSingleJs, postBulkJs } from './getExamples'
 
 
 <DummyData />
@@ -16,67 +18,31 @@ import FromFunction from '../common/FromFunction.mdx'
 
 ### Create a record
 
-This example how to create a new city:
-
-<!-- prettier-ignore -->
-```js {7-11}
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-const getCities = async () => {
-  try {
-    let cities = await supabase
-      .from('cities')
-      .insert([
-        { name: 'The Shire', country_id: 554 }
-      ])
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-```
-
-<Collapsable title="Toggle Example Response">
-
-@todo
-
-</Collapsable>
+<CustomCodeBlock
+  header="Creates a new city."
+  js={postSingleJs}
+  jsHighlight="{7-11}"
+  response={`{
+  "body": null,
+  "status": 201,
+  "statusCode": 201,
+  "statusText": "Created"
+}`}
+/>
 
 ### Bulk create
 
-This example how to create multiple cities with one request:
-
-<!-- prettier-ignore -->
-```js {7-12}
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-const createCities = async () => {
-  try {
-    let cities = await supabase
-      .from('cities')
-      .insert([
-        { name: 'The Shire', country_id: 554 },
-        { name: 'Rohan', country_id: 554 },
-      ])
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-```
-
-<Collapsable title="Toggle Example Response">
-
-@todo
-
-</Collapsable>
-
-
-
+<CustomCodeBlock
+  header="Creates a multiple new cities."
+  js={postBulkJs}
+  jsHighlight="{7-12}"
+  response={`{
+  "body": null,
+  "status": 201,
+  "statusCode": 201,
+  "statusText": "Created"
+}`}
+/>
 
 ## Reference
 

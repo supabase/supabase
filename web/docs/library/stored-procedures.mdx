@@ -8,6 +8,8 @@ import Collapsable from '../../src/components/Collapsable'
 import CommonFilters from '../common/CommonFilters'
 import CommonResponses from '../common/CommonResponses.mdx'
 import DummyData from '../common/DummyData.mdx'
+import CustomCodeBlock from '../../src/components/CustomCodeBlock'
+import { storedSingleJs, storedBulkJs, storedReadingJs } from './getExamples'
 
 You can call stored procedures as a "Remote Procedure Call". 
 
@@ -18,100 +20,60 @@ This is especially useful when the logic rarely changes - like password resets a
 
 ### Single call
 
-This example shows how to call a stored function that takes in a name of a city and returns it:
-
-<!-- prettier-ignore -->
-```js {7-8}
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-const echoCity = async () => {
-    try{
-        let city = await supabase
-            .rpc('echo_city', { name: 'The Shire' })
-        return cities
-    } catch (error) {
-        console.log('Error: ', error)
-    }
-}
-```
-
-<Collapsable title="Toggle Example Response">
-
-```json
-[
-    {echo_city: "The Shire"}
-]
-```
-
-</Collapsable>
+<CustomCodeBlock
+  header="Example of invoking a stored procedure that taking in a name of a city and returning it."
+  js={storedSingleJs}
+  jsHighlight="{7-8}"
+  response={`{
+    "body": [
+        {"echo_city": "The Shire"}
+    ],
+    "status": 200,
+    "statusCode": 200,
+    "statusText": "OK"   
+} 
+  `}
+/>
 
 ### Bulk call
 
 This example would call a the same stored procedure above (twice), but it will also wait to receive the response only when all the calls have completed:
 
-<!-- prettier-ignore -->
-```js {7-11}
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-const echoCities = async () => {
-    try{
-        let cities = await supabase
-            .rpc('echo_city', [
-                { name: 'The Shire' },
-                { name: 'Mordor' }
-            ])
-        return cities
-    } catch (error) {
-        console.log('Error: ', error)
-    }
-}
-```
-
-<Collapsable title="Toggle Example Response">
-
-```json
-[
-    {echo_city: "The Shire"},
-    {echo_city: "Mordor"}
-]
-```
-
-</Collapsable>
+<CustomCodeBlock
+  header="Example of invoking the same stored procedure multiple times within one call."
+  js={storedBulkJs}
+  jsHighlight="{7-11}"
+  response={`{
+    "body": [
+        {"echo_city": "The Shire"},
+        {"echo_city": "Mordor"}
+    ],
+    "status": 200,
+    "statusCode": 200,
+    "statusText": "OK"   
+} 
+  `}
+/>
 
 ### Reading data 
 
 This example shows how to call a stored function that returns a table type response:
 
-<!-- prettier-ignore -->
-```js {7-8}
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-const echoCities = async () => {
-    try{
-        let cities = await supabase
-            .rpc('asian_pacific_countries')
-        return cities
-    } catch (error) {
-        console.log('Error: ', error)
-    }
-}
-```
-
-<Collapsable title="Toggle Example Response">
-
-```json
-[
-    {id: 156, name: "China", iso2: "CN", continent: "Asia"},
-    {id: 554, name: "New Zealand", iso2: "NZ", continent: "Oceania"}
-]
-```
-</Collapsable>
+<CustomCodeBlock
+  header="Example of invoking the same stored procedure multiple times within one call."
+  js={storedReadingJs}
+  jsHighlight="{7-8}"
+  response={`{
+    "body": [
+        {"id": 156, "name": "China", "iso2": "CN", "continent": "Asia"},
+        {"id": 554, "name": "New Zealand", "iso2": "NZ", "continent": "Oceania"}
+    ],
+    "status": 200,
+    "statusCode": 200,
+    "statusText": "OK"   
+} 
+  `}
+/>
 
 ## Reference
 
