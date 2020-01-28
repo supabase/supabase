@@ -69,16 +69,11 @@ export const convertChangeData = (columns, records, options = {}) => {
   
       // If not null, convert to correct type.
       switch (type) {
+        case 'abstime':
+          return noop(stringValue) // To allow users to cast it based on Timezone
+          return toDate(stringValue)
         case 'bool':
           return toBoolean(stringValue)
-        case 'bpchar':
-          return noop(stringValue)
-        case 'bytea':
-          return noop(stringValue)
-        case 'char':
-          return noop(stringValue)
-        case 'cidr':
-          return noop(stringValue)
         case 'date':
           return noop(stringValue) // To allow users to cast it based on Timezone
           return toDate(stringValue)
@@ -88,12 +83,6 @@ export const convertChangeData = (columns, records, options = {}) => {
           return toFloat(stringValue)
         case 'float8':
           return toFloat(stringValue)
-        case 'geometry':
-          return noop(stringValue)
-        case 'hstore':
-          return noop(stringValue)
-        case 'inet':
-          return noop(stringValue)
         case 'int2':
           return toInt(stringValue)
         case 'int4':
@@ -104,22 +93,22 @@ export const convertChangeData = (columns, records, options = {}) => {
           return toInt(stringValue)
         case 'int8range':
           return toIntRange(stringValue)
-        case 'interval':
-          return noop(stringValue)
         case 'json':
           return toJson(stringValue)
         case 'jsonb':
           return toJson(stringValue)
-        case 'macaddr':
-          return noop(stringValue)
-        case 'macaddr8':
-          return noop(stringValue)
-        case 'point':
-          return noop(stringValue)
-        case 'text':
-          return noop(stringValue)
+        case 'money':
+          return toFloat(stringValue)
+        case 'numeric':
+          return toFloat(stringValue)
+        case 'oid':
+          return toInt(stringValue)
+        case 'reltime':
+          return noop(stringValue) // To allow users to cast it based on Timezone
+          return toDate(stringValue)
         case 'time':
-          return noop(stringValue)
+          return noop(stringValue) // To allow users to cast it based on Timezone
+          return toDate(stringValue)
         case 'timestamp':
           return noop(stringValue) // To allow users to cast it based on Timezone
           return toDate(stringValue)
@@ -127,17 +116,14 @@ export const convertChangeData = (columns, records, options = {}) => {
           return noop(stringValue) // To allow users to cast it based on Timezone
           return toDate(stringValue)
         case 'timetz':
-          return noop(stringValue)
+          return noop(stringValue) // To allow users to cast it based on Timezone
+          return toDate(stringValue)
         case 'tsrange':
-          return noop(stringValue)
+          return toDateRange(stringValue)
         case 'tstzrange':
-          return noop(stringValue)
-        case 'uuid':
-          return noop(stringValue)
-        case 'varchar':
-          return noop(stringValue)
+          return toDateRange(stringValue)
         default:
-          // Unhandled and custom types will always return as strings
+          // All the rest will be returned as strings
           return noop(stringValue)
       }
     } catch (error) {
