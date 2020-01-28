@@ -71,12 +71,10 @@ export const convertChangeData = (columns, records, options = {}) => {
       switch (type) {
         case 'abstime':
           return noop(stringValue) // To allow users to cast it based on Timezone
-          return toDate(stringValue)
         case 'bool':
           return toBoolean(stringValue)
         case 'date':
           return noop(stringValue) // To allow users to cast it based on Timezone
-          return toDate(stringValue)
         case 'daterange':
           return toDateRange(stringValue)
         case 'float4':
@@ -105,19 +103,14 @@ export const convertChangeData = (columns, records, options = {}) => {
           return toInt(stringValue)
         case 'reltime':
           return noop(stringValue) // To allow users to cast it based on Timezone
-          return toDate(stringValue)
         case 'time':
           return noop(stringValue) // To allow users to cast it based on Timezone
-          return toDate(stringValue)
         case 'timestamp':
           return noop(stringValue) // To allow users to cast it based on Timezone
-          return toDate(stringValue)
         case 'timestamptz':
           return noop(stringValue) // To allow users to cast it based on Timezone
-          return toDate(stringValue)
         case 'timetz':
           return noop(stringValue) // To allow users to cast it based on Timezone
-          return toDate(stringValue)
         case 'tsrange':
           return toDateRange(stringValue)
         case 'tstzrange':
