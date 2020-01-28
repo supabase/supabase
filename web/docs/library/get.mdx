@@ -113,57 +113,6 @@ import { getSimpleJs, getColumnsJs, getForeignJs, getForeignMultipleJs } from '.
 }`}
 />
 
-### Query foreign tables
-
-<CustomCodeBlock
-  header="Shows how to get all countries and the name of each of their cities"
-  js={getForeignJs}
-  jsHighlight="{9-14}"
-  response={`{
-  body: [
-    {
-      "name": "Brazil",  
-      "cities": [
-        { "name": "Rio de Janeiro" }
-      ]
-    },
-    {
-      "name": "China", 
-      "cities": [
-        { "name": "Beijing" }
-      ]
-    },
-    {
-      "name": "France", 
-      "cities": [
-        { "name": "Paris" }
-      ]
-    },
-    {
-      "name": "New Zealand", 
-      "cities": [
-        { "name": "Auckland" }
-      ]
-    },
-    {
-      "name": "Nigeria", 
-      "cities": [
-        { "name": "Lagos" }
-      ]
-    },
-    {
-      "name": "United States", 
-      "cities": [
-        { "name": "San Francisco" }
-      ]
-    }
-  ],
-  status: 200,
-  statusCode: 200,
-  statusText: "OK"
-}`}
-/>
-
 ### Query the same foreign table multiple times
 
 Sometimes you will need to query the same foreign table twice. In this case, you can use the name of the joined column to identify which join you intend to use. 
