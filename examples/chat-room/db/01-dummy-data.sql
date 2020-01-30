@@ -4,5 +4,5 @@ INSERT INTO
     public.users (name) 
 VALUES 
     ('kiwicopple'),
-    ('awailas')
+    ('awailas'),
     ('dragarcia');

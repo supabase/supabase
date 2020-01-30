@@ -1,4 +1,5 @@
 const withPlugins = require('next-compose-plugins')
+const path = require('path')
 
 // Next Config
 const nextConfig = {
