@@ -5,10 +5,11 @@
     "start": "next start"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^0.1.16",
     "@zeit/next-sass": "^1.0.0",
     "next": "latest",
     "next-compose-plugins": "^2.2.0",
-    "node-sass": "4.7.2",
+    "node-sass": "^4.13.1",
     "react": "^16.7.0",
     "react-dom": "^16.7.0"
   }

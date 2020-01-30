@@ -6,11 +6,11 @@ CREATE TABLE public.users (
   inserted_at timestamp without time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at timestamp without time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   data jsonb DEFAULT null,
-  username text
-  status public.users.data DEFAULT 'ONLINE'::public.user_status
+  username text,
+  status user_status DEFAULT 'ONLINE'::public.user_status
 );
 
-COMMENT ON TABLE public.users.data IS 'For unstructured data and prototyping.';
+COMMENT ON COLUMN public.users.data IS 'For unstructured data and prototyping.';
 
 
 
@@ -24,7 +24,7 @@ CREATE TABLE public.rooms (
   slug text,
   owner_id bigint REFERENCES users NOT NULL
 );
-COMMENT ON TABLE public.users.data IS 'For unstructured data and prototyping.';
+COMMENT ON COLUMN public.rooms.data IS 'For unstructured data and prototyping.';
 
 -- Create the Replication publication 
 CREATE PUBLICATION supabase_realtime FOR ALL TABLES;
