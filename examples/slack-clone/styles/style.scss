@@ -1,0 +1,13 @@
+@import "~tailwindcss/dist/base.css";
+@import "~tailwindcss/dist/components.css";
+@import "~tailwindcss/dist/utilities.css";
+
+.channel-list {
+  li a:before {
+    content: '# ';
+    opacity: 0.5;
+  }
+  li a:hover {
+    opacity: 0.9;
+  }
+}
