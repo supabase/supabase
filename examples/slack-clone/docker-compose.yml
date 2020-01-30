@@ -14,6 +14,20 @@ services:
       DB_SCHEMA: public
     depends_on:
       - db
+  realtime:
+    image: supabase/realtime
+    restart: on-failure
+    environment:
+      DB_HOST: db
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+      PORT: 4000
+      HOSTNAME: localhost
+      SECRET_KEY_BASE: postgres
+    ports:
+      - "4000:4000"
   db:
     image: postgres:12
     ports:
@@ -29,4 +43,3 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_PORT: 5432
-

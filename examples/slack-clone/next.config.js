@@ -13,7 +13,6 @@ const nextConfig = {
   },
 }
 
-
 // SASS
 const withSass = require('@zeit/next-sass')
 const withSassConfig = {
