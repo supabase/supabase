@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  supabase:
+    image: supabase/supabase-dev:latest
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: db
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+      DB_SCHEMA: public
+    depends_on:
+      - db
+  db:
+    image: postgres:12
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+
