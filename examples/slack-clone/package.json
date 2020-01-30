@@ -1,4 +1,7 @@
 {
+  "name": "supabase-slack-clone",
+  "version": "0.1.0",
+  "license": "MIT",
   "scripts": {
     "dev": "next",
     "build": "next build",
@@ -11,6 +14,7 @@
     "next-compose-plugins": "^2.2.0",
     "node-sass": "^4.13.1",
     "react": "^16.7.0",
-    "react-dom": "^16.7.0"
+    "react-dom": "^16.7.0",
+    "tailwindcss": "^1.1.4"
   }
 }
