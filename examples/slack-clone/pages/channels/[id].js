@@ -9,8 +9,30 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+/// TEMP
+import { Socket } from '@supabase/realtime-js'
+const REALTIME_URL = process.env.REALTIME_URL || 'ws://localhost:4000/socket'
+var socket = new Socket(REALTIME_URL)
+socket.connect()
+const topic = socket.channel('realtime:*')
+topic.on('*', msg => {
+  console.log('msg', msg)
+})
+topic
+  .join()
+  .receive('ok', () => console.log('Connected'))
+  .receive('error', () => console.log('Failed'))
+  .receive('timeout', () => console.log('Waiting...'))
+/// TEMP
 
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+// const mySubscription = supabase
+//   .from('messages')
+//   .on('*', payload => {
+//     console.log('Change received!', payload)
+//   })
+//   .subscribe()
+  
 const ChannelsPage = props => {
   const router = useRouter()
   const { id: channelId } = router.query
@@ -21,12 +43,6 @@ const ChannelsPage = props => {
   useEffect(() => {
     try {
       setChannels(props.channels)
-      const mySubscription = supabase
-        .from('messages')
-        .on('*', payload => {
-          console.log('Change received!', payload)
-        })
-        .subscribe()
     } catch (error) {
       console.log('Error: ', error)
     }
@@ -89,6 +105,7 @@ const getMessages = async (channelId, setState) => {
       .from('messages')
       .eq('channel_id', channelId)
       .select(`*, author:user_id(*)`)
+      .order('inserted_at', true)
     if (setState) setState(body)
     return body
   } catch (error) {
