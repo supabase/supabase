@@ -10,37 +10,29 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
-  
+
 const ChannelsPage = props => {
   const router = useRouter()
   const { id: channelId } = router.query
   const [channels, setChannels] = useState([])
   const [messages, setMessages] = useState([])
-  const [changes, setChanges] = useState([])
+  const [change, notifyDbChange] = useState(null)
 
   // Initial load of data
   useEffect(() => {
-    try {
-      setChannels(props.channels)
-      supabase
-        .from('messages')
-        .on('*', payload => {
-          setChanges([payload.new].concat(changes))
-        })
-        .subscribe()
-    } catch (error) {
-      console.log('Error: ', error)
-    }
+    setChannels(props.channels)
+    supabase
+      .from('messages')
+      .on('*', payload => {
+        notifyDbChange(payload.new)
+      })
+      .subscribe()
   }, [])
 
-  // Initial load of data
+  // On change update messages
   useEffect(() => {
-    try {
-      if (changes.length) setMessages(messages.concat(changes[0]))
-    } catch (error) {
-      console.log('Error: ', error)
-    }
-  }, [changes])
+    if (change) setMessages(messages.concat(change))
+  }, [change])
 
   // Update when the route changes
   useEffect(() => {
