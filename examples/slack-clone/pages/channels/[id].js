@@ -16,21 +16,31 @@ const ChannelsPage = props => {
   const { id: channelId } = router.query
   const [channels, setChannels] = useState([])
   const [messages, setMessages] = useState([])
+  const [changes, setChanges] = useState([])
 
   // Initial load of data
   useEffect(() => {
     try {
       setChannels(props.channels)
-      const mySubscription = supabase
+      supabase
         .from('messages')
         .on('*', payload => {
-          console.log('Change received!', payload)
+          setChanges([payload.new].concat(changes))
         })
         .subscribe()
     } catch (error) {
       console.log('Error: ', error)
     }
   }, [])
+
+  // Initial load of data
+  useEffect(() => {
+    try {
+      if (changes.length) setMessages(messages.concat(changes[0]))
+    } catch (error) {
+      console.log('Error: ', error)
+    }
+  }, [changes])
 
   // Update when the route changes
   useEffect(() => {
@@ -40,6 +50,15 @@ const ChannelsPage = props => {
       console.log('Error: ', error)
     }
   }, [router.query.id])
+
+  // // Update when the messages changes
+  // useEffect(() => {
+  //   try {
+  //     console.log(messages)
+  //   } catch (error) {
+  //     console.log('Error: ', error)
+  //   }
+  // }, [messages])
 
   // Render the channels and messages
   return (
