@@ -29,7 +29,7 @@ const ChannelsPage = props => {
       .subscribe()
   }, [])
 
-  // Initial load of data
+  // On change update messages
   useEffect(() => {
     if (change) setMessages(messages.concat(change))
   }, [change])
