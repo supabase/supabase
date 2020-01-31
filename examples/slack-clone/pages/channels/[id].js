@@ -10,7 +10,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
-
+  
 const ChannelsPage = props => {
   const router = useRouter()
   const { id: channelId } = router.query
@@ -50,15 +50,6 @@ const ChannelsPage = props => {
       console.log('Error: ', error)
     }
   }, [router.query.id])
-
-  // // Update when the messages changes
-  // useEffect(() => {
-  //   try {
-  //     console.log(messages)
-  //   } catch (error) {
-  //     console.log('Error: ', error)
-  //   }
-  // }, [messages])
 
   // Render the channels and messages
   return (
@@ -108,6 +99,7 @@ const getMessages = async (channelId, setState) => {
       .from('messages')
       .eq('channel_id', channelId)
       .select(`*, author:user_id(*)`)
+      .order('inserted_at', true)
     if (setState) setState(body)
     return body
   } catch (error) {

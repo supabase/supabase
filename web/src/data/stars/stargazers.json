@@ -226,5 +226,29 @@
     "@supabase/monorepo": 60,
     "@supabase/realtime": 333,
     "@supabase/schemas": 4
+  },
+  {
+    "name": "2020-01-27",
+    "@supabase/monorepo": 61,
+    "@supabase/realtime": 336,
+    "@supabase/schemas": 5
+  },
+  {
+    "name": "2020-01-28",
+    "@supabase/monorepo": 63,
+    "@supabase/realtime": 339,
+    "@supabase/schemas": 5
+  },
+  {
+    "name": "2020-01-29",
+    "@supabase/monorepo": 63,
+    "@supabase/realtime": 347,
+    "@supabase/schemas": 5
+  },
+  {
+    "name": "2020-01-30",
+    "@supabase/monorepo": 64,
+    "@supabase/realtime": 351,
+    "@supabase/schemas": 5
   }
 ]
