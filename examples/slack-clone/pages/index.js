@@ -1,28 +1,40 @@
-import Layout from '~/components/Layout'
+import '~/styles/style.scss'
+import { useRouter } from 'next/router'
 
-export default () => (
-  <Layout>
-    <div className="card">
-      <div className="max-w-sm rounded overflow-hidden shadow-lg">
-        <div className="px-6 py-4">
-          <div className="font-bold text-xl mb-2">The Coldest Sunset</div>
-          <p className="text-gray-700 text-base">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla!
-            Maiores et perferendis eaque, exercitationem praesentium nihil.
-          </p>
-        </div>
-        <div className="px-6 py-4">
-          <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
-            #photography
-          </span>
-          <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
-            #travel
-          </span>
-          <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">
-            #winter
-          </span>
+const Home = props => {
+  const router = useRouter()
+
+  const handleLogin = e => {
+    e.preventDefault()
+    router.push('/channels/[id]', '/channels/1')
+  }
+
+  return (
+    <div class="container mx-auto h-full flex justify-center items-center mt-8">
+      <div class="w-1/3 mt-8">
+        <div class="border-teal p-8 border-t-12 bg-white mb-6 rounded-lg shadow-lg">
+          <div class="mb-4">
+            <label class="font-bold text-grey-darker block mb-2">Username</label>
+            <input
+              type="text"
+              class="block appearance-none w-full bg-white border border-grey-light hover:border-grey px-2 py-2 rounded shadow"
+              placeholder="Your Username"
+            />
+          </div>
+
+          <div class="flex items-center justify-between">
+            <a
+              onClick={handleLogin}
+              href={'/channels'}
+              class="bg-gray-900 hover:bg-teal text-white font-bold py-2 px-4 rounded"
+            >
+              Login
+            </a>
+          </div>
         </div>
       </div>
     </div>
-  </Layout>
-)
+  )
+}
+
+export default Home
