@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@supabase/realtime-js": "^0.1.6",
     "@supabase/supabase-js": "^0.1.16",
     "@zeit/next-sass": "^1.0.0",
     "next": "latest",

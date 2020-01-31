@@ -15,10 +15,12 @@ ___________
 
 TECHNOLOGIES 
 
-Just a few of the opensource technologies that make Supabase possible.
+Supabase would not be possible without the work of some other amazing opensource contributors.
 
-Web - Docusaurus
-App - NextJS
-Reatime - Phoenix & Elixir
-Restful - PostgREST
-
+- Postgres - https://www.postgresql.org/docs/devel/git.html
+- PostgREST - https://github.com/PostgREST
+- Nginx - http://hg.nginx.org/nginx/
+- Kong - https://github.com/kong/
+- NextJS - https://nextjs.org/
+- Phoenix - https://www.phoenixframework.org/
+- Docusaurus - https://v2.docusaurus.io/
