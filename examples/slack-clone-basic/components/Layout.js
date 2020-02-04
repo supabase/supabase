@@ -21,55 +21,55 @@ export default props => {
   const newChannel = async () => {
     const slug = prompt('Please enter your name')
     if (slug) {
-      // let { body } = await 
+      // let { body } = await
       addChannel(slugify(slug))
       // console.log('body', body)
     }
   }
 
   return (
-    <main className="main flex mb-4 h-screen w-screen absolute">
-        {/* Sidebar */}
-        <nav className="w-1/4 bg-gray-900 text-gray-100 h-screen">
-          <div className="p-2">
-            <h4 className="font-bold">Channels</h4>
-            <ul className="channel-list">
-              {props.channels.map(x => (
-                <SidebarItem channel={x} key={x.id} />
-              ))}
-            </ul>
-          </div>
-          <hr className="m-2" />
-          <div className="p-2">
-            <button
-              className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
-              onClick={() => newChannel()}
-            >
-              New Channel
-            </button>
-          </div>
-          <hr className="m-2" />
-          <div className="p-2">
-            <button
-              className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
-              onClick={() => signOut()}
-            >
-              Log out
-            </button>
-          </div>
-        </nav>
+    <main className="main flex h-screen w-screen absolute">
+      {/* Sidebar */}
+      <nav className="w-1/4 bg-gray-900 text-gray-100 h-screen">
+        <div className="p-2">
+          <h4 className="font-bold">Channels</h4>
+          <ul className="channel-list">
+            {props.channels.map(x => (
+              <SidebarItem channel={x} key={x.id} isActiveChannel={x.id == props.activeChannelId} />
+            ))}
+          </ul>
+        </div>
+        <hr className="m-2" />
+        <div className="p-2">
+          <button
+            className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+            onClick={() => newChannel()}
+          >
+            New Channel
+          </button>
+        </div>
+        <hr className="m-2" />
+        <div className="p-2">
+          <button
+            className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+            onClick={() => signOut()}
+          >
+            Log out
+          </button>
+        </div>
+      </nav>
 
-        {/* Messages */}
-        <div className="w-3/4 bg-gray-800 h-screen">{props.children}</div>
+      {/* Messages */}
+      <div className="w-3/4 bg-gray-800 h-screen">{props.children}</div>
     </main>
   )
 }
 
-const SidebarItem = ({ channel }) => (
+const SidebarItem = ({ channel, isActiveChannel }) => (
   <>
     <li>
       <Link href="/channels/[id]" as={`/channels/${channel.id}`}>
-        <a>{channel.slug}</a>
+        <a className={isActiveChannel ? 'font-bold' : ''}>{channel.slug}</a>
       </Link>
     </li>
   </>
