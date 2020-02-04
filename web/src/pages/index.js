@@ -168,7 +168,7 @@ function Home() {
                       'button hero--button button--md button--primary responsive-button',
                       styles.button
                     )}
-                    to={'https://github.com/supabase/monorepo'}
+                    to={'https://github.com/supabase/supabase'}
                     style={{ marginTop: 10 }}
                   >
                     Follow our GitHub →
@@ -341,7 +341,7 @@ function Home() {
                   'button hero--button button--md button--primary responsive-button',
                   styles.button
                 )}
-                to={'https://github.com/supabase/monorepo'}
+                to={'https://github.com/supabase/supabase'}
                 style={{ margin: 5 }}
               >
                 Follow our GitHub →

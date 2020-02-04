@@ -49,7 +49,7 @@ export default function Oss() {
                     />
                     <Area
                       type="monotone"
-                      dataKey="@supabase/monorepo"
+                      dataKey="@supabase/supabase"
                       stackId="1"
                       stroke="#8884d8"
                       fill="#8884d8"

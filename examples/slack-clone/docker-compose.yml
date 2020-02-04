@@ -20,7 +20,7 @@ services:
     environment:
       DB_HOST: db
       DB_NAME: postgres
-      DB_USER: postgres
+      DB_USER: postgresgi
       DB_PASSWORD: postgres
       DB_PORT: 5432
       PORT: 4000

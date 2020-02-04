@@ -43,12 +43,12 @@ const formatResults = (repo, githubResponse) => {
 const main = async () => {
   const schemas = await fetchAllEvents('schemas', 100)
   const realtime = await fetchAllEvents('realtime', 400)
-  const monorepo = await fetchAllEvents('monorepo', 100)
+  const supabase = await fetchAllEvents('supabase', 100)
 
   const history = []
     .concat(formatResults('@supabase/schemas', schemas))
     .concat(formatResults('@supabase/realtime', realtime))
-    .concat(formatResults('@supabase/monorepo', monorepo))
+    .concat(formatResults('@supabase/supabase', supabase))
 
   const groups = history.reduce((groups, event) => {
     const date = event.starred_at.split('T')[0]
@@ -60,22 +60,22 @@ const main = async () => {
   }, {})
 
   var tally = {
-    '@supabase/monorepo': 0,
+    '@supabase/supabase': 0,
     '@supabase/realtime': 0,
     '@supabase/schemas': 0,
   }
   const data = Object.keys(groups)
     .sort((a, b) => a.localeCompare(b))
     .map(date => {
-      let monorepo = groups[date].filter(x => x.repo === '@supabase/monorepo').length
+      let supabase = groups[date].filter(x => x.repo === '@supabase/supabase').length
       let realtime = groups[date].filter(x => x.repo === '@supabase/realtime').length
       let schemas = groups[date].filter(x => x.repo === '@supabase/schemas').length
-      tally['@supabase/monorepo'] += monorepo
+      tally['@supabase/supabase'] += supabase
       tally['@supabase/realtime'] += realtime
       tally['@supabase/schemas'] += schemas
       return {
         name: date,
-        '@supabase/monorepo': tally['@supabase/monorepo'],
+        '@supabase/supabase': tally['@supabase/supabase'],
         '@supabase/realtime': tally['@supabase/realtime'],
         '@supabase/schemas': tally['@supabase/schemas'],
       }

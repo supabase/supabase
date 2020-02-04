@@ -1,253 +1,253 @@
 [
   {
     "name": "2019-10-15",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 0,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-10-25",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 33,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-10-26",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 41,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-10-27",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 46,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-10-28",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 51,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-10-29",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 52,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-10-30",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 53,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-10-31",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 54,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-11-03",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 55,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-11-09",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 58,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-11-10",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 59,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-11-11",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 60,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-11-21",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 61,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-11-23",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 62,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-12-10",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 63,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-12-13",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 64,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-12-17",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 158,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-12-18",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 174,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-12-19",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 177,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-12-20",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 180,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-12-21",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 182,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-12-23",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 183,
     "@supabase/schemas": 0
   },
   {
     "name": "2019-12-29",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 184,
     "@supabase/schemas": 0
   },
   {
     "name": "2020-01-07",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 185,
     "@supabase/schemas": 0
   },
   {
     "name": "2020-01-11",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 186,
     "@supabase/schemas": 0
   },
   {
     "name": "2020-01-14",
-    "@supabase/monorepo": 1,
+    "@supabase/supabase": 1,
     "@supabase/realtime": 187,
     "@supabase/schemas": 0
   },
   {
     "name": "2020-01-15",
-    "@supabase/monorepo": 2,
+    "@supabase/supabase": 2,
     "@supabase/realtime": 187,
     "@supabase/schemas": 0
   },
   {
     "name": "2020-01-16",
-    "@supabase/monorepo": 17,
+    "@supabase/supabase": 17,
     "@supabase/realtime": 196,
     "@supabase/schemas": 2
   },
   {
     "name": "2020-01-17",
-    "@supabase/monorepo": 18,
+    "@supabase/supabase": 18,
     "@supabase/realtime": 197,
     "@supabase/schemas": 2
   },
   {
     "name": "2020-01-18",
-    "@supabase/monorepo": 20,
+    "@supabase/supabase": 20,
     "@supabase/realtime": 198,
     "@supabase/schemas": 2
   },
   {
     "name": "2020-01-19",
-    "@supabase/monorepo": 21,
+    "@supabase/supabase": 21,
     "@supabase/realtime": 198,
     "@supabase/schemas": 2
   },
   {
     "name": "2020-01-20",
-    "@supabase/monorepo": 22,
+    "@supabase/supabase": 22,
     "@supabase/realtime": 199,
     "@supabase/schemas": 2
   },
   {
     "name": "2020-01-21",
-    "@supabase/monorepo": 29,
+    "@supabase/supabase": 29,
     "@supabase/realtime": 204,
     "@supabase/schemas": 2
   },
   {
     "name": "2020-01-22",
-    "@supabase/monorepo": 46,
+    "@supabase/supabase": 46,
     "@supabase/realtime": 276,
     "@supabase/schemas": 2
   },
   {
     "name": "2020-01-23",
-    "@supabase/monorepo": 56,
+    "@supabase/supabase": 56,
     "@supabase/realtime": 306,
     "@supabase/schemas": 4
   },
   {
     "name": "2020-01-24",
-    "@supabase/monorepo": 58,
+    "@supabase/supabase": 58,
     "@supabase/realtime": 326,
     "@supabase/schemas": 4
   },
   {
     "name": "2020-01-25",
-    "@supabase/monorepo": 60,
+    "@supabase/supabase": 60,
     "@supabase/realtime": 330,
     "@supabase/schemas": 4
   },
   {
     "name": "2020-01-26",
-    "@supabase/monorepo": 60,
+    "@supabase/supabase": 60,
     "@supabase/realtime": 333,
     "@supabase/schemas": 4
   },
   {
     "name": "2020-01-27",
-    "@supabase/monorepo": 61,
+    "@supabase/supabase": 61,
     "@supabase/realtime": 336,
     "@supabase/schemas": 5
   },
   {
     "name": "2020-01-28",
-    "@supabase/monorepo": 63,
+    "@supabase/supabase": 63,
     "@supabase/realtime": 339,
     "@supabase/schemas": 5
   },
   {
     "name": "2020-01-29",
-    "@supabase/monorepo": 63,
+    "@supabase/supabase": 63,
     "@supabase/realtime": 347,
     "@supabase/schemas": 5
   },
   {
     "name": "2020-01-30",
-    "@supabase/monorepo": 64,
+    "@supabase/supabase": 64,
     "@supabase/realtime": 351,
     "@supabase/schemas": 5
   }
