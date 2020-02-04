@@ -10,9 +10,11 @@
     "@supabase/supabase-js": "^0.1.5",
     "dotenv": "^8.2.0",
     "next": "latest",
+    "polished": "^3.4.4",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
-    "react-live": "^2.2.2"
+    "react-live": "^2.2.2",
+    "styled-components": "^5.0.0"
   },
   "license": "MIT"
 }
