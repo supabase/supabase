@@ -34,11 +34,11 @@ export const useStore = props => {
       .on('*', payload => handleNewChannel(payload.new))
       .subscribe()
     // Cleanup on unmount
-    // return () => {
-    //   messageListener.unsubscribe()
-    //   userListener.unsubscribe()
-    //   channelListener.unsubscribe()
-    // }
+    return () => {
+      messageListener.unsubscribe()
+      userListener.unsubscribe()
+      channelListener.unsubscribe()
+    }
   }, [])
 
   // Update when the route changes
@@ -51,7 +51,7 @@ export const useStore = props => {
 
   // New message recieved from Postgres
   useEffect(() => {
-    if (newMessage) {
+    if (newMessage && newMessage.channel_id == props.channelId) {
       const handleAsync = async () => {
         let authorId = newMessage.user_id
         if (!users.get(authorId)) await fetchUser(authorId, user => handleNewOrUpdatedUser(user))

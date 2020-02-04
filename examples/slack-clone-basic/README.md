@@ -1,6 +1,13 @@
 # Example chat room
 
-@todo
+Build a simple slack clone using Supabase, Postgres and React hooks.
+
+
+<p align="center">
+<kbd>
+<a href="https://media.giphy.com/media/J07U8iblJhlKDqZOxV/source.gif"><img src="https://media.giphy.com/media/J07U8iblJhlKDqZOxV/giphy.gif" alt="Demo"/></a>
+</kbd>
+</p>
 
 
 ## How to use
@@ -23,3 +30,5 @@ docker-compose up -d
 ```sh
 npm run dev
 ```
+
+Visit http://localhost:3000 and start slacking! Open in two tabs to see everything getting updated in realtime
