@@ -8,7 +8,7 @@ export default class Index extends React.Component {
     const code = `
     // I am live code -- edit me :)
     function World() {
-      const [countries, setCountries] = useState(<div>Hello wordl</div>);
+      const [countries, setCountries] = useState();
 
       getCountries = async function() {
         this.supabase = createClient('https://world.supabase.co', 'bhiGUYVHdhui7H')
