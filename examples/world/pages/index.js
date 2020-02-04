@@ -1,15 +1,17 @@
 import { createClient } from '@supabase/supabase-js'
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
+import { reactLiveHome } from '../utils//themes'
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live'
 
 export default class Index extends React.Component {
   render() {
     const code = `
+    // I am live code -- edit me :)
     function World() {
       const [countries, setCountries] = useState(<div>Hello wordl</div>);
 
       getCountries = async function() {
-        this.supabase = createClient('https://world.supabase.co', 'FkGhDLmT3V')
+        this.supabase = createClient('https://world.supabase.co', 'bhiGUYVHdhui7H')
 
         let countries = await this.supabase
           .from('countries')
@@ -26,33 +28,20 @@ export default class Index extends React.Component {
 
       return (
         <div>
-          Hello
           {countries}
         </div>
       )
-
     }
     `
 
     return (
-      <LiveProvider code={code} scope={{createClient, useState, useEffect}}>
-        <LiveEditor />
+      <LiveProvider code={code} scope={{ createClient, useState, useEffect }} theme={reactLiveHome}>
+        <h3>Live Editor:</h3>
+        <LiveEditor style={{ backgroundColor: 'black' }} />
         <LiveError />
-        <LivePreview />
+        <h3>Output:</h3>
+        <LivePreview style={{ margin: '20px' }} />
       </LiveProvider>
     )
   }
-}
-
-const styles = {
-  main: { fontFamily: 'monospace', padding: 30 },
-  pre: {
-    whiteSpace: 'pre',
-    overflow: 'auto',
-    background: '#333',
-    maxHeight: 200,
-    borderRadius: 6,
-    padding: 5,
-  },
-  code: { display: 'block', wordWrap: 'normal', color: '#fff' },
 }
