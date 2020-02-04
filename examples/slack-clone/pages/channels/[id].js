@@ -1,117 +1,48 @@
-/**
- * Fat controller!
- * Think of this page as a store that controls all the data flow.
- */
 import Layout from '~/components/Layout'
 import Message from '~/components/Message'
 import MessageInput from '~/components/MessageInput'
-import { useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
-
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+import { useStore, addMessage } from '~/lib/Store'
+import { useContext, useEffect, useRef } from 'react'
+import UserContext from '~/lib/UserContext'
 
 const ChannelsPage = props => {
   const router = useRouter()
+  const { user, authLoaded, signOut } = useContext(UserContext)
+  const messagesEndRef = useRef(null)
+
+  // Redirect if not signed in.
+  useEffect(() => {
+    if (authLoaded && !user) signOut()
+  }, [user, router])
+
+  // Else load up the page
   const { id: channelId } = router.query
-  const [channels, setChannels] = useState([])
-  const [messages, setMessages] = useState([])
-  const [change, notifyDbChange] = useState(null)
+  const { messages, channels } = useStore({ channelId })
 
-  // Initial load of data
   useEffect(() => {
-    setChannels(props.channels)
-    supabase
-      .from('messages')
-      .on('*', payload => {
-        notifyDbChange(payload.new)
-      })
-      .subscribe()
-  }, [])
-
-  // On change update messages
-  useEffect(() => {
-    if (change) setMessages(messages.concat(change))
-  }, [change])
-
-  // Update when the route changes
-  useEffect(() => {
-    try {
-      getMessages(channelId, setMessages)
-    } catch (error) {
-      console.log('Error: ', error)
-    }
-  }, [router.query.id])
+    console.log('messagesEndRef', messagesEndRef)
+    messagesEndRef.current.scrollIntoView({ block: 'start', behavior: 'smooth' })
+  }, [messages])
 
   // Render the channels and messages
   return (
     <Layout channels={channels}>
-      <div className="p-2">
-        {messages.map(x => (
-          <Message key={x.id} message={x} />
-        ))}
-      </div>
-      <div className="p-2">
-        <MessageInput onSubmit={text => addMessage(text, channelId, 2)} />
+      <div className="relative h-screen">
+        <div className="Messages h-full pb-16">
+          <div className="p-2 overflow-y-auto">
+            {messages.map(x => (
+              <Message key={x.id} message={x} />
+            ))}
+            <div ref={messagesEndRef} style={{height: 0}} />
+          </div>
+        </div>
+        <div className="p-2 absolute bottom-0 left-0 w-full">
+          <MessageInput onSubmit={async text => addMessage(text, channelId, user)} />
+        </div>
       </div>
     </Layout>
   )
-}
-
-/**
- * Hydrate the page on initial load
- */
-ChannelsPage.getInitialProps = async () => {
-  let channels = await getChannels()
-  return { channels }
-}
-
-/**
- * Get all channels
- * @param {function} setState Optionally pass in a hook or callback to set the state
- */
-const getChannels = async setState => {
-  try {
-    let { body } = await supabase.from('channels').select('*')
-    if (setState) setState(body)
-    return body
-  } catch (error) {
-    console.log('error', error)
-  }
-}
-
-/**
- * Get all messages and their authors
- * @param {number} channelId
- * @param {function} setState Optionally pass in a hook or callback to set the state
- */
-const getMessages = async (channelId, setState) => {
-  try {
-    let { body } = await supabase
-      .from('messages')
-      .eq('channel_id', channelId)
-      .select(`*, author:user_id(*)`)
-      .order('inserted_at', true)
-    if (setState) setState(body)
-    return body
-  } catch (error) {
-    console.log('error', error)
-  }
-}
-
-/**
- * Insert a new message
- * @param {string} message The message text
- * @param {number} channel_id
- * @param {number} user_id The author
- */
-const addMessage = async (message, channel_id, user_id) => {
-  try {
-    let { body } = await supabase.from('messages').insert([{ message, channel_id, user_id }])
-    return body
-  } catch (error) {
-    console.log('error', error)
-  }
 }
 
 export default ChannelsPage

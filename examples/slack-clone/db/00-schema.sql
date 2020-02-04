@@ -21,7 +21,7 @@ CREATE TABLE public.channels (
   inserted_at timestamp without time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at timestamp without time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   data jsonb DEFAULT null,
-  slug text
+  slug text NOT NULL UNIQUE
 );
 ALTER TABLE public.users REPLICA IDENTITY FULL; -- Send "previous data" to supabase
 COMMENT ON COLUMN public.channels.data IS 'For unstructured data and prototyping.';
