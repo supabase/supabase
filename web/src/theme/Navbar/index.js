@@ -138,7 +138,7 @@ function Navbar() {
 
           <a
             className={classnames(styles.displayOnlyInLargeViewport, 'button button--primary', styles.button)}
-            href={'https://github.com/supabase/monorepo'}
+            href={'https://github.com/supabase/supabase'}
             style={{ margin: 0, marginLeft: 15 }}
           >
             GITHUB →
@@ -181,7 +181,7 @@ function Navbar() {
               <div style={{ margin: 5, marginTop: 15 }}></div>
               <a
                 className={classnames('button button--block button--primary', styles.button)}
-                href="https://github.com/supabase/monorepo"
+                href="https://github.com/supabase/supabase"
               >
                 GITHUB →
               </a>
