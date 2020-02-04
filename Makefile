@@ -8,14 +8,14 @@ help:
 	@echo "make github.traction			# get a history of stargazers for our individual repos"
 
 github.users:
-	curl -sS https://api.github.com/repos/supabase/monorepo/contributors \
+	curl -sS https://api.github.com/repos/supabase/supabase/contributors \
 	| jq -r 'map_values({username: .login, avatar_url: .avatar_url}) \
 	| unique \
 	| sort_by(.username)' \
 	> $(REPO_DIR)/web/src/data/contributors/contributors.json
 
 github.issues:
-	curl -sS https://api.github.com/repos/supabase/monorepo/issues \
+	curl -sS https://api.github.com/repos/supabase/supabase/issues \
 	| jq -r 'map_values({username: .user.login, avatar_url: .user.avatar_url}) \
 	| unique \
 	| sort_by(.username)' \
@@ -23,7 +23,7 @@ github.issues:
 
 .PHONY: github.repos
 github.repos: \
-	github.repos.monorepo \
+	github.repos.supabase \
 	github.repos.realtime  \
 	github.repos.schemas
 

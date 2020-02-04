@@ -12,7 +12,7 @@
 
 We are currently in alpha. Watch "releases" of this repo to get notified when we are ready for Public Beta.
 
-![Watch this repo](https://gitcdn.xyz/repo/supabase/monorepo/master/web/static/watch-repo.gif "Watch this repo")
+![Watch this repo](https://gitcdn.xyz/repo/supabase/supabase/master/web/static/watch-repo.gif "Watch this repo")
 
 
 ## Structure

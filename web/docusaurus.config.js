@@ -31,7 +31,7 @@ module.exports = {
         { to: '/docs/about', label: 'Docs', position: 'right' },
         { to: '/docs/guides/examples', label: 'Guides', position: 'right' },
         // {
-        //   href: 'https://github.com/supabase/monorepo',
+        //   href: 'https://github.com/supabase/supabase',
         //   label: 'GitHub',
         //   position: 'right',
         // },
@@ -74,7 +74,7 @@ module.exports = {
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/supabase/monorepo',
+              href: 'https://github.com/supabase/supabase',
             },
             {
               label: 'Twitter',
