@@ -1,8 +1,11 @@
-@import "~tailwindcss/dist/base.css";
-@import "~tailwindcss/dist/components.css";
-@import "~tailwindcss/dist/utilities.css";
+@import '~tailwindcss/dist/base.css';
+@import '~tailwindcss/dist/components.css';
+@import '~tailwindcss/dist/utilities.css';
 
-html, body, #__next, .main {
+html,
+body,
+#__next,
+.main {
   max-height: 100vh;
   height: 100vh;
   margin: 0;
@@ -19,7 +22,7 @@ html, body, #__next, .main {
   }
 }
 .Messages {
-  overflow:auto;
+  overflow: auto;
   display: flex;
   flex-direction: column-reverse;
 }
