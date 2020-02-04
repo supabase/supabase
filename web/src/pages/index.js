@@ -296,9 +296,9 @@ function Home() {
               </div>
             </div>
 
-            <div className="row">
+            <div className="row is-multiline">
               {repos.map((props, idx) => (
-                <div className={'col'}>
+                <div className={'col col--6'}>
                   <GithubCard
                     key={idx}
                     title={props.name}
