@@ -2,7 +2,7 @@ version: '3'
 
 services:
   supabase:
-    image: supabase/supabase-dev:latest
+    image: supabase/supabase-dev:0.1.3
     ports:
       - "8000:8000"
     environment:
@@ -14,20 +14,6 @@ services:
       DB_SCHEMA: public
     depends_on:
       - db
-  realtime:
-    image: supabase/realtime
-    restart: on-failure
-    environment:
-      DB_HOST: db
-      DB_NAME: postgres
-      DB_USER: postgresgi
-      DB_PASSWORD: postgres
-      DB_PORT: 5432
-      PORT: 4000
-      HOSTNAME: localhost
-      SECRET_KEY_BASE: postgres
-    ports:
-      - "4000:4000"
   db:
     image: postgres:12
     ports:
