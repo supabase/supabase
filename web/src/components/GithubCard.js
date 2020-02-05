@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function GithubCard({ title, description, href, stars, handle }) {
   return (
-      <a className={'card'} href={href}>
+      <a className={'card'} href={href} style={{height: '100%'}}>
         <div className="card__body">
           <h3 style={styles.h3}>{title}</h3>
           <small>{description}</small>

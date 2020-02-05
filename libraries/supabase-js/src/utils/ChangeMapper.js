@@ -106,7 +106,7 @@ export const convertChangeData = (columns, records, options = {}) => {
         case 'time':
           return noop(stringValue) // To allow users to cast it based on Timezone
         case 'timestamp':
-          return noop(stringValue) // To allow users to cast it based on Timezone
+          return toTimestampString(stringValue) // Format to be consistent with PostgREST
         case 'timestamptz':
           return noop(stringValue) // To allow users to cast it based on Timezone
         case 'timetz':
@@ -160,4 +160,18 @@ export const convertChangeData = (columns, records, options = {}) => {
   }
   const toJson = stringValue => {
     return JSON.parse(stringValue)
+  }
+
+  /**
+   * Fixes timestamp to be ISO-8601. Swaps the space between the date and time for a 'T'
+   * See https://github.com/supabase/supabase/issues/18
+   * @returns {string}
+   * 
+   * @example
+   * toTimestampString('2019-09-10 00:00:00')
+   * //=>
+   * '2019-09-10T00:00:00'
+   */
+  const toTimestampString = stringValue => {
+    return stringValue.replace(' ', 'T')
   }
