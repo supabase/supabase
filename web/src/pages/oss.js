@@ -49,6 +49,13 @@ export default function Oss() {
                     />
                     <Area
                       type="monotone"
+                      dataKey="@supabase/postgrest-js"
+                      stackId="1"
+                      stroke="#EAB7B7"
+                      fill="#F27272"
+                    />
+                    <Area
+                      type="monotone"
                       dataKey="@supabase/supabase"
                       stackId="1"
                       stroke="#8884d8"
@@ -72,9 +79,9 @@ export default function Oss() {
       {/* OSS */}
       <section className={'section-lg'}>
         <div className="container">
-          <div className="row">
+          <div className="row is-multiline">
             {repos.map((props, idx) => (
-              <div className={'col'}>
+              <div className={'col col--6'}>
                 <GithubCard
                   key={idx}
                   title={props.name}

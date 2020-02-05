@@ -44,11 +44,13 @@ const main = async () => {
   const schemas = await fetchAllEvents('schemas', 100)
   const realtime = await fetchAllEvents('realtime', 400)
   const supabase = await fetchAllEvents('supabase', 100)
+  const postgrestJs = await fetchAllEvents('postgrest-js', 100)
 
   const history = []
     .concat(formatResults('@supabase/schemas', schemas))
     .concat(formatResults('@supabase/realtime', realtime))
     .concat(formatResults('@supabase/supabase', supabase))
+    .concat(formatResults('@supabase/postgrest-js', postgrestJs))
 
   const groups = history.reduce((groups, event) => {
     const date = event.starred_at.split('T')[0]
@@ -63,6 +65,7 @@ const main = async () => {
     '@supabase/supabase': 0,
     '@supabase/realtime': 0,
     '@supabase/schemas': 0,
+    '@supabase/postgrest-js': 0,
   }
   const data = Object.keys(groups)
     .sort((a, b) => a.localeCompare(b))
@@ -70,14 +73,17 @@ const main = async () => {
       let supabase = groups[date].filter(x => x.repo === '@supabase/supabase').length
       let realtime = groups[date].filter(x => x.repo === '@supabase/realtime').length
       let schemas = groups[date].filter(x => x.repo === '@supabase/schemas').length
+      let postgrestJs = groups[date].filter(x => x.repo === '@supabase/postgrest-js').length
       tally['@supabase/supabase'] += supabase
       tally['@supabase/realtime'] += realtime
       tally['@supabase/schemas'] += schemas
+      tally['@supabase/postgrest-js'] += postgrestJs
       return {
         name: date,
         '@supabase/supabase': tally['@supabase/supabase'],
         '@supabase/realtime': tally['@supabase/realtime'],
         '@supabase/schemas': tally['@supabase/schemas'],
+        '@supabase/postgrest-js': tally['@supabase/postgrest-js'],
       }
     })
 

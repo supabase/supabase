@@ -25,7 +25,8 @@ github.issues:
 github.repos: \
 	github.repos.supabase \
 	github.repos.realtime  \
-	github.repos.schemas
+	github.repos.schemas \
+	github.repos.postgrest-js
 
 github.repos.%:
 	curl -sS https://api.github.com/repos/supabase/$* \
