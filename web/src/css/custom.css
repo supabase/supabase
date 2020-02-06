@@ -1,6 +1,4 @@
-
 @import url('https://gitcdn.xyz/repo/kiwicopple/assets/master/public/css/metro.css');
-
 
 /**
  * Root variables
@@ -8,7 +6,7 @@
  * Override the default Infima variables here. These values cascade down to
  * the rest of the elements.
  */
- 
+
 :root,
 :root[data-theme=''],
 :root[data-theme='dark'] {
@@ -185,12 +183,12 @@ body {
 }
 
 :root[data-theme='light'] .navbar__logo.logo--dark,
-:root[data-theme=''] .navbar__logo.logo--dark, 
+:root[data-theme=''] .navbar__logo.logo--dark,
 :root .navbar__logo.logo--dark {
   display: none;
 }
 :root[data-theme='light'] .navbar__logo.logo--light,
-:root[data-theme=''] .navbar__logo.logo--light, 
+:root[data-theme=''] .navbar__logo.logo--light,
 :root .navbar__logo.logo--light {
   display: inline-block;
 }
@@ -569,7 +567,8 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   font-style: normal !important;
   color: #9cdcfe !important;
 }
-.token.keyword, .token.doc-comment.keyword  {
+.token.keyword,
+.token.doc-comment.keyword {
   font-style: normal !important;
   color: #569cd6 !important;
 }
@@ -588,7 +587,8 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
 .token.number {
   color: #b5cea8 !important;
 }
-.token.boolean, .token.doc-comment.class-name {
+.token.boolean,
+.token.doc-comment.class-name {
   color: var(--custom-primary) !important;
 }
 
@@ -623,7 +623,6 @@ a.hash-link {
 .has-emphasis {
   color: var(--custom-content-color-emphasis);
 }
-
 
 .ButtonTabs {
   padding-left: 0 !important;
@@ -671,7 +670,6 @@ a.hash-link {
   }
 }
 
-
 @media screen and (min-width: 996px) {
   .row.is-multiline .col {
     margin-top: var(--ifm-spacing-horizontal) !important;
@@ -690,4 +688,49 @@ a.hash-link {
 }
 .hidden {
   display: none;
+}
+
+
+
+.HowSections .col {
+  margin-bottom: 20px;
+}
+.HowSections img.diagram {
+    margin: 0px auto 30px auto;
+    display: block;
+}
+.HowCard {
+  position: relative;
+}
+.HowCard::before,
+.HowCard::after {
+  bottom: 100%;
+  border: solid transparent;
+  content: '';
+  height: 0;
+  left: 50%;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  margin-bottom: -1px;
+}
+.HowCard::before {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+
+  border-bottom: 5px solid black;
+  border-width: 12px;
+  margin-left: -12px;
+}
+.HowCard::after {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+
+  border-bottom: 5px solid var(--ifm-card-background-color);
+  border-width: 11px;
+  margin-left: -11px;
 }

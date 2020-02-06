@@ -7,6 +7,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl'
 import styles from './styles.module.css'
 import CustomCodeBlock from '../components/CustomCodeBlock'
 import GithubCard from '../components/GithubCard'
+import HowCard from '../components/HowCard'
 import { repos } from '../data/github'
 
 const heroExample = `
@@ -270,7 +271,89 @@ function Home() {
           </div>
         </section>
 
-        {/* FEATURES */}
+        {/* HOW */}
+        <section className={'section-lg'}>
+          <div className="container">
+            <div className={classnames('row', styles.responsiveCentered)}>
+              <div className="col col--6 col--offset-3">
+                <h2 className="with-underline">How it works</h2>
+                <p className="">
+                  Supabase helps you build faster, so you can focus on your core products.
+                </p>
+              </div>
+            </div>
+
+            <div className="HowSections row is-multiline">
+              <div className={'col col--4 '}>
+                <div>
+                  <img
+                    className="diagram"
+                    src="/img/how-replication.png"
+                    alt="Database replication"
+                  />
+                </div>
+                <div>
+                  <HowCard
+                    title="Connect your database to Supabase"
+                    description={
+                      <>
+                        Supabase introspects your database and provides instant APIs.
+                      </>
+                    }
+                    featureTitle="You get"
+                    features={[
+                      'APIs always in sync with your schema',
+                      'Instant RESTful API',
+                      'Realtime notifications via websockets',
+                    ]}
+                  />
+                </div>
+              </div>
+
+              <div className={'col col--4 '}>
+                <div>
+                  <img className="diagram" src="/img/how-transformation.png" alt="Supabase" />
+                </div>
+                <div>
+                  <HowCard
+                    title="Supabase handles the magic"
+                    description={<>Supabase handles the stuff you're usually too busy to build.</>}
+                    featureTitle="You get"
+                    features={[
+                      'Custom URL for your APIs',
+                      'Custom API docs for your schema',
+                      'Built-in security & monitoring',
+                    ]}
+                  />
+                </div>
+              </div>
+
+              <div className={'col col--4 '}>
+                <div>
+                  <img className="diagram" src="/img/how-client-libs.png" alt="Client libraries" />
+                </div>
+                <div>
+                  <HowCard
+                    title="Build realtime applications"
+                    description={
+                      <>
+                        Supabase provides libraries and examples to get you started.
+                      </>
+                    }
+                    featureTitle="Build"
+                    features={[
+                      'Auto-updating dashboards',
+                      'IoT applications',
+                      'Realtime chat apps',
+                    ]}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* USE CASES */}
         <section className={'section-lg'}>
           <div className="container">
             <h2 className="with-underline">Use Cases</h2>
