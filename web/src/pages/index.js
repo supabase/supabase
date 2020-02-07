@@ -70,11 +70,11 @@ import { createClient } from '@supabase/supabase-js'
 // Connect to the chat room 
 const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
-// Update a user
-const updatedUser = await supabase
+// Update multiple users
+const updatedUsers = await supabase
   .from('users')
-  .eq('username', 'kiwicopple')
-  .update({ status: 'Online' })
+  .eq('account_type', 'paid')
+  .update({ highlight_color: 'gold' })
 `.trim()
 
 const features = [
@@ -186,90 +186,14 @@ function Home() {
           </div>
         </header>
 
-        <section
+        {/* <section
           style={{
             padding: '50px 0',
           }}
           className="hero is--dark"
         >
-          <div className="container text--center">{/* <small>CUSTOMER LOGOS</small> */}</div>
-        </section>
-
-        {/* For Devs */}
-        <section className={styles.forDevelopers}>
-          <div className="container">
-            <div className={classnames('row', styles.responsiveCentered)}>
-              <div className="col col--6 col--offset-3">
-                <h2 className="with-underline">For Developers</h2>
-                <p className="">
-                  We introspect your database and provide APIs 
-                  <strong className="has-emphasis">instantly</strong> so you can stop building
-                  repetitive CRUD APIs and focus on building your products.
-                </p>
-              </div>
-            </div>
-            <div className="ForDevelopers">
-              <div className="row">
-                <div className="ButtonTabs col col--3">
-                  <div>
-                    <button
-                      className={`button button--${
-                        visibleCodeExample === 'SUBSCRIBE' ? 'info is-active' : 'info'
-                      }`}
-                      onClick={() => showCodeExample('SUBSCRIBE')}
-                    >
-                      Realtime subscriptions
-                    </button>
-                    <button
-                      className={`button button--${
-                        visibleCodeExample === 'READ' ? 'info is-active' : 'info '
-                      }`}
-                      onClick={() => showCodeExample('READ')}
-                    >
-                      Get your data
-                    </button>
-                    <button
-                      className={`button button--${
-                        visibleCodeExample === 'CREATE' ? 'info is-active' : 'info '
-                      }`}
-                      onClick={() => showCodeExample('CREATE')}
-                    >
-                      Create a record
-                    </button>
-                    <button
-                      className={`button button--${
-                        visibleCodeExample === 'UPDATE' ? 'info is-active' : 'info '
-                      }`}
-                      onClick={() => showCodeExample('UPDATE')}
-                    >
-                      Update mulitple rows
-                    </button>
-                  </div>
-                </div>
-                <div className="col col--9 code-with-header">
-                  {visibleCodeExample === 'SUBSCRIBE' && (
-                    <CustomCodeBlock
-                      header="Receive realtime messages in an example chat room"
-                      js={subscribeExample}
-                    />
-                  )}
-                  {visibleCodeExample === 'READ' && (
-                    <CustomCodeBlock
-                      header="Get all public rooms and their messages"
-                      js={readExample}
-                    />
-                  )}
-                  {visibleCodeExample === 'CREATE' && (
-                    <CustomCodeBlock header="Create a new chat room" js={createExample} />
-                  )}
-                  {visibleCodeExample === 'UPDATE' && (
-                    <CustomCodeBlock header="Update a user" js={updateExample} />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+          <div className="container text--center"><small>CUSTOMER LOGOS</small></div>
+        </section> */}
 
         {/* HOW */}
         <section className={'section-lg'}>
@@ -347,6 +271,82 @@ function Home() {
                       'Realtime chat apps',
                     ]}
                   />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* For Devs */}
+        <section className={styles.forDevelopers}>
+          <div className="container">
+            <div className={classnames('row', styles.responsiveCentered)}>
+              <div className="col col--6 col--offset-3">
+                <h2 className="with-underline">For Developers</h2>
+                <p className="">
+                  We introspect your database and provide APIs 
+                  <strong className="has-emphasis">instantly</strong> so you can stop building
+                  repetitive CRUD APIs and focus on building your products.
+                </p>
+              </div>
+            </div>
+            <div className="ForDevelopers">
+              <div className="row">
+                <div className="ButtonTabs col col--3">
+                  <div>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'SUBSCRIBE' ? 'info is-active' : 'info'
+                      }`}
+                      onClick={() => showCodeExample('SUBSCRIBE')}
+                    >
+                      Realtime subscriptions
+                    </button>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'READ' ? 'info is-active' : 'info '
+                      }`}
+                      onClick={() => showCodeExample('READ')}
+                    >
+                      Get your data
+                    </button>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'CREATE' ? 'info is-active' : 'info '
+                      }`}
+                      onClick={() => showCodeExample('CREATE')}
+                    >
+                      Create a record
+                    </button>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'UPDATE' ? 'info is-active' : 'info '
+                      }`}
+                      onClick={() => showCodeExample('UPDATE')}
+                    >
+                      Update mulitple rows
+                    </button>
+                  </div>
+                </div>
+                <div className="col col--9 code-with-header">
+                  {visibleCodeExample === 'SUBSCRIBE' && (
+                    <CustomCodeBlock
+                      header="Receive realtime messages in an example chat room"
+                      js={subscribeExample}
+                    />
+                  )}
+                  {visibleCodeExample === 'READ' && (
+                    <CustomCodeBlock
+                      header="Get all public rooms and their messages"
+                      js={readExample}
+                    />
+                  )}
+                  {visibleCodeExample === 'CREATE' && (
+                    <CustomCodeBlock header="Create a new chat room" js={createExample} />
+                  )}
+                  {visibleCodeExample === 'UPDATE' && (
+                    <CustomCodeBlock header="Update a user" js={updateExample} />
+                  )}
                 </div>
               </div>
             </div>
