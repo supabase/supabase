@@ -9,8 +9,8 @@ export default function HowCard({ title, description, featureTitle, features }) 
           {description}
           <h5 style={styles.h5}>{featureTitle}</h5>
           <div style={styles.features}>
-            {features.map(x => (
-              <div>
+            {features.map((x, i) => (
+              <div key={i}>
                 <span>
                   <img src="/img/check.svg" alt="✔" style={styles.check} />
                 </span>
