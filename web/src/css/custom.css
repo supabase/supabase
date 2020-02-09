@@ -781,6 +781,11 @@ a.hash-link {
   color: var(--ifm-color-content);
   font-size: 0.9rem;
 }
+.Mermaid .graph {
+  overflow-x: auto;
+  margin: 0px calc(var(--ifm-spacing-horizontal) * -1);
+  padding: var(--ifm-spacing-horizontal);
+}
 .Mermaid div,
 .Mermaid tspan,
 .Mermaid g.classGroup text {
