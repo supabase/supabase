@@ -15,14 +15,12 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
 
 export const useStore = ({ channelId }) => {
-  const [channels, setChannels] = useState(new Array())
-  const [messages, setMessages] = useState(new Array())
-  const [users] = useState(new Map())
+  const [channels, setChannels] = useState([])
+  const [messages, setMessages] = useState([])
 
   // Fetches messages for the channel and starts the channel listeners
   const reloadStore = () => {
     if (channelId) {
-        console.log('channelId', channelId)
       fetchChannels(setChannels)
       fetchMessages(channelId, setMessages)
     }
@@ -31,14 +29,11 @@ export const useStore = ({ channelId }) => {
   // Update the store when the user changes the "channel"
   useEffect(reloadStore, [channelId])
 
-  // Export computed properties to use in our app
-  return {
-    messages: messages.map(x => ({ ...x, author: users.get(x.user_id) })),
-    channels: channels.sort((a, b) => a.slug.localeCompare(b.slug)),
-    users,
-  }
+  // Export properties to use in our app
+  return { messages, channels, channelId }
 }
 
+// Get all the channels
 export const fetchChannels = async callback => {
   try {
     let { body } = await supabase.from('channels').select('*')
@@ -49,6 +44,7 @@ export const fetchChannels = async callback => {
   }
 }
 
+// Get all the messages and the authors in a single request
 export const fetchMessages = async (channelId, callback) => {
   try {
     let { body } = await supabase
