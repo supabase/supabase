@@ -35,7 +35,7 @@ We won't go over how to use Docker, but as long as you have it installed and run
 This is a thorough guide that will step you through four useful technologies which can scale up to production-ready realtime applications:
 
 - [PostgreSQL](https://www.postgresql.org) - an extremely scalable relational database
-- [Supabase](https://supabase.io) - a JS wrapper for Postgres that brings realtime functionality and instant RESTful APIs 
+- [Supabase](https://supabase.io) - a JS wrapper for Postgres for instant realtime and RESTful APIs 
 - [Next.js](https://nextjs.org/) - a JS framework for building server-rendered React apps
 - [Tailwind](https://tailwindcss.com/) - a CSS framework for quickly styling our frontend app 
 
@@ -48,22 +48,26 @@ NextJs(Next.js)
 Tailwind(Tailwind)
 Supabase-->NextJs-->Supabase
 Postgres-->Supabase-->Postgres
-NextJs---Tailwind
+NextJs-.-Tailwind
 subgraph Frontend
 NextJs
 Tailwind
 end
-subgraph Middleware
-Supabase
-end
-subgraph Data Layer
+subgraph Backend
 Postgres
+Supabase
 end
 `}
 />
 
 
 ## Initialising the app 
+
+
+<div className="alert alert--warning" role="alert">
+All the code for this section can be found in ...
+</div>
+
 
 ### Create the application
 
@@ -100,12 +104,43 @@ language="bash"
 
 ### Setup all the files
 
-```
-mkdir -p lib/2 && touch lib/{store.js,helpers.js}
+```bash
+mkdir components && touch components/{Layout.js,Message.js,MessageInput.js} && \
+mkdir db && touch db/schema.sql && \
+mkdir lib && touch lib/{Store.js,UserContext.js} && \
+touch pages/{_app.js,[channelId].js} && \
+touch docker-compose.yml
 ```
 
+You will now have the following boilerplate, ready to fill in with code.
 
-## Creating the database and APIs
+```bash
+├── components 
+│   ├── Layout.js         # Page Layout
+│   ├── Message.js        # Individual Messages
+│   └── MessageInput.js   # The text input for writing new messages
+├── db
+│   └── schema.sql        # Basic schema and dummy data
+├── lib
+│   ├── Store.js          # A basic data store using React Hooks
+│   └── UserContext.js    # Passes the logged in user to the App
+├── next.config.js
+├── pages
+│   ├── _app.js           # We will wrap our app with the logged in user 
+│   ├── [channelId].js    # Page for showing all the messages in a channel
+│   └── index.js          # Login page
+├── styles
+│   └── style.scss        # SASS file for styling our app
+└── docker-compose.yml    # Docker compose for Postgres and Supabase
+```
+
+By now you can get a simle app running 
+
+```
+npm install && npm run dev
+```
+
+## Creating the Backend
 
 ### Setting up Postgres
 
@@ -148,7 +183,7 @@ language="sql"
 This is the easiest step of all - you don't have to do anything. Supabase will introspect your database and provide you with APIs and websockets.
 
 
-### Fire up the backend
+### Fire up the Backend
 
 Create the following file:
 
@@ -160,13 +195,15 @@ language="yml"
 
 Now run `docker-compose up`
 
-----
-
-
 
 
 
 ## Setting up the front end
+
+
+<div className="alert alert--warning" role="alert">
+All the code for this section can be found in ...
+</div>
 
 
 ```bash
@@ -190,15 +227,25 @@ code={Snippets.store1}
 language="js"
 />
 
+## Adding basic logins
+
+<div className="alert alert--warning" role="alert">
+All the code for this section can be found in ...
+</div>
 
 
 ## Making it look like Slack
 
+
+<div className="alert alert--warning" role="alert">
+All the code for this section can be found in ...
+</div>
+
+
 Tailwind
 
-## Adding basic login
-
-React context
-
 ## Wrapping up
+
+You now have a realtime application. The combination of Docker + Postgres + Supabase made it quick and easy to get going on our local machines so that we could spend most of the time building the product.
+If you liked this tutorial, make sure to sign up for [Supabase](http://supabase.io) as we continue to bring all the functionality of Firebase to Postgres.
 
