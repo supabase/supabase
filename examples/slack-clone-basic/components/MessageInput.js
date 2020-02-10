@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 const MessageInput = ({onSubmit}) => {
   const [messageText, setMessageText] = useState('')

@@ -105,10 +105,10 @@ language="bash"
 ### Setup all the files
 
 ```bash
-mkdir components && touch components/{Layout.js,Message.js,MessageInput.js} && \
+mkdir components && touch components/MessageInput.js && \
 mkdir db && touch db/schema.sql && \
-mkdir lib && touch lib/{Store.js,UserContext.js} && \
 touch pages/{[channelId].js} && \
+touch Store.js && \
 touch docker-compose.yml
 ```
 
@@ -116,20 +116,16 @@ You will now have the following boilerplate, ready to fill in with code.
 
 ```bash
 ├── components 
-│   ├── Layout.js         # Page Layout
-│   ├── Message.js        # Individual Messages
 │   └── MessageInput.js   # The text input for writing new messages
 ├── db
 │   └── schema.sql        # Basic schema and dummy data
-├── lib
-│   ├── Store.js          # A basic data store using React Hooks
-│   └── UserContext.js    # Passes the logged in user to the App
-├── next.config.js
 ├── pages
 │   ├── [channelId].js    # Page for showing all the messages in a channel
-│   └── index.js          # Login page
+│   └── index.js          # Home page
 ├── styles
 │   └── style.scss        # SASS file for styling our app
+├── next.config.js        # For passing ENV variables to our app
+├── Store.js              # A basic data store using React Hooks
 └── docker-compose.yml    # Docker compose for Postgres and Supabase
 ```
 
@@ -342,18 +338,115 @@ import '../styles/style.scss'
 
 
 
-## Stage 5: Making it look like Slack
+## Stage 5: Adding realtime functionality
+
+Make the following changes to the store.
 
 
-<div className="alert alert--warning" role="alert">
-All the code for this section can be found in ...
-</div>
+
+### Handle new messages 
+
+```js
+const [newMessage, handleNewMessage] = useState(null)
+
+// New message recieved from Postgres
+useEffect(() => {
+  if (newMessage) {
+    let author = users.get(newMessage.user_id)
+    setMessages(messages.concat({...newMessage, author }))
+  }
+}, [newMessage])
+
+```
+
+### Lisen to the database
+
+```js {5-16}
+useEffect(() => {
+  fetchChannels(setChannels)
+  fetchMessages(setMessages)
+  
+  // Listen for new messages
+  const messageListener = supabase
+    .from('messages')
+    .eq('channel_id', channelId)
+    .on('*', payload => handleNewMessage(payload.new))
+    .subscribe()
 
 
-Tailwind
+  return () => {
+    // Cleanup on unmount
+    messageListener.unsubscribe()
+  }
+})
+```
+
+## Stage 6: Sending new messages 
+
+For now we will assume that we are user 2 (tonystark).
+
+### Add to store 
+
+
+```js
+export const addMessage = async (message, channel_id, user_id) => {
+  try {
+    let { body } = await supabase.from('messages').insert([{ message, channel_id, user_id }])
+    return body
+  } catch (error) {
+    console.log('error', error)
+  }
+}
+```
+
+### Add message component
+
+
+Create component 
+
+```js
+import { useState } from 'react'
+import { addMessage } from '~/lib/Store'
+
+const MessageInput = ({ channelId }) => {
+  const [messageText, setMessageText] = useState('')
+  
+  const submitOnEnter = event => {
+    // Watch for enter key
+    if (event.keyCode === 13) {
+      addMessage(messageText, channelId, 2)
+      setMessageText('')
+    }
+  }
+  
+  return (
+    <>
+        <input
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          type="text"
+          placeholder="Send a message"
+          value={messageText}
+          onChange={e => setMessageText(e.target.value)}
+          onKeyDown={e => submitOnEnter(e)}
+        />
+    </>
+  )}
+
+export default MessageInput
+```
+
+Add to Channel Page
+
+```js
+// @todo
+ <MessageInput channelId={channelId} />
+```
 
 ## Wrapping up
 
-You now have a realtime application. The combination of Docker + Postgres + Supabase made it quick and easy to get going on our local machines so that we could spend most of the time building the product.
-If you liked this tutorial, make sure to sign up for [Supabase](http://supabase.io) as we continue to bring all the functionality of Firebase to Postgres.
+- You now have a realtime application. Open on multiple browsers to see realtime.
+- The combination of Docker + Postgres + Supabase made it quick and easy to get going on our local machines so that we could spend most of the time building the product.
+- Link to the example with user auth, adding channels
 
+
+If you liked this tutorial, make sure to sign up for [Supabase](http://supabase.io) as we continue to bring all the functionality of Firebase to Postgres.
