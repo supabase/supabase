@@ -21,7 +21,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/supabase/monorepolate.git"
+    "url": "git+https://github.com/supabase/supabase.git"
   },
   "keywords": [
     "boilerplate",
@@ -33,7 +33,7 @@
   "author": "Supabase",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/supabase/monorepo/issues"
+    "url": "https://github.com/supabase/supabase/issues"
   },
   "homepage": "https://supabase.io",
   "devDependencies": {
