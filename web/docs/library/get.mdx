@@ -236,7 +236,8 @@ supabase
   .single()
 ```
 
-Returns only the first row of the table.
+Sets the header which signifies to PostgREST that the response must either be a single object 
+with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 
 ----
 
