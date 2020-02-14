@@ -242,7 +242,7 @@ const createCities = async () => {
       .from('cities')
       .insert([
         { name: 'The Shire', country_id: 554 },
-        { name: 'Rohan', country_id: 554 },
+        { name: 'Rohan', country_id: 555 },
       ])
     return cities
   } catch (error) {

@@ -1,6 +1,6 @@
 {
   "name": "@supabase/supabase-js",
-  "version": "0.1.18",
+  "version": "0.1.22",
   "description": "Supabase Realtime API",
   "main": "./lib/index.js",
   "scripts": {
@@ -21,7 +21,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/supabase/monorepolate.git"
+    "url": "git+https://github.com/supabase/supabase.git"
   },
   "keywords": [
     "boilerplate",
@@ -33,7 +33,7 @@
   "author": "Supabase",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/supabase/monorepo/issues"
+    "url": "https://github.com/supabase/supabase/issues"
   },
   "homepage": "https://supabase.io",
   "devDependencies": {
@@ -49,7 +49,7 @@
     "rimraf": "^2.6.2"
   },
   "dependencies": {
-    "@supabase/postgrest-js": "^0.4.0",
+    "@supabase/postgrest-js": "^0.6.0",
     "@supabase/realtime-js": "^0.1.6",
     "superagent": "^5.2.1"
   }

@@ -14,6 +14,8 @@ class Supabase {
     this.socket = null
     this.channel = null
     this.listeners = {}
+
+    this.queryFilters = []
   }
 
   /**
@@ -22,7 +24,26 @@ class Supabase {
 
   createListener() {
     let socketUrl = `${this.realtimeUrl}`
-    let channel = this.tableName == "*" ? 'realtime:*' : `realtime:${this.schema}:${this.tableName}`
+
+    var filterString = ''
+    this.queryFilters.forEach(queryFilter => {
+      switch (queryFilter.filter) {
+        case 'filter':
+          // temporary solution
+          // this is the only thing we are supporting at the moment
+          if(queryFilter.operator === 'eq'){
+            // right now, the string is replaced instead of being stacked
+            // the server does not support multiple eq. statements
+            // as such, we will only process the very last eq. statement provided
+            filterString = `:${queryFilter.columnName}=${queryFilter.operator}.${queryFilter.criteria}`
+          }
+          break
+        default:
+          break
+      }
+    })
+
+    let channel = this.tableName == "*" ? 'realtime:*' : `realtime:${this.schema}:${this.tableName}${filterString}`
     this.socket = new Socket(socketUrl, { params: { apikey: this.apikey } })
     this.channel = this.socket.channel(channel)
 
@@ -122,6 +143,34 @@ class Supabase {
     let rest = new PostgrestClient(this.restUrl, {queryParams: { apikey: this.apikey }})
     let api = rest.from(this.tableName)
 
+    // go through queryFilters
+    this.queryFilters.forEach(queryFilter => {
+      switch (queryFilter.filter) {
+        case 'filter':
+          api.filter(queryFilter.columnName, queryFilter.operator, queryFilter.criteria)
+          break
+
+        case 'match':
+          api.match(queryFilter.query)
+          break
+
+        case 'order':
+          api.order(queryFilter.property, queryFilter.ascending, queryFilter.nullsFirst)
+          break
+
+        case 'range':
+          api.range(queryFilter.from, queryFilter.to)
+          break
+
+        case 'single':
+          api.single()
+          break
+
+        default:
+          break
+      }
+    })
+
     return api
   }
 
@@ -146,28 +195,50 @@ class Supabase {
   }
 
   filter(columnName, operator, criteria) {
-    let api = this.initClient()
-    return api.filter(columnName, operator, criteria)
+    this.queryFilters.push({
+      filter: 'filter',
+      columnName,
+      operator,
+      criteria
+    })
+
+    return this
   }
 
   match(query) {
-    let api = this.initClient()
-    return api.match(query)
+    this.queryFilters.push({
+      filter: 'match',
+      query,
+    })
+
+    return this
   }
 
   order(property, ascending = false, nullsFirst = false) {
-    let api = this.initClient()
-    return api.order(property, ascending, nullsFirst)
+    this.queryFilters.push({
+      filter: 'order',
+      property,
+      ascending,
+      nullsFirst,
+    })
+
+    return this
   }
 
   range(from, to) {
-    let api = this.initClient()
-    return api.range(from, to)
+    this.queryFilters.push({
+      filter: 'range',
+      from,
+      to,
+    })
+
+    return this
   }
 
   single() {
-    let api = this.initClient()
-    return api.single()
+    this.queryFilters.push({ filter: 'single' })
+
+    return this
   }
 }
 
