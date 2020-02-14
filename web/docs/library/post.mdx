@@ -23,7 +23,9 @@ import { postSingleJs, postBulkJs } from './getExamples'
   js={postSingleJs}
   jsHighlight="{7-11}"
   response={`{
-  "body": null,
+  "body": [
+    { "name": "The Shire", "country_id": 554}
+  ],
   "status": 201,
   "statusCode": 201,
   "statusText": "Created"
@@ -37,7 +39,10 @@ import { postSingleJs, postBulkJs } from './getExamples'
   js={postBulkJs}
   jsHighlight="{7-12}"
   response={`{
-  "body": null,
+  "body": [
+    { "name": "The Shire", "country_id": 554},
+    { "name": "Rohan", "country_id": 555}
+  ],
   "status": 201,
   "statusCode": 201,
   "statusText": "Created"
@@ -56,8 +61,8 @@ supabase
   .insert(data, options?)
 ```
 
-#### `data: array`
-Array of rows of type `object` which contain information to be saved into the selected table.
+#### `data: { array | object }`
+A single `object` or an array of rows of type `object` which contain information to be saved into the selected table.
  
 #### `options: object?`  
 @todo
