@@ -24,7 +24,7 @@ import { getSimpleJs, getColumnsJs, getForeignJs, getForeignMultipleJs } from '.
   js={getSimpleJs}
   jsHighlight="{7-9}"
   response={`{
-  body: [
+  "body": [
     { "name": "Rio de Janeiro", "country_id": 76 },
     { "name": "Beijing", "country_id": 156 },
     { "name": "Paris", "country_id": 250 },
@@ -32,9 +32,9 @@ import { getSimpleJs, getColumnsJs, getForeignJs, getForeignMultipleJs } from '.
     { "name": "Lagos", "country_id": 556 },
     { "name": "San Francisco", "country_id": 840 }
   ],
-  status: 200,
-  statusCode: 200,
-  statusText: "OK"
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
 }`}
 />
 
@@ -47,7 +47,7 @@ import { getSimpleJs, getColumnsJs, getForeignJs, getForeignMultipleJs } from '.
   js={getColumnsJs}
   jsHighlight="{9}"
   response={`{
-  body: [
+  "body": [
     { "name": "Rio de Janeiro" },
     { "name": "Beijing" },
     { "name": "Paris" },
@@ -55,9 +55,9 @@ import { getSimpleJs, getColumnsJs, getForeignJs, getForeignMultipleJs } from '.
     { "name": "Lagos" },
     { "name": "San Francisco" }
   ],
-  status: 200,
-  statusCode: 200,
-  statusText: "OK"
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
 }`}
 />
 
@@ -69,7 +69,7 @@ import { getSimpleJs, getColumnsJs, getForeignJs, getForeignMultipleJs } from '.
   js={getForeignJs}
   jsHighlight="{9-14}"
   response={`{
-  body: [
+  "body": [
     {
       "name": "Brazil",  
       "cities": [
@@ -107,9 +107,9 @@ import { getSimpleJs, getColumnsJs, getForeignJs, getForeignMultipleJs } from '.
       ]
     }
   ],
-  status: 200,
-  statusCode: 200,
-  statusText: "OK"
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
 }`}
 />
 
@@ -125,7 +125,7 @@ the supplier and the purchaser at the same time (both in the `users`) table:
   js={getForeignMultipleJs}
   jsHighlight="{9-13}"
   response={`{
-  body: [
+  "body": [
     {
       "id": 1,  
       "purchaser": { "name": "John" },  
@@ -137,9 +137,9 @@ the supplier and the purchaser at the same time (both in the `users`) table:
       "supplier":  { "name": "Steve" }
     }
   ],
-  status: 200,
-  statusCode: 200,
-  statusText: "OK"
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
 }`}
 />
 
@@ -236,7 +236,8 @@ supabase
   .single()
 ```
 
-Returns only the first row of the table.
+Sets the header which signifies to PostgREST that the response must either be a single object 
+with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 
 ----
 
