@@ -264,7 +264,7 @@ const updateCountryName = async () => {
   try {
     let updates = await supabase
       .from('countries')
-      .udpate({ name: 'Middle Earth' })
+      .update({ name: 'Middle Earth' })
       .match({ name: 'New Zealand' })
 
     return updates
