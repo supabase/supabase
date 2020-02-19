@@ -3,6 +3,7 @@
 ## Commands
 - `npm run clean` - Remove `lib/` directory
 - `npm test` - Run tests with linting and coverage results.
+- `npm test:integration` - Run the integration tests (requires docker to be running)
 - `npm test:only` - Run tests without linting or coverage.
 - `npm test:watch` - You can even re-run tests on file changes!
 - `npm test:prod` - Run tests with minified code.
