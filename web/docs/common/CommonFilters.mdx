@@ -6,7 +6,7 @@ import Collapsable from '../../src/components/Collapsable'
 <div style={{display: props.verb == 'get' ? 'block' : 'none'}}>
 
 <!-- prettier-ignore -->
-```js {3} 
+```js {3}
 supabase
   .get(tableName)
   .match(filterObject)
@@ -16,7 +16,7 @@ supabase
 <div style={{display: props.verb == 'patch' ? 'block' : 'none'}}>
 
 <!-- prettier-ignore -->
-```js {3} 
+```js {3}
 supabase
   .patch(tableName, data)
   .match(filterObject)
@@ -26,7 +26,7 @@ supabase
 <div style={{display: props.verb == 'delete' ? 'block' : 'none'}}>
 
 <!-- prettier-ignore -->
-```js {3} 
+```js {3}
 supabase
   .delete(tableName)
   .match(filterObject)

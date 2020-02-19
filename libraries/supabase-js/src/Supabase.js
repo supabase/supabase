@@ -48,10 +48,10 @@ class Supabase {
     this.channel = this.socket.channel(channel)
 
     this.socket.onOpen(() => {
-      console.log('REALTIME CONNECTED')
+      console.debug(`${this.realtimeUrl}: REALTIME CONNECTED`)
     })
     this.socket.onClose(() => {
-      console.log('REALTIME DISCONNECTED')
+      console.debug(`${this.realtimeUrl}: REALTIME DISCONNECTED`)
     })
   }
 
@@ -121,9 +121,9 @@ class Supabase {
     if (this.channel.state !== 'joined') {
       this.channel
         .join()
-        .receive('ok', resp => console.log('Joined Realtime successfully ', resp))
-        .receive('error', resp => console.log('Unable to join ', resp))
-        .receive('timeout', () => console.log('Networking issue. Still waiting...'))
+        .receive('ok', resp => console.debug(`${this.realtimeUrl}: Joined Realtime successfully `, resp))
+        .receive('error', resp => console.debug(`${this.realtimeUrl}: Unable to join `, resp))
+        .receive('timeout', () => console.debug(`${this.realtimeUrl}: Network timeout. Still waiting...`))
     }
 
     return this
