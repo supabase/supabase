@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rimraf lib",
     "test": "npm run cover",
-    "test:integration": "docker-compose -f ./test/docker-compose.yml up -d && sleep 2 && mocha --require babel-core/register --require babel-polyfill  test/integration/**/*.js ; docker-compose -f ./test/docker-compose.yml down",
+    "test:integration": "docker-compose -f ./test/docker-compose.yml up -d && sleep 5 && mocha --require babel-core/register --require babel-polyfill  test/integration/**/*.js ; docker-compose -f ./test/docker-compose.yml down",
     "test:prod": "cross-env BABEL_ENV=production npm run test",
     "test:only": "mocha --require babel-core/register --require babel-polyfill --recursive",
     "test:watch": "npm test -- --watch",
