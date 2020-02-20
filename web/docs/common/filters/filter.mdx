@@ -1,7 +1,7 @@
 import Collapsable from '../../../src/components/Collapsable'
 
 <!-- prettier-ignore -->
-```js {3} 
+```js {3}
 supabase
   .from(tableName)
   .filter(columnName, operator, criteria)
@@ -15,7 +15,7 @@ This allows you to apply various filters on your query. Filters can also be chai
 ```js {3-5}
 supabase
   .from('countries')
-  .filter('name', 'in', '["China", "France"]')
+  .filter('name', 'in', ['China', 'France'])
   .filter('status', 'eq', 'ACTIVE')
 ```
 
