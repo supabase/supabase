@@ -54,7 +54,7 @@ describe('test reading from the rest interface', () => {
   it('filter()', async () => {
     const response = await supabase
       .from('users')
-      .filter('id', 'lt', 3)
+      .filter('id', 'lte', 3)
       .filter('username', 'in', ['awalias', 'supabot'])
       .select('*')
     assert(response.body.length === 2, 'should return two records, awalias, and supabot')
@@ -138,8 +138,8 @@ describe('test reading from the rest interface', () => {
       .from('users')
       .in('id', [2, 3])
       .select('*')
-    assert(response.body[0].id === 1, 'first item should be id 1')
-    assert(response.body[1].id === 4, 'last (and second) item should be id 4')
+    assert(response.body[0].id === 2, 'first item should be id 2')
+    assert(response.body[1].id === 3, 'last (and second) item should be id 3')
   })
 
   it('not()', async () => {
