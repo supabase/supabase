@@ -48,7 +48,7 @@
     "rimraf": "^2.6.2"
   },
   "dependencies": {
-    "@supabase/postgrest-js": "^0.7.0",
+    "@supabase/postgrest-js": "^0.8.0",
     "@supabase/realtime-js": "^0.1.6",
     "superagent": "^5.2.1"
   }
