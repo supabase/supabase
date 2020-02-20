@@ -40,6 +40,10 @@ class SupabaseClient {
     return rest.rpc(functionName, functionParameters)
   }
 
+  getSubscriptions() {
+    return Object.values(this.subscriptions)
+  }
+
   removeSubscription(mySubscription) {
     mySubscription.unsubscribe()
     delete this.subscriptions[mySubscription.uuid]

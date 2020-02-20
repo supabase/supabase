@@ -31,7 +31,7 @@ class Supabase {
         case 'filter':
           // temporary solution
           // this is the only thing we are supporting at the moment
-          if(queryFilter.operator === 'eq'){
+          if (queryFilter.operator === 'eq') {
             // right now, the string is replaced instead of being stacked
             // the server does not support multiple eq. statements
             // as such, we will only process the very last eq. statement provided
@@ -43,7 +43,10 @@ class Supabase {
       }
     })
 
-    let channel = this.tableName == "*" ? 'realtime:*' : `realtime:${this.schema}:${this.tableName}${filterString}`
+    let channel =
+      this.tableName == '*'
+        ? 'realtime:*'
+        : `realtime:${this.schema}:${this.tableName}${filterString}`
     this.socket = new Socket(socketUrl, { params: { apikey: this.apikey } })
     this.channel = this.socket.channel(channel)
 
@@ -121,16 +124,20 @@ class Supabase {
     if (this.channel.state !== 'joined') {
       this.channel
         .join()
-        .receive('ok', resp => console.debug(`${this.realtimeUrl}: Joined Realtime successfully `, resp))
+        .receive('ok', resp =>
+          console.debug(`${this.realtimeUrl}: Joined Realtime successfully `, resp)
+        )
         .receive('error', resp => console.debug(`${this.realtimeUrl}: Unable to join `, resp))
-        .receive('timeout', () => console.debug(`${this.realtimeUrl}: Network timeout. Still waiting...`))
+        .receive('timeout', () =>
+          console.debug(`${this.realtimeUrl}: Network timeout. Still waiting...`)
+        )
     }
 
     return this
   }
 
   unsubscribe() {
-    this.socket.disconnect()
+    if (this.socket) this.socket.disconnect()
 
     return this
   }
@@ -140,7 +147,7 @@ class Supabase {
    */
 
   initClient() {
-    let rest = new PostgrestClient(this.restUrl, {queryParams: { apikey: this.apikey }})
+    let rest = new PostgrestClient(this.restUrl, { queryParams: { apikey: this.apikey } })
     let api = rest.from(this.tableName)
 
     // go through queryFilters
@@ -199,7 +206,7 @@ class Supabase {
       filter: 'filter',
       columnName,
       operator,
-      criteria
+      criteria,
     })
 
     return this
