@@ -9,18 +9,32 @@ import { createClient } from '../../src'
 describe('test subscribing to an insert', () => {
   const supabase = createClient('http://localhost:8000', 'examplekey')
 
-  it('on() and subscribe()', async () => {
-    function callbackAction(record) {
-      assert(record.new.message === 'hello', 'inserted message is incorrect')
-      console.log("ASSERT MADE")
+  it('on() and subscribe()', done => {
+    const callbackAction = record => {
+      console.log('Assert made')
+      assert(record.new.message === 'hello, mocha', 'inserted message is incorrect')
+      done()
     }
-    await supabase
+
+    // subscribe
+    const subscription = supabase
       .from('messages')
-      .on('*', callbackAction)
+      .on('INSERT', callbackAction)
       .subscribe()
 
-    await supabase.from('messages').insert([{ message: 'hello', user_id: 1, channel_id: 1 }])
-  }).timeout(10000)
+    // make sure message only being sent after channel open
+    subscription.socket.conn.addEventListener('open', (event) => {
+      console.log("SAQCET OPEN")
+      supabase
+      .from('messages')
+      .insert([{ message: 'hello, mocha', user_id: 1, channel_id: 1 }])
+      .then(console.log)
+      .catch(console.error)
+    });
+
+    // prove that the binding is on the channel
+    setTimeout(()=>console.log(subscription.channel.bindings[3].callback.toString()), 5000)
+  }).timeout(15000)
 })
 
 after(async () => {
