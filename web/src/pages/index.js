@@ -219,11 +219,7 @@ function Home() {
                 <div>
                   <HowCard
                     title="Connect your database to Supabase"
-                    description={
-                      <>
-                        Supabase introspects your database and provides instant APIs.
-                      </>
-                    }
+                    description={<>Supabase introspects your database and provides instant APIs.</>}
                     featureTitle="You get"
                     features={[
                       'APIs always in sync with your schema',
@@ -259,11 +255,7 @@ function Home() {
                 <div>
                   <HowCard
                     title="Build realtime applications"
-                    description={
-                      <>
-                        Supabase provides libraries and examples to get you started.
-                      </>
-                    }
+                    description={<>Supabase provides libraries and examples to get you started.</>}
                     featureTitle="Build"
                     features={[
                       'Auto-updating dashboards',
@@ -361,6 +353,29 @@ function Home() {
               {features.map((props, idx) => (
                 <Feature key={idx} {...props} />
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section className={'section-lg'}>
+          <div className="container">
+            <div className={classnames('row', styles.responsiveCentered)}>
+              <div className="col col--6 col--offset-3">
+                <h2 className="with-underline">Self-documenting</h2>
+                <p className="">
+                  We introspect your database to give you instant, custom documentation for your REST and Realtime APIs.
+                </p>
+              </div>
+            </div>
+
+            <div className={classnames('row', styles.responsiveCentered)}>
+              <div className="col">
+                <img
+                  className={''}
+                  src={'/img/custom-docs.png'}
+                  alt={'Self-documenting dashboards'}
+                />
+              </div>
             </div>
           </div>
         </section>
