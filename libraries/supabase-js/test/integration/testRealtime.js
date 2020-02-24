@@ -6,37 +6,77 @@ import { createClient } from '../../src'
 // unsubscribe()
 // removeSubscription()
 // getSubscriptions()
-describe('test subscribing to an insert', () => {
+describe('test subscribing to an insert', function () {
   const supabase = createClient('http://localhost:8000', 'examplekey')
 
-  it('on() and subscribe()', done => {
-    const callbackAction = record => {
-      console.log('Assert made')
+  afterEach(function() {
+    const subscriptions = supabase.getSubscriptions()
+    for (const sub of subscriptions) {
+      supabase.removeSubscription(sub)
+    }
+  })
+
+  // test double wildcard, all events, all tables
+  it('from(*).on(*).subscribe()', function (done) {
+    const callbackAction = function(record) {
       assert(record.new.message === 'hello, mocha', 'inserted message is incorrect')
       done()
     }
-
-    // subscribe
     const subscription = supabase
-      .from('messages')
-      .on('INSERT', callbackAction)
+      .from('*')
+      .on('*', callbackAction)
       .subscribe()
 
-    // make sure message only being sent after channel open
-    subscription.socket.conn.addEventListener('open', (event) => {
-      console.log("SAQCET OPEN")
+    subscription.channel.socket.conn.addEventListener('open', function (event) {
       supabase
       .from('messages')
       .insert([{ message: 'hello, mocha', user_id: 1, channel_id: 1 }])
-      .then(console.log)
+      .then()
       .catch(console.error)
     });
+  }).timeout(15000)
 
-    // prove that the binding is on the channel
-    setTimeout(()=>console.log(subscription.channel.bindings[3].callback.toString()), 5000)
+  // test events on specific table
+  it('from("messages").on("*").subscribe()', function (done) {
+    const callbackAction = function(record) {
+      assert(record.new.message === 'hello, mocha fans', 'inserted message is incorrect')
+      done()
+    }
+    const subscription = supabase
+      .from('messages')
+      .on('*', callbackAction)
+      .subscribe()
+
+    subscription.channel.socket.conn.addEventListener('open', function (event) {
+      supabase
+      .from('messages')
+      .insert([{ message: 'hello, mocha fans', user_id: 1, channel_id: 1 }])
+      .then()
+      .catch(console.error)
+    });
+  }).timeout(15000)
+
+  // test on INSERT
+  it('from("*").on("INSERT").subscribe()', function (done) {
+    const callbackAction = function(record) {
+      assert(record.new.message === 'hello, mocha fans, Y2K', 'inserted message is incorrect')
+      done()
+    }
+    const subscription = supabase
+      .from('*')
+      .on('INSERT', callbackAction)
+      .subscribe()
+
+    subscription.channel.socket.conn.addEventListener('open', function (event) {
+      supabase
+      .from('messages')
+      .insert([{ message: 'hello, mocha fans, Y2K', user_id: 1, channel_id: 1 }])
+      .then()
+      .catch(console.error)
+    });
   }).timeout(15000)
 })
 
-after(async () => {
+after(function() {
   setTimeout(() => process.exit(0), 5000)
 })

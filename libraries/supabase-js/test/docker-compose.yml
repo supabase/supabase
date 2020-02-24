@@ -2,7 +2,7 @@ version: '3'
 
 services:
   supabase:
-    image: supabase/supabase-dev:0.1.4
+    image: supabase/supabase-dev:0.1.5
     ports:
       - "8000:8000"
     environment:
