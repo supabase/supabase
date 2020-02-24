@@ -326,6 +326,69 @@
     "@supabase/supabase": 73,
     "@supabase/realtime": 359,
     "@supabase/schemas": 6,
-    "@supabase/postgrest-js": 20
+    "@supabase/postgrest-js": 22
+  },
+  {
+    "name": "2020-02-05",
+    "@supabase/supabase": 74,
+    "@supabase/realtime": 359,
+    "@supabase/schemas": 6,
+    "@supabase/postgrest-js": 24
+  },
+  {
+    "name": "2020-02-10",
+    "@supabase/supabase": 74,
+    "@supabase/realtime": 359,
+    "@supabase/schemas": 6,
+    "@supabase/postgrest-js": 25
+  },
+  {
+    "name": "2020-02-11",
+    "@supabase/supabase": 74,
+    "@supabase/realtime": 361,
+    "@supabase/schemas": 6,
+    "@supabase/postgrest-js": 25
+  },
+  {
+    "name": "2020-02-14",
+    "@supabase/supabase": 74,
+    "@supabase/realtime": 362,
+    "@supabase/schemas": 6,
+    "@supabase/postgrest-js": 25
+  },
+  {
+    "name": "2020-02-16",
+    "@supabase/supabase": 74,
+    "@supabase/realtime": 363,
+    "@supabase/schemas": 6,
+    "@supabase/postgrest-js": 25
+  },
+  {
+    "name": "2020-02-19",
+    "@supabase/supabase": 75,
+    "@supabase/realtime": 370,
+    "@supabase/schemas": 6,
+    "@supabase/postgrest-js": 25
+  },
+  {
+    "name": "2020-02-20",
+    "@supabase/supabase": 75,
+    "@supabase/realtime": 371,
+    "@supabase/schemas": 6,
+    "@supabase/postgrest-js": 25
+  },
+  {
+    "name": "2020-02-21",
+    "@supabase/supabase": 75,
+    "@supabase/realtime": 372,
+    "@supabase/schemas": 6,
+    "@supabase/postgrest-js": 25
+  },
+  {
+    "name": "2020-02-23",
+    "@supabase/supabase": 75,
+    "@supabase/realtime": 373,
+    "@supabase/schemas": 6,
+    "@supabase/postgrest-js": 25
   }
 ]

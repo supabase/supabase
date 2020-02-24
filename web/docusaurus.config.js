@@ -80,6 +80,10 @@ module.exports = {
               label: 'Twitter',
               href: 'https://twitter.com/supabase_io',
             },
+            {
+              label: 'DevTo',
+              href: 'https://dev.to/supabase',
+            },
             // {
             //   label: "Discord",
             //   href: "https://discordapp.com/invite/docusaurus"
