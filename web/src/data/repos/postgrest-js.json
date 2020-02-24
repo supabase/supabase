@@ -65,16 +65,16 @@
   "releases_url": "https://api.github.com/repos/supabase/postgrest-js/releases{/id}",
   "deployments_url": "https://api.github.com/repos/supabase/postgrest-js/deployments",
   "created_at": "2020-01-27T05:32:19Z",
-  "updated_at": "2020-02-04T10:14:44Z",
-  "pushed_at": "2020-02-02T10:49:48Z",
+  "updated_at": "2020-02-23T09:38:54Z",
+  "pushed_at": "2020-02-23T09:38:51Z",
   "git_url": "git://github.com/supabase/postgrest-js.git",
   "ssh_url": "git@github.com:supabase/postgrest-js.git",
   "clone_url": "https://github.com/supabase/postgrest-js.git",
   "svn_url": "https://github.com/supabase/postgrest-js",
   "homepage": "https://supabase.io",
-  "size": 646,
-  "stargazers_count": 20,
-  "watchers_count": 20,
+  "size": 863,
+  "stargazers_count": 25,
+  "watchers_count": 25,
   "language": "JavaScript",
   "has_issues": true,
   "has_projects": true,
@@ -85,7 +85,7 @@
   "mirror_url": null,
   "archived": false,
   "disabled": false,
-  "open_issues_count": 4,
+  "open_issues_count": 0,
   "license": {
     "key": "mit",
     "name": "MIT License",
@@ -94,8 +94,8 @@
     "node_id": "MDc6TGljZW5zZTEz"
   },
   "forks": 0,
-  "open_issues": 4,
-  "watchers": 20,
+  "open_issues": 0,
+  "watchers": 25,
   "default_branch": "master",
   "temp_clone_token": null,
   "organization": {
@@ -119,5 +119,5 @@
     "site_admin": false
   },
   "network_count": 0,
-  "subscribers_count": 4
+  "subscribers_count": 5
 }
