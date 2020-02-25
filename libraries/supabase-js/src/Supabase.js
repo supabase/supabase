@@ -47,6 +47,7 @@ class Supabase {
       this.tableName == '*'
         ? 'realtime:*'
         : `realtime:${this.schema}:${this.tableName}${filterString}`
+    console.log(channel)
     this.socket = new Socket(socketUrl, { params: { apikey: this.apikey } })
     this.channel = this.socket.channel(channel)
 
@@ -61,7 +62,7 @@ class Supabase {
   on(eventType, callbackFunction) {
     if (this.socket == null) this.createListener()
 
-    var ref = this.channel.on(eventType, payload => {
+    this.channel.on(eventType, payload => {
       let payloadEnriched = {
         schema: payload.schema,
         table: payload.table,
@@ -112,7 +113,7 @@ class Supabase {
       callbackFunction(payloadEnriched)
     })
 
-    this.listeners[eventType] = ref
+    this.listeners[eventType] = callbackFunction
     return this
   }
 
