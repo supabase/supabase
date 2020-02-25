@@ -47,7 +47,6 @@ class Supabase {
       this.tableName == '*'
         ? 'realtime:*'
         : `realtime:${this.schema}:${this.tableName}${filterString}`
-    console.log(channel)
     this.socket = new Socket(socketUrl, { params: { apikey: this.apikey } })
     this.channel = this.socket.channel(channel)
 

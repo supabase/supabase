@@ -6,7 +6,7 @@ import { createClient } from '../../src'
 // unsubscribe()
 // removeSubscription()
 // getSubscriptions()
-describe('test subscribing to an insert', function() {
+describe('test various subscriptions', function() {
   const supabase = createClient('http://localhost:8000', 'examplekey')
 
   afterEach(function() {
@@ -14,6 +14,7 @@ describe('test subscribing to an insert', function() {
     for (const sub of subscriptions) {
       supabase.removeSubscription(sub)
     }
+    console.log('subscriptions removed')
   })
 
   // test adding and removing a subscription
@@ -48,7 +49,7 @@ describe('test subscribing to an insert', function() {
         .then()
         .catch(console.error)
     })
-  }).timeout(5000)
+  }).timeout(10000)
 
   // test events on specific table
   it('from("messages").on("*").subscribe()', function(done) {
@@ -68,28 +69,7 @@ describe('test subscribing to an insert', function() {
         .then()
         .catch(console.error)
     })
-  }).timeout(5000)
-
-  // test delete message
-  it('from("messages").on("DELETE").subscribe()', function(done) {
-    const callbackAction = function(record) {
-      assert(record.old.id === 1, 'deleted message does not have correct id')
-      done()
-    }
-    const subscription = supabase
-      .from('messages')
-      .on('DELETE', callbackAction)
-      .subscribe()
-
-    subscription.channel.socket.conn.addEventListener('open', function(event) {
-      supabase
-        .from('messages')
-        .match({ id: 1 })
-        .delete()
-        .then()
-        .catch(console.error)
-    })
-  }).timeout(5000)
+  }).timeout(10000)
 
   // test update message
   it('from(messages).on(UPDATE).subscribe()', function(done) {
@@ -108,12 +88,46 @@ describe('test subscribing to an insert', function() {
     subscription.channel.socket.conn.addEventListener('open', function(event) {
       supabase
         .from('messages')
-        .match({ id: 1 })
-        .update({ message: 'updated message yo' })
-        .then()
+        .insert([{ message: 'update test', user_id: 1, channel_id: 1 }])
+        .then(function(response) {
+          supabase
+            .from('messages')
+            .filter('id', 'eq', response.body[0].id)
+            .update({ message: 'updated message yo' })
+            .then()
+            .catch(console.error)
+        })
         .catch(console.error)
     })
-  }).timeout(5000)
+  }).timeout(10000)
+
+  // test delete message
+  it('from("messages").on("DELETE").subscribe()', function(done) {
+    const callbackAction = function(record) {
+      assert(record.old.message === 'delete test', 'deleted message does not have correct id')
+      done()
+    }
+    const subscription = supabase
+      .from('messages')
+      .on('DELETE', callbackAction)
+      .subscribe()
+
+    subscription.channel.socket.conn.addEventListener('open', function(event) {
+      supabase
+        .from('messages')
+        .insert([{ message: 'delete test', user_id: 1, channel_id: 1 }])
+        .then(function(response) {
+          console.log(response)
+          supabase
+            .from('messages')
+            .filter('id', 'eq', response.body[0].id)
+            .delete()
+            .then(console.log)
+            .catch(console.error)
+        })
+        .catch(console.error)
+    })
+  }).timeout(10000)
 
   // test on INSERT
   it('from("*").on("INSERT").subscribe()', function(done) {
@@ -122,7 +136,7 @@ describe('test subscribing to an insert', function() {
       done()
     }
     const subscription = supabase
-      .from('*')
+      .from('messages')
       .on('INSERT', callbackAction)
       .subscribe()
 
@@ -133,9 +147,12 @@ describe('test subscribing to an insert', function() {
         .then()
         .catch(console.error)
     })
-  }).timeout(5000)
-})
+  }).timeout(10000)
 
-after(function() {
-  setTimeout(() => process.exit(0), 5000)
+  after(function() {
+    setTimeout(function() {
+      console.log('ending process')
+      process.exit(0)
+    }, 5000)
+  })
 })
