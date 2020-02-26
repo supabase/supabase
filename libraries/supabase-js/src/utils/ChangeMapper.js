@@ -9,10 +9,8 @@
  * @param {Object} options The map of various options that can be applied to the mapper
  * @param {Array} options.skipTypes The array of types that should not be converted
  *
- * @example
- * convertChangeData([{name: 'first_name', type: 'text'}, {name: 'age', type: 'int4'}], {first_name: 'Paul', age:'33'}, {})
- * //=>
- * { first_name: 'Paul', age: 33 }
+ * @example convertChangeData([{name: 'first_name', type: 'text'}, {name: 'age', type: 'int4'}], {first_name: 'Paul', age:'33'}, {})
+ * //=>{ first_name: 'Paul', age: 33 }
  */
 export const convertChangeData = (columns, records, options = {}) => {
   let result = {}
@@ -31,15 +29,10 @@ export const convertChangeData = (columns, records, options = {}) => {
  * @param {Array} skipTypes An array of types that should not be converted
  * @return {object} Useless information
  *
- * @example
- * convertColumn('age', [{name: 'first_name', type: 'text'}, {name: 'age', type: 'int4'}], ['Paul', '33'], [])
- * //=>
- * 33
- *
- * @example
- * convertColumn('age', [{name: 'first_name', type: 'text'}, {name: 'age', type: 'int4'}], ['Paul', '33'], ['int4'])
- * //=>
- * "33"
+ * @example convertColumn('age', [{name: 'first_name', type: 'text'}, {name: 'age', type: 'int4'}], ['Paul', '33'], [])
+ * //=> 33
+ * @example convertColumn('age', [{name: 'first_name', type: 'text'}, {name: 'age', type: 'int4'}], ['Paul', '33'], ['int4'])
+ * //=> "33"
  */
 export const convertColumn = (columnName, columns, records, skipTypes) => {
   let column = columns.find(x => x.name == columnName)
@@ -53,20 +46,12 @@ export const convertColumn = (columnName, columns, records, skipTypes) => {
  * @param {String} type A postgres column type
  * @param {String} stringValue The cell value
  *
- * @example
- * convertCell('bool', 'true')
- * //=>
- * true
- *
- * @example
- * convertCell('int8', '10')
- * //=>
- * 10
- *
- * @example
- * convertCell('_int4', '{1,2,3,4}')
- * //=>
- * [1,2,3,4]
+ * @example convertCell('bool', 'true')
+ * //=> true
+ * @example convertCell('int8', '10')
+ * //=> 10
+ * @example convertCell('_int4', '{1,2,3,4}')
+ * //=> [1,2,3,4]
  */
 export const convertCell = (type, stringValue) => {
   try {
@@ -137,13 +122,10 @@ export const convertCell = (type, stringValue) => {
   }
 }
 
-/**
- * Passes back the raw string value
- */
-const noop = stringValue => {
+export const noop = stringValue => {
   return stringValue
 }
-const toBoolean = stringValue => {
+export const toBoolean = stringValue => {
   switch (stringValue) {
     case 't':
       return true
@@ -153,32 +135,35 @@ const toBoolean = stringValue => {
       return null
   }
 }
-const toDate = stringValue => {
+export const toDate = stringValue => {
   return new Date(stringValue)
 }
-const toDateRange = stringValue => {
+export const toDateRange = stringValue => {
   let arr = JSON.parse(stringValue)
   return [new Date(arr[0]), new Date(arr[1])]
 }
-const toFloat = stringValue => {
+export const toFloat = stringValue => {
   return parseFloat(stringValue)
 }
-const toInt = stringValue => {
+export const toInt = stringValue => {
   return parseInt(stringValue)
 }
-const toIntRange = stringValue => {
+export const toIntRange = stringValue => {
   let arr = JSON.parse(stringValue)
   return [parseInt(arr[0]), parseInt(arr[1])]
 }
-const toJson = stringValue => {
+export const toJson = stringValue => {
   return JSON.parse(stringValue)
 }
 
-const toArray = (stringValue, type) => {
+/**
+ * Converts a Postgres Array into a native JS array
+ * @example toArray('{1,2,3,4}', 'int4')
+ * //=> [1,2,3,4]
+ */
+export const toArray = (stringValue, type) => {
   // this takes off the '{' & '}'
   let stringEnriched = stringValue.slice(1, stringValue.length - 1)
-
-  console.log('this is the string Enriched ', stringEnriched)
 
   // converts the string into an array
   let stringArray = stringEnriched.split(',')
@@ -193,12 +178,9 @@ const toArray = (stringValue, type) => {
  * Fixes timestamp to be ISO-8601. Swaps the space between the date and time for a 'T'
  * See https://github.com/supabase/supabase/issues/18
  * @returns {string}
- *
- * @example
- * toTimestampString('2019-09-10 00:00:00')
- * //=>
- * '2019-09-10T00:00:00'
+ * @example toTimestampString('2019-09-10 00:00:00')
+ * //=> '2019-09-10T00:00:00'
  */
-const toTimestampString = stringValue => {
+export const toTimestampString = stringValue => {
   return stringValue.replace(' ', 'T')
 }

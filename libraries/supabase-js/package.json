@@ -5,13 +5,13 @@
   "main": "./lib/index.js",
   "scripts": {
     "clean": "rimraf lib",
-    "test": "npm run cover",
-    "test:integration": "docker-compose -f ./test/docker-compose.yml up -d && sleep 10 && mocha --require babel-core/register --require babel-polyfill  test/integration/**/*.js ; docker-compose -f ./test/docker-compose.yml down",
+    "test": "mocha --require babel-core/register --require babel-polyfill test/unit/**/*.js",
+    "test:integration:only": "mocha --require babel-core/register --require babel-polyfill test/integration/**/*.js",
+    "test:integration": "docker-compose -f ./test/integration/docker-compose.yml up -d && sleep 10 && mocha --require babel-core/register --require babel-polyfill test/integration/**/*.js ; docker-compose -f ./test/integration/docker-compose.yml down",
     "test:prod": "cross-env BABEL_ENV=production npm run test",
-    "test:only": "mocha --require babel-core/register --require babel-polyfill --recursive",
     "test:watch": "npm test -- --watch",
     "test:examples": "node examples/",
-    "cover": "nyc --check-coverage npm run test:only",
+    "cover": "nyc --check-coverage && npm test",
     "build": "cross-env BABEL_ENV=production babel src --out-dir lib",
     "prepublish": "npm run clean && npm run build",
     "deploy": "npm version patch && npm publish --access=public"
@@ -47,6 +47,7 @@
     "rimraf": "^2.6.2"
   },
   "dependencies": {
+    "@supabase/doctest-js": "^0.1.0",
     "@supabase/postgrest-js": "^0.8.0",
     "@supabase/realtime-js": "^0.1.6",
     "superagent": "^5.2.1"

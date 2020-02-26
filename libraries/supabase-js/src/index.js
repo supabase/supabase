@@ -36,7 +36,7 @@ class SupabaseClient {
   }
 
   rpc(functionName, functionParameters = null) {
-    let rest = new PostgrestClient(this.restUrl, { apikey: this.supabaseKey })
+    let rest = new PostgrestClient(this.restUrl, { queryParams: { apikey: this.supabaseKey } })
     return rest.rpc(functionName, functionParameters)
   }
 

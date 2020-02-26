@@ -150,3 +150,17 @@ describe('test reading from the rest interface', () => {
     assert(response.body.length === 3, 'should be all except id 3')
   })
 })
+
+
+describe('test rpc()', () => {
+  const supabase = createClient('http://localhost:8000', 'examplekey')
+
+  it('should return a value', async () => {
+    const response = await supabase.rpc('update_user_status', {
+      user_id: 2,
+      new_user_status: 'OFFLINE',
+    })
+    assert(response.body.result === true)
+    assert(response.body.status === 'OFFLINE')
+  })
+})

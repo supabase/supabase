@@ -39,3 +39,19 @@ CREATE TABLE public.messages (
 ALTER TABLE public.messages REPLICA IDENTITY FULL; -- Send "previous data" to supabase
 COMMENT ON COLUMN public.messages.data IS 'For unstructured data and prototyping.';
 
+CREATE OR REPLACE FUNCTION public.update_user_status(user_id bigint, new_user_status text) 
+RETURNS jsonb AS $$
+BEGIN
+   UPDATE users SET status = new_user_status::public.user_status
+   WHERE id = user_id;
+   return json_build_object(
+    'result',
+    true,
+    'user_id',
+    user_id,
+    'status',
+    new_user_status
+  );
+END;
+$$ LANGUAGE plpgsql;
+
