@@ -1,9 +1,17 @@
 import 'react-perfect-scrollbar/dist/css/styles.css'
 import React, { useState } from 'react'
 import CodeBlock from '@theme/CodeBlock'
-import PerfectScrollbar from 'react-perfect-scrollbar'
+// import PerfectScrollbar from 'react-perfect-scrollbar'
 
-export default function CustomCodeBlock({ header, js, jsHighlight, response }) {
+export default function CustomCodeBlock({
+  header,
+  code,
+  highlight,
+  js,
+  jsHighlight,
+  response,
+  language,
+}) {
   const [showResponse, toggleResponse] = useState(false)
 
   let wrapperClass = ''
@@ -14,9 +22,14 @@ export default function CustomCodeBlock({ header, js, jsHighlight, response }) {
     <>
       <div className={wrapperClass}>
         {header && <div className="code-header">{header}</div>}
-        <PerfectScrollbar>
-          <CodeBlock metastring={jsHighlight}>{js}</CodeBlock>
-        </PerfectScrollbar>
+        <>
+          {code && (
+            <CodeBlock className={language || 'bash'} metastring={highlight}>
+              {code}
+            </CodeBlock>
+          )}
+          {js && <CodeBlock metastring={jsHighlight}>{js}</CodeBlock>}
+        </>
       </div>
       {response && (
         <>
@@ -42,7 +55,7 @@ const styles = {
     display: 'block',
     borderRadius: '0',
     color: 'var(--custom-primary)',
-    borderTop: '1px solid #444'
+    borderTop: '1px solid #444',
   },
   responseHidden: {
     textAlign: 'right',
@@ -50,6 +63,6 @@ const styles = {
     borderBottom: 'none',
     borderRadius: '0 0 4px 4px',
     borderTop: '1px solid #444',
-    color: '#ccc'
+    color: '#ccc',
   },
 }
