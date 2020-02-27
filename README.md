@@ -2,7 +2,7 @@
 
 
 <p align="center">
-<img width="300" src="https://gitcdn.xyz/repo/supabase/supabase/master/web/static/supabase-light.png"/>
+<img width="300" src="https://gitcdn.xyz/repo/supabase/supabase/master/web/static/supabase-light.svg"/>
 </p>
 
 ---
