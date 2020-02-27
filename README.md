@@ -1,7 +1,15 @@
+
+
+
+<p align="center">
+<img width="300" src="https://gitcdn.xyz/repo/supabase/supabase/master/web/static/supabase-light.svg"/>
+</p>
+
+---
+
 # Supabase
 
-[Supabase](https://supabase.io)
-
+[Supabase](https://supabase.io) adds realtime and RESTful APIs to your existing PostgreSQL database without a single line of code.
 
 ## Status
 
@@ -12,17 +20,16 @@
 
 We are currently in alpha. Watch "releases" of this repo to get notified when we are ready for Public Beta.
 
-![Watch this repo](https://gitcdn.xyz/repo/supabase/supabase/master/web/static/watch-repo.gif "Watch this repo")
 
+<p align="center">
+<kbd><img src="https://gitcdn.xyz/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
+</p>
 
-## Structure
+----
 
-```bash
-├── connectors                  # WIP: connectors for Supabase
-├── examples
-│   └── next-js
-├── libraries                   # Client libraries
-│   └── supabase-js             # JS client library     
-└── web
-    └── docs                    # Website docs
-```
+## Also by Supabase
+
+- [Supabase Realtime](https://github.com/supabase/realtime): Listen to your to PostgreSQL database in realtime via websockets. Built with Elixir.
+- [@supabase/postgrest-js](https://github.com/supabase/postgrest-js): Isomorphic JavaScript client for PostgREST.
+- [@supabase/doctest-js](https://github.com/supabase/realtime): Run JSDoc style doc examples as tests within your test suite.
+- [Supabase Schemas](https://github.com/supabase/realtime): An opensource repository of PostgreSQL schemas to get your projects started..
