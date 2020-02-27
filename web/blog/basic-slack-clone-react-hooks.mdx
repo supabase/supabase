@@ -1,0 +1,452 @@
+---
+title: Building a basic Slack clone with Postgres and React Hooks
+description: Building a basic Slack clone with Postgres and React Hooks
+author: Paul Copplestone
+author_title: Supabase
+author_url: https://github.com/kiwicopple
+author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
+authorURL: https://github.com/kiwicopple
+tags: [postgres, react]
+---
+
+import Figure from '../src/components/Figure'
+import Mermaid from '../src/components/Mermaid'
+import CustomCodeBlock from '../src/components/CustomCodeBlock'
+import * as Snippets from './basic-slack-clone-react-hooks/snippets'
+
+<div className="alert alert--warning" role="alert">
+This guide uses Docker Compose to simplify Postgres setup and data loading. 
+We won't go over how to use Docker, but as long as you have it installed and running it will be simple to follow along.
+</div>
+
+[Full code](https://github.com/supabase/supabase/blob/master/examples/slack-clone-basic/README.md) | 
+[HN Discussion](https://new.ycombinator.com) | 
+[Dev Article](https://dev.to)
+
+<Figure
+  src="https://media.giphy.com/media/J07U8iblJhlKDqZOxV/source.gif"
+  alt="Slack Clone"
+  caption="A simple Next.js app that reacts to changes in your Postgres database."
+/>
+
+
+## Introduction
+
+This is a thorough guide that will step you through four useful technologies which can scale up to production-ready realtime applications:
+
+- [PostgreSQL](https://www.postgresql.org) - an extremely scalable relational database
+- [Supabase](https://supabase.io) - a JS wrapper for Postgres for instant realtime and RESTful APIs 
+- [Next.js](https://nextjs.org/) - a JS framework for building server-rendered React apps
+- [Tailwind](https://tailwindcss.com/) - a CSS framework for quickly styling our frontend app 
+
+<Mermaid
+caption="Supabase listens to Postgres and sends all changes to Next.js."
+graph={`graph LR
+Supabase(Supabase)
+Postgres(PostgreSQL)
+NextJs(Next.js)
+Tailwind(Tailwind)
+Supabase-->NextJs-->Supabase
+Postgres-->Supabase-->Postgres
+NextJs-.-Tailwind
+subgraph Frontend
+NextJs
+Tailwind
+end
+subgraph Backend
+Postgres
+Supabase
+end
+`}
+/>
+
+
+## Stage 1: Setup the project 
+
+<div className="alert alert--warning" role="alert">
+All the code for this section can be found in our main repo:<br />
+<a href="">slack-clone-basic-tutorial/stage-1-setup</a>
+</div>
+
+
+### Create the application
+
+We will create a new Next.js app called `slack-clone-basic`, using the [Next.js SASS example](https://github.com/zeit/next.js/tree/master/examples/with-next-sass) to get us started:
+
+
+<CustomCodeBlock
+header="Initialise the app using Next.js"
+code={`
+npm init next-app --example with-next-sass slack-clone-basic --useNpm
+`}
+language="bash"
+/>
+
+
+This comes with [SASS](https://duckduckgo.com/?q=sass+css&t=ffab&ia=web) built in. You don't need to know anything about SASS, except that it will be useful for Tailwind later on.
+
+
+### Install dependencies
+
+Now let's install our dependencies inside the `./slack-clone-basic` folder:
+
+<CustomCodeBlock
+header="./slack-clone-basic"
+code={`
+npm install --save @supabase/supabase-js tailwindcss
+`}
+language="bash"
+/>
+
+- `@supabase/supabase-js` - for interacting with the database. This will handle all the APIs and realtime functionality
+- `tailwindcss` - for making our frontend look great
+
+
+### Setup all the files
+
+```bash
+mkdir components && touch components/MessageInput.js && \
+mkdir db && touch db/schema.sql && \
+touch pages/{[channelId].js} && \
+touch Store.js && \
+touch docker-compose.yml
+```
+
+You will now have the following boilerplate, ready to fill in with code.
+
+```bash
+├── components 
+│   └── MessageInput.js   # The text input for writing new messages
+├── db
+│   └── schema.sql        # Basic schema and dummy data
+├── pages
+│   ├── [channelId].js    # Page for showing all the messages in a channel
+│   └── index.js          # Home page
+├── styles
+│   └── style.scss        # SASS file for styling our app
+├── next.config.js        # For passing ENV variables to our app
+├── Store.js              # A basic data store using React Hooks
+└── docker-compose.yml    # Docker compose for Postgres and Supabase
+```
+
+By now you can get a simle app running 
+
+```
+npm run dev
+```
+
+Visit <a href="http://localhost:3000">http://localhost:3000</a> and you should see a page with a nice green "Hello World!"
+
+## Stage 2: Setup the backend
+
+
+<div className="alert alert--warning" role="alert">
+All the code for this section can be found in stage-2-backend
+</div>
+
+### Setting up Postgres
+
+Let's sketch out the simplest possible database schema we can use.
+
+<Mermaid
+caption="Users can create a message, which belongs to a single channel"
+graph={`classDiagram
+class users{
+  id int
+  username text
+}
+class channels{
+  id int
+  slug text
+}
+class messages{
+  id int
+  message text
+  user_id int
+  channel_id int
+}
+users .. messages
+channels .. messages
+`}
+/>
+
+Save the corresponding schema in `./db/schema.sql`:
+
+<CustomCodeBlock
+header="~/db/schema.sql"
+code={Snippets.schema}
+language="sql"
+/>
+
+This schema will be automatically created when we start our Docker Compose.
+
+### Setting up the APIs
+
+This is the easiest step of all - you don't have to do anything! 
+
+Supabase will introspect your database and provide you with APIs and websockets once we start Docker Compose.
+
+
+### Fire up the Backend
+
+Now lets start Docker Compose. Fill in the docker compose file with the following code:
+
+<CustomCodeBlock
+header="~/docker-compose.yml"
+code={Snippets.dockerfile}
+language="yml"
+/>
+
+Now run `docker-compose up`. If you set everything up correctly, you should be able to visit 
+[http://localhost:8000/rest/v1/messages?apikey=examplekey](http://localhost:8000/rest/v1/messages?apikey=examplekey) 
+where you will see some of the messages that were created in the database.
+
+From now on you can forget about this route! Supabase will take care of everything when working with the database.
+
+Let's leave this running for the remainder of the tutorial.
+
+### Add ENV variables to Next JS 
+
+Let Next.js know how to access Supabase.
+
+<CustomCodeBlock
+header="~/next.config.js"
+code={Snippets.nextJsConfig1}
+language="js"
+/>
+
+
+## Stage 3: Setup the Frontend
+
+
+<div className="alert alert--warning" role="alert">
+All the code for this section can be found in our main repo:<br />
+<a href="">slack-clone-basic-tutorial/stage-3-frontend</a>
+</div>
+
+
+### Building a basic store with React hooks
+
+<CustomCodeBlock
+header="~/lib/Store.js"
+code={Snippets.store1}
+language="js"
+/>
+
+
+### Displaying our messages
+
+
+<CustomCodeBlock
+header="~/pages/[channelId].js"
+code={Snippets.channelPage1}
+language="js"
+/>
+
+Visit <a href="http://localhost:3000/2">http://localhost:3000/2</a> and you will see a page with 2 buttons, and the channel ID displayed.
+
+## Stage 4: Making it look like Slack
+
+<div className="alert alert--warning" role="alert">
+All the code for this section can be found ..
+</div>
+
+
+Now we get to see the power of Tailwind to quickly prototype a frontend.
+
+### Import Tailwind
+
+Add the following code:
+
+<CustomCodeBlock
+header="./styles/style.scss"
+code={`
+@import '~tailwindcss/dist/base.css';
+@import '~tailwindcss/dist/components.css';
+@import '~tailwindcss/dist/utilities.css';
+`}
+language="css"
+/>
+
+### Updating the channels page
+
+Add the following changes to `./pages/[channelId].js`.
+Ignore anything annotated with comments, which is just done to abbreviate the code snippets. 
+You won't delete any code in this section, you just need to add classNames to all JSX!
+
+#### Import the stylesheet 
+
+```js 
+import '../styles/style.scss'
+```
+
+#### Layout the sidebar and main content
+
+```js {1,2,5}
+<div className="main flex h-screen w-screen absolute">
+  <nav className="w-1/4 bg-gray-900 text-gray-100 h-screen p-2">
+    {/* Sidebar content */}
+  </nav>
+  <main className="w-3/4 bg-gray-800 h-screen p-2">
+    {/* Message content */}
+  </main>
+</div>
+```
+
+#### Style the messages
+
+```js {3,6}
+{messages.map(message => (
+  <div>
+    <p className="text-blue-700 font-bold">
+      {message.author.username}
+    </p>
+    <p className="text-white">
+      {message.message}
+    </p>
+  </div>
+))}
+```
+
+#### "New Channel" button
+
+```js {1}
+<button className="bg-blue-900 hover:bg-blue-700 text-white font-bold p-2 rounded w-full">
+  New Channel
+</button>
+```
+
+#### Channel list
+
+```js {1,7}
+<h3 className="py-4">Channels</h3>
+<ul>
+  {channels.map(channel => (
+    <li key={channel.id}>
+      <Link href="/[channelId]" as={`/${channel.id}`}>
+        <a
+          className="hover:text-blue-400"
+          style={{ fontWeight: channel.id == channelId ? 'bold' : 'normal' }}
+        >
+          {channel.slug}
+        </a>
+      </Link>
+    </li>
+  ))}
+</ul>
+```
+
+
+
+## Stage 5: Adding realtime functionality
+
+Make the following changes to the store.
+
+
+
+### Handle new messages 
+
+```js
+const [newMessage, handleNewMessage] = useState(null)
+
+// New message recieved from Postgres
+useEffect(() => {
+  if (newMessage) {
+    let author = users.get(newMessage.user_id)
+    setMessages(messages.concat({...newMessage, author }))
+  }
+}, [newMessage])
+
+```
+
+### Lisen to the database
+
+```js {5-16}
+useEffect(() => {
+  fetchChannels(setChannels)
+  fetchMessages(setMessages)
+  
+  // Listen for new messages
+  const messageListener = supabase
+    .from('messages')
+    .eq('channel_id', channelId)
+    .on('*', payload => handleNewMessage(payload.new))
+    .subscribe()
+
+
+  return () => {
+    // Cleanup on unmount
+    messageListener.unsubscribe()
+  }
+})
+```
+
+## Stage 6: Sending new messages 
+
+For now we will assume that we are user 2 (tonystark).
+
+### Add to store 
+
+
+```js
+export const addMessage = async (message, channel_id, user_id) => {
+  try {
+    let { body } = await supabase.from('messages').insert([{ message, channel_id, user_id }])
+    return body
+  } catch (error) {
+    console.log('error', error)
+  }
+}
+```
+
+### Add message component
+
+
+Create component 
+
+```js
+import { useState } from 'react'
+import { addMessage } from '~/lib/Store'
+
+const MessageInput = ({ channelId }) => {
+  const [messageText, setMessageText] = useState('')
+  
+  const submitOnEnter = event => {
+    // Watch for enter key
+    if (event.keyCode === 13) {
+      addMessage(messageText, channelId, 2)
+      setMessageText('')
+    }
+  }
+  
+  return (
+    <>
+        <input
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          type="text"
+          placeholder="Send a message"
+          value={messageText}
+          onChange={e => setMessageText(e.target.value)}
+          onKeyDown={e => submitOnEnter(e)}
+        />
+    </>
+  )}
+
+export default MessageInput
+```
+
+Add to Channel Page
+
+```js
+// @todo
+ <MessageInput channelId={channelId} />
+```
+
+## Wrapping up
+
+- You now have a realtime application. Open on multiple browsers to see realtime.
+- The combination of Docker + Postgres + Supabase made it quick and easy to get going on our local machines so that we could spend most of the time building the product.
+- Link to the example with user auth, adding channels
+
+
+If you liked this tutorial, make sure to sign up for [Supabase](http://supabase.io) as we continue to bring all the functionality of Firebase to Postgres.
