@@ -12,7 +12,7 @@
     "@docusaurus/core": "^2.0.0-alpha.40",
     "@docusaurus/preset-classic": "^2.0.0-alpha.40",
     "classnames": "^2.2.6",
-    "mermaid": "^8.4.6",
+    "mermaid": "^8.4.8",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-inlinesvg": "^1.2.0",

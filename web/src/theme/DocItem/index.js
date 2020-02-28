@@ -154,8 +154,6 @@ function DocItem(props) {
     },
   } = DocContent
 
-  console.log(metadata)
-
   const metaImageUrl = siteUrl + useBaseUrl(metaImage)
 
   return (
