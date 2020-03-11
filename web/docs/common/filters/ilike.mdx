@@ -9,18 +9,6 @@ supabase
 
 A case-sensitive version of `like()`. Equivalent of `filter(columnName, 'ilike', stringPattern)`.
 
-<Collapsable title="Toggle Example">
-
-<!-- prettier-ignore -->
-```js {3}
-supabase
-  .from('countries')
-  .ilike('name', '%united%')
-```
-
-</Collapsable>
-
-
 #### `columnName: string`
 Name of database column.
 

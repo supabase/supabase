@@ -8,17 +8,6 @@ supabase
 ```
 Finds all rows whose value on the stated columnName is less than or equal to the specified filterValue. Eqiuvalent of `filter(columnName, 'lte', criteria)`.
 
-<Collapsable title="Toggle Example">
-
-<!-- prettier-ignore -->
-```js {3}
-supabase
-  .from('countries')
-  .lte('id', 20)
-```
-
-</Collapsable>
-
 #### `columnName: string`
 Name of database column.
 

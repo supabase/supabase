@@ -11,7 +11,7 @@ import CommonResponses from '../common/CommonResponses.mdx'
 import CommonFilters from '../common/CommonFilters'
 import FromFunction from '../common/FromFunction.mdx'
 import CustomCodeBlock from '../../src/components/CustomCodeBlock'
-import { patchRecordJs } from './getExamples'
+import { patchRecordJs } from './examples/patch'
 
 <DummyData />
 
@@ -22,7 +22,9 @@ import { patchRecordJs } from './getExamples'
   js={patchRecordJs}
   jsHighlight="{7-10}"
   response={`{
-  "body": null,
+  "body": [
+    {"id": 554, "name": "Middle Earth", "iso2": "NZ", "continent": "Oceania"}
+  ],
   "status": 204,
   "statusCode": 204,
   "statusText": "No Content"
