@@ -143,7 +143,7 @@ const getCities = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .filter({'name', 'eq', 'Paris})
+      .filter({'name', 'eq', 'Paris'})
       .select('*')
     return cities
   } catch (error) {
