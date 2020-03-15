@@ -11,7 +11,20 @@ import CommonResponses from '../common/CommonResponses.mdx'
 import CommonFilters from '../common/CommonFilters'
 import FromFunction from '../common/FromFunction.mdx'
 import CustomCodeBlock from '../../src/components/CustomCodeBlock'
-import { patchRecordJs } from './getExamples'
+import { patchRecordJs,
+         patchFilterJs,
+         patchMatchJs,
+         patchEqJs,
+         patchGtJs,
+         patchLtJs,
+         patchGteJs,
+         patchLteJs,
+         patchLikeJs,
+         patchIlikeJs,
+         patchIsJs,
+         patchInJs,
+         patchNotJs
+      } from './examples/patch'
 
 <DummyData />
 
@@ -22,10 +35,12 @@ import { patchRecordJs } from './getExamples'
   js={patchRecordJs}
   jsHighlight="{7-10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  "body": [
+    { "name": "Middle Earth", "country_id": 554 },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
 }`}
 />
 
@@ -57,44 +72,262 @@ const options = {
 ## Filtering
 
 ### `filter()`
+
+<CustomCodeBlock
+  header="Shows how to use filter( ) with update( )"
+  js={patchFilterJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Mordor", "country_id": 250 },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='filter'/>
 
 ### `match()`
+
+<CustomCodeBlock
+  header="Shows how to use match( ) with update( )"
+  js={patchMatchJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Mordor", "country_id": 156 },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='match'/>
 
 ### `eq()`
+
+<CustomCodeBlock
+  header="Shows how to use eq( ) with update( )"
+  js={patchEqJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Mordor", "country_id": 840 },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='eq'/>
 
 ### `gt()`
+
+<CustomCodeBlock
+  header="Shows how to use gt( ) with update( )"
+  js={patchGtJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Mordor", "country_id": 554 },
+    { "name": "Mordor", "country_id": 556 },
+    { "name": "Mordor", "country_id": 840 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='gt'/>
 
 ### `lt()`
+
+<CustomCodeBlock
+  header="Shows how to use lt( ) with update( )"
+  js={patchLtJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Mordor", "country_id": 76 },
+    { "name": "Mordor", "country_id": 156 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='lt'/>
 
 ### `gte()`
+
+<CustomCodeBlock
+  header="Shows how to use gte( ) with update( )"
+  js={patchGteJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Mordor", "country_id": 250 },
+    { "name": "Mordor", "country_id": 554 },
+    { "name": "Mordor", "country_id": 556 },
+    { "name": "Mordor", "country_id": 840 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='gte'/>
 
 ### `lte()`
+
+<CustomCodeBlock
+  header="Shows how to use lte( ) with update( )"
+  js={patchLteJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Mordor", "country_id": 76 },
+    { "name": "Mordor", "country_id": 156 },
+    { "name": "Mordor", "country_id": 250 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='lte'/>
 
 ### `like()`
+
+<CustomCodeBlock
+  header="Shows how to use like( ) with update( )"
+  js={patchLikeJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Mordor", "country_id": 554 },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='like'/>
 
 ### `ilike()`
+
+<CustomCodeBlock
+  header="Shows how to use ilike( ) with update( )"
+  js={patchIlikeJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Mordor", "country_id": 554 },
+    { "name": "Mordor", "country_id": 556 },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='ilike'/>
 
 ### `is()`
+
+<CustomCodeBlock
+  header="Shows how to use is( ) with update( )"
+  js={patchIsJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='is'/>
 
 ### `in()`
+
+<CustomCodeBlock
+  header="Shows how to use in( ) with update( )"
+  js={patchInJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Mordor", "country_id": 76 },
+    { "name": "Mordor", "country_id": 840 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='in'/>
 
 ### `not()`
+
+<CustomCodeBlock
+  header="Shows how to use not( ) with update( )"
+  js={patchNotJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Mordor", "country_id": 76 },
+    { "name": "Mordor", "country_id": 156 },
+    { "name": "Mordor", "country_id": 250 },
+    { "name": "Mordor", "country_id": 554 },
+    { "name": "Mordor", "country_id": 556 },
+    { "name": "Mordor", "country_id": 840 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='not'/>
 
 ## Responses
 
 #### 200 OK
-Successful
+Successful request
 
 <CommonResponses />

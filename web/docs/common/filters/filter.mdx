@@ -9,18 +9,6 @@ supabase
 
 This allows you to apply various filters on your query. Filters can also be chained together.
 
-<Collapsable title="Toggle Example">
-
-<!-- prettier-ignore -->
-```js {3-5}
-supabase
-  .from('countries')
-  .filter('name', 'in', ['China', 'France'])
-  .filter('status', 'eq', 'ACTIVE')
-```
-
-</Collapsable>
-
 #### `columnName: string`
 Name of the database column.
 

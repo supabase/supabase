@@ -10,7 +10,20 @@ import CommonResponses from '../common/CommonResponses.mdx'
 import CommonFilters from '../common/CommonFilters'
 import FromFunction from '../common/FromFunction.mdx'
 import CustomCodeBlock from '../../src/components/CustomCodeBlock'
-import { deleteRecordJs } from './getExamples'
+import { deleteRecordJs,
+         deleteFilterJs,
+         deleteMatchJs,
+         deleteEqJs,
+         deleteGtJs,
+         deleteLtJs,
+         deleteGteJs,
+         deleteLteJs,
+         deleteLikeJs,
+         deleteIlikeJs,
+         deleteIsJs,
+         deleteInJs,
+         deleteNotJs
+     } from './examples/delete'
 
 
 <DummyData />
@@ -56,48 +69,227 @@ const options = {
 
 ----
 
-
 ## Filtering
 
 ### `filter()`
+
+<CustomCodeBlock
+  header="Shows how to use filter( ) with delete( )"
+  js={deleteFilterJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='filter'/>
 
 ### `match()`
+
+<CustomCodeBlock
+  header="Shows how to use match( ) with delete( )"
+  js={deleteMatchJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='match'/>
 
 ### `eq()`
+
+<CustomCodeBlock
+  header="Shows how to use eq( ) with delete( )"
+  js={deleteEqJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='eq'/>
 
 ### `gt()`
+
+<CustomCodeBlock
+  header="Shows how to use gt( ) with delete( )"
+  js={deleteGtJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='gt'/>
 
 ### `lt()`
+
+<CustomCodeBlock
+  header="Shows how to use lt( ) with delete( )"
+  js={deleteLtJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='lt'/>
 
 ### `gte()`
+
+<CustomCodeBlock
+  header="Shows how to use gte( ) with delete( )"
+  js={deleteGteJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='gte'/>
 
 ### `lte()`
+
+<CustomCodeBlock
+  header="Shows how to use lte( ) with delete( )"
+  js={deleteLteJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='lte'/>
 
 ### `like()`
+
+<CustomCodeBlock
+  header="Shows how to use like( ) with delete( )"
+  js={deleteLikeJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='like'/>
 
 ### `ilike()`
+
+<CustomCodeBlock
+  header="Shows how to use ilike( ) with delete( )"
+  js={deleteIlikeJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='ilike'/>
 
 ### `is()`
+
+<CustomCodeBlock
+  header="Shows how to use is( ) with delete( )"
+  js={deleteIsJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='is'/>
 
 ### `in()`
+
+<CustomCodeBlock
+  header="Shows how to use in( ) with delete( )"
+  js={deleteInJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='in'/>
 
 ### `not()`
+
+<CustomCodeBlock
+  header="Shows how to use not( ) with delete( )"
+  js={deleteNotJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='not'/>
 
 ## Responses
 
 #### 200 OK
-Successful
+Successful request
 
 <CommonResponses />
