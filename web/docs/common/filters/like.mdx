@@ -9,18 +9,6 @@ supabase
 
 Finds all rows whose value in the stated columnName matches the supplied pattern. Equivalent of `filter(columnName, 'like', stringPattern)`.
 
-<Collapsable title="Toggle Example">
-
-<!-- prettier-ignore -->
-```js {3}
-supabase
-  .from('countries')
-  .like('name', '%United%')
-```
-
-</Collapsable>
-
-
 #### `columnName: string`
 Name of database column.
 
