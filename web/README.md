@@ -1,3 +1,0 @@
-# Supabase
-
-Supabase Web
