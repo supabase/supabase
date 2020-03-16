@@ -38,7 +38,7 @@
     "babel-plugin-add-module-exports": "^1.0.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
-    "babel-preset-minify": "^0.3.0",
+    "babel-preset-minify": "^0.5.1",
     "chai": "^4.1.2",
     "cross-env": "^5.2.1",
     "jest-websocket-mock": "^2.0.1",
