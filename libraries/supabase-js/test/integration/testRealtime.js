@@ -117,12 +117,11 @@ describe('test various subscriptions', function() {
         .from('messages')
         .insert([{ message: 'delete test', user_id: 1, channel_id: 1 }])
         .then(function(response) {
-          console.log(response)
           supabase
             .from('messages')
             .filter('id', 'eq', response.body[0].id)
             .delete()
-            .then(console.log)
+            .then()
             .catch(console.error)
         })
         .catch(console.error)
