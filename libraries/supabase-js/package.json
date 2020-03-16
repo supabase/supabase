@@ -43,7 +43,7 @@
     "cross-env": "^5.2.1",
     "jest-websocket-mock": "^2.0.1",
     "mocha": "^7.1.0",
-    "nyc": "^14.1.1",
+    "nyc": "^15.0.0",
     "rimraf": "^3.0.2"
   },
   "dependencies": {
