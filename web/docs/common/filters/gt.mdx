@@ -8,17 +8,6 @@ supabase
 ```
 Finds all rows whose value on the stated columnName is greater than the specified filterValue. Eqiuvalent of `filter(columnName, 'gt', criteria)`.
 
-<Collapsable title="Toggle Example">
-
-<!-- prettier-ignore -->
-```js {3}
-supabase
-  .from('countries')
-  .gt('id', 20)
-```
-
-</Collapsable>
-
 #### `columnName: string`
 Name of database column.
 

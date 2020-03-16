@@ -12,7 +12,26 @@ import Collapsable from '../../src/components/Collapsable'
 import FromFunction from '../common/FromFunction.mdx'
 import DummyData from '../common/DummyData.mdx'
 import CustomCodeBlock from '../../src/components/CustomCodeBlock'
-import { getSimpleJs, getColumnsJs, getForeignJs, getForeignMultipleJs } from './getExamples'
+import { getSimpleJs,
+         getColumnsJs, 
+         getForeignJs, 
+         getForeignMultipleJs, 
+         getOrderJs,
+         getRangeJs,
+         getSingleJs,
+         getFilterJs,
+         getMatchJs,
+         getEqJs,
+         getGtJs,
+         getLtJs,
+         getGteJs,
+         getLteJs,
+         getLikeJs,
+         getIlikeJs,
+         getIsJs,
+         getInJs,
+         getNotJs
+      } from './examples/get'
 
 
 <DummyData />
@@ -188,6 +207,27 @@ supabase
 
 ### `order()`
 
+<CustomCodeBlock
+  header="Shows how to use order( ) with select( )"
+  js={getOrderJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "San Francisco", "country_id": 840 },
+    { "name": "Lagos", "country_id": 556 },
+    { "name": "Auckland", "country_id": 554 },
+    { "name": "Paris", "country_id": 250 },
+    { "name": "Beijing", "country_id": 156 },
+    { "name": "Rio de Janeiro", "country_id": 76 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <!-- prettier-ignore -->
 ```js {3}
 supabase
@@ -210,6 +250,25 @@ Specifies whether null values will be displayed first.
 
 ### `range()`
 
+<CustomCodeBlock
+  header="Shows how to use range( ) with select( )"
+  js={getRangeJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Rio de Janeiro", "country_id": 76 },
+    { "name": "Beijing", "country_id": 156 },
+    { "name": "Paris", "country_id": 250 },
+    { "name": "Auckland", "country_id": 554 },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <!-- prettier-ignore -->
 ```js {3}
 supabase
@@ -229,6 +288,22 @@ Index or position of the end of the specified range. If not stated, all remainin
 
 ### `single()`
 
+<CustomCodeBlock
+  header="Shows how to use single( ) with select( )"
+  js={getSingleJs}
+  jsHighlight="{10}"
+  response={`{
+  "body": { 
+    "name": "San Francisco", "country_id": 840 
+  },
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <!-- prettier-ignore -->
 ```js {3}
 supabase
@@ -244,39 +319,257 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 ## Filtering
 
 ### `filter()`
+
+<CustomCodeBlock
+  header="Shows how to use filter( ) with select( )"
+  js={getFilterJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Paris", "country_id": 250 },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='filter'/>
 
 ### `match()`
+
+<CustomCodeBlock
+  header="Shows how to use match( ) with select( )"
+  js={getMatchJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Beijing", "country_id": 156 },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='match'/>
 
 ### `eq()`
+
+<CustomCodeBlock
+  header="Shows how to use eq( ) with select( )"
+  js={getEqJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "San Francisco", "country_id": 840 },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='eq'/>
 
 ### `gt()`
+
+<CustomCodeBlock
+  header="Shows how to use gt( ) with select( )"
+  js={getGtJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Auckland", "country_id": 554 },
+    { "name": "Lagos", "country_id": 556 },
+    { "name": "San Francisco", "country_id": 840 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='gt'/>
 
 ### `lt()`
+
+<CustomCodeBlock
+  header="Shows how to use lt( ) with select( )"
+  js={getLtJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Rio de Janeiro", "country_id": 76 },
+    { "name": "Beijing", "country_id": 156 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='lt'/>
 
 ### `gte()`
+
+<CustomCodeBlock
+  header="Shows how to use gte( ) with select( )"
+  js={getGteJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Paris", "country_id": 250 },
+    { "name": "Auckland", "country_id": 554 },
+    { "name": "Lagos", "country_id": 556 },
+    { "name": "San Francisco", "country_id": 840 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='gte'/>
 
 ### `lte()`
+
+<CustomCodeBlock
+  header="Shows how to use lte( ) with select( )"
+  js={getLteJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Rio de Janeiro", "country_id": 76 },
+    { "name": "Beijing", "country_id": 156 },
+    { "name": "Paris", "country_id": 250 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='lte'/>
 
 ### `like()`
+
+<CustomCodeBlock
+  header="Shows how to use like( ) with select( )"
+  js={getLikeJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Auckland", "country_id": 554 },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='like'/>
 
 ### `ilike()`
+
+<CustomCodeBlock
+  header="Shows how to use ilike( ) with select( )"
+  js={getIlikeJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Auckland", "country_id": 554 },
+    { "name": "Lagos", "country_id": 556 },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='ilike'/>
 
 ### `is()`
+
+<CustomCodeBlock
+  header="Shows how to use is( ) with select( )"
+  js={getIsJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='is'/>
 
 ### `in()`
+
+<CustomCodeBlock
+  header="Shows how to use in( ) with select( )"
+  js={getInJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Rio de Janeiro", "country_id": 76 },
+    { "name": "San Francisco", "country_id": 840 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='in'/>
 
 ### `not()`
+
+<CustomCodeBlock
+  header="Shows how to use not( ) with select( )"
+  js={getNotJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Rio de Janeiro", "country_id": 76 },
+    { "name": "Beijing", "country_id": 156 },
+    { "name": "Paris", "country_id": 250 },
+    { "name": "Auckland", "country_id": 554 },
+    { "name": "Lagos", "country_id": 556 },
+    { "name": "San Francisco", "country_id": 840 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
 <CommonFilters filter='not'/>
 
 ## Responses

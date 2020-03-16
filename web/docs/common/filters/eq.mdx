@@ -9,17 +9,6 @@ supabase
 
 Finds all rows whose value on the stated columnName exactly matches the specified filterValue. Equivalent of `filter(columName, 'eq', criteria)`.
 
-<Collapsable title="Toggle Example">
-
-<!-- prettier-ignore -->
-```js {3}
-supabase
-  .from('countries')
-  .eq('name', 'New Zealand')
-```
-
-</Collapsable>
-
 #### `columnName: string`
 Name of the database column.
 
