@@ -1,0 +1,107 @@
+
+// @import '~tailwindcss/base';
+// @import '~tailwindcss/components';
+// @import '~tailwindcss/utilities';
+
+.Code {
+  width: 100%;
+  .prism-code {
+    @apply bg-gray-900;
+    white-space: pre !important;
+    font-size: 0.8rem;
+    overflow: auto !important;
+  }
+
+  .token.keyword.module,
+  .token.function {
+    font-style: normal !important;
+    color: #dcdcaa !important;
+  }
+  .token.plain,
+  .token.parameter,
+  .token.doc-comment.parameter,
+  .token.doc-comment.optional-parameter,
+  .token.doc-comment.parameter.punctuation,
+  .token.doc-comment.optional-parameter.punctuation {
+    font-style: normal !important;
+    color: #9cdcfe !important;
+  }
+  .token.keyword,
+  .token.doc-comment.keyword {
+    font-style: normal !important;
+    color: #569cd6 !important;
+  }
+  .token.string {
+    font-style: normal !important;
+    color: #ce9178 !important;
+  }
+  .token.console {
+    font-style: normal !important;
+    color: #49c1ad !important;
+  }
+  .token.comment {
+    font-style: normal !important;
+    color: #6a9955 !important;
+  }
+  .token.number {
+    color: #b5cea8 !important;
+  }
+  .token.boolean,
+  .token.doc-comment.class-name {
+    @apply text-green-500;
+  }
+
+  .codeBlock {
+    @apply bg-gray-600;
+    margin-bottom: 0;
+    overflow: hidden;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+  }
+
+  &.codeBlockWrapper {
+    position: relative;
+  }
+
+  &.codeBlockWrapper:hover .copyButton {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .copyButton {
+    @apply rounded text-xs;
+    right: 5px;
+    top: 5px;
+    background: rgb(1, 22, 39);
+    border: 1px solid rgb(214, 222, 235);
+    color: rgb(214, 222, 235);
+    cursor: pointer;
+    line-height: 12px;
+    opacity: 0;
+    outline: none;
+    padding: 4px 8px;
+    position: absolute;
+    visibility: hidden;
+    transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out, bottom 200ms ease-in-out;
+  }
+}
+
+
+.CustomCodeBlock {
+  width: 100%;
+  .code-with-header pre {
+    border-radius: 0 0 4px 4px;
+  }
+  .code-with-response pre {
+    border-radius: 0;
+  }
+  .code-header {
+    @apply bg-gray-600;
+    color: #ccc;
+    padding: 5px 15px;
+    border-radius: 4px 4px 0 0;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-bottom: 1px solid #444;
+  }
+}
