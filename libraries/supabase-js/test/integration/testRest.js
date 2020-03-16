@@ -21,7 +21,10 @@ describe('test reading from the rest interface', () => {
   const supabase = createClient('http://localhost:8000', 'examplekey')
 
   it('from() and select()', async () => {
-    const response = await supabase.from('users').select()
+    const response = await supabase
+      .from('users')
+      .select()
+      .order('id', false, false)
     assert(response.body[3].status === 'ONLINE', 'should return 4 records with all columns')
   })
 
@@ -38,8 +41,9 @@ describe('test reading from the rest interface', () => {
       .from('users')
       .select('*')
       .range(0, 3)
-    assert(response.body[3].id === 4, 'last item should be id 4')
-    assert(response.body[0].id === 1, 'first item should be id 1')
+      .order('id', false, false)
+    assert(response.body[3].id === 1, 'last item should be id 1')
+    assert(response.body[0].id === 4, 'first item should be id 4')
   })
 
   it('single()', async () => {
@@ -150,7 +154,6 @@ describe('test reading from the rest interface', () => {
     assert(response.body.length === 3, 'should be all except id 3')
   })
 })
-
 
 describe('test rpc()', () => {
   const supabase = createClient('http://localhost:8000', 'examplekey')
