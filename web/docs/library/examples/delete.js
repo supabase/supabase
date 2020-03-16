@@ -26,7 +26,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
 
-const deleteCIty = async () => {
+const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
@@ -44,7 +44,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
 
-const deleteCIty = async () => {
+const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
@@ -62,7 +62,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
 
-const deleteCIty = async () => {
+const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
@@ -80,7 +80,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
 
-const deleteCIty = async () => {
+const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
@@ -98,7 +98,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
 
-const deleteCIty = async () => {
+const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
@@ -116,7 +116,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
 
-const deleteCIty = async () => {
+const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
@@ -134,7 +134,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
 
-const deleteCIty = async () => {
+const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
@@ -152,7 +152,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
 
-const deleteCIty = async () => {
+const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
@@ -170,7 +170,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
 
-const deleteCIty = async () => {
+const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
@@ -188,7 +188,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
 
-const deleteCIty = async () => {
+const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
@@ -206,7 +206,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
 
-const deleteCIty = async () => {
+const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
@@ -224,7 +224,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
 
-const deleteCIty = async () => {
+const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
