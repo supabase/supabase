@@ -40,7 +40,7 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-minify": "^0.5.1",
     "chai": "^4.1.2",
-    "cross-env": "^5.2.1",
+    "cross-env": "^7.0.2",
     "jest-websocket-mock": "^2.0.1",
     "mocha": "^7.1.0",
     "nyc": "^15.0.0",
