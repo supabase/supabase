@@ -1,6 +1,6 @@
 {
   "name": "@supabase/code-snippets",
-  "version": "0.0.42",
+  "version": "0.0.48",
   "description": "Code snippets used in Supabase Documentation",
   "main": "./index.js",
   "scripts": {

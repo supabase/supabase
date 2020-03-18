@@ -1,17 +1,21 @@
-
 import CustomCodeBlock from '../components/CustomCodeBlock'
+import FunctionParam from './blocks/FunctionParam'
 
 ### Single call
 
 <CustomCodeBlock
   header="Call a stored procedure in your database."
   js={`/**
- * ${props.rpcCamelCase} ${props.rpcParams.map(x => `* @param {${x.format}} ${x.name}`).join('\n ')}
+ * ${props.rpcCamelCase} 
+${props.rpcParams.map(x => ` * @param {${x.format}} ${x.name}`).join('\n')}
  */
 const ${props.rpcCamelCase} = async ({ ${props.rpcParams.map(x => x.name).join(', ')} }) => {
   try{
-    let { body } = await supabase
-        .rpc('${props.rpcName}', { ${props.rpcParams.map(x => x.name).join(', ')} })
+    let { body, status } = await supabase
+        .rpc('${props.rpcName}', { 
+          ${props.rpcParams.map(x => x.name).join(`,
+          `)}
+        })
     return body
   } catch (error) {
     console.log('Error: ', error)
@@ -21,16 +25,6 @@ const ${props.rpcCamelCase} = async ({ ${props.rpcParams.map(x => x.name).join('
   response={props.response || null}
 />
 
-
 <div>
-{props.rpcParams.map(x => `
-#### \`${x.name}: ${x.format}\`
-No description provided
-`).join('\n\n')}
+{props.rpcParams.map(x => <FunctionParam key={x.name} name={x.name} format={x.format} required={x.required} description={x.description} />)}
 </div>
-
-#### `columnName: string`
-Name of chosen column to base the order on.
-
-#### `sortAscending: boolean? | Default is false`
-Specifies whether the order will be ascending or descending.
