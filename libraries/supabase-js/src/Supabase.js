@@ -147,7 +147,7 @@ class Supabase {
    */
 
   initClient() {
-    let rest = new PostgrestClient(this.restUrl, { queryParams: { apikey: this.apikey } })
+    let rest = new PostgrestClient(this.restUrl, { headers: { apikey: this.apikey } })
     let api = rest.from(this.tableName)
 
     // go through queryFilters
