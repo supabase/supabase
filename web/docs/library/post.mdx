@@ -10,7 +10,7 @@ import Collapsable from '../../src/components/Collapsable'
 import CommonResponses from '../common/CommonResponses.mdx'
 import FromFunction from '../common/FromFunction.mdx'
 import CustomCodeBlock from '../../src/components/CustomCodeBlock'
-import { postSingleJs, postBulkJs } from './examples/post'
+import { postSingleJs, postBulkJs, postUpsertJs } from './examples/post'
 
 
 <DummyData />
@@ -35,13 +35,31 @@ import { postSingleJs, postBulkJs } from './examples/post'
 ### Bulk create
 
 <CustomCodeBlock
-  header="Creates a multiple new cities."
+  header="Creates multiple new cities."
   js={postBulkJs}
   jsHighlight="{7-12}"
   response={`{
   "body": [
     { "name": "The Shire", "country_id": 554},
     { "name": "Rohan", "country_id": 555}
+  ],
+  "status": 201,
+  "statusCode": 201,
+  "statusText": "Created"
+}`}
+/>
+
+### Upsert
+
+<CustomCodeBlock
+  header="Creates multiple new cities and updates existing ones."
+  js={postUpsertJs}
+  jsHighlight="{7-15}"
+  response={`{
+  "body": [
+    { "name": "The Shire", "country_id": 554},
+    { "name": "Rohan", "country_id": 555},
+    { "name": "City by the Bay", "country_id":840}
   ],
   "status": 201,
   "statusCode": 201,
@@ -65,7 +83,15 @@ supabase
 A single `object` or an array of rows of type `object` which contain information to be saved into the selected table.
  
 #### `options: object?`  
-@todo
+
+```js
+const options = {
+  upsert: false // Set to true to allow upserting.
+}
+```
+For `upsert`, if set to `true`, primary key columns would need to be included in the `data` parameter in order for an update to properly happen. 
+Also, primary keys used must be natural, not surrogate.
+There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
 
 ---
 
