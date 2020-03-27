@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@supabase/doctest-js": "^0.1.0",
-    "@supabase/postgrest-js": "^0.10.0",
+    "@supabase/postgrest-js": "^0.11.0",
     "@supabase/realtime-js": "^0.1.7",
     "superagent": "^5.2.1"
   }
