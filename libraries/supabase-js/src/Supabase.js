@@ -47,7 +47,7 @@ class Supabase {
       this.tableName == '*'
         ? 'realtime:*'
         : `realtime:${this.schema}:${this.tableName}${filterString}`
-    this.socket = new Socket(socketUrl, { params: { apikey: this.apikey } })
+    this.socket = new Socket(socketUrl, { headers: { apikey: this.apikey } })
     this.channel = this.socket.channel(channel)
 
     this.socket.onOpen(() => {
@@ -147,7 +147,7 @@ class Supabase {
    */
 
   initClient() {
-    let rest = new PostgrestClient(this.restUrl, { queryParams: { apikey: this.apikey } })
+    let rest = new PostgrestClient(this.restUrl, { headers: { apikey: this.apikey } })
     let api = rest.from(this.tableName)
 
     // go through queryFilters

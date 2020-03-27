@@ -30,7 +30,7 @@ const updateCityName = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .filter({'name', 'eq', 'Paris'})
+      .filter('name', 'eq', 'Paris')
       .update({ name: 'Mordor' })
     return cities
   } catch (error) {
