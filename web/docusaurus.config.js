@@ -45,10 +45,6 @@ module.exports = {
           position: 'left',
           items: [
             {
-              label: 'Intro',
-              href: '/docs/about',
-            },
-            {
               label: 'Realtime',
               href: '/docs/library/subscribe',
             },
@@ -63,10 +59,6 @@ module.exports = {
             {
               label: 'Updating',
               href: '/docs/library/patch',
-            },
-            {
-              label: 'Deleting',
-              href: '/docs/library/delete',
             },
             {
               label: 'Stored Procedures',
