@@ -19,7 +19,7 @@ const updateCityName = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const patchFilterJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -37,7 +37,7 @@ const updateCityName = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const patchMatchJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -55,7 +55,7 @@ const updateCityName = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const patchEqJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -73,7 +73,7 @@ const updateCityName = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const patchGtJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -91,7 +91,7 @@ const updateCityName = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const patchLtJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -109,7 +109,7 @@ const updateCityName = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const patchGteJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -127,7 +127,7 @@ const updateCityName = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const patchLteJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -145,7 +145,7 @@ const updateCityName = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const patchLikeJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -163,7 +163,7 @@ const updateCityName = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const patchIlikeJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -181,7 +181,7 @@ const updateCityName = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const patchIsJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -199,7 +199,7 @@ const updateCityName = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const patchInJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -217,7 +217,7 @@ const updateCityName = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const patchNotJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -235,4 +235,4 @@ const updateCityName = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()

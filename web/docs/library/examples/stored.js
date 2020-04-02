@@ -16,7 +16,7 @@ const echoCity = async () => {
         console.log('Error: ', error)
     }
 }
-`
+`.trim()
 
 export const storedBulkJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -35,7 +35,7 @@ const echoCities = async () => {
         console.log('Error: ', error)
     }
 }
-`
+`.trim()
 
 export const storedReadingJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -51,7 +51,7 @@ const echoCities = async () => {
         console.log('Error: ', error)
     }
 }
-`
+`.trim()
 export const storedFilterJs = `
 import { createClient } from '@supabase/supabase-js'
 
@@ -67,7 +67,7 @@ const echoCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const storedMatchJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -84,7 +84,7 @@ const echoCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const storedEqJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -101,7 +101,7 @@ const echoCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const storedGtJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -118,7 +118,7 @@ const echoCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const storedLtJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -135,7 +135,7 @@ const echoCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const storedGteJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -152,7 +152,7 @@ const echoCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const storedLteJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -169,7 +169,7 @@ const echoCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const storedLikeJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -186,7 +186,7 @@ const echoCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const storedIlikeJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -203,7 +203,7 @@ const echoCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const storedIsJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -220,7 +220,7 @@ const echoCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const storedInJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -237,7 +237,7 @@ const echoCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const storedNotJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -254,4 +254,4 @@ const echoCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()

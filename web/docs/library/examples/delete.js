@@ -235,4 +235,4 @@ const deleteCity = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()

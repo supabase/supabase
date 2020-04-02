@@ -15,7 +15,7 @@ const mySubscription = supabase
     console.log('Change received!', payload)
   })
   .subscribe()
-`
+`.trim()
 
 export const subscribeTableJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -30,7 +30,7 @@ const mySubscription = supabase
     console.log('Change received!', payload)
   })
   .subscribe()
-`
+`.trim()
 
 export const subscribeInsertsJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -45,7 +45,7 @@ const mySubscription = supabase
     console.log('Change received!', payload)
   })
   .subscribe()
-`
+`.trim()
 
 export const subscribeUpdatesJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -60,7 +60,7 @@ const mySubscription = supabase
     console.log('Change received!', payload)
   })
   .subscribe()
-`
+`.trim()
 
 export const subscribeDeletesJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -75,7 +75,7 @@ const mySubscription = supabase
     console.log('Change received!', payload)
   })
   .subscribe()
-`
+`.trim()
 
 export const subscribeMultipleJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -89,7 +89,7 @@ const mySubscription = supabase
   .on('INSERT', handleRecordInserted)
   .on('DELETE', handleRecordDeleted)
   .subscribe()
-`
+`.trim()
 
 export const subscribeUnsubscribeJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -107,7 +107,7 @@ const mySubscription = supabase
 
 // Unsubscribe from changes
 mySubscription.unsubscribe()
-`
+`.trim()
 
 export const subscribeRemoveJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -125,4 +125,4 @@ const mySubscription = supabase
 
 // Disconnect mySubscription
 supabase.removeSubscription(mySubscription)
-`
+`.trim()
