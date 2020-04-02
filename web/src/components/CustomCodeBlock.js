@@ -1,7 +1,5 @@
-import 'react-perfect-scrollbar/dist/css/styles.css'
 import React, { useState } from 'react'
 import CodeBlock from '@theme/CodeBlock'
-// import PerfectScrollbar from 'react-perfect-scrollbar'
 
 export default function CustomCodeBlock({
   header,

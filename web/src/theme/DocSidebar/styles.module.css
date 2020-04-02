@@ -1,18 +1,61 @@
 /**
- * Copyright (c) 2017-present, Facebook, Inc.
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
 
- @media (min-width: 997px) {
+
+@media (min-width: 997px) {
   .sidebar {
-    height: calc(100vh - var(--ifm-navbar-height));
+    height: 100vh;
     overflow-y: auto;
-    padding: 0.5rem;
     position: sticky;
     top: var(--ifm-navbar-height);
+    padding-top: var(--ifm-navbar-height);
   }
+
+  .sidebar::-webkit-scrollbar {
+    width: 7px;
+  }
+
+  .sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  .sidebar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+
+  .sidebar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  .sidebarLogo {
+    display: flex !important;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    margin: 0 var(--ifm-navbar-padding-horizontal);
+    height: var(--ifm-navbar-height);
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  .sidebarLogo img {
+    margin-right: 0.5rem;
+    height: 2rem;
+  }
+
+  .menu {
+    padding: 0.5rem;
+  }
+}
+
+.sidebarLogo {
+  display: none;
 }
 
 .sidebarMenuIcon {
@@ -20,7 +63,9 @@
 }
 
 .sidebarMenuCloseIcon {
-  display: inline-block;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   height: 24px;
   font-size: 1.5rem;
   font-weight: var(--ifm-font-weight-bold);

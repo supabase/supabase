@@ -5,40 +5,46 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, {useState} from 'react';
-import classnames from 'classnames';
+import React, { useState, useCallback } from 'react'
+import classnames from 'classnames'
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
+import useLockBodyScroll from '@theme/hooks/useLockBodyScroll'
+import useLogo from '@theme/hooks/useLogo'
+import Link from '@docusaurus/Link'
+import isInternalUrl from '@docusaurus/isInternalUrl'
 
-import Link from '@docusaurus/Link';
+import styles from './styles.module.css'
 
-import styles from './styles.module.css';
-   
-const MOBILE_TOGGLE_SIZE = 24;
+const MOBILE_TOGGLE_SIZE = 24
 
-function DocSidebarItem({item, level, onItemClick, collapsible}) {
-  const {items, href, label, type} = item;
-  const [collapsed, setCollapsed] = useState(item.collapsed);
-  const [prevCollapsedProp, setPreviousCollapsedProp] = useState(null);
+function DocSidebarItem({ item, level, onItemClick, collapsible }) {
+  const { items, href, label, type } = item
+  const [collapsed, setCollapsed] = useState(item.collapsed)
+  const [prevCollapsedProp, setPreviousCollapsedProp] = useState(null)
 
   // If the collapsing state from props changed, probably a navigation event
   // occurred. Overwrite the component's collapsed state with the props'
   // collapsed value.
   if (item.collapsed !== prevCollapsedProp) {
-    setPreviousCollapsedProp(item.collapsed);
-    setCollapsed(item.collapsed);
+    setPreviousCollapsedProp(item.collapsed)
+    setCollapsed(item.collapsed)
   }
+
+  const handleItemClick = useCallback(e => {
+    e.preventDefault()
+    setCollapsed(state => !state)
+  })
 
   switch (type) {
     case 'category':
       if (items.length == 0) {
-        return false;
+        return false
       }
 
-      if(level == 1) {
+      if (level == 1) {
         return (
           <li className={classnames('menu__list-item')} key={label}>
-            <div className="title">
-              {label}
-            </div>
+            <div className="title">{label}</div>
             <ul className="menu__list">
               {items.map(childItem => (
                 <DocSidebarItem
@@ -51,12 +57,12 @@ function DocSidebarItem({item, level, onItemClick, collapsible}) {
               ))}
             </ul>
           </li>
-        );
+        )
       } else {
-        let categoryHref = '#!';
+        let categoryHref = '#!'
 
-        if(items[0].label == 'hidden') {
-          categoryHref = items[0].href;
+        if (items[0].label == 'hidden') {
+          categoryHref = items[0].href
         }
 
         return (
@@ -64,7 +70,8 @@ function DocSidebarItem({item, level, onItemClick, collapsible}) {
             className={classnames('menu__list-item', {
               'menu__list-item--collapsed': collapsed,
             })}
-            key={label}>
+            key={label}
+          >
             <Link
               activeClassName="menu__link--active"
               className={classnames('menu__link', {
@@ -73,7 +80,8 @@ function DocSidebarItem({item, level, onItemClick, collapsible}) {
               to={categoryHref}
               onClick={
                 collapsible && categoryHref == '#!' ? () => setCollapsed(!collapsed) : undefined
-              }>
+              }
+            >
               {label}
             </Link>
             <ul className="menu__list">
@@ -88,50 +96,43 @@ function DocSidebarItem({item, level, onItemClick, collapsible}) {
               ))}
             </ul>
           </li>
-        );
+        )
       }
 
     case 'link':
     default:
-      let eventTypes = [];
-      let processedLabel = label;
-
-      if (label.includes('|')) {
-        let parts = label.split('|', 2);
-        processedLabel = parts[0];
-        eventTypes = JSON.parse(parts[1]);
-      }
-
-      let hidden = processedLabel == 'hidden';
-
       return (
-        <li className={classnames('menu__list-item', (hidden && 'menu__list-item-hidden'))} key={label}>
+        <li className="menu__list-item" key={label}>
           <Link
-            activeClassName="menu__link--active"
             className="menu__link"
             to={href}
-            onClick={onItemClick}>
-            {processedLabel}
-            {eventTypes.length > 0 &&
-              <span className="badges">
-                {eventTypes.includes("log") && <span className="badge badge--secondary" title="This component works with log events.">L</span>}
-                {eventTypes.includes("metric") && <span className="badge badge--secondary" title="This component works with metric events.">M</span>}
-              </span>}
+            {...(isInternalUrl(href)
+              ? {
+                  activeClassName: 'menu__link--active',
+                  exact: true,
+                  onClick: onItemClick,
+                }
+              : {
+                  target: '_blank',
+                  rel: 'noreferrer noopener',
+                })}
+          >
+            {label}
           </Link>
         </li>
-      );
+      )
   }
 }
 
 // Calculate the category collapsing state when a page navigation occurs.
 // We want to automatically expand the categories which contains the current page.
-function mutateSidebarCollapsingState(item, location) {
+function mutateSidebarCollapsingState(item, path) {
   const {items, href, type} = item;
   switch (type) {
     case 'category': {
       const anyChildItemsActive =
         items
-          .map(childItem => mutateSidebarCollapsingState(childItem, location))
+          .map(childItem => mutateSidebarCollapsingState(childItem, path))
           .filter(val => val).length > 0;
       // eslint-disable-next-line no-param-reassign
       item.collapsed = !anyChildItemsActive;
@@ -140,36 +141,34 @@ function mutateSidebarCollapsingState(item, location) {
 
     case 'link':
     default:
-      return href === location.pathname.replace(/\/$/, '');
+      return href === path;
   }
 }
 
 function DocSidebar(props) {
-  const [showResponsiveSidebar, setShowResponsiveSidebar] = useState(false);
-
+  const [showResponsiveSidebar, setShowResponsiveSidebar] = useState(false)
   const {
-    docsSidebars,
-    location,
-    sidebar: currentSidebar,
-    sidebarCollapsible,
-  } = props;
+    siteConfig: { themeConfig: { navbar: { title, hideOnScroll = false } = {} } } = {},
+    isClient,
+  } = useDocusaurusContext()
+  const { logoLink, logoLinkProps, logoImageUrl, logoAlt } = useLogo()
+
+  const { docsSidebars, path, sidebar: currentSidebar, sidebarCollapsible } = props
+
+  useLockBodyScroll(showResponsiveSidebar)
 
   if (!currentSidebar) {
-    return null;
+    return null
   }
 
-  const sidebarData = docsSidebars[currentSidebar];
+  const sidebarData = docsSidebars[currentSidebar]
 
   if (!sidebarData) {
-    throw new Error(
-      `Cannot find the sidebar "${currentSidebar}" in the sidebar config!`,
-    );
+    throw new Error(`Cannot find the sidebar "${currentSidebar}" in the sidebar config!`)
   }
 
   if (sidebarCollapsible) {
-    sidebarData.forEach(sidebarItem =>
-      mutateSidebarCollapsingState(sidebarItem, location),
-    );
+    sidebarData.forEach(sidebarItem => mutateSidebarCollapsingState(sidebarItem, path))
   }
 
   return (
@@ -177,20 +176,18 @@ function DocSidebar(props) {
       <div
         className={classnames('menu', 'menu--responsive', {
           'menu--show': showResponsiveSidebar,
-        })}>
+        })}
+      >
         <button
           aria-label={showResponsiveSidebar ? 'Close Menu' : 'Open Menu'}
           className="button button--secondary button--sm menu__button"
           type="button"
           onClick={() => {
-            setShowResponsiveSidebar(!showResponsiveSidebar);
-          }}>
+            setShowResponsiveSidebar(!showResponsiveSidebar)
+          }}
+        >
           {showResponsiveSidebar ? (
-            <span
-              className={classnames(
-                styles.sidebarMenuIcon,
-                styles.sidebarMenuCloseIcon,
-              )}>
+            <span className={classnames(styles.sidebarMenuIcon, styles.sidebarMenuCloseIcon)}>
               &times;
             </span>
           ) : (
@@ -201,7 +198,8 @@ function DocSidebar(props) {
               width={MOBILE_TOGGLE_SIZE}
               viewBox="0 0 32 32"
               role="img"
-              focusable="false">
+              focusable="false"
+            >
               <title>Menu</title>
               <path
                 stroke="currentColor"
@@ -222,16 +220,16 @@ function DocSidebar(props) {
                   item={item}
                   level={1}
                   onItemClick={() => {
-                    setShowResponsiveSidebar(false);
+                    setShowResponsiveSidebar(false)
                   }}
                   collapsible={sidebarCollapsible}
                 />
-              ),
+              )
           )}
         </ul>
       </div>
     </div>
-  );
+  )
 }
 
-export default DocSidebar;
+export default DocSidebar

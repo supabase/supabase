@@ -23,12 +23,12 @@ module.exports = {
     Guides:[
       "guides/examples"
     ],
+    'Self Hosting':[
+      "hosting/hosting-realtime"
+    ],
     Handbook:[
       "handbook/introduction",
       "handbook/contributing"
     ],
-    'Self Hosting':[
-      "hosting/hosting-realtime"
-    ]
   }
 };

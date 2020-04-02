@@ -19,7 +19,7 @@ const getCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const postBulkJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -39,7 +39,7 @@ const createCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
 
 export const postUpsertJs = `
 import { createClient } from '@supabase/supabase-js'
@@ -62,4 +62,4 @@ const createCities = async () => {
     console.log('Error: ', error)
   }
 }
-`
+`.trim()
