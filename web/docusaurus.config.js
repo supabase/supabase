@@ -46,27 +46,27 @@ module.exports = {
           items: [
             {
               label: 'Realtime',
-              href: '/docs/library/subscribe',
+              to: '/docs/library/subscribe',
             },
             {
               label: 'Reading',
-              href: '/docs/library/get',
+              to: '/docs/library/get',
             },
             {
               label: 'Creating',
-              href: '/docs/library/post',
+              to: '/docs/library/post',
             },
             {
               label: 'Updating',
-              href: '/docs/library/patch',
+              to: '/docs/library/patch',
             },
             {
               label: 'Stored Procedures',
-              href: '/docs/library/stored-procedures',
+              to: '/docs/library/stored-procedures',
             },
             {
               label: 'Self Hosting',
-              href: '/docs/hosting/hosting-realtime',
+              to: '/docs/hosting/hosting-realtime',
             },
           ],
         },
