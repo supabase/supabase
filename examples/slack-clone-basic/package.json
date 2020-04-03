@@ -8,14 +8,11 @@
     "start": "next start"
   },
   "dependencies": {
-    "@supabase/realtime-js": "^0.1.6",
-    "@supabase/supabase-js": "^0.1.16",
-    "@zeit/next-sass": "^1.0.0",
-    "next": "latest",
-    "next-compose-plugins": "^2.2.0",
-    "node-sass": "^4.13.1",
+    "@supabase/supabase-js": "^0.1.26",
+    "next": "^9.3.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
+    "sass": "^1.26.2",
     "tailwindcss": "^1.1.4"
   }
 }

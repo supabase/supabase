@@ -1,4 +1,3 @@
-import '~/styles/style.scss'
 import { useRouter } from 'next/router'
 import { useState, useContext } from 'react'
 import UserContext from '../lib/UserContext'

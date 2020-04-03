@@ -21,7 +21,6 @@ const ChannelsPage = props => {
   const { messages, channels } = useStore({ channelId })
 
   useEffect(() => {
-    console.log('messagesEndRef', messagesEndRef)
     messagesEndRef.current.scrollIntoView({ block: 'start', behavior: 'smooth' })
   }, [messages])
 

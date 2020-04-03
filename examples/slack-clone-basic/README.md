@@ -1,7 +1,6 @@
-# Example chat room
+# Basic Slack Clone
 
 Build a simple slack clone using Supabase, Postgres and React hooks.
-
 
 <p align="center">
 <kbd>
@@ -14,6 +13,18 @@ Build a simple slack clone using Supabase, Postgres and React hooks.
 
 ## How to use
 
+**Clone the this folder**
+
+```sh
+# Copy the repo to your machine
+git clone --no-checkout https://github.com/supabase/supabase
+cd supabase
+
+# Checkout this 
+git sparse-checkout init --cone
+git sparse-checkout set examples/slack-clone-basic
+cd examples/slack-clone-basic
+```
 
 **Install dependencies**
 
@@ -21,15 +32,17 @@ Build a simple slack clone using Supabase, Postgres and React hooks.
 npm install 
 ```
 
-**Start Supbase Dev**
+**Start the backend**
 
 ```sh
-docker-compose up -d
+# Open a terminal and run:
+docker-compose up
 ```
 
-**Start the chat room**
+**Start the frontent**
 
 ```sh
+# Open a terminal and run:
 npm run dev
 ```
 
