@@ -9,8 +9,8 @@
     "traction": "node traction.js"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-alpha.49",
-    "@docusaurus/preset-classic": "2.0.0-alpha.49",
+    "@docusaurus/core": "2.0.0-alpha.50",
+    "@docusaurus/preset-classic": "2.0.0-alpha.50",
     "@kiwicopple/prism-react-renderer": "github:kiwicopple/prism-react-renderer",
     "classnames": "^2.2.6",
     "mermaid": "^8.4.8",
