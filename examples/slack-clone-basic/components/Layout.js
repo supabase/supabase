@@ -1,4 +1,3 @@
-import '~/styles/style.scss'
 import Link from 'next/link'
 import { useContext, useEffect } from 'react'
 import UserContext from '~/lib/UserContext'

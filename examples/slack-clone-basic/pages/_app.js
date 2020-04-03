@@ -1,3 +1,4 @@
+import '~/styles/style.scss'
 import React from 'react'
 import App from 'next/app'
 import Router from 'next/router'

@@ -21,7 +21,7 @@ export const useStore = props => {
     // Listen for new messages
     const messageListener = supabase
       .from('messages')
-      .on('*', payload => handleNewMessage(payload.new))
+      .on('INSERT', payload => handleNewMessage(payload.new))
       .subscribe()
     // Listen for changes to our users
     const userListener = supabase
@@ -31,7 +31,7 @@ export const useStore = props => {
     // Listen for new channels
     const channelListener = supabase
       .from('channels')
-      .on('*', payload => handleNewChannel(payload.new))
+      .on('INSERT', payload => handleNewChannel(payload.new))
       .subscribe()
     // Cleanup on unmount
     return () => {
