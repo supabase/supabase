@@ -6,15 +6,15 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DB_HOST: db
+      DB_HOST: postgres
       DB_NAME: postgres
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_PORT: 5432
       DB_SCHEMA: public
     depends_on:
-      - db
-  db:
+      - postgres
+  postgres:
     image: postgres:12
     ports:
       - "5432:5432"
