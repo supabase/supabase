@@ -70,7 +70,8 @@ module.exports = {
             },
           ],
         },
-        { to: 'https://app.supabase.io', label: 'Alpha', position: 'left' },
+        { to: '/blog', label: 'Blog', position: 'left' },
+        { href: 'https://app.supabase.io', label: 'Alpha', position: 'left' },
         // {
         //   href: 'https://github.com/supabase/supabase',
         //   label: 'GitHub',
