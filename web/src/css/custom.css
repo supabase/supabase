@@ -386,6 +386,9 @@ a.card:hover {
   border: 1px solid var(--custom-primary);
   box-shadow: var(--custom-shadow-xl), 0 0 0 1px var(--custom-primary) !important;
 }
+.avatar__intro {
+  padding-left: 15px;
+}
 
 /*
  * Docs
