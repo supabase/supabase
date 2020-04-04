@@ -1,9 +1,7 @@
-import { useRouter } from 'next/router'
 import { useState, useContext } from 'react'
 import UserContext from '../lib/UserContext'
 
-const Home = props => {
-  const router = useRouter()
+const Home = () => {
   const { signIn } = useContext(UserContext)
   const [username, setUsername] = useState('')
 

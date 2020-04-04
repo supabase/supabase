@@ -43,10 +43,12 @@ export const useStore = props => {
 
   // Update when the route changes
   useEffect(() => {
-    fetchMessages(props.channelId, messages => {
-      messages.forEach(x => users.set(x.user_id, x.author))
-      setMessages(messages)
-    })
+    if (props?.channelId > 0) {
+      fetchMessages(props.channelId, messages => {
+        messages.forEach(x => users.set(x.user_id, x.author))
+        setMessages(messages)
+      })
+    }
   }, [props.channelId])
 
   // New message recieved from Postgres
