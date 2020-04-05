@@ -545,8 +545,12 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   cursor: pointer;
 }
 
+div[class^="codeBlockContent"] , div[class*=" codeBlockContent"] {
+  background-color: var(--ifm-code-background);
+}
 .code-with-header .prism-code {
   padding: 0 !important;
+  background-color: var(--ifm-code-background);
 }
 .code-with-header pre {
   border-radius: 0 0 4px 4px;
