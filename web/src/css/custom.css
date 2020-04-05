@@ -545,6 +545,9 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   cursor: pointer;
 }
 
+.code-with-header .prism-code {
+  padding: 0 !important;
+}
 .code-with-header pre {
   border-radius: 0 0 4px 4px;
 }
