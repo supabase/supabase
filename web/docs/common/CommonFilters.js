@@ -10,7 +10,7 @@ import Like from './filters/like.mdx'
 import Ilike from './filters/ilike.mdx'
 import Is from './filters/is.mdx'
 import In from './filters/in.mdx'
-import Not from './filters/not.mdx'
+import Neq from './filters/neq.mdx'
 
 const filters = {
   filter: <Filter />,
@@ -24,7 +24,7 @@ const filters = {
   ilike: <Ilike />,
   is: <Is />,
   in: <In />,
-  not: <Not />,
+  neq: <Neq />,
 }
 
 function CommonFilters(props) {

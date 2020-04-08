@@ -23,7 +23,7 @@ import { patchRecordJs,
          patchIlikeJs,
          patchIsJs,
          patchInJs,
-         patchNotJs
+         patchNeqJs
       } from './examples/patch'
 
 <DummyData />
@@ -130,6 +130,31 @@ const options = {
 <br/>
 
 <CommonFilters filter='eq'/>
+
+### `neq()`
+
+<CustomCodeBlock
+  header="Shows how to use neq( ) with update( )"
+  js={patchNeqJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Mordor", "country_id": 76 },
+    { "name": "Mordor", "country_id": 156 },
+    { "name": "Mordor", "country_id": 250 },
+    { "name": "Mordor", "country_id": 554 },
+    { "name": "Mordor", "country_id": 556 },
+    { "name": "Mordor", "country_id": 840 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
+<CommonFilters filter='neq'/>
 
 ### `gt()`
 
@@ -299,31 +324,6 @@ const options = {
 <br/>
 
 <CommonFilters filter='in'/>
-
-### `not()`
-
-<CustomCodeBlock
-  header="Shows how to use not( ) with update( )"
-  js={patchNotJs}
-  jsHighlight="{9}"
-  response={`{
-  "body": [
-    { "name": "Mordor", "country_id": 76 },
-    { "name": "Mordor", "country_id": 156 },
-    { "name": "Mordor", "country_id": 250 },
-    { "name": "Mordor", "country_id": 554 },
-    { "name": "Mordor", "country_id": 556 },
-    { "name": "Mordor", "country_id": 840 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
-}`}
-/>
-
-<br/>
-
-<CommonFilters filter='not'/>
 
 ## Responses
 

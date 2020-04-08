@@ -239,7 +239,7 @@ const echoCities = async () => {
 }
 `.trim()
 
-export const storedNotJs = `
+export const storedNeqJs = `
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
@@ -248,7 +248,7 @@ const echoCities = async () => {
   try {
     let cities = await supabase
       .rpc('echo_all_cities')
-      .not('name', 'Lagos')
+      .neq('name', 'Lagos')
     return cities
   } catch (error) {
     console.log('Error: ', error)

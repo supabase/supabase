@@ -5,10 +5,10 @@ import Collapsable from '../../../src/components/Collapsable'
 ```js {3} 
 supabase
   .from(tableName)
-  .not(columnName, filterValue)
+  .neq(columnName, filterValue)
 ```
 
-Finds all rows whose value on the stated columnName does not match the specified filterValue. Equivalent of `filter(columnName, 'not', criteria)`.
+Finds all rows whose value on the stated columnName does not match the specified filterValue. Equivalent of `filter(columnName, 'neq', criteria)`.
 
 #### `columnName: string`
 Name of database column.
