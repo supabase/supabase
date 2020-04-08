@@ -10,27 +10,27 @@ We will be fictional "world" database in all of our examples.
 <div className="">
 <strong>Countries</strong>
 
-| id  | name          | iso2 | continent     |
-| --- | ------------- | :--: | ------------- |
-| 76  | Brazil        |  BR  | South America |
-| 156 | China         |  CN  | Asia          |
-| 250 | France        |  FR  | Europe        |
-| 554 | New Zealand   |  NZ  | Oceania       |
-| 566 | Nigeria       |  NG  | Africa        |
-| 840 | United States |  US  | North America |
+| id  | name          | iso2 | population_range_millions | main_exports          |
+| --- | ------------- | :--: | ------------------------- | --------------------- |
+| 76  | Brazil        |  BR  | ( 205, 215 )              | [ beans, minerals ]   |
+| 156 | China         |  CN  | ( 1380, 1390 )            | [ computers, phones ] |
+| 250 | France        |  FR  | ( 60, 70 )                | [ cars, machines ]    |
+| 554 | New Zealand   |  NZ  | ( 4, 6 )                  | [ food, machines ]    |
+| 556 | Nigeria       |  NG  | ( 185, 195 )              | [ oil, beans ]        |
+| 840 | United States |  US  | ( 320, 330 )              | [ oil, cars, food ]   |
 
 </div>
 <div className="">
 <strong>Cities</strong>
 
-| name           | country_id |
-| -------------- | :--------: |
-| Rio de Janeiro |     76     |
-| Beijing        |    156     |
-| Paris          |    250     |
-| Auckland       |    554     |
-| Lagos          |    556     |
-| San Francisco  |    840     |
+| name           | country_id | miscellaneous        |
+| -------------- | :--------: | -------------------- |
+| Rio de Janeiro |     76     | { isCapital: false } |
+| Beijing        |    156     | { isCapital: true }  |
+| Paris          |    250     | { isCapital: true }  |
+| Auckland       |    554     | { isCapital: false } |
+| Lagos          |    556     | { isCapital: false } |
+| San Francisco  |    840     | { isCapital: false } |
 
 </div>
 </div>

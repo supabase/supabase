@@ -1,0 +1,22 @@
+import Collapsable from '../../../src/components/Collapsable'
+
+#### General form
+<!-- prettier-ignore -->
+```js {3}
+supabase
+  .from(tableName)
+  .not(columnName, operator, criteria)
+```
+
+Reverse of `.filter()`. Returns rows that do not meet the criteria specified using the columnName and operator provided.
+
+#### `columnName: string`
+Name of the database column.
+
+#### `operator: string`
+Name of filter operator to be utilised.
+
+#### `criteria: { object | array | string | integer | boolean | null }`
+Value to compare to. Exact data type of criteria would depend on the operator used.
+
+---

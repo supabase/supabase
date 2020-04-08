@@ -531,7 +531,6 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
 }
 
 .DummyData {
-  display: flex;
   overflow-x: auto;
 }
 .DummyData div {

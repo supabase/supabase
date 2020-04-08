@@ -18,8 +18,10 @@ import { getSimpleJs,
          getRangeJs,
          getSingleJs,
          getFilterJs,
+         getNotJs,
          getMatchJs,
          getEqJs,
+         getNeqJs,
          getGtJs,
          getLtJs,
          getGteJs,
@@ -28,7 +30,15 @@ import { getSimpleJs,
          getIlikeJs,
          getIsJs,
          getInJs,
-         getNeqJs
+         getCsJs,
+         getCdJs,
+         getOvaJs,
+         getOvrJs,
+         getSlJs,
+         getSrJs,
+         getNxlJs,
+         getNxrJs,
+         getAdjJs
       } from './examples/get'
 
 
@@ -336,6 +346,30 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 
 <CommonFilters filter='filter'/>
 
+### `not()`
+
+<CustomCodeBlock
+  header="Shows how to use not( ) with select( )"
+  js={getNotJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Rio de Janeiro", "country_id": 76 },
+    { "name": "Beijing", "country_id": 156 },
+    { "name": "Auckland", "country_id": 554 },
+    { "name": "Lagos", "country_id": 556 },
+    { "name": "San Francisco", "country_id": 840 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
+<CommonFilters filter='not'/>
+
 ### `match()`
 
 <CustomCodeBlock
@@ -569,6 +603,199 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <br/>
 
 <CommonFilters filter='in'/>
+
+### `cs()`
+
+<CustomCodeBlock
+  header="Shows how to use cs( ) with select( )"
+  js={getCsJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Nigeria", "id": 556, "main_exports": [ "oil", "beans" ] },
+    { "name": "United States", "id": 840, "main_exports": [ "oil", "cars", "food" ] },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
+<CommonFilters filter='cs'/>
+
+### `cd()`
+
+<CustomCodeBlock
+  header="Shows how to use cd( ) with select( )"
+  js={getCdJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "France", "id": 250, "main_exports": [ "cars", "machines" ] },
+    { "name": "New Zealand", "id": 554, "main_exports": [ "food", "machines" ] },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
+<CommonFilters filter='cd'/>
+
+### `ova()`
+
+<CustomCodeBlock
+  header="Shows how to use ova( ) with select( )"
+  js={getOvaJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Brazil", "id": 76, "main_exports": [ "beans", "minerals" ] },
+    { "name": "China", "id": 156, "main_exports": [ "computers", "phones" ] },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
+<CommonFilters filter='ova'/>
+
+### `ovr()`
+
+<CustomCodeBlock
+  header="Shows how to use ovr( ) with select( )"
+  js={getOvrJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Brazil", "id": 76, "population_range_millions": [ 205, 215 ] },
+    { "name": "Nigeria", "id": 556, "population_range_millions": [ 185, 195 ] },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
+<CommonFilters filter='ovr'/>
+
+### `sl()`
+
+<CustomCodeBlock
+  header="Shows how to use sl( ) with select( )"
+  js={getSlJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "France", "id": 250, "population_range_millions": [ 60, 70 ] },
+    { "name": "New Zealand", "id": 554, "population_range_millions": [ 4, 6 ] },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
+<CommonFilters filter='sl'/>
+
+### `sr()`
+
+<CustomCodeBlock
+  header="Shows how to use sr( ) with select( )"
+  js={getSrJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "China", "id": 156, "population_range_millions": [ 1380, 1390 ] },
+    { "name": "United States", "id": 840, "population_range_millions": [ 320, 330 ] },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
+<CommonFilters filter='sr'/>
+
+### `nxl()`
+
+<CustomCodeBlock
+  header="Shows how to use nxl( ) with select( )"
+  js={getNxlJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Brazil", "id": 76, "population_range_millions": [ 205, 215 ] },
+    { "name": "China", "id": 156, "population_range_millions": [ 1380, 1390 ] },
+    { "name": "Nigeria", "id": 556, "population_range_millions": [ 185, 195 ] },
+    { "name": "United States", "id": 840, "population_range_millions": [ 320, 330 ] },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
+<CommonFilters filter='nxl'/>
+
+### `nxr()`
+
+<CustomCodeBlock
+  header="Shows how to use nxr( ) with select( )"
+  js={getNxrJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Brazil", "id": 76, "population_range_millions": [ 205, 215 ] },
+    { "name": "France", "id": 250, "population_range_millions": [ 60, 70 ] },
+    { "name": "New Zealand", "id": 554, "population_range_millions": [ 4, 6 ] },
+    { "name": "Nigeria", "id": 556, "population_range_millions": [ 185, 195 ] },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
+<CommonFilters filter='nxr'/>
+
+### `adj()`
+
+<CustomCodeBlock
+  header="Shows how to use adj( ) with select( )"
+  js={getAdjJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "France", "id": 250, "population_range_millions": [ 60, 70 ] },
+    { "name": "Nigeria", "id": 556, "population_range_millions": [ 185, 195 ] },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
+<CommonFilters filter='adj'/>
 
 ## Responses
 
