@@ -305,7 +305,7 @@ const getCountries = async () => {
     let countries = await supabase
       .from('countries')
       .sl('population_range_millions', [150, 250])
-      .select('name', 'id', 'main_exports')
+      .select('name', 'id', 'population_range_millions')
     return countries
   ${errorJs}
 `.trim()
@@ -317,7 +317,7 @@ const getCountries = async () => {
     let countries = await supabase
       .from('countries')
       .sr('population_range_millions', [150, 250])
-      .select('name', 'id', 'main_exports')
+      .select('name', 'id', 'population_range_millions')
     return countries
   ${errorJs}
 `.trim()
@@ -329,7 +329,7 @@ const getCountries = async () => {
     let countries = await supabase
       .from('countries')
       .nxl('population_range_millions', [150, 250])
-      .select('name', 'id', 'main_exports')
+      .select('name', 'id', 'population_range_millions')
     return countries
   ${errorJs}
 `.trim()
@@ -341,7 +341,7 @@ const getCountries = async () => {
     let countries = await supabase
       .from('countries')
       .nxr('population_range_millions', [150, 250])
-      .select('name', 'id', 'main_exports')
+      .select('name', 'id', 'population_range_millions')
     return countries
   ${errorJs}
 `.trim()
@@ -353,7 +353,7 @@ const getCountries = async () => {
     let countries = await supabase
       .from('countries')
       .adj('population_range_millions', [70, 185])
-      .select('name', 'id', 'main_exports')
+      .select('name', 'id', 'population_range_millions')
     return countries
   ${errorJs}
 `.trim()
