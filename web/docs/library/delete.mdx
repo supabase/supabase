@@ -22,7 +22,7 @@ import { deleteRecordJs,
          deleteIlikeJs,
          deleteIsJs,
          deleteInJs,
-         deleteNotJs
+         deleteNeqJs
      } from './examples/delete'
 
 
@@ -34,7 +34,7 @@ import { deleteRecordJs,
 <CustomCodeBlock
   header="Deletes city."
   js={deleteRecordJs}
-  jsHighlight="{7-10}"
+  jsHighlight="{7-11}"
   response={`{
   "body": null,
   "status": 204,
@@ -124,6 +124,24 @@ const options = {
 <br/>
 
 <CommonFilters filter='eq'/>
+
+### `neq()`
+
+<CustomCodeBlock
+  header="Shows how to use neq( ) with delete( )"
+  js={deleteNeqJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br/>
+
+<CommonFilters filter='neq'/>
 
 ### `gt()`
 
@@ -268,24 +286,6 @@ const options = {
 <br/>
 
 <CommonFilters filter='in'/>
-
-### `not()`
-
-<CustomCodeBlock
-  header="Shows how to use not( ) with delete( )"
-  js={deleteNotJs}
-  jsHighlight="{9}"
-  response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
-}`}
-/>
-
-<br/>
-
-<CommonFilters filter='not'/>
 
 ## Responses
 

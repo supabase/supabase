@@ -219,7 +219,7 @@ const deleteCity = async () => {
 }
 `
 
-export const deleteNotJs = `
+export const deleteNeqJs = `
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
@@ -228,7 +228,7 @@ const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .not('name', 'Lagos')
+      .neq('name', 'Lagos')
       .delete()
     return cities
   } catch (error) {

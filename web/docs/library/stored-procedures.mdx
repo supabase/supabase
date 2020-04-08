@@ -24,7 +24,7 @@ import {
   storedIlikeJs,
   storedIsJs,
   storedInJs,
-  storedNotJs,
+  storedNeqJs,
 } from './examples/stored'
 
 You can call stored procedures as a "Remote Procedure Call".
@@ -175,6 +175,31 @@ Parameters to be passed to the stored function.
 <br/>
 
 <CommonFilters filter='eq'/>
+
+### `neq()`
+
+<CustomCodeBlock
+  header="Shows how to use neq( ) with rpc( )"
+  js={storedNeqJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Rio de Janeiro", "country_id": 76 },
+    { "name": "Beijing", "country_id": 156 },
+    { "name": "Paris", "country_id": 250 },
+    { "name": "Auckland", "country_id": 554 },
+    { "name": "Lagos", "country_id": 556 },
+    { "name": "San Francisco", "country_id": 840 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br/>
+
+<CommonFilters filter='neq'/>
 
 ### `gt()`
 
@@ -344,31 +369,6 @@ Parameters to be passed to the stored function.
 <br/>
 
 <CommonFilters filter='in'/>
-
-### `not()`
-
-<CustomCodeBlock
-  header="Shows how to use not( ) with rpc( )"
-  js={storedNotJs}
-  jsHighlight="{9}"
-  response={`{
-  "body": [
-    { "name": "Rio de Janeiro", "country_id": 76 },
-    { "name": "Beijing", "country_id": 156 },
-    { "name": "Paris", "country_id": 250 },
-    { "name": "Auckland", "country_id": 554 },
-    { "name": "Lagos", "country_id": 556 },
-    { "name": "San Francisco", "country_id": 840 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
-}`}
-/>
-
-<br/>
-
-<CommonFilters filter='not'/>
 
 ## Responses
 

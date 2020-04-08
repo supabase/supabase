@@ -332,7 +332,7 @@ const getCities = async () => {
 }
 `.trim()
 
-export const getNotJs = `
+export const getNeqJs = `
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
@@ -341,7 +341,7 @@ const getCities = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .not('name', 'Lagos')
+      .neq('name', 'Lagos')
       .select('*')
     return cities
   } catch (error) {

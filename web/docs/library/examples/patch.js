@@ -219,7 +219,7 @@ const updateCityName = async () => {
 }
 `.trim()
 
-export const patchNotJs = `
+export const patchNeqJs = `
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
@@ -228,7 +228,7 @@ const updateCityName = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .not('name', 'Lagos')
+      .neq('name', 'Lagos')
       .update({ name: 'Mordor' })
     return cities
   } catch (error) {
