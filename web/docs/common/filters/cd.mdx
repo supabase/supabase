@@ -1,0 +1,19 @@
+import Collapsable from '../../../src/components/Collapsable'
+
+#### General form
+<!-- prettier-ignore -->
+```js {3} 
+supabase
+  .from(tableName)
+  .cd(columnName, filterObject)
+```
+
+Finds all rows whose json, array, or range value on the stated columnName is contained by the specific filterObject. Equivalent of `filter(columName, 'cd', criteria)`.
+
+#### `columnName: string`
+Name of the database column.
+
+#### `filterObject: { array | object }`
+Value to compare to.
+
+---

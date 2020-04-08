@@ -1,0 +1,19 @@
+import Collapsable from '../../../src/components/Collapsable'
+
+#### General form
+<!-- prettier-ignore -->
+```js {3} 
+supabase
+  .from(tableName)
+  .sr(columnName, filterRange)
+```
+
+Finds all rows whose range value on the stated columnName is strictly on the right hand side of the specified filterRange. Equivalent of `filter(columnName, 'sr', criteria)`.
+
+#### `columnName: string`
+Name of the database column.
+
+#### `filterRange: array`
+Array to compare to. Returns an error if length of array provided is not equal to 2.
+
+---
