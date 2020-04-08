@@ -10,31 +10,40 @@ import CommonResponses from '../common/CommonResponses.mdx'
 import CommonFilters from '../common/CommonFilters'
 import FromFunction from '../common/FromFunction.mdx'
 import CustomCodeBlock from '../../src/components/CustomCodeBlock'
-import { deleteRecordJs,
-         deleteFilterJs,
-         deleteMatchJs,
-         deleteEqJs,
-         deleteGtJs,
-         deleteLtJs,
-         deleteGteJs,
-         deleteLteJs,
-         deleteLikeJs,
-         deleteIlikeJs,
-         deleteIsJs,
-         deleteInJs,
-         deleteNeqJs
-     } from './examples/delete'
-
+import {
+  deleteRecordJs,
+  deleteFilterJs,
+  deleteNotJs,
+  deleteMatchJs,
+  deleteEqJs,
+  deleteNeqJs,
+  deleteGtJs,
+  deleteLtJs,
+  deleteGteJs,
+  deleteLteJs,
+  deleteLikeJs,
+  deleteIlikeJs,
+  deleteIsJs,
+  deleteInJs,
+  deleteCsJs,
+  deleteCdJs,
+  deleteOvaJs,
+  deleteOvrJs,
+  deleteSlJs,
+  deleteSrJs,
+  deleteNxlJs,
+  deleteNxrJs,
+  deleteAdjJs,
+} from './examples/delete'
 
 <DummyData />
-
 
 ### Delete records
 
 <CustomCodeBlock
   header="Deletes city."
   js={deleteRecordJs}
-  jsHighlight="{7-11}"
+  jsHighlight="{7-10}"
   response={`{
   "body": null,
   "status": 204,
@@ -46,28 +55,30 @@ import { deleteRecordJs,
 ## Reference
 
 ### `from()`
-<FromFunction verb='delete' />
+
+<FromFunction verb="delete" />
 
 ### `delete()`
+
 ```js {3}
 supabase
   .from(tableName)
   .delete(options?)
 ```
-  
-#### `options: object?` 
+
+#### `options: object?`
 
 ```js
 /**
- * @param {boolean} [bulk=false] 
- * Protects against bulk updates. Set to true if you intend to perform a bulk change.
+ * @param {boolean} [bulk=false]
+ * Protects against bulk deletes. Set to true if you intend to perform a bulk change.
  */
 const options = {
-  bulk: false 
+  bulk: false,
 }
 ```
 
-----
+---
 
 ## Filtering
 
@@ -85,9 +96,27 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='filter'/>
+<CommonFilters filter="filter" />
+
+### `not()`
+
+<CustomCodeBlock
+  header="Shows how to use not( ) with delete( )"
+  js={deleteNotJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="not" />
 
 ### `match()`
 
@@ -103,9 +132,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='match'/>
+<CommonFilters filter="match" />
 
 ### `eq()`
 
@@ -121,9 +150,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='eq'/>
+<CommonFilters filter="eq" />
 
 ### `neq()`
 
@@ -139,9 +168,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='neq'/>
+<CommonFilters filter="neq" />
 
 ### `gt()`
 
@@ -157,9 +186,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='gt'/>
+<CommonFilters filter="gt" />
 
 ### `lt()`
 
@@ -175,9 +204,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='lt'/>
+<CommonFilters filter="lt" />
 
 ### `gte()`
 
@@ -193,9 +222,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='gte'/>
+<CommonFilters filter="gte" />
 
 ### `lte()`
 
@@ -211,9 +240,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='lte'/>
+<CommonFilters filter="lte" />
 
 ### `like()`
 
@@ -229,9 +258,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='like'/>
+<CommonFilters filter="like" />
 
 ### `ilike()`
 
@@ -247,9 +276,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='ilike'/>
+<CommonFilters filter="ilike" />
 
 ### `is()`
 
@@ -265,9 +294,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='is'/>
+<CommonFilters filter="is" />
 
 ### `in()`
 
@@ -283,13 +312,176 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='in'/>
+<CommonFilters filter="in" />
+
+### `cs()`
+
+<CustomCodeBlock
+  header="Shows how to use cs( ) with delete( )"
+  js={deleteCsJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="cs" />
+
+### `cd()`
+
+<CustomCodeBlock
+  header="Shows how to use cd( ) with delete( )"
+  js={deleteCdJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="cd" />
+
+### `ova()`
+
+<CustomCodeBlock
+  header="Shows how to use ova( ) with delete( )"
+  js={deleteOvaJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="ova" />
+
+### `ovr()`
+
+<CustomCodeBlock
+  header="Shows how to use ovr( ) with delete( )"
+  js={deleteOvrJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="ovr" />
+
+### `sl()`
+
+<CustomCodeBlock
+  header="Shows how to use sl( ) with delete( )"
+  js={deleteSlJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="sl" />
+
+### `sr()`
+
+<CustomCodeBlock
+  header="Shows how to use sr( ) with delete( )"
+  js={deleteSrJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="sr" />
+
+### `nxl()`
+
+<CustomCodeBlock
+  header="Shows how to use nxl( ) with delete( )"
+  js={deleteNxlJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="nxl" />
+
+### `nxr()`
+
+<CustomCodeBlock
+  header="Shows how to use nxr( ) with delete( )"
+  js={deleteNxrJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="nxr" />
+
+### `adj()`
+
+<CustomCodeBlock
+  header="Shows how to use adj( ) with delete( )"
+  js={deleteAdjJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": null,
+  "status": 204,
+  "statusCode": 204,
+  "statusText": "No Content"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="adj" />
 
 ## Responses
 
 #### 200 OK
+
 Successful request
 
 <CommonResponses />

@@ -1,12 +1,11 @@
+import {importJs, errorJs} from './common'
+
 /**
  * delete.mdx examples
  */
 
 export const deleteRecordJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
+${importJs}
 const deleteCity = async () => {
   try {
     let values = await supabase
@@ -15,17 +14,11 @@ const deleteCity = async () => {
       .delete()
 
     return values
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`
+  ${errorJs}
+`.trim()
 
 export const deleteFilterJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const deleteCity = async () => {
   try {
     let cities = await supabase
@@ -33,17 +26,23 @@ const deleteCity = async () => {
       .filter({'name', 'eq', 'Paris'})
       .delete()
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`
+  ${errorJs}
+`.trim()
+
+export const deleteNotJs = `
+${importJs}
+const getCities = async () => {
+  try {
+    let cities = await supabase
+      .from('cities')
+      .not('name', 'eq', 'Paris')
+      .delete()
+    return cities
+  ${errorJs}
+`.trim()
 
 export const deleteMatchJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const deleteCity = async () => {
   try {
     let cities = await supabase
@@ -51,17 +50,11 @@ const deleteCity = async () => {
       .match({name: 'Beijing', country_id: 156})
       .delete()
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`
+  ${errorJs}
+`.trim()
 
 export const deleteEqJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const deleteCity = async () => {
   try {
     let cities = await supabase
@@ -69,161 +62,11 @@ const deleteCity = async () => {
       .eq('name', 'San Francisco')
       .delete()
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`
-
-export const deleteGtJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const deleteCity = async () => {
-  try {
-    let cities = await supabase
-      .from('cities')
-      .gt('country_id', 250)
-      .delete()
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`
-
-export const deleteLtJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const deleteCity = async () => {
-  try {
-    let cities = await supabase
-      .from('cities')
-      .lt('country_id', 250)
-      .delete()
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`
-
-export const deleteGteJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const deleteCity = async () => {
-  try {
-    let cities = await supabase
-      .from('cities')
-      .gte('country_id', 250)
-      .delete()
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`
-
-export const deleteLteJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const deleteCity = async () => {
-  try {
-    let cities = await supabase
-      .from('cities')
-      .lte('country_id', 250)
-      .delete()
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`
-
-export const deleteLikeJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const deleteCity = async () => {
-  try {
-    let cities = await supabase
-      .from('cities')
-      .like('name', '%la%')
-      .delete()
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`
-
-export const deleteIlikeJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const deleteCity = async () => {
-  try {
-    let cities = await supabase
-      .from('cities')
-      .ilike('name', '%la%')
-      .delete()
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`
-
-export const deleteIsJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const deleteCity = async () => {
-  try {
-    let cities = await supabase
-      .from('cities')
-      .is('name', null)
-      .delete()
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`
-
-export const deleteInJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const deleteCity = async () => {
-  try {
-    let cities = await supabase
-      .from('cities')
-      .in('name', ['Rio de Janeiro', 'San Francisco'])
-      .delete()
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`
+  ${errorJs}
+`.trim()
 
 export const deleteNeqJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const deleteCity = async () => {
   try {
     let cities = await supabase
@@ -231,8 +74,209 @@ const deleteCity = async () => {
       .neq('name', 'Lagos')
       .delete()
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
+`.trim()
+
+export const deleteGtJs = `
+${importJs}
+const deleteCity = async () => {
+  try {
+    let cities = await supabase
+      .from('cities')
+      .gt('country_id', 250)
+      .delete()
+    return cities
+  ${errorJs}
+`.trim()
+
+export const deleteLtJs = `
+${importJs}
+const deleteCity = async () => {
+  try {
+    let cities = await supabase
+      .from('cities')
+      .lt('country_id', 250)
+      .delete()
+    return cities
+  ${errorJs}
+`.trim()
+
+export const deleteGteJs = `
+${importJs}
+const deleteCity = async () => {
+  try {
+    let cities = await supabase
+      .from('cities')
+      .gte('country_id', 250)
+      .delete()
+    return cities
+  ${errorJs}
+`.trim()
+
+export const deleteLteJs = `
+${importJs}
+const deleteCity = async () => {
+  try {
+    let cities = await supabase
+      .from('cities')
+      .lte('country_id', 250)
+      .delete()
+    return cities
+  ${errorJs}
+`.trim()
+
+export const deleteLikeJs = `
+${importJs}
+const deleteCity = async () => {
+  try {
+    let cities = await supabase
+      .from('cities')
+      .like('name', '%la%')
+      .delete()
+    return cities
+  ${errorJs}
+`.trim()
+
+export const deleteIlikeJs = `
+${importJs}
+const deleteCity = async () => {
+  try {
+    let cities = await supabase
+      .from('cities')
+      .ilike('name', '%la%')
+      .delete()
+    return cities
+  ${errorJs}
+`.trim()
+
+export const deleteIsJs = `
+${importJs}
+const deleteCity = async () => {
+  try {
+    let cities = await supabase
+      .from('cities')
+      .is('name', null)
+      .delete()
+    return cities
+  ${errorJs}
+`.trim()
+
+export const deleteInJs = `
+${importJs}
+const deleteCity = async () => {
+  try {
+    let cities = await supabase
+      .from('cities')
+      .in('name', ['Rio de Janeiro', 'San Francisco'])
+      .delete()
+    return cities
+  ${errorJs}
+`.trim()
+
+export const deleteCsJs = `
+${importJs}
+const deleteCountry = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .cs('main_exports', ['oil'])
+      delete()
+    return countries
+  ${errorJs}
+`.trim()
+
+export const deleteCdJs = `
+${importJs}
+const deleteCountry = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .cd('main_exports', ['cars', 'food', 'machine'])
+      .delete()
+    return countries
+  ${errorJs}
+`.trim()
+
+export const deleteOvaJs = `
+${importJs}
+const deleteCountry = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .ova('main_exports', ['computers', 'minerals'])
+      .delete()
+    return countries
+  ${errorJs}
+`.trim()
+
+export const deleteOvrJs = `
+${importJs}
+const deleteCountry = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .ovr('population_range_millions', [150, 250])
+      .delete()
+    return countries
+  ${errorJs}
+`.trim()
+
+export const deleteSlJs = `
+${importJs}
+const deleteCountry = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .sl('population_range_millions', [150, 250])
+      .delete()
+    return countries
+  ${errorJs}
+`.trim()
+
+export const deleteSrJs = `
+${importJs}
+const deleteCountry = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .sr('population_range_millions', [150, 250])
+      .delete()
+    return countries
+  ${errorJs}
+`.trim()
+
+export const deleteNxlJs = `
+${importJs}
+const deleteCountry = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .nxl('population_range_millions', [150, 250])
+      .delete()
+    return countries
+  ${errorJs}
+`.trim()
+
+export const deleteNxrJs = `
+${importJs}
+const deleteCountry = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .nxr('population_range_millions', [150, 250])
+      .delete()
+    return countries
+  ${errorJs}
+`.trim()
+
+export const deleteAdjJs = `
+${importJs}
+const deleteCountry = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .adj('population_range_millions', [70, 185])
+      .delete()
+    return countries
+  ${errorJs}
 `.trim()

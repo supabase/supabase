@@ -4,27 +4,37 @@ title: 'Updating'
 description: 'How to update records in your database with Supabase'
 ---
 
-
 import DummyData from '../common/DummyData.mdx'
 import Collapsable from '../../src/components/Collapsable'
 import CommonResponses from '../common/CommonResponses.mdx'
 import CommonFilters from '../common/CommonFilters'
 import FromFunction from '../common/FromFunction.mdx'
 import CustomCodeBlock from '../../src/components/CustomCodeBlock'
-import { patchRecordJs,
-         patchFilterJs,
-         patchMatchJs,
-         patchEqJs,
-         patchGtJs,
-         patchLtJs,
-         patchGteJs,
-         patchLteJs,
-         patchLikeJs,
-         patchIlikeJs,
-         patchIsJs,
-         patchInJs,
-         patchNeqJs
-      } from './examples/patch'
+import {
+  patchRecordJs,
+  patchFilterJs,
+  patchNotJs,
+  patchMatchJs,
+  patchEqJs,
+  patchNeqJs,
+  patchGtJs,
+  patchLtJs,
+  patchGteJs,
+  patchLteJs,
+  patchLikeJs,
+  patchIlikeJs,
+  patchIsJs,
+  patchInJs,
+  patchCsJs,
+  patchCdJs,
+  patchOvaJs,
+  patchOvrJs,
+  patchSlJs,
+  patchSrJs,
+  patchNxlJs,
+  patchNxrJs,
+  patchAdjJs,
+} from './examples/patch'
 
 <DummyData />
 
@@ -47,27 +57,30 @@ import { patchRecordJs,
 ## Reference
 
 ### `from()`
-<FromFunction verb='patch' />
+
+<FromFunction verb="patch" />
 
 ### `update()`
+
 ```js {3}
 supabase
   .from(tableName)
   .update(data, options?)
 ```
-   
+
 #### `data: object`
+
 New record values.
 
-#### `options: object?`   
+#### `options: object?`
 
 ```js
 const options = {
-  bulk: false // Protects against bulk updates. Set to true if you intend to perform a bulk change.
+  bulk: false, // Protects against bulk updates. Set to true if you intend to perform a bulk change.
 }
 ```
 
-----
+---
 
 ## Filtering
 
@@ -87,9 +100,33 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='filter'/>
+<CommonFilters filter="filter" />
+
+### `not()`
+
+<CustomCodeBlock
+  header="Shows how to use not( ) with update( )"
+  js={patchNotJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Mordor", "country_id": 76 },
+    { "name": "Mordor", "country_id": 156 },
+    { "name": "Mordor", "country_id": 554 },
+    { "name": "Mordor", "country_id": 556 },
+    { "name": "Mordor", "country_id": 840 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="not" />
 
 ### `match()`
 
@@ -107,9 +144,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='match'/>
+<CommonFilters filter="match" />
 
 ### `eq()`
 
@@ -127,9 +164,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='eq'/>
+<CommonFilters filter="eq" />
 
 ### `neq()`
 
@@ -152,9 +189,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='neq'/>
+<CommonFilters filter="neq" />
 
 ### `gt()`
 
@@ -174,9 +211,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='gt'/>
+<CommonFilters filter="gt" />
 
 ### `lt()`
 
@@ -195,9 +232,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='lt'/>
+<CommonFilters filter="lt" />
 
 ### `gte()`
 
@@ -218,9 +255,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='gte'/>
+<CommonFilters filter="gte" />
 
 ### `lte()`
 
@@ -240,9 +277,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='lte'/>
+<CommonFilters filter="lte" />
 
 ### `like()`
 
@@ -260,9 +297,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='like'/>
+<CommonFilters filter="like" />
 
 ### `ilike()`
 
@@ -281,9 +318,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='ilike'/>
+<CommonFilters filter="ilike" />
 
 ### `is()`
 
@@ -300,9 +337,9 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='is'/>
+<CommonFilters filter="is" />
 
 ### `in()`
 
@@ -321,13 +358,295 @@ const options = {
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='in'/>
+<CommonFilters filter="in" />
+
+### `cs()`
+
+<CustomCodeBlock
+  header="Shows how to use cs( ) with update( )"
+  js={patchCsJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 556,
+      "name": "Mordor",
+      "population_range_millions": [185, 195]
+      "main_exports": ["oil", "beans"],
+    },
+    { "id": 840,
+      "name": "Mordor",
+      "population_range_millions": [320, 330]
+      "main_exports": ["oil", "cars", "food"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="cs" />
+
+### `cd()`
+
+<CustomCodeBlock
+  header="Shows how to use cd( ) with update( )"
+  js={patchCdJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 250,
+      "name": "Mordor",
+      "population_range_millions": [60, 70]
+      "main_exports": ["cars", "machines"],
+    },
+    { "id": 554,
+      "name": "Mordor",
+      "population_range_millions": [4, 6]
+      "main_exports": ["food", "machines"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="cd" />
+
+### `ova()`
+
+<CustomCodeBlock
+  header="Shows how to use ova( ) with update( )"
+  js={patchOvaJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 76,
+      "name": "Mordor",
+      "population_range_millions": [205, 215]
+      "main_exports": ["beans", "minerals"],
+    },
+    { "id": 156,
+      "name": "Mordor",
+      "population_range_millions": [1380, 1390]
+      "main_exports": ["computers", "phones"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="ova" />
+
+### `ovr()`
+
+<CustomCodeBlock
+  header="Shows how to use ovr( ) with update( )"
+  js={patchOvrJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 76,
+      "name": "Mordor",
+      "population_range_millions": [205, 215]
+      "main_exports": ["beans", "minerals"],
+    },
+    { "id": 556,
+      "name": "Mordor",
+      "population_range_millions": [185, 195]
+      "main_exports": ["oil", "beans"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="ovr" />
+
+### `sl()`
+
+<CustomCodeBlock
+  header="Shows how to use sl( ) with update( )"
+  js={patchSlJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 250,
+      "name": "Mordor",
+      "population_range_millions": [60, 70]
+      "main_exports": ["cars", "machines"],
+    },
+    { "id": 554,
+      "name": "Mordor",
+      "population_range_millions": [4, 6]
+      "main_exports": ["food", "machines"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="sl" />
+
+### `sr()`
+
+<CustomCodeBlock
+  header="Shows how to use sr( ) with update( )"
+  js={patchSrJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 156,
+      "name": "Mordor",
+      "population_range_millions": [1380, 1390]
+      "main_exports": ["computers", "phones"],
+    },
+    { "id": 840,
+      "name": "Mordor",
+      "population_range_millions": [320, 330]
+      "main_exports": ["oil", "cars", "food"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="sr" />
+
+### `nxl()`
+
+<CustomCodeBlock
+  header="Shows how to use nxl( ) with update( )"
+  js={patchNxlJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 76,
+      "name": "Mordor",
+      "population_range_millions": [205, 215]
+      "main_exports": ["beans", "minerals"],
+    },
+    { "id": 156,
+      "name": "Mordor",
+      "population_range_millions": [1380, 1390]
+      "main_exports": ["computers", "phones"],
+    },
+    { "id": 556,
+      "name": "Mordor",
+      "population_range_millions": [185, 195]
+      "main_exports": ["oil", "beans"],
+    },
+    { "id": 840,
+      "name": "Mordor",
+      "population_range_millions": [320, 330]
+      "main_exports": ["oil", "cars", "food"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="nxl" />
+
+### `nxr()`
+
+<CustomCodeBlock
+  header="Shows how to use nxr( ) with update( )"
+  js={patchNxrJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 76,
+      "name": "Mordor",
+      "population_range_millions": [205, 215]
+      "main_exports": ["beans", "minerals"],
+    },
+    { "id": 250,
+      "name": "Mordor",
+      "population_range_millions": [60, 70]
+      "main_exports": ["cars", "machines"],
+    },
+    { "id": 554,
+      "name": "Mordor",
+      "population_range_millions": [4, 6]
+      "main_exports": ["food", "machines"],
+    },
+    { "id": 556,
+      "name": "Mordor",
+      "population_range_millions": [185, 195]
+      "main_exports": ["oil", "beans"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="nxr" />
+
+### `adj()`
+
+<CustomCodeBlock
+  header="Shows how to use adj( ) with update( )"
+  js={patchAdjJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 250,
+      "name": "Mordor",
+      "population_range_millions": [60, 70]
+      "main_exports": ["cars", "machines"],
+    },
+    { "id": 556,
+      "name": "Mordor",
+      "population_range_millions": [185, 195]
+      "main_exports": ["oil", "beans"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="adj" />
 
 ## Responses
 
 #### 200 OK
+
 Successful request
 
 <CommonResponses />

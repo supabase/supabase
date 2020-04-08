@@ -1,12 +1,11 @@
+import {importJs, errorJs} from './common'
+
 /**
  * patch.mdx examples
  */
 
 export const patchRecordJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
+${importJs}
 const updateCityName = async () => {
   try {
     let updates = await supabase
@@ -15,17 +14,11 @@ const updateCityName = async () => {
       .match({ name: 'Auckland' })
 
     return updates
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
 `.trim()
 
 export const patchFilterJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const updateCityName = async () => {
   try {
     let cities = await supabase
@@ -33,17 +26,23 @@ const updateCityName = async () => {
       .filter('name', 'eq', 'Paris')
       .update({ name: 'Mordor' })
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
+`.trim()
+
+export const patchNotJs = `
+${importJs}
+const getCities = async () => {
+  try {
+    let cities = await supabase
+      .from('cities')
+      .not('name', 'eq', 'Paris')
+      .update({ name: 'Mordor' })
+    return cities
+  ${errorJs}
 `.trim()
 
 export const patchMatchJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const updateCityName = async () => {
   try {
     let cities = await supabase
@@ -51,17 +50,11 @@ const updateCityName = async () => {
       .match({name: 'Beijing', country_id: 156})
       .update({ name: 'Mordor' })
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
 `.trim()
 
 export const patchEqJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const updateCityName = async () => {
   try {
     let cities = await supabase
@@ -69,17 +62,23 @@ const updateCityName = async () => {
       .eq('name', 'San Francisco')
       .update({ name: 'Mordor' })
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
+`.trim()
+
+export const patchNeqJs = `
+${importJs}
+const updateCityName = async () => {
+  try {
+    let cities = await supabase
+      .from('cities')
+      .neq('name', 'Lagos')
+      .update({ name: 'Mordor' })
+    return cities
+  ${errorJs}
 `.trim()
 
 export const patchGtJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const updateCityName = async () => {
   try {
     let cities = await supabase
@@ -87,17 +86,11 @@ const updateCityName = async () => {
       .gt('country_id', 250)
       .update({ name: 'Mordor' })
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
 `.trim()
 
 export const patchLtJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const updateCityName = async () => {
   try {
     let cities = await supabase
@@ -105,17 +98,11 @@ const updateCityName = async () => {
       .lt('country_id', 250)
       .update({ name: 'Mordor' })
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
 `.trim()
 
 export const patchGteJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const updateCityName = async () => {
   try {
     let cities = await supabase
@@ -123,17 +110,11 @@ const updateCityName = async () => {
       .gte('country_id', 250)
       .update({ name: 'Mordor' })
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
 `.trim()
 
 export const patchLteJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const updateCityName = async () => {
   try {
     let cities = await supabase
@@ -141,17 +122,11 @@ const updateCityName = async () => {
       .lte('country_id', 250)
       .update({ name: 'Mordor' })
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
 `.trim()
 
 export const patchLikeJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const updateCityName = async () => {
   try {
     let cities = await supabase
@@ -166,10 +141,7 @@ const updateCityName = async () => {
 `.trim()
 
 export const patchIlikeJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const updateCityName = async () => {
   try {
     let cities = await supabase
@@ -177,17 +149,11 @@ const updateCityName = async () => {
       .ilike('name', '%la%')
       .update({ name: 'Mordor' })
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
 `.trim()
 
 export const patchIsJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const updateCityName = async () => {
   try {
     let cities = await supabase
@@ -195,17 +161,11 @@ const updateCityName = async () => {
       .is('name', null)
       .update({ name: 'Mordor' })
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
 `.trim()
 
 export const patchInJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const updateCityName = async () => {
   try {
     let cities = await supabase
@@ -213,26 +173,113 @@ const updateCityName = async () => {
       .in('name', ['Rio de Janeiro', 'San Francisco'])
       .update({ name: 'Mordor' })
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
 `.trim()
 
-export const patchNeqJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const updateCityName = async () => {
+export const patchCsJs = `
+${importJs}
+const updateCountryName = async () => {
   try {
-    let cities = await supabase
-      .from('cities')
-      .neq('name', 'Lagos')
+    let countries = await supabase
+      .from('countries')
+      .cs('main_exports', ['oil'])
+      update({ name: 'Mordor' })
+    return countries
+  ${errorJs}
+`.trim()
+
+export const patchCdJs = `
+${importJs}
+const updateCountryName = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .cd('main_exports', ['cars', 'food', 'machine'])
       .update({ name: 'Mordor' })
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+    return countries
+  ${errorJs}
+`.trim()
+
+export const patchOvaJs = `
+${importJs}
+const updateCountryName = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .ova('main_exports', ['computers', 'minerals'])
+      .update({ name: 'Mordor' })
+    return countries
+  ${errorJs}
+`.trim()
+
+export const patchOvrJs = `
+${importJs}
+const updateCountryName = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .ovr('population_range_millions', [150, 250])
+      .update({ name: 'Mordor' })
+    return countries
+  ${errorJs}
+`.trim()
+
+export const patchSlJs = `
+${importJs}
+const updateCountryName = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .sl('population_range_millions', [150, 250])
+      .update({ name: 'Mordor' })
+    return countries
+  ${errorJs}
+`.trim()
+
+export const patchSrJs = `
+${importJs}
+const updateCountryName = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .sr('population_range_millions', [150, 250])
+      .update({ name: 'Mordor' })
+    return countries
+  ${errorJs}
+`.trim()
+
+export const patchNxlJs = `
+${importJs}
+const updateCountryName = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .nxl('population_range_millions', [150, 250])
+      .update({ name: 'Mordor' })
+    return countries
+  ${errorJs}
+`.trim()
+
+export const patchNxrJs = `
+${importJs}
+const updateCountryName = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .nxr('population_range_millions', [150, 250])
+      .update({ name: 'Mordor' })
+    return countries
+  ${errorJs}
+`.trim()
+
+export const patchAdjJs = `
+${importJs}
+const updateCountryName = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .adj('population_range_millions', [70, 185])
+      .update({ name: 'Mordor' })
+    return countries
+  ${errorJs}
 `.trim()
