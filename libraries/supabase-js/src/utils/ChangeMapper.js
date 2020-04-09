@@ -160,13 +160,16 @@ export const toJson = stringValue => {
  * Converts a Postgres Array into a native JS array
  * @example toArray('{1,2,3,4}', 'int4')
  * //=> [1,2,3,4]
+ * @example toArray('{}', 'int4')
+ * //=> []
  */
 export const toArray = (stringValue, type) => {
   // this takes off the '{' & '}'
   let stringEnriched = stringValue.slice(1, stringValue.length - 1)
 
   // converts the string into an array
-  let stringArray = stringEnriched.split(',')
+  // if string is empty (meaning the array was empty), an empty array will be immediately returned
+  let stringArray = stringEnriched.length > 0 ? stringEnriched.split(',') : []
   let array = stringArray.map(string => {
     return convertCell(type, string)
   })
