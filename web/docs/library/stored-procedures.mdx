@@ -14,8 +14,10 @@ import {
   storedBulkJs,
   storedReadingJs,
   storedFilterJs,
+  storedNotJs,
   storedMatchJs,
   storedEqJs,
+  storedNeqJs,
   storedGtJs,
   storedLtJs,
   storedGteJs,
@@ -24,13 +26,29 @@ import {
   storedIlikeJs,
   storedIsJs,
   storedInJs,
-  storedNeqJs,
+  storedCsJs,
+  storedCdJs,
+  storedOvaJs,
+  storedOvrJs,
+  storedSlJs,
+  storedSrJs,
+  storedNxlJs,
+  storedNxrJs,
+  storedAdjJs,
 } from './examples/stored'
 
 You can call stored procedures as a "Remote Procedure Call".
 
 That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
 This is especially useful when the logic rarely changes - like password resets and updates.
+
+Here, we have three stored procedures that will act as our examples:
+
+`echo_city` : Takes in objects containing a city name and returns that name.
+
+`echo_all_cities` : Returns all rows in the table **Cities**.
+
+`echo_all_countries` : Returns all rows in the table **Countries**. 
 
 <DummyData />
 
@@ -100,8 +118,7 @@ This example shows how to call a stored function that returns a table type respo
 ### `rpc()`
 
 ```js {2}
-supabase
-    .rpc(functionName, functionParameters)
+supabase.rpc(functionName, functionParameters)
 ```
 
 #### `functionName: string`
@@ -132,9 +149,33 @@ Parameters to be passed to the stored function.
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='filter'/>
+<CommonFilters filter="filter" />
+
+### `not()`
+
+<CustomCodeBlock
+  header="Shows how to use not( ) with rpc( )"
+  js={storedNotJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Rio de Janeiro", "country_id": 76 },
+    { "name": "Beijing", "country_id": 156 },
+    { "name": "Auckland", "country_id": 554 },
+    { "name": "Lagos", "country_id": 556 },
+    { "name": "San Francisco", "country_id": 840 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="not" />
 
 ### `match()`
 
@@ -152,9 +193,9 @@ Parameters to be passed to the stored function.
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='match'/>
+<CommonFilters filter="match" />
 
 ### `eq()`
 
@@ -172,9 +213,9 @@ Parameters to be passed to the stored function.
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='eq'/>
+<CommonFilters filter="eq" />
 
 ### `neq()`
 
@@ -197,9 +238,9 @@ Parameters to be passed to the stored function.
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='neq'/>
+<CommonFilters filter="neq" />
 
 ### `gt()`
 
@@ -219,9 +260,9 @@ Parameters to be passed to the stored function.
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='gt'/>
+<CommonFilters filter="gt" />
 
 ### `lt()`
 
@@ -240,9 +281,9 @@ Parameters to be passed to the stored function.
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='lt'/>
+<CommonFilters filter="lt" />
 
 ### `gte()`
 
@@ -263,9 +304,9 @@ Parameters to be passed to the stored function.
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='gte'/>
+<CommonFilters filter="gte" />
 
 ### `lte()`
 
@@ -285,9 +326,9 @@ Parameters to be passed to the stored function.
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='lte'/>
+<CommonFilters filter="lte" />
 
 ### `like()`
 
@@ -305,9 +346,9 @@ Parameters to be passed to the stored function.
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='like'/>
+<CommonFilters filter="like" />
 
 ### `ilike()`
 
@@ -326,9 +367,9 @@ Parameters to be passed to the stored function.
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='ilike'/>
+<CommonFilters filter="ilike" />
 
 ### `is()`
 
@@ -345,9 +386,9 @@ Parameters to be passed to the stored function.
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='is'/>
+<CommonFilters filter="is" />
 
 ### `in()`
 
@@ -366,16 +407,299 @@ Parameters to be passed to the stored function.
 }`}
 />
 
-<br/>
+<br />
 
-<CommonFilters filter='in'/>
+<CommonFilters filter="in" />
+
+### `cs()`
+
+<CustomCodeBlock
+  header="Shows how to use cs( ) with rpc( )"
+  js={storedCsJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 556,
+      "name": "Nigeria",
+      "population_range_millions": [185, 195]
+      "main_exports": ["oil", "beans"],
+    },
+    { "id": 840,
+      "name": "United States",
+      "population_range_millions": [320, 330]
+      "main_exports": ["oil", "cars", "food"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="cs" />
+
+### `cd()`
+
+<CustomCodeBlock
+  header="Shows how to use cd( ) with rpc( )"
+  js={storedCdJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 250,
+      "name": "France",
+      "population_range_millions": [60, 70]
+      "main_exports": ["cars", "machines"],
+    },
+    { "id": 554,
+      "name": "New Zealand",
+      "population_range_millions": [4, 6]
+      "main_exports": ["food", "machines"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="cd" />
+
+### `ova()`
+
+<CustomCodeBlock
+  header="Shows how to use ova( ) with rpc( )"
+  js={storedOvaJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 76,
+      "name": "Brazil",
+      "population_range_millions": [205, 215]
+      "main_exports": ["beans", "minerals"],
+    },
+    { "id": 156,
+      "name": "China",
+      "population_range_millions": [1380, 1390]
+      "main_exports": ["computers", "phones"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="ova" />
+
+### `ovr()`
+
+<CustomCodeBlock
+  header="Shows how to use ovr( ) with rpc( )"
+  js={storedOvrJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 76,
+      "name": "Brazil",
+      "population_range_millions": [205, 215]
+      "main_exports": ["beans", "minerals"],
+    },
+    { "id": 556,
+      "name": "Nigeria",
+      "population_range_millions": [185, 195]
+      "main_exports": ["oil", "beans"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="ovr" />
+
+### `sl()`
+
+<CustomCodeBlock
+  header="Shows how to use sl( ) with rpc( )"
+  js={storedSlJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 250,
+      "name": "France",
+      "population_range_millions": [60, 70]
+      "main_exports": ["cars", "machines"],
+    },
+    { "id": 554,
+      "name": "New Zealand",
+      "population_range_millions": [4, 6]
+      "main_exports": ["food", "machines"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="sl" />
+
+### `sr()`
+
+<CustomCodeBlock
+  header="Shows how to use sr( ) with rpc( )"
+  js={storedSrJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 156,
+      "name": "China",
+      "population_range_millions": [1380, 1390]
+      "main_exports": ["computers", "phones"],
+    },
+    { "id": 840,
+      "name": "United States",
+      "population_range_millions": [320, 330]
+      "main_exports": ["oil", "cars", "food"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="sr" />
+
+### `nxl()`
+
+<CustomCodeBlock
+  header="Shows how to use nxl( ) with rpc( )"
+  js={storedNxlJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 76,
+      "name": "Brazil",
+      "population_range_millions": [205, 215]
+      "main_exports": ["beans", "minerals"],
+    },
+    { "id": 156,
+      "name": "China",
+      "population_range_millions": [1380, 1390]
+      "main_exports": ["computers", "phones"],
+    },
+    { "id": 556,
+      "name": "Nigeria",
+      "population_range_millions": [185, 195]
+      "main_exports": ["oil", "beans"],
+    },
+    { "id": 840,
+      "name": "United States",
+      "population_range_millions": [320, 330]
+      "main_exports": ["oil", "cars", "food"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="nxl" />
+
+### `nxr()`
+
+<CustomCodeBlock
+  header="Shows how to use nxr( ) with rpc( )"
+  js={storedNxrJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 76,
+      "name": "Brazil",
+      "population_range_millions": [205, 215]
+      "main_exports": ["beans", "minerals"],
+    },
+    { "id": 250,
+      "name": "France",
+      "population_range_millions": [60, 70]
+      "main_exports": ["cars", "machines"],
+    },
+    { "id": 554,
+      "name": "New Zealand",
+      "population_range_millions": [4, 6]
+      "main_exports": ["food", "machines"],
+    },
+    { "id": 556,
+      "name": "Nigeria",
+      "population_range_millions": [185, 195]
+      "main_exports": ["oil", "beans"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="nxr" />
+
+### `adj()`
+
+<CustomCodeBlock
+  header="Shows how to use adj( ) with rpc( )"
+  js={storedAdjJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "id": 250,
+      "name": "France",
+      "population_range_millions": [60, 70]
+      "main_exports": ["cars", "machines"],
+    },
+    { "id": 556,
+      "name": "Nigeria",
+      "population_range_millions": [185, 195]
+      "main_exports": ["oil", "beans"],
+    }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CommonFilters filter="adj" />
 
 ## Responses
 
 #### 200 OK
+
 Successful request
 
 #### 201 Created
+
 Successful
 
 <CommonResponses />

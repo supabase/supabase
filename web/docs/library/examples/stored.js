@@ -1,257 +1,282 @@
+import {importJs, errorJs} from './common'
+
 /**
  * stored-procedures.mdx examples
  */
 
 export const storedSingleJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
+${importJs}
 const echoCity = async () => {
-    try{
-        let city = await supabase
-            .rpc('echo_city', { name: 'The Shire' })
-        return cities
-    } catch (error) {
-        console.log('Error: ', error)
-    }
+  try{
+    let city = await supabase
+      .rpc('echo_city', { name: 'The Shire' })
+    return cities
+  ${errorJs}
 }
 `.trim()
 
 export const storedBulkJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
+${importJs}
 const echoCities = async () => {
-    try{
-        let cities = await supabase
-            .rpc('echo_city', [
-                { name: 'The Shire' },
-                { name: 'Mordor' }
-            ])
-        return cities
-    } catch (error) {
-        console.log('Error: ', error)
-    }
+  try{
+    let cities = await supabase
+      .rpc('echo_city', [
+        { name: 'The Shire' },
+        { name: 'Mordor' }
+      ])
+    return cities
+  ${errorJs}
 }
 `.trim()
 
 export const storedReadingJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
+${importJs}
 const echoCities = async () => {
-    try{
-        let cities = await supabase
-            .rpc('echo_all_cities')
-        return cities
-    } catch (error) {
-        console.log('Error: ', error)
-    }
-}
+  try{
+    let cities = await supabase
+      .rpc('echo_all_cities')
+    return cities
+  ${errorJs}
 `.trim()
+
 export const storedFilterJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const echoCities = async () => {
   try {
     let cities = await supabase
       .rpc('echo_all_cities')
       .filter({'name', 'eq', 'Paris'})
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
+`.trim()
+
+export const storedNotJs = `
+${importJs}
+const echoCities = async () => {
+  try {
+    let cities = await supabase
+      .rpc('echo_all_cities)
+      .not('name', 'eq', 'Paris')
+    return cities
+  ${errorJs}
 `.trim()
 
 export const storedMatchJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const echoCities = async () => {
   try {
     let cities = await supabase
       .rpc('echo_all_cities')
       .match({name: 'Beijing', country_id: 156})
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
 `.trim()
 
 export const storedEqJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const echoCities = async () => {
   try {
     let cities = await supabase
       .rpc('echo_all_cities')
       .eq('name', 'San Francisco')
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`.trim()
-
-export const storedGtJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const echoCities = async () => {
-  try {
-    let cities = await supabase
-      .rpc('echo_all_cities')
-      .gt('country_id', 250)
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`.trim()
-
-export const storedLtJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const echoCities = async () => {
-  try {
-    let cities = await supabase
-      .rpc('echo_all_cities')
-      .lt('country_id', 250)
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`.trim()
-
-export const storedGteJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const echoCities = async () => {
-  try {
-    let cities = await supabase
-      .rpc('echo_all_cities')
-      .gte('country_id', 250)
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`.trim()
-
-export const storedLteJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const echoCities = async () => {
-  try {
-    let cities = await supabase
-      .rpc('echo_all_cities')
-      .lte('country_id', 250)
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`.trim()
-
-export const storedLikeJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const echoCities = async () => {
-  try {
-    let cities = await supabase
-      .rpc('echo_all_cities')
-      .like('name', '%la%')
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`.trim()
-
-export const storedIlikeJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const echoCities = async () => {
-  try {
-    let cities = await supabase
-      .rpc('echo_all_cities')
-      .ilike('name', '%la%')
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`.trim()
-
-export const storedIsJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const echoCities = async () => {
-  try {
-    let cities = await supabase
-      .rpc('echo_all_cities')
-      .is('name', null)
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
-`.trim()
-
-export const storedInJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
-const echoCities = async () => {
-  try {
-    let cities = await supabase
-      .rpc('echo_all_cities')
-      .in('name', ['Rio de Janeiro', 'San Francisco'])
-    return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
 `.trim()
 
 export const storedNeqJs = `
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://world.supabase.co', 'public-key-bOYapLADERfE')
-
+${importJs}
 const echoCities = async () => {
   try {
     let cities = await supabase
       .rpc('echo_all_cities')
       .neq('name', 'Lagos')
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
-}
+  ${errorJs}
+`.trim()
+
+export const storedGtJs = `
+${importJs}
+const echoCities = async () => {
+  try {
+    let cities = await supabase
+      .rpc('echo_all_cities')
+      .gt('country_id', 250)
+    return cities
+  ${errorJs}
+`.trim()
+
+export const storedLtJs = `
+${importJs}
+const echoCities = async () => {
+  try {
+    let cities = await supabase
+      .rpc('echo_all_cities')
+      .lt('country_id', 250)
+    return cities
+  ${errorJs}
+`.trim()
+
+export const storedGteJs = `
+${importJs}
+const echoCities = async () => {
+  try {
+    let cities = await supabase
+      .rpc('echo_all_cities')
+      .gte('country_id', 250)
+    return cities
+  ${errorJs}
+`.trim()
+
+export const storedLteJs = `
+${importJs}
+const echoCities = async () => {
+  try {
+    let cities = await supabase
+      .rpc('echo_all_cities')
+      .lte('country_id', 250)
+    return cities
+  ${errorJs}
+`.trim()
+
+export const storedLikeJs = `
+${importJs}
+const echoCities = async () => {
+  try {
+    let cities = await supabase
+      .rpc('echo_all_cities')
+      .like('name', '%la%')
+    return cities
+  ${errorJs}
+`.trim()
+
+export const storedIlikeJs = `
+${importJs}
+const echoCities = async () => {
+  try {
+    let cities = await supabase
+      .rpc('echo_all_cities')
+      .ilike('name', '%la%')
+    return cities
+  ${errorJs}
+`.trim()
+
+export const storedIsJs = `
+${importJs}
+const echoCities = async () => {
+  try {
+    let cities = await supabase
+      .rpc('echo_all_cities')
+      .is('name', null)
+    return cities
+  ${errorJs}
+`.trim()
+
+export const storedInJs = `
+${importJs}
+const echoCities = async () => {
+  try {
+    let cities = await supabase
+      .rpc('echo_all_cities')
+      .in('name', ['Rio de Janeiro', 'San Francisco'])
+    return cities
+  ${errorJs}
+`.trim()
+
+export const storedCsJs = `
+${importJs}
+const echoCountries = async () => {
+  try {
+    let countries = await supabase
+      .rpc('echo_all_countries')
+      .cs('main_exports', ['oil'])
+    return countries
+  ${errorJs}
+`.trim()
+
+export const storedCdJs = `
+${importJs}
+const echoCountries = async () => {
+  try {
+    let countries = await supabase
+      .rpc('echo_all_countries')
+      .cd('main_exports', ['cars', 'food', 'machine'])
+    return countries
+  ${errorJs}
+`.trim()
+
+export const storedOvaJs = `
+${importJs}
+const echoCountries = async () => {
+  try {
+    let countries = await supabase
+      .rpc('echo_all_countries')
+      .ova('main_exports', ['computers', 'minerals'])
+    return countries
+  ${errorJs}
+`.trim()
+
+export const storedOvrJs = `
+${importJs}
+const echoCountries = async () => {
+  try {
+    let countries = await supabase
+      .rpc('echo_all_countries')
+      .ovr('population_range_millions', [150, 250])
+    return countries
+  ${errorJs}
+`.trim()
+
+export const storedSlJs = `
+${importJs}
+const echoCountries = async () => {
+  try {
+    let countries = await supabase
+      .rpc('echo_all_countries')
+      .sl('population_range_millions', [150, 250])
+    return countries
+  ${errorJs}
+`.trim()
+
+export const storedSrJs = `
+${importJs}
+const echoCountries = async () => {
+  try {
+    let countries = await supabase
+      .rpc('echo_all_countries')
+      .sr('population_range_millions', [150, 250])
+    return countries
+  ${errorJs}
+`.trim()
+
+export const storedNxlJs = `
+${importJs}
+const echoCountries = async () => {
+  try {
+    let countries = await supabase
+      .rpc('echo_all_countries')
+      .nxl('population_range_millions', [150, 250])
+    return countries
+  ${errorJs}
+`.trim()
+
+export const storedNxrJs = `
+${importJs}
+const echoCountries = async () => {
+  try {
+    let countries = await supabase
+      .rpc('echo_all_countries')
+      .nxr('population_range_millions', [150, 250])
+    return countries
+  ${errorJs}
+`.trim()
+
+export const storedAdjJs = `
+${importJs}
+const echoCountries = async () => {
+  try {
+    let countries = await supabase
+      .rpc('echo_all_countries')
+      .adj('population_range_millions', [70, 185])
+    return countries
+  ${errorJs}
 `.trim()
