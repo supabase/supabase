@@ -183,7 +183,7 @@ const updateCountryName = async () => {
     let countries = await supabase
       .from('countries')
       .cs('main_exports', ['oil'])
-      update({ name: 'Mordor' })
+      .update({ name: 'Mordor' })
     return countries
   ${errorJs}
 `.trim()
