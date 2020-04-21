@@ -31,7 +31,7 @@ CREATE PUBLICATION supabase_realtime FOR ALL TABLES; -- Set up the publication f
 
 ### Optional
 
-If you want to recieve the old record (previous values) on `UPDATE` and `DELETE`, you can set the `REPLICA IDENTITY` to `FULL` like this: 
+If you want to receive the old record (previous values) on `UPDATE` and `DELETE`, you can set the `REPLICA IDENTITY` to `FULL` like this: 
 
 ```sql
 ALTER TABLE your_table SET REPLICA IDENTITY = FULL;
