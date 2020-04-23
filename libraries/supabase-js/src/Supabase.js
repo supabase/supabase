@@ -26,7 +26,7 @@ class Supabase {
     let socketUrl = `${this.realtimeUrl}`
 
     var filterString = ''
-    this.queryFilters.forEach(queryFilter => {
+    this.queryFilters.forEach((queryFilter) => {
       switch (queryFilter.filter) {
         case 'filter':
           // temporary solution
@@ -61,7 +61,7 @@ class Supabase {
   on(eventType, callbackFunction) {
     if (this.socket == null) this.createListener()
 
-    this.channel.on(eventType, payload => {
+    this.channel.on(eventType, (payload) => {
       let payloadEnriched = {
         schema: payload.schema,
         table: payload.table,
@@ -83,7 +83,7 @@ class Supabase {
           oldData = ChangeMapper.convertChangeData(payload.columns, payload.old_record)
           newData = ChangeMapper.convertChangeData(payload.columns, payload.record)
 
-          Object.keys(oldData).forEach(key => {
+          Object.keys(oldData).forEach((key) => {
             if (oldData[key] != null) oldDataEnriched[key] = oldData[key]
           })
 
@@ -96,7 +96,7 @@ class Supabase {
         case 'DELETE':
           oldData = ChangeMapper.convertChangeData(payload.columns, payload.old_record)
 
-          Object.keys(oldData).forEach(key => {
+          Object.keys(oldData).forEach((key) => {
             if (oldData[key] != null) oldDataEnriched[key] = oldData[key]
           })
 
@@ -124,10 +124,10 @@ class Supabase {
     if (this.channel.state !== 'joined') {
       this.channel
         .join()
-        .receive('ok', resp =>
+        .receive('ok', (resp) =>
           console.debug(`${this.realtimeUrl}: Joined Realtime successfully `, resp)
         )
-        .receive('error', resp => console.debug(`${this.realtimeUrl}: Unable to join `, resp))
+        .receive('error', (resp) => console.debug(`${this.realtimeUrl}: Unable to join `, resp))
         .receive('timeout', () =>
           console.debug(`${this.realtimeUrl}: Network timeout. Still waiting...`)
         )
@@ -147,11 +147,14 @@ class Supabase {
    */
 
   initClient() {
-    let rest = new PostgrestClient(this.restUrl, { headers: { apikey: this.apikey } })
+    let rest = new PostgrestClient(this.restUrl, {
+      headers: { apikey: this.apikey },
+      schema: this.schema,
+    })
     let api = rest.from(this.tableName)
 
     // go through queryFilters
-    this.queryFilters.forEach(queryFilter => {
+    this.queryFilters.forEach((queryFilter) => {
       switch (queryFilter.filter) {
         case 'filter':
           api.filter(queryFilter.columnName, queryFilter.operator, queryFilter.criteria)
@@ -253,7 +256,7 @@ class Supabase {
 const advancedFilters = ['eq', 'gt', 'lt', 'gte', 'lte', 'like', 'ilike', 'is', 'in', 'not']
 
 advancedFilters.forEach(
-  operator =>
+  (operator) =>
     (Supabase.prototype[operator] = function filterValue(columnName, criteria) {
       return this.filter(columnName, operator, criteria)
     })

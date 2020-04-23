@@ -64,6 +64,15 @@ describe('test reading from the rest interface', () => {
     assert(response.body.length === 2, 'should return two records, awalias, and supabot')
   })
 
+  if('not()', async () => {
+    const response = await supabase
+      .from('users')
+      .not('id', 'lte', 3)
+      .select('*')
+    assert(response.body.length === 1, 'should return one record')
+    assert(response.body[0].username === 'dragarcia')
+  })
+
   it('match()', async () => {
     const response = await supabase
       .from('users')
@@ -146,10 +155,10 @@ describe('test reading from the rest interface', () => {
     assert(response.body[1].id === 3, 'last (and second) item should be id 3')
   })
 
-  it('not()', async () => {
+  it('neq()', async () => {
     const response = await supabase
       .from('users')
-      .not('id', '3')
+      .neq('id', '3')
       .select('*')
     assert(response.body.length === 3, 'should be all except id 3')
   })
@@ -159,11 +168,36 @@ describe('test rpc()', () => {
   const supabase = createClient('http://localhost:8000', 'examplekey')
 
   it('should return a value', async () => {
-    const response = await supabase.rpc('update_user_status', {
-      user_id: 2,
-      new_user_status: 'OFFLINE',
-    })
-    assert(response.body.result === true)
-    assert(response.body.status === 'OFFLINE')
+    const response = await supabase.rpc('show_schema')
+    assert(response.body === 'public')
+  })
+})
+
+describe('test multi schema', () => {
+  const supabase = createClient('http://localhost:8000', 'examplekey', {schema: 'personal'})
+
+  it('should return a value from the other schema', async () => {
+    const response = await supabase
+      .from('users')
+      .eq('username', 'leroyjenkins')
+      .select('*')
+
+    assert(response.body.length === 1)
+    assert(response.body[0].username === 'leroyjenkins')
+  })
+
+  it('should be able to update a value on the other schema', async () => {
+    const response = await supabase
+      .from('users')
+      .eq('username', 'leroyjenkins')
+      .update({username: 'jenkinsleroy'})
+
+    assert(response.body.length === 1)
+    assert(response.body[0].username === 'jenkinsleroy')
+  })
+
+  it('should return a value', async () => {
+    const response = await supabase.rpc('show_schema')
+    assert(response.body === 'personal')
   })
 })

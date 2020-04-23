@@ -2,7 +2,7 @@ version: '3'
 
 services:
   supabase:
-    image: supabase/supabase-dev:0.1.8
+    image: supabase/supabase-dev:0.1.9
     ports:
       - "8000:8000"
     environment:
@@ -11,13 +11,13 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_PORT: 5432
-      DB_SCHEMA: public
+      DB_SCHEMA: public, personal
     depends_on:
       - db
   db:
     image: postgres:12
     ports:
-      - "5432:5432"
+      - "6543:5432"
     volumes:
       - ./db:/docker-entrypoint-initdb.d/
     command:

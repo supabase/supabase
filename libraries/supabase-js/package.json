@@ -7,12 +7,12 @@
     "clean": "rimraf lib",
     "test": "mocha --require babel-core/register --require babel-polyfill test/unit/**/*.js",
     "test:integration:only": "mocha --require babel-core/register --require babel-polyfill test/integration/**/*.js",
-    "test:integration": "docker-compose -f ./test/integration/docker-compose.yml up -d && sleep 10 && mocha --require babel-core/register --require babel-polyfill test/integration/**/*.js ; docker-compose -f ./test/integration/docker-compose.yml down",
+    "test:integration": "docker-compose -f ./test/integration/docker-compose.yml up -d && sleep 10 && mocha -r @babel/register -r babel-polyfill  test/integration/**/*.js ; docker-compose -f ./test/integration/docker-compose.yml down",
     "test:prod": "cross-env BABEL_ENV=production npm run test",
     "test:watch": "npm test -- --watch",
     "test:examples": "node examples/",
     "cover": "nyc --check-coverage && npm test",
-    "build": "cross-env BABEL_ENV=production babel src --out-dir lib",
+    "build": "BABEL_ENV=production babel src --out-dir lib",
     "prepublish": "npm run clean && npm run build",
     "deploy": "npm version patch && npm publish --access=public"
   },
@@ -34,10 +34,12 @@
   },
   "homepage": "https://supabase.io",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
+    "@babel/cli": "^7.8.3",
+    "@babel/core": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/register": "^7.8.3",
     "babel-plugin-add-module-exports": "^1.0.0",
     "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
     "babel-preset-minify": "^0.5.1",
     "chai": "^4.1.2",
     "cross-env": "^7.0.2",
@@ -48,7 +50,7 @@
   },
   "dependencies": {
     "@supabase/doctest-js": "^0.1.0",
-    "@supabase/postgrest-js": "^0.13.0",
+    "@supabase/postgrest-js": "^0.14.0",
     "@supabase/realtime-js": "^0.1.7",
     "superagent": "^5.2.1"
   }
