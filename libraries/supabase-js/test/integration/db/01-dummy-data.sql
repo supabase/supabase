@@ -17,3 +17,12 @@ INSERT INTO
 VALUES
     ('Hello World 👋', 1, 1),
     ('Perfection is attained, not when there is nothing more to add, but when there is nothing left to take away.', 2, 1);
+
+INSERT INTO
+    personal.users (username)
+VALUES
+    ('supabot'),
+    ('kiwicopple'),
+    ('awalias'),
+    ('dragarcia'),
+    ('leroyjenkins');

@@ -8,8 +8,10 @@ class SupabaseClient {
     this.supabaseKey = null
     this.restUrl = null
     this.realtimeUrl = null
-    this.defaultSchema = 'public'
+    this.schema = 'public'
     this.subscriptions = {}
+
+    if(options.schema) this.schema = options.schema
 
     this.authenticate(supabaseUrl, supabaseKey)
   }
@@ -19,6 +21,8 @@ class SupabaseClient {
     this.supabaseKey = supabaseKey
     this.restUrl = `${supabaseUrl}/rest/v1`
     this.realtimeUrl = `${supabaseUrl}/realtime/v1`.replace('http', 'ws')
+    
+
   }
 
   from(tableName) {
@@ -28,7 +32,7 @@ class SupabaseClient {
       tableName,
       this.restUrl,
       this.realtimeUrl,
-      this.defaultSchema,
+      this.schema,
       this.supabaseKey,
       identifier
     )
@@ -36,7 +40,7 @@ class SupabaseClient {
   }
 
   rpc(functionName, functionParameters = null) {
-    let rest = new PostgrestClient(this.restUrl, { headers: { apikey: this.supabaseKey } })
+    let rest = new PostgrestClient(this.restUrl, { headers: { apikey: this.supabaseKey }, schema: this.schema })
     return rest.rpc(functionName, functionParameters)
   }
 
