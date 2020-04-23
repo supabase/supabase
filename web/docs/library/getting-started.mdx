@@ -50,9 +50,17 @@ The unique Supabase Key which is supplied when you create a new project in [your
  * @param {boolean} [allowBulkDeletes=false] 
  * Blocks the user from accidentally deleting many rows. 
  * Can also be overriden on individual calls to update().
+ *
+ * @param {string} [schema='public'] 
+ * You can switch in between schemas.
+ * The schema however would need to be on the list of exposed schemas.
+ * Defaults to the 'public' schema.
+ * If there is the need to use more than one schema,
+ * another instance of .createClient() would need to be instantiated.
  */
 const options = {
   allowBulkUpdates: false, 
   allowBulkDeletes: false, 
+  schema: 'public'
 }
 ```
