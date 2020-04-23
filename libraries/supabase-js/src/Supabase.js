@@ -253,7 +253,27 @@ class Supabase {
 }
 
 // pre-empts if any of the filters are used before select
-const advancedFilters = ['eq', 'gt', 'lt', 'gte', 'lte', 'like', 'ilike', 'is', 'in', 'not']
+const advancedFilters = [
+  'eq',
+  'neq',
+  'gt',
+  'lt',
+  'gte',
+  'lte',
+  'like',
+  'ilike',
+  'is',
+  'in',
+  'cs',
+  'cd',
+  'ova',
+  'ovr',
+  'sl',
+  'sr',
+  'nxr',
+  'nxl',
+  'adj',
+]
 
 advancedFilters.forEach(
   (operator) =>
