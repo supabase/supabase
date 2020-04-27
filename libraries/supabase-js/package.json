@@ -1,11 +1,11 @@
 {
   "name": "@supabase/supabase-js",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "description": "Supabase Realtime API",
   "main": "./lib/index.js",
   "scripts": {
     "clean": "rimraf lib",
-    "test": "mocha --require babel-core/register --require babel-polyfill test/unit/**/*.js",
+    "test": "mocha -r @babel/register -r babel-polyfill  test/unit/**/*.js",
     "test:integration:only": "mocha --require babel-core/register --require babel-polyfill test/integration/**/*.js",
     "test:integration": "docker-compose -f ./test/integration/docker-compose.yml up -d && sleep 10 && mocha -r @babel/register -r babel-polyfill  test/integration/**/*.js ; docker-compose -f ./test/integration/docker-compose.yml down",
     "test:prod": "cross-env BABEL_ENV=production npm run test",
@@ -51,7 +51,7 @@
   "dependencies": {
     "@supabase/doctest-js": "^0.1.0",
     "@supabase/postgrest-js": "^0.14.0",
-    "@supabase/realtime-js": "^0.1.7",
+    "@supabase/realtime-js": "^0.1.8",
     "superagent": "^5.2.1"
   }
 }
