@@ -1,11 +1,6 @@
 import { assert } from 'chai'
 import { createClient } from '../../src'
 
-// on()
-// subscribe()
-// unsubscribe()
-// removeSubscription()
-// getSubscriptions()
 describe('test various subscriptions', function() {
   const supabase = createClient('http://localhost:8000', 'examplekey')
 
