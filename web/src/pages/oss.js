@@ -42,7 +42,7 @@ export default function Oss() {
                     <Tooltip content={<CustomTooltip />} />
                     <Area
                       type="monotone"
-                      dataKey="@supabase/schemas"
+                      dataKey="@supabase/doctest-js"
                       stackId="1"
                       stroke="#ffc658"
                       fill="#ffc658"

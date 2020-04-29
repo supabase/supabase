@@ -81,7 +81,7 @@
   --ifm-color-info: var(--custom-background-color-diff);
 
   /* Fonts */
-  --ifm-font-base-color: var(--custom-content-color);
+  --ifm-font-color-base: var(--custom-content-color);
   --ifm-font-family-base: var(--custom-font-base);
   --ifm-font-family-monospace: var(--custom-font-code);
   --ifm-heading-font-family: var(--custom-font-base);
@@ -544,13 +544,17 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   cursor: pointer;
 }
 
-div[class^="codeBlockContent"] , div[class*=" codeBlockContent"] {
-  background-color: var(--ifm-code-background);
+div[class^="codeBlockContent"] , div[class*=" codeBlockContent"], .prism-code {
+  background-color: var(--ifm-code-background-dark) !important;
+}
+.code-with-header {
+  border-radius: 4px;
+  overflow: hidden;
 }
 .prism-code {
   padding: 0 !important;
   margin-bottom: 0;
-  background-color: var(--ifm-code-background);
+  background-color: var(--ifm-code-background-dark);
 }
 .code-with-header pre {
   border-radius: 0 0 4px 4px;
