@@ -1,22 +1,6 @@
 import { assert } from 'chai'
 import { createClient } from '../../src'
 
-// from()
-// select()
-// order()
-// range()
-// single()
-// filter()
-// match()
-// gt()
-// lt()
-// gte()
-// lte()
-// like()
-// ilike()
-// is()
-// in()
-// not()
 describe('test reading from the rest interface', () => {
   const supabase = createClient('http://localhost:8000', 'examplekey')
 
