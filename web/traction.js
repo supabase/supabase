@@ -41,13 +41,16 @@ const formatResults = (repo, githubResponse) => {
 }
 
 const main = async () => {
-  const schemas = await fetchAllEvents('schemas', 100)
-  const realtime = await fetchAllEvents('realtime', 400)
-  const supabase = await fetchAllEvents('supabase', 100)
+  const marketplace = await fetchAllEvents('marketplace', 100)
+  const realtime = await fetchAllEvents('realtime', 500)
+  const supabase = await fetchAllEvents('supabase', 200)
   const postgrestJs = await fetchAllEvents('postgrest-js', 100)
+  const doctestJs = await fetchAllEvents('doctest-js', 100)
+  console.log('doctestJs', doctestJs)
 
   const history = []
-    .concat(formatResults('@supabase/schemas', schemas))
+    .concat(formatResults('@supabase/marketplace', marketplace))
+    .concat(formatResults('@supabase/doctest-js', doctestJs))
     .concat(formatResults('@supabase/realtime', realtime))
     .concat(formatResults('@supabase/supabase', supabase))
     .concat(formatResults('@supabase/postgrest-js', postgrestJs))
@@ -64,26 +67,30 @@ const main = async () => {
   var tally = {
     '@supabase/supabase': 0,
     '@supabase/realtime': 0,
-    '@supabase/schemas': 0,
+    '@supabase/marketplace': 0,
     '@supabase/postgrest-js': 0,
+    '@supabase/doctest-js': 0,
   }
   const data = Object.keys(groups)
     .sort((a, b) => a.localeCompare(b))
     .map(date => {
       let supabase = groups[date].filter(x => x.repo === '@supabase/supabase').length
       let realtime = groups[date].filter(x => x.repo === '@supabase/realtime').length
-      let schemas = groups[date].filter(x => x.repo === '@supabase/schemas').length
+      let marketplace = groups[date].filter((x) => x.repo === '@supabase/marketplace').length
       let postgrestJs = groups[date].filter(x => x.repo === '@supabase/postgrest-js').length
+      let doctestJs = groups[date].filter((x) => x.repo === '@supabase/doctest-js').length
       tally['@supabase/supabase'] += supabase
       tally['@supabase/realtime'] += realtime
-      tally['@supabase/schemas'] += schemas
+      tally['@supabase/marketplace'] += marketplace
       tally['@supabase/postgrest-js'] += postgrestJs
+      tally['@supabase/doctest-js'] += doctestJs
       return {
         name: date,
         '@supabase/supabase': tally['@supabase/supabase'],
         '@supabase/realtime': tally['@supabase/realtime'],
-        '@supabase/schemas': tally['@supabase/schemas'],
+        '@supabase/marketplace': tally['@supabase/marketplace'],
         '@supabase/postgrest-js': tally['@supabase/postgrest-js'],
+        '@supabase/doctest-js': tally['@supabase/doctest-js'],
       }
     })
 
