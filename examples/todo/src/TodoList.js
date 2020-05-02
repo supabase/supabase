@@ -10,13 +10,14 @@ export const TodoList = (props) => {
 
   return (
     <div>
-      <Link to="/">Home</Link>
-      <h1>My Todo List</h1>
-      <h3>{uuid}</h3>
+      <Link to="/">back</Link>
+      <h1>My Task List</h1>
+      <label>Sharing url: </label>
+      <input type="text" readonly value={window.location.href} />
       <div className={'field-row'}>
         <input id="newtask" type="text" onChange={(e) => setNewTaskText(e.target.value)} />
         <label htmlFor="newtask">
-          <button onClick={() => addTask(newTaskText, list.id)}>add</button>
+          <button onClick={() => addTask(newTaskText, list.id)}>add task</button>
         </label>
       </div>
       {tasks
@@ -38,7 +39,9 @@ export const TodoList = (props) => {
                   type="checkbox"
                   id={`task-${task.id}`}
                 ></input>
-                <label htmlFor={`task-${task.id}`}>{task.task_text}</label>
+                <label htmlFor={`task-${task.id}`}>
+                  {task.complete ? <del>{task.task_text}</del> : task.task_text}
+                </label>
               </div>
             )
           })
