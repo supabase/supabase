@@ -20,7 +20,7 @@ const Home = () => {
           newList(history)
         }}
       >
-        +
+        new task list
       </button>
     </div>
   )
