@@ -326,10 +326,10 @@ article header {
   }
 }
 
-.navbar .navbar__items--right .react-toggle {
+/* .navbar .navbar__items--right .react-toggle {
   margin-left: var(--ifm-navbar-item-padding-horizontal);
-}
-.navbar .navbar__item .badge {
+} */
+/* .navbar .navbar__item .badge {
   border-color: var(--ifm-background-color) !important;
   border-radius: 1em;
   display: block;
@@ -342,7 +342,7 @@ article header {
   padding: 0.3em 0.5em;
   position: relative;
   z-index: 1;
-}
+} */
 .navbar-sidebar__brand .navbar__brand {
   flex: 1 0;
 }
