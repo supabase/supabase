@@ -1,6 +1,6 @@
 {
   "name": "@supabase/supabase-js",
-  "version": "0.1.32",
+  "version": "0.1.33",
   "description": "Supabase Realtime API",
   "main": "./lib/index.js",
   "scripts": {
@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "@supabase/doctest-js": "^0.1.0",
-    "@supabase/postgrest-js": "^0.14.0",
+    "@supabase/postgrest-js": "^0.15.0",
     "@supabase/realtime-js": "^0.1.8",
     "superagent": "^5.2.1"
   }
