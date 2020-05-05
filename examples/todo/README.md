@@ -1,5 +1,10 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Required env vars
+
+`REACT_APP_SUPABASE_URL=`
+`REACT_APP_SUPABASE_KEY=`
+
 ## Available Scripts
 
 In the project directory, you can run:

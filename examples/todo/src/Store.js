@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
-  'https://NqizgGpcFvHFzGKvEyia.supabase.co',
-  'drvzTxRwkZPeKSBoKLOtxvAV9Nei2n'
+  process.env.REACT_APP_SUPABASE_URL,
+  process.env.REACT_APP_SUPABASE_KEY
 )
 
 export const useStore = (props) => {
@@ -22,6 +22,7 @@ export const useStore = (props) => {
   }, [])
 
   useEffect(() => {
+    console.log(newTask)
     const handleAsync = async () => {
       if (newTask) {
         // could be an update
@@ -43,6 +44,7 @@ export const useStore = (props) => {
 
   useEffect(() => {
     if (!taskListener && list) {
+      console.log(list.id)
       setTaskListener(
         supabase
           .from(`tasks:list_id=eq.${list.id}`)
@@ -85,7 +87,11 @@ export const createList = async (uuid) => {
 
 export const fetchList = async (list_uuid) => {
   try {
-    let { body } = await supabase.from('lists').eq('uuid', list_uuid).select(`*, tasks(*)`).single()
+    let { body } = await supabase
+      .from('lists')
+      .eq('uuid', list_uuid)
+      .select(`*, tasks(*)`)
+      .single()
     return body
   } catch (error) {
     console.log('error', error)
