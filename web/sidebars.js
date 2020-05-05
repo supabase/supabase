@@ -7,28 +7,20 @@
 
 module.exports = {
   docs: {
-    Introduction:[
-      "about",
-      "faq"
+    Introduction: ['about', 'faq'],
+    Library: [
+      'library/getting-started',
+      'library/subscribe',
+      'library/get',
+      'library/post',
+      'library/patch',
+      'library/delete',
+      'library/stored-procedures',
     ],
-    Library:[
-      "library/getting-started",
-      "library/subscribe",
-      "library/get",
-      "library/post",
-      "library/patch",
-      "library/delete",
-      "library/stored-procedures"
-    ],
-    Guides:[
-      "guides/examples"
-    ],
-    'Self Hosting':[
-      "hosting/hosting-realtime"
-    ],
-    Handbook:[
-      "handbook/introduction",
-      "handbook/contributing"
-    ],
-  }
-};
+    // Guides: ['guides/examples'],
+    Realtime: ['realtime/realtime-install'],
+    Postgres: ['postgres/postgres-intro'],
+    'See Also': ['guides/examples', 'pricing', 'support'],
+    Handbook: ['handbook/introduction', 'handbook/contributing'],
+  },
+}

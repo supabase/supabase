@@ -65,7 +65,7 @@
   "releases_url": "https://api.github.com/repos/supabase/realtime/releases{/id}",
   "deployments_url": "https://api.github.com/repos/supabase/realtime/deployments",
   "created_at": "2019-09-23T12:15:45Z",
-  "updated_at": "2020-05-02T07:56:06Z",
+  "updated_at": "2020-05-05T13:01:50Z",
   "pushed_at": "2020-04-29T13:10:22Z",
   "git_url": "git://github.com/supabase/realtime.git",
   "ssh_url": "git@github.com:supabase/realtime.git",
@@ -73,19 +73,19 @@
   "svn_url": "https://github.com/supabase/realtime",
   "homepage": "https://supabase.io",
   "size": 2295,
-  "stargazers_count": 507,
-  "watchers_count": 507,
+  "stargazers_count": 545,
+  "watchers_count": 545,
   "language": "JavaScript",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
   "has_wiki": true,
   "has_pages": false,
-  "forks_count": 12,
+  "forks_count": 13,
   "mirror_url": null,
   "archived": false,
   "disabled": false,
-  "open_issues_count": 3,
+  "open_issues_count": 4,
   "license": {
     "key": "apache-2.0",
     "name": "Apache License 2.0",
@@ -93,9 +93,9 @@
     "url": "https://api.github.com/licenses/apache-2.0",
     "node_id": "MDc6TGljZW5zZTI="
   },
-  "forks": 12,
-  "open_issues": 3,
-  "watchers": 507,
+  "forks": 13,
+  "open_issues": 4,
+  "watchers": 545,
   "default_branch": "master",
   "temp_clone_token": null,
   "organization": {
@@ -118,6 +118,6 @@
     "type": "Organization",
     "site_admin": false
   },
-  "network_count": 12,
-  "subscribers_count": 18
+  "network_count": 13,
+  "subscribers_count": 20
 }

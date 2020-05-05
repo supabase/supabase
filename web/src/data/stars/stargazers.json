@@ -849,10 +849,26 @@
   },
   {
     "name": "2020-05-02",
-    "@supabase/supabase": 166,
+    "@supabase/supabase": 168,
     "@supabase/realtime": 500,
     "@supabase/marketplace": 8,
     "@supabase/postgrest-js": 39,
+    "@supabase/doctest-js": 33
+  },
+  {
+    "name": "2020-05-03",
+    "@supabase/supabase": 170,
+    "@supabase/realtime": 500,
+    "@supabase/marketplace": 8,
+    "@supabase/postgrest-js": 39,
+    "@supabase/doctest-js": 33
+  },
+  {
+    "name": "2020-05-05",
+    "@supabase/supabase": 171,
+    "@supabase/realtime": 500,
+    "@supabase/marketplace": 8,
+    "@supabase/postgrest-js": 40,
     "@supabase/doctest-js": 33
   }
 ]

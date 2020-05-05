@@ -44,33 +44,34 @@ module.exports = {
           to: '/docs/about',
           label: 'Docs',
           position: 'left',
-          items: [
-            {
-              label: 'Realtime',
-              to: '/docs/library/subscribe',
-            },
-            {
-              label: 'Reading',
-              to: '/docs/library/get',
-            },
-            {
-              label: 'Creating',
-              to: '/docs/library/post',
-            },
-            {
-              label: 'Updating',
-              to: '/docs/library/patch',
-            },
-            {
-              label: 'Stored Procedures',
-              to: '/docs/library/stored-procedures',
-            },
-            {
-              label: 'Self Hosting',
-              to: '/docs/hosting/hosting-realtime',
-            },
-          ],
+          // items: [
+          //   {
+          //     label: 'Realtime',
+          //     to: '/docs/library/subscribe',
+          //   },
+          //   {
+          //     label: 'Reading',
+          //     to: '/docs/library/get',
+          //   },
+          //   {
+          //     label: 'Creating',
+          //     to: '/docs/library/post',
+          //   },
+          //   {
+          //     label: 'Updating',
+          //     to: '/docs/library/patch',
+          //   },
+          //   {
+          //     label: 'Stored Procedures',
+          //     to: '/docs/library/stored-procedures',
+          //   },
+          //   {
+          //     label: 'Self Hosting',
+          //     to: '/docs/hosting/hosting-realtime',
+          //   },
+          // ],
         },
+        { to: '/docs/pricing', label: 'Pricing', position: 'left' },
         { to: '/blog', label: 'Blog', position: 'left' },
         { href: 'https://app.supabase.io', label: 'Alpha', position: 'left' },
         // {
@@ -96,8 +97,12 @@ module.exports = {
               to: '/docs/about',
             },
             {
-              label: 'Guides',
-              to: '/docs/guides/examples',
+              label: 'Pricing',
+              to: '/docs/pricing',
+            },
+            {
+              label: 'Support',
+              to: '/docs/support',
             },
             {
               label: 'Opensource',
