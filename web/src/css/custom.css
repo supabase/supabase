@@ -478,7 +478,14 @@ a.card:hover {
   vertical-align: middle;
 }
 
-
+/* Make the Docs page take up full height to fix the left sidebar */
+div.container.padding-vert--lg .row {
+    min-height: 100vh;
+}
+/* Disable full height for child rows */
+div.container.padding-vert--lg .row .row {
+    min-height: auto;
+}
 div[class^='docItemContainer_'] {
   max-width: none;
 }
