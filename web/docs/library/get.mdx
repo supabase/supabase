@@ -16,6 +16,11 @@ import {
   getForeignJs,
   getForeignMultipleJs,
   getOrderJs,
+  getEmbeddedOrderJs,
+  getLimitJs,
+  getEmbeddedLimitJs,
+  getOffsetJs,
+  getEmbeddedOffsetJs,
   getRangeJs,
   getSingleJs,
   getFilterJs,
@@ -57,6 +62,7 @@ import {
     { "name": "Paris", "country_id": 250 },
     { "name": "Auckland", "country_id": 554 },
     { "name": "Lagos", "country_id": 556 },
+    { "name": "Los Angeles", "country_id": 840 },
     { "name": "San Francisco", "country_id": 840 }
   ],
   "status": 200,
@@ -78,6 +84,7 @@ import {
     { "name": "Paris" },
     { "name": "Auckland" },
     { "name": "Lagos" },
+    { "name": "Los Angeles" },
     { "name": "San Francisco" }
   ],
   "status": 200,
@@ -127,6 +134,7 @@ import {
     {
       "name": "United States", 
       "cities": [
+        { "name": "Los Angeles " },
         { "name": "San Francisco" }
       ]
     }
@@ -175,10 +183,10 @@ the supplier and the purchaser at the same time (both in the `users`) table:
 ### `select()`
 
 <!-- prettier-ignore -->
+#### General Form
+
 ```js {3}
-supabase
-  .from(tableName)
-  .select(columnQuery)
+supabase.from(tableName).select(columnQuery)
 ```
 
 If not used, all columns in the table will be returned.
@@ -218,6 +226,7 @@ supabase
   response={`{
   "body": [
     { "name": "San Francisco", "country_id": 840 },
+    { "name": "Los Angeles", "country_id": 840 },
     { "name": "Lagos", "country_id": 556 },
     { "name": "Auckland", "country_id": 554 },
     { "name": "Paris", "country_id": 250 },
@@ -232,11 +241,33 @@ supabase
 
 <br />
 
+<CustomCodeBlock
+  header="Shows how to use order( ) with select( ) and foreign tables present"
+  js={getEmbeddedOrderJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { 
+      "name": "United States", 
+      "cities": [
+        { "name": "San Francisco" },
+        { "name": "Los Angeles " }
+      ] 
+    },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
 <!-- prettier-ignore -->
+#### General Form
+
 ```js {3}
-supabase
-  .from(tableName)
-  .order(columnName, sortAscending, nullsFirst)
+supabase.from(tableName).order(columnName, sortAscending, nullsFirst)
 ```
 
 Orders your data before fetching.
@@ -252,6 +283,127 @@ Specifies whether the order will be ascending or descending.
 #### `nullsFirst: boolean? | Default is false`
 
 Specifies whether null values will be displayed first.
+
+---
+
+### `limit()`
+
+<CustomCodeBlock
+  header="Shows how to use limit( ) with select( )"
+  js={getLimitJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Rio de Janeiro", "country_id": 76 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CustomCodeBlock
+  header="Shows how to use limit( ) and foreign tables present"
+  js={getEmbeddedLimitJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { 
+      "name": "United States", 
+      "cities": [
+        { "name": "Los Angeles " }
+      ] 
+    },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<!-- prettier-ignore -->
+#### General Form
+
+```js {3}
+supabase.from(tableName).limit(criteria, foreignTableName)
+```
+
+Orders your data before fetching.
+
+#### `criteria: number`
+
+Specifies number of items to be returned at most.
+
+#### `foreignTableName: string ? | Default is null`
+
+Name of chosen foreignTable to apply the limit on. Used if foreign tables are present.
+
+---
+
+### `offset()`
+
+<CustomCodeBlock
+  header="Shows how to use offset( ) with select( )"
+  js={getOffsetJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Beijing", "country_id": 156 },
+    { "name": "Paris", "country_id": 250 },
+    { "name": "Auckland", "country_id": 554 },
+    { "name": "Lagos", "country_id": 556 },
+    { "name": "Los Angeles", "country_id": 840 },
+    { "name": "San Francisco", "country_id": 840 }
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<CustomCodeBlock
+  header="Shows how to use offset( ) with select( ) and foreign tables present"
+  js={getEmbeddedOffsetJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { 
+      "name": "United States", 
+      "cities": [
+        { "name": "San Francisco" }
+      ] 
+    },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
+
+<!-- prettier-ignore -->
+#### General Form
+
+```js {3}
+supabase.from(tableName).offset(criteria, foreignTableName)
+```
+
+Orders your data before fetching.
+
+#### `criteria: number`
+
+Specifies number of items to be returned at most.
+
+#### `foreignTableName: string ? | Default is null`
+
+Name of chosen foreignTable to apply the limit on. Used if foreign tables are present.
 
 ---
 
@@ -277,10 +429,10 @@ Specifies whether null values will be displayed first.
 <br />
 
 <!-- prettier-ignore -->
+#### General Form
+
 ```js {3}
-supabase
-  .from(tableName)
-  .range(fromIndex, toIndex)
+supabase.from(tableName).range(fromIndex, toIndex)
 ```
 
 Paginates your request.
@@ -314,10 +466,10 @@ Index or position of the end of the specified range. If not stated, all remainin
 <br />
 
 <!-- prettier-ignore -->
+#### General Form
+
 ```js {3}
-supabase
-  .from(tableName)
-  .single()
+supabase.from(tableName).single()
 ```
 
 Sets the header which signifies to PostgREST that the response must either be a single object
@@ -328,6 +480,22 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 ## Filtering
 
 ### `filter()`
+
+<CustomCodeBlock
+  header="Shows how to use filter( ) with select( )"
+  js={getFilterJs}
+  jsHighlight="{9}"
+  response={`{
+  "body": [
+    { "name": "Paris", "country_id": 250 },
+  ],
+  "status": 200,
+  "statusCode": 200,
+  "statusText": "OK"
+}`}
+/>
+
+<br />
 
 <CustomCodeBlock
   header="Shows how to use filter( ) with select( )"
@@ -423,7 +591,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
     { "name": "Beijing", "country_id": 156 },
     { "name": "Paris", "country_id": 250 },
     { "name": "Auckland", "country_id": 554 },
-    { "name": "Lagos", "country_id": 556 },
+    { "name": "Los Angeles", "country_id": 840 },
     { "name": "San Francisco", "country_id": 840 }
   ],
   "status": 200,
@@ -446,6 +614,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
   "body": [
     { "name": "Auckland", "country_id": 554 },
     { "name": "Lagos", "country_id": 556 },
+    { "name": "Los Angeles", "country_id": 840 },
     { "name": "San Francisco", "country_id": 840 }
   ],
   "status": 200,
@@ -490,6 +659,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
     { "name": "Paris", "country_id": 250 },
     { "name": "Auckland", "country_id": 554 },
     { "name": "Lagos", "country_id": 556 },
+    { "name": "Los Angeles", "country_id": 840 },
     { "name": "San Francisco", "country_id": 840 }
   ],
   "status": 200,
