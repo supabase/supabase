@@ -3,6 +3,7 @@
     "name": "2019-10-15",
     "@supabase/supabase": 1,
     "@supabase/realtime": 0,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -11,6 +12,7 @@
     "name": "2019-10-25",
     "@supabase/supabase": 1,
     "@supabase/realtime": 33,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -19,6 +21,7 @@
     "name": "2019-10-26",
     "@supabase/supabase": 1,
     "@supabase/realtime": 41,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -27,6 +30,7 @@
     "name": "2019-10-27",
     "@supabase/supabase": 1,
     "@supabase/realtime": 46,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -35,6 +39,7 @@
     "name": "2019-10-28",
     "@supabase/supabase": 1,
     "@supabase/realtime": 51,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -43,6 +48,7 @@
     "name": "2019-10-29",
     "@supabase/supabase": 1,
     "@supabase/realtime": 52,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -51,6 +57,7 @@
     "name": "2019-10-30",
     "@supabase/supabase": 1,
     "@supabase/realtime": 53,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -59,6 +66,7 @@
     "name": "2019-10-31",
     "@supabase/supabase": 1,
     "@supabase/realtime": 54,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -67,6 +75,7 @@
     "name": "2019-11-03",
     "@supabase/supabase": 1,
     "@supabase/realtime": 55,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -75,6 +84,7 @@
     "name": "2019-11-09",
     "@supabase/supabase": 1,
     "@supabase/realtime": 58,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -83,6 +93,7 @@
     "name": "2019-11-10",
     "@supabase/supabase": 1,
     "@supabase/realtime": 59,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -91,6 +102,7 @@
     "name": "2019-11-11",
     "@supabase/supabase": 1,
     "@supabase/realtime": 60,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -99,6 +111,7 @@
     "name": "2019-11-21",
     "@supabase/supabase": 1,
     "@supabase/realtime": 61,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -107,6 +120,7 @@
     "name": "2019-11-23",
     "@supabase/supabase": 1,
     "@supabase/realtime": 62,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -115,6 +129,7 @@
     "name": "2019-12-10",
     "@supabase/supabase": 1,
     "@supabase/realtime": 63,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -123,6 +138,7 @@
     "name": "2019-12-13",
     "@supabase/supabase": 1,
     "@supabase/realtime": 64,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -131,6 +147,7 @@
     "name": "2019-12-17",
     "@supabase/supabase": 1,
     "@supabase/realtime": 158,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -139,6 +156,7 @@
     "name": "2019-12-18",
     "@supabase/supabase": 1,
     "@supabase/realtime": 174,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -147,6 +165,7 @@
     "name": "2019-12-19",
     "@supabase/supabase": 1,
     "@supabase/realtime": 177,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -155,6 +174,7 @@
     "name": "2019-12-20",
     "@supabase/supabase": 1,
     "@supabase/realtime": 180,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -163,6 +183,7 @@
     "name": "2019-12-21",
     "@supabase/supabase": 1,
     "@supabase/realtime": 182,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -171,6 +192,7 @@
     "name": "2019-12-23",
     "@supabase/supabase": 1,
     "@supabase/realtime": 183,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -179,6 +201,7 @@
     "name": "2019-12-29",
     "@supabase/supabase": 1,
     "@supabase/realtime": 184,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -187,6 +210,7 @@
     "name": "2020-01-07",
     "@supabase/supabase": 1,
     "@supabase/realtime": 185,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -195,6 +219,7 @@
     "name": "2020-01-11",
     "@supabase/supabase": 1,
     "@supabase/realtime": 186,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -203,6 +228,7 @@
     "name": "2020-01-14",
     "@supabase/supabase": 1,
     "@supabase/realtime": 187,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -211,6 +237,7 @@
     "name": "2020-01-15",
     "@supabase/supabase": 2,
     "@supabase/realtime": 187,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 0,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -219,6 +246,7 @@
     "name": "2020-01-16",
     "@supabase/supabase": 17,
     "@supabase/realtime": 196,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 2,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -227,6 +255,7 @@
     "name": "2020-01-17",
     "@supabase/supabase": 18,
     "@supabase/realtime": 197,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 2,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -235,6 +264,7 @@
     "name": "2020-01-18",
     "@supabase/supabase": 20,
     "@supabase/realtime": 198,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 2,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -243,6 +273,7 @@
     "name": "2020-01-19",
     "@supabase/supabase": 21,
     "@supabase/realtime": 198,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 2,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -251,6 +282,7 @@
     "name": "2020-01-20",
     "@supabase/supabase": 22,
     "@supabase/realtime": 199,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 2,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -259,6 +291,7 @@
     "name": "2020-01-21",
     "@supabase/supabase": 29,
     "@supabase/realtime": 204,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 2,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -267,6 +300,7 @@
     "name": "2020-01-22",
     "@supabase/supabase": 46,
     "@supabase/realtime": 275,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 2,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -275,6 +309,7 @@
     "name": "2020-01-23",
     "@supabase/supabase": 56,
     "@supabase/realtime": 304,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 4,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -283,6 +318,7 @@
     "name": "2020-01-24",
     "@supabase/supabase": 58,
     "@supabase/realtime": 324,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 4,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -291,6 +327,7 @@
     "name": "2020-01-25",
     "@supabase/supabase": 60,
     "@supabase/realtime": 328,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 4,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -299,6 +336,7 @@
     "name": "2020-01-26",
     "@supabase/supabase": 60,
     "@supabase/realtime": 331,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 4,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -307,6 +345,7 @@
     "name": "2020-01-27",
     "@supabase/supabase": 61,
     "@supabase/realtime": 334,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 5,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -315,6 +354,7 @@
     "name": "2020-01-28",
     "@supabase/supabase": 63,
     "@supabase/realtime": 337,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 5,
     "@supabase/postgrest-js": 0,
     "@supabase/doctest-js": 0
@@ -323,6 +363,7 @@
     "name": "2020-01-29",
     "@supabase/supabase": 63,
     "@supabase/realtime": 345,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 5,
     "@supabase/postgrest-js": 1,
     "@supabase/doctest-js": 0
@@ -331,6 +372,7 @@
     "name": "2020-01-30",
     "@supabase/supabase": 64,
     "@supabase/realtime": 349,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 5,
     "@supabase/postgrest-js": 2,
     "@supabase/doctest-js": 0
@@ -339,6 +381,7 @@
     "name": "2020-01-31",
     "@supabase/supabase": 66,
     "@supabase/realtime": 353,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 5,
     "@supabase/postgrest-js": 2,
     "@supabase/doctest-js": 0
@@ -347,6 +390,7 @@
     "name": "2020-02-01",
     "@supabase/supabase": 68,
     "@supabase/realtime": 354,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 5,
     "@supabase/postgrest-js": 2,
     "@supabase/doctest-js": 0
@@ -355,6 +399,7 @@
     "name": "2020-02-02",
     "@supabase/supabase": 71,
     "@supabase/realtime": 356,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 7,
     "@supabase/doctest-js": 0
@@ -363,6 +408,7 @@
     "name": "2020-02-03",
     "@supabase/supabase": 73,
     "@supabase/realtime": 357,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 19,
     "@supabase/doctest-js": 0
@@ -371,6 +417,7 @@
     "name": "2020-02-04",
     "@supabase/supabase": 73,
     "@supabase/realtime": 357,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 22,
     "@supabase/doctest-js": 0
@@ -379,6 +426,7 @@
     "name": "2020-02-05",
     "@supabase/supabase": 74,
     "@supabase/realtime": 357,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 24,
     "@supabase/doctest-js": 1
@@ -387,6 +435,7 @@
     "name": "2020-02-10",
     "@supabase/supabase": 74,
     "@supabase/realtime": 357,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 1
@@ -395,6 +444,7 @@
     "name": "2020-02-11",
     "@supabase/supabase": 74,
     "@supabase/realtime": 359,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 1
@@ -403,6 +453,7 @@
     "name": "2020-02-14",
     "@supabase/supabase": 74,
     "@supabase/realtime": 360,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 1
@@ -411,6 +462,7 @@
     "name": "2020-02-16",
     "@supabase/supabase": 74,
     "@supabase/realtime": 361,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 1
@@ -419,6 +471,7 @@
     "name": "2020-02-19",
     "@supabase/supabase": 74,
     "@supabase/realtime": 368,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 1
@@ -427,6 +480,7 @@
     "name": "2020-02-20",
     "@supabase/supabase": 74,
     "@supabase/realtime": 369,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 1
@@ -435,6 +489,7 @@
     "name": "2020-02-21",
     "@supabase/supabase": 74,
     "@supabase/realtime": 370,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 1
@@ -443,6 +498,7 @@
     "name": "2020-02-22",
     "@supabase/supabase": 74,
     "@supabase/realtime": 370,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 3
@@ -451,6 +507,7 @@
     "name": "2020-02-23",
     "@supabase/supabase": 74,
     "@supabase/realtime": 371,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 10
@@ -459,6 +516,7 @@
     "name": "2020-02-24",
     "@supabase/supabase": 75,
     "@supabase/realtime": 372,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 12
@@ -467,6 +525,7 @@
     "name": "2020-02-25",
     "@supabase/supabase": 75,
     "@supabase/realtime": 373,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 15
@@ -475,6 +534,7 @@
     "name": "2020-02-26",
     "@supabase/supabase": 76,
     "@supabase/realtime": 374,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 18
@@ -483,6 +543,7 @@
     "name": "2020-02-27",
     "@supabase/supabase": 76,
     "@supabase/realtime": 375,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 18
@@ -491,6 +552,7 @@
     "name": "2020-02-28",
     "@supabase/supabase": 76,
     "@supabase/realtime": 375,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 19
@@ -499,6 +561,7 @@
     "name": "2020-02-29",
     "@supabase/supabase": 77,
     "@supabase/realtime": 375,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 25,
     "@supabase/doctest-js": 19
@@ -507,6 +570,7 @@
     "name": "2020-03-02",
     "@supabase/supabase": 77,
     "@supabase/realtime": 376,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 26,
     "@supabase/doctest-js": 19
@@ -515,6 +579,7 @@
     "name": "2020-03-06",
     "@supabase/supabase": 78,
     "@supabase/realtime": 377,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 26,
     "@supabase/doctest-js": 19
@@ -523,6 +588,7 @@
     "name": "2020-03-07",
     "@supabase/supabase": 78,
     "@supabase/realtime": 378,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 26,
     "@supabase/doctest-js": 19
@@ -531,6 +597,7 @@
     "name": "2020-03-08",
     "@supabase/supabase": 78,
     "@supabase/realtime": 378,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 26,
     "@supabase/doctest-js": 20
@@ -539,6 +606,7 @@
     "name": "2020-03-09",
     "@supabase/supabase": 79,
     "@supabase/realtime": 378,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 26,
     "@supabase/doctest-js": 21
@@ -547,6 +615,7 @@
     "name": "2020-03-10",
     "@supabase/supabase": 79,
     "@supabase/realtime": 379,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 26,
     "@supabase/doctest-js": 21
@@ -555,6 +624,7 @@
     "name": "2020-03-11",
     "@supabase/supabase": 81,
     "@supabase/realtime": 380,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 26,
     "@supabase/doctest-js": 21
@@ -563,6 +633,7 @@
     "name": "2020-03-12",
     "@supabase/supabase": 82,
     "@supabase/realtime": 380,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 26,
     "@supabase/doctest-js": 21
@@ -571,6 +642,7 @@
     "name": "2020-03-13",
     "@supabase/supabase": 82,
     "@supabase/realtime": 380,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 27,
     "@supabase/doctest-js": 21
@@ -579,6 +651,7 @@
     "name": "2020-03-14",
     "@supabase/supabase": 82,
     "@supabase/realtime": 381,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 27,
     "@supabase/doctest-js": 22
@@ -587,6 +660,7 @@
     "name": "2020-03-15",
     "@supabase/supabase": 82,
     "@supabase/realtime": 381,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 27,
     "@supabase/doctest-js": 23
@@ -595,6 +669,7 @@
     "name": "2020-03-19",
     "@supabase/supabase": 83,
     "@supabase/realtime": 383,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 27,
     "@supabase/doctest-js": 23
@@ -603,6 +678,7 @@
     "name": "2020-03-21",
     "@supabase/supabase": 84,
     "@supabase/realtime": 383,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 27,
     "@supabase/doctest-js": 23
@@ -611,6 +687,7 @@
     "name": "2020-03-22",
     "@supabase/supabase": 84,
     "@supabase/realtime": 386,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 28,
     "@supabase/doctest-js": 27
@@ -619,6 +696,7 @@
     "name": "2020-03-24",
     "@supabase/supabase": 84,
     "@supabase/realtime": 387,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 28,
     "@supabase/doctest-js": 27
@@ -627,6 +705,7 @@
     "name": "2020-03-25",
     "@supabase/supabase": 84,
     "@supabase/realtime": 388,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 28,
     "@supabase/doctest-js": 28
@@ -635,6 +714,7 @@
     "name": "2020-03-26",
     "@supabase/supabase": 85,
     "@supabase/realtime": 389,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 28,
     "@supabase/doctest-js": 28
@@ -643,6 +723,7 @@
     "name": "2020-03-27",
     "@supabase/supabase": 85,
     "@supabase/realtime": 390,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 28,
     "@supabase/doctest-js": 28
@@ -651,6 +732,7 @@
     "name": "2020-03-29",
     "@supabase/supabase": 86,
     "@supabase/realtime": 390,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 28,
     "@supabase/doctest-js": 28
@@ -659,6 +741,7 @@
     "name": "2020-03-30",
     "@supabase/supabase": 86,
     "@supabase/realtime": 391,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 28,
     "@supabase/doctest-js": 28
@@ -667,6 +750,7 @@
     "name": "2020-03-31",
     "@supabase/supabase": 87,
     "@supabase/realtime": 391,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 29,
     "@supabase/doctest-js": 28
@@ -675,6 +759,7 @@
     "name": "2020-04-01",
     "@supabase/supabase": 87,
     "@supabase/realtime": 392,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 30,
     "@supabase/doctest-js": 28
@@ -683,6 +768,7 @@
     "name": "2020-04-02",
     "@supabase/supabase": 88,
     "@supabase/realtime": 392,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 30,
     "@supabase/doctest-js": 28
@@ -691,6 +777,7 @@
     "name": "2020-04-04",
     "@supabase/supabase": 102,
     "@supabase/realtime": 393,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 31,
     "@supabase/doctest-js": 28
@@ -699,6 +786,7 @@
     "name": "2020-04-05",
     "@supabase/supabase": 111,
     "@supabase/realtime": 395,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 31,
     "@supabase/doctest-js": 28
@@ -707,6 +795,7 @@
     "name": "2020-04-06",
     "@supabase/supabase": 111,
     "@supabase/realtime": 396,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 31,
     "@supabase/doctest-js": 29
@@ -715,6 +804,7 @@
     "name": "2020-04-08",
     "@supabase/supabase": 112,
     "@supabase/realtime": 396,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 31,
     "@supabase/doctest-js": 29
@@ -723,6 +813,7 @@
     "name": "2020-04-10",
     "@supabase/supabase": 113,
     "@supabase/realtime": 397,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 31,
     "@supabase/doctest-js": 29
@@ -731,6 +822,7 @@
     "name": "2020-04-11",
     "@supabase/supabase": 113,
     "@supabase/realtime": 397,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 31,
     "@supabase/doctest-js": 30
@@ -739,6 +831,7 @@
     "name": "2020-04-12",
     "@supabase/supabase": 113,
     "@supabase/realtime": 397,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 31,
     "@supabase/doctest-js": 31
@@ -747,6 +840,7 @@
     "name": "2020-04-15",
     "@supabase/supabase": 143,
     "@supabase/realtime": 400,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 31,
     "@supabase/doctest-js": 31
@@ -755,6 +849,7 @@
     "name": "2020-04-16",
     "@supabase/supabase": 150,
     "@supabase/realtime": 402,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 31,
     "@supabase/doctest-js": 31
@@ -763,6 +858,7 @@
     "name": "2020-04-18",
     "@supabase/supabase": 151,
     "@supabase/realtime": 402,
+    "@supabase/postgres": 0,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 31,
     "@supabase/doctest-js": 31
@@ -771,6 +867,16 @@
     "name": "2020-04-19",
     "@supabase/supabase": 151,
     "@supabase/realtime": 403,
+    "@supabase/postgres": 0,
+    "@supabase/marketplace": 6,
+    "@supabase/postgrest-js": 31,
+    "@supabase/doctest-js": 31
+  },
+  {
+    "name": "2020-04-21",
+    "@supabase/supabase": 151,
+    "@supabase/realtime": 403,
+    "@supabase/postgres": 1,
     "@supabase/marketplace": 6,
     "@supabase/postgrest-js": 31,
     "@supabase/doctest-js": 31
@@ -779,6 +885,7 @@
     "name": "2020-04-22",
     "@supabase/supabase": 151,
     "@supabase/realtime": 404,
+    "@supabase/postgres": 2,
     "@supabase/marketplace": 7,
     "@supabase/postgrest-js": 32,
     "@supabase/doctest-js": 32
@@ -787,6 +894,7 @@
     "name": "2020-04-23",
     "@supabase/supabase": 151,
     "@supabase/realtime": 404,
+    "@supabase/postgres": 2,
     "@supabase/marketplace": 7,
     "@supabase/postgrest-js": 36,
     "@supabase/doctest-js": 32
@@ -795,6 +903,7 @@
     "name": "2020-04-24",
     "@supabase/supabase": 151,
     "@supabase/realtime": 404,
+    "@supabase/postgres": 2,
     "@supabase/marketplace": 7,
     "@supabase/postgrest-js": 37,
     "@supabase/doctest-js": 32
@@ -803,6 +912,7 @@
     "name": "2020-04-25",
     "@supabase/supabase": 151,
     "@supabase/realtime": 404,
+    "@supabase/postgres": 2,
     "@supabase/marketplace": 7,
     "@supabase/postgrest-js": 39,
     "@supabase/doctest-js": 32
@@ -811,6 +921,7 @@
     "name": "2020-04-27",
     "@supabase/supabase": 152,
     "@supabase/realtime": 404,
+    "@supabase/postgres": 2,
     "@supabase/marketplace": 7,
     "@supabase/postgrest-js": 39,
     "@supabase/doctest-js": 32
@@ -819,6 +930,7 @@
     "name": "2020-04-28",
     "@supabase/supabase": 153,
     "@supabase/realtime": 405,
+    "@supabase/postgres": 2,
     "@supabase/marketplace": 7,
     "@supabase/postgrest-js": 39,
     "@supabase/doctest-js": 32
@@ -827,6 +939,7 @@
     "name": "2020-04-29",
     "@supabase/supabase": 154,
     "@supabase/realtime": 423,
+    "@supabase/postgres": 5,
     "@supabase/marketplace": 8,
     "@supabase/postgrest-js": 39,
     "@supabase/doctest-js": 33
@@ -835,6 +948,7 @@
     "name": "2020-04-30",
     "@supabase/supabase": 159,
     "@supabase/realtime": 424,
+    "@supabase/postgres": 10,
     "@supabase/marketplace": 8,
     "@supabase/postgrest-js": 39,
     "@supabase/doctest-js": 33
@@ -843,6 +957,7 @@
     "name": "2020-05-01",
     "@supabase/supabase": 161,
     "@supabase/realtime": 492,
+    "@supabase/postgres": 14,
     "@supabase/marketplace": 8,
     "@supabase/postgrest-js": 39,
     "@supabase/doctest-js": 33
@@ -850,7 +965,8 @@
   {
     "name": "2020-05-02",
     "@supabase/supabase": 168,
-    "@supabase/realtime": 500,
+    "@supabase/realtime": 519,
+    "@supabase/postgres": 15,
     "@supabase/marketplace": 8,
     "@supabase/postgrest-js": 39,
     "@supabase/doctest-js": 33
@@ -858,7 +974,17 @@
   {
     "name": "2020-05-03",
     "@supabase/supabase": 170,
-    "@supabase/realtime": 500,
+    "@supabase/realtime": 530,
+    "@supabase/postgres": 15,
+    "@supabase/marketplace": 8,
+    "@supabase/postgrest-js": 39,
+    "@supabase/doctest-js": 33
+  },
+  {
+    "name": "2020-05-04",
+    "@supabase/supabase": 170,
+    "@supabase/realtime": 539,
+    "@supabase/postgres": 15,
     "@supabase/marketplace": 8,
     "@supabase/postgrest-js": 39,
     "@supabase/doctest-js": 33
@@ -866,7 +992,8 @@
   {
     "name": "2020-05-05",
     "@supabase/supabase": 171,
-    "@supabase/realtime": 500,
+    "@supabase/realtime": 547,
+    "@supabase/postgres": 15,
     "@supabase/marketplace": 8,
     "@supabase/postgrest-js": 40,
     "@supabase/doctest-js": 33

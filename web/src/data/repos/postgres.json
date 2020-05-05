@@ -72,7 +72,7 @@
   "clone_url": "https://github.com/supabase/postgres.git",
   "svn_url": "https://github.com/supabase/postgres",
   "homepage": "https://supabase.io",
-  "size": 73,
+  "size": 75,
   "stargazers_count": 15,
   "watchers_count": 15,
   "language": "Shell",
