@@ -22,7 +22,6 @@ export const useStore = (props) => {
   }, [])
 
   useEffect(() => {
-    console.log(newTask)
     const handleAsync = async () => {
       if (newTask) {
         // could be an update
@@ -44,7 +43,6 @@ export const useStore = (props) => {
 
   useEffect(() => {
     if (!taskListener && list) {
-      console.log(list.id)
       setTaskListener(
         supabase
           .from(`tasks:list_id=eq.${list.id}`)
