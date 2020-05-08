@@ -15,10 +15,17 @@ export const TodoList = (props) => {
       <label>Sharing url: </label>
       <input type="text" readonly value={window.location.href} />
       <div className={'field-row'}>
-        <input id="newtask" type="text" onChange={(e) => setNewTaskText(e.target.value)} />
-        <label htmlFor="newtask">
-          <button onClick={() => addTask(newTaskText, list.id)}>add task</button>
-        </label>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            setNewTaskText('')
+          }}
+        >
+          <input id="newtask" type="text" value={newTaskText} onChange={(e) => setNewTaskText(e.target.value)} />
+          <button type="submit" onClick={() => addTask(newTaskText, list.id)}>
+            add task
+          </button>
+        </form>
       </div>
       {tasks
         ? tasks.map((task) => {
