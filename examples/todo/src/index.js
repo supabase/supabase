@@ -1,4 +1,5 @@
 import React from 'react'
+import './index.css'
 import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router-dom'
 import { render } from 'react-dom'
 import { TodoList } from './TodoList'
@@ -14,7 +15,7 @@ const newList = async (history) => {
 const Home = () => {
   const history = useHistory()
   return (
-    <div>
+    <div className='container'>
       <button
         onClick={() => {
           newList(history)
