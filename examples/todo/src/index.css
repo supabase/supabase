@@ -8,9 +8,8 @@ body {
   background-color: rgb(250, 217, 246);
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+h1 {
+  margin-bottom: 0;
 }
 
 .container {
