@@ -6,25 +6,39 @@ import { TodoList } from './TodoList'
 import * as serviceWorker from './serviceWorker'
 import { v4 as uuidv4 } from 'uuid'
 import { createList } from './Store'
+import queryString from 'query-string'
 
 const newList = async (history) => {
   const list = await createList(uuidv4())
-  history.push(`/${list.uuid}`)
+  history.push(`/?uuid=${list.uuid}`)
 }
 
-const Home = () => {
+const Home = (props) => {
   const history = useHistory()
-  return (
-    <div className='container'>
-      <button
-        onClick={() => {
-          newList(history)
-        }}
-      >
-        new task list
-      </button>
-    </div>
-  )
+  const uuid = queryString.parse(props.location.search).uuid
+
+  if (uuid) return TodoList(uuid)
+  else {
+    return (
+      <div className="container">
+        <div className="section">
+          <h1>Collaborative Task Lists</h1>
+          <small>
+            Powered by <a href="https://supabase.io">Supabase</a>
+          </small>
+        </div>
+        <div className="section">
+          <button
+            onClick={() => {
+              newList(history)
+            }}
+          >
+            new task list
+          </button>
+        </div>
+      </div>
+    )
+  }
 }
 
 render(
@@ -32,7 +46,6 @@ render(
     <Router>
       <Switch>
         <Route exact path="/" component={Home} />
-        <Route path="/:uuid" component={TodoList} />
       </Switch>
     </Router>
   </div>,

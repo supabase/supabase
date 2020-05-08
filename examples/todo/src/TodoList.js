@@ -2,10 +2,8 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore, addTask, updateTask } from './Store'
 
-export const TodoList = (props) => {
+export const TodoList = (uuid) => {
   const [newTaskText, setNewTaskText] = useState('')
-  const { match } = props
-  let { uuid } = match.params
   const { tasks, setTasks, list } = useStore({ uuid })
 
   return (
