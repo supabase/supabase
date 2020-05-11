@@ -19,3 +19,19 @@ h1 {
 .section {
   margin: 1em;
 }
+
+.build {
+  width: 600px;
+}
+
+.build-img {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+
+@media screen and (max-width : 600px) {
+  .build {
+    width: 300px;
+  }
+}
