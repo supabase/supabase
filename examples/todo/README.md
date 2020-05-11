@@ -2,6 +2,10 @@
 
 ![Alt Text](https://dev-to-uploads.s3.amazonaws.com/i/n48hnd9zl78a0uq68xak.png)
 
+## Tutorial
+
+[https://dev.to/awalias/howto-build-collaborative-realtime-task-lists-in-react-4k52](https://dev.to/awalias/howto-build-collaborative-realtime-task-lists-in-react-4k52)
+
 ## Warning
 
 This demo doesn't provide any form of client-side authentication so please don't use it in
