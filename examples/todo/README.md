@@ -5,9 +5,13 @@ production unless you're ok with all your tasks being publicly available
 
 ## Required env vars
 
-Get these from the your project dashboard at app.supabase.io:
-`REACT_APP_SUPABASE_URL=`
-`REACT_APP_SUPABASE_KEY=`
+Make a `.env` in this folder with the following 
+(you can get these values from the your project dashboard at app.supabase.io):
+
+```bash
+REACT_APP_SUPABASE_URL=<your-supabase-url>
+REACT_APP_SUPABASE_KEY=<your-supabase-key>
+```
 
 ## Available Scripts
 
