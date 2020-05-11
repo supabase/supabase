@@ -60,6 +60,9 @@ export const TodoList = (uuid) => {
             })
           : ''}
       </div>
+      <div className="section">
+        <small>warning: do not store any sensitive information in this list, it is not secure</small>
+      </div>
     </div>
   )
 }
