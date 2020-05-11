@@ -1,3 +1,7 @@
+## Collaborative Realtime Task Lists
+
+![Alt Text](https://dev-to-uploads.s3.amazonaws.com/i/n48hnd9zl78a0uq68xak.png)
+
 ## Warning
 
 This demo doesn't provide any form of client-side authentication so please don't use it in
