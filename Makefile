@@ -26,6 +26,7 @@ github.repos: \
 	github.repos.supabase \
 	github.repos.realtime  \
 	github.repos.marketplace \
+	github.repos.pg-api \
 	github.repos.postgrest-js \
 	github.repos.postgres \
 	github.repos.doctest-js

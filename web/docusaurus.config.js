@@ -7,7 +7,7 @@
 
 module.exports = {
   title: 'Supabase',
-  tagline: 'realtime postgres.',
+  tagline: 'The opensource Firebase alternative.',
   url: 'https://supabase.io',
   baseUrl: '/',
   favicon: '/favicon.ico',
@@ -74,7 +74,7 @@ module.exports = {
         },
         { to: '/docs/pricing', label: 'Pricing', position: 'left' },
         { to: '/blog', label: 'Blog', position: 'left' },
-        { href: 'https://app.supabase.io', label: 'Alpha', position: 'left' },
+        { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
         // {
         //   href: 'https://github.com/supabase/supabase',
         //   label: 'GitHub',
@@ -94,6 +94,23 @@ module.exports = {
           title: 'Company',
           items: [
             {
+              label: 'Humans',
+              to: 'https://supabase.io/humans.txt',
+            },
+            {
+              label: 'Blog',
+              to: '/blog',
+            },
+            {
+              label: 'Opensource',
+              to: '/oss',
+            },
+          ],
+        },
+        {
+          title: 'Resources',
+          items: [
+            {
               label: 'Docs',
               to: '/docs/about',
             },
@@ -104,14 +121,6 @@ module.exports = {
             {
               label: 'Support',
               to: '/docs/support',
-            },
-            {
-              label: 'Opensource',
-              to: '/oss',
-            },
-            {
-              label: 'Humans',
-              to: 'https://supabase.io/humans.txt',
             },
           ],
         },
