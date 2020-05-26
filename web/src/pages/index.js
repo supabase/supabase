@@ -19,8 +19,10 @@ const realtime = supabase
 const subscribeExample = `
 import { createClient } from '@supabase/supabase-js'
 
-// Connect to the chat room 
-const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
+// Initialize 
+const supabaseUrl = 'https://chat-room.supabase.co'
+const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Get notified of all new chat messages
 const realtime = supabase
@@ -33,8 +35,10 @@ const realtime = supabase
 const readExample = `
 import { createClient } from '@supabase/supabase-js'
 
-// Connect to the chat room 
-const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
+// Initialize 
+const supabaseUrl = 'https://chat-room.supabase.co'
+const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Get public rooms and their messages
 const publicRooms = await supabase
@@ -48,8 +52,10 @@ const publicRooms = await supabase
 const createExample = `
 import { createClient } from '@supabase/supabase-js'
 
-// Connect to the chat room 
-const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
+// Initialize 
+const supabaseUrl = 'https://chat-room.supabase.co'
+const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Create a new chat room
 const newRoom = await supabase
@@ -59,8 +65,10 @@ const newRoom = await supabase
 const updateExample = `
 import { createClient } from '@supabase/supabase-js'
 
-// Connect to the chat room 
-const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
+// Initialize 
+const supabaseUrl = 'https://chat-room.supabase.co'
+const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Update multiple users
 const updatedUsers = await supabase
@@ -130,7 +138,7 @@ function Feature({ imageUrl, title, description, href }) {
 function Home() {
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
-  const [visibleCodeExample, showCodeExample] = useState('SUBSCRIBE')
+  const [visibleCodeExample, showCodeExample] = useState('READ')
   return (
     <Layout title={`${siteConfig.title}`} description={siteConfig.tagline}>
       <main className="HomePage">
@@ -179,9 +187,21 @@ function Home() {
           }}
           className="hero is--dark"
         >
-          <div className="container " style={{display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <div
+            className="container "
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          >
             <img src="/img/yc-gray.png" alt="Y Combinator" width="50" />
-            <p style={{fontWeight: 'bold', padding: '0px 20px', margin: 0, display: 'inline-block' }}>Backed by Y Combinator.</p>
+            <p
+              style={{
+                fontWeight: 'bold',
+                padding: '0px 20px',
+                margin: 0,
+                display: 'inline-block',
+              }}
+            >
+              Backed by Y Combinator.
+            </p>
           </div>
         </section>
 
@@ -280,19 +300,19 @@ function Home() {
                   <div>
                     <button
                       className={`button button--${
-                        visibleCodeExample === 'SUBSCRIBE' ? 'info is-active' : 'info'
-                      }`}
-                      onClick={() => showCodeExample('SUBSCRIBE')}
-                    >
-                      Realtime subscriptions
-                    </button>
-                    <button
-                      className={`button button--${
                         visibleCodeExample === 'READ' ? 'info is-active' : 'info '
                       }`}
                       onClick={() => showCodeExample('READ')}
                     >
                       Get your data
+                    </button>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'SUBSCRIBE' ? 'info is-active' : 'info'
+                      }`}
+                      onClick={() => showCodeExample('SUBSCRIBE')}
+                    >
+                      Realtime subscriptions
                     </button>
                     <button
                       className={`button button--${
@@ -313,16 +333,16 @@ function Home() {
                   </div>
                 </div>
                 <div className="col col--9 code-with-header">
-                  {visibleCodeExample === 'SUBSCRIBE' && (
-                    <CustomCodeBlock
-                      header="Receive realtime messages in an example chat room"
-                      js={subscribeExample}
-                    />
-                  )}
                   {visibleCodeExample === 'READ' && (
                     <CustomCodeBlock
                       header="Get all public rooms and their messages"
                       js={readExample}
+                    />
+                  )}
+                  {visibleCodeExample === 'SUBSCRIBE' && (
+                    <CustomCodeBlock
+                      header="Receive realtime messages in an example chat room"
+                      js={subscribeExample}
                     />
                   )}
                   {visibleCodeExample === 'CREATE' && (
