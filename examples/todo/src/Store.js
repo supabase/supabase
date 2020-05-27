@@ -16,10 +16,10 @@ export const useStore = (props) => {
     fetchList(props.uuid)
       .then((response) => {
         setList(response)
-        setTasks(response.tasks.sort((a, b) => a.id - b.id))
+        setTasks(response.tasks.sort((a, b) => b.id - a.id))
       })
       .catch(console.error)
-  }, [])
+  }, [props.uuid])
 
   useEffect(() => {
     const handleAsync = async () => {
@@ -29,12 +29,15 @@ export const useStore = (props) => {
           if (task.id === newTask.id) {
             tasks[i] = newTask
             return true
+          } else {
+            return false
           }
         })
         if (update) {
-          setTasks([...tasks]) // update
+          setTasks(t => [...tasks]) // update
         } else {
-          setTasks(tasks.concat(newTask)) // new
+          tasks.unshift(newTask)
+          setTasks(t => [...tasks]) // new
         }
       }
     }
@@ -51,7 +54,7 @@ export const useStore = (props) => {
           .subscribe()
       )
     }
-  }, [list])
+  }, [list, taskListener])
 
   return { list, tasks, setTasks }
 }

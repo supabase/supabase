@@ -12,7 +12,7 @@ export const TodoList = (uuid) => {
       <h1 className="section">My Task List</h1>
       <div className="section">
         <label>Sharing url: </label>
-        <input type="text" readonly value={window.location.href} />
+        <input type="text" readOnly value={window.location.href} />
       </div>
       <div className={'field-row section'}>
         <form
@@ -27,7 +27,7 @@ export const TodoList = (uuid) => {
             value={newTaskText}
             onChange={(e) => setNewTaskText(e.target.value)}
           />
-          <button type="submit" onClick={() => addTask(newTaskText, list.id)}>
+          <button type="submit" onClick={() => (newTaskText ? addTask(newTaskText, list.id) : '')}>
             add task
           </button>
         </form>
@@ -44,6 +44,8 @@ export const TodoList = (uuid) => {
                         if (t.id === task.id) {
                           tasks[i].complete = !task.complete
                           return true
+                        } else {
+                          return false
                         }
                       })
                       setTasks([...tasks])
@@ -61,7 +63,9 @@ export const TodoList = (uuid) => {
           : ''}
       </div>
       <div className="section">
-        <small>warning: do not store any sensitive information in this list, it is not secure</small>
+        <small>
+          warning: do not store any sensitive information in this list, it is not secure
+        </small>
       </div>
     </div>
   )
