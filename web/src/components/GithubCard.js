@@ -4,7 +4,7 @@ export default function GithubCard({ title, description, href, stars, handle }) 
   return (
       <a className={'card'} href={href} style={{height: '100%'}}>
         <div className="card__body">
-          <h3 style={styles.h3}>{title}</h3>
+          <h4 style={styles.h4} style={{margin: 0}}>{title.toUpperCase()}</h4>
           <small>{description}</small>
         </div>
         <hr style={styles.hr} />

@@ -11,24 +11,18 @@ import HowCard from '../components/HowCard'
 import { repos } from '../data/github'
 
 const heroExample = `
-import { createClient } from '@supabase/supabase-js'
-
-// Connect to your own PostgreSQL database
-const supabase = createClient('https://your-db.supabase.co', 'api-key')
-
-// Receive updates when a new record is inserted into your database
 const realtime = supabase
-  .from('*')
-  .on('INSERT', change => {
-    console.log('Change received!', change)
-  })
+  .from('messages')
+  .on('INSERT', message => console.log('New message!', message) )
   .subscribe()
 `.trim()
 const subscribeExample = `
 import { createClient } from '@supabase/supabase-js'
 
-// Connect to the chat room 
-const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
+// Initialize 
+const supabaseUrl = 'https://chat-room.supabase.co'
+const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Get notified of all new chat messages
 const realtime = supabase
@@ -41,8 +35,10 @@ const realtime = supabase
 const readExample = `
 import { createClient } from '@supabase/supabase-js'
 
-// Connect to the chat room 
-const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
+// Initialize 
+const supabaseUrl = 'https://chat-room.supabase.co'
+const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Get public rooms and their messages
 const publicRooms = await supabase
@@ -56,8 +52,10 @@ const publicRooms = await supabase
 const createExample = `
 import { createClient } from '@supabase/supabase-js'
 
-// Connect to the chat room 
-const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
+// Initialize 
+const supabaseUrl = 'https://chat-room.supabase.co'
+const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Create a new chat room
 const newRoom = await supabase
@@ -67,8 +65,10 @@ const newRoom = await supabase
 const updateExample = `
 import { createClient } from '@supabase/supabase-js'
 
-// Connect to the chat room 
-const supabase = createClient('https://chat-room.supabase.co', '1a2b-3c4d-5e6f-7g8h')
+// Initialize 
+const supabaseUrl = 'https://chat-room.supabase.co'
+const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Update multiple users
 const updatedUsers = await supabase
@@ -138,7 +138,7 @@ function Feature({ imageUrl, title, description, href }) {
 function Home() {
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
-  const [visibleCodeExample, showCodeExample] = useState('SUBSCRIBE')
+  const [visibleCodeExample, showCodeExample] = useState('READ')
   return (
     <Layout title={`${siteConfig.title}`} description={siteConfig.tagline}>
       <main className="HomePage">
@@ -149,9 +149,7 @@ function Home() {
               <div className="col col--5">
                 <h2 className="hero__title">{siteConfig.tagline}</h2>
                 <p className="hero__subtitle">
-                  Supabase adds realtime and RESTful APIs to your{' '}
-                  <strong className="has-emphasis">existing</strong> PostgreSQL database without a
-                  single line of code.
+                  Supabase adds realtime and restful APIs to Postgres without a single line of code.
                 </p>
                 <div>
                   <Link
@@ -169,31 +167,43 @@ function Home() {
                       'button hero--button button--md button--primary responsive-button',
                       styles.button
                     )}
-                    to={'https://github.com/supabase/supabase'}
+                    to={'https://app.supabase.io'}
                     style={{ marginTop: 10 }}
                   >
-                    Follow our GitHub →
+                    Alpha sign up →
                   </Link>
                 </div>
               </div>
               <div className="col col--7">
-                <CustomCodeBlock
-                  header="Get notified of all new records in your database"
-                  js={heroExample}
-                />
+                <CustomCodeBlock header="Listen to your Postgres in realtime." js={heroExample} />
               </div>
             </div>
           </div>
         </header>
 
-        {/* <section
+        <section
           style={{
-            padding: '50px 0',
+            padding: 30,
           }}
           className="hero is--dark"
         >
-          <div className="container text--center"><small>CUSTOMER LOGOS</small></div>
-        </section> */}
+          <div
+            className="container "
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          >
+            <img src="/img/yc-gray.png" alt="Y Combinator" width="50" />
+            <p
+              style={{
+                fontWeight: 'bold',
+                padding: '0px 20px',
+                margin: 0,
+                display: 'inline-block',
+              }}
+            >
+              Backed by Y Combinator.
+            </p>
+          </div>
+        </section>
 
         {/* HOW */}
         <section className={'section-lg'}>
@@ -218,11 +228,13 @@ function Home() {
                 </div>
                 <div>
                   <HowCard
-                    title="Connect your database to Supabase"
-                    description={<>Supabase introspects your database and provides instant APIs.</>}
+                    title="Built with PostgreSQL"
+                    description={
+                      <>Sign up and query your Postgres database in less than 2 minutes.</>
+                    }
                     featureTitle="You get"
                     features={[
-                      'APIs always in sync with your schema',
+                      'Full Postgres database',
                       'Instant RESTful API',
                       'Realtime notifications via websockets',
                     ]}
@@ -240,7 +252,7 @@ function Home() {
                     description={<>Supabase handles the stuff you're usually too busy to build.</>}
                     featureTitle="You get"
                     features={[
-                      'Custom URL for your APIs',
+                      'APIs always in sync with your schema',
                       'Custom API docs for your schema',
                       'Built-in security & monitoring',
                     ]}
@@ -288,19 +300,19 @@ function Home() {
                   <div>
                     <button
                       className={`button button--${
-                        visibleCodeExample === 'SUBSCRIBE' ? 'info is-active' : 'info'
-                      }`}
-                      onClick={() => showCodeExample('SUBSCRIBE')}
-                    >
-                      Realtime subscriptions
-                    </button>
-                    <button
-                      className={`button button--${
                         visibleCodeExample === 'READ' ? 'info is-active' : 'info '
                       }`}
                       onClick={() => showCodeExample('READ')}
                     >
                       Get your data
+                    </button>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'SUBSCRIBE' ? 'info is-active' : 'info'
+                      }`}
+                      onClick={() => showCodeExample('SUBSCRIBE')}
+                    >
+                      Realtime subscriptions
                     </button>
                     <button
                       className={`button button--${
@@ -321,16 +333,16 @@ function Home() {
                   </div>
                 </div>
                 <div className="col col--9 code-with-header">
-                  {visibleCodeExample === 'SUBSCRIBE' && (
-                    <CustomCodeBlock
-                      header="Receive realtime messages in an example chat room"
-                      js={subscribeExample}
-                    />
-                  )}
                   {visibleCodeExample === 'READ' && (
                     <CustomCodeBlock
                       header="Get all public rooms and their messages"
                       js={readExample}
+                    />
+                  )}
+                  {visibleCodeExample === 'SUBSCRIBE' && (
+                    <CustomCodeBlock
+                      header="Receive realtime messages in an example chat room"
+                      js={subscribeExample}
                     />
                   )}
                   {visibleCodeExample === 'CREATE' && (
@@ -363,7 +375,8 @@ function Home() {
               <div className="col col--6 col--offset-3">
                 <h2 className="with-underline">Self-documenting</h2>
                 <p className="">
-                  We introspect your database to give you instant, custom documentation for your REST and Realtime APIs.
+                  We introspect your database to give you instant, custom documentation for your
+                  REST and Realtime APIs.
                 </p>
               </div>
             </div>
@@ -395,18 +408,23 @@ function Home() {
             </div>
 
             <div className="row is-multiline">
-              {repos.map((props, idx) => (
-                <div className={'col col--6'} key={idx}>
-                  <GithubCard
-                    key={idx}
-                    title={props.name}
-                    description={props.description}
-                    href={props.html_url}
-                    stars={props.stargazers_count}
-                    handle={props.full_name}
-                  />
-                </div>
-              ))}
+              {repos
+                .filter((x) => ['supabase', 'realtime', 'postgres', 'pg-api'].includes(x.name))
+                .map((props, idx) => (
+                  <div className={'col col--6'} key={idx}>
+                    <GithubCard
+                      key={idx}
+                      title={props.name}
+                      description={props.description}
+                      href={props.html_url}
+                      stars={props.stargazers_count}
+                      handle={props.full_name}
+                    />
+                  </div>
+                ))}
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <a href="/oss">See more →</a>
             </div>
           </div>
         </section>
@@ -439,10 +457,10 @@ function Home() {
                   'button hero--button button--md button--primary responsive-button',
                   styles.button
                 )}
-                to={'https://github.com/supabase/supabase'}
+                to={'https://app.supabase.io'}
                 style={{ margin: 5 }}
               >
-                Follow our GitHub →
+                Alpha sign up →
               </Link>
             </div>
           </div>
