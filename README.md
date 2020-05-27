@@ -14,11 +14,11 @@
 ## Status
 
 - [x] Alpha: We are testing Supabase with a closed set of customers
-- [ ] Private Beta: We will open Supabase to some of our early watchers.
-- [ ] Public Beta: We will open Supabase to the world. But go easy on us, there may be a few kinks.
-- [ ] Public: All welcome!
+- [x] Public Alpha: Anyone can sign up over at [app.supabase.io](https://app.supabase.io). But go easy on us, there are a few kinks.
+- [ ] Public Beta: Stable enough for most non-enterprise use-cases
+- [ ] Public: Production-ready
 
-We are currently in alpha. Watch "releases" of this repo to get notified when we are ready for Public Beta.
+We are currently in Public Alpha. Watch "releases" of this repo to get notified of major updates.
 
 
 <p align="center">
