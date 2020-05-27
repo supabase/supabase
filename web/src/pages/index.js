@@ -174,9 +174,16 @@ function Home() {
                   </Link>
                 </div>
                 <div>
-                  <a href="https://www.producthunt.com/posts/supabase?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-supabase" target="_blank">
+                  <Link
+                    className={classnames(
+                      'button hero--button button--md button--secondary button--outline responsive-button',
+                      styles.button
+                    )}
+                    to={'https://www.producthunt.com/posts/supabase?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-supabase'}
+                    style={{ marginLeft: 0, marginTop: 10 }}
+                  >
                     <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=203792&theme=dark" alt="Supabase - An open source Firebase alternative | Product Hunt Embed" style="width: 250px; height: 54px;" width="250px" height="54px" />
-                  </a>
+                  </Link>
                 </div>
               </div>
               <div className="col col--7">
