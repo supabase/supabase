@@ -182,7 +182,7 @@ function Home() {
                     to={'https://www.producthunt.com/posts/supabase?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-supabase'}
                     style={{ marginLeft: 0, marginTop: 10 }}
                   >
-                    <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=203792&theme=dark" alt="Supabase - An open source Firebase alternative | Product Hunt Embed" style="width: 250px; height: 54px;" width="250px" height="54px" />
+                    <img className="" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=203792&theme=dark" alt="Supabase - An open source Firebase alternative | Product Hunt Embed" style="width: 250px; height: 54px;" width="250px" height="54px" />
                   </Link>
                 </div>
               </div>
