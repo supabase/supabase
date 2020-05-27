@@ -20,7 +20,7 @@ module.exports = {
     },
     forceDarkMode: true,
     darkMode: true,
-    image: 'https://supabase.io/favicon.png', // used for meta tag, in particular og:image and twitter:image
+    image: 'https://supabase.io/img/supabase-og-image.png', // used for meta tag, in particular og:image and twitter:image
     metaImage: '/img/supabase-og-image.png',
     googleAnalytics: {
       trackingID: 'UA-155232740-1',
