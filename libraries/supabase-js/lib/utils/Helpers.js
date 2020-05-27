@@ -1,0 +1,1 @@
+'use strict';Object.defineProperty(exports,'__esModule',{value:!0}),exports.uuid=uuid;function uuid(){function a(){return Math.floor(65536*(1+Math.random())).toString(16).substring(1)}return a()+a()+'-'+a()+'-'+a()+'-'+a()+'-'+a()+a()+a()}
