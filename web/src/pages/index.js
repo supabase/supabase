@@ -442,16 +442,22 @@ function Home() {
               <h2>Get Early Access</h2>
             </div> */}
             <div className="">
-              <Link
+              <a
                 className={classnames(
-                  'button hero--button button--outline button--md button--secondary responsive-button',
+                  'button hero--button button--md responsive-button',
                   styles.button
                 )}
-                style={{ margin: 5 }}
-                to={useBaseUrl('docs/about')}
+                href="https://www.producthunt.com/posts/supabase?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-supabase"
+                style={{ width: 250, height: 54, margin:0, padding:0,  display: 'inline-block' }}
               >
-                Learn More
-              </Link>
+                <img
+                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=203792&theme=dark"
+                  alt="Supabase - An open source Firebase alternative | Product Hunt Embed"
+                  style={{ width: 250, height: 54 }}
+                  width="250px"
+                  height="54px"
+                />
+              </a>
               <Link
                 className={classnames(
                   'button hero--button button--md button--primary responsive-button',
