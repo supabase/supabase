@@ -328,7 +328,7 @@ function Home() {
                       }`}
                       onClick={() => showCodeExample('UPDATE')}
                     >
-                      Update mulitple rows
+                      Update multiple rows
                     </button>
                   </div>
                 </div>
