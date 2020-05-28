@@ -7,7 +7,7 @@
 
 module.exports = {
   title: 'Supabase',
-  tagline: 'The opensource Firebase alternative.',
+  tagline: 'The open source Firebase alternative.',
   url: 'https://supabase.io',
   baseUrl: '/',
   favicon: '/favicon.ico',
