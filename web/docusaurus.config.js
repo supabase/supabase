@@ -74,6 +74,7 @@ module.exports = {
         },
         { to: '/docs/pricing', label: 'Pricing', position: 'left' },
         { to: '/blog', label: 'Blog', position: 'left' },
+        { href: 'https://github.com/supabase/supabase', label: 'GitHub', position: 'left' },
         { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
         // {
         //   href: 'https://github.com/supabase/supabase',
