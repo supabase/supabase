@@ -140,6 +140,10 @@ module.exports = {
               label: 'DevTo',
               href: 'https://dev.to/supabase',
             },
+            {
+              label: 'Stackshare',
+              href: 'https://stackshare.io/supabase,
+            },
             // {
             //   label: "Discord",
             //   href: "https://discordapp.com/invite/docusaurus"
