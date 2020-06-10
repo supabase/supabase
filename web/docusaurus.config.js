@@ -142,7 +142,7 @@ module.exports = {
             },
             {
               label: 'Stackshare',
-              href: 'https://stackshare.io/supabase,
+              href: 'https://stackshare.io/supabase',
             },
             // {
             //   label: "Discord",
