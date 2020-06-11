@@ -144,6 +144,10 @@ module.exports = {
               label: 'Stackshare',
               href: 'https://stackshare.io/supabase',
             },
+            {
+              label: 'Product Hunt',
+              href: 'https://www.producthunt.com/posts/supabase-alpha',
+            },
             // {
             //   label: "Discord",
             //   href: "https://discordapp.com/invite/docusaurus"
