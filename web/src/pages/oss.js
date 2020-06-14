@@ -75,10 +75,26 @@ export default function Oss() {
           </div>
         </div>
       </section>
+      {/* Sponsors */}
+      <section className={'section-lg'}>
+        <div className="container">
+          <h2>Sponsors</h2>
+          <p>
+            Like what we do? Consider{' '}
+            <a href="https://github.com/sponsors/supabase">becoming a sponsor</a>.
+          </p>
+          <p>
+            Thanks to these contributors for their sponsorship:{' '}
+            <a href="https://github.com/reverie">@reverie</a>,{' '}
+            <a href="https://github.com/saphp">@saphp</a>
+          </p>
+        </div>
+      </section>
 
       {/* OSS */}
       <section className={'section-lg'}>
         <div className="container">
+          <h2>Repositories</h2>
           <div className="row is-multiline">
             {repos.map((props, idx) => (
               <div className={'col col--6'}>
@@ -102,7 +118,7 @@ export default function Oss() {
 /**
  * Hijacked from recharts as the labels don't show up properly without the XAxis component
  */
-const CustomTooltip = props => {
+const CustomTooltip = (props) => {
   const renderContent = () => {
     const { payload, separator, formatter, itemStyle, itemSorter } = props
 
