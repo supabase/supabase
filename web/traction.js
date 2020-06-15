@@ -45,7 +45,9 @@ const main = async () => {
       .map(async ([name, stars]) => [name, await fetchAllEvents(name, stars)])
   )
 
-  const history = repos.map(([name, githubResponse]) => formatResults(name, githubResponse)).flat()
+  const history = repos
+    .map(([name, githubResponse]) => formatResults(name, githubResponse))
+    .reduce((acc, x) => acc.concat(x), [])
 
   const groups = history.reduce((groups, event) => {
     const date = event.starred_at.split('T')[0]
