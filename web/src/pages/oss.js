@@ -42,28 +42,28 @@ export default function Oss() {
                     <Tooltip content={<CustomTooltip />} />
                     <Area
                       type="monotone"
-                      dataKey="@supabase/doctest-js"
+                      dataKey="pg-api"
                       stackId="1"
                       stroke="#ffc658"
                       fill="#ffc658"
                     />
                     <Area
                       type="monotone"
-                      dataKey="@supabase/postgrest-js"
+                      dataKey="postgres"
                       stackId="1"
                       stroke="#EAB7B7"
                       fill="#F27272"
                     />
                     <Area
                       type="monotone"
-                      dataKey="@supabase/supabase"
+                      dataKey="realtime"
                       stackId="1"
                       stroke="#8884d8"
                       fill="#8884d8"
                     />
                     <Area
                       type="monotone"
-                      dataKey="@supabase/realtime"
+                      dataKey="supabase"
                       stackId="1"
                       stroke="#82ca9d"
                       fill="#82ca9d"
