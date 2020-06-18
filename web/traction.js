@@ -73,11 +73,19 @@ const main = async () => {
       return result
     })
 
+  for (const [name, _] of repos) {
+    let { data } = await axios.get(`https://api.github.com/repos/supabase/${name}`)
+    fs.writeFile(`./src/data/repos/${name}.json`, JSON.stringify(data, null, 2), 'utf8', (err) => {
+      if (err) throw err
+      console.log(`${name}.json saved.`)
+    })
+  }
+
   fs.writeFile('./src/data/stars/stargazers.json', JSON.stringify(data, null, 2), 'utf8', function (
     err
   ) {
     if (err) throw err
-    console.log('Saved.')
+    console.log('stargazers.json saved.')
   })
 }
 main()
