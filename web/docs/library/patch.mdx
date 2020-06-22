@@ -65,20 +65,14 @@ import {
 ```js {3}
 supabase
   .from(tableName)
-  .update(data, options?)
+  .update(data)
 ```
+
+It is to note that it is required to apply filters when using `.update()`. Not using filters would result in an error.
 
 #### `data: object`
 
 New record values.
-
-#### `options: object?`
-
-```js
-const options = {
-  bulk: false, // Protects against bulk updates. Set to true if you intend to perform a bulk change.
-}
-```
 
 ---
 

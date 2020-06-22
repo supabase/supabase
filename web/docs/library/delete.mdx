@@ -63,20 +63,9 @@ import {
 ```js {3}
 supabase
   .from(tableName)
-  .delete(options?)
+  .delete()
 ```
-
-#### `options: object?`
-
-```js
-/**
- * @param {boolean} [bulk=false]
- * Protects against bulk deletes. Set to true if you intend to perform a bulk change.
- */
-const options = {
-  bulk: false,
-}
-```
+It is to note that it is required to apply filters when using `.delete()`. Not using filters would result in an error.
 
 ---
 

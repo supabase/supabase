@@ -43,14 +43,6 @@ The unique Supabase Key which is supplied when you create a new project in [your
 
 ```js
 /**
- * @param {boolean} [allowBulkUpdates=false] 
- * Blocks the user from accidentally updating many rows. 
- * Can also be overriden on individual calls to update().
- * 
- * @param {boolean} [allowBulkDeletes=false] 
- * Blocks the user from accidentally deleting many rows. 
- * Can also be overriden on individual calls to update().
- *
  * @param {string} [schema='public'] 
  * You can switch in between schemas.
  * The schema however would need to be on the list of exposed schemas.
@@ -59,8 +51,6 @@ The unique Supabase Key which is supplied when you create a new project in [your
  * another instance of .createClient() would need to be instantiated.
  */
 const options = {
-  allowBulkUpdates: false, 
-  allowBulkDeletes: false, 
   schema: 'public'
 }
 ```
