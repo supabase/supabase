@@ -1,6 +1,6 @@
 import React from 'react'
 import Layout from '@theme/Layout'
-import { AreaChart, Area, Tooltip, ResponsiveContainer } from 'recharts'
+import { AreaChart, Area, BarChart, Bar, Tooltip, ResponsiveContainer } from 'recharts'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import stargazers from '../data/stars/stargazers.json'
 import GithubCard from '../components/GithubCard'
@@ -9,6 +9,14 @@ import { repos } from '../data/github'
 export default function Oss() {
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
+  
+  // Take only the start of each month
+  const monthlySummary = stargazers.filter((x) => {
+    const currentDate = new Date(x.name)
+    const dayOfWeek = currentDate.getDate()
+    if (dayOfWeek == 1) return true 
+    else return false
+  })
 
   return (
     <Layout title={`${siteConfig.title}`} description={siteConfig.tagline}>
@@ -31,7 +39,7 @@ export default function Oss() {
                   <AreaChart
                     width={600}
                     height={400}
-                    data={stargazers}
+                    data={monthlySummary}
                     margin={{
                       top: 0,
                       right: 0,
@@ -40,34 +48,25 @@ export default function Oss() {
                     }}
                   >
                     <Tooltip content={<CustomTooltip />} />
-                    <Area
+                    {/* <Bar
                       type="monotone"
                       dataKey="pg-api"
-                      stackId="1"
                       stroke="#ffc658"
                       fill="#ffc658"
                     />
-                    <Area
+                    <Bar
                       type="monotone"
                       dataKey="postgres"
-                      stackId="1"
                       stroke="#EAB7B7"
                       fill="#F27272"
                     />
-                    <Area
+                    <Bar
                       type="monotone"
                       dataKey="realtime"
-                      stackId="1"
                       stroke="#8884d8"
                       fill="#8884d8"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="supabase"
-                      stackId="1"
-                      stroke="#82ca9d"
-                      fill="#82ca9d"
-                    />
+                    /> */}
+                    <Area type="monotone" dataKey="supabase" stroke="#82ca9d" fill="#82ca9d" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
