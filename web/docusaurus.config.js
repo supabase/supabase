@@ -45,42 +45,11 @@ module.exports = {
           to: '/docs/about',
           label: 'Docs',
           position: 'left',
-          // items: [
-          //   {
-          //     label: 'Realtime',
-          //     to: '/docs/library/subscribe',
-          //   },
-          //   {
-          //     label: 'Reading',
-          //     to: '/docs/library/get',
-          //   },
-          //   {
-          //     label: 'Creating',
-          //     to: '/docs/library/post',
-          //   },
-          //   {
-          //     label: 'Updating',
-          //     to: '/docs/library/patch',
-          //   },
-          //   {
-          //     label: 'Stored Procedures',
-          //     to: '/docs/library/stored-procedures',
-          //   },
-          //   {
-          //     label: 'Self Hosting',
-          //     to: '/docs/hosting/hosting-realtime',
-          //   },
-          // ],
         },
         { to: '/docs/pricing', label: 'Pricing', position: 'left' },
         { to: '/blog', label: 'Blog', position: 'left' },
         { href: 'https://github.com/supabase/supabase', label: 'GitHub', position: 'left' },
         { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
-        // {
-        //   href: 'https://github.com/supabase/supabase',
-        //   label: 'GitHub',
-        //   position: 'right',
-        // },
       ],
     },
     prism: {
@@ -103,7 +72,7 @@ module.exports = {
               to: '/blog',
             },
             {
-              label: 'Opensource',
+              label: 'Open source',
               to: '/oss',
             },
           ],
@@ -164,11 +133,6 @@ module.exports = {
           ],
         },
       ],
-      // logo: {
-      //   alt: "Flock",
-      //   src: "/img/logo-white.svg",
-      //   // href: "https://opensource.facebook.com/"
-      // },
       copyright: `Copyright © ${new Date().getFullYear()} Supabase.`,
     },
   },
