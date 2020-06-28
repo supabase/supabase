@@ -9,7 +9,7 @@ export default function ContributorList({ list }) {
       {i < list.length - 1 && ', '}
     </>
   ))
-  console.log('users', users)
+  // console.log('users', users)
 
   return users
 }

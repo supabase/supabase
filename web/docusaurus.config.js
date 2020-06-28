@@ -42,7 +42,7 @@ module.exports = {
       },
       links: [
         {
-          to: '/docs/about',
+          to: '/docs',
           label: 'Docs',
           position: 'left',
         },
@@ -82,7 +82,7 @@ module.exports = {
           items: [
             {
               label: 'Docs',
-              to: '/docs/about',
+              to: '/docs',
             },
             {
               label: 'Pricing',
@@ -141,6 +141,7 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
+          homePageId: 'about',
           sidebarPath: require.resolve('./sidebars.js'),
         },
         theme: {
