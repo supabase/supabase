@@ -1,0 +1,38 @@
+body {
+  font-family: 'SF Pro Text', 'SF Pro Icons', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  padding: 20px;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+label {
+  display: block;
+  width: 100px;
+  padding: 5px 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: #666;
+}
+
+input {
+  border: 1px solid #999;
+  border-radius: 4px;
+  padding: 5px;
+  font-size: 0.9rem;
+}
+
+button {
+  border-radius: 4px;
+  background: #4630eb;
+  border: #4630eb;
+  color: white;
+  padding: 8px 20px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #3724c5;
+  cursor: pointer;
+}
