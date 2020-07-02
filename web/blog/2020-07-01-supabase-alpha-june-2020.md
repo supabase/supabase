@@ -60,7 +60,7 @@ We have a number of small improvements:
 - Start using Supabase today: [app.supabase.io](https://app.supabase.io)
 - Make sure to [star us on GitHub](https://github.com/supabase/supabase)
 - Follow us [on Twitter](https://twitter.com/supabase_io)
-- Become a [sponsor]()
+- Become a [sponsor](https://github.com/sponsors/supabase)
 
 
 
