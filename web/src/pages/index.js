@@ -157,7 +157,7 @@ function Home() {
                       'button hero--button button--md button--secondary button--outline responsive-button',
                       styles.button
                     )}
-                    to={useBaseUrl('docs/about')}
+                    to={useBaseUrl('docs')}
                     style={{ marginLeft: 0, marginTop: 10 }}
                   >
                     Learn More
