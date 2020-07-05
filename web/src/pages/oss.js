@@ -84,8 +84,8 @@ export default function Oss() {
           </p>
           <p>
             Thanks to these contributors for their sponsorship:{' '}
-            <a href="https://github.com/reverie">@reverie</a>,{' '}
-            <a href="https://github.com/saphp">@saphp</a>
+            <a href="https://github.com/reverie" key="a-reverie">@reverie</a>,{' '}
+            <a href="https://github.com/saphp" key="a-saphp">@saphp</a>
           </p>
         </div>
       </section>
