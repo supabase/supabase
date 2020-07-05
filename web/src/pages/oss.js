@@ -9,12 +9,12 @@ import { repos } from '../data/github'
 export default function Oss() {
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
-  
+
   // Take only the start of each month
   const monthlySummary = stargazers.filter((x) => {
     const currentDate = new Date(x.name)
     const dayOfWeek = currentDate.getDate()
-    if (dayOfWeek == 1) return true 
+    if (dayOfWeek == 1) return true
     else return false
   })
 
@@ -84,8 +84,18 @@ export default function Oss() {
           </p>
           <p>
             Thanks to these contributors for their sponsorship:{' '}
-            <a href="https://github.com/reverie" key="a-reverie">@reverie</a>,{' '}
-            <a href="https://github.com/saphp" key="a-saphp">@saphp</a>
+            <ul>
+              <li>
+                <a href="https://github.com/reverie" key="a-reverie">
+                  @reverie
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/saphp" key="a-saphp">
+                  @saphp
+                </a>
+              </li>
+            </ul>
           </p>
         </div>
       </section>
