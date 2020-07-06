@@ -1,6 +1,6 @@
 import useSWR from 'swr'
 import Link from 'next/link'
-import { useUser } from '../utils/auth/useUser'
+// import { useUser } from '../utils/auth/useUser'
 
 const fetcher = (url, token) =>
   fetch(url, {
@@ -10,7 +10,7 @@ const fetcher = (url, token) =>
   }).then((res) => res.json())
 
 const Index = () => {
-  const { user, logout } = useUser()
+  // const { user, logout } = useUser()
   const { data, error } = useSWR(
     user ? ['/api/getFood', user.token] : null,
     fetcher
