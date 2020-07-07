@@ -1,0 +1,37 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src='./dist/bundle.js'></script>
+    <link rel="stylesheet" type="text/css" href="./index.css">
+</head>
+
+<body>
+    <div class='container'>
+        <div class='section'>
+            <form id='sign-up'>
+                <h3>Sign Up</h3>
+                <label>Email</label><input type='email' name='email' />
+                <label>Full Name</label><input type='text' name='fullname' />
+                <label>Password</label><input type='password' name='password' />
+                <input type='submit'>
+            </form>
+        </div>
+        <div class='section'>
+            <form id='log-in'>
+                <h3>Log In</h3>
+                <label>Email</label><input type='email' name='email' />
+                <label>Password</label><input type='password' name='password' />
+                <input type='submit'>
+            </form>
+        </div>
+        <div class='section'>
+            <form id='validate'>
+                <h3>User Token</h3>
+                <input readonly=readonly type='text' id='user-token' />
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
