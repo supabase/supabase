@@ -36,7 +36,7 @@ For all Restful functionality, we introspect your database to provide an instant
 - You own your data. Realtime can be pointed at any PostgreSQL database that has replication enabled.
 - Listening to data changes on client side solves stale data problems and update collisions.
 - Many systems that give you realtime functionality require you to update via the same interface that the listener is on. Supabase is source agnostic. Update your database from anywhere and you'll still get the changes.
-- Scale the realtime servers without putting any additional load on your DB. All you need is one connection to your database, and you can handle thousands (or millions) or users
+- Scale the realtime servers without putting any additional load on your DB. All you need is one connection to your database, and you can handle thousands (or millions) of users
 
 ## Where it is
 
