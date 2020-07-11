@@ -136,6 +136,7 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} Supabase.`,
     },
   },
+  plugins: ['@docusaurus/plugin-ideal-image'],
   presets: [
     [
       '@docusaurus/preset-classic',

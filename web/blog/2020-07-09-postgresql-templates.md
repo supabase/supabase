@@ -6,6 +6,8 @@ author_title: Supabase
 author_url: https://github.com/dragarcia
 author_image_url: https://avatars0.githubusercontent.com/u/26374889?s=400&u=f5e35e9b47a50fa2b4d8c4bb96babd921071bcf1&v=4
 authorURL: https://github.com/dragarcia
+tags: 
+    - postgres
 ---
 
 Whenever you create a new database in Postgres, you are actually [basing it off an already present database](https://www.postgresql.org/docs/current/manage-ag-templatedbs.html) in your cluster. 
