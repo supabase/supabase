@@ -53,9 +53,9 @@ We have since migrated our middleware to multiple ECS clusters, globally load-ba
 
 ### Frontend: Netlify, Vercel, Auth0
 
-We serve our marketing site ([supabase.io](http://supabase.io)) from Netlify. It's a [Docusaurus (v2)](https://v2.docusaurus.io/) site, which is a static build so it had no problems (apart from one developer in Russia who couldn't access the site - it looks like some of Netlify's IP addresses are blocked there).
+We serve our marketing site ([supabase.io](http://supabase.io)) from Netlify. It's a static-build [Docusaurus (v2)](https://v2.docusaurus.io/) site, so it had no problems (apart from one developer in Russia who couldn't access the site - it looks like some of Netlify's IP addresses are blocked there).
 
-We serve our app ([app.supabase.io](http://app.supabase.io)) using Vercel, and the login system uses Auth0. These were both rock-solid. Before the launch we noticed that Vercel was extremely slow on their free plan, and once we upgraded to their Pro Plan for multi-region deploys and it solved all of our issues. It looks like they are changing their plans again so buyer beware.
+We serve our app ([app.supabase.io](http://app.supabase.io)) using Vercel, and the login system uses Auth0. These were both rock-solid. Before the launch we noticed that Vercel was extremely slow on their free plan, and once we upgraded to their Pro Plan for multi-region deploys it solved performance issues. It looks like they are changing their plans again so buyer beware.
 
 ## The Bad
 
@@ -67,11 +67,9 @@ Digital Ocean were very responsive when we asked for increases, each time respon
 
 ### Cloudflare cloud limits
 
-Each Supabase project gets a unique URL for their API and database. This is set up using Cloudflare's API. This was a seamless process until we hit the 1000 subdomain limit, at 4am in the morning. My cofounder was awake at this time, and managed to identify the problem early,and reached out to the support to increase the limit. 
+Each Supabase project gets a unique URL for their API and database. This is set up using Cloudflare's API. This was a seamless process until we hit the 1000-subdomain limit, at 4am in the morning. My cofounder was awake, managed to identify the problem early, and reached out to the support to increase the limit. 
 
-Cloudflare support advised him to upgrade the account to increase the limit, but the upgrade could only be done by the owner (me). Unfortunately my phone was on silent, so for 3 hours our systems were down.
-
-This seems like a flaw in the Cloudflare process. Ideally any one of our team could have upgraded our account.
+Cloudflare support advised him to upgrade the account to increase the limit, but the upgrade could only be done by the owner (me). Unfortunately my phone was on silent, so for 3 hours our systems were down. Ideally any one of our team could have upgraded our account, but I imagine that Cloudflare have their reasons for this restriction.
 
 ## The Ugly - migrating 1800 servers
 
@@ -102,6 +100,8 @@ Also we had conveniently just run out of credits. We don’t expect cloud provid
 
 In the past 3 weeks we have migrated 1800 servers over to AWS. 
 
-The AWS team at YC were super helpful, suggesting how we could run our VMs more efficiently using their new `t3a` instances. We're already starting to see massive improvements, with database startup times almost halved from ~90s to ~50s. From our research, this is the fastest Postgres setup in the market.
+We are on the AWS "Activate" program, which grants us $100,000 credits. Since Firebase has a very generous free-tier, and we want to be able to offer Supabase developers a similar experience, this is a huge benefit to our company. 
+
+The AWS team were helpful too, suggesting how we could run our VMs more efficiently using their new `t3a` instances. We're already starting to see improvements, with database startup times almost halved from ~90s to ~50s. From our research, this is the fastest Postgres setup in the market.
 
 We will release a detailed write-up on these instances in the next few weeks. Sign up to our newsletter if you want to be notified when we release the post.
