@@ -100,16 +100,22 @@ function BlogPostItem(props) {
       <section className="markdown">
         <MDXProvider components={MDXComponents}>{children}</MDXProvider>
       </section>
+      <section className="section" style={{ marginTop: 50, marginBottom: 50 }}>
+        <a
+          href="http://eepurl.com/gPWkwn"
+          style={{width:'100%'}}
+          className={'button hero--button button--md button--primary responsive-button'}
+        >
+          SUBSCRIBE TO OUR NEWSLETTER
+        </a>
+      </section>
       {(tags.length > 0 || truncated) && (
         <footer className="row margin-vert--lg">
           {tags.length > 0 && (
             <div className="col">
               <strong>Tags:</strong>
-              {tags.map(({label, permalink: tagPermalink}) => (
-                <Link
-                  key={tagPermalink}
-                  className="margin-horiz--sm"
-                  to={tagPermalink}>
+              {tags.map(({ label, permalink: tagPermalink }) => (
+                <Link key={tagPermalink} className="margin-horiz--sm" to={tagPermalink}>
                   {label}
                 </Link>
               ))}
@@ -117,9 +123,7 @@ function BlogPostItem(props) {
           )}
           {truncated && (
             <div className="col text--right">
-              <Link
-                to={metadata.permalink}
-                aria-label={`Read more about ${title}`}>
+              <Link to={metadata.permalink} aria-label={`Read more about ${title}`}>
                 <strong>Read More</strong>
               </Link>
             </div>
@@ -127,7 +131,7 @@ function BlogPostItem(props) {
         </footer>
       )}
     </article>
-  );
+  )
 }
 
 export default BlogPostItem;
