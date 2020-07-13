@@ -59,7 +59,7 @@ We serve our app ([app.supabase.io](http://app.supabase.io)) using Vercel, and t
 
 ## The Bad
 
-### Cloud limits: Digital Ocean
+### Digital Ocean cloud limits
 
 In May we were using Digital Ocean to serve all of our customer databases. We hit the first server limit (400 servers) in the space of a few hours. They bumped our limit up to 1000 and we hit that again a few hours later. 
 
@@ -73,16 +73,16 @@ Cloudflare support advised him to upgrade the account to increase the limit, but
 
 ## The Ugly - migrating 1800 servers
 
-Let me start this section by saying that Digital Ocean have been pretty good for getting up and running. The experience was great to start with, but ended painfully. 
+Let me start by saying that Digital Ocean have been great for getting up and running. The experience was simple to start with, but ended painfully. 
 
-### Production errors
+### Digital Ocean production errors
 
 The first sign of problems were the frequent production errors. This is a screenshot of emails from Digital ocean for the month of June.
 
 <Image img={require('../static/img/digital-ocean-emails-errors.png')} alt="This image shows all the emails I was receiving from Digital Ocean. I was receiving an email every other day about servers which needed to be migrated."/>
 <br />
 
-Each of these emails represents one or more servers that has a server issue - most of the time it was 2 servers.
+Each of these emails represents one or more servers that has a critical issue:
 
 > We have identified an issue on the physical machine hosting one or more of your Droplets. In the event that we are not able to perform a live migration of a Droplet, we will perform an offline migration during which the Droplet will be powered off and migrated offline during the window.
 
@@ -90,18 +90,18 @@ Luckily we are in alpha, and our community has been extremely patient.
 
 ### Credit limits
 
-The next issue came with the credits. We were generously granted $10,000 Digital Ocean credits in February through Stripe Atlas, and so they became our primary cloud provider.
+Most of our frustration was due to their internal policy around credits program. We were generously granted $10,000 Digital Ocean credits in February through Stripe Atlas, and so they became our primary cloud provider.
 
-Digital Ocean have another (more generous) credits package for YC companies. Unfortunately when we applied for this we were told we weren't eligible because it was a "Partner switch" from Stripe to YC. This was frustrating because a "Partner switch" is completely arbitrary to us as a customer. 
+Digital Ocean have another (more generous) credits package for YC companies. Unfortunately when we applied for this we were told we weren't eligible because it was a "Partner switch" from Stripe to YC. This was frustrating because a "Partner switch" is completely arbitrary to us as a customer.  
 
-Also we had conveniently just run out of credits. We don’t expect cloud providers to fund our inefficiencies, but we needed time to optimize our infrastructure after our surprise launch. We decided to migrate away from Digital Ocean. 
+Also we had conveniently just run out of credits. We don’t expect cloud providers to fund our inefficiencies, but we needed time to optimize our infrastructure after our surprise launch. We had assumed that the more generous credits package was guaranteed - an assumption which cost us several thousand dollars. After swift deliberation, we decided to migrate away from Digital Ocean. 
 
 ## Going Forward: AWS t3a
 
 In the past 3 weeks we have migrated 1800 servers over to AWS. 
 
-We are on the AWS "Activate" program, which grants us $100,000 credits. Since Firebase has a very generous free-tier, and we want to be able to offer Supabase developers a similar experience, this is a huge benefit to our company. 
+We are on the AWS "Activate" program, which grants us $100,000 credits. Since Firebase has a very generous free-tier, and we want to be able to offer Supabase developers a similar experience, this is ultimately a huge benefit to our community.
 
-The AWS team were helpful too, suggesting how we could run our VMs more efficiently using their new `t3a` instances. We're already starting to see improvements, with database startup times almost halved from ~90s to ~50s. From our research, this is the fastest Postgres setup in the market.
+The AWS team were helpful, suggesting their new `t3a` instances. We're already seeing improvements, with database startup times almost halved from ~90s to ~50s. From our research, this is the fastest Postgres setup in the market.
 
 We will release a detailed write-up on these instances in the next few weeks. Sign up to our newsletter if you want to be notified when we release the post.
