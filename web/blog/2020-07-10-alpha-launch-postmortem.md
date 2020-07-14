@@ -1,5 +1,5 @@
 ---
-title: Surviving Hacker News 
+title: Alpha Launch Postmortem
 description: Everything that went wrong with Supabase's launch
 author: Paul Copplestone
 author_title: Supabase
