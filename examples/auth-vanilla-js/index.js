@@ -42,12 +42,12 @@ const logInSubmitted = (event) => {
   xmlHttp.onreadystatechange = function () {
     if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
       alert(xmlHttp.responseText)
-      let data = xmlHttp.responseText
+      let data = JSON.parse(xmlHttp.responseText)
       window.accessToken = data.access_token
-      document.querySelector('#access-token').innerHTML = window.accessToken
+      document.querySelector('#access-token').value = window.accessToken
 
-      window.refreshToken = data.access_token
-      document.querySelector('#refresh-token').innerHTML = window.refreshToken
+      window.refreshToken = data.refresh_token
+      document.querySelector('#refresh-token').value = window.refreshToken
     }
   }
   xmlHttp.open('post', SUPABASE_URL + `/auth/v1/token?apikey=${SUPABASE_KEY}&grant_type=password&username=${email}&password=${password}`)
