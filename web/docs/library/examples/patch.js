@@ -31,7 +31,7 @@ const updateCityName = async () => {
 
 export const patchNotJs = `
 ${importJs}
-const getCities = async () => {
+const updateCities = async () => {
   try {
     let cities = await supabase
       .from('cities')
