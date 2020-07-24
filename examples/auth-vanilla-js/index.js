@@ -2,8 +2,9 @@ console.log('Auth, Auth, Baby')
 
 import { createClient } from '@supabase/supabase-js'
 
-var SUPABASE_URL = 'https://UxtUdvoEHGzXftFJhwwT.supabase.net'
-var SUPABASE_KEY = 'XbBJdEH2WdymQ0Hq9Huk1JqCCmggPX'
+var SUPABASE_URL = 'https://qgxofzpdhwflxckfyoyz.supabase.net'
+var SUPABASE_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTU5NTU3OTM1MywiZXhwIjoxOTExMTU1MzUzfQ.zS6U4PuJsHJ0wbBQXANpg2fbvHazUtfCgWonJ_TXlRk'
 
 var supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 window.userToken = null
@@ -14,6 +15,9 @@ window.onload = function () {
 
   var logInForm = document.querySelector('#log-in')
   logInForm.onsubmit = logInSubmitted.bind(logInForm)
+
+  var userDetailsButton = document.querySelector('#user-button')
+  userDetailsButton.onclick = fetchUserDetails.bind(userDetailsButton)
 }
 
 const signUpSubmitted = (event) => {
@@ -21,46 +25,40 @@ const signUpSubmitted = (event) => {
   const email = event.target[0].value
   const password = event.target[1].value
 
-  var xmlHttp = new XMLHttpRequest()
-  xmlHttp.onreadystatechange = function () {
-    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-      alert(xmlHttp.responseText)
-    }
-  }
-  xmlHttp.open('post', SUPABASE_URL + `/auth/v1/signup?apikey=${SUPABASE_KEY}`)
-  xmlHttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8')
-  xmlHttp.send(JSON.stringify({ email: email, password: password }))
+  supabase.auth
+    .signup(email, password)
+    .then((response) => {
+      alert(JSON.stringify(response.body))
+    })
+    .catch((err) => {
+      alert(err.response.text)
+    })
 }
 
 const logInSubmitted = (event) => {
   event.preventDefault()
-  console.log(event)
   const email = event.target[0].value
   const password = event.target[1].value
 
-  var xmlHttp = new XMLHttpRequest()
-  xmlHttp.onreadystatechange = function () {
-    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-      alert(xmlHttp.responseText)
-      let data = JSON.parse(xmlHttp.responseText)
-      window.accessToken = data.access_token
-      document.querySelector('#access-token').value = window.accessToken
-
-      window.refreshToken = data.refresh_token
-      document.querySelector('#refresh-token').value = window.refreshToken
-    }
-  }
-  xmlHttp.open('post', SUPABASE_URL + `/auth/v1/token?apikey=${SUPABASE_KEY}&grant_type=password&username=${email}&password=${password}`)
-  xmlHttp.send()
+  supabase.auth
+    .login(email, password)
+    .then((response) => {
+      document.querySelector('#access-token').value = response.body.access_token
+      document.querySelector('#refresh-token').value = response.body.refresh_token
+      alert(JSON.stringify(response.body))
+    })
+    .catch((err) => {
+      alert(err.response.text)
+    })
 }
 
-// manual signup
-// curl --header "Content-Type: application/json" \
-//   --request POST \
-//   --data '{"email":"antwilson@hotmail.co.uk","password":"password"}' \
-//   https://UxtUdvoEHGzXftFJhwwT.supabase.net/auth/v1/signup?apikey=XbBJdEH2WdymQ0Hq9Huk1JqCCmggPX
-
-// manual login
-// curl --header "Content-Type: application/json" \             
-//   --request POST \
-//   "https://UxtUdvoEHGzXftFJhwwT.supabase.net/auth/v1/token?username=antwilson@hotmail.co.uk&password=password&grant_type=password&apikey=XbBJdEH2WdymQ0Hq9Huk1JqCCmggPX"
+const fetchUserDetails = () => {
+  supabase.auth
+    .user()
+    .then((response) => {
+      alert(JSON.stringify(response))
+    })
+    .catch((err) => {
+      alert(err.response.text)
+    })
+}
