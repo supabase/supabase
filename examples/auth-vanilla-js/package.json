@@ -1,0 +1,19 @@
+{
+  "name": "supabase-auth-vanilla-js",
+  "version": "0.0.1",
+  "description": "basic auth example for supabase with js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --watch",
+    "build": "webpack --config webpack.config.js",
+    "dev": "python -m SimpleHTTPServer 3000"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^0.34.5",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12"
+  }
+}
