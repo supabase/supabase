@@ -1,3 +1,7 @@
+# Vanilla-js Auth Example
+
+how to sign up and login using supabase and supabase-js
+
 ### running
 `npm install`
 `npm run dev`
