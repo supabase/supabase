@@ -25,6 +25,7 @@ import {
   getSingleJs,
   getFilterJs,
   getNotJs,
+  getOrJs,
   getMatchJs,
   getEqJs,
   getNeqJs,
@@ -538,6 +539,18 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <br />
 
 <CommonFilters filter="not" />
+
+### `or()`
+
+<CustomCodeBlock
+  header="Shows how to use or( ) with select( )"
+  js={getOrJs}
+  jsHighlight="{9}"
+/>
+
+<br />
+
+<CommonFilters filter="or" />
 
 ### `match()`
 
