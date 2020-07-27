@@ -9,7 +9,7 @@ var SUPABASE_KEY =
 var supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 window.userToken = null
 
-window.onload = function () {
+document.addEventListener('DOMContentLoaded', function (event) {
   var signUpForm = document.querySelector('#sign-up')
   signUpForm.onsubmit = signUpSubmitted.bind(signUpForm)
 
@@ -18,7 +18,7 @@ window.onload = function () {
 
   var userDetailsButton = document.querySelector('#user-button')
   userDetailsButton.onclick = fetchUserDetails.bind(userDetailsButton)
-}
+})
 
 const signUpSubmitted = (event) => {
   event.preventDefault()
