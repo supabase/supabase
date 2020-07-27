@@ -5,13 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dev-server --content-base ./ --port 3000 --hot",
+    "dev": "webpack --watch & webpack-dev-server --content-base ./ --port 3000 --hot",
     "start": "npm run dev"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@supabase/supabase-js": "^0.34.5"
+    "@supabase/supabase-js": "^0.35.2"
   },
   "devDependencies": {
     "webpack-dev-server": "^3.11.0",

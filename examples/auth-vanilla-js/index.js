@@ -2,12 +2,11 @@ console.log('Auth, Auth, Baby')
 
 import { createClient } from '@supabase/supabase-js'
 
-var SUPABASE_URL = 'https://qgxofzpdhwflxckfyoyz.supabase.net'
+var SUPABASE_URL = 'https://sskakiwdjwakxhtfdrmu.supabase.net'
 var SUPABASE_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTU5NTU3OTM1MywiZXhwIjoxOTExMTU1MzUzfQ.zS6U4PuJsHJ0wbBQXANpg2fbvHazUtfCgWonJ_TXlRk'
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTU5NTgzNjAwNSwiZXhwIjoxOTExNDEyMDA1fQ.RpSXvqqzD6A5cpY03LVi1Ek655bdRFCiFf1TaFXqHhE'
 
-var supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
-window.userToken = null
+window.supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 document.addEventListener('DOMContentLoaded', function (event) {
   var signUpForm = document.querySelector('#sign-up')
