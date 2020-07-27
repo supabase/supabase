@@ -181,6 +181,18 @@ const getCities = async () => {
   ${errorJs}
 `.trim()
 
+export const getOrJs = `
+${importJs}
+const getCities = async () => {
+  try {
+    let cities = await supabase
+      .from('cities')
+      .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
+      .select('name, country_id')
+    return cities
+  ${errorJs}
+`.trim()
+
 export const getMatchJs = `
 ${importJs}
 const getCities = async () => {
