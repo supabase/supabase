@@ -2,10 +2,13 @@ import '~/styles/style.scss'
 import React from 'react'
 import App from 'next/app'
 import Router from 'next/router'
-import UserContext from '~/lib/UserContext'
+import UserContext from 'lib/UserContext'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_KEY
+)
 
 export default class SupabaseSlackClone extends App {
   state = {
@@ -20,22 +23,18 @@ export default class SupabaseSlackClone extends App {
   }
 
   /**
-   * Dummy function 
+   * Dummy function
    * DO NOT USE IN PRODUCTION
    */
-  signIn = async username => {
+  signIn = async (username) => {
     var user = {}
-    let { body } = await supabase
-      .from('users')
-      .match({ username })
-      .select('id, username')
+    console.log('username', username)
+    let { body } = await supabase.from('users').match({ username }).select('id, username')
+    console.log('body', body)
     if (!body.length) {
-      // @TODO: upsert
-      await supabase.from('users').insert([{ username }])
-      let { body } = await supabase
-        .from('users')
-        .match({ username })
-        .select('id, username')
+      let res = await supabase.from('users').insert([{ username }], { upsert: true })
+      console.log('res', res)
+      let { body } = await supabase.from('users').match({ username }).select('id, username')
       user = body[0].id
     } else {
       user = body[0].id
