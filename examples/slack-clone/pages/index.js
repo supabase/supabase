@@ -16,12 +16,13 @@ const Home = () => {
 
   const handleLogin = async (type, username, password) => {
     try {
-      const user =
+      const { body } =
         type == 'LOGIN'
           ? await supabase.auth.login(username, password)
           : await supabase.auth.signup(username, password)
-      let parsed = JSON.parse(user.text)
-      if (!!parsed) signIn(username)
+
+      const user = await supabase.auth.user()
+      if (!!user) signIn(user.id, user.email)
     } catch (error) {
       console.log('error', error)
       alert(error.error_description || error)
@@ -45,7 +46,7 @@ const Home = () => {
           <div className="mb-4">
             <label className="font-bold text-grey-darker block mb-2">Password</label>
             <input
-              type="text"
+              type="password"
               className="block appearance-none w-full bg-white border border-grey-light hover:border-grey px-2 py-2 rounded shadow"
               placeholder="Your password"
               value={password}

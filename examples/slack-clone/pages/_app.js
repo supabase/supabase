@@ -22,30 +22,25 @@ export default class SupabaseSlackClone extends App {
     else Router.push('/')
   }
 
-  /**
-   * Dummy function
-   * DO NOT USE IN PRODUCTION
-   */
-  signIn = async (username) => {
-    var user = {}
-    console.log('username', username)
-    let { body } = await supabase.from('users').match({ username }).select('id, username')
-    console.log('body', body)
-    if (!body.length) {
-      let res = await supabase.from('users').insert([{ username }], { upsert: true })
-      console.log('res', res)
+  signIn = async (id, username) => {
+    try {
       let { body } = await supabase.from('users').match({ username }).select('id, username')
-      user = body[0].id
-    } else {
-      user = body[0].id
+      const existing = body[0]
+      const { body: user } = existing?.id
+        ? await supabase.from('users').update({ id, username }).match({ id }).single()
+        : await supabase.from('users').insert([{ id, username }]).single()
+
+      localStorage.setItem('supabase-slack-clone', user.id)
+      this.setState({ user: user.id }, () => {
+        Router.push('/channels/[id]', '/channels/1')
+      })
+    } catch (error) {
+      console.log('error', error)
     }
-    localStorage.setItem('supabase-slack-clone', user)
-    this.setState({ user }, () => {
-      Router.push('/channels/[id]', '/channels/1')
-    })
   }
 
   signOut = () => {
+    supabase.auth.logout()
     localStorage.removeItem('supabase-slack-clone')
     this.setState({ user: null })
     Router.push('/')

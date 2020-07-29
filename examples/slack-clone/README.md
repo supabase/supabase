@@ -13,6 +13,13 @@ Build a simple slack clone using Supabase, Postgres and React hooks.
 
 ## How to use
 
+
+
+[![Deploy to Netlify]([Dragster.jpg](https://www.netlify.com/img/deploy/button.svg))](https://github.com/supabase/supabase/tree/master/examples/slack-clone)
+
+
+## For developers
+
 **Clone the this folder**
 
 ```sh
@@ -32,14 +39,7 @@ cd examples/slack-clone-basic
 npm install 
 ```
 
-**Start the backend**
-
-```sh
-# Open a terminal and run:
-docker-compose up
-```
-
-**Start the frontent**
+**Start the frontend**
 
 ```sh
 # Open a terminal and run:
