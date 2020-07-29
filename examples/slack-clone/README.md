@@ -15,8 +15,8 @@ Build a simple slack clone using Supabase, Postgres and React hooks.
 
 
 
-[![Deploy to Netlify]([Dragster.jpg](https://www.netlify.com/img/deploy/button.svg))](https://github.com/supabase/supabase/tree/master/examples/slack-clone)
 
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/supabase/supabase/tree/master/examples/slack-clone)
 
 ## For developers
 
