@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@supabase/supabase-js": "^0.35.2"
+    "@supabase/supabase-js": "^0.35.9"
   },
   "devDependencies": {
     "webpack-dev-server": "^3.11.0",
