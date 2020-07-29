@@ -1,8 +1,0 @@
-[build]
-  base = "examples/slack-clone"
-  publish = "out"
-  command = "npm run build"
-
-[template.environment]
-  NEXT_PUBLIC_SUPABASE_URL = "Find the Supabase URL in the your auto-generated docs at app.supabase.io"
-  NEXT_PUBLIC_SUPABASE_KEY = "Add your Supabase client key"
