@@ -2,9 +2,9 @@ console.log('Auth, Auth, Baby')
 
 import { createClient } from '@supabase/supabase-js'
 
-var SUPABASE_URL = 'https://sskakiwdjwakxhtfdrmu.supabase.net'
+var SUPABASE_URL = 'https://npvsuixcdvqwadjbsesq.supabase.net'
 var SUPABASE_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTU5NTgzNjAwNSwiZXhwIjoxOTExNDEyMDA1fQ.RpSXvqqzD6A5cpY03LVi1Ek655bdRFCiFf1TaFXqHhE'
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTU5NjAxNTQ5OSwiZXhwIjoxOTExNTkxNDk5fQ.5VrXb66gEnD8OWfZVXvOX2OSVJtBfdClYUP3_kPf5ZA'
 
 window.supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
