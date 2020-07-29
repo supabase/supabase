@@ -14,13 +14,11 @@ Build a simple slack clone using Supabase, Postgres and React hooks.
 ## How to use
 
 
-
-
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/supabase/supabase/tree/master/examples/slack-clone)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/project?template=https://github.com/supabase/supabase/tree/master/examples/slack-clone)
 
 ## For developers
 
-**Clone the this folder**
+**Clone this folder**
 
 ```sh
 # Copy the repo to your machine
@@ -33,17 +31,11 @@ git sparse-checkout set examples/slack-clone-basic
 cd examples/slack-clone-basic
 ```
 
-**Install dependencies**
-
-```sh
-npm install 
-```
-
 **Start the frontend**
 
 ```sh
-# Open a terminal and run:
-npm run dev
+npm install     # install npm dependencies
+npm run dev     # start Next.js
 ```
 
 Visit http://localhost:3000 and start slacking! Open in two tabs to see everything getting updated in realtime
