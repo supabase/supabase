@@ -1,6 +1,6 @@
-# Basic Slack Clone
+# Slack Clone
 
-Build a simple slack clone using Supabase, Postgres and React hooks.
+Deploy a simple slack clone using Supabase and Vercel.
 
 <p align="center">
 <kbd>
@@ -15,19 +15,34 @@ Build a simple slack clone using Supabase, Postgres and React hooks.
 
 Embed video.
 
-**Sign up to Supabase**
+**1. Create new project**
 
-**Create new project**
+Sign up to Supabase - [https://app.supabase.io](https://app.supabase.io) and create a new project. Wait for your database to start.
 
-**Run "Slack Clone" Quickstart**
+**2. Run "Slack Clone" Quickstart**
 
-**Get the URL and Key**
+Once your database has started, run the "Slack Clone" quickstart.
 
-**Deploy the front end**
+![Slack Clone Quick Start](https://user-images.githubusercontent.com/10214025/88916135-1b1d7a00-d298-11ea-82e7-e2c18314e805.png)
+
+**3. Get the URL and Key**
+
+Go to the Project Settings (the cog icon), and find your API URL and `anon` key.
+
+![image](https://user-images.githubusercontent.com/10214025/88916245-528c2680-d298-11ea-8a71-708f93e1ce4f.png)
+
+**4. Deploy the front end**
+
+Deploy!
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/git?s=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fslack-clone&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_KEY&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.io&project-name=supabase-slack-clone&repo-name=supabase-slack-clone)
 
+You will be asked for a `NEXT_PUBLIC_SUPABASE_URL` and `NENEXT_PUBLIC_SUPABASE_KEY`. You can use the keys in step 3.
+
+
 ## For developers
+
+If you want to run this without deploying: 
 
 **Clone this folder**
 

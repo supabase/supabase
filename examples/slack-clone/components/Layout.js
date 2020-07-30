@@ -3,7 +3,7 @@ import { useContext } from 'react'
 import UserContext from '~/lib/UserContext'
 import { addChannel } from '~/lib/Store'
 
-export default props => {
+export default function Layout(props) {
   const { signOut } = useContext(UserContext)
 
   const slugify = text => {
@@ -27,13 +27,16 @@ export default props => {
   }
 
   return (
-    <main className="main flex h-screen w-screen absolute">
+    <main className="main flex h-screen w-screen absolute overflow-hidden">
       {/* Sidebar */}
-      <nav className="w-1/4 bg-gray-900 text-gray-100 h-screen">
+      <nav
+        className="w-64 bg-gray-900 text-gray-100 h-screen"
+        style={{ maxWidth: '20%', minWidth: 150 }}
+      >
         <div className="p-2">
           <h4 className="font-bold">Channels</h4>
           <ul className="channel-list">
-            {props.channels.map(x => (
+            {props.channels.map((x) => (
               <SidebarItem channel={x} key={x.id} isActiveChannel={x.id == props.activeChannelId} />
             ))}
           </ul>
@@ -41,7 +44,7 @@ export default props => {
         <hr className="m-2" />
         <div className="p-2">
           <button
-            className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+            className="bg-blue-900 hover:bg-blue-800 text-white py-2 px-4 rounded w-full transition duration-150"
             onClick={() => newChannel()}
           >
             New Channel
@@ -50,7 +53,7 @@ export default props => {
         <hr className="m-2" />
         <div className="p-2">
           <button
-            className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+            className="bg-blue-900 hover:bg-blue-800 text-white py-2 px-4 rounded w-full transition duration-150"
             onClick={() => signOut()}
           >
             Log out
@@ -59,7 +62,7 @@ export default props => {
       </nav>
 
       {/* Messages */}
-      <div className="w-3/4 bg-gray-800 h-screen">{props.children}</div>
+      <div className="flex-1 bg-gray-800 h-screen">{props.children}</div>
     </main>
   )
 }
