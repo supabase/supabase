@@ -2,7 +2,7 @@
 
 Deploy a simple, real-time Slack clone using Supabase (Postgres) and Vercel (Next.js).
 
-<p align="center">
+<p>
 <kbd>
 <img src="https://media.giphy.com/media/J07U8iblJhlKDqZOxV/giphy.gif" alt="Demo"/>
 </kbd>
