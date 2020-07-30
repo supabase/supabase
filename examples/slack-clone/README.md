@@ -1,6 +1,6 @@
 # Slack Clone
 
-Deploy a simple slack clone using Supabase and Vercel.
+Deploy a simple, real-time Slack clone using Supabase (Postgres) and Vercel (Next.js).
 
 <p align="center">
 <kbd>
@@ -11,7 +11,7 @@ Deploy a simple slack clone using Supabase and Vercel.
 
 ## How to use
 
-Embed video.
+<a href="https://www.loom.com/share/31eec9b656e44b8d87c88bde8a465676"> <p>Watch Video: how to use this repo</p> <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/31eec9b656e44b8d87c88bde8a465676-with-play.gif"> </a>
 
 **1. Create new project**
 
@@ -35,7 +35,7 @@ Deploy!
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/git?s=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fslack-clone&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_KEY&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.io&project-name=supabase-slack-clone&repo-name=supabase-slack-clone)
 
-You will be asked for a `NEXT_PUBLIC_SUPABASE_URL` and `NENEXT_PUBLIC_SUPABASE_KEY`. You can use the keys in step 3.
+You will be asked for a `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_KEY`. You can use the keys in step 3.
 
 
 ## For developers
