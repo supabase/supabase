@@ -6,8 +6,6 @@ Deploy a simple slack clone using Supabase and Vercel.
 <kbd>
 <img src="https://media.giphy.com/media/J07U8iblJhlKDqZOxV/giphy.gif" alt="Demo"/>
 </kbd>
-<br />
-<a href="https://media.giphy.com/media/J07U8iblJhlKDqZOxV/source.gif">View full image</a>
 </p>
 
 
