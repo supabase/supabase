@@ -33,7 +33,9 @@ We will be using these tables as reference for our examples.
   jsHighlight="{8}"
 />
 
-Note, if you want to receive the "previous" data for updates and deletes,
+<br />
+
+If you want to receive the "previous" data for updates and deletes,
 you will need to set `REPLICA IDENTITY` to `FULL`, like this:
 `ALTER TABLE your_table REPLICA IDENTITY FULL;`
 
@@ -45,7 +47,9 @@ you will need to set `REPLICA IDENTITY` to `FULL`, like this:
   jsHighlight="{8}"
 />
 
-Note, if you want to receive the "previous" data for updates and deletes,
+<br />
+
+If you want to receive the "previous" data for updates and deletes,
 you will need to set `REPLICA IDENTITY` to `FULL`, like this:
 `ALTER TABLE your_table REPLICA IDENTITY FULL;`
 
@@ -65,7 +69,9 @@ you will need to set `REPLICA IDENTITY` to `FULL`, like this:
   jsHighlight="{9-11}"
 />
 
-Note, if you want to receive the "previous" data for updates,
+<br />
+
+If you want to receive the "previous" data for updates,
 you will need to set `REPLICA IDENTITY` to `FULL`, like this:
 `ALTER TABLE your_table REPLICA IDENTITY FULL;`
 
@@ -77,7 +83,9 @@ you will need to set `REPLICA IDENTITY` to `FULL`, like this:
   jsHighlight="{9-11}"
 />
 
-You will not be able to delete data from your database unless you set your set your table to use FILL `REPLICA IDENTITY`, like this:
+<br />
+
+You will not be able to delete data from your database unless you set your set your table to use FULL `REPLICA IDENTITY`, like this:
 `ALTER TABLE your_table REPLICA IDENTITY FULL;`
 
 <!-- ### Listening to multiple events
