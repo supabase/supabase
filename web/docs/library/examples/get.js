@@ -88,8 +88,8 @@ const getCities = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .limit(1)
       .select('name, country_id')
+      .limit(1)
     return cities
   ${errorJs}
 `.trim()
@@ -100,9 +100,9 @@ const getCountries = async () => {
   try {
     let countries = await supabase
       .from('cities')
-      .limit(1, 'cities')
       .eq('name', 'United States')
       .select('name, cities(name)')
+      .limit(1, 'cities')
     return countries
   ${errorJs}
 `.trim()
@@ -113,8 +113,8 @@ const getCities = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .offset(1)
       .select('name, country_id')
+      .offset(1)
     return cities
   ${errorJs}
 `.trim()
@@ -125,9 +125,9 @@ const getCountries = async () => {
   try {
     let countries = await supabase
       .from('cities')
-      .limit(1, 'cities')
       .eq('name', 'United States')
       .select('name, cities(name)')
+      .limit(1, 'cities')
     return countries
   ${errorJs}
 `.trim()
@@ -187,8 +187,8 @@ const getCities = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
       .select('name, country_id')
+      .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
     return cities
   ${errorJs}
 `.trim()
