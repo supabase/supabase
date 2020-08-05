@@ -10,11 +10,12 @@ module.exports = {
     Introduction: ['about', 'faq'],
     Library: [
       'library/getting-started',
-      'library/subscribe',
+      'library/user-management',
       'library/get',
       'library/post',
       'library/patch',
       'library/delete',
+      'library/subscribe',
       'library/stored-procedures',
     ],
     // Guides: ['guides/examples'],
@@ -26,7 +27,7 @@ module.exports = {
       'realtime/source',
     ],
     Postgres: ['postgres/postgres-intro'],
-    'See Also': ['guides/examples', 'pricing', 'support'],
-    Handbook: ['handbook/introduction', 'handbook/contributing'],
+    'See Also': ['guides/examples', 'pricing', 'support', 'handbook/contributing'],
+    // Handbook: ['handbook/introduction', 'handbook/contributing'],
   },
 }
