@@ -6,38 +6,34 @@ description: 'What is Supabase?'
 
 ## What it is
 
-Supabase is a service to:
+Supabase is an open source Firebase alternative. We are a service to:
 
-- listen to changes to your PostgreSQL database 
-- query your tables, including filtering, pagination, and deeply nested relationships (just like GraphQL)
+- listen to database changes 
+- query your tables, including filtering, pagination, and deeply nested relationships (like GraphQL)
 - create, update, and delete rows
+- manage your users and their permissions
+- interact with your database using a simple UI
 
-It does all of this without you having to write a single line of code.
 
 ## What it isn't
 
-- An ORM, at least not like typical ORMs. Supabase is more like an API, since we don't require you to set up any mappings and we interact with your database through a derived schema that get from introspecting your database.
+Supabase is not a 1-to-1 mapping of Firebase. While we are building many of the features that Firebase offers, we are not going about it the same way. 
+
+Our technological choices are quite different to Firebase. Everything we use is open source. Wherever possible we use and support existing tools in the ecosystem, rather than developing from scratch.
+
+Most notably, we use Postgres rather than a NoSQL store. This was a deliberate choice. We believe that no other database on the market offers the scalability and functionality required to legitimately compete with Firebase. 
 
 ## How it works 
 
-At its core, Supabase is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Supabase listens to Postgres' built-in replication functionality, converts the replication byte stream into JSON, then broadcasts the JSON over websockets. 
+At its core, is a suite of open source tools, stiched together to build a seamless developer experience:
 
-For all Restful functionality, we introspect your database to provide an instant, fully functional API.
+![Supabase Architecture](/img/supabase-architecture.png)
 
-## Features
+- [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
+- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Supabase listens to Postgres' built-in replication functionality, converts the replication byte stream into JSON, then broadcasts the JSON over websockets. 
+- [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
+- [pg-api](https://github.com/supabase/pg-api) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries etc.
+- [GoTrue](https://github.com/netlify/gotrue) is an SWT based API for managing users and issuing SWT tokens.
+- [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
 
-- Fast. Performance and simplicity are our two most important features.
-- 100% open source under the Apache 2.0 License.
-- Accessible by mobile and web with simple client libraries.
-- Works without any major changes to your database (like adding `NOTIFY` functions) or additional plugins (like `wal2json`). By using PostgreSQL's replication functionality we overcome many of their limitations. For example, `NOTIFY` has a 8000 byte payload limit, making it hard to listen to bulk changes.
 
-## Benefits
-
-- You own your data. Realtime can be pointed at any PostgreSQL database that has replication enabled.
-- Listening to data changes on client side solves stale data problems and update collisions.
-- Many systems that give you realtime functionality require you to update via the same interface that the listener is on. Supabase is source agnostic. Update your database from anywhere and you'll still get the changes.
-- Scale the realtime servers without putting any additional load on your DB. All you need is one connection to your database, and you can handle thousands (or millions) of users
-
-## Where it is
-
-All code is hosted on [our GitHub org](https://github.com/supabase).

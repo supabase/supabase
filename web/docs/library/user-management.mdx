@@ -1,0 +1,68 @@
+---
+id: user-management
+title: User Management
+description: Use Supabase to Authenticate and Authorize your users.
+---
+
+import CustomCodeBlock from '../../src/components/CustomCodeBlock'
+import {
+  signup,
+  login,
+  userData,
+  logout,
+} from './examples/users'
+
+## About
+
+Supabase makes it easy to manage your users.
+
+When a user signs up, Supabase assigns them a unique ID. You can reference this ID anywhere in your database. For example, you might create a `profiles` table references the user using a `user_id` field.
+
+Supabase already has built in the routes to sign up, login, and log out for managing users in your apps and websites.
+
+
+### Sign up
+
+
+<CustomCodeBlock
+  header="New user."
+  js={signup}
+/>
+<br />
+
+Allow your users to sign up and create a new account.
+
+After they have signed up, all interactions using the Supabase JS client will be performed as "that user".
+
+### Log in
+
+<CustomCodeBlock
+  header="Existing user."
+  js={login}
+/>
+<br />
+
+If an account is created, users can login to your app.
+
+After they have logged in, all interactions using the Supabase JS client will be performed as "that user".
+
+### User data
+
+<CustomCodeBlock
+  header="Get the logged in user."
+  js={userData}
+/>
+<br />
+
+Get the JSON object for the logged in user.
+
+### Log out
+
+<CustomCodeBlock
+  header="Get the logged in user."
+  js={logout}
+/>
+<br />
+
+After calling log out, all interactions using the Supabase JS client will be "anonymous".
+
