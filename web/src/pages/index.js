@@ -11,7 +11,14 @@ import HowCard from '../components/HowCard'
 import { repos } from '../data/github'
 
 const heroExample = `
-const realtime = supabase
+const messages = supabase
+  .from('messages')
+  .select(\`
+    id, text,
+    user ( id, name )
+  \`)
+
+const newMessages = supabase
   .from('messages')
   .on('INSERT', message => console.log('New message!', message) )
   .subscribe()
@@ -142,8 +149,8 @@ function Home() {
   return (
     <Layout title={`${siteConfig.title}`} description={siteConfig.tagline}>
       <main className="HomePage">
-        {/* HEARDER */}
-        <header className={classnames('hero', styles.heroBanner)}>
+        {/* HEADER */}
+        <header className={classnames('hero full', styles.heroBanner)}>
           <div className="container">
             <div className="row">
               <div className="col col--5">
@@ -175,7 +182,10 @@ function Home() {
                 </div>
               </div>
               <div className="col col--7">
-                <CustomCodeBlock header="Listen to your Postgres in realtime." js={heroExample} />
+                <CustomCodeBlock
+                  header="Query your PostgreSQL database and listen in real-time."
+                  js={heroExample}
+                />
               </div>
             </div>
           </div>
@@ -358,7 +368,7 @@ function Home() {
         </section>
 
         {/* USE CASES */}
-        <section className={'section-lg'}>
+        {/* <section className={'section-lg'}>
           <div className="container">
             <h2 className="with-underline">Use Cases</h2>
             <div className="row is-multiline">
@@ -367,11 +377,11 @@ function Home() {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
 
         <section className={'section-lg'}>
           <div className="container">
-            <div className={classnames('row', styles.responsiveCentered)}>
+            <div className={classnames('row', styles.centered)}>
               <div className="col col--6 col--offset-3">
                 <h2 className="with-underline">Self-documenting</h2>
                 <p className="">
@@ -381,7 +391,7 @@ function Home() {
               </div>
             </div>
 
-            <div className={classnames('row', styles.responsiveCentered)}>
+            <div className={classnames('row', styles.centered)}>
               <div className="col">
                 <img
                   className={''}
@@ -392,6 +402,27 @@ function Home() {
             </div>
           </div>
         </section>
+
+        {/* <section className={'section-lg'}>
+          <div className="container">
+            <div className={classnames('row', styles.centered)}>
+              <div className="col col--6 col--offset-3">
+                <h2 className="with-underline">Table view</h2>
+                <p className="">Start building your database directly from the dashboard.</p>
+              </div>
+            </div>
+
+            <div className={classnames('row', styles.centered)}>
+              <div className="col">
+                <img
+                  className={''}
+                  src={'/img/table-view.png'}
+                  alt={'Self-documenting dashboards'}
+                />
+              </div>
+            </div>
+          </div>
+        </section> */}
 
         {/* OSS */}
         <section className={'section-lg'}>
@@ -448,7 +479,7 @@ function Home() {
                   styles.button
                 )}
                 href="https://www.producthunt.com/posts/supabase?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-supabase"
-                style={{ width: 250, height: 54, margin:0, padding:0,  display: 'inline-block' }}
+                style={{ width: 250, height: 54, margin: 0, padding: 0, display: 'inline-block' }}
               >
                 <img
                   src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=203792&theme=dark"
