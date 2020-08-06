@@ -1,19 +1,19 @@
 export const signup = `
 let { body: user } = await supabase
   .auth
-  .signup({ 
+  .signup( 
     email: 'someone@email.com', 
     password: 'fOdaPdyTpkpxJgDVIORt' 
-  })
+  )
 `.trim()
 
 export const login = `
 let { body: user } = await supabase
   .auth
-  .login({ 
+  .login( 
     email: 'someone@email.com', 
     password: 'fOdaPdyTpkpxJgDVIORt' 
-  })
+  )
 `.trim()
 
 export const userData = `
