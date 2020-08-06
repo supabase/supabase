@@ -14,33 +14,47 @@ module.exports = {
   organizationName: 'supabase', // Usually your GitHub org/user name.
   projectName: 'supabase', // Usually your repo name.
   themeConfig: {
+    forceDarkMode: true,
+    darkMode: true,
+    colorMode: {
+      // "light" | "dark"
+      defaultMode: 'dark',
+
+      // Hides the switch in the navbar
+      // Useful if you want to support a single color mode
+      disableSwitch: true,
+
+      // Should we use the prefers-color-scheme media-query,
+      // using user system preferences, instead of the hardcoded defaultMode
+      respectPrefersColorScheme: false,
+    },
+    sidebarCollapsible: false,
     algolia: {
       apiKey: '766d56f13dd1e82f43253559b7c86636',
       indexName: 'supabase',
     },
-    forceDarkMode: true,
-    darkMode: true,
     image: '/img/supabase-og-image.png', // used for meta tag, in particular og:image and twitter:image
     metaImage: '/img/supabase-og-image.png',
     googleAnalytics: {
       trackingID: 'UA-155232740-1',
     },
-    announcementBar: {
-      id: 'support_us', // Any value that will identify this message
-      content:
-        'Join our early alpha: <a target="_blank" rel="noopener noreferrer" href="https://app.supabase.io">app.supabase.io</a>',
-      backgroundColor: '#111111', // Defaults to `#fff`
-      textColor: '#ddd', // Defaults to `#000`
-    },
+    // announcementBar: {
+    //   id: 'support_us', // Any value that will identify this message
+    //   content:
+    //     'Join our early alpha: <a target="_blank" rel="noopener noreferrer" href="https://app.supabase.io">app.supabase.io</a>',
+    //   backgroundColor: '#111111', // Defaults to `#fff`
+    //   textColor: '#ddd', // Defaults to `#000`
+    // },
     navbar: {
-      classNames: 'shadow--md',
+      // classNames: 'shadow--md',
       // title: 'supabase',
+      hideOnScroll: true,
       logo: {
         alt: 'Supabase',
         src: '/supabase-light.svg',
         srcDark: '/supabase-dark.svg',
       },
-      links: [
+      items: [
         {
           to: '/docs',
           label: 'Docs',
@@ -136,7 +150,6 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} Supabase.`,
     },
   },
-  plugins: ['@docusaurus/plugin-ideal-image'],
   presets: [
     [
       '@docusaurus/preset-classic',
