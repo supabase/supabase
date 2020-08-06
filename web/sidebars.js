@@ -6,28 +6,42 @@
  */
 
 module.exports = {
-  docs: {
-    Introduction: ['about', 'faq'],
-    Library: [
-      'library/getting-started',
-      'library/user-management',
-      'library/get',
-      'library/post',
-      'library/patch',
-      'library/delete',
-      'library/subscribe',
-      'library/stored-procedures',
-    ],
-    // Guides: ['guides/examples'],
-    Realtime: [
-      'realtime/about',
-      'realtime/docker',
-      'realtime/aws',
-      'realtime/digitalocean',
-      'realtime/source',
-    ],
-    Postgres: ['postgres/postgres-intro'],
-    'See Also': ['guides/examples', 'pricing', 'support', 'handbook/contributing'],
+  docs: [
+    { type: 'category', label: 'Introduction', items: ['about', 'faq'], collapsed: false },
+    {
+      type: 'category',
+      label: 'Library',
+      collapsed: false,
+      items: [
+        'library/getting-started',
+        'library/user-management',
+        'library/get',
+        'library/post',
+        'library/patch',
+        'library/delete',
+        'library/subscribe',
+        'library/stored-procedures',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Realtime',
+      collapsed: false,
+      items: [
+        'realtime/about',
+        'realtime/docker',
+        'realtime/aws',
+        'realtime/digitalocean',
+        'realtime/source',
+      ],
+    },
+    { type: 'category', collapsed: false, label: 'Postgres', items: ['postgres/postgres-intro'] },
+    {
+      type: 'category',
+      label: 'See Also',
+      collapsed: false,
+      items: ['guides/examples', 'pricing', 'support', 'handbook/contributing'],
+    },
     // Handbook: ['handbook/introduction', 'handbook/contributing'],
-  },
+  ],
 }

@@ -296,13 +296,13 @@ li + li {
 .navbar .navbar__link {
   font-weight: bold;
 }
-.navbar-sidebar__items .menu__link {
+/* .navbar-sidebar__items .menu__link {
   line-height: calc(var(--ifm-spacing-vertical) * 2) !important;
   font-weight: bold;
   text-transform: uppercase;
   font-size: 0.9em;
   padding: 10px !important;
-}
+} */
 
 /* .with-underline::after,
 .markdown h2:after {
@@ -394,6 +394,9 @@ a.card:hover {
  * Docs
  */
 
+.menu.menu--responsive {
+  padding: 0;
+}
 .menu > ul.menu__list li {
   margin-top: 0;
   margin-bottom: 0;
@@ -405,7 +408,8 @@ a.card:hover {
 .menu .menu__list-item-hidden {
   display: none;
 }
-.menu > ul.menu__list > li.menu__list-item div.title {
+/* Category headers */
+.menu > ul.menu__list > li.menu__list-item > a:first-child {
   color: var(--custom-content-color-light);
   cursor: text;
   display: flex;
@@ -414,7 +418,8 @@ a.card:hover {
   margin-top: calc(var(--ifm-spacing-vertical) * 1.5);
   margin-bottom: 0;
   padding: var(--ifm-menu-link-padding-vertical) 0;
-  /* font-weight: bold; */
+  font-weight: bold;
+  color: var(--custom-content-color-lightest) !important;
   text-transform: uppercase;
   font-size: 0.9em;
 }
@@ -477,6 +482,7 @@ a.card:hover {
   padding: 0 0.25rem;
   vertical-align: middle;
 }
+
 
 /* Make the Docs page take up full height to fix the left sidebar */
 div.container.padding-vert--lg .row {
@@ -763,4 +769,68 @@ a.hash-link {
 .Mermaid figcaption {
   font-size: 0.8rem;
   margin-bottom: 20px;
+}
+
+.DocSearch-Button {
+  border-radius: 8px !important;
+}
+.DocSearch-Button svg {
+  display: none;
+}
+.DocSearch-Button-Placeholder {
+  font-family: var(--ifm-font-family-base);
+  line-height: 10px;
+}
+
+
+.prism-code {
+  background-color: none;
+  white-space: normal;
+  word-break: break-word;
+}
+.token.keyword.module,
+.token.property-access,
+.token.function {
+  font-style: normal !important;
+  color: #ccc !important;
+}
+.token.plain,
+.token.parameter,
+.token.punctuation,
+.token.operator,
+.token.console.class-name,
+.token.doc-comment.parameter,
+.token.doc-comment.optional-parameter,
+.token.doc-comment.parameter.punctuation,
+.token.doc-comment.optional-parameter.punctuation {
+  font-style: normal !important;
+  color: #ccc !important;
+}
+.token.keyword,
+.token.doc-comment.keyword {
+  font-style: normal !important;
+  color: #569cd6 !important;
+}
+.token.string {
+  font-style: normal !important;
+  color: #24b47e !important;
+}
+.token.console {
+  font-style: normal !important;
+  color: #49c1ad !important;
+}
+.token.constant {
+  font-style: normal !important;
+  color: #569cd6 !important;
+}
+.token.comment {
+  font-style: normal !important;
+  color: #666 !important;
+}
+.token.number {
+  color: #b5cea8 !important;
+}
+.token.boolean,
+.token.doc-comment.class-name {
+  @apply text-green-500;
 }
