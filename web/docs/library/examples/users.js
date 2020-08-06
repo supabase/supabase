@@ -17,7 +17,7 @@ let { body: user } = await supabase
 `.trim()
 
 export const userData = `
-let { bod: user } = await supabase
+let { body: user } = await supabase
   .auth
   .user()
 `.trim()

@@ -236,6 +236,10 @@ body {
   padding: 10px 25px;
   font-weight: bold;
 }
+blockquote,
+blockquote p {
+  color: var(--custom-content-color);
+}
 
 div[class^="announcementBar"] , div[class*=" announcementBar"] {
     padding-bottom: 5px;
