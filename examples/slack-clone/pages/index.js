@@ -1,7 +1,6 @@
 import { useState, useContext } from 'react'
 import UserContext from 'lib/UserContext'
 import { createClient } from '@supabase/supabase-js'
-import { useRouter } from 'next/router'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -12,16 +11,15 @@ const Home = () => {
   const { signIn } = useContext(UserContext)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const router = useRouter()
 
   const handleLogin = async (type, username, password) => {
     try {
-      const { body } =
-        type == 'LOGIN'
+      const {
+        body: { user },
+      } =
+        type === 'LOGIN'
           ? await supabase.auth.login(username, password)
           : await supabase.auth.signup(username, password)
-
-      const user = await supabase.auth.user()
       if (!!user) signIn(user.id, user.email)
     } catch (error) {
       console.log('error', error)
