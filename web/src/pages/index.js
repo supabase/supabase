@@ -99,8 +99,11 @@ type User = {
 };
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const users = await supabase.from<User>('users').select('*');
-  res.status(200).json(users);
+  const allOnlineUsers = await supabase
+    .from<User>('users')
+    .select('*')
+    .eq('status', 'ONLINE');
+  res.status(200).json(allOnlineUsers);
 };
 `.trim()
 
