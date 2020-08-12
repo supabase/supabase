@@ -28,7 +28,7 @@ import { createClient } from '@supabase/supabase-js'
 
 // Initialize 
 const supabaseUrl = 'https://chat-room.supabase.co'
-const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabaseKey = 'public-anon-key'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Get notified of all new chat messages
@@ -44,7 +44,7 @@ import { createClient } from '@supabase/supabase-js'
 
 // Initialize 
 const supabaseUrl = 'https://chat-room.supabase.co'
-const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabaseKey = 'public-anon-key'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Get public rooms and their messages
@@ -61,7 +61,7 @@ import { createClient } from '@supabase/supabase-js'
 
 // Initialize 
 const supabaseUrl = 'https://chat-room.supabase.co'
-const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabaseKey = 'public-anon-key'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Create a new chat room
@@ -74,7 +74,7 @@ import { createClient } from '@supabase/supabase-js'
 
 // Initialize 
 const supabaseUrl = 'https://chat-room.supabase.co'
-const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabaseKey = 'public-anon-key'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Update multiple users
@@ -82,6 +82,26 @@ const updatedUsers = await supabase
   .from('users')
   .eq('account_type', 'paid')
   .update({ highlight_color: 'gold' })
+`.trim()
+const nodeTSExample = `
+import { NextApiRequest, NextApiResponse } from 'next';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SECRET_KEY
+);
+
+type User = {
+  id: string;
+  username: string;
+  status: 'ONLINE' | 'OFFLINE';
+};
+
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+  const users = await supabase.from<User>('users').select('*');
+  res.status(200).json(users);
+};
 `.trim()
 
 const features = [
@@ -340,6 +360,14 @@ function Home() {
                     >
                       Update multiple rows
                     </button>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'NODETS' ? 'info is-active' : 'info '
+                      }`}
+                      onClick={() => showCodeExample('NODETS')}
+                    >
+                      Node.js & TypeScript support
+                    </button>
                   </div>
                 </div>
                 <div className="col col--9 code-with-header">
@@ -360,6 +388,12 @@ function Home() {
                   )}
                   {visibleCodeExample === 'UPDATE' && (
                     <CustomCodeBlock header="Update a user" js={updateExample} />
+                  )}
+                  {visibleCodeExample === 'NODETS' && (
+                    <CustomCodeBlock
+                      header="Server-side & client-side TypeScript support e.g. in Next.js API routes"
+                      js={nodeTSExample}
+                    />
                   )}
                 </div>
               </div>
