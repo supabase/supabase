@@ -38,7 +38,7 @@ CREATE PUBLICATION supabase_realtime FOR ALL TABLES;
 If you want to receive the old record (previous values) on `UPDATE` and `DELETE`, you can set the `REPLICA IDENTITY` to `FULL` like this:
 
 ```sql
-ALTER TABLE your_table SET REPLICA IDENTITY = FULL;
+ALTER TABLE your_table REPLICA IDENTITY FULL;
 ```
 
-This has to be set for each table unfortunately.
+This has to be set for each table.
