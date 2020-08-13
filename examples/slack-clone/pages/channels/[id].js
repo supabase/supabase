@@ -6,7 +6,7 @@ import { useStore, addMessage } from '~/lib/Store'
 import { useContext, useEffect, useRef } from 'react'
 import UserContext from '~/lib/UserContext'
 
-const ChannelsPage = props => {
+const ChannelsPage = (props) => {
   const router = useRouter()
   const { user, authLoaded, signOut } = useContext(UserContext)
   const messagesEndRef = useRef(null)
@@ -14,6 +14,7 @@ const ChannelsPage = props => {
   // Redirect if not signed in.
   useEffect(() => {
     if (authLoaded && !user) signOut()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, router])
 
   // Else load up the page
@@ -21,7 +22,10 @@ const ChannelsPage = props => {
   const { messages, channels } = useStore({ channelId })
 
   useEffect(() => {
-    messagesEndRef.current.scrollIntoView({ block: 'start', behavior: 'smooth' })
+    messagesEndRef.current.scrollIntoView({
+      block: 'start',
+      behavior: 'smooth',
+    })
   }, [messages])
 
   // Render the channels and messages
@@ -30,14 +34,14 @@ const ChannelsPage = props => {
       <div className="relative h-screen">
         <div className="Messages h-full pb-16">
           <div className="p-2 overflow-y-auto">
-            {messages.map(x => (
+            {messages.map((x) => (
               <Message key={x.id} message={x} />
             ))}
             <div ref={messagesEndRef} style={{ height: 0 }} />
           </div>
         </div>
         <div className="p-2 absolute bottom-0 left-0 w-full">
-          <MessageInput onSubmit={async text => addMessage(text, channelId, user)} />
+          <MessageInput onSubmit={async (text) => addMessage(text, channelId, user)} />
         </div>
       </div>
     </Layout>
