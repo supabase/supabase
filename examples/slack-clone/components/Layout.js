@@ -6,13 +6,13 @@ import { addChannel } from '~/lib/Store'
 export default function Layout(props) {
   const { signOut } = useContext(UserContext)
 
-  const slugify = text => {
+  const slugify = (text) => {
     return text
       .toString()
       .toLowerCase()
       .replace(/\s+/g, '-') // Replace spaces with -
-      .replace(/[^\w\-]+/g, '') // Remove all non-word chars
-      .replace(/\-\-+/g, '-') // Replace multiple - with single -
+      .replace(/[^\w-]+/g, '') // Remove all non-word chars
+      .replace(/--+/g, '-') // Replace multiple - with single -
       .replace(/^-+/, '') // Trim - from start of text
       .replace(/-+$/, '') // Trim - from end of text
   }
@@ -20,9 +20,7 @@ export default function Layout(props) {
   const newChannel = async () => {
     const slug = prompt('Please enter your name')
     if (slug) {
-      // let { body } = await
       addChannel(slugify(slug))
-      // console.log('body', body)
     }
   }
 
@@ -37,7 +35,11 @@ export default function Layout(props) {
           <h4 className="font-bold">Channels</h4>
           <ul className="channel-list">
             {props.channels.map((x) => (
-              <SidebarItem channel={x} key={x.id} isActiveChannel={x.id == props.activeChannelId} />
+              <SidebarItem
+                channel={x}
+                key={x.id}
+                isActiveChannel={x.id === props.activeChannelId}
+              />
             ))}
           </ul>
         </div>
