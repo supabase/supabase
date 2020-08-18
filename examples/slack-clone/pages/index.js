@@ -1,11 +1,6 @@
 import { useState, useContext } from 'react'
 import UserContext from 'lib/UserContext'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_KEY
-)
+import { supabase } from 'lib/Store'
 
 const Home = () => {
   const { signIn } = useContext(UserContext)
