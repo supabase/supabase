@@ -3,12 +3,7 @@ import React from 'react'
 import App from 'next/app'
 import Router from 'next/router'
 import UserContext from 'lib/UserContext'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_KEY
-)
+import { supabase } from 'lib/Store'
 
 export default class SupabaseSlackClone extends App {
   state = {
