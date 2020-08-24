@@ -5,6 +5,7 @@ Supabase is 100% remote.
 Angelico de los Reyes
 Ant Wilson
 Bobbie Soedirgo
+Chris Copplestone
 Hieu Pham
 Joshen Lim
 Paul Copplestone
@@ -29,3 +30,4 @@ Supabase would not be possible without the work of some other amazing opensource
 - Next.js - https://nextjs.org/
 - Phoenix - https://www.phoenixframework.org/
 - Docusaurus - https://v2.docusaurus.io/
+- GoAuth - https://github.com/netlify/gotrue
