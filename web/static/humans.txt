@@ -1,8 +1,14 @@
 TEAM
 
-Paul Copplestone
-Ant Wilson
+Supabase is 100% remote.
+
 Angelico de los Reyes
+Ant Wilson
+Bobbie Soedirgo
+Hieu Pham
+Joshen Lim
+Paul Copplestone
+Steve Chavez
 
 ____________
 
@@ -19,8 +25,7 @@ Supabase would not be possible without the work of some other amazing opensource
 
 - Postgres - https://www.postgresql.org/docs/devel/git.html
 - PostgREST - https://github.com/PostgREST
-- Nginx - http://hg.nginx.org/nginx/
 - Kong - https://github.com/kong/
-- NextJS - https://nextjs.org/
+- Next.js - https://nextjs.org/
 - Phoenix - https://www.phoenixframework.org/
 - Docusaurus - https://v2.docusaurus.io/
