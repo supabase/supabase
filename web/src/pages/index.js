@@ -210,7 +210,7 @@ function Home() {
                 display: 'inline-block',
               }}
             >
-              Backed by Y Combinator.
+              Backed by Y Combinator
             </p>
           </div>
         </section>
