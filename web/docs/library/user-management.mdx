@@ -10,7 +10,8 @@ import {
   login,
   userData,
   logout,
-} from './examples/users'
+  errorHandling,
+} from '../../src/examples/users'
 
 ### Introduction
 
@@ -66,3 +67,11 @@ Get the JSON data for the logged in user.
 
 After calling log out, all interactions using the Supabase JS client will be "anonymous".
 
+
+### Error handling
+
+<CustomCodeBlock
+  header="Shows how to parse errors returned from the server."
+  js={errorHandling}
+/>
+<br />
