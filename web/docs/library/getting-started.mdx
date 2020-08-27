@@ -10,7 +10,7 @@ description: 'How to install Supabase and start interacting with your database'
 ```bash
 npm install --save @supabase/supabase-js
 # OR
-yarn install @supabase/supabase-js
+yarn add @supabase/supabase-js
 ```
 
 
@@ -20,7 +20,40 @@ yarn install @supabase/supabase-js
 import { createClient } from '@supabase/supabase-js'
 
 // Create a single supabase client for interacting with your database 
-const supabase = createClient("https://xyzcompany.supabase.co", "1a2b-3c4d-5e6f-7g8h");
+const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key");
+```
+
+
+
+## Usage with TypeScript
+
+Supabase-js ships with type definitions for usage with TypeScript and for convenient IntelliSense autocomplete and documentation in your editor.
+
+When using TypeScript, you can pass the type of database row as a type parameter to the `from` method to get better autocompletion support down the chain. 
+If you don't provide a type for the row you need to explicitly pass `from<any>('tableName')`.
+
+```ts
+type Message = {
+  id: number;
+  inserted_at: string;
+  message: string;
+  user_id: string;
+  channel_id: number;
+  author: { username: string };
+};
+
+const response = await supabase
+  .from<Message>('messages') // Message maps to the type of the row in your database.
+  .select('*, author:user_id(username)')
+  .match({ channel_id: 2 }); // Your IDE will be able to help with automcompletion.
+response.body // Response body will be of type Array<Message>.
+
+// If you don't provide a type for the row you need to explicitly pass `from<any>('tableName')`.
+const response = await supabase
+  .from<any>('messages')
+  .select('*, author:user_id(username)')
+  .match({ channel_id: 2 });
+response.body // Response body will be of type Array<any>.
 ```
 
 
