@@ -107,6 +107,29 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 };
 `.trim()
 
+const umdExample = `
+<script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
+
+<script>
+  // Initialize
+  const supabaseUrl = 'https://chat-room.supabase.co'
+  const supabaseKey = 'public-anon-key'
+  const supabase = Supabase.createClient(supabaseUrl, supabaseKey)
+
+  // Get public rooms and their messages
+  supabase
+    .from('rooms')
+    .select(\`
+      name,
+      messages ( text )
+    \`)
+    .eq('public', true)
+    .then(response => {
+      // do s.th with the response
+    })
+</script>
+`.trim()
+
 const features = [
   {
     title: <>Chat apps</>,
@@ -371,6 +394,14 @@ function Home() {
                     >
                       Node.js & TypeScript support
                     </button>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'NODETS' ? 'info is-active' : 'info '
+                      }`}
+                      onClick={() => showCodeExample('UMD')}
+                    >
+                      UMD bundle support
+                    </button>
                   </div>
                 </div>
                 <div className="col col--9 code-with-header">
@@ -396,6 +427,12 @@ function Home() {
                     <CustomCodeBlock
                       header="Server-side & client-side TypeScript support e.g. in Next.js API routes"
                       js={nodeTSExample}
+                    />
+                  )}
+                  {visibleCodeExample === 'UMD' && (
+                    <CustomCodeBlock
+                      header="Supabase-js standalone bundle"
+                      js={umdExample}
                     />
                   )}
                 </div>
