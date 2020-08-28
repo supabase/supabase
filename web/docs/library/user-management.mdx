@@ -10,6 +10,9 @@ import {
   login,
   userData,
   logout,
+  requestRecoveryTokenEmail,
+  verifyRecoveryToken,
+  updateUser
 } from './examples/users'
 
 ### Introduction
@@ -33,6 +36,8 @@ Supabase provides the routes to sign up, login, log out, and manage users in you
 Allow your users to sign up and create a new account.
 
 After they have signed up, all interactions using the Supabase JS client will be performed as "that user".
+
+By default, signups auto-confirm, if you require users to confirm their email address toggle this on in Auth > Settings via the Supabase dashboard.
 
 ### Log in
 
@@ -65,4 +70,42 @@ Get the JSON data for the logged in user.
 <br />
 
 After calling log out, all interactions using the Supabase JS client will be "anonymous".
+
+### Password Reset
+
+This functionality is not yet inside supabase-js but is available on your Supabase API as HTTP endpoints:
+
+Request a recovery url to be sent to a user:
+
+<CustomCodeBlock
+  header="Request recovery email."
+  js={requestRecoveryTokenEmail}
+/>
+<br />
+
+The link inside the email will take the form `<your-app-url>?recovery_token=<SOME-TOKEN>` where `your-app-url` is the url provided on the Supabase dashboard at Project > Auth > Settings
+
+Your app should take the `recovery_token` and make a request to the verify endpoint which will return an accessToken good for 60 mins (effectively logging the user in to your app):
+
+<CustomCodeBlock
+  header="Use recovery token to get access token."
+  js={verifyRecoveryToken}
+/>
+<br />
+
+Next you need to provide your user with a new password form, which should send the new password to the `/auth/v1/user` endpoint as a PUT
+
+<CustomCodeBlock
+  header="Update user's password."
+  js={updateUser}
+/>
+<br />
+
+### Email Confirmation
+
+Email confirmations can be enabled via the dashboard. Navigate to Auth > Settings within your project and uncheck "Disable Email Confirmations".
+
+Then head to Auth > Templates to customize the email.
+
+You can also add your own SMTP credentials on the settings page if you'd prefer to use your own email server.
 
