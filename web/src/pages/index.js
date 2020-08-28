@@ -396,7 +396,7 @@ function Home() {
                     </button>
                     <button
                       className={`button button--${
-                        visibleCodeExample === 'NODETS' ? 'info is-active' : 'info '
+                        visibleCodeExample === 'UMD' ? 'info is-active' : 'info '
                       }`}
                       onClick={() => showCodeExample('UMD')}
                     >
