@@ -1,7 +1,7 @@
 
-var SUPABASE_URL = 'https://varxfsgggoffdfqxlmmj.supabase.co'
+var SUPABASE_URL = '<supabase url - retrieve from supabase dashboard>'
 var SUPABASE_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTU5ODQyMzU3OCwiZXhwIjoxOTEzOTk5NTc4fQ.V6J-ybbfFfk2EkYAzs24jLP4-aoCDzZQzdhTFiJ6KeI'
+  '<client key - retrieve from supabase dashboard>'
 
 var supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 window.userToken = null
