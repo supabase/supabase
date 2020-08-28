@@ -50,11 +50,11 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 // Get public rooms and their messages
 const publicRooms = await supabase
   .from('rooms')
-  .eq('public', true)
   .select(\`
     name,
     messages ( text )
   \`)
+  .eq('public', true)
 `.trim()
 const createExample = `
 import { createClient } from '@supabase/supabase-js'
