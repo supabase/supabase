@@ -50,11 +50,11 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 // Get public rooms and their messages
 const publicRooms = await supabase
   .from('rooms')
-  .eq('public', true)
   .select(\`
     name,
     messages ( text )
   \`)
+  .eq('public', true)
 `.trim()
 const createExample = `
 import { createClient } from '@supabase/supabase-js'
@@ -105,6 +105,29 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     .eq('status', 'ONLINE');
   res.status(200).json(allOnlineUsers);
 };
+`.trim()
+
+const umdExample = `
+<script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
+
+<script>
+  // Initialize
+  const supabaseUrl = 'https://chat-room.supabase.co'
+  const supabaseKey = 'public-anon-key'
+  const supabase = Supabase.createClient(supabaseUrl, supabaseKey)
+
+  // Get public rooms and their messages
+  supabase
+    .from('rooms')
+    .select(\`
+      name,
+      messages ( text )
+    \`)
+    .eq('public', true)
+    .then(response => {
+      // Do something with the response
+    })
+</script>
 `.trim()
 
 const features = [
@@ -371,6 +394,14 @@ function Home() {
                     >
                       Node.js & TypeScript support
                     </button>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'UMD' ? 'info is-active' : 'info '
+                      }`}
+                      onClick={() => showCodeExample('UMD')}
+                    >
+                      Install from CDN
+                    </button>
                   </div>
                 </div>
                 <div className="col col--9 code-with-header">
@@ -396,6 +427,12 @@ function Home() {
                     <CustomCodeBlock
                       header="Server-side & client-side TypeScript support e.g. in Next.js API routes"
                       js={nodeTSExample}
+                    />
+                  )}
+                  {visibleCodeExample === 'UMD' && (
+                    <CustomCodeBlock
+                      header="Supabase-js standalone bundle"
+                      js={umdExample}
                     />
                   )}
                 </div>
