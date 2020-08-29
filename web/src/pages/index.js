@@ -125,7 +125,7 @@ const umdExample = `
     \`)
     .eq('public', true)
     .then(response => {
-      // do s.th with the response
+      // Do something with the response
     })
 </script>
 `.trim()
@@ -400,7 +400,7 @@ function Home() {
                       }`}
                       onClick={() => showCodeExample('UMD')}
                     >
-                      UMD bundle support
+                      Install from CDN
                     </button>
                   </div>
                 </div>
