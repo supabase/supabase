@@ -12,7 +12,6 @@ const updateCityName = async () => {
       .from('cities')
       .update({ name: 'Middle Earth' })
       .match({ name: 'Auckland' })
-
     return updates
   ${errorJs}
 `.trim()
@@ -23,8 +22,8 @@ const updateCityName = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .filter('name', 'eq', 'Paris')
       .update({ name: 'Mordor' })
+      .filter('name', 'eq', 'Paris')
     return cities
   ${errorJs}
 `.trim()
@@ -35,8 +34,8 @@ const updateCities = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .not('name', 'eq', 'Paris')
       .update({ name: 'Mordor' })
+      .not('name', 'eq', 'Paris')
     return cities
   ${errorJs}
 `.trim()
@@ -47,8 +46,8 @@ const updateCityName = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .match({name: 'Beijing', country_id: 156})
       .update({ name: 'Mordor' })
+      .match({name: 'Beijing', country_id: 156})
     return cities
   ${errorJs}
 `.trim()
@@ -59,8 +58,8 @@ const updateCityName = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .eq('name', 'San Francisco')
       .update({ name: 'Mordor' })
+      .eq('name', 'San Francisco')
     return cities
   ${errorJs}
 `.trim()
@@ -71,8 +70,8 @@ const updateCityName = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .neq('name', 'Lagos')
       .update({ name: 'Mordor' })
+      .neq('name', 'Lagos')
     return cities
   ${errorJs}
 `.trim()
@@ -83,8 +82,8 @@ const updateCityName = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .gt('country_id', 250)
       .update({ name: 'Mordor' })
+      .gt('country_id', 250)
     return cities
   ${errorJs}
 `.trim()
@@ -95,8 +94,8 @@ const updateCityName = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .lt('country_id', 250)
       .update({ name: 'Mordor' })
+      .lt('country_id', 250)
     return cities
   ${errorJs}
 `.trim()
@@ -107,8 +106,8 @@ const updateCityName = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .gte('country_id', 250)
       .update({ name: 'Mordor' })
+      .gte('country_id', 250)
     return cities
   ${errorJs}
 `.trim()
@@ -119,8 +118,8 @@ const updateCityName = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .lte('country_id', 250)
       .update({ name: 'Mordor' })
+      .lte('country_id', 250)
     return cities
   ${errorJs}
 `.trim()
@@ -131,12 +130,10 @@ const updateCityName = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .like('name', '%la%')
       .update({ name: 'Mordor' })
+      .like('name', '%la%')
     return cities
-  } catch (error) {
-    console.log('Error: ', error)
-  }
+  ${errorJs}
 }
 `.trim()
 
@@ -146,8 +143,8 @@ const updateCityName = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .ilike('name', '%la%')
       .update({ name: 'Mordor' })
+      .ilike('name', '%la%')
     return cities
   ${errorJs}
 `.trim()
@@ -158,8 +155,8 @@ const updateCityName = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .is('name', null)
       .update({ name: 'Mordor' })
+      .is('name', null)
     return cities
   ${errorJs}
 `.trim()
@@ -170,8 +167,8 @@ const updateCityName = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .in('name', ['Rio de Janeiro', 'San Francisco'])
       .update({ name: 'Mordor' })
+      .in('name', ['Rio de Janeiro', 'San Francisco'])
     return cities
   ${errorJs}
 `.trim()
@@ -182,8 +179,8 @@ const updateCountryName = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .cs('main_exports', ['oil'])
       .update({ name: 'Mordor' })
+      .cs('main_exports', ['oil'])
     return countries
   ${errorJs}
 `.trim()
@@ -194,8 +191,8 @@ const updateCountryName = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .cd('main_exports', ['cars', 'food', 'machine'])
       .update({ name: 'Mordor' })
+      .cd('main_exports', ['cars', 'food', 'machine'])
     return countries
   ${errorJs}
 `.trim()
@@ -206,8 +203,8 @@ const updateCountryName = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .ova('main_exports', ['computers', 'minerals'])
       .update({ name: 'Mordor' })
+      .ova('main_exports', ['computers', 'minerals'])
     return countries
   ${errorJs}
 `.trim()
@@ -218,8 +215,8 @@ const updateCountryName = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .ovr('population_range_millions', [150, 250])
       .update({ name: 'Mordor' })
+      .ovr('population_range_millions', [150, 250])
     return countries
   ${errorJs}
 `.trim()
@@ -230,8 +227,8 @@ const updateCountryName = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .sl('population_range_millions', [150, 250])
       .update({ name: 'Mordor' })
+      .sl('population_range_millions', [150, 250])
     return countries
   ${errorJs}
 `.trim()
@@ -242,8 +239,8 @@ const updateCountryName = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .sr('population_range_millions', [150, 250])
       .update({ name: 'Mordor' })
+      .sr('population_range_millions', [150, 250])
     return countries
   ${errorJs}
 `.trim()
@@ -254,8 +251,8 @@ const updateCountryName = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .nxl('population_range_millions', [150, 250])
       .update({ name: 'Mordor' })
+      .nxl('population_range_millions', [150, 250])
     return countries
   ${errorJs}
 `.trim()
@@ -266,8 +263,8 @@ const updateCountryName = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .nxr('population_range_millions', [150, 250])
       .update({ name: 'Mordor' })
+      .nxr('population_range_millions', [150, 250])
     return countries
   ${errorJs}
 `.trim()
@@ -278,8 +275,8 @@ const updateCountryName = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .adj('population_range_millions', [70, 185])
       .update({ name: 'Mordor' })
+      .adj('population_range_millions', [70, 185])
     return countries
   ${errorJs}
 `.trim()

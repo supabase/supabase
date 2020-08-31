@@ -10,9 +10,8 @@ const deleteCity = async () => {
   try {
     let values = await supabase
       .from('cities')
-      .match({ id: 666 })
       .delete()
-
+      .match({ id: 666 })
     return values
   ${errorJs}
 `.trim()
@@ -23,8 +22,8 @@ const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .filter({'name', 'eq', 'Paris'})
       .delete()
+      .filter({'name', 'eq', 'Paris'})
     return cities
   ${errorJs}
 `.trim()
@@ -35,8 +34,8 @@ const getCities = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .not('name', 'eq', 'Paris')
       .delete()
+      .not('name', 'eq', 'Paris')
     return cities
   ${errorJs}
 `.trim()
@@ -47,8 +46,8 @@ const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .match({name: 'Beijing', country_id: 156})
       .delete()
+      .match({name: 'Beijing', country_id: 156})
     return cities
   ${errorJs}
 `.trim()
@@ -59,8 +58,8 @@ const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .eq('name', 'San Francisco')
       .delete()
+      .eq('name', 'San Francisco')
     return cities
   ${errorJs}
 `.trim()
@@ -71,8 +70,8 @@ const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .neq('name', 'Lagos')
       .delete()
+      .neq('name', 'Lagos')
     return cities
   ${errorJs}
 `.trim()
@@ -83,8 +82,8 @@ const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .gt('country_id', 250)
       .delete()
+      .gt('country_id', 250)
     return cities
   ${errorJs}
 `.trim()
@@ -95,8 +94,8 @@ const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .lt('country_id', 250)
       .delete()
+      .lt('country_id', 250)
     return cities
   ${errorJs}
 `.trim()
@@ -107,8 +106,8 @@ const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .gte('country_id', 250)
       .delete()
+      .gte('country_id', 250)
     return cities
   ${errorJs}
 `.trim()
@@ -119,8 +118,8 @@ const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .lte('country_id', 250)
       .delete()
+      .lte('country_id', 250)
     return cities
   ${errorJs}
 `.trim()
@@ -131,8 +130,8 @@ const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .like('name', '%la%')
       .delete()
+      .like('name', '%la%')
     return cities
   ${errorJs}
 `.trim()
@@ -143,8 +142,8 @@ const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .ilike('name', '%la%')
       .delete()
+      .ilike('name', '%la%')
     return cities
   ${errorJs}
 `.trim()
@@ -155,8 +154,8 @@ const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .is('name', null)
       .delete()
+      .is('name', null)
     return cities
   ${errorJs}
 `.trim()
@@ -167,8 +166,8 @@ const deleteCity = async () => {
   try {
     let cities = await supabase
       .from('cities')
-      .in('name', ['Rio de Janeiro', 'San Francisco'])
       .delete()
+      .in('name', ['Rio de Janeiro', 'San Francisco'])
     return cities
   ${errorJs}
 `.trim()
@@ -179,8 +178,8 @@ const deleteCountry = async () => {
   try {
     let countries = await supabase
       .from('countries')
+      .delete()
       .cs('main_exports', ['oil'])
-      delete()
     return countries
   ${errorJs}
 `.trim()
@@ -191,8 +190,8 @@ const deleteCountry = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .cd('main_exports', ['cars', 'food', 'machine'])
       .delete()
+      .cd('main_exports', ['cars', 'food', 'machine'])
     return countries
   ${errorJs}
 `.trim()
@@ -203,8 +202,8 @@ const deleteCountry = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .ova('main_exports', ['computers', 'minerals'])
       .delete()
+      .ova('main_exports', ['computers', 'minerals'])
     return countries
   ${errorJs}
 `.trim()
@@ -215,8 +214,8 @@ const deleteCountry = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .ovr('population_range_millions', [150, 250])
       .delete()
+      .ovr('population_range_millions', [150, 250])
     return countries
   ${errorJs}
 `.trim()
@@ -227,8 +226,8 @@ const deleteCountry = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .sl('population_range_millions', [150, 250])
       .delete()
+      .sl('population_range_millions', [150, 250])
     return countries
   ${errorJs}
 `.trim()
@@ -239,8 +238,8 @@ const deleteCountry = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .sr('population_range_millions', [150, 250])
       .delete()
+      .sr('population_range_millions', [150, 250])
     return countries
   ${errorJs}
 `.trim()
@@ -251,8 +250,8 @@ const deleteCountry = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .nxl('population_range_millions', [150, 250])
       .delete()
+      .nxl('population_range_millions', [150, 250])
     return countries
   ${errorJs}
 `.trim()
@@ -263,8 +262,8 @@ const deleteCountry = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .nxr('population_range_millions', [150, 250])
       .delete()
+      .nxr('population_range_millions', [150, 250])
     return countries
   ${errorJs}
 `.trim()
@@ -275,8 +274,8 @@ const deleteCountry = async () => {
   try {
     let countries = await supabase
       .from('countries')
-      .adj('population_range_millions', [70, 185])
       .delete()
+      .adj('population_range_millions', [70, 185])
     return countries
   ${errorJs}
 `.trim()
