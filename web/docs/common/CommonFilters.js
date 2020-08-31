@@ -21,12 +21,14 @@ import Sr from './filters/sr.mdx'
 import Nxl from './filters/nxl.mdx'
 import Nxr from './filters/nxr.mdx'
 import Adj from './filters/adj.mdx'
+import Or from './filters/or.mdx'
 
 
 const filters = {
   filter: <Filter />,
   not: <Not />,
   match: <Match />,
+  or: <Or />,
   eq: <Eq />,
   neq: <Neq />,
   gt: <Gt />,

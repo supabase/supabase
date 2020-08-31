@@ -6,7 +6,7 @@ var SUPABASE_KEY =
 var supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 window.userToken = null
 
-window.onload = function () {
+document.addEventListener('DOMContentLoaded', function (event) {
   var signUpForm = document.querySelector('#sign-up')
   signUpForm.onsubmit = signUpSubmitted.bind(signUpForm)
 
@@ -18,7 +18,7 @@ window.onload = function () {
 
   var logoutButton = document.querySelector('#logout-button')
   logoutButton.onclick = logoutSubmitted.bind(logoutButton)
-}
+})
 
 const signUpSubmitted = (event) => {
   event.preventDefault()

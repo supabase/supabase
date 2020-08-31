@@ -17,6 +17,15 @@
   overflow: hidden;
 } */
 
+.heroBanner {
+  /* height: calc(100vh - 60px); */
+  min-height: 80vh;
+}
+.hero .code-with-header {
+  box-shadow:  0 0 5px 5px rgba(0, 0, 0, 0.3);
+  /* box-shadow: var(--ifm-global-shadow-md); */
+}
+
 .heroBanner h2 {
   font-size: 2rem !important;
 }
@@ -72,6 +81,10 @@
 }
 
 .responsiveCentered {
+  text-align: center;
+}
+
+.centered {
   text-align: center;
 }
 
