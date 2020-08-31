@@ -11,7 +11,14 @@ import HowCard from '../components/HowCard'
 import { repos } from '../data/github'
 
 const heroExample = `
-const realtime = supabase
+const messages = supabase
+  .from('messages')
+  .select(\`
+    id, text,
+    user ( id, name )
+  \`)
+
+const newMessages = supabase
   .from('messages')
   .on('INSERT', message => console.log('New message!', message) )
   .subscribe()
@@ -21,7 +28,7 @@ import { createClient } from '@supabase/supabase-js'
 
 // Initialize 
 const supabaseUrl = 'https://chat-room.supabase.co'
-const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabaseKey = 'public-anon-key'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Get notified of all new chat messages
@@ -37,24 +44,24 @@ import { createClient } from '@supabase/supabase-js'
 
 // Initialize 
 const supabaseUrl = 'https://chat-room.supabase.co'
-const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabaseKey = 'public-anon-key'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Get public rooms and their messages
 const publicRooms = await supabase
   .from('rooms')
-  .eq('public', true)
   .select(\`
     name,
     messages ( text )
   \`)
+  .eq('public', true)
 `.trim()
 const createExample = `
 import { createClient } from '@supabase/supabase-js'
 
 // Initialize 
 const supabaseUrl = 'https://chat-room.supabase.co'
-const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabaseKey = 'public-anon-key'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Create a new chat room
@@ -67,7 +74,7 @@ import { createClient } from '@supabase/supabase-js'
 
 // Initialize 
 const supabaseUrl = 'https://chat-room.supabase.co'
-const supabaseKey = '1a2b-3c4d-5e6f-7g8h'
+const supabaseKey = 'public-anon-key'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Update multiple users
@@ -75,6 +82,52 @@ const updatedUsers = await supabase
   .from('users')
   .eq('account_type', 'paid')
   .update({ highlight_color: 'gold' })
+`.trim()
+const nodeTSExample = `
+import { NextApiRequest, NextApiResponse } from 'next';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SECRET_KEY
+);
+
+type User = {
+  id: string;
+  username: string;
+  status: 'ONLINE' | 'OFFLINE';
+};
+
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+  const allOnlineUsers = await supabase
+    .from<User>('users')
+    .select('*')
+    .eq('status', 'ONLINE');
+  res.status(200).json(allOnlineUsers);
+};
+`.trim()
+
+const umdExample = `
+<script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
+
+<script>
+  // Initialize
+  const supabaseUrl = 'https://chat-room.supabase.co'
+  const supabaseKey = 'public-anon-key'
+  const supabase = Supabase.createClient(supabaseUrl, supabaseKey)
+
+  // Get public rooms and their messages
+  supabase
+    .from('rooms')
+    .select(\`
+      name,
+      messages ( text )
+    \`)
+    .eq('public', true)
+    .then(response => {
+      // Do something with the response
+    })
+</script>
 `.trim()
 
 const features = [
@@ -142,8 +195,8 @@ function Home() {
   return (
     <Layout title={`${siteConfig.title}`} description={siteConfig.tagline}>
       <main className="HomePage">
-        {/* HEARDER */}
-        <header className={classnames('hero', styles.heroBanner)}>
+        {/* HEADER */}
+        <header className={classnames('hero full', styles.heroBanner)}>
           <div className="container">
             <div className="row">
               <div className="col col--5">
@@ -157,7 +210,7 @@ function Home() {
                       'button hero--button button--md button--secondary button--outline responsive-button',
                       styles.button
                     )}
-                    to={useBaseUrl('docs/about')}
+                    to={useBaseUrl('docs')}
                     style={{ marginLeft: 0, marginTop: 10 }}
                   >
                     Learn More
@@ -175,7 +228,10 @@ function Home() {
                 </div>
               </div>
               <div className="col col--7">
-                <CustomCodeBlock header="Listen to your Postgres in realtime." js={heroExample} />
+                <CustomCodeBlock
+                  header="Query your PostgreSQL database and listen in real-time."
+                  js={heroExample}
+                />
               </div>
             </div>
           </div>
@@ -200,7 +256,7 @@ function Home() {
                 display: 'inline-block',
               }}
             >
-              Backed by Y Combinator.
+              Backed by Y Combinator
             </p>
           </div>
         </section>
@@ -330,6 +386,22 @@ function Home() {
                     >
                       Update multiple rows
                     </button>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'NODETS' ? 'info is-active' : 'info '
+                      }`}
+                      onClick={() => showCodeExample('NODETS')}
+                    >
+                      Node.js & TypeScript support
+                    </button>
+                    <button
+                      className={`button button--${
+                        visibleCodeExample === 'UMD' ? 'info is-active' : 'info '
+                      }`}
+                      onClick={() => showCodeExample('UMD')}
+                    >
+                      Install from CDN
+                    </button>
                   </div>
                 </div>
                 <div className="col col--9 code-with-header">
@@ -351,6 +423,18 @@ function Home() {
                   {visibleCodeExample === 'UPDATE' && (
                     <CustomCodeBlock header="Update a user" js={updateExample} />
                   )}
+                  {visibleCodeExample === 'NODETS' && (
+                    <CustomCodeBlock
+                      header="Server-side & client-side TypeScript support e.g. in Next.js API routes"
+                      js={nodeTSExample}
+                    />
+                  )}
+                  {visibleCodeExample === 'UMD' && (
+                    <CustomCodeBlock
+                      header="Supabase-js standalone bundle"
+                      js={umdExample}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -358,7 +442,7 @@ function Home() {
         </section>
 
         {/* USE CASES */}
-        <section className={'section-lg'}>
+        {/* <section className={'section-lg'}>
           <div className="container">
             <h2 className="with-underline">Use Cases</h2>
             <div className="row is-multiline">
@@ -367,11 +451,11 @@ function Home() {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
 
         <section className={'section-lg'}>
           <div className="container">
-            <div className={classnames('row', styles.responsiveCentered)}>
+            <div className={classnames('row', styles.centered)}>
               <div className="col col--6 col--offset-3">
                 <h2 className="with-underline">Self-documenting</h2>
                 <p className="">
@@ -381,7 +465,7 @@ function Home() {
               </div>
             </div>
 
-            <div className={classnames('row', styles.responsiveCentered)}>
+            <div className={classnames('row', styles.centered)}>
               <div className="col">
                 <img
                   className={''}
@@ -393,6 +477,27 @@ function Home() {
           </div>
         </section>
 
+        {/* <section className={'section-lg'}>
+          <div className="container">
+            <div className={classnames('row', styles.centered)}>
+              <div className="col col--6 col--offset-3">
+                <h2 className="with-underline">Table view</h2>
+                <p className="">Start building your database directly from the dashboard.</p>
+              </div>
+            </div>
+
+            <div className={classnames('row', styles.centered)}>
+              <div className="col">
+                <img
+                  className={''}
+                  src={'/img/table-view.png'}
+                  alt={'Self-documenting dashboards'}
+                />
+              </div>
+            </div>
+          </div>
+        </section> */}
+
         {/* OSS */}
         <section className={'section-lg'}>
           <div className="container">
@@ -400,9 +505,9 @@ function Home() {
               <div className="col col--6 col--offset-3">
                 <h2 className="with-underline">Open source</h2>
                 <p className="">
-                  Follow us on <a href="https://github.com/supabase">GitHub</a>.{' '}
-                  <strong>Watch</strong> the releases of each repo to get notified when we are ready
-                  for Beta launch.
+                  Supabase <Link to={'/oss'}>loves open source</Link>. Follow us on{' '}
+                  <a href="https://github.com/supabase">GitHub</a>. <strong>Watch</strong> the
+                  releases of each repo to get notified when we are ready for Beta launch.
                 </p>
               </div>
             </div>
@@ -437,37 +542,37 @@ function Home() {
           }}
           className="hero is--dark"
         >
-          <div className="container text--center">
-            {/* <div>
-              <h2>Get Early Access</h2>
-            </div> */}
+          <div className="container">
+            <div>
+              <h2
+                style={{
+                  margin: 10,
+                }}
+              >
+                Enterprise sponsors
+              </h2>
+            </div>
             <div className="">
               <a
-                className={classnames(
-                  'button hero--button button--md responsive-button',
-                  styles.button
-                )}
-                href="https://www.producthunt.com/posts/supabase?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-supabase"
-                style={{ width: 250, height: 54, margin:0, padding:0,  display: 'inline-block' }}
+                href={'http://worklife.vc/'}
+                target="_blank"
+                style={{
+                  height: 150,
+                  margin: 10,
+                }}
               >
-                <img
-                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=203792&theme=dark"
-                  alt="Supabase - An open source Firebase alternative | Product Hunt Embed"
-                  style={{ width: 250, height: 54 }}
-                  width="250px"
-                  height="54px"
-                />
+                <img src="/img/worklife-dark.png" alt="WorkLife VC" />
               </a>
-              <Link
-                className={classnames(
-                  'button hero--button button--md button--primary responsive-button',
-                  styles.button
-                )}
-                to={'https://app.supabase.io'}
-                style={{ margin: 5 }}
+              <a
+                href={'https://github.com/sponsors/supabase'}
+                target="_blank"
+                style={{
+                  height: 150,
+                  margin: 10,
+                }}
               >
-                Alpha sign up →
-              </Link>
+                <img src="/img/new-sponsor-dark.png" alt="Become a sponsor" />
+              </a>
             </div>
           </div>
         </section>

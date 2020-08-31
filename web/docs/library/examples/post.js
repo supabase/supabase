@@ -7,7 +7,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
 
-const getCities = async () => {
+const createCities = async () => {
   try {
     let cities = await supabase
       .from('cities')

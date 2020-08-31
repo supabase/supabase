@@ -24,7 +24,9 @@ import {
   getRangeJs,
   getSingleJs,
   getFilterJs,
+  getFilterJsEmbedded,
   getNotJs,
+  getOrJs,
   getMatchJs,
   getEqJs,
   getNeqJs,
@@ -222,7 +224,7 @@ supabase
 <CustomCodeBlock
   header="Shows how to use order( ) with select( )"
   js={getOrderJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "San Francisco", "country_id": 840 },
@@ -244,7 +246,7 @@ supabase
 <CustomCodeBlock
   header="Shows how to use order( ) with select( ) and foreign tables present"
   js={getEmbeddedOrderJs}
-  jsHighlight="{9}"
+  jsHighlight="{11}"
   response={`{
   "body": [
     { 
@@ -291,7 +293,7 @@ Specifies whether null values will be displayed first.
 <CustomCodeBlock
   header="Shows how to use limit( ) with select( )"
   js={getLimitJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Rio de Janeiro", "country_id": 76 }
@@ -307,7 +309,7 @@ Specifies whether null values will be displayed first.
 <CustomCodeBlock
   header="Shows how to use limit( ) and foreign tables present"
   js={getEmbeddedLimitJs}
-  jsHighlight="{9}"
+  jsHighlight="{11}"
   response={`{
   "body": [
     { 
@@ -349,7 +351,7 @@ Name of chosen foreignTable to apply the limit on. Used if foreign tables are pr
 <CustomCodeBlock
   header="Shows how to use offset( ) with select( )"
   js={getOffsetJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Beijing", "country_id": 156 },
@@ -370,7 +372,7 @@ Name of chosen foreignTable to apply the limit on. Used if foreign tables are pr
 <CustomCodeBlock
   header="Shows how to use offset( ) with select( ) and foreign tables present"
   js={getEmbeddedOffsetJs}
-  jsHighlight="{9}"
+  jsHighlight="{11}"
   response={`{
   "body": [
     { 
@@ -412,7 +414,7 @@ Name of chosen foreignTable to apply the limit on. Used if foreign tables are pr
 <CustomCodeBlock
   header="Shows how to use range( ) with select( )"
   js={getRangeJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Rio de Janeiro", "country_id": 76 },
@@ -484,7 +486,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use filter( ) with select( )"
   js={getFilterJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Paris", "country_id": 250 },
@@ -498,12 +500,15 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <br />
 
 <CustomCodeBlock
-  header="Shows how to use filter( ) with select( )"
-  js={getFilterJs}
-  jsHighlight="{9}"
+  header="Shows how to use filter embedded tables"
+  js={getFilterJsEmbedded}
+  jsHighlight="{10}"
   response={`{
   "body": [
-    { "name": "Paris", "country_id": 250 },
+    { 
+      "name": "Paris", 
+      "country": { "name": "France" }
+    },
   ],
   "status": 200,
   "statusCode": 200,
@@ -520,7 +525,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use not( ) with select( )"
   js={getNotJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Rio de Janeiro", "country_id": 76 },
@@ -539,12 +544,24 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 
 <CommonFilters filter="not" />
 
+### `or()`
+
+<CustomCodeBlock
+  header="Shows how to use or( ) with select( )"
+  js={getOrJs}
+  jsHighlight="{10}"
+/>
+
+<br />
+
+<CommonFilters filter="or" />
+
 ### `match()`
 
 <CustomCodeBlock
   header="Shows how to use match( ) with select( )"
   js={getMatchJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Beijing", "country_id": 156 },
@@ -564,7 +581,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use eq( ) with select( )"
   js={getEqJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "San Francisco", "country_id": 840 },
@@ -584,7 +601,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use neq( ) with select( )"
   js={getNeqJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Rio de Janeiro", "country_id": 76 },
@@ -609,7 +626,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use gt( ) with select( )"
   js={getGtJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Auckland", "country_id": 554 },
@@ -632,7 +649,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use lt( ) with select( )"
   js={getLtJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Rio de Janeiro", "country_id": 76 },
@@ -653,7 +670,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use gte( ) with select( )"
   js={getGteJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Paris", "country_id": 250 },
@@ -677,7 +694,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use lte( ) with select( )"
   js={getLteJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Rio de Janeiro", "country_id": 76 },
@@ -699,7 +716,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use like( ) with select( )"
   js={getLikeJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Auckland", "country_id": 554 },
@@ -719,7 +736,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use ilike( ) with select( )"
   js={getIlikeJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Auckland", "country_id": 554 },
@@ -740,7 +757,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use is( ) with select( )"
   js={getIsJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
   ],
@@ -759,7 +776,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use in( ) with select( )"
   js={getInJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Rio de Janeiro", "country_id": 76 },
@@ -780,7 +797,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use cs( ) with select( )"
   js={getCsJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Nigeria", "id": 556, "main_exports": ["oil", "beans"] },
@@ -801,7 +818,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use cd( ) with select( )"
   js={getCdJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "France", "id": 250, "main_exports": ["cars", "machines"] },
@@ -822,7 +839,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use ova( ) with select( )"
   js={getOvaJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Brazil", "id": 76, "main_exports": ["beans", "minerals"] },
@@ -843,7 +860,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use ovr( ) with select( )"
   js={getOvrJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Brazil", "id": 76, "population_range_millions": [205, 215] },
@@ -864,7 +881,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use sl( ) with select( )"
   js={getSlJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "France", "id": 250, "population_range_millions": [60, 70] },
@@ -885,7 +902,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use sr( ) with select( )"
   js={getSrJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "China", "id": 156, "population_range_millions": [1380, 1390] },
@@ -906,7 +923,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use nxl( ) with select( )"
   js={getNxlJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Brazil", "id": 76, "population_range_millions": [205, 215] },
@@ -929,7 +946,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use nxr( ) with select( )"
   js={getNxrJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "Brazil", "id": 76, "population_range_millions": [205, 215] },
@@ -952,7 +969,7 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use adj( ) with select( )"
   js={getAdjJs}
-  jsHighlight="{9}"
+  jsHighlight="{10}"
   response={`{
   "body": [
     { "name": "France", "id": 250, "population_range_millions": [60, 70] },

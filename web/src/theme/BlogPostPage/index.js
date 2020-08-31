@@ -5,11 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React from 'react';
+import React from 'react'
 
-import Layout from '@theme/Layout';
-import BlogPostItem from '@theme/BlogPostItem';
-import BlogPostPaginator from '@theme/BlogPostPaginator';
+import Layout from '@theme/Layout'
+import BlogPostItem from '@theme/BlogPostItem'
+import BlogPostPaginator from '@theme/BlogPostPaginator'
 import useTOCHighlight from '@theme/hooks/useTOCHighlight'
 import styles from './styles.module.css'
 
@@ -22,9 +22,7 @@ function DocTOC({ headings }) {
   return (
     <div className={styles.tableOfContents}>
       <div className="contents contents__left-border">
-        <h4 className="title">
-          Contents
-        </h4>
+        <h4 className="title">Contents</h4>
         <Headings headings={headings} />
       </div>
     </div>
@@ -32,11 +30,12 @@ function DocTOC({ headings }) {
 }
 
 /* eslint-disable jsx-a11y/control-has-associated-label */
+
 function Headings({ headings, isChild }) {
   if (!headings.length) return null
   return (
     <ul className={isChild ? '' : ''}>
-      {headings.map(heading => (
+      {headings.map((heading) => (
         <li key={heading.id}>
           <a
             href={`#${heading.id}`}
@@ -50,10 +49,9 @@ function Headings({ headings, isChild }) {
   )
 }
 
-
 function BlogPostPage(props) {
-  const {content: BlogPostContents} = props;
-  const {frontMatter, metadata} = BlogPostContents;
+  const { content: BlogPostContents } = props
+  const { frontMatter, metadata } = BlogPostContents
 
   return (
     <Layout title={metadata.title} description={metadata.description}>
@@ -80,4 +78,4 @@ function BlogPostPage(props) {
   )
 }
 
-export default BlogPostPage;
+export default BlogPostPage

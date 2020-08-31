@@ -4,14 +4,29 @@ title: FAQs
 description: 'Most frequently asked questions regarding Supabase'
 ---
 
-## Do you support (some other database)?
+### Have you built `[insert Firebase feature]` yet?
 
-At the moment we only support PostgreSQL. However you can [vote on a new database](https://github.com/supabase/supabase/issues/6) if you want us to start development.
+We're building as fast as we can! And we are even adding a few things that Firebase doesn't have as we go. Here are the features we have built:
 
-## Do you have a library for (some other language)?
+- A dashboard/UI for spinning up and managing your database in less than 1 minute.
+- User Authentication to sign up users and edit access rules on your database.
+- Real-time database listeners
+- JS library and APIs
+- Functions (kinda). These exist as database stored procedures, which can be written in SQL, Javascript, Python, and Java.
 
-We currently have only a Javascript library. However you can [vote on a new client library](https://github.com/supabase/supabase/issues/5) for your favourite language.
+### How can you be a Firebase alternative if you're built with a relational database?
 
-## Can you build a connector for (some other product)?
+We started Supabase because we love the functionality of Firebase, but we personally experienced the scaling issues that many others experienced. We chose Postgres because it's well-trusted and is has phenomenal scalability. Our goal is to make Postgres as easy to use as Firebase, so that you no longer have to choose between usability and scalability. Also, we're sure that once you start using Postgres, you'll love it more than any other database.
 
-We don't have any connectors right now. However you can [vote on a new connector](https://github.com/supabase/supabase/issues/4) for a tool that you use.
+### How do I host Supabase?
+
+Supabase is an amalgamation of 5 open source tools (and growing). We don't have an simple way to install everything on a single server, but we will work on this as soon as we have a stable set of features. Each tool can be installed as a standalone product. Some of these tools are made by Supabase (like our [Realtime Server](https://github.com/supabase/realtime)), some we support indirectly (like [PostgREST](http://postgrest.org/en/v7.0.0/)), and some are 3rd-party tools (like [Kong](https://github.com/Kong/kong)). All of the tools we use in Supabase are MIT, Apache 2.0, or PostgreSQL licensed.
+
+### Do you support `[some other database]`?
+
+At the moment we only support PostgreSQL. It's unlikely we'll ever move away from Postgres, however you can [vote on a new database](https://github.com/supabase/supabase/issues/6) if you want us to start development.
+
+### Do you have a library for `[some other language]`?
+
+We currently have a Javascript library. You can [vote on a new client library](https://github.com/supabase/supabase/issues/5) for your favourite language.
+
