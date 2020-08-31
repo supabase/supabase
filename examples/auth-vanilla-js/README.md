@@ -1,6 +1,6 @@
 # Vanilla-js Auth Example
 
-how to sign up and login using supabase and supabase-js using HTML and Javascript only
+How to sign up and login using supabase and supabase-js using HTML and Javascript only
 
 ### running
 `npm run dev` (requires npx to be installed)
