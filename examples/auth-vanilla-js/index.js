@@ -1,12 +1,10 @@
-console.log('Auth, Auth, Baby')
 
-import { createClient } from '@supabase/supabase-js'
-
-var SUPABASE_URL = 'https://npvsuixcdvqwadjbsesq.supabase.net'
+var SUPABASE_URL = '<supabase url - retrieve from supabase dashboard>'
 var SUPABASE_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTU5NjAxNTQ5OSwiZXhwIjoxOTExNTkxNDk5fQ.5VrXb66gEnD8OWfZVXvOX2OSVJtBfdClYUP3_kPf5ZA'
+  '<client key - retrieve from supabase dashboard>'
 
-window.supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+var supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+window.userToken = null
 
 document.addEventListener('DOMContentLoaded', function (event) {
   var signUpForm = document.querySelector('#sign-up')
@@ -17,6 +15,9 @@ document.addEventListener('DOMContentLoaded', function (event) {
 
   var userDetailsButton = document.querySelector('#user-button')
   userDetailsButton.onclick = fetchUserDetails.bind(userDetailsButton)
+
+  var logoutButton = document.querySelector('#logout-button')
+  logoutButton.onclick = logoutSubmitted.bind(logoutButton)
 })
 
 const signUpSubmitted = (event) => {
@@ -27,7 +28,9 @@ const signUpSubmitted = (event) => {
   supabase.auth
     .signup(email, password)
     .then((response) => {
-      alert(JSON.stringify(response.body))
+      document.querySelector('#access-token').value = response.body.access_token
+      document.querySelector('#refresh-token').value = response.body.refresh_token
+      alert("Logged in as " + response.body.user.email)
     })
     .catch((err) => {
       alert(err.response.text)
@@ -44,7 +47,7 @@ const logInSubmitted = (event) => {
     .then((response) => {
       document.querySelector('#access-token').value = response.body.access_token
       document.querySelector('#refresh-token').value = response.body.refresh_token
-      alert(JSON.stringify(response.body))
+      alert("Logged in as " + response.body.user.email)
     })
     .catch((err) => {
       alert(err.response.text)
@@ -56,6 +59,21 @@ const fetchUserDetails = () => {
     .user()
     .then((response) => {
       alert(JSON.stringify(response))
+    })
+    .catch((err) => {
+      alert(err.response.text)
+    })
+}
+
+const logoutSubmitted = (event) => {
+  event.preventDefault()
+
+  supabase.auth
+    .logout()
+    .then((response) => {
+      document.querySelector('#access-token').value = ''
+      document.querySelector('#refresh-token').value = ''
+      alert("Logout successful")
     })
     .catch((err) => {
       alert(err.response.text)

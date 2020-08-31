@@ -4,18 +4,8 @@
   "description": "basic auth example for supabase with js",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack --watch & webpack-dev-server --content-base ./ --port 3000 --hot",
-    "start": "npm run dev"
+    "dev": "npx light-server -s ."
   },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@supabase/supabase-js": "^0.35.9"
-  },
-  "devDependencies": {
-    "webpack-dev-server": "^3.11.0",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.12"
-  }
+  "author": "ant@supabase.io",
+  "license": "MIT"
 }
