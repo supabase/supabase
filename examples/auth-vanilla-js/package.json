@@ -6,6 +6,6 @@
   "scripts": {
     "dev": "npx light-server -s ."
   },
-  "author": "",
-  "license": "ISC"
+  "author": "ant@supabase.io",
+  "license": "MIT"
 }
