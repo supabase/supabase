@@ -28,7 +28,7 @@ export default function Oss() {
                 tools and communities wherever possible.
               </p>
               <p className="">
-                We also take sponsorship, which we then re-distribute to they community, either
+                We also take sponsorship, which we then re-distribute to the community, either
                 directly or by hiring employees to work on the tools we use. Open source is made
                 better by all of our sponsors:
               </p>
