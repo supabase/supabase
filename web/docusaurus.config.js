@@ -155,7 +155,6 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
-          homePageId: 'about',
           sidebarPath: require.resolve('./sidebars.js'),
         },
         theme: {

@@ -2,6 +2,7 @@
 id: about
 title: About
 description: 'What is Supabase?'
+slug: /
 ---
 
 ## What it is
