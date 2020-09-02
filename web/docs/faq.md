@@ -4,7 +4,7 @@ title: FAQs
 description: 'Most frequently asked questions regarding Supabase'
 ---
 
-### Have you built `[insert Firebase feature]` yet?
+### Have you built `[Firebase feature]` yet?
 
 We're building as fast as we can! And we are even adding a few things that Firebase doesn't have as we go. Here are the features we have built:
 

@@ -6,7 +6,17 @@
     "sponsorship_started_on": "2020-05-27T17:06:42.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": []
+    "transactions": [
+      {
+        "transaction_id": "7SY61892ND0264025",
+        "tier_name": "$5 a month",
+        "tier_monthly_amount": "$5.00",
+        "processed_amount": "$5.00",
+        "is_prorated": false,
+        "status": "settled",
+        "transaction_date": "2020-08-28T01:21:53.000+08:00"
+      }
+    ]
   },
   {
     "sponsor_handle": "prashantpawar",
@@ -71,7 +81,17 @@
     "sponsorship_started_on": "2020-05-28T12:57:15.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": []
+    "transactions": [
+      {
+        "transaction_id": "ch_1HKpKjEQsq43iHhX74RFUOhV",
+        "tier_name": "$19 a month",
+        "tier_monthly_amount": "$19.00",
+        "processed_amount": "$19.00",
+        "is_prorated": false,
+        "status": "settled",
+        "transaction_date": "2020-08-28T01:56:29.000+08:00"
+      }
+    ]
   },
   {
     "sponsor_handle": "Cmarenburg",
@@ -234,6 +254,15 @@
     "is_yearly": true,
     "transactions": [
       {
+        "transaction_id": "ch_1HLB7GEQsq43iHhXjbYy2sho",
+        "tier_name": "$19 a month",
+        "tier_monthly_amount": "$19.00",
+        "processed_amount": "$228.00",
+        "is_prorated": false,
+        "status": "processor_declined",
+        "transaction_date": "2020-08-29T01:12:03.000+08:00"
+      },
+      {
         "transaction_id": "ch_1HIeLlEQsq43iHhXpNJXbWpX",
         "tier_name": "$19 a month",
         "tier_monthly_amount": "$19.00",
@@ -316,6 +345,44 @@
         "is_prorated": false,
         "status": "settled",
         "transaction_date": "2020-08-19T04:03:17.000+08:00"
+      }
+    ]
+  },
+  {
+    "sponsor_handle": "singareddynm",
+    "sponsor_profile_name": null,
+    "sponsor_public_email": null,
+    "sponsorship_started_on": "2020-08-25T14:55:22.000+08:00",
+    "is_public": true,
+    "is_yearly": false,
+    "transactions": [
+      {
+        "transaction_id": "ch_1HJw41EQsq43iHhXsroO9Bwa",
+        "tier_name": "$19 a month",
+        "tier_monthly_amount": "$19.00",
+        "processed_amount": "$19.00",
+        "is_prorated": false,
+        "status": "settled",
+        "transaction_date": "2020-08-25T14:55:34.000+08:00"
+      }
+    ]
+  },
+  {
+    "sponsor_handle": "zlwaterfield",
+    "sponsor_profile_name": "Zach Waterfield",
+    "sponsor_public_email": null,
+    "sponsorship_started_on": "2020-08-28T22:39:16.000+08:00",
+    "is_public": true,
+    "is_yearly": true,
+    "transactions": [
+      {
+        "transaction_id": "ch_1HL8jbEQsq43iHhXDAgWo2Kd",
+        "tier_name": "$5 a month",
+        "tier_monthly_amount": "$5.00",
+        "processed_amount": "$60.00",
+        "is_prorated": false,
+        "status": "settled",
+        "transaction_date": "2020-08-28T22:39:26.000+08:00"
       }
     ]
   }

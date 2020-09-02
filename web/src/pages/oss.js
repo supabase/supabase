@@ -8,13 +8,56 @@ import { repos } from '../data/github'
 export default function Oss() {
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
-
-  const level1 = sponsors.filter((x) => x.transactions[0]?.tier_name == '$5 a month')
-  const level2 = sponsors.filter((x) => x.transactions[0]?.tier_name == '$19 a month')
-  const level3 = sponsors.filter((x) => x.transactions[0]?.tier_name == '$49 a month')
-  const level4 = sponsors.filter((x) => x.transactions[0]?.tier_name == '$1,000 a month')
-  const level5 = sponsors.filter((x) => x.transactions[0]?.tier_name == '$2,500 a month')
-  const level6 = sponsors.filter((x) => x.transactions[0]?.tier_name == '$5,000 a month')
+  const tiers = [
+    {
+      tier_name: '$5,000 a month',
+      heading: 'Enterprise: $5,000 per month',
+      transactions: sponsors.filter(
+        (x) =>
+          x.transactions[0]?.tier_name == '$5,000 a month' && x.transactions[0]?.status == 'settled'
+      ),
+    },
+    {
+      tier_name: '$2,500 a month',
+      heading: 'Agency: $2,500 per month',
+      transactions: sponsors.filter(
+        (x) =>
+          x.transactions[0]?.tier_name == '$2,500 a month' && x.transactions[0]?.status == 'settled'
+      ),
+    },
+    {
+      tier_name: '$1,000 a month',
+      heading: 'Startup: $1,000 per month',
+      transactions: sponsors.filter(
+        (x) =>
+          x.transactions[0]?.tier_name == '$1,000 a month' && x.transactions[0]?.status == 'settled'
+      ),
+    },
+    {
+      tier_name: '$49 a month',
+      heading: 'Evangelist: $49 per month',
+      transactions: sponsors.filter(
+        (x) =>
+          x.transactions[0]?.tier_name == '$49 a month' && x.transactions[0]?.status == 'settled'
+      ),
+    },
+    {
+      tier_name: '$19 a month',
+      heading: 'Supporter: $19 per month',
+      transactions: sponsors.filter(
+        (x) =>
+          x.transactions[0]?.tier_name == '$19 a month' && x.transactions[0]?.status == 'settled'
+      ),
+    },
+    {
+      tier_name: '$5 a month',
+      heading: 'Contributor: $5 per month',
+      transactions: sponsors.filter(
+        (x) =>
+          x.transactions[0]?.tier_name == '$5 a month' && x.transactions[0]?.status == 'settled'
+      ),
+    },
+  ]
 
   return (
     <Layout title={`${siteConfig.title}`} description={siteConfig.tagline}>
@@ -24,140 +67,39 @@ export default function Oss() {
             <div className="col">
               <h2 className="with-underline">Open source</h2>
               <p className="">
-                Supabase is an opensource company. Supabase tries to support existing open source
+                Supabase is an opensource company, supporting existing open source
                 tools and communities wherever possible.
               </p>
               <p className="">
-                We also take sponsorship, which we then re-distribute to they community, either
+                We re-distribute our sponsorship to the community either
                 directly or by hiring employees to work on the tools we use. Open source is made
-                better by all of our sponsors:
+                better by all of our sponsors.
               </p>
             </div>
           </div>
-          {level6.length && (
-            <>
-              <h3 className="">Enterprise: $5,000 per month</h3>
-              <div class="row is-multiline">
-                {level6.map((x) => (
-                  <div class="col col--3" key={x.sponsor_handle}>
-                    <a class="avatar" href={`https://github.com/${x.sponsor_handle}`}>
-                      <img
-                        class="avatar__photo avatar__photo--sm"
-                        src={`https://github.com/${x.sponsor_handle}.png`}
-                      />
-                      <div class="avatar__intro">
-                        <h5 class="avatar__name">{x.sponsor_handle}</h5>
+          {tiers.map(
+            (t) =>
+              !!t.transactions.length && (
+                <>
+                  <h3 className="">{t.heading}</h3>
+                  <div class="row is-multiline">
+                    {t.transactions.map((x) => (
+                      <div class="col col--3" key={x.sponsor_handle}>
+                        <a class="avatar" href={`https://github.com/${x.sponsor_handle}`}>
+                          <img
+                            class="avatar__photo avatar__photo--sm"
+                            src={`https://github.com/${x.sponsor_handle}.png`}
+                          />
+                          <div class="avatar__intro">
+                            <h5 class="avatar__name">{x.sponsor_handle}</h5>
+                          </div>
+                        </a>
                       </div>
-                    </a>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <br />
-            </>
-          )}
-          {!!level5.length && (
-            <>
-              <h3 className="">Agency: $2,500 per month</h3>
-              <div class="row is-multiline">
-                {level5.map((x) => (
-                  <div class="col col--3" key={x.sponsor_handle}>
-                    <a class="avatar" href={`https://github.com/${x.sponsor_handle}`}>
-                      <img
-                        class="avatar__photo avatar__photo--sm"
-                        src={`https://github.com/${x.sponsor_handle}.png`}
-                      />
-                      <div class="avatar__intro">
-                        <h5 class="avatar__name">{x.sponsor_handle}</h5>
-                      </div>
-                    </a>
-                  </div>
-                ))}
-              </div>
-              <br />
-            </>
-          )}
-          {!!level4.length && (
-            <>
-              <h3 className="">Startup: $1,000 per month</h3>
-              <div class="row is-multiline">
-                {level4.map((x) => (
-                  <div class="col col--3" key={x.sponsor_handle}>
-                    <a class="avatar" href={`https://github.com/${x.sponsor_handle}`}>
-                      <img
-                        class="avatar__photo avatar__photo--sm"
-                        src={`https://github.com/${x.sponsor_handle}.png`}
-                      />
-                      <div class="avatar__intro">
-                        <h5 class="avatar__name">{x.sponsor_handle}</h5>
-                      </div>
-                    </a>
-                  </div>
-                ))}
-              </div>
-              <br />
-            </>
-          )}
-          {!!level3.length && (
-            <>
-              <h3 className="">Evangelist: $49 per month</h3>
-              <div class="row is-multiline">
-                {level3.map((x) => (
-                  <div class="col col--3" key={x.sponsor_handle}>
-                    <a class="avatar" href={`https://github.com/${x.sponsor_handle}`}>
-                      <img
-                        class="avatar__photo avatar__photo--sm"
-                        src={`https://github.com/${x.sponsor_handle}.png`}
-                      />
-                      <div class="avatar__intro">
-                        <h5 class="avatar__name">{x.sponsor_handle}</h5>
-                      </div>
-                    </a>
-                  </div>
-                ))}
-              </div>
-              <br />
-            </>
-          )}
-          {level2.length && (
-            <>
-              <h3 className="">Supporter: $19 per month</h3>
-              <div class="row is-multiline">
-                {level2.map((x) => (
-                  <div class="col col--3" key={x.sponsor_handle}>
-                    <a class="avatar" href={`https://github.com/${x.sponsor_handle}`}>
-                      <img
-                        class="avatar__photo avatar__photo--sm"
-                        src={`https://github.com/${x.sponsor_handle}.png`}
-                      />
-                      <div class="avatar__intro">
-                        <h5 class="avatar__name">{x.sponsor_handle}</h5>
-                      </div>
-                    </a>
-                  </div>
-                ))}
-              </div>
-              <br />
-            </>
-          )}
-          {level1.length && (
-            <>
-              <h3 className="">Contributor: $5 per month</h3>
-              <div class="row is-multiline">
-                {level1.map((x) => (
-                  <div class="col col--3" key={x.sponsor_handle}>
-                    <a class="avatar" href={`https://github.com/${x.sponsor_handle}`}>
-                      <img
-                        class="avatar__photo avatar__photo--sm"
-                        src={`https://github.com/${x.sponsor_handle}.png`}
-                      />
-                      <div class="avatar__intro">
-                        <h5 class="avatar__name">{x.sponsor_handle}</h5>
-                      </div>
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </>
+                  <br />
+                </>
+              )
           )}
         </div>
       </section>

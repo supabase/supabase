@@ -443,3 +443,17 @@ const getCountries = async () => {
     return countries
   ${errorJs}
 `.trim()
+
+export const getJsonData = `
+${importJs}
+const getCountries = async () => {
+  try {
+    let countries = await supabase
+      .from('countries')
+      .select(\`
+        json_column_name->>population,
+        json_column_name->weather->>temperature
+      \`)
+    return countries
+  ${errorJs}
+`.trim()
