@@ -13,6 +13,9 @@
             <h1>Supabase Auth Example</h1>
         </div>
         <div class='section'>
+            <a href="https://github.com/supabase/supabase/tree/master/examples/auth-vanilla-js">View the code on GitHub</a>
+        </div>
+        <div class='section'>
             <form id='sign-up'>
                 <h3>Sign Up</h3>
                 <label>Email</label><input type='email' name='email' />
@@ -31,9 +34,9 @@
         <div class='section'>
             <form id='validate'>
                 <h3>Access Token</h3>
-                <input readonly=readonly type='text' id='access-token' />
+                <input readonly=readonly type='text' id='access-token' /> <small>Default expiry is 60 minutes</small>
                 <h3>Refresh Token</h3>
-                <input readonly=readonly type='text' id='refresh-token' />
+                <input readonly=readonly type='text' id='refresh-token' /> <small>Supabase-js will use this to automatically fetch a new accessToken for you every 60 mins whilst the client is running</small> 
             </form>
         </div>
         <div class='section'>
