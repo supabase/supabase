@@ -204,7 +204,7 @@ Also see [PostgREST](http://postgrest.org/en/v7.0.0/api.html#json-columns) docs 
 supabase.from(tableName).select(columnQuery)
 ```
 
-If not used, all columns in the table will be returned.
+If `'*'` is passd in for `columnQuery`(i.e. `.select('*')`) then all columns in the table will be returned.
 
 #### `columnQuery: string`
 
