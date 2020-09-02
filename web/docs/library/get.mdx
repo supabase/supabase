@@ -5,16 +5,17 @@ description: 'How to fetch records from your database with Supabase'
 ---
 
 import CommonFilters from '../common/CommonFilters'
-import CommonResponses from '../common/CommonResponses.mdx'
+import CommonResponses from '../common/_CommonResponses.mdx'
 import Collapsable from '../../src/components/Collapsable'
-import FromFunction from '../common/FromFunction.mdx'
-import DummyData from '../common/DummyData.mdx'
+import FromFunction from '../common/_FromFunction.mdx'
+import DummyData from '../common/_DummyData.mdx'
 import CustomCodeBlock from '../../src/components/CustomCodeBlock'
 import {
   getSimpleJs,
   getColumnsJs,
   getForeignJs,
   getForeignMultipleJs,
+  getJsonData,
   getOrderJs,
   getEmbeddedOrderJs,
   getLimitJs,
@@ -174,6 +175,18 @@ the supplier and the purchaser at the same time (both in the `users`) table:
   "statusCode": 200,
   "statusText": "OK"
 }`}
+/>
+
+### Quering JSON data
+
+If you have data inside of a JSONB column, you can apply select and query filters to the data values. 
+Postgres offers a [number of operators](https://www.postgresql.org/docs/9.5/functions-json.html) for querying JSON data. 
+Also see [PostgREST](http://postgrest.org/en/v7.0.0/api.html#json-columns) docs for more details.
+
+<CustomCodeBlock
+  header="Shows how to reference a foreign table when it is referenced twice"
+  js={getJsonData}
+  jsHighlight="{9-12}"
 />
 
 ## Reference
