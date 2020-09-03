@@ -7,8 +7,14 @@ import GithubCard from '../components/GithubCard'
 import { repos } from '../data/github'
 
 export default function Oss() {
+  const [activePill, setActivePill] = React.useState('All')
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
+  const maintainerTags = maintainers
+    .reduce((acc, x) => acc.concat(x.tags), []) // get all tags
+    .filter((v, i, a) => a.indexOf(v) === i) // remove duplicates
+    .sort((a, b) => a.localeCompare(b)) // alphabetical
+  const maintainerPills = ['All'].concat(maintainerTags)
   const tiers = [
     {
       tier_name: '$5,000 a month',
@@ -113,32 +119,38 @@ export default function Oss() {
           <h2>Community Maintainers</h2>
 
           <ul class="pills">
-            <li class="pills__item pills__item--active">All</li>
-            <li class="pills__item">Community</li>
-            <li class="pills__item">C#</li>
-            <li class="pills__item">Go</li>
-            <li class="pills__item">JS/TS</li>
-            <li class="pills__item">Python</li>
+            {maintainerPills.map((x) => (
+              <li
+                key={x}
+                class={`pills__item ${activePill == x ? 'pills__item--active' : ''}`}
+                onClick={() => setActivePill(x)}
+              >
+                {x}
+              </li>
+            ))}
           </ul>
 
           <div className="row is-multiline">
-            {maintainers.map((x, idx) => (
-              <div className={'col col--4'} key={idx}>
-                <a className="card" href={`https://github.com/${x.handle}`}>
-                  <div className="card__body">
-                    <div className="avatar">
-                      <div className="avatar__photo-link avatar__photo avatar__photo--lg">
-                        <img alt={x.handle} src={`https://github.com/${x.handle}.png`} />
-                      </div>
-                      <div className="avatar__intro">
-                        <h4 className="avatar__name">@{x.handle}</h4>
-                        <small className="avatar__subtitle">{x.description}</small>
+            {maintainers
+              .filter((x) => activePill == 'All' || x.tags.includes(activePill))
+              .sort((a,b) => a.handle.localeCompare(b.handle))
+              .map((x, idx) => (
+                <div className={'col col--4'} key={idx}>
+                  <a className="card" href={`https://github.com/${x.handle}`} target="_blank">
+                    <div className="card__body">
+                      <div className="avatar">
+                        <div className="avatar__photo-link avatar__photo avatar__photo--lg">
+                          <img alt={x.handle} src={`https://github.com/${x.handle}.png`} />
+                        </div>
+                        <div className="avatar__intro">
+                          <h4 className="avatar__name">@{x.handle}</h4>
+                          <small className="avatar__subtitle">{x.description}</small>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </a>
-              </div>
-            ))}
+                  </a>
+                </div>
+              ))}
           </div>
         </div>
       </section>
