@@ -6,7 +6,7 @@
   },
   {
     "handle": "lqmanh",
-    "description": "Heading up Python development",
+    "description": "Maintaining postgrest-py",
     "tags": [ "Python"]
   },
   {
@@ -16,17 +16,12 @@
   },
   {
     "handle": "aliharis",
-    "description": "Supporting up Python development",
+    "description": "Supporting Python development",
     "tags": [ "Python" ]
   },
   {
-    "handle": "thorwebdev",
+    "handle": "logankilpatrick",
     "description": "Community oversight",
-    "tags": [ "Community", "JS/TS" ]
-  },
-  {
-    "handle": "thorwebdev",
-    "description": "Short description here",
     "tags": [ "Community", "JS/TS" ]
   }
 ]
