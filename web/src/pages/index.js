@@ -266,7 +266,7 @@ function Home() {
           <div className="container">
             <div className={classnames('row', styles.responsiveCentered)}>
               <div className="col col--6 col--offset-3">
-                <h2 className="with-underline">How it works</h2>
+                <h2 className="">How it works</h2>
                 <p className="">
                   Supabase helps you build faster, so you can focus on your core products.
                 </p>
@@ -342,7 +342,7 @@ function Home() {
           <div className="container">
             <div className={classnames('row', styles.responsiveCentered)}>
               <div className="col col--6 col--offset-3">
-                <h2 className="with-underline">For Developers</h2>
+                <h2 className="">For Developers</h2>
                 <p className="">
                   We introspect your database and provide APIs 
                   <strong className="has-emphasis">instantly</strong> so you can stop building
@@ -444,7 +444,7 @@ function Home() {
         {/* USE CASES */}
         {/* <section className={'section-lg'}>
           <div className="container">
-            <h2 className="with-underline">Use Cases</h2>
+            <h2 className="">Use Cases</h2>
             <div className="row is-multiline">
               {features.map((props, idx) => (
                 <Feature key={idx} {...props} />
@@ -457,7 +457,7 @@ function Home() {
           <div className="container">
             <div className={classnames('row', styles.centered)}>
               <div className="col col--6 col--offset-3">
-                <h2 className="with-underline">Self-documenting</h2>
+                <h2 className="">Self-documenting</h2>
                 <p className="">
                   We introspect your database to give you instant, custom documentation for your
                   REST and Realtime APIs.
@@ -481,7 +481,7 @@ function Home() {
           <div className="container">
             <div className={classnames('row', styles.centered)}>
               <div className="col col--6 col--offset-3">
-                <h2 className="with-underline">Table view</h2>
+                <h2 className="">Table view</h2>
                 <p className="">Start building your database directly from the dashboard.</p>
               </div>
             </div>
@@ -503,7 +503,7 @@ function Home() {
           <div className="container">
             <div className={classnames('row', styles.responsiveCentered)}>
               <div className="col col--6 col--offset-3">
-                <h2 className="with-underline">Open source</h2>
+                <h2 className="">Open source</h2>
                 <p className="">
                   Supabase <Link to={'/oss'}>loves open source</Link>. Follow us on{' '}
                   <a href="https://github.com/supabase">GitHub</a>. <strong>Watch</strong> the
