@@ -2,12 +2,19 @@ import React from 'react'
 import Layout from '@theme/Layout'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import sponsors from '../data/sponsors.json'
+import maintainers from '../data/maintainers.json'
 import GithubCard from '../components/GithubCard'
 import { repos } from '../data/github'
 
 export default function Oss() {
+  const [activePill, setActivePill] = React.useState('All')
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
+  const maintainerTags = maintainers
+    .reduce((acc, x) => acc.concat(x.tags), []) // get all tags
+    .filter((v, i, a) => a.indexOf(v) === i) // remove duplicates
+    .sort((a, b) => a.localeCompare(b)) // alphabetical
+  const maintainerPills = ['All'].concat(maintainerTags)
   const tiers = [
     {
       tier_name: '$5,000 a month',
@@ -67,31 +74,33 @@ export default function Oss() {
             <div className="col">
               <h2 className="with-underline">Open source</h2>
               <p className="">
-                Supabase is an opensource company, supporting existing open source
-                tools and communities wherever possible.
-              </p>
-              <p className="">
-                We re-distribute our sponsorship to the community either
-                directly or by hiring employees to work on the tools we use. Open source is made
-                better by all of our sponsors.
+                Supabase is an opensource company, supporting existing open source tools and
+                communities wherever possible.
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Sponsors */}
+      <section className={'section-lg'}>
+        <div className="container">
+          <h2 className="with-underline">Sponsors</h2>
           {tiers.map(
             (t) =>
               !!t.transactions.length && (
                 <>
-                  <h3 className="">{t.heading}</h3>
-                  <div class="row is-multiline">
+                  <h4 className="">{t.heading}</h4>
+                  <div className="row is-multiline">
                     {t.transactions.map((x) => (
-                      <div class="col col--3" key={x.sponsor_handle}>
-                        <a class="avatar" href={`https://github.com/${x.sponsor_handle}`}>
+                      <div className="col col--3" key={x.sponsor_handle}>
+                        <a className="avatar" href={`https://github.com/${x.sponsor_handle}`}>
                           <img
-                            class="avatar__photo avatar__photo--sm"
+                            className="avatar__photo avatar__photo--sm"
                             src={`https://github.com/${x.sponsor_handle}.png`}
                           />
-                          <div class="avatar__intro">
-                            <h5 class="avatar__name">{x.sponsor_handle}</h5>
+                          <div className="avatar__intro">
+                            <h5 className="avatar__name">{x.sponsor_handle}</h5>
                           </div>
                         </a>
                       </div>
@@ -101,6 +110,48 @@ export default function Oss() {
                 </>
               )
           )}
+        </div>
+      </section>
+
+      {/* Core */}
+      <section className={'section-lg'}>
+        <div className="container">
+          <h2>Community Maintainers</h2>
+
+          <ul class="pills">
+            {maintainerPills.map((x) => (
+              <li
+                key={x}
+                class={`pills__item ${activePill == x ? 'pills__item--active' : ''}`}
+                onClick={() => setActivePill(x)}
+              >
+                {x}
+              </li>
+            ))}
+          </ul>
+
+          <div className="row is-multiline">
+            {maintainers
+              .filter((x) => activePill == 'All' || x.tags.includes(activePill))
+              .sort((a,b) => a.handle.localeCompare(b.handle))
+              .map((x, idx) => (
+                <div className={'col col--4'} key={idx}>
+                  <a className="card" href={`https://github.com/${x.handle}`} target="_blank">
+                    <div className="card__body">
+                      <div className="avatar">
+                        <div className="avatar__photo-link avatar__photo avatar__photo--lg">
+                          <img alt={x.handle} src={`https://github.com/${x.handle}.png`} />
+                        </div>
+                        <div className="avatar__intro">
+                          <h4 className="avatar__name">@{x.handle}</h4>
+                          <small className="avatar__subtitle">{x.description}</small>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              ))}
+          </div>
         </div>
       </section>
 
@@ -128,68 +179,37 @@ export default function Oss() {
   )
 }
 
-/**
- * Hijacked from recharts as the labels don't show up properly without the XAxis component
- */
-const CustomTooltip = (props) => {
-  const renderContent = () => {
-    const { payload, separator, formatter, itemStyle, itemSorter } = props
-
-    if (payload && payload.length) {
-      const listStyle = { padding: 0, margin: 0 }
-      const items = payload.sort(itemSorter).map((entry, i) => {
-        const finalItemStyle = {
-          display: 'block',
-          paddingTop: 4,
-          paddingBottom: 4,
-          color: entry.color || '#000',
-          ...itemStyle,
-        }
-        const hasName = entry.name
-        const finalFormatter = entry.formatter || formatter || (() => {})
-        return (
-          <li className="recharts-tooltip-item" key={`tooltip-item-${i}`} style={finalItemStyle}>
-            {hasName ? <span className="recharts-tooltip-item-name">{entry.name}</span> : null}
-            {hasName ? <span className="recharts-tooltip-item-separator">{separator}</span> : null}
-            <span className="recharts-tooltip-item-value">
-              {finalFormatter ? finalFormatter(entry.value, entry.name, entry, i) : entry.value}
-            </span>
-            <span className="recharts-tooltip-item-unit">{entry.value || '0'}</span>
-          </li>
-        )
-      })
-      return (
-        <ul className="recharts-tooltip-item-list" style={listStyle}>
-          {items}
-        </ul>
-      )
-    }
-  }
-  if (props.active) {
-    const { labelStyle, label, wrapperStyle } = props
-    const finalStyle = {
-      margin: 0,
-      padding: 10,
-      backgroundColor: '#fff',
-      border: '1px solid #ccc',
-      whiteSpace: 'nowrap',
-      ...wrapperStyle,
-    }
-    const finalLabelStyle = {
-      margin: 0,
-      ...labelStyle,
-    }
-    let finalLabel = stargazers[label].name
-
-    return (
-      <div className="recharts-default-tooltip" style={finalStyle}>
-        <p className="recharts-tooltip-label" style={finalLabelStyle}>
-          {finalLabel}
-        </p>
-        {renderContent()}
+function ContributorCard({ title, description, href, stars, handle }) {
+  return (
+    <a className={'card'} href={href} style={{ height: '100%' }}>
+      <div className="card__body">
+        <h4 style={styles.h4} style={{ margin: 0 }}>
+          {title.toUpperCase()}
+        </h4>
+        <small>{description}</small>
       </div>
-    )
-  }
+      <hr style={styles.hr} />
+      <div style={styles.cardBase}>
+        <div>@{handle}</div>
+        <div>{stars} ★</div>
+      </div>
+    </a>
+  )
+}
 
-  return null
+const styles = {
+  hr: {
+    margin: '15px 0 10px 0',
+  },
+  h3: {
+    margin: 0,
+    textTransform: 'capitalize',
+  },
+  cardBase: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: '0 15px 10px 15px',
+    fontSize: '0.8em',
+  },
 }
