@@ -6,7 +6,7 @@
   },
   {
     "handle": "lqmanh",
-    "description": "Maintaining postgrest-py",
+    "description": "Python contributor",
     "tags": [ "Python"]
   },
   {
@@ -16,12 +16,22 @@
   },
   {
     "handle": "aliharis",
-    "description": "Supporting Python development",
+    "description": "Python contributor",
     "tags": [ "Python" ]
   },
   {
     "handle": "logankilpatrick",
     "description": "Community oversight",
     "tags": [ "Community", "JS/TS" ]
+  },
+  {
+    "handle": "0az",
+    "description": "Python contributor",
+    "tags": [ "Python" ]
+  },
+  {
+    "handle": "acupofjose",
+    "description": "C# contributor",
+    "tags": [ "C#" ]
   }
 ]
