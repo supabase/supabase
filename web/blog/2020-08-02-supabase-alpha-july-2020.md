@@ -34,7 +34,7 @@ We've made some massive improvements to our Table Editor that we're excited to s
 
 Last month we made it easy to drill into your table relationships. This month, we make it possible to drill multiple levels deep. 
 
-<video width="99%" autoplay="" loop="" muted="" playsinline="" controls="true">
+<video width="99%" autoplay="" loop="" muted="" playsInline="" controls="true">
 <source src="/videos/relational-drilldown-zoom.mp4" type="video/mp4" />
 </video>
 
@@ -43,7 +43,7 @@ Last month we made it easy to drill into your table relationships. This month, w
 
 We're making it easier to manipulate your data. Next month, you'll be able to add and remove columns directly from the Table view.
 
-<video width="99%" autoplay="" loop="" muted="" playsinline="" controls="true">
+<video width="99%" autoplay="" loop="" muted="" playsInline="" controls="true">
 <source src="/videos/csv-download-zoom.mp4" type="video/mp4" />
 </video>
 
