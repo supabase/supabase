@@ -308,12 +308,11 @@ li + li {
   padding: 10px !important;
 } */
 
-/* .with-underline::after,
-.markdown h2:after {
+.with-underline::after {
   content: '\2501\2501';
   display: block;
-  color: #333;
-} */
+  color: var(--ifm-color-primary);
+}
 article header {
   margin-bottom: 3rem;
 }
