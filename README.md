@@ -52,7 +52,7 @@ Supabase is a [hosted platform](https://app.supabase.io). You can sign up and st
 
 **Client libraries**
 
-Our client libraries are modular so that each sub-library works as a standalone implementation for external open source systems. This is just one of the ways we try to support existing communities.
+Our client library is modular. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing tools.
 
 - **`supabase-{lang}`**: Combines libraries and adds enrichments.
   - `postgrest-{lang}`: Client library to work with [PostgREST](https://github.com/postgrest/postgrest) 
@@ -62,12 +62,10 @@ Our client libraries are modular so that each sub-library works as a standalone 
  
 | Repo                                                                                       | Official                                         | Community        |
 |-----------------------|--------------------------------------------------|------------------|
-| **`supabase-{lang}`**     | [`JS`](https://github.com/@supabase/supabase-js) | `C#` \| `Python` \| `Rust` |
+| **`supabase-{lang}`**     | [`JS`](https://github.com/@supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` |
 | `postgrest-{lang}` | [`JS`](https://github.com/@supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
 | `realtime-{lang}`  | [`JS`](https://github.com/@supabase/realtime-js) | `C#` \| `Python` \| `Rust` |
 | `gotrue-{lang}`    | [`JS`](https://github.com/@supabase/gotrue-js) | `C#` \| `Python` \| `Rust` |
-
-
 
 
 
