@@ -54,12 +54,21 @@ Supabase is a [hosted platform](https://app.supabase.io). You can sign up and st
 
 We structure our client libraries in a modular way so that each sub-library can be a standalone library for some other external open source system. This is just one of the ways we try to support existing communities.
 
-| Repo                  | Description                                                                     | Official                                         | Community        |
-|-----------------------|---------------------------------------------------------------------------------|--------------------------------------------------|------------------|
-| `supabase-{lang}`     | Combines various libraries and adds enrichments.                                | [`JS`](https://github.com/@supabase/supabase-js) | `C#` \| `Python` |
-| -- `postgrest-{lang}` | Client library to work with [PostgREST](https://github.com/postgrest/postgrest) | `JS`                                             | `C#` \| `Python` |
-| -- `realtime-{lang}`  | Client library to work with [Realtime](https://github.com/supabase/realtime)    | `JS`                                             | `C#` \| `Python` |
-| -- `gotrue-{lang}`    | Client library to work with [GoTrue](https://github.com/netlify/gotrue)         | `JS`                                             | `C#` \| `Python` |
+- `supabase-{lang}`: Combines libraries and adds enrichments.
+  - `postgrest-{lang}`: Client library to work with [PostgREST](https://github.com/postgrest/postgrest) 
+  - `realtime-{lang}`: Client library to work with [Realtime](https://github.com/supabase/realtime)    
+  - `gotrue-{lang}`: Client library to work with [GoTrue](https://github.com/netlify/gotrue)         
+
+ 
+| Repo                                                                                       | Official                                         | Community        |
+|-----------------------|--------------------------------------------------|------------------|
+| `supabase-{lang}`     | [`JS`](https://github.com/@supabase/supabase-js) | `C#` \| `Python` |
+| -- `postgrest-{lang}` | `JS`                                             | `C#` \| `Python` |
+| -- `realtime-{lang}`  | `JS`                                             | `C#` \| `Python` |
+| -- `gotrue-{lang}`    | `JS`                                             | `C#` \| `Python` |
+
+
+
 
 
 ----
