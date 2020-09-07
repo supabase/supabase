@@ -16,7 +16,7 @@
     "mermaid": "^8.6.4",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "react-inlinesvg": "^2.0.1",
+    "react-inlinesvg": "^2.1.0",
     "recharts": "^2.0.0-beta.6"
   },
   "browserslist": {
