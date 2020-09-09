@@ -1,19 +1,24 @@
 {
-  "name": "supabase-realtime-map",
+  "name": "supabase-realtime-map-v2",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 4000",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^0.34.0",
+    "@supabase/doctest-js": "^0.1.0",
+    "@supabase/postgrest-js": "^0.17.0",
+    "@supabase/realtime-js": "^0.9.0",
+    "dotenv": "^8.2.0",
     "leaflet": "^1.6.0",
-    "nanoid": "^3.1.10",
-    "next": "9.4.4",
+    "micro-api-client": "^3.3.0",
+    "nanoid": "^3.1.12",
+    "next": "9.5.2",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "react-leaflet": "^3.0.0-beta.2"
+    "react-leaflet": "^3.0.0-beta.4",
+    "superagent": "^6.0.0"
   }
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet'
-import { RoundToFixDecimals } from "lib/utils"
+import { RoundToFixDecimals } from "lib/Utils"
 import TextLog from "components/TextLog"
 
 function DraggableMarker({ initialPos, addCircle }) {
@@ -49,7 +49,7 @@ function MapInput({ supabase, clientRef, center, zoom }) {
       await supabase
         .from('locations')
         .insert([
-          { latitude: pos.lat, longitude: pos.lng, ref: clientRef },
+          { latitude: pos.lat, longitude: pos.lng, user_id: clientRef },
         ])
     },
     [setCircles, circles, supabase, clientRef]
