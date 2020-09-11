@@ -542,7 +542,8 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
 }
 @media (min-width: 997px) {
   div[class^='sidebar_'] {
-    padding: var(--ifm-spacing-vertical) var(--ifm-spacing-horizontal);
+    padding-right: var(--ifm-spacing-horizontal);
+    padding-left: var(--ifm-spacing-horizontal);
   }
 }
 
