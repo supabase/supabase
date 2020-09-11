@@ -1652,30 +1652,31 @@
     jison "^0.4.18"
     lex "^1.7.9"
 
-"@supabase/postgrest-js@^0.15.0":
-  version "0.15.0"
-  resolved "https://registry.yarnpkg.com/@supabase/postgrest-js/-/postgrest-js-0.15.0.tgz#2502fd857849cd59cddc36d27ac1d08333705689"
-  integrity sha512-SthPaZdrgk8Sr3+odXAmJ7DhGgtLUC/yKkWE1zVuttxFxX9IPGc6dx6AuGcU1uZyt24IObVyZqJ5eg7hV8L3eg==
+"@supabase/postgrest-js@^0.17.0":
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/@supabase/postgrest-js/-/postgrest-js-0.17.0.tgz#fcf700e731e234ba53ff9fcda679c9740a165dcf"
+  integrity sha512-7Dt7ALli+bOQK51JMolraI08sJg2UweNuGFghr8MrX4nc3WoDwL5PP6fNZwy+j/7f7nvvM6s1OUtqNTvqiW+5Q==
   dependencies:
     superagent "^5.2.1"
 
-"@supabase/realtime-js@^0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@supabase/realtime-js/-/realtime-js-0.1.8.tgz#d85d476a941ee7354af90f7aa0d76d1f4f02684e"
-  integrity sha512-Y5+sjz0EwaVF70rpFj9ZQpEQZjEPpGlDG2X0ei0NefsQ+Q7nE6pm+qk6xu2P4hjbJ4gaJb55gRtzEUrE21Onpg==
+"@supabase/realtime-js@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@supabase/realtime-js/-/realtime-js-0.9.0.tgz#6dd646f08713f359af160ce6f1b2fb801a53d2d0"
+  integrity sha512-aYkVsD2hNgD7QPPBV+LALJTexNf8pVhIh9qJC13NnOLYZpudtHbof+rg0dgq5+GIhYa8HzqUMdf+OwwlQVJgsw==
   dependencies:
     "@babel/runtime" "^7.9.2"
     query-string "^6.12.1"
     websocket "^1.0.31"
 
-"@supabase/supabase-js@^0.1.32":
-  version "0.1.33"
-  resolved "https://registry.yarnpkg.com/@supabase/supabase-js/-/supabase-js-0.1.33.tgz#9fd85f41ddadfdf6c9399e51cb2909cebe000d98"
-  integrity sha512-PXM9UObjk8lPrrxGCYLP3r2qK4IyxmNmWhH6T90GT5ZihqFnzXkPc3j/ztt1SKpTyD3d1yffJ6H8Opm2B2m3Bg==
+"@supabase/supabase-js@^0.35.10":
+  version "0.35.11"
+  resolved "https://registry.yarnpkg.com/@supabase/supabase-js/-/supabase-js-0.35.11.tgz#c9ae8a9588cfb7e7d90789b283b60e607d4eea1a"
+  integrity sha512-ITDdqt/PZgFQlhL8qwuKd2f2ekTshgluJF8JQrZobpp+KggWOzD97K+NCOa4Fev+Wlr8CoTWrG/3PVr89JxIKA==
   dependencies:
     "@supabase/doctest-js" "^0.1.0"
-    "@supabase/postgrest-js" "^0.15.0"
-    "@supabase/realtime-js" "^0.1.8"
+    "@supabase/postgrest-js" "^0.17.0"
+    "@supabase/realtime-js" "^0.9.0"
+    dotenv "^8.2.0"
     superagent "^5.2.1"
 
 "@svgr/babel-plugin-add-jsx-attribute@^4.2.0":
@@ -4188,7 +4189,7 @@ debug@2.6.9, debug@^2.2.0, debug@^2.3.3, debug@^2.6.0, debug@^2.6.8, debug@^2.6.
   dependencies:
     ms "2.0.0"
 
-debug@^3.0.0, debug@^3.1.1, debug@^3.2.5:
+debug@^3.1.1, debug@^3.2.5:
   version "3.2.6"
   resolved "https://registry.yarnpkg.com/debug/-/debug-3.2.6.tgz#e83d17de16d8a7efb7717edbe5fb10135eee629b"
   integrity sha512-mel+jf7nrtEl5Pn1Qx46zARXKDpBbvzezse7p7LqINmdoIk8PYP5SySaxEmYv6TZ0JyEKA1hsCId6DIhgITtWQ==
@@ -4498,7 +4499,7 @@ dotenv-expand@5.1.0:
   resolved "https://registry.yarnpkg.com/dotenv-expand/-/dotenv-expand-5.1.0.tgz#3fbaf020bfd794884072ea26b1e9791d45a629f0"
   integrity sha512-YXQl1DSa4/PQyRfgrv6aoNjhasp/p4qs9FjJ4q4cQk+8m4r6k4ZSiEyytKG8f8W9gi8WsQtIObNmKd+tMzNTmA==
 
-dotenv@8.2.0:
+dotenv@8.2.0, dotenv@^8.2.0:
   version "8.2.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.2.0.tgz#97e619259ada750eea3e4ea3e26bceea5424b16a"
   integrity sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==
@@ -4948,9 +4949,9 @@ etag@~1.8.1:
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
 
 eventemitter3@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.0.tgz#d65176163887ee59f386d64c82610b696a4a74eb"
-  integrity sha512-qerSRB0p+UDEssxTtm6EDKcE7W4OaoisfIMl4CngyEhjpYglocpNg6UEqCvemdGhosAsg4sO2dXJOdyBifPGCg==
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
+  integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
 
 events@^3.0.0:
   version "3.1.0"
@@ -5349,11 +5350,9 @@ flush-write-stream@^1.0.0:
     readable-stream "^2.3.6"
 
 follow-redirects@^1.0.0:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.10.0.tgz#01f5263aee921c6a54fb91667f08f4155ce169eb"
-  integrity sha512-4eyLK6s6lH32nOvLLwlIOnr9zrL8Sm+OvW4pVTJNoXeGzYIkHVf+pADQi+OJ0E67hiuSLezPVPyBcIZO50TmmQ==
-  dependencies:
-    debug "^3.0.0"
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.13.0.tgz#b42e8d93a2a7eea5ed88633676d6597bc8e384db"
+  integrity sha512-aq6gF1BEKje4a9i9+5jimNFIpq4Q1WiwBToeRK5NvZBd/TRsmW8BsJfOEGkr76TbOyPVD3OVDN910EcUNtRYEA==
 
 for-in@^0.1.3:
   version "0.1.8"
@@ -5971,9 +5970,9 @@ http-proxy-middleware@0.19.1:
     micromatch "^3.1.10"
 
 http-proxy@^1.17.0:
-  version "1.18.0"
-  resolved "https://registry.yarnpkg.com/http-proxy/-/http-proxy-1.18.0.tgz#dbe55f63e75a347db7f3d99974f2692a314a6a3a"
-  integrity sha512-84I2iJM/n1d4Hdgc6y2+qY5mDaz2PUVjlg9znE9byl+q0uC3DeByqBGReQu5tpLK0TAqTIXScRUV+dg7+bUPpQ==
+  version "1.18.1"
+  resolved "https://registry.yarnpkg.com/http-proxy/-/http-proxy-1.18.1.tgz#401541f0534884bbf95260334e72f88ee3976549"
+  integrity sha512-7mz/721AbnJwIVbnaSv1Cz3Am0ZLT/UBwkC92VlxhXv/k/BBQfM2fXElQNC27BVGr0uwUpplYPQM9LnaBMR5NQ==
   dependencies:
     eventemitter3 "^4.0.0"
     follow-redirects "^1.0.0"
