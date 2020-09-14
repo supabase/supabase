@@ -1,13 +1,13 @@
 ---
 title: Supabase Hacktoberfest 2020
-description: Six months of building
-author: Thor Schaeff
-author_title: Supabase
+description: Join us for a celebration of open source software and learn how to contribute to Supabase.
+author: Thor 雷神 Schaeff
+author_title: Supabase community contributor
 author_url: https://github.com/thorwebdev
 author_image_url: https://github.com/thorwebdev.png
-tags: 
-    - supabase
-    - hacktoberfest
+tags:
+  - supabase
+  - hacktoberfest
 ---
 
 October is looming, and for open source communities and contributors this means one thing: [Hacktoberfest](https://hacktoberfest.digitalocean.com/).
@@ -35,21 +35,21 @@ Tune in to our online events.
 
 ### GitHub Open Source Friday live stream
 
-- What: [@kiwicopple](https://github.com/kiwicopple) chats with the GitHub team about open source
-- When: Fri, Sep 25, 11:00 AM  (Thu, Sep 24, 8:00 PM PT)
+- What: [@kiwicopple](https://github.com/kiwicopple) chats with the GitHub team about open source.
+- When: Fri, Sep 25, 11:00 AM (Thu, Sep 24, 8:00 PM PT)
 - Where: [GitHub Twitch channel](https://www.twitch.tv/github)
 
 ### Supabase Hacktoberfest Online Meetup
 
-- What: [@thorwebdev](https://github.com/thorwebdev) demonstrates how to contribute to Supabase and Hacktoberfest
+- What: Join us to learn more about Supabase and how to contribute during Hacktoberfest.
 - When: Fri, Oct 2, 9:00 AM SG time (Thu, Oct 1, 6:00 PM PT)
-- Where: [Please RSVP here](https://organize.mlh.io/participants/events/4291-hacktoberfest-supabase-meetup)
+- Where: [YouTube](https://youtu.be/3_xRLTjvEiE) | [Please RSVP here](https://organize.mlh.io/participants/events/4291-hacktoberfest-supabase-meetup)
 
 ## Contribute to Supabase and win a Hacktoberfest T-Shirt
 
 We've created a [GitHub project board](https://github.com/orgs/supabase/projects/5) to keep track of what's happening and can enjoy collaborating and hacking together 🥳
 
-You can contribute to one of the existing `hacktoberfest` issue, or you can grab one of the ideas from the notes in the project board and [open a new issue](https://github.com/supabase/supabase/issues/new/choose) for it. Make sure to tag the newly created issue with the `hacktoberfest` label. This will be important for you to have a chance at getting the limited edition Hacktoberfest T-Shirt. See the [participation rules](https://hacktoberfest.digitalocean.com/details/#rules) for more details. 
+You can contribute to one of the existing `hacktoberfest` issue, or you can grab one of the ideas from the notes in the project board and [open a new issue](https://github.com/supabase/supabase/issues/new/choose) for it. Make sure to tag the newly created issue with the `hacktoberfest` label. This will be important for you to have a chance at getting the limited edition Hacktoberfest T-Shirt. See the [participation rules](https://hacktoberfest.digitalocean.com/details/#rules) for more details.
 
 ### I'm a Developer
 
