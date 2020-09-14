@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@docusaurus/core": "^2.0.0-alpha.62",
-    "@docusaurus/preset-classic": "^2.0.0-alpha.62",
+    "@docusaurus/preset-classic": "^2.0.0-alpha.64",
     "@kiwicopple/prism-react-renderer": "github:kiwicopple/prism-react-renderer",
     "classnames": "^2.2.6",
     "mermaid": "^8.6.4",
