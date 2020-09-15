@@ -1,12 +1,12 @@
 
 Lawyers.txt
 
-
-For compliance, lawyers want us to disclose ever piece of software that we use. 
-
 ____________
 
-This is a full dependency tree of all the packages we use in our Dashboard. For all other repositories, check out the package-lock.json in each repo. 
+
+For compliance, lawyers want us to disclose every piece of free "software" that we use. 
+
+This is a full dependency tree of all the packages we use in our Dashboard. For other repositories, check out the package-lock.json in each respective repo. 
 If you're a creator/contributor to one of these packages, thanks!
 
 
