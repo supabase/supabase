@@ -5,6 +5,7 @@ author: Thor 雷神 Schaeff
 author_title: Supabase community contributor
 author_url: https://github.com/thorwebdev
 author_image_url: https://github.com/thorwebdev.png
+image: /img/hacktoberfest.png
 tags:
   - supabase
   - hacktoberfest
