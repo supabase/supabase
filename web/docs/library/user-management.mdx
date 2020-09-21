@@ -5,13 +5,7 @@ description: Use Supabase to Authenticate and Authorize your users.
 ---
 
 import CustomCodeBlock from '../../src/components/CustomCodeBlock'
-import {
-  signup,
-  login,
-  userData,
-  logout,
-  errorHandling,
-} from './examples/users'
+import { signup, login, userData, logout, errorHandling, setAccessToken } from './examples/users'
 
 ### Introduction
 
@@ -21,14 +15,9 @@ When a user signs up, Supabase assigns them a unique ID. You can reference this 
 
 Supabase provides the routes to sign up, login, log out, and manage users in your apps and websites.
 
-
 ### Sign up
 
-
-<CustomCodeBlock
-  header="New user."
-  js={signup}
-/>
+<CustomCodeBlock header="New user." js={signup} />
 <br />
 
 Allow your users to sign up and create a new account.
@@ -37,10 +26,7 @@ After they have signed up, all interactions using the Supabase JS client will be
 
 ### Log in
 
-<CustomCodeBlock
-  header="Existing user."
-  js={login}
-/>
+<CustomCodeBlock header="Existing user." js={login} />
 <br />
 
 If an account is created, users can login to your app.
@@ -49,29 +35,43 @@ After they have logged in, all interactions using the Supabase JS client will be
 
 ### User data
 
-<CustomCodeBlock
-  header="Get the logged in user."
-  js={userData}
-/>
+<CustomCodeBlock header="Get the logged in user." js={userData} />
 <br />
 
 Get the JSON data for the logged in user.
 
 ### Log out
 
-<CustomCodeBlock
-  header="Clear the user's session."
-  js={logout}
-/>
+<CustomCodeBlock header="Clear the user's session." js={logout} />
 <br />
 
 After calling log out, all interactions using the Supabase JS client will be "anonymous".
 
-
 ### Error handling
 
-<CustomCodeBlock
-  header="Shows how to parse errors returned from the server."
-  js={errorHandling}
-/>
+<CustomCodeBlock header="Shows how to parse errors returned from the server." js={errorHandling} />
 <br />
+
+### Third Party Logins
+
+You can enable Google OAuth by navigating to Authentication > Settings > Google Login and inputting your `Client ID` and `Secret`.
+
+To fetch these you need to:
+
+1. Start a project on Google Cloud then navigate to `https://console.developers.google.com/apis/credentials?project=<your-project-id>`
+2. Select Create Credentials > OAuth Client ID
+3. Select Application Type: Web Application
+4. Enter Authorized Redirect URI: `http://<your-project>.supabase.co/auth/v1/callback`
+
+You can now test your integration by navigating to: `https://<your-project>.supabase.co/auth/v1/authorize?provider=google`. This is where you should send your users to authenticate.
+
+After authenticating you should be redirected to `<your-site-url>/#access_token=xyzabc&expires_in=3600&refresh_token=abcdef&token_type=bearer`. This site url can be updated on the Supabase dashboard at Authorization > Settings.
+
+The user will now appear in your database in the `auth.users` table.
+
+You can now use the access_token in the url above in an Authorize header like: `Authorization: Bearer xyzabc` when making requests to your REST or Realtime APIs in order to authenticate as that user. If using supabase-js then you can set the accessToken on the client:
+
+<CustomCodeBlock header="Sets the accessToken inside supabase-js" js={setAccessToken} />
+<br />
+
+If you require any help with these steps please contact `alpha@supabase.io`
