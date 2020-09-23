@@ -51,13 +51,6 @@ module.exports = {
     googleAnalytics: {
       trackingID: 'UA-155232740-1',
     },
-    // announcementBar: {
-    //   id: 'support_us', // Any value that will identify this message
-    //   content:
-    //     'Join our early alpha: <a target="_blank" rel="noopener noreferrer" href="https://app.supabase.io">app.supabase.io</a>',
-    //   backgroundColor: '#111111', // Defaults to `#fff`
-    //   textColor: '#ddd', // Defaults to `#000`
-    // },
     navbar: {
       // classNames: 'shadow--md',
       // title: 'supabase',
@@ -69,9 +62,20 @@ module.exports = {
       },
       items: [
         {
-          to: '/docs',
+          to: 'docs/',
+          activeBasePath: 'Docs',
           label: 'Docs',
           position: 'right',
+          items: [
+            {
+              label: 'Getting started',
+              to: '/docs',
+            },
+            {
+              label: 'GoTrue Client',
+              to: '/ref/gotrue',
+            },
+          ],
         },
         { to: '/docs/pricing', label: 'Pricing', position: 'right' },
         { to: '/blog', label: 'Blog', position: 'right' },
@@ -172,6 +176,7 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
+          id: 'docs',
           sidebarPath: require.resolve('./sidebars.js'),
         },
         theme: {
@@ -179,5 +184,31 @@ module.exports = {
         },
       },
     ],
+  ],
+  plugins: [
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'gotrue', // for first plugin-content-docs with "resources/" path
+        // homePageId: "doc2",
+        path: './ref/gotrue', // Path to data on filesystem, relative to site dir.
+        routeBasePath: 'ref/gotrue', // URL Route.
+        include: ['**/*.md', '**/*.mdx'],
+        sidebarPath: require.resolve('./sidebar_spec_gotrue.js'),
+        // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+      },
+    ],
+    // [
+    //   '@docusaurus/plugin-content-docs',
+    //   {
+    //     id: 'postgrest', // for first plugin-content-docs with "resources/" path
+    //     // homePageId: "doc2",
+    //     path: './ref/postgrest', // Path to data on filesystem, relative to site dir.
+    //     routeBasePath: 'ref/postgrest', // URL Route.
+    //     include: ['**/*.md', '**/*.mdx'],
+    //     sidebarPath: require.resolve('./sidebar_spec_postgrest.js'),
+    //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+    //   },
+    // ],
   ],
 }
