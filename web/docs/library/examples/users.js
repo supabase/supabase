@@ -45,3 +45,12 @@ try {
     }
 }
 `.trim()
+
+export const setAccessToken = `
+supabase.auth.saveSession(
+  access_token, // from callback URL
+  refresh_token, // from callback URL
+  Math.round(Date.now() / 1000) + expires_in, // current time + seconds from callback URL
+  null // currentUser not present yet
+)
+`.trim()
