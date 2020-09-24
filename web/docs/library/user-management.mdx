@@ -54,22 +54,26 @@ After calling log out, all interactions using the Supabase JS client will be "an
 
 ### Third Party Logins
 
-You can enable Google OAuth by navigating to Authentication > Settings > Google Login and inputting your `Client ID` and `Secret`.
+We currently support the following OAuth providers:
+- Google
+- Github
+- Gitlab
+- Bitbucket
+
+You can enable providers by navigating to Authentication > Settings > External OAuth Providers and inputting your `Client ID` and `Secret` for each.
 
 To fetch these you need to:
 
-1. Start a project on Google Cloud then navigate to `https://console.developers.google.com/apis/credentials?project=<your-project-id>`
-2. Select Create Credentials > OAuth Client ID
-3. Select Application Type: Web Application
-4. Enter Authorized Redirect URI: `http://<your-project>.supabase.co/auth/v1/callback`
+1. Generate `Client ID` and `Secret` ([google](https://console.developers.google.com/apis/credentials), [github](https://github.com/settings/applications/new), [gitlab](https://gitlab.com/oauth/applications), [bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/))
+2. Enter Authorized Redirect URI: `http://<your-project>.supabase.co/auth/v1/callback` on provider dashboard
 
-You can now test your integration by navigating to: `https://<your-project>.supabase.co/auth/v1/authorize?provider=google`. This is where you should send your users to authenticate.
+You can now test your integration by navigating to: `https://<your-project>.supabase.co/auth/v1/authorize?provider=<provider-name>`. This is where you should send your users to authenticate. Options for `provider` are `google`, `github`, `gitlab`, or `bitbucket`.
 
-After authenticating you should be redirected to `<your-site-url>/#access_token=xyzabc&expires_in=3600&refresh_token=abcdef&token_type=bearer`. This site url can be updated on the Supabase dashboard at Authorization > Settings.
+After authenticating you should be redirected to `<your-site-url>/?access_token=xyzabc&expires_in=3600&refresh_token=abcdef&token_type=bearer`. This base url can be updated on the Supabase dashboard at Authorization > Settings.
 
 The user will now appear in your database in the `auth.users` table.
 
-You can now use the access_token in the url above in an Authorize header like: `Authorization: Bearer xyzabc` when making requests to your REST or Realtime APIs in order to authenticate as that user. If using supabase-js then you can set the accessToken on the client:
+You can now use the `access_token` in the url above in an Authorize header like: `Authorization: Bearer xyzabc` when making requests to your REST or Realtime APIs in order to authenticate as that user. If using supabase-js then you can set the `accessToken` on the client:
 
 <CustomCodeBlock header="Sets the accessToken inside supabase-js" js={setAccessToken} />
 <br />
