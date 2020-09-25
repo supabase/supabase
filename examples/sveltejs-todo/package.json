@@ -5,6 +5,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^0.36.5",
     "svelte": "^3.21.0",
     "tailwindcss": "^1.4.6"
   },
