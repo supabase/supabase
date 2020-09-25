@@ -1,17 +1,13 @@
 <script>
 	import TailwindStyles from './TailwindStyles.svelte';
 	
-
+	import {items} from './items'
+	const todos = items() || []
 	const ENTER_KEY = 13;
 	const ESCAPE_KEY = 27;
 	let currentFilter = 'all';
-	let items = [];
 	let editing = null;
-	try {
-		items = JSON.parse(localStorage.getItem('todos-svelte')) || [];
-	} catch (err) {
-		items = [];
-	}
+
 	const updateView = () => {
 		currentFilter = 'all';
 		if (window.location.hash === '#/active') {
@@ -23,13 +19,13 @@
 	window.addEventListener('hashchange', updateView);
 	updateView();
 	function clearCompleted() {
-		items = items.filter(item => !item.completed);
+		todos = todos.filter(item => !item.completed);
 	}
 	function remove(index) {
-		items = items.slice(0, index).concat(items.slice(index + 1));
+		todos = todos.slice(0, index).concat(todos.slice(index + 1));
 	}
 	function toggleAll(event) {
-		items = items.map(item => ({
+		todos = todos.map(item => ({
 			id: item.id,
 			description: item.description,
 			completed: event.target.checked
@@ -37,7 +33,7 @@
 	}
 	function createNew(event) {
 		if (event.which === ENTER_KEY) {
-			items = items.concat({
+			todos = todos.concat({
 				id: uuid(),
 				description: event.target.value,
 				completed: false
@@ -50,7 +46,7 @@
 		else if (event.which === ESCAPE_KEY) editing = null;
 	}
 	function submit(event) {
-		items[editing].description = event.target.value;
+		todos[editing].description = event.target.value;
 		editing = null;
 	}
 	function uuid() {
@@ -60,20 +56,20 @@
 		});
 	}
 	$: filtered = currentFilter === 'all'
-		? items
+		? todos
 		: currentFilter === 'completed'
-			? items.filter(item => item.completed)
-			: items.filter(item => !item.completed);
-	$: numActive = items.filter(item => !item.completed).length;
-	$: numCompleted = items.filter(item => item.completed).length;
+			? todos.filter(item => item.completed)
+			: todos.filter(item => !item.completed);
+	$: numActive = todos.filter(item => !item.completed).length;
+	$: numCompleted = todos.filter(item => item.completed).length;
 	$: try {
-		localStorage.setItem('todos-svelte', JSON.stringify(items));
+		localStorage.setItem('todos-svelte', JSON.stringify(todos));
 	} catch (err) {
 		// noop
 	}
 </script>
 
-<header class="items-center flex">
+<header class="todos-center flex">
 	<h1 class="rounded border border-teal-500 border-solid px-20 ">todos</h1>
 	<!-- svelte-ignore a11y-autofocus -->
 	<input
@@ -84,15 +80,15 @@
 	>
 </header>
 
-{#if items.length > 0}
+{#if todos.length > 0}
 	<section class="container bg-white rounded shadow p-6 m-4 w-full lg:w-3/4 lg:max-w-lg">
-		<input id="toggle-all" class="inline-block mr-4" type="checkbox" on:change={toggleAll} checked="{numCompleted === items.length}">
+		<input id="toggle-all" class="inline-block mr-4" type="checkbox" on:change={toggleAll} checked="{numCompleted === todos.length}">
 		<label for="toggle-all">Mark all as complete</label>
 
 		<ul class="mx-0 list-none bg-clip-padding">
 			{#each filtered as item, index (item.id)}
 				<li class="{item.completed ? 'line-through' : 'underline'} {editing === index ? 'editing' : ''} 
-				py-6 px-2 border-b bol border-grey-darkest flex justify-between items-center relative todo__item">
+				py-6 px-2 border-b bol border-grey-darkest flex justify-between todos-center relative todo__item">
 					<div class="view">
 						<input class="inline-block mr-4" type="checkbox" bind:checked={item.completed}>
 						<label on:dblclick="{() => editing = index}" class="" >{item.description}</label>
@@ -115,7 +111,7 @@
 
 		<footer class="">
 			<span class="">
-				<strong>{numActive}</strong> {numActive === 1 ? 'item' : 'items'} left
+				<strong>{numActive}</strong> {numActive === 1 ? 'item' : 'todos'} left
 			</span>
 
 			<ul class="text-gray-900 mt-2 ml-8">
