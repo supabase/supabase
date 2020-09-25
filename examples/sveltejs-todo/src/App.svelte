@@ -1,7 +1,6 @@
 <script>
 	import TailwindStyles from './TailwindStyles.svelte';
 	
-	const message = 'Learn Svelte';
 
 	const ENTER_KEY = 13;
 	const ESCAPE_KEY = 27;
@@ -74,10 +73,11 @@
 	}
 </script>
 
-<header class="header">
-	<h1>todos</h1>
+<header class="items-center flex">
+	<h1 class="rounded border border-teal-500 border-solid px-20 ">todos</h1>
+	<!-- svelte-ignore a11y-autofocus -->
 	<input
-		class="new-todo"
+		class="shadow appearance-none border rounded w-full py-2 px-3 mr-4 text-grey-darker"
 		on:keydown={createNew}
 		placeholder="What needs to be done?"
 		autofocus
@@ -85,17 +85,18 @@
 </header>
 
 {#if items.length > 0}
-	<section class="main">
-		<input id="toggle-all" class="toggle-all" type="checkbox" on:change={toggleAll} checked="{numCompleted === items.length}">
+	<section class="container bg-white rounded shadow p-6 m-4 w-full lg:w-3/4 lg:max-w-lg">
+		<input id="toggle-all" class="inline-block mr-4" type="checkbox" on:change={toggleAll} checked="{numCompleted === items.length}">
 		<label for="toggle-all">Mark all as complete</label>
 
-		<ul class="todo-list">
+		<ul class="mx-0 list-none bg-clip-padding">
 			{#each filtered as item, index (item.id)}
-				<li class="{item.completed ? 'completed' : ''} {editing === index ? 'editing' : ''}">
+				<li class="{item.completed ? 'line-through' : 'underline'} {editing === index ? 'editing' : ''} 
+				py-6 px-2 border-b bol border-grey-darkest flex justify-between items-center relative todo__item">
 					<div class="view">
-						<input class="toggle" type="checkbox" bind:checked={item.completed}>
-						<label on:dblclick="{() => editing = index}">{item.description}</label>
-						<button on:click="{() => remove(index)}" class="destroy"></button>
+						<input class="inline-block mr-4" type="checkbox" bind:checked={item.completed}>
+						<label on:dblclick="{() => editing = index}" class="" >{item.description}</label>
+						<button on:click="{() => remove(index)}" class="flex-no-shrink p-2 ml-2 border-2 rounded text-red border-red hover:text-white hover:bg-red bg-red-600 transition">&cross;</button>
 					</div>
 
 					{#if editing === index}
@@ -112,20 +113,20 @@
 			{/each}
 		</ul>
 
-		<footer class="footer">
-			<span class="todo-count">
+		<footer class="">
+			<span class="">
 				<strong>{numActive}</strong> {numActive === 1 ? 'item' : 'items'} left
 			</span>
 
-			<ul class="filters">
-				<li><a class="{currentFilter === 'all' ? 'selected' : ''}" href="#/">All</a></li>
-				<li><a class="{currentFilter === 'active' ? 'selected' : ''}" href="#/active">Active</a></li>
-				<li><a class="{currentFilter === 'completed' ? 'selected' : ''}" href="#/completed">Completed</a></li>
+			<ul class="text-gray-900 mt-2 ml-8">
+				<li><a class="{currentFilter === 'all' ? 'shadow border border-teal-500' : ''}" href="#/">All</a></li>
+				<li><a class="{currentFilter === 'active' ? 'shadow border border-teal-500' : ''}" href="#/active"> <i class="underline">Active  </i></a></li>
+				<li><a class="{currentFilter === 'completed' ? 'shadow border border-teal-500' : ''}" href="#/completed"> <i class="line-through">Completed </i></a></li>
 			</ul>
 
 			{#if numCompleted}
-				<button class="clear-completed" on:click={clearCompleted}>
-					Clear completed
+				<button class="flex-no-shrink p-2 ml-2 border-2 rounded text-red border-red hover:text-white hover:bg-red bg-red-600" on:click={clearCompleted}>
+					Clear completed &cross;
 				</button>
 			{/if}
 		</footer>
