@@ -2,7 +2,7 @@
 	import TailwindStyles from './TailwindStyles.svelte';
 	
 	import {items} from './items'
-	const todos = items() || []
+	let todos = items() || []
 	const ENTER_KEY = 13;
 	const ESCAPE_KEY = 27;
 	let currentFilter = 'all';
