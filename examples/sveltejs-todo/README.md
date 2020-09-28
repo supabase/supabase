@@ -1,4 +1,21 @@
-# Svelte with TailwindCSS - Snowpack
+# Sveltejs todo with TailwindCSS - Snowpack, Backend Supabase
+
+## Deploy your own
+
+### 1. Create new project
+
+Sign up to Supabase - [https://app.supabase.io](https://app.supabase.io) and create a new project. Wait for your database to start.
+
+## configure .env
+
+```
+SUPABASE_URL=https://yoururl.supabase.io
+SUPABASE_KEY=your-anon-key
+```
+
+## create db
+
+run db/task_list_schema.sql
 
 > ✨ Bootstrapped with Create Snowpack App (CSA).
 
