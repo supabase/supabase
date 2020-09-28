@@ -2,5 +2,5 @@
   "extends": "@snowpack/app-scripts-svelte",
   "install": ["@supabase/supabase-js"],
   "scripts": {},
-  "plugins": []
+  "plugins": ["@snowpack/plugin-dotenv"]
 }
