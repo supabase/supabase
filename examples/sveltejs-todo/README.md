@@ -9,8 +9,8 @@ Sign up to Supabase - [https://app.supabase.io](https://app.supabase.io) and cre
 ## configure .env
 
 ```
-SUPABASE_URL=https://yoururl.supabase.io
-SUPABASE_KEY=your-anon-key
+SNOWPACK_PUBLIC_SUPABASE_URL=https://yoururl.supabase.io
+SNOWPACK_PUBLIC_SUPABASE_KEY=your-anon-key
 ```
 
 ## create db
