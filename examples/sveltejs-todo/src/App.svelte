@@ -1,7 +1,7 @@
 <script>
   import TailwindStyles from './TailwindStyles.svelte'
 
-	import Items from './Items'
+  import Items from './Items'
   import { getLists, getItems, items } from './items'
   import { addTask, updateTask, createList, fetchList } from './store'
   let lists
@@ -46,7 +46,6 @@
     })
   }
 
-
   $: try {
     //		updateTask(todos)
     localStorage.setItem('todos-svelte', JSON.stringify(todos))
@@ -63,24 +62,19 @@
     {#if lists.length > 0}
       {#each lists as list}
         {list.uuid} {list.id} {list.inserted_at} {list.updated_at}
-
-				{#each list.tasks as task}{task.id} {task.task_text} {task.complete}{/each}
+        {#each list.tasks as task}{task.id} {task.task_text} {task.complete}{/each}
       {/each}
     {/if}
     <!-- svelte-ignore a11y-autofocus -->
     <input
       class="shadow appearance-none border rounded w-full py-2 px-3 mr-4 text-grey-darker"
-      on:keydown={createNew}  
+      on:keydown={createNew}
       placeholder="What needs to be done?"
       autofocus />
   </header>
   Todos
   <pre>{JSON.stringify(lists[0].tasks)}</pre>
 
-
-  <Items items={lists[0].tasks} bind:currentFilter={currentFilter} bind:editing={editing}/>
-
-
-
+  <Items items={lists[0].tasks} bind:currentFilter bind:editing />
 
 {/await}
