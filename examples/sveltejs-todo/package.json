@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@snowpack/app-scripts-svelte": "^1.2.0",
+    "@snowpack/plugin-dotenv": "^2.0.2",
     "@testing-library/jest-dom": "^5.5.0",
     "@testing-library/svelte": "^3.0.0",
     "autoprefixer": "^9.8.0",
