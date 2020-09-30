@@ -6,18 +6,26 @@
 
 Sign up to Supabase - [https://app.supabase.io](https://app.supabase.io) and create a new project. Wait for your database to start.
 
-## configure .env
+## 2. configure .env
 
 ```
 SNOWPACK_PUBLIC_SUPABASE_URL=https://yoururl.supabase.io
 SNOWPACK_PUBLIC_SUPABASE_KEY=your-anon-key
 ```
 
-## create db
+## 3. create db
 
 run db/task_list_schema.sql
 
 > ✨ Bootstrapped with Create Snowpack App (CSA).
+
+
+### 4. Deploy the Next.js client
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/git?s=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fsveltejs-todo&env=SNOWPACK_PUBLIC_SUPABASE_URL,SNOWPACK_PUBLIC_SUPABASE_KEY&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.io&project-name=supabase-sveltejs-todo&repo-name=supabase-sveltejs-todo)
+
+You will be asked for a `SNOWPACK__PUBLIC_SUPABASE_URL` and `SNOWPACK__PUBLIC_SUPABASE_KEY`. Use the API URL and `anon` key from [step 2](#2.-configure-.env).
+
 
 ## Available Scripts
 
