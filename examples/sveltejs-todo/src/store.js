@@ -19,7 +19,14 @@ export const updateTask = async (task_id, values) => {
     console.log('error', error)
   }
 }
-
+export const deleteTask = async (task_id) => {
+  try {
+    let { body } = await supabase.from('tasks').delete().eq('id', task_id)
+    return body
+  } catch (error) {
+    console.log('error', error)
+  }
+}
 export const createList = async (uuid) => {
   try {
     let { body } = await supabase.from('lists').insert([{ uuid }])
