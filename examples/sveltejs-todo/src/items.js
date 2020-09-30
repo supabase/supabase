@@ -5,19 +5,36 @@ import Supabase from '@supabase/supabase-js'
 const {SNOWPACK_PUBLIC_SUPABASE_URL,SNOWPACK_PUBLIC_SUPABASE_KEY} =import.meta.env
 
 const supabase = Supabase.createClient(SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY)
+export const getLists = async () => {
+  const {body} = await supabase
+  .from(`lists`)
+  // .on('INSERT', (payload) => handleNewTask(payload.new))
+  // .on('UPDATE', (payload) => handleNewTask(payload.new))
+  .select("uuid,id")
+  return body
+}
 
+export const getItems = async (list) => {
+  const {body} = await supabase
+  .from(`tasks:list_id=eq.${list.id}`)
+  // .on('INSERT', (payload) => handleNewTask(payload.new))
+  // .on('UPDATE', (payload) => handleNewTask(payload.new))
+  .select("*")
+  return body
+}
 export const itemsAllAtOnce = async () => {
   const { body } = await supabase.from('lists').select(`
       id, inserted_at, updated_at,
-      tasks (id, task_text, complete, user_id, inserted_at, updated_at)
+      tasks (id, task_text, complete, inserted_at, updated_at)
   `)
-  return body
+  return body || []
 }
 
 export const items = () => {
   try {
-    return JSON.parse(localStorage.getItem('todos-svelte')) || []
+    return itemsAllAtOnce()
   } catch (err) {
+    console.error(err)
     return []
   }
 }
