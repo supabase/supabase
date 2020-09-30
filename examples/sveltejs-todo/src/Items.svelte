@@ -7,18 +7,7 @@
   function clearCompleted() {
     todos = todos.filter(item => !item.complete)
   }
-  function handleEdit(event) {
-    if (event.which === ENTER_KEY) event.target.blur()
-    else if (event.which === ESCAPE_KEY) editing = null
-  }
-  function submit(event) {
-    updateTask(editing, event.target.value)
-    editing = null
-  }
 
-  function remove(index) {
-    todos = todos.slice(0, index).concat(todos.slice(index + 1))
-  }
   function toggleAll(event) {
     todos = todos.map(item => ({
       id: item.id,
