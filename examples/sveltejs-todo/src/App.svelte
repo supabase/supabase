@@ -12,7 +12,9 @@
   LIST_ID = lists && lists.length > 0 ? lists[0].id : 1
 
   $: todos = lists && lists.length > 0 ? lists[0].tasks : []
-
+  if(!lists) {
+    createList(uuid())
+  }
   // || createList(LIST_ID)
   const ENTER_KEY = 13
   const ESCAPE_KEY = 27
