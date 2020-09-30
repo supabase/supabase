@@ -1,8 +1,10 @@
 <script>
-  import { addTask, updateTask, createList, fetchList } from './store'
+  import { addTask, deleteTask, updateTask, createList, fetchList } from './store'
   export let item
   export let editing
   export let index
+  const ENTER_KEY = 13
+  const ESCAPE_KEY = 27
   function handleEdit(event) {
     if (event.which === ENTER_KEY) event.target.blur()
     else if (event.which === ESCAPE_KEY) editing = null
@@ -12,7 +14,8 @@
     editing = null
   }
   function remove(index) {
-    todos = todos.slice(0, index).concat(todos.slice(index + 1))
+    deleteTask(item.id)
+//    todos = todos.slice(0, index).concat(todos.slice(index + 1))
   }
 </script>
 

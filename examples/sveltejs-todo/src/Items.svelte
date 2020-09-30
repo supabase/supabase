@@ -36,7 +36,7 @@
 
   <ul class="mx-0 list-none bg-clip-padding">
     {#each filtered as item, index (item.id)}
-      <Item {item} {index} {editing} />
+      <Item bind:item={item} {index} {editing} />
     {/each}
   </ul>
 
@@ -75,6 +75,4 @@
       </button>
     {/if}
   </footer>
-  Filtered
-  <pre>{JSON.stringify(filtered)}</pre>
 </section>
