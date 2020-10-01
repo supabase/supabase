@@ -106,6 +106,10 @@ module.exports = {
               label: 'Open source',
               to: '/oss',
             },
+            {
+              label: 'Lawyers',
+              to: 'https://supabase.io/lawyers.txt',
+            },
           ],
         },
         {
