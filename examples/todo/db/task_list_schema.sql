@@ -57,7 +57,7 @@ CREATE POLICY "Allow individual update access" on lists FOR UPDATE USING ( auth.
 -- no to RS 
 -- ALTER TABLE tasks SET ROW SECURITY FOR  SELECT TO (SELECT users_id from userslists where userlists.lists_id=list_id);
 -- CREATE POLICY "Allow logged in user to see items on their current list" on tasks FOR SELECT USING ( select list_id from public.users where public.users.list_id=list_id AND public.users.user_id=auth.uid() )
-
+CREATE POLICY "Allow logged in user to see items on their current list" on tasks FOR SELECT USING ( EXISTS( select 1 from userlists where userlists.lists_id=tasks.list_id AND userlists.users_id=auth.uid() ))
 -- user can update their tasks
 CREATE POLICY "Allow individual insert access" on tasks FOR INSERT WITH CHECK ( auth.uid() = user_id );
 CREATE POLICY "Allow individual update access" on tasks FOR UPDATE USING ( auth.uid() = user_id );
