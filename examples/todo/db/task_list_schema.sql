@@ -45,7 +45,9 @@ CREATE POLICY "Allow individual select access" on userlists FOR SELECT USING ( a
 CREATE POLICY "Allow individual insert access" on userlists FOR INSERT WITH CHECK ( auth.uid() = users_id );
 CREATE POLICY "Allow individual update access" on userlists FOR UPDATE USING ( auth.uid() = users_id );
 
-CREATE POLICY "Allow logged-in full access" on lists FOR ALL USING ( auth.role() = 'authenticated' );
+CREATE POLICY "Allow logged-in full access" on lists FOR SELECT USING ( auth.role() = 'authenticated' );
+CREATE POLICY "Allow individual insert access" on lists FOR INSERT WITH CHECK ( auth.role() = 'authenticated' );
+CREATE POLICY "Allow individual update access" on lists FOR UPDATE USING ( auth.role() = 'authenticated' );
 
 -- user should see other tasks in lists they are a member of
 -- todo
