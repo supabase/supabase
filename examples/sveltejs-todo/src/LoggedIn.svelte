@@ -4,7 +4,7 @@
   import Items from './Items'
   import { getLists, getItems, items } from './items'
   import { addTask, updateTask, createList, fetchList } from './store'
-  let user = localStorage.getItem("user")
+  export let user // = localStorage.getItem("user")
   let lists
   let todos
   let LIST_ID
