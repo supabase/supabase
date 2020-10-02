@@ -5,7 +5,7 @@
 
   const supabase = Supabase.createClient(SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY)
   let values = {}
-
+  export let user
   window.userToken = null
 
   const signUpSubmitted = (event) => {
@@ -35,6 +35,7 @@
       .then((response) => {
         document.querySelector('#access-token').value = response.body.access_token
         document.querySelector('#refresh-token').value = response.body.refresh_token
+        user = response.body.user
         alert('Logged in as ' + response.body.user.email)
       })
       .catch((err) => {
@@ -46,6 +47,7 @@
     supabase.auth
       .user()
       .then((response) => {
+        user = response.body.user
         alert(JSON.stringify(response))
       })
       .catch((err) => {
