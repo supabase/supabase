@@ -1,14 +1,14 @@
 <script>
   import TailwindStyles from './TailwindStyles.svelte'
-  import Home from './Home'
+
   import Login from './Login'
   import LoggedIn from './LoggedIn'
 
-
-let user
+  let user
 </script>
+
 {#if user}
-<LoggedIn bind:user={user} />
+  <LoggedIn bind:user />
 {:else}
-<Login bind:user={user}/>
+  <Login bind:user />
 {/if}
