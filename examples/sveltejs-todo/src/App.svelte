@@ -7,6 +7,8 @@
 
 let user
 </script>
-
-{!user && (<Login bind:user={user}/>)}
-{user && (<LoggedIn bind:user={user})}
+{#if user}
+<LoggedIn bind:user={user} />
+{:else}
+<Login bind:user={user}/>
+{/if}
