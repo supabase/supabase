@@ -5,3 +5,9 @@ sparse-checkout:
 	cd supabase
 	git sparse-checkout init --cone
 	git sparse-checkout set examples/sveltejs-todo
+signup:
+	node src/_signup.js
+login:
+	node src/_login.js
+test-db:
+	DEBUG= npx jest src/DB.setup.test.js 
