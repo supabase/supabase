@@ -2,7 +2,8 @@
   "scripts": {
     "start": "snowpack dev",
     "build": "snowpack build",
-    "test": "jest"
+    "test": "NODE_ENV=test DEBUG= jest",
+    "2020-test": "NODE_ENV=test DEBUG= node --experimental-vm-modules node_modules/jest/bin/jest.js --no-cache -b"
   },
   "dependencies": {
     "@supabase/supabase-js": "^0.36.5",
@@ -23,6 +24,7 @@
     "postcss-load-config": "^2.1.0",
     "prettier": "2.0.5",
     "snowpack": "^2.5.0",
+    "svelte-jester": "^1.1.5",
     "svelte-preprocess": "^3.9.7"
   }
 }

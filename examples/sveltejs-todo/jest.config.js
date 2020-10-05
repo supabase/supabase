@@ -1,10 +1,9 @@
-// as of 2020-10-03 default config hangs 
+// as of 2020-10-03 default config hangs
 
-const config =
-{...require("@snowpack/app-scripts-svelte/jest.config.js")()}
+const config = { ...require('@snowpack/app-scripts-svelte/jest.config.js')() }
 // change default config to use svelte-jester
 
-config.transform["^.+\\.svelte$"][0]="svelte-jester"
+config.transform['^.+\\.svelte$'][0] = 'svelte-jester'
 // optional output transformed file for debugging
 
 // config.transform["^.+\\.svelte$"][1]["debug"]=true
@@ -14,8 +13,8 @@ config.transform["^.+\\.svelte$"][0]="svelte-jester"
 // config.setupFilesAfterEnv.push('<rootDir>/src/_testHelper.js')
 
 module.exports = {
-  ...config
-};
+  ...config,
+}
 
 // // changes to snowpack to fix testing with svelte
 

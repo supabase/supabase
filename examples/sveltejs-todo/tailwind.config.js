@@ -4,11 +4,11 @@ module.exports = {
     extend: {
       colors: {
         orange: {
-          500: "#ff3e00",
+          500: '#ff3e00',
         },
       },
     },
   },
   variants: {},
   plugins: [],
-};
+}
