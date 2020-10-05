@@ -19,36 +19,36 @@ We're now 7 months into building Supabase. This update is a big one!
 
 Watch a full demo:
 
-- [ ]  Insert video
+<iframe width="640" height="385" src="https://www.loom.com/embed/c7d66ae1f4c1458d964147c5c58aad59" frameborder="0" allowFullScreen></iframe>
 
 ### Third-party logins
 
-We've released OAuth logins! If you've been using Supabase Auth, you can now enable third-party logins on your app for Bitbucket, GitHub, GitLab, or Google.
+We've released OAuth logins! You can now enable third-party logins on your app for Bitbucket, GitHub, GitLab, or Google.
 
 ![This is a picture of the supabase dashboard with OAuth logins](/img/supabase-oauth-logins.png)
 
 ### Clone tables
 
-You can now duplicate your tables, just like you would inside a spreadsheet.
+You can duplicate your tables, just like you would inside a spreadsheet.
 
-<video width="99%" autoplay="autoplay" loop muted playsInline controls="true">
-<source src="/videos/duplicate-tables.mp4" type="video/mp4" loop muted playsInline />
+<video width="99%" autoplay="autoplay" muted playsInline controls="true">
+<source src="/videos/duplicate-tables.mp4" type="video/mp4" muted playsInline />
 </video>
 
 ### Enable and disable extensions
 
-You can enable Postgres extensions with the click of a button.
+Extensions are easier to use. You can enable Postgres extensions with the click of a button.
 
-<video width="99%" autoplay="autoplay" loop muted playsInline controls="true">
-<source src="/videos/toggle-extensions.mp4" type="video/mp4" loop muted playsInline />
+<video width="99%" autoplay="autoplay" muted playsInline controls="true">
+<source src="/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
 </video>
 
-### Save your farite queries
+### Save your farvorite queries
 
 The SQL editor now stores your query history in your browser. You can also save your favorite queries! 
 
-<video width="99%" autoplay="autoplay" loop muted playsInline controls="true">
-<source src="/videos/favourites.mp4" type="video/mp4" loop muted playsInline />
+<video width="99%" autoplay="autoplay" muted playsInline controls="true">
+<source src="/videos/favourites.mp4" type="video/mp4" muted playsInline />
 </video>
 
 ### GitHub Discussions
@@ -70,13 +70,13 @@ Supabase was given access to [GitHub Discussions](https://github.com/supabase/su
 - @Thorwebdev [presented Supabase Auth at the SingaporeJS](https://www.youtube.com/watch?v=LUMxJ4w-MUU) meetup
 - [realtime-py](https://github.com/lionellloh/realtime-py) is underway thanks to [@lionellloh](https://github.com/lionellloh) & [@j0](https://github.com/j0)
 - [postgrest-dart](https://github.com/supabase/postgrest-dart) was shipped by [@phamhieu](https://github.com/phamhieu)
-- [postrgest-csharp](https://github.com/supabase/postgrest-csharp) is being implemented by [@acupofjose](https://github.com/acupofjose)
+- [postgrest-csharp](https://github.com/supabase/postgrest-csharp) is being implemented by [@acupofjose](https://github.com/acupofjose)
 
 ### Hacktoberfest
 
 There's been [plenty of drama](https://hacktoberfest.digitalocean.com/hacktoberfest-update) during Hacktoberfest, but Supabase is committed to helping new contributors get started with open source. We've already seen a lot of issues closed by new members to our community and first-time contributors. If you're looking for ways to get involved, read our Hacktoberfest [blog post](https://supabase.io/blog/2020/09/11/supabase-hacktoberfest-2020), check our our [live stream](https://www.youtube.com/watch?v=3_xRLTjvEiE&t=60s), and then dive into our [project board](https://github.com/orgs/supabase/projects/5).
 
-![This is an image of our hacktoberfest project board on GitHub.](/img/supabase-oauth-logins.png)
+![This is an image of our hacktoberfest project board on GitHub.](/img/supabase-hacktoberfest-board.png)
 
 ### Coming next
 
