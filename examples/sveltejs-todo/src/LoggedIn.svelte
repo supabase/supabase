@@ -1,15 +1,10 @@
 <script>
   import TailwindStyles from './TailwindStyles.svelte'
   import Lists from './Lists.svelte'
-  import { items } from './items'
-  export let user // = localStorage.getItem("user")
-  // let lists
-  // let todos
-
+  import { items, subscription } from './items'
+  export let user
   $: lists = items()
+  // $: lists2 = subscription()
+</script>
 
-
-  // $: todos = lists && lists.length > 0 ? lists[0].tasks : []
-
-  </script>
-  <Lists user_id={user.id} lists={lists}  />
+<Lists user_id={user.id} {lists} />
