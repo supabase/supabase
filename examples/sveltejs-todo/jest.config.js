@@ -4,10 +4,14 @@ const config =
 {...require("@snowpack/app-scripts-svelte/jest.config.js")()}
 // change default config to use svelte-jester
 
-ret.transform["^.+\\.svelte$"][0]="svelte-jester"
+config.transform["^.+\\.svelte$"][0]="svelte-jester"
 // optional output transformed file for debugging
 
-// ret.transform["^.+\\.svelte$"][1]["debug"]=true
+// config.transform["^.+\\.svelte$"][1]["debug"]=true
+
+// add setuphelper
+
+// config.setupFilesAfterEnv.push('<rootDir>/src/_testHelper.js')
 
 module.exports = {
   ...config
