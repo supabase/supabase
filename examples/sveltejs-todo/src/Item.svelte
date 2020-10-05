@@ -10,6 +10,9 @@
     if (event.which === ENTER_KEY) event.target.blur()
     else if (event.which === ESCAPE_KEY) editing = null
   }
+  function markComplete(event){
+    updateTask(item.id, {complete: !item.complete})
+  }
   function submit(event) {
     updateTask(editing, event.target.value)
     editing = null
@@ -25,7 +28,7 @@
   {editing === index ? 'editing' : ''} py-6 px-2 border-b bol border-grey-darkest flex
   justify-between todos-center relative todo__item">
   <div class="view">
-    <input class="inline-block mr-4" type="checkbox" bind:checked={item.complete} />
+    <input on:click={markComplete} class="inline-block mr-4" type="checkbox" bind:checked={item.complete} />
     <label on:dblclick={() => (editing = index)} class="">{item.task_text}</label>
     <button
       on:click={() => remove(index)}
