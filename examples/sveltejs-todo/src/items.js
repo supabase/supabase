@@ -10,7 +10,7 @@ export const getLists = async () => {
     .from(`lists`)
     // .on('INSERT', (payload) => handleNewTask(payload.new))
     // .on('UPDATE', (payload) => handleNewTask(payload.new))
-    .select('uuid,id')
+    .select('name,id')
   return body
 }
 
@@ -24,8 +24,8 @@ export const getItems = async (list) => {
 }
 export const itemsAllAtOnce = async () => {
   const { body } = await supabase.from('lists').select(`
-      id, inserted_at, updated_at,
-      tasks (id, task_text, complete, inserted_at, updated_at)
+      id, name, inserted_at,
+      tasks (id, task_text, complete, inserted_at)
   `)
   return body || []
 }
