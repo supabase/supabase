@@ -1,15 +1,20 @@
 <script>
   import Item from './Item.svelte'
-  import { addTask, updateTask, createList, fetchList } from './store'
+  import { addTask, updateTask, deleteTask, createList, fetchList } from './store'
   export let items
   export let currentFilter
   export let editing
+  export let list_id
   function clearCompleted() {
-    todos = todos.filter(item => !item.complete)
+    items.filter(item=>item.complete).map(item=>{
+      deleteTask(item.id)
+      // sends rest call but 204 back?
+    })
+    items = items.filter((item) => !item.complete)
   }
 
   function toggleAll(event) {
-    todos = todos.map(item => ({
+    todos = todos.map((item) => ({
       id: item.id,
       description: item.description,
       complete: event.target.checked,
@@ -19,10 +24,10 @@
     currentFilter === 'all'
       ? items
       : currentFilter === 'completed'
-      ? items.filter(item => item.complete)
-      : items.filter(item => !item.complete)
-  $: numActive = items ? items.filter(item => !item.complete).length : 0
-  $: numCompleted = items ? items.filter(item => item.complete).length : 0
+      ? items.filter((item) => item.complete)
+      : items.filter((item) => !item.complete)
+  $: numActive = items ? items.filter((item) => !item.complete).length : 0
+  $: numCompleted = items ? items.filter((item) => item.complete).length : 0
 </script>
 
 <section class="container bg-white rounded shadow p-6 m-4 w-full lg:w-3/4 lg:max-w-lg">
@@ -36,15 +41,12 @@
 
   <ul class="mx-0 list-none bg-clip-padding">
     {#each filtered as item, index (item.id)}
-      <Item bind:item={item} {index} {editing} />
+      <Item bind:item {index} {editing} {list_id} />
     {/each}
   </ul>
 
   <footer class="">
-    <span class="">
-      <strong>{numActive}</strong>
-      {numActive === 1 ? 'item' : 'todos'} left
-    </span>
+    <span class=""> <strong>{numActive}</strong> {numActive === 1 ? 'item' : 'todos'} left </span>
 
     <ul class="text-gray-900 mt-2 ml-8">
       <li>

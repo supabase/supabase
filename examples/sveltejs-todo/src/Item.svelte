@@ -3,6 +3,7 @@
   export let item
   export let editing
   export let index
+  export let list_id
   const ENTER_KEY = 13
   const ESCAPE_KEY = 27
   function handleEdit(event) {

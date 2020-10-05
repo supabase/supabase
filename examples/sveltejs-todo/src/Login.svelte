@@ -18,7 +18,7 @@
       .then((response) => {
         document.querySelector('#access-token').value = response.body.access_token
         document.querySelector('#refresh-token').value = response.body.refresh_token
-        alert('Logged in as ' + response.body.user.email)
+        // alert('Logged in as ' + response.body.user.email)
       })
       .catch((err) => {
         alert(err.response.text)
@@ -35,23 +35,12 @@
       .then((response) => {
         document.querySelector('#access-token').value = response.body.access_token
         document.querySelector('#refresh-token').value = response.body.refresh_token
+        // setContext("user" ,response.body.user)
         user = response.body.user
-        alert('Logged in as ' + response.body.user.email)
+        // alert('Logged in as ' + response.body.user.email)
       })
       .catch((err) => {
-        alert(err.response.text)
-      })
-  }
-
-  const fetchUserDetails = () => {
-    supabase.auth
-      .user()
-      .then((response) => {
-        user = response.body.user
-        alert(JSON.stringify(response))
-      })
-      .catch((err) => {
-        alert(err.response.text)
+        alert(JSON.stringify(err))
       })
   }
 
@@ -66,7 +55,7 @@
         alert('Logout successful')
       })
       .catch((err) => {
-        alert(err.response.text)
+        alert(JSON.stringify(err))
       })
   }
 </script>
@@ -127,13 +116,6 @@
           mins whilst the client is running</small>
       </form>
     </div>
-    <div class="section">
-      <h3>Fetch User Details</h3>
-      <button on:click={fetchUserDetails} id="user-button">Fetch</button>
-    </div>
-    <div class="section">
-      <h3>Logout</h3>
-      <button on:click={logoutSubmitted} id="logout-button">Logout</button>
-    </div>
+    <div class="section"><button on:click={logoutSubmitted} id="logout-button">Logout</button></div>
   </div>
 </div>
