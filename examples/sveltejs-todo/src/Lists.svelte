@@ -22,16 +22,18 @@
   window.addEventListener('hashchange', updateView)
   updateView()
 
-  function createNew(event) {
+  function createNewTask(event) {
     if (event.which === ENTER_KEY) {
       // TODO change to bind
       addTask(event.target.value, event.target.attributes.list_id.value)
       event.target.value = ''
     }
   }
-  if (!lists && user_id) {
+  function createNewList(event) {
     createList(user_id, window.prompt('list name'))
-  } else {
+  }
+  if (!lists && user_id) {
+    createNewList()
   }
 </script>
 
@@ -40,6 +42,7 @@
 
 <header class="todos-center flex">
   <h1 class="rounded border border-teal-500 border-solid px-20 ">todos</h1>
+  <button on:click={createNewList}>add new list</button>
 </header>
 {#await lists then lists}
   {#each lists as list}
@@ -51,7 +54,7 @@ list.id
     <input
       list_id={list.id}
       class="shadow appearance-none border rounded w-full py-2 px-3 mr-4 text-grey-darker"
-      on:keydown={createNew}
+      on:keydown={createNewTask}
       placeholder="What needs to be done?"
       autofocus />
 
