@@ -38,3 +38,8 @@ export const items = () => {
     return []
   }
 }
+
+export const subscription = () => {
+  return supabase.from(`lists(id, name, inserted_at,
+    tasks (id, task_text, complete, inserted_at)`).on("*",payload=>{console.log({payload})}).subscribe()
+}
