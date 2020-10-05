@@ -13,7 +13,7 @@
     "@docusaurus/preset-classic": "^2.0.0-alpha.62",
     "@kiwicopple/prism-react-renderer": "github:kiwicopple/prism-react-renderer",
     "classnames": "^2.2.6",
-    "mermaid": "^8.6.4",
+    "mermaid": "^8.8.1",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-inlinesvg": "^2.0.1",
