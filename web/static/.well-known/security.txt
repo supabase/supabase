@@ -1,0 +1,2 @@
+Contact: security@supabase.io
+Canonical: https://supabase.io/.well-known/security.txt
