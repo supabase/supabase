@@ -1,0 +1,10 @@
+{
+  "presets": [
+    "@babel/env",
+    "@babel/preset-react"
+  ],
+  "plugins": [
+    "macros",
+    "@emotion/babel-plugin"
+  ]
+}
