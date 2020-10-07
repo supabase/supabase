@@ -15,16 +15,18 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },
+  "dependencies": {
+    "@emotion/react": "^11.0.0-next.19",
+    "@emotion/styled": "^11.0.0-next.19"
+  },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
     "@babel/preset-react": "^7.10.4",
-    "@emotion/babel-plugin": "^11.0.0-next.10",
-    "@emotion/css": "^10.0.27",
-    "@emotion/react": "^11.0.0-next.10",
-    "@emotion/server": "^11.0.0-next.10",
-    "@emotion/styled": "^10.0.27",
+    "@emotion/babel-plugin": "11.0.0-next.17",
+    "@emotion/css": "^11.0.0-next.19",
+    "@emotion/server": "^11.0.0-next.19",
     "@rollup/plugin-babel": "^5.2.1",
     "@storybook/addon-actions": "^6.0.26",
     "@storybook/addon-essentials": "^6.0.26",
