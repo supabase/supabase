@@ -20,11 +20,11 @@
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
     "@babel/preset-react": "^7.10.4",
-    "@emotion/babel-plugin": "^10.0.0",
-    "@emotion/css": "^10.0.0",
-    "@emotion/react": "^10.0.0",
-    "@emotion/server": "^10.0.0",
-    "@emotion/styled": "^10.0.0",
+    "@emotion/babel-plugin": "^11.0.0-next.10",
+    "@emotion/css": "^10.0.27",
+    "@emotion/react": "^11.0.0-next.10",
+    "@emotion/server": "^11.0.0-next.10",
+    "@emotion/styled": "^10.0.27",
     "@rollup/plugin-babel": "^5.2.1",
     "@storybook/addon-actions": "^6.0.26",
     "@storybook/addon-essentials": "^6.0.26",
@@ -32,10 +32,11 @@
     "@storybook/react": "^6.0.26",
     "@tailwindcss/ui": "^0.6.2",
     "@tailwindcssinjs/macro": "^0.10.0",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.0.4",
+    "@testing-library/user-event": "^12.1.7",
     "babel-loader": "^8.1.0",
+    "babel-plugin-add-react-displayname": "^0.0.5",
     "babel-plugin-macros": "^2.8.0",
     "npm-run-all": "^4.1.5",
     "react-is": "^16.13.1",
@@ -59,6 +60,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "dependencies": {}
+  }
 }

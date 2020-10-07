@@ -16,6 +16,7 @@ module.exports = {
   ],
   "plugins": [
     "macros",
-    "@emotion/babel-plugin"
+    "@emotion/babel-plugin",
+    "add-react-displayname"
   ]
 }
