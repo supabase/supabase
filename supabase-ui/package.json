@@ -1,0 +1,58 @@
+{
+  "name": "supabase-ui",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "source": "src/index.js",
+  "scripts": {
+    "build": "rollup -c",
+    "build-watch": "rollup -c -w",
+    "start-playground": "cd playground && npm run start",
+    "i-all": "npm i && cd playground && npm i",
+    "dev": "npm-run-all --parallel build-watch start-playground"
+  },
+  "peerDependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.11.6",
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/preset-react": "^7.10.4",
+    "@emotion/babel-plugin": "^11.0.0-next.17",
+    "@emotion/css": "^10.0.27",
+    "@emotion/react": "^11.0.0-next.19",
+    "@emotion/server": "^11.0.0-next.19",
+    "@emotion/styled": "^10.0.27",
+    "@rollup/plugin-babel": "^5.2.1",
+    "@tailwindcss/ui": "^0.6.2",
+    "@tailwindcssinjs/macro": "^0.10.0",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "babel-plugin-macros": "^2.8.0",
+    "npm-run-all": "^4.1.5",
+    "react-scripts": "3.4.3",
+    "rollup": "^2.28.2",
+    "rollup-plugin-delete": "^2.0.0",
+    "rollup-plugin-peer-deps-external": "^2.2.3",
+    "tailwindcss": "^1.8.11"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
