@@ -1,22 +1,16 @@
 module.exports = {
-  "presets": [
+  presets: [
     [
-      "@babel/env",
+      '@babel/env',
       {
-        "modules": false,
-        "loose": true,
-        "targets": {
-          "browsers": [
-            ">2%"
-          ]
-        }
-      }
+        modules: false,
+        loose: true,
+        targets: {
+          browsers: ['>2%'],
+        },
+      },
     ],
-    "@babel/preset-react"
+    '@babel/preset-react',
   ],
-  "plugins": [
-    "macros",
-    "@emotion/babel-plugin",
-    "add-react-displayname"
-  ]
+  plugins: ['macros', '@emotion/babel-plugin', 'add-react-displayname'],
 }
