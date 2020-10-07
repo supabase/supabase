@@ -10,6 +10,9 @@ module.exports = {
     "@storybook/addon-essentials"
   ],
   webpackFinal: async config => {
+
+    // This is for fix webpack storybook get module @emotion/styled/base
+    // It's wrong module, the right module is @emotion/styled-base
     config.resolve.alias = {
       '@emotion/styled/base': '@emotion/styled-base'
     }
