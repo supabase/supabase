@@ -430,10 +430,7 @@ function Home() {
                     />
                   )}
                   {visibleCodeExample === 'UMD' && (
-                    <CustomCodeBlock
-                      header="Supabase-js standalone bundle"
-                      js={umdExample}
-                    />
+                    <CustomCodeBlock header="Supabase-js standalone bundle" js={umdExample} />
                   )}
                 </div>
               </div>
@@ -534,7 +531,7 @@ function Home() {
           </div>
         </section>
 
-        <section
+        {/* <section
           style={{
             marginTop: 100,
             padding: '50px 0',
@@ -573,6 +570,49 @@ function Home() {
               >
                 <img src="/img/new-sponsor-dark.png" alt="Become a sponsor" />
               </a>
+            </div>
+          </div>
+        </section> */}
+
+        <section
+          style={{
+            marginTop: 100,
+            padding: '50px 0',
+            borderTop: '1px solid var(--custom-border-color)',
+          }}
+          className="hero is--dark"
+        >
+          <div className="container text--center">
+            {/* <div>
+              <h2>Get Early Access</h2>
+            </div> */}
+            <div className="">
+              <a
+                className={classnames(
+                  'button hero--button button--md responsive-button',
+                  styles.button
+                )}
+                href="https://www.producthunt.com/posts/supabase?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-supabase"
+                style={{ width: 250, height: 54, margin: 0, padding: 0, display: 'inline-block' }}
+              >
+                <img
+                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=203792&theme=dark"
+                  alt="Supabase - An open source Firebase alternative | Product Hunt Embed"
+                  style={{ width: 250, height: 54 }}
+                  width="250px"
+                  height="54px"
+                />
+              </a>
+              <Link
+                className={classnames(
+                  'button hero--button button--md button--primary responsive-button',
+                  styles.button
+                )}
+                to={'https://app.supabase.io'}
+                style={{ margin: 5 }}
+              >
+                Alpha sign up →
+              </Link>
             </div>
           </div>
         </section>
