@@ -4,6 +4,7 @@
   export let editing
   export let index
   export let list_id
+  export let items
   const ENTER_KEY = 13
   const ESCAPE_KEY = 27
   function handleEdit(event) {
@@ -18,8 +19,8 @@
     editing = null
   }
   function remove(index) {
-    deleteTask(item.id)
-//    todos = todos.slice(0, index).concat(todos.slice(index + 1))
+      deleteTask(item.id)
+      items = items.slice(0, index).concat(items.slice(index + 1))
   }
 </script>
 
