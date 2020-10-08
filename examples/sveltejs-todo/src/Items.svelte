@@ -41,7 +41,7 @@
 
   <ul class="mx-0 list-none bg-clip-padding">
     {#each filtered as item, index (item.id)}
-      <Item bind:item {index} {editing} {list_id} />
+      <Item bind:item {index} {editing} {list_id} bind:items />
     {/each}
   </ul>
 
