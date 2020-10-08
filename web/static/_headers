@@ -16,8 +16,5 @@
 /*.gif
   Cache-Control: public, max-age=10800
 
-/*front-integration-plugin.png
-  Cache-Control: public, max-age=100, s-maxage=10800
-
 /*
   X-Frame-Options: DENY
