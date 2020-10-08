@@ -44,6 +44,7 @@
   <h1 class="rounded border border-teal-500 border-solid px-20 ">todos</h1>
   <button on:click={createNewList}>add new list</button>
 </header>
+
 {#await lists then lists}
   {#each lists as list}
     <!-- svelte-ignore a11y-autofocus -->
@@ -60,4 +61,6 @@ list.id
 
     <Items list_id={list.id} items={list.tasks} bind:currentFilter bind:editing />
   {/each}
+{:catch err}
+  {err}
 {/await}
