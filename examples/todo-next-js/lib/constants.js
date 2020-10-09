@@ -1,3 +1,2 @@
-export const NEXT_PUBLIC_SUPABASE_URL = 'https://mgfqocwjajyyqqrztfjq.supabase.co'
-export const NEXT_PUBLIC_SUPABASE_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYwMjIxNDg1OCwiZXhwIjoxOTE3NzkwODU4fQ.FdsD859xg820DVKIfdvI8PL0MdonqPKT0omisTOWCF8'
+export const NEXT_PUBLIC_SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+export const NEXT_PUBLIC_SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_KEY
