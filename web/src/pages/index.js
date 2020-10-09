@@ -430,10 +430,7 @@ function Home() {
                     />
                   )}
                   {visibleCodeExample === 'UMD' && (
-                    <CustomCodeBlock
-                      header="Supabase-js standalone bundle"
-                      js={umdExample}
-                    />
+                    <CustomCodeBlock header="Supabase-js standalone bundle" js={umdExample} />
                   )}
                 </div>
               </div>
