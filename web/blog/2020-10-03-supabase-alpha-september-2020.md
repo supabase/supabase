@@ -19,7 +19,7 @@ We're now 7 months into building Supabase. This update is a big one!
 
 Watch a full demo:
 
-<iframe width="640" height="385" src="https://www.loom.com/embed/c7d66ae1f4c1458d964147c5c58aad59" frameborder="0" allowFullScreen></iframe>
+<iframe style="max-width:100%;" width="640" height="385" src="https://www.loom.com/embed/c7d66ae1f4c1458d964147c5c58aad59" frameborder="0" allowFullScreen></iframe>
 
 ### Third-party logins
 

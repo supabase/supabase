@@ -19,7 +19,7 @@ Now in [Supabase](https://app.supabase.io):
 
 <!--truncate-->
 
-<iframe width="700" height="350" src="https://www.youtube.com/embed/ck5MM_PD4Co" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe style="max-width:100%;" width="700" height="350" src="https://www.youtube.com/embed/ck5MM_PD4Co" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Important Notes
 

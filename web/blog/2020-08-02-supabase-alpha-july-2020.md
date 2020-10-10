@@ -18,7 +18,7 @@ After 5 months of building, we're releasing one of our most anticipated features
 
 Watch a full demo:
 
-<iframe width="640" height="385" src="https://www.loom.com/embed/17fbbc3bc9b2459eb0efbbb174b2ce7b" frameborder="0" allowFullScreen></iframe>
+<iframe style="max-width:100%;" width="640" height="385" src="https://www.loom.com/embed/17fbbc3bc9b2459eb0efbbb174b2ce7b" frameborder="0" allowFullScreen></iframe>
 
 ### Auth
 
