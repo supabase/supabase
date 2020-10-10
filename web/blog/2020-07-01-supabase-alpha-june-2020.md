@@ -18,7 +18,7 @@ We're now 4 months into building [Supabase](https://supabase.io), which means an
 
 Watch a full demo:
 
-<iframe className="w-full" width="640" height="385" src="https://www.loom.com/embed/b3ba79c1633d464ea758e0796bbb39da" frameborder="0" allowFullScreen></iframe>
+<iframe className="w-full" width="640" height="385" src="https://www.loom.com/embed/b3ba79c1633d464ea758e0796bbb39da" frameBorder="0" allowFullScreen></iframe>
 
 ### View relational data
 

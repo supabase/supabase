@@ -18,7 +18,7 @@ We're 6 months into building our hosted database platform and we've made some ma
 
 Watch a full demo:
 
-<iframe className="w-full" width="640" height="385" src="https://www.loom.com/embed/a43084629c7e47828e3a292b60719393" frameborder="0" allowFullScreen></iframe>
+<iframe className="w-full" width="640" height="385" src="https://www.loom.com/embed/a43084629c7e47828e3a292b60719393" frameBorder="0" allowFullScreen></iframe>
 
 
 ### Easily create tables 
