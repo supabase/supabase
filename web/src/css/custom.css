@@ -1,4 +1,5 @@
-@import url('/css/metro.css');
+@import url('https://rsms.me/inter/inter.css');
+
 
 /**
  * Root variables
@@ -15,7 +16,7 @@
   /* 
     Customisation here for both Light and Dark themes
   */
-  --custom-font-base: 'Metro', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen',
+  --custom-font-base: 'Inter', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial',
     sans-serif;
   --custom-font-code: 'Source Code Pro', Menlo, monospace;
@@ -212,6 +213,9 @@ body {
   display: inline-block;
 }
 
+.button {
+  font-family: var(--custom-font-base);
+}
 .button.button--primary {
   color: white;
   text-shadow: 0px 0px 6px rgba(13, 128, 86, 0.8);
