@@ -53,7 +53,7 @@ The biggest communty contribution to date, [@thorwebdev](https://twitter.com/tho
 
 ![This git shows how TypeScript makes it even easier to use Supabase, through VSCode's intellisense.](/img/typescript-support.gif)
 
-### **Kaizen**
+### Kaizen
 
 We have a number of small improvements:
 
