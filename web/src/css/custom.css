@@ -301,7 +301,9 @@ li + li {
 
 .navbar,
 .main-wrapper {
-  box-shadow: var(--ifm-global-shadow-md);
+  /* box-shadow: var(--ifm-global-shadow-md); */
+  box-shadow: none;
+  border-bottom: 1px solid var(--custom-border-color);
 }
 .navbar .navbar__link {
   font-weight: bold;
