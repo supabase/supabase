@@ -1,5 +1,6 @@
 import babel from '@rollup/plugin-babel'
 import external from 'rollup-plugin-peer-deps-external'
+import postcss from 'rollup-plugin-postcss'
 import del from 'rollup-plugin-delete'
 import pkg from './package.json'
 
@@ -10,6 +11,11 @@ export default {
     { file: pkg.module, format: 'esm' },
   ],
   plugins: [
+    postcss({
+      plugins: require('./postcss.config').plugins,
+      minimize: true,
+      sourceMap: 'inline',
+    }),
     external(),
     babel({
       exclude: 'node_modules/**',
