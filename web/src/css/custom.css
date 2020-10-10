@@ -212,7 +212,8 @@ body {
 }
 
 .button.button--primary {
-  text-shadow: 0px 0px 6px rgba(13, 128, 86, 0.4);
+  color: white;
+  text-shadow: 0px 0px 6px rgba(13, 128, 86, 0.8);
 }
 .button.button--secondary {
   color: var(--custom-content-color);
@@ -734,6 +735,9 @@ a.hash-link {
 .Blog .code-with-header {
   margin-bottom: 30px;
 }
+.badge--secondary {
+  color: var(--ifm-color-content);
+}
 
 .Figure {
   text-align: center;
@@ -791,6 +795,13 @@ a.hash-link {
   background-color: none;
   white-space: normal;
   word-break: break-word;
+  font-size: 0.8rem;
+  outline: none !important;
+}
+.prism-code div, 
+.prism-code div:focus, 
+.prism-code div:active {
+  outline: none !important;
 }
 .token.keyword.module,
 .token.property-access,
