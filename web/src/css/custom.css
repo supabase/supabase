@@ -1,4 +1,5 @@
-@import url('/css/metro.css');
+@import url('https://rsms.me/inter/inter.css');
+
 
 /**
  * Root variables
@@ -15,7 +16,7 @@
   /* 
     Customisation here for both Light and Dark themes
   */
-  --custom-font-base: 'Metro', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen',
+  --custom-font-base: 'Inter', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial',
     sans-serif;
   --custom-font-code: 'Source Code Pro', Menlo, monospace;
@@ -64,6 +65,7 @@
   --ifm-color-content-secondary: var(--custom-content-color-light);
   --ifm-code-background: var(--custom-background-color-diff);
   --ifm-code-background-dark: #2a2a2a;
+  --ifm-code-color: var(--custom-content-color);
   --ifm-color-warning: var(--custom-color-orange-600);
 
   /* Primary */
@@ -211,8 +213,12 @@ body {
   display: inline-block;
 }
 
+.button {
+  font-family: var(--custom-font-base);
+}
 .button.button--primary {
-  text-shadow: 0px 0px 6px rgba(13, 128, 86, 0.4);
+  color: white;
+  text-shadow: 0px 0px 6px rgba(13, 128, 86, 0.8);
 }
 .button.button--secondary {
   color: var(--custom-content-color);
@@ -295,7 +301,9 @@ li + li {
 
 .navbar,
 .main-wrapper {
-  box-shadow: var(--ifm-global-shadow-md);
+  /* box-shadow: var(--ifm-global-shadow-md); */
+  box-shadow: none;
+  border-bottom: 1px solid var(--custom-border-color);
 }
 .navbar .navbar__link {
   font-weight: bold;
@@ -576,7 +584,7 @@ div[class^="codeBlockContent"] , div[class*=" codeBlockContent"], .prism-code {
 .code-with-header pre {
   border-radius: 0 0 4px 4px;
 }
-.code-with-response pre {
+.code-with-header.code-with-response  {
   border-radius: 0;
 }
 .code-header {
@@ -588,6 +596,9 @@ div[class^="codeBlockContent"] , div[class*=" codeBlockContent"], .prism-code {
   font-weight: bold;
   /* text-transform: uppercase; */
   border-bottom: 1px solid #444;
+}
+.repsonse-header {
+  border-radius: 0 0 4px 4px;
 }
 
 /* HomePage */
@@ -734,6 +745,9 @@ a.hash-link {
 .Blog .code-with-header {
   margin-bottom: 30px;
 }
+.badge--secondary {
+  color: var(--ifm-color-content);
+}
 
 .Figure {
   text-align: center;
@@ -791,6 +805,13 @@ a.hash-link {
   background-color: none;
   white-space: normal;
   word-break: break-word;
+  font-size: 0.8rem;
+  outline: none !important;
+}
+.prism-code div, 
+.prism-code div:focus, 
+.prism-code div:active {
+  outline: none !important;
 }
 .token.keyword.module,
 .token.property-access,
@@ -894,4 +915,9 @@ html[data-theme='dark'] .navbar-item-github:before {
 }
 .navbar__item .dropdown__menu li:not(:first-child) {
   margin-top: 5px;
+}
+
+.w-full {
+  width: 100%;
+  max-width: 100%;
 }

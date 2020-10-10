@@ -74,7 +74,6 @@ module.exports = {
           position: 'right',
         },
         { to: '/docs/pricing', label: 'Pricing', position: 'right' },
-        { to: '/blog', label: 'Blog', position: 'right' },
         { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
         {
           href: 'https://github.com/supabase/supabase',
@@ -95,10 +94,6 @@ module.exports = {
           title: 'Company',
           items: [
             {
-              label: 'Humans',
-              to: 'https://supabase.io/humans.txt',
-            },
-            {
               label: 'Blog',
               to: '/blog',
             },
@@ -107,7 +102,11 @@ module.exports = {
               to: '/oss',
             },
             {
-              label: 'Lawyers',
+              label: 'Humans.txt',
+              to: 'https://supabase.io/humans.txt',
+            },
+            {
+              label: 'Lawyers.txt',
               to: 'https://supabase.io/lawyers.txt',
             },
           ],
@@ -143,14 +142,6 @@ module.exports = {
             {
               label: 'DevTo',
               href: 'https://dev.to/supabase',
-            },
-            {
-              label: 'Stackshare',
-              href: 'https://stackshare.io/supabase',
-            },
-            {
-              label: 'Product Hunt',
-              href: 'https://www.producthunt.com/posts/supabase-alpha',
             },
             // {
             //   label: "Discord",
