@@ -64,6 +64,7 @@
   --ifm-color-content-secondary: var(--custom-content-color-light);
   --ifm-code-background: var(--custom-background-color-diff);
   --ifm-code-background-dark: #2a2a2a;
+  --ifm-code-color: var(--custom-content-color);
   --ifm-color-warning: var(--custom-color-orange-600);
 
   /* Primary */
@@ -577,7 +578,7 @@ div[class^="codeBlockContent"] , div[class*=" codeBlockContent"], .prism-code {
 .code-with-header pre {
   border-radius: 0 0 4px 4px;
 }
-.code-with-response pre {
+.code-with-header.code-with-response  {
   border-radius: 0;
 }
 .code-header {
@@ -589,6 +590,9 @@ div[class^="codeBlockContent"] , div[class*=" codeBlockContent"], .prism-code {
   font-weight: bold;
   /* text-transform: uppercase; */
   border-bottom: 1px solid #444;
+}
+.repsonse-header {
+  border-radius: 0 0 4px 4px;
 }
 
 /* HomePage */
