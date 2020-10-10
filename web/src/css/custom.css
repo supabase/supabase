@@ -916,3 +916,8 @@ html[data-theme='dark'] .navbar-item-github:before {
 .navbar__item .dropdown__menu li:not(:first-child) {
   margin-top: 5px;
 }
+
+.w-full {
+  width: 100%;
+  max-width: 100%;
+}
