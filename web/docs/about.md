@@ -5,7 +5,7 @@ description: 'What is Supabase?'
 slug: /
 ---
 
-## What it is
+## What it is.
 
 Supabase is an open source Firebase alternative. We are a service to:
 
@@ -16,7 +16,7 @@ Supabase is an open source Firebase alternative. We are a service to:
 - interact with your database using a simple UI
 
 
-## What it isn't
+## What it isn't.
 
 Supabase is not a 1-to-1 mapping of Firebase. While we are building many of the features that Firebase offers, we are not going about it the same way. 
 
@@ -24,7 +24,7 @@ Our technological choices are quite different to Firebase. Everything we use is 
 
 Most notably, we use Postgres rather than a NoSQL store. This was a deliberate choice. We believe that no other database on the market offers the scalability and functionality required to legitimately compete with Firebase. 
 
-## How it works 
+## How it works.
 
 At its core, is a suite of open source tools, stiched together to build a seamless developer experience:
 

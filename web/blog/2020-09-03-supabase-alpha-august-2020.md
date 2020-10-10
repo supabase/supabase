@@ -18,14 +18,14 @@ We're 6 months into building our hosted database platform and we've made some ma
 
 Watch a full demo:
 
-<iframe width="640" height="385" src="https://www.loom.com/embed/a43084629c7e47828e3a292b60719393" frameborder="0" allowFullScreen></iframe>
+<iframe className="w-full" width="640" height="385" src="https://www.loom.com/embed/a43084629c7e47828e3a292b60719393" frameBorder="0" allowFullScreen></iframe>
 
 
 ### Easily create tables 
 
 Set up tables and columns directly from the table view.
 
-<video width="99%" autoplay="autoplay" loop muted playsInline controls="true">
+<video width="99%" autoPlay="autoplay" loop muted playsInline controls="true">
 <source src="/videos/new-tables.mp4" type="video/mp4" loop muted playsInline />
 </video>
 
@@ -33,7 +33,7 @@ Set up tables and columns directly from the table view.
 
 You can now invite team members to your organisation.
 
-<video width="99%" autoplay="autoplay" loop muted playsInline controls="true">
+<video width="99%" autoPlay="autoplay" loop muted playsInline controls="true">
 <source src="/videos/invite-team.mp4" type="video/mp4" loop muted playsInline />
 </video>
 
@@ -42,7 +42,7 @@ You can now invite team members to your organisation.
 
 You can now enable Email Confirmations for new users. This can be toggled on or off and the template for this email can be edited via the dashboard. 
 
-<video width="99%" autoplay="autoplay" loop muted playsInline controls="true">
+<video width="99%" autoPlay="autoplay" loop muted playsInline controls="true">
 <source src="/videos/confirm-email.mp4" type="video/mp4" loop muted playsInline />
 </video>
 
@@ -53,7 +53,7 @@ The biggest communty contribution to date, [@thorwebdev](https://twitter.com/tho
 
 ![This git shows how TypeScript makes it even easier to use Supabase, through VSCode's intellisense.](/img/typescript-support.gif)
 
-### **Kaizen**
+### Kaizen
 
 We have a number of small improvements:
 
