@@ -12,5 +12,5 @@ module.exports = {
     ],
     '@babel/preset-react',
   ],
-  plugins: ['macros', '@emotion/babel-plugin', 'add-react-displayname'],
+  plugins: ['add-react-displayname'],
 }

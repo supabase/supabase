@@ -15,18 +15,14 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },
-  "dependencies": {
-    "@emotion/react": "^11.0.0-next.19",
-    "@emotion/styled": "^11.0.0-next.19"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "rollup-plugin-postcss": "^3.1.8",
     "@babel/cli": "^7.11.6",
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
     "@babel/preset-react": "^7.10.4",
-    "@emotion/babel-plugin": "11.0.0-next.17",
-    "@emotion/css": "^11.0.0-next.19",
-    "@emotion/server": "^11.0.0-next.19",
+    "@fullhuman/postcss-purgecss": "^3.0.0",
     "@rollup/plugin-babel": "^5.2.1",
     "@storybook/addon-actions": "^6.0.26",
     "@storybook/addon-essentials": "^6.0.26",
@@ -44,6 +40,7 @@
     "eslint-config-prettier": "^6.12.0",
     "eslint-plugin-prettier": "^3.1.4",
     "npm-run-all": "^4.1.5",
+    "postcss-preset-env": "^6.7.0",
     "prettier": "^2.1.2",
     "react-is": "^16.13.1",
     "react-scripts": "3.4.3",
