@@ -12,5 +12,5 @@ module.exports = {
     ],
     '@babel/preset-react',
   ],
-  plugins: ['add-react-displayname'],
+  plugins: ['@babel/plugin-transform-runtime', 'add-react-displayname'],
 }

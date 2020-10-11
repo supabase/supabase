@@ -18,9 +18,13 @@ export default {
     }),
     external(),
     babel({
+      babelHelpers: 'runtime',
       exclude: 'node_modules/**',
     }),
     del({ targets: ['dist/*'] }),
   ],
-  external: Object.keys(pkg.peerDependencies || {}),
+  external: [
+    ...Object.keys(pkg.peerDependencies || {}),
+    ...Object.keys(pkg.dependencies || {}),
+  ],
 }
