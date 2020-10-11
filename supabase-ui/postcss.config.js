@@ -18,6 +18,6 @@ module.exports = {
   plugins: [
     require('tailwindcss'),
     require('postcss-flexbugs-fixes'),
-    purgecss,
+    ...(process.env.NODE_ENV === 'production' ? [purgecss] : []),
   ],
 }

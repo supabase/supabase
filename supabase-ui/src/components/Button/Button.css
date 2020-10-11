@@ -1,9 +1,3 @@
-@tailwind 'tailwindcss/base';
-
-/* Start purging... */
-@tailwind components;
-/* Stop purging. */
-
 .btn {
   @apply cursor-pointer flex items-center justify-center px-8 py-3 border border-transparent text-base leading-6 font-medium rounded text-white bg-green-600 transition duration-150 ease-in-out;
 }
@@ -15,7 +9,3 @@
 .btn:hover {
   @apply bg-green-500;
 }
-
-/* Start purging... */
-@tailwind utilities;
-/* Stop purging. */
