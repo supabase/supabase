@@ -1,10 +1,12 @@
 <script>
+  import {createEventDispatcher} from 'svelte'
   import { addTask, deleteTask, updateTask, createList, fetchList } from './store'
   export let item
   export let editing
   export let index
   export let list_id
-  export let items
+  // export let items
+  const dispatch = createEventDispatcher()
   const ENTER_KEY = 13
   const ESCAPE_KEY = 27
   function handleEdit(event) {
@@ -18,10 +20,7 @@
     updateTask(editing, event.target.value)
     editing = null
   }
-  function remove(index) {
-      deleteTask(item.id)
-      items = items.slice(0, index).concat(items.slice(index + 1))
-  }
+
 </script>
 
 <li
@@ -32,7 +31,7 @@
     <input on:click={markComplete} class="inline-block mr-4" type="checkbox" bind:checked={item.complete} />
     <label on:dblclick={() => (editing = index)} class="">{item.task_text}</label>
     <button
-      on:click={() => remove(index)}
+      on:click={() => dispatch('remove')}
       class="flex-no-shrink p-2 ml-2 border-2 rounded text-red border-red hover:text-white
       hover:bg-red bg-red-600 transition">
       &cross;

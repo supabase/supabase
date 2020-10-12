@@ -6,13 +6,18 @@
   export let editing
   export let list_id
   function clearCompleted() {
-    items.filter(item=>item.complete).map(item=>{
-      deleteTask(item.id)
-      // sends rest call but 204 back?
-    })
+    items
+      .filter((item) => item.complete)
+      .map((item) => {
+        deleteTask(item.id)
+        // sends rest call but 204 back?
+      })
     items = items.filter((item) => !item.complete)
   }
-
+  function remove(index,item_id) {
+    deleteTask(item_id)
+    items = items.slice(0, index).concat(items.slice(index + 1))
+  }
   function toggleAll(event) {
     todos = todos.map((item) => ({
       id: item.id,
@@ -41,7 +46,7 @@
 
   <ul class="mx-0 list-none bg-clip-padding">
     {#each filtered as item, index (item.id)}
-      <Item bind:item {index} {editing} {list_id} bind:items />
+      <Item bind:item {index} {editing} {list_id} on:remove={() => remove(index,item.id)} />
     {/each}
   </ul>
 
