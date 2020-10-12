@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "axios": "^0.19.2",
-    "babel-plugin-css-modules-transform": "^1.6.2"
+    "babel-plugin-css-modules-transform": "^1.6.2",
+    "clsx": "^1.1.1"
   }
 }
