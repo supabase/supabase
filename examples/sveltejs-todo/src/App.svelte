@@ -1,11 +1,17 @@
 <script>
+  import { onMount } from 'svelte'
   import TailwindStyles from './TailwindStyles.svelte'
   import Login from './Login'
   import LoggedIn from './LoggedIn'
-
   let user
-// // uncomment below for autologin while testing
-//   import Supabase from '@supabase/supabase-js'
+  onMount(async () => {
+    let userString = await localStorage.getItem('user-todolist')
+    if (userString) {
+      user = JSON.parse(userString)
+    }
+  })
+  // // uncomment below for autologin while testing
+  // import Supabase from '@supabase/supabase-js'
   // const {
   //   SNOWPACK_PUBLIC_SUPABASE_URL,
   //   SNOWPACK_PUBLIC_SUPABASE_KEY,
@@ -16,7 +22,6 @@
   // async function login() {
   //   try {
   //     const { body } = await supabase.auth.login(SNOWPACK_PUBLIC_USER, SNOWPACK_PUBLIC_PASSWORD)
-  //     console.log({ body })
   //     user = body.user
   //     return user
   //   } catch (error) {
@@ -37,8 +42,19 @@
   //   }
   //   return null
   // }
-  // user = login()
+  // if (!user) {
+  //   user = login()
+  //   console.log('logging in')
 
+  //   // login().then(res=>{
+  //   //   user=res
+  //   //   localStorage.setItem('user-todolist', JSON.stringify(user))
+  //   // }).catch(err=>{
+  //   //   console.error(err)
+  //   // })
+
+  // }
+  ////{@debug user}
 </script>
 
 {#if user}

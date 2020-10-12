@@ -37,6 +37,7 @@
         document.querySelector('#refresh-token').value = response.body.refresh_token
         // setContext("user" ,response.body.user)
         user = response.body.user
+        localStorage.setItem('user-todolist', JSON.stringify(user))
         // alert('Logged in as ' + response.body.user.email)
       })
       .catch((err) => {
