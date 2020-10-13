@@ -3,7 +3,8 @@
     "start": "snowpack dev",
     "build": "snowpack build",
     "test": "NODE_ENV=test DEBUG= jest",
-    "2020-test": "NODE_ENV=test DEBUG= node --experimental-vm-modules node_modules/jest/bin/jest.js --no-cache -b"
+    "2020-test": "NODE_ENV=test DEBUG= node --experimental-vm-modules node_modules/jest/bin/jest.js --no-cache -b",
+    "format": "prettier --write '{public,src}/**/*.{css,html,js,svelte}'"
   },
   "dependencies": {
     "@supabase/supabase-js": "^0.36.5",
@@ -13,9 +14,11 @@
   "devDependencies": {
     "@snowpack/app-scripts-svelte": "^1.2.0",
     "@snowpack/plugin-dotenv": "^2.0.2",
+    "@testing-library/cypress": "^7.0.1",
     "@testing-library/jest-dom": "^5.5.0",
     "@testing-library/svelte": "^3.0.0",
     "autoprefixer": "^9.8.0",
+    "cypress": "^5.3.0",
     "husky": "^4.2.5",
     "jest": "^25.4.0",
     "lint-staged": "^10.2.10",
