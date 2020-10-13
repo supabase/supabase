@@ -1,8 +1,8 @@
 <script>
   import { onMount } from 'svelte'
   import TailwindStyles from './TailwindStyles.svelte'
-  import Login from './Login'
-  import LoggedIn from './LoggedIn'
+  import Login from './Login.svelte'
+  import LoggedIn from './LoggedIn.svelte'
   let user
   onMount(async () => {
     let userString = await localStorage.getItem('user-todolist')
