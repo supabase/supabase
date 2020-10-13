@@ -1,3 +1,6 @@
+<style>
+</style>
+
 <script>
   import Items from './Items.svelte'
 
@@ -37,12 +40,9 @@
   }
 </script>
 
-<style>
-</style>
-
 <header class="todos-center flex">
   <h1 class="rounded border border-teal-500 border-solid px-20 ">todos</h1>
-  <button on:click={createNewList}>add new list</button>
+  <button on:click="{createNewList}">add new list</button>
 </header>
 
 {#await lists then lists}
@@ -53,13 +53,14 @@ list.id
 }</b>
     <u> {list.name} </u>
     <input
-      list_id={list.id}
+      list_id="{list.id}"
       class="shadow appearance-none border rounded w-full py-2 px-3 mr-4 text-grey-darker"
-      on:keydown={createNewTask}
+      on:keydown="{createNewTask}"
       placeholder="What needs to be done?"
-      autofocus />
+      autofocus
+    />
 
-    <Items list_id={list.id} items={list.tasks} bind:currentFilter bind:editing />
+    <Items list_id="{list.id}" items="{list.tasks}" bind:currentFilter bind:editing />
   {/each}
 {:catch err}
   {err}
