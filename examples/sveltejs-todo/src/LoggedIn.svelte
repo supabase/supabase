@@ -11,5 +11,10 @@
   // lists2.socket.isConnected() && lists2.socket.connectionState()
 </script>
 
-<Lists user_id={user.id} {lists} />
-<button on:click={()=>{user=null;localStorage.removeItem('user-todolist')}}>Logout</button>
+<Lists user_id="{user.id}" lists="{lists}" />
+<button
+  on:click="{() => {
+    user = null
+    localStorage.removeItem('user-todolist')
+  }}"
+>Logout</button>
