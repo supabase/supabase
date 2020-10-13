@@ -1,7 +1,19 @@
+<style>
+</style>
+
 <script>
   import TailwindStyles from './TailwindStyles.svelte'
+  // import {createClient} from '@supabase/supabase-js'
   import Supabase from '@supabase/supabase-js'
-  const { SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY } = import.meta.env
+  let importEnv = true
+  try {
+    if(process.env.NODE_ENV==="test")
+      importEnv =false
+  } catch (error) {
+    
+  }
+
+  const { SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY } = !importEnv ? process.env : import.meta.env
 
   const supabase = Supabase.createClient(SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY)
   let values = {}
@@ -61,9 +73,6 @@
   }
 </script>
 
-<style>
-</style>
-
 <div className="w-full h-full flex justify-center items-center p-4 bg-gray-300">
   <div className="w-full sm:w-1/2 xl:w-1/3">
     <div className="border-teal p-8 border-t-12 bg-white mb-6 rounded-lg shadow-lg bg-white">
@@ -78,7 +87,8 @@
               autocomplete="email"
               type="email"
               name="email"
-              bind:value={values.email} />
+              bind:value="{values.email}"
+            />
           </control>
           <label>Password</label><input
             autocomplete="current-password"
@@ -86,22 +96,25 @@
             placeholder="Your password"
             type="password"
             name="password"
-            bind:value={values.password} />
+            bind:value="{values.password}"
+          />
         </form>
       </div>
     </div>
 
     <div className="flex flex-col gap-2">
       <button
-        on:click={logInSubmitted}
-        href={'/LoggedIn'}
-        className="border border-indigo-700 text-indigo-700 py-2 px-4 rounded w-full text-center transition duration-150 hover:bg-indigo-700 hover:text-white">
+        on:click="{logInSubmitted}"
+        href="{'/LoggedIn'}"
+        className="border border-indigo-700 text-indigo-700 py-2 px-4 rounded w-full text-center transition duration-150 hover:bg-indigo-700 hover:text-white"
+      >
         Login
       </button>
       <a
-        on:click={signUpSubmitted}
-        href={'/Login'}
-        className="border border-indigo-700 text-indigo-700 py-2 px-4 rounded w-full text-center transition duration-150 hover:bg-indigo-700 hover:text-white">
+        on:click="{signUpSubmitted}"
+        href="{'/Login'}"
+        className="border border-indigo-700 text-indigo-700 py-2 px-4 rounded w-full text-center transition duration-150 hover:bg-indigo-700 hover:text-white"
+      >
         Signup
       </a>
     </div>
@@ -117,6 +130,8 @@
           mins whilst the client is running</small>
       </form>
     </div>
-    <div class="section"><button on:click={logoutSubmitted} id="logout-button">Logout</button></div>
+    <div class="section">
+      <button on:click="{logoutSubmitted}" id="logout-button">Logout</button>
+    </div>
   </div>
 </div>

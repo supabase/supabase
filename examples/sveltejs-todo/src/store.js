@@ -1,5 +1,13 @@
 import Supabase from '@supabase/supabase-js'
-const { SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY } = import.meta.env
+let importEnv = true
+try {
+  if(process.env.NODE_ENV==="test")
+    importEnv =false
+} catch (error) {
+  
+}
+
+const { SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY } = !importEnv ? process.env : import.meta.env
 
 const supabase = Supabase.createClient(SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY)
 export const addTask = async (task_text, list_id) => {
@@ -21,10 +29,13 @@ export const updateTask = async (task_id, values) => {
 }
 export const deleteTask = async (task_id) => {
   try {
-    let { body } = await supabase.from('tasks').delete().eq('id', task_id)
+    console.log(`deleting task ${task_id}`)
+    let body = await supabase.from('tasks').delete().match({ id: task_id })
+    console.log({ body })
     return body
   } catch (error) {
     console.log('error', error)
+    return null
   }
 }
 export const createList = async (user_id, name) => {
