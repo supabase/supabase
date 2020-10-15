@@ -91,6 +91,19 @@ const mySubscription = supabase
   .subscribe()
 `.trim()
 
+export const subscribeRowJs = `
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
+
+// Listen to changes
+const mySubscription = supabase
+  .from('countries:id.eq.200')
+  .on('UPDATE', handleRecordUpdated)
+  .subscribe()
+`.trim()
+
 export const subscribeUnsubscribeJs = `
 import { createClient } from '@supabase/supabase-js'
 
@@ -124,5 +137,6 @@ const mySubscription = supabase
   .subscribe()
 
 // Disconnect mySubscription
-supabase.removeSubscription(mySubscription)
+let { error, data } = await supabase.removeSubscription(mySubscription)
+let { openSubscriptions } = data
 `.trim()

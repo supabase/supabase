@@ -17,6 +17,7 @@ import {
   subscribeMultipleJs,
   subscribeUnsubscribeJs,
   subscribeRemoveJs,
+  subscribeRowJs
 } from './examples/subscribe'
 
 Subscribe to realtime changes in your own database.
@@ -88,13 +89,31 @@ you will need to set `REPLICA IDENTITY` to `FULL`, like this:
 You will not be able to delete data from your database unless you set your set your table to use FULL `REPLICA IDENTITY`, like this:
 `ALTER TABLE your_table REPLICA IDENTITY FULL;`
 
-<!-- ### Listening to multiple events
+### Listening to multiple events
+
 
 <CustomCodeBlock
   header="Subscribes to multiple but not all events."
   js={subscribeMultipleJs}
   jsHighlight="{9-10}"
-/> -->
+/>
+
+<br />
+
+You can chain listeners if you want to listen to multiple events for each table.
+
+### Listening to row changes
+
+
+<CustomCodeBlock
+  header="Listen to individual rows."
+  js={subscribeRowJs}
+  jsHighlight="{9}"
+/>
+
+<br />
+
+You can listen to individual rows using the format `{table}:{col}.eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
 
 ### Unsubscribing
 
