@@ -14,7 +14,7 @@
     "@kiwicopple/prism-react-renderer": "github:kiwicopple/prism-react-renderer",
     "classnames": "^2.2.6",
     "mermaid": "^8.6.4",
-    "react": "^16.8.4",
+    "react": "^16.14.0",
     "react-dom": "^16.8.4",
     "react-inlinesvg": "^2.0.1",
     "recharts": "^2.0.0-beta.6"
