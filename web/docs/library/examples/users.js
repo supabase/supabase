@@ -1,56 +1,40 @@
-export const signup = `
-const {
-  body: { user },
-} = await supabase.auth.signup(
-  'someone@email.com',
-  'password'
-)
+export const signUp = `
+const { error, user } = await supabase.auth.signUp({
+  email: 'someone@email.com',
+  password: 'password'
+})
 `.trim()
 
-export const login = `
-const {
-  body: { user },
-} = await supabase.auth.login(
-  'someone@email.com',
-  'password'
-)
+export const signIn = `
+const { error, user } = await supabase.auth.signIn({
+  email: 'someone@email.com',
+  password: 'password'
+})
 `.trim()
 
 export const userData = `
-const user = await supabase.auth.user()
+const { error, data } = await auth.user()
 `.trim()
 
-export const logout = `
-await supabase.auth.logout()
+export const signOut = `
+await supabase.auth.signOut()
 `.trim()
 
-export const errorHandling = `
-try {
-  const res = await supabase
-    .auth
-    .login('someone@email.com', 'password')
-} catch (error) {
-    if (error.response === undefined) {
-      // No response from server
-    } else {
-      const server_response = error.response
-      // Here you can further process the response ..
-    }
-
-    if (error.status === undefined) {
-      // No HTTP status code
-    } else {
-      const http_code = error.status
-      // Further processing ..
-    }
-}
+export const update = `
+const { error, data } = await auth.update({ 
+  data: { hello: 'world' } 
+})
 `.trim()
 
-export const setAccessToken = `
-supabase.auth.saveSession(
-  access_token, // from callback URL
-  refresh_token, // from callback URL
-  Math.round(Date.now() / 1000) + expires_in, // current time + seconds from callback URL
-  null // currentUser not present yet
-)
+export const signInOauth = `
+const { error, user } = await supabase.auth.signIn({
+  // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
+  provider: 'github'
+})
+`.trim()
+
+export const onAuthStateChange = `
+supabase.auth.onAuthStateChange((event, session) => {
+  console.log(event, session)
+})
 `.trim()

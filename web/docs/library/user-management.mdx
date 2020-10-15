@@ -5,7 +5,7 @@ description: Use Supabase to Authenticate and Authorize your users.
 ---
 
 import CustomCodeBlock from '../../src/components/CustomCodeBlock'
-import { signup, login, userData, logout, errorHandling, setAccessToken } from './examples/users'
+import { signUp, signIn, userData, signOut, signInOauth, onAuthStateChange, update } from './examples/users'
 
 ### Introduction
 
@@ -15,42 +15,44 @@ When a user signs up, Supabase assigns them a unique ID. You can reference this 
 
 Supabase provides the routes to sign up, login, log out, and manage users in your apps and websites.
 
-### Sign up
+### `signUp()`
 
-<CustomCodeBlock header="New user." js={signup} />
+<CustomCodeBlock header="New user." js={signUp} />
 <br />
 
 Allow your users to sign up and create a new account.
 
 After they have signed up, all interactions using the Supabase JS client will be performed as "that user".
 
-### Log in
+### `signIn()`
 
-<CustomCodeBlock header="Existing user." js={login} />
+<CustomCodeBlock header="Existing user." js={signIn} />
 <br />
 
 If an account is created, users can login to your app.
 
 After they have logged in, all interactions using the Supabase JS client will be performed as "that user".
 
-### User data
+### `signOut()`
 
-<CustomCodeBlock header="Get the logged in user." js={userData} />
-<br />
-
-Get the JSON data for the logged in user.
-
-### Log out
-
-<CustomCodeBlock header="Clear the user's session." js={logout} />
+<CustomCodeBlock header="Clear the user's session." js={signOut} />
 <br />
 
 After calling log out, all interactions using the Supabase JS client will be "anonymous".
 
-### Error handling
+### `user()`
 
-<CustomCodeBlock header="Shows how to parse errors returned from the server." js={errorHandling} />
+<CustomCodeBlock header="Get the logged in user." js={userData} />
 <br />
+
+### `update()`
+
+<CustomCodeBlock header="Update the user data." js={update} />
+<br />
+
+Updates the user data if there is a logged in user. This should only be used for storing static data for the user. 
+For more advanced cases, you should instead create a `users` table in your `public` schema, which references the user in `auth.users` via the user ID.
+
 
 ### Third Party Logins
 
@@ -67,15 +69,13 @@ To fetch these you need to:
 1. Generate `Client ID` and `Secret` ([google](https://console.developers.google.com/apis/credentials), [github](https://github.com/settings/applications/new), [gitlab](https://gitlab.com/oauth/applications), [bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/))
 2. Enter Authorized Redirect URI: `http://<your-project>.supabase.co/auth/v1/callback` on provider dashboard
 
-You can now test your integration by navigating to: `https://<your-project>.supabase.co/auth/v1/authorize?provider=<provider-name>`. This is where you should send your users to authenticate. Options for `provider` are `google`, `github`, `gitlab`, or `bitbucket`.
+Once these steps are completed, you can use the `signIn()` menthod with the enabled provider:
 
-After authenticating you should be redirected to `<your-site-url>/?access_token=xyzabc&expires_in=3600&refresh_token=abcdef&token_type=bearer`. This base url can be updated on the Supabase dashboard at Authorization > Settings.
+<CustomCodeBlock header="Sign in with a third party provider." js={signInOauth} />
 
-The user will now appear in your database in the `auth.users` table.
 
-You can now use the `access_token` in the url above in an Authorize header like: `Authorization: Bearer xyzabc` when making requests to your REST or Realtime APIs in order to authenticate as that user. If using supabase-js then you can set the `accessToken` on the client:
+### Auth State Changes
 
-<CustomCodeBlock header="Sets the accessToken inside supabase-js" js={setAccessToken} />
-<br />
+We provide a convenient wrapper for listening to auth changes. Statuses are either `'SIGNED_IN'`, `'SIGNED_OUT'`, or `'USER_UPDATED'`.
 
-If you require any help with these steps please contact `alpha@supabase.io`
+<CustomCodeBlock header="Sign in with a third party provider." js={onAuthStateChange} />
