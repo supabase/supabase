@@ -4,8 +4,6 @@ title: 'Creating'
 description: 'Add new records to your database with Supabase'
 ---
 
-
-import DummyData from '../common/_DummyData.mdx'
 import Collapsable from '../../src/components/Collapsable'
 import CommonResponses from '../common/_CommonResponses.mdx'
 import FromFunction from '../common/_FromFunction.mdx'
@@ -13,22 +11,16 @@ import CustomCodeBlock from '../../src/components/CustomCodeBlock'
 import { postSingleJs, postBulkJs, postUpsertJs } from './examples/post'
 
 
-<DummyData />
-
-
 ### Create a record
 
 <CustomCodeBlock
   header="Creates a new city."
   js={postSingleJs}
-  jsHighlight="{7-11}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "The Shire", "country_id": 554}
-  ],
-  "status": 201,
-  "statusCode": 201,
-  "statusText": "Created"
+  ]
 }`}
 />
 
@@ -37,15 +29,12 @@ import { postSingleJs, postBulkJs, postUpsertJs } from './examples/post'
 <CustomCodeBlock
   header="Creates multiple new cities."
   js={postBulkJs}
-  jsHighlight="{7-12}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "The Shire", "country_id": 554},
     { "name": "Rohan", "country_id": 555}
-  ],
-  "status": 201,
-  "statusCode": 201,
-  "statusText": "Created"
+  ]
 }`}
 />
 
@@ -54,16 +43,13 @@ import { postSingleJs, postBulkJs, postUpsertJs } from './examples/post'
 <CustomCodeBlock
   header="Creates multiple new cities and updates existing ones."
   js={postUpsertJs}
-  jsHighlight="{7-15}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "The Shire", "country_id": 554},
     { "name": "Rohan", "country_id": 555},
     { "name": "City by the Bay", "country_id":840}
-  ],
-  "status": 201,
-  "statusCode": 201,
-  "statusText": "Created"
+  ]
 }`}
 />
 

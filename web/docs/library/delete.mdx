@@ -4,7 +4,6 @@ title: 'Deleting'
 description: 'How to delete records from your database with Supabase'
 ---
 
-import DummyData from '../common/_DummyData.mdx'
 import Collapsable from '../../src/components/Collapsable'
 import CommonResponses from '../common/_CommonResponses.mdx'
 import CommonFilters from '../common/CommonFilters'
@@ -36,19 +35,14 @@ import {
   deleteAdjJs,
 } from './examples/delete'
 
-<DummyData />
-
 ### Delete records
 
 <CustomCodeBlock
   header="Deletes city."
   js={deleteRecordJs}
-  jsHighlight="{7-10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -76,12 +70,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use filter( ) with delete( )"
   js={deleteFilterJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -94,12 +85,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use not( ) with delete( )"
   js={deleteNotJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -112,12 +100,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use match( ) with delete( )"
   js={deleteMatchJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -130,12 +115,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use eq( ) with delete( )"
   js={deleteEqJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -148,12 +130,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use neq( ) with delete( )"
   js={deleteNeqJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -166,12 +145,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use gt( ) with delete( )"
   js={deleteGtJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -184,12 +160,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use lt( ) with delete( )"
   js={deleteLtJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -202,12 +175,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use gte( ) with delete( )"
   js={deleteGteJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -220,12 +190,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use lte( ) with delete( )"
   js={deleteLteJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -238,12 +205,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use like( ) with delete( )"
   js={deleteLikeJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -256,12 +220,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use ilike( ) with delete( )"
   js={deleteIlikeJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -274,12 +235,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use is( ) with delete( )"
   js={deleteIsJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -292,12 +250,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use in( ) with delete( )"
   js={deleteInJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -310,12 +265,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use cs( ) with delete( )"
   js={deleteCsJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -328,12 +280,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use cd( ) with delete( )"
   js={deleteCdJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -346,12 +295,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use ova( ) with delete( )"
   js={deleteOvaJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -364,12 +310,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use ovr( ) with delete( )"
   js={deleteOvrJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -382,12 +325,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use sl( ) with delete( )"
   js={deleteSlJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -400,12 +340,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use sr( ) with delete( )"
   js={deleteSrJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -418,12 +355,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use nxl( ) with delete( )"
   js={deleteNxlJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -436,12 +370,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use nxr( ) with delete( )"
   js={deleteNxrJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 
@@ -454,12 +385,9 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 <CustomCodeBlock
   header="Shows how to use adj( ) with delete( )"
   js={deleteAdjJs}
-  jsHighlight="{10}"
   response={`{
-  "body": null,
-  "status": 204,
-  "statusCode": 204,
-  "statusText": "No Content"
+  error: null,
+  data: null
 }`}
 />
 

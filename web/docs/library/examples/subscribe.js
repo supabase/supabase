@@ -3,12 +3,6 @@
  */
 
 export const subscribeAllJs = `
-import { createClient } from '@supabase/supabase-js'
-
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-// Listen to changes
 const mySubscription = supabase
   .from('*')
   .on('*', payload => {
@@ -18,12 +12,6 @@ const mySubscription = supabase
 `.trim()
 
 export const subscribeTableJs = `
-import { createClient } from '@supabase/supabase-js'
-
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-// Listen to changes
 const mySubscription = supabase
   .from('countries')
   .on('*', payload => {
@@ -33,12 +21,6 @@ const mySubscription = supabase
 `.trim()
 
 export const subscribeInsertsJs = `
-import { createClient } from '@supabase/supabase-js'
-
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-// Listen to changes
 const mySubscription = supabase
   .from('countries')
   .on('INSERT', payload => {
@@ -48,12 +30,6 @@ const mySubscription = supabase
 `.trim()
 
 export const subscribeUpdatesJs = `
-import { createClient } from '@supabase/supabase-js'
-
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-// Listen to changes
 const mySubscription = supabase
   .from('countries')
   .on('UPDATE', payload => {
@@ -63,12 +39,6 @@ const mySubscription = supabase
 `.trim()
 
 export const subscribeDeletesJs = `
-import { createClient } from '@supabase/supabase-js'
-
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-// Listen to changes
 const mySubscription = supabase
   .from('countries')
   .on('DELETE', payload => {
@@ -78,12 +48,6 @@ const mySubscription = supabase
 `.trim()
 
 export const subscribeMultipleJs = `
-import { createClient } from '@supabase/supabase-js'
-
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-// Listen to changes
 const mySubscription = supabase
   .from('countries')
   .on('INSERT', handleRecordInserted)
@@ -92,12 +56,6 @@ const mySubscription = supabase
 `.trim()
 
 export const subscribeRowJs = `
-import { createClient } from '@supabase/supabase-js'
-
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-// Listen to changes
 const mySubscription = supabase
   .from('countries:id.eq.200')
   .on('UPDATE', handleRecordUpdated)
@@ -105,12 +63,6 @@ const mySubscription = supabase
 `.trim()
 
 export const subscribeUnsubscribeJs = `
-import { createClient } from '@supabase/supabase-js'
-
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-// Listen to changes
 const mySubscription = supabase
   .from('countries')
   .on('*', payload => {
@@ -123,12 +75,6 @@ mySubscription.unsubscribe()
 `.trim()
 
 export const subscribeRemoveJs = `
-import { createClient } from '@supabase/supabase-js'
-
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://world.supabase.co', '1a2b-3c4d-5e6f-7g8h')
-
-// Listen to changes
 const mySubscription = supabase
   .from('countries')
   .on('*', payload => {

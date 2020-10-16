@@ -4,7 +4,6 @@ title: 'Updating'
 description: 'How to update records in your database with Supabase'
 ---
 
-import DummyData from '../common/_DummyData.mdx'
 import Collapsable from '../../src/components/Collapsable'
 import CommonResponses from '../common/_CommonResponses.mdx'
 import CommonFilters from '../common/CommonFilters'
@@ -43,14 +42,11 @@ import {
 <CustomCodeBlock
   header="Updates information about a city."
   js={patchRecordJs}
-  jsHighlight="{7-10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Middle Earth", "country_id": 554 },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -83,14 +79,11 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use filter( ) with update( )"
   js={patchFilterJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Mordor", "country_id": 250 },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -103,18 +96,15 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use not( ) with update( )"
   js={patchNotJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Mordor", "country_id": 76 },
     { "name": "Mordor", "country_id": 156 },
     { "name": "Mordor", "country_id": 554 },
     { "name": "Mordor", "country_id": 556 },
     { "name": "Mordor", "country_id": 840 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -127,14 +117,11 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use match( ) with update( )"
   js={patchMatchJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Mordor", "country_id": 156 },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -147,14 +134,11 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use eq( ) with update( )"
   js={patchEqJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Mordor", "country_id": 840 },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -167,9 +151,9 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use neq( ) with update( )"
   js={patchNeqJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Mordor", "country_id": 76 },
     { "name": "Mordor", "country_id": 156 },
     { "name": "Mordor", "country_id": 250 },
@@ -177,10 +161,7 @@ New record values.
     { "name": "Mordor", "country_id": 556 },
     { "name": "Mordor", "country_id": 840 },
     { "name": "Mordor", "country_id": 840 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -193,17 +174,14 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use gt( ) with update( )"
   js={patchGtJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Mordor", "country_id": 554 },
     { "name": "Mordor", "country_id": 556 },
     { "name": "Mordor", "country_id": 840 },
     { "name": "Mordor", "country_id": 840 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -216,15 +194,12 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use lt( ) with update( )"
   js={patchLtJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Mordor", "country_id": 76 },
     { "name": "Mordor", "country_id": 156 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -237,18 +212,15 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use gte( ) with update( )"
   js={patchGteJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Mordor", "country_id": 250 },
     { "name": "Mordor", "country_id": 554 },
     { "name": "Mordor", "country_id": 556 },
     { "name": "Mordor", "country_id": 840 },
     { "name": "Mordor", "country_id": 840 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -261,16 +233,13 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use lte( ) with update( )"
   js={patchLteJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Mordor", "country_id": 76 },
     { "name": "Mordor", "country_id": 156 },
     { "name": "Mordor", "country_id": 250 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -283,14 +252,11 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use like( ) with update( )"
   js={patchLikeJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Mordor", "country_id": 554 },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -303,15 +269,12 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use ilike( ) with update( )"
   js={patchIlikeJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Mordor", "country_id": 554 },
     { "name": "Mordor", "country_id": 556 },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -324,13 +287,10 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use is( ) with update( )"
   js={patchIsJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  error: null,
+  data: [
+  ]
 }`}
 />
 
@@ -343,15 +303,12 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use in( ) with update( )"
   js={patchInJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Mordor", "country_id": 76 },
     { "name": "Mordor", "country_id": 840 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -364,9 +321,9 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use cs( ) with update( )"
   js={patchCsJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "id": 556,
       "name": "Mordor",
       "population_range_millions": [185, 195]
@@ -377,10 +334,7 @@ New record values.
       "population_range_millions": [320, 330]
       "main_exports": ["oil", "cars", "food"],
     }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -393,9 +347,9 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use cd( ) with update( )"
   js={patchCdJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "id": 250,
       "name": "Mordor",
       "population_range_millions": [60, 70]
@@ -406,10 +360,7 @@ New record values.
       "population_range_millions": [4, 6]
       "main_exports": ["food", "machines"],
     }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -422,9 +373,9 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use ova( ) with update( )"
   js={patchOvaJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "id": 76,
       "name": "Mordor",
       "population_range_millions": [205, 215]
@@ -435,10 +386,7 @@ New record values.
       "population_range_millions": [1380, 1390]
       "main_exports": ["computers", "phones"],
     }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -451,9 +399,9 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use ovr( ) with update( )"
   js={patchOvrJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "id": 76,
       "name": "Mordor",
       "population_range_millions": [205, 215]
@@ -464,10 +412,7 @@ New record values.
       "population_range_millions": [185, 195]
       "main_exports": ["oil", "beans"],
     }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -480,9 +425,9 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use sl( ) with update( )"
   js={patchSlJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "id": 250,
       "name": "Mordor",
       "population_range_millions": [60, 70]
@@ -493,10 +438,7 @@ New record values.
       "population_range_millions": [4, 6]
       "main_exports": ["food", "machines"],
     }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -509,9 +451,9 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use sr( ) with update( )"
   js={patchSrJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "id": 156,
       "name": "Mordor",
       "population_range_millions": [1380, 1390]
@@ -522,10 +464,7 @@ New record values.
       "population_range_millions": [320, 330]
       "main_exports": ["oil", "cars", "food"],
     }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -538,9 +477,9 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use nxl( ) with update( )"
   js={patchNxlJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "id": 76,
       "name": "Mordor",
       "population_range_millions": [205, 215]
@@ -561,10 +500,7 @@ New record values.
       "population_range_millions": [320, 330]
       "main_exports": ["oil", "cars", "food"],
     }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -577,9 +513,9 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use nxr( ) with update( )"
   js={patchNxrJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "id": 76,
       "name": "Mordor",
       "population_range_millions": [205, 215]
@@ -600,10 +536,7 @@ New record values.
       "population_range_millions": [185, 195]
       "main_exports": ["oil", "beans"],
     }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -616,9 +549,9 @@ New record values.
 <CustomCodeBlock
   header="Shows how to use adj( ) with update( )"
   js={patchAdjJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "id": 250,
       "name": "Mordor",
       "population_range_millions": [60, 70]
@@ -629,10 +562,7 @@ New record values.
       "population_range_millions": [185, 195]
       "main_exports": ["oil", "beans"],
     }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 

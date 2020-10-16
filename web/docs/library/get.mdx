@@ -8,7 +8,6 @@ import CommonFilters from '../common/CommonFilters'
 import CommonResponses from '../common/_CommonResponses.mdx'
 import Collapsable from '../../src/components/Collapsable'
 import FromFunction from '../common/_FromFunction.mdx'
-import DummyData from '../common/_DummyData.mdx'
 import CustomCodeBlock from '../../src/components/CustomCodeBlock'
 import {
   getSimpleJs,
@@ -50,16 +49,14 @@ import {
   getAdjJs,
 } from './examples/get'
 
-<DummyData />
-
 ### Getting your data
 
 <CustomCodeBlock
   header="Shows how to get all cities from our public 'world' database"
   js={getSimpleJs}
-  jsHighlight="{7-9}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Rio de Janeiro", "country_id": 76 },
     { "name": "Beijing", "country_id": 156 },
     { "name": "Paris", "country_id": 250 },
@@ -67,10 +64,7 @@ import {
     { "name": "Lagos", "country_id": 556 },
     { "name": "Los Angeles", "country_id": 840 },
     { "name": "San Francisco", "country_id": 840 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -79,9 +73,9 @@ import {
 <CustomCodeBlock
   header="Shows how to get all cities but only return the name"
   js={getColumnsJs}
-  jsHighlight="{9}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Rio de Janeiro" },
     { "name": "Beijing" },
     { "name": "Paris" },
@@ -89,10 +83,7 @@ import {
     { "name": "Lagos" },
     { "name": "Los Angeles" },
     { "name": "San Francisco" }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -101,9 +92,9 @@ import {
 <CustomCodeBlock
   header="Shows how to get all countries and the name of each of their cities"
   js={getForeignJs}
-  jsHighlight="{9-14}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     {
       "name": "Brazil",  
       "cities": [
@@ -141,10 +132,7 @@ import {
         { "name": "San Francisco" }
       ]
     }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -157,9 +145,9 @@ the supplier and the purchaser at the same time (both in the `users`) table:
 <CustomCodeBlock
   header="Shows how to reference a foreign table when it is referenced twice"
   js={getForeignMultipleJs}
-  jsHighlight="{9-13}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     {
       "id": 1,  
       "purchaser": { "name": "John" },  
@@ -170,10 +158,7 @@ the supplier and the purchaser at the same time (both in the `users`) table:
       "purchaser": { "name": "Sue" },  
       "supplier":  { "name": "Steve" }
     }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -186,7 +171,6 @@ Also see [PostgREST](http://postgrest.org/en/v7.0.0/api.html#json-columns) docs 
 <CustomCodeBlock
   header="Shows how to reference a foreign table when it is referenced twice"
   js={getJsonData}
-  jsHighlight="{9-12}"
 />
 
 ## Reference
@@ -237,9 +221,9 @@ supabase
 <CustomCodeBlock
   header="Shows how to use order( ) with select( )"
   js={getOrderJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "San Francisco", "country_id": 840 },
     { "name": "Los Angeles", "country_id": 840 },
     { "name": "Lagos", "country_id": 556 },
@@ -247,10 +231,7 @@ supabase
     { "name": "Paris", "country_id": 250 },
     { "name": "Beijing", "country_id": 156 },
     { "name": "Rio de Janeiro", "country_id": 76 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -259,9 +240,9 @@ supabase
 <CustomCodeBlock
   header="Shows how to use order( ) with select( ) and foreign tables present"
   js={getEmbeddedOrderJs}
-  jsHighlight="{11}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { 
       "name": "United States", 
       "cities": [
@@ -269,10 +250,7 @@ supabase
         { "name": "Los Angeles " }
       ] 
     },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -306,14 +284,11 @@ Specifies whether null values will be displayed first.
 <CustomCodeBlock
   header="Shows how to use limit( ) with select( )"
   js={getLimitJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Rio de Janeiro", "country_id": 76 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -322,19 +297,16 @@ Specifies whether null values will be displayed first.
 <CustomCodeBlock
   header="Shows how to use limit( ) and foreign tables present"
   js={getEmbeddedLimitJs}
-  jsHighlight="{11}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { 
       "name": "United States", 
       "cities": [
         { "name": "Los Angeles " }
       ] 
     },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -364,19 +336,16 @@ Name of chosen foreignTable to apply the limit on. Used if foreign tables are pr
 <CustomCodeBlock
   header="Shows how to use offset( ) with select( )"
   js={getOffsetJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Beijing", "country_id": 156 },
     { "name": "Paris", "country_id": 250 },
     { "name": "Auckland", "country_id": 554 },
     { "name": "Lagos", "country_id": 556 },
     { "name": "Los Angeles", "country_id": 840 },
     { "name": "San Francisco", "country_id": 840 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -387,7 +356,8 @@ Name of chosen foreignTable to apply the limit on. Used if foreign tables are pr
   js={getEmbeddedOffsetJs}
   jsHighlight="{11}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { 
       "name": "United States", 
       "cities": [
@@ -427,17 +397,14 @@ Name of chosen foreignTable to apply the limit on. Used if foreign tables are pr
 <CustomCodeBlock
   header="Shows how to use range( ) with select( )"
   js={getRangeJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Rio de Janeiro", "country_id": 76 },
     { "name": "Beijing", "country_id": 156 },
     { "name": "Paris", "country_id": 250 },
     { "name": "Auckland", "country_id": 554 },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -467,14 +434,11 @@ Index or position of the end of the specified range. If not stated, all remainin
 <CustomCodeBlock
   header="Shows how to use single( ) with select( )"
   js={getSingleJs}
-  jsHighlight="{10}"
   response={`{
-  "body": { 
+  error: null,
+  data: { 
     "name": "San Francisco", "country_id": 840 
-  },
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  }
 }`}
 />
 
@@ -499,14 +463,11 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use filter( ) with select( )"
   js={getFilterJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Paris", "country_id": 250 },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -515,17 +476,14 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use filter embedded tables"
   js={getFilterJsEmbedded}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { 
       "name": "Paris", 
       "country": { "name": "France" }
     },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -538,18 +496,15 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use not( ) with select( )"
   js={getNotJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Rio de Janeiro", "country_id": 76 },
     { "name": "Beijing", "country_id": 156 },
     { "name": "Auckland", "country_id": 554 },
     { "name": "Lagos", "country_id": 556 },
     { "name": "San Francisco", "country_id": 840 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -562,7 +517,6 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use or( ) with select( )"
   js={getOrJs}
-  jsHighlight="{10}"
 />
 
 <br />
@@ -574,14 +528,11 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use match( ) with select( )"
   js={getMatchJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Beijing", "country_id": 156 },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -594,14 +545,11 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use eq( ) with select( )"
   js={getEqJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "San Francisco", "country_id": 840 },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -614,19 +562,16 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use neq( ) with select( )"
   js={getNeqJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Rio de Janeiro", "country_id": 76 },
     { "name": "Beijing", "country_id": 156 },
     { "name": "Paris", "country_id": 250 },
     { "name": "Auckland", "country_id": 554 },
     { "name": "Los Angeles", "country_id": 840 },
     { "name": "San Francisco", "country_id": 840 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -639,17 +584,14 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use gt( ) with select( )"
   js={getGtJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Auckland", "country_id": 554 },
     { "name": "Lagos", "country_id": 556 },
     { "name": "Los Angeles", "country_id": 840 },
     { "name": "San Francisco", "country_id": 840 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -662,15 +604,12 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use lt( ) with select( )"
   js={getLtJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Rio de Janeiro", "country_id": 76 },
     { "name": "Beijing", "country_id": 156 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -683,18 +622,15 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use gte( ) with select( )"
   js={getGteJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Paris", "country_id": 250 },
     { "name": "Auckland", "country_id": 554 },
     { "name": "Lagos", "country_id": 556 },
     { "name": "Los Angeles", "country_id": 840 },
     { "name": "San Francisco", "country_id": 840 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -707,16 +643,13 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use lte( ) with select( )"
   js={getLteJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Rio de Janeiro", "country_id": 76 },
     { "name": "Beijing", "country_id": 156 },
     { "name": "Paris", "country_id": 250 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -729,14 +662,11 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use like( ) with select( )"
   js={getLikeJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Auckland", "country_id": 554 },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -749,15 +679,12 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use ilike( ) with select( )"
   js={getIlikeJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Auckland", "country_id": 554 },
     { "name": "Lagos", "country_id": 556 },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -770,9 +697,9 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use is( ) with select( )"
   js={getIsJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
   ],
   "status": 200,
   "statusCode": 200,
@@ -789,15 +716,12 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use in( ) with select( )"
   js={getInJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Rio de Janeiro", "country_id": 76 },
     { "name": "San Francisco", "country_id": 840 }
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -810,15 +734,12 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use cs( ) with select( )"
   js={getCsJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Nigeria", "id": 556, "main_exports": ["oil", "beans"] },
     { "name": "United States", "id": 840, "main_exports": ["oil", "cars", "food"] },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -831,15 +752,12 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use cd( ) with select( )"
   js={getCdJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "France", "id": 250, "main_exports": ["cars", "machines"] },
     { "name": "New Zealand", "id": 554, "main_exports": ["food", "machines"] },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -852,15 +770,12 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use ova( ) with select( )"
   js={getOvaJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Brazil", "id": 76, "main_exports": ["beans", "minerals"] },
     { "name": "China", "id": 156, "main_exports": ["computers", "phones"] },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -873,15 +788,12 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use ovr( ) with select( )"
   js={getOvrJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Brazil", "id": 76, "population_range_millions": [205, 215] },
     { "name": "Nigeria", "id": 556, "population_range_millions": [185, 195] },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -894,15 +806,12 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use sl( ) with select( )"
   js={getSlJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "France", "id": 250, "population_range_millions": [60, 70] },
     { "name": "New Zealand", "id": 554, "population_range_millions": [4, 6] },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -915,15 +824,12 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use sr( ) with select( )"
   js={getSrJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "China", "id": 156, "population_range_millions": [1380, 1390] },
     { "name": "United States", "id": 840, "population_range_millions": [320, 330] },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -936,17 +842,14 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use nxl( ) with select( )"
   js={getNxlJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Brazil", "id": 76, "population_range_millions": [205, 215] },
     { "name": "China", "id": 156, "population_range_millions": [1380, 1390] },
     { "name": "Nigeria", "id": 556, "population_range_millions": [185, 195] },
     { "name": "United States", "id": 840, "population_range_millions": [320, 330] },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -959,17 +862,14 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use nxr( ) with select( )"
   js={getNxrJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "Brazil", "id": 76, "population_range_millions": [205, 215] },
     { "name": "France", "id": 250, "population_range_millions": [60, 70] },
     { "name": "New Zealand", "id": 554, "population_range_millions": [4, 6] },
     { "name": "Nigeria", "id": 556, "population_range_millions": [185, 195] },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 
@@ -982,15 +882,12 @@ with `200 OK`. Otherwise, it will return an error with `406 Not Acceptable`.
 <CustomCodeBlock
   header="Shows how to use adj( ) with select( )"
   js={getAdjJs}
-  jsHighlight="{10}"
   response={`{
-  "body": [
+  error: null,
+  data: [
     { "name": "France", "id": 250, "population_range_millions": [60, 70] },
     { "name": "Nigeria", "id": 556, "population_range_millions": [185, 195] },
-  ],
-  "status": 200,
-  "statusCode": 200,
-  "statusText": "OK"
+  ]
 }`}
 />
 

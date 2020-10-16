@@ -4,7 +4,6 @@ title: 'Subscribing'
 description: 'Subscribe to realtime changes in your database with Supabase'
 ---
 
-import DummyData from '../common/_DummyData.mdx'
 import FromFunction from '../common/_FromFunction.mdx'
 import Collapsable from '../../src/components/Collapsable'
 import CustomCodeBlock from '../../src/components/CustomCodeBlock'
@@ -22,16 +21,11 @@ import {
 
 Subscribe to realtime changes in your own database.
 
-We will be using these tables as reference for our examples.
-
-<DummyData />
-
 ### Listen to all database changes
 
 <CustomCodeBlock
   header="Subscribes to all database changes in realtime."
   js={subscribeAllJs}
-  jsHighlight="{8}"
 />
 
 <br />
@@ -45,7 +39,6 @@ you will need to set `REPLICA IDENTITY` to `FULL`, like this:
 <CustomCodeBlock
   header="Subscribes to a specific table for changes in realtime."
   js={subscribeTableJs}
-  jsHighlight="{8}"
 />
 
 <br />
@@ -59,7 +52,6 @@ you will need to set `REPLICA IDENTITY` to `FULL`, like this:
 <CustomCodeBlock
   header="Subscribes only to the INSERT event."
   js={subscribeInsertsJs}
-  jsHighlight="{9-11}"
 />
 
 ### Listening only to UPDATE
@@ -67,7 +59,6 @@ you will need to set `REPLICA IDENTITY` to `FULL`, like this:
 <CustomCodeBlock
   header="Subscribes only to the UPDATE event."
   js={subscribeUpdatesJs}
-  jsHighlight="{9-11}"
 />
 
 <br />
@@ -81,7 +72,6 @@ you will need to set `REPLICA IDENTITY` to `FULL`, like this:
 <CustomCodeBlock
   header="Subscribes only to the DELETE event."
   js={subscribeDeletesJs}
-  jsHighlight="{9-11}"
 />
 
 <br />
@@ -95,7 +85,6 @@ You will not be able to delete data from your database unless you set your set y
 <CustomCodeBlock
   header="Subscribes to multiple but not all events."
   js={subscribeMultipleJs}
-  jsHighlight="{9-10}"
 />
 
 <br />
@@ -108,7 +97,6 @@ You can chain listeners if you want to listen to multiple events for each table.
 <CustomCodeBlock
   header="Listen to individual rows."
   js={subscribeRowJs}
-  jsHighlight="{9}"
 />
 
 <br />
@@ -120,7 +108,6 @@ You can listen to individual rows using the format `{table}:{col}.eq.{val}` - wh
 <CustomCodeBlock
   header="Unsubscribes from a specific subscription."
   js={subscribeUnsubscribeJs}
-  jsHighlight="{15}"
 />
 
 ### Removing a subscription
@@ -128,7 +115,6 @@ You can listen to individual rows using the format `{table}:{col}.eq.{val}` - wh
 <CustomCodeBlock
   header="Disconnects from a subscription fully."
   js={subscribeRemoveJs}
-  jsHighlight="{15}"
 />
 
 ## Reference
@@ -140,7 +126,7 @@ You can listen to individual rows using the format `{table}:{col}.eq.{val}` - wh
 ### `on()`
 
 <!-- prettier-ignore -->
-```js {3}
+```js
 const mySubscription = supabase
   .from('tableName')
   .on('eventType', callbackFunction)
@@ -159,7 +145,7 @@ A callback that will handle the payload that is sent whenever your database chan
 ### `subscribe()`
 
 <!-- prettier-ignore -->
-```js {4}
+```js
 const mySubscription = supabase
   .from(tableName)
   .on(eventType, callbackFunction)
@@ -168,7 +154,7 @@ const mySubscription = supabase
 
 Subscribes to the database table specified in `from()` and starts listening to it. An object of type _subscription_ will be returned.
 
-```js {1}
+```js
 mySubscription.subscribe()
 ```
 
@@ -179,7 +165,7 @@ If the subscription already exists, but has been unsubscribed from with the func
 ### `unsubscribe()`
 
 <!-- prettier-ignore -->
-```js {2}
+```js
 mySubscription
   .unsubscribe()
 ```
@@ -192,7 +178,7 @@ If you don't need to connect again in the future, use `removeSubscription()` ins
 ### `removeSubscription()`
 
 <!-- prettier-ignore -->
-```js {2}
+```js
 supabase
   .removeSubscription(mySubscription)
 ```
@@ -208,50 +194,17 @@ A subscription that was previously created. If you don't have access to the subs
 ### `getSubscriptions()`
 
 <!-- prettier-ignore -->
-```js {2}
+```js
 supabase
   .getSubscriptions()
 ```
 
-Returns an array of all your subscriptions (including disconnected subscriptions).
-
-<Collapsable title="Toggle Example Response">
-
-<!-- prettier-ignore -->
-```js
-[
-  {
-    uuid: 'xxxx-xxxx-xxxx-xxxx',
-    state: 'CONNECTED',
-    tableName: 'users',
-    eventListeners: {
-      '*': null,
-      'INSERT': null,
-      'UPDATE': null,
-      'DELETE': null,
-    }
-  },
-  {
-    uuid: 'yyyy-yyyy-yyyy-yyyy',
-    state: 'DISCONNECTED',
-    tableName: 'messages',
-    eventListeners: {
-      '*': null,
-      'INSERT': null,
-      'UPDATE': null,
-      'DELETE': null,
-    }
-  }
-]
-```
-
-</Collapsable>
+Returns an array of all your subscriptions.
 
 ---
 
 ## Change Events
 
-@TODO what happens on bulk insert/update/delete?
 
 ### New record created
 
