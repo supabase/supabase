@@ -3,7 +3,7 @@
  */
 
 export const postSingleJs = `
-const { error, data } = await supabase
+const { data, error } = await supabase
   .from('cities')
   .insert([
     { name: 'The Shire', country_id: 554 }
@@ -11,7 +11,7 @@ const { error, data } = await supabase
 `.trim()
 
 export const postBulkJs = `
-const { error, data } = await supabase
+const { data, error } = await supabase
   .from('cities')
   .insert([
     { name: 'The Shire', country_id: 554 },
@@ -20,7 +20,7 @@ const { error, data } = await supabase
 `.trim()
 
 export const postUpsertJs = `
-const { error, data } = await supabase
+const { data, error } = await supabase
   .from('cities')
   .insert(
     [

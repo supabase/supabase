@@ -83,6 +83,6 @@ const mySubscription = supabase
   .subscribe()
 
 // Disconnect mySubscription
-let { error, data } = await supabase.removeSubscription(mySubscription)
+let { data, error } = await supabase.removeSubscription(mySubscription)
 let { openSubscriptions } = data
 `.trim()
