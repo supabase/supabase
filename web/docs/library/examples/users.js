@@ -1,19 +1,19 @@
 export const signUp = `
-const { error, user } = await supabase.auth.signUp({
+const { user, error } = await supabase.auth.signUp({
   email: 'someone@email.com',
   password: 'password'
 })
 `.trim()
 
 export const signIn = `
-const { error, user } = await supabase.auth.signIn({
+const { user, error } = await supabase.auth.signIn({
   email: 'someone@email.com',
   password: 'password'
 })
 `.trim()
 
 export const userData = `
-const { data, error } = await auth.user()
+const { data, error } = await supabase.auth.user()
 `.trim()
 
 export const signOut = `
@@ -21,13 +21,13 @@ await supabase.auth.signOut()
 `.trim()
 
 export const update = `
-const { data, error } = await auth.update({ 
+const { data, error } = await supabase.auth.update({ 
   data: { hello: 'world' } 
 })
 `.trim()
 
 export const signInOauth = `
-const { error, user } = await supabase.auth.signIn({
+const { user, error } = await supabase.auth.signIn({
   // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
   provider: 'github'
 })
