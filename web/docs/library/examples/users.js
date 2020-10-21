@@ -13,7 +13,7 @@ const { user, error } = await supabase.auth.signIn({
 `.trim()
 
 export const userData = `
-const { data, error } = await supabase.auth.user()
+const { user, error } = await supabase.auth.user()
 `.trim()
 
 export const signOut = `
@@ -21,7 +21,7 @@ await supabase.auth.signOut()
 `.trim()
 
 export const update = `
-const { data, error } = await supabase.auth.update({ 
+const { user, error } = await supabase.auth.update({ 
   data: { hello: 'world' } 
 })
 `.trim()

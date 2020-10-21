@@ -54,6 +54,12 @@ Updates the user data if there is a logged in user. This should only be used for
 For more advanced cases, you should instead create a `users` table in your `public` schema, which references the user in `auth.users` via the user ID.
 
 
+### `onAuthStateChange()`
+
+We provide a convenient wrapper for listening to auth changes. Statuses are either `'SIGNED_IN'`, `'SIGNED_OUT'`, or `'USER_UPDATED'`.
+
+<CustomCodeBlock header="Sign in with a third party provider." js={onAuthStateChange} />
+
 ### Third Party Logins
 
 We currently support the following OAuth providers:
@@ -69,13 +75,7 @@ To fetch these you need to:
 1. Generate `Client ID` and `Secret` ([google](https://console.developers.google.com/apis/credentials), [github](https://github.com/settings/applications/new), [gitlab](https://gitlab.com/oauth/applications), [bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/))
 2. Enter Authorized Redirect URI: `http://<your-project>.supabase.co/auth/v1/callback` on provider dashboard
 
-Once these steps are completed, you can use the `signIn()` menthod with the enabled provider:
+Once these steps are completed, you can use the `signIn()` method with the enabled provider:
 
 <CustomCodeBlock header="Sign in with a third party provider." js={signInOauth} />
 
-
-### Auth State Changes
-
-We provide a convenient wrapper for listening to auth changes. Statuses are either `'SIGNED_IN'`, `'SIGNED_OUT'`, or `'USER_UPDATED'`.
-
-<CustomCodeBlock header="Sign in with a third party provider." js={onAuthStateChange} />

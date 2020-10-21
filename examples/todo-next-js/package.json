@@ -7,7 +7,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^0.36.5",
+    "@supabase/supabase-js": "github:kiwicopple/supabase-js#feature/migrate_to_typescript",
     "next": "latest",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
