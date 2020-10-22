@@ -7,7 +7,7 @@ info:
 
     Supabase provides client libraries to interact with the server
     
-  definition: https://supabase.github.io/gotrue-js/spec.json
+  definition: spec/gotrue.json
   libraries: 
     - name: 'JavaScript'
       id: 'js'

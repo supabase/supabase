@@ -15,7 +15,7 @@ postgrest:
 	> $(REPO_DIR)/postgrest.json
 
 combine:
-	jq -s '{ supabase: .[0], gotrue: .[1], postgrest: .[2] }' \
+	jq -s '{ name: "Combined Specs", children: [.[0], .[1], .[2]] }' \
 	$(REPO_DIR)/supabase.json \
 	$(REPO_DIR)/gotrue.json \
 	$(REPO_DIR)/postgrest.json \

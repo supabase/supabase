@@ -30,7 +30,10 @@ const main = (fileNames, options) => {
 
 async function gen(inputFileName, outputDir) {
   const docSpec = yaml.safeLoad(fs.readFileSync(inputFileName, 'utf8'))
-  const { data: definition } = await axios.get(docSpec.info.definition)
+  const defRef = fs.readFileSync(docSpec.info.definition, 'utf8')
+  if (!defRef) return
+
+  const definition = JSON.parse(defRef)
   const allLanguages = docSpec.info.libraries
   const pages = Object.entries(docSpec.pages).map(([name, x]: [string, OpenRef.Page]) => ({
     ...x,

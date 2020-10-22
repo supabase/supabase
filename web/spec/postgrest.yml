@@ -7,7 +7,7 @@ info:
 
     Supabase provides client libraries to interact with the PostgREST.
     
-  definition: https://supabase.github.io/postgrest-js/spec.json
+  definition: spec/postgrest.json
   libraries: 
     - name: 'JavaScript'
       id: 'js'
