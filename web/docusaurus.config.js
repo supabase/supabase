@@ -79,8 +79,8 @@ module.exports = {
           position: 'left',
         },
         {
-          to: '/docs',
           label: 'API Reference',
+          to: '/ref/supabase',
           position: 'left',
         },
         {
@@ -89,6 +89,14 @@ module.exports = {
           label: 'Tools',
           position: 'left',
           items: [
+            {
+              label: 'Postgres',
+              to: '/docs/postgres/about',
+            },
+            {
+              label: 'Realtime Server',
+              to: '/docs/realtime/about',
+            },
             {
               label: 'PostgREST Client',
               to: '/ref/postgrest',
@@ -200,6 +208,18 @@ module.exports = {
     [
       '@docusaurus/plugin-content-docs',
       {
+        id: 'supabase', // for first plugin-content-docs with "resources/" path
+        // homePageId: "doc2",
+        path: './ref/supabase', // Path to data on filesystem, relative to site dir.
+        routeBasePath: 'ref/supabase', // URL Route.
+        include: ['**/*.md', '**/*.mdx'],
+        sidebarPath: require.resolve('./sidebar_spec_supabase.js'),
+        // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
         id: 'postgrest', // for first plugin-content-docs with "resources/" path
         // homePageId: "doc2",
         path: './ref/postgrest', // Path to data on filesystem, relative to site dir.
@@ -221,6 +241,17 @@ module.exports = {
         // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
       },
     ],
+    // [
+    //   '@docusaurus/plugin-content-docs',
+    //   {
+    //     id: 'realtime-server', // for first plugin-content-docs with "resources/" path
+    //     path: './tools/realtime', // Path to data on filesystem, relative to site dir.
+    //     routeBasePath: 'docs/realtime', // URL Route.
+    //     include: ['**/*.md', '**/*.mdx'],
+    //     sidebarPath: require.resolve('./sidebar_realtime_server.js'),
+    //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+    //   },
+    // ],
     // [
     //   '@docusaurus/plugin-content-docs',
     //   {

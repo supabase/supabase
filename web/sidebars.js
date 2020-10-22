@@ -25,6 +25,15 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'See Also',
+      collapsed: false,
+      items: ['guides/examples', 'pricing', 'support', 'handbook/contributing'],
+    },
+    // Handbook: ['handbook/introduction', 'handbook/contributing'],
+  ],
+  realtime: [
+    {
+      type: 'category',
       label: 'Realtime',
       collapsed: false,
       items: [
@@ -35,13 +44,13 @@ module.exports = {
         'realtime/source',
       ],
     },
-    { type: 'category', collapsed: false, label: 'Postgres', items: ['postgres/postgres-intro'] },
+  ],
+  postgres: [
     {
       type: 'category',
-      label: 'See Also',
+      label: 'Postgres',
       collapsed: false,
-      items: ['guides/examples', 'pricing', 'support', 'handbook/contributing'],
+      items: ['postgres/about'],
     },
-    // Handbook: ['handbook/introduction', 'handbook/contributing'],
   ],
 }
