@@ -43,17 +43,21 @@ pages:
 
   Installing: 
     description: |
-     Simple to install.
-    examples:
-      - name: Install
-        js: |
-          ```bash
-          npm install @supabase/gotrue-js
-          ```
-        py: | 
-          ```bash
-          # Not yet implemented
-          ```
+      All JavaScript libraries are built directly by the Supabase team. 
+      
+      Other languages are built by the community and supported by Supabase.
+
+      ## Javascript
+
+      ```bash
+      npm install @supabase/gotrue-js
+      ```
+
+      ## Python
+
+      ```bash
+      # Not yet implemented
+      ```
 
   signUp:
     $ref: '"GoTrueClient".GoTrueClient.signUp'
