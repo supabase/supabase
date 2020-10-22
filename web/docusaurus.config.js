@@ -70,10 +70,23 @@ module.exports = {
       items: [
         {
           to: '/docs',
-          label: 'Docs',
-          position: 'right',
+          label: 'Guides',
+          position: 'left',
         },
-        { to: '/docs/pricing', label: 'Pricing', position: 'right' },
+
+        {
+          to: 'docs/',
+          activeBasePath: 'API Reference',
+          label: 'API Reference',
+          position: 'left',
+          items: [
+            {
+              label: 'GoTrue Client',
+              to: '/ref/gotrue',
+            },
+          ],
+        },
+        // { to: '/docs/pricing', label: 'Pricing', position: 'right' },
         { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
         {
           href: 'https://github.com/supabase/supabase',
@@ -174,5 +187,31 @@ module.exports = {
         },
       },
     ],
+  ],
+  plugins: [
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'gotrue', // for first plugin-content-docs with "resources/" path
+        // homePageId: "doc2",
+        path: './ref/gotrue', // Path to data on filesystem, relative to site dir.
+        routeBasePath: 'ref/gotrue', // URL Route.
+        include: ['**/*.md', '**/*.mdx'],
+        sidebarPath: require.resolve('./sidebar_spec_gotrue.js'),
+        // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+      },
+    ],
+    // [
+    //   '@docusaurus/plugin-content-docs',
+    //   {
+    //     id: 'postgrest', // for first plugin-content-docs with "resources/" path
+    //     // homePageId: "doc2",
+    //     path: './ref/postgrest', // Path to data on filesystem, relative to site dir.
+    //     routeBasePath: 'ref/postgrest', // URL Route.
+    //     include: ['**/*.md', '**/*.mdx'],
+    //     sidebarPath: require.resolve('./sidebar_spec_postgrest.js'),
+    //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+    //   },
+    // ],
   ],
 }
