@@ -78,11 +78,15 @@ module.exports = {
           label: 'Guides',
           position: 'left',
         },
-
+        {
+          to: '/docs',
+          label: 'API Reference',
+          position: 'left',
+        },
         {
           to: 'docs/',
-          activeBasePath: 'API Reference',
-          label: 'API Reference',
+          activeBasePath: 'Tools',
+          label: 'Tools',
           position: 'left',
           items: [
             {
