@@ -7,7 +7,8 @@
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "traction": "node traction.js",
-    "gen:gotrue": "ts-node ReferenceGenerator.ts -o ref/gotrue spec/gotrue.yml"
+    "gen:gotrue": "ts-node ReferenceGenerator.ts -o ref/gotrue spec/gotrue.yml",
+    "gen:postgrest": "ts-node ReferenceGenerator.ts -o ref/postgrest spec/postgrest.yml"
   },
   "dependencies": {
     "@docusaurus/core": "^2.0.0-alpha.62",

@@ -69,6 +69,11 @@ module.exports = {
       },
       items: [
         {
+          href: 'https://github.com/supabase/supabase',
+          className: 'navbar-item-github',
+          position: 'left',
+        },
+        {
           to: '/docs',
           label: 'Guides',
           position: 'left',
@@ -81,6 +86,10 @@ module.exports = {
           position: 'left',
           items: [
             {
+              label: 'PostgREST Client',
+              to: '/ref/postgrest',
+            },
+            {
               label: 'GoTrue Client',
               to: '/ref/gotrue',
             },
@@ -88,11 +97,6 @@ module.exports = {
         },
         // { to: '/docs/pricing', label: 'Pricing', position: 'right' },
         { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
-        {
-          href: 'https://github.com/supabase/supabase',
-          className: 'navbar-item-github',
-          position: 'right',
-        },
       ],
     },
     prism: {
@@ -189,6 +193,18 @@ module.exports = {
     ],
   ],
   plugins: [
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'postgrest', // for first plugin-content-docs with "resources/" path
+        // homePageId: "doc2",
+        path: './ref/postgrest', // Path to data on filesystem, relative to site dir.
+        routeBasePath: 'ref/postgrest', // URL Route.
+        include: ['**/*.md', '**/*.mdx'],
+        sidebarPath: require.resolve('./sidebar_spec_postgrest.js'),
+        // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+      },
+    ],
     [
       '@docusaurus/plugin-content-docs',
       {

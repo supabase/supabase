@@ -85,8 +85,11 @@ async function gen(inputFileName, outputDir) {
 
 function generateParameters(tsDefinition: any) {
   let functionDeclaration = null
-  if (tsDefinition.kindString == 'Method') functionDeclaration = tsDefinition
-  else functionDeclaration = tsDefinition?.type?.declaration
+  if (tsDefinition.kindString == 'Method') {
+    functionDeclaration = tsDefinition
+  } else if (tsDefinition.kindString == 'Constructor') {
+    functionDeclaration = tsDefinition
+  } else functionDeclaration = tsDefinition?.type?.declaration
   if (!functionDeclaration) return ''
 
   const paramDefinitions: TsDoc.TypeDefinition[] = functionDeclaration.signatures[0].parameters // PMC: seems flaky.. why the [0]?
@@ -99,7 +102,8 @@ function generateParameters(tsDefinition: any) {
 
 function getDescriptionFromDefintion(tsDefinition) {
   if (!tsDefinition) return null
-  if (tsDefinition.kindString == 'Method') return tsDefinition?.signatures[0].comment
+  if (['Method', 'Constructor', 'Constructor signature'].includes(tsDefinition.kindString))
+    return tsDefinition?.signatures[0].comment
   else return tsDefinition?.comment || ''
 }
 

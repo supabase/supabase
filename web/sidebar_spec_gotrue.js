@@ -2,8 +2,8 @@ module.exports = {
   docs: [
     {
       type: 'category',
-      label: 'Getting started',
-      items: ['index', 'installing'],
+      label: 'GoTrue Client',
+      items: ['index', 'installing', 'initializing'],
       collapsed: false,
     },
     {

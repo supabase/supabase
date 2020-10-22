@@ -17,10 +17,11 @@ info:
       version: '0.0.1'
   docs:
     sidebar:
-      - name: 'Getting started'
+      - name: 'GoTrue Client'
         items:
           - index
           - Installing
+          - Initializing
       - name: 'Client functions'
         items:
           - signUp
@@ -58,6 +59,9 @@ pages:
       ```bash
       # Not yet implemented
       ```
+
+  Initializing: 
+    $ref: '"GoTrueClient".GoTrueClient.constructor'
 
   signUp:
     $ref: '"GoTrueClient".GoTrueClient.signUp'
