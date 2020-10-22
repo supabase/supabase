@@ -7,6 +7,6 @@
   },
   "plugins": [
     "@snowpack/plugin-dotenv",
-    ["@snowpack/plugin-svelte", { "hydratable": true, "css": false }]
+    ["@snowpack/plugin-svelte", {"compilerOptions":{ "hydratable": true, "css": false }}]
   ]
 }
