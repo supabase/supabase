@@ -90,20 +90,32 @@ module.exports = {
           position: 'left',
           items: [
             {
+              label: 'GoTrue',
+              to: '/docs/realtime/about',
+            },
+            {
+              label: 'GoTrue Client',
+              to: '/ref/gotrue',
+            },
+            {
               label: 'Postgres',
               to: '/docs/postgres/about',
             },
             {
-              label: 'Realtime Server',
-              to: '/docs/realtime/about',
+              label: 'Postgres API',
+              to: '/docs/postgres/about',
+            },
+            {
+              label: 'PostgREST',
+              to: '/docs/postgrest/about',
             },
             {
               label: 'PostgREST Client',
               to: '/ref/postgrest',
             },
             {
-              label: 'GoTrue Client',
-              to: '/ref/gotrue',
+              label: 'Realtime',
+              to: '/docs/realtime/about',
             },
           ],
         },
@@ -208,7 +220,7 @@ module.exports = {
     [
       '@docusaurus/plugin-content-docs',
       {
-        id: 'supabase', // for first plugin-content-docs with "resources/" path
+        id: 'supabase-client', // for first plugin-content-docs with "resources/" path
         // homePageId: "doc2",
         path: './ref/supabase', // Path to data on filesystem, relative to site dir.
         routeBasePath: 'ref/supabase', // URL Route.
@@ -220,7 +232,7 @@ module.exports = {
     [
       '@docusaurus/plugin-content-docs',
       {
-        id: 'postgrest', // for first plugin-content-docs with "resources/" path
+        id: 'postgrest-client', // for first plugin-content-docs with "resources/" path
         // homePageId: "doc2",
         path: './ref/postgrest', // Path to data on filesystem, relative to site dir.
         routeBasePath: 'ref/postgrest', // URL Route.
@@ -232,7 +244,7 @@ module.exports = {
     [
       '@docusaurus/plugin-content-docs',
       {
-        id: 'gotrue', // for first plugin-content-docs with "resources/" path
+        id: 'gotrue-client', // for first plugin-content-docs with "resources/" path
         // homePageId: "doc2",
         path: './ref/gotrue', // Path to data on filesystem, relative to site dir.
         routeBasePath: 'ref/gotrue', // URL Route.

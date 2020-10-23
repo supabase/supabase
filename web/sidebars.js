@@ -10,25 +10,39 @@ module.exports = {
     { type: 'category', label: 'Introduction', items: ['about', 'faq'], collapsed: false },
     {
       type: 'category',
-      label: 'Using your Database',
+      label: 'Client library',
+      collapsed: false,
+      items: ['library/getting-started'],
+    },
+    {
+      type: 'category',
+      label: 'Auth',
+      collapsed: false,
+      items: ['library/user-management'],
+    },
+    {
+      type: 'category',
+      label: 'Database',
       collapsed: false,
       items: [
-        'library/getting-started',
         'library/get',
         'library/post',
         'library/patch',
         'library/delete',
-        'library/subscribe',
         'library/stored-procedures',
       ],
     },
     {
       type: 'category',
-      label: 'Authentication',
+      label: 'PostgREST',
       collapsed: false,
-      items: [
-        'library/user-management',
-      ],
+      items: ['postgrest/about'],
+    },
+    {
+      type: 'category',
+      label: 'Realtime',
+      collapsed: false,
+      items: ['library/subscribe'],
     },
     {
       type: 'category',
@@ -43,20 +57,13 @@ module.exports = {
       type: 'category',
       label: 'Realtime',
       collapsed: false,
-      items: [
-        'realtime/about',
-      ],
+      items: ['realtime/about'],
     },
     {
       type: 'category',
       label: 'Self hosting',
       collapsed: false,
-      items: [
-        'realtime/docker',
-        'realtime/aws',
-        'realtime/digitalocean',
-        'realtime/source',
-      ],
+      items: ['realtime/docker', 'realtime/aws', 'realtime/digitalocean', 'realtime/source'],
     },
   ],
   postgres: [

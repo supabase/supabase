@@ -36,38 +36,53 @@ info:
           - index
           - Installing
           - Initializing
-      - name: 'Query Builder'
+      - name: 'Auth'
         items:
-          - from()
-          - from().select()
-      #     - insert
-      #     - update
-      #     - delete
-      #     - rpc
-      # - name: 'Filters'
-      #   items:
-      #     - eq
-      #     - neq
-      #     - gt
-      #     - gte
-      #     - lt
-      #     - lte
-      #     - like
-      #     - ilike
-      #     - is
-      #     - in
-      #     - cs
-      #     - cd
-      #     - sl
-      #     - sr
-      #     - nxl
-      #     - nxr
-      #     - adj
-      #     - ov
-      #     - fts
-      #     - plfts
-      #     - phfts
-      #     - wfts
+          - .auth.signUp()
+          - .auth.signIn()
+          - .auth.signOut()
+          - .auth.user()
+          - .auth.update()
+          - .auth.onAuthStateChange()
+          - .auth.api.resetPasswordForEmail()
+      - name: 'Reading data'
+        items:
+          - .from().select()
+          - .from().select().limit()
+          - .from().select().order()
+      - name: 'Operating on data'
+        items:
+          - .from().insert()
+          - .from().update()
+          - .from().delete()
+      - name: Stored Procedures
+        items:
+          - .rpc()
+      - name: 'Filters'
+        items:
+          - Using Filters
+          - .eq()
+          - .neq()
+          - .gt()
+          - .gte()
+          - .lt()
+          - .lte()
+          - .like()
+          - .ilike()
+          - .is()
+          - .in()
+          - .cs()
+          - .cd()
+          - .sl()
+          - .sr()
+          - .nxl()
+          - .nxr()
+          - .adj()
+          - .ov()
+          - .fts()
+          - .plfts()
+          - .phfts()
+          - .wfts()
 
 pages:
 
@@ -93,86 +108,159 @@ pages:
   Initializing: 
     $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.constructor'
 
-  from():
-    $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.from'
 
-  from().select():
+  .auth.signUp():
+    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signUp'
+    examples:
+      - name: Sign up
+        isSpotlight: true
+        js: |
+          ```js
+          const { error, data } = await supabase.auth.signUp({
+            email: 'example@email.com',
+            password: 'example-password',
+          })
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+
+  .auth.signIn():
+    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signIn'
+    notes: |
+      - A user can sign up either via email or OAuth.
+      - If you provide `email`, `password` is also required
+      - If you provide `access_token`, `password` is also required
+    examples:
+      - name: Sign in
+        isSpotlight: true
+        js: |
+          ```js
+          const { error, data } = await supabase.auth.signIn({
+            email: 'example@email.com',
+            password: 'example-password',
+          })
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+
+  .auth.signOut():
+    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signOut'
+    examples:
+      - name: Sign out
+        js: |
+          ```js
+          const { error, data } = await supabase.auth.signOut()
+          ```
+
+  .auth.user():
+    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.user'
+    examples:
+      - name: Get user
+        js: |
+          ```js
+          const { error, data } = await supabase.auth.user()
+          ```
+  .auth.update():
+    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.update'
+
+  .auth.onAuthStateChange(): 
+    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.onAuthStateChange'
+
+  .auth.api.resetPasswordForEmail():
+    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.resetPasswordForEmail'
+
+  .from().select():
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.select'
+  
+  .from().select().limit():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.limit'
+  
+  .from().select().order():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.order'
 
-  # insert:
-  #   $ref: '"lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
+  .from().insert():
+    $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
 
-  # update:
-  #   $ref: '"lib/PostgrestQueryBuilder".PostgrestQueryBuilder.update'
+  .from().update():
+    $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.update'
 
-  # delete:
-  #   $ref: '"lib/PostgrestQueryBuilder".PostgrestQueryBuilder.delete'
+  .from().delete():
+    $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.delete'
 
-  # rpc:
-  #   $ref: '"PostgrestClient".PostgrestClient.rpc'
+  .rpc():
+    $ref: '@supabase/postgrest-js."PostgrestClient".PostgrestClient.rpc'
 
-  # eq:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.eq'
 
-  # neq:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.neq'
+  Using Filters: 
+    description: |
+      Filters can be used on `select()`, `update()`, and `delete()` queries.
 
-  # gt:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.gt'
+  .eq():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.eq'
 
-  # gte:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.gte'
+  .neq():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.neq'
 
-  # lt:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lt'
+  .gt():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.gt'
 
-  # lte:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lte'
+  .gte():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.gte'
 
-  # like:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.like'
+  .lt():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lt'
 
-  # ilike:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.ilike'
+  .lte():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lte'
 
-  # is:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.is'
+  .like():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.like'
 
-  # in:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.in'
+  .ilike():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.ilike'
 
-  # cs:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cs'
+  .is():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.is'
 
-  # cd:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cd'
+  .in():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.in'
 
-  # sl:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.sl'
+  .cs():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cs'
 
-  # sr:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.sr'
+  .cd():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cd'
 
-  # nxl:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxl'
+  .sl():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.sl'
 
-  # nxr:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxr'
+  .sr():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.sr'
 
-  # adj:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.adj'
+  .nxl():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxl'
 
-  # ov:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.ov'
+  .nxr():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxr'
 
-  # fts:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.fts'
+  .adj():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.adj'
 
-  # plfts:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.plfts'
+  .ov():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.ov'
 
-  # phfts:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.phfts'
+  .fts():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.fts'
 
-  # wfts:
-  #   $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.wfts'
+  .plfts():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.plfts'
+
+  .phfts():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.phfts'
+
+  .wfts():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.wfts'
