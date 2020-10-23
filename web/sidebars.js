@@ -34,12 +34,6 @@ module.exports = {
     },
     {
       type: 'category',
-      label: 'PostgREST',
-      collapsed: false,
-      items: ['postgrest/about'],
-    },
-    {
-      type: 'category',
       label: 'Realtime',
       collapsed: false,
       items: ['library/subscribe'],
@@ -52,26 +46,63 @@ module.exports = {
     },
     // Handbook: ['handbook/introduction', 'handbook/contributing'],
   ],
-  realtime: [
+  goTrueServer: [
+    {
+      type: 'category',
+      label: 'GoTrue',
+      collapsed: false,
+      items: ['gotrue/server/about'],
+    },
+  ],
+  realtimeServer: [
     {
       type: 'category',
       label: 'Realtime',
       collapsed: false,
-      items: ['realtime/about'],
+      items: ['realtime/server/about'],
     },
     {
       type: 'category',
       label: 'Self hosting',
       collapsed: false,
-      items: ['realtime/docker', 'realtime/aws', 'realtime/digitalocean', 'realtime/source'],
+      items: [
+        'realtime/server/docker',
+        'realtime/server/aws',
+        'realtime/server/digitalocean',
+        'realtime/server/source',
+      ],
     },
   ],
-  postgres: [
+  realtimeClient: [
+    {
+      type: 'category',
+      label: 'Realtime',
+      collapsed: false,
+      items: ['realtime/client/about'],
+    },
+  ],
+  postgrestServer: [
+    {
+      type: 'category',
+      label: 'PostgREST',
+      collapsed: false,
+      items: ['postgrest/server/about'],
+    },
+  ],
+  postgresServer: [
     {
       type: 'category',
       label: 'Postgres',
       collapsed: false,
-      items: ['postgres/about'],
+      items: ['postgres/server/about'],
+    },
+  ],
+  postgresApi: [
+    {
+      type: 'category',
+      label: 'Postgres API',
+      collapsed: false,
+      items: ['postgres/api/about'],
     },
   ],
 }

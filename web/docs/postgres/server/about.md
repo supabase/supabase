@@ -1,10 +1,8 @@
 ---
 id: about
-title: Postgres
+title: Postgres 
 description: 'The easiest way to get started with Postgres.'
 ---
-
-## Introduction
 
 We've talked to a lot of developers, and they often tell us that they know Postgres is the best database for their needs, but they still choose something that's easier to get started.
 

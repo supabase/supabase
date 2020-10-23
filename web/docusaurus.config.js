@@ -91,7 +91,7 @@ module.exports = {
           items: [
             {
               label: 'GoTrue',
-              to: '/docs/realtime/about',
+              to: '/docs/gotrue/server/about',
             },
             {
               label: 'GoTrue Client',
@@ -99,15 +99,15 @@ module.exports = {
             },
             {
               label: 'Postgres',
-              to: '/docs/postgres/about',
+              to: '/docs/postgres/server/about',
             },
             {
               label: 'Postgres API',
-              to: '/docs/postgres/about',
+              to: '/docs/postgres/api/about',
             },
             {
               label: 'PostgREST',
-              to: '/docs/postgrest/about',
+              to: '/docs/postgrest/server/about',
             },
             {
               label: 'PostgREST Client',
@@ -115,7 +115,11 @@ module.exports = {
             },
             {
               label: 'Realtime',
-              to: '/docs/realtime/about',
+              to: '/docs/realtime/server/about',
+            },
+            {
+              label: 'Realtime Client',
+              to: '/docs/realtime/client/about',
             },
           ],
         },
