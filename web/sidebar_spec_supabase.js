@@ -9,19 +9,19 @@ module.exports = {
     {
       type: 'category',
       label: 'Auth',
-      items: ['auth-signup', 'auth-signin', 'auth-signout', 'auth-user', 'auth-update', 'auth-onauthstatechange', 'auth-api-resetpasswordforemail'],
+      items: ['sign-up', 'sign-in', 'sign-out', 'get-the-logged-in-user', 'update-the-logged-in-user', 'reset-password', 'listen-to-auth-change-events'],
       collapsed: false,
     },
     {
       type: 'category',
       label: 'Reading data',
-      items: ['from-select', 'from-select-limit', 'from-select-order'],
+      items: ['select-data', 'limit-rows-returned', 'order-data'],
       collapsed: false,
     },
     {
       type: 'category',
-      label: 'Operating on data',
-      items: ['from-insert', 'from-update', 'from-delete'],
+      label: 'Data operations',
+      items: ['insert-data', 'update-rows', 'delete-rows'],
       collapsed: false,
     },
     {

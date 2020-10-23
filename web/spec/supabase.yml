@@ -38,23 +38,23 @@ info:
           - Initializing
       - name: 'Auth'
         items:
-          - .auth.signUp()
-          - .auth.signIn()
-          - .auth.signOut()
-          - .auth.user()
-          - .auth.update()
-          - .auth.onAuthStateChange()
-          - .auth.api.resetPasswordForEmail()
+          - Sign up
+          - Sign in
+          - Sign out
+          - Get the logged in user
+          - Update the logged in user
+          - Reset password
+          - Listen to auth change events
       - name: 'Reading data'
         items:
-          - .from().select()
-          - .from().select().limit()
-          - .from().select().order()
-      - name: 'Operating on data'
+          - Select data
+          - Limit rows returned
+          - Order data
+      - name: 'Data operations'
         items:
-          - .from().insert()
-          - .from().update()
-          - .from().delete()
+          - Insert data
+          - Update rows
+          - Delete rows
       - name: Stored Procedures
         items:
           - .rpc()
@@ -109,7 +109,7 @@ pages:
     $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.constructor'
 
 
-  .auth.signUp():
+  Sign up:
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signUp'
     examples:
       - name: Sign up
@@ -126,7 +126,7 @@ pages:
           # Not yet implemented
           ```
 
-  .auth.signIn():
+  Sign in:
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signIn'
     notes: |
       - A user can sign up either via email or OAuth.
@@ -147,48 +147,48 @@ pages:
           # Not yet implemented
           ```
 
-  .auth.signOut():
+  Sign out:
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signOut'
     examples:
       - name: Sign out
         js: |
           ```js
-          const { error, data } = await supabase.auth.signOut()
+          const { error, data } = await supabaseSign out
           ```
 
-  .auth.user():
+  Get the logged in user:
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.user'
     examples:
       - name: Get user
         js: |
           ```js
-          const { error, data } = await supabase.auth.user()
+          const { error, data } = await supabaseGet the logged in user
           ```
-  .auth.update():
+  Update the logged in user:
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.update'
 
-  .auth.onAuthStateChange(): 
+  Listen to auth change events: 
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.onAuthStateChange'
 
-  .auth.api.resetPasswordForEmail():
+  Reset password:
     $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.resetPasswordForEmail'
 
-  .from().select():
+  Select data:
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.select'
   
-  .from().select().limit():
+  Limit rows returned:
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.limit'
   
-  .from().select().order():
+  Order data:
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.order'
 
-  .from().insert():
+  Insert data:
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
 
-  .from().update():
+  Update rows:
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.update'
 
-  .from().delete():
+  Delete rows:
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.delete'
 
   .rpc():
