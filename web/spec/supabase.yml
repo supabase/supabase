@@ -3,7 +3,23 @@ openref: 0.1
 info:
   title:  Supabase Client
   description: |
-    TBD.
+    
+    Our client library is modular. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing tools.
+
+    - **`supabase-{lang}`**: Combines libraries and adds enrichments.
+      - `postgrest-{lang}`: Client library to work with [PostgREST](https://github.com/postgrest/postgrest) 
+      - `realtime-{lang}`: Client library to work with [Realtime](https://github.com/supabase/realtime)    
+      - `gotrue-{lang}`: Client library to work with [GoTrue](https://github.com/netlify/gotrue)         
+
+    
+    | Repo                                                                                       | Official                                         | Community        |
+    |-----------------------|--------------------------------------------------|------------------|
+    | **`supabase-{lang}`**     | [`JS`](https://github.com/supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` |
+    | `postgrest-{lang}` | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
+    | `realtime-{lang}`  | [`JS`](https://github.com/supabase/realtime-js) | `C#` \| `Python` \| `Rust` |
+    | `gotrue-{lang}`    | [`JS`](https://github.com/supabase/gotrue-js) | `C#` \| `Python` \| `Rust` |
+
+
     
   definition: spec/combined.json
   libraries: 
@@ -20,10 +36,10 @@ info:
           - index
           - Installing
           - Initializing
-      # - name: 'Query Builder'
-      #   items:
-      #     - from
-      #     - select
+      - name: 'Query Builder'
+        items:
+          - from()
+          - from().select()
       #     - insert
       #     - update
       #     - delete
@@ -77,11 +93,11 @@ pages:
   Initializing: 
     $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.constructor'
 
-  # from:
-  #   $ref: 'supabase."SupabaseClient".SupabaseClient.from'
+  from():
+    $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.from'
 
-  # select:
-  #   $ref: '"lib/PostgrestQueryBuilder".PostgrestQueryBuilder.select'
+  from().select():
+    $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.select'
 
   # insert:
   #   $ref: '"lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'

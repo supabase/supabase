@@ -152,7 +152,7 @@ const methodListItemLabel = ({ name, isOptional, type, description }, subContent
   </h4>
   <div class="method-list-item-description">
 
-${description ? description : 'No description provided. [Contribute?](https://supabase.io)'}
+${description ? description : 'No description provided. '}
   
   </div>
   ${subContent}

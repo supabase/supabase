@@ -5,6 +5,12 @@ module.exports = {
       label: 'Supabase Client',
       items: ['index', 'installing', 'initializing'],
       collapsed: false,
+    },
+    {
+      type: 'category',
+      label: 'Query Builder',
+      items: ['from', 'from-select'],
+      collapsed: false,
     }
   ],
 }
