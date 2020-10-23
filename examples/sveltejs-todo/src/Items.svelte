@@ -19,9 +19,9 @@
     items = items.slice(0, index).concat(items.slice(index + 1))
   }
   function toggleAll(event) {
-    todos = todos.map((item) => ({
+    items = items.map((item) => ({
       id: item.id,
-      description: item.description,
+      description: item.task_text,
       complete: event.target.checked,
     }))
   }
