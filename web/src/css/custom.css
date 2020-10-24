@@ -921,3 +921,135 @@ html[data-theme='dark'] .navbar-item-github:before {
   width: 100%;
   max-width: 100%;
 }
+
+/* Section */
+.Section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.Section-Hash {
+  margin-left: 8px;
+  color: var(--custom-content-color-light);
+  opacity: 0.4;
+}
+.Section-Title:hover .Section-Hash {
+  color: var(--custom-primary);
+  opacity: 1;
+}
+.Section-Title {
+  cursor: pointer;
+  scroll-margin: 74px; /* Navbar size (60) + a little margin */
+}
+
+/* Showcase */
+.ShowcaseCard {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: none;
+  border: 1px solid #333;
+}
+
+.ShowcaseCard:hover {
+  transition: all 0.2s ease;
+  border: 1px solid var(--custom-primary);
+  box-shadow: var(--custom-shadow-xl), 0 0 0 1px var(--custom-primary) !important;
+}
+
+.ShowcaseCard-Img {
+  height: 100%;
+  width: auto;
+}
+
+.ShowcaseCard-ImgContainer {
+  height: 140px;
+  display: flex;
+  justify-content: center;
+}
+
+.ShowcaseCard-Text {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ShowcaseCard-Text p {
+  width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+  margin: 0;
+}
+
+.ShowcaseCard-Text h3 {
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  backdrop-filter: blur(3px) contrast(80%);
+  padding-top: var(--ifm-card-vertical-spacing);
+  padding-left: var(--ifm-card-horizontal-spacing);
+  padding-right: var(--ifm-card-horizontal-spacing);
+  transition: 0.2s ease;
+}
+
+.ShowcaseCard-Content {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--ifm-card-vertical-spacing);
+  height: 100%;
+}
+
+.ShowcaseCard:hover h3 {
+  opacity: 1;
+}
+
+.ShowcaseCard-Tag {
+  color: var(--custom-primary);
+  font-weight: bold;
+  font-size: 12px;
+  margin: 8px 4px 12px 0px;
+}
+
+.ShowcaseCard-Footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.ShowcaseCard-Footer a {
+  margin: auto;
+}
+
+@media screen and (max-width: 997px) {
+  .ShowcaseCard-Content {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .ShowcaseCard-Text {
+    width: 100%;
+    margin-left: var(--ifm-card-horizontal-spacing);
+  }
+
+  .ShowcaseCard-Tag {
+    margin-top: 0px;
+  }
+
+  .ShowcaseCard-Footer a {
+    margin: var(--ifm-card-vertical-spacing) var(--ifm-card-horizontal-spacing) 0 0;
+  }
+
+  .ShowcaseCard-Text h3 {
+    position: relative;
+    bottom: 0;
+    opacity: 1;
+  }
+  .ShowcaseCard-ImgContainer {
+    height: 140px;
+  }
+}

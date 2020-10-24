@@ -73,6 +73,11 @@ module.exports = {
           label: 'Docs',
           position: 'right',
         },
+        {
+          to: '/showcase',
+          label: 'Showcase',
+          position: 'right',
+        },
         { to: '/docs/pricing', label: 'Pricing', position: 'right' },
         { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
         {
