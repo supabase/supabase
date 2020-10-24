@@ -31,6 +31,7 @@
     "@storybook/addon-essentials": "^6.0.26",
     "@storybook/addon-links": "^6.0.26",
     "@storybook/react": "^6.0.26",
+    "@tailwindcss/custom-forms": "^0.2.1",
     "@tailwindcss/ui": "^0.6.2",
     "@tailwindcssinjs/macro": "^0.10.0",
     "@testing-library/jest-dom": "^5.11.4",
