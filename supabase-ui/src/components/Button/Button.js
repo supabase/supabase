@@ -49,8 +49,6 @@ Button.propTypes = {
   size: PropTypes.oneOf(SIZES),
   variant: PropTypes.oneOf(VARIANTS),
   block: PropTypes.bool,
-  outline: PropTypes.bool,
-  ghost: PropTypes.bool,
   className: PropTypes.string,
 }
 
