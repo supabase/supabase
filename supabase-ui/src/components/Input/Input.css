@@ -1,0 +1,11 @@
+.form--small {
+  @apply text-sm py-1;
+}
+
+.form--medium {
+  @apply text-base;
+}
+
+.form--error {
+  @apply border-red-500;
+}
