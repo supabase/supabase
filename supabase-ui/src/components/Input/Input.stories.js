@@ -3,7 +3,7 @@ import React from 'react'
 import { Input } from '.'
 
 export default {
-  title: 'Basic/Input',
+  title: 'Form/Input',
   component: Input,
 }
 
