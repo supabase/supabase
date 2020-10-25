@@ -3,7 +3,7 @@ import React from 'react'
 import { Textarea } from '.'
 
 export default {
-  title: 'Basic/Textarea',
+  title: 'Form/Textarea',
   component: Textarea,
 }
 
