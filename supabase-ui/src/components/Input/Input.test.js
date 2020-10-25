@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import Input, { SIZES } from './Input'
 
 describe('#Input', () => {
-  it('should render button correctly', async () => {
+  it('should render input correctly', async () => {
     render(<Input data-testid="form-input" />)
     expect(screen.queryByTestId('form-input')).toBeInTheDocument()
   })
