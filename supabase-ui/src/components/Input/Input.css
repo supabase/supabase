@@ -1,11 +1,15 @@
-.form--small {
+.form-input:disabled {
+  @apply bg-gray-100;
+}
+
+.form-input--small {
   @apply text-sm py-1;
 }
 
-.form--medium {
+.form-input--medium {
   @apply text-base;
 }
 
-.form--error {
+.form-input--error {
   @apply border-red-500;
 }

@@ -5,28 +5,30 @@ import './Input.css'
 export const SIZES = ['small', 'medium']
 
 const Input = ({
-  className,
-  children,
+  className = '',
+  type='text',
   size = 'medium',
   isError = false,
+  children,
   ...props
 }) => {
   const classes = []
   if (size) {
     const sizeClasses = {
-      small: 'form--small',
-      medium: 'form--medium',
+      small: 'form-input--small',
+      medium: 'form-input--medium',
     }
     classes.push(sizeClasses[size])
   }
 
   if (isError) {
-    classes.push('form--error')
+    classes.push('form-input--error')
   }
 
   return (
     <input
-      className={`form-input border-solid ${classes.join(' ')}`}
+      type={type}
+      className={`form-input border-solid ${classes.join(' ')} ${className}`}
       {...props}
     />
   )
