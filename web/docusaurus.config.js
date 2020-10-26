@@ -4,6 +4,41 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+const showcase = require('./src/data/showcase.json');
+
+const items = showcase.length > 0 ? [
+  {
+    to: '/docs',
+    label: 'Docs',
+    position: 'right',
+  },
+  {
+    to: '/showcase',
+    label: 'Showcase',
+    position: 'right',
+  },
+  { to: '/docs/pricing', label: 'Pricing', position: 'right' },
+  { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
+  {
+    href: 'https://github.com/supabase/supabase',
+    className: 'navbar-item-github',
+    position: 'right',
+  },
+] : [
+  {
+    to: '/docs',
+    label: 'Docs',
+    position: 'right',
+  },
+  { to: '/docs/pricing', label: 'Pricing', position: 'right' },
+  { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
+  {
+    href: 'https://github.com/supabase/supabase',
+    className: 'navbar-item-github',
+    position: 'right',
+  },
+]
+
 
 module.exports = {
   title: 'Supabase',
@@ -67,25 +102,7 @@ module.exports = {
         src: '/supabase-light.svg',
         srcDark: '/supabase-dark.svg',
       },
-      items: [
-        {
-          to: '/docs',
-          label: 'Docs',
-          position: 'right',
-        },
-        {
-          to: '/showcase',
-          label: 'Showcase',
-          position: 'right',
-        },
-        { to: '/docs/pricing', label: 'Pricing', position: 'right' },
-        { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
-        {
-          href: 'https://github.com/supabase/supabase',
-          className: 'navbar-item-github',
-          position: 'right',
-        },
-      ],
+      items,
     },
     prism: {
       defaultLanguage: 'js',

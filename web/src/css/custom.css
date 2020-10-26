@@ -950,6 +950,7 @@ html[data-theme='dark'] .navbar-item-github:before {
   flex-direction: column;
   box-shadow: none;
   border: 1px solid #333;
+  padding: var(--ifm-card-vertical-spacing) var(--ifm-card-horizontal-spacing);
 }
 
 .ShowcaseCard:hover {
@@ -991,9 +992,7 @@ html[data-theme='dark'] .navbar-item-github:before {
   top: 0;
   left: 0;
   backdrop-filter: blur(3px) contrast(80%);
-  padding-top: var(--ifm-card-vertical-spacing);
-  padding-left: var(--ifm-card-horizontal-spacing);
-  padding-right: var(--ifm-card-horizontal-spacing);
+  padding: var(--ifm-card-vertical-spacing) var(--ifm-card-horizontal-spacing);
   transition: 0.2s ease;
 }
 
@@ -1021,11 +1020,30 @@ html[data-theme='dark'] .navbar-item-github:before {
   justify-content: flex-start;
 }
 
-.ShowcaseCard-Footer a {
-  margin: auto;
+.ShowcaseCard-Footer-Item {
+  width: 100%;
+}
+
+/* Spaces between children */
+.ShowcaseCard-Footer-Spaced .ShowcaseCard-Footer-Item:first-child {
+  margin-right: 4px;
+}
+
+.ShowcaseCard-Footer-Spaced .ShowcaseCard-Footer-Item:nth-child(even) {
+  margin-left:  4px;
+  margin-right: 4px;
+}
+
+.ShowcaseCard-Footer-Spaced .ShowcaseCard-Footer-Item:last-child {
+  margin-right: 0px;
 }
 
 @media screen and (max-width: 997px) {
+  .ShowcaseCard-ImgContainer {
+    height: 120px;
+    align-self: center;
+  }
+
   .ShowcaseCard-Content {
     display: flex;
     flex-direction: row;
@@ -1048,8 +1066,46 @@ html[data-theme='dark'] .navbar-item-github:before {
     position: relative;
     bottom: 0;
     opacity: 1;
-  }
-  .ShowcaseCard-ImgContainer {
-    height: 140px;
+    backdrop-filter: blur(0) contrast(100%);
+    padding: 0;
   }
 }
+
+@media screen and (max-width: 650px) {
+  .ShowcaseCard-ImgContainer {
+    height: 80px;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  .ShowcaseCard-Content {
+    flex-direction: column;
+    padding: 0px;
+  }
+
+  .ShowcaseCard-Text {
+    margin: 0px;
+    padding: 0px;
+  }
+
+  .ShowcaseCard-Text h3 {
+    margin-top: var(--ifm-card-vertical-spacing);
+  }
+}
+
+@media screen and (max-width: 380px) {
+  .ShowcaseCard-Footer {
+    flex-direction: column;
+  }
+
+  /* Spaces between children */
+  .ShowcaseCard-Footer-Spaced .ShowcaseCard-Footer-Item:first-child {
+    margin-right: 0px;
+  }
+
+  .ShowcaseCard-Footer-Spaced .ShowcaseCard-Footer-Item:nth-child(even) {
+    margin-left:  0px;
+    margin-right: 0px;
+  }
+}
+
