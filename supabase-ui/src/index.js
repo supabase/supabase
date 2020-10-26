@@ -1,5 +1,6 @@
 export * from './components/Button/index'
 export * from './components/Toggle/index'
+export * from './components/Icon/index'
 
 // FORM
 export * from './components/Checkbox/index'
