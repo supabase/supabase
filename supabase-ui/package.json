@@ -18,7 +18,8 @@
   },
   "dependencies": {
     "@headlessui/react": "^0.2.0",
-    "prop-types": "^15.7.2"
+    "prop-types": "^15.7.2",
+    "react-feather": "^2.0.8"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
