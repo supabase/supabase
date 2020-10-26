@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './Select.css'
 
-const Textarea = ({
+const Select = ({
   className = '',
   isError = false,
   children,
@@ -24,9 +24,9 @@ const Textarea = ({
   )
 }
 
-Textarea.propTypes = {
+Select.propTypes = {
   isError: PropTypes.bool,
   className: PropTypes.string,
 }
 
-export default Textarea
+export default Select
