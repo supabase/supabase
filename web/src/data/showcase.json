@@ -1,12 +1,1 @@
-[
-    {
-        "project_or_company": {
-            "name": "Supabase",
-            "description": "Supabase adds realtime and RESTful APIs to your existing PostgreSQL database without a single line of code.",
-            "web_site": "https://supabase.io/",
-            "image": "supabase-logo.svg"
-        },
-        "is_open_source": true,
-        "public_repo": "https://github.com/supabase/supabase"
-    }
-]
+[ ]
