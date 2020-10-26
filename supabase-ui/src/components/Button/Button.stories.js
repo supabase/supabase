@@ -7,4 +7,4 @@ export default {
   component: Button,
 }
 
-export const Primary = (args) => <Button>Some Children</Button>
+export const Default = (args) => <Button {...args}>Button</Button>
