@@ -98,7 +98,7 @@ pages:
       npm install @supabase/postgrest-js
       ```
 
-      - [Source code](https://github.com/supabase/postgrest-js)
+      Find the source code on [GitHub](https://github.com/supabase/postgrest-js).
 
       ## Python
 
@@ -107,6 +107,33 @@ pages:
 
   Initializing: 
     $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.constructor'
+    description: |
+      You can initialize a new Supabase client using the `createClient()` method.
+    examples:
+      - name: createClient()
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          // Create a single supabase client for interacting with your database 
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With additional parameters
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const options = { }
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
 
   Sign up:
@@ -197,58 +224,707 @@ pages:
 
   Using Filters: 
     description: |
-      Filters can be used on `select()`, `update()`, and `delete()` queries.
+      Filters can be used on `select()`, `update()`, and `delete()` queries. 
+      
+      If a Stored Procedure returns a table response, you can also apply filters.
 
   .eq():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.eq'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .eq('name', 'The shire')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .eq('name', 'San Francisco')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .eq('name', 'Mordor')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .neq():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.neq'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .neq('name', 'The shire')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .neq('name', 'San Francisco')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .neq('name', 'Mordor')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .gt():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.gt'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .gt('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .gt('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .gt('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .gte():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.gte'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .gte('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .gte('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .gte('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .lt():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lt'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .lt('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .lt('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .lt('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .lte():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lte'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .lte('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .lte('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .lte('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .like():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.like'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .like('name', '%la%')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .like('name', '%la%')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .like('name', '%la%')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .ilike():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.ilike'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .ilike('name', '%la%')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .ilike('name', '%la%')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .ilike('name', '%la%')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .is():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.is'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .is('name', null)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .is('name', null)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .is('name', null)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .in():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.in'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .in('name', ['Rio de Janeiro', 'San Francisco'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .in('name', ['Rio de Janeiro', 'San Francisco'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .in('name', ['Rio de Janeiro', 'San Francisco'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+
 
   .cs():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cs'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .cs('main_exports', ['oil'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .cs('main_exports', ['oil'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .cs('main_exports', ['oil'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .cd():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cd'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .cd('main_exports', ['cars', 'food', 'machine'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .cd('main_exports', ['orks', 'surveillance', 'evil'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .cd('main_exports', ['cars', 'food', 'machine'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .sl():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.sl'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .sl('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .sl('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .sl('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .sr():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.sr'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .sr('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .sr('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .sr('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .nxl():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxl'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .nxl('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .nxl('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .nxl('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .nxr():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxr'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .nxr('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .nxr('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .nxr('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .adj():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.adj'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .adj('population_range_millions', [70, 185])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .adj('population_range_millions', [70, 185])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .adj('population_range_millions', [70, 185])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .ov():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.ov'

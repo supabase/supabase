@@ -14,25 +14,8 @@ import {
   deleteFilterJs,
   deleteNotJs,
   deleteMatchJs,
-  deleteEqJs,
-  deleteNeqJs,
-  deleteGtJs,
-  deleteLtJs,
-  deleteGteJs,
-  deleteLteJs,
-  deleteLikeJs,
-  deleteIlikeJs,
-  deleteIsJs,
-  deleteInJs,
-  deleteCsJs,
-  deleteCdJs,
   deleteOvaJs,
   deleteOvrJs,
-  deleteSlJs,
-  deleteSrJs,
-  deleteNxlJs,
-  deleteNxrJs,
-  deleteAdjJs,
 } from './examples/delete'
 
 ### Delete records
@@ -110,191 +93,12 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 
 <CommonFilters filter="match" />
 
-### `eq()`
-
-<CustomCodeBlock
-  header="Shows how to use eq( ) with delete( )"
-  js={deleteEqJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="eq" />
-
-### `neq()`
-
-<CustomCodeBlock
-  header="Shows how to use neq( ) with delete( )"
-  js={deleteNeqJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="neq" />
-
-### `gt()`
-
-<CustomCodeBlock
-  header="Shows how to use gt( ) with delete( )"
-  js={deleteGtJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="gt" />
-
-### `lt()`
-
-<CustomCodeBlock
-  header="Shows how to use lt( ) with delete( )"
-  js={deleteLtJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="lt" />
-
-### `gte()`
-
-<CustomCodeBlock
-  header="Shows how to use gte( ) with delete( )"
-  js={deleteGteJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="gte" />
-
-### `lte()`
-
-<CustomCodeBlock
-  header="Shows how to use lte( ) with delete( )"
-  js={deleteLteJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="lte" />
-
-### `like()`
-
-<CustomCodeBlock
-  header="Shows how to use like( ) with delete( )"
-  js={deleteLikeJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="like" />
-
-### `ilike()`
-
-<CustomCodeBlock
-  header="Shows how to use ilike( ) with delete( )"
-  js={deleteIlikeJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="ilike" />
-
-### `is()`
-
-<CustomCodeBlock
-  header="Shows how to use is( ) with delete( )"
-  js={deleteIsJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="is" />
-
-### `in()`
-
-<CustomCodeBlock
-  header="Shows how to use in( ) with delete( )"
-  js={deleteInJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="in" />
-
-### `cs()`
-
-<CustomCodeBlock
-  header="Shows how to use cs( ) with delete( )"
-  js={deleteCsJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="cs" />
-
-### `cd()`
-
-<CustomCodeBlock
-  header="Shows how to use cd( ) with delete( )"
-  js={deleteCdJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="cd" />
 
 ### `ova()`
 
 <CustomCodeBlock
   header="Shows how to use ova( ) with delete( )"
-  js={deleteOvaJs}
+  js={deleteOvrJs}
   response={`{
   error: null,
   data: null
@@ -302,6 +106,7 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 />
 
 <br />
+
 
 <CommonFilters filter="ova" />
 
@@ -320,85 +125,3 @@ It is to note that it is required to apply filters when using `.delete()`. Not u
 
 <CommonFilters filter="ovr" />
 
-### `sl()`
-
-<CustomCodeBlock
-  header="Shows how to use sl( ) with delete( )"
-  js={deleteSlJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="sl" />
-
-### `sr()`
-
-<CustomCodeBlock
-  header="Shows how to use sr( ) with delete( )"
-  js={deleteSrJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="sr" />
-
-### `nxl()`
-
-<CustomCodeBlock
-  header="Shows how to use nxl( ) with delete( )"
-  js={deleteNxlJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="nxl" />
-
-### `nxr()`
-
-<CustomCodeBlock
-  header="Shows how to use nxr( ) with delete( )"
-  js={deleteNxrJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="nxr" />
-
-### `adj()`
-
-<CustomCodeBlock
-  header="Shows how to use adj( ) with delete( )"
-  js={deleteAdjJs}
-  response={`{
-  error: null,
-  data: null
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="adj" />
-
-## Responses
-
-#### 200 OK
-
-Successful request
-
-<CommonResponses />

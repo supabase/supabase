@@ -131,89 +131,13 @@ const { data, error } = await supabase
   .match({name: 'Beijing', country_id: 156})
 `.trim()
 
-export const getEqJs = `
-const { data, error } = await supabase
-  .from('cities')
-  .select('name, country_id')
-  .eq('name', 'San Francisco')
-`.trim()
 
-export const getNeqJs = `
-const { data, error } = await supabase
-  .from('cities')
-  .select('name, country_id')
-  .neq('name', 'Lagos')
-`.trim()
 
-export const getGtJs = `
-const { data, error } = await supabase
-  .from('cities')
-  .select('name, country_id')
-  .gt('country_id', 250)
-`.trim()
 
-export const getLtJs = `
-const { data, error } = await supabase
-  .from('cities')
-  .select('name, country_id')
-  .lt('country_id', 250)
-`.trim()
 
-export const getGteJs = `
-const { data, error } = await supabase
-  .from('cities')
-  .select('name, country_id')
-  .gte('country_id', 250)
-`.trim()
 
-export const getLteJs = `
-const { data, error } = await supabase
-  .from('cities')
-  .select('name, country_id')
-  .lte('country_id', 250)
-`.trim()
 
-export const getLikeJs = `
-const { data, error } = await supabase
-  .from('cities')
-  .select('name, country_id')
-  .like('name', '%la%')
-`.trim()
 
-export const getIlikeJs = `
-const { data, error } = await supabase
-  .from('cities')
-  .select('name, country_id')
-  .ilike('name', '%la%')
-`.trim()
-
-export const getIsJs = `
-const { data, error } = await supabase
-  .from('cities')
-  .select('name, country_id')
-  .is('name', null)
-`.trim()
-
-export const getInJs = `
-const { data, error } = await supabase
-  .from('cities')
-  .select('name, country_id')
-  .in('name', ['Rio de Janeiro', 'San Francisco'])
-`.trim()
-
-export const getCsJs = `
-const { data, error } = await supabase
-  .from('countries')
-  .select('name, id, main_exports')
-  .cs('main_exports', ['oil'])
-`.trim()
-
-export const getCdJs = `
-const { data, error } = await supabase
-  .from('countries')
-  .select('name, id, main_exports')
-  .cd('main_exports', ['cars', 'food', 'machine'])
-`.trim()
 
 export const getOvaJs = `
 const { data, error } = await supabase
@@ -229,40 +153,12 @@ const { data, error } = await supabase
   .ovr('population_range_millions', [150, 250])
 `.trim()
 
-export const getSlJs = `
-const { data, error } = await supabase
-  .from('countries')
-  .select('name, id, population_range_millions')
-  .sl('population_range_millions', [150, 250])
-`.trim()
 
-export const getSrJs = `
-const { data, error } = await supabase
-  .from('countries')
-  .select('name, id, population_range_millions')
-  .sr('population_range_millions', [150, 250])
-`.trim()
 
-export const getNxlJs = `
-const { data, error } = await supabase
-  .from('countries')
-  .select('name, id, population_range_millions')
-  .nxl('population_range_millions', [150, 250])
-`.trim()
 
-export const getNxrJs = `
-const { data, error } = await supabase
-  .from('countries')
-  .select('name, id, population_range_millions')
-  .nxr('population_range_millions', [150, 250])
-`.trim()
 
-export const getAdjJs = `
-const { data, error } = await supabase
-  .from('countries')
-  .select('name, id, population_range_millions')
-  .adj('population_range_millions', [70, 185])
-`.trim()
+
+
 
 export const getJsonData = `
 const { data, error } = await supabase

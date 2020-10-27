@@ -14,25 +14,8 @@ import {
   patchFilterJs,
   patchNotJs,
   patchMatchJs,
-  patchEqJs,
-  patchNeqJs,
-  patchGtJs,
-  patchLtJs,
-  patchGteJs,
-  patchLteJs,
-  patchLikeJs,
-  patchIlikeJs,
-  patchIsJs,
-  patchInJs,
-  patchCsJs,
-  patchCdJs,
   patchOvaJs,
   patchOvrJs,
-  patchSlJs,
-  patchSrJs,
-  patchNxlJs,
-  patchNxrJs,
-  patchAdjJs,
 } from './examples/patch'
 
 <DummyData />
@@ -129,250 +112,14 @@ New record values.
 
 <CommonFilters filter="match" />
 
-### `eq()`
 
-<CustomCodeBlock
-  header="Shows how to use eq( ) with update( )"
-  js={patchEqJs}
-  response={`{
-  error: null,
-  data: [
-    { "name": "Mordor", "country_id": 840 },
-  ]
-}`}
-/>
 
-<br />
-
-<CommonFilters filter="eq" />
-
-### `neq()`
-
-<CustomCodeBlock
-  header="Shows how to use neq( ) with update( )"
-  js={patchNeqJs}
-  response={`{
-  error: null,
-  data: [
-    { "name": "Mordor", "country_id": 76 },
-    { "name": "Mordor", "country_id": 156 },
-    { "name": "Mordor", "country_id": 250 },
-    { "name": "Mordor", "country_id": 554 },
-    { "name": "Mordor", "country_id": 556 },
-    { "name": "Mordor", "country_id": 840 },
-    { "name": "Mordor", "country_id": 840 }
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="neq" />
-
-### `gt()`
-
-<CustomCodeBlock
-  header="Shows how to use gt( ) with update( )"
-  js={patchGtJs}
-  response={`{
-  error: null,
-  data: [
-    { "name": "Mordor", "country_id": 554 },
-    { "name": "Mordor", "country_id": 556 },
-    { "name": "Mordor", "country_id": 840 },
-    { "name": "Mordor", "country_id": 840 }
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="gt" />
-
-### `lt()`
-
-<CustomCodeBlock
-  header="Shows how to use lt( ) with update( )"
-  js={patchLtJs}
-  response={`{
-  error: null,
-  data: [
-    { "name": "Mordor", "country_id": 76 },
-    { "name": "Mordor", "country_id": 156 }
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="lt" />
-
-### `gte()`
-
-<CustomCodeBlock
-  header="Shows how to use gte( ) with update( )"
-  js={patchGteJs}
-  response={`{
-  error: null,
-  data: [
-    { "name": "Mordor", "country_id": 250 },
-    { "name": "Mordor", "country_id": 554 },
-    { "name": "Mordor", "country_id": 556 },
-    { "name": "Mordor", "country_id": 840 },
-    { "name": "Mordor", "country_id": 840 }
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="gte" />
-
-### `lte()`
-
-<CustomCodeBlock
-  header="Shows how to use lte( ) with update( )"
-  js={patchLteJs}
-  response={`{
-  error: null,
-  data: [
-    { "name": "Mordor", "country_id": 76 },
-    { "name": "Mordor", "country_id": 156 },
-    { "name": "Mordor", "country_id": 250 }
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="lte" />
-
-### `like()`
-
-<CustomCodeBlock
-  header="Shows how to use like( ) with update( )"
-  js={patchLikeJs}
-  response={`{
-  error: null,
-  data: [
-    { "name": "Mordor", "country_id": 554 },
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="like" />
-
-### `ilike()`
-
-<CustomCodeBlock
-  header="Shows how to use ilike( ) with update( )"
-  js={patchIlikeJs}
-  response={`{
-  error: null,
-  data: [
-    { "name": "Mordor", "country_id": 554 },
-    { "name": "Mordor", "country_id": 556 },
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="ilike" />
-
-### `is()`
-
-<CustomCodeBlock
-  header="Shows how to use is( ) with update( )"
-  js={patchIsJs}
-  response={`{
-  error: null,
-  data: [
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="is" />
-
-### `in()`
-
-<CustomCodeBlock
-  header="Shows how to use in( ) with update( )"
-  js={patchInJs}
-  response={`{
-  error: null,
-  data: [
-    { "name": "Mordor", "country_id": 76 },
-    { "name": "Mordor", "country_id": 840 }
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="in" />
-
-### `cs()`
-
-<CustomCodeBlock
-  header="Shows how to use cs( ) with update( )"
-  js={patchCsJs}
-  response={`{
-  error: null,
-  data: [
-    { "id": 556,
-      "name": "Mordor",
-      "population_range_millions": [185, 195]
-      "main_exports": ["oil", "beans"],
-    },
-    { "id": 840,
-      "name": "Mordor",
-      "population_range_millions": [320, 330]
-      "main_exports": ["oil", "cars", "food"],
-    }
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="cs" />
-
-### `cd()`
-
-<CustomCodeBlock
-  header="Shows how to use cd( ) with update( )"
-  js={patchCdJs}
-  response={`{
-  error: null,
-  data: [
-    { "id": 250,
-      "name": "Mordor",
-      "population_range_millions": [60, 70]
-      "main_exports": ['orks', 'surveillance', 'evil'],
-    },
-    { "id": 554,
-      "name": "Mordor",
-      "population_range_millions": [4, 6]
-      "main_exports": ['orks', 'surveillance', 'evil'],
-    }
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="cd" />
 
 ### `ova()`
 
 <CustomCodeBlock
   header="Shows how to use ova( ) with update( )"
-  js={patchOvaJs}
+  js={patchOvrJs}
   response={`{
   error: null,
   data: [
@@ -381,16 +128,17 @@ New record values.
       "population_range_millions": [205, 215]
       "main_exports": ["beans", "minerals"],
     },
-    { "id": 156,
+    { "id": 556,
       "name": "Mordor",
-      "population_range_millions": [1380, 1390]
-      "main_exports": ["computers", "phones"],
+      "population_range_millions": [185, 195]
+      "main_exports": ["oil", "beans"],
     }
   ]
 }`}
 />
 
 <br />
+
 
 <CommonFilters filter="ova" />
 
@@ -420,160 +168,3 @@ New record values.
 
 <CommonFilters filter="ovr" />
 
-### `sl()`
-
-<CustomCodeBlock
-  header="Shows how to use sl( ) with update( )"
-  js={patchSlJs}
-  response={`{
-  error: null,
-  data: [
-    { "id": 250,
-      "name": "Mordor",
-      "population_range_millions": [60, 70]
-      "main_exports": ["cars", "machines"],
-    },
-    { "id": 554,
-      "name": "Mordor",
-      "population_range_millions": [4, 6]
-      "main_exports": ["food", "machines"],
-    }
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="sl" />
-
-### `sr()`
-
-<CustomCodeBlock
-  header="Shows how to use sr( ) with update( )"
-  js={patchSrJs}
-  response={`{
-  error: null,
-  data: [
-    { "id": 156,
-      "name": "Mordor",
-      "population_range_millions": [1380, 1390]
-      "main_exports": ["computers", "phones"],
-    },
-    { "id": 840,
-      "name": "Mordor",
-      "population_range_millions": [320, 330]
-      "main_exports": ["oil", "cars", "food"],
-    }
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="sr" />
-
-### `nxl()`
-
-<CustomCodeBlock
-  header="Shows how to use nxl( ) with update( )"
-  js={patchNxlJs}
-  response={`{
-  error: null,
-  data: [
-    { "id": 76,
-      "name": "Mordor",
-      "population_range_millions": [205, 215]
-      "main_exports": ["beans", "minerals"],
-    },
-    { "id": 156,
-      "name": "Mordor",
-      "population_range_millions": [1380, 1390]
-      "main_exports": ["computers", "phones"],
-    },
-    { "id": 556,
-      "name": "Mordor",
-      "population_range_millions": [185, 195]
-      "main_exports": ["oil", "beans"],
-    },
-    { "id": 840,
-      "name": "Mordor",
-      "population_range_millions": [320, 330]
-      "main_exports": ["oil", "cars", "food"],
-    }
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="nxl" />
-
-### `nxr()`
-
-<CustomCodeBlock
-  header="Shows how to use nxr( ) with update( )"
-  js={patchNxrJs}
-  response={`{
-  error: null,
-  data: [
-    { "id": 76,
-      "name": "Mordor",
-      "population_range_millions": [205, 215]
-      "main_exports": ["beans", "minerals"],
-    },
-    { "id": 250,
-      "name": "Mordor",
-      "population_range_millions": [60, 70]
-      "main_exports": ["cars", "machines"],
-    },
-    { "id": 554,
-      "name": "Mordor",
-      "population_range_millions": [4, 6]
-      "main_exports": ["food", "machines"],
-    },
-    { "id": 556,
-      "name": "Mordor",
-      "population_range_millions": [185, 195]
-      "main_exports": ["oil", "beans"],
-    }
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="nxr" />
-
-### `adj()`
-
-<CustomCodeBlock
-  header="Shows how to use adj( ) with update( )"
-  js={patchAdjJs}
-  response={`{
-  error: null,
-  data: [
-    { "id": 250,
-      "name": "Mordor",
-      "population_range_millions": [60, 70]
-      "main_exports": ["cars", "machines"],
-    },
-    { "id": 556,
-      "name": "Mordor",
-      "population_range_millions": [185, 195]
-      "main_exports": ["oil", "beans"],
-    }
-  ]
-}`}
-/>
-
-<br />
-
-<CommonFilters filter="adj" />
-
-## Responses
-
-#### 200 OK
-
-Successful request
-
-<CommonResponses />
