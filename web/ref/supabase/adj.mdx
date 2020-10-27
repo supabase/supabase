@@ -182,3 +182,31 @@ const { data, error } = await supabase
 </TabItem>
 
 </Tabs>
+
+### With `rpc()`
+
+<Tabs
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+// Only valid if the Stored Procedure returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .adj('population_range_millions', [70, 185])
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>

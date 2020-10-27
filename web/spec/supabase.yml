@@ -268,6 +268,18 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .eq('name', 'San Francisco')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .neq():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.neq'
@@ -309,6 +321,18 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .neq('name', 'Lagos')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .gt():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.gt'
@@ -344,6 +368,18 @@ pages:
           const { data, error } = await supabase
             .from('cities')
             .delete()
+            .gt('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
             .gt('country_id', 250)
           ```
         py: | 
@@ -391,6 +427,18 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .gte('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .lt():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lt'
@@ -426,6 +474,18 @@ pages:
           const { data, error } = await supabase
             .from('cities')
             .delete()
+            .lt('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
             .lt('country_id', 250)
           ```
         py: | 
@@ -473,6 +533,18 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .lte('country_id', 250)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .like():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.like'
@@ -508,6 +580,18 @@ pages:
           const { data, error } = await supabase
             .from('cities')
             .delete()
+            .like('name', '%la%')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
             .like('name', '%la%')
           ```
         py: | 
@@ -555,6 +639,18 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .ilike('name', '%la%')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .is():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.is'
@@ -596,6 +692,18 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .is('name', null)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .in():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.in'
@@ -631,6 +739,18 @@ pages:
           const { data, error } = await supabase
             .from('cities')
             .delete()
+            .in('name', ['Rio de Janeiro', 'San Francisco'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
             .in('name', ['Rio de Janeiro', 'San Francisco'])
           ```
         py: | 
@@ -679,6 +799,18 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .cs('main_exports', ['oil'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .cd():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cd'
@@ -714,6 +846,18 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
+            .cd('main_exports', ['cars', 'food', 'machine'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
             .cd('main_exports', ['cars', 'food', 'machine'])
           ```
         py: | 
@@ -761,6 +905,18 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .sl('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .sr():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.sr'
@@ -796,6 +952,18 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
+            .sr('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
             .sr('population_range_millions', [150, 250])
           ```
         py: | 
@@ -843,6 +1011,18 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .nxl('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .nxr():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxr'
@@ -884,6 +1064,18 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .nxr('population_range_millions', [150, 250])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .adj():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.adj'
@@ -919,6 +1111,18 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
+            .adj('population_range_millions', [70, 185])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
             .adj('population_range_millions', [70, 185])
           ```
         py: | 
