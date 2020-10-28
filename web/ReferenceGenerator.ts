@@ -11,7 +11,6 @@ import Tab from './spec/gen/components/Tab'
 import Tabs from './spec/gen/components/Tabs'
 import { slugify, tsDocCommentToMdComment, writeToDisk } from './spec/gen/lib/helpers'
 import { TsDoc, OpenRef } from './spec/gen/definitions'
-import axios from 'axios'
 
 const yaml = require('js-yaml')
 const fs = require('fs')
@@ -68,7 +67,7 @@ async function gen(inputFileName, outputDir) {
       const content = Page({
         slug,
         id: slug,
-        title: pageSpec.pageName,
+        title: pageSpec.title || pageSpec.pageName,
         description,
         parameters: hasTsRef ? generateParameters(tsDefinition) : '',
         spotlight: generateSpotlight(pageSpec['examples'] || [], allLanguages),

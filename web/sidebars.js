@@ -18,7 +18,7 @@ module.exports = {
       type: 'category',
       label: 'Auth',
       collapsed: false,
-      items: ['library/user-management'],
+      items: ['guides/user-management', 'guides/policies'],
     },
     {
       type: 'category',
@@ -95,6 +95,16 @@ module.exports = {
       label: 'Postgres',
       collapsed: false,
       items: ['postgres/server/about'],
+    },
+    {
+      type: 'category',
+      label: 'Self hosting',
+      collapsed: false,
+      items: [
+        'postgres/server/docker',
+        'postgres/server/aws',
+        'postgres/server/digitalocean'
+      ],
     },
   ],
   postgresApi: [

@@ -26,7 +26,7 @@ const Page = ({
   `
 ---
 id: ${id}
-title: ${title}
+title: "${title}"
 slug: ${slug}
 ---
 

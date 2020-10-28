@@ -4,11 +4,9 @@ title: About
 description: 'Host your own Realtime server'
 ---
 
-## Introduction
+Supabase Realtime is a Change Data Capture server. It allows you to listen to Postgres changes.
 
-The easiest way to get started with Realtime is to sign up to our [Alpha](https://app.supabase.io).
-
-If you want to host your own Realtime server, this document will help you to get set up. You have options to host using Docker, AWS, DigitalOcean, or build from source.
+If you want to host your own Realtime server, you have options to host using Docker, AWS, DigitalOcean, or build from source.
 
 ## Prerequisites
 

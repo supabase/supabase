@@ -79,7 +79,7 @@ module.exports = {
           position: 'left',
         },
         {
-          label: 'API Reference',
+          label: 'Client',
           to: '/ref/supabase',
           position: 'left',
         },

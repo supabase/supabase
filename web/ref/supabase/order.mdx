@@ -1,14 +1,13 @@
 ---
-id: wfts
-title: ".wfts()"
-slug: wfts
+id: order
+title: "order()"
+slug: order
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Finds all rows whose tsvector value on the stated `column` matches
-websearch_to_tsquery(`query`).
+Orders the result with the specified `column`.
 
 
 
@@ -31,28 +30,7 @@ websearch_to_tsquery(`query`).
   </h4>
   <div class="method-list-item-description">
 
-The column to filter on.
-  
-  </div>
-  
-</li>
-
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      query
-    </span>
-    <span className="method-list-item-label-badge required">
-      required
-    </span>
-    <span className="method-list-item-validation">
-      string
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-The Postgres tsquery string to filter with.
+The column to order on.
   
   </div>
   
@@ -83,7 +61,28 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      config
+      ascending
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      boolean
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+If `true`, the result will be in ascending order.
+  
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      foreignTable
     </span>
     <span className="method-list-item-label-badge required">
       required
@@ -94,7 +93,28 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-The text search configuration to use.
+The foreign table to use (if `column` is a foreign column).
+  
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      nullsFirst
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      boolean
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+If `true`, `null`s appear first.
   
   </div>
   

@@ -1,14 +1,13 @@
 ---
-id: wfts
-title: ".wfts()"
-slug: wfts
+id: insert
+title: "Create data: insert()"
+slug: insert
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Finds all rows whose tsvector value on the stated `column` matches
-websearch_to_tsquery(`query`).
+Performs an INSERT into the table.
 
 
 
@@ -20,39 +19,18 @@ websearch_to_tsquery(`query`).
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      column
+      values
     </span>
     <span className="method-list-item-label-badge required">
       required
     </span>
     <span className="method-list-item-validation">
-      object
+       | 
     </span>
   </h4>
   <div class="method-list-item-description">
 
-The column to filter on.
-  
-  </div>
-  
-</li>
-
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      query
-    </span>
-    <span className="method-list-item-label-badge required">
-      required
-    </span>
-    <span className="method-list-item-validation">
-      string
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-The Postgres tsquery string to filter with.
+The values to insert.
   
   </div>
   
@@ -83,7 +61,7 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      config
+      onConflict
     </span>
     <span className="method-list-item-label-badge required">
       required
@@ -94,7 +72,28 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-The text search configuration to use.
+By specifying the `on_conflict` query parameter, you can make UPSERT work on a column(s) that has a UNIQUE constraint.
+  
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      upsert
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      boolean
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+If `true`, performs an UPSERT.
   
   </div>
   

@@ -36,12 +36,6 @@ const { data, error } = await supabase
   .not('name', 'eq', 'Paris')
 `.trim()
 
-export const storedMatchJs = `
-const { data, error } = await supabase
-  .rpc('echo_all_cities')
-  .match({name: 'Beijing', country_id: 156})
-`.trim()
-
 
 
 

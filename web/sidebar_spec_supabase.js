@@ -9,31 +9,25 @@ module.exports = {
     {
       type: 'category',
       label: 'Auth',
-      items: ['sign-up', 'sign-in', 'sign-out', 'get-the-logged-in-user', 'update-the-logged-in-user', 'reset-password', 'listen-to-auth-change-events'],
+      items: ['auth-signup', 'auth-signin', 'auth-signout', 'auth-user', 'auth-update', 'auth-forgotpassword', 'auth-onauthstatechange'],
       collapsed: false,
     },
     {
       type: 'category',
-      label: 'Reading data',
-      items: ['select-data', 'limit-rows-returned', 'order-data'],
+      label: 'Operators',
+      items: ['select', 'insert', 'update', 'delete', 'rpc', 'on'],
       collapsed: false,
     },
     {
       type: 'category',
-      label: 'Data operations',
-      items: ['insert-data', 'update-rows', 'delete-rows'],
-      collapsed: false,
-    },
-    {
-      type: 'category',
-      label: 'Stored Procedures',
-      items: ['rpc'],
+      label: 'Modifiers',
+      items: ['using-modifiers', 'limit', 'order'],
       collapsed: false,
     },
     {
       type: 'category',
       label: 'Filters',
-      items: ['using-filters', 'eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'like', 'ilike', 'is', 'in', 'cs', 'cd', 'sl', 'sr', 'nxl', 'nxr', 'adj', 'ov', 'fts', 'plfts', 'phfts', 'wfts'],
+      items: ['using-filters', 'match', 'eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'like', 'ilike', 'is', 'in', 'cs', 'cd', 'sl', 'sr', 'nxl', 'nxr', 'adj', 'ov', 'fts', 'plfts', 'phfts', 'wfts'],
       collapsed: false,
     }
   ],

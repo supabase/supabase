@@ -38,29 +38,30 @@ info:
           - Initializing
       - name: 'Auth'
         items:
-          - Sign up
-          - Sign in
-          - Sign out
-          - Get the logged in user
-          - Update the logged in user
-          - Reset password
-          - Listen to auth change events
-      - name: 'Reading data'
+          - auth.signUp()
+          - auth.signIn()
+          - auth.signOut()
+          - auth.user()
+          - auth.update()
+          - auth.forgotPassword()
+          - auth.onAuthStateChange()
+      - name: 'Operators'
         items:
-          - Select data
-          - Limit rows returned
-          - Order data
-      - name: 'Data operations'
+          - select()
+          - insert()
+          - update()
+          - delete()
+          - rpc()
+          - on()
+      - name: 'Modifiers'
         items:
-          - Insert data
-          - Update rows
-          - Delete rows
-      - name: Stored Procedures
-        items:
-          - .rpc()
+          - Using Modifiers
+          - limit()
+          - order()
       - name: 'Filters'
         items:
           - Using Filters
+          - .match()
           - .eq()
           - .neq()
           - .gt()
@@ -136,7 +137,7 @@ pages:
           ```
 
 
-  Sign up:
+  auth.signUp():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signUp'
     examples:
       - name: Sign up
@@ -153,7 +154,7 @@ pages:
           # Not yet implemented
           ```
 
-  Sign in:
+  auth.signIn():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signIn'
     notes: |
       - A user can sign up either via email or OAuth.
@@ -174,7 +175,7 @@ pages:
           # Not yet implemented
           ```
 
-  Sign out:
+  auth.signOut():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signOut'
     examples:
       - name: Sign out
@@ -183,7 +184,7 @@ pages:
           const { error, data } = await supabaseSign out
           ```
 
-  Get the logged in user:
+  auth.user():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.user'
     examples:
       - name: Get user
@@ -191,35 +192,51 @@ pages:
           ```js
           const { error, data } = await supabaseGet the logged in user
           ```
-  Update the logged in user:
+  auth.update():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.update'
 
-  Listen to auth change events: 
+  auth.onAuthStateChange(): 
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.onAuthStateChange'
 
-  Reset password:
+  auth.forgotPassword():
     $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.resetPasswordForEmail'
 
-  Select data:
+  select():
+    title: "Fetch data: select()"
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.select'
   
-  Limit rows returned:
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.limit'
-  
-  Order data:
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.order'
-
-  Insert data:
+  insert():
+    title: "Create data: insert()"
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
 
-  Update rows:
+  update():
+    title: "Modify data: update()"
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.update'
 
-  Delete rows:
+  delete():
+    title: "Delete data: delete()" 
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.delete'
 
-  .rpc():
+  rpc():
+    title: "Stored Procedures: rpc()"
     $ref: '@supabase/postgrest-js."PostgrestClient".PostgrestClient.rpc'
+
+  on():
+    title: "Subscribing: on()"
+    $ref: '@supabase/supabase-js."lib/SupabaseQueryBuilder".SupabaseQueryBuilder.on'
+
+
+  Using Modifiers: 
+    description: |
+      Modifiers can be used on `select()` queries. 
+      
+      If a Stored Procedure returns a table response, you can also apply modifiers to the `rpc()` function.
+
+  limit():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.limit'
+  
+  order():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.order'
 
 
   Using Filters: 
@@ -227,6 +244,59 @@ pages:
       Filters can be used on `select()`, `update()`, and `delete()` queries. 
       
       If a Stored Procedure returns a table response, you can also apply filters.
+
+  .match():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.match'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .match({name: 'Beijing', country_id: 156})
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .match({name: 'Beijing', country_id: 156})
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .match({name: 'Beijing', country_id: 156})
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .match({name: 'Beijing', country_id: 156})
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .eq():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.eq'

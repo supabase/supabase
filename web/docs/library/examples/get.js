@@ -124,12 +124,6 @@ const { data, error } = await supabase
   .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
 `.trim()
 
-export const getMatchJs = `
-const { data, error } = await supabase
-  .from('cities')
-  .select('name, country_id')
-  .match({name: 'Beijing', country_id: 156})
-`.trim()
 
 
 

@@ -25,14 +25,6 @@ const { data, error } = await supabase
   .not('name', 'eq', 'Paris')
 `.trim()
 
-export const deleteMatchJs = `
-const { data, error } = await supabase
-  .from('cities')
-  .delete()
-  .match({name: 'Beijing', country_id: 156})
-`.trim()
-
-
 
 
 

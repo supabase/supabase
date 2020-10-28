@@ -25,12 +25,6 @@ const { data, error } = await supabase
   .not('name', 'eq', 'Paris')
 `.trim()
 
-export const patchMatchJs = `
-const { data, error } = await supabase
-  .from('cities')
-  .update({ name: 'Mordor' })
-  .match({name: 'Beijing', country_id: 156})
-`.trim()
 
 
 
