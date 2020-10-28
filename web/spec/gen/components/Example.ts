@@ -1,8 +1,10 @@
-type params = { name: string; tabs: string }
+type params = { name: string; description:string; tabs: string }
 
-const Example = ({ name, tabs = '' }: params) =>
+const Example = ({ name, description = '', tabs = '' }: params) =>
   `
 ### ${name}
+
+${description}
 
 ${tabs}
 `.trim()

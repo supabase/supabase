@@ -7,10 +7,10 @@
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "traction": "node traction.js",
-    "gen:gotrue": "ts-node ReferenceGenerator.ts -o ref/gotrue spec/gotrue.yml",
-    "gen:postgrest": "ts-node ReferenceGenerator.ts -o ref/postgrest spec/postgrest.yml",
-    "gen:realtime": "ts-node ReferenceGenerator.ts -o ref/realtime spec/realtime.yml",
-    "gen:supabase": "ts-node ReferenceGenerator.ts -o ref/supabase spec/supabase.yml"
+    "gen:gotrue": "ts-node ReferenceGenerator.ts -o docs/gotrue/client spec/gotrue.yml",
+    "gen:postgrest": "ts-node ReferenceGenerator.ts -o docs/postgrest/client spec/postgrest.yml",
+    "gen:realtime": "ts-node ReferenceGenerator.ts -o docs/realtime/client spec/realtime.yml",
+    "gen:supabase": "ts-node ReferenceGenerator.ts -o docs/client spec/supabase.yml"
   },
   "dependencies": {
     "@docusaurus/core": "^2.0.0-alpha.63",

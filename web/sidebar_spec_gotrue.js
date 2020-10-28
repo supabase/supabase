@@ -2,20 +2,20 @@ module.exports = {
   docs: [
     {
       type: 'category',
-      label: 'GoTrue Client',
-      items: ['index', 'installing', 'initializing'],
+      label: 'About',
+      items: ['gotrue/client/index', 'gotrue/client/installing', 'gotrue/client/initializing'],
       collapsed: false,
     },
     {
       type: 'category',
       label: 'Client functions',
-      items: ['signup', 'signin', 'signout', 'user', 'update', 'onauthstatechange'],
+      items: ['gotrue/client/signup', 'gotrue/client/signin', 'gotrue/client/signout', 'gotrue/client/user', 'gotrue/client/update', 'gotrue/client/onauthstatechange'],
       collapsed: false,
     },
     {
       type: 'category',
       label: 'General functions',
-      items: ['api-signupwithemail', 'api-signinwithemail', 'api-resetpasswordforemail', 'api-signout', 'api-getuser', 'api-updateuser', 'api-refreshaccesstoken'],
+      items: ['gotrue/client/api-signupwithemail', 'gotrue/client/api-signinwithemail', 'gotrue/client/api-resetpasswordforemail', 'gotrue/client/api-signout', 'gotrue/client/api-getuser', 'gotrue/client/api-updateuser', 'gotrue/client/api-refreshaccesstoken'],
       collapsed: false,
     }
   ],

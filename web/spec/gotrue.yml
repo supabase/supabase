@@ -16,8 +16,9 @@ info:
       id: 'py'
       version: '0.0.1'
   docs:
+    path: gotrue/client/
     sidebar:
-      - name: 'GoTrue Client'
+      - name: 'About'
         items:
           - index
           - Installing

@@ -16,8 +16,9 @@ info:
       id: 'py'
       version: '0.0.1'
   docs:
+    path: realtime/client/
     sidebar:
-      - name: 'Realtime Client'
+      - name: 'About'
         items:
           - index
           - Installing

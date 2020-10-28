@@ -30,8 +30,9 @@ info:
       id: 'py'
       version: '0.0.1'
   docs:
+    path: client/
     sidebar:
-      - name: 'Supabase Client'
+      - name: 'About'
         items:
           - index
           - Installing
@@ -45,22 +46,30 @@ info:
           - auth.update()
           - auth.forgotPassword()
           - auth.onAuthStateChange()
-      - name: 'Operators'
+      - name: 'Data'
         items:
           - select()
           - insert()
           - update()
           - delete()
           - rpc()
-          - on()
+      - name: 'Realtime'
+        items:
+          - subscribe()
+          - removeSubscription()
+          - getSubscriptions()
       - name: 'Modifiers'
         items:
           - Using Modifiers
           - limit()
           - order()
+          - range()
+          - single()
       - name: 'Filters'
         items:
           - Using Filters
+          - .filter()
+          - .not()
           - .match()
           - .eq()
           - .neq()
@@ -221,10 +230,140 @@ pages:
     title: "Stored Procedures: rpc()"
     $ref: '@supabase/postgrest-js."PostgrestClient".PostgrestClient.rpc'
 
-  on():
-    title: "Subscribing: on()"
+  subscribe():
+    title: "on().subscribe()"
     $ref: '@supabase/supabase-js."lib/SupabaseQueryBuilder".SupabaseQueryBuilder.on'
+    notes: |
+      - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
+    examples:
+      - name: Listen to all database changes
+        isSpotlight: true
+        js: |
+          ```js
+          const mySubscription = supabase
+            .from('*')
+            .on('*', payload => {
+              console.log('Change received!', payload)
+            })
+            .subscribe()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Listening to a specific table
+        js: |
+          ```js
+          const mySubscription = supabase
+            .from('countries')
+            .on('*', payload => {
+              console.log('Change received!', payload)
+            })
+            .subscribe()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Listening to inserts
+        js: |
+          ```js
+          const mySubscription = supabase
+            .from('countries')
+            .on('INSERT', payload => {
+              console.log('Change received!', payload)
+            })
+            .subscribe()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Listening to updates
+        js: |
+          ```js
+          const mySubscription = supabase
+            .from('countries')
+            .on('UPDATE', payload => {
+              console.log('Change received!', payload)
+            })
+            .subscribe()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Listening to deletes
+        js: |
+          ```js
+          const mySubscription = supabase
+            .from('countries')
+            .on('DELETE', payload => {
+              console.log('Change received!', payload)
+            })
+            .subscribe()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Listening to multiple events
+        description: You can chain listeners if you want to listen to multiple events for each table.
+        js: |
+          ```js
+          const mySubscription = supabase
+            .from('countries')
+            .on('INSERT', handleRecordInserted)
+            .on('DELETE', handleRecordDeleted)
+            .subscribe()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Listening to row level changes
+        description: You can listen to individual rows using the format `{table}:{col}.eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        js: |
+          ```js
+          const mySubscription = supabase
+            .from('countries:id.eq.200')
+            .on('UPDATE', handleRecordUpdated)
+            .subscribe()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
+  removeSubscription():
+    title: "removeSubscription()"
+    $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.removeSubscription'
+    examples:
+      - name: Remove a subscription
+        isSpotlight: true
+        js: |
+          ```js
+          supabase.removeSubscription(mySubscription)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+
+  getSubscriptions():
+    title: "getSubscriptions()"
+    $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.getSubscriptions'
+    examples:
+      - name: Remove a subscription
+        isSpotlight: true
+        js: |
+          ```js
+          const subscriptions = supabase.getSubscriptions()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   Using Modifiers: 
     description: |
@@ -234,16 +373,223 @@ pages:
 
   limit():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.limit'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .limit(1)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With embedded resources
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, cities(name)')
+            .eq('name', 'United States')
+            .limit(1, 'cities')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
   
   order():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.order'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name', 'country_id')
+            .order('id')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With embedded resources
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, cities(name)')
+            .eq('name', 'United States')
+            .order('cities.name')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
+  range():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.range'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .range(0,3)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+
+  single():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.single'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .single()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   Using Filters: 
     description: |
       Filters can be used on `select()`, `update()`, and `delete()` queries. 
       
       If a Stored Procedure returns a table response, you can also apply filters.
+
+  .filter():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.filter'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .filter('name', 'eq', 'Paris')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .filter('name', 'eq', 'Paris')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .filter({'name', 'eq', 'Paris'})
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .filter({'name', 'eq', 'Paris'})
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Filter embedded resources
+        js: |
+          ```js
+          export const getFilterJsEmbedded = `
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, countries ( name )')
+            .filter('countries.name', 'eq', 'France')
+          `.trim()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+
+  .not():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.not'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .not('name', 'eq', 'Paris')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .not('name', 'eq', 'Paris')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .not('name', 'eq', 'Paris')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities)
+            .not('name', 'eq', 'Paris')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .match():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.match'
@@ -1202,6 +1548,56 @@ pages:
 
   .ov():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.ov'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .ova('main_exports', ['computers', 'minerals'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          let countries = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .ova('main_exports', ['computers', 'minerals'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .ova('main_exports', ['computers', 'minerals'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Stored Procedure returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .ova('main_exports', ['computers', 'minerals'])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   .fts():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.fts'

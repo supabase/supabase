@@ -16,8 +16,9 @@ info:
       id: 'py'
       version: '0.0.1'
   docs:
+    path: postgrest/client/
     sidebar:
-      - name: 'Postgrest Client'
+      - name: 'About'
         items:
           - index
           - Installing
@@ -32,6 +33,8 @@ info:
           - rpc
       - name: 'Filters'
         items:
+          - filter
+          - not
           - eq
           - neq
           - gt
@@ -96,6 +99,12 @@ pages:
 
   rpc:
     $ref: '"PostgrestClient".PostgrestClient.rpc'
+
+  filter:
+    $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.filter'
+
+  not:
+    $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.not'
 
   eq:
     $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.eq'

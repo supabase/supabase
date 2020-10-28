@@ -5,14 +5,23 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+const goTrueClient = require('./sidebar_spec_gotrue')
+const postgrestClient = require('./sidebar_spec_postgrest')
+const realtimeClient = require('./sidebar_spec_realtime')
+const supabaseClient = require('./sidebar_spec_supabase')
+
 module.exports = {
+  goTrueClient: goTrueClient.docs,
+  postgrestClient: postgrestClient.docs,
+  realtimeClient: realtimeClient.docs,
+  supabaseClient: supabaseClient.docs,
   docs: [
     { type: 'category', label: 'Introduction', items: ['about', 'faq'], collapsed: false },
     {
       type: 'category',
       label: 'Client library',
       collapsed: false,
-      items: ['library/getting-started'],
+      items: ['library/getting-started', 'guides/generating-types'],
     },
     {
       type: 'category',
@@ -73,14 +82,14 @@ module.exports = {
       ],
     },
   ],
-  realtimeClient: [
-    {
-      type: 'category',
-      label: 'Realtime',
-      collapsed: false,
-      items: ['realtime/client/about'],
-    },
-  ],
+  // realtimeClient: [
+  //   {
+  //     type: 'category',
+  //     label: 'Realtime',
+  //     collapsed: false,
+  //     items: ['realtime/client/about'],
+  //   },
+  // ],
   postgrestServer: [
     {
       type: 'category',
@@ -100,11 +109,7 @@ module.exports = {
       type: 'category',
       label: 'Self hosting',
       collapsed: false,
-      items: [
-        'postgres/server/docker',
-        'postgres/server/aws',
-        'postgres/server/digitalocean'
-      ],
+      items: ['postgres/server/docker', 'postgres/server/aws', 'postgres/server/digitalocean'],
     },
   ],
   postgresApi: [

@@ -161,7 +161,7 @@ ${description ? description : 'No description provided. '}
 function generateExamples(specExamples: any, allLanguages: any) {
   return specExamples.map((example) => {
     let allTabs = Tabs(allLanguages, generateTabs(allLanguages, example))
-    return Example({ name: example.name, tabs: allTabs })
+    return Example({ name: example.name, description: example.description, tabs: allTabs })
   })
 }
 
@@ -219,8 +219,12 @@ function extractTsDocNode(nodeToFind: string, definition: any) {
 }
 
 function generateSidebar(docSpec: any) {
+  let path = docSpec.info.docs.path || ''
   let categories = docSpec.info.docs.sidebar.map((x) => {
-    const items = x.items.map((item) => `'${slugify(item)}'`)
+    const items = x.items.map((item) => {
+      let slug = slugify(item)
+      return `'${path}${slug}'`
+    })
     return SidebarCategory(x.name, items)
   })
   return Sidebar(categories)
@@ -228,7 +232,7 @@ function generateSidebar(docSpec: any) {
 
 function generateDocsIndexPage(docSpec: any) {
   return Page({
-    slug: '/',
+    slug: slugify(docSpec.info.title),
     id: 'index',
     title: docSpec.info.title,
     description: docSpec.info.description,

@@ -2,32 +2,38 @@ module.exports = {
   docs: [
     {
       type: 'category',
-      label: 'Supabase Client',
-      items: ['index', 'installing', 'initializing'],
+      label: 'About',
+      items: ['client/index', 'client/installing', 'client/initializing'],
       collapsed: false,
     },
     {
       type: 'category',
       label: 'Auth',
-      items: ['auth-signup', 'auth-signin', 'auth-signout', 'auth-user', 'auth-update', 'auth-forgotpassword', 'auth-onauthstatechange'],
+      items: ['client/auth-signup', 'client/auth-signin', 'client/auth-signout', 'client/auth-user', 'client/auth-update', 'client/auth-forgotpassword', 'client/auth-onauthstatechange'],
       collapsed: false,
     },
     {
       type: 'category',
-      label: 'Operators',
-      items: ['select', 'insert', 'update', 'delete', 'rpc', 'on'],
+      label: 'Data',
+      items: ['client/select', 'client/insert', 'client/update', 'client/delete', 'client/rpc'],
+      collapsed: false,
+    },
+    {
+      type: 'category',
+      label: 'Realtime',
+      items: ['client/subscribe', 'client/removesubscription', 'client/getsubscriptions'],
       collapsed: false,
     },
     {
       type: 'category',
       label: 'Modifiers',
-      items: ['using-modifiers', 'limit', 'order'],
+      items: ['client/using-modifiers', 'client/limit', 'client/order', 'client/range', 'client/single'],
       collapsed: false,
     },
     {
       type: 'category',
       label: 'Filters',
-      items: ['using-filters', 'match', 'eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'like', 'ilike', 'is', 'in', 'cs', 'cd', 'sl', 'sr', 'nxl', 'nxr', 'adj', 'ov', 'fts', 'plfts', 'phfts', 'wfts'],
+      items: ['client/using-filters', 'client/filter', 'client/not', 'client/match', 'client/eq', 'client/neq', 'client/gt', 'client/gte', 'client/lt', 'client/lte', 'client/like', 'client/ilike', 'client/is', 'client/in', 'client/cs', 'client/cd', 'client/sl', 'client/sr', 'client/nxl', 'client/nxr', 'client/adj', 'client/ov', 'client/fts', 'client/plfts', 'client/phfts', 'client/wfts'],
       collapsed: false,
     }
   ],
