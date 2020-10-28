@@ -119,7 +119,7 @@ module.exports = {
             },
             {
               label: 'Realtime Client',
-              to: '/docs/realtime/client/about',
+              to: '/ref/realtime',
             },
           ],
         },
@@ -254,6 +254,18 @@ module.exports = {
         routeBasePath: 'ref/gotrue', // URL Route.
         include: ['**/*.md', '**/*.mdx'],
         sidebarPath: require.resolve('./sidebar_spec_gotrue.js'),
+        // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'realtime-client', // for first plugin-content-docs with "resources/" path
+        // homePageId: "doc2",
+        path: './ref/realtime', // Path to data on filesystem, relative to site dir.
+        routeBasePath: 'ref/realtime', // URL Route.
+        include: ['**/*.md', '**/*.mdx'],
+        sidebarPath: require.resolve('./sidebar_spec_realtime.js'),
         // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
       },
     ],

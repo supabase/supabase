@@ -9,6 +9,7 @@
     "traction": "node traction.js",
     "gen:gotrue": "ts-node ReferenceGenerator.ts -o ref/gotrue spec/gotrue.yml",
     "gen:postgrest": "ts-node ReferenceGenerator.ts -o ref/postgrest spec/postgrest.yml",
+    "gen:realtime": "ts-node ReferenceGenerator.ts -o ref/realtime spec/realtime.yml",
     "gen:supabase": "ts-node ReferenceGenerator.ts -o ref/supabase spec/supabase.yml"
   },
   "dependencies": {
