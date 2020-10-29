@@ -21,7 +21,7 @@ module.exports = {
       type: 'category',
       label: 'Getting Started',
       collapsed: false,
-      items: ['guides/database', 'guides/auth', 'guides/client-libraries'],
+      items: ['guides/platform', 'guides/database', 'guides/auth', 'guides/client-libraries'],
     },
     {
       type: 'category',

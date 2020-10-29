@@ -25,6 +25,8 @@ We currently support the following OAuth providers:
 - Gitlab
 - Bitbucket
 
+![OAuth Logins.](/img/supabase-oauth-logins.png)
+
 You can enable providers by navigating to Authentication > Settings > External OAuth Providers and inputting your `Client ID` and `Secret` for each.
 
 To fetch these you need to:
@@ -113,3 +115,8 @@ from todos
 where auth.uid() = todos.user_id; -- Policy is implicitly added.
 ```
 
+
+## Next steps
+
+- Read more about [Row Level Security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
+- Sign in: [app.supabase.io](https://app.supabase.io)
