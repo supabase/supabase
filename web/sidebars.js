@@ -19,9 +19,15 @@ module.exports = {
     { type: 'category', label: 'Introduction', items: ['about', 'faq'], collapsed: false },
     {
       type: 'category',
+      label: 'Products',
+      collapsed: false,
+      items: ['guides/database', 'guides/auth', 'guides/storage'],
+    },
+    {
+      type: 'category',
       label: 'Client library',
       collapsed: false,
-      items: ['library/getting-started', 'guides/generating-types'],
+      items: ['library/getting-started', 'guides/auth', 'guides/generating-types'],
     },
     {
       type: 'category',
@@ -34,9 +40,7 @@ module.exports = {
       label: 'Database',
       collapsed: false,
       items: [
-        'library/get',
         'library/post',
-        'library/patch',
         'library/delete',
         'library/stored-procedures',
       ],

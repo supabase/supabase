@@ -69,6 +69,7 @@ info:
         items:
           - Using Filters
           - .filter()
+          - .or()
           - .not()
           - .match()
           - .eq()
@@ -213,6 +214,94 @@ pages:
   select():
     title: "Fetch data: select()"
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.select'
+    notes: | 
+      - `select()` can be combined with [Modifiers](/docs/client/using-modifiers)
+      - `select()` can be combined with [Filters](/docs/client/using-filters)
+    examples:
+      - name: Getting your data
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Selecting specific columns
+        description: You can select specific fields from your tables.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Query foreign tables
+        description: If your database has relationships, you can query related tables too.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select(\`
+              name,
+              cities (
+                name
+              )
+            \`)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Query the same foreign table multiple times
+        description: | 
+          Sometimes you will need to query the same foreign table twice. 
+          In this case, you can use the name of the joined column to identify 
+          which join you intend to use. For convenience, you can also give an 
+          alias for each column. For example, if we had a shop of products, 
+          and we wanted to get the supplier and the purchaser at the same time 
+          (both in the users) table:
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('products')
+            .select(\`
+              id,
+              supplier:supplier_id ( name ),
+              purchaser:purchaser_id ( name )
+            \`)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Quering JSON data
+        description: | 
+          If you have data inside of a JSONB column, you can apply select 
+          and query filters to the data values. Postgres offers a 
+          [number of operators](https://www.postgresql.org/docs/9.5/functions-json.html) 
+          for querying JSON data. Also see 
+          [PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('products')
+            .select(\`
+              id,
+              supplier:supplier_id ( name ),
+              purchaser:purchaser_id ( name )
+            \`)
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
   
   insert():
     title: "Create data: insert()"
@@ -221,6 +310,22 @@ pages:
   update():
     title: "Modify data: update()"
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.update'
+    notes: | 
+      - `update()` should always be combined with [Filters](/docs/client/using-filters) to target the item(s) you wish to update.
+    examples:
+      - name: Updating your data
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Middle Earth' })
+            .match({ name: 'Auckland' })
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   delete():
     title: "Delete data: delete()" 
@@ -532,6 +637,36 @@ pages:
             .select('name, countries ( name )')
             .filter('countries.name', 'eq', 'France')
           `.trim()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+
+  .or():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.or'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .or('id.eq.20,id.eq.30')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: User `or` with `and`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
           ```
         py: | 
           ```py

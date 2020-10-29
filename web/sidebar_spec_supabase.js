@@ -33,7 +33,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Filters',
-      items: ['client/using-filters', 'client/filter', 'client/not', 'client/match', 'client/eq', 'client/neq', 'client/gt', 'client/gte', 'client/lt', 'client/lte', 'client/like', 'client/ilike', 'client/is', 'client/in', 'client/cs', 'client/cd', 'client/sl', 'client/sr', 'client/nxl', 'client/nxr', 'client/adj', 'client/ov', 'client/fts', 'client/plfts', 'client/phfts', 'client/wfts'],
+      items: ['client/using-filters', 'client/filter', 'client/or', 'client/not', 'client/match', 'client/eq', 'client/neq', 'client/gt', 'client/gte', 'client/lt', 'client/lte', 'client/like', 'client/ilike', 'client/is', 'client/in', 'client/cs', 'client/cd', 'client/sl', 'client/sr', 'client/nxl', 'client/nxr', 'client/adj', 'client/ov', 'client/fts', 'client/plfts', 'client/phfts', 'client/wfts'],
       collapsed: false,
     }
   ],
