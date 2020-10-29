@@ -3,13 +3,13 @@ module.exports = {
     {
       type: 'category',
       label: 'About',
-      items: ['client/index', 'client/installing', 'client/initializing'],
+      items: ['client/index', 'client/installing', 'client/initializing', 'client/generating-types'],
       collapsed: false,
     },
     {
       type: 'category',
       label: 'Auth',
-      items: ['client/auth-signup', 'client/auth-signin', 'client/auth-signout', 'client/auth-user', 'client/auth-update', 'client/auth-forgotpassword', 'client/auth-onauthstatechange'],
+      items: ['client/auth-signup', 'client/auth-signin', 'client/auth-signout', 'client/auth-user', 'client/auth-update', 'client/auth-onauthstatechange', 'client/reset-password-email'],
       collapsed: false,
     },
     {

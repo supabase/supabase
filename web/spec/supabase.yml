@@ -37,6 +37,7 @@ info:
           - index
           - Installing
           - Initializing
+          - Generating Types
       - name: 'Auth'
         items:
           - auth.signUp()
@@ -44,8 +45,8 @@ info:
           - auth.signOut()
           - auth.user()
           - auth.update()
-          - auth.forgotPassword()
           - auth.onAuthStateChange()
+          - Reset Password (Email)
       - name: 'Data'
         items:
           - select()
@@ -146,6 +147,79 @@ pages:
           # Not yet implemented
           ```
 
+  Generating Types: 
+    description: |
+      Supabase will soon release native type generators that dump your database types for various languages. For now, we support TypeScript through a third-party tool.
+
+      ## Usage with TypeScript
+
+      `supabase-js` ships with type definitions for usage with TypeScript and for convenient IntelliSense autocomplete and documentation in your editor.
+
+      When using TypeScript, you can pass the type of database row as a type parameter to the `from` method to get better autocompletion support down the chain. 
+      If you don't provide a type for the row you need to explicitly pass `from<any>('tableName')`.
+
+      ```ts
+      type Message = {
+        id: number;
+        inserted_at: string;
+        message: string;
+        user_id: string;
+        channel_id: number;
+        author: { username: string };
+      };
+
+      const response = await supabase
+        .from<Message>('messages') // Message maps to the type of the row in your database.
+        .select('*, author:user_id(username)')
+        .match({ channel_id: 2 }); // Your IDE will be able to help with automcompletion.
+      response.body // Response body will be of type Array<Message>.
+
+      // If you don't provide a type for the row you need to explicitly pass `from<any>('tableName')`.
+      const response = await supabase
+        .from<any>('messages')
+        .select('*, author:user_id(username)')
+        .match({ channel_id: 2 });
+      response.body // Response body will be of type Array<any>.
+      ```
+
+      ### Generate database types from Swagger OpenAPI specification
+
+      Supabase generates a Swagger speficiation file for your database which can be used to generate your data types for usage with TypeScript.
+
+      The Swagger specification for your Supabase project can be accessed as follows:
+
+      ```txt
+      https://your-project.supabase.co/rest/v1/?apikey=your-anon-key
+      ```
+
+      Using the open source [swagger-to-ts](https://github.com/manifoldco/swagger-to-ts#%EF%B8%8F-reading-specs-from-remote-resource) tool you can generate your types and store them locally:
+
+      ```bash
+      npx @manifoldco/swagger-to-ts https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/supabase.ts
+      ```
+
+      **Note:** Do note that your local types won't automatically stay in sync with your database, so make sure to regenerate your types after your make changes to your database.
+
+      After you have generated your types, you can use them in your TypeScript projects:
+
+      ```ts
+      import { NextApiRequest, NextApiResponse } from "next";
+      import { createClient } from "@supabase/supabase-js";
+      import { definitions } from "../../types/supabase";
+
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL,
+        process.env.SUPABASE_SECRET_KEY
+      );
+
+      export default async (req: NextApiRequest, res: NextApiResponse) => {
+        const allOnlineUsers = await supabase
+          .from<definitions["users"]>("users")
+          .select("*")
+          .eq("status", "ONLINE");
+        res.status(200).json(allOnlineUsers);
+      };
+      ```
 
   auth.signUp():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signUp'
@@ -184,32 +258,109 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: Sign in using third-party providers.
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.signIn({
+            // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
+            provider: 'github'
+          })
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   auth.signOut():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signOut'
     examples:
       - name: Sign out
+        isSpotlight: true
         js: |
           ```js
           const { error, data } = await supabaseSign out
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+
+  auth.session():
+    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.session'
+    examples:
+      - name: Get the session data
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.session()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
           ```
 
   auth.user():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.user'
     examples:
-      - name: Get user
+      - name: Get the logged in user
+        isSpotlight: true
         js: |
           ```js
-          const { error, data } = await supabaseGet the logged in user
+          vawait supabase.auth.user()
           ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+
   auth.update():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.update'
+    notes: | 
+      It's generally better to store user data in a table inside your public schema (i.e. `public.users`). 
+      Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
+    examples:
+      - name: Update a user's metadata.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.update({ 
+            data: { hello: 'world' } 
+          })
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   auth.onAuthStateChange(): 
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.onAuthStateChange'
+    examples:
+      - name: Listen to auth changes
+        isSpotlight: true
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            console.log(event, session)
+          })
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
-  auth.forgotPassword():
+  Reset Password (Email):
     $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.resetPasswordForEmail'
+    examples:
+      - name: Reset password
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = supabase.auth.api.resetPasswordForEmail('user@email.com')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   select():
     title: "Fetch data: select()"
@@ -248,12 +399,12 @@ pages:
           ```js
           const { data, error } = await supabase
             .from('countries')
-            .select(\`
+            .select(`
               name,
               cities (
                 name
               )
-            \`)
+            `)
           ```
         py: | 
           ```py
@@ -271,11 +422,11 @@ pages:
           ```js
           const { data, error } = await supabase
             .from('products')
-            .select(\`
+            .select(`
               id,
               supplier:supplier_id ( name ),
               purchaser:purchaser_id ( name )
-            \`)
+            `)
           ```
         py: | 
           ```py
@@ -292,11 +443,11 @@ pages:
           ```js
           const { data, error } = await supabase
             .from('products')
-            .select(\`
+            .select(`
               id,
               supplier:supplier_id ( name ),
               purchaser:purchaser_id ( name )
-            \`)
+            `)
           ```
         py: | 
           ```py
@@ -306,6 +457,58 @@ pages:
   insert():
     title: "Create data: insert()"
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
+    examples:
+      - name: Create a record
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .insert([
+              { name: 'The Shire', country_id: 554 }
+            ])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Bulk create
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .insert([
+              { name: 'The Shire', country_id: 554 },
+              { name: 'Rohan', country_id: 555 },
+            ])
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Upsert
+        description: | 
+          For upsert, if set to true, primary key columns would need to be included 
+          in the data parameter in order for an update to properly happen. Also, primary keys 
+          used must be natural, not surrogate. There are however, 
+          [workarounds](https://github.com/PostgREST/postgrest/issues/1118) 
+          for surrogate primary keys.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .insert(
+              [
+                { name: 'The Shire', country_id: 554 },
+                { name: 'Rohan', country_id: 555 },
+                { name: 'City by the Bay', country_id:840}
+              ],
+              { upsert: true })
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   update():
     title: "Modify data: update()"
@@ -330,10 +533,85 @@ pages:
   delete():
     title: "Delete data: delete()" 
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.delete'
+    notes: | 
+      - `delete()` should always be combined with [Filters](/docs/client/using-filters) to target the item(s) you wish to delete.
+    examples:
+      - name: Delete records
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .match({ id: 666 })
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   rpc():
     title: "Stored Procedures: rpc()"
+    description: | 
+      You can call stored procedures as a "Remote Procedure Call".
+
+      That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
+      It's especially useful when the logic rarely changes - like password resets and updates.
     $ref: '@supabase/postgrest-js."PostgrestClient".PostgrestClient.rpc'
+    examples:
+      - name: Call a stored procedure
+        isSpotlight: true
+        description: This is an example invoking a stored procedure.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .rpc('hello_world')
+          }
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With Parameters
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .rpc('echo_city', { name: 'The Shire' })
+          }
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Bulk call
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .rpc('echo_city', [
+              { name: 'The Shire' },
+              { name: 'Mordor' }
+            ])
+          }
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: With filters.
+        description: | 
+          Stored procedures that return tables can also be combined with 
+          [Modifiers](/docs/client/using-modifiers) and 
+          [Filters](/docs/client/using-filters).
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .eq('name', 'The Shire')
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   subscribe():
     title: "on().subscribe()"

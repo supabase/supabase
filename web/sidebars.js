@@ -19,37 +19,9 @@ module.exports = {
     { type: 'category', label: 'Introduction', items: ['about', 'faq'], collapsed: false },
     {
       type: 'category',
-      label: 'Products',
+      label: 'Getting Started',
       collapsed: false,
-      items: ['guides/database', 'guides/auth', 'guides/storage'],
-    },
-    {
-      type: 'category',
-      label: 'Client library',
-      collapsed: false,
-      items: ['library/getting-started', 'guides/auth', 'guides/generating-types'],
-    },
-    {
-      type: 'category',
-      label: 'Auth',
-      collapsed: false,
-      items: ['guides/user-management', 'guides/policies'],
-    },
-    {
-      type: 'category',
-      label: 'Database',
-      collapsed: false,
-      items: [
-        'library/post',
-        'library/delete',
-        'library/stored-procedures',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Realtime',
-      collapsed: false,
-      items: ['library/subscribe'],
+      items: ['guides/database', 'guides/auth', 'guides/client-libraries'],
     },
     {
       type: 'category',

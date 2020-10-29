@@ -7,9 +7,36 @@ slug: rpc
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Perform a stored procedure call.
+You can call stored procedures as a "Remote Procedure Call".
+
+That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
+It's especially useful when the logic rarely changes - like password resets and updates.
 
 
+<Tabs
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .rpc('hello_world')
+}
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
 
 ## Parameters
 
@@ -58,3 +85,140 @@ The parameters to pass to the function call.
 </li>
 
 </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### Call a stored procedure
+
+This is an example invoking a stored procedure.
+
+<Tabs
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .rpc('hello_world')
+}
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+### With Parameters
+
+
+
+<Tabs
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .rpc('echo_city', { name: 'The Shire' })
+}
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+### Bulk call
+
+
+
+<Tabs
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .rpc('echo_city', [
+    { name: 'The Shire' },
+    { name: 'Mordor' }
+  ])
+}
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+### With filters.
+
+Stored procedures that return tables can also be combined with 
+[Modifiers](/docs/client/using-modifiers) and 
+[Filters](/docs/client/using-filters).
+
+
+<Tabs
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .eq('name', 'The Shire')
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>

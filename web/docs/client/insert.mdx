@@ -9,7 +9,32 @@ import TabItem from '@theme/TabItem';
 
 Performs an INSERT into the table.
 
+<Tabs
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
 
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .insert([
+    { name: 'The Shire', country_id: 554 }
+  ])
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
 
 ## Parameters
 
@@ -104,3 +129,121 @@ If `true`, performs an UPSERT.
 </li>
 
 </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### Create a record
+
+
+
+<Tabs
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .insert([
+    { name: 'The Shire', country_id: 554 }
+  ])
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+### Bulk create
+
+
+
+<Tabs
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .insert([
+    { name: 'The Shire', country_id: 554 },
+    { name: 'Rohan', country_id: 555 },
+  ])
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+### Upsert
+
+For upsert, if set to true, primary key columns would need to be included 
+in the data parameter in order for an update to properly happen. Also, primary keys 
+used must be natural, not surrogate. There are however, 
+[workarounds](https://github.com/PostgREST/postgrest/issues/1118) 
+for surrogate primary keys.
+
+
+<Tabs
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .insert(
+    [
+      { name: 'The Shire', country_id: 554 },
+      { name: 'Rohan', country_id: 555 },
+      { name: 'City by the Bay', country_id:840}
+    ],
+    { upsert: true })
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>

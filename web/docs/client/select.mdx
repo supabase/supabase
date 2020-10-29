@@ -149,12 +149,12 @@ If your database has relationships, you can query related tables too.
 ```js
 const { data, error } = await supabase
   .from('countries')
-  .select(\`
+  .select(`
     name,
     cities (
       name
     )
-  \`)
+  `)
 ```
 
 
@@ -189,11 +189,11 @@ and we wanted to get the supplier and the purchaser at the same time
 ```js
 const { data, error } = await supabase
   .from('products')
-  .select(\`
+  .select(`
     id,
     supplier:supplier_id ( name ),
     purchaser:purchaser_id ( name )
-  \`)
+  `)
 ```
 
 
@@ -227,11 +227,11 @@ for querying JSON data. Also see
 ```js
 const { data, error } = await supabase
   .from('products')
-  .select(\`
+  .select(`
     id,
     supplier:supplier_id ( name ),
     purchaser:purchaser_id ( name )
-  \`)
+  `)
 ```
 
 

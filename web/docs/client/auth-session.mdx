@@ -1,13 +1,13 @@
 ---
-id: auth-signout
-title: "auth.signOut()"
-slug: auth-signout
+id: auth-session
+title: "auth.session()"
+slug: auth-session
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Signs out the current user, if there is a logged in user.
+Returns the session data, if there is an active session.
 
 <Tabs
   groupId="libraries"
@@ -16,7 +16,7 @@ Signs out the current user, if there is a logged in user.
 <TabItem value="js">
 
 ```js
-const { error, data } = await supabaseSign out
+const { user, error } = await supabase.auth.session()
 ```
 
 
@@ -50,7 +50,7 @@ const { error, data } = await supabaseSign out
 
 ## Examples
 
-### Sign out
+### Get the session data
 
 
 
@@ -61,7 +61,7 @@ const { error, data } = await supabaseSign out
 <TabItem value="js">
 
 ```js
-const { error, data } = await supabaseSign out
+const { user, error } = await supabase.auth.session()
 ```
 
 

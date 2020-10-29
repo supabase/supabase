@@ -176,3 +176,33 @@ const { error, data } = await supabase.auth.signIn({
 </TabItem>
 
 </Tabs>
+
+### Sign in using third-party providers.
+
+
+
+<Tabs
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { user, error } = await supabase.auth.signIn({
+  // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
+  provider: 'github'
+})
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
