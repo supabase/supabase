@@ -1,11 +1,45 @@
 .btn {
-  @apply cursor-pointer flex items-center justify-center px-8 py-3 border border-transparent text-base leading-6 font-medium rounded text-white bg-green-600 transition duration-150 ease-in-out;
+  @apply cursor-pointer flex items-center justify-center px-4 py-1 border border-transparent text-sm leading-6 rounded transition duration-150 ease-in-out;
 }
 
 .btn:focus {
   @apply outline-none shadow-outline;
 }
 
-.btn:hover {
-  @apply bg-green-500;
+.btn:disabled {
+  @apply opacity-50 cursor-default;
+}
+
+/* SIZE */
+.btn--large {
+  @apply text-base px-6 py-2;
+}
+
+.btn--small {
+  @apply text-xs px-3 py-0;
+}
+
+/* VARIANT */
+.btn--solid {
+  @apply text-white bg-brand-500;
+}
+
+.btn--solid:hover {
+  @apply bg-brand-600;
+}
+
+.btn--outline {
+  @apply bg-transparent border border-brand-500 border-solid text-brand-500;
+}
+
+.btn--outline:hover {
+  @apply bg-brand-500 text-white;
+}
+
+.btn--ghost {
+  @apply bg-transparent text-brand-500 border-none;
+}
+
+.btn--ghost:hover {
+  @apply bg-brand-300 bg-opacity-25;
 }

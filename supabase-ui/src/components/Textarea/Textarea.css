@@ -1,0 +1,7 @@
+.form-textarea:disabled {
+  @apply bg-gray-100 cursor-not-allowed;
+}
+
+.form-textarea--error {
+  @apply border-red-500;
+}
