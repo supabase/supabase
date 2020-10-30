@@ -80,10 +80,15 @@ module.exports = {
           position: 'left',
         },
         {
-          label: 'Client',
+          label: 'Docs',
           activeBasePath: '/docs/client/',
           to: '/docs/client/supabase-client',
           position: 'left',
+        },
+        {
+          label: 'Blog',
+          to: '/blog',
+          position: 'right',
         },
         {
           to: 'docs/',
