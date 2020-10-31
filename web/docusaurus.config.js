@@ -74,6 +74,11 @@ module.exports = {
           position: 'left',
         },
         {
+          href: 'https://twitter.com/supabase_io',
+          className: 'navbar-item-twitter',
+          position: 'left',
+        },
+        {
           to: '/docs',
           activeBasePath: '/docs/guides/',
           label: 'Guides',
