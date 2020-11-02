@@ -238,8 +238,8 @@ pages:
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signIn'
     notes: |
       - A user can sign up either via email or OAuth.
-      - If you provide `email`, `password` is also required
-      - If you provide `access_token`, `password` is also required
+      - If you provide `email` without a `password`, the user will be sent a magic link.
+      - Specifying a `provider` will open the browser to the relevant login page.
     examples:
       - name: Sign in
         isSpotlight: true

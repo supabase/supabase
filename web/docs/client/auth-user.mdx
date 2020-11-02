@@ -10,6 +10,7 @@ import TabItem from '@theme/TabItem';
 Returns the user data, if there is a logged in user.
 
 <Tabs
+  defaultValue="js"
   groupId="libraries"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
 
@@ -55,6 +56,7 @@ const user = supabase.auth.user()
 
 
 <Tabs
+  defaultValue="js"
   groupId="libraries"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
 

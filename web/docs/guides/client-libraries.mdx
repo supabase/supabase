@@ -18,6 +18,7 @@ Create new users using [`signUp()`](/docs/client/auth-signup).
 
 <Tabs
   groupId="libraries"
+  defaultValue="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
 
 <TabItem value="js">
@@ -48,6 +49,7 @@ Existing users can log in using [`signIn()`](/docs/client/auth-signin).
 
 <Tabs
   groupId="libraries"
+  defaultValue="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
 
 <TabItem value="js">
@@ -73,11 +75,41 @@ const { error, data } = await supabase.auth.signIn({
 </Tabs>
 
 
+If there is an email, but no password passed to [`signIn()`](/docs/client/auth-signin), the user will receive a magic link.
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { error, data } = await supabase.auth.signIn({
+  email: 'example@email.com'
+})
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+
 Third party logins are also handled through [`signIn()`](/docs/client/auth-signin).
 
 
 <Tabs
   groupId="libraries"
+  defaultValue="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
 
 <TabItem value="js">
@@ -109,6 +141,7 @@ Since Postgres is a Relational database, the client makes it simple to query tab
 
 <Tabs
   groupId="libraries"
+  defaultValue="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
 
 <TabItem value="js">
@@ -143,6 +176,7 @@ You can do advanced [filtering](/docs/client/using-filters) to extract only the 
 
 <Tabs
   groupId="libraries"
+  defaultValue="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
 
 <TabItem value="js">
@@ -175,6 +209,7 @@ You can create data easiely using [`insert()`](/docs/client/insert).
 
 <Tabs
   groupId="libraries"
+  defaultValue="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
 
 <TabItem value="js">
@@ -209,6 +244,7 @@ The Supabase client makes it simple to listen to realtime database changes, usin
 
 <Tabs
   groupId="libraries"
+  defaultValue="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
 
 <TabItem value="js">
@@ -241,6 +277,7 @@ You can even [listen to Row Level changes](/docs/client/subscribe#listening-to-r
 
 <Tabs
   groupId="libraries"
+  defaultValue="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
 
 <TabItem value="js">
