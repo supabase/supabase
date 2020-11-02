@@ -103,10 +103,10 @@ pages:
       ## Javascript
 
       ```bash
-      npm install @supabase/postgrest-js
+      npm install @supabase/supabase-js
       ```
 
-      Find the source code on [GitHub](https://github.com/supabase/postgrest-js).
+      Find the source code on [GitHub](https://github.com/supabase/supabase-js).
 
       ## Python
 
