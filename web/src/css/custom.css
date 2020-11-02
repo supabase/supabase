@@ -393,7 +393,8 @@ a.card {
   display: flex;
   /* background-color: var(--ifm-background-color); */
 }
-a.card__body {
+a.card .card__body {
+  flex: 1;
   flex-grow: 1;
 }
 a.card:hover {
