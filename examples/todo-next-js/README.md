@@ -1,20 +1,10 @@
 # Todo example using Supabase
 
-This is a full-stack Slack clone example using:
-
 - Frontend:
   - Next.js.
   - [Supabase.js](https://supabase.io/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
   - [app.supabase.io/](https://app.supabase.io/): hosted Postgres database with restful API for usage with Supabase.js.
-
-## Demo
-
-- Live demo: {TODO}
-- CodeSandbox: {TODO}
-- Video tutorial: {TODO}
-
-![Demo animation gif](./public/slack-clone-demo.gif)
 
 ## Deploy your own
 
@@ -25,8 +15,6 @@ Sign up to Supabase - [https://app.supabase.io](https://app.supabase.io) and cre
 ### 2. Run "Todo List" Quickstart
 
 Once your database has started, run the "Todo List" quickstart.
-
-![Todo List](https://user-images.githubusercontent.com/10214025/88916135-1b1d7a00-d298-11ea-82e7-e2c18314e805.png)
 
 ### 3. Get the URL and Key
 
@@ -43,7 +31,6 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/git?s=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Ftodo-next-js&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_KEY&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.io&project-name=supabase-todo-list&repo-name=supabase-todo-list)
 
 You will be asked for a `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_KEY`. Use the API URL and `anon` key from [step 3](#3.-get-the-url-and-key).
-
 
 ## Supabase details
 
