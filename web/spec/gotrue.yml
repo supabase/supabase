@@ -1,0 +1,164 @@
+openref: 0.1
+
+info:
+  title:  GoTrue Client
+  description: |
+    GoTrue is an authentication server.
+
+    Supabase provides client libraries to interact with the server
+    
+  definition: spec/gotrue.json
+  libraries: 
+    - name: 'JavaScript'
+      id: 'js'
+      version: '0.0.1'
+    - name: 'Python'
+      id: 'py'
+      version: '0.0.1'
+  docs:
+    path: gotrue/client/
+    sidebar:
+      - name: 'About'
+        items:
+          - index
+          - Installing
+          - Initializing
+      - name: 'Client functions'
+        items:
+          - signUp
+          - signIn
+          - signOut
+          - user
+          - session
+          - update
+          - onAuthStateChange
+      - name: 'General functions'
+        items:
+          - api.signUpWithEmail
+          - api.signInWithEmail
+          - api.resetPasswordForEmail
+          - api.signOut
+          - api.getUser
+          - api.updateUser
+          - api.refreshAccessToken
+
+pages:
+
+  Installing: 
+    description: |
+      All JavaScript libraries are built directly by the Supabase team. 
+      
+      Other languages are built by the community and supported by Supabase.
+
+      ## Javascript
+
+      ```bash
+      npm install @supabase/gotrue-js
+      ```
+
+      ## Python
+
+      ```bash
+      # Not yet implemented
+      ```
+
+  Initializing: 
+    $ref: '"GoTrueClient".GoTrueClient.constructor'
+
+  signUp:
+    $ref: '"GoTrueClient".GoTrueClient.signUp'
+    notes: |
+      - A user can sign up either via email or OAuth.
+      - If you provide `email`, `password` is also required
+      - If you provide `access_token`, `password` is also required
+    examples:
+      - name: Sign up
+        js: |
+          ```js
+          const { error, data } = await auth.signUp({
+            email: 'example@email.com',
+            password: 'example-password',
+          })
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+
+  signIn:
+    $ref: '"GoTrueClient".GoTrueClient.signIn'
+    examples:
+      - name: Sign in
+        isSpotlight: true
+        js: |
+          ```js
+          const { error, data } = await auth.signIn({
+            email: 'example@email.com',
+            password: 'example-password',
+          })
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+
+  signOut:
+    $ref: '"GoTrueClient".GoTrueClient.signOut'
+    examples:
+      - name: Sign out
+        js: |
+          ```js
+          const { error, data } = await auth.signOut()
+          ```
+
+  user:
+    $ref: '"GoTrueClient".GoTrueClient.user'
+    examples:
+      - name: Get user
+        js: |
+          ```js
+          const user = auth.user()
+          ```
+
+  session:
+    $ref: '"GoTrueClient".GoTrueClient.session'
+    examples:
+      - name: Get user
+        js: |
+          ```js
+          const user = auth.session()
+          ```
+
+  update:
+    $ref: '"GoTrueClient".GoTrueClient.update'
+
+  onAuthStateChange: 
+    # $ref: onAuthStateChange
+
+  api.signUpWithEmail:
+    $ref: '"GoTrueApi".GoTrueApi.signUpWithEmail'
+    examples:
+      - name: Sign up a new user with email
+        js: |
+          ```js
+          const { error, data } = await api
+            .signUpWithEmail('example@email.com', 'example-password')
+          ```
+
+  api.signInWithEmail:
+    $ref: '"GoTrueApi".GoTrueApi.signInWithEmail'
+
+  api.resetPasswordForEmail:
+    $ref: '"GoTrueApi".GoTrueApi.resetPasswordForEmail'
+
+  api.signOut:
+    $ref: '"GoTrueApi".GoTrueApi.signOut'
+
+  api.getUser:
+    $ref: '"GoTrueApi".GoTrueApi.getUser'
+
+  api.updateUser:
+    $ref: '"GoTrueApi".GoTrueApi.updateUser'
+     
+  api.refreshAccessToken:
+    $ref: '"GoTrueApi".GoTrueApi.refreshAccessToken'

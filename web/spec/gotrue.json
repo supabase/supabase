@@ -1,0 +1,7188 @@
+{
+	"id": 0,
+	"name": "@supabase/gotrue-js",
+	"kind": 0,
+	"flags": {},
+	"originalName": "",
+	"children": [
+		{
+			"id": 68,
+			"name": "\"GoTrueApi\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/gotrue-js/gotrue-js/src/GoTrueApi.ts",
+			"children": [
+				{
+					"id": 69,
+					"name": "GoTrueApi",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {
+						"isExported": true
+					},
+					"children": [
+						{
+							"id": 75,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 76,
+									"name": "new GoTrueApi",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 77,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__0",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 78,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 80,
+															"name": "headers",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueApi.ts",
+																	"line": 12,
+																	"character": 11
+																}
+															],
+															"type": {
+																"type": "reflection",
+																"declaration": {
+																	"id": 81,
+																	"name": "__type",
+																	"kind": 65536,
+																	"kindString": "Type literal",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"indexSignature": [
+																		{
+																			"id": 82,
+																			"name": "__index",
+																			"kind": 8192,
+																			"kindString": "Index signature",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"parameters": [
+																				{
+																					"id": 83,
+																					"name": "key",
+																					"kind": 32768,
+																					"kindString": "Parameter",
+																					"flags": {
+																						"isExported": true
+																					},
+																					"type": {
+																						"type": "intrinsic",
+																						"name": "string"
+																					}
+																				}
+																			],
+																			"type": {
+																				"type": "intrinsic",
+																				"name": "string"
+																			}
+																		}
+																	]
+																}
+															}
+														},
+														{
+															"id": 79,
+															"name": "url",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueApi.ts",
+																	"line": 11,
+																	"character": 7
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															},
+															"defaultValue": "\"\""
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																80,
+																79
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueApi.ts",
+															"line": 10,
+															"character": 14
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 69,
+										"name": "GoTrueApi"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueApi.ts",
+									"line": 8,
+									"character": 3
+								}
+							]
+						},
+						{
+							"id": 71,
+							"name": "headers",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "GoTrueApi.ts",
+									"line": 6,
+									"character": 19
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 72,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {
+										"isExported": true
+									},
+									"indexSignature": [
+										{
+											"id": 73,
+											"name": "__index",
+											"kind": 8192,
+											"kindString": "Index signature",
+											"flags": {
+												"isExported": true
+											},
+											"parameters": [
+												{
+													"id": 74,
+													"name": "key",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {
+														"isExported": true
+													},
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											],
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "GoTrueApi.ts",
+											"line": 6,
+											"character": 20
+										}
+									]
+								}
+							}
+						},
+						{
+							"id": 70,
+							"name": "url",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "GoTrueApi.ts",
+									"line": 5,
+									"character": 15
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 110,
+							"name": "getUrlForProvider",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 111,
+									"name": "getUrlForProvider",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Generates the relevant login URL for a third-party provider."
+									},
+									"parameters": [
+										{
+											"id": 112,
+											"name": "provider",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "One of the providers supported by GoTrue.\n"
+											},
+											"type": {
+												"type": "reference",
+												"id": 66,
+												"name": "Provider"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueApi.ts",
+									"line": 93,
+									"character": 19
+								}
+							]
+						},
+						{
+							"id": 113,
+							"name": "getUser",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 114,
+									"name": "getUser",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Gets the user details."
+									},
+									"parameters": [
+										{
+											"id": 115,
+											"name": "jwt",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "A valid, logged-in JWT.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "union",
+												"types": [
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 116,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"children": [
+																{
+																	"id": 117,
+																	"name": "data",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueApi.ts",
+																			"line": 106,
+																			"character": 19
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "any"
+																	}
+																},
+																{
+																	"id": 118,
+																	"name": "error",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueApi.ts",
+																			"line": 106,
+																			"character": 26
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
+																}
+															],
+															"groups": [
+																{
+																	"title": "Variables",
+																	"kind": 32,
+																	"children": [
+																		117,
+																		118
+																	]
+																}
+															]
+														}
+													},
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 119,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"children": [
+																{
+																	"id": 120,
+																	"name": "data",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueApi.ts",
+																			"line": 108,
+																			"character": 19
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
+																},
+																{
+																	"id": 121,
+																	"name": "error",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueApi.ts",
+																			"line": 108,
+																			"character": 32
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "any"
+																	}
+																}
+															],
+															"groups": [
+																{
+																	"title": "Variables",
+																	"kind": 32,
+																	"children": [
+																		120,
+																		121
+																	]
+																}
+															]
+														}
+													}
+												]
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueApi.ts",
+									"line": 101,
+									"character": 15
+								}
+							]
+						},
+						{
+							"id": 132,
+							"name": "refreshAccessToken",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 133,
+									"name": "refreshAccessToken",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Generates a new JWT."
+									},
+									"parameters": [
+										{
+											"id": 134,
+											"name": "refreshToken",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "A valid refresh token that was returned on login.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "union",
+												"types": [
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 135,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"children": [
+																{
+																	"id": 136,
+																	"name": "data",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueApi.ts",
+																			"line": 139,
+																			"character": 19
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "any"
+																	}
+																},
+																{
+																	"id": 137,
+																	"name": "error",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueApi.ts",
+																			"line": 139,
+																			"character": 26
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
+																}
+															],
+															"groups": [
+																{
+																	"title": "Variables",
+																	"kind": 32,
+																	"children": [
+																		136,
+																		137
+																	]
+																}
+															]
+														}
+													},
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 138,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"children": [
+																{
+																	"id": 139,
+																	"name": "data",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueApi.ts",
+																			"line": 141,
+																			"character": 19
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
+																},
+																{
+																	"id": 140,
+																	"name": "error",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueApi.ts",
+																			"line": 141,
+																			"character": 32
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "any"
+																	}
+																}
+															],
+															"groups": [
+																{
+																	"title": "Variables",
+																	"kind": 32,
+																	"children": [
+																		139,
+																		140
+																	]
+																}
+															]
+														}
+													}
+												]
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueApi.ts",
+									"line": 132,
+									"character": 26
+								}
+							]
+						},
+						{
+							"id": 98,
+							"name": "resetPasswordForEmail",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 99,
+									"name": "resetPasswordForEmail",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Sends a reset request to an email address."
+									},
+									"parameters": [
+										{
+											"id": 100,
+											"name": "email",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The email address of the user.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 101,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 102,
+															"name": "data",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueApi.ts",
+																	"line": 65,
+																	"character": 60
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reflection",
+																		"declaration": {
+																			"id": 103,
+																			"name": "__type",
+																			"kind": 65536,
+																			"kindString": "Type literal",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"sources": [
+																				{
+																					"fileName": "GoTrueApi.ts",
+																					"line": 65,
+																					"character": 61
+																				}
+																			]
+																		}
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 104,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueApi.ts",
+																	"line": 65,
+																	"character": 78
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Error"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																102,
+																104
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueApi.ts",
+															"line": 65,
+															"character": 54
+														}
+													]
+												}
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueApi.ts",
+									"line": 65,
+									"character": 29
+								}
+							]
+						},
+						{
+							"id": 91,
+							"name": "signInWithEmail",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 92,
+									"name": "signInWithEmail",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Logs in an existing using their email address."
+									},
+									"parameters": [
+										{
+											"id": 93,
+											"name": "email",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The email address of the user."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 94,
+											"name": "password",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The password of the user.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 95,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 96,
+															"name": "data",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueApi.ts",
+																	"line": 48,
+																	"character": 19
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"id": 27,
+																		"name": "Session"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 97,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueApi.ts",
+																	"line": 48,
+																	"character": 42
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Error"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																96,
+																97
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueApi.ts",
+															"line": 48,
+															"character": 13
+														}
+													]
+												}
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueApi.ts",
+									"line": 45,
+									"character": 23
+								}
+							]
+						},
+						{
+							"id": 105,
+							"name": "signOut",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 106,
+									"name": "signOut",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Removes a logged-in session."
+									},
+									"parameters": [
+										{
+											"id": 107,
+											"name": "jwt",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "A valid, logged-in JWT.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 108,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 109,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueApi.ts",
+																	"line": 78,
+																	"character": 45
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Error"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																109
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueApi.ts",
+															"line": 78,
+															"character": 38
+														}
+													]
+												}
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueApi.ts",
+									"line": 78,
+									"character": 15
+								}
+							]
+						},
+						{
+							"id": 84,
+							"name": "signUpWithEmail",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 85,
+									"name": "signUpWithEmail",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Creates a new user using their email address."
+									},
+									"parameters": [
+										{
+											"id": 86,
+											"name": "email",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The email address of the user."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 87,
+											"name": "password",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The password of the user.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 88,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 89,
+															"name": "data",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueApi.ts",
+																	"line": 31,
+																	"character": 19
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"id": 27,
+																		"name": "Session"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 90,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueApi.ts",
+																	"line": 31,
+																	"character": 42
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Error"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																89,
+																90
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueApi.ts",
+															"line": 31,
+															"character": 13
+														}
+													]
+												}
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueApi.ts",
+									"line": 28,
+									"character": 23
+								}
+							]
+						},
+						{
+							"id": 122,
+							"name": "updateUser",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 123,
+									"name": "updateUser",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Updates the user data."
+									},
+									"parameters": [
+										{
+											"id": 124,
+											"name": "jwt",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "A valid, logged-in JWT."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 125,
+											"name": "attributes",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The data you want to update.\n"
+											},
+											"type": {
+												"type": "reference",
+												"id": 51,
+												"name": "UserAttributes"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "union",
+												"types": [
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 126,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"children": [
+																{
+																	"id": 127,
+																	"name": "data",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueApi.ts",
+																			"line": 122,
+																			"character": 19
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "any"
+																	}
+																},
+																{
+																	"id": 128,
+																	"name": "error",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueApi.ts",
+																			"line": 122,
+																			"character": 26
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
+																}
+															],
+															"groups": [
+																{
+																	"title": "Variables",
+																	"kind": 32,
+																	"children": [
+																		127,
+																		128
+																	]
+																}
+															]
+														}
+													},
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 129,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"children": [
+																{
+																	"id": 130,
+																	"name": "data",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueApi.ts",
+																			"line": 124,
+																			"character": 19
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
+																},
+																{
+																	"id": 131,
+																	"name": "error",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueApi.ts",
+																			"line": 124,
+																			"character": 32
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "any"
+																	}
+																}
+															],
+															"groups": [
+																{
+																	"title": "Variables",
+																	"kind": 32,
+																	"children": [
+																		130,
+																		131
+																	]
+																}
+															]
+														}
+													}
+												]
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueApi.ts",
+									"line": 117,
+									"character": 18
+								}
+							]
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								75
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								71,
+								70
+							]
+						},
+						{
+							"title": "Methods",
+							"kind": 2048,
+							"children": [
+								110,
+								113,
+								132,
+								98,
+								91,
+								105,
+								84,
+								122
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "GoTrueApi.ts",
+							"line": 4,
+							"character": 30
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Classes",
+					"kind": 128,
+					"children": [
+						69
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "GoTrueApi.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 180,
+			"name": "\"GoTrueClient\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/gotrue-js/gotrue-js/src/GoTrueClient.ts",
+			"children": [
+				{
+					"id": 181,
+					"name": "GoTrueClient",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {
+						"isExported": true
+					},
+					"children": [
+						{
+							"id": 189,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Create a new client for use in the browser."
+							},
+							"signatures": [
+								{
+									"id": 190,
+									"name": "new GoTrueClient",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Create a new client for use in the browser."
+									},
+									"parameters": [
+										{
+											"id": 191,
+											"name": "options",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 192,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 199,
+															"name": "autoRefreshToken",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"comment": {
+																"text": "Set to \"true\" if you want to automatically refresh the token before expiring."
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 46,
+																	"character": 20
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "false"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "true"
+																	}
+																]
+															}
+														},
+														{
+															"id": 198,
+															"name": "detectSessionInUrl",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"comment": {
+																"text": "Set to \"true\" if you want to automatically detects OAuth grants in the URL and signs in the user."
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 45,
+																	"character": 22
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "false"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "true"
+																	}
+																]
+															}
+														},
+														{
+															"id": 194,
+															"name": "headers",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"comment": {
+																"text": "Any additional headers to send to the GoTrue server."
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 44,
+																	"character": 11
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "reflection",
+																		"declaration": {
+																			"id": 195,
+																			"name": "__type",
+																			"kind": 65536,
+																			"kindString": "Type literal",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"indexSignature": [
+																				{
+																					"id": 196,
+																					"name": "__index",
+																					"kind": 8192,
+																					"kindString": "Index signature",
+																					"flags": {
+																						"isExported": true
+																					},
+																					"parameters": [
+																						{
+																							"id": 197,
+																							"name": "key",
+																							"kind": 32768,
+																							"kindString": "Parameter",
+																							"flags": {
+																								"isExported": true
+																							},
+																							"type": {
+																								"type": "intrinsic",
+																								"name": "string"
+																							}
+																						}
+																					],
+																					"type": {
+																						"type": "intrinsic",
+																						"name": "string"
+																					}
+																				}
+																			]
+																		}
+																	}
+																]
+															}
+														},
+														{
+															"id": 201,
+															"name": "localStorage",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"comment": {
+																"text": "\n"
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 48,
+																	"character": 16
+																}
+															],
+															"type": {
+																"type": "reference",
+																"name": "Storage"
+															}
+														},
+														{
+															"id": 200,
+															"name": "persistSession",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"comment": {
+																"text": "Set to \"true\" if you want to automatically save the user session into local storage."
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 47,
+																	"character": 18
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "false"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "true"
+																	}
+																]
+															}
+														},
+														{
+															"id": 193,
+															"name": "url",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"comment": {
+																"text": "The URL of the GoTrue server."
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 43,
+																	"character": 7
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																199,
+																198,
+																194,
+																201,
+																200,
+																193
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 42,
+															"character": 22
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 181,
+										"name": "GoTrueClient"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 31,
+									"character": 71
+								}
+							]
+						},
+						{
+							"id": 182,
+							"name": "api",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Namespace for the GoTrue API methods.\nThese can be used for example to get a user from a JWT in a server environment or reset a user's password."
+							},
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 19,
+									"character": 5
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 69,
+								"name": "GoTrueApi"
+							}
+						},
+						{
+							"id": 185,
+							"name": "autoRefreshToken",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 28,
+									"character": 28
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						},
+						{
+							"id": 184,
+							"name": "currentSession",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "The session object for the currently logged in user or null."
+							},
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 27,
+									"character": 26
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "reference",
+										"id": 27,
+										"name": "Session"
+									},
+									{
+										"type": "intrinsic",
+										"name": "null"
+									}
+								]
+							}
+						},
+						{
+							"id": 183,
+							"name": "currentUser",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "The currently logged in user or null."
+							},
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 23,
+									"character": 23
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "reference",
+										"id": 33,
+										"name": "User"
+									},
+									{
+										"type": "intrinsic",
+										"name": "null"
+									}
+								]
+							}
+						},
+						{
+							"id": 187,
+							"name": "localStorage",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 30,
+									"character": 24
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "Storage"
+							}
+						},
+						{
+							"id": 186,
+							"name": "persistSession",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 29,
+									"character": 26
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						},
+						{
+							"id": 188,
+							"name": "stateChangeEmmitters",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 31,
+									"character": 32
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "intrinsic",
+										"name": "string"
+									},
+									{
+										"type": "reference",
+										"id": 56,
+										"name": "Subscription"
+									}
+								],
+								"name": "Map"
+							},
+							"defaultValue": "new Map()"
+						},
+						{
+							"id": 307,
+							"name": "_callRefreshToken",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isPrivate": true,
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 308,
+									"name": "_callRefreshToken",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "union",
+												"types": [
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													},
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 309,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"children": [
+																{
+																	"id": 310,
+																	"name": "data",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueClient.ts",
+																			"line": 382,
+																			"character": 21
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "any"
+																	}
+																},
+																{
+																	"id": 311,
+																	"name": "error",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueClient.ts",
+																			"line": 382,
+																			"character": 28
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
+																}
+															],
+															"groups": [
+																{
+																	"title": "Variables",
+																	"kind": 32,
+																	"children": [
+																		310,
+																		311
+																	]
+																}
+															]
+														}
+													},
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 312,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"children": [
+																{
+																	"id": 313,
+																	"name": "data",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueClient.ts",
+																			"line": 385,
+																			"character": 19
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
+																},
+																{
+																	"id": 314,
+																	"name": "error",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueClient.ts",
+																			"line": 385,
+																			"character": 32
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "any"
+																	}
+																}
+															],
+															"groups": [
+																{
+																	"title": "Variables",
+																	"kind": 32,
+																	"children": [
+																		313,
+																		314
+																	]
+																}
+															]
+														}
+													}
+												]
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 364,
+									"character": 33
+								}
+							]
+						},
+						{
+							"id": 271,
+							"name": "_handeEmailSignIn",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isPrivate": true,
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 272,
+									"name": "_handeEmailSignIn",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 273,
+											"name": "email",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 274,
+											"name": "password",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "union",
+												"types": [
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 275,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"children": [
+																{
+																	"id": 276,
+																	"name": "data",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueClient.ts",
+																			"line": 287,
+																			"character": 19
+																		}
+																	],
+																	"type": {
+																		"type": "reference",
+																		"id": 27,
+																		"name": "Session"
+																	}
+																},
+																{
+																	"id": 278,
+																	"name": "error",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueClient.ts",
+																			"line": 287,
+																			"character": 43
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
+																},
+																{
+																	"id": 277,
+																	"name": "user",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueClient.ts",
+																			"line": 287,
+																			"character": 25
+																		}
+																	],
+																	"type": {
+																		"type": "reference",
+																		"id": 33,
+																		"name": "User"
+																	},
+																	"defaultValue": "data.user"
+																}
+															],
+															"groups": [
+																{
+																	"title": "Variables",
+																	"kind": 32,
+																	"children": [
+																		276,
+																		278,
+																		277
+																	]
+																}
+															]
+														}
+													},
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 279,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"children": [
+																{
+																	"id": 280,
+																	"name": "data",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueClient.ts",
+																			"line": 289,
+																			"character": 19
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
+																},
+																{
+																	"id": 282,
+																	"name": "error",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueClient.ts",
+																			"line": 289,
+																			"character": 44
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "any"
+																	}
+																},
+																{
+																	"id": 281,
+																	"name": "user",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueClient.ts",
+																			"line": 289,
+																			"character": 31
+																		}
+																	],
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
+																}
+															],
+															"groups": [
+																{
+																	"title": "Variables",
+																	"kind": 32,
+																	"children": [
+																		280,
+																		282,
+																		281
+																	]
+																}
+															]
+														}
+													}
+												]
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 277,
+									"character": 33
+								}
+							]
+						},
+						{
+							"id": 283,
+							"name": "_handeProviderSignIn",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isPrivate": true,
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 284,
+									"name": "_handeProviderSignIn",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 285,
+											"name": "provider",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 66,
+												"name": "Provider"
+											}
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 286,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 289,
+															"name": "data",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 301,
+																	"character": 34
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "null"
+															},
+															"defaultValue": "null"
+														},
+														{
+															"id": 291,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 301,
+																	"character": 59
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "null"
+															},
+															"defaultValue": "null"
+														},
+														{
+															"id": 287,
+															"name": "provider",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 301,
+																	"character": 23
+																}
+															],
+															"type": {
+																"type": "reference",
+																"id": 66,
+																"name": "Provider"
+															}
+														},
+														{
+															"id": 288,
+															"name": "url",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 301,
+																	"character": 28
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 290,
+															"name": "user",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 301,
+																	"character": 46
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "null"
+															},
+															"defaultValue": "null"
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																289,
+																291,
+																287,
+																288,
+																290
+															]
+														}
+													]
+												}
+											},
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 292,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 293,
+															"name": "data",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 305,
+																	"character": 24
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "null"
+															},
+															"defaultValue": "null"
+														},
+														{
+															"id": 295,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 305,
+																	"character": 49
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "any"
+															}
+														},
+														{
+															"id": 294,
+															"name": "user",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 305,
+																	"character": 36
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "null"
+															},
+															"defaultValue": "null"
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																293,
+																295,
+																294
+															]
+														}
+													]
+												}
+											}
+										]
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 293,
+									"character": 30
+								}
+							]
+						},
+						{
+							"id": 315,
+							"name": "_notifyAllSubscribers",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isPrivate": true,
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 316,
+									"name": "_notifyAllSubscribers",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 317,
+											"name": "event",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 67,
+												"name": "AuthChangeEvent"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 389,
+									"character": 31
+								}
+							]
+						},
+						{
+							"id": 299,
+							"name": "_persistSession",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isPrivate": true,
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 300,
+									"name": "_persistSession",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 301,
+											"name": "currentSession",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 27,
+												"name": "Session"
+											}
+										},
+										{
+											"id": 302,
+											"name": "secondsToExpiry",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "number"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 323,
+									"character": 25
+								}
+							]
+						},
+						{
+							"id": 305,
+							"name": "_recoverSession",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isPrivate": true,
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 306,
+									"name": "_recoverSession",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "intrinsic",
+												"name": "null"
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 336,
+									"character": 31
+								}
+							]
+						},
+						{
+							"id": 303,
+							"name": "_removeSession",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isPrivate": true,
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 304,
+									"name": "_removeSession",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "intrinsic",
+												"name": "void"
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 330,
+									"character": 30
+								}
+							]
+						},
+						{
+							"id": 296,
+							"name": "_saveSession",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isPrivate": true,
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 297,
+									"name": "_saveSession",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 298,
+											"name": "session",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 27,
+												"name": "Session"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 309,
+									"character": 22
+								}
+							]
+						},
+						{
+							"id": 249,
+							"name": "getSessionFromUrl",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 250,
+									"name": "getSessionFromUrl",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Gets the session data from a URL string"
+									},
+									"parameters": [
+										{
+											"id": 251,
+											"name": "options",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													},
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 252,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"children": [
+																{
+																	"id": 253,
+																	"name": "storeSession",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true,
+																		"isOptional": true
+																	},
+																	"comment": {
+																		"text": "Optionally store the session in the browser\n"
+																	},
+																	"sources": [
+																		{
+																			"fileName": "GoTrueClient.ts",
+																			"line": 200,
+																			"character": 16
+																		}
+																	],
+																	"type": {
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "intrinsic",
+																				"name": "undefined"
+																			},
+																			{
+																				"type": "intrinsic",
+																				"name": "false"
+																			},
+																			{
+																				"type": "intrinsic",
+																				"name": "true"
+																			}
+																		]
+																	}
+																}
+															],
+															"groups": [
+																{
+																	"title": "Variables",
+																	"kind": 32,
+																	"children": [
+																		253
+																	]
+																}
+															]
+														}
+													}
+												]
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 254,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 255,
+															"name": "data",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 201,
+																	"character": 20
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"id": 27,
+																		"name": "Session"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 256,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 201,
+																	"character": 43
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Error"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																255,
+																256
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 201,
+															"character": 14
+														}
+													]
+												}
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 199,
+									"character": 25
+								}
+							]
+						},
+						{
+							"id": 261,
+							"name": "onAuthStateChange",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 262,
+									"name": "onAuthStateChange",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Receive a notification every time an auth event happens.",
+										"returns": "A subscription object which can be used to unsubcribe itself.\n"
+									},
+									"parameters": [
+										{
+											"id": 263,
+											"name": "callback",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 264,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"signatures": [
+														{
+															"id": 265,
+															"name": "__call",
+															"kind": 4096,
+															"kindString": "Call signature",
+															"flags": {
+																"isExported": true
+															},
+															"parameters": [
+																{
+																	"id": 266,
+																	"name": "event",
+																	"kind": 32768,
+																	"kindString": "Parameter",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"type": {
+																		"type": "reference",
+																		"id": 67,
+																		"name": "AuthChangeEvent"
+																	}
+																},
+																{
+																	"id": 267,
+																	"name": "session",
+																	"kind": 32768,
+																	"kindString": "Parameter",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"type": {
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "reference",
+																				"id": 27,
+																				"name": "Session"
+																			},
+																			{
+																				"type": "intrinsic",
+																				"name": "null"
+																			}
+																		]
+																	}
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "void"
+															}
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 258,
+															"character": 13
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 268,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {
+												"isExported": true
+											},
+											"children": [
+												{
+													"id": 269,
+													"name": "data",
+													"kind": 32,
+													"kindString": "Variable",
+													"flags": {
+														"isExported": true
+													},
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 259,
+															"character": 11
+														}
+													],
+													"type": {
+														"type": "union",
+														"types": [
+															{
+																"type": "reference",
+																"id": 56,
+																"name": "Subscription"
+															},
+															{
+																"type": "intrinsic",
+																"name": "null"
+															}
+														]
+													}
+												},
+												{
+													"id": 270,
+													"name": "error",
+													"kind": 32,
+													"kindString": "Variable",
+													"flags": {
+														"isExported": true
+													},
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 259,
+															"character": 39
+														}
+													],
+													"type": {
+														"type": "union",
+														"types": [
+															{
+																"type": "reference",
+																"name": "Error"
+															},
+															{
+																"type": "intrinsic",
+																"name": "null"
+															}
+														]
+													}
+												}
+											],
+											"groups": [
+												{
+													"title": "Variables",
+													"kind": 32,
+													"children": [
+														269,
+														270
+													]
+												}
+											],
+											"sources": [
+												{
+													"fileName": "GoTrueClient.ts",
+													"line": 259,
+													"character": 4
+												}
+											]
+										}
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 257,
+									"character": 19
+								}
+							]
+						},
+						{
+							"id": 236,
+							"name": "refreshSession",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 237,
+									"name": "refreshSession",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Force refreshes the session including the user data in case it was updated in a different session."
+									},
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 238,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 239,
+															"name": "data",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 155,
+																	"character": 8
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"id": 27,
+																		"name": "Session"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 241,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 157,
+																	"character": 9
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Error"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 240,
+															"name": "user",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 156,
+																	"character": 8
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"id": 33,
+																		"name": "User"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																239,
+																241,
+																240
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 154,
+															"character": 34
+														}
+													]
+												}
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 154,
+									"character": 22
+								}
+							]
+						},
+						{
+							"id": 231,
+							"name": "session",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 232,
+									"name": "session",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Returns the session data, if there is an active session."
+									},
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 233,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {
+												"isExported": true
+											},
+											"children": [
+												{
+													"id": 234,
+													"name": "data",
+													"kind": 32,
+													"kindString": "Variable",
+													"flags": {
+														"isExported": true
+													},
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 141,
+															"character": 19
+														}
+													],
+													"type": {
+														"type": "union",
+														"types": [
+															{
+																"type": "reference",
+																"id": 27,
+																"name": "Session"
+															},
+															{
+																"type": "intrinsic",
+																"name": "null"
+															}
+														]
+													}
+												},
+												{
+													"id": 235,
+													"name": "error",
+													"kind": 32,
+													"kindString": "Variable",
+													"flags": {
+														"isExported": true
+													},
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 141,
+															"character": 42
+														}
+													],
+													"type": {
+														"type": "union",
+														"types": [
+															{
+																"type": "reference",
+																"name": "Error"
+															},
+															{
+																"type": "intrinsic",
+																"name": "null"
+															}
+														]
+													}
+												}
+											],
+											"groups": [
+												{
+													"title": "Variables",
+													"kind": 32,
+													"children": [
+														234,
+														235
+													]
+												}
+											],
+											"sources": [
+												{
+													"fileName": "GoTrueClient.ts",
+													"line": 141,
+													"character": 12
+												}
+											]
+										}
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 141,
+									"character": 9
+								}
+							]
+						},
+						{
+							"id": 212,
+							"name": "signIn",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 213,
+									"name": "signIn",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Log in an existing user, or login via a third-party provider."
+									},
+									"parameters": [
+										{
+											"id": 214,
+											"name": "credentials",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The user login details."
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 215,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 216,
+															"name": "email",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"comment": {
+																"text": "The user's email address."
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 104,
+																	"character": 9
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														},
+														{
+															"id": 217,
+															"name": "password",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"comment": {
+																"text": "The user's password."
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 105,
+																	"character": 12
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														},
+														{
+															"id": 218,
+															"name": "provider",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"comment": {
+																"text": "One of the providers supported by GoTrue.\n"
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 106,
+																	"character": 12
+																}
+															],
+															"type": {
+																"type": "reference",
+																"id": 66,
+																"name": "Provider"
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																216,
+																217,
+																218
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 103,
+															"character": 27
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 219,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 220,
+															"name": "data",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 108,
+																	"character": 8
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"id": 27,
+																		"name": "Session"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 224,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 112,
+																	"character": 9
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Error"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 222,
+															"name": "provider",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 110,
+																	"character": 12
+																}
+															],
+															"type": {
+																"type": "reference",
+																"id": 66,
+																"name": "Provider"
+															}
+														},
+														{
+															"id": 223,
+															"name": "url",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 111,
+																	"character": 7
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 221,
+															"name": "user",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 109,
+																	"character": 8
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"id": 33,
+																		"name": "User"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																220,
+																224,
+																222,
+																223,
+																221
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 107,
+															"character": 14
+														}
+													]
+												}
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 103,
+									"character": 14
+								}
+							]
+						},
+						{
+							"id": 257,
+							"name": "signOut",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 258,
+									"name": "signOut",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Signs out the current user, if there is a logged in user."
+									},
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 259,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 260,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 243,
+																	"character": 34
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Error"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																260
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 243,
+															"character": 27
+														}
+													]
+												}
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 243,
+									"character": 15
+								}
+							]
+						},
+						{
+							"id": 202,
+							"name": "signUp",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 203,
+									"name": "signUp",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Creates a new user."
+									},
+									"parameters": [
+										{
+											"id": 204,
+											"name": "credentials",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The user login details."
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 205,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 206,
+															"name": "email",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The user's email address."
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 76,
+																	"character": 9
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 207,
+															"name": "password",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The user's password.\n"
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 77,
+																	"character": 12
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																206,
+																207
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 75,
+															"character": 27
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 208,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 209,
+															"name": "data",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 78,
+																	"character": 20
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"id": 27,
+																		"name": "Session"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 211,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 78,
+																	"character": 62
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Error"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 210,
+															"name": "user",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 78,
+																	"character": 42
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"id": 33,
+																		"name": "User"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																209,
+																211,
+																210
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 78,
+															"character": 14
+														}
+													]
+												}
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 75,
+									"character": 14
+								}
+							]
+						},
+						{
+							"id": 242,
+							"name": "update",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 243,
+									"name": "update",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Updates user data, if there is a logged in user."
+									},
+									"parameters": [
+										{
+											"id": 244,
+											"name": "attributes",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 51,
+												"name": "UserAttributes"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 245,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 246,
+															"name": "data",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 179,
+																	"character": 19
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"id": 33,
+																		"name": "User"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 248,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 179,
+																	"character": 58
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Error"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 247,
+															"name": "user",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueClient.ts",
+																	"line": 179,
+																	"character": 38
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"id": 33,
+																		"name": "User"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																246,
+																248,
+																247
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 179,
+															"character": 13
+														}
+													]
+												}
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 177,
+									"character": 14
+								}
+							]
+						},
+						{
+							"id": 225,
+							"name": "user",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 226,
+									"name": "user",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Returns the user data, if there is a logged in user."
+									},
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 227,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {
+												"isExported": true
+											},
+											"children": [
+												{
+													"id": 228,
+													"name": "data",
+													"kind": 32,
+													"kindString": "Variable",
+													"flags": {
+														"isExported": true
+													},
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 128,
+															"character": 16
+														}
+													],
+													"type": {
+														"type": "union",
+														"types": [
+															{
+																"type": "reference",
+																"id": 33,
+																"name": "User"
+															},
+															{
+																"type": "intrinsic",
+																"name": "null"
+															}
+														]
+													}
+												},
+												{
+													"id": 230,
+													"name": "error",
+													"kind": 32,
+													"kindString": "Variable",
+													"flags": {
+														"isExported": true
+													},
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 128,
+															"character": 55
+														}
+													],
+													"type": {
+														"type": "union",
+														"types": [
+															{
+																"type": "reference",
+																"name": "Error"
+															},
+															{
+																"type": "intrinsic",
+																"name": "null"
+															}
+														]
+													}
+												},
+												{
+													"id": 229,
+													"name": "user",
+													"kind": 32,
+													"kindString": "Variable",
+													"flags": {
+														"isExported": true
+													},
+													"sources": [
+														{
+															"fileName": "GoTrueClient.ts",
+															"line": 128,
+															"character": 35
+														}
+													],
+													"type": {
+														"type": "union",
+														"types": [
+															{
+																"type": "reference",
+																"id": 33,
+																"name": "User"
+															},
+															{
+																"type": "intrinsic",
+																"name": "null"
+															}
+														]
+													}
+												}
+											],
+											"groups": [
+												{
+													"title": "Variables",
+													"kind": 32,
+													"children": [
+														228,
+														230,
+														229
+													]
+												}
+											],
+											"sources": [
+												{
+													"fileName": "GoTrueClient.ts",
+													"line": 128,
+													"character": 9
+												}
+											]
+										}
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 128,
+									"character": 6
+								}
+							]
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								189
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								182,
+								185,
+								184,
+								183,
+								187,
+								186,
+								188
+							]
+						},
+						{
+							"title": "Methods",
+							"kind": 2048,
+							"children": [
+								307,
+								271,
+								283,
+								315,
+								299,
+								305,
+								303,
+								296,
+								249,
+								261,
+								236,
+								231,
+								212,
+								257,
+								202,
+								242,
+								225
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "GoTrueClient.ts",
+							"line": 14,
+							"character": 33
+						}
+					]
+				},
+				{
+					"id": 318,
+					"name": "DEFAULT_OPTIONS",
+					"kind": 2097152,
+					"kindString": "Object literal",
+					"flags": {
+						"isConst": true
+					},
+					"children": [
+						{
+							"id": 320,
+							"name": "autoRefreshToken",
+							"kind": 32,
+							"kindString": "Variable",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 8,
+									"character": 18
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							},
+							"defaultValue": "true"
+						},
+						{
+							"id": 323,
+							"name": "detectSessionInUrl",
+							"kind": 32,
+							"kindString": "Variable",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 11,
+									"character": 20
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							},
+							"defaultValue": "true"
+						},
+						{
+							"id": 324,
+							"name": "headers",
+							"kind": 32,
+							"kindString": "Variable",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 12,
+									"character": 9
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 325,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {}
+								}
+							},
+							"defaultValue": "DEFAULT_HEADERS"
+						},
+						{
+							"id": 322,
+							"name": "localStorage",
+							"kind": 32,
+							"kindString": "Variable",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 10,
+									"character": 14
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "Storage"
+							},
+							"defaultValue": "global.localStorage"
+						},
+						{
+							"id": 321,
+							"name": "persistSession",
+							"kind": 32,
+							"kindString": "Variable",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 9,
+									"character": 16
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							},
+							"defaultValue": "true"
+						},
+						{
+							"id": 319,
+							"name": "url",
+							"kind": 32,
+							"kindString": "Variable",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "GoTrueClient.ts",
+									"line": 7,
+									"character": 5
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							},
+							"defaultValue": "GOTRUE_URL"
+						}
+					],
+					"groups": [
+						{
+							"title": "Variables",
+							"kind": 32,
+							"children": [
+								320,
+								323,
+								324,
+								322,
+								321,
+								319
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "GoTrueClient.ts",
+							"line": 6,
+							"character": 21
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "object"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Classes",
+					"kind": 128,
+					"children": [
+						181
+					]
+				},
+				{
+					"title": "Object literals",
+					"kind": 2097152,
+					"children": [
+						318
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "GoTrueClient.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 326,
+			"name": "\"index\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/gotrue-js/gotrue-js/src/index.ts",
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 173,
+			"name": "\"lib/constants\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/gotrue-js/gotrue-js/src/lib/constants.ts",
+			"children": [
+				{
+					"id": 175,
+					"name": "AUDIENCE",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {
+						"isExported": true,
+						"isConst": true
+					},
+					"sources": [
+						{
+							"fileName": "lib/constants.ts",
+							"line": 2,
+							"character": 21
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					},
+					"defaultValue": "process.env.AUDIENCE || ''"
+				},
+				{
+					"id": 176,
+					"name": "DEFAULT_HEADERS",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {
+						"isExported": true,
+						"isConst": true
+					},
+					"sources": [
+						{
+							"fileName": "lib/constants.ts",
+							"line": 3,
+							"character": 28
+						}
+					],
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 177,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {
+								"isExported": true
+							}
+						}
+					}
+				},
+				{
+					"id": 178,
+					"name": "EXPIRY_MARGIN",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {
+						"isExported": true,
+						"isConst": true
+					},
+					"sources": [
+						{
+							"fileName": "lib/constants.ts",
+							"line": 4,
+							"character": 26
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "string"
+							},
+							{
+								"type": "intrinsic",
+								"name": "number"
+							}
+						]
+					},
+					"defaultValue": "process.env.EXPIRY_MARGIN || 60 * 1000"
+				},
+				{
+					"id": 174,
+					"name": "GOTRUE_URL",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {
+						"isExported": true,
+						"isConst": true
+					},
+					"sources": [
+						{
+							"fileName": "lib/constants.ts",
+							"line": 1,
+							"character": 23
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					},
+					"defaultValue": "process.env.GOTRUE_URL || 'http://localhost:9999'"
+				},
+				{
+					"id": 179,
+					"name": "STORAGE_KEY",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {
+						"isExported": true,
+						"isConst": true
+					},
+					"sources": [
+						{
+							"fileName": "lib/constants.ts",
+							"line": 5,
+							"character": 24
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					},
+					"defaultValue": "process.env.STORAGE_KEY || 'supabase.auth.token'"
+				}
+			],
+			"groups": [
+				{
+					"title": "Variables",
+					"kind": 32,
+					"children": [
+						175,
+						176,
+						178,
+						174,
+						179
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "lib/constants.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 1,
+			"name": "\"lib/fetch\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/gotrue-js/gotrue-js/src/lib/fetch.ts",
+			"children": [
+				{
+					"id": 2,
+					"name": "FetchOptions",
+					"kind": 256,
+					"kindString": "Interface",
+					"flags": {
+						"isExported": true
+					},
+					"children": [
+						{
+							"id": 3,
+							"name": "headers",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/fetch.ts",
+									"line": 4,
+									"character": 9
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "reflection",
+										"declaration": {
+											"id": 4,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {
+												"isExported": true
+											},
+											"indexSignature": [
+												{
+													"id": 5,
+													"name": "__index",
+													"kind": 8192,
+													"kindString": "Index signature",
+													"flags": {
+														"isExported": true
+													},
+													"parameters": [
+														{
+															"id": 6,
+															"name": "key",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isExported": true
+															},
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											]
+										}
+									}
+								]
+							}
+						},
+						{
+							"id": 7,
+							"name": "noResolveJson",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/fetch.ts",
+									"line": 7,
+									"character": 15
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "false"
+									},
+									{
+										"type": "intrinsic",
+										"name": "true"
+									}
+								]
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								3,
+								7
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/fetch.ts",
+							"line": 3,
+							"character": 29
+						}
+					]
+				},
+				{
+					"id": 12,
+					"name": "get",
+					"kind": 64,
+					"kindString": "Function",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 13,
+							"name": "get",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 14,
+									"name": "url",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 15,
+									"name": "options",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 2,
+										"name": "FetchOptions"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "intrinsic",
+										"name": "any"
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/fetch.ts",
+							"line": 22,
+							"character": 25
+						}
+					]
+				},
+				{
+					"id": 8,
+					"name": "handleError",
+					"kind": 64,
+					"kindString": "Function",
+					"flags": {
+						"isConst": true
+					},
+					"signatures": [
+						{
+							"id": 9,
+							"name": "handleError",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"parameters": [
+								{
+									"id": 10,
+									"name": "error",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "intrinsic",
+										"name": "any"
+									}
+								},
+								{
+									"id": 11,
+									"name": "reject",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "intrinsic",
+										"name": "any"
+									}
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/fetch.ts",
+							"line": 10,
+							"character": 17
+						}
+					]
+				},
+				{
+					"id": 16,
+					"name": "post",
+					"kind": 64,
+					"kindString": "Function",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 17,
+							"name": "post",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 18,
+									"name": "url",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 19,
+									"name": "body",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "object"
+									}
+								},
+								{
+									"id": 20,
+									"name": "options",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 2,
+										"name": "FetchOptions"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "intrinsic",
+										"name": "any"
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/fetch.ts",
+							"line": 37,
+							"character": 26
+						}
+					]
+				},
+				{
+					"id": 21,
+					"name": "put",
+					"kind": 64,
+					"kindString": "Function",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 22,
+							"name": "put",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 23,
+									"name": "url",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 24,
+									"name": "body",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "object"
+									}
+								},
+								{
+									"id": 25,
+									"name": "options",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 2,
+										"name": "FetchOptions"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "intrinsic",
+										"name": "any"
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/fetch.ts",
+							"line": 53,
+							"character": 25
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Interfaces",
+					"kind": 256,
+					"children": [
+						2
+					]
+				},
+				{
+					"title": "Functions",
+					"kind": 64,
+					"children": [
+						12,
+						8,
+						16,
+						21
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "lib/fetch.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 141,
+			"name": "\"lib/helpers\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/gotrue-js/gotrue-js/src/lib/helpers.ts",
+			"children": [
+				{
+					"id": 142,
+					"name": "LocalStorage",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {
+						"isExported": true
+					},
+					"indexSignature": [
+						{
+							"id": 144,
+							"name": "__index",
+							"kind": 8192,
+							"kindString": "Index signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 145,
+									"name": "name",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							}
+						}
+					],
+					"children": [
+						{
+							"id": 147,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 148,
+									"name": "new LocalStorage",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 149,
+											"name": "localStorage",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"name": "Storage"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 142,
+										"name": "LocalStorage"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/helpers.ts",
+									"line": 24,
+									"character": 17
+								}
+							]
+						},
+						{
+							"id": 146,
+							"name": "length",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/helpers.ts",
+									"line": 24,
+									"character": 8
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "number"
+							}
+						},
+						{
+							"id": 143,
+							"name": "localStorage",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/helpers.ts",
+									"line": 22,
+									"character": 14
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "Storage"
+							}
+						},
+						{
+							"id": 150,
+							"name": "clear",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 151,
+									"name": "clear",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/helpers.ts",
+									"line": 28,
+									"character": 7
+								}
+							]
+						},
+						{
+							"id": 159,
+							"name": "getItem",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 160,
+									"name": "getItem",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 161,
+											"name": "key",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "string"
+											},
+											{
+												"type": "intrinsic",
+												"name": "null"
+											}
+										]
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/helpers.ts",
+									"line": 37,
+									"character": 9
+								}
+							]
+						},
+						{
+							"id": 152,
+							"name": "key",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 153,
+									"name": "key",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 154,
+											"name": "index",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "number"
+											}
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "string"
+											},
+											{
+												"type": "intrinsic",
+												"name": "null"
+											}
+										]
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/helpers.ts",
+									"line": 31,
+									"character": 5
+								}
+							]
+						},
+						{
+							"id": 162,
+							"name": "removeItem",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 163,
+									"name": "removeItem",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 164,
+											"name": "key",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/helpers.ts",
+									"line": 40,
+									"character": 12
+								}
+							]
+						},
+						{
+							"id": 155,
+							"name": "setItem",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 156,
+									"name": "setItem",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 157,
+											"name": "key",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 158,
+											"name": "value",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/helpers.ts",
+									"line": 34,
+									"character": 9
+								}
+							]
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								147
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								146,
+								143
+							]
+						},
+						{
+							"title": "Methods",
+							"kind": 2048,
+							"children": [
+								150,
+								159,
+								152,
+								162,
+								155
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/helpers.ts",
+							"line": 21,
+							"character": 25
+						}
+					],
+					"implementedTypes": [
+						{
+							"type": "reference",
+							"name": "Storage"
+						}
+					]
+				},
+				{
+					"id": 169,
+					"name": "getParameterByName",
+					"kind": 64,
+					"kindString": "Function",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 170,
+							"name": "getParameterByName",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 171,
+									"name": "name",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 172,
+									"name": "url",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "undefined"
+											},
+											{
+												"type": "intrinsic",
+												"name": "string"
+											}
+										]
+									}
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "null"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/helpers.ts",
+							"line": 11,
+							"character": 34
+						}
+					]
+				},
+				{
+					"id": 167,
+					"name": "isBrowser",
+					"kind": 64,
+					"kindString": "Function",
+					"flags": {
+						"isExported": true,
+						"isConst": true
+					},
+					"signatures": [
+						{
+							"id": 168,
+							"name": "isBrowser",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/helpers.ts",
+							"line": 9,
+							"character": 22
+						}
+					]
+				},
+				{
+					"id": 165,
+					"name": "uuid",
+					"kind": 64,
+					"kindString": "Function",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 166,
+							"name": "uuid",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/helpers.ts",
+							"line": 1,
+							"character": 20
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Classes",
+					"kind": 128,
+					"children": [
+						142
+					]
+				},
+				{
+					"title": "Functions",
+					"kind": 64,
+					"children": [
+						169,
+						167,
+						165
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "lib/helpers.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 26,
+			"name": "\"lib/types\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/gotrue-js/gotrue-js/src/lib/types.ts",
+			"children": [
+				{
+					"id": 27,
+					"name": "Session",
+					"kind": 256,
+					"kindString": "Interface",
+					"flags": {
+						"isExported": true
+					},
+					"children": [
+						{
+							"id": 28,
+							"name": "access_token",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 6,
+									"character": 14
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 29,
+							"name": "expires_in",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 7,
+									"character": 12
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "number"
+							}
+						},
+						{
+							"id": 30,
+							"name": "refresh_token",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 8,
+									"character": 15
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 31,
+							"name": "token_type",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 9,
+									"character": 12
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 32,
+							"name": "user",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 10,
+									"character": 6
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 33,
+								"name": "User"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								28,
+								29,
+								30,
+								31,
+								32
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/types.ts",
+							"line": 5,
+							"character": 24
+						}
+					]
+				},
+				{
+					"id": 56,
+					"name": "Subscription",
+					"kind": 256,
+					"kindString": "Interface",
+					"flags": {
+						"isExported": true
+					},
+					"children": [
+						{
+							"id": 58,
+							"name": "callback",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "The function to call every time there is an event. eg: (eventName) => {}"
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 58,
+									"character": 10
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 59,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {
+										"isExported": true
+									},
+									"signatures": [
+										{
+											"id": 60,
+											"name": "__call",
+											"kind": 4096,
+											"kindString": "Call signature",
+											"flags": {
+												"isExported": true
+											},
+											"parameters": [
+												{
+													"id": 61,
+													"name": "event",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {
+														"isExported": true
+													},
+													"type": {
+														"type": "reference",
+														"id": 67,
+														"name": "AuthChangeEvent"
+													}
+												},
+												{
+													"id": 62,
+													"name": "session",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {
+														"isExported": true
+													},
+													"type": {
+														"type": "union",
+														"types": [
+															{
+																"type": "reference",
+																"id": 27,
+																"name": "Session"
+															},
+															{
+																"type": "intrinsic",
+																"name": "null"
+															}
+														]
+													}
+												}
+											],
+											"type": {
+												"type": "intrinsic",
+												"name": "void"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "lib/types.ts",
+											"line": 58,
+											"character": 11
+										}
+									]
+								}
+							}
+						},
+						{
+							"id": 57,
+							"name": "id",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "The subscriber UUID. This will be set by the client."
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 54,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 63,
+							"name": "unsubscribe",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Call this to remove the listener."
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 62,
+									"character": 13
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 64,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {
+										"isExported": true
+									},
+									"signatures": [
+										{
+											"id": 65,
+											"name": "__call",
+											"kind": 4096,
+											"kindString": "Call signature",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "void"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "lib/types.ts",
+											"line": 62,
+											"character": 14
+										}
+									]
+								}
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								58,
+								57,
+								63
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/types.ts",
+							"line": 50,
+							"character": 29
+						}
+					]
+				},
+				{
+					"id": 33,
+					"name": "User",
+					"kind": 256,
+					"kindString": "Interface",
+					"flags": {
+						"isExported": true
+					},
+					"children": [
+						{
+							"id": 35,
+							"name": "app_metadata",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 14,
+									"character": 14
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 36,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {
+										"isExported": true
+									},
+									"indexSignature": [
+										{
+											"id": 38,
+											"name": "__index",
+											"kind": 8192,
+											"kindString": "Index signature",
+											"flags": {
+												"isExported": true
+											},
+											"parameters": [
+												{
+													"id": 39,
+													"name": "key",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {
+														"isExported": true
+													},
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											],
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									],
+									"children": [
+										{
+											"id": 37,
+											"name": "provider",
+											"kind": 32,
+											"kindString": "Variable",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"sources": [
+												{
+													"fileName": "lib/types.ts",
+													"line": 15,
+													"character": 12
+												}
+											],
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													},
+													{
+														"type": "intrinsic",
+														"name": "string"
+													}
+												]
+											}
+										}
+									],
+									"groups": [
+										{
+											"title": "Variables",
+											"kind": 32,
+											"children": [
+												37
+											]
+										}
+									],
+									"sources": [
+										{
+											"fileName": "lib/types.ts",
+											"line": 14,
+											"character": 15
+										}
+									]
+								}
+							}
+						},
+						{
+							"id": 44,
+							"name": "aud",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 21,
+									"character": 5
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 47,
+							"name": "confirmed_at",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 24,
+									"character": 14
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						},
+						{
+							"id": 46,
+							"name": "created_at",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 23,
+									"character": 12
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 45,
+							"name": "email",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 22,
+									"character": 7
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						},
+						{
+							"id": 34,
+							"name": "id",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 13,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 48,
+							"name": "last_sign_in_at",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 25,
+									"character": 17
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						},
+						{
+							"id": 49,
+							"name": "role",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 26,
+									"character": 6
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						},
+						{
+							"id": 50,
+							"name": "updated_at",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 27,
+									"character": 12
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						},
+						{
+							"id": 40,
+							"name": "user_metadata",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 18,
+									"character": 15
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 41,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {
+										"isExported": true
+									},
+									"indexSignature": [
+										{
+											"id": 42,
+											"name": "__index",
+											"kind": 8192,
+											"kindString": "Index signature",
+											"flags": {
+												"isExported": true
+											},
+											"parameters": [
+												{
+													"id": 43,
+													"name": "key",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {
+														"isExported": true
+													},
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											],
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "lib/types.ts",
+											"line": 18,
+											"character": 16
+										}
+									]
+								}
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								35,
+								44,
+								47,
+								46,
+								45,
+								34,
+								48,
+								49,
+								50,
+								40
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/types.ts",
+							"line": 12,
+							"character": 21
+						}
+					]
+				},
+				{
+					"id": 51,
+					"name": "UserAttributes",
+					"kind": 256,
+					"kindString": "Interface",
+					"flags": {
+						"isExported": true
+					},
+					"children": [
+						{
+							"id": 55,
+							"name": "data",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"comment": {
+								"shortText": "A custom data object. Can be any JSON."
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 47,
+									"character": 6
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "object"
+									}
+								]
+							}
+						},
+						{
+							"id": 52,
+							"name": "email",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"comment": {
+								"shortText": "The user's email."
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 34,
+									"character": 7
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						},
+						{
+							"id": 54,
+							"name": "email_change_token",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"comment": {
+								"shortText": "An email change token."
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 42,
+									"character": 20
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						},
+						{
+							"id": 53,
+							"name": "password",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"comment": {
+								"shortText": "The user's password."
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 38,
+									"character": 10
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								55,
+								52,
+								54,
+								53
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/types.ts",
+							"line": 30,
+							"character": 31
+						}
+					]
+				},
+				{
+					"id": 67,
+					"name": "AuthChangeEvent",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "lib/types.ts",
+							"line": 3,
+							"character": 27
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "stringLiteral",
+								"value": "SIGNED_IN"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "SIGNED_OUT"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "USER_UPDATED"
+							}
+						]
+					}
+				},
+				{
+					"id": 66,
+					"name": "Provider",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "lib/types.ts",
+							"line": 1,
+							"character": 20
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "stringLiteral",
+								"value": "bitbucket"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "github"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "gitlab"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "google"
+							}
+						]
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Interfaces",
+					"kind": 256,
+					"children": [
+						27,
+						56,
+						33,
+						51
+					]
+				},
+				{
+					"title": "Type aliases",
+					"kind": 4194304,
+					"children": [
+						67,
+						66
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "lib/types.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		}
+	],
+	"groups": [
+		{
+			"title": "Modules",
+			"kind": 1,
+			"children": [
+				68,
+				180,
+				326,
+				173,
+				1,
+				141,
+				26
+			]
+		}
+	]
+}
