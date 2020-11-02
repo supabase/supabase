@@ -11,7 +11,7 @@ tags:
     - supabase
 ---
 
-Today we're releasing [supabase-js](https://github.com/supabase/supabase-js) version 1.0.0, and it comes with some major Developer Experience improvements.
+Today we're releasing [supabase-js](https://github.com/supabase/supabase-js) version 1.0, and it comes with some major Developer Experience improvements.
 
 <!--truncate-->
 

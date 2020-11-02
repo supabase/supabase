@@ -6,19 +6,13 @@ export default function Auth({ onLogin }) {
   const [password, setPassword] = useState('')
 
   const handleLogin = async (type, email, password) => {
-    try {
-      const {
-        body: { user },
-      } =
-        type === 'LOGIN'
-          ? await supabase.auth.login(email, password)
-          : await supabase.auth.signup(email, password)
+    const { user, error } =
+      type === 'LOGIN'
+        ? await supabase.auth.signIn({email, password})
+        : await supabase.auth.signUp({email, password})
 
-      onLogin(user)
-    } catch (error) {
-      console.log('error', error)
-      alert(error.error_description || error)
-    }
+    if (error) alert(error.message || error)
+    else onLogin(user)
   }
 
   return (
