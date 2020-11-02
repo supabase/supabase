@@ -1,0 +1,122 @@
+---
+id: auth
+title: Auth
+description: Use Supabase to Authenticate and Authorize your users.
+---
+
+### User Management
+
+Supabase makes it simple to manage your users.
+
+<video width="99%" muted playsInline controls="true">
+<source src="/videos/auth-zoom2.mp4" type="video/mp4" muted playsInline />
+</video>
+
+When a user signs up, Supabase assigns them a unique ID. You can reference this ID anywhere in your database. For example, you might create a `profiles` table referencing the user using a `user_id` field.
+
+Supabase provides the routes to [sign up](/docs/client/auth-signup), [login](/docs/client/auth-signin), [log out](/docs/client/auth-signout), and manage users in your apps and websites.
+
+
+### Third Party Logins
+
+We currently support the following OAuth providers:
+- Google
+- Github
+- Gitlab
+- Bitbucket
+
+![OAuth Logins.](/img/supabase-oauth-logins.png)
+
+You can enable providers by navigating to Authentication > Settings > External OAuth Providers and inputting your `Client ID` and `Secret` for each.
+
+To fetch these you need to:
+
+1. Generate `Client ID` and `Secret` ([google](https://console.developers.google.com/apis/credentials), [github](https://github.com/settings/applications/new), [gitlab](https://gitlab.com/oauth/applications), [bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/))
+2. Enter Authorized Redirect URI: `http://<your-project>.supabase.co/auth/v1/callback` on provider dashboard
+
+### Row Level Security
+
+Authentication only gets you so far. When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html). Supabase makes it simple to turn RLS on and off.
+
+<video width="99%" muted playsInline controls="true">
+<source src="/videos/rls-zoom2.mp4" type="video/mp4" muted playsInline />
+</video>
+
+
+### Policies
+
+[Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) are PostgreSQL's rule engine. They are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs. 
+
+<video width="99%"  muted playsInline controls="true">
+<source src="/videos/policies-zoom2.mp4" type="video/mp4" muted playsInline />
+</video>
+
+With policies, your database becomes the rules engine. Instead of repetitively filtering your queries, like this ...
+
+```js
+const loggedInUserId = 'd0714948'
+let { data, error } = await supabase
+    .from('users')
+    .select('user_id, name')
+    .eq('user_id', loggedInUserId)
+
+// console.log(data)
+// => { id: 'd0714948', name: 'Jane' }
+```
+
+... you can simply define a rule on your database table, `auth.uid() = user_id`, and your request will return the rows which pass the rule, even when you remove the filter from your middleware:
+
+```js
+let user = await supabase
+    .from('users')
+    .select('user_id, name')
+
+// console.log(data)
+// Still => { id: 'd0714948', name: 'Jane' }
+```
+
+## How it works
+
+1. A user signs up. Supabase creates a new user in the `auth.users` table.
+2. Supabase returns a new JWT, which contains the user's `UUID`.
+3. Every request to your database also sends the JWT.
+4. Postgres inspects the JWT to determine the user making the request.
+5. The user's UID can be used in Policies to restrict access to rows. 
+
+Supabase provides a special function in Postgres, `auth.uid()`, which extracts the user's UID from the JWT. This is especially useful when creating Policies.
+ 
+## Tips
+
+### Never use a service key on the client.
+
+Supabase provides special "Service" keys, which can be used to bypass all Row Level Security. 
+These should never be used in the browser or exposed to customers, but they are usefull for administrative tasks.
+
+### Create a `public.users` table.
+
+Even though Supabase provides an `auth.users` table, it is helpful to also create a users table in the `public` schema, which uses the same UUID Primary Key as the `auth.users`.
+For security purposes, the `auth` schema is not exposed on the auto-generated API. Created a `public.users` table allows you to interact via the Supabase client - 
+especially useful for cross-table queries.
+
+### Policies are like where clauses.
+
+Policies are easy to understand once you get the hang of them. You can just think of the as adding a `WHERE` clause to every query. For example if you had a policy like this:
+
+```sql
+create policy "Individuals can view their own todos." on todos for
+    select using (auth.uid() = user_id);
+```
+
+It would translate to this whenever a user tries to select from the todos table:
+
+```sql
+select *
+from todos
+where auth.uid() = todos.user_id; -- Policy is implicitly added.
+```
+
+
+## Next steps
+
+- Read more about [Row Level Security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
+- Sign in: [app.supabase.io](https://app.supabase.io)

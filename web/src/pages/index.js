@@ -169,25 +169,6 @@ const features = [
   },
 ]
 
-function Feature({ imageUrl, title, description, href }) {
-  const imgUrl = useBaseUrl(imageUrl)
-  return (
-    <div className={classnames('col col--4 m-b-md', styles.feature)}>
-      <Link className={classnames('card', styles.featureCard)} to={href}>
-        <div className="card__body">
-          {imgUrl && (
-            <div className="">
-              <img className={styles.featureImage} src={imgUrl} alt={title} />
-            </div>
-          )}
-          <h3>{title}</h3>
-          <p>{description}</p>
-        </div>
-      </Link>
-    </div>
-  )
-}
-
 function Home() {
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
