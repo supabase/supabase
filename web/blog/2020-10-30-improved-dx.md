@@ -17,7 +17,7 @@ Today we're releasing [supabase-js](https://github.com/supabase/supabase-js) ver
 
 ### New Docs
 
-Before digging into the improvements, we're excited to point out our new [developer docs](http://localhost:3005/docs/client/supabase-client). While they're still a work in progress, here are some things we think you'll like:
+Before digging into the improvements, we're excited to point out our new [developer docs](/docs/client/supabase-client). While they're still a work in progress, here are some things we think you'll like:
 
 - The [Reference Docs](/docs/client/supabase-client) are auto-generated from our Typescript definitions and then enriched with examples. This forces us to document our code and makes it easier to keep everything in sync.
 - We added placeholders for the other languages that the community is developing. They have already started with Python, C#, Dart, Rust, and Swift. Expect to see the docs filling up soon!
