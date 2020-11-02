@@ -390,7 +390,11 @@ a.card {
   color: var(--ifm-color-content);
   box-shadow: none;
   border: 1px solid #333;
+  display: flex;
   /* background-color: var(--ifm-background-color); */
+}
+a.card__body {
+  flex-grow: 1;
 }
 a.card:hover {
   transition: all 0.2s ease;

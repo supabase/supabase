@@ -1,13 +1,13 @@
 ---
-id: signout
-title: "signOut"
-slug: signout
+id: session
+title: "session"
+slug: session
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Signs out the current user, if there is a logged in user.
+Returns the session data, if there is an active session.
 
 
 
@@ -29,7 +29,7 @@ Signs out the current user, if there is a logged in user.
 
 ## Examples
 
-### Sign out
+### Get user
 
 
 
@@ -40,7 +40,7 @@ Signs out the current user, if there is a logged in user.
 <TabItem value="js">
 
 ```js
-const { error, data } = await auth.signOut()
+const user = auth.session()
 ```
 
 

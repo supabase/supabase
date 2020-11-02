@@ -6,18 +6,13 @@ info:
     
     Our client library is modular. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing tools.
 
-    - **`supabase-{lang}`**: Combines libraries and adds enrichments.
-      - `postgrest-{lang}`: Client library to work with [PostgREST](https://github.com/postgrest/postgrest) 
-      - `realtime-{lang}`: Client library to work with [Realtime](https://github.com/supabase/realtime)    
-      - `gotrue-{lang}`: Client library to work with [GoTrue](https://github.com/netlify/gotrue)         
-
     
     | Repo                                                                                       | Official                                         | Community        |
     |-----------------------|--------------------------------------------------|------------------|
-    | **`supabase-{lang}`**     | [`JS`](https://github.com/supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` |
-    | `postgrest-{lang}` | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
-    | `realtime-{lang}`  | [`JS`](https://github.com/supabase/realtime-js) | `C#` \| `Python` \| `Rust` |
-    | `gotrue-{lang}`    | [`JS`](https://github.com/supabase/gotrue-js) | `C#` \| `Python` \| `Rust` |
+    | **`supabase-{lang}`** <br /> Combines libraries and adds enrichments.    | [`JavaScript`](https://github.com/supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp), [`Python`](https://github.com/supabase/supabase-py), `Rust` |
+    | `postgrest-{lang}` <br /> Client library to work with [PostgREST](https://github.com/postgrest/postgrest) | [`JavaScript`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp), [`Python`](https://github.com/supabase/postgrest-py), [`Rust`](https://github.com/supabase/postgrest-rs) |
+    | `realtime-{lang}` <br /> Client library to work with [Realtime](https://github.com/supabase/realtime) | [`JavaScript`](https://github.com/supabase/realtime-js) | `C#`, `Python`, `Rust` |
+    | `gotrue-{lang}` <br /> Client library to work with [GoTrue](https://github.com/netlify/gotrue)   | [`JavaScript`](https://github.com/supabase/gotrue-js) | `C#`, `Python`, `Rust` |
 
 
     
@@ -43,6 +38,7 @@ info:
           - auth.signUp()
           - auth.signIn()
           - auth.signOut()
+          - auth.session()
           - auth.user()
           - auth.update()
           - auth.onAuthStateChange()
@@ -278,7 +274,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { error, data } = await supabaseSign out
+          const { error, data } = supabase.signOut()
           ```
         py: | 
           ```py
@@ -292,7 +288,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.session()
+          const session = supabase.auth.session()
           ```
         py: | 
           ```py
@@ -306,7 +302,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          vawait supabase.auth.user()
+          const user = supabase.auth.user()
           ```
         py: | 
           ```py

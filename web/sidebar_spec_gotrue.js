@@ -9,7 +9,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Client functions',
-      items: ['gotrue/client/signup', 'gotrue/client/signin', 'gotrue/client/signout', 'gotrue/client/user', 'gotrue/client/update', 'gotrue/client/onauthstatechange'],
+      items: ['gotrue/client/signup', 'gotrue/client/signin', 'gotrue/client/signout', 'gotrue/client/user', 'gotrue/client/session', 'gotrue/client/update', 'gotrue/client/onauthstatechange'],
       collapsed: false,
     },
     {

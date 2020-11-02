@@ -29,6 +29,7 @@ info:
           - signIn
           - signOut
           - user
+          - session
           - update
           - onAuthStateChange
       - name: 'General functions'
@@ -116,8 +117,18 @@ pages:
       - name: Get user
         js: |
           ```js
-          const { error, data } = await auth.user()
+          const user = auth.user()
           ```
+
+  session:
+    $ref: '"GoTrueClient".GoTrueClient.session'
+    examples:
+      - name: Get user
+        js: |
+          ```js
+          const user = auth.session()
+          ```
+
   update:
     $ref: '"GoTrueClient".GoTrueClient.update'
 
