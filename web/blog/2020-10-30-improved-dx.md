@@ -108,7 +108,9 @@ const { data } = supabase.from('todos').select()
 
 ### Upgrading
 
-There will be a number of tasks that you want to do when you upgrade:
+We have documented all of the changes in the [release notes](https://github.com/supabase/supabase-js/releases/tag/v1.0.1). 
+
+To summarise the steps:
 
 1. Install the new version: `npm install @supabase/supabase-js@latest`
 2. Update all your `body` constants to `data`
