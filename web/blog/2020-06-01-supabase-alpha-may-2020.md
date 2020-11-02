@@ -14,7 +14,7 @@ It has been a monster month at [Supabase](https://supabase.io) and we're back wi
 
 <!--truncate-->
 
-<iframe width="700" height="350" src="https://www.youtube.com/embed/e4qXmcEFaUs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe className="w-full" width="700" height="350" src="https://www.youtube.com/embed/e4qXmcEFaUs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Housekeeping
 

@@ -27,7 +27,6 @@ export default function HowCard({ title, description, featureTitle, features }) 
 const styles = {
   h4: {
     padding: 10,
-    paddingBottom: 15,
     textAlign: 'center',
     borderBottom: '1px solid #000',
     margin: 0

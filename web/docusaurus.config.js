@@ -69,18 +69,74 @@ module.exports = {
       },
       items: [
         {
-          to: '/docs',
-          label: 'Docs',
-          position: 'right',
-        },
-        { to: '/docs/pricing', label: 'Pricing', position: 'right' },
-        { to: '/blog', label: 'Blog', position: 'right' },
-        { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
-        {
           href: 'https://github.com/supabase/supabase',
           className: 'navbar-item-github',
+          position: 'left',
+        },
+        {
+          href: 'https://twitter.com/supabase_io',
+          className: 'navbar-item-twitter',
+          position: 'left',
+        },
+        {
+          to: '/docs',
+          activeBasePath: '/docs/guides/',
+          label: 'Guides',
+          position: 'left',
+        },
+        {
+          label: 'Docs',
+          activeBasePath: '/docs/client/',
+          to: '/docs/client/supabase-client',
+          position: 'left',
+        },
+        {
+          label: 'Blog',
+          to: '/blog',
           position: 'right',
         },
+        {
+          to: 'docs/',
+          activeBasePath: 'Tools',
+          label: 'Tools',
+          position: 'left',
+          items: [
+            {
+              label: 'GoTrue',
+              to: '/docs/gotrue/server/about',
+            },
+            {
+              label: 'GoTrue Client',
+              to: '/docs/gotrue/client/gotrue-client',
+            },
+            {
+              label: 'Postgres',
+              to: '/docs/postgres/server/about',
+            },
+            {
+              label: 'Postgres API',
+              to: '/docs/postgres/api/about',
+            },
+            {
+              label: 'PostgREST',
+              to: '/docs/postgrest/server/about',
+            },
+            {
+              label: 'PostgREST Client',
+              to: '/docs/postgrest/client/postgrest-client',
+            },
+            {
+              label: 'Realtime',
+              to: '/docs/realtime/server/about',
+            },
+            {
+              label: 'Realtime Client',
+              to: '/docs/realtime/client/realtime-client',
+            },
+          ],
+        },
+        // { to: '/docs/pricing', label: 'Pricing', position: 'right' },
+        { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
       ],
     },
     prism: {
@@ -95,16 +151,20 @@ module.exports = {
           title: 'Company',
           items: [
             {
-              label: 'Humans',
-              to: 'https://supabase.io/humans.txt',
-            },
-            {
               label: 'Blog',
               to: '/blog',
             },
             {
               label: 'Open source',
               to: '/oss',
+            },
+            {
+              label: 'Humans.txt',
+              to: 'https://supabase.io/humans.txt',
+            },
+            {
+              label: 'Lawyers.txt',
+              to: 'https://supabase.io/lawyers.txt',
             },
           ],
         },
@@ -140,14 +200,6 @@ module.exports = {
               label: 'DevTo',
               href: 'https://dev.to/supabase',
             },
-            {
-              label: 'Stackshare',
-              href: 'https://stackshare.io/supabase',
-            },
-            {
-              label: 'Product Hunt',
-              href: 'https://www.producthunt.com/posts/supabase-alpha',
-            },
             // {
             //   label: "Discord",
             //   href: "https://discordapp.com/invite/docusaurus"
@@ -180,4 +232,77 @@ module.exports = {
       },
     ],
   ],
+  // plugins: [
+  //   // [
+  //   //   '@docusaurus/plugin-content-docs',
+  //   //   {
+  //   //     id: 'supabase-client', // for first plugin-content-docs with "resources/" path
+  //   //     // homePageId: "doc2",
+  //   //     path: './ref/supabase', // Path to data on filesystem, relative to site dir.
+  //   //     routeBasePath: 'ref/supabase', // URL Route.
+  //   //     include: ['**/*.md', '**/*.mdx'],
+  //   //     sidebarPath: require.resolve('./sidebar_spec_supabase.js'),
+  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //   },
+  //   // ],
+  //   // [
+  //   //   '@docusaurus/plugin-content-docs',
+  //   //   {
+  //   //     id: 'postgrest-client', // for first plugin-content-docs with "resources/" path
+  //   //     // homePageId: "doc2",
+  //   //     path: './ref/postgrest', // Path to data on filesystem, relative to site dir.
+  //   //     routeBasePath: 'ref/postgrest', // URL Route.
+  //   //     include: ['**/*.md', '**/*.mdx'],
+  //   //     sidebarPath: require.resolve('./sidebar_spec_postgrest.js'),
+  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //   },
+  //   // ],
+  //   // [
+  //   //   '@docusaurus/plugin-content-docs',
+  //   //   {
+  //   //     id: 'gotrue-client', // for first plugin-content-docs with "resources/" path
+  //   //     // homePageId: "doc2",
+  //   //     path: './ref/gotrue', // Path to data on filesystem, relative to site dir.
+  //   //     routeBasePath: 'ref/gotrue', // URL Route.
+  //   //     include: ['**/*.md', '**/*.mdx'],
+  //   //     sidebarPath: require.resolve('./sidebar_spec_gotrue.js'),
+  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //   },
+  //   // ],
+  //   // [
+  //   //   '@docusaurus/plugin-content-docs',
+  //   //   {
+  //   //     id: 'realtime-client', // for first plugin-content-docs with "resources/" path
+  //   //     // homePageId: "doc2",
+  //   //     path: './ref/realtime', // Path to data on filesystem, relative to site dir.
+  //   //     routeBasePath: 'ref/realtime', // URL Route.
+  //   //     include: ['**/*.md', '**/*.mdx'],
+  //   //     sidebarPath: require.resolve('./sidebar_spec_realtime.js'),
+  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //   },
+  //   // ],
+  //   // [
+  //   //   '@docusaurus/plugin-content-docs',
+  //   //   {
+  //   //     id: 'realtime-server', // for first plugin-content-docs with "resources/" path
+  //   //     path: './tools/realtime', // Path to data on filesystem, relative to site dir.
+  //   //     routeBasePath: 'docs/realtime', // URL Route.
+  //   //     include: ['**/*.md', '**/*.mdx'],
+  //   //     sidebarPath: require.resolve('./sidebar_realtime_server.js'),
+  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //   },
+  //   // ],
+  //   // [
+  //   //   '@docusaurus/plugin-content-docs',
+  //   //   {
+  //   //     id: 'postgrest', // for first plugin-content-docs with "resources/" path
+  //   //     // homePageId: "doc2",
+  //   //     path: './ref/postgrest', // Path to data on filesystem, relative to site dir.
+  //   //     routeBasePath: 'ref/postgrest', // URL Route.
+  //   //     include: ['**/*.md', '**/*.mdx'],
+  //   //     sidebarPath: require.resolve('./sidebar_spec_postgrest.js'),
+  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //   },
+  //   // ],
+  // ],
 }
