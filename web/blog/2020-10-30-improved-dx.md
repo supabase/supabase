@@ -1,5 +1,5 @@
 ---
-title: Supabase.js 1.0.0
+title: Supabase.js 1.0
 description: We're releasing a new version of our Supabase client with some awesome new improvements.
 author: Paul Copplestone
 author_title: Supabase
