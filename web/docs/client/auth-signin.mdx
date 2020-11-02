@@ -17,7 +17,7 @@ Log in an existing user, or login via a third-party provider.
 <TabItem value="js">
 
 ```js
-const { error, data } = await supabase.auth.signIn({
+const { user, error } = await supabase.auth.signIn({
   email: 'example@email.com',
   password: 'example-password',
 })
@@ -160,7 +160,7 @@ The user's email address.
 <TabItem value="js">
 
 ```js
-const { error, data } = await supabase.auth.signIn({
+const { user, error } = await supabase.auth.signIn({
   email: 'example@email.com',
   password: 'example-password',
 })

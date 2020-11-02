@@ -224,7 +224,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { error, data } = await supabase.auth.signUp({
+          const { user, error } = await supabase.auth.signUp({
             email: 'example@email.com',
             password: 'example-password',
           })
@@ -245,7 +245,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { error, data } = await supabase.auth.signIn({
+          const { user, error } = await supabase.auth.signIn({
             email: 'example@email.com',
             password: 'example-password',
           })
@@ -274,7 +274,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { error, data } = supabase.signOut()
+          const { error } = supabase.signOut()
           ```
         py: | 
           ```py

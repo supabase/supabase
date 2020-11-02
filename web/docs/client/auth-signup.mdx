@@ -17,7 +17,7 @@ Creates a new user.
 <TabItem value="js">
 
 ```js
-const { error, data } = await supabase.auth.signUp({
+const { user, error } = await supabase.auth.signUp({
   email: 'example@email.com',
   password: 'example-password',
 })
@@ -136,7 +136,7 @@ The user's password.
 <TabItem value="js">
 
 ```js
-const { error, data } = await supabase.auth.signUp({
+const { user, error } = await supabase.auth.signUp({
   email: 'example@email.com',
   password: 'example-password',
 })
