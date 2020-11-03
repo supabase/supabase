@@ -9,7 +9,7 @@ const {
 const supabase = Supabase.createClient(SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY)
 async function login() {
   try {
-    const res = await supabase.auth.login(SNOWPACK_PUBLIC_USER, SNOWPACK_PUBLIC_PASSWORD)
+    const res = await supabase.auth.signIn({email: SNOWPACK_PUBLIC_USER, password:SNOWPACK_PUBLIC_PASSWORD})
     console.log({ res })
     return res
   } catch (error) {

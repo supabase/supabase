@@ -3,8 +3,8 @@
 
 <script>
   import TailwindStyles from './TailwindStyles.svelte'
-  // import {createClient} from '@supabase/supabase-js'
-  import Supabase from '@supabase/supabase-js'
+  import { createClient } from '@supabase/supabase-js'
+
   let importEnv = true
   try {
     if (process.env.NODE_ENV === 'test') importEnv = false
@@ -14,7 +14,7 @@
     ? process.env
     : import.meta.env
 
-  const supabase = Supabase.createClient(SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY)
+  const supabase = createClient(SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY)
   let values = {}
   export let user
   window.userToken = null
@@ -25,14 +25,19 @@
     const password = event.target[1].value
 
     supabase.auth
-      .signup(email, password)
-      .then((response) => {
-        document.querySelector('#access-token').value = response.body.access_token
-        document.querySelector('#refresh-token').value = response.body.refresh_token
-        // alert('Logged in as ' + response.body.user.email)
+      .signUp({ email, password })
+      .then((res) => {
+        if(res.error){
+          document.querySelector('#login-error').value = res.error
+        } else {
+        document.querySelector('#access-token').value = res.data.access_token
+        document.querySelector('#refresh-token').value = res.data.refresh_token
+        user = res.user
+        }
+
       })
       .catch((err) => {
-        alert(err.response.text)
+        document.querySelector('#login-error').value = err
       })
   }
 
@@ -42,13 +47,19 @@
     // const password = event.target[1].value
     const { email, password } = values
     supabase.auth
-      .login(email, password)
-      .then((response) => {
-        document.querySelector('#access-token').value = response.body.access_token
-        document.querySelector('#refresh-token').value = response.body.refresh_token
-        // setContext("user" ,response.body.user)
-        user = response.body.user
-        localStorage.setItem('user-todolist', JSON.stringify(user))
+      .signIn({ email, password })
+      .then((res) => {
+        const { data, error } = res
+        console.log({data,user: res.user,error})
+        if (error) {
+          document.querySelector('#login-error').value = error
+        } else {
+          document.querySelector('#access-token').value = data.access_token
+          document.querySelector('#refresh-token').value = data.refresh_token
+          // setContext("user" ,response.body.user)
+          user = res.user
+          localStorage.setItem('user-todolist', JSON.stringify(user))
+        }
         // alert('Logged in as ' + response.body.user.email)
       })
       .catch((err) => {
@@ -127,6 +138,8 @@
         <input readonly="readonly" type="text" id="refresh-token" />
         <small>Supabase-js will use this to automatically fetch a new accessToken for you every 60
           mins whilst the client is running</small>
+        <br />
+        <input readonly="readonly" type="text" id="login-error" />
       </form>
     </div>
     <div class="section">
