@@ -1,4 +1,5 @@
-import Supabase from '@supabase/supabase-js'
+import {createClient} from '@supabase/supabase-js'
+
 let importEnv = true
 try {
   if (process.env.NODE_ENV === 'test') importEnv = false
@@ -8,7 +9,7 @@ const { SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY } = !importEn
   ? process.env
   : import.meta.env
 
-const supabase = Supabase.createClient(SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY)
+const supabase = createClient(SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY)
 export const fetchUsers = async () => {
   const { body } = await supabase.from('users').select(`
       *
