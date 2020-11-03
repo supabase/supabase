@@ -80,7 +80,7 @@ There's been [plenty of drama](https://hacktoberfest.digitalocean.com/hacktoberf
 
 ### Coming next
 
-Our focus now is to move from Alpha to Beta and we'll be improving stability, reliability, and performance. We've create a [Benchmarks](https://github.com/supabase/benchmarks/) repository, where we'll be measuring the performance of all the open source tools we use.
+Our focus now is to move from Alpha to Beta and we'll be improving stability, reliability, and performance. We've created a [Benchmarks](https://github.com/supabase/benchmarks/) repository, where we'll be measuring the performance of all the open source tools we use.
 
 ### Get started
 
