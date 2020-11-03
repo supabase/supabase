@@ -1028,3 +1028,9 @@ h4.method-list-item-label .method-list-item-validation {
 .method-list-group .method-list-group li h4 {
   margin-bottom: 4px;
 }
+
+.video-with-border {
+  border-radius: 5px;
+  overflow: hidden;
+  border: 2px solid var(--custom-border-color);
+}
