@@ -1,7 +1,6 @@
 // BUG:  https://github.com/pikapkg/snowpack/pull/444
 // adding   "namedExports": ["@supabase/supabase-js"], to snowPack config doesn't work
-// import {createClient} from '@supabase/supabase-js'
-import Supabase from '@supabase/supabase-js'
+import {createClient} from '@supabase/supabase-js'
 // import { Socket } = '@supabase/realtime-js'
 
 // var socket = new Socket(process.env.REALTIME_URL)
@@ -16,7 +15,7 @@ const { SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY } = !importEn
   ? process.env
   : import.meta.env
 
-const supabase = Supabase.createClient(SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY)
+const supabase = createClient(SNOWPACK_PUBLIC_SUPABASE_URL, SNOWPACK_PUBLIC_SUPABASE_KEY)
 export const getLists = async () => {
   const { body } = await supabase
     .from(`lists`)
