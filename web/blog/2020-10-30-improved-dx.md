@@ -85,7 +85,7 @@ const { user, error } = await supabase.auth.signUp({
 
 ### Breaking changes
 
-We've bumped the major version because there are a number of breaking changes. We've detailed these in the [release notes](https://github.com/supabase/supabase-js/releases/tag/v1.0.0), but here are a few to be aware of:
+We've bumped the major version because there are a number of breaking changes. We've detailed these in the [release notes](https://github.com/supabase/supabase-js/releases/tag/v1.0.1), but here are a few to be aware of:
 
 - `signup()` is now `signUp()` and `email` / `password` is passed as an object
 - `logout()` is now `signOut()`
