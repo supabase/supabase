@@ -301,7 +301,7 @@ const mySubscription = supabase
 
 ### Listening to row level changes
 
-You can listen to individual rows using the format `{table}:{col}.eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
 
 <Tabs
   defaultValue="js"
@@ -312,7 +312,7 @@ You can listen to individual rows using the format `{table}:{col}.eq.{val}` - wh
 
 ```js
 const mySubscription = supabase
-  .from('countries:id.eq.200')
+  .from('countries:id=eq.200')
   .on('UPDATE', handleRecordUpdated)
   .subscribe()
 ```

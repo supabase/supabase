@@ -701,11 +701,11 @@ pages:
           # Not yet implemented
           ```
       - name: Listening to row level changes
-        description: You can listen to individual rows using the format `{table}:{col}.eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
         js: |
           ```js
           const mySubscription = supabase
-            .from('countries:id.eq.200')
+            .from('countries:id=eq.200')
             .on('UPDATE', handleRecordUpdated)
             .subscribe()
           ```
