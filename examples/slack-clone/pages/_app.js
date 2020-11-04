@@ -35,7 +35,7 @@ export default class SupabaseSlackClone extends App {
   }
 
   signOut = () => {
-    supabase.auth.logout()
+    supabase.auth.signOut()
     localStorage.removeItem('supabase-slack-clone')
     this.setState({ user: null })
     Router.push('/')
