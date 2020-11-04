@@ -27,7 +27,7 @@ function MyApp({ Component, pageProps }) {
   function onSignOut() {
     try {
       const user = auth.currentUser();
-      user.logout()
+      user.signOut()
         .then(response => {
           console.log("User logged out")
           window.location.reload()
