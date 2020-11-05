@@ -1,6 +1,6 @@
 import React from 'react'
 import { GestureResponderEvent, StyleSheet, Text, TouchableOpacity } from 'react-native'
-import { Styles } from '../constants'
+import { Styles } from '../lib/constants'
 
 type ButtonProps = {
   text: string
