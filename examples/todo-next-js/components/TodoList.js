@@ -71,12 +71,15 @@ const Todo = ({ todo, onDelete }) => {
 
   const toggle = async () => {
     try {
-      const { body } = await supabase
+      const { data,error } = await supabase
         .from('todos')
         .update({ is_complete: !isCompleted })
         .eq('id', todo.id)
         .single()
-      setIsCompleted(body.is_complete)
+        if(error){
+          throw new Error(error)
+        }
+      setIsCompleted(data.is_complete)
     } catch (error) {
       console.log('error', error)
     }

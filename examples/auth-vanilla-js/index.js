@@ -47,6 +47,7 @@ const logInSubmitted = (event) => {
     .then((response) => {
       document.querySelector('#access-token').value = response.data.access_token
       document.querySelector('#refresh-token').value = response.data.refresh_token
+      // response.error ?
       alert("Logged in as " + response.user.email)
     })
     .catch((err) => {

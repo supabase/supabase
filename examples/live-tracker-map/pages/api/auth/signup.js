@@ -7,7 +7,7 @@ export default async function (req, res) {
     const authBody = await auth.signUp({email, password})
 
     supabase.setAccessToken(authBody.data.access_token)
-    const { body: user } = await supabase.from('users').insert([{ id: authBody.user.id, username: email, role }]).single()
+    const { data: user } = await supabase.from('users').insert([{ id: authBody.user.id, username: email, role }]).single()
 
     return res.status(200).json({ ...user, refresh_token: authBody.refresh_token })
   } catch (error) {
