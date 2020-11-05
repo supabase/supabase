@@ -34,10 +34,10 @@ export const useStore = (props) => {
           }
         })
         if (update) {
-          setTasks(t => [...tasks]) // update
+          setTasks((t) => [...tasks]) // update
         } else {
           tasks.unshift(newTask)
-          setTasks(t => [...tasks]) // new
+          setTasks((t) => [...tasks]) // new
         }
       }
     }
@@ -61,8 +61,11 @@ export const useStore = (props) => {
 
 export const addTask = async (task_text, list_id) => {
   try {
-    let { body } = await supabase.from('tasks').insert([{ task_text, list_id }])
-    return body
+    let { data, error } = await supabase.from('tasks').insert([{ task_text, list_id }])
+    if (error) {
+      throw new Error(error)
+    }
+    return data
   } catch (error) {
     console.log('error', error)
   }
@@ -70,8 +73,11 @@ export const addTask = async (task_text, list_id) => {
 
 export const updateTask = async (task_id, values) => {
   try {
-    let { body } = await supabase.from('tasks').eq('id', task_id).update(values)
-    return body
+    let { data, error } = await supabase.from('tasks').eq('id', task_id).update(values)
+    if (error) {
+      throw new Error(error)
+    }
+    return data
   } catch (error) {
     console.log('error', error)
   }
@@ -79,8 +85,11 @@ export const updateTask = async (task_id, values) => {
 
 export const createList = async (uuid) => {
   try {
-    let { body } = await supabase.from('lists').insert([{ uuid }])
-    return body[0]
+    let { data, error } = await supabase.from('lists').insert([{ uuid }])
+    if (error) {
+      throw new Error(error)
+    }
+    return data[0]
   } catch (error) {
     console.log('error', error)
   }
@@ -88,12 +97,15 @@ export const createList = async (uuid) => {
 
 export const fetchList = async (list_uuid) => {
   try {
-    let { body } = await supabase
+    let { data, error } = await supabase
       .from('lists')
       .eq('uuid', list_uuid)
       .select(`*, tasks(*)`)
       .single()
-    return body
+    if (error) {
+      throw new Error(error)
+    }
+    return data
   } catch (error) {
     console.log('error', error)
   }
