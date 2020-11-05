@@ -1,6 +1,6 @@
 import React from 'react'
 import { TextInput, StyleSheet } from 'react-native'
-import { Styles } from '../constants'
+import { Styles } from '../lib/constants'
 
 type TextFieldProps = {
   onChangeText: ((text: string) => void) | undefined
