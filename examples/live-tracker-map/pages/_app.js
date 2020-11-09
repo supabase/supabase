@@ -12,10 +12,14 @@ function MyApp({ Component, pageProps }) {
         const authUser = auth.currentUser()
         if (!authUser) return
 
-        const { body: user } = await supabase.from('users')
+        const { data: user, error } = await supabase
+          .from('users')
           .match({ id: authUser.id })
           .select('*')
           .single()
+        if (error) {
+          throw new Error(error)
+        }
         setUser(user)
       } catch (error) {
         console.log(error)
@@ -26,15 +30,16 @@ function MyApp({ Component, pageProps }) {
 
   function onSignOut() {
     try {
-      const user = auth.currentUser();
-      user.logout()
-        .then(response => {
-          console.log("User logged out")
+      const user = auth.currentUser()
+      user
+        .signOut()
+        .then((response) => {
+          console.log('User logged out')
           window.location.reload()
         })
-        .catch(error => {
-          console.log("Failed to logout user: %o", error)
-        });
+        .catch((error) => {
+          console.log('Failed to logout user: %o', error)
+        })
     } catch (error) {
       console.log(error)
     }
@@ -44,7 +49,7 @@ function MyApp({ Component, pageProps }) {
     <UserContext.Provider
       value={{
         user: user,
-        signOut: onSignOut
+        signOut: onSignOut,
       }}
     >
       <Component {...pageProps} />
