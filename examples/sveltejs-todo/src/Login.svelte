@@ -71,7 +71,7 @@
     event.preventDefault()
 
     supabase.auth
-      .logout()
+      .signOut()
       .then((response) => {
         document.querySelector('#access-token').value = ''
         document.querySelector('#refresh-token').value = ''
