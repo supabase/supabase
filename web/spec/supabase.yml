@@ -180,7 +180,7 @@ pages:
 
       ### Generate database types from Swagger OpenAPI specification
 
-      Supabase generates a Swagger speficiation file for your database which can be used to generate your data types for usage with TypeScript.
+      Supabase generates a Swagger specification file for your database which can be used to generate your data types for usage with TypeScript.
 
       The Swagger specification for your Supabase project can be accessed as follows:
 
