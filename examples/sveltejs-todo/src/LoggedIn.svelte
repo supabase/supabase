@@ -1,5 +1,4 @@
 <script>
-  import TailwindStyles from './TailwindStyles.svelte'
   import Lists from './Lists.svelte'
   import { items, subscription } from './items'
   export let user

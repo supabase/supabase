@@ -2,7 +2,6 @@
 </style>
 
 <script>
-  import TailwindStyles from './TailwindStyles.svelte'
   import { createClient } from '@supabase/supabase-js'
 
   let importEnv = true
@@ -155,5 +154,3 @@
     id="logout-button"
   >Logout</button>
 </div>
-<!-- </div>
-</div> -->
