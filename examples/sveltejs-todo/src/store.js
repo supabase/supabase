@@ -1,5 +1,5 @@
 //import Supabase from '@supabase/supabase-js'
-import {createClient} from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 
 let importEnv = true
 try {
@@ -22,7 +22,7 @@ export const addTask = async (task_text, list_id) => {
 
 export const updateTask = async (task_id, values) => {
   try {
-    let { body } = await supabase.from('tasks').eq('id', task_id).update(values)
+    let { body } = await supabase.from('tasks').update(values).match({ id: task_id })
     return body
   } catch (error) {
     console.log('error', error)
@@ -32,7 +32,7 @@ export const deleteTask = async (task_id) => {
   try {
     console.log(`deleting task ${task_id}`)
     let body,
-      { data, error } = await supabase.from('tasks').delete().filter('id', 'eq', task_id)
+      { data, error } = await supabase.from('tasks').delete().match({ id: task_id })
     console.log({ body, data, error })
     return data
   } catch (error) {
@@ -47,11 +47,11 @@ export const createList = async (user_id, name) => {
   } catch (error) {
     console.log('error', error)
   }
-} 
+}
 
 export const fetchList = async (id) => {
   try {
-    let { body } = await supabase.from('lists').eq('id', id).select(`*, tasks(*)`).single()
+    let { body } = await supabase.from('lists').select(`*, tasks(*)`).eq('id', id).single()
     return body
   } catch (error) {
     console.log('error', error)
