@@ -148,7 +148,7 @@ The user's email address.
 
 ## Examples
 
-### Sign in
+### Sign in with email.
 
 
 
@@ -179,9 +179,39 @@ const { user, error } = await supabase.auth.signIn({
 
 </Tabs>
 
+### Sign in with magic link.
+
+If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session.
+
+<Tabs
+  defaultValue="js"
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { user, error } = await supabase.auth.signIn({
+  email: 'example@email.com'
+})
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
 ### Sign in using third-party providers.
 
-
+Supabase supports OAuth logins.
 
 <Tabs
   defaultValue="js"

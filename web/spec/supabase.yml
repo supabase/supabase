@@ -241,7 +241,7 @@ pages:
       - If you provide `email` without a `password`, the user will be sent a magic link.
       - Specifying a `provider` will open the browser to the relevant login page.
     examples:
-      - name: Sign in
+      - name: Sign in with email.
         isSpotlight: true
         js: |
           ```js
@@ -254,7 +254,20 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: Sign in with magic link.
+        description: If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session.
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.signIn({
+            email: 'example@email.com'
+          })
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
       - name: Sign in using third-party providers.
+        description: Supabase supports OAuth logins.
         js: |
           ```js
           const { user, error } = await supabase.auth.signIn({
@@ -274,7 +287,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { error } = supabase.signOut()
+          const { error } = supabase.auth.signOut()
           ```
         py: | 
           ```py
