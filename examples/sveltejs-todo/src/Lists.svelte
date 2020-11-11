@@ -5,10 +5,10 @@
   import Items from './Items.svelte'
 
   import { addTask, updateTask, createList, clearList, fetchList } from './store'
-
+  import { items } from './items'
   export let lists
   export let user_id
-  let listsResolved
+
   const ENTER_KEY = 13
   const ESCAPE_KEY = 27
   let currentFilter = 'all'
@@ -30,12 +30,16 @@
       // TODO change to bind
       addTask(event.target.value, event.target.attributes.list_id.value)
       event.target.value = ''
+      // refetch list until bind and subscribe working
+      setTimeout(async () => {
+        lists = await items()
+      }, 500)
     }
   }
   function createNewList(event) {
     createList(user_id, window.prompt('list name'))
   }
-  async function removeList(lists,index, item_id) {
+  async function removeList(lists, index, item_id) {
     clearList(item_id)
     // local
     lists = lists.slice(0, index).concat(lists.slice(index + 1))
@@ -51,22 +55,21 @@
 </header>
 
 {#await lists}
-Waiting for lists
+  Waiting for lists
 {:then lists}
   {#each lists as list, index}
     <!-- svelte-ignore a11y-autofocus -->
-    <b>{
-list.id
-}</b>
+    <b>{list.id}</b>
     <u> {list.name} </u>
-        <button
-        class="flex-no-shrink p-2 ml-2 border-2 rounded text-red border-red hover:text-white
+    <button
+      class="flex-no-shrink p-2 ml-2 border-2 rounded text-red border-red hover:text-white
         hover:bg-red bg-red-600"
-        on:click="{() => {
-          removeList(lists, index,list.id)}}"
-      >
-        Clear list &cross;
-      </button>
+      on:click="{() => {
+        removeList(lists, index, list.id)
+      }}"
+    >
+      Clear list &cross;
+    </button>
     <input
       list_id="{list.id}"
       class="shadow appearance-none border rounded w-full py-2 px-3 mr-4 text-grey-darker"
