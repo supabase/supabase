@@ -9,7 +9,31 @@ import TabItem from '@theme/TabItem';
 
 Updates user data, if there is a logged in user.
 
+<Tabs
+  defaultValue="js"
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
 
+<TabItem value="js">
+
+```js
+const { user, error } = await auth.update({ 
+  data: { hello: 'world' } 
+})
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
 
 ## Parameters
 
@@ -37,3 +61,48 @@ No description provided.
 </li>
 
 </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### Update a user's metadata.
+
+
+
+<Tabs
+  defaultValue="js"
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { user, error } = await auth.update({ 
+  data: { hello: 'world' } 
+})
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>

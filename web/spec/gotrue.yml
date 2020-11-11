@@ -131,6 +131,19 @@ pages:
 
   update:
     $ref: '"GoTrueClient".GoTrueClient.update'
+    examples:
+      - name: Update a user's metadata.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, error } = await auth.update({ 
+            data: { hello: 'world' } 
+          })
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   onAuthStateChange: 
     # $ref: onAuthStateChange
