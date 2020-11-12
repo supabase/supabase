@@ -1,6 +1,23 @@
 <template>
-  <div id="TodoList">
-    Todo List Component
+  <div class="w-full">
+    <h1 class="mb-12 font-bold text-6xl">Todo List.</h1>
+    <div class="flex gap-2 my-2">
+      <input
+        class="rounded w-full p-2"
+        type="text"
+        placeholder="make coffee"
+        value="{newTaskText}"
+      />
+      <button class="btn-black">
+        Add
+      </button>
+    </div>
+
+    <div class="bg-white shadow overflow-hidden rounded-md">
+      <ul>
+        <!-- for loop around a todo component -->
+      </ul>
+    </div>
   </div>
 </template>
 
