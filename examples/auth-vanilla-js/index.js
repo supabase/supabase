@@ -26,11 +26,11 @@ const signUpSubmitted = (event) => {
   const password = event.target[1].value
 
   supabase.auth
-    .signup(email, password)
+    .signUp({email, password})
     .then((response) => {
-      document.querySelector('#access-token').value = response.body.access_token
-      document.querySelector('#refresh-token').value = response.body.refresh_token
-      alert("Logged in as " + response.body.user.email)
+      document.querySelector('#access-token').value = response.data.access_token
+      document.querySelector('#refresh-token').value = response.data.refresh_token
+      alert("Logged in as " + response.user.email)
     })
     .catch((err) => {
       alert(err.response.text)
@@ -43,11 +43,12 @@ const logInSubmitted = (event) => {
   const password = event.target[1].value
 
   supabase.auth
-    .login(email, password)
+    .signIn({email, password})
     .then((response) => {
-      document.querySelector('#access-token').value = response.body.access_token
-      document.querySelector('#refresh-token').value = response.body.refresh_token
-      alert("Logged in as " + response.body.user.email)
+      document.querySelector('#access-token').value = response.data.access_token
+      document.querySelector('#refresh-token').value = response.data.refresh_token
+      // response.error ?
+      alert("Logged in as " + response.user.email)
     })
     .catch((err) => {
       alert(err.response.text)
@@ -69,7 +70,7 @@ const logoutSubmitted = (event) => {
   event.preventDefault()
 
   supabase.auth
-    .logout()
+    .signOut()
     .then((response) => {
       document.querySelector('#access-token').value = ''
       document.querySelector('#refresh-token').value = ''

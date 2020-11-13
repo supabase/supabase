@@ -1,0 +1,8044 @@
+{
+	"id": 0,
+	"name": "@supabase/postgrest-js",
+	"kind": 0,
+	"flags": {},
+	"originalName": "",
+	"children": [
+		{
+			"id": 319,
+			"name": "\"PostgrestClient\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/postgrest-js/postgrest-js/src/PostgrestClient.ts",
+			"children": [
+				{
+					"id": 320,
+					"name": "PostgrestClient",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {
+						"isExported": true
+					},
+					"children": [
+						{
+							"id": 327,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Creates a PostgREST client."
+							},
+							"signatures": [
+								{
+									"id": 328,
+									"name": "new PostgrestClient",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Creates a PostgREST client."
+									},
+									"parameters": [
+										{
+											"id": 329,
+											"name": "url",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"shortText": "URL of the PostgREST endpoint."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 330,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__1",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 331,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 332,
+															"name": "headers",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "Custom headers."
+															},
+															"sources": [
+																{
+																	"fileName": "PostgrestClient.ts",
+																	"line": 18,
+																	"character": 13
+																}
+															],
+															"type": {
+																"type": "reflection",
+																"declaration": {
+																	"id": 333,
+																	"name": "__type",
+																	"kind": 65536,
+																	"kindString": "Type literal",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"indexSignature": [
+																		{
+																			"id": 334,
+																			"name": "__index",
+																			"kind": 8192,
+																			"kindString": "Index signature",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"parameters": [
+																				{
+																					"id": 335,
+																					"name": "key",
+																					"kind": 32768,
+																					"kindString": "Parameter",
+																					"flags": {
+																						"isExported": true
+																					},
+																					"type": {
+																						"type": "intrinsic",
+																						"name": "string"
+																					}
+																				}
+																			],
+																			"type": {
+																				"type": "intrinsic",
+																				"name": "string"
+																			}
+																		}
+																	]
+																}
+															}
+														},
+														{
+															"id": 336,
+															"name": "schema",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "Postgres schema to switch to.\n"
+															},
+															"sources": [
+																{
+																	"fileName": "PostgrestClient.ts",
+																	"line": 18,
+																	"character": 26
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																332,
+																336
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "PostgrestClient.ts",
+															"line": 17,
+															"character": 16
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 320,
+										"name": "PostgrestClient"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "PostgrestClient.ts",
+									"line": 7,
+									"character": 17
+								}
+							]
+						},
+						{
+							"id": 322,
+							"name": "headers",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "PostgrestClient.ts",
+									"line": 6,
+									"character": 9
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 323,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {
+										"isExported": true
+									},
+									"indexSignature": [
+										{
+											"id": 324,
+											"name": "__index",
+											"kind": 8192,
+											"kindString": "Index signature",
+											"flags": {
+												"isExported": true
+											},
+											"parameters": [
+												{
+													"id": 325,
+													"name": "key",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {
+														"isExported": true
+													},
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											],
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "PostgrestClient.ts",
+											"line": 6,
+											"character": 10
+										}
+									]
+								}
+							}
+						},
+						{
+							"id": 326,
+							"name": "schema",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "PostgrestClient.ts",
+									"line": 7,
+									"character": 8
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						},
+						{
+							"id": 321,
+							"name": "url",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "PostgrestClient.ts",
+									"line": 5,
+									"character": 5
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 337,
+							"name": "auth",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 338,
+									"name": "auth",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Authenticates the request with JWT."
+									},
+									"parameters": [
+										{
+											"id": 339,
+											"name": "token",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The JWT token to use.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "PostgrestClient.ts",
+									"line": 30,
+									"character": 6
+								}
+							]
+						},
+						{
+							"id": 340,
+							"name": "from",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 341,
+									"name": "from",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Perform a table operation."
+									},
+									"typeParameter": [
+										{
+											"id": 342,
+											"name": "T",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {
+												"isExported": true
+											}
+										}
+									],
+									"parameters": [
+										{
+											"id": 343,
+											"name": "table",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The table name to operate on.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 269,
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T",
+												"default": {
+													"type": "intrinsic",
+													"name": "any"
+												}
+											}
+										],
+										"name": "PostgrestQueryBuilder"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "PostgrestClient.ts",
+									"line": 40,
+									"character": 6
+								}
+							]
+						},
+						{
+							"id": 344,
+							"name": "rpc",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 345,
+									"name": "rpc",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Perform a stored procedure call."
+									},
+									"typeParameter": [
+										{
+											"id": 346,
+											"name": "T",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {
+												"isExported": true
+											}
+										}
+									],
+									"parameters": [
+										{
+											"id": 347,
+											"name": "fn",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The function name to call."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 348,
+											"name": "params",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"comment": {
+												"text": "The parameters to pass to the function call.\n"
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													},
+													{
+														"type": "intrinsic",
+														"name": "object"
+													}
+												]
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 21,
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T",
+												"default": {
+													"type": "intrinsic",
+													"name": "any"
+												}
+											}
+										],
+										"name": "PostgrestBuilder"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "PostgrestClient.ts",
+									"line": 51,
+									"character": 5
+								}
+							]
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								327
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								322,
+								326,
+								321
+							]
+						},
+						{
+							"title": "Methods",
+							"kind": 2048,
+							"children": [
+								337,
+								340,
+								344
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "PostgrestClient.ts",
+							"line": 4,
+							"character": 36
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Classes",
+					"kind": 128,
+					"children": [
+						320
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "PostgrestClient.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 349,
+			"name": "\"index\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/postgrest-js/postgrest-js/src/index.ts",
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 95,
+			"name": "\"lib/PostgrestFilterBuilder\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/postgrest-js/postgrest-js/src/lib/PostgrestFilterBuilder.ts",
+			"children": [
+				{
+					"id": 96,
+					"name": "PostgrestFilterBuilder",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {
+						"isExported": true
+					},
+					"typeParameter": [
+						{
+							"id": 97,
+							"name": "T",
+							"kind": 131072,
+							"kindString": "Type parameter",
+							"flags": {
+								"isExported": true
+							}
+						}
+					],
+					"children": [
+						{
+							"id": 248,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 249,
+									"name": "new PostgrestFilterBuilder",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 250,
+											"name": "builder",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 21,
+												"typeArguments": [
+													{
+														"type": "typeParameter",
+														"name": "T"
+													}
+												],
+												"name": "PostgrestBuilder"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 96,
+										"name": "PostgrestFilterBuilder"
+									},
+									"inheritedFrom": {
+										"type": "reference",
+										"id": 31,
+										"name": "PostgrestBuilder.__constructor"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 43,
+									"character": 44
+								}
+							],
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 31,
+								"name": "PostgrestBuilder.__constructor"
+							}
+						},
+						{
+							"id": 247,
+							"name": "body",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 43,
+									"character": 16
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T"
+											}
+										],
+										"name": "Partial"
+									},
+									{
+										"type": "array",
+										"elementType": {
+											"type": "reference",
+											"typeArguments": [
+												{
+													"type": "typeParameter",
+													"name": "T"
+												}
+											],
+											"name": "Partial"
+										}
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 30,
+								"name": "PostgrestBuilder.body"
+							}
+						},
+						{
+							"id": 242,
+							"name": "headers",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 41,
+									"character": 19
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 243,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {
+										"isExported": true
+									},
+									"indexSignature": [
+										{
+											"id": 244,
+											"name": "__index",
+											"kind": 8192,
+											"kindString": "Index signature",
+											"flags": {
+												"isExported": true
+											},
+											"parameters": [
+												{
+													"id": 245,
+													"name": "key",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {
+														"isExported": true
+													},
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											],
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "lib/types.ts",
+											"line": 41,
+											"character": 21
+										}
+									]
+								}
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 25,
+								"name": "PostgrestBuilder.headers"
+							}
+						},
+						{
+							"id": 240,
+							"name": "method",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 39,
+									"character": 18
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "stringLiteral",
+										"value": "GET"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "HEAD"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "POST"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "PATCH"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "DELETE"
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 23,
+								"name": "PostgrestBuilder.method"
+							}
+						},
+						{
+							"id": 246,
+							"name": "schema",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 42,
+									"character": 18
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 29,
+								"name": "PostgrestBuilder.schema"
+							}
+						},
+						{
+							"id": 241,
+							"name": "url",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 40,
+									"character": 15
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "URL"
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 24,
+								"name": "PostgrestBuilder.url"
+							}
+						},
+						{
+							"id": 170,
+							"name": "adj",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 171,
+									"name": "adj",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose range value on the stated `column` is adjacent to\nthe specified `range`."
+									},
+									"parameters": [
+										{
+											"id": 172,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 173,
+											"name": "range",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The range to filter with.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 274,
+									"character": 5
+								}
+							]
+						},
+						{
+							"id": 150,
+							"name": "cd",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 151,
+									"name": "cd",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose json, array, or range value on the stated `column` is\ncontained by the specified `value`."
+									},
+									"parameters": [
+										{
+											"id": 152,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 153,
+											"name": "value",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The value to filter with.\n"
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "intrinsic",
+														"name": "string"
+													},
+													{
+														"type": "array",
+														"elementType": {
+															"type": "indexedAccess",
+															"indexType": {
+																"type": "typeOperator",
+																"operator": "keyof",
+																"target": {
+																	"type": "typeParameter",
+																	"name": "T"
+																}
+															},
+															"objectType": {
+																"type": "typeParameter",
+																"name": "T"
+															}
+														}
+													},
+													{
+														"type": "intrinsic",
+														"name": "object"
+													}
+												]
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 205,
+									"character": 4
+								}
+							]
+						},
+						{
+							"id": 146,
+							"name": "cs",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 147,
+									"name": "cs",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose json, array, or range value on the stated `column`\ncontains the values specified in `value`."
+									},
+									"parameters": [
+										{
+											"id": 148,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 149,
+											"name": "value",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The value to filter with.\n"
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "intrinsic",
+														"name": "string"
+													},
+													{
+														"type": "array",
+														"elementType": {
+															"type": "indexedAccess",
+															"indexType": {
+																"type": "typeOperator",
+																"operator": "keyof",
+																"target": {
+																	"type": "typeParameter",
+																	"name": "T"
+																}
+															},
+															"objectType": {
+																"type": "typeParameter",
+																"name": "T"
+															}
+														}
+													},
+													{
+														"type": "intrinsic",
+														"name": "object"
+													}
+												]
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 183,
+									"character": 4
+								}
+							]
+						},
+						{
+							"id": 106,
+							"name": "eq",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 107,
+									"name": "eq",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose value on the stated `column` exactly matches the\nspecified `value`."
+									},
+									"parameters": [
+										{
+											"id": 108,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 109,
+											"name": "value",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The value to filter with.\n"
+											},
+											"type": {
+												"type": "indexedAccess",
+												"indexType": {
+													"type": "typeOperator",
+													"operator": "keyof",
+													"target": {
+														"type": "typeParameter",
+														"name": "T"
+													}
+												},
+												"objectType": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 63,
+									"character": 4
+								}
+							]
+						},
+						{
+							"id": 206,
+							"name": "filter",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 207,
+									"name": "filter",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose `column` satisfies the filter."
+									},
+									"parameters": [
+										{
+											"id": 208,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 209,
+											"name": "operator",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The operator to filter with."
+											},
+											"type": {
+												"type": "reference",
+												"id": 267,
+												"name": "FilterOperator"
+											}
+										},
+										{
+											"id": 210,
+											"name": "value",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The value to filter with.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 360,
+									"character": 8
+								}
+							]
+						},
+						{
+							"id": 178,
+							"name": "fts",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 179,
+									"name": "fts",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose tsvector value on the stated `column` matches\nto_tsquery(`query`)."
+									},
+									"parameters": [
+										{
+											"id": 180,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 181,
+											"name": "query",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The Postgres tsquery string to filter with."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 182,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__2",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 183,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 184,
+															"name": "config",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The text search configuration to use.\n"
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestFilterBuilder.ts",
+																	"line": 305,
+																	"character": 46
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																184
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "lib/PostgrestFilterBuilder.ts",
+															"line": 305,
+															"character": 37
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 305,
+									"character": 5
+								}
+							]
+						},
+						{
+							"id": 114,
+							"name": "gt",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 115,
+									"name": "gt",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose value on the stated `column` is greater than the\nspecified `value`."
+									},
+									"parameters": [
+										{
+											"id": 116,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 117,
+											"name": "value",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The value to filter with.\n"
+											},
+											"type": {
+												"type": "indexedAccess",
+												"indexType": {
+													"type": "typeOperator",
+													"operator": "keyof",
+													"target": {
+														"type": "typeParameter",
+														"name": "T"
+													}
+												},
+												"objectType": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 87,
+									"character": 4
+								}
+							]
+						},
+						{
+							"id": 118,
+							"name": "gte",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 119,
+									"name": "gte",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose value on the stated `column` is greater than or\nequal to the specified `value`."
+									},
+									"parameters": [
+										{
+											"id": 120,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 121,
+											"name": "value",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The value to filter with.\n"
+											},
+											"type": {
+												"type": "indexedAccess",
+												"indexType": {
+													"type": "typeOperator",
+													"operator": "keyof",
+													"target": {
+														"type": "typeParameter",
+														"name": "T"
+													}
+												},
+												"objectType": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 99,
+									"character": 5
+								}
+							]
+						},
+						{
+							"id": 134,
+							"name": "ilike",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 135,
+									"name": "ilike",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose value in the stated `column` matches the supplied\n`pattern` (case insensitive)."
+									},
+									"parameters": [
+										{
+											"id": 136,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 137,
+											"name": "pattern",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The pattern to filter with.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 147,
+									"character": 7
+								}
+							]
+						},
+						{
+							"id": 142,
+							"name": "in",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 143,
+									"name": "in",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose value on the stated `column` is found on the\nspecified `values`."
+									},
+									"parameters": [
+										{
+											"id": 144,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 145,
+											"name": "values",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The values to filter with.\n"
+											},
+											"type": {
+												"type": "array",
+												"elementType": {
+													"type": "indexedAccess",
+													"indexType": {
+														"type": "typeOperator",
+														"operator": "keyof",
+														"target": {
+															"type": "typeParameter",
+															"name": "T"
+														}
+													},
+													"objectType": {
+														"type": "typeParameter",
+														"name": "T"
+													}
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 171,
+									"character": 4
+								}
+							]
+						},
+						{
+							"id": 138,
+							"name": "is",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 139,
+									"name": "is",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "A check for exact equality (null, true, false), finds all rows whose\nvalue on the stated `column` exactly match the specified `value`."
+									},
+									"parameters": [
+										{
+											"id": 140,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 141,
+											"name": "value",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The value to filter with.\n"
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "intrinsic",
+														"name": "boolean"
+													},
+													{
+														"type": "intrinsic",
+														"name": "null"
+													}
+												]
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 159,
+									"character": 4
+								}
+							]
+						},
+						{
+							"id": 130,
+							"name": "like",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 131,
+									"name": "like",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose value in the stated `column` matches the supplied\n`pattern` (case sensitive)."
+									},
+									"parameters": [
+										{
+											"id": 132,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 133,
+											"name": "pattern",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The pattern to filter with.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 135,
+									"character": 6
+								}
+							]
+						},
+						{
+							"id": 225,
+							"name": "limit",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 226,
+									"name": "limit",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Limits the result with the specified `count`."
+									},
+									"parameters": [
+										{
+											"id": 227,
+											"name": "count",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The maximum no. of rows to limit to."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "number"
+											}
+										},
+										{
+											"id": 228,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__1",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 229,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 230,
+															"name": "foreignTable",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The foreign table to use (for foreign columns).\n"
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestTransformBuilder.ts",
+																	"line": 40,
+																	"character": 18
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																230
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "lib/PostgrestTransformBuilder.ts",
+															"line": 39,
+															"character": 18
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 47,
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T"
+											}
+										],
+										"name": "PostgrestTransformBuilder"
+									},
+									"inheritedFrom": {
+										"type": "reference",
+										"id": 57,
+										"name": "PostgrestTransformBuilder.limit"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestTransformBuilder.ts",
+									"line": 38,
+									"character": 7
+								}
+							],
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 57,
+								"name": "PostgrestTransformBuilder.limit"
+							}
+						},
+						{
+							"id": 122,
+							"name": "lt",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 123,
+									"name": "lt",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose value on the stated `column` is less than the\nspecified `value`."
+									},
+									"parameters": [
+										{
+											"id": 124,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 125,
+											"name": "value",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The value to filter with.\n"
+											},
+											"type": {
+												"type": "indexedAccess",
+												"indexType": {
+													"type": "typeOperator",
+													"operator": "keyof",
+													"target": {
+														"type": "typeParameter",
+														"name": "T"
+													}
+												},
+												"objectType": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 111,
+									"character": 4
+								}
+							]
+						},
+						{
+							"id": 126,
+							"name": "lte",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 127,
+									"name": "lte",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose value on the stated `column` is less than or equal\nto the specified `value`."
+									},
+									"parameters": [
+										{
+											"id": 128,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 129,
+											"name": "value",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The value to filter with.\n"
+											},
+											"type": {
+												"type": "indexedAccess",
+												"indexType": {
+													"type": "typeOperator",
+													"operator": "keyof",
+													"target": {
+														"type": "typeParameter",
+														"name": "T"
+													}
+												},
+												"objectType": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 123,
+									"character": 5
+								}
+							]
+						},
+						{
+							"id": 211,
+							"name": "match",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 212,
+									"name": "match",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose columns match the specified `query` object."
+									},
+									"parameters": [
+										{
+											"id": 213,
+											"name": "query",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The object to filter with, with column names as keys mapped\n              to their filter values.\n"
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 214,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"indexSignature": [
+														{
+															"id": 215,
+															"name": "__index",
+															"kind": 8192,
+															"kindString": "Index signature",
+															"flags": {
+																"isExported": true
+															},
+															"parameters": [
+																{
+																	"id": 216,
+																	"name": "key",
+																	"kind": 32768,
+																	"kindString": "Parameter",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"sources": [
+														{
+															"fileName": "lib/PostgrestFilterBuilder.ts",
+															"line": 371,
+															"character": 14
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "unknown",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 371,
+									"character": 7
+								}
+							]
+						},
+						{
+							"id": 110,
+							"name": "neq",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 111,
+									"name": "neq",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose value on the stated `column` doesn't match the\nspecified `value`."
+									},
+									"parameters": [
+										{
+											"id": 112,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 113,
+											"name": "value",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The value to filter with.\n"
+											},
+											"type": {
+												"type": "indexedAccess",
+												"indexType": {
+													"type": "typeOperator",
+													"operator": "keyof",
+													"target": {
+														"type": "typeParameter",
+														"name": "T"
+													}
+												},
+												"objectType": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 75,
+									"character": 5
+								}
+							]
+						},
+						{
+							"id": 98,
+							"name": "not",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 99,
+									"name": "not",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows which doesn't satisfy the filter."
+									},
+									"parameters": [
+										{
+											"id": 100,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 101,
+											"name": "operator",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The operator to filter with."
+											},
+											"type": {
+												"type": "reference",
+												"id": 267,
+												"name": "FilterOperator"
+											}
+										},
+										{
+											"id": 102,
+											"name": "value",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The value to filter with.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 41,
+									"character": 5
+								}
+							]
+						},
+						{
+							"id": 162,
+							"name": "nxl",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 163,
+									"name": "nxl",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose range value on the stated `column` does not extend\nto the left of the specified `range`."
+									},
+									"parameters": [
+										{
+											"id": 164,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 165,
+											"name": "range",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The range to filter with.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 250,
+									"character": 5
+								}
+							]
+						},
+						{
+							"id": 166,
+							"name": "nxr",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 167,
+									"name": "nxr",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose range value on the stated `column` does not extend\nto the right of the specified `range`."
+									},
+									"parameters": [
+										{
+											"id": 168,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 169,
+											"name": "range",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The range to filter with.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 262,
+									"character": 5
+								}
+							]
+						},
+						{
+							"id": 103,
+							"name": "or",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 104,
+									"name": "or",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows satisfying at least one of the filters."
+									},
+									"parameters": [
+										{
+											"id": 105,
+											"name": "filters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The filters to use, separated by commas.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 51,
+									"character": 4
+								}
+							]
+						},
+						{
+							"id": 217,
+							"name": "order",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 218,
+									"name": "order",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Orders the result with the specified `column`."
+									},
+									"parameters": [
+										{
+											"id": 219,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to order on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 220,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__1",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 221,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 222,
+															"name": "ascending",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "If `true`, the result will be in ascending order."
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestTransformBuilder.ts",
+																	"line": 19,
+																	"character": 15
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															},
+															"defaultValue": "true"
+														},
+														{
+															"id": 224,
+															"name": "foreignTable",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The foreign table to use (if `column` is a foreign column).\n"
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestTransformBuilder.ts",
+																	"line": 21,
+																	"character": 18
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														},
+														{
+															"id": 223,
+															"name": "nullsFirst",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "If `true`, `null`s appear first."
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestTransformBuilder.ts",
+																	"line": 20,
+																	"character": 16
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															},
+															"defaultValue": "false"
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																222,
+																224,
+																223
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "lib/PostgrestTransformBuilder.ts",
+															"line": 17,
+															"character": 20
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 47,
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T"
+											}
+										],
+										"name": "PostgrestTransformBuilder"
+									},
+									"inheritedFrom": {
+										"type": "reference",
+										"id": 49,
+										"name": "PostgrestTransformBuilder.order"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestTransformBuilder.ts",
+									"line": 16,
+									"character": 7
+								}
+							],
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 49,
+								"name": "PostgrestTransformBuilder.order"
+							}
+						},
+						{
+							"id": 174,
+							"name": "ov",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 175,
+									"name": "ov",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose array or range value on the stated `column` is\ncontained by the specified `value`."
+									},
+									"parameters": [
+										{
+											"id": 176,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 177,
+											"name": "value",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The value to filter with.\n"
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "intrinsic",
+														"name": "string"
+													},
+													{
+														"type": "array",
+														"elementType": {
+															"type": "indexedAccess",
+															"indexType": {
+																"type": "typeOperator",
+																"operator": "keyof",
+																"target": {
+																	"type": "typeParameter",
+																	"name": "T"
+																}
+															},
+															"objectType": {
+																"type": "typeParameter",
+																"name": "T"
+															}
+														}
+													}
+												]
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 286,
+									"character": 4
+								}
+							]
+						},
+						{
+							"id": 192,
+							"name": "phfts",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 193,
+									"name": "phfts",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose tsvector value on the stated `column` matches\nphraseto_tsquery(`query`)."
+									},
+									"parameters": [
+										{
+											"id": 194,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 195,
+											"name": "query",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The Postgres tsquery string to filter with."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 196,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__2",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 197,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 198,
+															"name": "config",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The text search configuration to use.\n"
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestFilterBuilder.ts",
+																	"line": 333,
+																	"character": 48
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																198
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "lib/PostgrestFilterBuilder.ts",
+															"line": 333,
+															"character": 39
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 333,
+									"character": 7
+								}
+							]
+						},
+						{
+							"id": 185,
+							"name": "plfts",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 186,
+									"name": "plfts",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose tsvector value on the stated `column` matches\nplainto_tsquery(`query`)."
+									},
+									"parameters": [
+										{
+											"id": 187,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 188,
+											"name": "query",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The Postgres tsquery string to filter with."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 189,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__2",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 190,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 191,
+															"name": "config",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The text search configuration to use.\n"
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestFilterBuilder.ts",
+																	"line": 319,
+																	"character": 48
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																191
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "lib/PostgrestFilterBuilder.ts",
+															"line": 319,
+															"character": 39
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 319,
+									"character": 7
+								}
+							]
+						},
+						{
+							"id": 231,
+							"name": "range",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 232,
+									"name": "range",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Limits the result to rows within the specified range, inclusive."
+									},
+									"parameters": [
+										{
+											"id": 233,
+											"name": "from",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The starting index from which to limit the result, inclusive."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "number"
+											}
+										},
+										{
+											"id": 234,
+											"name": "to",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The last index to which to limit the result, inclusive."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "number"
+											}
+										},
+										{
+											"id": 235,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__2",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 236,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 237,
+															"name": "foreignTable",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The foreign table to use (for foreign columns).\n"
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestTransformBuilder.ts",
+																	"line": 57,
+																	"character": 18
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																237
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "lib/PostgrestTransformBuilder.ts",
+															"line": 56,
+															"character": 15
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 47,
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T"
+											}
+										],
+										"name": "PostgrestTransformBuilder"
+									},
+									"inheritedFrom": {
+										"type": "reference",
+										"id": 63,
+										"name": "PostgrestTransformBuilder.range"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestTransformBuilder.ts",
+									"line": 54,
+									"character": 7
+								}
+							],
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 63,
+								"name": "PostgrestTransformBuilder.range"
+							}
+						},
+						{
+							"id": 238,
+							"name": "single",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 239,
+									"name": "single",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Retrieves only one row from the result. Result must be one row (e.g. using\n`limit`), otherwise this will result in an error."
+									},
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reference",
+												"id": 14,
+												"typeArguments": [
+													{
+														"type": "typeParameter",
+														"name": "T"
+													}
+												],
+												"name": "PostgrestSingleResponse"
+											}
+										],
+										"name": "PromiseLike"
+									},
+									"inheritedFrom": {
+										"type": "reference",
+										"id": 70,
+										"name": "PostgrestTransformBuilder.single"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestTransformBuilder.ts",
+									"line": 71,
+									"character": 8
+								}
+							],
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 70,
+								"name": "PostgrestTransformBuilder.single"
+							}
+						},
+						{
+							"id": 154,
+							"name": "sl",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 155,
+									"name": "sl",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose range value on the stated `column` is strictly to the\nleft of the specified `range`."
+									},
+									"parameters": [
+										{
+											"id": 156,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 157,
+											"name": "range",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The range to filter with.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 226,
+									"character": 4
+								}
+							]
+						},
+						{
+							"id": 158,
+							"name": "sr",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 159,
+									"name": "sr",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose range value on the stated `column` is strictly to\nthe right of the specified `range`."
+									},
+									"parameters": [
+										{
+											"id": 160,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 161,
+											"name": "range",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The range to filter with.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 238,
+									"character": 4
+								}
+							]
+						},
+						{
+							"id": 251,
+							"name": "then",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 252,
+									"name": "then",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"typeParameter": [
+										{
+											"id": 253,
+											"name": "TResult1",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {
+												"isExported": true
+											}
+										},
+										{
+											"id": 254,
+											"name": "TResult2",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {
+												"isExported": true
+											}
+										}
+									],
+									"parameters": [
+										{
+											"id": 255,
+											"name": "onfulfilled",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 256,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"signatures": [
+																{
+																	"id": 257,
+																	"name": "__call",
+																	"kind": 4096,
+																	"kindString": "Call signature",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"parameters": [
+																		{
+																			"id": 258,
+																			"name": "value",
+																			"kind": 32768,
+																			"kindString": "Parameter",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"type": {
+																				"type": "reference",
+																				"id": 7,
+																				"typeArguments": [
+																					{
+																						"type": "typeParameter",
+																						"name": "T"
+																					}
+																				],
+																				"name": "PostgrestResponse"
+																			}
+																		}
+																	],
+																	"type": {
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "typeParameter",
+																				"name": "TResult1",
+																				"default": {
+																					"type": "reference",
+																					"typeArguments": [
+																						{
+																							"type": "typeParameter",
+																							"name": "T"
+																						}
+																					],
+																					"name": "PostgrestResponse"
+																				}
+																			},
+																			{
+																				"type": "reference",
+																				"typeArguments": [
+																					{
+																						"type": "typeParameter",
+																						"name": "TResult1",
+																						"default": {
+																							"type": "reference",
+																							"typeArguments": [
+																								{
+																									"type": "typeParameter",
+																									"name": "T"
+																								}
+																							],
+																							"name": "PostgrestResponse"
+																						}
+																					}
+																				],
+																				"name": "PromiseLike"
+																			}
+																		]
+																	}
+																}
+															],
+															"sources": [
+																{
+																	"fileName": "lib/types.ts",
+																	"line": 51,
+																	"character": 9
+																}
+															]
+														}
+													},
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													},
+													{
+														"type": "intrinsic",
+														"name": "null"
+													}
+												]
+											}
+										},
+										{
+											"id": 259,
+											"name": "onrejected",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 260,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"signatures": [
+																{
+																	"id": 261,
+																	"name": "__call",
+																	"kind": 4096,
+																	"kindString": "Call signature",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"parameters": [
+																		{
+																			"id": 262,
+																			"name": "reason",
+																			"kind": 32768,
+																			"kindString": "Parameter",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"type": {
+																				"type": "intrinsic",
+																				"name": "any"
+																			}
+																		}
+																	],
+																	"type": {
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "typeParameter",
+																				"name": "TResult2",
+																				"default": {
+																					"type": "intrinsic",
+																					"name": "never"
+																				}
+																			},
+																			{
+																				"type": "reference",
+																				"typeArguments": [
+																					{
+																						"type": "typeParameter",
+																						"name": "TResult2",
+																						"default": {
+																							"type": "intrinsic",
+																							"name": "never"
+																						}
+																					}
+																				],
+																				"name": "PromiseLike"
+																			}
+																		]
+																	}
+																}
+															],
+															"sources": [
+																{
+																	"fileName": "lib/types.ts",
+																	"line": 54,
+																	"character": 18
+																}
+															]
+														}
+													},
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													},
+													{
+														"type": "intrinsic",
+														"name": "null"
+													}
+												]
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "union",
+												"types": [
+													{
+														"type": "typeParameter",
+														"name": "TResult1",
+														"default": {
+															"type": "reference",
+															"typeArguments": [
+																{
+																	"type": "typeParameter",
+																	"name": "T"
+																}
+															],
+															"name": "PostgrestResponse"
+														}
+													},
+													{
+														"type": "typeParameter",
+														"name": "TResult2",
+														"default": {
+															"type": "intrinsic",
+															"name": "never"
+														}
+													}
+												]
+											}
+										],
+										"name": "PromiseLike"
+									},
+									"inheritedFrom": {
+										"type": "reference",
+										"id": 34,
+										"name": "PostgrestBuilder.then"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 49,
+									"character": 6
+								}
+							],
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 34,
+								"name": "PostgrestBuilder.then"
+							}
+						},
+						{
+							"id": 199,
+							"name": "wfts",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 200,
+									"name": "wfts",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Finds all rows whose tsvector value on the stated `column` matches\nwebsearch_to_tsquery(`query`)."
+									},
+									"parameters": [
+										{
+											"id": 201,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to filter on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 202,
+											"name": "query",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The Postgres tsquery string to filter with."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 203,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__2",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 204,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 205,
+															"name": "config",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The text search configuration to use.\n"
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestFilterBuilder.ts",
+																	"line": 347,
+																	"character": 47
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																205
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "lib/PostgrestFilterBuilder.ts",
+															"line": 347,
+															"character": 38
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "this"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestFilterBuilder.ts",
+									"line": 347,
+									"character": 6
+								}
+							]
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								248
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								247,
+								242,
+								240,
+								246,
+								241
+							]
+						},
+						{
+							"title": "Methods",
+							"kind": 2048,
+							"children": [
+								170,
+								150,
+								146,
+								106,
+								206,
+								178,
+								114,
+								118,
+								134,
+								142,
+								138,
+								130,
+								225,
+								122,
+								126,
+								211,
+								110,
+								98,
+								162,
+								166,
+								103,
+								217,
+								174,
+								192,
+								185,
+								231,
+								238,
+								154,
+								158,
+								251,
+								199
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/PostgrestFilterBuilder.ts",
+							"line": 33,
+							"character": 43
+						}
+					],
+					"extendedTypes": [
+						{
+							"type": "reference",
+							"id": 47,
+							"typeArguments": [
+								{
+									"type": "typeParameter",
+									"name": "T"
+								}
+							],
+							"name": "PostgrestTransformBuilder"
+						}
+					],
+					"implementedTypes": [
+						{
+							"type": "reference",
+							"typeArguments": [
+								{
+									"type": "reference",
+									"id": 7,
+									"typeArguments": [
+										{
+											"type": "typeParameter",
+											"name": "T"
+										}
+									],
+									"name": "PostgrestResponse"
+								}
+							],
+							"name": "PromiseLike"
+						}
+					]
+				},
+				{
+					"id": 267,
+					"name": "FilterOperator",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "lib/PostgrestFilterBuilder.ts",
+							"line": 9,
+							"character": 19
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "stringLiteral",
+								"value": "eq"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "neq"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "gt"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "gte"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "lt"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "lte"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "like"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "ilike"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "is"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "in"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "cs"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "cd"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "sl"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "sr"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "nxl"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "nxr"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "adj"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "ov"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "fts"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "plfts"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "phfts"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "wfts"
+							}
+						]
+					}
+				},
+				{
+					"id": 263,
+					"name": "cleanFilterArray",
+					"kind": 64,
+					"kindString": "Function",
+					"flags": {
+						"isConst": true
+					},
+					"comment": {
+						"shortText": "Filters"
+					},
+					"signatures": [
+						{
+							"id": 264,
+							"name": "cleanFilterArray",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"comment": {
+								"shortText": "Filters"
+							},
+							"typeParameter": [
+								{
+									"id": 265,
+									"name": "T",
+									"kind": 131072,
+									"kindString": "Type parameter",
+									"flags": {}
+								}
+							],
+							"parameters": [
+								{
+									"id": 266,
+									"name": "filter",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "array",
+										"elementType": {
+											"type": "indexedAccess",
+											"indexType": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											},
+											"objectType": {
+												"type": "typeParameter",
+												"name": "T"
+											}
+										}
+									}
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/PostgrestFilterBuilder.ts",
+							"line": 7,
+							"character": 22
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Classes",
+					"kind": 128,
+					"children": [
+						96
+					]
+				},
+				{
+					"title": "Type aliases",
+					"kind": 4194304,
+					"children": [
+						267
+					]
+				},
+				{
+					"title": "Functions",
+					"kind": 64,
+					"children": [
+						263
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "lib/PostgrestFilterBuilder.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 268,
+			"name": "\"lib/PostgrestQueryBuilder\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/postgrest-js/postgrest-js/src/lib/PostgrestQueryBuilder.ts",
+			"children": [
+				{
+					"id": 269,
+					"name": "PostgrestQueryBuilder",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {
+						"shortText": "CRUD"
+					},
+					"typeParameter": [
+						{
+							"id": 270,
+							"name": "T",
+							"kind": 131072,
+							"kindString": "Type parameter",
+							"flags": {
+								"isExported": true
+							}
+						}
+					],
+					"children": [
+						{
+							"id": 271,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 272,
+									"name": "new PostgrestQueryBuilder",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 273,
+											"name": "url",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 274,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__1",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 275,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 276,
+															"name": "headers",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestQueryBuilder.ts",
+																	"line": 11,
+																	"character": 13
+																}
+															],
+															"type": {
+																"type": "reflection",
+																"declaration": {
+																	"id": 277,
+																	"name": "__type",
+																	"kind": 65536,
+																	"kindString": "Type literal",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"indexSignature": [
+																		{
+																			"id": 278,
+																			"name": "__index",
+																			"kind": 8192,
+																			"kindString": "Index signature",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"parameters": [
+																				{
+																					"id": 279,
+																					"name": "key",
+																					"kind": 32768,
+																					"kindString": "Parameter",
+																					"flags": {
+																						"isExported": true
+																					},
+																					"type": {
+																						"type": "intrinsic",
+																						"name": "string"
+																					}
+																				}
+																			],
+																			"type": {
+																				"type": "intrinsic",
+																				"name": "string"
+																			}
+																		}
+																	]
+																}
+															}
+														},
+														{
+															"id": 280,
+															"name": "schema",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestQueryBuilder.ts",
+																	"line": 11,
+																	"character": 26
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																276,
+																280
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "lib/PostgrestQueryBuilder.ts",
+															"line": 10,
+															"character": 16
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 269,
+										"name": "PostgrestQueryBuilder"
+									},
+									"overwrites": {
+										"type": "reference",
+										"id": 31,
+										"name": "PostgrestBuilder.__constructor"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestQueryBuilder.ts",
+									"line": 8,
+									"character": 75
+								}
+							],
+							"overwrites": {
+								"type": "reference",
+								"id": 31,
+								"name": "PostgrestBuilder.__constructor"
+							}
+						},
+						{
+							"id": 306,
+							"name": "body",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 43,
+									"character": 16
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T"
+											}
+										],
+										"name": "Partial"
+									},
+									{
+										"type": "array",
+										"elementType": {
+											"type": "reference",
+											"typeArguments": [
+												{
+													"type": "typeParameter",
+													"name": "T"
+												}
+											],
+											"name": "Partial"
+										}
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 30,
+								"name": "PostgrestBuilder.body"
+							}
+						},
+						{
+							"id": 301,
+							"name": "headers",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 41,
+									"character": 19
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 302,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {
+										"isExported": true
+									},
+									"indexSignature": [
+										{
+											"id": 303,
+											"name": "__index",
+											"kind": 8192,
+											"kindString": "Index signature",
+											"flags": {
+												"isExported": true
+											},
+											"parameters": [
+												{
+													"id": 304,
+													"name": "key",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {
+														"isExported": true
+													},
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											],
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "lib/types.ts",
+											"line": 41,
+											"character": 21
+										}
+									]
+								}
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 25,
+								"name": "PostgrestBuilder.headers"
+							}
+						},
+						{
+							"id": 299,
+							"name": "method",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 39,
+									"character": 18
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "stringLiteral",
+										"value": "GET"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "HEAD"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "POST"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "PATCH"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "DELETE"
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 23,
+								"name": "PostgrestBuilder.method"
+							}
+						},
+						{
+							"id": 305,
+							"name": "schema",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 42,
+									"character": 18
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 29,
+								"name": "PostgrestBuilder.schema"
+							}
+						},
+						{
+							"id": 300,
+							"name": "url",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 40,
+									"character": 15
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "URL"
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 24,
+								"name": "PostgrestBuilder.url"
+							}
+						},
+						{
+							"id": 294,
+							"name": "delete",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 295,
+									"name": "delete",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Performs a DELETE on the table."
+									},
+									"type": {
+										"type": "reference",
+										"id": 96,
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T"
+											}
+										],
+										"name": "PostgrestFilterBuilder"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestQueryBuilder.ts",
+									"line": 79,
+									"character": 8
+								}
+							]
+						},
+						{
+							"id": 284,
+							"name": "insert",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 285,
+									"name": "insert",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Performs an INSERT into the table."
+									},
+									"parameters": [
+										{
+											"id": 286,
+											"name": "values",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The values to insert."
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reference",
+														"typeArguments": [
+															{
+																"type": "typeParameter",
+																"name": "T"
+															}
+														],
+														"name": "Partial"
+													},
+													{
+														"type": "array",
+														"elementType": {
+															"type": "reference",
+															"typeArguments": [
+																{
+																	"type": "typeParameter",
+																	"name": "T"
+																}
+															],
+															"name": "Partial"
+														}
+													}
+												]
+											}
+										},
+										{
+											"id": 287,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__1",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 288,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 290,
+															"name": "onConflict",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "By specifying the `on_conflict` query parameter, you can make UPSERT work on a column(s) that has a UNIQUE constraint.\n"
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestQueryBuilder.ts",
+																	"line": 53,
+																	"character": 32
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														},
+														{
+															"id": 289,
+															"name": "upsert",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "If `true`, performs an UPSERT."
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestQueryBuilder.ts",
+																	"line": 53,
+																	"character": 12
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															},
+															"defaultValue": "false"
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																290,
+																289
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "lib/PostgrestQueryBuilder.ts",
+															"line": 52,
+															"character": 38
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 96,
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T"
+											}
+										],
+										"name": "PostgrestFilterBuilder"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestQueryBuilder.ts",
+									"line": 51,
+									"character": 8
+								}
+							]
+						},
+						{
+							"id": 281,
+							"name": "select",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 282,
+									"name": "select",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Performs horizontal filtering with SELECT."
+									},
+									"parameters": [
+										{
+											"id": 283,
+											"name": "columns",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The columns to retrieve, separated by commas.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											},
+											"defaultValue": "\"*\""
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 96,
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T"
+											}
+										],
+										"name": "PostgrestFilterBuilder"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestQueryBuilder.ts",
+									"line": 24,
+									"character": 8
+								}
+							]
+						},
+						{
+							"id": 307,
+							"name": "then",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 308,
+									"name": "then",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"typeParameter": [
+										{
+											"id": 309,
+											"name": "TResult1",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {
+												"isExported": true
+											}
+										},
+										{
+											"id": 310,
+											"name": "TResult2",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {
+												"isExported": true
+											}
+										}
+									],
+									"parameters": [
+										{
+											"id": 311,
+											"name": "onfulfilled",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 312,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"signatures": [
+																{
+																	"id": 313,
+																	"name": "__call",
+																	"kind": 4096,
+																	"kindString": "Call signature",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"parameters": [
+																		{
+																			"id": 314,
+																			"name": "value",
+																			"kind": 32768,
+																			"kindString": "Parameter",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"type": {
+																				"type": "reference",
+																				"id": 7,
+																				"typeArguments": [
+																					{
+																						"type": "typeParameter",
+																						"name": "T"
+																					}
+																				],
+																				"name": "PostgrestResponse"
+																			}
+																		}
+																	],
+																	"type": {
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "typeParameter",
+																				"name": "TResult1",
+																				"default": {
+																					"type": "reference",
+																					"typeArguments": [
+																						{
+																							"type": "typeParameter",
+																							"name": "T"
+																						}
+																					],
+																					"name": "PostgrestResponse"
+																				}
+																			},
+																			{
+																				"type": "reference",
+																				"typeArguments": [
+																					{
+																						"type": "typeParameter",
+																						"name": "TResult1",
+																						"default": {
+																							"type": "reference",
+																							"typeArguments": [
+																								{
+																									"type": "typeParameter",
+																									"name": "T"
+																								}
+																							],
+																							"name": "PostgrestResponse"
+																						}
+																					}
+																				],
+																				"name": "PromiseLike"
+																			}
+																		]
+																	}
+																}
+															],
+															"sources": [
+																{
+																	"fileName": "lib/types.ts",
+																	"line": 51,
+																	"character": 9
+																}
+															]
+														}
+													},
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													},
+													{
+														"type": "intrinsic",
+														"name": "null"
+													}
+												]
+											}
+										},
+										{
+											"id": 315,
+											"name": "onrejected",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 316,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"signatures": [
+																{
+																	"id": 317,
+																	"name": "__call",
+																	"kind": 4096,
+																	"kindString": "Call signature",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"parameters": [
+																		{
+																			"id": 318,
+																			"name": "reason",
+																			"kind": 32768,
+																			"kindString": "Parameter",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"type": {
+																				"type": "intrinsic",
+																				"name": "any"
+																			}
+																		}
+																	],
+																	"type": {
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "typeParameter",
+																				"name": "TResult2",
+																				"default": {
+																					"type": "intrinsic",
+																					"name": "never"
+																				}
+																			},
+																			{
+																				"type": "reference",
+																				"typeArguments": [
+																					{
+																						"type": "typeParameter",
+																						"name": "TResult2",
+																						"default": {
+																							"type": "intrinsic",
+																							"name": "never"
+																						}
+																					}
+																				],
+																				"name": "PromiseLike"
+																			}
+																		]
+																	}
+																}
+															],
+															"sources": [
+																{
+																	"fileName": "lib/types.ts",
+																	"line": 54,
+																	"character": 18
+																}
+															]
+														}
+													},
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													},
+													{
+														"type": "intrinsic",
+														"name": "null"
+													}
+												]
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "union",
+												"types": [
+													{
+														"type": "typeParameter",
+														"name": "TResult1",
+														"default": {
+															"type": "reference",
+															"typeArguments": [
+																{
+																	"type": "typeParameter",
+																	"name": "T"
+																}
+															],
+															"name": "PostgrestResponse"
+														}
+													},
+													{
+														"type": "typeParameter",
+														"name": "TResult2",
+														"default": {
+															"type": "intrinsic",
+															"name": "never"
+														}
+													}
+												]
+											}
+										],
+										"name": "PromiseLike"
+									},
+									"inheritedFrom": {
+										"type": "reference",
+										"id": 34,
+										"name": "PostgrestBuilder.then"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 49,
+									"character": 6
+								}
+							],
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 34,
+								"name": "PostgrestBuilder.then"
+							}
+						},
+						{
+							"id": 291,
+							"name": "update",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 292,
+									"name": "update",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Performs an UPDATE on the table."
+									},
+									"parameters": [
+										{
+											"id": 293,
+											"name": "values",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The values to update.\n"
+											},
+											"type": {
+												"type": "reference",
+												"typeArguments": [
+													{
+														"type": "typeParameter",
+														"name": "T"
+													}
+												],
+												"name": "Partial"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 96,
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T"
+											}
+										],
+										"name": "PostgrestFilterBuilder"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestQueryBuilder.ts",
+									"line": 69,
+									"character": 8
+								}
+							]
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								271
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								306,
+								301,
+								299,
+								305,
+								300
+							]
+						},
+						{
+							"title": "Methods",
+							"kind": 2048,
+							"children": [
+								294,
+								284,
+								281,
+								307,
+								291
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/PostgrestQueryBuilder.ts",
+							"line": 8,
+							"character": 42
+						}
+					],
+					"extendedTypes": [
+						{
+							"type": "reference",
+							"id": 21,
+							"typeArguments": [
+								{
+									"type": "typeParameter",
+									"name": "T"
+								}
+							],
+							"name": "PostgrestBuilder"
+						}
+					],
+					"implementedTypes": [
+						{
+							"type": "reference",
+							"typeArguments": [
+								{
+									"type": "reference",
+									"id": 7,
+									"typeArguments": [
+										{
+											"type": "typeParameter",
+											"name": "T"
+										}
+									],
+									"name": "PostgrestResponse"
+								}
+							],
+							"name": "PromiseLike"
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Classes",
+					"kind": 128,
+					"children": [
+						269
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "lib/PostgrestQueryBuilder.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 46,
+			"name": "\"lib/PostgrestTransformBuilder\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/postgrest-js/postgrest-js/src/lib/PostgrestTransformBuilder.ts",
+			"children": [
+				{
+					"id": 47,
+					"name": "PostgrestTransformBuilder",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {
+						"shortText": "Post-filters (transforms)"
+					},
+					"typeParameter": [
+						{
+							"id": 48,
+							"name": "T",
+							"kind": 131072,
+							"kindString": "Type parameter",
+							"flags": {
+								"isExported": true
+							}
+						}
+					],
+					"children": [
+						{
+							"id": 80,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 81,
+									"name": "new PostgrestTransformBuilder",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 82,
+											"name": "builder",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 21,
+												"typeArguments": [
+													{
+														"type": "typeParameter",
+														"name": "T"
+													}
+												],
+												"name": "PostgrestBuilder"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 47,
+										"name": "PostgrestTransformBuilder"
+									},
+									"inheritedFrom": {
+										"type": "reference",
+										"id": 31,
+										"name": "PostgrestBuilder.__constructor"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 43,
+									"character": 44
+								}
+							],
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 31,
+								"name": "PostgrestBuilder.__constructor"
+							}
+						},
+						{
+							"id": 79,
+							"name": "body",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 43,
+									"character": 16
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T"
+											}
+										],
+										"name": "Partial"
+									},
+									{
+										"type": "array",
+										"elementType": {
+											"type": "reference",
+											"typeArguments": [
+												{
+													"type": "typeParameter",
+													"name": "T"
+												}
+											],
+											"name": "Partial"
+										}
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 30,
+								"name": "PostgrestBuilder.body"
+							}
+						},
+						{
+							"id": 74,
+							"name": "headers",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 41,
+									"character": 19
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 75,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {
+										"isExported": true
+									},
+									"indexSignature": [
+										{
+											"id": 76,
+											"name": "__index",
+											"kind": 8192,
+											"kindString": "Index signature",
+											"flags": {
+												"isExported": true
+											},
+											"parameters": [
+												{
+													"id": 77,
+													"name": "key",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {
+														"isExported": true
+													},
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											],
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "lib/types.ts",
+											"line": 41,
+											"character": 21
+										}
+									]
+								}
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 25,
+								"name": "PostgrestBuilder.headers"
+							}
+						},
+						{
+							"id": 72,
+							"name": "method",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 39,
+									"character": 18
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "stringLiteral",
+										"value": "GET"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "HEAD"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "POST"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "PATCH"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "DELETE"
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 23,
+								"name": "PostgrestBuilder.method"
+							}
+						},
+						{
+							"id": 78,
+							"name": "schema",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 42,
+									"character": 18
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 29,
+								"name": "PostgrestBuilder.schema"
+							}
+						},
+						{
+							"id": 73,
+							"name": "url",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 40,
+									"character": 15
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "URL"
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 24,
+								"name": "PostgrestBuilder.url"
+							}
+						},
+						{
+							"id": 57,
+							"name": "limit",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 58,
+									"name": "limit",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Limits the result with the specified `count`."
+									},
+									"parameters": [
+										{
+											"id": 59,
+											"name": "count",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The maximum no. of rows to limit to."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "number"
+											}
+										},
+										{
+											"id": 60,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__1",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 61,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 62,
+															"name": "foreignTable",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The foreign table to use (for foreign columns).\n"
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestTransformBuilder.ts",
+																	"line": 40,
+																	"character": 18
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																62
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "lib/PostgrestTransformBuilder.ts",
+															"line": 39,
+															"character": 18
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 47,
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T"
+											}
+										],
+										"name": "PostgrestTransformBuilder"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestTransformBuilder.ts",
+									"line": 38,
+									"character": 7
+								}
+							]
+						},
+						{
+							"id": 49,
+							"name": "order",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 50,
+									"name": "order",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Orders the result with the specified `column`."
+									},
+									"parameters": [
+										{
+											"id": 51,
+											"name": "column",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The column to order on."
+											},
+											"type": {
+												"type": "typeOperator",
+												"operator": "keyof",
+												"target": {
+													"type": "typeParameter",
+													"name": "T"
+												}
+											}
+										},
+										{
+											"id": 52,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__1",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 53,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 54,
+															"name": "ascending",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "If `true`, the result will be in ascending order."
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestTransformBuilder.ts",
+																	"line": 19,
+																	"character": 15
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															},
+															"defaultValue": "true"
+														},
+														{
+															"id": 56,
+															"name": "foreignTable",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The foreign table to use (if `column` is a foreign column).\n"
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestTransformBuilder.ts",
+																	"line": 21,
+																	"character": 18
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														},
+														{
+															"id": 55,
+															"name": "nullsFirst",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "If `true`, `null`s appear first."
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestTransformBuilder.ts",
+																	"line": 20,
+																	"character": 16
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															},
+															"defaultValue": "false"
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																54,
+																56,
+																55
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "lib/PostgrestTransformBuilder.ts",
+															"line": 17,
+															"character": 20
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 47,
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T"
+											}
+										],
+										"name": "PostgrestTransformBuilder"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestTransformBuilder.ts",
+									"line": 16,
+									"character": 7
+								}
+							]
+						},
+						{
+							"id": 63,
+							"name": "range",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 64,
+									"name": "range",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Limits the result to rows within the specified range, inclusive."
+									},
+									"parameters": [
+										{
+											"id": 65,
+											"name": "from",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The starting index from which to limit the result, inclusive."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "number"
+											}
+										},
+										{
+											"id": 66,
+											"name": "to",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The last index to which to limit the result, inclusive."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "number"
+											}
+										},
+										{
+											"id": 67,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__2",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 68,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 69,
+															"name": "foreignTable",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The foreign table to use (for foreign columns).\n"
+															},
+															"sources": [
+																{
+																	"fileName": "lib/PostgrestTransformBuilder.ts",
+																	"line": 57,
+																	"character": 18
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																69
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "lib/PostgrestTransformBuilder.ts",
+															"line": 56,
+															"character": 15
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 47,
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T"
+											}
+										],
+										"name": "PostgrestTransformBuilder"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestTransformBuilder.ts",
+									"line": 54,
+									"character": 7
+								}
+							]
+						},
+						{
+							"id": 70,
+							"name": "single",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 71,
+									"name": "single",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Retrieves only one row from the result. Result must be one row (e.g. using\n`limit`), otherwise this will result in an error."
+									},
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reference",
+												"id": 14,
+												"typeArguments": [
+													{
+														"type": "typeParameter",
+														"name": "T"
+													}
+												],
+												"name": "PostgrestSingleResponse"
+											}
+										],
+										"name": "PromiseLike"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/PostgrestTransformBuilder.ts",
+									"line": 71,
+									"character": 8
+								}
+							]
+						},
+						{
+							"id": 83,
+							"name": "then",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 84,
+									"name": "then",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"typeParameter": [
+										{
+											"id": 85,
+											"name": "TResult1",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {
+												"isExported": true
+											}
+										},
+										{
+											"id": 86,
+											"name": "TResult2",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {
+												"isExported": true
+											}
+										}
+									],
+									"parameters": [
+										{
+											"id": 87,
+											"name": "onfulfilled",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 88,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"signatures": [
+																{
+																	"id": 89,
+																	"name": "__call",
+																	"kind": 4096,
+																	"kindString": "Call signature",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"parameters": [
+																		{
+																			"id": 90,
+																			"name": "value",
+																			"kind": 32768,
+																			"kindString": "Parameter",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"type": {
+																				"type": "reference",
+																				"id": 7,
+																				"typeArguments": [
+																					{
+																						"type": "typeParameter",
+																						"name": "T"
+																					}
+																				],
+																				"name": "PostgrestResponse"
+																			}
+																		}
+																	],
+																	"type": {
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "typeParameter",
+																				"name": "TResult1",
+																				"default": {
+																					"type": "reference",
+																					"typeArguments": [
+																						{
+																							"type": "typeParameter",
+																							"name": "T"
+																						}
+																					],
+																					"name": "PostgrestResponse"
+																				}
+																			},
+																			{
+																				"type": "reference",
+																				"typeArguments": [
+																					{
+																						"type": "typeParameter",
+																						"name": "TResult1",
+																						"default": {
+																							"type": "reference",
+																							"typeArguments": [
+																								{
+																									"type": "typeParameter",
+																									"name": "T"
+																								}
+																							],
+																							"name": "PostgrestResponse"
+																						}
+																					}
+																				],
+																				"name": "PromiseLike"
+																			}
+																		]
+																	}
+																}
+															],
+															"sources": [
+																{
+																	"fileName": "lib/types.ts",
+																	"line": 51,
+																	"character": 9
+																}
+															]
+														}
+													},
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													},
+													{
+														"type": "intrinsic",
+														"name": "null"
+													}
+												]
+											}
+										},
+										{
+											"id": 91,
+											"name": "onrejected",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 92,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"signatures": [
+																{
+																	"id": 93,
+																	"name": "__call",
+																	"kind": 4096,
+																	"kindString": "Call signature",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"parameters": [
+																		{
+																			"id": 94,
+																			"name": "reason",
+																			"kind": 32768,
+																			"kindString": "Parameter",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"type": {
+																				"type": "intrinsic",
+																				"name": "any"
+																			}
+																		}
+																	],
+																	"type": {
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "typeParameter",
+																				"name": "TResult2",
+																				"default": {
+																					"type": "intrinsic",
+																					"name": "never"
+																				}
+																			},
+																			{
+																				"type": "reference",
+																				"typeArguments": [
+																					{
+																						"type": "typeParameter",
+																						"name": "TResult2",
+																						"default": {
+																							"type": "intrinsic",
+																							"name": "never"
+																						}
+																					}
+																				],
+																				"name": "PromiseLike"
+																			}
+																		]
+																	}
+																}
+															],
+															"sources": [
+																{
+																	"fileName": "lib/types.ts",
+																	"line": 54,
+																	"character": 18
+																}
+															]
+														}
+													},
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													},
+													{
+														"type": "intrinsic",
+														"name": "null"
+													}
+												]
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "union",
+												"types": [
+													{
+														"type": "typeParameter",
+														"name": "TResult1",
+														"default": {
+															"type": "reference",
+															"typeArguments": [
+																{
+																	"type": "typeParameter",
+																	"name": "T"
+																}
+															],
+															"name": "PostgrestResponse"
+														}
+													},
+													{
+														"type": "typeParameter",
+														"name": "TResult2",
+														"default": {
+															"type": "intrinsic",
+															"name": "never"
+														}
+													}
+												]
+											}
+										],
+										"name": "PromiseLike"
+									},
+									"inheritedFrom": {
+										"type": "reference",
+										"id": 34,
+										"name": "PostgrestBuilder.then"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 49,
+									"character": 6
+								}
+							],
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 34,
+								"name": "PostgrestBuilder.then"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								80
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								79,
+								74,
+								72,
+								78,
+								73
+							]
+						},
+						{
+							"title": "Methods",
+							"kind": 2048,
+							"children": [
+								57,
+								49,
+								63,
+								70,
+								83
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/PostgrestTransformBuilder.ts",
+							"line": 7,
+							"character": 46
+						}
+					],
+					"extendedTypes": [
+						{
+							"type": "reference",
+							"id": 21,
+							"typeArguments": [
+								{
+									"type": "typeParameter",
+									"name": "T"
+								}
+							],
+							"name": "PostgrestBuilder"
+						}
+					],
+					"extendedBy": [
+						{
+							"type": "reference",
+							"id": 96,
+							"name": "PostgrestFilterBuilder"
+						}
+					],
+					"implementedTypes": [
+						{
+							"type": "reference",
+							"typeArguments": [
+								{
+									"type": "reference",
+									"id": 7,
+									"typeArguments": [
+										{
+											"type": "typeParameter",
+											"name": "T"
+										}
+									],
+									"name": "PostgrestResponse"
+								}
+							],
+							"name": "PromiseLike"
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Classes",
+					"kind": 128,
+					"children": [
+						47
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "lib/PostgrestTransformBuilder.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 1,
+			"name": "\"lib/types\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/postgrest-js/postgrest-js/src/lib/types.ts",
+			"children": [
+				{
+					"id": 21,
+					"name": "PostgrestBuilder",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {
+						"isExported": true,
+						"isAbstract": true
+					},
+					"typeParameter": [
+						{
+							"id": 22,
+							"name": "T",
+							"kind": 131072,
+							"kindString": "Type parameter",
+							"flags": {
+								"isExported": true
+							}
+						}
+					],
+					"children": [
+						{
+							"id": 31,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 32,
+									"name": "new PostgrestBuilder",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 33,
+											"name": "builder",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 21,
+												"typeArguments": [
+													{
+														"type": "typeParameter",
+														"name": "T"
+													}
+												],
+												"name": "PostgrestBuilder"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 21,
+										"name": "PostgrestBuilder"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 43,
+									"character": 44
+								}
+							]
+						},
+						{
+							"id": 30,
+							"name": "body",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 43,
+									"character": 16
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "typeParameter",
+												"name": "T"
+											}
+										],
+										"name": "Partial"
+									},
+									{
+										"type": "array",
+										"elementType": {
+											"type": "reference",
+											"typeArguments": [
+												{
+													"type": "typeParameter",
+													"name": "T"
+												}
+											],
+											"name": "Partial"
+										}
+									}
+								]
+							}
+						},
+						{
+							"id": 25,
+							"name": "headers",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 41,
+									"character": 19
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 26,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {
+										"isExported": true
+									},
+									"indexSignature": [
+										{
+											"id": 27,
+											"name": "__index",
+											"kind": 8192,
+											"kindString": "Index signature",
+											"flags": {
+												"isExported": true
+											},
+											"parameters": [
+												{
+													"id": 28,
+													"name": "key",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {
+														"isExported": true
+													},
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											],
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "lib/types.ts",
+											"line": 41,
+											"character": 21
+										}
+									]
+								}
+							}
+						},
+						{
+							"id": 23,
+							"name": "method",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 39,
+									"character": 18
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "stringLiteral",
+										"value": "GET"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "HEAD"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "POST"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "PATCH"
+									},
+									{
+										"type": "stringLiteral",
+										"value": "DELETE"
+									}
+								]
+							}
+						},
+						{
+							"id": 29,
+							"name": "schema",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 42,
+									"character": 18
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						},
+						{
+							"id": 24,
+							"name": "url",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 40,
+									"character": 15
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "URL"
+							}
+						},
+						{
+							"id": 34,
+							"name": "then",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 35,
+									"name": "then",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"typeParameter": [
+										{
+											"id": 36,
+											"name": "TResult1",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {
+												"isExported": true
+											}
+										},
+										{
+											"id": 37,
+											"name": "TResult2",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {
+												"isExported": true
+											}
+										}
+									],
+									"parameters": [
+										{
+											"id": 38,
+											"name": "onfulfilled",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 39,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"signatures": [
+																{
+																	"id": 40,
+																	"name": "__call",
+																	"kind": 4096,
+																	"kindString": "Call signature",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"parameters": [
+																		{
+																			"id": 41,
+																			"name": "value",
+																			"kind": 32768,
+																			"kindString": "Parameter",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"type": {
+																				"type": "reference",
+																				"id": 7,
+																				"typeArguments": [
+																					{
+																						"type": "typeParameter",
+																						"name": "T"
+																					}
+																				],
+																				"name": "PostgrestResponse"
+																			}
+																		}
+																	],
+																	"type": {
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "typeParameter",
+																				"name": "TResult1",
+																				"default": {
+																					"type": "reference",
+																					"typeArguments": [
+																						{
+																							"type": "typeParameter",
+																							"name": "T"
+																						}
+																					],
+																					"name": "PostgrestResponse"
+																				}
+																			},
+																			{
+																				"type": "reference",
+																				"typeArguments": [
+																					{
+																						"type": "typeParameter",
+																						"name": "TResult1",
+																						"default": {
+																							"type": "reference",
+																							"typeArguments": [
+																								{
+																									"type": "typeParameter",
+																									"name": "T"
+																								}
+																							],
+																							"name": "PostgrestResponse"
+																						}
+																					}
+																				],
+																				"name": "PromiseLike"
+																			}
+																		]
+																	}
+																}
+															],
+															"sources": [
+																{
+																	"fileName": "lib/types.ts",
+																	"line": 51,
+																	"character": 9
+																}
+															]
+														}
+													},
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													},
+													{
+														"type": "intrinsic",
+														"name": "null"
+													}
+												]
+											}
+										},
+										{
+											"id": 42,
+											"name": "onrejected",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 43,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"signatures": [
+																{
+																	"id": 44,
+																	"name": "__call",
+																	"kind": 4096,
+																	"kindString": "Call signature",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"parameters": [
+																		{
+																			"id": 45,
+																			"name": "reason",
+																			"kind": 32768,
+																			"kindString": "Parameter",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"type": {
+																				"type": "intrinsic",
+																				"name": "any"
+																			}
+																		}
+																	],
+																	"type": {
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "typeParameter",
+																				"name": "TResult2",
+																				"default": {
+																					"type": "intrinsic",
+																					"name": "never"
+																				}
+																			},
+																			{
+																				"type": "reference",
+																				"typeArguments": [
+																					{
+																						"type": "typeParameter",
+																						"name": "TResult2",
+																						"default": {
+																							"type": "intrinsic",
+																							"name": "never"
+																						}
+																					}
+																				],
+																				"name": "PromiseLike"
+																			}
+																		]
+																	}
+																}
+															],
+															"sources": [
+																{
+																	"fileName": "lib/types.ts",
+																	"line": 54,
+																	"character": 18
+																}
+															]
+														}
+													},
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													},
+													{
+														"type": "intrinsic",
+														"name": "null"
+													}
+												]
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "union",
+												"types": [
+													{
+														"type": "typeParameter",
+														"name": "TResult1",
+														"default": {
+															"type": "reference",
+															"typeArguments": [
+																{
+																	"type": "typeParameter",
+																	"name": "T"
+																}
+															],
+															"name": "PostgrestResponse"
+														}
+													},
+													{
+														"type": "typeParameter",
+														"name": "TResult2",
+														"default": {
+															"type": "intrinsic",
+															"name": "never"
+														}
+													}
+												]
+											}
+										],
+										"name": "PromiseLike"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 49,
+									"character": 6
+								}
+							]
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								31
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								30,
+								25,
+								23,
+								29,
+								24
+							]
+						},
+						{
+							"title": "Methods",
+							"kind": 2048,
+							"children": [
+								34
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/types.ts",
+							"line": 38,
+							"character": 38
+						}
+					],
+					"extendedBy": [
+						{
+							"type": "reference",
+							"id": 47,
+							"name": "PostgrestTransformBuilder"
+						},
+						{
+							"type": "reference",
+							"id": 269,
+							"name": "PostgrestQueryBuilder"
+						}
+					],
+					"implementedTypes": [
+						{
+							"type": "reference",
+							"typeArguments": [
+								{
+									"type": "reference",
+									"id": 7,
+									"typeArguments": [
+										{
+											"type": "typeParameter",
+											"name": "T"
+										}
+									],
+									"name": "PostgrestResponse"
+								}
+							],
+							"name": "PromiseLike"
+						}
+					]
+				},
+				{
+					"id": 2,
+					"name": "PostgrestError",
+					"kind": 256,
+					"kindString": "Interface",
+					"flags": {},
+					"comment": {
+						"shortText": "Error format",
+						"text": "{@link https://postgrest.org/en/stable/api.html?highlight=options#errors-and-http-status-codes}\n"
+					},
+					"children": [
+						{
+							"id": 6,
+							"name": "code",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 12,
+									"character": 6
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 4,
+							"name": "details",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 10,
+									"character": 9
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 5,
+							"name": "hint",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 11,
+									"character": 6
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 3,
+							"name": "message",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 9,
+									"character": 9
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								6,
+								4,
+								5,
+								3
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/types.ts",
+							"line": 8,
+							"character": 24
+						}
+					]
+				},
+				{
+					"id": 7,
+					"name": "PostgrestResponse",
+					"kind": 256,
+					"kindString": "Interface",
+					"flags": {},
+					"comment": {
+						"shortText": "Response format",
+						"text": "{@link https://github.com/supabase/supabase-js/issues/32}\n"
+					},
+					"typeParameter": [
+						{
+							"id": 8,
+							"name": "T",
+							"kind": 131072,
+							"kindString": "Type parameter",
+							"flags": {}
+						}
+					],
+					"children": [
+						{
+							"id": 13,
+							"name": "body",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 26,
+									"character": 6
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "array",
+										"elementType": {
+											"type": "typeParameter",
+											"name": "T"
+										}
+									},
+									{
+										"type": "intrinsic",
+										"name": "null"
+									}
+								]
+							}
+						},
+						{
+							"id": 10,
+							"name": "data",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 22,
+									"character": 6
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "array",
+										"elementType": {
+											"type": "typeParameter",
+											"name": "T"
+										}
+									},
+									{
+										"type": "intrinsic",
+										"name": "null"
+									}
+								]
+							}
+						},
+						{
+							"id": 9,
+							"name": "error",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 21,
+									"character": 7
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "reference",
+										"id": 2,
+										"name": "PostgrestError"
+									},
+									{
+										"type": "intrinsic",
+										"name": "null"
+									}
+								]
+							}
+						},
+						{
+							"id": 11,
+							"name": "status",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 23,
+									"character": 8
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "number"
+							}
+						},
+						{
+							"id": 12,
+							"name": "statusText",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 24,
+									"character": 12
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								13,
+								10,
+								9,
+								11,
+								12
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/types.ts",
+							"line": 20,
+							"character": 27
+						}
+					]
+				},
+				{
+					"id": 14,
+					"name": "PostgrestSingleResponse",
+					"kind": 256,
+					"kindString": "Interface",
+					"flags": {
+						"isExported": true
+					},
+					"typeParameter": [
+						{
+							"id": 15,
+							"name": "T",
+							"kind": 131072,
+							"kindString": "Type parameter",
+							"flags": {
+								"isExported": true
+							}
+						}
+					],
+					"children": [
+						{
+							"id": 20,
+							"name": "body",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 35,
+									"character": 6
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "typeParameter",
+										"name": "T"
+									},
+									{
+										"type": "intrinsic",
+										"name": "null"
+									}
+								]
+							}
+						},
+						{
+							"id": 17,
+							"name": "data",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 31,
+									"character": 6
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "typeParameter",
+										"name": "T"
+									},
+									{
+										"type": "intrinsic",
+										"name": "null"
+									}
+								]
+							}
+						},
+						{
+							"id": 16,
+							"name": "error",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 30,
+									"character": 7
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "reference",
+										"id": 2,
+										"name": "PostgrestError"
+									},
+									{
+										"type": "intrinsic",
+										"name": "null"
+									}
+								]
+							}
+						},
+						{
+							"id": 18,
+							"name": "status",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 32,
+									"character": 8
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "number"
+							}
+						},
+						{
+							"id": 19,
+							"name": "statusText",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 33,
+									"character": 12
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								20,
+								17,
+								16,
+								18,
+								19
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/types.ts",
+							"line": 29,
+							"character": 40
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Classes",
+					"kind": 128,
+					"children": [
+						21
+					]
+				},
+				{
+					"title": "Interfaces",
+					"kind": 256,
+					"children": [
+						2,
+						7,
+						14
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "lib/types.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		}
+	],
+	"groups": [
+		{
+			"title": "Modules",
+			"kind": 1,
+			"children": [
+				319,
+				349,
+				95,
+				268,
+				46,
+				1
+			]
+		}
+	]
+}

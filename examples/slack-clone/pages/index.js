@@ -13,8 +13,8 @@ const Home = () => {
         body: { user },
       } =
         type === 'LOGIN'
-          ? await supabase.auth.login(username, password)
-          : await supabase.auth.signup(username, password)
+          ? await supabase.auth.signIn({email:username, password})
+          : await supabase.auth.signUp({email:username, password})
       if (!!user) signIn(user.id, user.email)
     } catch (error) {
       console.log('error', error)

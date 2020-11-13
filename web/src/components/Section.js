@@ -15,15 +15,31 @@ export default function Section({ title, id, style, children }) {
       }
     }
 
+    function changeHash() {
+      const el = document.getElementById(hash);
+
+      if (el) {
+        const elementPos = el.getBoundingClientRect();
+
+        if (elementPos.top <= 80 && elementPos.top >= 0)
+          replaceHistoryHash();
+      }
+    }
     scrollOnHash();
+    window.addEventListener("scroll", changeHash);
+
+    return () => {
+      window.removeEventListener("scroll", changeHash);
+    };
   }, [])
 
-  function handleHashClick() {
-    sectionRef.current.scrollIntoView({ behavior: 'smooth' });
+  function replaceHistoryHash() {
+    history.replaceState(history.state, '', `#${hash}`);
+  }
 
-    setTimeout(() => {
-      window.location.hash = hash;
-    }, 500)
+  function handleHashClick() {
+    replaceHistoryHash();
+    sectionRef.current.scrollIntoView({ behavior: 'smooth' });
   }
 
   return (
