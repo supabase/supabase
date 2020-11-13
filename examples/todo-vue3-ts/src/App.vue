@@ -1,9 +1,9 @@
 <template>
   <div id="app" class="w-full h-full bg-gray-300">
-    <div v-if="true" class="w-full h-full flex justify-center items-center p-4">
+    <div v-if="false" class="w-full h-full flex justify-center items-center p-4">
       <Auth />
     </div>
-    <div v-else class="w-full h-full flex justify-center items-center p-4">
+    <div v-else class="w-full h-full flex flex-col justify-center items-center p-4 max-w-sm m-auto">
       <TodoList />
     </div>
   </div>
