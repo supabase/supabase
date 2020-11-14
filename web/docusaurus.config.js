@@ -4,7 +4,6 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 module.exports = {
   title: 'Supabase',
   tagline: 'The open source Firebase alternative.',
@@ -134,6 +133,11 @@ module.exports = {
               to: '/docs/realtime/client/realtime-client',
             },
           ],
+        },
+        {
+          to: '/showcase',
+          label: 'Showcase',
+          position: 'right',
         },
         // { to: '/docs/pricing', label: 'Pricing', position: 'right' },
         { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
