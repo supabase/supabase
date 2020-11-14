@@ -9,12 +9,10 @@ const Home = () => {
 
   const handleLogin = async (type, username, password) => {
     try {
-      const {
-        body: { user },
-      } =
+      const { user } =
         type === 'LOGIN'
-          ? await supabase.auth.signIn({email:username, password})
-          : await supabase.auth.signUp({email:username, password})
+          ? await supabase.auth.signIn({ email: username, password })
+          : await supabase.auth.signUp({ email: username, password })
       if (!!user) signIn(user.id, user.email)
     } catch (error) {
       console.log('error', error)
