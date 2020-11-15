@@ -16,7 +16,7 @@
     <div class="bg-white shadow overflow-hidden rounded-md">
       <ul>
         <!-- for loop around a todo component -->
-        <Todo />
+        <Todo :todo="{task: 'test todo'}"/>
       </ul>
     </div>
   </div>
@@ -33,6 +33,3 @@ export default defineComponent({
   },
 })
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped></style>
