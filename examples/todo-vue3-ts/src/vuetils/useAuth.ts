@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase.ts'
-import { Session } from '@supabase/gotrue-js/dist/main/lib/types'
+import { Session, Provider } from '@supabase/gotrue-js/dist/main/lib/types'
 
 const userSession = ref<Session | null>(null)
 
@@ -44,6 +44,11 @@ async function handleSignup(credentials: Credentials) {
   }
 }
 
+async function handleOAuthLogin(provider: Provider) {
+  const { error } = await supabase.auth.signIn({ provider })
+  if (error) console.error('Error: ', error.message)
+}
+
 async function handlePasswordReset() {
   const email = prompt('Please enter your email:')
   if (email === null || email === '') {
@@ -77,4 +82,4 @@ async function handleLogout() {
   }
 }
 
-export { userSession, handleLogin, handleSignup, handleLogout, handlePasswordReset }
+export { userSession, handleLogin, handleOAuthLogin, handleSignup, handleLogout, handlePasswordReset }

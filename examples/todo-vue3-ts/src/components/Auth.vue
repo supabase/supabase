@@ -54,6 +54,7 @@
           <div class="mt-6">
             <span class="block w-full rounded-md shadow-sm">
               <button
+              @click="handleOAuthLogin('github')"
                 type="button"
                 class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
               >
@@ -64,6 +65,7 @@
           <div class="mt-6">
             <span class="block w-full rounded-md shadow-sm">
               <button
+              @click="handleOAuthLogin('google')"
                 type="button"
                 class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
               >
@@ -79,7 +81,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { handleLogin, handleSignup, handlePasswordReset } from '@/vuetils/useAuth'
+import { handleLogin,handleOAuthLogin ,handleSignup, handlePasswordReset } from '@/vuetils/useAuth'
 
 export default defineComponent({
   name: 'Auth',
@@ -92,6 +94,7 @@ export default defineComponent({
       email,
       password,
       handleLogin,
+      handleOAuthLogin,
       handleSignup,
       handlePasswordReset,
     }
