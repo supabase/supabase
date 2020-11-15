@@ -19,7 +19,7 @@ export default class SupabaseSlackClone extends App {
 
   signIn = async (id, username) => {
     try {
-      let { data,error } = await supabase.from('users').match({ username }).select('id, username')
+      let { data, error } = await supabase.from('users').select('id, username').match({ username })
       const existing = data[0]
       const { data: user } = existing?.id
         ? await supabase.from('users').update({ id, username }).match({ id }).single()
