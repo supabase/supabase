@@ -16,6 +16,7 @@
     <div class="bg-white shadow overflow-hidden rounded-md">
       <ul>
         <!-- for loop around a todo component -->
+        <Todo />
       </ul>
     </div>
   </div>
@@ -23,10 +24,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import Todo from '@/components/Todo.vue'
 
 export default defineComponent({
   name: 'TodoList',
-  props: {},
+  components: {
+    Todo,
+  },
 })
 </script>
 
