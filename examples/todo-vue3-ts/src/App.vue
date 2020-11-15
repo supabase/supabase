@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="w-full h-full flex flex-col justify-center text-center bg-gray-300">
+  <div id="app" class="w-full h-full flex flex-col justify-center bg-gray-300">
     <div
       v-if="userSession === null"
       class="w-full h-full flex flex-col justify-center items-center p-4"
