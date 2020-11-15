@@ -10,9 +10,8 @@ async function handleLogin(credentials: Credentials) {
       email: credentials.email,
       password: credentials.password,
     })
-    console.log("what is user?", user, error)
     if (error) {
-      alert("Error logging in")
+      alert('Error logging in')
       console.error('Error returned:', error.message)
     }
     // No error throw, but no user detected so send magic link
@@ -25,7 +24,27 @@ async function handleLogin(credentials: Credentials) {
   }
 }
 
-async function forgotPassword() {
+async function handleSignup(credentials: Credentials) {
+  try {
+    const { email, password } = credentials
+    if (email === undefined || password === undefined) {
+      alert('Form cant be empty')
+      return
+    }
+    const { error } = await supabase.auth.signUp({ email, password })
+    if (error) {
+      alert(error.message)
+      console.error(error, error.message)
+      return
+    }
+    alert('Successfully signed up!')
+  } catch (err) {
+    alert('Fatal error signing up')
+    console.error('signup error', err)
+  }
+}
+
+async function handlePasswordReset() {
   const email = prompt('Please enter your email:')
   if (email === null || email === '') {
     window.alert('You must enter your email.')
@@ -39,7 +58,7 @@ async function forgotPassword() {
   }
 }
 
-async function logout() {
+async function handleLogout() {
   console.log('logging out')
   try {
     const { error } = await supabase.auth.signOut()
@@ -58,4 +77,4 @@ async function logout() {
   }
 }
 
-export { userSession, handleLogin, logout, forgotPassword }
+export { userSession, handleLogin, handleSignup, handleLogout, handlePasswordReset }
