@@ -94,7 +94,7 @@ export const useStore = (props) => {
  */
 export const fetchChannels = async (setState) => {
   try {
-    let { data } = await supabase.from('channels').select('*')
+    let { data } = await supabase.from('channels').select()
     if (setState) setState(data)
     return data
   } catch (error) {
@@ -109,7 +109,7 @@ export const fetchChannels = async (setState) => {
  */
 export const fetchUser = async (userId, setState) => {
   try {
-    let { data } = await supabase.from('users').eq('id', userId).select(`*`)
+    let { data } = await supabase.from('users').select().eq('id', userId)
     let user = data[0]
     if (setState) setState(user)
     return user
@@ -127,9 +127,9 @@ export const fetchMessages = async (channelId, setState) => {
   try {
     let { data } = await supabase
       .from('messages')
-      .eq('channel_id', channelId)
       .select(`*, author:user_id(*)`)
-      .order('inserted_at', true)
+      .eq('channel_id', channelId)
+      .order('inserted_at', { ascending: true })
     if (setState) setState(data)
     return data
   } catch (error) {
