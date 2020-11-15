@@ -7,7 +7,7 @@
           type="text"
           class="block appearance-none w-full bg-white border border-grey-light hover:border-grey px-2 py-2 rounded shadow"
           placeholder="Your email"
-          value="value"
+          v-model="email"
         />
       </div>
       <div class="mb-4">
@@ -16,7 +16,7 @@
           type="password"
           class="block appearance-none w-full bg-white border border-grey-light hover:border-grey px-2 py-2 rounded shadow"
           placeholder="Your password"
-          value="password"
+          v-model="password"
         />
       </div>
 
@@ -24,13 +24,15 @@
         <a href="#" class="btn-black">
           Sign up
         </a>
-        <a href="#" class="btn-black-outline">
-          'Sign in' : 'Send magic link
+        <a @click="handleLogin({ email, password })" href="#" class="btn-black-outline">
+          <span v-if="password.length">Sign in</span>
+          <span v-else> Send magic link </span>
         </a>
       </div>
 
       <div class="mt-2 text-sm leading-5">
         <a
+          @click.prevent="forgotPassword"
           href="/"
           class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150"
         >
@@ -76,11 +78,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
+import { handleLogin, forgotPassword } from '@/vuetils/useAuth'
 
 export default defineComponent({
   name: 'Auth',
-  props: {},
+
+  setup() {
+    const email = ref('')
+    const password = ref('')
+
+    return {
+      email,
+      password,
+      handleLogin,
+      forgotPassword,
+    }
+  },
 })
 </script>
 
