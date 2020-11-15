@@ -5,7 +5,7 @@
     </div>
     <div v-else class="w-full h-full flex flex-col justify-center items-center p-4 max-w-sm m-auto">
       <TodoList />
-      <button class="btn-black w-full mt-12" @click="logout">
+      <button class="btn-black w-full mt-12" @click="handleLogout">
         Logout
       </button>
     </div>
@@ -15,7 +15,7 @@
 <script>
 import Auth from '@/components/Auth.vue'
 import TodoList from '@/components/TodoList.vue'
-import { userSession, logout } from '@/vuetils/useAuth'
+import { userSession, handleLogout } from '@/vuetils/useAuth'
 
 export default {
   components: {
@@ -23,7 +23,7 @@ export default {
     TodoList,
   },
   setup() {
-    return { userSession, logout }
+    return { userSession, handleLogout }
   },
 }
 </script>
