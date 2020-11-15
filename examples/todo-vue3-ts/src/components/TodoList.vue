@@ -19,7 +19,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import Todo from '@/components/Todo.vue'
-import { allTodos } from '@/vuetils/useTodo'
+import { allTodos, fetchTodos } from '@/vuetils/useTodo'
 
 export default defineComponent({
   name: 'TodoList',
@@ -27,7 +27,9 @@ export default defineComponent({
     Todo,
   },
 
-  setup() {
+  async setup() {
+    await fetchTodos()
+
     return {
       allTodos,
     }
