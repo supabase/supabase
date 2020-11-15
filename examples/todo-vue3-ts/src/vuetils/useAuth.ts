@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { supabase } from '@/lib/supabase.ts'
+import { supabase } from '@/lib/supabase'
 import { Session, Provider } from '@supabase/gotrue-js/dist/main/lib/types'
 
 const userSession = ref<Session | null>(null)
@@ -82,4 +82,11 @@ async function handleLogout() {
   }
 }
 
-export { userSession, handleLogin, handleOAuthLogin, handleSignup, handleLogout, handlePasswordReset }
+export {
+  userSession,
+  handleLogin,
+  handleOAuthLogin,
+  handleSignup,
+  handleLogout,
+  handlePasswordReset,
+}
