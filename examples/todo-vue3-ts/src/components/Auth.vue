@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full sm:w-1/2 xl:w-1/3">
+  <main class="w-full sm:w-1/2 xl:w-1/3">
     <div class="border-teal p-8 border-t-12 mb-6 rounded-lg shadow-lg bg-white">
       <div class="mb-4">
         <label class="font-bold text-grey-darker block mb-2">Email</label>
@@ -21,7 +21,7 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <a href="#" class="btn-black">
+        <a @click="handleSignup({ email, password })" href="#" class="btn-black" tabindex="0">
           Sign up
         </a>
         <a @click="handleLogin({ email, password })" href="#" class="btn-black-outline">
@@ -32,7 +32,7 @@
 
       <div class="mt-2 text-sm leading-5">
         <a
-          @click.prevent="forgotPassword"
+          @click.prevent="handlePasswordReset"
           href="/"
           class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150"
         >
@@ -74,12 +74,12 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { handleLogin, forgotPassword } from '@/vuetils/useAuth'
+import { handleLogin, handleSignup, handlePasswordReset } from '@/vuetils/useAuth'
 
 export default defineComponent({
   name: 'Auth',
@@ -92,7 +92,8 @@ export default defineComponent({
       email,
       password,
       handleLogin,
-      forgotPassword,
+      handleSignup,
+      handlePasswordReset,
     }
   },
 })
