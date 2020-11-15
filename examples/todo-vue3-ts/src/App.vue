@@ -1,6 +1,9 @@
 <template>
-  <div id="app" class="w-full h-full bg-gray-300">
-    <div v-if="userSession === null" class="w-full h-full flex justify-center items-center p-4">
+  <div id="app" class="w-full h-full flex flex-col justify-center text-center bg-gray-300">
+    <div
+      v-if="userSession === null"
+      class="w-full h-full flex flex-col justify-center items-center p-4"
+    >
       <Auth />
     </div>
     <div v-else class="w-full h-full flex flex-col justify-center items-center p-4 max-w-sm m-auto">
@@ -9,18 +12,21 @@
         Logout
       </button>
     </div>
+    <Footer />
   </div>
 </template>
 
 <script>
 import Auth from '@/components/Auth.vue'
 import TodoList from '@/components/TodoList.vue'
+import Footer from '@/components/Footer.vue'
 import { userSession, handleLogout } from '@/vuetils/useAuth'
 
 export default {
   components: {
     Auth,
     TodoList,
+    Footer,
   },
   setup() {
     return { userSession, handleLogout }
