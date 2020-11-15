@@ -7,10 +7,19 @@
       <Auth />
     </div>
     <div v-else class="w-full h-full flex flex-col justify-center items-center p-4 max-w-sm m-auto">
-      <TodoList />
-      <button class="btn-black w-full mt-12" @click="handleLogout">
-        Logout
-      </button>
+      <Suspense>
+        <template #default>
+          <div>
+            <TodoList />
+            <button class="btn-black w-full mt-12" @click="handleLogout">
+              Logout
+            </button>
+          </div>
+        </template>
+        <template #fallback>
+          <Loading />
+        </template>
+      </Suspense>
     </div>
     <Footer />
   </div>
@@ -19,6 +28,7 @@
 <script>
 import Auth from '@/components/Auth.vue'
 import TodoList from '@/components/TodoList.vue'
+import Loading from '@/components/Loading.vue'
 import Footer from '@/components/Footer.vue'
 import { userSession, handleLogout } from '@/vuetils/useAuth'
 
@@ -26,6 +36,7 @@ export default {
   components: {
     Auth,
     TodoList,
+    Loading,
     Footer,
   },
   setup() {
