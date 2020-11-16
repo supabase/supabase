@@ -4,10 +4,13 @@ import { SideOver } from '.'
 
 export default {
   title: 'Overlays/SideOver',
-  component: SideOver
+  component: SideOver,
 }
 
-export const Default = (args) => 
-<div className='font-sans'>
-<SideOver {...args}>Modal content is inserted here</SideOver>
-</div>
+export const Default = (args) => (
+  <div className="font-sans">
+    <SideOver {...args}>
+      <p className="text-white">SideOver content is inserted here</p>
+    </SideOver>
+  </div>
+)
