@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { supabase } from '@/lib/supabase'
 import { ref } from 'vue'
 
@@ -9,7 +10,10 @@ async function fetchTodos() {
       .from('todos')
       .select('*')
       .order('id')
-    if (error) console.log('error', error)
+    if (error) {
+      console.log('error', error)
+      return
+    }
 
     if (todos === null) {
       allTodos.value = []
@@ -23,4 +27,43 @@ async function fetchTodos() {
   }
 }
 
-export { allTodos, fetchTodos }
+async function addTodo(todo: Todo): Promise<null | Todo> {
+  try {
+    const { data, error } = await supabase
+      .from('todos')
+      .insert(todo)
+      .single()
+    if (error) {
+      alert(error.message)
+      console.error('There was an error inserting', error)
+      return null
+    }
+    console.log('created a new todo')
+    return data
+  } catch (err) {
+    alert('Error')
+    console.error('Unknown problem inserting to db', err)
+    return null
+  }
+}
+
+async function updateTaskCompletion(todo: Todo, isCompleted: boolean) {
+  try {
+    const { error } = await supabase
+      .from('todos')
+      .update({ is_complete: isCompleted })
+      .eq('id', todo.id)
+      .single()
+    if (error) {
+      alert(error.message)
+      console.error('There was an error updating', error)
+      return
+    }
+    console.log('Updated task', todo.id)
+  } catch (err) {
+    alert('Error')
+    console.error('Unknown problem updating record', err)
+  }
+}
+
+export { allTodos, fetchTodos, addTodo, updateTaskCompletion }
