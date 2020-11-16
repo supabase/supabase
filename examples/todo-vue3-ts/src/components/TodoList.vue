@@ -39,24 +39,31 @@ export default defineComponent({
 
     const task = ref('')
 
+    /**
+     * Wrapper function adding a new todo for additional client side error handling.
+     */
     async function insertTask() {
+      // Guard for short task descriptions which will fail db policy.
       if (task.value.length <= 3) {
         alert('Please make your task a little more descriptive')
         return
       }
-
+      // Type check to ensure user is still logged in.
       if (userSession?.value === null) {
         alert('Please log in again')
         return
       }
-
-      const todo = await addTodo({ user_id: userSession.value.user.id, task: task.value })
-
-      if (!todo) {
-        return
+      try {
+        const todo = await addTodo({ user_id: userSession.value.user.id, task: task.value })
+        // If there was no response, dont do anything.
+        if (!todo) {
+          return
+        }
+        // Otherwise push the response into allTodos.
+        allTodos.value.push(todo)
+      } catch (err) {
+        console.error('Unknown error when adding todo', err)
       }
-
-      allTodos.value.push(todo)
     }
 
     return {
