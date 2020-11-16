@@ -48,18 +48,11 @@ module.exports = {
         'brand-900': '#10633e',
       }
     },
-    fontFamily: {
-      sans: [
-        'Helvetica Neue',
-        'Helvetica',
-        'Arial',
-        'sans-serif',
-      ],
-      mono: ['Source Code Pro', 'Menlo', 'monospace'],
-    },
   },
 
 
-  variants: {},
+  variants: {
+    divideWidth: ['responsive', 'hover', 'focus'],
+  },
   plugins: [require('@tailwindcss/ui'), require('@tailwindcss/custom-forms')],
 }
