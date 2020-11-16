@@ -2,7 +2,7 @@
 import { supabase } from '@/lib/supabase'
 import { ref } from 'vue'
 
-const allTodos = ref<any[]>([])
+const allTodos = ref<Todo[]>([])
 
 async function fetchTodos() {
   try {
@@ -66,4 +66,16 @@ async function updateTaskCompletion(todo: Todo, isCompleted: boolean) {
   }
 }
 
-export { allTodos, fetchTodos, addTodo, updateTaskCompletion }
+async function deleteTodo(todo: Todo) {
+  try {
+    await supabase
+      .from('todos')
+      .delete()
+      .eq('id', todo.id)
+    console.log('deleted todo', todo.id)
+  } catch (error) {
+    console.error('error', error)
+  }
+}
+
+export { allTodos, fetchTodos, addTodo, updateTaskCompletion, deleteTodo }

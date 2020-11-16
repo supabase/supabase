@@ -14,7 +14,7 @@
           :checked="todo['is_complete']"
         />
       </div>
-      <button class="w-4 h-4 ml-2 border-2 hover:border-black rounded">
+      <button @click="clearTodo" class="w-4 h-4 ml-2 border-2 hover:border-black rounded">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="gray" aria-label="delete">
           <path
             fillRule="evenodd"
@@ -29,7 +29,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, PropType } from 'vue'
-import { updateTaskCompletion } from '@/vuetils/useTodo'
+import { updateTaskCompletion, deleteTodo } from '@/vuetils/useTodo'
+import { allTodos } from '@/vuetils/useTodo'
 
 export default defineComponent({
   name: 'Todo',
@@ -39,9 +40,17 @@ export default defineComponent({
       required: true,
     },
   },
-  setup() {
+  setup(props) {
     const isCompleted = ref(false)
-    return { isCompleted, updateTaskCompletion }
+
+    // Removes todo from db and app state
+    function clearTodo() {
+      deleteTodo(props.todo).then(() => {
+        allTodos.value = allTodos.value.filter(todo => todo.id != props.todo.id)
+      })
+    }
+
+    return { isCompleted, updateTaskCompletion, clearTodo }
   },
 })
 </script>
