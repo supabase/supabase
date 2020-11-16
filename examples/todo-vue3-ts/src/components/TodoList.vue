@@ -46,9 +46,10 @@ export default defineComponent({
       }
 
       if (userSession?.value === null) {
-        alert(' please log in again')
+        alert('Please log in again')
         return
       }
+
       const todo = await addTodo({ user_id: userSession.value.user.id, task: task.value })
 
       if (!todo) {
