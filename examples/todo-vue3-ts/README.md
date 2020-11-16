@@ -1,4 +1,4 @@
-# Todo example using Supabase , Vue.js & TypeScript
+# Todo example using Supabase, Vue.js & TypeScript
 
 - Frontend:
   - Vue 3, TypeScript
