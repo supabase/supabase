@@ -94,9 +94,9 @@ export const useStore = (props) => {
  */
 export const fetchChannels = async (setState) => {
   try {
-    let { data } = await supabase.from('channels').select()
-    if (setState) setState(data)
-    return data
+    let { body } = await supabase.from('channels').select('*')
+    if (setState) setState(body)
+    return body
   } catch (error) {
     console.log('error', error)
   }
@@ -109,8 +109,8 @@ export const fetchChannels = async (setState) => {
  */
 export const fetchUser = async (userId, setState) => {
   try {
-    let { data } = await supabase.from('users').select().eq('id', userId)
-    let user = data[0]
+    let { body } = await supabase.from('users').eq('id', userId).select(`*`)
+    let user = body[0]
     if (setState) setState(user)
     return user
   } catch (error) {
@@ -125,13 +125,13 @@ export const fetchUser = async (userId, setState) => {
  */
 export const fetchMessages = async (channelId, setState) => {
   try {
-    let { data } = await supabase
+    let { body } = await supabase
       .from('messages')
-      .select(`*, author:user_id(*)`)
       .eq('channel_id', channelId)
-      .order('inserted_at', { ascending: true })
-    if (setState) setState(data)
-    return data
+      .select(`*, author:user_id(*)`)
+      .order('inserted_at', true)
+    if (setState) setState(body)
+    return body
   } catch (error) {
     console.log('error', error)
   }
@@ -143,8 +143,8 @@ export const fetchMessages = async (channelId, setState) => {
  */
 export const addChannel = async (slug) => {
   try {
-    let { data } = await supabase.from('channels').insert([{ slug }])
-    return data
+    let { body } = await supabase.from('channels').insert([{ slug }])
+    return body
   } catch (error) {
     console.log('error', error)
   }
@@ -158,8 +158,8 @@ export const addChannel = async (slug) => {
  */
 export const addMessage = async (message, channel_id, user_id) => {
   try {
-    let { data } = await supabase.from('messages').insert([{ message, channel_id, user_id }])
-    return data
+    let { body } = await supabase.from('messages').insert([{ message, channel_id, user_id }])
+    return body
   } catch (error) {
     console.log('error', error)
   }

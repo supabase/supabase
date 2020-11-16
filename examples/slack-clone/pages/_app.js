@@ -19,9 +19,9 @@ export default class SupabaseSlackClone extends App {
 
   signIn = async (id, username) => {
     try {
-      let { data, error } = await supabase.from('users').select('id, username').match({ username })
-      const existing = data[0]
-      const { data: user } = existing?.id
+      let { body } = await supabase.from('users').match({ username }).select('id, username')
+      const existing = body[0]
+      const { body: user } = existing?.id
         ? await supabase.from('users').update({ id, username }).match({ id }).single()
         : await supabase.from('users').insert([{ id, username }]).single()
 
@@ -35,7 +35,7 @@ export default class SupabaseSlackClone extends App {
   }
 
   signOut = () => {
-    supabase.auth.signOut()
+    supabase.auth.logout()
     localStorage.removeItem('supabase-slack-clone')
     this.setState({ user: null })
     Router.push('/')
