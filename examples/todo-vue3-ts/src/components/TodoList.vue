@@ -2,8 +2,13 @@
   <div class="w-full">
     <h1 class="mb-12 font-bold text-6xl">Todo List.</h1>
     <div class="flex gap-2 my-2">
-      <input class="rounded w-full p-2" type="text" placeholder="What do you need to?" />
-      <button class="btn-black">
+      <input
+        v-model="task"
+        class="rounded w-full p-2"
+        type="text"
+        placeholder="What do you need to?"
+      />
+      <button @click="insertTask" class="btn-black">
         Add
       </button>
     </div>
@@ -17,9 +22,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+/* eslint-disable @typescript-eslint/camelcase */
+import { defineComponent, ref } from 'vue'
 import Todo from '@/components/Todo.vue'
-import { allTodos, fetchTodos } from '@/vuetils/useTodo'
+import { allTodos, fetchTodos, addTodo } from '@/vuetils/useTodo'
+import { userSession } from '@/vuetils/useAuth'
 
 export default defineComponent({
   name: 'TodoList',
@@ -30,8 +37,32 @@ export default defineComponent({
   async setup() {
     await fetchTodos()
 
+    const task = ref('')
+
+    async function insertTask() {
+      if (task.value.length <= 3) {
+        alert('Please make your task a little more descriptive')
+        return
+      }
+
+      if (userSession?.value === null) {
+        alert(' please log in again')
+        return
+      }
+      const todo = await addTodo({ user_id: userSession.value.user.id, task: task.value })
+
+      if (!todo) {
+        return
+      }
+
+      allTodos.value.push(todo)
+    }
+
     return {
+      task,
       allTodos,
+      insertTask,
+      userSession,
     }
   },
 })
