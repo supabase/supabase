@@ -27,25 +27,25 @@ const Modal = ({
   ...props
 }) => {
 
-  let icon = {
-    alert: <Icon size={24} strokeWidth={2} type="AlertCircle" color="red" />,
-    warning: (
-      <Icon size={24} strokeWidth={2} type="AlertCircle" color="orange" />
-    ),
-    success: <Icon size={24} strokeWidth={2} type="Check" color="green" />,
-  }
-
+  
   let variantBgColor = {
     alert: 'red',
-    warning: 'orange',
+    warning: 'yellow',
     success: 'green',
+  }
+  
+  let icon = {
+    alert: <Icon size={24} strokeWidth={2} type="AlertCircle" color={variantBgColor[variant]} />,
+    warning: (
+      <Icon size={24} strokeWidth={2} type="AlertCircle" color={variantBgColor[variant]} />
+    ),
+    success: <Icon size={24} strokeWidth={2} type="Check" color={variantBgColor[variant]} />,
   }
 
   let bgColor = [`bg-${variantBgColor[variant]}-100`]
-  let color = [`${variantBgColor[variant]}-100`]
 
   const iconMarkup = showIcon && (
-    <div className={"mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10 " + bgColor.join(" ")}>
+    <div className={"mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10 bg-opacity-75 " + bgColor.join(" ")}>
       {icon[variant]}
     </div>
   )
@@ -65,7 +65,7 @@ const Modal = ({
       leaveTo="opacity-0"
     >
       <div
-        className="font-sans fixed z-10 inset-0 overflow-y-auto"
+        className={"fixed z-10 inset-0 overflow-y-auto " + className}
         onClick={action('onCancel')}
       >
         <div
@@ -93,19 +93,19 @@ const Modal = ({
               aria-labelledby="modal-headline"
               onClick={stopPropagation}
             >
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div className="bg-gray-600 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
                   {iconMarkup}
 
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                     <h3
-                      className="text-lg leading-6 font-medium text-gray-900"
+                      className="text-lg leading-6 font-medium text-white"
                       id="modal-headline"
                     >
                       {title}
                     </h3>
                     <div className="mt-2">
-                      <p className="text-sm leading-5 text-gray-500">
+                      <p className="text-sm leading-5 text-gray-300">
                         {description}
                       </p>
                     </div>
@@ -113,7 +113,7 @@ const Modal = ({
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <div className="bg-gray-500 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <span className="flex w-full sm:ml-3 sm:w-auto">
                   <Button onClick={action('onConfirm')}>
                     {onConfirmText}

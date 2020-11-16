@@ -7,4 +7,10 @@ export default {
   component: Modal
 }
 
-export const Default = (args) => <Modal {...args}>Modal content is inserted here</Modal>
+export const Default = (args) => 
+  <Modal {...args} className="font-sans">
+    <p className="text-white">
+    Modal content is inserted here
+    </p>
+  </Modal>
+
