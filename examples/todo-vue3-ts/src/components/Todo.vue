@@ -7,7 +7,12 @@
         <div class="text-sm leading-5 font-medium truncate">{{ todo.task }}</div>
       </div>
       <div>
-        <input class="cursor-pointer" type="checkbox" />
+        <input
+          @click="updateTaskCompletion(todo, !todo['is_complete'])"
+          class="cursor-pointer"
+          type="checkbox"
+          :checked="todo['is_complete']"
+        />
       </div>
       <button class="w-4 h-4 ml-2 border-2 hover:border-black rounded">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="gray" aria-label="delete">
@@ -23,18 +28,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref, PropType } from 'vue'
+import { updateTaskCompletion } from '@/vuetils/useTodo'
+
 export default defineComponent({
   name: 'Todo',
   props: {
     todo: {
-      type: Object,
+      type: Object as PropType<Todo>,
       required: true,
     },
   },
-  setup(props) {
-    console.log('got props', props)
-    return {}
+  setup() {
+    const isCompleted = ref(false)
+    return { isCompleted, updateTaskCompletion }
   },
 })
 </script>
