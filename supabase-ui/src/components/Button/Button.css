@@ -11,12 +11,24 @@
 }
 
 /* SIZE */
-.btn--large {
-  @apply text-base px-6 py-2;
+.btn--tiny {
+  @apply px-2.5 py-1.5 text-xs leading-4;
 }
 
 .btn--small {
-  @apply text-xs px-3 py-0;
+  @apply px-3 py-2 text-sm leading-4;
+}
+
+.btn--medium {
+  @apply px-4 py-2 text-sm leading-5;
+}
+
+.btn--large {
+  @apply px-4 py-2 leading-6 font-medium;
+}
+
+.btn--xlarge {
+  @apply px-6 py-3 leading-6 font-medium;
 }
 
 /* VARIANT */
@@ -26,6 +38,14 @@
 
 .btn--solid:hover {
   @apply bg-brand-600;
+}
+
+.btn--secondary {
+  @apply text-brand-800 bg-brand-50 bg-opacity-75;
+}
+
+.btn--secondary:hover {
+  @apply bg-brand-100;
 }
 
 .btn--outline {
@@ -42,4 +62,12 @@
 
 .btn--ghost:hover {
   @apply bg-brand-300 bg-opacity-25;
+}
+
+.btn--white {
+  @apply text-gray-700 bg-white border border-gray-300;
+}
+
+.btn--white:hover {
+  @apply text-gray-500;
 }
