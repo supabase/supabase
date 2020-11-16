@@ -5,15 +5,15 @@ import { ref } from 'vue'
 const allTodos = ref<Todo[]>([])
 
 /**
-* Retreive all todo for the signed in user 
-*/
+ * Retreive all todo for the signed in user
+ */
 async function fetchTodos() {
   try {
     const { data: todos, error } = await supabase
       .from('todos')
       .select('*')
       .order('id')
-    
+
     if (error) {
       console.log('error', error)
       return
@@ -32,8 +32,8 @@ async function fetchTodos() {
 }
 
 /**
-*  Add a new todo to supabase
-*/
+ *  Add a new todo to supabase
+ */
 async function addTodo(todo: Todo): Promise<null | Todo> {
   try {
     const { data, error } = await supabase
@@ -57,8 +57,8 @@ async function addTodo(todo: Todo): Promise<null | Todo> {
 }
 
 /**
-* Targets a specific todo via its record id and updates the is_completed attribute.    
-*/
+ * Targets a specific todo via its record id and updates the is_completed attribute.
+ */
 async function updateTaskCompletion(todo: Todo, isCompleted: boolean) {
   try {
     const { error } = await supabase
@@ -81,8 +81,8 @@ async function updateTaskCompletion(todo: Todo, isCompleted: boolean) {
 }
 
 /**
-*  Deletes a todo via its id
-*/
+ *  Deletes a todo via its id
+ */
 async function deleteTodo(todo: Todo) {
   try {
     await supabase
