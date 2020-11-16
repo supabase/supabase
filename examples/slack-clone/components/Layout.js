@@ -25,13 +25,31 @@ export default function Layout(props) {
   }
 
   return (
-    <main className="main flex h-screen w-screen absolute overflow-hidden">
+    <main className="main flex h-screen w-screen overflow-hidden">
       {/* Sidebar */}
       <nav
-        className="w-64 bg-gray-900 text-gray-100 h-screen"
-        style={{ maxWidth: '20%', minWidth: 150 }}
+        className="w-64 bg-gray-900 text-gray-100 overflow-scroll "
+        style={{ maxWidth: '20%', minWidth: 150, maxHeight: '100vh' }}
       >
-        <div className="p-2">
+        <div className="p-2 ">
+          <div className="p-2">
+            <button
+              className="bg-blue-900 hover:bg-blue-800 text-white py-2 px-4 rounded w-full transition duration-150"
+              onClick={() => newChannel()}
+            >
+              New Channel
+            </button>
+          </div>
+          <hr className="m-2" />
+          <div className="p-2">
+            <button
+              className="bg-blue-900 hover:bg-blue-800 text-white py-2 px-4 rounded w-full transition duration-150"
+              onClick={() => signOut()}
+            >
+              Log out
+            </button>
+          </div>
+          <hr className="m-2" />
           <h4 className="font-bold">Channels</h4>
           <ul className="channel-list">
             {props.channels.map((x) => (
@@ -42,24 +60,6 @@ export default function Layout(props) {
               />
             ))}
           </ul>
-        </div>
-        <hr className="m-2" />
-        <div className="p-2">
-          <button
-            className="bg-blue-900 hover:bg-blue-800 text-white py-2 px-4 rounded w-full transition duration-150"
-            onClick={() => newChannel()}
-          >
-            New Channel
-          </button>
-        </div>
-        <hr className="m-2" />
-        <div className="p-2">
-          <button
-            className="bg-blue-900 hover:bg-blue-800 text-white py-2 px-4 rounded w-full transition duration-150"
-            onClick={() => signOut()}
-          >
-            Log out
-          </button>
         </div>
       </nav>
 
