@@ -1,5 +1,5 @@
 .btn {
-  @apply cursor-pointer flex items-center justify-center px-4 py-1 border border-transparent text-sm leading-6 rounded transition duration-150 ease-in-out;
+  @apply cursor-pointer flex items-center justify-center px-4 py-1 border border-solid border-transparent text-sm leading-6 rounded transition duration-150 ease-in-out;
 }
 
 .btn:focus {
@@ -65,9 +65,9 @@
 }
 
 .btn--white {
-  @apply text-gray-700 bg-white border border-gray-300;
+  @apply text-white bg-transparent border-gray-300;
 }
 
 .btn--white:hover {
-  @apply text-gray-500;
+  @apply text-gray-600 bg-white border-gray-200;
 }
