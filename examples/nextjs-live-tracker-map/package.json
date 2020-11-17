@@ -15,7 +15,7 @@
     "leaflet": "^1.6.0",
     "micro-api-client": "^3.3.0",
     "nanoid": "^3.1.12",
-    "next": "9.5.2",
+    "next": "9.5.4",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-leaflet": "^3.0.0-beta.4",
