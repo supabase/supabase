@@ -918,12 +918,10 @@ pages:
       - name: Filter embedded resources
         js: |
           ```js
-          export const getFilterJsEmbedded = `
           const { data, error } = await supabase
             .from('cities')
             .select('name, countries ( name )')
             .filter('countries.name', 'eq', 'France')
-          `.trim()
           ```
         py: | 
           ```py
