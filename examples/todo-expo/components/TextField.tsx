@@ -7,17 +7,27 @@ type TextFieldProps = {
   text: string
   type?: 'none' | 'password'
   placeholder?: string
+  customStyles?: object
+  autoCapitalize?: 'sentences' | 'characters' | 'words' | 'none'
 }
 
-export default function TextField({ onChangeText, text, type = 'none', placeholder = '' }: TextFieldProps) {
+export default function TextField({
+  onChangeText,
+  text,
+  type = 'none',
+  placeholder = '',
+  customStyles = {},
+  autoCapitalize = 'none'
+}: TextFieldProps) {
   return (
     <TextInput
-      style={styles.textInput}
+      style={[styles.textInput, customStyles]}
       onChangeText={onChangeText}
       value={text}
       placeholder={placeholder}
       textContentType={type}
       secureTextEntry={type == 'password'}
+      autoCapitalize={autoCapitalize}
     />
   )
 }

@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.12.1",
-    "@supabase/supabase-js": "^1.0.2",
+    "@supabase/supabase-js": "latest",
     "babel-plugin-inline-dotenv": "^1.6.0",
     "expo": "~39.0.2",
     "expo-status-bar": "~1.0.2",
