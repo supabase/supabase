@@ -62,10 +62,10 @@ Our client library is modular. Each sub-library is a standalone implementation f
  
 | Repo                                                                                       | Official                                         | Community        |
 |-----------------------|--------------------------------------------------|------------------|
-| **`supabase-{lang}`**     | [`JS`](https://github.com/supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` |
-| `postgrest-{lang}` | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
-| `realtime-{lang}`  | [`JS`](https://github.com/supabase/realtime-js) | `C#` \| `Python` \| `Rust` |
-| `gotrue-{lang}`    | [`JS`](https://github.com/supabase/gotrue-js) | `C#` \| `Python` \| `Rust` |
+| **`supabase-{lang}`**     | [`JS`](https://github.com/supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp) \| Dart \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` |
+| `postgrest-{lang}` | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
+| `realtime-{lang}`  | [`JS`](https://github.com/supabase/realtime-js) | `C#` \| [`Dart`](https://github.com/supabase/realtime-dart) \| `Python` \| `Rust` |
+| `gotrue-{lang}`    | [`JS`](https://github.com/supabase/gotrue-js) | `C#` \| Dart \| `Python` \| `Rust` |
 
 
 
@@ -73,8 +73,5 @@ Our client library is modular. Each sub-library is a standalone implementation f
 
 ## Sponsors
 
-Thanks to these sponsors who are making the OSS ecosystem better for everyone.
-
-[![Worklife VC](https://user-images.githubusercontent.com/10214025/90451355-34d71200-e11e-11ea-81f9-1592fd1e9146.png)](https://www.worklife.vc)
 [![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
 
