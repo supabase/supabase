@@ -17,8 +17,9 @@ export default function App() {
   const [password, setPassword] = React.useState('')
 
   const handleLogin = async (type: string, email: string, password: string) => {
-
-    console.log(supabase)
+    
+    // console.log('email', email)
+    // console.log('password', password)
     try {
       const { error, user } =
         type === 'LOGIN'
@@ -63,7 +64,7 @@ export default function App() {
         <Button text="Log in" onPress={() => handleLogin('LOGIN', email, password)} />
       </View>
       <View style={styles.verticallySpaced}>
-        <Button text="Sign up" onPress={() => alert('hey')} />
+        <Button text="Sign up" onPress={() => handleLogin('SIGNUP', email, password)} />
       </View>
       <StatusBar style="auto" />
     </View>
