@@ -11,7 +11,7 @@ tags:
     - postgres
 ---
 
-A quick summary of Postgres views, materilized views, and why you should use them.
+A quick summary of Postgres views, materialized views, and why you should use them.
 
 <!--truncate-->
 
