@@ -75,7 +75,7 @@ For additional parameters or options, refer [here](https://www.postgresql.org/do
 
 ### Why should we use Views?
 
-Views provide the several benifits:
+Views provide the several benefits:
 
 - Simplicity
 - Consistency
