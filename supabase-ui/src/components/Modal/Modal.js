@@ -6,8 +6,11 @@ import Icon from '../Icon/Icon'
 
 import { action } from '@storybook/addon-actions'
 
-import Transition from './../../lib/Transition'
-import { Button } from './../../index'
+import { Button, Transition } from './../../index'
+
+// import addons, { mockChannel } from '@storybook/addons';
+
+// addons.setChannel(mockChannel());
 
 // import './Button.css'
 
@@ -24,6 +27,8 @@ const Modal = ({
   visible = true,
   onConfirmText = 'Confirm',
   onCancelText = 'Cancel',
+  onCancel,
+  onConfirm,
   ...props
 }) => {
 
@@ -66,7 +71,7 @@ const Modal = ({
     >
       <div
         className={"fixed z-10 inset-0 overflow-y-auto " + className}
-        onClick={action('onCancel')}
+        onClick={() => onCancel()}
       >
         <div
           className={`flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0`}
@@ -115,14 +120,16 @@ const Modal = ({
               </div>
               <div className="bg-gray-500 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <span className="flex w-full sm:ml-3 sm:w-auto">
-                  <Button onClick={action('onConfirm')}>
+                  <Button 
+                    onClick={() => onConfirm()}
+                  >
                     {onConfirmText}
                   </Button>
                 </span>
                 <span className="mt-3 flex w-full sm:mt-0 sm:w-auto">
                   <Button
                     variant='white'
-                    onClick={action('onCancel')}
+                    onClick={() => onCancel()}
                   >
                     {onCancelText}
                   </Button>
