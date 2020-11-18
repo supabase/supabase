@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { action, actions } from '@storybook/addon-actions'
 
 import Transition from './../../lib/Transition'
-import { Button } from '../Button'
+import { Button } from './../../index'
 
 const SideOver = ({
   className = '',

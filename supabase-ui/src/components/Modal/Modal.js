@@ -7,7 +7,7 @@ import Icon from '../Icon/Icon'
 import { action } from '@storybook/addon-actions'
 
 import Transition from './../../lib/Transition'
-import { Button } from '../Button'
+import { Button } from './../../index'
 
 // import './Button.css'
 

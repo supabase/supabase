@@ -8,3 +8,8 @@ export * from './components/Input/index'
 export * from './components/Radio/index'
 export * from './components/Select/index'
 export * from './components/Textarea/index'
+
+// OVERLAYS
+
+export * from './components/Modal/index'
+export * from './components/SideOver/index'
