@@ -9,7 +9,15 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) adds realtime and RESTful APIs to your existing PostgreSQL database without a single line of code.
+[Supabase](https://supabase.io) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools. 
+
+- [x] Hosted Postgres Database
+- [x] Realtime subscriptions
+- [x] Authentication and authorization
+- [x] Auto-generated APIs
+- [x] Dashboard
+- [ ] Storage (coming soon)
+- [ ] Functions (coming soon)
 
 ## Status
 
@@ -62,10 +70,10 @@ Our client library is modular. Each sub-library is a standalone implementation f
  
 | Repo                                                                                       | Official                                         | Community        |
 |-----------------------|--------------------------------------------------|------------------|
-| **`supabase-{lang}`**     | [`JS`](https://github.com/supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp) \| Dart \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` |
+| **`supabase-{lang}`**     | [`JS`](https://github.com/supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp) \| `Dart` \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` |
 | `postgrest-{lang}` | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
 | `realtime-{lang}`  | [`JS`](https://github.com/supabase/realtime-js) | `C#` \| [`Dart`](https://github.com/supabase/realtime-dart) \| `Python` \| `Rust` |
-| `gotrue-{lang}`    | [`JS`](https://github.com/supabase/gotrue-js) | `C#` \| Dart \| `Python` \| `Rust` |
+| `gotrue-{lang}`    | [`JS`](https://github.com/supabase/gotrue-js) | `C#` \| `Dart` \| `Python` \| `Rust` |
 
 
 
