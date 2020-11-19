@@ -13,7 +13,7 @@
     "gen:supabase": "ts-node ReferenceGenerator.ts -o docs/client spec/supabase.yml"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.0.0-alpha.63",
+    "@docusaurus/core": "^2.0.0-alpha.68",
     "@docusaurus/preset-classic": "^2.0.0-alpha.63",
     "@kiwicopple/prism-react-renderer": "github:kiwicopple/prism-react-renderer",
     "classnames": "^2.2.6",
