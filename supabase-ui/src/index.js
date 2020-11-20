@@ -13,3 +13,7 @@ export * from './components/Textarea/index'
 
 export * from './components/Modal/index'
 export * from './components/SideOver/index'
+
+// UTILITIES
+
+export * from './components/Transition/index'
