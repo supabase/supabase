@@ -2,11 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './Modal.css'
 
-import Icon from '../Icon/Icon'
-
 import { action } from '@storybook/addon-actions'
 
-import { Button, Transition } from './../../index'
+import { Button, Transition, Icon } from './../../index'
 
 // import addons, { mockChannel } from '@storybook/addons';
 
@@ -29,28 +27,53 @@ const Modal = ({
   onCancelText = 'Cancel',
   onCancel,
   onConfirm,
+  customFooter = undefined,
+  hideFooter = false,
+  loading = false,
   ...props
 }) => {
-
-  
   let variantBgColor = {
     alert: 'red',
     warning: 'yellow',
     success: 'green',
   }
-  
+
   let icon = {
-    alert: <Icon size={24} strokeWidth={2} type="AlertCircle" color={variantBgColor[variant]} />,
-    warning: (
-      <Icon size={24} strokeWidth={2} type="AlertCircle" color={variantBgColor[variant]} />
+    alert: (
+      <Icon
+        size={24}
+        strokeWidth={2}
+        type="AlertCircle"
+        color={variantBgColor[variant]}
+      />
     ),
-    success: <Icon size={24} strokeWidth={2} type="Check" color={variantBgColor[variant]} />,
+    warning: (
+      <Icon
+        size={24}
+        strokeWidth={2}
+        type="AlertCircle"
+        color={variantBgColor[variant]}
+      />
+    ),
+    success: (
+      <Icon
+        size={24}
+        strokeWidth={2}
+        type="Check"
+        color={variantBgColor[variant]}
+      />
+    ),
   }
 
   let bgColor = [`bg-${variantBgColor[variant]}-100`]
 
   const iconMarkup = showIcon && (
-    <div className={"mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10 bg-opacity-75 " + bgColor.join(" ")}>
+    <div
+      className={
+        'mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10 bg-opacity-75 ' +
+        bgColor.join(' ')
+      }
+    >
       {icon[variant]}
     </div>
   )
@@ -70,7 +93,7 @@ const Modal = ({
       leaveTo="opacity-0"
     >
       <div
-        className={"fixed z-10 inset-0 overflow-y-auto " + className}
+        className={'fixed z-10 inset-0 overflow-y-auto ' + className}
         onClick={() => onCancel()}
       >
         <div
@@ -118,23 +141,26 @@ const Modal = ({
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-500 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <span className="flex w-full sm:ml-3 sm:w-auto">
-                  <Button 
-                    onClick={() => onConfirm()}
-                  >
-                    {onConfirmText}
-                  </Button>
-                </span>
-                <span className="mt-3 flex w-full sm:mt-0 sm:w-auto">
-                  <Button
-                    variant='white'
-                    onClick={() => onCancel()}
-                  >
-                    {onCancelText}
-                  </Button>
-                </span>
-              </div>
+              {!hideFooter && (
+                <div className="bg-gray-500 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                  {customFooter ? (
+                    customFooter
+                  ) : (
+                    <React.Fragment>
+                      <span className="flex w-full sm:ml-3 sm:w-auto">
+                        <Button onClick={() => onConfirm()} loading={loading}>
+                          {onConfirmText}
+                        </Button>
+                      </span>
+                      <span className="mt-3 flex w-full sm:mt-0 sm:w-auto">
+                        <Button variant="white" onClick={() => onCancel()}>
+                          {onCancelText}
+                        </Button>
+                      </span>
+                    </React.Fragment>
+                  )}
+                </div>
+              )}
             </div>
           </Transition>
         </div>
@@ -151,7 +177,8 @@ Modal.propTypes = {
   showIcon: PropTypes.bool,
   className: PropTypes.string,
   onConfirmText: PropTypes.string,
-  onCancelText: PropTypes.string
+  onCancelText: PropTypes.string,
+  loading: PropTypes.bool
 }
 
 export default Modal

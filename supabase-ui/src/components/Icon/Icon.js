@@ -5,8 +5,8 @@ import PropTypes from 'prop-types'
 const Icon = ({
   className,
   size = 24,
-  type = 'Activity',
-  color = 'black',
+  type = 'Loader',
+  color = ' ',
   strokeWidth = 2,
   ...props
 }) => {
@@ -14,10 +14,10 @@ const Icon = ({
 
   return (
     <FeatherIcon
+      stroke={color}
       className={`${className}`}
       strokeWidth={strokeWidth}
       size={size}
-      stroke={color}
       {...props}
     />
   )

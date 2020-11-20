@@ -1,73 +1,55 @@
-.btn {
-  @apply cursor-pointer flex items-center justify-center px-4 py-1 border border-solid border-transparent text-sm leading-6 rounded transition duration-150 ease-in-out;
-}
+/* 
+  Puesdo classes
+ */
 
 .btn:focus {
   @apply outline-none shadow-outline;
 }
 
 .btn:disabled {
-  @apply opacity-50 cursor-default;
+  @apply opacity-75 cursor-default;
+  pointer-events: none;
 }
 
-/* SIZE */
-.btn--tiny {
-  @apply px-2.5 py-1.5 text-xs leading-4;
+/* 
+  Animation for icon
+*/
+.btn--anim--spin {
+  animation-name: spin;
+  animation-duration: 1500ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; 
+  /* transform: rotate(3deg); */
+   /* transform: rotate(0.3rad);/ */
+   /* transform: rotate(3grad); */ 
+   /* transform: rotate(.03turn);  */
 }
 
-.btn--small {
-  @apply px-3 py-2 text-sm leading-4;
+@keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
 }
 
-.btn--medium {
-  @apply px-4 py-2 text-sm leading-5;
-}
+/* 
+  Hover modifiers for Icon
+*/
 
-.btn--large {
-  @apply px-4 py-2 leading-6 font-medium;
+.btn--solid:hover svg {
+  @apply text-gray-500;
 }
-
-.btn--xlarge {
-  @apply px-6 py-3 leading-6 font-medium;
-}
-
-/* VARIANT */
-.btn--solid {
-  @apply text-white bg-brand-500;
-}
-
-.btn--solid:hover {
-  @apply bg-brand-600;
-}
-
-.btn--secondary {
-  @apply text-brand-800 bg-brand-50 bg-opacity-75;
-}
-
-.btn--secondary:hover {
+.btn--secondary:hover svg {
   @apply bg-brand-100;
 }
-
-.btn--outline {
-  @apply bg-transparent border border-brand-500 border-solid text-brand-500;
+.btn--white:hover svg {
+  @apply text-gray-600;
 }
-
-.btn--outline:hover {
-  @apply bg-brand-500 text-white;
+.btn--outline:hover svg {
+  @apply text-white;
 }
-
-.btn--ghost {
-  @apply bg-transparent text-brand-500 border-none;
-}
-
-.btn--ghost:hover {
-  @apply bg-brand-300 bg-opacity-25;
-}
-
-.btn--white {
-  @apply text-white bg-transparent border-gray-300;
-}
-
-.btn--white:hover {
-  @apply text-gray-600 bg-white border-gray-200;
+.btn--ghost:hover svg {
+  @apply bg-brand-300
 }
