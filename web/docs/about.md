@@ -26,7 +26,7 @@ Most notably, we use Postgres rather than a NoSQL store. This was a deliberate c
 
 ## How it works.
 
-At its core, is a suite of open source tools, stitched together to build a seamless developer experience:
+At its core, Supabase is a suite of open source tools, stitched together to build a seamless developer experience:
 
 ![Supabase Architecture](/img/supabase-architecture.png)
 
