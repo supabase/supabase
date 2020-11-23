@@ -99,8 +99,8 @@ export const fetchList = async (list_uuid) => {
   try {
     let { data, error } = await supabase
       .from('lists')
-      .eq('uuid', list_uuid)
       .select(`*, tasks(*)`)
+      .eq('uuid', list_uuid)
       .single()
     if (error) {
       throw new Error(error)
