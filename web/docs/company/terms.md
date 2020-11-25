@@ -86,7 +86,17 @@ If Customer or any of its employees or contractors sends or transmits any commun
 
 ## 9. Warranty Disclaimer. 
 
-THE SUPABASE IP IS PROVIDED "AS IS" AND SUPABASE HEREBY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. SUPABASE SPECIFICALLY DISCLAIMS ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT, AND ALL WARRANTIES ARISING FROM COURSE OF DEALING, USAGE, OR TRADE PRACTICE. SUPABASE MAKES NO WARRANTY OF ANY KIND THAT THE SUPABASE IP, OR ANY PRODUCTS OR RESULTS OF THE USE THEREOF, WILL MEET CUSTOMER'S OR ANY OTHER PERSON'S REQUIREMENTS, OPERATE WITHOUT INTERRUPTION, ACHIEVE ANY INTENDED RESULT, BE COMPATIBLE OR WORK WITH ANY SOFTWARE, SYSTEM OR OTHER SERVICES, OR BE SECURE, ACCURATE, COMPLETE, FREE OF HARMFUL CODE, OR ERROR FREE.
+The Supabase IP is provided "as is" and Supabase
+hereby disclaims all warranties, whether express, implied, statutory, or
+otherwise. Supabase specifically disclaims all implied warranties of
+merchantability, fitness for a particular purpose, title, and non-infringement,
+and all warranties arising from course of dealing, usage, or trade practice. Supabase
+makes no warranty of any kind that the Supabase IP, or any products or results
+of the use thereof, will meet Customer’s or any other person’s requirements,
+operate without interruption, achieve any intended result, be compatible or
+work with any software, system or other services, or be secure, accurate,
+complete, free of harmful code, or error free.
+
 
 ## 10. Indemnification.
   
@@ -100,11 +110,35 @@ THE SUPABASE IP IS PROVIDED "AS IS" AND SUPABASE HEREBY DISCLAIMS ALL WARRANTIES
 Customer shall indemnify, hold harmless, and, at Supabase's option, defend Supabase from and against any Losses resulting from any Third-Party Claim that the Customer Data, or any use of the Customer Data in accordance with this Agreement, infringes or misappropriates such third party's US intellectual property or other rights and any Third-Party Claims based on Customer's or any Authorized User's (i) negligence or willful misconduct; (ii) use of the Services in a manner not authorized by this Agreement; or (iii) use of the Services in combination with data, software, hardware, equipment or technology not provided by Supabase or authorized by Supabase in writing; in each case provided that Customer may not settle any Third-Party Claim against Supabase unless Supabase consents to such settlement, and further provided that Supabase will have the right, at its option, to defend itself against any such Third-Party Claim or to participate in the defense thereof by counsel of its own choice.
 ### 3. Sole Remedy. 
 
-THIS SECTION 10.3 SETS FORTH CUSTOMER'S SOLE REMEDIES AND SUPABASE'S SOLE LIABILITY AND OBLIGATION FOR ANY ACTUAL, THREATENED, OR ALLEGED CLAIMS THAT THE SERVICES INFRINGE, MISAPPROPRIATE, OR OTHERWISE VIOLATE ANY INTELLECTUAL PROPERTY RIGHTS OF ANY THIRD PARTY.
+This section 10.3 sets forth Customer's sole remedies and Supabase's sole liability and obligation for any actual, threatened, or alleged claims that the services infringe, misappropriate, or otherwise violate any intellectual property rights of any third party.
+
 
 ## 11. Limitations of Liability. 
 
-EXCEPT FOR: (I) A PARTY'S BREACH OF ITS CONFIDENTIALITY OBLIGATIONS; (II) A PARTY'S INDEMNITY OBLIGATIONS; OR (III) A PARTY'S GROSS NEGLIGENCE, FRAUD, OR WILLFUL MISCONDUCT ("**Excluded Liabilities**"), (A) IN NO EVENT WILL EITHER PARTY BE LIABLE UNDER OR IN CONNECTION WITH THIS AGREEMENT UNDER ANY LEGAL OR EQUITABLE THEORY, INCLUDING BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY, AND OTHERWISE, FOR ANY: (1) CONSEQUENTIAL, INCIDENTAL, INDIRECT, EXEMPLARY, SPECIAL, ENHANCED, OR PUNITIVE DAMAGES; (2) INCREASED COSTS, DIMINUTION IN VALUE OR LOST BUSINESS, PRODUCTION, REVENUES, OR PROFITS; (3) LOSS OF GOODWILL OR REPUTATION; (4) USE, INABILITY TO USE, LOSS, INTERRUPTION, DELAY OR RECOVERY OF ANY DATA, OR BREACH OF DATA OR SYSTEM SECURITY; OR (5) COST OF REPLACEMENT GOODS OR SERVICES, IN EACH CASE REGARDLESS OF WHETHER SUCH PARTY WAS ADVISED OF THE POSSIBILITY OF SUCH LOSSES OR DAMAGES OR SUCH LOSSES OR DAMAGES WERE OTHERWISE FORESEEABLE; AND (B) IN NO EVENT WILL EITHER PARTY'S AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT UNDER ANY LEGAL OR EQUITABLE THEORY, INCLUDING BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY, AND OTHERWISE EXCEED THE TOTAL AMOUNTS PAID AND/OR PAYABLE TO SUPABASE UNDER THIS AGREEMENT IN THE TWELVE (12) MONTHS IMMEDIATELY PRECEDING THE CLAIM; PROVIDED THAT, NOTWITHSTANDING THE FOREGOING, SUPABASE'S AGGREGATE LIABILITY ARISING OUT OF OR RELATING TO ANY EXCLUDED LIABILITIES WILL NOT EXCEED THREE TIMES (3X) THE TOTAL AMOUNTS PAID AND/OR PAYABLE TO SUPABASE BY CUSTOMER UNDER THIS AGREEMENT IN THE TWELVE (12) MONTHS IMMEDIATELY PRECEDING THE CLAIM.
+Except for: (i) a party’s breach of its confidentiality obligations;
+(ii) a party’s indemnity obligations; or (iii) a party’s gross negligence,
+fraud, or willful misconduct ("**Excluded Liabilities**"), (a) in no
+event will either party be liable under or in connection with this agreement
+under any legal or equitable theory, including breach of contract, tort
+(including negligence), strict liability, and otherwise, for any: (1)
+consequential, incidental, indirect, exemplary, special, enhanced, or punitive
+damages; (2) increased costs, diminution in value or lost business, production,
+revenues, or profits; (3) loss of goodwill or reputation; (4) use, inability to
+use, loss, interruption, delay or recovery of any data, or breach of data or
+system security; or (5) cost of replacement goods or services, in each case
+regardless of whether such party was advised of the possibility of such losses
+or damages or such losses or damages were otherwise foreseeable; and (b) in no
+event will either party’s aggregate liability arising out of or related to this
+agreement under any legal or equitable theory, including breach of contract,
+tort (including negligence), strict liability, and otherwise exceed the total
+amounts paid and/or payable to Supabase under this agreement in the twelve (12)
+months immediately preceding the claim; provided that, notwithstanding the
+foregoing, Supabase's aggregate liability arising out of or relating to any
+excluded liabilities will not exceed three times (3x) the total amounts paid
+and/or payable to Supabase by Customer under this agreement in the twelve (12)
+months immediately preceding the claim.
+
+
 
 ## 12. Subscription Period and Termination.
   
