@@ -27,7 +27,7 @@ module.exports = {
       type: 'category',
       label: 'See Also',
       collapsed: false,
-      items: ['guides/examples', 'pricing', 'support', 'handbook/contributing'],
+      items: ['guides/examples', 'pricing', 'support', 'handbook/contributing', 'company/terms'],
     },
     // Handbook: ['handbook/introduction', 'handbook/contributing'],
   ],
