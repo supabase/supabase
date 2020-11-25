@@ -98,6 +98,25 @@ Even though Supabase provides an `auth.users` table, it is helpful to also creat
 For security purposes, the `auth` schema is not exposed on the auto-generated API. Created a `public.users` table allows you to interact via the Supabase client - 
 especially useful for cross-table queries.
 
+Pro tip: if you want to add a row to your `public.users` table every time a user signs up, you can use triggers. For example:
+
+```sql
+-- inserts a row into public.users
+create function public.handle_new_user() 
+returns trigger as $$
+begin
+  insert into public.users (id)
+  values (new.id);
+  return new;
+end;
+$$ language plpgsql security definer;
+
+-- trigger the function every time a user is created
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+```
+
 ### Policies are like where clauses.
 
 Policies are easy to understand once you get the hang of them. You can just think of the as adding a `WHERE` clause to every query. For example if you had a policy like this:
