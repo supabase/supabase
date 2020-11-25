@@ -1,8 +1,14 @@
 import Container from '../components/container'
-import Hero from '../components/hero'
 import Layout from '../components/layout'
 import Head from 'next/head'
 import { CMS_NAME } from '../lib/constants'
+
+import Hero from '../components/hero'
+import Features from '../components/features'
+import BuiltExamples from '../components/index_sections/BuiltWithSupabase'
+import MadeForDevelopers from '../components/index_sections/MadeForDevelopers'
+import AdminAccess from '../components/index_sections/AdminAccess'
+import CaseStudies from '../components/index_sections/CaseStudies'
 
 type Props = {
   
@@ -17,6 +23,11 @@ const Index = ({  }: Props) => {
         </Head>
         <Container>
           <Hero />
+          <Features />
+          <BuiltExamples />
+          <MadeForDevelopers />
+          <AdminAccess />
+          <CaseStudies />
         </Container>
       </Layout>
     </>
