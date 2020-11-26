@@ -1,0 +1,23 @@
+{
+  "monitoro": {
+    "type": "case study",
+    "title": "Monitoro gets to 73M api requests in a week",
+    "url": "https://supabase.io/casestudies/monitoro",
+    "description":"Omar Kamali is the founder of Monitoro, a service for scraping countless websites 24/7 to notify  customers when these websites change. To create this product, Omar needed to handle massive data throughput whilst ensuring his product was reliable and resilient to satisfy a rapidly growing user base.",
+    "author" : "paul_copplestone"
+  },
+  "tayfab": {
+    "type": "case study",
+    "title": "Tayfab",
+    "url": "https://supabase.io/casestudies/monitoro",
+    "description":"Sarup Banskota loves creating new products that delight his customers. He knows he can add the most value by understanding his client's needs and shipping impressive products fast. For his latest product, Tayfa, he needed to ship quality product fast.",
+    "author" : "paul_copplestone"
+  },
+  "llama_lab": {
+    "type": "case study",
+    "title": "Llama Lab",
+    "url": "https://supabase.io/casestudies/monitoro",
+    "description":"Amal first discovered us on Ui.Dev newsletter - he doesn't normally click on things in the newsletter but when he saw \"open source firebase Postgres\" as a dev with firebase experience he immediately got it",
+    "author" : "paul_copplestone"
+  }
+}

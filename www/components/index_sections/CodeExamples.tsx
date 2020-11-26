@@ -27,6 +27,7 @@ const CodeExamples = () => {
     return (
       <button
         type="button"
+        key={id + "-button"}
         onClick={() => handleClick(id)}
         className={
           'm-1 mb-4 rounded-md border border-gray-200 px-4 py-2 text-base font-medium text-gray focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-transparent sm:w-auto sm:text-sm' +
