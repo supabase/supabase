@@ -15,6 +15,7 @@
     "gray-matter": "4.0.2",
     "next": "latest",
     "react": "^16.13.0",
+    "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "^16.13.0",
     "react-syntax-highlighter": "^15.3.1",
     "remark": "11.0.2",
