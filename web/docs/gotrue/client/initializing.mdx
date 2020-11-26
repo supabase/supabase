@@ -9,7 +9,33 @@ import TabItem from '@theme/TabItem';
 
 Create a new client for use in the browser.
 
+<Tabs
+  defaultValue="js"
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
 
+<TabItem value="js">
+
+```js
+import { GoTrueClient } from '@supabase/gotrue-js'
+
+const auth = new GoTrueClient({
+  url: "https://your-gotrue-url.com"
+})
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
 
 ## Parameters
 
@@ -40,28 +66,7 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      url
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-       | 
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-The URL of the GoTrue server.
-  
-  </div>
-  
-</li>
-
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      persistSession
+      autoRefreshToken
     </span>
     <span className="method-list-item-label-badge false">
       optional
@@ -72,49 +77,7 @@ The URL of the GoTrue server.
   </h4>
   <div class="method-list-item-description">
 
-Set to "true" if you want to automatically save the user session into local storage.
-  
-  </div>
-  
-</li>
-
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      localStorage
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-      Storage
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-No description provided. 
-  
-  </div>
-  
-</li>
-
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      headers
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-       | 
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-Any additional headers to send to the GoTrue server.
+Set to "true" if you want to automatically refresh the token before expiring.
   
   </div>
   
@@ -145,7 +108,49 @@ Set to "true" if you want to automatically detects OAuth grants in the URL and s
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      autoRefreshToken
+      headers
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+       | 
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Any additional headers to send to the GoTrue server.
+  
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      localStorage
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      Storage
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided. 
+  
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      persistSession
     </span>
     <span className="method-list-item-label-badge false">
       optional
@@ -156,7 +161,28 @@ Set to "true" if you want to automatically detects OAuth grants in the URL and s
   </h4>
   <div class="method-list-item-description">
 
-Set to "true" if you want to automatically refresh the token before expiring.
+Set to "true" if you want to automatically save the user session into local storage.
+  
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      url
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+       | 
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The URL of the GoTrue server.
   
   </div>
   
@@ -167,3 +193,50 @@ Set to "true" if you want to automatically refresh the token before expiring.
 </li>
 
 </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### Initialize a GoTrue client
+
+
+
+<Tabs
+  defaultValue="js"
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+import { GoTrueClient } from '@supabase/gotrue-js'
+
+const auth = new GoTrueClient({
+  url: "https://your-gotrue-url.com"
+})
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
