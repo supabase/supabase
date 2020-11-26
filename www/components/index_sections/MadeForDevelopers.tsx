@@ -9,7 +9,7 @@ const MadeForDevelopers = () => {
         <div className="relative mt-12 lg:mt-24 lg:grid lg:grid-cols-12 lg:gap-8 lg:items-center">
           <div className="relative col-span-12 text-center">
             <small>MADE FOR DEVELOPERS</small>
-            <h2 className="text-3xl leading-8 font-bold text-gray-900 sm:text-4xl">
+            <h2 className="text-3xl tracking-tight leading-8 text-gray-900 sm:text-4xl">
               Supafast easy-to-use APIs that do the hard work for you
             </h2>
             <p className="mt-4 max-w-3xl mx-auto text-xl text-gray-500">

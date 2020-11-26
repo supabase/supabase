@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 const Hero = () => {
   return (
-    <div className="relative bg-gray-800 overflow-hidden">
+    <div className="relative bg-dark-100 overflow-hidden">
       <div className="hidden sm:block sm:absolute sm:inset-0" aria-hidden="true">
         <svg
           className="absolute bottom-0 right-0 transform translate-x-1/2 mb-48 text-gray-700 lg:top-0 lg:mt-28 lg:mb-0 xl:transform-none xl:translate-x-0"
