@@ -1,14 +1,14 @@
 {
   "vercel_and_stripe": {
     "type": "project example",
-    "title": "NextJS, Vercel and Supabase",
-    "url": "https://supabase.io/casestudies/monitoro",
-    "description":"Easily deploy a Supabase powered app with Stripe already built in for payments.",
+    "title": "NextJS, Stripe and Supabase",
+    "url": "https://github.com/supabase/supabase/tree/master/examples",
+    "description":"Easily deploy a Supabase powered app with Stripe already built in for payments",
 
     "icons" : [
       {
         "img_url": "https://avatars3.githubusercontent.com/u/54469796?s=480&v=4",
-        "img_alt": "vercel logo"
+        "img_alt": "supabase icon"
       },
       {
         "img_url": "https://avatars1.githubusercontent.com/u/14985020?s=480&v=4",
@@ -17,6 +17,24 @@
       {
         "img_url": "https://avatars3.githubusercontent.com/u/856813?s=480&v=6",
         "img_alt": "stripe icon"
+      }
+    ],
+    "cta" : true
+  },
+  "nextjs-slack-clone": {
+    "type": "project example",
+    "title": "NextJS realtime chat using Supabase",
+    "url": "https://github.com/supabase/supabase/tree/master/examples/nextjs-slack-clone",
+    "description":"Full-stack Slack clone example",
+
+    "icons" : [
+      {
+        "img_url": "https://avatars3.githubusercontent.com/u/54469796?s=480&v=4",
+        "img_alt": "supabase icon"
+      },
+      {
+        "img_url": "https://avatars1.githubusercontent.com/u/14985020?s=480&v=4",
+        "img_alt": "vercel icon"
       }
     ],
     "cta" : true

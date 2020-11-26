@@ -27,11 +27,7 @@ const BuiltExamples = () => {
               }/>
               <ArticleThumb article={
               // @ts-ignore
-              ProjectExamples["vercel_and_stripe"]
-              }/>
-              <ArticleThumb article={
-              // @ts-ignore
-              ProjectExamples["vercel_and_stripe"]
+              ProjectExamples["nextjs-slack-clone"]
               }/>
           </div>
         </div>

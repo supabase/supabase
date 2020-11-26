@@ -1,9 +1,10 @@
 import Link from 'next/link'
+import FlyOut from './nav/FlyOut'
 
 const Nav = () => {
   return (
     
-<nav className="bg-white shadow">
+<nav className="bg-white shadow" style={{zIndex: 500}}>
   <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
     <div className="relative flex justify-between h-16">
       <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -38,6 +39,7 @@ const Nav = () => {
           <a href="#" className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
             Calendar
           </a>
+          <FlyOut/>
         </div>
       </div>
       <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">

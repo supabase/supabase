@@ -1,0 +1,313 @@
+import { useState, useEffect } from 'react'
+import Transition from '../../lib/Transition'
+
+const FlyOut = () => {
+  const [show, setShow] = useState(false)
+
+  function handleToggle() {
+    setShow(!show)
+  }
+
+  useEffect(() => {
+    // window is accessible here.
+    window.addEventListener('scroll', function(e){
+      // close Fly Out window if user scrolls past 96px from top
+      if (window.pageYOffset > 96) {
+        setShow(false)
+      }
+    });
+  }, []);
+
+
+  return (
+    <React.Fragment>
+      <a
+        href="#"
+        className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+        onClick={() => handleToggle()}
+      >
+        <span>Solutions</span>
+        <svg
+          className="ml-2 h-5 w-5 text-gray-400 group-hover:text-gray-500 transition ease-in-out duration-150"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            fillRule="evenodd"
+            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </a>
+      <Transition
+        show={show}
+        enter="transition ease-out duration-200"
+        enterFrom="opacity-0 translate-y-1"
+        enterTo="opacity-100 translate-y-0"
+        leave="transition ease-in duration-150"
+        leaveFrom="opacity-100 translate-y-0"
+        leaveTo="opacity-0 translate-y-1"
+      >
+        <React.Fragment>
+          <div
+            class="absolute inset-x-0 transform shadow-lg border-t-2 border-gray-50"
+            style={{
+              zIndex: 999,
+              position: 'absolute',
+              width: '100vw',
+              margin: '0 auto',
+              marginTop: '64px',
+              left: '-50vw',
+              right: '-50vw',
+            }}
+          >
+            <div className="absolute inset-0 flex" aria-hidden="true">
+              <div className="bg-white w-1/2"></div>
+              <div className="bg-gray-50 w-1/2"></div>
+            </div>
+            <div className="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2">
+              <nav
+                className="grid gap-y-10 px-4 py-8 bg-white sm:grid-cols-2 sm:gap-x-8 sm:py-12 sm:px-6 lg:px-8 xl:pr-12"
+                aria-labelledby="solutionsHeading"
+              >
+                <a
+                  href="#"
+                  className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
+                >
+                  <div className="flex md:h-full lg:flex-col">
+                    <div className="flex-shrink-0">
+                      <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-brand-500 text-white sm:h-12 sm:w-12">
+                        {/* <!-- Heroicon name: chart-bar --> */}
+                        <svg
+                          className="h-6 w-6"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
+                      <div>
+                        <p className="text-base font-medium text-gray-900">Database</p>
+                        <p className="mt-1 text-sm text-gray-500">
+                        Built on top of Postgres, an extremely scalable relational database, so you can start building with the best tool in hand.
+                        </p>
+                      </div>
+                      <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
+                        Learn more <span aria-hidden="true">&rarr;</span>
+                      </p>
+                    </div>
+                  </div>
+                </a>
+
+                <a
+                  href="#"
+                  className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
+                >
+                  <div className="flex md:h-full lg:flex-col">
+                    <div className="flex-shrink-0">
+                      <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-brand-500 text-white sm:h-12 sm:w-12">
+                        {/* <!-- Heroicon name: chart-bar --> */}
+                        <svg
+                          className="h-6 w-6"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
+                      <div>
+                        <p className="text-base font-medium text-gray-900">Authentication</p>
+                        <p className="mt-1 text-sm text-gray-500">
+                        Manage your users easily, leverage on PostgreSQL’s Row Level Security, and even write policies which fit your unique needs.
+                        </p>
+                      </div>
+                      <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
+                        Learn more <span aria-hidden="true">&rarr;</span>
+                      </p>
+                    </div>
+                  </div>
+                </a>
+
+                <a
+                  href="#"
+                  className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
+                >
+                  <div className="flex md:h-full lg:flex-col">
+                    <div className="flex-shrink-0">
+                      <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-brand-500 text-white sm:h-12 sm:w-12">
+                        {/* <!-- Heroicon name: chart-bar --> */}
+                        <svg
+                          className="h-6 w-6"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
+                      <div>
+                        <p className="text-base font-medium text-gray-900">Storage</p>
+                        <p className="mt-1 text-sm text-gray-500">
+                          Store, organize, and serve any amount of assets from anywhere. Any media, including videos of any size and format.
+                        </p>
+                      </div>
+                      <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
+                        Learn more <span aria-hidden="true">&rarr;</span>
+                      </p>
+                    </div>
+                  </div>
+                </a>
+
+                <a
+                  href="#"
+                  className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
+                >
+                  <div className="flex md:h-full lg:flex-col">
+                    <div className="flex-shrink-0">
+                      <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-brand-500 text-white sm:h-12 sm:w-12">
+                        {/* <!-- Heroicon name: chart-bar --> */}
+                        <svg
+                          className="h-6 w-6"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
+                      <div>
+                        <p className="text-base font-medium text-gray-900">Functions</p>
+                        <p className="mt-1 text-sm text-gray-500">
+                          Trigger backend code automatically with database events, without ever worrying about scaling a server.
+                        </p>
+                      </div>
+                      <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
+                        Learn more <span aria-hidden="true">&rarr;</span>
+                      </p>
+                    </div>
+                  </div>
+                </a>
+              </nav>
+              <div className="bg-gray-50 px-4 py-8 sm:py-12 sm:px-6 lg:px-8 xl:pl-12">
+                <div>
+                  <h3 className="text-sm font-medium tracking-wide text-gray-500 uppercase">
+                    Latest news
+                  </h3>
+                  <ul className="mt-6 space-y-6">
+                    <li className="flow-root">
+                      <a
+                        href="#"
+                        className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 transition ease-in-out duration-150"
+                      >
+                        <div className="hidden sm:block flex-shrink-0">
+                          <img
+                            className="w-32 h-20 object-cover rounded-md"
+                            src="https://images.unsplash.com/photo-1558478551-1a378f63328e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2849&q=80"
+                            alt=""
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1 sm:ml-8">
+                          <h4 className="text-base font-medium text-gray-900 truncate">
+                            Supabase launch news
+                          </h4>
+                          <p className="mt-1 text-sm text-gray-500">
+                            Eget ullamcorper ac ut vulputate fames nec mattis pellentesque
+                            elementum. Viverra tempor id mus.
+                          </p>
+                        </div>
+                      </a>
+                    </li>
+                    <li className="flow-root">
+                      <a
+                        href="#"
+                        className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 transition ease-in-out duration-150"
+                      >
+                        <div className="hidden sm:block flex-shrink-0">
+                          <img
+                            className="w-32 h-20 object-cover rounded-md"
+                            src="https://images.unsplash.com/1/apple-gear-looking-pretty.jpg?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2850&q=80"
+                            alt=""
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1 sm:ml-8">
+                          <h4 className="text-base font-medium text-gray-900 truncate">
+                            New project example released
+                          </h4>
+                          <p className="mt-1 text-sm text-gray-500">
+                            Eget ullamcorper ac ut vulputate fames nec mattis pellentesque
+                            elementum. Viverra tempor id mus.
+                          </p>
+                        </div>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <div className="mt-6 text-sm font-medium">
+                  <a
+                    href="#"
+                    className="text-gray-600 hover:text-gray-500 transition ease-in-out duration-150"
+                  >
+                    View all posts <span aria-hidden="true">&rarr;</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            className="fixed inset-0 transition-opacity"
+            style={{
+              zIndex: 100,
+              marginLeft: 0,
+              pointerEvents: 'visiblePainted'
+            }}
+            onClick={() => handleToggle()}
+          >
+            <div className="absolute inset-0 opacity-0"></div>
+          </div>
+        </React.Fragment>
+      </Transition>
+    </React.Fragment>
+  )
+}
+
+export default FlyOut
