@@ -37,3 +37,48 @@ A valid refresh token that was returned on login.
 </li>
 
 </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### Get a new access and refresh token using a valied refresh_token
+
+
+
+<Tabs
+  defaultValue="js"
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { error, data } = await api
+  .refreshAccessToken(refresh_token)
+  ```
+
+
+</TabItem>
+<TabItem value="py">
+
+
+```
+Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
