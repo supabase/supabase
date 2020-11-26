@@ -1,5 +1,4 @@
 import { ReactNode, FunctionComponent } from 'react'
-import Navigation from './navigation'
 
 type Props = {
   children?: ReactNode
