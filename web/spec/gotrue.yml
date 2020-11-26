@@ -64,6 +64,21 @@ pages:
 
   Initializing: 
     $ref: '"GoTrueClient".GoTrueClient.constructor'
+    examples:
+      - name: Initialize a GoTrue client
+        isSpotlight: true
+        js: |
+          ```js
+          import { GoTrueClient } from '@supabase/gotrue-js'
+
+          const auth = new GoTrueClient({
+            url: "https://your-gotrue-url.com"
+          })
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
 
   signUp:
     $ref: '"GoTrueClient".GoTrueClient.signUp'
