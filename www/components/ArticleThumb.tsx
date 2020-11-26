@@ -21,7 +21,7 @@ const ArticleThumb = (props: any) => {
   //   avatar_url :string;
   // }
 
-  console.log(props.article)
+  // console.log(props.article)
 
   // @ts-ignore
   const AuthorProfile: User = Authors[author]
@@ -38,8 +38,8 @@ const ArticleThumb = (props: any) => {
     )
   })
 
-  console.log(icons)
-  console.log(iconMarkup)
+  // console.log(icons)
+  // console.log(iconMarkup)
 
   return (
     <div className="flex flex-col rounded-sm shadow-lg overflow-hidden">
