@@ -57,13 +57,13 @@ const ArticleThumb = (props: any) => {
               {iconMarkup}
             </div>
           )}
-          <p className="text-sm font-medium text-brand-600">
+          <p className="text-sm font-medium text-gray-600">
             <a href="#" className="hover:underline capitalize">
               {type}
             </a>
           </p>
           <a href="#" className="block mt-2">
-            <p className="text-xl font-semibold text-gray-900">{title}</p>
+            <p className="text-xl text-gray-900">{title}</p>
             <p className="mt-3 text-base text-gray-500">
               {description}
             </p>
