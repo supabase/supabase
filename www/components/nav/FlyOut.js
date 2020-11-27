@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import Transition from '../../lib/Transition'
 
+import Solutions from './../../data/Solutions.json'
+
 const FlyOut = () => {
   const [show, setShow] = useState(false)
 
@@ -10,14 +12,50 @@ const FlyOut = () => {
 
   useEffect(() => {
     // window is accessible here.
-    window.addEventListener('scroll', function(e){
+    window.addEventListener('scroll', function (e) {
       // close Fly Out window if user scrolls past 96px from top
       if (window.pageYOffset > 96) {
         setShow(false)
       }
-    });
-  }, []);
+    })
+  }, [])
 
+  const iconSections = Object.values(Solutions).map((solution) => {
+    const { name, description, description_short, icon, label, url } = solution
+    return (
+      <a
+        href="#"
+        className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
+      >
+        <div className="flex md:h-full lg:flex-col">
+          <div className="flex-shrink-0">
+            <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-gray-900 text-white sm:h-12 sm:w-12">
+              {/* <!-- Heroicon name: chart-bar --> */}
+              <svg
+                className="h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
+              </svg>
+            </div>
+          </div>
+          <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
+            <div>
+              <p className="text-base font-medium text-gray-900">{name}</p>
+              <p className="mt-1 text-sm text-gray-500">{description}</p>
+            </div>
+            <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
+              Learn more <span aria-hidden="true">&rarr;</span>
+            </p>
+          </div>
+        </div>
+      </a>
+    )
+  })
 
   return (
     <React.Fragment>
@@ -72,161 +110,7 @@ const FlyOut = () => {
                 className="grid gap-y-10 px-4 py-8 bg-white sm:grid-cols-2 sm:gap-x-8 sm:py-12 sm:px-6 lg:px-8 xl:pr-12"
                 aria-labelledby="solutionsHeading"
               >
-                <a
-                  href="#"
-                  className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
-                >
-                  <div className="flex md:h-full lg:flex-col">
-                    <div className="flex-shrink-0">
-                      <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-brand-500 text-white sm:h-12 sm:w-12">
-                        {/* <!-- Heroicon name: chart-bar --> */}
-                        <svg
-                          className="h-6 w-6"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
-                      <div>
-                        <p className="text-base font-medium text-gray-900">Database</p>
-                        <p className="mt-1 text-sm text-gray-500">
-                        Built on top of Postgres, an extremely scalable relational database, so you can start building with the best tool in hand.
-                        </p>
-                      </div>
-                      <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
-                        Learn more <span aria-hidden="true">&rarr;</span>
-                      </p>
-                    </div>
-                  </div>
-                </a>
-
-                <a
-                  href="#"
-                  className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
-                >
-                  <div className="flex md:h-full lg:flex-col">
-                    <div className="flex-shrink-0">
-                      <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-brand-500 text-white sm:h-12 sm:w-12">
-                        {/* <!-- Heroicon name: chart-bar --> */}
-                        <svg
-                          className="h-6 w-6"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
-                      <div>
-                        <p className="text-base font-medium text-gray-900">Authentication</p>
-                        <p className="mt-1 text-sm text-gray-500">
-                        Manage your users easily, leverage on PostgreSQL’s Row Level Security, and even write policies which fit your unique needs.
-                        </p>
-                      </div>
-                      <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
-                        Learn more <span aria-hidden="true">&rarr;</span>
-                      </p>
-                    </div>
-                  </div>
-                </a>
-
-                <a
-                  href="#"
-                  className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
-                >
-                  <div className="flex md:h-full lg:flex-col">
-                    <div className="flex-shrink-0">
-                      <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-brand-500 text-white sm:h-12 sm:w-12">
-                        {/* <!-- Heroicon name: chart-bar --> */}
-                        <svg
-                          className="h-6 w-6"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
-                      <div>
-                        <p className="text-base font-medium text-gray-900">Storage</p>
-                        <p className="mt-1 text-sm text-gray-500">
-                          Store, organize, and serve any amount of assets from anywhere. Any media, including videos of any size and format.
-                        </p>
-                      </div>
-                      <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
-                        Learn more <span aria-hidden="true">&rarr;</span>
-                      </p>
-                    </div>
-                  </div>
-                </a>
-
-                <a
-                  href="#"
-                  className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
-                >
-                  <div className="flex md:h-full lg:flex-col">
-                    <div className="flex-shrink-0">
-                      <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-brand-500 text-white sm:h-12 sm:w-12">
-                        {/* <!-- Heroicon name: chart-bar --> */}
-                        <svg
-                          className="h-6 w-6"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
-                      <div>
-                        <p className="text-base font-medium text-gray-900">Functions</p>
-                        <p className="mt-1 text-sm text-gray-500">
-                          Trigger backend code automatically with database events, without ever worrying about scaling a server.
-                        </p>
-                      </div>
-                      <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
-                        Learn more <span aria-hidden="true">&rarr;</span>
-                      </p>
-                    </div>
-                  </div>
-                </a>
+                {iconSections}
               </nav>
               <div className="bg-gray-50 px-4 py-8 sm:py-12 sm:px-6 lg:px-8 xl:pl-12">
                 <div>
@@ -298,7 +182,7 @@ const FlyOut = () => {
             style={{
               zIndex: 100,
               marginLeft: 0,
-              pointerEvents: 'visiblePainted'
+              pointerEvents: 'visiblePainted',
             }}
             onClick={() => handleToggle()}
           >
