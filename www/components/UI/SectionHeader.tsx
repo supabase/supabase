@@ -11,13 +11,13 @@ const SectionHeader = (props :any) => {
             <span className="text-gray-600">{props.title_alt}</span>
           )}
         </h2>
-        <p>
+        <div>
           {props.paragraph && (
-        <p className="mt-3 mx-auto text-xl text-gray-400 sm:mt-4">
-          {props.paragraph}
-        </p>
+            <p className="mt-3 mx-auto text-xl text-gray-400 sm:mt-4">
+              {props.paragraph}
+            </p>
           )}
-        </p>
+        </div>
       </div>
     </div>
   )

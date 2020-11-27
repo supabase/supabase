@@ -18,13 +18,13 @@ const AdminAccess = () => {
                 tabId={tabId}
                 setTabId={setTabId}
               />
-              <div>
+              <div className="shadow-md">
                 <div className="w-full rounded-t-md h-5 bg-dark-200 flex items-center justify-start px-2">
                   <div className="h-2 w-2 mr-2 rounded-full bg-dark-300"/>
                   <div className="h-2 w-2 mr-2 rounded-full bg-dark-300"/>
                   <div className="h-2 w-2 mr-2 rounded-full bg-dark-300"/>
                 </div>
-                <video className="rounded-b-md shadow-md" src={`videos/${tabId}.mp4`} autoPlay loop muted>
+                <video className="rounded-b-md" src={`videos/${tabId}.mp4`} autoPlay loop muted>
                   Your browser does not support the video tag
                 </video>
               </div>
