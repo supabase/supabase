@@ -7,7 +7,7 @@ const Features = () => {
     const { name, description, icon, label, url } = solution
 
     return (
-      <div>
+      <div key={name}>
         <div className="flex items-center">
           <div className="flex items-center justify-center h-12 w-12 rounded-md bg-gray-900 text-white">
             {/* <!-- Heroicon name: globe-alt --> */}

@@ -1,3 +1,5 @@
+import TabMarkup from "./../data/AdminAccess.json"
+
 type Props = { 
   tabId: string,
   setTabId: Function,
@@ -11,24 +13,6 @@ function Tabs(props: Props) {
     event.preventDefault()
     const tabId: string = event.target.id
     return setTabId(tabId)
-  }
-
-  const tabMarkup: any = {
-    tabTableEditor: {
-      header: 'Manage your data with the familiarity of a spreadsheet',
-      description: 'You don’t have to be a database expert to start using Supabase — Our table editor makes Postgres easy to use even for non-techies, and you can do everything right in our dashboard.',
-      cta: 'Explore Table View'
-    },
-    tabSqlEditor: {
-      header: 'In-built SQL editor for when you need greater control',
-      description: 'Write, save, and execute SQL queries directly on our dashboard, with templates to help you save time from common queries and even build applications.',
-      cta: 'Explore SQL Editor'
-    },
-    tabAuthRules: {
-      header: 'User management as straight-forward as it can be',
-      description: 'Easily manage your users via our authentication, or integrate third party logins. Create policies with complex SQL rules which fit your unique business needs.',
-      cta: 'Explore Auth Policies'
-    }
   }
 
   return (
@@ -69,17 +53,17 @@ function Tabs(props: Props) {
           <div>
             <div className="mt-5">
               <dd className="mt-8 text-2xl text-gray-800">
-                {tabMarkup[tabId].header}
+                {TabMarkup[tabId].header}
               </dd>
               <dd className="mt-8 text-base text-gray-500">
-                {tabMarkup[tabId].description}
+                {TabMarkup[tabId].description}
               </dd>
             </div>
             <button
               type="button"
               className="mt-8 inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 rounded-md text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
             >
-              {tabMarkup[tabId].cta}
+              {TabMarkup[tabId].cta}
             </button>
           </div>
         </div>

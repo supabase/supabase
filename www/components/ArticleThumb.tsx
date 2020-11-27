@@ -30,11 +30,12 @@ const ArticleThumb = (props: any) => {
 
   const iconMarkup = icons && icons.map((icon :any) => {
     return (
-    <img
-      className="inline-block h-12 w-12 rounded-full ring-2 ring-white"
-      src={icon.img_url}
-      alt={icon.img_alt}
-    />
+      <img
+        key={icon.img_alt}
+        className="inline-block h-12 w-12 rounded-full ring-2 ring-white"
+        src={icon.img_url}
+        alt={icon.img_alt}
+      />
     )
   })
 

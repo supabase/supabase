@@ -61,13 +61,16 @@ const Nav = () => {
     )
     return url ? (
       <a
+        key={`solution_${label}`}
         href="#"
         className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
       >
         {content}
       </a>
     ) : (
-      <div className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150">
+      <div
+        key={`solution_${label}`}
+        className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150">
         {content}
       </div>
     )
