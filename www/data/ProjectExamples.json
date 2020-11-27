@@ -1,6 +1,6 @@
 {
   "vercel_and_stripe": {
-    "img_url": "https://images.unsplash.com/photo-1496128858413-b36217c2ce36?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1679&q=80",
+    "img_url": "images/payments-demo.png",
     "type": "project example",
     "title": "NextJS, Stripe and Supabase",
     "url": "https://github.com/supabase/supabase/tree/master/examples",
