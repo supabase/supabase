@@ -1,5 +1,6 @@
 {
   "monitoro": {
+    "img_url": "https://images.unsplash.com/photo-1496128858413-b36217c2ce36?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1679&q=80",
     "type": "case study",
     "title": "Monitoro gets to 73M api requests in a week",
     "url": "https://supabase.io/casestudies/monitoro",
@@ -7,13 +8,15 @@
     "author" : "paul_copplestone"
   },
   "tayfab": {
+    "img_url": "https://images.unsplash.com/photo-1496128858413-b36217c2ce36?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1679&q=80",
     "type": "case study",
     "title": "Tayfab",
     "url": "https://supabase.io/casestudies/monitoro",
-    "description":"Sarup Banskota loves creating new products that delight his customers. He knows he can add the most value by understanding his client's needs and shipping impressive products fast. For his latest product, Tayfa, he needed to ship quality product fast.",
+    "description":"Sarup Banskota loves creating new products that delight his customers. He knows he can add the most value by understanding his client's needs and shipping impressive products fast. For his latest product, Tayfab, he needed to ship quality product fast.",
     "author" : "paul_copplestone"
   },
   "llama_lab": {
+    "img_url": "images/llamalab.png",
     "type": "case study",
     "title": "Llama Lab",
     "url": "https://supabase.io/casestudies/monitoro",
