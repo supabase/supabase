@@ -11,10 +11,11 @@ const BuiltExamples = () => {
           <div className="bg-white h-1/3 sm:h-2/3"></div>
         </div>
         <div className="mx-auto max-w-7xl">
-        <SectionHeader title={'What you can build'}
-        title_alt={' with Supabase'} 
-        subtitle={'Built with supabase'} 
-        />
+          <SectionHeader
+            title={'What you can build'}
+            title_alt={' with Supabase'} 
+            subtitle={'Built with supabase'} 
+          />
         </div>
         {/* <div className="relative max-w-7xl mx-auto">
           <div>

@@ -1,5 +1,6 @@
 import React, { useState, ReactElement } from 'react'
 import Tabs from '../tabs'
+import SectionHeader from '../UI/SectionHeader'
 
 const AdminAccess = () => {
   const [tabId, setTabId] = useState('tabTableEditor')
@@ -9,11 +10,12 @@ const AdminAccess = () => {
       <div className="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
         <div className="relative mt-12 items-center mt-24">
           <div className="relative">
-            <small>MADE FOR DEVELOPERS</small>
-            <h2 className="mt-4 text-3xl leading-8 font-medium tracking-tight text-gray-900 sm:text-4xl">
-              Organise your app, without a developer
-            </h2>
-            <div className="mt-6 grid grid-cols-2 gap-52 items-center">
+            <SectionHeader
+              title={'Build your app,'}
+              title_alt={' without leaving the dashboard'} 
+              subtitle={'Admin Access'} 
+            />
+            <div className="grid grid-cols-2 gap-52 items-center">
               <Tabs
                 tabId={tabId}
                 setTabId={setTabId}

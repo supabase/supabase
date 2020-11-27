@@ -128,12 +128,12 @@ const Nav = () => {
             <div className="flex-shrink-0 flex items-center">
               <img
                 className="block lg:hidden h-8 w-auto"
-                src="https://supabase.io/supabase-light.svg"
+                src="images/logo-light.png"
                 alt="Workflow"
               />
               <img
                 className="hidden lg:block h-8 w-auto"
-                src="https://supabase.io/supabase-light.svg"
+                src="images/logo-light.png"
                 alt="Workflow"
               />
             </div>

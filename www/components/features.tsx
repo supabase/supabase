@@ -55,12 +55,8 @@ const Features = () => {
                   {IconSections}
                 </dl>
               </div>
-              <div className="lg:col-span-5">
-                <div>
-                  <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-                    image here
-                  </h2>
-                </div>
+              <div className="lg:col-span-5 flex justify-end">
+                <img src="images/features.png" />
               </div>
             </div>
           </div>
