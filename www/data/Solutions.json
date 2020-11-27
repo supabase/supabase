@@ -21,7 +21,7 @@
     "description": "Store, organize, and serve any amount of assets from anywhere. Any media, including videos of any size and format.",
     "description_short": "",
     "label": "Coming soon",
-    "url" : "https://supabase.io/docs"
+    "url" : ""
   },
   "functions": {
     "name": "Functions",
@@ -29,6 +29,6 @@
     "description": "Trigger backend code automatically with database events, without ever worrying about scaling a server.",
     "description_short": "",
     "label": "Coming soon Q1 2021",
-    "url" : "https://supabase.io/docs"
+    "url" : ""
   }
 }
