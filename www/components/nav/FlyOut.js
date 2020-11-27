@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Transition from '../../lib/Transition'
+import Badge from '../badge'
 
 import Solutions from './../../data/Solutions.json'
 
@@ -21,39 +22,51 @@ const FlyOut = () => {
   }, [])
 
   const iconSections = Object.values(Solutions).map((solution) => {
-    const { name, description, description_short, icon, label, url } = solution
-    return (
+    const { name, description, icon, label, url } = solution
+
+    const content = (
+      <div className="flex md:h-full lg:flex-col">
+        <div className="flex-shrink-0">
+          <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-gray-900 text-white sm:h-12 sm:w-12">
+            {/* <!-- Heroicon name: chart-bar --> */}
+            <svg
+              className="h-6 w-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
+            </svg>
+          </div>
+        </div>
+        <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
+          <div>
+            <p className="text-base font-medium text-gray-900">
+              {name} {label && <Badge>{label}</Badge>}
+            </p>
+            <p className="mt-1 text-sm text-gray-500">{description}</p>
+          </div>
+          {url && (
+            <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
+              Learn more <span aria-hidden="true">&rarr;</span>
+            </p>
+          )}
+        </div>
+      </div>
+    )
+    return url ? (
       <a
         href="#"
         className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
       >
-        <div className="flex md:h-full lg:flex-col">
-          <div className="flex-shrink-0">
-            <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-gray-900 text-white sm:h-12 sm:w-12">
-              {/* <!-- Heroicon name: chart-bar --> */}
-              <svg
-                className="h-6 w-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
-              </svg>
-            </div>
-          </div>
-          <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
-            <div>
-              <p className="text-base font-medium text-gray-900">{name}</p>
-              <p className="mt-1 text-sm text-gray-500">{description}</p>
-            </div>
-            <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
-              Learn more <span aria-hidden="true">&rarr;</span>
-            </p>
-          </div>
-        </div>
+        {content}
       </a>
+    ) : (
+      <div className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150">
+        {content}
+      </div>
     )
   })
 
@@ -64,7 +77,7 @@ const FlyOut = () => {
         className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
         onClick={() => handleToggle()}
       >
-        <span>Solutions</span>
+        <span>Product</span>
         <svg
           className="ml-2 h-5 w-5 text-gray-400 group-hover:text-gray-500 transition ease-in-out duration-150"
           xmlns="http://www.w3.org/2000/svg"
