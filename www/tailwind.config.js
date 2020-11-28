@@ -40,6 +40,17 @@ module.exports = {
           100: '#202020',
           200: '#1E1E1E',
           300: '#3A3A3A',
+        },
+        // Joshen: Adding our Figma palette here
+        neutral: {
+          100: '#F1F1F1',
+          200: '#E0E0E0',
+          300: '#BBBBBB',
+          400: '#666666',
+          500: '#444444',
+          600: '#1E1E1E',
+          700: '#181818',
+          800: '#000000',
         }
       },
       spacing: {

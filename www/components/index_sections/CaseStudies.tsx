@@ -1,4 +1,5 @@
 import React from 'react'
+import Button from '../button'
 import ArticleThumb from './../ArticleThumb'
 import SectionHeader from '../UI/SectionHeader'
 import CaseStudiesData from "./../../data/CaseStudies.json"
@@ -23,6 +24,23 @@ const CaseStudies = () => {
             <ArticleThumb article={CaseStudiesData["monitoro"]} />
             <ArticleThumb article={CaseStudiesData["tayfab"]} />
             <ArticleThumb article={CaseStudiesData["llama_lab"]} />
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white pt-16 pb-4 px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-12 gap-4 items-center shadow-md rounded-md">
+          <div className="w-full h-full col-span-2 bg-gray-300 rounded-l-md"></div>
+          <div className="col-span-6 py-6 ml-4">
+            <p className="text-xl">Record breaking speed and reliability</p>
+            <p className="text-gray-400 mt-2">
+              <span className="block">Supabase is already enterprise level and we’re blown away by the speed!</span>
+              <span className="block">Sign up for our public benchmark release and we’ll email it to you</span>
+            </p>
+          </div>
+          <div className="col-span-2" />
+          <div className="col-span-2 rounded-r-md">
+            <Button text="Get notified" url="#"/>
           </div>
         </div>
       </div>
