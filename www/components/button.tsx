@@ -23,11 +23,12 @@ const Button = (props: Props) => {
       className={`
         mt-1 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium 
         rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500
+        group transition
         ${colorClass} ${className}
       `}
     >
-      {text}
-      { url && <span className="ml-2">→</span> }
+      <span className="relative transition-all left-3 group-hover:left-0">{text}</span>
+      { url && <span className="ml-2 transition-all opacity-0 group-hover:opacity-100">→</span> }
     </button>
   )
 
