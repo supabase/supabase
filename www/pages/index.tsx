@@ -9,6 +9,7 @@ import BuiltExamples from '../components/index_sections/BuiltWithSupabase'
 import MadeForDevelopers from '../components/index_sections/MadeForDevelopers'
 import AdminAccess from '../components/index_sections/AdminAccess'
 import CaseStudies from '../components/index_sections/CaseStudies'
+import CTABanner from '../components/index_sections/CTABanner'
 
 type Props = {
   
@@ -28,6 +29,7 @@ const Index = ({  }: Props) => {
           <MadeForDevelopers />
           <AdminAccess />
           <CaseStudies />
+          <CTABanner />
         </Container>
       </Layout>
     </>
