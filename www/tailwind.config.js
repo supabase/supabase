@@ -96,7 +96,9 @@ module.exports = {
     },
   },
   variants: {
-    extend: {},
+    extend: {
+      inset: ['responsive', 'group-hover']
+    },
   },
   plugins: [],
 }
