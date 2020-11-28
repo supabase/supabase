@@ -39,7 +39,7 @@ const Footer = () => {
               src="https://tailwindui.com/img/logos/workflow-mark-gray-300.svg"
               alt="Company name"
             /> */}
-            <img className="h-10 w-auto" src="https://supabase.io/supabase-light.svg" alt="Workflow" />
+            <img className="h-10 w-auto" src="images/logo-light.png" alt="Supabase" />
             <p className="text-gray-500 text-base">
               Making the world a better place through constructing elegant hierarchies.
             </p>
