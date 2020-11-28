@@ -27,7 +27,7 @@ const Button = (props: Props) => {
         ${colorClass} ${className}
       `}
     >
-      <span className="relative transition-all left-3 group-hover:left-0">{text}</span>
+      <span className={`relative transition-all ${url ? 'left-3 group-hover:left-0' : ''}`}>{text}</span>
       { url && <span className="ml-2 transition-all opacity-0 group-hover:opacity-100">→</span> }
     </button>
   )
