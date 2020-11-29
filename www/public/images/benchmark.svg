@@ -1,0 +1,28 @@
+<svg width="213" height="107" viewBox="0 0 213 107" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_d)">
+<rect width="160" height="100" rx="5" transform="matrix(0.997859 -0.0654031 0.475931 0.879483 3 12.4645)" fill="white"/>
+</g>
+<line x1="2" y1="-2" x2="118" y2="-2" transform="matrix(0.997859 -0.0654031 0.475931 0.879483 61.0317 81.515)" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M68.8608 67.3418C68.3351 66.3703 68.8024 65.5242 69.9047 65.452L80.8811 64.7325C81.9833 64.6603 83.303 65.3893 83.8287 66.3607L89.0639 76.035L74.096 77.0161L68.8608 67.3418Z" fill="#ED9797"/>
+<path d="M82.8608 45.4786C82.3351 44.5071 82.8024 43.661 83.9047 43.5888L94.8811 42.8694C95.9833 42.7971 97.303 43.5261 97.8287 44.4975L114.01 74.3999L99.0425 75.381L82.8608 45.4786Z" fill="#F5B796"/>
+<path d="M111.615 50.8794C111.089 49.9079 111.556 49.0618 112.659 48.9896L123.635 48.2702C124.737 48.1979 126.057 48.9269 126.583 49.8983L138.957 72.7649L123.989 73.7459L111.615 50.8794Z" fill="#8BCFFD"/>
+<path d="M123.235 24.6188C122.709 23.6473 123.177 22.8012 124.279 22.729L135.255 22.0096C136.358 21.9373 137.677 22.6663 138.203 23.6377L163.903 71.1298L148.935 72.1108L123.235 24.6188Z" fill="#9FE7C7"/>
+<circle r="3.5" transform="matrix(0.997859 -0.0654031 0.475931 0.879483 75.1547 64.6525)" stroke="black" stroke-width="2"/>
+<circle r="3.5" transform="matrix(0.997859 -0.0654031 0.475931 0.879483 89.6308 43.6688)" stroke="black" stroke-width="2"/>
+<circle r="3.5" transform="matrix(0.997859 -0.0654031 0.475931 0.879483 118.385 49.0696)" stroke="black" stroke-width="2"/>
+<circle r="3.5" transform="matrix(0.997859 -0.0654031 0.475931 0.879483 130.005 22.809)" stroke="black" stroke-width="2"/>
+<line x1="1" y1="-1" x2="25.9072" y2="-1" transform="matrix(0.423322 -0.636957 1.02129 0.609962 77.9333 63.1044)" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="1" y1="-1" x2="19.2485" y2="-1" transform="matrix(-1.10087 -0.242671 -0.101622 -0.847867 115.176 47.9139)" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="1" y1="-1" x2="30.241" y2="-1" transform="matrix(0.273193 -0.717507 1.07126 0.512787 121.163 47.5215)" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<defs>
+<filter id="filter0_d" x="0.839844" y="0.314671" width="211.571" height="105.783" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+<feOffset dy="2"/>
+<feGaussianBlur stdDeviation="2"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+</filter>
+</defs>
+</svg>

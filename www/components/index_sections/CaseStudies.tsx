@@ -28,9 +28,12 @@ const CaseStudies = () => {
         </div>
       </div>
 
+      {/* Joshen: Created a version that's referenced from Figma */}
       <div className="bg-white pt-16 pb-4 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-12 gap-4 items-center shadow-md rounded-md">
-          <div className="w-full h-full col-span-2 bg-gray-300 rounded-l-md"></div>
+          <div className="w-full h-full col-span-2 bg-gray-700 rounded-l-md flex items-center justify-center">
+            <img className="w-3/4" src="images/benchmark.svg" />
+          </div>
           <div className="col-span-6 py-6 ml-4">
             <p className="text-xl">Record breaking speed and reliability</p>
             <p className="text-gray-400 mt-2">
