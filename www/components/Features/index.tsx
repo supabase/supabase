@@ -31,7 +31,7 @@ const Features = () => {
         </div>
         {url && (
           <div className="mt-5">
-            <dd className="mt-2 text-sm text-brand-600">Learn more link</dd>
+            <a href="#" className="mt-2 text-sm text-brand-600 hover:underline">Learn more link</a>
           </div>
         )}
       </div>
@@ -39,23 +39,25 @@ const Features = () => {
   })
 
   return (
-    <div className="bg-gray-50 dark:bg-dark-300 overflow-hidden py-12 sm:px-6 lg:px-16">
-      <div className="mx-auto max-w-7xl">
-        <SectionHeader
-          title={'Build Faster'}
-          title_alt={' and Focus on Your Core Products'}
-          subtitle={'A better way to build products'}
-        />
-        <div className="mt-16 grid grid-cols-12 gap-8">
-          <div className="relative pb-12 col-span-12">
-            <div className="relative lg:grid lg:grid-cols-12 lg:gap-x-8">
-              <div className="relative lg:grid lg:grid-cols-2 lg:gap-x-8 lg:col-span-7">
-                <dl className="space-y-10 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 lg:mt-0 lg:col-span-2">
-                  {IconSections}
-                </dl>
-              </div>
-              <div className="lg:col-span-5 flex justify-end">
-                {/* <img src="images/features.png" /> */}
+    <div className="bg-gray-50 dark:bg-dark-300 overflow-hidden py-12">
+      <div className="container mx-auto px-20">
+        <div className="mx-auto max-w-7xl">
+          <SectionHeader
+            title={'Build Faster'}
+            title_alt={' and Focus on Your Core Products'}
+            subtitle={'A better way to build products'}
+          />
+          <div className="mt-12 grid grid-cols-12 gap-8">
+            <div className="relative pb-12 col-span-12">
+              <div className="relative lg:grid lg:grid-cols-12 lg:gap-x-8">
+                <div className="relative lg:grid lg:grid-cols-2 lg:gap-x-8 lg:col-span-7">
+                  <dl className="space-y-10 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 lg:mt-0 lg:col-span-2">
+                    {IconSections}
+                  </dl>
+                </div>
+                <div className="lg:col-span-5 flex justify-end">
+                  {/* <img src="images/features.png" /> */}
+                </div>
               </div>
             </div>
           </div>

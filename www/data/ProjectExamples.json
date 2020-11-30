@@ -1,44 +1,40 @@
-{
-  "vercel_and_stripe": {
-    "img_url": "images/payments-demo.png",
-    "type": "project example",
+[
+  {
+    "imgUrl": "images/payments-demo.png",
     "title": "NextJS, Stripe and Supabase",
     "url": "https://github.com/supabase/supabase/tree/master/examples",
     "description":"Easily deploy a Supabase powered app with Stripe already built in for payments",
-
     "icons" : [
       {
-        "img_url": "https://avatars3.githubusercontent.com/u/54469796?s=480&v=4",
-        "img_alt": "supabase icon"
+        "imgUrl": "https://avatars3.githubusercontent.com/u/54469796?s=480&v=4",
+        "imgAlt": "supabase icon"
       },
       {
-        "img_url": "https://avatars1.githubusercontent.com/u/14985020?s=480&v=4",
-        "img_alt": "vercel icon"
+        "imgUrl": "https://avatars1.githubusercontent.com/u/14985020?s=480&v=4",
+        "imgAlt": "vercel icon"
       },
       {
-        "img_url": "https://avatars3.githubusercontent.com/u/856813?s=480&v=6",
-        "img_alt": "stripe icon"
+        "imgUrl": "https://avatars3.githubusercontent.com/u/856813?s=480&v=6",
+        "imgAlt": "stripe icon"
       }
     ],
-    "cta" : true
+    "ctaText" : "View Project"
   },
-  "nextjs-slack-clone": {
-    "img_url": "images/slack-clone.png",
-    "type": "project example",
+  {
+    "imgUrl": "images/slack-clone.png",
     "title": "NextJS realtime chat using Supabase",
     "url": "https://github.com/supabase/supabase/tree/master/examples/nextjs-slack-clone",
     "description":"Full-stack Slack clone example",
-
     "icons" : [
       {
-        "img_url": "https://avatars3.githubusercontent.com/u/54469796?s=480&v=4",
-        "img_alt": "supabase icon"
+        "imgUrl": "https://avatars3.githubusercontent.com/u/54469796?s=480&v=4",
+        "imgAlt": "supabase icon"
       },
       {
-        "img_url": "https://avatars1.githubusercontent.com/u/14985020?s=480&v=4",
-        "img_alt": "vercel icon"
+        "imgUrl": "https://avatars1.githubusercontent.com/u/14985020?s=480&v=4",
+        "imgAlt": "vercel icon"
       }
     ],
-    "cta" : true
+    "ctaText" : "View Project"
   }
-}
+]

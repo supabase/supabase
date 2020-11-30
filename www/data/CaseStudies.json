@@ -1,26 +1,47 @@
-{
-  "monitoro": {
-    "img_url": "https://images.unsplash.com/photo-1496128858413-b36217c2ce36?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1679&q=80",
-    "type": "case study",
-    "title": "Monitoro gets to 73M api requests in a week",
+[
+  {
+    "type": "Case Study",
+    "imgUrl": "images/casestudy.png",
+    "logoUrl": "images/logos/monitoro.png",
+    "organization": "Monitoro",
     "url": "https://supabase.io/casestudies/monitoro",
-    "description":"Omar Kamali is the founder of Monitoro, a service for scraping countless websites 24/7 to notify  customers when these websites change. To create this product, Omar needed to handle massive data throughput whilst ensuring his product was reliable and resilient to satisfy a rapidly growing user base.",
-    "author" : "paul_copplestone"
+    "description":"Supabase helped Monitoro scale to millions of API requests.",
+    "postMeta": {
+      "name" : "Paul Copplestone",
+      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
+      "publishDate": "Mar 16, 2020",
+      "readLength": 6
+    },
+    "ctaText": "View case study"
   },
-  "tayfab": {
-    "img_url": "https://images.unsplash.com/photo-1496128858413-b36217c2ce36?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1679&q=80",
-    "type": "case study",
-    "title": "Tayfab",
+  {
+    "type": "Case Study",
+    "imgUrl": "images/casestudy.png",
+    "logoUrl": "images/logos/monitoro.png",
+    "organization": "Tayfab",
     "url": "https://supabase.io/casestudies/monitoro",
-    "description":"Sarup Banskota loves creating new products that delight his customers. He knows he can add the most value by understanding his client's needs and shipping impressive products fast. For his latest product, Tayfab, he needed to ship quality product fast.",
-    "author" : "paul_copplestone"
+    "description":"Supabase helped Monitoro scale to millions of API requests.",
+    "postMeta": {
+      "name" : "Paul Copplestone",
+      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
+      "publishDate": "Mar 27, 2020",
+      "readLength": 5
+    },
+    "ctaText": "View case study"
   },
-  "llama_lab": {
-    "img_url": "images/llamalab.png",
-    "type": "case study",
-    "title": "Llama Lab",
+  {
+    "type": "Blog Post",
+    "imgUrl": "images/casestudy.png",
+    "logoUrl": "images/logos/xendit.png",
+    "organization": "Llama Lab",
     "url": "https://supabase.io/casestudies/monitoro",
-    "description":"Amal first discovered us on Ui.Dev newsletter - he doesn't normally click on things in the newsletter but when he saw \"open source firebase Postgres\" as a dev with firebase experience he immediately got it",
-    "author" : "paul_copplestone"
+    "description":"Supabase helped Monitoro scale to millions of API requests.",
+    "postMeta": {
+      "name" : "Paul Copplestone",
+      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
+      "publishDate": "Mar 20, 2020",
+      "readLength": 10
+    },
+    "ctaText": "View case study"
   }
-}
+]
