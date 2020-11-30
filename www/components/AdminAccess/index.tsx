@@ -7,7 +7,7 @@ const AdminAccess = () => {
 
   return (
     <div className="py-16 bg-gray-50 dark:bg-dark-300 overflow-hidden lg:py-24">
-      <div className="container mx-auto sm:px-16 xl:px-20">
+      <div className="container mx-auto px-10 sm:px-16 xl:px-20">
         <div className="relative items-center">
           <div className="relative">
             <SectionHeader
@@ -15,7 +15,7 @@ const AdminAccess = () => {
               title_alt={' without leaving the dashboard'} 
               subtitle={'Admin Access'} 
             />
-            <div className="grid sm:flex sm:flex-col-reverse lg:flex-row lg:grid-cols-2 gap-28 items-center">
+            <div className="flex flex-col-reverse lg:flex-row lg:grid lg:grid-cols-2 gap-28 items-center">
               <Tabs
                 tabId={tabId}
                 setTabId={setTabId}
