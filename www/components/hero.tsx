@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 const Hero = () => {
   return (
-    <div className="relative bg-dark-100 overflow-hidden px-16">
+    <div className="relative bg-dark-300 overflow-hidden px-16">
       <div className="hidden sm:block sm:absolute sm:inset-0" aria-hidden="true">
         <svg
           className="absolute bottom-0 right-0 transform translate-x-1/2 mb-48 text-gray-700 lg:top-0 lg:mt-28 lg:mb-0 xl:transform-none xl:translate-x-0"
@@ -68,7 +68,7 @@ const Hero = () => {
               </div>
               <div className="mt-16 sm:mt-24 lg:mt-0 lg:col-span-6">
                 {/* <div className="bg-white sm:max-w-md sm:w-full sm:mx-auto sm:rounded-lg sm:overflow-hidden"></div> */}
-                <img src="images/hero.png" className="relative" style={{ right: -20 }} />
+                {/* <img src="images/hero.png" className="relative" style={{ right: -20 }} /> */}
               </div>        
             </div>
           </div>

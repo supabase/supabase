@@ -1,15 +1,16 @@
-import Container from '../components/container'
-import Layout from '../components/layout'
 import Head from 'next/head'
-import { CMS_NAME } from '../lib/constants'
+import { CMS_NAME } from 'lib/constants'
 
-import Hero from '../components/hero'
-import Features from '../components/features'
-import BuiltExamples from '../components/index_sections/BuiltWithSupabase'
-import MadeForDevelopers from '../components/index_sections/MadeForDevelopers'
-import AdminAccess from '../components/index_sections/AdminAccess'
-import CaseStudies from '../components/index_sections/CaseStudies'
-import CTABanner from '../components/index_sections/CTABanner'
+import Container from 'components/container'
+import Layout from 'components/layout'
+import Hero from 'components/hero'
+import Features from 'components/Features/index'
+import BuiltExamples from 'components/BuiltWithSupabase/index'
+import MadeForDevelopers from 'components/MadeForDevelopers/index'
+import AdminAccess from 'components/AdminAccess/index'
+import CaseStudies from 'components/CaseStudies/index'
+import CTABanner from 'components/CTABanner/index'
+import Benchmark from 'components/Benchmark/index'
 
 type Props = {
   
@@ -29,6 +30,7 @@ const Index = ({  }: Props) => {
           <MadeForDevelopers />
           <AdminAccess />
           <CaseStudies />
+          <Benchmark />
           <CTABanner />
         </Container>
       </Layout>

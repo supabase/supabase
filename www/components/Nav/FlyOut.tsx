@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-import Transition from '../../lib/Transition'
-import Badge from '../badge'
-
-import Solutions from './../../data/Solutions.json'
+import Badge from 'components/badge'
+import Transition from 'lib/Transition'
+import Solutions from 'data/Solutions.json'
 
 const FlyOut = () => {
   const [show, setShow] = useState(false)
@@ -72,10 +71,10 @@ const FlyOut = () => {
   })
 
   return (
-    <React.Fragment>
+    <>
       <a
         href="#"
-        className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+        className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-300 dark:hover:border-gray-300"
         onClick={() => handleToggle()}
       >
         <span>Product</span>
@@ -94,6 +93,7 @@ const FlyOut = () => {
         </svg>
       </a>
       <Transition
+        appear={true}
         show={show}
         enter="transition ease-out duration-200"
         enterFrom="opacity-0 translate-y-1"
@@ -102,9 +102,9 @@ const FlyOut = () => {
         leaveFrom="opacity-100 translate-y-0"
         leaveTo="opacity-0 translate-y-1"
       >
-        <React.Fragment>
+        <>
           <div
-            class="absolute inset-x-0 transform shadow-lg border-t-2 border-gray-50"
+            className="absolute inset-x-0 transform shadow-lg border-t-2 border-gray-50"
             style={{
               zIndex: 999,
               position: 'absolute',
@@ -202,9 +202,9 @@ const FlyOut = () => {
           >
             <div className="absolute inset-0 opacity-0"></div>
           </div>
-        </React.Fragment>
+        </>
       </Transition>
-    </React.Fragment>
+    </>
   )
 }
 

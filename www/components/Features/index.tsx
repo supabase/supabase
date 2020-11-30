@@ -1,33 +1,33 @@
-import Badge from './badge'
-import Solutions from './../data/Solutions.json'
-import SectionHeader from './UI/SectionHeader'
+import Badge from 'components/badge'
+import SectionHeader from 'components/UI/SectionHeader'
+import Solutions from 'data/Solutions.json'
 
 const Features = () => {
-  const IconSections = Object.values(Solutions).map((solution) => {
+  const IconSections = Object.values(Solutions).map((solution: any) => {
     const { name, description, icon, label, url } = solution
 
     return (
       <div key={name}>
         <div className="flex items-center">
-          <div className="flex items-center justify-center h-12 w-12 rounded-md bg-gray-900 text-white">
+          <div className="flex items-center justify-center h-12 w-12 rounded-md bg-gray-900 dark:bg-white text-white">
             {/* <!-- Heroicon name: globe-alt --> */}
             <svg
               className="h-6 w-6"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
+              stroke="black"
               aria-hidden="true"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
             </svg>
           </div>
-          <dt className="ml-4 text-lg leading-6 font-medium text-gray-900">
+          <dt className="ml-4 text-lg leading-6 font-medium text-gray-900 dark:text-white">
             {name} {label && <Badge>{label}</Badge>}
           </dt>
         </div>
         <div className="mt-5">
-          <dd className="mt-2 text-base text-gray-500">{description}</dd>
+          <dd className="mt-2 text-base text-gray-500 dark:text-gray-400">{description}</dd>
         </div>
         {url && (
           <div className="mt-5">
@@ -39,8 +39,7 @@ const Features = () => {
   })
 
   return (
-    // <!-- This example requires Tailwind CSS v2.0+ -->
-    <div className="bg-gray-50 overflow-hidden py-12 sm:px-6 lg:px-16">
+    <div className="bg-gray-50 dark:bg-dark-200 overflow-hidden py-12 sm:px-6 lg:px-16">
       <div className="mx-auto max-w-7xl">
         <SectionHeader
           title={'Build Faster'}
@@ -56,7 +55,7 @@ const Features = () => {
                 </dl>
               </div>
               <div className="lg:col-span-5 flex justify-end">
-                <img src="images/features.png" />
+                {/* <img src="images/features.png" /> */}
               </div>
             </div>
           </div>
