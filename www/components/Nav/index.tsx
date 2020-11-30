@@ -152,7 +152,7 @@ const Nav = (props: Props) => {
               className={`
                 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium
                 text-gray-500 hover:text-gray-700 hover:border-gray-500
-                dark:hover:text-gray-300 dark:hover:border-gray-300
+                dark:text-dark-100 dark:hover:border-dark-100
               `}
             >
               Developers
@@ -162,7 +162,7 @@ const Nav = (props: Props) => {
               className={`
                 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium
                 text-gray-500 hover:text-gray-700 hover:border-gray-500
-                dark:hover:text-gray-300 dark:hover:border-gray-300
+                dark:text-dark-100 dark:hover:border-dark-100
               `}
             >
               Company
@@ -172,7 +172,7 @@ const Nav = (props: Props) => {
               className={`
                 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium
                 text-gray-500 hover:text-gray-700 hover:border-gray-500
-                dark:hover:text-gray-300 dark:hover:border-gray-300
+                dark:text-dark-100 dark:hover:border-dark-100
               `}
             >
               Pricing
