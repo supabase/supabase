@@ -35,7 +35,7 @@ const Hero = () => {
               <div className="lg:grid lg:grid-cols-12 lg:gap-8">
                 <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left lg:flex lg:items-center">
 
-                  <div className="sm:w-3/4 sm:mx-auto lg:mx-0">
+                  <div className="sm:mx-auto md:w-3/4 lg:w-full lg:mx-0">
                     <h1 className="mt-4 text-4xl text-white sm:mt-5 sm:leading-none lg:mt-6 lg:text-5xl xl:text-6xl">
                       <span className="md:block">The Open Source</span>
                       <span className="text-brand-400 md:block">Firebase Alternative</span>
@@ -53,7 +53,7 @@ const Hero = () => {
                       backed by
                     </p>
                     <div className="mt-5 w-full sm:mx-auto sm:max-w-lg lg:ml-0">
-                      <div className="flex flex-wrap items-center sm:justify-center">
+                      <div className="flex flex-wrap items-center sm:justify-center lg:justify-start">
                         <img className="h-9 sm:h-10 pr-10" src="images/logos/yc--grey.png" alt="Y Combinator" />
                         <img className="relative -top-1 h-7 pr-10" src="images/logos/mozilla--grey.png" alt="Mozilla" />
                         <img className="h-5 pr-10" src="images/logos/coatue.png" alt="Coatue" />
