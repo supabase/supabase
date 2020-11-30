@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import Nav from 'components/Nav/index'
 import Footer from 'components/Footer/index'
 import Meta from 'components/meta'
@@ -8,6 +9,16 @@ type Props = {
 }
 
 const Layout = ({ preview, children }: Props) => {
+
+  useEffect(() => {
+    const darkMode = localStorage.getItem('supabaseDarkMode')
+    if (darkMode) document.documentElement.className = darkMode === 'true' ? 'dark' : ''
+  }, [])
+
+  const updateTheme = (isDarkMode: boolean) => {
+    document.documentElement.className = isDarkMode ? 'dark' : ''
+  }
+
   return (
     <>
       <Meta />
@@ -15,7 +26,7 @@ const Layout = ({ preview, children }: Props) => {
       <div className="min-h-screen bg-gray-100">
         <main>{children}</main>
       </div>
-      <Footer />
+      <Footer updateTheme={updateTheme} />
     </>
   )
 }
