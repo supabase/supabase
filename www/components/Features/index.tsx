@@ -5,18 +5,15 @@ import Solutions from 'data/Solutions.json'
 const Features = () => {
   const IconSections = Object.values(Solutions).map((solution: any) => {
     const { name, description, icon, label, url } = solution
-
     return (
       <div key={name}>
         <div className="flex items-center">
-          <div className="flex items-center justify-center h-12 w-12 rounded-md bg-gray-900 dark:bg-white text-white">
-            {/* <!-- Heroicon name: globe-alt --> */}
+          <div className="flex items-center justify-center h-12 w-12 rounded-md bg-gray-900 text-white dark:bg-white">
             <svg
-              className="h-6 w-6"
+              className="h-6 w-6 stroke-white dark:stroke-black"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="black"
               aria-hidden="true"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
@@ -31,7 +28,7 @@ const Features = () => {
         </div>
         {url && (
           <div className="mt-5">
-            <a href="#" className="mt-2 text-sm text-brand-600 hover:underline">Learn more link</a>
+            <a href="#" className="mt-2 text-sm text-brand-600 hover:underline">Learn more <span aria-hidden="true">&rarr;</span></a>
           </div>
         )}
       </div>
@@ -39,7 +36,7 @@ const Features = () => {
   })
 
   return (
-    <div className="bg-gray-50 dark:bg-dark-300 overflow-hidden py-12">
+    <div className="bg-gray-50 dark:bg-dark-400 overflow-hidden py-12">
       <div className="container mx-auto sm:px-16 xl:px-20">
         <div className="mx-auto max-w-7xl">
           <SectionHeader

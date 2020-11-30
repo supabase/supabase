@@ -6,7 +6,7 @@ import CaseStudiesData from "data/CaseStudies.json"
 const CaseStudies = () => {
 
   return (
-    <div className="relative bg-gray-50 dark:bg-dark-300 pt-16 pb-20 lg:pt-24 lg:pb-28">
+    <div className="relative bg-gray-50 dark:bg-dark-400 pt-16 pb-20 lg:pt-24 lg:pb-28">
       <div className="container relative mx-auto sm:px-16 xl:px-20">
         <div className="absolute inset-0">
           <div className="bg-white dark:bg-dark-300 h-1/3 sm:h-2/3"></div>
