@@ -46,7 +46,7 @@ const CodeExamples = () => {
       <div className="col-span-12 text-center">
         {buttons}
       </div>
-      <div className="col-span-8 col-start-3">
+      <div className="sm:col-span-12 xl:col-span-8 xl:col-start-3">
         <div className="rounded" style={{ background: '#474949' }}>
           <div className="p-2 pl-5 flex justify-between items-center">
           <p className="text-base text-gray-400 text-white">

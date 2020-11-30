@@ -5,9 +5,9 @@ import CodeExamples from 'components/MadeForDevelopers/CodeExamples'
 const MadeForDevelopers = () => {
   return (
     <div className="py-16 bg-gray-50 dark:bg-dark-300 overflow-hidden lg:py-16">
-      <div className="container mx-auto px-20">
+      <div className="container mx-auto sm:px-16  xl:px-20">
 
-      <SectionHeader className="text-center w-2/3 mx-auto" title={'Supafast easy-to-use APIs'} title_alt={' that do the hard work for you'} subtitle={'MADE FOR DEVELOPERS'} paragraph={'We inspect your database and provide APIs instantly so you can stop building repetitive CRUD endpoints and focus on your product.'} />
+      <SectionHeader className="text-center sm:w-3/4 xl:w-2/3 mx-auto" title={'Supafast easy-to-use APIs'} title_alt={' that do the hard work for you'} subtitle={'MADE FOR DEVELOPERS'} paragraph={'We inspect your database and provide APIs instantly so you can stop building repetitive CRUD endpoints and focus on your product.'} />
 
         <div className="relative lg:grid lg:grid-cols-12 lg:gap-8 lg:items-center">
 

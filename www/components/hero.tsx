@@ -3,8 +3,8 @@ import Button from 'components/button'
 
 const Hero = () => {
   return (
-    <div className="relative bg-dark-400 overflow-hidden px-16">
-      <div className="container mx-auto px-20">
+    <div className="relative bg-dark-400 overflow-hidden">
+      <div className="container mx-auto sm:px-16 xl:px-20">
         <div className="hidden sm:block sm:absolute sm:inset-0" aria-hidden="true">
           <svg
             className="absolute bottom-0 right-0 transform translate-x-1/2 mb-48 text-gray-700 lg:top-0 lg:mt-28 lg:mb-0 xl:transform-none xl:translate-x-0"
@@ -35,7 +35,7 @@ const Hero = () => {
               <div className="lg:grid lg:grid-cols-12 lg:gap-8">
                 <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left lg:flex lg:items-center">
 
-                  <div>
+                  <div className="sm:w-3/4 mx-auto">
                     <h1 className="mt-4 text-4xl text-white sm:mt-5 sm:leading-none lg:mt-6 lg:text-5xl xl:text-6xl">
                       <span className="md:block">The Open Source</span>
                       <span className="text-brand-400 md:block">Firebase Alternative</span>
@@ -53,7 +53,7 @@ const Hero = () => {
                       backed by
                     </p>
                     <div className="mt-5 w-full sm:mx-auto sm:max-w-lg lg:ml-0">
-                      <div className="flex flex-wrap items-center">
+                      <div className="flex flex-wrap items-center sm:justify-center">
                         <img className="h-9 sm:h-10 pr-10" src="images/logos/yc--grey.png" alt="Y Combinator" />
                         <img className="relative -top-1 h-7 pr-10" src="images/logos/mozilla--grey.png" alt="Mozilla" />
                         <img className="h-5 pr-10" src="images/logos/coatue.png" alt="Coatue" />

@@ -123,11 +123,11 @@ const Nav = () => {
 
   return (
     <nav className="bg-white dark:bg-dark-400 z-50 shadow-lg sticky">
-      <div className="container mx-auto relative flex justify-between h-16">
+      <div className="container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-16">
         
         <HamburgerButton toggleFlyOut={() => setOpen(true)} />
 
-        <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
+        <div className="flex-1 flex items-center justify-center sm:px-10 sm:items-stretch sm:justify-start">
           <div className="flex-shrink-0 flex items-center">
             {/* Mobile - remove if not needed */}
             <img
@@ -176,7 +176,7 @@ const Nav = () => {
             </a>
           </div>
         </div>
-        <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"></div>
+        {/* <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"></div> */}
       </div>
 
       <Transition
