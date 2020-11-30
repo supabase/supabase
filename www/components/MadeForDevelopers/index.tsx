@@ -16,7 +16,7 @@ const MadeForDevelopers = () => {
 
             <div className="grid grid-cols-12 gap-2">
               <dl className="mt-12 space-y-10 md:grid md:grid-cols-2 md:col-span-12 lg:space-y-0 lg:col-start-2 lg:col-span-10 lg:gap-12 xl:col-start-3 xl:col-span-8">
-                <div className="md:border-r-2 md:border-gray-200 pr-6">
+                <div className="md:border-r-2 md:border-gray-200 pr-6 dark:border-dark-200">
                   <div className="mt-5">
                     <dt className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
                       TypeScript support
