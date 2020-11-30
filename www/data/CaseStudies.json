@@ -1,11 +1,11 @@
 [
   {
     "type": "Case Study",
-    "imgUrl": "images/casestudy.png",
+    "title": "Supabase helped Monitoro scale to millions of API requests",
+    "imgUrl": "images/case-study-placeholder.jpg",
     "logoUrl": "images/logos/monitoro.png",
     "organization": "Monitoro",
     "url": "https://supabase.io/casestudies/monitoro",
-    "description":"Supabase helped Monitoro scale to millions of API requests.",
     "postMeta": {
       "name" : "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
@@ -16,11 +16,11 @@
   },
   {
     "type": "Case Study",
-    "imgUrl": "images/casestudy.png",
+    "title": "Supabase helped Monitoro scale to millions of API requests",
+    "imgUrl": "images/case-study-placeholder.jpg",
     "logoUrl": "images/logos/monitoro.png",
     "organization": "Tayfab",
     "url": "https://supabase.io/casestudies/monitoro",
-    "description":"Supabase helped Monitoro scale to millions of API requests.",
     "postMeta": {
       "name" : "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
@@ -31,11 +31,11 @@
   },
   {
     "type": "Blog Post",
-    "imgUrl": "images/casestudy.png",
+    "title": "Supabase helped Monitoro scale to millions of API requests",
+    "imgUrl": "images/case-study-placeholder.jpg",
     "logoUrl": "images/logos/xendit.png",
     "organization": "Llama Lab",
     "url": "https://supabase.io/casestudies/monitoro",
-    "description":"Supabase helped Monitoro scale to millions of API requests.",
     "postMeta": {
       "name" : "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
