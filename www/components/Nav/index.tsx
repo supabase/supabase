@@ -46,10 +46,10 @@ const Nav = (props: Props) => {
         </div>
         <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
           <div>
-            <p className="text-base font-medium text-gray-900">
+            <p className="text-base font-medium text-gray-900 dark:text-white">
               {name} {label && <Badge>{label}</Badge>}
             </p>
-            <p className="mt-1 text-sm text-gray-500">{description}</p>
+            <p className="mt-1 text-sm text-gray-500 dark:text-dark-100">{description}</p>
           </div>
           {url && (
             <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
@@ -182,6 +182,7 @@ const Nav = (props: Props) => {
         {/* <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"></div> */}
       </div>
 
+      {/* Mobile Nav Menu */}
       <Transition
         appear={true}
         show={open}
@@ -193,14 +194,13 @@ const Nav = (props: Props) => {
         leaveTo="opacity-0 translate-y-1"
       >
         
-          <div className="p-4 md:p-8 h-full h-screen fixed bg-white transform lg:hidden overflow-y-scroll -inset-y-0" style={{zIndex: 999}}>
-            {/* <div className="rounded-lg shadow-md bg-white ring-1 ring-black ring-opacity-5 overflow-hidden"> */}
+          <div className="p-4 md:p-8 h-full h-screen fixed bg-white transform lg:hidden overflow-y-scroll -inset-y-0 z-50 dark:bg-dark-400">
               <div className="absolute right-4 top-4 items-center justify-between">
                 <div className="-mr-2">
                   <button
                     onClick={() => setOpen(false)}
                     type="button"
-                    className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500"
+                    className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 dark:bg-dark-400"
                   >
                     <span className="sr-only">Close menu</span>
 
@@ -227,25 +227,25 @@ const Nav = (props: Props) => {
               <div className="pt-2 pb-4 space-y-1">
                 <a
                   href="#"
-                  className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300"
+                  className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-white"
                 >
                   Product
                 </a>
                 <a
                   href="#"
-                  className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300"
+                  className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-white"
                 >
                   Developers
                 </a>
                 <a
                   href="#"
-                  className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300"
+                  className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-white"
                 >
                   Company
                 </a>
                 <a
                   href="#"
-                  className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300"
+                  className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-white"
                 >
                   Pricing
                 </a>

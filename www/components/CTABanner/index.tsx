@@ -2,7 +2,7 @@ import Button from '../button'
 
 const CTABanner = () => {
 	return (
-		<div className="py-32 grid grid-cols-12 gap-4 items-center text-center bg-dark-700">
+		<div className="py-32 grid grid-cols-12 gap-4 items-center text-center bg-dark-700 px-16">
 			<div className="col-span-12">
 				<h4 className="font-normal text-white lg:text-3xl">
 					<span className="block">Create your next project backend </span>
