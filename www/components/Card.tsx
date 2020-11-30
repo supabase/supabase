@@ -50,7 +50,7 @@ const Card = (props: Props) => {
     <div className="flex flex-col rounded-md shadow-lg overflow-hidden">
       <div className="flex-shrink-0 dark:bg-dark-500">
         <img
-          className="h-48 w-full object-cover"
+          className="h-64 w-full object-cover"
           src={imgUrl}
           alt={title}
         />
@@ -66,10 +66,8 @@ const Card = (props: Props) => {
             {type}
           </a>
           <div className="block mt-2">
-            {type === 'Project Example'
-              ? <a href={url} className="text-xl text-gray-900 dark:text-white">{title}</a>
-              : <img src={logoUrl} className="h-9 my-4" />
-            }
+            {logoUrl && <img src={logoUrl} className="h-9 my-4" />}
+            {title && <a href={url} className="text-xl text-gray-900 dark:text-white">{title}</a>}
             <p className="mt-3 text-base text-gray-500 dark:text-dark-100">
               {description}
             </p>

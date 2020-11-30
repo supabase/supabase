@@ -1,6 +1,6 @@
 [
   {
-    "imgUrl": "images/payments-demo.png",
+    "imgUrl": "images/stripe.jpg",
     "title": "NextJS, Stripe and Supabase",
     "url": "https://github.com/supabase/supabase/tree/master/examples",
     "description":"Easily deploy a Supabase powered app with Stripe already built in for payments",
@@ -21,7 +21,24 @@
     "ctaText" : "View Project"
   },
   {
-    "imgUrl": "images/slack-clone.png",
+    "imgUrl": "images/slack-clone.jpg",
+    "title": "NextJS realtime chat using Supabase",
+    "url": "https://github.com/supabase/supabase/tree/master/examples/nextjs-slack-clone",
+    "description":"Full-stack Slack clone example",
+    "icons" : [
+      {
+        "imgUrl": "https://avatars3.githubusercontent.com/u/54469796?s=480&v=4",
+        "imgAlt": "supabase icon"
+      },
+      {
+        "imgUrl": "https://avatars1.githubusercontent.com/u/14985020?s=480&v=4",
+        "imgAlt": "vercel icon"
+      }
+    ],
+    "ctaText" : "View Project"
+  },
+  {
+    "imgUrl": "images/to-do-app.jpg",
     "title": "NextJS realtime chat using Supabase",
     "url": "https://github.com/supabase/supabase/tree/master/examples/nextjs-slack-clone",
     "description":"Full-stack Slack clone example",
