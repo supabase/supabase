@@ -1,12 +1,9 @@
 import { useState } from 'react'
-
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import rainbow from 'react-syntax-highlighter/dist/cjs/styles/hljs/rainbow'
-
 import CopyToClipboard from 'react-copy-to-clipboard'
-
-import { examples } from './../../data/CodeExamples'
+import { examples } from 'data/CodeExamples'
 
 SyntaxHighlighter.registerLanguage('javascript', js)
 

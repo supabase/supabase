@@ -1,36 +1,11 @@
-import React from 'react'
-import Button from '../button'
-import ArticleThumb from './../ArticleThumb'
-import SectionHeader from '../UI/SectionHeader'
-import CaseStudiesData from "./../../data/CaseStudies.json"
+import Button from 'components/button'
 
-const CaseStudies = () => {
-
+const Benchmark = () => {
   return (
-    <React.Fragment>
-      <div className="relative bg-gray-50 pt-16 pb-20 px-4 sm:px-6 lg:pt-24 lg:pb-28 lg:px-8">
-        <div className="absolute inset-0">
-          <div className="bg-white h-1/3 sm:h-2/3"></div>
-        </div>
-        <div className="relative max-w-7xl mx-auto">
-          <div>
-            <SectionHeader
-              title={'We\'re ready to help scale your business'}
-              subtitle={'Enterprise Solutions'}
-              paragraph={'Supabase has already been supporting many companies in production, from monitoring applications to social networks. '}
-            />
-          </div>
-          <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
-            <ArticleThumb article={CaseStudiesData["monitoro"]} />
-            <ArticleThumb article={CaseStudiesData["tayfab"]} />
-            <ArticleThumb article={CaseStudiesData["llama_lab"]} />
-          </div>
-        </div>
-      </div>
-
-      {/* Joshen: Created a version that's referenced from Figma */}
-      <div className="bg-white pt-16 pb-4 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-12 gap-4 items-center shadow-md rounded-md">
+    <>
+      {/* Figma ref */}
+      <div className="bg-white dark:bg-dark-100 pt-16 pb-4 px-4 sm:px-6 lg:px-8">
+        <div className="bg-white grid grid-cols-12 gap-4 items-center shadow-lg rounded-md">
           <div className="w-full h-full col-span-2 bg-gray-700 rounded-l-md flex items-center justify-center">
             <img className="w-3/4" src="images/benchmark.svg" />
           </div>
@@ -48,7 +23,8 @@ const CaseStudies = () => {
         </div>
       </div>
 
-      <div className="bg-white">
+      {/* Other */}
+      <div className="bg-white dark:bg-dark-100">
         <div className="mx-auto py-16 px-4 sm:px-6 lg:px-8">
           <div className="bg-gray-700 rounded-lg shadow-xl overflow-hidden lg:grid lg:grid-cols-12 lg:gap-4">
             <div className="pt-10 pb-12 px-6 sm:pt-16 sm:px-16 lg:py-16 lg:pr-0 xl:py-20 xl:px-20 col-span-8">
@@ -80,8 +56,8 @@ const CaseStudies = () => {
           </div>
         </div>
       </div>
-    </React.Fragment>
+    </>
   )
 }
 
-export default CaseStudies
+export default Benchmark

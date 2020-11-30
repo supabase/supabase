@@ -1,0 +1,86 @@
+[
+  {
+    "title": "Product",
+    "links": [
+      {
+        "text": "Database",
+        "url": "#"
+      },
+      {
+        "text": "Authentication",
+        "url": "#"
+      },
+      {
+        "text": "Storage",
+        "url": null
+      },
+      {
+        "text": "Functions",
+        "url": null
+      },
+      {
+        "text": "Pricing",
+        "url": "#"
+      }
+    ]
+  },
+  {
+    "title": "Resources",
+    "links": [
+      {
+        "text": "Support",
+        "url": "#"
+      },
+      {
+        "text": "Contact",
+        "url": "#"
+      },
+      {
+        "text": "Case Studies",
+        "url": "#"
+      },
+      {
+        "text": "Privacy & Terms",
+        "url": "#"
+      }
+    ]
+  },
+  {
+    "title": "Developers",
+    "links": [
+      {
+        "text": "Documentation",
+        "url": "#"
+      },
+      {
+        "text": "API Reference",
+        "url": "#"
+      },
+      {
+        "text": "Guides",
+        "url": "#"
+      }
+    ]
+  },
+  {
+    "title": "Company",
+    "links": [
+      {
+        "text": "Blog",
+        "url": "#"
+      },
+      {
+        "text": "Open Source",
+        "url": "#"
+      },
+      {
+        "text": "Humans.txt",
+        "url": "#"
+      },
+      {
+        "text": "Lawyers.txt",
+        "url": "#"
+      }
+    ]
+  }
+]

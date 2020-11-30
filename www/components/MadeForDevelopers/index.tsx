@@ -1,11 +1,10 @@
-import SectionHeader from '../UI/SectionHeader'
-import Badge from './../badge'
-
-import CodeExamples from './CodeExamples'
+import Badge from 'components/badge'
+import SectionHeader from 'components/UI/SectionHeader'
+import CodeExamples from 'components/MadeForDevelopers/CodeExamples'
 
 const MadeForDevelopers = () => {
   return (
-    <div className="py-16 bg-gray-50 overflow-hidden lg:py-24">
+    <div className="py-16 bg-gray-50 dark:bg-dark-200 overflow-hidden lg:py-16">
       <div className="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
 
       <SectionHeader className="text-center" title={'Supafast easy-to-use APIs'} title_alt={' that do the hard work for you'} subtitle={'MADE FOR DEVELOPERS'} paragraph={'We inspect your database and provide APIs instantly so you can stop building repetitive CRUD endpoints and focus on your product.'} />

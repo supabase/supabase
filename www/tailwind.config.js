@@ -1,6 +1,6 @@
 module.exports = {
   purge: ['./components/**/*.tsx', './pages/**/*.tsx'],
-  darkMode: 'media', // 'media' or 'class'
+  darkMode: 'class', // 'media' or 'class'
   theme: {
     extend: {
       screens: {
@@ -37,9 +37,10 @@ module.exports = {
           '900': '#1C583D',
         },
         dark: {
-          100: '#202020',
-          200: '#1E1E1E',
-          300: '#3A3A3A',
+          100: '#3A3A3A',
+          200: '#292929',
+          300: '#202020',
+          400: '#1E1E1E',
         },
         // Joshen: Adding our Figma palette here
         neutral: {

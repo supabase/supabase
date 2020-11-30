@@ -1,4 +1,4 @@
-import Authors from "./../data/Authors.json"
+import Authors from "data/Authors.json"
 
 const ArticleThumb = (props: any) => {
   const {
