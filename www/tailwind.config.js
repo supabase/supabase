@@ -36,13 +36,14 @@ module.exports = {
           '800': '#236E4C',
           '900': '#1C583D',
         },
+        // Joshen TODO: At the end just rearrange the values
         dark: {
           100: '#828282',
+          600: '#424242',
           200: '#3A3A3A',
           300: '#292929',
           400: '#202020',
           500: '#1E1E1E',
-          600: '#424242',
         },
         // Joshen: Adding our Figma palette here
         neutral: {
