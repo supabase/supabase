@@ -95,7 +95,7 @@ const Footer = (props: Props) => {
               {FooterLinks.map((segment: any) => {
                 return (
                   <div key={`footer_${segment.title}`}>
-                    <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
+                    <h3 className="text-sm font-semibold text-gray-400 dark:text-dark-200 tracking-wider uppercase">
                       {segment.title}
                     </h3>
                     <ul className="mt-4 space-y-4">
@@ -103,10 +103,10 @@ const Footer = (props: Props) => {
                         <li key={`${segment.title}_link_${idx}`}>
                           <a
                             href={link.url}
-                            className={`text-base ${link.url ? 'text-gray-500' : 'text-gray-400'} hover:text-gray-900 dark:hover:text-gray-300`}
+                            className={`text-base ${link.url ? 'text-gray-500 dark:text-dark-100' : 'text-gray-400 dark:text-dark-200'} hover:text-gray-900 dark:hover:text-gray-300`}
                           >
                             {link.text}
-                            {!link.url && <span className="block text-sm text-gray-300">Coming soon</span>}
+                            {!link.url && <span className="block text-sm text-gray-300 dark:text-dark-300">Coming soon</span>}
                           </a>
                         </li>
                       ))}
@@ -117,8 +117,8 @@ const Footer = (props: Props) => {
             </div>
           </div>
         </div>
-        <div className="mt-12 border-t border-gray-200 pt-8 flex justify-between">
-          <p className="text-base text-gray-400">
+        <div className="mt-12 border-t border-gray-200 dark:border-dark-300 pt-8 flex justify-between">
+          <p className="text-base text-gray-400 dark:text-dark-200">
             &copy; Supabase Inc
           </p>
           <div className="flex items-center">
