@@ -61,7 +61,7 @@ const Footer = (props: Props) => {
   )
 
   return (
-    <footer className="bg-white dark:bg-dark-400" aria-labelledby="footerHeading">
+    <footer className="bg-white dark:bg-dark-500" aria-labelledby="footerHeading">
       <h2 id="footerHeading" className="sr-only">Footer</h2>
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
@@ -129,7 +129,7 @@ const Footer = (props: Props) => {
               className={`
                 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer 
                 transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 
-                focus:ring-brand-500 ${darkMode ? 'bg-dark-200' : 'bg-gray-200'} mx-5
+                focus:ring-brand-500 ${darkMode ? 'bg-dark-300' : 'bg-gray-200'} mx-5
               `}
               onClick={() => toggleDarkMode()}
             >
