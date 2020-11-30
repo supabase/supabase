@@ -13,7 +13,7 @@
 			"flags": {
 				"isExported": true
 			},
-			"originalName": "/home/runner/work/gotrue-js/gotrue-js/src/GoTrueApi.ts",
+			"originalName": "/Users/supabase/Documents/projects/supabase/gotrue-js/src/GoTrueApi.ts",
 			"children": [
 				{
 					"id": 69,
@@ -266,7 +266,7 @@
 							}
 						},
 						{
-							"id": 110,
+							"id": 124,
 							"name": "getUrlForProvider",
 							"kind": 2048,
 							"kindString": "Method",
@@ -275,7 +275,7 @@
 							},
 							"signatures": [
 								{
-									"id": 111,
+									"id": 125,
 									"name": "getUrlForProvider",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -287,7 +287,7 @@
 									},
 									"parameters": [
 										{
-											"id": 112,
+											"id": 126,
 											"name": "provider",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -313,13 +313,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueApi.ts",
-									"line": 93,
+									"line": 119,
 									"character": 19
 								}
 							]
 						},
 						{
-							"id": 113,
+							"id": 127,
 							"name": "getUser",
 							"kind": 2048,
 							"kindString": "Method",
@@ -328,7 +328,7 @@
 							},
 							"signatures": [
 								{
-									"id": 114,
+									"id": 128,
 									"name": "getUser",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -340,7 +340,7 @@
 									},
 									"parameters": [
 										{
-											"id": 115,
+											"id": 129,
 											"name": "jwt",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -365,7 +365,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 116,
+															"id": 130,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -374,7 +374,7 @@
 															},
 															"children": [
 																{
-																	"id": 117,
+																	"id": 131,
 																	"name": "data",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -384,7 +384,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueApi.ts",
-																			"line": 106,
+																			"line": 132,
 																			"character": 19
 																		}
 																	],
@@ -394,7 +394,7 @@
 																	}
 																},
 																{
-																	"id": 118,
+																	"id": 132,
 																	"name": "error",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -404,7 +404,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueApi.ts",
-																			"line": 106,
+																			"line": 132,
 																			"character": 26
 																		}
 																	],
@@ -420,8 +420,8 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		117,
-																		118
+																		131,
+																		132
 																	]
 																}
 															]
@@ -430,7 +430,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 119,
+															"id": 133,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -439,7 +439,7 @@
 															},
 															"children": [
 																{
-																	"id": 120,
+																	"id": 134,
 																	"name": "data",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -449,7 +449,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueApi.ts",
-																			"line": 108,
+																			"line": 134,
 																			"character": 19
 																		}
 																	],
@@ -460,7 +460,7 @@
 																	"defaultValue": "null"
 																},
 																{
-																	"id": 121,
+																	"id": 135,
 																	"name": "error",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -470,7 +470,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueApi.ts",
-																			"line": 108,
+																			"line": 134,
 																			"character": 32
 																		}
 																	],
@@ -485,8 +485,8 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		120,
-																		121
+																		134,
+																		135
 																	]
 																}
 															]
@@ -502,13 +502,171 @@
 							"sources": [
 								{
 									"fileName": "GoTrueApi.ts",
-									"line": 101,
+									"line": 127,
 									"character": 15
 								}
 							]
 						},
 						{
-							"id": 132,
+							"id": 105,
+							"name": "inviteUserByEmail",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 106,
+									"name": "inviteUserByEmail",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Sends an invite link to an email address."
+									},
+									"parameters": [
+										{
+											"id": 107,
+											"name": "email",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The email address of the user.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 108,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 109,
+															"name": "data",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueApi.ts",
+																	"line": 78,
+																	"character": 56
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reflection",
+																		"declaration": {
+																			"id": 110,
+																			"name": "__type",
+																			"kind": 65536,
+																			"kindString": "Type literal",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"sources": [
+																				{
+																					"fileName": "GoTrueApi.ts",
+																					"line": 78,
+																					"character": 57
+																				}
+																			]
+																		}
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 111,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueApi.ts",
+																	"line": 78,
+																	"character": 74
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Error"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																109,
+																111
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueApi.ts",
+															"line": 78,
+															"character": 50
+														}
+													]
+												}
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueApi.ts",
+									"line": 78,
+									"character": 25
+								}
+							]
+						},
+						{
+							"id": 146,
 							"name": "refreshAccessToken",
 							"kind": 2048,
 							"kindString": "Method",
@@ -517,7 +675,7 @@
 							},
 							"signatures": [
 								{
-									"id": 133,
+									"id": 147,
 									"name": "refreshAccessToken",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -529,7 +687,7 @@
 									},
 									"parameters": [
 										{
-											"id": 134,
+											"id": 148,
 											"name": "refreshToken",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -554,7 +712,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 135,
+															"id": 149,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -563,7 +721,7 @@
 															},
 															"children": [
 																{
-																	"id": 136,
+																	"id": 150,
 																	"name": "data",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -573,7 +731,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueApi.ts",
-																			"line": 139,
+																			"line": 165,
 																			"character": 19
 																		}
 																	],
@@ -583,7 +741,7 @@
 																	}
 																},
 																{
-																	"id": 137,
+																	"id": 151,
 																	"name": "error",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -593,7 +751,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueApi.ts",
-																			"line": 139,
+																			"line": 165,
 																			"character": 26
 																		}
 																	],
@@ -609,8 +767,8 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		136,
-																		137
+																		150,
+																		151
 																	]
 																}
 															]
@@ -619,7 +777,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 138,
+															"id": 152,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -628,7 +786,7 @@
 															},
 															"children": [
 																{
-																	"id": 139,
+																	"id": 153,
 																	"name": "data",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -638,7 +796,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueApi.ts",
-																			"line": 141,
+																			"line": 167,
 																			"character": 19
 																		}
 																	],
@@ -649,7 +807,7 @@
 																	"defaultValue": "null"
 																},
 																{
-																	"id": 140,
+																	"id": 154,
 																	"name": "error",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -659,7 +817,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueApi.ts",
-																			"line": 141,
+																			"line": 167,
 																			"character": 32
 																		}
 																	],
@@ -674,8 +832,8 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		139,
-																		140
+																		153,
+																		154
 																	]
 																}
 															]
@@ -691,13 +849,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueApi.ts",
-									"line": 132,
+									"line": 158,
 									"character": 26
 								}
 							]
 						},
 						{
-							"id": 98,
+							"id": 112,
 							"name": "resetPasswordForEmail",
 							"kind": 2048,
 							"kindString": "Method",
@@ -706,7 +864,7 @@
 							},
 							"signatures": [
 								{
-									"id": 99,
+									"id": 113,
 									"name": "resetPasswordForEmail",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -715,6 +873,164 @@
 									},
 									"comment": {
 										"shortText": "Sends a reset request to an email address."
+									},
+									"parameters": [
+										{
+											"id": 114,
+											"name": "email",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"text": "The email address of the user.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 115,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 116,
+															"name": "data",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueApi.ts",
+																	"line": 91,
+																	"character": 60
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reflection",
+																		"declaration": {
+																			"id": 117,
+																			"name": "__type",
+																			"kind": 65536,
+																			"kindString": "Type literal",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"sources": [
+																				{
+																					"fileName": "GoTrueApi.ts",
+																					"line": 91,
+																					"character": 61
+																				}
+																			]
+																		}
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 118,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "GoTrueApi.ts",
+																	"line": 91,
+																	"character": 78
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Error"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																116,
+																118
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "GoTrueApi.ts",
+															"line": 91,
+															"character": 54
+														}
+													]
+												}
+											}
+										],
+										"name": "Promise"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "GoTrueApi.ts",
+									"line": 91,
+									"character": 29
+								}
+							]
+						},
+						{
+							"id": 98,
+							"name": "sendMagicLinkEmail",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 99,
+									"name": "sendMagicLinkEmail",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Sends a magic login link to an email address."
 									},
 									"parameters": [
 										{
@@ -760,7 +1076,7 @@
 																{
 																	"fileName": "GoTrueApi.ts",
 																	"line": 65,
-																	"character": 60
+																	"character": 57
 																}
 															],
 															"type": {
@@ -780,7 +1096,7 @@
 																				{
 																					"fileName": "GoTrueApi.ts",
 																					"line": 65,
-																					"character": 61
+																					"character": 58
 																				}
 																			]
 																		}
@@ -804,7 +1120,7 @@
 																{
 																	"fileName": "GoTrueApi.ts",
 																	"line": 65,
-																	"character": 78
+																	"character": 75
 																}
 															],
 															"type": {
@@ -836,7 +1152,7 @@
 														{
 															"fileName": "GoTrueApi.ts",
 															"line": 65,
-															"character": 54
+															"character": 51
 														}
 													]
 												}
@@ -850,7 +1166,7 @@
 								{
 									"fileName": "GoTrueApi.ts",
 									"line": 65,
-									"character": 29
+									"character": 26
 								}
 							]
 						},
@@ -1015,7 +1331,7 @@
 							]
 						},
 						{
-							"id": 105,
+							"id": 119,
 							"name": "signOut",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1024,7 +1340,7 @@
 							},
 							"signatures": [
 								{
-									"id": 106,
+									"id": 120,
 									"name": "signOut",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1036,7 +1352,7 @@
 									},
 									"parameters": [
 										{
-											"id": 107,
+											"id": 121,
 											"name": "jwt",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1058,7 +1374,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 108,
+													"id": 122,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -1067,7 +1383,7 @@
 													},
 													"children": [
 														{
-															"id": 109,
+															"id": 123,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1077,7 +1393,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueApi.ts",
-																	"line": 78,
+																	"line": 104,
 																	"character": 45
 																}
 															],
@@ -1101,14 +1417,14 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																109
+																123
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "GoTrueApi.ts",
-															"line": 78,
+															"line": 104,
 															"character": 38
 														}
 													]
@@ -1122,7 +1438,7 @@
 							"sources": [
 								{
 									"fileName": "GoTrueApi.ts",
-									"line": 78,
+									"line": 104,
 									"character": 15
 								}
 							]
@@ -1288,7 +1604,7 @@
 							]
 						},
 						{
-							"id": 122,
+							"id": 136,
 							"name": "updateUser",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1297,7 +1613,7 @@
 							},
 							"signatures": [
 								{
-									"id": 123,
+									"id": 137,
 									"name": "updateUser",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1309,7 +1625,7 @@
 									},
 									"parameters": [
 										{
-											"id": 124,
+											"id": 138,
 											"name": "jwt",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1325,7 +1641,7 @@
 											}
 										},
 										{
-											"id": 125,
+											"id": 139,
 											"name": "attributes",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1351,7 +1667,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 126,
+															"id": 140,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -1360,7 +1676,7 @@
 															},
 															"children": [
 																{
-																	"id": 127,
+																	"id": 141,
 																	"name": "data",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -1370,7 +1686,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueApi.ts",
-																			"line": 122,
+																			"line": 148,
 																			"character": 19
 																		}
 																	],
@@ -1380,7 +1696,7 @@
 																	}
 																},
 																{
-																	"id": 128,
+																	"id": 142,
 																	"name": "error",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -1390,7 +1706,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueApi.ts",
-																			"line": 122,
+																			"line": 148,
 																			"character": 26
 																		}
 																	],
@@ -1406,8 +1722,8 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		127,
-																		128
+																		141,
+																		142
 																	]
 																}
 															]
@@ -1416,7 +1732,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 129,
+															"id": 143,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -1425,7 +1741,7 @@
 															},
 															"children": [
 																{
-																	"id": 130,
+																	"id": 144,
 																	"name": "data",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -1435,7 +1751,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueApi.ts",
-																			"line": 124,
+																			"line": 150,
 																			"character": 19
 																		}
 																	],
@@ -1446,7 +1762,7 @@
 																	"defaultValue": "null"
 																},
 																{
-																	"id": 131,
+																	"id": 145,
 																	"name": "error",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -1456,7 +1772,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueApi.ts",
-																			"line": 124,
+																			"line": 150,
 																			"character": 32
 																		}
 																	],
@@ -1471,8 +1787,8 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		130,
-																		131
+																		144,
+																		145
 																	]
 																}
 															]
@@ -1488,7 +1804,7 @@
 							"sources": [
 								{
 									"fileName": "GoTrueApi.ts",
-									"line": 117,
+									"line": 143,
 									"character": 18
 								}
 							]
@@ -1514,14 +1830,16 @@
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								110,
-								113,
-								132,
+								124,
+								127,
+								105,
+								146,
+								112,
 								98,
 								91,
-								105,
+								119,
 								84,
-								122
+								136
 							]
 						}
 					],
@@ -1552,17 +1870,17 @@
 			]
 		},
 		{
-			"id": 180,
+			"id": 194,
 			"name": "\"GoTrueClient\"",
 			"kind": 1,
 			"kindString": "Module",
 			"flags": {
 				"isExported": true
 			},
-			"originalName": "/home/runner/work/gotrue-js/gotrue-js/src/GoTrueClient.ts",
+			"originalName": "/Users/supabase/Documents/projects/supabase/gotrue-js/src/GoTrueClient.ts",
 			"children": [
 				{
-					"id": 181,
+					"id": 195,
 					"name": "GoTrueClient",
 					"kind": 128,
 					"kindString": "Class",
@@ -1571,7 +1889,7 @@
 					},
 					"children": [
 						{
-							"id": 189,
+							"id": 203,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -1583,7 +1901,7 @@
 							},
 							"signatures": [
 								{
-									"id": 190,
+									"id": 204,
 									"name": "new GoTrueClient",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -1595,7 +1913,7 @@
 									},
 									"parameters": [
 										{
-											"id": 191,
+											"id": 205,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1605,7 +1923,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 192,
+													"id": 206,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -1614,7 +1932,7 @@
 													},
 													"children": [
 														{
-															"id": 199,
+															"id": 213,
 															"name": "autoRefreshToken",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1651,7 +1969,7 @@
 															}
 														},
 														{
-															"id": 198,
+															"id": 212,
 															"name": "detectSessionInUrl",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1688,7 +2006,7 @@
 															}
 														},
 														{
-															"id": 194,
+															"id": 208,
 															"name": "headers",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1716,7 +2034,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 195,
+																			"id": 209,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -1725,7 +2043,7 @@
 																			},
 																			"indexSignature": [
 																				{
-																					"id": 196,
+																					"id": 210,
 																					"name": "__index",
 																					"kind": 8192,
 																					"kindString": "Index signature",
@@ -1734,7 +2052,7 @@
 																					},
 																					"parameters": [
 																						{
-																							"id": 197,
+																							"id": 211,
 																							"name": "key",
 																							"kind": 32768,
 																							"kindString": "Parameter",
@@ -1759,7 +2077,7 @@
 															}
 														},
 														{
-															"id": 201,
+															"id": 215,
 															"name": "localStorage",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1783,7 +2101,7 @@
 															}
 														},
 														{
-															"id": 200,
+															"id": 214,
 															"name": "persistSession",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1820,7 +2138,7 @@
 															}
 														},
 														{
-															"id": 193,
+															"id": 207,
 															"name": "url",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1858,12 +2176,12 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																199,
-																198,
-																194,
-																201,
-																200,
-																193
+																213,
+																212,
+																208,
+																215,
+																214,
+																207
 															]
 														}
 													],
@@ -1880,7 +2198,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 181,
+										"id": 195,
 										"name": "GoTrueClient"
 									}
 								}
@@ -1894,7 +2212,7 @@
 							]
 						},
 						{
-							"id": 182,
+							"id": 196,
 							"name": "api",
 							"kind": 1024,
 							"kindString": "Property",
@@ -1918,7 +2236,7 @@
 							}
 						},
 						{
-							"id": 185,
+							"id": 199,
 							"name": "autoRefreshToken",
 							"kind": 1024,
 							"kindString": "Property",
@@ -1939,7 +2257,7 @@
 							}
 						},
 						{
-							"id": 184,
+							"id": 198,
 							"name": "currentSession",
 							"kind": 1024,
 							"kindString": "Property",
@@ -1973,7 +2291,7 @@
 							}
 						},
 						{
-							"id": 183,
+							"id": 197,
 							"name": "currentUser",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2007,7 +2325,7 @@
 							}
 						},
 						{
-							"id": 187,
+							"id": 201,
 							"name": "localStorage",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2028,7 +2346,7 @@
 							}
 						},
 						{
-							"id": 186,
+							"id": 200,
 							"name": "persistSession",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2049,7 +2367,7 @@
 							}
 						},
 						{
-							"id": 188,
+							"id": 202,
 							"name": "stateChangeEmmitters",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2082,7 +2400,7 @@
 							"defaultValue": "new Map()"
 						},
 						{
-							"id": 307,
+							"id": 314,
 							"name": "_callRefreshToken",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2092,7 +2410,7 @@
 							},
 							"signatures": [
 								{
-									"id": 308,
+									"id": 315,
 									"name": "_callRefreshToken",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2112,7 +2430,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 309,
+															"id": 316,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -2121,7 +2439,7 @@
 															},
 															"children": [
 																{
-																	"id": 310,
+																	"id": 317,
 																	"name": "data",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -2131,7 +2449,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 382,
+																			"line": 374,
 																			"character": 21
 																		}
 																	],
@@ -2141,7 +2459,7 @@
 																	}
 																},
 																{
-																	"id": 311,
+																	"id": 318,
 																	"name": "error",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -2151,7 +2469,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 382,
+																			"line": 374,
 																			"character": 28
 																		}
 																	],
@@ -2167,8 +2485,8 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		310,
-																		311
+																		317,
+																		318
 																	]
 																}
 															]
@@ -2177,7 +2495,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 312,
+															"id": 319,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -2186,7 +2504,7 @@
 															},
 															"children": [
 																{
-																	"id": 313,
+																	"id": 320,
 																	"name": "data",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -2196,7 +2514,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 385,
+																			"line": 377,
 																			"character": 19
 																		}
 																	],
@@ -2207,7 +2525,7 @@
 																	"defaultValue": "null"
 																},
 																{
-																	"id": 314,
+																	"id": 321,
 																	"name": "error",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -2217,7 +2535,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 385,
+																			"line": 377,
 																			"character": 32
 																		}
 																	],
@@ -2232,8 +2550,8 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		313,
-																		314
+																		320,
+																		321
 																	]
 																}
 															]
@@ -2249,13 +2567,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 364,
+									"line": 356,
 									"character": 33
 								}
 							]
 						},
 						{
-							"id": 271,
+							"id": 278,
 							"name": "_handeEmailSignIn",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2265,7 +2583,7 @@
 							},
 							"signatures": [
 								{
-									"id": 272,
+									"id": 279,
 									"name": "_handeEmailSignIn",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2274,7 +2592,7 @@
 									},
 									"parameters": [
 										{
-											"id": 273,
+											"id": 280,
 											"name": "email",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2287,7 +2605,7 @@
 											}
 										},
 										{
-											"id": 274,
+											"id": 281,
 											"name": "password",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2309,7 +2627,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 275,
+															"id": 282,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -2318,7 +2636,7 @@
 															},
 															"children": [
 																{
-																	"id": 276,
+																	"id": 283,
 																	"name": "data",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -2328,7 +2646,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 287,
+																			"line": 279,
 																			"character": 19
 																		}
 																	],
@@ -2339,7 +2657,7 @@
 																	}
 																},
 																{
-																	"id": 278,
+																	"id": 285,
 																	"name": "error",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -2349,7 +2667,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 287,
+																			"line": 279,
 																			"character": 43
 																		}
 																	],
@@ -2360,7 +2678,7 @@
 																	"defaultValue": "null"
 																},
 																{
-																	"id": 277,
+																	"id": 284,
 																	"name": "user",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -2370,7 +2688,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 287,
+																			"line": 279,
 																			"character": 25
 																		}
 																	],
@@ -2387,9 +2705,9 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		276,
-																		278,
-																		277
+																		283,
+																		285,
+																		284
 																	]
 																}
 															]
@@ -2398,7 +2716,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 279,
+															"id": 286,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -2407,7 +2725,7 @@
 															},
 															"children": [
 																{
-																	"id": 280,
+																	"id": 287,
 																	"name": "data",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -2417,7 +2735,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 289,
+																			"line": 281,
 																			"character": 19
 																		}
 																	],
@@ -2428,7 +2746,7 @@
 																	"defaultValue": "null"
 																},
 																{
-																	"id": 282,
+																	"id": 289,
 																	"name": "error",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -2438,7 +2756,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 289,
+																			"line": 281,
 																			"character": 44
 																		}
 																	],
@@ -2448,7 +2766,7 @@
 																	}
 																},
 																{
-																	"id": 281,
+																	"id": 288,
 																	"name": "user",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -2458,7 +2776,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 289,
+																			"line": 281,
 																			"character": 31
 																		}
 																	],
@@ -2474,9 +2792,9 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		280,
-																		282,
-																		281
+																		287,
+																		289,
+																		288
 																	]
 																}
 															]
@@ -2492,13 +2810,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 277,
+									"line": 269,
 									"character": 33
 								}
 							]
 						},
 						{
-							"id": 283,
+							"id": 290,
 							"name": "_handeProviderSignIn",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2508,7 +2826,7 @@
 							},
 							"signatures": [
 								{
-									"id": 284,
+									"id": 291,
 									"name": "_handeProviderSignIn",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2517,7 +2835,7 @@
 									},
 									"parameters": [
 										{
-											"id": 285,
+											"id": 292,
 											"name": "provider",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2537,7 +2855,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 286,
+													"id": 293,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2546,7 +2864,7 @@
 													},
 													"children": [
 														{
-															"id": 289,
+															"id": 296,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2556,7 +2874,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 301,
+																	"line": 293,
 																	"character": 34
 																}
 															],
@@ -2567,7 +2885,7 @@
 															"defaultValue": "null"
 														},
 														{
-															"id": 291,
+															"id": 298,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2577,7 +2895,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 301,
+																	"line": 293,
 																	"character": 59
 																}
 															],
@@ -2588,7 +2906,7 @@
 															"defaultValue": "null"
 														},
 														{
-															"id": 287,
+															"id": 294,
 															"name": "provider",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2598,7 +2916,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 301,
+																	"line": 293,
 																	"character": 23
 																}
 															],
@@ -2609,7 +2927,7 @@
 															}
 														},
 														{
-															"id": 288,
+															"id": 295,
 															"name": "url",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2619,7 +2937,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 301,
+																	"line": 293,
 																	"character": 28
 																}
 															],
@@ -2629,7 +2947,7 @@
 															}
 														},
 														{
-															"id": 290,
+															"id": 297,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2639,7 +2957,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 301,
+																	"line": 293,
 																	"character": 46
 																}
 															],
@@ -2655,11 +2973,11 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																289,
-																291,
-																287,
-																288,
-																290
+																296,
+																298,
+																294,
+																295,
+																297
 															]
 														}
 													]
@@ -2668,7 +2986,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 292,
+													"id": 299,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2677,7 +2995,7 @@
 													},
 													"children": [
 														{
-															"id": 293,
+															"id": 300,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2687,7 +3005,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 305,
+																	"line": 297,
 																	"character": 24
 																}
 															],
@@ -2698,7 +3016,7 @@
 															"defaultValue": "null"
 														},
 														{
-															"id": 295,
+															"id": 302,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2708,7 +3026,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 305,
+																	"line": 297,
 																	"character": 49
 																}
 															],
@@ -2718,7 +3036,7 @@
 															}
 														},
 														{
-															"id": 294,
+															"id": 301,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2728,7 +3046,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 305,
+																	"line": 297,
 																	"character": 36
 																}
 															],
@@ -2744,9 +3062,9 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																293,
-																295,
-																294
+																300,
+																302,
+																301
 															]
 														}
 													]
@@ -2759,13 +3077,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 293,
+									"line": 285,
 									"character": 30
 								}
 							]
 						},
 						{
-							"id": 315,
+							"id": 322,
 							"name": "_notifyAllSubscribers",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2775,7 +3093,7 @@
 							},
 							"signatures": [
 								{
-									"id": 316,
+									"id": 323,
 									"name": "_notifyAllSubscribers",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2784,7 +3102,7 @@
 									},
 									"parameters": [
 										{
-											"id": 317,
+											"id": 324,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2807,13 +3125,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 389,
+									"line": 381,
 									"character": 31
 								}
 							]
 						},
 						{
-							"id": 299,
+							"id": 306,
 							"name": "_persistSession",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2823,7 +3141,7 @@
 							},
 							"signatures": [
 								{
-									"id": 300,
+									"id": 307,
 									"name": "_persistSession",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2832,7 +3150,7 @@
 									},
 									"parameters": [
 										{
-											"id": 301,
+											"id": 308,
 											"name": "currentSession",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2846,7 +3164,7 @@
 											}
 										},
 										{
-											"id": 302,
+											"id": 309,
 											"name": "secondsToExpiry",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2868,13 +3186,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 323,
+									"line": 315,
 									"character": 25
 								}
 							]
 						},
 						{
-							"id": 305,
+							"id": 312,
 							"name": "_recoverSession",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2884,7 +3202,7 @@
 							},
 							"signatures": [
 								{
-									"id": 306,
+									"id": 313,
 									"name": "_recoverSession",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2906,13 +3224,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 336,
+									"line": 328,
 									"character": 31
 								}
 							]
 						},
 						{
-							"id": 303,
+							"id": 310,
 							"name": "_removeSession",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2922,7 +3240,7 @@
 							},
 							"signatures": [
 								{
-									"id": 304,
+									"id": 311,
 									"name": "_removeSession",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2944,13 +3262,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 330,
+									"line": 322,
 									"character": 30
 								}
 							]
 						},
 						{
-							"id": 296,
+							"id": 303,
 							"name": "_saveSession",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2960,7 +3278,7 @@
 							},
 							"signatures": [
 								{
-									"id": 297,
+									"id": 304,
 									"name": "_saveSession",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2969,7 +3287,7 @@
 									},
 									"parameters": [
 										{
-											"id": 298,
+											"id": 305,
 											"name": "session",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2992,13 +3310,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 309,
+									"line": 301,
 									"character": 22
 								}
 							]
 						},
 						{
-							"id": 249,
+							"id": 256,
 							"name": "getSessionFromUrl",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3007,7 +3325,7 @@
 							},
 							"signatures": [
 								{
-									"id": 250,
+									"id": 257,
 									"name": "getSessionFromUrl",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3019,7 +3337,7 @@
 									},
 									"parameters": [
 										{
-											"id": 251,
+											"id": 258,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3037,7 +3355,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 252,
+															"id": 259,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -3046,7 +3364,7 @@
 															},
 															"children": [
 																{
-																	"id": 253,
+																	"id": 260,
 																	"name": "storeSession",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -3060,7 +3378,7 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 200,
+																			"line": 192,
 																			"character": 16
 																		}
 																	],
@@ -3088,7 +3406,7 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		253
+																		260
 																	]
 																}
 															]
@@ -3104,7 +3422,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 254,
+													"id": 261,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3113,7 +3431,7 @@
 													},
 													"children": [
 														{
-															"id": 255,
+															"id": 262,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3123,7 +3441,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 201,
+																	"line": 193,
 																	"character": 20
 																}
 															],
@@ -3143,7 +3461,7 @@
 															}
 														},
 														{
-															"id": 256,
+															"id": 263,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3153,7 +3471,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 201,
+																	"line": 193,
 																	"character": 43
 																}
 															],
@@ -3177,15 +3495,15 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																255,
-																256
+																262,
+																263
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "GoTrueClient.ts",
-															"line": 201,
+															"line": 193,
 															"character": 14
 														}
 													]
@@ -3199,13 +3517,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 199,
+									"line": 191,
 									"character": 25
 								}
 							]
 						},
 						{
-							"id": 261,
+							"id": 268,
 							"name": "onAuthStateChange",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3214,7 +3532,7 @@
 							},
 							"signatures": [
 								{
-									"id": 262,
+									"id": 269,
 									"name": "onAuthStateChange",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3227,7 +3545,7 @@
 									},
 									"parameters": [
 										{
-											"id": 263,
+											"id": 270,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3237,7 +3555,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 264,
+													"id": 271,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3246,7 +3564,7 @@
 													},
 													"signatures": [
 														{
-															"id": 265,
+															"id": 272,
 															"name": "__call",
 															"kind": 4096,
 															"kindString": "Call signature",
@@ -3255,7 +3573,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 266,
+																	"id": 273,
 																	"name": "event",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -3269,7 +3587,7 @@
 																	}
 																},
 																{
-																	"id": 267,
+																	"id": 274,
 																	"name": "session",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -3301,7 +3619,7 @@
 													"sources": [
 														{
 															"fileName": "GoTrueClient.ts",
-															"line": 258,
+															"line": 250,
 															"character": 13
 														}
 													]
@@ -3312,7 +3630,7 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 268,
+											"id": 275,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -3321,7 +3639,7 @@
 											},
 											"children": [
 												{
-													"id": 269,
+													"id": 276,
 													"name": "data",
 													"kind": 32,
 													"kindString": "Variable",
@@ -3331,7 +3649,7 @@
 													"sources": [
 														{
 															"fileName": "GoTrueClient.ts",
-															"line": 259,
+															"line": 251,
 															"character": 11
 														}
 													],
@@ -3351,7 +3669,7 @@
 													}
 												},
 												{
-													"id": 270,
+													"id": 277,
 													"name": "error",
 													"kind": 32,
 													"kindString": "Variable",
@@ -3361,7 +3679,7 @@
 													"sources": [
 														{
 															"fileName": "GoTrueClient.ts",
-															"line": 259,
+															"line": 251,
 															"character": 39
 														}
 													],
@@ -3385,15 +3703,15 @@
 													"title": "Variables",
 													"kind": 32,
 													"children": [
-														269,
-														270
+														276,
+														277
 													]
 												}
 											],
 											"sources": [
 												{
 													"fileName": "GoTrueClient.ts",
-													"line": 259,
+													"line": 251,
 													"character": 4
 												}
 											]
@@ -3404,13 +3722,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 257,
+									"line": 249,
 									"character": 19
 								}
 							]
 						},
 						{
-							"id": 236,
+							"id": 243,
 							"name": "refreshSession",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3419,7 +3737,7 @@
 							},
 							"signatures": [
 								{
-									"id": 237,
+									"id": 244,
 									"name": "refreshSession",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3435,7 +3753,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 238,
+													"id": 245,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3444,7 +3762,7 @@
 													},
 													"children": [
 														{
-															"id": 239,
+															"id": 246,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3454,7 +3772,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 155,
+																	"line": 147,
 																	"character": 8
 																}
 															],
@@ -3474,7 +3792,7 @@
 															}
 														},
 														{
-															"id": 241,
+															"id": 248,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3484,7 +3802,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 157,
+																	"line": 149,
 																	"character": 9
 																}
 															],
@@ -3503,7 +3821,7 @@
 															}
 														},
 														{
-															"id": 240,
+															"id": 247,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3513,7 +3831,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 156,
+																	"line": 148,
 																	"character": 8
 																}
 															],
@@ -3538,16 +3856,16 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																239,
-																241,
-																240
+																246,
+																248,
+																247
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "GoTrueClient.ts",
-															"line": 154,
+															"line": 146,
 															"character": 34
 														}
 													]
@@ -3561,13 +3879,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 154,
+									"line": 146,
 									"character": 22
 								}
 							]
 						},
 						{
-							"id": 231,
+							"id": 241,
 							"name": "session",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3576,7 +3894,7 @@
 							},
 							"signatures": [
 								{
-									"id": 232,
+									"id": 242,
 									"name": "session",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3587,107 +3905,31 @@
 										"shortText": "Returns the session data, if there is an active session."
 									},
 									"type": {
-										"type": "reflection",
-										"declaration": {
-											"id": 233,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {
-												"isExported": true
+										"type": "union",
+										"types": [
+											{
+												"type": "reference",
+												"id": 27,
+												"name": "Session"
 											},
-											"children": [
-												{
-													"id": 234,
-													"name": "data",
-													"kind": 32,
-													"kindString": "Variable",
-													"flags": {
-														"isExported": true
-													},
-													"sources": [
-														{
-															"fileName": "GoTrueClient.ts",
-															"line": 141,
-															"character": 19
-														}
-													],
-													"type": {
-														"type": "union",
-														"types": [
-															{
-																"type": "reference",
-																"id": 27,
-																"name": "Session"
-															},
-															{
-																"type": "intrinsic",
-																"name": "null"
-															}
-														]
-													}
-												},
-												{
-													"id": 235,
-													"name": "error",
-													"kind": 32,
-													"kindString": "Variable",
-													"flags": {
-														"isExported": true
-													},
-													"sources": [
-														{
-															"fileName": "GoTrueClient.ts",
-															"line": 141,
-															"character": 42
-														}
-													],
-													"type": {
-														"type": "union",
-														"types": [
-															{
-																"type": "reference",
-																"name": "Error"
-															},
-															{
-																"type": "intrinsic",
-																"name": "null"
-															}
-														]
-													}
-												}
-											],
-											"groups": [
-												{
-													"title": "Variables",
-													"kind": 32,
-													"children": [
-														234,
-														235
-													]
-												}
-											],
-											"sources": [
-												{
-													"fileName": "GoTrueClient.ts",
-													"line": 141,
-													"character": 12
-												}
-											]
-										}
+											{
+												"type": "intrinsic",
+												"name": "null"
+											}
+										]
 									}
 								}
 							],
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 141,
+									"line": 139,
 									"character": 9
 								}
 							]
 						},
 						{
-							"id": 212,
+							"id": 226,
 							"name": "signIn",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3696,7 +3938,7 @@
 							},
 							"signatures": [
 								{
-									"id": 213,
+									"id": 227,
 									"name": "signIn",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3708,7 +3950,7 @@
 									},
 									"parameters": [
 										{
-											"id": 214,
+											"id": 228,
 											"name": "credentials",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3721,7 +3963,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 215,
+													"id": 229,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3730,7 +3972,7 @@
 													},
 													"children": [
 														{
-															"id": 216,
+															"id": 230,
 															"name": "email",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3763,7 +4005,7 @@
 															}
 														},
 														{
-															"id": 217,
+															"id": 231,
 															"name": "password",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3796,7 +4038,7 @@
 															}
 														},
 														{
-															"id": 218,
+															"id": 232,
 															"name": "provider",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3826,9 +4068,9 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																216,
-																217,
-																218
+																230,
+																231,
+																232
 															]
 														}
 													],
@@ -3849,7 +4091,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 219,
+													"id": 233,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3858,7 +4100,7 @@
 													},
 													"children": [
 														{
-															"id": 220,
+															"id": 234,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3888,7 +4130,7 @@
 															}
 														},
 														{
-															"id": 224,
+															"id": 238,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3917,7 +4159,7 @@
 															}
 														},
 														{
-															"id": 222,
+															"id": 236,
 															"name": "provider",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3939,7 +4181,7 @@
 															}
 														},
 														{
-															"id": 223,
+															"id": 237,
 															"name": "url",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3969,7 +4211,7 @@
 															}
 														},
 														{
-															"id": 221,
+															"id": 235,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4004,11 +4246,11 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																220,
-																224,
-																222,
-																223,
-																221
+																234,
+																238,
+																236,
+																237,
+																235
 															]
 														}
 													],
@@ -4035,7 +4277,7 @@
 							]
 						},
 						{
-							"id": 257,
+							"id": 264,
 							"name": "signOut",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4044,7 +4286,7 @@
 							},
 							"signatures": [
 								{
-									"id": 258,
+									"id": 265,
 									"name": "signOut",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4060,7 +4302,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 259,
+													"id": 266,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -4069,7 +4311,7 @@
 													},
 													"children": [
 														{
-															"id": 260,
+															"id": 267,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4079,7 +4321,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 243,
+																	"line": 235,
 																	"character": 34
 																}
 															],
@@ -4103,14 +4345,14 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																260
+																267
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "GoTrueClient.ts",
-															"line": 243,
+															"line": 235,
 															"character": 27
 														}
 													]
@@ -4124,13 +4366,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 243,
+									"line": 235,
 									"character": 15
 								}
 							]
 						},
 						{
-							"id": 202,
+							"id": 216,
 							"name": "signUp",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4139,7 +4381,7 @@
 							},
 							"signatures": [
 								{
-									"id": 203,
+									"id": 217,
 									"name": "signUp",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4151,7 +4393,7 @@
 									},
 									"parameters": [
 										{
-											"id": 204,
+											"id": 218,
 											"name": "credentials",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4164,7 +4406,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 205,
+													"id": 219,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -4173,7 +4415,7 @@
 													},
 													"children": [
 														{
-															"id": 206,
+															"id": 220,
 															"name": "email",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4196,7 +4438,7 @@
 															}
 														},
 														{
-															"id": 207,
+															"id": 221,
 															"name": "password",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4224,8 +4466,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																206,
-																207
+																220,
+																221
 															]
 														}
 													],
@@ -4246,7 +4488,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 208,
+													"id": 222,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -4255,7 +4497,7 @@
 													},
 													"children": [
 														{
-															"id": 209,
+															"id": 223,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4285,7 +4527,7 @@
 															}
 														},
 														{
-															"id": 211,
+															"id": 225,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4314,7 +4556,7 @@
 															}
 														},
 														{
-															"id": 210,
+															"id": 224,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4349,9 +4591,9 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																209,
-																211,
-																210
+																223,
+																225,
+																224
 															]
 														}
 													],
@@ -4378,7 +4620,7 @@
 							]
 						},
 						{
-							"id": 242,
+							"id": 249,
 							"name": "update",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4387,7 +4629,7 @@
 							},
 							"signatures": [
 								{
-									"id": 243,
+									"id": 250,
 									"name": "update",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4399,7 +4641,7 @@
 									},
 									"parameters": [
 										{
-											"id": 244,
+											"id": 251,
 											"name": "attributes",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4419,7 +4661,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 245,
+													"id": 252,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -4428,7 +4670,7 @@
 													},
 													"children": [
 														{
-															"id": 246,
+															"id": 253,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4438,7 +4680,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 179,
+																	"line": 171,
 																	"character": 19
 																}
 															],
@@ -4458,7 +4700,7 @@
 															}
 														},
 														{
-															"id": 248,
+															"id": 255,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4468,7 +4710,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 179,
+																	"line": 171,
 																	"character": 58
 																}
 															],
@@ -4487,7 +4729,7 @@
 															}
 														},
 														{
-															"id": 247,
+															"id": 254,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4497,7 +4739,7 @@
 															"sources": [
 																{
 																	"fileName": "GoTrueClient.ts",
-																	"line": 179,
+																	"line": 171,
 																	"character": 38
 																}
 															],
@@ -4522,16 +4764,16 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																246,
-																248,
-																247
+																253,
+																255,
+																254
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "GoTrueClient.ts",
-															"line": 179,
+															"line": 171,
 															"character": 13
 														}
 													]
@@ -4545,13 +4787,13 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 177,
+									"line": 169,
 									"character": 14
 								}
 							]
 						},
 						{
-							"id": 225,
+							"id": 239,
 							"name": "user",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4560,7 +4802,7 @@
 							},
 							"signatures": [
 								{
-									"id": 226,
+									"id": 240,
 									"name": "user",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4571,132 +4813,25 @@
 										"shortText": "Returns the user data, if there is a logged in user."
 									},
 									"type": {
-										"type": "reflection",
-										"declaration": {
-											"id": 227,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {
-												"isExported": true
+										"type": "union",
+										"types": [
+											{
+												"type": "reference",
+												"id": 33,
+												"name": "User"
 											},
-											"children": [
-												{
-													"id": 228,
-													"name": "data",
-													"kind": 32,
-													"kindString": "Variable",
-													"flags": {
-														"isExported": true
-													},
-													"sources": [
-														{
-															"fileName": "GoTrueClient.ts",
-															"line": 128,
-															"character": 16
-														}
-													],
-													"type": {
-														"type": "union",
-														"types": [
-															{
-																"type": "reference",
-																"id": 33,
-																"name": "User"
-															},
-															{
-																"type": "intrinsic",
-																"name": "null"
-															}
-														]
-													}
-												},
-												{
-													"id": 230,
-													"name": "error",
-													"kind": 32,
-													"kindString": "Variable",
-													"flags": {
-														"isExported": true
-													},
-													"sources": [
-														{
-															"fileName": "GoTrueClient.ts",
-															"line": 128,
-															"character": 55
-														}
-													],
-													"type": {
-														"type": "union",
-														"types": [
-															{
-																"type": "reference",
-																"name": "Error"
-															},
-															{
-																"type": "intrinsic",
-																"name": "null"
-															}
-														]
-													}
-												},
-												{
-													"id": 229,
-													"name": "user",
-													"kind": 32,
-													"kindString": "Variable",
-													"flags": {
-														"isExported": true
-													},
-													"sources": [
-														{
-															"fileName": "GoTrueClient.ts",
-															"line": 128,
-															"character": 35
-														}
-													],
-													"type": {
-														"type": "union",
-														"types": [
-															{
-																"type": "reference",
-																"id": 33,
-																"name": "User"
-															},
-															{
-																"type": "intrinsic",
-																"name": "null"
-															}
-														]
-													}
-												}
-											],
-											"groups": [
-												{
-													"title": "Variables",
-													"kind": 32,
-													"children": [
-														228,
-														230,
-														229
-													]
-												}
-											],
-											"sources": [
-												{
-													"fileName": "GoTrueClient.ts",
-													"line": 128,
-													"character": 9
-												}
-											]
-										}
+											{
+												"type": "intrinsic",
+												"name": "null"
+											}
+										]
 									}
 								}
 							],
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 128,
+									"line": 132,
 									"character": 6
 								}
 							]
@@ -4707,43 +4842,43 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								189
+								203
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								182,
-								185,
-								184,
-								183,
-								187,
-								186,
-								188
+								196,
+								199,
+								198,
+								197,
+								201,
+								200,
+								202
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								307,
-								271,
-								283,
-								315,
-								299,
-								305,
+								314,
+								278,
+								290,
+								322,
+								306,
+								312,
+								310,
 								303,
-								296,
+								256,
+								268,
+								243,
+								241,
+								226,
+								264,
+								216,
 								249,
-								261,
-								236,
-								231,
-								212,
-								257,
-								202,
-								242,
-								225
+								239
 							]
 						}
 					],
@@ -4756,7 +4891,7 @@
 					]
 				},
 				{
-					"id": 318,
+					"id": 325,
 					"name": "DEFAULT_OPTIONS",
 					"kind": 2097152,
 					"kindString": "Object literal",
@@ -4765,7 +4900,7 @@
 					},
 					"children": [
 						{
-							"id": 320,
+							"id": 327,
 							"name": "autoRefreshToken",
 							"kind": 32,
 							"kindString": "Variable",
@@ -4784,7 +4919,7 @@
 							"defaultValue": "true"
 						},
 						{
-							"id": 323,
+							"id": 330,
 							"name": "detectSessionInUrl",
 							"kind": 32,
 							"kindString": "Variable",
@@ -4803,7 +4938,7 @@
 							"defaultValue": "true"
 						},
 						{
-							"id": 324,
+							"id": 331,
 							"name": "headers",
 							"kind": 32,
 							"kindString": "Variable",
@@ -4818,7 +4953,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 325,
+									"id": 332,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -4828,7 +4963,7 @@
 							"defaultValue": "DEFAULT_HEADERS"
 						},
 						{
-							"id": 322,
+							"id": 329,
 							"name": "localStorage",
 							"kind": 32,
 							"kindString": "Variable",
@@ -4844,10 +4979,10 @@
 								"type": "reference",
 								"name": "Storage"
 							},
-							"defaultValue": "global.localStorage"
+							"defaultValue": "globalThis.localStorage"
 						},
 						{
-							"id": 321,
+							"id": 328,
 							"name": "persistSession",
 							"kind": 32,
 							"kindString": "Variable",
@@ -4866,7 +5001,7 @@
 							"defaultValue": "true"
 						},
 						{
-							"id": 319,
+							"id": 326,
 							"name": "url",
 							"kind": 32,
 							"kindString": "Variable",
@@ -4890,12 +5025,12 @@
 							"title": "Variables",
 							"kind": 32,
 							"children": [
-								320,
-								323,
-								324,
-								322,
-								321,
-								319
+								327,
+								330,
+								331,
+								329,
+								328,
+								326
 							]
 						}
 					],
@@ -4917,14 +5052,14 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						181
+						195
 					]
 				},
 				{
 					"title": "Object literals",
 					"kind": 2097152,
 					"children": [
-						318
+						325
 					]
 				}
 			],
@@ -4937,14 +5072,14 @@
 			]
 		},
 		{
-			"id": 326,
+			"id": 333,
 			"name": "\"index\"",
 			"kind": 1,
 			"kindString": "Module",
 			"flags": {
 				"isExported": true
 			},
-			"originalName": "/home/runner/work/gotrue-js/gotrue-js/src/index.ts",
+			"originalName": "/Users/supabase/Documents/projects/supabase/gotrue-js/src/index.ts",
 			"sources": [
 				{
 					"fileName": "index.ts",
@@ -4954,17 +5089,17 @@
 			]
 		},
 		{
-			"id": 173,
+			"id": 187,
 			"name": "\"lib/constants\"",
 			"kind": 1,
 			"kindString": "Module",
 			"flags": {
 				"isExported": true
 			},
-			"originalName": "/home/runner/work/gotrue-js/gotrue-js/src/lib/constants.ts",
+			"originalName": "/Users/supabase/Documents/projects/supabase/gotrue-js/src/lib/constants.ts",
 			"children": [
 				{
-					"id": 175,
+					"id": 189,
 					"name": "AUDIENCE",
 					"kind": 32,
 					"kindString": "Variable",
@@ -4986,7 +5121,7 @@
 					"defaultValue": "process.env.AUDIENCE || ''"
 				},
 				{
-					"id": 176,
+					"id": 190,
 					"name": "DEFAULT_HEADERS",
 					"kind": 32,
 					"kindString": "Variable",
@@ -5004,7 +5139,7 @@
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 177,
+							"id": 191,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
@@ -5015,7 +5150,7 @@
 					}
 				},
 				{
-					"id": 178,
+					"id": 192,
 					"name": "EXPIRY_MARGIN",
 					"kind": 32,
 					"kindString": "Variable",
@@ -5046,7 +5181,7 @@
 					"defaultValue": "process.env.EXPIRY_MARGIN || 60 * 1000"
 				},
 				{
-					"id": 174,
+					"id": 188,
 					"name": "GOTRUE_URL",
 					"kind": 32,
 					"kindString": "Variable",
@@ -5068,7 +5203,7 @@
 					"defaultValue": "process.env.GOTRUE_URL || 'http://localhost:9999'"
 				},
 				{
-					"id": 179,
+					"id": 193,
 					"name": "STORAGE_KEY",
 					"kind": 32,
 					"kindString": "Variable",
@@ -5095,11 +5230,11 @@
 					"title": "Variables",
 					"kind": 32,
 					"children": [
-						175,
-						176,
-						178,
-						174,
-						179
+						189,
+						190,
+						192,
+						188,
+						193
 					]
 				}
 			],
@@ -5119,7 +5254,7 @@
 			"flags": {
 				"isExported": true
 			},
-			"originalName": "/home/runner/work/gotrue-js/gotrue-js/src/lib/fetch.ts",
+			"originalName": "/Users/supabase/Documents/projects/supabase/gotrue-js/src/lib/fetch.ts",
 			"children": [
 				{
 					"id": 2,
@@ -5560,17 +5695,17 @@
 			]
 		},
 		{
-			"id": 141,
+			"id": 155,
 			"name": "\"lib/helpers\"",
 			"kind": 1,
 			"kindString": "Module",
 			"flags": {
 				"isExported": true
 			},
-			"originalName": "/home/runner/work/gotrue-js/gotrue-js/src/lib/helpers.ts",
+			"originalName": "/Users/supabase/Documents/projects/supabase/gotrue-js/src/lib/helpers.ts",
 			"children": [
 				{
-					"id": 142,
+					"id": 156,
 					"name": "LocalStorage",
 					"kind": 128,
 					"kindString": "Class",
@@ -5579,7 +5714,7 @@
 					},
 					"indexSignature": [
 						{
-							"id": 144,
+							"id": 158,
 							"name": "__index",
 							"kind": 8192,
 							"kindString": "Index signature",
@@ -5588,7 +5723,7 @@
 							},
 							"parameters": [
 								{
-									"id": 145,
+									"id": 159,
 									"name": "name",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -5609,7 +5744,7 @@
 					],
 					"children": [
 						{
-							"id": 147,
+							"id": 161,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -5618,7 +5753,7 @@
 							},
 							"signatures": [
 								{
-									"id": 148,
+									"id": 162,
 									"name": "new LocalStorage",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -5627,7 +5762,7 @@
 									},
 									"parameters": [
 										{
-											"id": 149,
+											"id": 163,
 											"name": "localStorage",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5642,7 +5777,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 142,
+										"id": 156,
 										"name": "LocalStorage"
 									}
 								}
@@ -5656,7 +5791,7 @@
 							]
 						},
 						{
-							"id": 146,
+							"id": 160,
 							"name": "length",
 							"kind": 1024,
 							"kindString": "Property",
@@ -5676,7 +5811,7 @@
 							}
 						},
 						{
-							"id": 143,
+							"id": 157,
 							"name": "localStorage",
 							"kind": 1024,
 							"kindString": "Property",
@@ -5696,7 +5831,7 @@
 							}
 						},
 						{
-							"id": 150,
+							"id": 164,
 							"name": "clear",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5705,7 +5840,7 @@
 							},
 							"signatures": [
 								{
-									"id": 151,
+									"id": 165,
 									"name": "clear",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5727,7 +5862,7 @@
 							]
 						},
 						{
-							"id": 159,
+							"id": 173,
 							"name": "getItem",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5736,7 +5871,7 @@
 							},
 							"signatures": [
 								{
-									"id": 160,
+									"id": 174,
 									"name": "getItem",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5745,7 +5880,7 @@
 									},
 									"parameters": [
 										{
-											"id": 161,
+											"id": 175,
 											"name": "key",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5782,7 +5917,7 @@
 							]
 						},
 						{
-							"id": 152,
+							"id": 166,
 							"name": "key",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5791,7 +5926,7 @@
 							},
 							"signatures": [
 								{
-									"id": 153,
+									"id": 167,
 									"name": "key",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5800,7 +5935,7 @@
 									},
 									"parameters": [
 										{
-											"id": 154,
+											"id": 168,
 											"name": "index",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5837,7 +5972,7 @@
 							]
 						},
 						{
-							"id": 162,
+							"id": 176,
 							"name": "removeItem",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5846,7 +5981,7 @@
 							},
 							"signatures": [
 								{
-									"id": 163,
+									"id": 177,
 									"name": "removeItem",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5855,7 +5990,7 @@
 									},
 									"parameters": [
 										{
-											"id": 164,
+											"id": 178,
 											"name": "key",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5883,7 +6018,7 @@
 							]
 						},
 						{
-							"id": 155,
+							"id": 169,
 							"name": "setItem",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5892,7 +6027,7 @@
 							},
 							"signatures": [
 								{
-									"id": 156,
+									"id": 170,
 									"name": "setItem",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5901,7 +6036,7 @@
 									},
 									"parameters": [
 										{
-											"id": 157,
+											"id": 171,
 											"name": "key",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5914,7 +6049,7 @@
 											}
 										},
 										{
-											"id": 158,
+											"id": 172,
 											"name": "value",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5947,26 +6082,26 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								147
+								161
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								146,
-								143
+								160,
+								157
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								150,
-								159,
-								152,
-								162,
-								155
+								164,
+								173,
+								166,
+								176,
+								169
 							]
 						}
 					],
@@ -5985,7 +6120,7 @@
 					]
 				},
 				{
-					"id": 169,
+					"id": 183,
 					"name": "getParameterByName",
 					"kind": 64,
 					"kindString": "Function",
@@ -5994,7 +6129,7 @@
 					},
 					"signatures": [
 						{
-							"id": 170,
+							"id": 184,
 							"name": "getParameterByName",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -6003,7 +6138,7 @@
 							},
 							"parameters": [
 								{
-									"id": 171,
+									"id": 185,
 									"name": "name",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -6016,7 +6151,7 @@
 									}
 								},
 								{
-									"id": 172,
+									"id": 186,
 									"name": "url",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -6063,7 +6198,7 @@
 					]
 				},
 				{
-					"id": 167,
+					"id": 181,
 					"name": "isBrowser",
 					"kind": 64,
 					"kindString": "Function",
@@ -6073,7 +6208,7 @@
 					},
 					"signatures": [
 						{
-							"id": 168,
+							"id": 182,
 							"name": "isBrowser",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -6095,7 +6230,7 @@
 					]
 				},
 				{
-					"id": 165,
+					"id": 179,
 					"name": "uuid",
 					"kind": 64,
 					"kindString": "Function",
@@ -6104,7 +6239,7 @@
 					},
 					"signatures": [
 						{
-							"id": 166,
+							"id": 180,
 							"name": "uuid",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -6131,16 +6266,16 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						142
+						156
 					]
 				},
 				{
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						169,
-						167,
-						165
+						183,
+						181,
+						179
 					]
 				}
 			],
@@ -6160,7 +6295,7 @@
 			"flags": {
 				"isExported": true
 			},
-			"originalName": "/home/runner/work/gotrue-js/gotrue-js/src/lib/types.ts",
+			"originalName": "/Users/supabase/Documents/projects/supabase/gotrue-js/src/lib/types.ts",
 			"children": [
 				{
 					"id": 27,
@@ -7176,11 +7311,11 @@
 			"kind": 1,
 			"children": [
 				68,
-				180,
-				326,
-				173,
+				194,
+				333,
+				187,
 				1,
-				141,
+				155,
 				26
 			]
 		}

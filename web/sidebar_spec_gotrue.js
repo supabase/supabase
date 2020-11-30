@@ -15,7 +15,7 @@ module.exports = {
     {
       type: 'category',
       label: 'General functions',
-      items: ['gotrue/client/api-signupwithemail', 'gotrue/client/api-signinwithemail', 'gotrue/client/api-resetpasswordforemail', 'gotrue/client/api-signout', 'gotrue/client/api-getuser', 'gotrue/client/api-updateuser', 'gotrue/client/api-refreshaccesstoken'],
+      items: ['gotrue/client/api-signupwithemail', 'gotrue/client/api-signinwithemail', 'gotrue/client/api-sendmagiclinkemail', 'gotrue/client/api-inviteuserbyemail', 'gotrue/client/api-resetpasswordforemail', 'gotrue/client/api-signout', 'gotrue/client/api-getuser', 'gotrue/client/api-updateuser', 'gotrue/client/api-refreshaccesstoken'],
       collapsed: false,
     }
   ],
