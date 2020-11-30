@@ -20,7 +20,13 @@ Create a new client for use in the browser.
 import { GoTrueClient } from '@supabase/gotrue-js'
 
 const auth = new GoTrueClient({
-  url: "https://your-gotrue-url.com"
+  url: "https://your-gotrue-url.com",
+  headers: {
+    apikey:
+      "<SOME-API-KEY>",
+    Authorization:
+      "Bearer <SOME-JWT>",
+  },
 })
 ```
 
@@ -224,7 +230,13 @@ The URL of the GoTrue server.
 import { GoTrueClient } from '@supabase/gotrue-js'
 
 const auth = new GoTrueClient({
-  url: "https://your-gotrue-url.com"
+  url: "https://your-gotrue-url.com",
+  headers: {
+    apikey:
+      "<SOME-API-KEY>",
+    Authorization:
+      "Bearer <SOME-JWT>",
+  },
 })
 ```
 
