@@ -187,6 +187,10 @@ module.exports = {
               label: 'Support',
               to: '/docs/support',
             },
+            {
+              label: 'System Status',
+              to: 'https://status.supabase.io/',
+            },
           ],
         },
         {
