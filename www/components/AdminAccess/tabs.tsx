@@ -19,12 +19,12 @@ function Tabs(props: Props) {
   return (
     <div className="flex justify-between items-center w-full sm:relative sm:-mt-20 lg:mt-0">
       <div>
-        <div className="border-b border-gray-200">
+        <div className="">
           <nav className="-mb-px flex" aria-label="Tabs">
             <a
               href="#"
               id="tabTableEditor"
-              className={"transition w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm" + (tabId === "tabTableEditor" ? " border-brand-500 text-brand-600" : " border-b border-gray-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200")}
+              className={"transition w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm" + (tabId === "tabTableEditor" ? " border-brand-500 dark:border-white text-brand-600 dark:text-white" : " border-b border-gray-200 dark:border-dark-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200")}
               onClick={(event: any) => handleTabChange(event)}
             >
               Table Editor
@@ -32,7 +32,7 @@ function Tabs(props: Props) {
             <a
               href="#"
               id="tabSqlEditor"
-              className={"transition w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm" + (tabId === "tabSqlEditor" ? " border-brand-500 text-brand-600" : " border-b border-gray-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200")}
+              className={"transition w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm" + (tabId === "tabSqlEditor" ? " border-brand-500 dark:border-white text-brand-600 dark:text-white" : " border-b border-gray-200 dark:border-dark-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200")}
               onClick={(event: any) => handleTabChange(event)}
             >
               SQL Editor
@@ -40,7 +40,7 @@ function Tabs(props: Props) {
             <a
               href="#"
               id="tabAuthRules"
-              className={"transition w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm" + (tabId === "tabAuthRules" ? " border-brand-500 text-brand-600" : " border-b border-gray-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200")}
+              className={"transition w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm" + (tabId === "tabAuthRules" ? " border-brand-500 dark:border-white text-brand-600 dark:text-white" : " border-b border-gray-200 dark:border-dark-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200")}
               onClick={(event: any) => handleTabChange(event)}
               aria-current="page"
             >
