@@ -91,7 +91,7 @@ const Footer = (props: Props) => {
             </div>
           </div>
           <div className="mt-12 grid grid-cols-1 gap-8 xl:mt-0 xl:col-span-2">
-            <div className="md:grid md:grid-cols-4 md:gap-8">
+            <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
               {FooterLinks.map((segment: any) => {
                 return (
                   <div key={`footer_${segment.title}`}>

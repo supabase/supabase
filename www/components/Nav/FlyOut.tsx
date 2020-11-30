@@ -115,9 +115,10 @@ const FlyOut = () => {
               right: '-50vw',
             }}
           >
-            <div className="absolute inset-0 flex" aria-hidden="true">
-              <div className="bg-white dark:bg-dark-400 w-1/2"></div>
-              <div className="bg-gray-50 dark:bg-dark-300 w-1/2"></div>
+            <div className="absolute inset-0 flex sm:flex-col lg:flex-row" aria-hidden="true">
+              <div className="bg-white dark:bg-dark-400 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full"></div>
+              <div className="bg-gray-50 dark:bg-dark-300 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full"></div>
+              {/* <div className="bg-gray-50 dark:bg-dark-300 md:hidden lg:block lg:w-1/2"></div> */}
             </div>
             <div className="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2">
               <nav
