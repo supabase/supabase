@@ -26,14 +26,13 @@ const FlyOut = () => {
     const content = (
       <div className="flex md:h-full lg:flex-col">
         <div className="flex-shrink-0">
-          <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-gray-900 text-white sm:h-12 sm:w-12">
-            {/* <!-- Heroicon name: chart-bar --> */}
+          <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-gray-900 dark:bg-white text-white sm:h-12 sm:w-12">
             <svg
               className="h-6 w-6"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
+              stroke="black"
               aria-hidden="true"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
@@ -42,10 +41,12 @@ const FlyOut = () => {
         </div>
         <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
           <div>
-            <p className="text-base font-medium text-gray-900">
+            <p className="text-base font-medium text-gray-900 dark:text-white">
               {name} {label && <Badge>{label}</Badge>}
             </p>
-            <p className="mt-1 text-sm text-gray-500">{description}</p>
+            <p className="mt-1 text-sm text-gray-500 dark:text-dark-100">
+              {description}
+            </p>
           </div>
           {url && (
             <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
@@ -59,7 +60,7 @@ const FlyOut = () => {
       <a
         key={name}
         href="#"
-        className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
+        className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 dark:hover:bg-dark-600 transition ease-in-out duration-150"
       >
         {content}
       </a>
@@ -104,7 +105,7 @@ const FlyOut = () => {
       >
         <>
           <div
-            className="absolute inset-x-0 transform shadow-lg border-t-2 border-gray-50"
+            className="absolute inset-x-0 transform shadow-lg border-t-2 border-gray-50 dark:border-dark-600"
             style={{
               zIndex: 999,
               position: 'absolute',
@@ -116,26 +117,26 @@ const FlyOut = () => {
             }}
           >
             <div className="absolute inset-0 flex" aria-hidden="true">
-              <div className="bg-white w-1/2"></div>
-              <div className="bg-gray-50 w-1/2"></div>
+              <div className="bg-white dark:bg-dark-300 w-1/2"></div>
+              <div className="bg-gray-50 dark:bg-dark-200 w-1/2"></div>
             </div>
             <div className="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2">
               <nav
-                className="grid gap-y-10 px-4 py-8 bg-white sm:grid-cols-2 sm:gap-x-8 sm:py-12 sm:px-6 lg:px-8 xl:pr-12"
+                className="grid gap-y-10 px-4 py-8 sm:grid-cols-2 sm:gap-x-8 sm:py-12 sm:px-6 lg:px-8 xl:pr-12"
                 aria-labelledby="solutionsHeading"
               >
                 {iconSections}
               </nav>
-              <div className="bg-gray-50 px-4 py-8 sm:py-12 sm:px-6 lg:px-8 xl:pl-12">
+              <div className="px-4 py-8 sm:py-12 sm:px-6 lg:px-8 xl:pl-12">
                 <div>
-                  <h3 className="text-sm font-medium tracking-wide text-gray-500 uppercase">
+                  <h3 className="text-sm font-medium tracking-wide text-gray-500 dark:text-dark-100 uppercase">
                     Latest news
                   </h3>
                   <ul className="mt-6 space-y-6">
                     <li className="flow-root">
                       <a
                         href="#"
-                        className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 transition ease-in-out duration-150"
+                        className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-600 transition ease-in-out duration-150"
                       >
                         <div className="hidden sm:block flex-shrink-0">
                           <img
@@ -145,10 +146,10 @@ const FlyOut = () => {
                           />
                         </div>
                         <div className="min-w-0 flex-1 sm:ml-8">
-                          <h4 className="text-base font-medium text-gray-900 truncate">
+                          <h4 className="text-base font-medium text-gray-900 dark:text-white truncate">
                             Supabase launch news
                           </h4>
-                          <p className="mt-1 text-sm text-gray-500">
+                          <p className="mt-1 text-sm text-gray-500 dark:text-dark-100">
                             Eget ullamcorper ac ut vulputate fames nec mattis pellentesque
                             elementum. Viverra tempor id mus.
                           </p>
@@ -158,7 +159,7 @@ const FlyOut = () => {
                     <li className="flow-root">
                       <a
                         href="#"
-                        className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 transition ease-in-out duration-150"
+                        className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-600 transition ease-in-out duration-150"
                       >
                         <div className="hidden sm:block flex-shrink-0">
                           <img
@@ -168,10 +169,10 @@ const FlyOut = () => {
                           />
                         </div>
                         <div className="min-w-0 flex-1 sm:ml-8">
-                          <h4 className="text-base font-medium text-gray-900 truncate">
+                          <h4 className="text-base font-medium text-gray-900 dark:text-white truncate">
                             New project example released
                           </h4>
-                          <p className="mt-1 text-sm text-gray-500">
+                          <p className="mt-1 text-sm text-gray-500 dark:text-dark-100">
                             Eget ullamcorper ac ut vulputate fames nec mattis pellentesque
                             elementum. Viverra tempor id mus.
                           </p>
@@ -183,7 +184,7 @@ const FlyOut = () => {
                 <div className="mt-6 text-sm font-medium">
                   <a
                     href="#"
-                    className="text-gray-600 hover:text-gray-500 transition ease-in-out duration-150"
+                    className="text-gray-600 hover:text-gray-500 dark:text-brand-600 dark:hover:text-brand-700 transition ease-in-out duration-150"
                   >
                     View all posts <span aria-hidden="true">&rarr;</span>
                   </a>
