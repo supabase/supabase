@@ -7,7 +7,7 @@ const CTABanner = () => {
 				<h4 className="font-normal text-white lg:text-3xl">
 					<span className="block">Create your next project backend </span>
 				</h4>
-				<p className="font-normal mt-1 text-gray-500 lg:text-3xl">
+				<p className="font-normal mt-1 text-gray-500 dark:text-dark-100 lg:text-3xl">
 					Create your next project backend in less than 2 minutes
 				</p>
 			</div>
