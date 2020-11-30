@@ -7,7 +7,7 @@ const BuiltExamples = () => {
     <div className="bg-gray-50 dark:bg-dark-200 py-16">
       <div className="container mx-auto sm:px-16 xl:px-20 relative">
         <div className="absolute inset-0">
-          <div className="bg-white dark:bg-dark-200 h-1/3 sm:h-2/3"></div>
+          <div className="bg-white dark:bg-dark-600 h-1/3 sm:h-2/3"></div>
         </div>
         <div className="mx-auto max-w-7xl">
           <SectionHeader
@@ -18,9 +18,9 @@ const BuiltExamples = () => {
         </div>
         <div className="relative max-w-7xl mx-auto">
           <div className="mt-12 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
-            {ProjectExamples.map((example: any) => (
+            {ProjectExamples.map((example: any, idx: number) => (
               <Card
-                key={example.title}
+                key={`example_${idx}`}
                 title={example.title}
                 type="Project Example"
                 description={example.description}

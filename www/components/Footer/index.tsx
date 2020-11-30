@@ -2,22 +2,16 @@ import { useState, useEffect } from 'react'
 import FooterLinks from "data/Footer.json"
 
 type Props = {
+  darkMode: boolean,
   updateTheme: Function
 }
 
 const Footer = (props: Props) => {
-  const { updateTheme } = props
-  const [darkMode, setDarkMode] = useState<boolean>(true)
-
-  useEffect(() => {
-    const isDarkMode = localStorage.getItem('supabaseDarkMode')
-    if (isDarkMode) setDarkMode(isDarkMode === 'true')
-  }, [])
+  const { darkMode, updateTheme } = props
 
   const toggleDarkMode = () => {
     localStorage.setItem('supabaseDarkMode', (!darkMode).toString())
     updateTheme(!darkMode)
-    setDarkMode(!darkMode)
   }
 
   const SunEmoji = () => (
@@ -72,7 +66,7 @@ const Footer = (props: Props) => {
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
-            <img className="h-10 w-auto" src="images/logo-dark.png" alt="Supabase" />
+            <img className="h-10 w-auto" src={darkMode ? "images/logo-dark.png" : "images/logo-light.png"} alt="Supabase" />
             <p className="text-gray-500 text-base sr-only">Any description</p>
             <div className="flex space-x-6">
 

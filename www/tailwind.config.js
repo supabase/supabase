@@ -44,18 +44,8 @@ module.exports = {
           300: '#292929',
           400: '#202020',
           500: '#1E1E1E',
-        },
-        // Joshen: Adding our Figma palette here
-        neutral: {
-          100: '#F1F1F1',
-          200: '#E0E0E0',
-          300: '#BBBBBB',
-          400: '#666666',
-          500: '#444444',
-          600: '#1E1E1E',
           700: '#181818',
-          800: '#000000',
-        }
+        },
       },
       spacing: {
         28: '7rem',
@@ -97,11 +87,16 @@ module.exports = {
         ],
         mono: ['Source Code Pro', 'Menlo', 'monospace'],
       },
+      stroke: theme => ({
+        'white': theme('colors.white'),
+        'black': theme('colors.black'),
+      })
     },
   },
   variants: {
     extend: {
-      inset: ['responsive', 'group-hover']
+      inset: ['group-hover'],
+      stroke: ['dark']
     },
   },
   plugins: [],

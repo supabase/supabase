@@ -5,18 +5,15 @@ import Solutions from 'data/Solutions.json'
 const Features = () => {
   const IconSections = Object.values(Solutions).map((solution: any) => {
     const { name, description, icon, label, url } = solution
-
     return (
       <div key={name}>
         <div className="flex items-center">
-          <div className="flex items-center justify-center h-12 w-12 rounded-md bg-gray-900 dark:bg-white text-white">
-            {/* <!-- Heroicon name: globe-alt --> */}
+          <div className="flex items-center justify-center h-12 w-12 rounded-md bg-gray-900 text-white dark:bg-white">
             <svg
-              className="h-6 w-6"
+              className="h-6 w-6 stroke-white dark:stroke-black"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="black"
               aria-hidden="true"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
