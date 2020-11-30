@@ -10,7 +10,6 @@ import MadeForDevelopers from 'components/MadeForDevelopers/index'
 import AdminAccess from 'components/AdminAccess/index'
 import CaseStudies from 'components/CaseStudies/index'
 import CTABanner from 'components/CTABanner/index'
-import Benchmark from 'components/Benchmark/index'
 
 type Props = {
   
@@ -30,7 +29,6 @@ const Index = ({  }: Props) => {
           <MadeForDevelopers />
           <AdminAccess />
           <CaseStudies />
-          <Benchmark />
           <CTABanner />
         </Container>
       </Layout>
