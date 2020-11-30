@@ -122,7 +122,7 @@ const Nav = () => {
   )
 
   return (
-    <nav className="bg-white dark:bg-dark-300 z-50 shadow-lg sticky">
+    <nav className="bg-white dark:bg-dark-400 z-50 shadow-lg sticky">
       <div className="container mx-auto relative flex justify-between h-16">
         
         <HamburgerButton toggleFlyOut={() => setOpen(true)} />
