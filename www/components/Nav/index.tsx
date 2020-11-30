@@ -6,7 +6,12 @@ import FlyOut from 'components/Nav/FlyOut'
 import Transition from 'lib/Transition'
 import Solutions from 'data/Solutions.json'
 
-const Nav = () => {
+type Props = {
+  darkMode: boolean,
+}
+
+const Nav = (props: Props) => {
+  const { darkMode } = props
   const [open, setOpen] = useState(false)
 
   React.useEffect(() => {
@@ -122,24 +127,22 @@ const Nav = () => {
   )
 
   return (
-    <nav className="bg-white dark:bg-dark-400 z-50 shadow-lg sticky">
-      <div className="container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-16">
+    <nav className="bg-white dark:bg-dark-500 z-50 shadow-lg sticky">
+      <div className="container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0">
         
         <HamburgerButton toggleFlyOut={() => setOpen(true)} />
 
         <div className="flex-1 flex items-center justify-center sm:px-10 sm:items-stretch sm:justify-start">
           <div className="flex-shrink-0 flex items-center">
-            {/* Mobile - remove if not needed */}
             <img
               className="block lg:hidden h-6 w-auto"
-              src="images/logo-light.png"
-              alt="Workflow"
+              src={darkMode ? "images/logo-dark.png" : "images/logo-light.png"}
+              alt="Logo"
             />
-            {/* Desktop */}
             <img
               className="hidden lg:block h-6 w-auto"
-              src="images/logo-dark.png"
-              alt="Workflow"
+              src={darkMode ? "images/logo-dark.png" : "images/logo-light.png"}
+              alt="Logo"
             />
           </div>
           <div className="pl-4 hidden sm:ml-6 sm:flex sm:space-x-8">

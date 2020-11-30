@@ -28,11 +28,10 @@ const FlyOut = () => {
         <div className="flex-shrink-0">
           <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-gray-900 dark:bg-white text-white sm:h-12 sm:w-12">
             <svg
-              className="h-6 w-6"
+              className="h-6 w-6 stroke-white dark:stroke-black"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="black"
               aria-hidden="true"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
@@ -60,7 +59,7 @@ const FlyOut = () => {
       <a
         key={name}
         href="#"
-        className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 dark:hover:bg-dark-600 transition ease-in-out duration-150"
+        className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 dark:hover:bg-dark-300 transition ease-in-out duration-150"
       >
         {content}
       </a>
@@ -105,7 +104,7 @@ const FlyOut = () => {
       >
         <>
           <div
-            className="absolute inset-x-0 transform shadow-lg border-t-2 border-gray-50 dark:border-dark-600"
+            className="absolute inset-x-0 transform shadow-lg border-t-2 border-gray-50 dark:border-dark-200"
             style={{
               zIndex: 999,
               position: 'absolute',
@@ -117,8 +116,8 @@ const FlyOut = () => {
             }}
           >
             <div className="absolute inset-0 flex" aria-hidden="true">
-              <div className="bg-white dark:bg-dark-300 w-1/2"></div>
-              <div className="bg-gray-50 dark:bg-dark-200 w-1/2"></div>
+              <div className="bg-white dark:bg-dark-400 w-1/2"></div>
+              <div className="bg-gray-50 dark:bg-dark-300 w-1/2"></div>
             </div>
             <div className="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2">
               <nav
@@ -136,7 +135,7 @@ const FlyOut = () => {
                     <li className="flow-root">
                       <a
                         href="#"
-                        className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-600 transition ease-in-out duration-150"
+                        className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-200 transition ease-in-out duration-150"
                       >
                         <div className="hidden sm:block flex-shrink-0">
                           <img
@@ -159,7 +158,7 @@ const FlyOut = () => {
                     <li className="flow-root">
                       <a
                         href="#"
-                        className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-600 transition ease-in-out duration-150"
+                        className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-200 transition ease-in-out duration-150"
                       >
                         <div className="hidden sm:block flex-shrink-0">
                           <img

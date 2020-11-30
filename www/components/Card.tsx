@@ -55,7 +55,7 @@ const Card = (props: Props) => {
           alt={title}
         />
       </div>
-      <div className="flex-1 bg-white p-6 flex flex-col justify-between dark:bg-dark-600">
+      <div className="flex-1 bg-white p-6 flex flex-col justify-between dark:bg-dark-200">
         <div className="flex-1">
           {/* {icons && (
             <div className="-mt-12 mb-6 flex -space-x-3">
