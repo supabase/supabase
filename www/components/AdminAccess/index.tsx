@@ -15,7 +15,7 @@ const AdminAccess = () => {
               title_alt={' without leaving the dashboard'} 
               subtitle={'Admin Access'} 
             />
-            <div className="grid sm:flex sm:flex-col-reverse lg:grid-cols-2 gap-28 items-center">
+            <div className="grid sm:flex sm:flex-col-reverse lg:flex-row lg:grid-cols-2 gap-28 items-center">
               <Tabs
                 tabId={tabId}
                 setTabId={setTabId}
