@@ -2,7 +2,7 @@ import FooterLinks from "data/Footer.json"
 
 const Footer = () => {
   return (
-    <footer className="bg-white dark:bg-dark-300" aria-labelledby="footerHeading">
+    <footer className="bg-white dark:bg-dark-400" aria-labelledby="footerHeading">
       <h2 id="footerHeading" className="sr-only">Footer</h2>
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">

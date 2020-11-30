@@ -4,7 +4,7 @@ const Benchmark = () => {
   return (
     <>
       {/* Figma ref */}
-      <div className="bg-white dark:bg-dark-100 pt-16 pb-4 px-4 sm:px-6 lg:px-8">
+      <div className="bg-white dark:bg-dark-200 pt-16 pb-4 px-4 sm:px-6 lg:px-8">
         <div className="bg-white grid grid-cols-12 gap-4 items-center shadow-lg rounded-md">
           <div className="w-full h-full col-span-2 bg-gray-700 rounded-l-md flex items-center justify-center">
             <img className="w-3/4" src="images/benchmark.svg" />
@@ -24,7 +24,7 @@ const Benchmark = () => {
       </div>
 
       {/* Other */}
-      <div className="bg-white dark:bg-dark-100">
+      <div className="bg-white dark:bg-dark-200">
         <div className="mx-auto py-16 px-4 sm:px-6 lg:px-8">
           <div className="bg-gray-700 rounded-lg shadow-xl overflow-hidden lg:grid lg:grid-cols-12 lg:gap-4">
             <div className="pt-10 pb-12 px-6 sm:pt-16 sm:px-16 lg:py-16 lg:pr-0 xl:py-20 xl:px-20 col-span-8">

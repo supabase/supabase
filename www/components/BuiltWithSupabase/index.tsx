@@ -5,9 +5,9 @@ import ProjectExamples from "data/ProjectExamples.json"
 const BuiltExamples = () => {
   return (
     <>
-      <div className="relative bg-gray-50 dark:bg-dark-100 py-16 px-4 sm:px-6 lg:pt-24 lg:pb-28 lg:px-16">
+      <div className="relative bg-gray-50 dark:bg-dark-200 py-16 px-4 sm:px-6 lg:pt-24 lg:pb-28 lg:px-16">
         <div className="absolute inset-0">
-          <div className="bg-white dark:bg-dark-100 h-1/3 sm:h-2/3"></div>
+          <div className="bg-white dark:bg-dark-200 h-1/3 sm:h-2/3"></div>
         </div>
         <div className="mx-auto max-w-7xl">
           <SectionHeader

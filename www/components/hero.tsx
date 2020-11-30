@@ -1,8 +1,9 @@
 import Link from 'next/link'
+import Button from 'components/button'
 
 const Hero = () => {
   return (
-    <div className="relative bg-dark-300 overflow-hidden px-16">
+    <div className="relative bg-dark-400 overflow-hidden px-16">
       <div className="hidden sm:block sm:absolute sm:inset-0" aria-hidden="true">
         <svg
           className="absolute bottom-0 right-0 transform translate-x-1/2 mb-48 text-gray-700 lg:top-0 lg:mt-28 lg:mb-0 xl:transform-none xl:translate-x-0"
@@ -45,13 +46,7 @@ const Hero = () => {
                     Storage and serverless functions coming soon
                   </p>
 
-                  <div className="mt-10 sm:flex sm:justify-center lg:justify-start">
-                    <div className="rounded-md shadow">
-                      <a href="#" className="inline-flex items-center px-4 py-2 border border-transparent text-med font-medium rounded-md shadow-sm text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">                        
-                        Start your project
-                      </a>
-                    </div>
-                  </div>
+                  <Button className="mt-10 py-3" text="Start your project" url="#"/>
 
                   <p className="mt-8 text-sm text-gray-400 tracking-wide sm:mt-10">
                     backed by
