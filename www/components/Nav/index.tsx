@@ -6,7 +6,12 @@ import FlyOut from 'components/Nav/FlyOut'
 import Transition from 'lib/Transition'
 import Solutions from 'data/Solutions.json'
 
-const Nav = () => {
+type Props = {
+  darkMode: boolean,
+}
+
+const Nav = (props: Props) => {
+  const { darkMode } = props
   const [open, setOpen] = useState(false)
 
   React.useEffect(() => {
@@ -132,13 +137,13 @@ const Nav = () => {
             {/* Mobile - remove if not needed */}
             <img
               className="block lg:hidden h-6 w-auto"
-              src="images/logo-light.png"
+              src={darkMode ? "images/logo-dark.png" : "images/logo-light.png"}
               alt="Workflow"
             />
             {/* Desktop */}
             <img
               className="hidden lg:block h-6 w-auto"
-              src="images/logo-dark.png"
+              src={darkMode ? "images/logo-dark.png" : "images/logo-light.png"}
               alt="Workflow"
             />
           </div>
