@@ -5,7 +5,7 @@ import ProjectExamples from "data/ProjectExamples.json"
 const BuiltExamples = () => {
   return (
     <div className="bg-gray-50 dark:bg-dark-300 py-16">
-      <div className="container mx-auto sm:px-16 xl:px-20 relative">
+      <div className="container mx-auto px-10 sm:px-16 xl:px-20 relative">
         <div className="absolute inset-0">
           <div className="mx-auto bg-white dark:bg-dark-200 h-1/3 sm:h-2/3 md:w-5/6 lg:w-3/4 xl:w-full"></div>
         </div>

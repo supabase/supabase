@@ -4,7 +4,7 @@ import Button from 'components/button'
 const Hero = () => {
   return (
     <div className="relative bg-dark-500 overflow-hidden">
-      <div className="container mx-auto sm:px-16 xl:px-20">
+      <div className="container mx-auto px-10 sm:px-16 xl:px-20">
         <div className="hidden sm:block sm:absolute sm:inset-0" aria-hidden="true">
           <svg
             className="absolute bottom-0 right-0 transform translate-x-1/2 mb-48 text-gray-700 lg:top-0 lg:mt-28 lg:mb-0 xl:transform-none xl:translate-x-0"
@@ -38,7 +38,7 @@ const Hero = () => {
                   <div className="sm:mx-auto md:w-3/4 lg:w-full lg:mx-0">
                     <h1 className="mt-4 text-4xl text-white sm:mt-5 sm:leading-none lg:mt-6 lg:text-5xl xl:text-6xl">
                       <span className="md:block">The Open Source</span>
-                      <span className="text-brand-400 md:block">Firebase Alternative</span>
+                      <span className="text-brand-400 ml-2 md:ml-0 md:block">Firebase Alternative</span>
                     </h1>
                     <p className="mt-5 text-base text-gray-200 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                       Create your new project backend in less than 2 minutes with easy to use Postgres Database and Authentication.
@@ -54,9 +54,9 @@ const Hero = () => {
                     </p>
                     <div className="mt-5 w-full sm:mx-auto sm:max-w-lg lg:ml-0">
                       <div className="flex flex-wrap items-center sm:justify-center lg:justify-start">
-                        <img className="h-9 sm:h-10 pr-10" src="images/logos/yc--grey.png" alt="Y Combinator" />
-                        <img className="relative -top-1 h-7 pr-10" src="images/logos/mozilla--grey.png" alt="Mozilla" />
-                        <img className="h-5 pr-10" src="images/logos/coatue.png" alt="Coatue" />
+                        <img className="h-8 sm:h-10 pr-10" src="images/logos/yc--grey.png" alt="Y Combinator" />
+                        <img className="relative -top-1 h-5 sm:h-7 pr-10" src="images/logos/mozilla--grey.png" alt="Mozilla" />
+                        <img className="h-3 sm:h-5 pr-10" src="images/logos/coatue.png" alt="Coatue" />
                       </div>
                     </div>
                   </div>
