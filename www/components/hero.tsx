@@ -3,7 +3,7 @@ import Button from 'components/button'
 
 const Hero = () => {
   return (
-    <div className="relative bg-dark-400 overflow-hidden">
+    <div className="relative bg-dark-500 overflow-hidden">
       <div className="container mx-auto sm:px-16 xl:px-20">
         <div className="hidden sm:block sm:absolute sm:inset-0" aria-hidden="true">
           <svg
@@ -31,11 +31,11 @@ const Hero = () => {
 
         <div className="relative pt-6 pb-16 sm:pb-24">
           <main className="mt-16 sm:mt-24">
-            <div className="mx-auto max-w-7xl">
+            <div className="mx-auto">
               <div className="lg:grid lg:grid-cols-12 lg:gap-8">
                 <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left lg:flex lg:items-center">
 
-                  <div className="sm:w-3/4 mx-auto">
+                  <div className="sm:w-3/4 sm:mx-auto lg:mx-0">
                     <h1 className="mt-4 text-4xl text-white sm:mt-5 sm:leading-none lg:mt-6 lg:text-5xl xl:text-6xl">
                       <span className="md:block">The Open Source</span>
                       <span className="text-brand-400 md:block">Firebase Alternative</span>

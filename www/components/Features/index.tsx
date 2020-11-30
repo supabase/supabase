@@ -28,7 +28,7 @@ const Features = () => {
         </div>
         {url && (
           <div className="mt-5">
-            <a href="#" className="mt-2 text-sm text-brand-600 hover:underline">Learn more link</a>
+            <a href="#" className="mt-2 text-sm text-brand-600 hover:underline">Learn more <span aria-hidden="true">&rarr;</span></a>
           </div>
         )}
       </div>
@@ -36,7 +36,7 @@ const Features = () => {
   })
 
   return (
-    <div className="bg-gray-50 dark:bg-dark-300 overflow-hidden py-12">
+    <div className="bg-gray-50 dark:bg-dark-400 overflow-hidden py-12">
       <div className="container mx-auto sm:px-16 xl:px-20">
         <div className="mx-auto max-w-7xl">
           <SectionHeader

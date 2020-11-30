@@ -4,10 +4,10 @@ import ProjectExamples from "data/ProjectExamples.json"
 
 const BuiltExamples = () => {
   return (
-    <div className="bg-gray-50 dark:bg-dark-200 py-16">
+    <div className="bg-gray-50 dark:bg-dark-300 py-16">
       <div className="container mx-auto sm:px-16 xl:px-20 relative">
         <div className="absolute inset-0">
-          <div className="bg-white dark:bg-dark-600 h-1/3 sm:h-2/3"></div>
+          <div className="bg-white dark:bg-dark-200 h-1/3 sm:h-2/3"></div>
         </div>
         <div className="mx-auto max-w-7xl">
           <SectionHeader

@@ -127,24 +127,22 @@ const Nav = (props: Props) => {
   )
 
   return (
-    <nav className="bg-white dark:bg-dark-400 z-50 shadow-lg sticky">
-      <div className="container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-16">
+    <nav className="bg-white dark:bg-dark-500 z-50 shadow-lg sticky">
+      <div className="container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0">
         
         <HamburgerButton toggleFlyOut={() => setOpen(true)} />
 
         <div className="flex-1 flex items-center justify-center sm:px-10 sm:items-stretch sm:justify-start">
           <div className="flex-shrink-0 flex items-center">
-            {/* Mobile - remove if not needed */}
             <img
               className="block lg:hidden h-6 w-auto"
               src={darkMode ? "images/logo-dark.png" : "images/logo-light.png"}
-              alt="Workflow"
+              alt="Logo"
             />
-            {/* Desktop */}
             <img
               className="hidden lg:block h-6 w-auto"
               src={darkMode ? "images/logo-dark.png" : "images/logo-light.png"}
-              alt="Workflow"
+              alt="Logo"
             />
           </div>
           <div className="pl-4 hidden sm:ml-6 sm:flex sm:space-x-8">
