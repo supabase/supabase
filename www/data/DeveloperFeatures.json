@@ -12,15 +12,15 @@
     "url": "#"
   },
   {
-    "name": "Full CLI",
-    "description": "Ready to use for NodeJS and serverless functions.",
+    "name": "Local emulator",
+    "description": "Develop locally and push to production when you're ready",
     "badge": "Q1 2020",
     "url": "#"
   },
   {
-    "name": "Local emulator",
-    "description": "Develop locally and push to production when you're ready",
-    "badge": "Q1 2020",
+    "name": "Supabase CLI",
+    "description": "Manage your Supabase projects from your local machine",
+    "badge": "Q2 2020",
     "url": "#"
   }
 ]
