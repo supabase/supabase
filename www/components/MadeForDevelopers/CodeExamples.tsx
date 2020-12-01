@@ -144,7 +144,7 @@ const CodeExamples = () => {
           m-1 mb-4 rounded-md border border-gray-200 dark:border-dark-200 px-4 py-2 text-base font-medium text-gray transition
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-transparent sm:w-auto sm:text-sm
           ${example === id ? ' border-gray-900 bg-dark-600 dark:bg-white text-white dark:text-dark-600' : ' hover:bg-gray-200 dark:hover:text-black'}
-          dark:text-white
+          dark:text-white xl:w-52
       `}
       >
         {
@@ -157,11 +157,11 @@ const CodeExamples = () => {
 
   return (
     <div className="grid grid-cols-12 gap-2">
-      <div className="col-span-12 text-center">
+      <div className="col-span-12 text-center xl:col-span-3">
         {buttons}
       </div>
-      <div className="col-span-12 xl:col-span-8 xl:col-start-3">
-        <div className="rounded bg-dark-500">
+      <div className="col-span-12 xl:col-span-9">
+        <div className="rounded" style={{ background: '#474949' }}>
           <div className="p-2 pl-5 flex justify-between items-center">
           <p className="text-base text-dark-100">
             {
