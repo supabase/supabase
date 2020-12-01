@@ -47,9 +47,9 @@ const CodeExamples = () => {
         {buttons}
       </div>
       <div className="col-span-12 lg:col-span-9">
-        <div className="rounded-md rounded-b-lg" style={{ background: '#474949' }}>
+        <div className="rounded-md rounded-b-lg bg-dark-600">
           <div className="p-2 pl-5 flex justify-between items-center">
-          <p className="text-base text-dark-100">
+          <p className="text-sm truncate mr-2 sm:text-base text-dark-100">
             {
               // @ts-ignore
               examples[example].description

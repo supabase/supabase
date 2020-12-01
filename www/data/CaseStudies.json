@@ -2,6 +2,7 @@
   {
     "type": "Case Study",
     "title": "Supabase helped Monitoro scale to millions of API requests",
+    "description": "Probably a simple sentence to summarize this post, could stretch out to maybe two lines, will look good.",
     "imgUrl": "images/case-study-monitoro.jpg",
     "logoUrl": "images/logos/monitoro.png",
     "organization": "Monitoro",
@@ -17,6 +18,7 @@
   {
     "type": "Case Study",
     "title": "Supabase helped Monitoro scale to millions of API requests",
+    "description": "Probably a simple sentence to summarize this post, could stretch out to maybe two lines, will look good.",
     "imgUrl": "images/case-study-tayfab.jpg",
     "logoUrl": "images/logos/monitoro.png",
     "organization": "Tayfab",
@@ -32,6 +34,7 @@
   {
     "type": "Blog Post",
     "title": "Supabase helped Monitoro scale to millions of API requests",
+    "description": "Probably a simple sentence to summarize this post, could stretch out to maybe two lines, will look good.",
     "imgUrl": "images/case-study-xendit.jpg",
     "logoUrl": "images/logos/xendit.png",
     "organization": "Llama Lab",
