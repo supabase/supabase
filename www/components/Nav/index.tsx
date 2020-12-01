@@ -132,30 +132,63 @@ const Nav = (props: Props) => {
         
         <HamburgerButton toggleFlyOut={() => setOpen(true)} />
 
-        <div className="flex-1 flex items-center justify-center sm:px-10 sm:items-stretch sm:justify-start">
-          <div className="flex-shrink-0 flex items-center">
-            <img
-              className="block lg:hidden h-6 w-auto"
-              src={darkMode ? "images/logo-dark.png" : "images/logo-light.png"}
-              alt="Logo"
-            />
-            <img
-              className="hidden lg:block h-6 w-auto"
-              src={darkMode ? "images/logo-dark.png" : "images/logo-light.png"}
-              alt="Logo"
-            />
+        <div className="flex-1 flex items-center justify-center sm:px-10 sm:items-stretch sm:justify-between">
+          <div className="flex items-center">
+            <div className="flex-shrink-0 flex items-center">
+              <img
+                className="block lg:hidden h-6 w-auto"
+                src={darkMode ? "images/logo-dark.png" : "images/logo-light.png"}
+                alt="Logo"
+              />
+              <img
+                className="hidden lg:block h-6 w-auto"
+                src={darkMode ? "images/logo-dark.png" : "images/logo-light.png"}
+                alt="Logo"
+              />
+            </div>
+            <div className="pl-4 hidden sm:ml-6 sm:flex sm:space-x-8">
+              <FlyOut />
+              <a
+                href="#"
+                className={`
+                  inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium
+                  text-gray-500 hover:text-gray-700 hover:border-gray-500
+                  dark:text-dark-100 dark:hover:border-dark-100
+                `}
+              >
+                Developers
+              </a>
+              <a
+                href="#"
+                className={`
+                  inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium
+                  text-gray-500 hover:text-gray-700 hover:border-gray-500
+                  dark:text-dark-100 dark:hover:border-dark-100
+                `}
+              >
+                Company
+              </a>
+              <a
+                href="#"
+                className={`
+                  inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium
+                  text-gray-500 hover:text-gray-700 hover:border-gray-500
+                  dark:text-dark-100 dark:hover:border-dark-100
+                `}
+              >
+                Pricing
+              </a>
+            </div>
           </div>
-          <div className="pl-4 hidden sm:ml-6 sm:flex sm:space-x-8">
-            <FlyOut />
+          <div className="flex items-center">
             <a
               href="#"
               className={`
-                inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium
-                text-gray-500 hover:text-gray-700 hover:border-gray-500
-                dark:text-dark-100 dark:hover:border-dark-100
+                inline-flex items-center border-b-2 border-transparent text-sm font-normal transition
+                rounded-md px-3 py-1 mr-5 bg-brand-600 text-white hover:bg-brand-700
               `}
             >
-              Developers
+              Start a project
             </a>
             <a
               href="#"
@@ -165,17 +198,7 @@ const Nav = (props: Props) => {
                 dark:text-dark-100 dark:hover:border-dark-100
               `}
             >
-              Company
-            </a>
-            <a
-              href="#"
-              className={`
-                inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium
-                text-gray-500 hover:text-gray-700 hover:border-gray-500
-                dark:text-dark-100 dark:hover:border-dark-100
-              `}
-            >
-              Pricing
+              Sign in
             </a>
           </div>
         </div>
