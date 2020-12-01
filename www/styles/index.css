@@ -7,20 +7,6 @@
 /* Stop purging. */
 
 /* Write you own custom component styles here */
-.hero-iframe { height: 174.94px; }
-
-@media (min-width: 768px) {
-  .hero-iframe { height: 360px; }
-}
-@media (min-width: 1024px) {
-  .hero-iframe { height: 234px; }
-}
-@media (min-width: 1280px) {
-  .hero-iframe { height: 297px; }
-}
-@media (min-width: 1536px) {
-  .hero-iframe { height: 342px; }
-}
 
 /* Start purging... */
 @tailwind utilities;
