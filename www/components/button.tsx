@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 type Props = {
   type?: 'primary' | 'secondary',
   text: string,
@@ -16,7 +18,7 @@ const Button = (props: Props) => {
   } = props
 
   const colorClass = type === 'primary'
-    ? 'px-3 py-2 shadow-sm  border border-transparent text-white bg-brand-600 hover:bg-brand-700'
+    ? 'px-3 py-2 shadow-sm  border border-transparent text-white bg-brand-600 hover:bg-brand-700 focus:ring-2 focus:ring-offset-2 focus:ring-brand-500'
     : 'text-brand-600 bg-none'
   
   const textClass = type === 'primary'
@@ -32,8 +34,7 @@ const Button = (props: Props) => {
       type="button"
       className={`
         inline-flex items-center text-sm leading-4 rounded-md
-        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500
-        group transition ${colorClass} ${className}
+        focus:outline-none group transition ${colorClass} ${className}
       `}
     >
       <span className={`
@@ -47,7 +48,7 @@ const Button = (props: Props) => {
 
   return (
     url
-      ? <a href={url}>{renderButton()}</a>
+      ? <Link href={url}>{renderButton()}</Link>
       : renderButton()
   )
 }

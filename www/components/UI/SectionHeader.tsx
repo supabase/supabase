@@ -8,7 +8,7 @@ const SectionHeader = (props :any) => {
         <h2 className="text-gray-900 dark:text-white text-3xl md:text-4xl lg:text-5xl">
           {props.title}
           {props.title_alt && (
-            <span className="text-gray-600 dark:text-gray-400 block lg:inline">{props.title_alt}</span>
+            <span className="text-gray-600 dark:text-gray-400 inline">{props.title_alt}</span>
           )}
         </h2>
         <div>

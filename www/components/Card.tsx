@@ -69,7 +69,7 @@ const Card = (props: Props) => {
           </p>
           <div className="block mt-2">
             {/* {logoUrl && <img src={logoUrl} className="h-9 my-4" />} */}
-            {title && <a href={url} className="text-xl text-gray-900 dark:text-white">{title}</a>}
+            {title && <p className="text-xl text-gray-900 dark:text-white">{title}</p>}
             <p className="mt-3 text-base text-gray-500 dark:text-dark-100">
               {description}
             </p>

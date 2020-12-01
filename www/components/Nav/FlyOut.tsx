@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Badge from 'components/Badge'
 import Transition from 'lib/Transition'
 import Solutions from 'data/Solutions.json'
+import CaseStudiesData from "data/CaseStudies.json"
 
 const FlyOut = () => {
   const [show, setShow] = useState(false)
@@ -110,7 +111,7 @@ const FlyOut = () => {
               position: 'absolute',
               width: '100vw',
               margin: '0 auto',
-              marginTop: '44px',
+              marginTop: '64px',
               left: '-50vw',
               right: '-50vw',
             }}
@@ -133,52 +134,27 @@ const FlyOut = () => {
                     Latest news
                   </h3>
                   <ul className="mt-6 space-y-6">
-                    <li className="flow-root">
-                      <a
-                        href="#"
-                        className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-200 transition ease-in-out duration-150"
-                      >
-                        <div className="hidden sm:block flex-shrink-0">
-                          <img
-                            className="w-32 h-20 object-cover rounded-md"
-                            src="https://images.unsplash.com/photo-1558478551-1a378f63328e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2849&q=80"
-                            alt=""
-                          />
-                        </div>
-                        <div className="min-w-0 flex-1 sm:ml-8">
-                          <h4 className="text-base font-medium text-gray-900 dark:text-white truncate">
-                            Supabase launch news
-                          </h4>
-                          <p className="mt-1 text-sm text-gray-500 dark:text-dark-100">
-                            Eget ullamcorper ac ut vulputate fames nec mattis pellentesque
-                            elementum. Viverra tempor id mus.
-                          </p>
-                        </div>
-                      </a>
-                    </li>
-                    <li className="flow-root">
-                      <a
-                        href="#"
-                        className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-200 transition ease-in-out duration-150"
-                      >
-                        <div className="hidden sm:block flex-shrink-0">
-                          <img
-                            className="w-32 h-20 object-cover rounded-md"
-                            src="https://images.unsplash.com/1/apple-gear-looking-pretty.jpg?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2850&q=80"
-                            alt=""
-                          />
-                        </div>
-                        <div className="min-w-0 flex-1 sm:ml-8">
-                          <h4 className="text-base font-medium text-gray-900 dark:text-white truncate">
-                            New project example released
-                          </h4>
-                          <p className="mt-1 text-sm text-gray-500 dark:text-dark-100">
-                            Eget ullamcorper ac ut vulputate fames nec mattis pellentesque
-                            elementum. Viverra tempor id mus.
-                          </p>
-                        </div>
-                      </a>
-                    </li>
+                    {CaseStudiesData.map((caseStudy: any, idx:number) => (
+                      <li className="flow-root" key={`flyout_case_${idx}`}>
+                        <a href={caseStudy.url} className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-200 transition ease-in-out duration-150">
+                          <div className="hidden sm:block flex-shrink-0">
+                            <img
+                              className="w-32 h-20 object-cover rounded-md"
+                              src={caseStudy.imgUrl}
+                              alt="caseStudyThumb"
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1 sm:ml-8">
+                            <h4 className="text-base font-medium text-gray-900 dark:text-white truncate">
+                              {caseStudy.title}
+                            </h4>
+                            <p className="mt-1 text-sm text-gray-500 dark:text-dark-100">
+                              {caseStudy.description}
+                            </p>
+                          </div>
+                        </a>
+                      </li>
+                    ))}
                   </ul>
                 </div>
                 <div className="mt-6 text-sm font-medium">
