@@ -1,4 +1,4 @@
-import Badge from 'components/badge'
+import Badge from 'components/Badge'
 import SectionHeader from 'components/UI/SectionHeader'
 import Solutions from 'data/Solutions.json'
 
