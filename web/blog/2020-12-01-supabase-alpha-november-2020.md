@@ -11,7 +11,7 @@ tags:
     - supabase
 ---
 
-We're now 8 months into building Supabase. We're focused on performance, stability, and reliability but that hasn't prevented us from shipping some great features.
+We've been building for 9 months now, are we're getting even closer to Beta. 
 
 <!--truncate-->
 
