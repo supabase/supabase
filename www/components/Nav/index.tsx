@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 
-import Badge from 'components/badge'
+import Badge from 'components/Badge'
 import FlyOut from 'components/Nav/FlyOut'
 import Transition from 'lib/Transition'
 import Solutions from 'data/Solutions.json'

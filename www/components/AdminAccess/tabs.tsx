@@ -1,4 +1,4 @@
-import Button from "components/button"
+import Button from "components/Button"
 import TabMarkup from "data/AdminAccess.json"
 
 type Props = { 
