@@ -1,6 +1,6 @@
 const SectionHeader = (props :any) => {
   return (
-    <div className={"grid grid-cols-12 gap-8 " + props.className}>
+    <div className={"grid grid-cols-12 gap-1 sm:gap-8 " + props.className}>
       <div className="relative py-12 col-span-12">
         <span className="block mb-6 text-sm tracking-widest uppercase text-gray-400 font-mono">
           {props.subtitle}

@@ -46,7 +46,7 @@ const Features = () => {
             <div className="relative pb-12 col-span-12">
               <div className="relative lg:grid lg:grid-cols-12 lg:gap-x-8">
                 <div className="relative col-span-12 lg:grid lg:grid-cols-2 lg:gap-x-8">
-                  <dl className="space-y-10 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 lg:gap-x-4 lg:mt-0 lg:col-span-2 xl:grid-cols-4">
+                  <dl className="space-y-10 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 lg:gap-x-4 lg:mt-0 lg:col-span-2 xl:grid-cols-4 xl:gap-x-12">
                     {IconSections}
                   </dl>
                 </div>

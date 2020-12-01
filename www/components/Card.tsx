@@ -49,7 +49,7 @@ const Card = (props: Props) => {
   })
 
   return (
-    <a href={url} target="_blank" className="flex flex-col rounded-md shadow-lg overflow-hidden">
+    <a href={url} target="_blank" className="flex flex-col rounded-md shadow-lg overflow-hidden relative transition transform hover:-translate-y-1">
       <div className="flex-shrink-0 dark:bg-dark-500">
         <img
           className="h-64 w-full object-cover"

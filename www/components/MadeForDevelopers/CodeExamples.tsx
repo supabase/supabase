@@ -27,10 +27,10 @@ const CodeExamples = () => {
         key={id + "-button"}
         onClick={() => handleClick(id)}
         className={`
-          m-1 mb-4 rounded-md border border-gray-200 dark:border-dark-200 px-4 py-2 text-base font-medium text-gray transition
-          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-transparent sm:w-auto sm:text-sm
+          m-1 mb-4 rounded-md border border-gray-200 dark:border-dark-200 px-4 py-2 text-xs font-medium text-gray transition
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-transparent sm:text-sm sm:w-auto
           ${example === id ? ' border-gray-900 bg-dark-600 dark:bg-white text-white dark:text-dark-600' : ' hover:bg-gray-200 dark:hover:text-black'}
-          dark:text-white xl:w-52
+          dark:text-white lg:w-full
       `}
       >
         {
@@ -42,12 +42,12 @@ const CodeExamples = () => {
   })
 
   return (
-    <div className="grid grid-cols-12 gap-2">
-      <div className="col-span-12 text-center xl:col-span-3">
+    <div className="grid grid-cols-12 gap-2 xl:gap-8">
+      <div className="col-span-12 text-center lg:col-span-3 lg:hidden">
         {buttons}
       </div>
-      <div className="col-span-12 xl:col-span-9">
-        <div className="rounded" style={{ background: '#474949' }}>
+      <div className="col-span-12 lg:col-span-9">
+        <div className="rounded-md rounded-b-lg" style={{ background: '#474949' }}>
           <div className="p-2 pl-5 flex justify-between items-center">
           <p className="text-base text-dark-100">
             {
@@ -103,6 +103,9 @@ const CodeExamples = () => {
             }
           </SyntaxHighlighter>
         </div>
+      </div>
+      <div className="col-span-12 text-center hidden lg:col-span-3 lg:block">
+        {buttons}
       </div>
     </div>
   )
