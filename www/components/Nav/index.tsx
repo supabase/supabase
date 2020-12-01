@@ -185,7 +185,7 @@ const Nav = (props: Props) => {
               href="#"
               className={`
                 inline-flex items-center border-b-2 border-transparent text-sm font-normal transition
-                rounded-md px-3 py-1 mr-5 bg-brand-600 text-gray-500 dark:text-white hover:bg-brand-700
+                rounded-md px-3 py-1 mr-5 bg-brand-600 text-white hover:bg-brand-700
               `}
             >
               Start a project
