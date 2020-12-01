@@ -12,7 +12,7 @@ const AdminAccess = () => {
           <div className="relative items-center">
             <div className="relative">
               <SectionHeader
-                title={'Build your app,'}
+                title={'Build your app'}
                 title_alt={' without leaving the dashboard'} 
                 subtitle={'Admin Access'} 
               />
