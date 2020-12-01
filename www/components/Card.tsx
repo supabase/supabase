@@ -1,3 +1,5 @@
+import Button from 'components/Button'
+
 type PostMetaProps = {
   name: string,
   avatarUrl: string,
@@ -95,11 +97,7 @@ const Card = (props: Props) => {
             </div>
           </div>
         )}
-        { ctaText && (
-          <div className="mt-6 flex items-center text-sm text-brand-600">
-            <a href={url}>{ctaText}</a>
-          </div>
-        )}
+        { ctaText && <Button className="mt-5" type="secondary" text={ctaText} url="#" /> }
       </div>
     </div>
   )
