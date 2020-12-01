@@ -63,23 +63,26 @@ const Hero = () => {
 
                 </div>
                 <div className="mt-16 sm:mt-24 lg:mt-0 lg:col-span-6">
-                  <div className="shadow-lg relative w-full rounded-md hero-iframe">
+                  <div className="shadow-lg relative w-full rounded-md">
                     <div className="w-full rounded-t-md h-5 bg-dark-400 flex items-center justify-start px-2">
                       <div className="h-2 w-2 mr-2 rounded-full bg-dark-500"/>
                       <div className="h-2 w-2 mr-2 rounded-full bg-dark-500"/>
                       <div className="h-2 w-2 mr-2 rounded-full bg-dark-500"/>
                     </div>
-                    {/* <video className="rounded-b-md" src={`videos/hero.mp4`} autoPlay loop muted>
-                      Your browser does not support the video tag
-                    </video>    */}
-                    <iframe
-                      className="rounded-b-md position inset-0 w-full h-full"
-                      width="560"
-                      height="315"
-                      src={`https://www.youtube.com/embed/dBOSUER_5T4?playlist=dBOSUER_5T4&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1`}
-                      frameBorder="0"
-                      allow="autoplay"
-                    />
+                    <div className="relative bg-red" style={{ padding: '56.25% 0 0 0' }}>
+                      <iframe
+                        className="absolute w-full h-full"
+                        src="https://www.youtube.com/embed/dBOSUER_5T4?playlist=dBOSUER_5T4&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&muted=1"
+                        style={{ top: 0, left: 0 }}
+                        frameBorder="0"
+                        allow="autoplay"
+                      />
+                    </div>
+                    {/* 
+                      Replace src with the following if have preference:
+                      Vimeo:   https://player.vimeo.com/video/485959063?loop=1&autoplay=1
+                      Youtube: https://www.youtube.com/embed/dBOSUER_5T4?playlist=dBOSUER_5T4&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&muted=1
+                     */}
                   </div>
                 </div>        
               </div>
