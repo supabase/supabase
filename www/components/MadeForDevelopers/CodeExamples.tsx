@@ -7,6 +7,38 @@ import monokaiCustomTheme from 'data/CodeEditorTheme'
 
 SyntaxHighlighter.registerLanguage('javascript', js)
 
+const ClipboardIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    width="12"
+    height="12"
+    stroke="currentColor"
+    strokeWidth="2"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="css-i6dzq1"
+  >
+    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+    <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+  </svg>
+)
+
+const CopiedIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    width="12"
+    height="12"
+    stroke="currentColor"
+    strokeWidth="2"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="css-i6dzq1">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+)
+
 const CodeExamples = () => {
   const [example, setExample] = useState('subscribeExample')
   const [copied, setCopied] = useState(false)
@@ -66,7 +98,12 @@ const CodeExamples = () => {
               type="button"
               className="inline-flex items-center px-2.5 py-1.5 border border-dark-300 shadow-sm text-xs font-medium rounded text-dark-100 hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              {copied ? 'Copied!' : 'Copy code'}
+              <span className="hidden sm:block">
+                {copied ? 'Copied!' : 'Copy code'}
+              </span>
+              <span className="block sm:hidden">
+                {copied ? <CopiedIcon /> : <ClipboardIcon />}
+              </span>
             </button>
           </CopyToClipboard>
           </div>
