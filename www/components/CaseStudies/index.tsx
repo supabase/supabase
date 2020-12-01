@@ -9,7 +9,7 @@ const CaseStudies = () => {
       <div className="absolute inset-0">
         <div className="mx-auto bg-white dark:bg-dark-300 h-1/3 sm:h-3/5 xl:h-2/5 xl:w-full"></div>
       </div>
-      <div className="container relative mx-auto px-8 sm:px-16 xl:px-20">
+      <div className="container relative mx-auto px-8 sm:px-16 xl:px-20 lg:py-8">
         <div className="relative max-w-7xl mx-auto">
           <div>
             <SectionHeader
