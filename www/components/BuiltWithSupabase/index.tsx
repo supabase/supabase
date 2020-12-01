@@ -4,9 +4,9 @@ import ProjectExamples from "data/ProjectExamples.json"
 
 const BuiltExamples = () => {
   return (
-    <div className="relative bg-gray-50 dark:bg-dark-300 pt-12 pb-16">
+    <div className="relative bg-gray-50 dark:bg-dark-400 pt-12 pb-16">
       <div className="absolute inset-0">
-        <div className="mx-auto bg-white dark:bg-dark-400 w-full h-1/3 sm:h-2/3 lg:h-1/2"></div>
+        <div className="mx-auto bg-white dark:bg-dark-300 w-full h-1/3 sm:h-2/3 lg:h-1/2"></div>
       </div>
       <div className="container mx-auto px-8 sm:px-16 xl:px-20 relative">
         <div className="mx-auto max-w-7xl">
