@@ -6,7 +6,7 @@ const BuiltExamples = () => {
   return (
     <div className="relative bg-gray-50 dark:bg-dark-300 pt-12 pb-16">
       <div className="absolute inset-0">
-        <div className="mx-auto bg-white dark:bg-dark-400 h-1/3 sm:h-2/3 lg:h-1/2 md:w-5/6 lg:w-3/4 xl:w-full"></div>
+        <div className="mx-auto bg-white dark:bg-dark-400 w-full h-1/3 sm:h-2/3 lg:h-1/2"></div>
       </div>
       <div className="container mx-auto px-8 sm:px-16 xl:px-20 relative">
         <div className="mx-auto max-w-7xl">
