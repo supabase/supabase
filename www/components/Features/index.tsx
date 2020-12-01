@@ -25,7 +25,7 @@ const Features = () => {
           </dt>
         </div>
         <div className="mt-5">
-          <dd className="mt-2 text-base text-gray-500 dark:text-gray-400">{description}</dd>
+          <dd className="mt-2 text-base text-gray-500 dark:text-dark-100">{description}</dd>
         </div>
         { url && <Button className="mt-5" type="secondary" text="Learn more" url="#" /> }
         

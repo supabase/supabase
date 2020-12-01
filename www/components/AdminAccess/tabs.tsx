@@ -57,7 +57,7 @@ function Tabs(props: Props) {
                 {/* @ts-ignore */}
                 {TabMarkup[tabId].header}
               </dd>
-              <dd className="mt-8 text-base text-gray-500 dark:text-gray-400">
+              <dd className="mt-8 text-base text-gray-500 dark:text-dark-100">
                 {/* @ts-ignore */}
                 {TabMarkup[tabId].description}
               </dd>
