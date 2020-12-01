@@ -2,7 +2,7 @@
   {
     "type": "Case Study",
     "title": "Supabase helped Monitoro scale to millions of API requests",
-    "imgUrl": "images/case-study-placeholder.jpg",
+    "imgUrl": "images/case-study-monitoro.jpg",
     "logoUrl": "images/logos/monitoro.png",
     "organization": "Monitoro",
     "url": "https://supabase.io/casestudies/monitoro",
@@ -17,7 +17,7 @@
   {
     "type": "Case Study",
     "title": "Supabase helped Monitoro scale to millions of API requests",
-    "imgUrl": "images/case-study-placeholder.jpg",
+    "imgUrl": "images/case-study-tayfab.jpg",
     "logoUrl": "images/logos/monitoro.png",
     "organization": "Tayfab",
     "url": "https://supabase.io/casestudies/monitoro",
@@ -32,7 +32,7 @@
   {
     "type": "Blog Post",
     "title": "Supabase helped Monitoro scale to millions of API requests",
-    "imgUrl": "images/case-study-placeholder.jpg",
+    "imgUrl": "images/case-study-xendit.jpg",
     "logoUrl": "images/logos/xendit.png",
     "organization": "Llama Lab",
     "url": "https://supabase.io/casestudies/monitoro",
