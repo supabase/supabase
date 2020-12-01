@@ -1,8 +1,8 @@
 [
   {
     "type": "Case Study",
-    "title": "Supabase helped Monitoro scale to millions of API requests",
-    "description": "Probably a simple sentence to summarize this post, could stretch out to maybe two lines, will look good.",
+    "title": "A web crawler handling millions of API requests.",
+    "description": "See how Monitoro built an automated a scraping platform using Supabase.",
     "imgUrl": "images/case-study-monitoro.jpg",
     "logoUrl": "images/logos/monitoro.png",
     "organization": "Monitoro",
@@ -17,8 +17,8 @@
   },
   {
     "type": "Case Study",
-    "title": "Supabase helped Monitoro scale to millions of API requests",
-    "description": "Probably a simple sentence to summarize this post, could stretch out to maybe two lines, will look good.",
+    "title": "A no-code website builder, deployed in seven days.",
+    "description": "See how Tayfa went from idea to paying customer in less than 30 days.",
     "imgUrl": "images/case-study-tayfab.jpg",
     "logoUrl": "images/logos/monitoro.png",
     "organization": "Tayfab",
@@ -32,9 +32,9 @@
     "ctaText": "View case study"
   },
   {
-    "type": "Blog Post",
-    "title": "Supabase helped Monitoro scale to millions of API requests",
-    "description": "Probably a simple sentence to summarize this post, could stretch out to maybe two lines, will look good.",
+    "type": "Case Study",
+    "title": "Counter-fraud watchlists for the fintech industry.",
+    "description": "See how Xendit use Supabase to build a full-text search engine.",
     "imgUrl": "images/case-study-xendit.jpg",
     "logoUrl": "images/logos/xendit.png",
     "organization": "Llama Lab",
