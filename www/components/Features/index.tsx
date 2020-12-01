@@ -1,4 +1,5 @@
 import Badge from 'components/Badge'
+import Button from 'components/Button'
 import SectionHeader from 'components/UI/SectionHeader'
 import Solutions from 'data/Solutions.json'
 
@@ -26,11 +27,8 @@ const Features = () => {
         <div className="mt-5">
           <dd className="mt-2 text-base text-gray-500 dark:text-gray-400">{description}</dd>
         </div>
-        {url && (
-          <div className="mt-5">
-            <a href="#" className="mt-2 text-sm text-brand-600 hover:underline">Learn more <span aria-hidden="true">&rarr;</span></a>
-          </div>
-        )}
+        { url && <Button className="mt-5" type="secondary" text="Learn more" url="#" /> }
+        
       </div>
     )
   })

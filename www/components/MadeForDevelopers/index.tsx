@@ -1,3 +1,4 @@
+import Button from 'components/Button'
 import Badge from 'components/Badge'
 import SectionHeader from 'components/UI/SectionHeader'
 import CodeExamples from 'components/MadeForDevelopers/CodeExamples'
@@ -22,15 +23,10 @@ const MadeForDevelopers = () => {
                     <dt className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
                       TypeScript support
                     </dt>
-                    <dd className="mt-2 text-base text-gray-500 mb-6 dark:text-dark-100">
+                    <dd className="mt-3 text-base text-gray-500 mb-6 dark:text-dark-100">
                       Type definitions for both server side and client side
                     </dd>
-                    <button
-                      type="button"
-                      className="inline-flex items-center text-xs font-medium rounded transition text-brand-600 hover:text-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
-                    >
-                      Explore more
-                    </button>
+                    <Button type="secondary" text="Explore more" url="#" />
                   </div>
                 </div>
                 <div className="col-span-12 sm:col-span-6">
@@ -39,15 +35,10 @@ const MadeForDevelopers = () => {
                       Local emulator
                       <Badge>Coming Q1 2021</Badge>
                     </dt>
-                    <dd className="mt-2 text-base text-gray-500 mb-6 dark:text-dark-100">
+                    <dd className="mt-3 text-base text-gray-500 mb-6 dark:text-dark-100">
                       Develop locally and push to production when you're ready
                     </dd>
-                    <button
-                      type="button"
-                      className="inline-flex items-center text-xs font-medium rounded transition text-brand-600 hover:text-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
-                    >
-                      Get notified
-                    </button>
+                    <Button type="secondary" text="Get notified" url="#" />
                   </div>
                 </div>
               </dl>
