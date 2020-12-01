@@ -32,7 +32,7 @@ const Hero = () => {
           <div className="relative pt-6 pb-16 sm:pb-24">
           <main className="mt-16 sm:mt-24">
             <div className="mx-auto">
-              <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+              <div className="lg:grid lg:grid-cols-12 lg:gap-16">
                 <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left lg:flex lg:items-center">
 
                   <div className="sm:mx-auto md:w-3/4 lg:w-full lg:mx-0">
@@ -65,6 +65,17 @@ const Hero = () => {
                 <div className="mt-16 sm:mt-24 lg:mt-0 lg:col-span-6">
                   {/* <div className="bg-white sm:max-w-md sm:w-full sm:mx-auto sm:rounded-lg sm:overflow-hidden"></div> */}
                   {/* <img src="images/hero.png" className="relative" style={{ right: -20 }} /> */}
+                  <div className="shadow-lg rounded-md" style={{ height: 'fit-content'}}>
+                    <div className="w-full rounded-t-md h-5 bg-dark-400 flex items-center justify-start px-2">
+                      <div className="h-2 w-2 mr-2 rounded-full bg-dark-500"/>
+                      <div className="h-2 w-2 mr-2 rounded-full bg-dark-500"/>
+                      <div className="h-2 w-2 mr-2 rounded-full bg-dark-500"/>
+                    </div>
+                    {/* Joshen: Preload all videos to prevent the flickering of video when changing tabs */}
+                    <video className="rounded-b-md" src={`videos/hero.mp4`} autoPlay loop muted>
+                      Your browser does not support the video tag
+                    </video>   
+                  </div>
                 </div>        
               </div>
             </div>
