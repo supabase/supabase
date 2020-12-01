@@ -18,7 +18,7 @@
         "imgAlt": "stripe icon"
       }
     ],
-    "ctaText" : "View Project"
+    "ctaText" : "View project"
   },
   {
     "imgUrl": "images/slack-clone.jpg",
@@ -35,7 +35,7 @@
         "imgAlt": "vercel icon"
       }
     ],
-    "ctaText" : "View Project"
+    "ctaText" : "View project"
   },
   {
     "imgUrl": "images/to-do-app.jpg",
@@ -52,6 +52,6 @@
         "imgAlt": "vercel icon"
       }
     ],
-    "ctaText" : "View Project"
+    "ctaText" : "View project"
   }
 ]
