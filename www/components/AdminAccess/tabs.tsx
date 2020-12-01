@@ -17,7 +17,7 @@ function Tabs(props: Props) {
   }
 
   return (
-    <div className="flex justify-between items-center w-full sm:relative -mt-20 lg:mt-0">
+    <div className="flex justify-between w-full sm:relative -mt-20 lg:mt-0">
       <div>
         <div className="">
           <nav className="-mb-px flex" aria-label="Tabs">
