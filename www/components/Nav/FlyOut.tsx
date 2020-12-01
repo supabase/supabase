@@ -42,7 +42,7 @@ const FlyOut = () => {
         <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
           <div>
             <p className="text-base font-medium text-gray-900 dark:text-white">
-              {name} {label && <Badge>{label}</Badge>}
+              {name} {label && <Badge className="ml-3">{label}</Badge>}
             </p>
             <p className="mt-1 text-sm text-gray-500 dark:text-dark-100">
               {description}
