@@ -7,7 +7,7 @@ const AdminAccess = () => {
 
   return (
     <div className="py-16 bg-gray-50 dark:bg-dark-300 overflow-hidden lg:py-24">
-      <div className="container mx-auto px-10 sm:px-16 xl:px-20">
+      <div className="container mx-auto px-8 sm:px-16 xl:px-20">
         <div className="mx-auto max-w-7xl">
           <div className="relative items-center">
             <div className="relative">
