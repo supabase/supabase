@@ -110,7 +110,7 @@ const FlyOut = () => {
               position: 'absolute',
               width: '100vw',
               margin: '0 auto',
-              marginTop: '64px',
+              marginTop: '44px',
               left: '-50vw',
               right: '-50vw',
             }}
