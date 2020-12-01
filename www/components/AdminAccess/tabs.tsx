@@ -1,4 +1,4 @@
-import Button from "components/button"
+import Button from "components/Button"
 import TabMarkup from "data/AdminAccess.json"
 
 type Props = { 
@@ -24,7 +24,7 @@ function Tabs(props: Props) {
             <a
               href="#"
               id="tabTableEditor"
-              className={"transition sm:w-1/3 lg:w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm" + (tabId === "tabTableEditor" ? " border-gray-500 dark:border-white text-gray-600 dark:text-white" : " border-b border-gray-200 dark:border-dark-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200")}
+              className={"transition w-1/3 lg:w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm" + (tabId === "tabTableEditor" ? " border-gray-500 dark:border-white text-gray-600 dark:text-white" : " border-b border-gray-200 dark:border-dark-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200")}
               onClick={(event: any) => handleTabChange(event)}
             >
               Table Editor
@@ -32,7 +32,7 @@ function Tabs(props: Props) {
             <a
               href="#"
               id="tabSqlEditor"
-              className={"transition sm:w-1/3 lg:w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm" + (tabId === "tabSqlEditor" ? " border-gray-500 dark:border-white text-gray-600 dark:text-white" : " border-b border-gray-200 dark:border-dark-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200")}
+              className={"transition w-1/3 lg:w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm" + (tabId === "tabSqlEditor" ? " border-gray-500 dark:border-white text-gray-600 dark:text-white" : " border-b border-gray-200 dark:border-dark-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200")}
               onClick={(event: any) => handleTabChange(event)}
             >
               SQL Editor
@@ -40,7 +40,7 @@ function Tabs(props: Props) {
             <a
               href="#"
               id="tabAuthRules"
-              className={"transition sm:w-1/3 lg:w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm" + (tabId === "tabAuthRules" ? " border-gray-500 dark:border-white text-gray-600 dark:text-white" : " border-b border-gray-200 dark:border-dark-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200")}
+              className={"transition w-1/3 lg:w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm" + (tabId === "tabAuthRules" ? " border-gray-500 dark:border-white text-gray-600 dark:text-white" : " border-b border-gray-200 dark:border-dark-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200")}
               onClick={(event: any) => handleTabChange(event)}
               aria-current="page"
             >
