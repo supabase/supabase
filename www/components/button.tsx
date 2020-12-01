@@ -14,21 +14,32 @@ const Button = (props: Props) => {
   } = props
 
   const colorClass = type === 'primary'
-    ? 'text-white bg-brand-600 hover:bg-brand-700'
-    : 'text-black bg-none'
+    ? 'px-3 py-2 shadow-sm  border border-transparent text-white bg-brand-600 hover:bg-brand-700'
+    : 'text-brand-600 bg-none'
+  
+  const textClass = type === 'primary'
+    ? 'font-medium left-3 group-hover:left-0'
+    : 'font-normal'
+
+  const arrowClass = type === 'primary'
+    ? ''
+    : 'relative -left-1 group-hover:left-0'
 
   const renderButton = () => (
     <button
       type="button"
       className={`
-        mt-1 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium 
-        rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500
-        group transition
-        ${colorClass} ${className}
+        inline-flex items-center text-sm leading-4 rounded-md
+        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500
+        group transition ${colorClass} ${className}
       `}
     >
-      <span className={`relative transition-all ${url ? 'left-3 group-hover:left-0' : ''}`}>{text}</span>
-      { url && <span className="ml-2 transition-all opacity-0 group-hover:opacity-100">→</span> }
+      <span className={`
+        relative transition-all ${url ? textClass : ''}
+      `}>
+        {text}
+      </span>
+      { url && <span className={`ml-2 transition-all opacity-0 group-hover:opacity-100 ${arrowClass}`}>→</span> }
     </button>
   )
 

@@ -1,9 +1,9 @@
 import Head from 'next/head'
 import { APP_NAME, DESCRIPTION } from 'lib/constants'
 
-import Container from 'components/container'
-import Layout from 'components/layout'
-import Hero from 'components/hero'
+import Container from 'components/Container'
+import Layout from 'components/Layout'
+import Hero from 'components/Hero'
 import Features from 'components/Features/index'
 import BuiltExamples from 'components/BuiltWithSupabase/index'
 import MadeForDevelopers from 'components/MadeForDevelopers/index'

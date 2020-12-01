@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import Button from 'components/button'
+import Button from 'components/Button'
 
 const Hero = () => {
   return (
     <div className="relative bg-dark-500 overflow-hidden">
-      <div className="container mx-auto px-10 sm:px-16 xl:px-20">
+      <div className="container mx-auto px-8 sm:px-16 xl:px-20">
         <div className="mx-auto max-w-7xl">
           <div className="hidden sm:block sm:absolute sm:inset-0" aria-hidden="true">
             <svg

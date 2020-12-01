@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Nav from 'components/Nav/index'
 import Footer from 'components/Footer/index'
-import Meta from 'components/meta'
+import Meta from 'components/Meta'
 
 type Props = {
   preview?: boolean
