@@ -33,7 +33,7 @@ const MadeForDevelopers = () => {
                   <div className="lg:mt-5">
                     <dt className="text-lg leading-6 font-medium text-gray-900 dark:text-white flex">
                       Local emulator
-                      <Badge>Coming Q1 2021</Badge>
+                      <Badge>Q1 2021</Badge>
                     </dt>
                     <dd className="mt-3 text-base text-gray-500 mb-6 dark:text-dark-100">
                       Develop locally and push to production when you're ready
