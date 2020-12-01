@@ -22,7 +22,7 @@ const Features = () => {
           </div>
           <dt className="flex flex-row xl:flex-col ml-4 text-lg leading-6 font-medium text-gray-900 dark:text-white">
             {name}
-            {label && <Badge>{label}</Badge>}
+            {label && <Badge className="mt-1">{label}</Badge>}
           </dt>
         </div>
         <div className="mt-5">
