@@ -63,18 +63,23 @@ const Hero = () => {
 
                 </div>
                 <div className="mt-16 sm:mt-24 lg:mt-0 lg:col-span-6">
-                  {/* <div className="bg-white sm:max-w-md sm:w-full sm:mx-auto sm:rounded-lg sm:overflow-hidden"></div> */}
-                  {/* <img src="images/hero.png" className="relative" style={{ right: -20 }} /> */}
-                  <div className="shadow-lg rounded-md" style={{ height: 'fit-content'}}>
+                  <div className="shadow-lg relative w-full rounded-md hero-iframe">
                     <div className="w-full rounded-t-md h-5 bg-dark-400 flex items-center justify-start px-2">
                       <div className="h-2 w-2 mr-2 rounded-full bg-dark-500"/>
                       <div className="h-2 w-2 mr-2 rounded-full bg-dark-500"/>
                       <div className="h-2 w-2 mr-2 rounded-full bg-dark-500"/>
                     </div>
-                    {/* Joshen: Preload all videos to prevent the flickering of video when changing tabs */}
-                    <video className="rounded-b-md" src={`videos/hero.mp4`} autoPlay loop muted>
+                    {/* <video className="rounded-b-md" src={`videos/hero.mp4`} autoPlay loop muted>
                       Your browser does not support the video tag
-                    </video>   
+                    </video>    */}
+                    <iframe
+                      className="rounded-b-md position inset-0 w-full h-full"
+                      width="560"
+                      height="315"
+                      src={`https://www.youtube.com/embed/dBOSUER_5T4?playlist=dBOSUER_5T4&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1`}
+                      frameBorder="0"
+                      allow="autoplay"
+                    />
                   </div>
                 </div>        
               </div>
