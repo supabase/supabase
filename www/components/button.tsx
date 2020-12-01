@@ -3,6 +3,7 @@ type Props = {
   text: string,
   url?: string,
   className?: string,
+  hideArrow?: boolean,
 }
 
 const Button = (props: Props) => {
@@ -10,7 +11,8 @@ const Button = (props: Props) => {
     type = 'primary',
     text, 
     url,
-    className
+    className,
+    hideArrow = false,
   } = props
 
   const colorClass = type === 'primary'

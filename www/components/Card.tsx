@@ -49,7 +49,7 @@ const Card = (props: Props) => {
   })
 
   return (
-    <div className="flex flex-col rounded-md shadow-lg overflow-hidden">
+    <a href={url} target="_blank" className="flex flex-col rounded-md shadow-lg overflow-hidden">
       <div className="flex-shrink-0 dark:bg-dark-500">
         <img
           className="h-64 w-full object-cover"
@@ -64,9 +64,9 @@ const Card = (props: Props) => {
               {iconMarkup}
             </div>
           )} */}
-          <a href="#" target="_blank" className="text-sm font-medium capitalize text-gray-600 dark:text-dark-100 hover:underline">
+          <p className="text-sm font-medium capitalize text-gray-600 dark:text-dark-100">
             {type}
-          </a>
+          </p>
           <div className="block mt-2">
             {/* {logoUrl && <img src={logoUrl} className="h-9 my-4" />} */}
             {title && <a href={url} className="text-xl text-gray-900 dark:text-white">{title}</a>}
@@ -97,9 +97,9 @@ const Card = (props: Props) => {
             </div>
           </div>
         )}
-        { ctaText && <Button className="mt-5" type="secondary" text={ctaText} url="#" /> }
+        { ctaText && <Button className="mt-5" type="secondary" text={ctaText} url={url} /> }
       </div>
-    </div>
+    </a>
   )
 }
 

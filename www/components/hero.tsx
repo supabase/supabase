@@ -43,7 +43,7 @@ const Hero = () => {
                     <p className="mt-5 text-base text-gray-200 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                       Create your new project backend in less than 2 minutes with easy to use Postgres Database and Authentication.
                     </p>
-                    <p className="mt-3 text-base text-gray-500">
+                    <p className="mt-3 text-base text-dark-100">
                       Storage and serverless functions coming soon
                     </p>
 
