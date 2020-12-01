@@ -20,8 +20,9 @@ const Features = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
             </svg>
           </div>
-          <dt className="ml-4 text-lg leading-6 font-medium text-gray-900 dark:text-white">
-            {name} {label && <Badge>{label}</Badge>}
+          <dt className="flex flex-row xl:flex-col ml-4 text-lg leading-6 font-medium text-gray-900 dark:text-white">
+            {name}
+            {label && <Badge>{label}</Badge>}
           </dt>
         </div>
         <div className="mt-5">
