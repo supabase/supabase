@@ -128,7 +128,7 @@ const Nav = (props: Props) => {
 
   return (
     <nav className="bg-white dark:bg-dark-500 z-50 shadow-lg sticky">
-      <div className="container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0">
+      <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0">
         
         <HamburgerButton toggleFlyOut={() => setOpen(true)} />
 
