@@ -82,7 +82,7 @@ const Nav = (props: Props) => {
 
   const HamburgerButton = (props: HamburgerButtonProps) => (
     <div
-      className="absolute inset-y-0 left-0 flex items-center sm:hidden"
+      className="absolute inset-y-0 left-0 px-2 flex items-center lg:hidden"
       onClick={() => props.toggleFlyOut()}
     >
       <button
@@ -132,7 +132,7 @@ const Nav = (props: Props) => {
         
         <HamburgerButton toggleFlyOut={() => setOpen(true)} />
 
-        <div className="flex-1 flex items-center justify-center sm:px-10 sm:items-stretch sm:justify-between">
+        <div className="flex-1 flex items-center justify-center sm:px-10 sm:items-stretch lg:justify-between">
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
               <img
@@ -146,7 +146,7 @@ const Nav = (props: Props) => {
                 alt="Logo"
               />
             </div>
-            <div className="pl-4 hidden sm:ml-6 sm:flex sm:space-x-8">
+            <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-8">
               <FlyOut />
               <a
                 href="#"
@@ -185,7 +185,7 @@ const Nav = (props: Props) => {
               href="#"
               className={`
                 inline-flex items-center border-b-2 border-transparent text-sm font-normal transition
-                rounded-md px-3 py-1 mr-5 bg-brand-600 text-white hover:bg-brand-700
+                rounded-md px-3 py-1 mr-5 bg-brand-600 text-white hover:bg-brand-700 hidden lg:block
               `}
             >
               Start a project
@@ -194,7 +194,7 @@ const Nav = (props: Props) => {
               href="#"
               className={`
                 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium
-                text-gray-500 hover:text-gray-700 hover:border-gray-500
+                text-gray-500 hover:text-gray-700 hover:border-gray-500 hidden lg:block
                 dark:text-dark-100 dark:hover:border-dark-100
               `}
             >
@@ -247,6 +247,14 @@ const Nav = (props: Props) => {
               </div>
             {/* </div> */}
             <div className="mt-6 mb-12">
+              <div className="pt-2 pb-4 space-y-1">
+                <a
+                  href="#"
+                  className="block pl-3 pr-4 text-base font-medium text-gray-600 dark:text-white"
+                >
+                  Sign in
+                </a>
+              </div>
               <div className="pt-2 pb-4 space-y-1">
                 <a
                   href="#"
