@@ -33,8 +33,8 @@ const CaseStudies = () => {
               />
             ))}
           </div>
+          <Benchmark />
         </div>
-        <Benchmark />
       </div>
     </div>
   )
