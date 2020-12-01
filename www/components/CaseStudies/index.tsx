@@ -13,10 +13,10 @@ const CaseStudies = () => {
         <div className="relative max-w-7xl mx-auto">
           <div>
             <SectionHeader
-              title={'We\'re ready to help'}
-              title_alt={' scale your business'}
+              title={'Scale up'}
+              title_alt={' with no extra effort'}
               subtitle={'Enterprise Solutions'}
-              paragraph={'Supabase has already been supporting many companies in production, from monitoring applications to social networks. '}
+              paragraph={'Supabase is built with proven, enterprise-ready tools. We\'re supporting everything from fintech providers to social networks. '}
             />
           </div>
           <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
