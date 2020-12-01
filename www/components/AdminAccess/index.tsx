@@ -27,9 +27,16 @@ const AdminAccess = () => {
                     <div className="h-2 w-2 mr-2 rounded-full bg-dark-500"/>
                     <div className="h-2 w-2 mr-2 rounded-full bg-dark-500"/>
                   </div>
-                  <video className="rounded-b-md" src={`videos/${tabId}.mp4`} autoPlay loop muted>
+                  {/* Joshen: Preload all videos to prevent the flickering of video when changing tabs */}
+                  <video className={`rounded-b-md ${tabId === 'tabTableEditor' ? 'block' : 'hidden'}`} src={`videos/tabTableEditor.mp4`} autoPlay loop muted>
                     Your browser does not support the video tag
-                  </video>           
+                  </video>
+                  <video className={`rounded-b-md ${tabId === 'tabSqlEditor' ? 'block' : 'hidden'}`} src={`videos/tabSqlEditor.mp4`} autoPlay loop muted>
+                    Your browser does not support the video tag
+                  </video>
+                  <video className={`rounded-b-md ${tabId === 'tabAuthRules' ? 'block' : 'hidden'}`} src={`videos/tabAuthRules.mp4`} autoPlay loop muted>
+                    Your browser does not support the video tag
+                  </video>       
                 </div>
               </div>
             </div>
