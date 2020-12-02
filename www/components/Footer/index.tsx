@@ -15,11 +15,7 @@ const Footer = (props: Props) => {
   }
 
   const SunEmoji = () => (
-    <svg
-      width="32"
-      height="32"
-      fill="none"
-    >
+    <svg width="32" height="32" fill="none">
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -28,18 +24,15 @@ const Footer = (props: Props) => {
       />
       <defs>
         <linearGradient
-          id="paint0_linear" x1="2" y1="2" x2="30" y2="30"
+          id="paint0_linear"
+          x1="2"
+          y1="2"
+          x2="30"
+          y2="30"
           gradientUnits="userSpaceOnUse"
         >
-          <stop
-            className="transition-all duration-200"
-            stopColor="#FACC15"
-          />
-          <stop
-            className="transition-all duration-200"
-            offset="1"
-            stopColor="#FA9D16"
-          />
+          <stop className="transition-all duration-200" stopColor="#bbbbbb" />
+          <stop className="transition-all duration-200" offset="1" stopColor="#bbbbbb" />
         </linearGradient>
       </defs>
     </svg>
@@ -61,7 +54,7 @@ const Footer = (props: Props) => {
   )
 
   return (
-    <footer className="bg-white dark:bg-dark-600" aria-labelledby="footerHeading">
+    <footer className="bg-white dark:bg-dark-700" aria-labelledby="footerHeading">
       <h2 id="footerHeading" className="sr-only">
         Footer
       </h2>
@@ -101,7 +94,7 @@ const Footer = (props: Props) => {
               {FooterLinks.map((segment: any) => {
                 return (
                   <div key={`footer_${segment.title}`}>
-                    <h3 className="text-sm font-semibold text-gray-400 dark:text-dark-300 tracking-wider uppercase">
+                    <h3 className="text-sm font-semibold text-gray-400 dark:text-dark-400 tracking-wider uppercase">
                       {segment.title}
                     </h3>
                     <ul className="mt-4 space-y-4">
@@ -131,8 +124,8 @@ const Footer = (props: Props) => {
             </div>
           </div>
         </div>
-        <div className="mt-12 border-t border-gray-200 dark:border-dark-300 pt-8 flex justify-between">
-          <p className="text-base text-gray-400 dark:text-dark-300">&copy; Supabase Inc</p>
+        <div className="mt-12 border-t border-gray-200 dark:border-dark-600 pt-8 flex justify-between">
+          <p className="text-base text-gray-400 dark:text-dark-400">&copy; Supabase Inc</p>
           <div className="flex items-center">
             <SunEmoji />
             <button
@@ -140,8 +133,7 @@ const Footer = (props: Props) => {
               aria-pressed="false"
               className={`
                 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer 
-                transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 
-                focus:ring-brand-500 ${darkMode ? 'bg-dark-300' : 'bg-gray-200'} mx-5
+                transition-colors ease-in-out duration-200 focus:outline-none ${darkMode ? 'bg-dark-500' : 'bg-gray-200'} mx-5
               `}
               onClick={() => toggleDarkMode()}
             >
@@ -150,7 +142,7 @@ const Footer = (props: Props) => {
                 aria-hidden="true"
                 className={`
                   ${darkMode ? 'translate-x-5' : 'translate-x-0'} inline-block h-5 w-5 rounded-full
-                  bg-white shadow-lg transform ring-0 transition ease-in-out duration-200
+                  bg-white dark:bg-dark-700 shadow-lg transform ring-0 transition ease-in-out duration-200
                 `}
               />
             </button>

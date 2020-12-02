@@ -59,18 +59,18 @@ const Card = (props: Props) => {
       <div className="flex-shrink-0 dark:bg-dark-800">
         <img className="h-64 w-full object-cover" src={imgUrl} alt={title} />
       </div>
-      <div className="flex-1 bg-white p-6 flex flex-col justify-between dark:bg-dark-700">
+      <div className="flex-1 bg-white p-8 flex flex-col justify-between dark:bg-dark-700">
         <div className="flex-1">
           {/* {icons && (
             <div className="-mt-12 mb-6 flex -space-x-3">
               {iconMarkup}
             </div>
           )} */}
-          <p className="text-sm font-medium capitalize text-gray-600 dark:text-dark-300">{type}</p>
-          <div className="block mt-2">
+          <p className="text-sm font-base capitalize text-gray-600 dark:text-dark-300">{type}</p>
+          <div className="block mt-2 flex flex-col justify-between h-32">
             {/* {logoUrl && <img src={logoUrl} className="h-9 my-4" />} */}
             {title && <p className="text-xl text-gray-900 dark:text-white">{title}</p>}
-            <p className="mt-3 text-base text-gray-500 dark:text-dark-300">{description}</p>
+            <p className="mt-3 text-base text-gray-500 dark:text-dark-400">{type !== 'Project Example' ? postMeta.publishDate : description}</p>
           </div>
         </div>
         {type === 'Case Study' && postMeta.name.length > 0 && (
