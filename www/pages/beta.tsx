@@ -97,23 +97,24 @@ const Performance = () => {
   const readColors = ["#38BC81", "red"]
   const writeColors = ["#65D9A5", "pink"]
 
-  type labelProps = {
-    x?: any,
-    y?: any,
-    width?: any,
-    height?: any,
-    text?: string,
-  }
-
-  const renderCustomizedLabel = (props: labelProps) => {
-    const { x, y, width, text } = props;
-    const radius = 10;
-  
+  function renderCustomizedLabel(props: any): any {
+    const {  width, text } = props
+    const radius = 10
+    
+    let x: number = props.x + width / 2
+    let y: number = props.y - radius
     return (
-      <text x={x + width / 2} y={y - radius} fill="#000" textAnchor="middle" dominantBaseline="middle" fontSize={14}>
+      <text
+        x={x}
+        y={y}
+        fill="#000"
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontSize={14}
+      >
         {text}
       </text>
-    );
+    )
   };
 
   // Documentation on recharts:
@@ -133,7 +134,7 @@ const Performance = () => {
         </YAxis>
         <Tooltip cursor={{ fill: 'rgba(0, 0, 0, 0.05)'}} />
         <Bar dataKey="read" name="Read" barSize={20} unit=" requests/s">
-          {PerformanceComparisonData.map((entry: any, idx: number) =>(
+          {PerformanceComparisonData.map((entry: any, idx: number) => (
             <Cell key={`cell_${idx}`} fill={readColors[idx]} />
           ))}
           {/* @ts-ignore */}
@@ -145,7 +146,7 @@ const Performance = () => {
           />
         </Bar>
         <Bar dataKey="write" name="Write" barSize={20} unit=" requests/s">
-          {PerformanceComparisonData.map((entry: any, idx: number) =>(
+          {PerformanceComparisonData.map((entry: any, idx: number) => (
             <Cell key={`cell_${idx}`} fill={writeColors[idx]} />
           ))}
           {/* @ts-ignore */}

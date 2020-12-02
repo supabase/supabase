@@ -4,11 +4,11 @@
     "links": [
       {
         "text": "Database",
-        "url": "#"
+        "url": "/docs/guides/database"
       },
       {
         "text": "Authentication",
-        "url": "#"
+        "url": "/docs/guides/auth"
       },
       {
         "text": "Storage",
@@ -20,7 +20,7 @@
       },
       {
         "text": "Pricing",
-        "url": "#"
+        "url": "/docs/pricing"
       }
     ]
   },
@@ -29,19 +29,19 @@
     "links": [
       {
         "text": "Support",
-        "url": "#"
-      },
-      {
-        "text": "Contact",
-        "url": "#"
+        "url": "/docs/support"
       },
       {
         "text": "Case Studies",
-        "url": "#"
+        "url": "/case-studies"
       },
       {
-        "text": "Privacy & Terms",
-        "url": "#"
+        "text": "System Status",
+        "url": "https://status.supabase.io/"
+      },
+      {
+        "text": "Terms of service",
+        "url": "/docs/company/terms/"
       }
     ]
   },
@@ -50,15 +50,15 @@
     "links": [
       {
         "text": "Documentation",
-        "url": "#"
+        "url": "/docs"
       },
       {
         "text": "API Reference",
-        "url": "#"
+        "url": "/docs/client/supabase-client"
       },
       {
         "text": "Guides",
-        "url": "#"
+        "url": "/docs/guides/examples"
       }
     ]
   },
@@ -67,19 +67,19 @@
     "links": [
       {
         "text": "Blog",
-        "url": "#"
+        "url": "/blog"
       },
       {
         "text": "Open Source",
-        "url": "#"
+        "url": "/oss"
       },
       {
         "text": "Humans.txt",
-        "url": "#"
+        "url": "/humans.txt"
       },
       {
         "text": "Lawyers.txt",
-        "url": "#"
+        "url": "/lawyers.txt"
       }
     ]
   }

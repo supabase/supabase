@@ -40,10 +40,10 @@ const CopiedIcon = () => (
 )
 
 const CodeExamples = () => {
-  const [example, setExample] = useState('subscribeExample')
+  const [example, setExample] = useState('createUserExample')
   const [copied, setCopied] = useState(false)
 
-  const exampleList = ['subscribeExample', 'readExample', 'createExample', 'updateExample']
+  const exampleList = ['createUserExample', 'subscribeExample', 'readExample', 'createExample', 'updateExample']
 
   const lang = 'javascript'
 
@@ -59,7 +59,7 @@ const CodeExamples = () => {
         key={id + "-button"}
         onClick={() => handleClick(id)}
         className={`
-          m-1 mb-4 rounded-md border border-gray-200 dark:border-dark-200 px-4 py-2 text-xs font-medium text-gray transition
+          mb-2 rounded-md border border-gray-200 dark:border-dark-200 px-4 py-2 text-xs font-medium text-gray transition
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-transparent sm:text-sm sm:w-auto
           ${example === id ? ' border-gray-900 bg-dark-600 dark:bg-white text-white dark:text-dark-600' : ' hover:bg-gray-200 dark:hover:text-black'}
           dark:text-white lg:w-full

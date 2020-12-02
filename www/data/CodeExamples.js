@@ -119,6 +119,26 @@ const umdExample = `
 `
 
 export const examples = {
+  createUserExample: {
+    name: 'Create user',
+    description: 'Sign up a new user in an example chat rooom',
+    code: {
+      javascript: `
+  import { createClient } from '@supabase/supabase-js'
+  
+  // Initialize 
+  const supabaseUrl = 'https://chat-room.supabase.co'
+  const supabaseKey = 'public-anon-key'
+  const supabase = createClient(supabaseUrl, supabaseKey)
+  
+  // Create a new user
+  const { user, error } = await supabase.auth.signUp({
+    email: 'example@email.com',
+    password: 'example-password',
+  })
+  `,
+    },
+  },
   subscribeExample: {
     name: 'Realtime subscriptions',
     description: 'Receive realtime messages in an example chat room',
