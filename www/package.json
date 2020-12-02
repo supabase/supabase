@@ -8,7 +8,8 @@
     "build": "next build",
     "export": "next export",
     "start": "next start",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "prettier": "prettier --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\""
   },
   "dependencies": {
     "@types/recharts": "^1.8.17",
@@ -36,6 +37,7 @@
     "@types/react-syntax-highlighter": "^13.5.0",
     "file-loader": "^6.2.0",
     "postcss-preset-env": "^6.7.0",
+    "prettier": "^2.2.1",
     "tailwindcss": "^2.0.1"
   },
   "license": "MIT"
