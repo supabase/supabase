@@ -28,7 +28,7 @@ As a payment processor, Xendit are responsible for verifying that all transactio
 
 ### Why they chose Supabase
 
-Xendit needed something fast. Something that was cheaper than using the global players like Worldcheck or Refinitiv. Xendit already uses Postgres for a lot of their critical infrastructure, and so the team 
+Xendit needed something fast. Something that was cheaper than using the global players like Worldcheck or Refinitiv. Xendit already uses Postgres for a lot of their critical infrastructure, and so Xendit team are familiar with the technology and comfortable in it's ability to scale.
 
 ### What they built
 
