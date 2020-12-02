@@ -42,7 +42,7 @@ const MadeForDevelopers = () => {
                           {feature.name}
                           {feature.badge && <Badge className="ml-3 md:ml-0 md:w-20 md:mt-2 xl:ml-3 xl:mt-0 xl:w-auto">{feature.badge}</Badge>}
                         </dt>
-                        <dd className="mt-3 text-base text-gray-500 mb-6 dark:text-dark-100">
+                        <dd className="mt-3 text-base text-gray-500 mb-6 dark:text-dark-300">
                           {feature.description}
                         </dd>
                         <Button type="secondary" text={feature.badge ? "Get notified" : "Explore more"} url="#" />
