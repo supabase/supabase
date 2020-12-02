@@ -6,37 +6,52 @@ author_title: Supabase
 author_url: https://github.com/roryw10
 author_image_url: https://github.com/roryw10.png
 authorURL: https://github.com/roryw10
-image: /img/supabase-november-2020.png
+# image: /img/supabase-november-2020.png
 tags: 
     - case-study
-    - fintech
+    - nocode
 ---
 
-Xendit one of South East Asia's largest payment processors. They use Supabase to run automated checks against international sanctions lists.
+[**TAYFA**](https://usetayfa.com) is the fastest no-code approach to create and iterate on bespoke frontends. Learn how its solo founder, Sarup Banskota, was able to launch quickly with [Supabase](https://supabase.io), Next.js, and Vercel.
 
 <!--truncate-->
 
-### About Xendit
+Sarup's background is in open-source, web frontends, and devtools. In the summer of 2020, he was rapidly building MVPs as he explored different problem spaces. Sarup found that reusing his frontend work across projects, wasn't as simple as he'd have liked. 
 
-Xendit is a leading payment gateway for Indonesia and Southeast Asia. They enable businesses to accept payments in Indonesia with a single integration for  credit and debit cards, e-wallets, and bank transfer.
+> Frontends should be as simple as: <br />
+> Sign-up, drag & drop, publish. <br />
+> Tweak, publish. <br />
+> Tweak, publish. <br />
+> That is TAYFA. <br />
+
+*[Sarup Banskota](https://twitter.com/sarupbanskota), Founder of [TAYFA](https://usetayfa.com)*
 
 
-### Counter-fraud
+### About Tayfa 
 
-As a payment processor, Xendit are responsible for verifying that all transactions are legal. Any transactions which are suspicions must be verified against a strict set of criteria, and the parties involved need to be checked against international sanctions lists. This is a critical anti-money-laundering operation and needs to be performed in realtime to prevent any delays on legitimate payments.
+- Zero to MVP: **7 Days**
+- Idea to 1st Payment: **30 Days**
+- Creating Scalable Backend APIs: **30 mins**
+
+### The Maker Journey
+
+When Sarup found an interested customer, TAYFA was still a fuzzy idea in his head. As a workflow tool, the best way to demonstrate the concept was to build an MVP. His customer needed the product yesterday — there was no time to waste.
+
+He started out with a first iteration using Next.js and Vercel for the frontend — technologies he loved, and Firebase because he was familiar with it. However, he soon realised that for his enterprise customers, self-hosting capabilities would be a deal-breaker. Moreover, he'd require sensible RESTful APIs for developing the subsequent iterations of TAYFA. 
 
 
-### Why they chose Supabase
+One option was to do it the "old-school" way: Postgres on a custom server, or MongoDB. But that would mean losing momentum by getting bogged down setting up a backend. 
 
-Xendit needed something fast. Something that was cheaper than using the global players like Worldcheck or Refinitiv. Xendit already uses Postgres for a lot of their critical infrastructure, and so the team 
+Luckily, Sarup discovered Supabase through the Vercel community. Open-source and built on top of Postgres, it was perfect for his future self-hosting needs and also offered him an API out of the box. The current version of TAYFA is the third iteration, and also takes advantage of  Supabase Auth, an out of the box auth layer.
 
-### What they built
+Within a week, Sarup had a version ready for use that he could put in front of his customer. He went through a few iteration cycles based on feedback, and was able to satisfy all the high-level objections from 6 different stakeholders. Fast forward to a one-month later, and he had a paying business contract.  
 
-Xendit parses international sanctions lists from the UN and the Indonesian government and loads them into Supabase. Since Supabase provides a full Postgres server, the then can use the [Trigram](https://www.postgresql.org/docs/current/pgtrgm.html) extension to perform full-text search on the lists, with a relevance score on every search.
+> The speed at which TAYFA is evolving is crazy. I've seen ideas translate into live features 10 minutes after speaking on the phone.
 
-Supabase was perfect for their use case, as they needed something built fast. The full solution was built and in production in less than one week.
+*[Tanmai Sharma](https://www.linkedin.com/in/tanmai-sharma-9b1777/), CEO at Canopy & early TAYFA customer*
 
-> The full solution was built and in production in less than one week.
+Quote from Sarup "It's not just a priority for me to be really productive and fast, if I'm successful for my clients then I should enable them to be really productive and fast too. With this approach, I was able to deliver a superhuman feature for my customer, the command K key" (Sarup)
 
-Xendit created a database function for searching, which they are able to call directly using their Python clients. They have plans to iterate on the current implementation using more advanced techniques, like machine learning, but for now the Supabase system has been in Production for 9 months without a problem.
+## Prototype fast, and keep going
 
+Thanks to Supabase  Sarup can focus on what he does best and get his final product in front of his customer. Thanks to Supabase there was no need to worry about choosing and setting up back-ends, Sarup could focus on launching fast.
