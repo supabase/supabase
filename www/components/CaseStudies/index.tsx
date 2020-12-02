@@ -1,7 +1,7 @@
 import Card from 'components/Card'
 import Benchmark from 'components/CaseStudies/benchmark'
 import SectionHeader from 'components/UI/SectionHeader'
-import CaseStudiesData from "data/CaseStudies.json"
+import CaseStudiesData from 'data/CaseStudies.json'
 
 const CaseStudies = () => {
   return (
@@ -16,7 +16,9 @@ const CaseStudies = () => {
               title={'Scale up'}
               title_alt={' with no extra effort'}
               subtitle={'Enterprise Solutions'}
-              paragraph={'Supabase is built with proven, enterprise-ready tools. We\'re supporting everything from fintech providers to social networks. '}
+              paragraph={
+                "Supabase is built with proven, enterprise-ready tools. We're supporting everything from fintech providers to social networks. "
+              }
             />
           </div>
           <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">

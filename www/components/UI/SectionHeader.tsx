@@ -1,4 +1,4 @@
-const SectionHeader = (props :any) => {
+const SectionHeader = (props: any) => {
   return (
     <div className={'grid grid-cols-12 gap-1 sm:gap-8 ' + props.className}>
       <div className="relative grid py-12 col-span-12 grid-cols-12">

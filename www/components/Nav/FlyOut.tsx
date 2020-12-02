@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import Badge from 'components/Badge'
 import Transition from 'lib/Transition'
 import Solutions from 'data/Solutions.json'
-import CaseStudiesData from "data/CaseStudies.json"
+import CaseStudiesData from 'data/CaseStudies.json'
 
 const FlyOut = () => {
   const [show, setShow] = useState(false)
@@ -44,9 +44,7 @@ const FlyOut = () => {
             <p className="text-base font-medium text-gray-900 dark:text-white">
               {name} {label && <Badge className="ml-3">{label}</Badge>}
             </p>
-            <p className="mt-1 text-sm text-gray-500 dark:text-dark-300">
-              {description}
-            </p>
+            <p className="mt-1 text-sm text-gray-500 dark:text-dark-300">{description}</p>
           </div>
           {url && (
             <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
@@ -65,7 +63,10 @@ const FlyOut = () => {
         {content}
       </a>
     ) : (
-      <div key={name} className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150">
+      <div
+        key={name}
+        className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150"
+      >
         {content}
       </div>
     )

@@ -34,16 +34,23 @@ const CopiedIcon = () => (
     fill="none"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="css-i6dzq1">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
+    className="css-i6dzq1"
+  >
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
 )
 
 const CodeExamples = () => {
   const [example, setExample] = useState('createUserExample')
   const [copied, setCopied] = useState(false)
 
-  const exampleList = ['createUserExample', 'subscribeExample', 'readExample', 'createExample', 'updateExample']
+  const exampleList = [
+    'createUserExample',
+    'subscribeExample',
+    'readExample',
+    'createExample',
+    'updateExample',
+  ]
 
   const lang = 'javascript'
 
@@ -56,12 +63,16 @@ const CodeExamples = () => {
     return (
       <button
         type="button"
-        key={id + "-button"}
+        key={id + '-button'}
         onClick={() => handleClick(id)}
         className={`
           mb-2 rounded-md border border-gray-200 dark:border-dark-200 px-4 py-2 text-xs font-medium text-gray transition
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-transparent sm:text-sm sm:w-auto
-          ${example === id ? ' border-gray-900 bg-dark-600 dark:bg-white text-white dark:text-dark-600' : ' hover:bg-gray-200 dark:hover:text-black'}
+          ${
+            example === id
+              ? ' border-gray-900 bg-dark-600 dark:bg-white text-white dark:text-dark-600'
+              : ' hover:bg-gray-200 dark:hover:text-black'
+          }
           dark:text-white lg:w-full
       `}
       >
