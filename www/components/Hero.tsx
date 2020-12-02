@@ -38,7 +38,7 @@ const Hero = () => {
                   <div className="sm:mx-auto md:w-3/4 lg:w-full lg:mx-0">
                     <h1 className="mt-4 text-4xl text-white sm:mt-5 sm:leading-none lg:mt-6 lg:text-5xl xl:text-6xl">
                       <span className="md:block">The Open Source</span>
-                      <span className="text-brand-400 ml-2 md:ml-0 md:block">Firebase Alternative</span>
+                      <span className="text-brand-600 ml-2 md:ml-0 md:block">Firebase Alternative</span>
                     </h1>
                     <p className="mt-5 text-base text-gray-200 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                       Create your new project backend in less than 2 minutes with easy to use Postgres Database and Authentication.
