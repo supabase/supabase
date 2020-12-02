@@ -27,14 +27,14 @@ const Features = () => {
         <div className="mt-5">
           <dd className="mt-2 text-base text-gray-500 dark:text-dark-100">{description}</dd>
         </div>
-        {url && <Button className="mt-5" type="secondary" text="Learn more" url="#" />}
+        {url && <Button className="mt-5" type="secondary" text="Learn more" url={url} />}
         {label && <Badge className="mt-5">{label}</Badge>}
       </div>
     )
   })
 
   return (
-    <div className="bg-gray-50 dark:bg-dark-600 overflow-hidden py-12">
+    <div className="bg-gray-50 dark:bg-dark-700 overflow-hidden py-12">
       <div className="container mx-auto px-8 sm:px-16 xl:px-20">
         <div className="mx-auto max-w-7xl">
           <SectionHeader

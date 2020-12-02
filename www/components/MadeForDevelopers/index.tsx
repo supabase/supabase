@@ -11,12 +11,12 @@ const MadeForDevelopers = () => {
       <div className="container mx-auto px-8 sm:px-16 xl:px-20">
       <div className="mx-auto max-w-7xl">
         <div className="grid grid-cols-12">
-          <div className="col-span-12 lg:col-span-9 xl:col-span-7">
+          <div className="col-span-12 lg:col-span-12 xl:col-span-12">
             <SectionHeader              
               title={'Instant APIs'}
               title_alt={' that do the hard work for you'}
               subtitle={'MADE FOR DEVELOPERS'}
-              paragraph={'We inspect your database and provide APIs instantly so you can stop building repetitive CRUD endpoints and focus on your product.'}
+              paragraph={`We inspect your database and provide APIs instantly so you can stop building repetitive CRUD endpoints and focus on your product`}
             />
           </div>
         </div>

@@ -131,8 +131,8 @@ const Footer = (props: Props) => {
             </div>
           </div>
         </div>
-        <div className="mt-12 border-t border-gray-200 dark:border-dark-300 pt-8 flex justify-between">
-          <p className="text-base text-gray-400 dark:text-dark-300">&copy; Supabase Inc</p>
+        <div className="mt-12 border-t border-gray-200 dark:border-dark-600 pt-8 flex justify-between">
+          <p className="text-base text-gray-400 dark:text-dark-400">&copy; Supabase Inc</p>
           <div className="flex items-center">
             <SunEmoji />
             <button
@@ -140,8 +140,7 @@ const Footer = (props: Props) => {
               aria-pressed="false"
               className={`
                 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer 
-                transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 
-                focus:ring-brand-500 ${darkMode ? 'bg-dark-300' : 'bg-gray-200'} mx-5
+                transition-colors ease-in-out duration-200 focus:outline-none ${darkMode ? 'bg-dark-500' : 'bg-gray-200'} mx-5
               `}
               onClick={() => toggleDarkMode()}
             >
@@ -150,7 +149,7 @@ const Footer = (props: Props) => {
                 aria-hidden="true"
                 className={`
                   ${darkMode ? 'translate-x-5' : 'translate-x-0'} inline-block h-5 w-5 rounded-full
-                  bg-white shadow-lg transform ring-0 transition ease-in-out duration-200
+                  bg-white dark:bg-dark-700 shadow-lg transform ring-0 transition ease-in-out duration-200
                 `}
               />
             </button>
