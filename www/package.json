@@ -19,6 +19,7 @@
     "react": "^16.13.0",
     "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "^16.13.0",
+    "react-ga": "^3.3.0",
     "react-syntax-highlighter": "^15.3.1",
     "react-transition-group": "^4.4.1",
     "recharts": "^1.8.5",
