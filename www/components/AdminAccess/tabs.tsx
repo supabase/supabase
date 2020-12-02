@@ -25,9 +25,9 @@ function Tabs(props: Props) {
               href="#"
               id="tabTableEditor"
               className={
-                'transition w-1/3 lg:w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm' +
+                'transition w-1/3 lg:w-1/4 py-4 px-1 text-center border-b-2 text-sm' +
                 (tabId === 'tabTableEditor'
-                  ? ' border-gray-500 dark:border-white text-gray-600 dark:text-white'
+                  ? ' border-gray-500 dark:border-white text-gray-600 font-medium dark:text-white'
                   : ' border-b border-gray-200 dark:border-dark-400 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200')
               }
               onClick={(event: any) => handleTabChange(event)}
@@ -38,9 +38,9 @@ function Tabs(props: Props) {
               href="#"
               id="tabSqlEditor"
               className={
-                'transition w-1/3 lg:w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm' +
+                'transition w-1/3 lg:w-1/4 py-4 px-1 text-center border-b-2 text-sm' +
                 (tabId === 'tabSqlEditor'
-                  ? ' border-gray-500 dark:border-white text-gray-600 dark:text-white'
+                  ? ' border-gray-500 dark:border-white text-gray-600 font-medium dark:text-white'
                   : ' border-b border-gray-200 dark:border-dark-400 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200')
               }
               onClick={(event: any) => handleTabChange(event)}
@@ -51,9 +51,9 @@ function Tabs(props: Props) {
               href="#"
               id="tabAuthRules"
               className={
-                'transition w-1/3 lg:w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm' +
+                'transition w-1/3 lg:w-1/4 py-4 px-1 text-center border-b-2 text-sm' +
                 (tabId === 'tabAuthRules'
-                  ? ' border-gray-500 dark:border-white text-gray-600 dark:text-white'
+                  ? ' border-gray-500 dark:border-white text-gray-600 font-medium dark:text-white'
                   : ' border-b border-gray-200 dark:border-dark-400 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-200')
               }
               onClick={(event: any) => handleTabChange(event)}
