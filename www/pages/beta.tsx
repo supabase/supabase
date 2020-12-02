@@ -53,9 +53,9 @@ const SectionHeader = (props: any) => {
 }
 
 const Hero = () => (
-  <div className="w-screen bg-dark-800" style={{ height: '80vh' }}>
-    <div className="container mx-auto px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-white">
-      <div className="col-span-6 text-2xl">
+  <div className="w-screen py-16 lg:py-56 bg-dark-800">
+    <div className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-white">
+      <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-2xl">
         <p className="mb-10">
           Supabase is an opensource Firebase alternative. We're building the features of Firebase
           using enterprise-grade, open source tools.
@@ -72,8 +72,8 @@ const Introduction = (props: any) => {
   const { scrollTo } = props
   return (
     <div className="bg-gray-50 dark:bg-dark-700">
-      <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-4 text-black dark:text-white">
-        <div className="col-span-7 text-base mb-20">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-black dark:text-white">
+        <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base mb-20">
           <p>
             After the launch of our{' '}
             <a
@@ -94,22 +94,22 @@ const Introduction = (props: any) => {
           </p>
         </div>
 
-        <div className="col-span-12 grid grid-cols-12 gap-y-20 mb-20">
+        <div className="col-span-12 grid grid-cols-12 gap-y-12 lg:gap-y-20 mb-20">
           {AlphaNumbers.map((stat: any, idx: number) => (
-            <div key={`stat_${idx}`} className="col-span-4 grid grid-cols-12 gap-x-6 items-center">
-              <div className="col-span-2">
+            <div key={`stat_${idx}`} className="col-span-6 sm:col-span-4 grid grid-cols-8 sm:grid-cols-12 gap-x-4 xl:gap-x-6 items-center">
+              <div className="col-span-4 sm:col-span-3 xl:col-span-2">
                 <div className="w-12 h-12 rounded-md bg-dark-700 flex items-center justify-center bg-gray-900 dark:bg-white">
                   {stat.icon}
                 </div>
               </div>
-              <div className="col-span-10">
-                <p className="text-6xl">
+              <div className="col-span-4 sm:col-span-9 xl:col-span-10">
+                <p className="text-5xl lg:text-6xl">
                   <CountUp>{stat.value}</CountUp>
                   {stat.unit && <span className="text-2xl ml-1">{stat.unit}</span>}
                 </p>
               </div>
-              <div className="col-span-10 col-start-3">
-                <p className="text-dark-300 dark:text-dark-400">{stat.name}</p>
+              <div className="col-span-12 sm:col-span-10 sm:col-start-4 xl:col-start-3">
+                <p className="text-xs lg:text-base text-dark-300 dark:text-dark-400">{stat.name}</p>
               </div>
             </div>
           ))}
@@ -118,11 +118,11 @@ const Introduction = (props: any) => {
         <div className="col-span-12 grid grid-cols-12 gap-y-10">
           {IntroductionSegments.map((segment: any, segmentIdx: number) => (
             <div key={`introSegment_${segmentIdx}`} className="col-span-12 grid grid-cols-12">
-              <div className="col-span-4">
+              <div className="col-span-12 mb-10 sm:col-span-5 xl:col-span-4 sm:mb-0">
                 <p>{segment.description}</p>
               </div>
-              <div className="col-span-2" />
-              <div className="col-span-6 flex flex-col">
+              <div className="hidden sm:block sm:col-span-1 xl:col-span-2" />
+              <div className="col-span-12 sm:col-span-6 flex flex-col">
                 {segment.chapters.map((chapter: any, idx: number) => (
                   <div
                     key={`section_select_${idx}`}
@@ -207,13 +207,21 @@ const Performance = () => {
     </ResponsiveContainer>
   )
 
+  const ComparisonChartV2 = () => {
+    return (
+      <div>
+        Hello
+      </div>
+    )
+  }
+
   return (
     <div id="performance" className="bg-white dark:bg-dark-800">
-      <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
         <SectionHeader sectionNumber={1} header="Performance" />
 
-        <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10 items-center">
-          <div className="col-span-7 text-base">
+        <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10 items-center">
+          <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
             <p className="mb-10">
               Supabase grew out of a need for a faster and more scalable web-ready datastore.
               Postgres enables our users to handle massive amounts of data without sacrificing read
@@ -261,11 +269,14 @@ const Performance = () => {
               on our methodologies.
             </p>
           </div>
-          <div className="col-span-5">
+          {/* <div className="col-span-5">
             <ComparisonChart />
+          </div> */}
+          <div className="col-span-12 sm:col-span-9 xl:col-span-7 mt-10 mb-10">
+            <ComparisonChartV2 />
           </div>
-          <div className="col-span-7 text-base">
-            <p className="mt-10 mb-10">
+          <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
+            <p className="mb-10">
               Supabase is now available in 7 different geographic regions, so you can reduce latency
               by deploying in close proximity to your customer base.
             </p>
@@ -286,11 +297,11 @@ const Performance = () => {
 const Security = () => {
   return (
     <div id="security" className="bg-gray-50 dark:bg-dark-700">
-      <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
         <SectionHeader sectionNumber={2} header="Security" />
 
-        <div className="col-span-12 grid grid-cols-12 gap-x-8">
-          <div className="col-span-7 text-base">
+        <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8">
+          <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
             <p className="mb-10">
               As an infrastructure provider, Security has been a priority from day one. During
               Supabase's Alpha period we experienced a single security breach, which was the result
@@ -349,11 +360,11 @@ const Security = () => {
 
 const Reliability = () => (
   <div id="reliability" className="bg-white dark:bg-dark-800">
-    <div className="container mx-auto px-28 py-12 grid grid-cols-12 gap-y-10 text-black dark:text-white ">
+    <div className="container mx-auto px-8 lg:px-28 py-12 grid grid-cols-12 gap-y-10 text-black dark:text-white ">
       <SectionHeader sectionNumber={3} header="Reliability" />
 
-      <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10">
-        <div className="col-span-7 text-base">
+      <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
+        <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
           <p className="mb-5">
             During Alpha we experienced 2 minor incidents related to availability, neither of which
             affected customer access to their data. These were:
@@ -395,11 +406,11 @@ const Reliability = () => (
 
 const NewFeaturesAndIntegrations = () => (
   <div id="newFeaturesAndIntegrations" className="bg-gray-50 dark:bg-dark-700">
-    <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
       <SectionHeader sectionNumber={4} header="New Features & Integrations" />
 
-      <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10">
-        <div className="col-span-7 text-base">
+      <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
+        <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
           <p className="mb-5">
             If you're new to Supabase, here's some of the things you can expect to get when using
             Supabase as your backend and database:
@@ -513,11 +524,11 @@ const NewFeaturesAndIntegrations = () => (
 
 const BetaPricing = () => (
   <div id="betaPricing" className="bg-white dark:bg-dark-800">
-    <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
       <SectionHeader sectionNumber={5} header="Beta Pricing" />
 
-      <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10">
-        <div className="col-span-7 text-base">
+      <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
+        <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
           <p className="mb-10">
             We've been working closely with many Open Source projects, Infrastructure Providers, and
             of course our Alpha Users, to provide a predictable and sustainable pricing model.
@@ -575,11 +586,11 @@ const BetaPricing = () => (
 
 const OpenSource = () => (
   <div id="openSource" className="bg-gray-50 dark:bg-dark-700">
-    <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
       <SectionHeader sectionNumber={6} header="Open Source" />
 
-      <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10">
-        <div className="col-span-7 text-base">
+      <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
+        <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
           <p className="mb-10">
             Great software is multi generational and stretches far beyond any single company.
           </p>
@@ -636,11 +647,11 @@ const FundingPartners = () => <div></div>
 
 const ScalingOurTeam = () => (
   <div id="scalingOurTeam" className="bg-white dark:bg-dark-800">
-    <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
       <SectionHeader sectionNumber={7} header="Scaling Our Team" />
 
-      <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10">
-        <div className="col-span-7 text-base">
+      <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
+        <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
           <p>
             We are looking for hires across multiple positions including PostgreSQL engineers, Cloud
             engineers, SRE's, and Developer Advocates. We are a fully remote team, spanning 4
@@ -666,11 +677,11 @@ const WhatsNext = () => (
     id="whatsNext"
     className="border-b-2 border-gray-50 bg-gray-50 dark:bg-dark-700 dark:border-dark-800"
   >
-    <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
       <SectionHeader sectionNumber={8} header="What's Next" />
 
-      <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10">
-        <div className="col-span-7 text-base">
+      <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
+        <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
           <p className="mb-5">
             If you watch our repos you'll see that development never stops, we ship every day (and
             night!), and are always improving Supabase based on user feedback. Alongside
@@ -728,14 +739,14 @@ const WhatsNext = () => (
 
 const Beta = () => {
   const references: any = {
-    performance: useRef<HTMLDivElement>(document.createElement('div')),
-    security: useRef<HTMLDivElement>(document.createElement('div')),
-    reliability: useRef<HTMLDivElement>(document.createElement('div')),
-    features: useRef<HTMLDivElement>(document.createElement('div')),
-    pricing: useRef<HTMLDivElement>(document.createElement('div')),
-    openSource: useRef<HTMLDivElement>(document.createElement('div')),
-    scaling: useRef<HTMLDivElement>(document.createElement('div')),
-    next: useRef<HTMLDivElement>(document.createElement('div')),
+    performance: useRef<HTMLDivElement>(null),
+    security: useRef<HTMLDivElement>(null),
+    reliability: useRef<HTMLDivElement>(null),
+    features: useRef<HTMLDivElement>(null),
+    pricing: useRef<HTMLDivElement>(null),
+    openSource: useRef<HTMLDivElement>(null),
+    scaling: useRef<HTMLDivElement>(null),
+    next: useRef<HTMLDivElement>(null),
   }
 
   const scrollTo = (key: string) => {
@@ -765,7 +776,7 @@ const Beta = () => {
         <meta name="twitter:image" content="/public/og/og-image.jpg" />
       </Head>
       <Container>
-        <div className="shadow-lg py-5 px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
+        <div className="shadow-lg py-5 px-5 lg:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
           <img className="h-5" src="images/logo-dark.png" />
           <HamburgerMenu />
         </div>
