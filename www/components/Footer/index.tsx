@@ -61,7 +61,7 @@ const Footer = (props: Props) => {
   )
 
   return (
-    <footer className="bg-white dark:bg-dark-600" aria-labelledby="footerHeading">
+    <footer className="bg-white dark:bg-dark-700" aria-labelledby="footerHeading">
       <h2 id="footerHeading" className="sr-only">
         Footer
       </h2>
@@ -101,7 +101,7 @@ const Footer = (props: Props) => {
               {FooterLinks.map((segment: any) => {
                 return (
                   <div key={`footer_${segment.title}`}>
-                    <h3 className="text-sm font-semibold text-gray-400 dark:text-dark-300 tracking-wider uppercase">
+                    <h3 className="text-sm font-semibold text-gray-400 dark:text-dark-400 tracking-wider uppercase">
                       {segment.title}
                     </h3>
                     <ul className="mt-4 space-y-4">
