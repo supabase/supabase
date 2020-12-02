@@ -6,13 +6,13 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   Label,
   LabelList,
   ResponsiveContainer,
 } from 'recharts'
 
 import Head from 'next/head'
+import { useRef } from 'react'
 import Container from 'components/Container'
 import Layout from 'components/Layout'
 import CountUp from 'components/CountUp'
@@ -45,7 +45,9 @@ const SectionHeader = (props: any) => {
   const { sectionNumber, header } = props
   return (
     <div className="col-span-12">
-      <span className="block font-mono text-3xl text-dark-300 dark:text-dark-400 mb-3">0{sectionNumber}</span>
+      <span className="block font-mono text-3xl text-dark-300 dark:text-dark-400 mb-3">
+        0{sectionNumber}
+      </span>
       <h3 className="text-black dark:text-white text-6xl">{header}</h3>
     </div>
   )
@@ -56,8 +58,8 @@ const Hero = () => (
     <div className="container mx-auto px-28 py-20 h-full grid grid-cols-12 gap-4 items-center">
       <div className="col-span-6 text-2xl">
         <p className="mb-10 text-white">
-          Supabase is an opensource Firebase alternative. We're building the features of Firebase using
-          enterprise-grade, open source tools.
+          Supabase is an opensource Firebase alternative. We're building the features of Firebase
+          using enterprise-grade, open source tools.
         </p>
         <p className="text-white">
           Today, we're moving to <span className="text-brand-700">Beta</span>
@@ -67,65 +69,77 @@ const Hero = () => (
   </div>
 )
 
-const Introduction = () => (
-  <div className="bg-gray-50 dark:bg-dark-700">
-    <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-4">
-      <div className="col-span-7 text-base mb-20">
-        <p className="text-black dark:text-white">
-          After the launch of our <span className="text-brand-700 hover:text-brand-800">Alpha</span>{' '}
-          Program in June, we've been fortunate to work with thousands of early adopters on
-          improving both our Open Source, and Hosted offerings.
-        </p>
-      </div>
+const Introduction = (props: any) => {
+  const { scrollTo } = props
+  return (
+    <div className="bg-gray-50 dark:bg-dark-700">
+      <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-4">
+        <div className="col-span-7 text-base mb-20">
+          <p className="text-black dark:text-white">
+            After the launch of our{' '}
+            <span className="text-brand-700 hover:text-brand-800">Alpha</span> Program in June,
+            we've been fortunate to work with thousands of early adopters on improving both our Open
+            Source, and Hosted offerings.
+          </p>
+        </div>
 
-      <div className="col-span-12 text-base mb-10">
-        <p className="text-black dark:text-white w-60 pb-2 border-b-2 border-dark-100">Alpha Program in Numbers</p>
-      </div>
+        <div className="col-span-12 text-base mb-10">
+          <p className="text-black dark:text-white w-60 pb-2 border-b-2 border-dark-100">
+            Alpha Program in Numbers
+          </p>
+        </div>
 
-      <div className="col-span-12 grid grid-cols-12 gap-y-20 mb-20">
-        {AlphaNumbers.map((stat: any, idx: number) => (
-          <div key={`stat_${idx}`} className="col-span-4 grid grid-cols-12 gap-x-6 items-center">
-            <div className="col-span-2">
-              <div className="w-12 h-12 rounded-md bg-dark-700 flex items-center justify-center">
-                {stat.icon}
+        <div className="col-span-12 grid grid-cols-12 gap-y-20 mb-20">
+          {AlphaNumbers.map((stat: any, idx: number) => (
+            <div key={`stat_${idx}`} className="col-span-4 grid grid-cols-12 gap-x-6 items-center">
+              <div className="col-span-2">
+                <div className="w-12 h-12 rounded-md bg-dark-700 flex items-center justify-center">
+                  {stat.icon}
+                </div>
+              </div>
+              <div className="col-span-10">
+                <p className="text-black dark:text-white text-6xl">
+                  <CountUp>{stat.value}</CountUp>
+                  {stat.unit && <span className="text-2xl ml-1">{stat.unit}</span>}
+                </p>
+              </div>
+              <div className="col-span-10 col-start-3">
+                <p className="text-dark-300 dark:text-dark-400">{stat.name}</p>
               </div>
             </div>
-            <div className="col-span-10">
-              <p className="text-black dark:text-white text-6xl">
-                <CountUp>{stat.value}</CountUp>
-                {stat.unit && <span className="text-2xl ml-1">{stat.unit}</span>}
-              </p>
-            </div>
-            <div className="col-span-10 col-start-3">
-              <p className="text-dark-300 dark:text-dark-400">{stat.name}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <div className="col-span-12 grid grid-cols-12 gap-y-10">
-        {IntroductionSegments.map((segment: any, segmentIdx: number) => (
-          <>
-            <div key={`introSegment_${segmentIdx}`} className="col-span-4">
-              <p className="text-black dark:text-white">{segment.description}</p>
+        <div className="col-span-12 grid grid-cols-12 gap-y-10">
+          {IntroductionSegments.map((segment: any, segmentIdx: number) => (
+            <div key={`introSegment_${segmentIdx}`} className="col-span-12 grid grid-cols-12">
+              <div className="col-span-4">
+                <p className="text-black dark:text-white">{segment.description}</p>
+              </div>
+              <div className="col-span-2" />
+              <div className="col-span-6 flex flex-col">
+                {segment.chapters.map((chapter: any, idx: number) => (
+                  <div
+                    key={`section_select_${idx}`}
+                    className="flex items-center mb-5 cursor-pointer"
+                    onClick={() => scrollTo(chapter.key)}
+                  >
+                    <p className="font-mono text-xs text-dark-300 dark:text-dark-400">{`0${
+                      idx + 1
+                    }`}</p>
+                    <p className="ml-4 text-black dark:text-white text-base border-b border-gray-400">
+                      {chapter.name}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="col-span-2" />
-            <div className="col-span-6 flex flex-col">
-              {segment.chapters.map((chapter: string, idx: number) => (
-                <div className="flex items-center mb-5">
-                  <p className="font-mono text-xs text-dark-300 dark:text-dark-400">{`0${idx + 1}`}</p>
-                  <p className="ml-4 text-black dark:text-white text-base border-b border-gray-400 cursor-pointer">
-                    {chapter}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
-  </div>
-)
+  )
+}
 
 const Performance = () => {
   const readColors = ['#38BC81', 'red']
@@ -250,59 +264,61 @@ const Performance = () => {
   )
 }
 
-const Security = () => (
-  <div id="security" className="bg-gray-50 dark:bg-dark-700">
-    <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10">
-      <SectionHeader sectionNumber={2} header="Security" />
+const Security = () => {
+  return (
+    <div id="security" className="bg-gray-50 dark:bg-dark-700">
+      <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10">
+        <SectionHeader sectionNumber={2} header="Security" />
 
-      <div className="col-span-12 grid grid-cols-12 gap-x-8">
-        <div className="col-span-7 text-base">
-          <p className="text-black dark:text-white mb-10">
-            As an infrastructure provider, Security has been a priority from day one. During
-            Supabase's Alpha period we experienced a single security breach, which was the result of
-            weak customer passwords. An automated brute force attack accessed a handful of our
-            customer's databases who had chosen weak passwords. The instances involved were
-            destroyed, and the users involved reminded the importance of strong passwords. We now
-            require that all database passwords pass a strength test (provided by the excellent{' '}
-            <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">
-              zxcvbn
-            </a>
-            ).
-          </p>
-          <p className="text-black dark:text-white mb-5">
-            Approaching the launch of our Beta period, we have been working with a number of
-            security advisors and specialists globally to put in place several new measures and
-            processes:
-          </p>
-          <ul className="text-black dark:text-white list-disc list-outside ml-6">
-            <li className="mb-5">
-              Employed DigitalXRAID to run a full Pen Test on both our internal and customer
-              infrastructure. In the interest of transparency we are making the summary report
-              available here. We have since patched the higher priority issues and are currently in
-              the process of resolving the minor and informational issues.
-            </li>
-            <li className="mb-5">
-              Published a disclosure policy to help ethical hackers help us find vulnerabilities in
-              our systems. It is availablein the usual place.
-            </li>
-            <li className="mb-5">
-              We now run an ongoing internal Capture the Flag competition, where team members are
-              challenged to breach various components of our systems.
-            </li>
-            <li>
-              Adopted the{' '}
+        <div className="col-span-12 grid grid-cols-12 gap-x-8">
+          <div className="col-span-7 text-base">
+            <p className="text-black dark:text-white mb-10">
+              As an infrastructure provider, Security has been a priority from day one. During
+              Supabase's Alpha period we experienced a single security breach, which was the result
+              of weak customer passwords. An automated brute force attack accessed a handful of our
+              customer's databases who had chosen weak passwords. The instances involved were
+              destroyed, and the users involved reminded the importance of strong passwords. We now
+              require that all database passwords pass a strength test (provided by the excellent{' '}
               <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">
-                Snyk
-              </a>{' '}
-              dependency monitor as part of our SSDLC on several key component of our system, to
-              help locate potential vulnerabilities in third party Open Source dependencies.
-            </li>
-          </ul>
+                zxcvbn
+              </a>
+              ).
+            </p>
+            <p className="text-black dark:text-white mb-5">
+              Approaching the launch of our Beta period, we have been working with a number of
+              security advisors and specialists globally to put in place several new measures and
+              processes:
+            </p>
+            <ul className="text-black dark:text-white list-disc list-outside ml-6">
+              <li className="mb-5">
+                Employed DigitalXRAID to run a full Pen Test on both our internal and customer
+                infrastructure. In the interest of transparency we are making the summary report
+                available here. We have since patched the higher priority issues and are currently
+                in the process of resolving the minor and informational issues.
+              </li>
+              <li className="mb-5">
+                Published a disclosure policy to help ethical hackers help us find vulnerabilities
+                in our systems. It is availablein the usual place.
+              </li>
+              <li className="mb-5">
+                We now run an ongoing internal Capture the Flag competition, where team members are
+                challenged to breach various components of our systems.
+              </li>
+              <li>
+                Adopted the{' '}
+                <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">
+                  Snyk
+                </a>{' '}
+                dependency monitor as part of our SSDLC on several key component of our system, to
+                help locate potential vulnerabilities in third party Open Source dependencies.
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-)
+  )
+}
 
 const Reliability = () => (
   <div id="reliability" className="bg-white dark:bg-dark-800">
@@ -524,7 +540,10 @@ const ScalingOurTeam = () => (
 )
 
 const WhatsNext = () => (
-  <div id="whatsNext" className="border-b-2 border-gray-50 bg-gray-50 dark:bg-dark-700 dark:border-dark-800">
+  <div
+    id="whatsNext"
+    className="border-b-2 border-gray-50 bg-gray-50 dark:bg-dark-700 dark:border-dark-800"
+  >
     <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10">
       <SectionHeader sectionNumber={8} header="What's Next" />
 
@@ -582,6 +601,23 @@ const WhatsNext = () => (
 )
 
 const Beta = () => {
+  const references: any = {
+    performance: useRef<HTMLDivElement>(document.createElement('div')),
+    security: useRef<HTMLDivElement>(document.createElement('div')),
+    reliability: useRef<HTMLDivElement>(document.createElement('div')),
+    features: useRef<HTMLDivElement>(document.createElement('div')),
+    pricing: useRef<HTMLDivElement>(document.createElement('div')),
+    openSource: useRef<HTMLDivElement>(document.createElement('div')),
+    scaling: useRef<HTMLDivElement>(document.createElement('div')),
+    next: useRef<HTMLDivElement>(document.createElement('div')),
+  }
+
+  const scrollTo = (key: string) => {
+    if (references[key]) {
+      references[key].current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   return (
     <Layout hideHeader={true}>
       <Head>
@@ -608,15 +644,31 @@ const Beta = () => {
           <HamburgerMenu />
         </div>
         <Hero />
-        <Introduction />
-        <Performance />
-        <Security />
-        <Reliability />
-        <NewFeaturesAndIntegrations />
-        <BetaPricing />
-        <OpenSource />
-        <ScalingOurTeam />
-        <WhatsNext />
+        <Introduction scrollTo={scrollTo} />
+        <div ref={references['performance']}>
+          <Performance />
+        </div>
+        <div ref={references['security']}>
+          <Security />
+        </div>
+        <div ref={references['reliability']}>
+          <Reliability />
+        </div>
+        <div ref={references['features']}>
+          <NewFeaturesAndIntegrations />
+        </div>
+        <div ref={references['pricing']}>
+          <BetaPricing />
+        </div>
+        <div ref={references['openSource']}>
+          <OpenSource />
+        </div>
+        <div ref={references['scaling']}>
+          <ScalingOurTeam />
+        </div>
+        <div ref={references['next']}>
+          <WhatsNext />
+        </div>
       </Container>
     </Layout>
   )
