@@ -19,7 +19,7 @@ const Button = (props: Props) => {
 
   const colorClass = type === 'primary'
     ? 'px-3 py-2 shadow-sm  border border-transparent text-white bg-brand-600 hover:bg-brand-700 focus:ring-2 focus:ring-offset-2 focus:ring-brand-500'
-    : 'text-brand-600 bg-none'
+    : 'text-brand-700 bg-none'
   
   const textClass = type === 'primary'
     ? 'font-medium left-3 group-hover:left-0'

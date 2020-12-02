@@ -49,46 +49,36 @@ const Card = (props: Props) => {
   })
 
   return (
-    <a href={url} target="_blank" className="flex flex-col rounded-md shadow-lg overflow-hidden relative transition transform hover:-translate-y-1">
+    <a
+      href={url}
+      target="_blank"
+      className="flex flex-col rounded-md hover:shadow-2xl overflow-hidden relative transition transform hover:border-black dark:hover:border-green-300 border-2 border-black"
+    >
       <div className="flex-shrink-0 dark:bg-dark-500">
-        <img
-          className="h-64 w-full object-cover"
-          src={imgUrl}
-          alt={title}
-        />
+        <img className="h-64 w-full object-cover" src={imgUrl} alt={title} />
       </div>
-      <div className="flex-1 bg-white p-6 flex flex-col justify-between dark:bg-dark-200">
+      <div className="flex-1 bg-white p-6 flex flex-col justify-between dark:bg-dark-700 border-t-2 border-black">
         <div className="flex-1">
           {/* {icons && (
             <div className="-mt-12 mb-6 flex -space-x-3">
               {iconMarkup}
             </div>
           )} */}
-          <p className="text-sm font-medium capitalize text-gray-600 dark:text-dark-100">
-            {type}
-          </p>
+          <p className="text-sm font-medium capitalize text-gray-600 dark:text-dark-300">{type}</p>
           <div className="block mt-2">
             {/* {logoUrl && <img src={logoUrl} className="h-9 my-4" />} */}
             {title && <p className="text-xl text-gray-900 dark:text-white">{title}</p>}
-            <p className="mt-3 text-base text-gray-500 dark:text-dark-100">
-              {description}
-            </p>
+            <p className="mt-3 text-base text-gray-500 dark:text-dark-300">{description}</p>
           </div>
         </div>
         {type === 'Case Study' && postMeta.name.length > 0 && (
           <div className="mt-6 flex items-center">
             <div className="flex-shrink-0">
               <span className="sr-only">{postMeta.name}</span>
-              <img
-                className="h-10 w-10 rounded-full"
-                src={postMeta.avatarUrl}
-                alt=""
-              />
+              <img className="h-10 w-10 rounded-full" src={postMeta.avatarUrl} alt="" />
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                {postMeta.name}
-              </p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{postMeta.name}</p>
               <div className="flex space-x-1 text-sm text-gray-500 dark:text-dark-100">
                 <time dateTime="2020-03-16">{postMeta.publishDate}</time>
                 <span aria-hidden="true">&middot;</span>
@@ -97,7 +87,7 @@ const Card = (props: Props) => {
             </div>
           </div>
         )}
-        { ctaText && <Button className="mt-5" type="secondary" text={ctaText} url={url} /> }
+        {/* {ctaText && <Button className="mt-5" type="secondary" text={ctaText} url={url} />} */}
       </div>
     </a>
   )

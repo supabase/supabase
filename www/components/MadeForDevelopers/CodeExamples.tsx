@@ -75,37 +75,33 @@ const CodeExamples = () => {
 
   return (
     <div className="grid grid-cols-12 gap-2 xl:gap-8">
-      <div className="col-span-12 text-center lg:col-span-3 lg:hidden">
-        {buttons}
-      </div>
+      <div className="col-span-12 text-center lg:col-span-3 lg:hidden">{buttons}</div>
       <div className="col-span-12 lg:col-span-9">
-        <div className="rounded-md rounded-b-lg bg-dark-600">
+        <div className="rounded-md rounded-b-lg bg-dark-600 dark:bg-dark-700">
           <div className="p-2 pl-5 flex justify-between items-center">
-          <p className="text-sm truncate mr-2 sm:text-base text-dark-100">
-            {
-              // @ts-ignore
-              examples[example].description
-            }
-          </p>
-          <CopyToClipboard
-            text={
-              // @ts-ignore
-              examples[example].code[lang]
-            }
-            onCopy={() => setCopied(true)}
-          >
-            <button
-              type="button"
-              className="inline-flex items-center px-2.5 py-1.5 border border-dark-300 shadow-sm text-xs font-medium rounded text-dark-100 hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            <p className="text-sm truncate mr-2 sm:text-base text-dark-100">
+              {
+                // @ts-ignore
+                examples[example].description
+              }
+            </p>
+            <CopyToClipboard
+              text={
+                // @ts-ignore
+                examples[example].code[lang]
+              }
+              onCopy={() => setCopied(true)}
             >
-              <span className="hidden sm:block">
-                {copied ? 'Copied!' : 'Copy code'}
-              </span>
-              <span className="block sm:hidden">
-                {copied ? <CopiedIcon /> : <ClipboardIcon />}
-              </span>
-            </button>
-          </CopyToClipboard>
+              <button
+                type="button"
+                className="inline-flex items-center px-2.5 py-1.5 border border-dark-300 shadow-sm text-xs font-medium rounded text-dark-100 hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <span className="hidden sm:block">{copied ? 'Copied!' : 'Copy code'}</span>
+                <span className="block sm:hidden">
+                  {copied ? <CopiedIcon /> : <ClipboardIcon />}
+                </span>
+              </button>
+            </CopyToClipboard>
           </div>
           <SyntaxHighlighter
             // startingLineNumber={3}
@@ -118,11 +114,11 @@ const CodeExamples = () => {
               fontSize: 12,
               lineHeight: 1.2,
               borderTop: '1px solid #393939',
-              background: '#181818'
+              background: '#181818',
             }}
             showLineNumbers
             lineNumberContainerStyle={{
-              paddingTop: '128px'
+              paddingTop: '128px',
             }}
             lineNumberStyle={{
               minWidth: '48px',
@@ -141,9 +137,7 @@ const CodeExamples = () => {
           </SyntaxHighlighter>
         </div>
       </div>
-      <div className="col-span-12 text-center hidden lg:col-span-3 lg:block">
-        {buttons}
-      </div>
+      <div className="col-span-12 text-center hidden lg:col-span-3 lg:block">{buttons}</div>
     </div>
   )
 }

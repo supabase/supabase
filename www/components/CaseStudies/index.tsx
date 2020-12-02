@@ -5,9 +5,9 @@ import CaseStudiesData from "data/CaseStudies.json"
 
 const CaseStudies = () => {
   return (
-    <div className="relative bg-gray-50 dark:bg-dark-400 pb-20">
+    <div className="relative bg-gray-50 dark:bg-dark-600 pb-20">
       <div className="absolute inset-0">
-        <div className="mx-auto bg-white dark:bg-dark-300 h-1/5 sm:h-2/5 w-full"></div>
+        <div className="mx-auto bg-white dark:bg-dark-700 h-1/5 sm:h-2/5 w-full"></div>
       </div>
       <div className="container relative mx-auto px-8 sm:px-16 xl:px-20 lg:py-8">
         <div className="relative max-w-7xl mx-auto">

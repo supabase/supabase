@@ -46,52 +46,52 @@ const monokaiCustomTheme = {
     "color": "#bf79db"
   },
   "hljs-string": {
-    "color": "#05b560"
+    "color": "#3ECF8E"
   },
   "hljs-bullet": {
-    "color": "#05b560"
+    "color": "#3ECF8E"
   },
   "hljs-subst": {
-    "color": "#05b560"
+    "color": "#3ECF8E"
   },
   "hljs-title": {
-    "color": "#05b560",
+    "color": "#3ECF8E",
     "fontWeight": "bold"
   },
   "hljs-section": {
-    "color": "#05b560",
+    "color": "#3ECF8E",
     "fontWeight": "bold"
   },
   "hljs-emphasis": {
-    "color": "#05b560"
+    "color": "#3ECF8E"
   },
   "hljs-type": {
-    "color": "#05b560",
+    "color": "#3ECF8E",
     "fontWeight": "bold"
   },
   "hljs-built_in": {
-    "color": "#05b560"
+    "color": "#3ECF8E"
   },
   "hljs-builtin-name": {
-    "color": "#05b560"
+    "color": "#3ECF8E"
   },
   "hljs-selector-attr": {
-    "color": "#05b560"
+    "color": "#3ECF8E"
   },
   "hljs-selector-pseudo": {
-    "color": "#05b560"
+    "color": "#3ECF8E"
   },
   "hljs-addition": {
-    "color": "#05b560"
+    "color": "#3ECF8E"
   },
   "hljs-variable": {
-    "color": "#05b560"
+    "color": "#3ECF8E"
   },
   "hljs-template-tag": {
-    "color": "#05b560"
+    "color": "#3ECF8E"
   },
   "hljs-template-variable": {
-    "color": "#05b560"
+    "color": "#3ECF8E"
   },
   "hljs-comment": {
     "color": "#75715e"
