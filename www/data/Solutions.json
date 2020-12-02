@@ -5,7 +5,7 @@
     "description": "Built with Postgres, the world's most trusted and versatile relational database.",
     "description_short": "",
     "label": "",
-    "url" : "https://supabase.io/docs/guides/database"
+    "url" : "/docs/guides/database"
   },
   "authentication": {
     "name": "Authentication",
@@ -13,7 +13,7 @@
     "description": "Add user sign ups and logins, securing your data with Row Level Security.",
     "description_short": "",
     "label": "",
-    "url" : "https://supabase.io/docs/guides/auth"
+    "url" : "/docs/guides/auth"
   },
   "storage": {
     "name": "Storage",
