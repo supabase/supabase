@@ -1,11 +1,11 @@
+import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Label, LabelList, ResponsiveContainer } from 'recharts';
+
 import Head from 'next/head'
 import Container from 'components/Container'
 import Layout from 'components/Layout'
 import CountUp from 'components/CountUp'
-
 import { APP_NAME, DESCRIPTION } from 'lib/constants'
-
-import { AlphaNumbers, IntroductionSegments } from 'data/BetaPage'
+import { AlphaNumbers, IntroductionSegments, PerformanceComparisonData } from 'data/BetaPage'
 
 const site_title = `${APP_NAME} | We are now in Beta`
 
@@ -36,7 +36,7 @@ const Introduction = () => (
 
       <div className="col-span-7 text-base mb-20">
         <p>
-          After the launch of our <span className="text-brand-700">Alpha</span> Program
+          After the launch of our <span className="text-brand-700 hover:text-brand-800">Alpha</span> Program
           in June, we've been fortunate to work with thousands of early adopters
           on improving both our Open Source, and Hosted offerings.
         </p>
@@ -92,55 +92,107 @@ const Introduction = () => (
   </div>
 )
 
-const Performance = () => (
-  <div id="performance" className="bg-white">
-    <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10">
-      <SectionHeader sectionNumber={1} header="Performance" />
-      
-      <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10">
-        <div className="col-span-7 text-base">
-          <p className="mb-10">
-            Supabase grew out of a need for a faster and more scalable web-ready datastore.
-            Postgres enables our users to handle massive amounts of data without sacrificing read and write speed.
-          </p>
-          <p className="mb-10">
-            During our Alpha program we have been obsessively tweaking our stack to tease out superior performance.
-            We chose the hyper-scalable <a href="#" target="_blank" className="text-brand-700">Elixer</a> to handle
-            our <a href="#" target="_blank" className="text-brand-700">Realtime engine</a>, and have supported
-            the <a href="#" target="_blank" className="text-brand-700">PostgREST</a> team while they improved the
-            performance of their auto-generated CRUD APIs.
-          </p>
-          <p>
-            We are proud to publish the results of our benchmarks here and we'll continue to seek gains throughout
-            our Beta program and beyond. Our <a href="#" target="_blank" className="text-brand-700">benchmarks</a> are
-            Open Source, and we are seeking contributors to help maintain our code and improve on our methodologies.
-          </p>
+const Performance = () => {
+
+  const readColors = ["#38BC81", "red"]
+  const writeColors = ["#65D9A5", "pink"]
+
+  type labelProps = {
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    text?: string,
+  }
+
+  const renderCustomizedLabel = (props: labelProps) => {
+    const { x, y, width, text } = props;
+    const radius = 10;
+  
+    return (
+      <text x={x + width / 2} y={y - radius} fill="#000" textAnchor="middle" dominantBaseline="middle" fontSize={14}>
+        Read
+      </text>
+    );
+  };
+
+  // Documentation on recharts:
+  // http://recharts.org/en-US/api/Bar
+  const ComparisonChart = () => (
+    <ResponsiveContainer width="100%" height={300}>
+      <BarChart data={PerformanceComparisonData}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" />
+        <YAxis type="number" padding={{ top: 20 }}>
+          <Label
+            value="requests/s"
+            position="insideLeft"
+            angle={-90}
+            style={{ textAnchor: 'middle' }}
+          />
+        </YAxis>
+        <Tooltip />
+        {/* <Legend /> */}
+        <Bar dataKey="read" name="Read" barSize={20} unit=" requests/s">
+          {PerformanceComparisonData.map((entry: any, idx: number) =>(
+            <Cell key={`cell_${idx}`} fill={readColors[idx]} />
+          ))}
+          <LabelList content={(props) => renderCustomizedLabel(props)} position="top" />
+        </Bar>
+        <Bar dataKey="write" name="Write" barSize={20} unit=" requests/s">
+          {PerformanceComparisonData.map((entry: any, idx: number) =>(
+            <Cell key={`cell_${idx}`} fill={writeColors[idx]} />
+          ))}
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  )
+
+  return (
+    <div id="performance" className="bg-white">
+      <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10">
+        <SectionHeader sectionNumber={1} header="Performance" />
+        
+        <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10 items-center">
+          <div className="col-span-7 text-base">
+            <p className="mb-10">
+              Supabase grew out of a need for a faster and more scalable web-ready datastore.
+              Postgres enables our users to handle massive amounts of data without sacrificing read and write speed.
+            </p>
+            <p className="mb-10">
+              During our Alpha program we have been obsessively tweaking our stack to tease out superior performance.
+              We chose the hyper-scalable <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">Elixer</a> to handle
+              our <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">Realtime engine</a>, and have supported
+              the <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">PostgREST</a> team while they improved the
+              performance of their auto-generated CRUD APIs.
+            </p>
+            <p>
+              We are proud to publish the results of our benchmarks here and we'll continue to seek gains throughout
+              our Beta program and beyond. Our <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">benchmarks</a> are
+              Open Source, and we are seeking contributors to help maintain our code and improve on our methodologies.
+            </p>
+          </div>
+          <div className="col-span-5">
+            <ComparisonChart />
+          </div>
+          <div className="col-span-7 text-base">
+            <p className="mt-10 mb-10">
+            Supabase is now available in 7 different geographic regions, so you can reduce latency by deploying in close
+            proximity to your customer base.
+            </p>
+            <p>
+            A key metric in how we measure Supabase is what we call "Time to Value". How fast can a user go from sign up,
+            to making their first API request? How fast can they from being in Production and generating value for their
+            own customers? We've made several case studies available on our website here, with a special focus on how Supabase
+            enables them to build and scale their product in as little time as possible.
+            </p>
+          </div>
         </div>
-      </div>
 
-      <div className="col-span-12 bg-dark-200 flex items-center justify-center py-64 text-center mb-10">
-        Benchmark graph goes here
       </div>
-
-      <div className="col-span-12 grid grid-cols-12 gap-x-8">
-        <div className="col-span-7 text-base">
-          <p className="mb-10">
-          Supabase is now available in 7 different geographic regions, so you can reduce latency by deploying in close
-          proximity to your customer base.
-          </p>
-          <p className="mb-10">
-          A key metric in how we measure Supabase is what we call "Time to Value". How fast can a user go from sign up,
-          to making their first API request? How fast can they from being in Production and generating value for their
-          own customers? We've made several case studies available on our website here, with a special focus on how Supabase
-          enables them to build and scale their product in as little time as possible.
-          </p>
-        </div>
-        <div className="col-span-6"></div>
-      </div>
-
     </div>
-  </div>
-)
+  )
+}
 
 const Security = () => (
   <div id="security" className="bg-gray-50">
@@ -155,7 +207,7 @@ const Security = () => (
             An automated brute force attack accessed a handful of our customer's databases who had chosen weak passwords.
             The instances involved were destroyed, and the users involved reminded the importance of strong passwords.
             We now require that all database passwords pass a strength test (provided by the
-            excellent <a href="#" target="_blank" className="text-brand-700">zxcvbn</a>).
+            excellent <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">zxcvbn</a>).
           </p>
           <p className="mb-5">
             Approaching the launch of our Beta period, we have been working with a number of security advisors and
@@ -176,7 +228,7 @@ const Security = () => (
               various components of our systems.
             </li>
             <li>
-              Adopted the <a href="#" target="_blank" className="text-brand-700">Snyk</a> dependency monitor as part of
+              Adopted the <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">Snyk</a> dependency monitor as part of
               our SSDLC on several key component of our system, to help locate potential vulnerabilities in third party
               Open Source dependencies.
             </li>
@@ -199,7 +251,7 @@ const Security = () => (
             various components of our systems.
           </div>
           <div className="col-span-6 bg-white shadow-md rounded-md px-4 py-4">
-            Adopted the <a href="#" target="_blank" className="text-brand-700">Snyk</a> dependency monitor as part of our SSDLC on several key component of our system, to help locate
+            Adopted the <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">Snyk</a> dependency monitor as part of our SSDLC on several key component of our system, to help locate
             potential vulnerabilities in third party Open Source dependencies.
           </div>
         </div> */}
@@ -235,7 +287,7 @@ const Reliability = () => (
             data is backed up in a secure and encrypted location.
           </p>
           <p className="mb-10">
-            We're launching <a href="#" target="_blank" className="text-brand-700">https://status.supabase.io</a> to
+            We're launching <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">https://status.supabase.io</a> to
             keep track of uptime across all of our services and critical infrastructure. (Possibly drop a screen grab here)
           </p>
           <p>
@@ -357,17 +409,17 @@ const OpenSource = () => (
             community, we rely on making it easier for contributors to get involved by making Open Source more accessible.
           </p>
           <p className="mb-10">
-            Every dollar that is given to Supabase in GitHub <a href="#" target="_blank" className="text-brand-700">sponsorship</a> will
+            Every dollar that is given to Supabase in GitHub <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">sponsorship</a> will
             be funneled back into the community to support the next generation of Open Source maintainers.
           </p>
           <p className="mb-10">
             One of the biggest barriers to Open Source is knowing exactly how you can contribute. We're partnering
-            with <a href="#" target="_blank" className="text-brand-700">Strive School</a> to educate the next generation
+            with <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">Strive School</a> to educate the next generation
             of programmers in Open Source by providing tutorials, Founder Office Hours, and other free resources.
           </p>
           <p>
             If you teach programming, and you're interested in offering OSS tuition to your students, we're actively looking
-            for more education partners. Email <a href="mailto:rory@supabase.io" target="_blank" className="text-brand-700">rory@supabase.io</a> to
+            for more education partners. Email <a href="mailto:rory@supabase.io" target="_blank" className="text-brand-700 hover:text-brand-800">rory@supabase.io</a> to
             find out more.
           </p>
         </div>
@@ -393,7 +445,7 @@ const ScalingOurTeam = () => (
             We are looking for hires across multiple positions including PostgreSQL engineers, Cloud engineers, SRE's, and
             Developer Advocates. We are a fully remote team, spanning 4 continents and 10 nationalities. If you are
             interested and think you can be a factor in the success of Supabase, get in touch at
-            <a href="mailto:work@supabase.io" target="_blank" className="text-brand-700">work@supabase.io</a>.
+            <a href="mailto:work@supabase.io" target="_blank" className="text-brand-700 hover:text-brand-800">work@supabase.io</a>.
           </p>
         </div>
       </div>
@@ -439,8 +491,8 @@ const WhatsNext = () => (
           </ul>
           <p>
             We depend on your feedback to continually improve Supabase.Email us
-            at <a href="mailto:beta@supabase.io" target="_blank" className="text-brand-700">beta@supabase.io</a> or join
-            the <a href="#" target="_blank" className="text-brand-700">discussion</a> on GitHub to let us know how we
+            at <a href="mailto:beta@supabase.io" target="_blank" className="text-brand-700 hover:text-brand-800">beta@supabase.io</a> or join
+            the <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">discussion</a> on GitHub to let us know how we
             can help you build things faster.
           </p>
         </div>
