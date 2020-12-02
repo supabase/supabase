@@ -96,7 +96,10 @@ const Introduction = (props: any) => {
 
         <div className="col-span-12 grid grid-cols-12 gap-y-12 lg:gap-y-20 mb-20">
           {AlphaNumbers.map((stat: any, idx: number) => (
-            <div key={`stat_${idx}`} className="col-span-6 sm:col-span-4 grid grid-cols-8 sm:grid-cols-12 gap-x-4 xl:gap-x-6 items-center">
+            <div
+              key={`stat_${idx}`}
+              className="col-span-6 sm:col-span-4 grid grid-cols-8 sm:grid-cols-12 gap-x-4 xl:gap-x-6 items-center"
+            >
               <div className="col-span-4 sm:col-span-3 xl:col-span-2">
                 <div className="w-12 h-12 rounded-md bg-dark-700 flex items-center justify-center bg-gray-900 dark:bg-white">
                   {stat.icon}
@@ -208,11 +211,7 @@ const Performance = () => {
   )
 
   const ComparisonChartV2 = () => {
-    return (
-      <div>
-        Hello
-      </div>
-    )
+    return <div>Hello</div>
   }
 
   return (
