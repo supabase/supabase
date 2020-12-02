@@ -149,3 +149,16 @@ export const IntroductionSegments = [
     chapters: ['Funding Partners', 'Scaling Our Team', 'What\'s Next']
   },
 ]
+
+export const PerformanceComparisonData = [
+  {
+    name: 'Supabase',
+    read: 1167,
+    write: 870
+  },
+  {
+    name: 'Firebase',
+    read: 366,
+    write: 280
+  }
+]
