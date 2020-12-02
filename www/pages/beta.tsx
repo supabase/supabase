@@ -98,10 +98,10 @@ const Performance = () => {
   const writeColors = ["#65D9A5", "pink"]
 
   type labelProps = {
-    x: number,
-    y: number,
-    width: number,
-    height: number,
+    x?: any,
+    y?: any,
+    width?: any,
+    height?: any,
     text?: string,
   }
 
@@ -111,7 +111,7 @@ const Performance = () => {
   
     return (
       <text x={x + width / 2} y={y - radius} fill="#000" textAnchor="middle" dominantBaseline="middle" fontSize={14}>
-        Read
+        {text}
       </text>
     );
   };
@@ -120,7 +120,7 @@ const Performance = () => {
   // http://recharts.org/en-US/api/Bar
   const ComparisonChart = () => (
     <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={PerformanceComparisonData}>
+      <BarChart data={PerformanceComparisonData} barGap={10}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
         <YAxis type="number" padding={{ top: 20 }}>
@@ -131,18 +131,30 @@ const Performance = () => {
             style={{ textAnchor: 'middle' }}
           />
         </YAxis>
-        <Tooltip />
-        {/* <Legend /> */}
+        <Tooltip cursor={{ fill: 'rgba(0, 0, 0, 0.05)'}} />
         <Bar dataKey="read" name="Read" barSize={20} unit=" requests/s">
           {PerformanceComparisonData.map((entry: any, idx: number) =>(
             <Cell key={`cell_${idx}`} fill={readColors[idx]} />
           ))}
-          <LabelList content={(props) => renderCustomizedLabel(props)} position="top" />
+          {/* @ts-ignore */}
+          <LabelList content={(props) => {
+              const updatedProps = { ...props, text: "Read"}
+              return renderCustomizedLabel(updatedProps)
+            }}
+            position="top"
+          />
         </Bar>
         <Bar dataKey="write" name="Write" barSize={20} unit=" requests/s">
           {PerformanceComparisonData.map((entry: any, idx: number) =>(
             <Cell key={`cell_${idx}`} fill={writeColors[idx]} />
           ))}
+          {/* @ts-ignore */}
+          <LabelList content={(props) => {
+              const updatedProps = { ...props, text: "Write"}
+              return renderCustomizedLabel(updatedProps)
+            }}
+            position="top"
+          />
         </Bar>
       </BarChart>
     </ResponsiveContainer>
