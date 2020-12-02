@@ -121,9 +121,9 @@ const FlyOut = () => {
               <div className="bg-gray-50 dark:bg-dark-500 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full"></div>
               {/* <div className="bg-gray-50 dark:bg-dark-300 md:hidden lg:block lg:w-1/2"></div> */}
             </div>
-            <div className="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2">
+            <div className="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 md:px-8 lg:px-0">
               <nav
-                className="grid gap-y-10 px-4 py-8 sm:grid-cols-2 sm:gap-x-8 sm:py-12 sm:px-6 lg:px-8 xl:pr-12"
+                className="grid gap-y-10 px-4 py-8 sm:grid-cols-2 sm:gap-x-8 sm:py-12 sm:px-6 md:px-8 lg:px-0 xl:pr-12"
                 aria-labelledby="solutionsHeading"
               >
                 {iconSections}
