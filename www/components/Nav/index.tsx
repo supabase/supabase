@@ -7,7 +7,7 @@ import Transition from 'lib/Transition'
 import Solutions from 'data/Solutions.json'
 
 type Props = {
-  darkMode: boolean,
+  darkMode: boolean
 }
 
 const Nav = (props: Props) => {
@@ -15,15 +15,15 @@ const Nav = (props: Props) => {
   const [open, setOpen] = useState(false)
 
   React.useEffect(() => {
-    if(open) {
+    if (open) {
       console.log('open if')
       // Prevent scrolling on mount
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'
     } else {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = 'auto'
     }
-  }, [open]);
-  
+  }, [open])
+
   const iconSections = Object.values(Solutions).map((solution: any, idx: number) => {
     const { name, description, icon, label, url } = solution
 
@@ -70,14 +70,15 @@ const Nav = (props: Props) => {
     ) : (
       <div
         key={`solution_${idx}`}
-        className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150">
+        className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150"
+      >
         {content}
       </div>
     )
   })
 
   type HamburgerButtonProps = {
-    toggleFlyOut: Function,
+    toggleFlyOut: Function
   }
 
   const HamburgerButton = (props: HamburgerButtonProps) => (
@@ -129,7 +130,6 @@ const Nav = (props: Props) => {
   return (
     <nav className="bg-white dark:bg-dark-700 z-50 sticky">
       <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0">
-        
         <HamburgerButton toggleFlyOut={() => setOpen(true)} />
 
         <div className="flex-1 flex items-center justify-center sm:px-10 sm:items-stretch lg:justify-between">
@@ -137,12 +137,12 @@ const Nav = (props: Props) => {
             <div className="flex-shrink-0 flex items-center">
               <img
                 className="block lg:hidden h-6 w-auto"
-                src={darkMode ? "images/logo-dark.png" : "images/logo-light.png"}
+                src={darkMode ? 'images/logo-dark.png' : 'images/logo-light.png'}
                 alt="Logo"
               />
               <img
                 className="hidden lg:block h-6 w-auto"
-                src={darkMode ? "images/logo-dark.png" : "images/logo-light.png"}
+                src={darkMode ? 'images/logo-dark.png' : 'images/logo-light.png'}
                 alt="Logo"
               />
             </div>
@@ -215,77 +215,76 @@ const Nav = (props: Props) => {
         leaveFrom="opacity-100 translate-y-0"
         leaveTo="opacity-0 translate-y-1"
       >
-        
-          <div className="p-4 md:p-8 h-full h-screen fixed bg-white transform lg:hidden overflow-y-scroll -inset-y-0 z-50 dark:bg-dark-400">
-              <div className="absolute right-4 top-4 items-center justify-between">
-                <div className="-mr-2">
-                  <button
-                    onClick={() => setOpen(false)}
-                    type="button"
-                    className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 dark:bg-dark-400"
-                  >
-                    <span className="sr-only">Close menu</span>
+        <div className="p-4 md:p-8 h-full h-screen fixed bg-white transform lg:hidden overflow-y-scroll -inset-y-0 z-50 dark:bg-dark-400">
+          <div className="absolute right-4 top-4 items-center justify-between">
+            <div className="-mr-2">
+              <button
+                onClick={() => setOpen(false)}
+                type="button"
+                className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 dark:bg-dark-400"
+              >
+                <span className="sr-only">Close menu</span>
 
-                    <svg
-                      className="h-6 w-6"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            {/* </div> */}
-            <div className="mt-6 mb-12">
-              <div className="pt-2 pb-4 space-y-1">
-                <a
-                  href="#"
-                  className="block pl-3 pr-4 text-base font-medium text-gray-600 dark:text-white"
+                <svg
+                  className="h-6 w-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
                 >
-                  Sign in
-                </a>
-              </div>
-              <div className="pt-2 pb-4 space-y-1">
-                <a
-                  href="#"
-                  className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-white"
-                >
-                  Product
-                </a>
-                <a
-                  href="#"
-                  className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-white"
-                >
-                  Developers
-                </a>
-                <a
-                  href="#"
-                  className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-white"
-                >
-                  Company
-                </a>
-                <a
-                  href="#"
-                  className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-white"
-                >
-                  Pricing
-                </a>
-              </div>
-              <div className="p-3">
-                <p className="mb-6 text-sm text-gray-400">Products available:</p>
-                {iconSections}
-              </div>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
+          {/* </div> */}
+          <div className="mt-6 mb-12">
+            <div className="pt-2 pb-4 space-y-1">
+              <a
+                href="#"
+                className="block pl-3 pr-4 text-base font-medium text-gray-600 dark:text-white"
+              >
+                Sign in
+              </a>
+            </div>
+            <div className="pt-2 pb-4 space-y-1">
+              <a
+                href="#"
+                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-white"
+              >
+                Product
+              </a>
+              <a
+                href="#"
+                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-white"
+              >
+                Developers
+              </a>
+              <a
+                href="#"
+                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-white"
+              >
+                Company
+              </a>
+              <a
+                href="#"
+                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-white"
+              >
+                Pricing
+              </a>
+            </div>
+            <div className="p-3">
+              <p className="mb-6 text-sm text-gray-400">Products available:</p>
+              {iconSections}
+            </div>
+          </div>
+        </div>
       </Transition>
     </nav>
   )

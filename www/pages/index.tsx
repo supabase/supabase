@@ -11,18 +11,18 @@ import AdminAccess from 'components/AdminAccess/index'
 import CaseStudies from 'components/CaseStudies/index'
 import CTABanner from 'components/CTABanner/index'
 
-type Props = {
-  
-}
+type Props = {}
 
 const site_title = `The Open Source Firebase Alternative | ${APP_NAME}`
 
-const Index = ({  }: Props) => {
+const Index = ({}: Props) => {
   return (
     <>
       <Layout>
         <Head>
-          <title>{DESCRIPTION} | {site_title}</title>
+          <title>
+            {DESCRIPTION} | {site_title}
+          </title>
           <meta name="description" content={DESCRIPTION} />
           <meta property="og:type" content="website" />
           <meta name="og:title" property="og:title" content={site_title} />
