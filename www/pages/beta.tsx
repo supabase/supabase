@@ -21,32 +21,57 @@ import { AlphaNumbers, IntroductionSegments, PerformanceComparisonData } from 'd
 
 const site_title = `${APP_NAME} | We are now in Beta`
 
-type SectionHeaderProps = {
-  sectionNumber: number
-  header: string
-}
+const HamburgerMenu = () => (
+  <div className="cursor-pointer">
+    <svg
+      viewBox="0 0 24 24"
+      width="24"
+      height="24"
+      stroke="white"
+      strokeWidth="2"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="css-i6dzq1"
+    >
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  </div>
+)
 
-const SectionHeader = (props: SectionHeaderProps) => {
+const SectionHeader = (props: any) => {
   const { sectionNumber, header } = props
   return (
     <div className="col-span-12">
-      <span className="block font-mono text-3xl text-dark-300 mb-3">0{sectionNumber}</span>
-      <h3 className="text-6xl">{header}</h3>
+      <span className="block font-mono text-3xl text-dark-300 dark:text-dark-400 mb-3">0{sectionNumber}</span>
+      <h3 className="text-black dark:text-white text-6xl">{header}</h3>
     </div>
   )
 }
 
 const Hero = () => (
-  <div className="w-screen h-screen bg-dark-500 flex items-center justify-center text-white">
-    TBD, scroll down first
+  <div className="w-screen bg-dark-800" style={{ height: '80vh' }}>
+    <div className="container mx-auto px-28 py-20 h-full grid grid-cols-12 gap-4 items-center">
+      <div className="col-span-6 text-2xl">
+        <p className="mb-10 text-white">
+          Supabase is an opensource Firebase alternative. We're building the features of Firebase using
+          enterprise-grade, open source tools.
+        </p>
+        <p className="text-white">
+          Today, we're moving to <span className="text-brand-700">Beta</span>
+        </p>
+      </div>
+    </div>
   </div>
 )
 
 const Introduction = () => (
-  <div className="bg-gray-50">
+  <div className="bg-gray-50 dark:bg-dark-700">
     <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-4">
       <div className="col-span-7 text-base mb-20">
-        <p>
+        <p className="text-black dark:text-white">
           After the launch of our <span className="text-brand-700 hover:text-brand-800">Alpha</span>{' '}
           Program in June, we've been fortunate to work with thousands of early adopters on
           improving both our Open Source, and Hosted offerings.
@@ -54,7 +79,7 @@ const Introduction = () => (
       </div>
 
       <div className="col-span-12 text-base mb-10">
-        <p className="w-60 pb-2 border-b-2 border-dark-100">Alpha Program in Numbers</p>
+        <p className="text-black dark:text-white w-60 pb-2 border-b-2 border-dark-100">Alpha Program in Numbers</p>
       </div>
 
       <div className="col-span-12 grid grid-cols-12 gap-y-20 mb-20">
@@ -66,13 +91,13 @@ const Introduction = () => (
               </div>
             </div>
             <div className="col-span-10">
-              <p className="text-6xl">
+              <p className="text-black dark:text-white text-6xl">
                 <CountUp>{stat.value}</CountUp>
                 {stat.unit && <span className="text-2xl ml-1">{stat.unit}</span>}
               </p>
             </div>
             <div className="col-span-10 col-start-3">
-              <p className="text-dark-300">{stat.name}</p>
+              <p className="text-dark-300 dark:text-dark-400">{stat.name}</p>
             </div>
           </div>
         ))}
@@ -82,14 +107,14 @@ const Introduction = () => (
         {IntroductionSegments.map((segment: any, segmentIdx: number) => (
           <>
             <div key={`introSegment_${segmentIdx}`} className="col-span-4">
-              {segment.description}
+              <p className="text-black dark:text-white">{segment.description}</p>
             </div>
             <div className="col-span-2" />
             <div className="col-span-6 flex flex-col">
               {segment.chapters.map((chapter: string, idx: number) => (
                 <div className="flex items-center mb-5">
-                  <p className="font-mono text-xs text-dark-300">{`0${idx + 1}`}</p>
-                  <p className="ml-4 text-base border-b border-gray-400 cursor-pointer">
+                  <p className="font-mono text-xs text-dark-300 dark:text-dark-400">{`0${idx + 1}`}</p>
+                  <p className="ml-4 text-black dark:text-white text-base border-b border-gray-400 cursor-pointer">
                     {chapter}
                   </p>
                 </div>
@@ -166,18 +191,18 @@ const Performance = () => {
   )
 
   return (
-    <div id="performance" className="bg-white">
+    <div id="performance" className="bg-white dark:bg-dark-800">
       <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10">
         <SectionHeader sectionNumber={1} header="Performance" />
 
         <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10 items-center">
           <div className="col-span-7 text-base">
-            <p className="mb-10">
+            <p className="text-black dark:text-white mb-10">
               Supabase grew out of a need for a faster and more scalable web-ready datastore.
               Postgres enables our users to handle massive amounts of data without sacrificing read
               and write speed.
             </p>
-            <p className="mb-10">
+            <p className="text-black dark:text-white mb-10">
               During our Alpha program we have been obsessively tweaking our stack to tease out
               superior performance. We chose the hyper-scalable{' '}
               <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">
@@ -193,7 +218,7 @@ const Performance = () => {
               </a>{' '}
               team while they improved the performance of their auto-generated CRUD APIs.
             </p>
-            <p>
+            <p className="text-black dark:text-white">
               We are proud to publish the results of our benchmarks here and we'll continue to seek
               gains throughout our Beta program and beyond. Our{' '}
               <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">
@@ -207,11 +232,11 @@ const Performance = () => {
             <ComparisonChart />
           </div>
           <div className="col-span-7 text-base">
-            <p className="mt-10 mb-10">
+            <p className="text-black dark:text-white mt-10 mb-10">
               Supabase is now available in 7 different geographic regions, so you can reduce latency
               by deploying in close proximity to your customer base.
             </p>
-            <p>
+            <p className="text-black dark:text-white">
               A key metric in how we measure Supabase is what we call "Time to Value". How fast can
               a user go from sign up, to making their first API request? How fast can they from
               being in Production and generating value for their own customers? We've made several
@@ -226,13 +251,13 @@ const Performance = () => {
 }
 
 const Security = () => (
-  <div id="security" className="bg-gray-50">
+  <div id="security" className="bg-gray-50 dark:bg-dark-700">
     <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10">
       <SectionHeader sectionNumber={2} header="Security" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-8">
         <div className="col-span-7 text-base">
-          <p className="mb-10">
+          <p className="text-black dark:text-white mb-10">
             As an infrastructure provider, Security has been a priority from day one. During
             Supabase's Alpha period we experienced a single security breach, which was the result of
             weak customer passwords. An automated brute force attack accessed a handful of our
@@ -244,12 +269,12 @@ const Security = () => (
             </a>
             ).
           </p>
-          <p className="mb-5">
+          <p className="text-black dark:text-white mb-5">
             Approaching the launch of our Beta period, we have been working with a number of
             security advisors and specialists globally to put in place several new measures and
             processes:
           </p>
-          <ul className="list-disc list-outside ml-6">
+          <ul className="text-black dark:text-white list-disc list-outside ml-6">
             <li className="mb-5">
               Employed DigitalXRAID to run a full Pen Test on both our internal and customer
               infrastructure. In the interest of transparency we are making the summary report
@@ -274,44 +299,23 @@ const Security = () => (
             </li>
           </ul>
         </div>
-
-        {/* Joshen: Was trying a card layout */}
-        {/* <div className="col-span-12 grid grid-cols-12 gap-8 mt-10">
-          <div className="col-span-6 bg-white shadow-md rounded-md px-4 py-4">
-            Employed DigitalXRAID to run a full Pen Test on both our internal and customer infrastructure.
-            In the interest of transparency we are making the summary report available here. We have since patched
-            the higher priority issues and are currently in the process of resolving the minor and informational issues.
-          </div>
-          <div className="col-span-6 bg-white shadow-md rounded-md px-4 py-4">
-            Published a disclosure policy to help ethical hackers help us find vulnerabilities in our systems.
-            It is availablein the usual place.
-          </div>
-          <div className="col-span-6 bg-white shadow-md rounded-md px-4 py-4">
-            We now run an ongoing internal Capture the Flag competition, where team members are challenged to breach
-            various components of our systems.
-          </div>
-          <div className="col-span-6 bg-white shadow-md rounded-md px-4 py-4">
-            Adopted the <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">Snyk</a> dependency monitor as part of our SSDLC on several key component of our system, to help locate
-            potential vulnerabilities in third party Open Source dependencies.
-          </div>
-        </div> */}
       </div>
     </div>
   </div>
 )
 
 const Reliability = () => (
-  <div id="reliability" className="bg-white">
+  <div id="reliability" className="bg-white dark:bg-dark-800">
     <div className="container mx-auto px-28 py-12 grid grid-cols-12 gap-y-10">
       <SectionHeader sectionNumber={3} header="Reliability" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10">
         <div className="col-span-7 text-base">
-          <p className="mb-5">
+          <p className="text-black dark:text-white mb-5">
             During Alpha we experienced 2 minor incidents related to availability, neither of which
             affected customer access to their data. These were:
           </p>
-          <ul className="list-disc list-outside ml-6 mb-10">
+          <ul className="text-black dark:text-white list-disc list-outside ml-6 mb-10">
             <li className="mb-5">
               A third-party CDN API outage. As a result, subdomains were not created for new
               projects.
@@ -323,11 +327,11 @@ const Reliability = () => (
               that could be issued temporarily
             </li>
           </ul>
-          <p className="mb-10">
+          <p className="text-black dark:text-white mb-10">
             Availability is one of our High Priority goals. We're making efforts to maximize uptime
             and ensuring user data is backed up in a secure and encrypted location.
           </p>
-          <p className="mb-10">
+          <p className="text-black dark:text-white mb-10">
             We're launching{' '}
             <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">
               https://status.supabase.io
@@ -335,7 +339,7 @@ const Reliability = () => (
             to keep track of uptime across all of our services and critical infrastructure.
             (Possibly drop a screen grab here)
           </p>
-          <p>
+          <p className="text-black dark:text-white">
             For our Alpha & Beta Users we take daily backups of your Database free of charge up to
             20GB and store them in an encrypted format. They are available to download at any time
             via the dashboard.
@@ -347,17 +351,17 @@ const Reliability = () => (
 )
 
 const NewFeaturesAndIntegrations = () => (
-  <div id="newFeaturesAndIntegrations" className="bg-gray-50">
+  <div id="newFeaturesAndIntegrations" className="bg-gray-50 dark:bg-dark-700">
     <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10">
       <SectionHeader sectionNumber={4} header="New Features & Integrations" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10">
         <div className="col-span-7 text-base">
-          <p className="mb-5">
+          <p className="text-black dark:text-white mb-5">
             Supabase Beta now comes with the following high level features: (Joshen see whether you
             can add pizzazz to this part)
           </p>
-          <ul className="list-disc list-outside ml-6">
+          <ul className="text-black dark:text-white list-disc list-outside ml-6">
             <li className="mb-5">
               Supabase Auth: we provide an easy to use Javascript (and HTTP) interface allowing your
               Users to sign in and out of your application. You can define which rows in your
@@ -376,18 +380,20 @@ const NewFeaturesAndIntegrations = () => (
 )
 
 const BetaPricing = () => (
-  <div id="betaPricing" className="bg-white">
+  <div id="betaPricing" className="bg-white dark:bg-dark-800">
     <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10">
       <SectionHeader sectionNumber={5} header="Beta Pricing" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10">
         <div className="col-span-7 text-base">
-          <p className="mb-10">
+          <p className="text-black dark:text-white mb-10">
             We've been working closely with many Open Source projects, Infrastructure Providers, and
             of course our Alpha Users, to provide a predictable and sustainable pricing model.
           </p>
-          <p className="mb-5">Our key aims going into this exercise were:</p>
-          <ul className="list-disc list-outside ml-6 mb-10">
+          <p className="text-black dark:text-white mb-5">
+            Our key aims going into this exercise were:
+          </p>
+          <ul className="text-black dark:text-white list-disc list-outside ml-6 mb-10">
             <li className="mb-5">
               To continue offering free Supabase instances for Students, Hobbyists, and Early
               Adopters
@@ -401,11 +407,11 @@ const BetaPricing = () => (
               ability to create value for their customers
             </li>
           </ul>
-          <p className="mb-10">
+          <p className="text-black dark:text-white mb-10">
             Whilst we're still not at the stage where we can publish a standardized pricing model,
             we are committing to the following initiatives:
           </p>
-          <ul className="list-decimal list-outside ml-6 mb-10">
+          <ul className="text-black dark:text-white list-decimal list-outside ml-6 mb-10">
             <li className="mb-5">
               All Alpha Users will receive credits equivalent of 2 years of base tier usage, these
               will automatically be credited to your account if you signed up prior to December
@@ -427,7 +433,7 @@ const BetaPricing = () => (
               credits which can be applied to products outside of the base tier.
             </li>
           </ul>
-          <p>
+          <p className="text-black dark:text-white">
             The Supabase Base Tier constitutes a Supabase Instance running in a single region, on 2
             vCPUs, 1 GiB Memory, with 2 GB of storage, and daily backups.
           </p>
@@ -438,21 +444,21 @@ const BetaPricing = () => (
 )
 
 const OpenSource = () => (
-  <div id="openSource" className="bg-gray-50">
+  <div id="openSource" className="bg-gray-50 dark:bg-dark-700">
     <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10">
       <SectionHeader sectionNumber={6} header="Open Source" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10">
         <div className="col-span-7 text-base">
-          <p className="mb-10">
+          <p className="text-black dark:text-white mb-10">
             Great software is multi generational and stretches far beyond any single company.
           </p>
-          <p className="mb-10">
+          <p className="text-black dark:text-white mb-10">
             Since Supabase is a collection of many different projects and repos, hosted by us, and
             by members of the community, we rely on making it easier for contributors to get
             involved by making Open Source more accessible.
           </p>
-          <p className="mb-10">
+          <p className="text-black dark:text-white mb-10">
             Every dollar that is given to Supabase in GitHub{' '}
             <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">
               sponsorship
@@ -460,7 +466,7 @@ const OpenSource = () => (
             will be funneled back into the community to support the next generation of Open Source
             maintainers.
           </p>
-          <p className="mb-10">
+          <p className="text-black dark:text-white mb-10">
             One of the biggest barriers to Open Source is knowing exactly how you can contribute.
             We're partnering with{' '}
             <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">
@@ -469,7 +475,7 @@ const OpenSource = () => (
             to educate the next generation of programmers in Open Source by providing tutorials,
             Founder Office Hours, and other free resources.
           </p>
-          <p>
+          <p className="text-black dark:text-white">
             If you teach programming, and you're interested in offering OSS tuition to your
             students, we're actively looking for more education partners. Email{' '}
             <a
@@ -491,13 +497,13 @@ const OpenSource = () => (
 const FundingPartners = () => <div></div>
 
 const ScalingOurTeam = () => (
-  <div id="scalingOurTeam" className="bg-white">
+  <div id="scalingOurTeam" className="bg-white dark:bg-dark-800">
     <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10">
       <SectionHeader sectionNumber={7} header="Scaling Our Team" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10">
         <div className="col-span-7 text-base">
-          <p>
+          <p className="text-black dark:text-white">
             We are looking for hires across multiple positions including PostgreSQL engineers, Cloud
             engineers, SRE's, and Developer Advocates. We are a fully remote team, spanning 4
             continents and 10 nationalities. If you are interested and think you can be a factor in
@@ -518,19 +524,19 @@ const ScalingOurTeam = () => (
 )
 
 const WhatsNext = () => (
-  <div id="whatsNext" className="bg-gray-50">
+  <div id="whatsNext" className="border-b-2 border-gray-50 bg-gray-50 dark:bg-dark-700 dark:border-dark-800">
     <div className="container mx-auto px-28 py-20 grid grid-cols-12 gap-y-10">
       <SectionHeader sectionNumber={8} header="What's Next" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-8 mb-10">
         <div className="col-span-7 text-base">
-          <p className="mb-5">
+          <p className="text-black dark:text-white mb-5">
             If you watch our repos you'll see that development never stops, we ship every day (and
             night!), and are always improving Supabase based on user feedback. Alongside
             Performance, Security, and Reliability improvements, here are some new features we're
             currently working on for 2021:
           </p>
-          <ul className="list-disc list-outside ml-6 mb-10">
+          <ul className="text-black dark:text-white list-disc list-outside ml-6 mb-10">
             <li className="mb-5">Storage - Making blob storage easier than ever before</li>
             <li className="mb-5">
               Functions - write and deploy serverless functions that have access to your Supabase
@@ -554,7 +560,7 @@ const WhatsNext = () => (
               and help us bring Supabase to your favourite language or framework.
             </li>
           </ul>
-          <p>
+          <p className="text-black dark:text-white ">
             We depend on your feedback to continually improve Supabase.Email us at{' '}
             <a
               href="mailto:beta@supabase.io"
@@ -597,6 +603,10 @@ const Beta = () => {
         <meta name="twitter:image" content="/public/og/og-image.jpg" />
       </Head>
       <Container>
+        <div className="shadow-lg py-5 px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
+          <img className="h-5" src="images/logo-dark.png" />
+          <HamburgerMenu />
+        </div>
         <Hero />
         <Introduction />
         <Performance />
