@@ -1,9 +1,9 @@
 [
   {
     "imgUrl": "images/stripe.jpg",
-    "title": "NextJS, Stripe and Supabase",
+    "title": "Stripe SaaS starter",
     "url": "https://github.com/supabase/supabase/tree/master/examples",
-    "description":"Easily deploy a Supabase powered app with Stripe already built in for payments",
+    "description":"Build a SaaS business with Stripe subscriptions and Supabase.",
     "icons" : [
       {
         "imgUrl": "https://avatars3.githubusercontent.com/u/54469796?s=480&v=4",
@@ -22,9 +22,9 @@
   },
   {
     "imgUrl": "images/slack-clone.jpg",
-    "title": "NextJS realtime chat using Supabase",
+    "title": "Chat app with Next.js",
     "url": "https://github.com/supabase/supabase/tree/master/examples/nextjs-slack-clone",
-    "description":"Full-stack Slack clone example",
+    "description":"Build a full-stack Slack clone using Next.js and Supabase.",
     "icons" : [
       {
         "imgUrl": "https://avatars3.githubusercontent.com/u/54469796?s=480&v=4",
@@ -39,9 +39,9 @@
   },
   {
     "imgUrl": "images/to-do-app.jpg",
-    "title": "NextJS realtime chat using Supabase",
-    "url": "https://github.com/supabase/supabase/tree/master/examples/nextjs-slack-clone",
-    "description":"Full-stack Slack clone example",
+    "title": "Todo list with Vue.js",
+    "url": "https://github.com/supabase/supabase/tree/master/examples/vue3-ts-todo-list",
+    "description":"Build a simple todo list with Vue and Supabase.",
     "icons" : [
       {
         "imgUrl": "https://avatars3.githubusercontent.com/u/54469796?s=480&v=4",
