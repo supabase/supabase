@@ -15,11 +15,7 @@ const Footer = (props: Props) => {
   }
 
   const SunEmoji = () => (
-    <svg
-      width="32"
-      height="32"
-      fill="none"
-    >
+    <svg width="32" height="32" fill="none">
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -28,18 +24,15 @@ const Footer = (props: Props) => {
       />
       <defs>
         <linearGradient
-          id="paint0_linear" x1="2" y1="2" x2="30" y2="30"
+          id="paint0_linear"
+          x1="2"
+          y1="2"
+          x2="30"
+          y2="30"
           gradientUnits="userSpaceOnUse"
         >
-          <stop
-            className="transition-all duration-200"
-            stopColor="#FACC15"
-          />
-          <stop
-            className="transition-all duration-200"
-            offset="1"
-            stopColor="#FA9D16"
-          />
+          <stop className="transition-all duration-200" stopColor="#bbbbbb" />
+          <stop className="transition-all duration-200" offset="1" stopColor="#bbbbbb" />
         </linearGradient>
       </defs>
     </svg>
