@@ -211,7 +211,65 @@ const Performance = () => {
   )
 
   const ComparisonChartV2 = () => {
-    return <div>Hello</div>
+    return (
+      <div className="grid grid-cols-12 text-black dark:text-white items-center">
+        <div className="col-span-12">
+          <p className="w-36 pb-2 mb-4">Read (requests/s)</p>
+        </div>
+        <div className="col-span-12 sm:col-span-9 grid grid-cols-12">
+          <div className="col-span-12 grid grid-cols-12 items-center">
+            <div className="col-span-4 sm:col-span-3 py-2 border-r-2 border-dark-200 dark:border-dark-400 mr-3">Supabase</div>
+            <div className="col-span-8 py-2">
+              <div className="bg-brand-600 dark:bg-brand-700 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6" style={{ width: '100%' }}>
+                <p className="transition opacity-0 group-hover:opacity-100">1167</p>
+              </div>
+            </div>
+            <div className="hidden col-span-1 sm:block" />
+          </div>
+          <div className="col-span-12 grid grid-cols-12 items-center">
+            <div className="col-span-4 sm:col-span-3 py-2 border-r-2 border-dark-200 dark:border-dark-400 mr-3">Firebase</div>
+            <div className="col-span-8 py-2">
+              <div className="bg-dark-300 dark:bg-dark-400 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6" style={{ width: '31.36%' }}>
+                <p className="transition opacity-0 group-hover:opacity-100">366</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-span-12 sm:col-span-3">
+          <p className="text-6xl sm:text-right">3.2x</p>
+          <p className="text-sm sm:text-right -mt-2">faster read requests</p>
+        </div>
+
+        <div className="col-span-12 py-5" />
+
+        <div className="col-span-12">
+          <p className="w-36 pb-2 mb-4">Write (requests/s)</p>
+        </div>
+        <div className="col-span-12 sm:col-span-9 grid grid-cols-12">
+          <div className="col-span-12 grid grid-cols-12 items-center">
+            <div className="col-span-4 sm:col-span-3 py-2 border-r-2 border-dark-200 dark:border-dark-400 mr-3">Supabase</div>
+            <div className="col-span-8 py-2">
+              <div className="bg-brand-600 dark:bg-brand-700 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6" style={{ width: '74.55%' }}>
+                <p className="transition opacity-0 group-hover:opacity-100">870</p>
+              </div>
+            </div>
+            <div className="hidden col-span-1 sm:block" />
+          </div>
+          <div className="col-span-12 grid grid-cols-12 items-center">
+            <div className="col-span-4 sm:col-span-3 py-2 border-r-2 border-dark-200 dark:border-dark-400 mr-3">Firebase</div>
+            <div className="col-span-8 py-2">
+              <div className="bg-dark-300 dark:bg-dark-400 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6" style={{ width: '23.99%' }}>
+                <p className="transition opacity-0 group-hover:opacity-100">280</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-span-12 sm:col-span-3">
+          <p className="text-6xl sm:text-right">3.1x</p>
+          <p className="text-sm sm:text-right -mt-2">faster write requests</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -268,7 +326,7 @@ const Performance = () => {
               on our methodologies.
             </p>
           </div>
-          {/* <div className="col-span-5">
+          {/* <div className="col-span-12 sm:col-span-9 xl:col-span-7">
             <ComparisonChart />
           </div> */}
           <div className="col-span-12 sm:col-span-9 xl:col-span-7 mt-10 mb-10">
