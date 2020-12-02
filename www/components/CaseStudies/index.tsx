@@ -30,7 +30,7 @@ const CaseStudies = () => {
                 url={caseStudy.url}
                 logoUrl={caseStudy.logoUrl}
                 // postMeta={caseStudy.postMeta}
-                ctaText={caseStudy.ctaText}
+                // ctaText={caseStudy.ctaText}
               />
             ))}
           </div>

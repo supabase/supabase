@@ -66,11 +66,11 @@ const Card = (props: Props) => {
               {iconMarkup}
             </div>
           )} */}
-          <p className="text-sm font-medium capitalize text-gray-600 dark:text-dark-100">{type}</p>
+          <p className="text-sm font-medium capitalize text-gray-600 dark:text-dark-300">{type}</p>
           <div className="block mt-2">
             {/* {logoUrl && <img src={logoUrl} className="h-9 my-4" />} */}
             {title && <p className="text-xl text-gray-900 dark:text-white">{title}</p>}
-            <p className="mt-3 text-base text-gray-500 dark:text-dark-100">{description}</p>
+            <p className="mt-3 text-base text-gray-500 dark:text-dark-300">{description}</p>
           </div>
         </div>
         {type === 'Case Study' && postMeta.name.length > 0 && (
