@@ -44,7 +44,7 @@ const FlyOut = () => {
             <p className="text-base font-medium text-gray-900 dark:text-white">
               {name} {label && <Badge className="ml-3">{label}</Badge>}
             </p>
-            <p className="mt-1 text-sm text-gray-500 dark:text-dark-100">
+            <p className="mt-1 text-sm text-gray-500 dark:text-dark-300">
               {description}
             </p>
           </div>
@@ -60,7 +60,7 @@ const FlyOut = () => {
       <a
         key={name}
         href="#"
-        className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 dark:hover:bg-dark-300 transition ease-in-out duration-150"
+        className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition ease-in-out duration-150"
       >
         {content}
       </a>
@@ -105,7 +105,7 @@ const FlyOut = () => {
       >
         <>
           <div
-            className="absolute inset-x-0 transform shadow-lg border-t-2 border-gray-50 dark:border-dark-200"
+            className="absolute inset-x-0 transform shadow-lg border-t border-gray-50 dark:border-dark-500"
             style={{
               zIndex: 999,
               position: 'absolute',
@@ -130,7 +130,7 @@ const FlyOut = () => {
               </nav>
               <div className="px-4 py-8 sm:py-12 sm:px-6 lg:px-8 xl:pl-12">
                 <div>
-                  <h3 className="text-sm font-medium tracking-wide text-gray-500 dark:text-dark-100 uppercase">
+                  <h3 className="text-sm font-medium tracking-wide text-gray-500 dark:text-dark-300 uppercase">
                     Latest news
                   </h3>
                   <ul className="mt-6 space-y-6">
@@ -138,7 +138,7 @@ const FlyOut = () => {
                       <li className="flow-root" key={`flyout_case_${idx}`}>
                         <a
                           href={caseStudy.url}
-                          className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-200 transition ease-in-out duration-150"
+                          className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-600 transition ease-in-out duration-150"
                         >
                           <div className="hidden sm:block flex-shrink-0">
                             <img
@@ -151,7 +151,7 @@ const FlyOut = () => {
                             <h4 className="text-base font-medium text-gray-900 dark:text-white truncate">
                               {caseStudy.title}
                             </h4>
-                            <p className="mt-1 text-sm text-gray-500 dark:text-dark-100">
+                            <p className="mt-1 text-sm text-gray-500 dark:text-dark-300">
                               {caseStudy.description}
                             </p>
                           </div>
