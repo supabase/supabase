@@ -135,30 +135,30 @@ export const IntroductionSegments = [
   {
     description: "In preparation for some of our users moving into production, we've put extra effort into 3 key areas of Supabase",
     chapters: [
-      { name: 'Performance', key: 'performance' },
-      { name: 'Security', key: 'security' },
-      { name: 'Reliability', key: 'reliability' }
+      { no: 1, name: 'Performance', key: 'performance' },
+      { no: 2, name: 'Security', key: 'security' },
+      { no: 3, name: 'Reliability', key: 'reliability' }
     ]
   },
   {
     description: "We have received an incredible number of requests for new features and integrations from our Alpha Users, and we are factoring these conversations into our Beta Pricing model.",
     chapters: [
-      { name: 'New Features & Integrations', key: 'features' },
-      { name: 'Beta Pricing', key: 'pricing' }
+      { no: 4, name: 'New Features & Integrations', key: 'features' },
+      { no: 5, name: 'Beta Pricing', key: 'pricing' }
     ]
   },
   {
     description: "Open Source is, and will always be, at the core of everything that we do. Find out how we've been working with the community to support existing OSS projects and Communities.",
     chapters: [
-      { name: 'Open Source', key: 'openSource' }
+      { no: 6, name: 'Open Source', key: 'openSource' }
     ]
   },
   {
     description: "And finally, we are bringing on 23 new Funding Partners to help us achieve our goal of becoming the default backend for every business. Find out who they are, and what we have in store for 2021.",
     chapters: [
-      { name: 'Funding Partners', key: 'funding' },
-      { name: 'Scaling Our Team', key: 'scaling' },
-      { name: 'What\'s Next', key: 'next' }
+      { no: 7, name: 'Funding Partners', key: 'funding' },
+      { no: 8, name: 'Scaling Our Team', key: 'scaling' },
+      { no: 9, name: 'What\'s Next', key: 'next' }
     ]
   },
 ]

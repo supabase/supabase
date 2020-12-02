@@ -133,7 +133,7 @@ const Introduction = (props: any) => {
                     onClick={() => scrollTo(chapter.key)}
                   >
                     <p className="font-mono text-xs text-dark-300 dark:text-dark-400">{`0${
-                      idx + 1
+                      chapter.no
                     }`}</p>
                     <p className="ml-4 text-base border-b border-gray-400">{chapter.name}</p>
                   </div>
