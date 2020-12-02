@@ -22,14 +22,13 @@ const Features = () => {
           </div>
           <dt className="flex flex-row xl:flex-col ml-4 text-lg leading-6 font-medium text-gray-900 dark:text-white">
             {name}
-            {label && <Badge className="ml-3 xl:mt-1 xl:ml-0">{label}</Badge>}
           </dt>
         </div>
         <div className="mt-5">
           <dd className="mt-2 text-base text-gray-500 dark:text-dark-100">{description}</dd>
         </div>
-        { url && <Button className="mt-5" type="secondary" text="Learn more" url="#" /> }
-        
+        {url && <Button className="mt-5" type="secondary" text="Learn more" url="#" />}
+        {label && <Badge className="mt-5">{label}</Badge>}
       </div>
     )
   })
