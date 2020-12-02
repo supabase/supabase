@@ -7,7 +7,7 @@ import DeveloperFeatures from 'data/DeveloperFeatures.json'
 
 const MadeForDevelopers = () => {
   return (
-    <div className="py-16 bg-gray-50 dark:bg-dark-400 overflow-hidden lg:py-16">
+    <div className="py-16 bg-gray-50 dark:bg-dark-600 overflow-hidden lg:py-16">
       <div className="container mx-auto px-8 sm:px-16  xl:px-20">
         
         <div className="grid grid-cols-12">
@@ -32,7 +32,7 @@ const MadeForDevelopers = () => {
 
                 {DeveloperFeatures.map((feature: any, idx: number) => {
                   const blockClass = idx !== DeveloperFeatures.length - 1
-                    ? 'col-span-12 mb-10 sm:mb-0 sm:col-span-3 sm:border-r-2 sm:border-gray-200 sm:pr-4 md:pr-6 dark:border-dark-200'
+                    ? 'col-span-12 mb-10 sm:mb-0 sm:col-span-3 sm:border-r-2 sm:border-gray-200 sm:pr-4 md:pr-6 dark:border-dark-500'
                     : 'col-span-12 sm:col-span-3'
 
                   return (

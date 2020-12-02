@@ -3,7 +3,7 @@ import Button from 'components/Button'
 
 const Hero = () => {
   return (
-    <div className="relative bg-dark-500 overflow-hidden">
+    <div className="relative bg-dark-700 overflow-hidden">
       <div className="container mx-auto px-8 sm:px-16 xl:px-20">
         <div className="mx-auto max-w-7xl">
           <div className="hidden sm:block sm:absolute sm:inset-0" aria-hidden="true">
@@ -40,16 +40,16 @@ const Hero = () => {
                       <span className="md:block">The Open Source</span>
                       <span className="text-brand-600 ml-2 md:ml-0 md:block">Firebase Alternative</span>
                     </h1>
-                    <p className="mt-5 text-base text-gray-200 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
+                    <p className="mt-5 text-base text-dark-200 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                       Create your new project backend in less than 2 minutes with easy to use Postgres Database and Authentication.
                     </p>
-                    <p className="mt-3 text-base text-dark-100">
+                    <p className="mt-3 text-base text-dark-400">
                       Storage and serverless functions coming soon
                     </p>
 
                     <Button className="mt-10 py-3" text="Start your project" url="#"/>
 
-                    <p className="mt-8 text-sm text-gray-400 tracking-wide sm:mt-10">
+                    <p className="mt-8 text-sm text-dark-400 tracking-wide sm:mt-10">
                       backed by
                     </p>
                     <div className="mt-5 w-full sm:mx-auto sm:max-w-lg lg:ml-0">

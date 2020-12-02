@@ -80,7 +80,7 @@ const FlyOut = () => {
       >
         <span>Product</span>
         <svg
-          className="ml-2 h-5 w-5 text-gray-400 group-hover:text-gray-500 transition ease-in-out duration-150"
+          className="ml-2 h-5 w-5 text-gray-300 group-hover:text-gray-300 transition ease-in-out duration-150"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
           fill="currentColor"
@@ -117,8 +117,8 @@ const FlyOut = () => {
             }}
           >
             <div className="absolute inset-0 flex sm:flex-col lg:flex-row" aria-hidden="true">
-              <div className="bg-white dark:bg-dark-400 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full"></div>
-              <div className="bg-gray-50 dark:bg-dark-300 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full"></div>
+              <div className="bg-white dark:bg-dark-600 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full"></div>
+              <div className="bg-gray-50 dark:bg-dark-500 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full"></div>
               {/* <div className="bg-gray-50 dark:bg-dark-300 md:hidden lg:block lg:w-1/2"></div> */}
             </div>
             <div className="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2">
@@ -134,9 +134,12 @@ const FlyOut = () => {
                     Latest news
                   </h3>
                   <ul className="mt-6 space-y-6">
-                    {CaseStudiesData.map((caseStudy: any, idx:number) => (
+                    {CaseStudiesData.map((caseStudy: any, idx: number) => (
                       <li className="flow-root" key={`flyout_case_${idx}`}>
-                        <a href={caseStudy.url} className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-200 transition ease-in-out duration-150">
+                        <a
+                          href={caseStudy.url}
+                          className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-200 transition ease-in-out duration-150"
+                        >
                           <div className="hidden sm:block flex-shrink-0">
                             <img
                               className="w-32 h-20 object-cover rounded-md"
@@ -159,7 +162,7 @@ const FlyOut = () => {
                 </div>
                 <div className="mt-6 text-sm font-medium">
                   <a
-                    href="#"
+                    href="/blog"
                     className="text-gray-600 hover:text-gray-500 dark:text-brand-600 dark:hover:text-brand-700 transition ease-in-out duration-150"
                   >
                     View all posts <span aria-hidden="true">&rarr;</span>
