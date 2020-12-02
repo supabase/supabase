@@ -4,18 +4,18 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        'sm': '640px',
+        sm: '640px',
         // => @media (min-width: 640px) { ... }
-  
-        'md': '768px',
+
+        md: '768px',
         // => @media (min-width: 768px) { ... }
-  
-        'lg': '1024px',
+
+        lg: '1024px',
         // => @media (min-width: 1024px) { ... }
-  
-        'xl': '1280px',
+
+        xl: '1280px',
         // => @media (min-width: 1280px) { ... }
-  
+
         '2xl': '1536px',
         // => @media (min-width: 1536px) { ... }
       },
@@ -26,15 +26,15 @@ module.exports = {
         success: '#0070f3',
         cyan: '#79FFE1',
         brand: {
-          '100': '#82dab0',
-          '200': '#69d3a0',
-          '300': '#50cb90',
-          '400': '#37c480',
-          '500': '#1ebc70',
-          '600': '#05b560',
-          '700': '#05a356',
-          '800': '#04914d',
-          '900': '#047f43',
+          100: '#82dab0',
+          200: '#69d3a0',
+          300: '#50cb90',
+          400: '#C5F1DD',
+          500: '#9FE7C7',
+          600: '#65D9A5',
+          700: '#3ECF8E',
+          800: '#38BC81',
+          900: '#10633E',
         },
         // Joshen TODO: At the end just rearrange the values
         dark: {
@@ -87,16 +87,16 @@ module.exports = {
         ],
         mono: ['Source Code Pro', 'Menlo', 'monospace'],
       },
-      stroke: theme => ({
-        'white': theme('colors.white'),
-        'black': theme('colors.black'),
-      })
+      stroke: (theme) => ({
+        white: theme('colors.white'),
+        black: theme('colors.black'),
+      }),
     },
   },
   variants: {
     extend: {
       inset: ['group-hover'],
-      stroke: ['dark']
+      stroke: ['dark'],
     },
   },
   plugins: [],
