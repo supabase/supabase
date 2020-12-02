@@ -53,7 +53,7 @@ const SectionHeader = (props: any) => {
 }
 
 const Hero = () => (
-  <div className="w-screen py-16 lg:py-56 bg-dark-800">
+  <div className="w-screen py-16 lg:py-36 bg-dark-800">
     <div className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-white">
       <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-2xl">
         <p className="mb-10">
