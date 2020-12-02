@@ -26,7 +26,6 @@ const BuiltExamples = () => {
                 description={example.description}
                 imgUrl={example.imgUrl}
                 url={example.url}
-                ctaText={example.ctaText}
                 icons={example.icons}
               />
             ))}
