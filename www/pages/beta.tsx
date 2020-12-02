@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import Container from 'components/Container'
 import Layout from 'components/Layout'
+import CountUp from 'components/CountUp'
 
 import { APP_NAME, DESCRIPTION } from 'lib/constants'
 
@@ -57,7 +58,7 @@ const Introduction = () => (
             </div>
             <div className="col-span-10">
               <p className="text-6xl">
-                {stat.value}
+                <CountUp>{stat.value}</CountUp>
                 {stat.unit && <span className="text-2xl ml-1">{stat.unit}</span>}
               </p>
             </div>
