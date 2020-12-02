@@ -105,15 +105,24 @@ const Performance = () => {
     text?: string,
   }
 
-  const renderCustomizedLabel = (props: labelProps) => {
-    const { x, y, width, text } = props;
-    const radius = 10;
-  
+  function renderCustomizedLabel(props: any): any {
+    const {  width, text } = props
+    const radius = 10
+    
+    let x: number = props.x + width / 2
+    let y: number = props.y - radius
     return (
-      <text x={x + width / 2} y={y - radius} fill="#000" textAnchor="middle" dominantBaseline="middle" fontSize={14}>
+      <text
+        x={x}
+        y={y}
+        fill="#000"
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontSize={14}
+      >
         Read
       </text>
-    );
+    )
   };
 
   // Documentation on recharts:
@@ -134,13 +143,13 @@ const Performance = () => {
         <Tooltip />
         {/* <Legend /> */}
         <Bar dataKey="read" name="Read" barSize={20} unit=" requests/s">
-          {PerformanceComparisonData.map((entry: any, idx: number) =>(
+          {PerformanceComparisonData.map((entry: any, idx: number) => (
             <Cell key={`cell_${idx}`} fill={readColors[idx]} />
           ))}
-          <LabelList content={(props) => renderCustomizedLabel(props)} position="top" />
+          <LabelList dataKey="name" content={renderCustomizedLabel} />
         </Bar>
         <Bar dataKey="write" name="Write" barSize={20} unit=" requests/s">
-          {PerformanceComparisonData.map((entry: any, idx: number) =>(
+          {PerformanceComparisonData.map((entry: any, idx: number) => (
             <Cell key={`cell_${idx}`} fill={writeColors[idx]} />
           ))}
         </Bar>
