@@ -1,6 +1,6 @@
 import Card from 'components/Card'
 import SectionHeader from 'components/UI/SectionHeader'
-import ProjectExamples from "data/ProjectExamples.json"
+import ProjectExamples from 'data/ProjectExamples.json'
 
 const BuiltExamples = () => {
   return (
@@ -12,10 +12,15 @@ const BuiltExamples = () => {
         <div className="mx-auto max-w-7xl">
           <SectionHeader
             title={'What you can build'}
-            title_alt={' with Supabase'} 
-            subtitle={'Built with supabase'} 
+            title_alt={' with Supabase'}
+            subtitle={'Built with supabase'}
           />
-          <p className="mt-3 text-base text-gray-500 dark:text-dark-400">See all examples on our <a className="text-brand-700" href="https://github.com/supabase">Github</a></p>
+          <p className="mt-3 text-base text-gray-500 dark:text-dark-400">
+            See all examples on our{' '}
+            <a className="text-brand-700" href="https://github.com/supabase">
+              Github
+            </a>
+          </p>
         </div>
         <div className="relative max-w-7xl mx-auto">
           <div className="mt-12 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">

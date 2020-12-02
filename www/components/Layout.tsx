@@ -10,7 +10,6 @@ type Props = {
 }
 
 const Layout = (props: Props) => {
-
   const { hideHeader = false, hideFooter = false, children } = props
   const [darkMode, setDarkMode] = useState<boolean>(true)
 
@@ -34,7 +33,7 @@ const Layout = (props: Props) => {
       <div className="min-h-screen bg-gray-100">
         <main>{children}</main>
       </div>
-      {!hideFooter && <Footer darkMode={darkMode} updateTheme={updateTheme}/>}
+      {!hideFooter && <Footer darkMode={darkMode} updateTheme={updateTheme} />}
     </>
   )
 }

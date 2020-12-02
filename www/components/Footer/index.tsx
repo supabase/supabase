@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import FooterLinks from "data/Footer.json"
+import FooterLinks from 'data/Footer.json'
 
 type Props = {
-  darkMode: boolean,
+  darkMode: boolean
   updateTheme: Function
 }
 
@@ -133,7 +133,9 @@ const Footer = (props: Props) => {
               aria-pressed="false"
               className={`
                 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer 
-                transition-colors ease-in-out duration-200 focus:outline-none ${darkMode ? 'bg-dark-500' : 'bg-gray-200'} mx-5
+                transition-colors ease-in-out duration-200 focus:outline-none ${
+                  darkMode ? 'bg-dark-500' : 'bg-gray-200'
+                } mx-5
               `}
               onClick={() => toggleDarkMode()}
             >
