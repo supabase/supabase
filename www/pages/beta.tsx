@@ -66,7 +66,13 @@ const SectionHeader = (props: any) => {
 
 const Hero = () => (
   <div className="w-screen py-16 lg:py-36 bg-dark-800">
-    <div className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300">
+    <div
+      // style={{ backgroundImage: "url('images/trial.png')", backgroundSize: "30%", backgroundPosition: "90% 50%"}}
+      className={`
+        container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300
+        bg-no-repeat
+      `}
+    >
       <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-2xl text-white">
         <p className="mb-10">
           Supabase is an opensource Firebase alternative. We're building the features of Firebase
@@ -83,19 +89,26 @@ const Hero = () => (
 const Introduction = (props: any) => {
   const { scrollTo } = props
   return (
-    <div className="bg-gray-50 dark:bg-dark-700">
-      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-dark-400 dark:text-dark-300">
-        <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base mb-20">
+    <div className="bg-dark-900">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-dark-300">
+        <div className="col-span-12 sm:col-span-9 xl:col-span-8">
           <p>
-            After the launch of our{' '}
-            <a
-              href="https://news.ycombinator.com/item?id=23319901"
-              target="_blank"
-              className="text-brand-700 hover:text-brand-800"
-            >
-              Alpha
-            </a>{' '}
-            Program in June, we've been fortunate to work with thousands of early adopters on
+            <span className="text-2xl block text-white">
+              After the launch of our{' '}
+              <a
+                href="https://news.ycombinator.com/item?id=23319901"
+                target="_blank"
+                className="text-brand-700 hover:text-brand-800"
+              >
+                Alpha
+              </a>{' '}
+              Program in June,
+            </span>
+          </p>
+        </div>
+        <div className="col-span-12 sm:col-span-9 xl:col-span-6 text-base mb-20">
+          <p>            
+            we've been fortunate to work with thousands of early adopters on
             improving both our Open Source, and Hosted offerings.
           </p>
         </div>
@@ -198,7 +211,7 @@ const Performance = () => {
         </div>
         <div className="col-span-12 sm:col-span-2">
           <p className="text-6xl text-dark-700 sm:text-right">3.2x</p>
-          <p className="text-sm sm:text-right -mt-2">faster read requests</p>
+          <p className="text-sm sm:text-right -mt-2">more read requests</p>
         </div>
 
         <div className="col-span-12 py-5" />
@@ -237,7 +250,7 @@ const Performance = () => {
         </div>
         <div className="col-span-12 sm:col-span-2">
           <p className="text-6xl text-dark-700 sm:text-right">3.1x</p>
-          <p className="text-sm sm:text-right -mt-2">faster write requests</p>
+          <p className="text-sm sm:text-right -mt-2">more write requests</p>
         </div>
       </div>
     )
