@@ -5,7 +5,7 @@ import Layout from 'components/Layout'
 import CountUp from 'components/CountUp'
 import FlyOut from 'components/UI/FlyOut'
 import { APP_NAME, DESCRIPTION } from 'lib/constants'
-import { AlphaNumbers, IntroductionSegments } from 'data/BetaPage'
+import { AlphaNumbers, IntroductionSegments, PerformanceComparisonData } from 'data/BetaPage'
 
 const site_title = `${APP_NAME} | We are now in Beta`
 
@@ -22,7 +22,7 @@ const NavFlyOutMenu = (props: any) => {
         {segments.flat().map((segment: any) => (
           <div
             onClick={() => scrollTo(segment.key)}
-            className="col-span-4 px-6 py-8 text-dark-300 dark:text-dark-400 cursor-pointer bg-white hover:bg-dark-100"
+            className="col-span-4 px-6 py-10 text-dark-300 dark:text-dark-400 cursor-pointer bg-white dark:bg-dark-600 hover:bg-dark-100 dark:hover:bg-dark-500"
           >
             <p className="flex items-center text-black dark:text-white">
               <span className="font-mono text-xs text-dark-300 dark:text-dark-400 mr-2">
@@ -194,91 +194,35 @@ const Introduction = (props: any) => {
 
 const Performance = () => {
   const ComparisonChart = () => {
+    const maxValue = 1500
     return (
-      <div className="grid grid-cols-12 text-dark-400 dark:text-dark-300 items-center">
-        <div className="col-span-12">
-          <p className="w-36 pb-2 mb-4">Read (requests/s)</p>
-        </div>
-        <div className="col-span-12 sm:col-span-10 grid grid-cols-12">
-          <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
-              Supabase
-            </div>
-            <div className="col-span-9 py-2">
-              <div
-                className="bg-brand-600 dark:bg-brand-700 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
-                style={{ width: '100%' }}
-              >
-                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">
-                  1167 requests/s
-                </p>
+      <div>
+        {PerformanceComparisonData.map((metric: any) => {
+          const multiplier = (metric.stats[0].value / metric.stats[1].value).toFixed(1)
+          return (
+            <div key={`${metric.key}`} className="mb-10 text-dark-400 dark:text-dark-300">
+              <p className="sm:w-36 pb-2 mb-4">{metric.title}</p>
+              <div className="flex flex-col sm:flex-row sm:items-center">
+                <div className="w-full sm:w-5/6">
+                  {metric.stats.map((stat: any, idx: number) => (
+                    <div key={`metric_${metric.key}_${idx}`} className="flex items-center">
+                      <p className="w-20 lg:w-24 border-r py-2 pr-4 mr-4 text-left sm:text-right">{stat.name}</p>
+                      <div
+                        className={`${stat.color} rounded-full h-3 transition-all`}
+                        style={{ width: `calc(${((stat.value / maxValue) * 100)}%)`}}
+                      />
+                      <p className="ml-2">{stat.value}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-left sm:w-1/6 sm:text-right flex flex-col">
+                  <p className="text-6xl text-dark-700 dark:text-dark-100">{multiplier}x</p>
+                  <p className="text-sm -mt-2">more {metric.key} requests</p>
+                </div>
               </div>
             </div>
-            <div className="hidden col-span-1 sm:block" />
-          </div>
-          <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
-              Firestore
-            </div>
-            <div className="col-span-9 py-2">
-              <div
-                className="bg-dark-300 dark:bg-dark-400 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
-                style={{ width: '31.36%' }}
-              >
-                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">
-                  366 requests/s
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="col-span-12 sm:col-span-2">
-          <p className="text-6xl text-dark-700 sm:text-right">3.2x</p>
-          <p className="text-sm sm:text-right -mt-2">more read requests</p>
-        </div>
-
-        <div className="col-span-12 py-5" />
-
-        <div className="col-span-12">
-          <p className="w-36 pb-2 mb-4">Write (requests/s)</p>
-        </div>
-        <div className="col-span-12 sm:col-span-10 grid grid-cols-12">
-          <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
-              Supabase
-            </div>
-            <div className="col-span-9 py-2">
-              <div
-                className="bg-brand-600 dark:bg-brand-700 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
-                style={{ width: '74.55%' }}
-              >
-                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">
-                  870 requests/s
-                </p>
-              </div>
-            </div>
-            <div className="hidden col-span-1 sm:block" />
-          </div>
-          <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
-              Firestore
-            </div>
-            <div className="col-span-9 py-2">
-              <div
-                className="bg-dark-300 dark:bg-dark-400 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
-                style={{ width: '23.99%' }}
-              >
-                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">
-                  280 requests/s
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="col-span-12 sm:col-span-2">
-          <p className="text-6xl text-dark-700 sm:text-right">3.1x</p>
-          <p className="text-sm sm:text-right -mt-2">more write requests</p>
-        </div>
+          )
+        })}
       </div>
     )
   }
@@ -848,7 +792,7 @@ const Beta = () => {
       <Container>
         <div className="relative shadow-lg py-5 px-5 lg:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
           <img className="h-5" src="images/logo-dark.png" />
-          <FlyOut className="lg:col-span-1" renderTriggerElement={renderHamburgerMenu}>
+          <FlyOut className="lg:col-span-1" renderTriggerElement={renderHamburgerMenu} singleBgColor={true}>
             <NavFlyOutMenu scrollTo={scrollTo} />
           </FlyOut>
         </div>
