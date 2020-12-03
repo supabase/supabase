@@ -8,6 +8,7 @@ import { APP_NAME, DESCRIPTION } from 'lib/constants'
 import { AlphaNumbers, IntroductionSegments, PerformanceComparisonData } from 'data/BetaPage'
 import { render } from 'react-dom'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 
 const site_title = `${APP_NAME} | We are now in Beta`
 
@@ -813,7 +814,9 @@ const Beta = () => {
       </Head>
       <Container>
         <div className="relative shadow-lg py-5 px-5 xl:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
-          <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
+          <Link href="/">
+            <img className="h-5 cursor-pointer" src={`${basePath}/images/logo-dark.png`} />
+          </Link>
           <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)}/>
           <FlyOut
             open={menuOpen}
