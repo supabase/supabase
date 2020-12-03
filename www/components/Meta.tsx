@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { DESCRIPTION, HOME_OG_IMAGE_URL } from '../lib/constants'
+import { DESCRIPTION } from '../lib/constants'
 import { useRouter } from 'next/router'
 
 const Meta = () => {
@@ -31,7 +31,7 @@ const Meta = () => {
       <meta name="theme-color" content="#1E1E1E" />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
       <meta name="description" content={DESCRIPTION} />
-      <meta property="og:image" content={HOME_OG_IMAGE_URL} />
+      <meta property="og:image" content={`${basePath}/og/og-image.jpg`} />
     </Head>
   )
 }
