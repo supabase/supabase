@@ -27,7 +27,6 @@ const Nav = (props: Props) => {
     }
   }, [open])
 
-
   function handleNavClick() {
     // @ts-ignore
     ref.current
@@ -160,10 +159,10 @@ const Nav = (props: Props) => {
                 <Solutions />
               </FlyOut>
               <FlyOut title={'Developers'}>
-                <Developers/>
+                <Developers />
               </FlyOut>
               <FlyOut title={'Company'}>
-                <Company/>
+                <Company />
               </FlyOut>
               <a
                 href="https://supabase.io/docs/pricing"

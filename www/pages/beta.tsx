@@ -15,7 +15,7 @@ const site_title = `${APP_NAME} | We are now in Beta`
 const NavFlyOutMenu = (props: any) => {
   const { scrollTo } = props
   const segments = IntroductionSegments.map((segment: any) => segment.chapters)
-  
+
   return (
     <>
       <div className="col-span-12 grid grid-cols-12 items-center">
@@ -25,7 +25,9 @@ const NavFlyOutMenu = (props: any) => {
             className="col-span-4 px-6 py-8 text-dark-300 dark:text-dark-400 cursor-pointer bg-white hover:bg-dark-100"
           >
             <p className="flex items-center text-black dark:text-white">
-              <span className="font-mono text-xs text-dark-300 dark:text-dark-400 mr-2">0{segment.no}</span>
+              <span className="font-mono text-xs text-dark-300 dark:text-dark-400 mr-2">
+                0{segment.no}
+              </span>
               <span>{segment.name}</span>
             </p>
           </div>
