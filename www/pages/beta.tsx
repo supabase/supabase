@@ -54,7 +54,7 @@ const VideoShot = (props: any) => {
           <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
           <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
         </div>
-        <video className="rounded-b-md" src={src} autoPlay loop muted>
+        <video className="rounded-b-md" src={src} autoPlay loop muted playsInline>
           Your browser does not support the video tag
         </video>
       </div>
