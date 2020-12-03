@@ -37,7 +37,7 @@ const Meta = () => {
       <meta name="og:description" property="og:description" content={DESCRIPTION} />
       <meta property="og:site_name" content="" />
       <meta property="og:url" content={`${basePath}/og/og-image.jpg`} />
-      <meta name="twitter:card" content="summary" />
+      <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="" />
       <meta name="twitter:description" content={DESCRIPTION} />
       <meta name="twitter:creator" content="supabase_io" />
