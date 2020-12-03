@@ -204,7 +204,7 @@ function Home() {
                     to={'https://app.supabase.io'}
                     style={{ marginTop: 10 }}
                   >
-                    Alpha sign up →
+                    Beta sign up →
                   </Link>
                 </div>
               </div>
@@ -592,7 +592,7 @@ function Home() {
                 to={'https://app.supabase.io'}
                 style={{ margin: 5 }}
               >
-                Alpha sign up →
+                Beta sign up →
               </Link>
             </div>
           </div>
