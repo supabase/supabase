@@ -29,14 +29,6 @@ const Nav = (props: Props) => {
     } else {
       document.body.style.overflow = 'auto'
     }
-
-    // window is accessible here.
-    window.addEventListener('scroll', function (e) {
-      // close Fly Outs window if user scrolls past 96px from top
-      if (window.pageYOffset > 96) {
-        handleCancel()
-      }
-    })
   }, [open])
 
   function handleToggle(callback: any) {
