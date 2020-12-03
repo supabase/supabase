@@ -348,7 +348,7 @@ const Performance = () => {
                 target="_blank"
                 className="text-brand-700 hover:text-brand-800"
               >
-                Elixer
+                Elixir
               </a>{' '}
               to handle our{' '}
               <a
