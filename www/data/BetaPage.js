@@ -17,7 +17,7 @@ export const AlphaNumbers = [
         <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
       </svg>
     ),
-    value: 3011,
+    value: 3102,
     unit: null,
     name: 'Hosted Databases'
   },
@@ -58,7 +58,7 @@ export const AlphaNumbers = [
         <polyline points="22 4 12 14.01 9 11.01" />
       </svg>
     ),
-    value: 499,
+    value: 505,
     unit: null,
     name: 'Github issues resolved'
   },
@@ -104,7 +104,7 @@ export const AlphaNumbers = [
         <path d="M16 3.13a4 4 0 0 1 0 7.75" />
       </svg>
     ),
-    value: 87,
+    value: 88,
     unit: null,
     name: 'Active Github contributors'
   },
@@ -125,7 +125,7 @@ export const AlphaNumbers = [
         <line x1="12" y1="19" x2="20" y2="19" />
       </svg>
     ),
-    value: 236,
+    value: 238,
     unit: 'K',
     name: 'Lines of code'
   },
