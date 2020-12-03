@@ -83,7 +83,7 @@ const Nav = (props: Props) => {
     return url ? (
       <a
         key={`solution_${idx}`}
-        href="#"
+        href={url}
         className="-m-3 p-3 my-2 flex flex-col justify-between rounded-lg hover:bg-gray-50 dark:hover:bg-dark-600 transition ease-in-out duration-150"
       >
         {content}
