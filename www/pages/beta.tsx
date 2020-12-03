@@ -680,7 +680,7 @@ const BetaPricing = () => (
             </li>
           </ul>
           <p className="mb-10">
-            Whilst we're ready to publish a standardized pricing model, we are committing to the
+            Whilst we're not yet ready to publish a standardized pricing model, we are committing to the
             following initiatives:
           </p>
           <ul className="list-decimal list-outside ml-6 mb-10">
