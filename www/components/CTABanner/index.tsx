@@ -12,7 +12,7 @@ const CTABanner = () => {
 				</p> */}
       </div>
       <div className="col-span-12">
-        <Button text="Start your project" url="#" />
+        <Button text="Start your project" url="https://app.supabase.io?auth=signin" />
       </div>
     </div>
   )
