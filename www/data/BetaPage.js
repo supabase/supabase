@@ -170,7 +170,7 @@ export const PerformanceComparisonData = [
     write: 870
   },
   {
-    name: 'Firebase',
+    name: 'Firestore',
     read: 366,
     write: 280
   }

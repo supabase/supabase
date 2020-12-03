@@ -233,7 +233,7 @@ const Performance = () => {
           </div>
           <div className="col-span-12 grid grid-cols-12 items-center">
             <div className="col-span-4 sm:col-span-3 py-2 border-r-2 border-dark-200 dark:border-dark-400 mr-3">
-              Firebase
+              Firestore
             </div>
             <div className="col-span-8 py-2">
               <div
@@ -272,7 +272,7 @@ const Performance = () => {
           </div>
           <div className="col-span-12 grid grid-cols-12 items-center">
             <div className="col-span-4 sm:col-span-3 py-2 border-r-2 border-dark-200 dark:border-dark-400 mr-3">
-              Firebase
+              Firestore
             </div>
             <div className="col-span-8 py-2">
               <div
