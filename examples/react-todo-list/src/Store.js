@@ -73,7 +73,7 @@ export const addTask = async (task_text, list_id) => {
 
 export const updateTask = async (task_id, values) => {
   try {
-    let { data, error } = await supabase.from('tasks').eq('id', task_id).update(values)
+    let { data, error } = await supabase.from('tasks').update(values).eq('id', task_id)
     if (error) {
       throw new Error(error)
     }
@@ -99,8 +99,8 @@ export const fetchList = async (list_uuid) => {
   try {
     let { data, error } = await supabase
       .from('lists')
-      .eq('uuid', list_uuid)
       .select(`*, tasks(*)`)
+      .eq('uuid', list_uuid)
       .single()
     if (error) {
       throw new Error(error)
