@@ -17,12 +17,6 @@ const BuiltExamples = () => {
             title_alt={' with Supabase'}
             subtitle={'Built with supabase'}
           />
-          <p className="mt-3 text-base text-gray-500 dark:text-dark-400">
-            See all examples on our{' '}
-            <a className="text-brand-700" href="https://github.com/supabase">
-              Github
-            </a>
-          </p>
         </div>
         <div className="relative max-w-7xl mx-auto">
           <div className="mt-12 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
@@ -38,6 +32,12 @@ const BuiltExamples = () => {
               />
             ))}
           </div>
+          <p className="mt-10 text-base text-gray-500 dark:text-dark-400">
+            See all examples on our{' '}
+            <a className="text-brand-700" href="https://github.com/supabase">
+              Github
+            </a>
+          </p>
         </div>
       </div>
     </div>
