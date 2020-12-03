@@ -694,7 +694,7 @@ const BetaPricing = () => (
               for free.
             </li>
             <li className="mb-5">
-              All University (and participating code school) Students will be eligible for 2 years
+              University (and participating code school) Students will be eligible for 2 years
               of base tier usage (Code Schools can contact{' '}
               <a
                 href="mailto:rory@supabase.io"
