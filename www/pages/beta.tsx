@@ -163,6 +163,21 @@ const Introduction = (props: any) => {
           ))}
         </div>
 
+        <div className="col-span-12 text-base mb-10">
+          <p className="text-2xl text-white">
+            Supabase Beta is starting now.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const TableOfContents = (props: any) => {
+  const { scrollTo } = props
+  return (
+    <div className="bg-gray-50 dark:bg-dark-700 text-dark-400 dark:text-dark-300">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4">
         <div className="col-span-12 grid grid-cols-12 gap-y-10">
           {IntroductionSegments.map((segment: any, segmentIdx: number) => (
             <div key={`introSegment_${segmentIdx}`} className="col-span-12 grid grid-cols-12">
@@ -177,8 +192,8 @@ const Introduction = (props: any) => {
                     className="flex items-center mb-5 cursor-pointer"
                     onClick={() => scrollTo(chapter.key)}
                   >
-                    <p className="font-mono text-xs text-dark-400">{`0${chapter.no}`}</p>
-                    <p className="ml-4 transition text-base border-b border-gray-400 hover:text-white">
+                    <p className="font-mono text-xs text-dark-300 dark:text-dark-400">{`0${chapter.no}`}</p>
+                    <p className="ml-4 transition text-base border-b border-gray-400 hover:text-black">
                       {chapter.name}
                     </p>
                   </div>
@@ -211,13 +226,13 @@ const Performance = () => {
                         className={`${stat.color} rounded-full h-3 transition-all`}
                         style={{ width: `calc(${((stat.value / maxValue) * 100)}%)`}}
                       />
-                      <p className="ml-2">{stat.value}</p>
+                      <p className="ml-2">{stat.value}/s</p>
                     </div>
                   ))}
                 </div>
                 <div className="text-left sm:w-1/6 sm:text-right flex flex-col">
                   <p className="text-6xl text-dark-700 dark:text-dark-100">{multiplier}x</p>
-                  <p className="text-sm -mt-2">more {metric.key} requests</p>
+                  <p className="text-sm -mt-2">more {metric.key}s per second</p>
                 </div>
               </div>
             </div>
@@ -798,6 +813,7 @@ const Beta = () => {
         </div>
         <Hero />
         <Introduction scrollTo={scrollTo} />
+        <TableOfContents scrollTo={scrollTo} />
         <div ref={references['performance']}>
           <Performance />
         </div>
