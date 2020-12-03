@@ -516,121 +516,124 @@ const Reliability = () => {
   )
 }
 
-const NewFeaturesAndIntegrations = () => (
-  <div id="newFeaturesAndIntegrations" className="bg-gray-50 dark:bg-dark-700">
-    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
-      <SectionHeader sectionNumber={4} header="New Features & Integrations" />
-
-      <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
-        <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
-          <p className="mb-5">
-            If you're new to Supabase, here's a few of the things you get when you choose us as your backend.
-          </p>
-          <ul className="">
-            <li className="mb-10">
-              <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">Auth</p>
-              <p className="mb-5">
-                If you're new to Supabase, here's a few of the things you get when you choose us as your backend.
-                We provide{' '}
-                <a
-                  href="https://supabase.io/docs/client/auth-signup"
-                  target="_blank"
-                  className="text-brand-700 hover:text-brand-800"
-                >
-                  Javascript
-                </a>{' '}
-                (and{' '}
-                <a
-                  href="https://supabase.io/docs/gotrue/server/about#endpoints"
-                  target="_blank"
-                  className="text-brand-700 hover:text-brand-800"
-                >
-                  HTTP
-                </a>
-                ) APIs for your users to sign in and out of your application. You can define the rows in your database
-                that logged-in users can access (e.g. only his or her shopping cart). We even provide account confirmation,
-                recovery, and invite email templates which you can customize on the dashboard, and we handle the
-                transactional emails for you. We support passwordless links, and we offer several OAuth providers including
-                Google, GitHub, with more on the way.
-              </p>
-              <VideoShot src="videos/tabAuthRules.mp4" />
-            </li>
-            <li className="mb-10">
-              <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                Realtime
-              </p>
-              <p>
-                You can{' '}
-                <a
-                  href="https://supabase.io/docs/guides/client-libraries#realtime-changes"
-                  target="_blank"
-                  className="text-brand-700 hover:text-brand-800"
-                >
-                  subscribe to changes in your database
-                </a>{' '}
-                over websockets, receiving your data in realtime. Companies are using Supabase to build chat applications,
-                trigger notifications, and pipe data to analytics dashboards whenever it changes in their database.
-              </p>
-            </li>
-            <li className="mb-10">
-              <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                CRUD API
-              </p>
-              <p>
-                You can use your database immediately, without an ORM or an API backend. We support GraphQL-like{' '}
-                <a
-                  href="https://supabase.io/docs/client/select#query-foreign-tables"
-                  target="_blank"
-                  className="text-brand-700 hover:text-brand-800"
-                >
-                  querying from multiple tables
-                </a>{' '}
-                in a single request, and you can even{' '}
-                <a
-                  href="https://supabase.io/docs/client/rpc"
-                  target="_blank"
-                  className="text-brand-700 hover:text-brand-800"
-                >
-                  invoke complex functions
-                </a>
-                .
-              </p>
-            </li>
-            <li className="mb-10">
-              <p className="w-44 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                Quickstart Templates
-              </p>
-              <p>
-                If you're unfamiliar with SQL, we provide a set of Quickstart Templates to get you building quickly.
-                Very soon you'll be able to deploy entire apps (front and back end) with just the click of a button.
-              </p>
-            </li>
-            <li className="mb-10">
-              <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                Table View
-              </p>
-              <p className="mb-5">
-                View and edit your data like a spreadsheet from within the Supabase dashboard. Build your schema,
-                create complex relationships, and import and export to csv.
-              </p>
-              <VideoShot src="videos/tabTableEditor.mp4" />
-            </li>
-            <li>
-              <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                SQL Editor
-              </p>
-              <p className="mb-5">
-                No need to install third party SQL tools, you can run queries directly from the
-                Supabase Dashboard.
-              </p>
-              <VideoShot src="videos/tabSqlEditor.mp4" />
-            </li>
-          </ul>
+const NewFeaturesAndIntegrations = () => {
+  const { basePath } = useRouter()
+  return (
+    <div id="newFeaturesAndIntegrations" className="bg-gray-50 dark:bg-dark-700">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
+        <SectionHeader sectionNumber={4} header="New Features & Integrations" />
+  
+        <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
+          <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
+            <p className="mb-5">
+              If you're new to Supabase, here's a few of the things you get when you choose us as your backend.
+            </p>
+            <ul className="">
+              <li className="mb-10">
+                <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">Auth</p>
+                <p className="mb-5">
+                  If you're new to Supabase, here's a few of the things you get when you choose us as your backend.
+                  We provide{' '}
+                  <a
+                    href="https://supabase.io/docs/client/auth-signup"
+                    target="_blank"
+                    className="text-brand-700 hover:text-brand-800"
+                  >
+                    Javascript
+                  </a>{' '}
+                  (and{' '}
+                  <a
+                    href="https://supabase.io/docs/gotrue/server/about#endpoints"
+                    target="_blank"
+                    className="text-brand-700 hover:text-brand-800"
+                  >
+                    HTTP
+                  </a>
+                  ) APIs for your users to sign in and out of your application. You can define the rows in your database
+                  that logged-in users can access (e.g. only his or her shopping cart). We even provide account confirmation,
+                  recovery, and invite email templates which you can customize on the dashboard, and we handle the
+                  transactional emails for you. We support passwordless links, and we offer several OAuth providers including
+                  Google, GitHub, with more on the way.
+                </p>
+                <VideoShot src={`${basePath}/videos/tabAuthRules.mp4`} />
+              </li>
+              <li className="mb-10">
+                <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
+                  Realtime
+                </p>
+                <p>
+                  You can{' '}
+                  <a
+                    href="https://supabase.io/docs/guides/client-libraries#realtime-changes"
+                    target="_blank"
+                    className="text-brand-700 hover:text-brand-800"
+                  >
+                    subscribe to changes in your database
+                  </a>{' '}
+                  over websockets, receiving your data in realtime. Companies are using Supabase to build chat applications,
+                  trigger notifications, and pipe data to analytics dashboards whenever it changes in their database.
+                </p>
+              </li>
+              <li className="mb-10">
+                <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
+                  CRUD API
+                </p>
+                <p>
+                  You can use your database immediately, without an ORM or an API backend. We support GraphQL-like{' '}
+                  <a
+                    href="https://supabase.io/docs/client/select#query-foreign-tables"
+                    target="_blank"
+                    className="text-brand-700 hover:text-brand-800"
+                  >
+                    querying from multiple tables
+                  </a>{' '}
+                  in a single request, and you can even{' '}
+                  <a
+                    href="https://supabase.io/docs/client/rpc"
+                    target="_blank"
+                    className="text-brand-700 hover:text-brand-800"
+                  >
+                    invoke complex functions
+                  </a>
+                  .
+                </p>
+              </li>
+              <li className="mb-10">
+                <p className="w-44 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
+                  Quickstart Templates
+                </p>
+                <p>
+                  If you're unfamiliar with SQL, we provide a set of Quickstart Templates to get you building quickly.
+                  Very soon you'll be able to deploy entire apps (front and back end) with just the click of a button.
+                </p>
+              </li>
+              <li className="mb-10">
+                <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
+                  Table View
+                </p>
+                <p className="mb-5">
+                  View and edit your data like a spreadsheet from within the Supabase dashboard. Build your schema,
+                  create complex relationships, and import and export to csv.
+                </p>
+                <VideoShot src={`${basePath}/videos/tabTableEditor.mp4`} />
+              </li>
+              <li>
+                <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
+                  SQL Editor
+                </p>
+                <p className="mb-5">
+                  No need to install third party SQL tools, you can run queries directly from the
+                  Supabase Dashboard.
+                </p>
+                <VideoShot src={`${basePath}/videos/tabSqlEditor.mp4`} />
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-)
+  )
+}
 
 const BetaPricing = () => (
   <div id="betaPricing" className="bg-white dark:bg-dark-800">
