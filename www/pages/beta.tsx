@@ -9,6 +9,7 @@ import { AlphaNumbers, IntroductionSegments, PerformanceComparisonData } from 'd
 import { render } from 'react-dom'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { addBasePath } from 'next/dist/next-server/lib/router/router'
 
 const site_title = `${APP_NAME} | We are now in Beta`
 
@@ -94,16 +95,16 @@ const SectionHeader = (props: any) => {
 
 const Hero = () => (
   <div
-    style={{ backgroundImage: "url('images/beta-hero.png')", backgroundSize: "65%", backgroundPosition: "120% 50%"}}
+    style={{
+      backgroundImage: "url('images/beta-hero.png')",
+      backgroundSize: '65%',
+      backgroundPosition: '120% 50%',
+    }}
     className="w-screen py-16 lg:py-36 bg-dark-800 bg-no-repeat"
   >
-    <div
-      className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300"
-    >
+    <div className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300">
       <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-white">
-        <p className="mb-10 text-4xl">
-          Supabase is an opensource Firebase alternative.
-        </p>
+        <p className="mb-10 text-4xl">Supabase is an opensource Firebase alternative.</p>
         <p className="text-2xl">
           Today, we're moving to <span className="text-brand-700">Beta</span>
         </p>
@@ -157,7 +158,9 @@ const Introduction = () => {
               </div>
               <div className="col-span-4 sm:col-span-9 xl:col-span-10">
                 <p className="text-5xl lg:text-6xl">
-                  <CountUp triggerAnimOnScroll={true} referenceElId="alphaNumbers">{stat.value}</CountUp>
+                  <CountUp triggerAnimOnScroll={true} referenceElId="alphaNumbers">
+                    {stat.value}
+                  </CountUp>
                   {stat.unit && <span className="text-2xl ml-1">{stat.unit}</span>}
                 </p>
               </div>
@@ -179,7 +182,8 @@ const TableOfContents = (props: any) => {
       <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4">
         <div className="col-span-12 text-base mb-10">
           <p className="text-2xl text-black dark:text-white">
-            Supabase <span className="text-brand-600 dark:text-brand-700">Beta</span> is starting now.
+            Supabase <span className="text-brand-600 dark:text-brand-700">Beta</span> is starting
+            now.
           </p>
         </div>
         <div className="col-span-12 grid grid-cols-12 gap-y-10">
@@ -212,7 +216,6 @@ const TableOfContents = (props: any) => {
 }
 
 const Performance = () => {
-
   const Bar = (props: any) => {
     const { color, finalPercentage, duration = 2000 } = props
     const countTo = parseInt(finalPercentage, 10)
@@ -227,7 +230,7 @@ const Performance = () => {
       const totalFrames = Math.round(duration / frameDuration)
 
       async function handleScroll() {
-        const reference = document.getElementById("performanceCharts")
+        const reference = document.getElementById('performanceCharts')
         if (reference && !animTriggered) {
           const yOffset = reference.getBoundingClientRect().top - window.innerHeight + 20
           if (yOffset <= 0) {
@@ -237,7 +240,7 @@ const Performance = () => {
               frame++
               const progress = easeOutQuad(frame / totalFrames)
               setCount(countTo * progress)
-  
+
               if (frame === totalFrames) clearInterval(counter)
             }, frameDuration)
           }
@@ -248,12 +251,7 @@ const Performance = () => {
       return () => window.removeEventListener('scroll', handleScroll)
     }, [animTriggered])
 
-    return (
-      <div
-        className={`${color} rounded-full h-3`}
-        style={{ width: `${count.toFixed(2)}%`}}
-      />
-    )
+    return <div className={`${color} rounded-full h-3`} style={{ width: `${count.toFixed(2)}%` }} />
   }
 
   const ComparisonChart = () => {
@@ -269,13 +267,18 @@ const Performance = () => {
                 <div className="w-full sm:w-5/6">
                   {metric.stats.map((stat: any, idx: number) => (
                     <div key={`metric_${metric.key}_${idx}`} className="flex items-center">
-                      <p className="w-20 lg:w-24 border-r py-2 pr-4 mr-4 text-left sm:text-right">{stat.name}</p>
+                      <p className="w-20 lg:w-24 border-r py-2 pr-4 mr-4 text-left sm:text-right">
+                        {stat.name}
+                      </p>
                       {/* Default bar without anim below if something goes wrong */}
                       {/* <div
                         className={`${stat.color} rounded-full h-3 transition-all`}
                         style={{ width: `calc(${((stat.value / maxValue) * 100)}%)`}}
                       /> */}
-                      <Bar color={stat.color} finalPercentage={Math.ceil((stat.value / maxValue) * 100)} />
+                      <Bar
+                        color={stat.color}
+                        finalPercentage={Math.ceil((stat.value / maxValue) * 100)}
+                      />
                       <p className="ml-2">{stat.value}/s</p>
                     </div>
                   ))}
@@ -432,53 +435,56 @@ const Security = () => {
   )
 }
 
-const Reliability = () => (
-  <div id="reliability" className="bg-white dark:bg-dark-800">
-    <div className="container mx-auto px-8 lg:px-28 py-12 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300 ">
-      <SectionHeader sectionNumber={3} header="Reliability" />
+const Reliability = () => {
+  const { basePath } = useRouter()
+  return (
+    <div id="reliability" className="bg-white dark:bg-dark-800">
+      <div className="container mx-auto px-8 lg:px-28 py-12 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300 ">
+        <SectionHeader sectionNumber={3} header="Reliability" />
 
-      <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
-        <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
-          <p className="mb-5">
-            During Alpha we experienced 2 minor incidents related to availability, neither of which
-            affected customer access to their data. These were:
-          </p>
-          <ul className="list-disc list-outside ml-6 mb-10">
-            <li className="mb-5">
-              A third-party CDN API outage. As a result, subdomains were not created for new
-              projects.
-            </li>
-            <li>
-              Cloud resource limits. During peak periods we maxed out the number of Virtual Machines
-              we could initiate in a couple of popular regions, these limitations are artificial and
-              our Cloud providers quickly lifted them. We also hit the maximum number of subdomains
-              that could be issued temporarily
-            </li>
-          </ul>
-          <p className="mb-10">
-            Availability is one of our High Priority goals. We're making efforts to maximize uptime
-            and ensuring user data is backed up in a secure and encrypted location.
-          </p>
-          <p className="mb-10">
-            We're launching{' '}
-            <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">
-              https://status.supabase.io
-            </a>{' '}
-            to keep track of uptime across all of our services and critical infrastructure.
-          </p>
-          <div className="mb-10">
-            <VideoShot src="videos/statusPage.mp4" />
+        <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
+          <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
+            <p className="mb-5">
+              During Alpha we experienced 2 minor incidents related to availability, neither of
+              which affected customer access to their data. These were:
+            </p>
+            <ul className="list-disc list-outside ml-6 mb-10">
+              <li className="mb-5">
+                A third-party CDN API outage. As a result, subdomains were not created for new
+                projects.
+              </li>
+              <li>
+                Cloud resource limits. During peak periods we maxed out the number of Virtual
+                Machines we could initiate in a couple of popular regions, these limitations are
+                artificial and our Cloud providers quickly lifted them. We also hit the maximum
+                number of subdomains that could be issued temporarily
+              </li>
+            </ul>
+            <p className="mb-10">
+              Availability is one of our High Priority goals. We're making efforts to maximize
+              uptime and ensuring user data is backed up in a secure and encrypted location.
+            </p>
+            <p className="mb-10">
+              We're launching{' '}
+              <a href="#" target="_blank" className="text-brand-700 hover:text-brand-800">
+                https://status.supabase.io
+              </a>{' '}
+              to keep track of uptime across all of our services and critical infrastructure.
+            </p>
+            <div className="mb-10">
+              <VideoShot src={`${basePath}/videos/statusPage.mp4`} />
+            </div>
+            <p>
+              For our Alpha & Beta Users we take daily backups of your Database free of charge up to
+              20GB and store them in an encrypted format. They are available to download at any time
+              via the dashboard.
+            </p>
           </div>
-          <p>
-            For our Alpha & Beta Users we take daily backups of your Database free of charge up to
-            20GB and store them in an encrypted format. They are available to download at any time
-            via the dashboard.
-          </p>
         </div>
       </div>
     </div>
-  </div>
-)
+  )
+}
 
 const NewFeaturesAndIntegrations = () => (
   <div id="newFeaturesAndIntegrations" className="bg-gray-50 dark:bg-dark-700">
@@ -817,8 +823,7 @@ const WhatsNext = () => (
 )
 
 const Beta = () => {
-
-  const [ menuOpen, setMenuOpen ] = useState<boolean>(false)
+  const [menuOpen, setMenuOpen] = useState<boolean>(false)
   const { basePath } = useRouter()
 
   const references: any = {
@@ -863,7 +868,7 @@ const Beta = () => {
           <Link href="/">
             <img className="h-5 cursor-pointer" src={`${basePath}/images/logo-dark.png`} />
           </Link>
-          <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)}/>
+          <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)} />
           <FlyOut
             open={menuOpen}
             handleCancel={() => setMenuOpen(false)}
