@@ -6,10 +6,11 @@ type Props = {
   children?: React.ReactNode
   className?: string
   renderTriggerElement?: any
+  singleBgColor?: boolean
 }
 
 const FlyOut = (props: Props) => {
-  const { title = '', children, className = '', renderTriggerElement = null } = props
+  const { title = '', children, className = '', renderTriggerElement = null, singleBgColor = false } = props
   const [show, setShow] = useState(false)
 
   function handleToggle() {
@@ -83,8 +84,8 @@ const FlyOut = (props: Props) => {
             }}
           >
             <div className="absolute inset-0 flex sm:flex-col lg:flex-row" aria-hidden="true">
-              <div className="bg-white dark:bg-dark-600 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full"></div>
-              <div className="bg-gray-50 dark:bg-dark-500 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full"></div>
+              <div className="bg-white dark:bg-dark-600 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full" />
+              <div className={`${singleBgColor ? 'bg-white dark:bg-dark-600' : 'bg-gray-50 dark:bg-dark-500'} sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full`} />
               {/* <div className="bg-gray-50 dark:bg-dark-300 md:hidden lg:block lg:w-1/2"></div> */}
             </div>
             <div
