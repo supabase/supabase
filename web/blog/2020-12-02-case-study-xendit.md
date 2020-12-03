@@ -1,5 +1,5 @@
 ---
-title: Building a counter-fraud watchlist for the fintech industry
+title: Xendit building a counter-fraud watchlist for the fintech industry
 description: See how Xendit use Supabase to build a full-text search engine.
 author: Rory Wilding
 author_title: Supabase
