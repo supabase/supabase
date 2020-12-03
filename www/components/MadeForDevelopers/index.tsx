@@ -16,7 +16,7 @@ const MadeForDevelopers = () => {
                 title={'Instant APIs'}
                 title_alt={' that do the hard work for you'}
                 subtitle={'MADE FOR DEVELOPERS'}
-                paragraph={`We inspect your database and provide APIs instantly so you can stop building repetitive CRUD endpoints and focus on your product`}
+                paragraph={`We introspect your database to provide APIs instantly. Stop building repetitive CRUD endpoints and focus on your product.`}
               />
             </div>
           </div>
