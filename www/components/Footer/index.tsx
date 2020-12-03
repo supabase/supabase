@@ -58,7 +58,8 @@ const Footer = (props: Props) => {
       <h2 id="footerHeading" className="sr-only">
         Footer
       </h2>
-      <div className="max-w-7xl mx-auto py-12 px-8 lg:py-16 lg:px-8">
+      <div className="container mx-auto px-8 sm:px-16 xl:px-20 py-12 lg:pt-16 lg:pb-32">
+      <div className="mx-auto max-w-7xl">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
             <img
@@ -151,6 +152,7 @@ const Footer = (props: Props) => {
             <MoonEmoji />
           </div>
         </div>
+      </div>
       </div>
     </footer>
   )
