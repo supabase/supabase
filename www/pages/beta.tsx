@@ -1,23 +1,10 @@
-import {
-  BarChart,
-  Bar,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Label,
-  LabelList,
-  ResponsiveContainer,
-} from 'recharts'
-
 import Head from 'next/head'
 import { useRef } from 'react'
 import Container from 'components/Container'
 import Layout from 'components/Layout'
 import CountUp from 'components/CountUp'
 import { APP_NAME, DESCRIPTION } from 'lib/constants'
-import { AlphaNumbers, IntroductionSegments, PerformanceComparisonData } from 'data/BetaPage'
+import { AlphaNumbers, IntroductionSegments } from 'data/BetaPage'
 
 const site_title = `${APP_NAME} | We are now in Beta`
 
@@ -148,80 +135,19 @@ const Introduction = (props: any) => {
 }
 
 const Performance = () => {
-  const readColors = ['#38BC81', 'red']
-  const writeColors = ['#65D9A5', 'pink']
 
-  function renderCustomizedLabel(props: any): any {
-    const { width, text } = props
-    const radius = 10
-
-    let x: number = props.x + width / 2
-    let y: number = props.y - radius
-    return (
-      <text x={x} y={y} fill="#000" textAnchor="middle" dominantBaseline="middle" fontSize={14}>
-        {text}
-      </text>
-    )
-  }
-
-  // Documentation on recharts:
-  // http://recharts.org/en-US/api/Bar
-  const ComparisonChart = () => (
-    <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={PerformanceComparisonData} barGap={10}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis type="number" padding={{ top: 20 }}>
-          <Label
-            value="requests/s"
-            position="insideLeft"
-            angle={-90}
-            style={{ textAnchor: 'middle' }}
-          />
-        </YAxis>
-        <Tooltip cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }} />
-        <Bar dataKey="read" name="Read" barSize={20} unit=" requests/s">
-          {PerformanceComparisonData.map((entry: any, idx: number) => (
-            <Cell key={`cell_${idx}`} fill={readColors[idx]} />
-          ))}
-          {/* @ts-ignore */}
-          <LabelList
-            content={(props) => {
-              const updatedProps = { ...props, text: 'Read' }
-              return renderCustomizedLabel(updatedProps)
-            }}
-            position="top"
-          />
-        </Bar>
-        <Bar dataKey="write" name="Write" barSize={20} unit=" requests/s">
-          {PerformanceComparisonData.map((entry: any, idx: number) => (
-            <Cell key={`cell_${idx}`} fill={writeColors[idx]} />
-          ))}
-          {/* @ts-ignore */}
-          <LabelList
-            content={(props) => {
-              const updatedProps = { ...props, text: 'Write' }
-              return renderCustomizedLabel(updatedProps)
-            }}
-            position="top"
-          />
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
-  )
-
-  const ComparisonChartV2 = () => {
+  const ComparisonChart = () => {
     return (
       <div className="grid grid-cols-12 text-black dark:text-white items-center">
         <div className="col-span-12">
           <p className="w-36 pb-2 mb-4">Read (requests/s)</p>
         </div>
-        <div className="col-span-12 sm:col-span-9 grid grid-cols-12">
+        <div className="col-span-12 sm:col-span-10 grid grid-cols-12">
           <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-3 py-2 border-r-2 border-dark-200 dark:border-dark-400 mr-3">
+            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
               Supabase
             </div>
-            <div className="col-span-8 py-2">
+            <div className="col-span-9 py-2">
               <div
                 className="bg-brand-600 dark:bg-brand-700 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '100%' }}
@@ -232,10 +158,10 @@ const Performance = () => {
             <div className="hidden col-span-1 sm:block" />
           </div>
           <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-3 py-2 border-r-2 border-dark-200 dark:border-dark-400 mr-3">
+            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
               Firestore
             </div>
-            <div className="col-span-8 py-2">
+            <div className="col-span-9 py-2">
               <div
                 className="bg-dark-300 dark:bg-dark-400 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '31.36%' }}
@@ -245,7 +171,7 @@ const Performance = () => {
             </div>
           </div>
         </div>
-        <div className="col-span-12 sm:col-span-3">
+        <div className="col-span-12 sm:col-span-2">
           <p className="text-6xl sm:text-right">3.2x</p>
           <p className="text-sm sm:text-right -mt-2">faster read requests</p>
         </div>
@@ -255,12 +181,12 @@ const Performance = () => {
         <div className="col-span-12">
           <p className="w-36 pb-2 mb-4">Write (requests/s)</p>
         </div>
-        <div className="col-span-12 sm:col-span-9 grid grid-cols-12">
+        <div className="col-span-12 sm:col-span-10 grid grid-cols-12">
           <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-3 py-2 border-r-2 border-dark-200 dark:border-dark-400 mr-3">
+            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
               Supabase
             </div>
-            <div className="col-span-8 py-2">
+            <div className="col-span-9 py-2">
               <div
                 className="bg-brand-600 dark:bg-brand-700 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '74.55%' }}
@@ -271,10 +197,10 @@ const Performance = () => {
             <div className="hidden col-span-1 sm:block" />
           </div>
           <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-3 py-2 border-r-2 border-dark-200 dark:border-dark-400 mr-3">
+            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
               Firestore
             </div>
-            <div className="col-span-8 py-2">
+            <div className="col-span-9 py-2">
               <div
                 className="bg-dark-300 dark:bg-dark-400 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '23.99%' }}
@@ -284,7 +210,7 @@ const Performance = () => {
             </div>
           </div>
         </div>
-        <div className="col-span-12 sm:col-span-3">
+        <div className="col-span-12 sm:col-span-2">
           <p className="text-6xl sm:text-right">3.1x</p>
           <p className="text-sm sm:text-right -mt-2">faster write requests</p>
         </div>
@@ -346,11 +272,8 @@ const Performance = () => {
               on our methodologies.
             </p>
           </div>
-          {/* <div className="col-span-12 sm:col-span-9 xl:col-span-7">
+          <div className="col-span-12 mt-10 mb-10">
             <ComparisonChart />
-          </div> */}
-          <div className="col-span-12 sm:col-span-9 xl:col-span-7 mt-10 mb-10">
-            <ComparisonChartV2 />
           </div>
           <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
             <p className="mb-10">

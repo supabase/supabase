@@ -12,7 +12,6 @@
     "prettier": "prettier --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\""
   },
   "dependencies": {
-    "@types/recharts": "^1.8.17",
     "classnames": "2.2.6",
     "date-fns": "2.10.0",
     "gray-matter": "4.0.2",
@@ -23,7 +22,6 @@
     "react-ga": "^3.3.0",
     "react-syntax-highlighter": "^15.3.1",
     "react-transition-group": "^4.4.1",
-    "recharts": "^1.8.5",
     "remark": "11.0.2",
     "remark-html": "10.0.0",
     "typescript": "^4.0.3"
