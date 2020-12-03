@@ -767,6 +767,16 @@ const OpenSource = () => (
             </a>{' '}
             to find out more.
           </p>
+          <p>
+            Come and check out{' '}
+            <a
+              href="https://github.com/supabase"
+              target="_blank"
+              className="text-brand-700 hover:text-brand-800"
+            >
+              our GitHub.
+            </a>{' '}
+          </p>
         </div>
       </div>
     </div>
