@@ -35,7 +35,7 @@ const Developers = () => {
     )
     return url ? (
       <a
-        key={name}
+        key={text}
         href="#"
         className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150"
       >
@@ -43,7 +43,7 @@ const Developers = () => {
       </a>
     ) : (
       <div
-        key={name}
+        key={text}
         className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150"
       >
         {content}
