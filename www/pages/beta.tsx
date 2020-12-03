@@ -175,18 +175,18 @@ const Introduction = () => {
           </p>
         </div>
 
-        <div id="alphaNumbers" className="col-span-12 grid grid-cols-12 gap-y-12 lg:gap-y-20 mb-20">
+        <div id="alphaNumbers" className="col-span-12 grid grid-cols-12 gap-y-12 lg:gap-y-20 mb-20 gap-x-3 sm:gap-x-0">
           {AlphaNumbers.map((stat: any, idx: number) => (
             <div
               key={`stat_${idx}`}
-              className="col-span-6 sm:col-span-4 grid grid-cols-8 sm:grid-cols-12 gap-x-4 xl:gap-x-6 items-center"
+              className="col-span-6 sm:col-span-4 grid grid-cols-8 sm:grid-cols-12 xl:gap-x-6 items-center"
             >
-              <div className="col-span-4 sm:col-span-3 xl:col-span-2">
+              <div className="col-span-3 sm:col-span-3 xl:col-span-2">
                 <div className="w-12 h-12 rounded-md bg-dark-700 flex items-center justify-center bg-gray-900 dark:bg-white">
                   {stat.icon}
                 </div>
               </div>
-              <div className="col-span-4 sm:col-span-9 xl:col-span-10">
+              <div className="col-span-5 sm:col-span-9 xl:col-span-10">
                 <p className="text-5xl lg:text-6xl">
                   <CountUp triggerAnimOnScroll={true} referenceElId="alphaNumbers">
                     {stat.value}
@@ -208,7 +208,7 @@ const Introduction = () => {
 const TableOfContents = (props: any) => {
   const { scrollTo } = props
   return (
-    <div className="bg-gray-50 dark:bg-dark-700 text-dark-400 dark:text-dark-300">
+    <div className="bg-gray-50 dark:bg-dark-700 text-dark-400 dark:text-dark-200">
       <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4">
         <div className="col-span-12 text-base mb-10">
           <p className="text-2xl text-black dark:text-white">
@@ -409,7 +409,7 @@ const Performance = () => {
 const Security = () => {
   return (
     <div id="security" className="bg-gray-50 dark:bg-dark-700">
-      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-200">
         <SectionHeader sectionNumber={2} header="Security" />
 
         <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8">
@@ -438,7 +438,7 @@ const Security = () => {
                 We now run an ongoing internal Capture the Flag competition, where team members are
                 challenged to breach various components of our systems.
               </li>
-              <li>
+              <li className="mb-5">
                 Adopted the{' '}
                 <a
                   href="https://snyk.io/"
@@ -527,7 +527,7 @@ const NewFeaturesAndIntegrations = () => {
   const { basePath } = useRouter()
   return (
     <div id="newFeaturesAndIntegrations" className="bg-gray-50 dark:bg-dark-700">
-      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-200">
         <SectionHeader sectionNumber={4} header="New Features & Integrations" />
 
         <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
@@ -718,7 +718,7 @@ const BetaPricing = () => (
 
 const OpenSource = () => (
   <div id="openSource" className="bg-gray-50 dark:bg-dark-700">
-    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-200">
       <SectionHeader sectionNumber={6} header="Open Source" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
@@ -767,6 +767,16 @@ const OpenSource = () => (
             </a>{' '}
             to find out more.
           </p>
+          <p>
+            Come and check out{' '}
+            <a
+              href="https://github.com/supabase"
+              target="_blank"
+              className="text-brand-700 hover:text-brand-800"
+            >
+              our GitHub.
+            </a>{' '}
+          </p>
         </div>
       </div>
     </div>
@@ -812,7 +822,7 @@ const FundingPartners = () => (
 
 const ScalingOurTeam = () => (
   <div id="scalingOurTeam" className="bg-gray-50 dark:bg-dark-700">
-    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-200">
       <SectionHeader sectionNumber={8} header="Scaling Our Team" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
