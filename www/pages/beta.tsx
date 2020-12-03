@@ -22,7 +22,7 @@ const NavFlyOutMenu = (props: any) => {
         {segments.flat().map((segment: any) => (
           <div
             onClick={() => scrollTo(segment.key)}
-            className="col-span-4 px-6 py-8 text-dark-300 dark:text-dark-400 cursor-pointer bg-white hover:bg-dark-100"
+            className="col-span-4 px-6 py-10 text-dark-300 dark:text-dark-400 cursor-pointer bg-white dark:bg-dark-600 hover:bg-dark-100 dark:hover:bg-dark-500"
           >
             <p className="flex items-center text-black dark:text-white">
               <span className="font-mono text-xs text-dark-300 dark:text-dark-400 mr-2">
@@ -848,7 +848,7 @@ const Beta = () => {
       <Container>
         <div className="relative shadow-lg py-5 px-5 lg:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
           <img className="h-5" src="images/logo-dark.png" />
-          <FlyOut className="lg:col-span-1" renderTriggerElement={renderHamburgerMenu}>
+          <FlyOut className="lg:col-span-1" renderTriggerElement={renderHamburgerMenu} singleBgColor={true}>
             <NavFlyOutMenu scrollTo={scrollTo} />
           </FlyOut>
         </div>
