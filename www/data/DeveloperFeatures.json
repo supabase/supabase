@@ -3,7 +3,7 @@
     "name": "Typescript Support",
     "description": "Type definitions for both server side and client side",
     "badge": null,
-    "url": "https://supabase.io/docs/client/generating-types/"
+    "url": "https://supabase.io/docs/client/generating-types"
   },
   {
     "name": "Install from CDN",
