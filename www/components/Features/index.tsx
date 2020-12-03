@@ -39,8 +39,8 @@ const Features = () => {
         <div className="mx-auto max-w-7xl">
           <SectionHeader
             title={'Build Faster'}
-            title_alt={' and Focus on Your Core Products'}
-            subtitle={'A better way to build products'}
+            title_alt={' and Focus on Your Products'}
+            subtitle={'What you get with Supabase'}
           />
           <div className="mt-12 grid grid-cols-12 gap-8">
             <div className="relative pb-12 col-span-12">
