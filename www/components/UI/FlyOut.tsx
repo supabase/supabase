@@ -22,7 +22,6 @@ const FlyOut = (props: Props) => {
     return () => window.removeEventListener('scroll', handleScroll)
   })
 
-
   // function handleToggle() {
   //   setShow(!show)
   //   props.handleClick()
@@ -75,7 +74,11 @@ const FlyOut = (props: Props) => {
           >
             <div className="absolute inset-0 flex sm:flex-col lg:flex-row" aria-hidden="true">
               <div className="bg-white dark:bg-dark-600 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full" />
-              <div className={`${singleBgColor ? 'bg-white dark:bg-dark-600' : 'bg-gray-50 dark:bg-dark-500'} sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full`} />
+              <div
+                className={`${
+                  singleBgColor ? 'bg-white dark:bg-dark-600' : 'bg-gray-50 dark:bg-dark-500'
+                } sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full`}
+              />
               {/* <div className="bg-gray-50 dark:bg-dark-300 md:hidden lg:block lg:w-1/2"></div> */}
             </div>
             <div
