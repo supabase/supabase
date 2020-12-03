@@ -175,7 +175,10 @@ const Introduction = () => {
           </p>
         </div>
 
-        <div id="alphaNumbers" className="col-span-12 grid grid-cols-12 gap-y-12 lg:gap-y-20 mb-20 gap-x-3 sm:gap-x-0">
+        <div
+          id="alphaNumbers"
+          className="col-span-12 grid grid-cols-12 gap-y-12 lg:gap-y-20 mb-20 gap-x-3 sm:gap-x-0"
+        >
           {AlphaNumbers.map((stat: any, idx: number) => (
             <div
               key={`stat_${idx}`}
@@ -957,16 +960,16 @@ const Beta = () => {
         <meta name="og:title" property="og:title" content={site_title} />
         <meta name="og:description" property="og:description" content={DESCRIPTION} />
         <meta property="og:site_name" content="" />
-        <meta property="og:url" content="/public/og/og-image.jpg" />
+        <meta property="og:url" content={`${basePath}/public/og/og-image.jpg`} />
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="" />
         <meta name="twitter:description" content={DESCRIPTION} />
         <meta name="twitter:site" content={site_title} />
         <meta name="twitter:creator" content="supabase_io" />
-        <link rel="icon" type="image/png" href="/public/favicon/favicon.ico" />
-        <link rel="apple-touch-icon" href="/public/favicon/favicon.ico" />
-        <meta property="og:image" content="/public/og/og-image.jpg" />
-        <meta name="twitter:image" content="/public/og/og-image.jpg" />
+        <link rel="icon" type="image/png" href={`${basePath}/public/favicon/favicon.ico`} />
+        <link rel="apple-touch-icon" href={`${basePath}/public/favicon/favicon.ico`} />
+        <meta property="og:image" content={`${basePath}/public/og/og-image.jpg`} />
+        <meta name="twitter:image" content={`${basePath}/public/og/og-image.jpg`} />
       </Head>
       <Container>
         <div className="relative shadow-lg py-5 px-5 xl:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
