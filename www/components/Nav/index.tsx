@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
-import Link from 'next/link'
 
 import Badge from 'components/Badge'
-import FlyOut from 'components/Nav/FlyOut'
+import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
-import Solutions from 'data/Solutions.json'
+import SolutionsData from 'data/Solutions.json'
+
+import Solutions from '~/components/Nav/Product'
+import Developers from './Developers'
+import Company from './Company'
 
 type Props = {
   darkMode: boolean
@@ -24,7 +27,13 @@ const Nav = (props: Props) => {
     }
   }, [open])
 
-  const iconSections = Object.values(Solutions).map((solution: any, idx: number) => {
+
+  function handleNavClick() {
+    // @ts-ignore
+    ref.current
+  }
+
+  const iconSections = Object.values(SolutionsData).map((solution: any, idx: number) => {
     const { name, description, icon, label, url } = solution
 
     const content = (
@@ -147,27 +156,16 @@ const Nav = (props: Props) => {
               />
             </div>
             <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-8">
-              <FlyOut />
-              <a
-                href="https://supabase.io/docs"
-                className={`
-                  inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                  text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
-                  dark:text-dark-100 dark:hover:border-dark-100
-                `}
-              >
-                Developers
-              </a>
-              <a
-                href="https://supabase.io/docs/guides/platform"
-                className={`
-                  inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                  text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
-                  dark:text-dark-100 dark:hover:border-dark-100
-                `}
-              >
-                Company
-              </a>
+              <button onClick={() => handleNavClick()}>make me do something</button>
+              <FlyOut title={'Product'}>
+                <Solutions />
+              </FlyOut>
+              <FlyOut title={'Developers'}>
+                <Developers/>
+              </FlyOut>
+              <FlyOut title={'Company'}>
+                <Company/>
+              </FlyOut>
               <a
                 href="https://supabase.io/docs/pricing"
                 className={`

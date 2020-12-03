@@ -1,0 +1,12 @@
+[
+  {
+    "text": "Documentation",
+    "description": "Everything you need that makes it simple to get started.",
+    "url": "https://supabase.io/docs"
+  },
+  {
+    "text": "API reference",
+    "description": "Examples and references for using API libraries",
+    "url": "https://supabase.io/docs/client/supabase-client"
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "text": "Blog",
+    "description": "Read the latest developments from Supabase",
+    "url": "https://supabase.io/blog"
+  },
+  {
+    "text": "Open Source",
+    "description": "Supabase is an opensource company, supporting existing open source tools and communities wherever possible.",
+    "url": "https://supabase.io/oss"
+  },
+  {
+    "text": "Humans.txt",
+    "description": "Overview of Supabase staff",
+    "url": "https://supabase.io/humans.txt"
+  },
+  {
+    "text": "Lawyers.txt",
+    "description": "Details of technology used by Supabase",
+    "url": "https://supabase.io/lawyers.txt"
+  }
+]
