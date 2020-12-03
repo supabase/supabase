@@ -5,6 +5,7 @@ import Layout from 'components/Layout'
 import CountUp from 'components/CountUp'
 import { APP_NAME, DESCRIPTION } from 'lib/constants'
 import { AlphaNumbers, IntroductionSegments } from 'data/BetaPage'
+import { useRouter } from 'next/router'
 
 const site_title = `${APP_NAME} | We are now in Beta`
 
@@ -741,6 +742,7 @@ const WhatsNext = () => (
 )
 
 const Beta = () => {
+  const { basePath } = useRouter()
   const references: any = {
     performance: useRef<HTMLDivElement>(null),
     security: useRef<HTMLDivElement>(null),
@@ -780,7 +782,7 @@ const Beta = () => {
       </Head>
       <Container>
         <div className="shadow-lg py-5 px-5 lg:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
-          <img className="h-5" src="images/logo-dark.png" />
+          <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
           <HamburgerMenu />
         </div>
         <Hero />
