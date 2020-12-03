@@ -1,5 +1,5 @@
 ---
-title: A No-Code Website Builder Deployed in Seven Days
+title: Tayfa Built a No-Code Website Builder Deployed in Seven Days
 description: See how Tayfa went from idea to paying customer in less than 30 days.
 author: Rory Wilding
 author_title: Supabase
@@ -9,7 +9,7 @@ authorURL: https://github.com/roryw10
 image: /img/supabase-tayfa.png
 tags: 
     - case-study
-    - fintech
+    - no-code
 ---
 [**TAYFA**](https://usetayfa.com) is the fastest no-code approach to create and iterate on bespoke frontends. Learn how its solo founder, Sarup Banskota, was able to launch quickly with [Supabase](https://supabase.io), Next.js, and Vercel.
 
