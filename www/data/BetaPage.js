@@ -163,15 +163,22 @@ export const IntroductionSegments = [
   },
 ]
 
+// Currently unused
 export const PerformanceComparisonData = [
   {
-    name: 'Supabase',
-    read: 1167,
-    write: 870
+    key: 'read',
+    title: 'Read (requests/s)',
+    stats: [
+      { name: 'Supabase', value: 1167, color: 'bg-brand-600 dark:bg-brand-700' },
+      { name: 'Firestore', value: 366, color: 'bg-dark-300 dark:bg-dark-400' },
+    ]
   },
   {
-    name: 'Firestore',
-    read: 366,
-    write: 280
+    key: 'write',
+    title: 'Write (requests/s)',
+    stats: [
+      { name: 'Supabase', value: 870, color: 'bg-brand-600 dark:bg-brand-700' },
+      { name: 'Firestore', value: 280, color: 'bg-dark-300 dark:bg-dark-400' },
+    ]
   }
 ]

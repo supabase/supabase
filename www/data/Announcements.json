@@ -1,0 +1,18 @@
+[
+  {
+    "type": "Announcement",
+    "title": "Beta launch",
+    "description": "We're excitied to announce we have moved from Alpha to Beta",
+    "imgUrl": "images/case-study-monitoro.jpg",
+    "logoUrl": "images/logos/monitoro.png",
+    "organization": "Monitoro",
+    "url": "/casestudies/monitoro",
+    "postMeta": {
+      "name" : "Paul Copplestone",
+      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
+      "publishDate": "Mar 16, 2020",
+      "readLength": 6
+    },
+    "ctaText": "View case study"
+  }
+]

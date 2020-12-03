@@ -67,11 +67,6 @@ const Hero = () => {
                             src={`${basePath}/images/logos/mozilla--grey.png`}
                             alt="Mozilla"
                           />
-                          <img
-                            className="h-3 sm:h-5 pr-10"
-                            src={`${basePath}/images/logos/coatue.png`}
-                            alt="Coatue"
-                          />
                         </div>
                       </div>
                     </div>
@@ -83,7 +78,10 @@ const Hero = () => {
                         <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
                         <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
                       </div>
-                      <div className="w-full relative bg-dark-900 pointer-events-none" style={{ padding: '56.25% 0 0 0' }}>
+                      <div
+                        className="w-full relative bg-dark-900 pointer-events-none"
+                        style={{ padding: '56.25% 0 0 0' }}
+                      >
                         <iframe
                           className="absolute w-full h-full rounded-b-md"
                           src="https://www.youtube.com/embed/dBOSUER_5T4?playlist=dBOSUER_5T4&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&muted=1"
