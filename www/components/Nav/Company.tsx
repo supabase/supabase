@@ -1,8 +1,6 @@
 import React from 'react'
-import Badge from 'components/Badge'
-import SolutionsData from 'data/Solutions.json'
 import CompanyData from 'data/Company.json'
-import CaseStudiesData from 'data/CaseStudies.json'
+import BlogPostsData from 'data/BlogPosts.json'
 
 const Company = () => {
   const iconSections = Object.values(CompanyData).map((company) => {
@@ -60,7 +58,7 @@ const Company = () => {
             Latest blog posts
           </h3>
           <ul className="mt-6 space-y-6">
-            {CaseStudiesData.map((caseStudy: any, idx: number) => (
+            {BlogPostsData.map((caseStudy: any, idx: number) => (
               <li className="flow-root" key={`flyout_case_${idx}`}>
                 <a
                   href={caseStudy.url}
@@ -81,7 +79,7 @@ const Company = () => {
         </div>
         <div className="mt-6 text-sm font-medium">
           <a
-            href="/blog"
+            href="https://supabase.io/blog"
             className="text-gray-600 hover:text-gray-500 dark:text-brand-600 dark:hover:text-brand-700 transition ease-in-out duration-150"
           >
             View all posts <span aria-hidden="true">&rarr;</span>
