@@ -884,9 +884,6 @@ const WhatsNext = () => (
             </a>{' '}
             on GitHub to let us know how we can help you build things faster.
           </p>
-          <p>
-            We're partnering with the best in the business
-          </p>
         </div>
       </div>
     </div>
