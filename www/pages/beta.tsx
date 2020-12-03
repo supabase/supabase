@@ -416,8 +416,8 @@ const Reliability = () => (
               https://status.supabase.io
             </a>{' '}
             to keep track of uptime across all of our services and critical infrastructure.
-            (Possibly drop a screen grab here)
           </p>
+          <div className="mb-10"><VideoShot src="videos/statusPage.mp4" /></div>
           <p>
             For our Alpha & Beta Users we take daily backups of your Database free of charge up to
             20GB and store them in an encrypted format. They are available to download at any time
