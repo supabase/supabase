@@ -6,7 +6,7 @@ author_title: Supabase
 author_url: https://github.com/roryw10
 author_image_url: https://github.com/roryw10.png
 authorURL: https://github.com/roryw10
-# image: /img/supabase-november-2020.png
+image: /img/supabase-xendit.png
 tags: 
     - case-study
     - nocode
