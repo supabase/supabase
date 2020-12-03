@@ -80,13 +80,13 @@ const Hero = () => {
                         <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
                         <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
                       </div>
-                      <div className="w-full relative bg-dark-900" style={{ padding: '56.25% 0 0 0' }}>
+                      <div className="w-full relative bg-dark-900 pointer-events-none" style={{ padding: '56.25% 0 0 0' }}>
                         <iframe
                           className="absolute w-full h-full rounded-b-md"
                           src="https://www.youtube.com/embed/dBOSUER_5T4?playlist=dBOSUER_5T4&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&muted=1"
                           style={{ top: 0, left: 0 }}
                           frameBorder="0"
-                          allow="autoplay"
+                          allow="autoplay; modestbranding"
                         />
                       </div>
                       {/* 
