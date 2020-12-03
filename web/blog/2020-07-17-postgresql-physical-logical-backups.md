@@ -1,5 +1,5 @@
 ---
-title: Physical vs Logical backups in PostgreSQL
+title: Physical vs Logical Backups in PostgreSQL
 description: What are physical and logical backups in Postgres?
 author: Angelico de los Reyes
 author_title: Supabase

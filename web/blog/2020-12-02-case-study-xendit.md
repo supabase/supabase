@@ -1,5 +1,5 @@
 ---
-title: Building a counter-fraud watchlist for the fintech industry
+title: Building a Counter-Fraud Watchlist for the Fintech Industry
 description: See how Xendit use Supabase to build a full-text search engine.
 author: Rory Wilding
 author_title: Supabase
@@ -12,7 +12,7 @@ tags:
     - nocode
 ---
 
-[Xendit](https://www.xendit.co/) one of South East Asia's largest payment processors. They use Supabase to run automated checks against international sanctions lists.
+[Xendit](https://www.xendit.co/) is one of South East Asia's largest payment processors. They use Supabase to run automated checks against international sanctions lists.
 
 <!--truncate-->
 
@@ -32,7 +32,7 @@ Xendit needed something fast. Something that was cheaper than using the global p
 
 ### What they built
 
-Xendit parses international sanctions lists from the UN and the Indonesian government and loads them into Supabase. Since Supabase provides a full Postgres server, the then can use the [Trigram](https://www.postgresql.org/docs/current/pgtrgm.html) extension to perform full-text search on the lists, with a relevance score on every search.
+Xendit parses international sanctions lists from the UN and the Indonesian government and loads them into Supabase. Since Supabase provides a full Postgres server, they can then use the [Trigram](https://www.postgresql.org/docs/current/pgtrgm.html) extension to perform full-text search on the lists, with a relevance score on every search.
 
 Supabase was perfect for their use case, as they needed something built fast. The full solution was built and in production in less than one week.
 

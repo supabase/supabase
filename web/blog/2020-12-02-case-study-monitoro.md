@@ -1,5 +1,5 @@
 ---
-title: A web crawler handling millions of API requests
+title: A Web Crawler Handling Millions of API Requests
 description: See how Monitoro built an automated scraping platform using Supabase.
 author: Rory Wilding
 author_title: Supabase
@@ -38,7 +38,7 @@ Within a couple of days, the team had a version ready they could deploy. Monitor
 
 Fast forward to today, and Monitoro's user base has been ramping up, as they use Monitoro to monitor changes to websites all over the world. Despite how fast their user base has grown, the Monitoro team have peace of mind as they scale because they used Supabase, knowing it will just work without worrying about DevOps.
 
-> *"Supabase was the exactly the solution I needed so when I saw it on Hacker News I was instantly excited. Supabase allowed us to go further, faster, with our product functionality. We had a fast-growing user base which would have been challenging to support without being able to depend on Supabase."*
+> *"Supabase was exactly the solution I needed so when I saw it on Hacker News I was instantly excited. Supabase allowed us to go further, faster, with our product functionality. We had a fast-growing user base which would have been challenging to support without being able to depend on Supabase."*
 >
 > Omar Kamali, Monitoro Founder.
 
