@@ -958,6 +958,7 @@ const Beta = () => {
         <title>{site_title}</title>
         <meta name="og:title" property="og:title" content={site_title} />
         <meta name="twitter:site" content={site_title} />
+        <meta name="twitter:text:title" content={site_title} />
       </Head>
       <Container>
         <div className="relative shadow-lg py-5 px-5 xl:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">

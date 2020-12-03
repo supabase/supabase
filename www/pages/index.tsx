@@ -25,6 +25,7 @@ const Index = ({}: Props) => {
           </title>
           <meta name="og:title" property="og:title" content={site_title} />
           <meta name="twitter:site" content={site_title} />
+          <meta name="twitter:text:title" content={site_title} />
         </Head>
         <Container>
           <Hero />
