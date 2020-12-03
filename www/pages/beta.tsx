@@ -20,13 +20,7 @@ const VideoShot = (props: any) => {
         <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
         <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
       </div>
-      <video
-        className="rounded-b-md"
-        src={src}
-        autoPlay
-        loop
-        muted
-      >
+      <video className="rounded-b-md" src={src} autoPlay loop muted>
         Your browser does not support the video tag
       </video>
     </div>
@@ -107,9 +101,9 @@ const Introduction = (props: any) => {
           </p>
         </div>
         <div className="col-span-12 sm:col-span-9 xl:col-span-6 text-base mb-20">
-          <p>            
-            we've been fortunate to work with thousands of early adopters on
-            improving both our Open Source, and Hosted offerings.
+          <p>
+            we've been fortunate to work with thousands of early adopters on improving both our Open
+            Source, and Hosted offerings.
           </p>
         </div>
 
@@ -157,10 +151,10 @@ const Introduction = (props: any) => {
                     className="flex items-center mb-5 cursor-pointer"
                     onClick={() => scrollTo(chapter.key)}
                   >
-                    <p className="font-mono text-xs text-dark-300 dark:text-dark-400">{`0${
-                      chapter.no
-                    }`}</p>
-                    <p className="ml-4 transition text-base border-b border-gray-400 hover:text-black">{chapter.name}</p>
+                    <p className="font-mono text-xs text-dark-300 dark:text-dark-400">{`0${chapter.no}`}</p>
+                    <p className="ml-4 transition text-base border-b border-gray-400 hover:text-black">
+                      {chapter.name}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -173,7 +167,6 @@ const Introduction = (props: any) => {
 }
 
 const Performance = () => {
-
   const ComparisonChart = () => {
     return (
       <div className="grid grid-cols-12 text-dark-400 dark:text-dark-300 items-center">
@@ -190,7 +183,9 @@ const Performance = () => {
                 className="bg-brand-600 dark:bg-brand-700 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '100%' }}
               >
-                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">1167 requests/s</p>
+                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">
+                  1167 requests/s
+                </p>
               </div>
             </div>
             <div className="hidden col-span-1 sm:block" />
@@ -204,7 +199,9 @@ const Performance = () => {
                 className="bg-dark-300 dark:bg-dark-400 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '31.36%' }}
               >
-                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">366 requests/s</p>
+                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">
+                  366 requests/s
+                </p>
               </div>
             </div>
           </div>
@@ -229,7 +226,9 @@ const Performance = () => {
                 className="bg-brand-600 dark:bg-brand-700 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '74.55%' }}
               >
-                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">870 requests/s</p>
+                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">
+                  870 requests/s
+                </p>
               </div>
             </div>
             <div className="hidden col-span-1 sm:block" />
@@ -243,7 +242,9 @@ const Performance = () => {
                 className="bg-dark-300 dark:bg-dark-400 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '23.99%' }}
               >
-                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">280 requests/s</p>
+                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">
+                  280 requests/s
+                </p>
               </div>
             </div>
           </div>
@@ -430,7 +431,9 @@ const Reliability = () => (
             </a>{' '}
             to keep track of uptime across all of our services and critical infrastructure.
           </p>
-          <div className="mb-10"><VideoShot src="videos/statusPage.mp4" /></div>
+          <div className="mb-10">
+            <VideoShot src="videos/statusPage.mp4" />
+          </div>
           <p>
             For our Alpha & Beta Users we take daily backups of your Database free of charge up to
             20GB and store them in an encrypted format. They are available to download at any time
