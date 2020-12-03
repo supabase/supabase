@@ -169,16 +169,16 @@ export const PerformanceComparisonData = [
     key: 'read',
     title: 'Read (requests/s)',
     stats: [
-      { name: 'Supabase', value: 1167, color: 'bg-brand-600 dark:bg-brand-700' },
-      { name: 'Firestore', value: 366, color: 'bg-dark-300 dark:bg-dark-400' },
+      { name: 'Supabase', value: 1167 },
+      { name: 'Firestore', value: 366 },
     ]
   },
   {
     key: 'write',
     title: 'Write (requests/s)',
     stats: [
-      { name: 'Supabase', value: 870, color: 'bg-brand-600 dark:bg-brand-700' },
-      { name: 'Firestore', value: 280, color: 'bg-dark-300 dark:bg-dark-400' },
+      { name: 'Supabase', value: 870 },
+      { name: 'Firestore', value: 28 },
     ]
   }
 ]
