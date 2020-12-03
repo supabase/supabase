@@ -178,7 +178,7 @@ export const PerformanceComparisonData = [
     title: 'Write (requests/s)',
     stats: [
       { name: 'Supabase', value: 870 },
-      { name: 'Firestore', value: 28 },
+      { name: 'Firestore', value: 280 },
     ]
   }
 ]
