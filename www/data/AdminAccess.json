@@ -3,18 +3,18 @@
     "header": "Manage your data with the familiarity of a spreadsheet",
     "description": "You don’t have to be a database expert to start using Supabase — Our table editor makes Postgres easy to use even for non-techies, and you can do everything right in our dashboard.",
     "cta": "Explore Table View",
-    "url": "https://beta.supabase.io/docs/guides/platform"
+    "url": "https://supabase.io/docs/guides/platform"
   },
   "tabSqlEditor": {
     "header": "In-built SQL editor for when you need greater control",
     "description": "Write, save, and execute SQL queries directly on our dashboard, with templates to help you save time from common queries and even build applications.",
     "cta": "Explore SQL Editor",
-    "url": "https://beta.supabase.io/docs/guides/platform"
+    "url": "https://supabase.io/docs/guides/platform"
   },
   "tabAuthRules": {
     "header": "User management as straight-forward as it can be",
     "description": "Easily manage your users via our authentication, or integrate third party logins. Create policies with complex SQL rules which fit your unique business needs.",
     "cta": "Explore Auth Policies",
-    "url": "https://beta.supabase.io/docs/guides/auth"
+    "url": "https://supabase.io/docs/guides/auth"
   }
 }

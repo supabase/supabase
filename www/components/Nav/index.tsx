@@ -244,7 +244,7 @@ const Nav = (props: Props) => {
                 Beta
               </a>
               <a
-                href="https://beta.supabase.io/docs/pricing"
+                href="https://supabase.io/docs/pricing"
                 className={`
                   inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
                   text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
