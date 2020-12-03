@@ -1,5 +1,5 @@
 ---
-title: A no-code website builder, deployed in seven days
+title: A No-Code Website Builder Deployed in Seven Days
 description: See how Tayfa went from idea to paying customer in less than 30 days.
 author: Rory Wilding
 author_title: Supabase
