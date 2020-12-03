@@ -110,6 +110,7 @@ module.exports = {
     extend: {
       inset: ['group-hover'],
       stroke: ['dark'],
+      height: ['hover'],
     },
   },
   plugins: [],

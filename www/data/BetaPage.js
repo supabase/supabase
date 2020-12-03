@@ -10,7 +10,7 @@ export const AlphaNumbers = [
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="css-i6dzq1"
+        className="stroke-white dark:stroke-black"
       >
         <ellipse cx="12" cy="5" rx="9" ry="3" />
         <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
@@ -32,7 +32,7 @@ export const AlphaNumbers = [
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="css-i6dzq1"
+        className="stroke-white dark:stroke-black"
       >
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
       </svg>
@@ -52,7 +52,7 @@ export const AlphaNumbers = [
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="css-i6dzq1"
+        className="stroke-white dark:stroke-black"
       >
         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
         <polyline points="22 4 12 14.01 9 11.01" />
@@ -73,7 +73,7 @@ export const AlphaNumbers = [
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="css-i6dzq1"
+        className="stroke-white dark:stroke-black"
       >
         <line x1="6" y1="3" x2="6" y2="15" />
         <circle cx="18" cy="6" r="3" />
@@ -96,7 +96,7 @@ export const AlphaNumbers = [
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="css-i6dzq1"
+        className="stroke-white dark:stroke-black"
       >
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
         <circle cx="9" cy="7" r="4" />
@@ -119,7 +119,7 @@ export const AlphaNumbers = [
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="css-i6dzq1"
+        className="stroke-white dark:stroke-black"
       >
         <polyline points="4 17 10 11 4 5" />
         <line x1="12" y1="19" x2="20" y2="19" />
@@ -134,19 +134,32 @@ export const AlphaNumbers = [
 export const IntroductionSegments = [
   {
     description: "In preparation for some of our users moving into production, we've put extra effort into 3 key areas of Supabase",
-    chapters: ['Performance', 'Security', 'Reliability']
+    chapters: [
+      { no: 1, name: 'Performance', key: 'performance' },
+      { no: 2, name: 'Security', key: 'security' },
+      { no: 3, name: 'Reliability', key: 'reliability' }
+    ]
   },
   {
     description: "We have received an incredible number of requests for new features and integrations from our Alpha Users, and we are factoring these conversations into our Beta Pricing model.",
-    chapters: ['New Features & Integrations', 'Beta Pricing']
+    chapters: [
+      { no: 4, name: 'New Features & Integrations', key: 'features' },
+      { no: 5, name: 'Beta Pricing', key: 'pricing' }
+    ]
   },
   {
     description: "Open Source is, and will always be, at the core of everything that we do. Find out how we've been working with the community to support existing OSS projects and Communities.",
-    chapters: ['Open Source']
+    chapters: [
+      { no: 6, name: 'Open Source', key: 'openSource' }
+    ]
   },
   {
     description: "And finally, we are bringing on 23 new Funding Partners to help us achieve our goal of becoming the default backend for every business. Find out who they are, and what we have in store for 2021.",
-    chapters: ['Funding Partners', 'Scaling Our Team', 'What\'s Next']
+    chapters: [
+      { no: 7, name: 'Funding Partners', key: 'funding' },
+      { no: 8, name: 'Scaling Our Team', key: 'scaling' },
+      { no: 9, name: 'What\'s Next', key: 'next' }
+    ]
   },
 ]
 
