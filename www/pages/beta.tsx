@@ -680,7 +680,7 @@ const BetaPricing = () => (
             </li>
           </ul>
           <p className="mb-10">
-            Whilst we're ready to publish a standardized pricing model, we are committing to the
+            Whilst we're not yet ready to publish a standardized pricing model, we are committing to the
             following initiatives:
           </p>
           <ul className="list-decimal list-outside ml-6 mb-10">
@@ -694,7 +694,7 @@ const BetaPricing = () => (
               for free.
             </li>
             <li className="mb-5">
-              All University (and participating code school) Students will be eligible for 2 years
+              University (and participating code school) Students will be eligible for 2 years
               of base tier usage (Code Schools can contact{' '}
               <a
                 href="mailto:rory@supabase.io"
