@@ -3,8 +3,10 @@ import Badge from 'components/Badge'
 import Transition from 'lib/Transition'
 import Solutions from 'data/Solutions.json'
 import CaseStudiesData from 'data/CaseStudies.json'
+import { useRouter } from 'next/router'
 
 const FlyOut = () => {
+  const { basePath } = useRouter()
   const [show, setShow] = useState(false)
 
   function handleToggle() {
@@ -144,7 +146,7 @@ const FlyOut = () => {
                           <div className="hidden sm:block flex-shrink-0">
                             <img
                               className="w-32 h-20 object-cover rounded-md"
-                              src={caseStudy.imgUrl}
+                              src={`${basePath}/${caseStudy.imgUrl}`}
                               alt="caseStudyThumb"
                             />
                           </div>
