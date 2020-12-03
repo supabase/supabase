@@ -66,7 +66,7 @@ const Footer = (props: Props) => {
             <div className="space-y-8 xl:col-span-1">
               <img
                 className="h-10 w-auto"
-                src={darkMode ? 'images/logo-dark.png' : 'images/logo-light.png'}
+                src={darkMode ? `${basePath}/images/logo-dark.png` : `${basePath}/images/logo-light.png`}
                 alt="Supabase"
               />
               <div className="flex space-x-6">

@@ -2,8 +2,10 @@ import React from 'react'
 import Badge from 'components/Badge'
 import SolutionsData from 'data/Solutions.json'
 import CaseStudiesData from 'data/CaseStudies.json'
+import { useRouter } from 'next/router'
 
 const Product = () => {
+  const { basePath } = useRouter()
   const iconSections = Object.values(SolutionsData).map((solution) => {
     const { name, description, icon, label, url } = solution
 
@@ -78,7 +80,7 @@ const Product = () => {
                   <div className="hidden sm:block flex-shrink-0">
                     <img
                       className="w-32 h-20 object-cover rounded-md"
-                      src={caseStudy.imgUrl}
+                      src={`${basePath}/${caseStudy.imgUrl}`}
                       alt="caseStudyThumb"
                     />
                   </div>
