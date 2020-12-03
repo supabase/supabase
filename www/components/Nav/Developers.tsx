@@ -3,18 +3,16 @@ import DevelopersData from 'data/Developers.json'
 import AnnouncementsData from 'data/Announcements.json'
 import { useRouter } from 'next/router'
 
-
 type Props = {
   text: string
-  description? : string
-  url? : string
-  icon? : string
+  description?: string
+  url?: string
+  icon?: string
 }
-
 
 const Developers = () => {
   const { basePath } = useRouter()
-  const iconSections = Object.values(DevelopersData).map((company : Props) => {
+  const iconSections = Object.values(DevelopersData).map((company: Props) => {
     const { text, description, url, icon } = company
 
     const content = (
@@ -31,15 +29,10 @@ const Developers = () => {
           stroke="currentColor"
           aria-hidden="true"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d={icon}
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icon} />
         </svg>
         <div className="ml-4">
-        <p className="text-base font-medium text-gray-900 dark:text-white">{text}</p>
+          <p className="text-base font-medium text-gray-900 dark:text-white">{text}</p>
           <p className="mt-1 text-sm text-gray-500 dark:text-dark-300">{description}</p>
         </div>
       </a>
