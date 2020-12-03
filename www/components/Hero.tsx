@@ -64,11 +64,6 @@ const Hero = () => {
                             src="images/logos/mozilla--grey.png"
                             alt="Mozilla"
                           />
-                          <img
-                            className="h-3 sm:h-5 pr-10"
-                            src="images/logos/coatue.png"
-                            alt="Coatue"
-                          />
                         </div>
                       </div>
                     </div>
