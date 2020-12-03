@@ -149,7 +149,7 @@ const Nav = (props: Props) => {
             <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-8">
               <FlyOut />
               <a
-                href="#"
+                href="https://supabase.io/docs"
                 className={`
                   inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
                   text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
@@ -159,7 +159,7 @@ const Nav = (props: Props) => {
                 Developers
               </a>
               <a
-                href="#"
+                href="https://supabase.io/docs/guides/platform"
                 className={`
                   inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
                   text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
@@ -169,7 +169,7 @@ const Nav = (props: Props) => {
                 Company
               </a>
               <a
-                href="#"
+                href="https://supabase.io/docs/pricing"
                 className={`
                   inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
                   text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
@@ -182,7 +182,7 @@ const Nav = (props: Props) => {
           </div>
           <div className="flex items-center">
             <a
-              href="#"
+              href="https://app.supabase.io?auth=signup"
               className={`
                 inline-flex items-center border-b-2 border-transparent text-sm font-normal transition
                 rounded-md px-3 py-1 mr-5 bg-brand-600 text-white hover:bg-brand-700 hidden lg:block
@@ -191,7 +191,7 @@ const Nav = (props: Props) => {
               Start your project
             </a>
             <a
-              href="#"
+              href="https://app.supabase.io?auth=signin"
               className={`
                 inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
                 text-gray-500 hover:text-gray-700 hidden lg:block dark:text-dark-100 dark:hover:text-white

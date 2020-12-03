@@ -3,13 +3,13 @@
     "name": "Typescript Support",
     "description": "Type definitions for both server side and client side",
     "badge": null,
-    "url": "/docs/client/generating-types/"
+    "url": "https://supabase.io/docs/client/generating-types/"
   },
   {
     "name": "Install from CDN",
     "description": "Use Supabase in the browser without a build process",
     "badge": null,
-    "url": "/docs/client/initializing"
+    "url": "https://supabase.io/docs/client/initializing"
   },
   {
     "name": "Local emulator",
