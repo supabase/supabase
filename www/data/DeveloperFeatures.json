@@ -1,7 +1,7 @@
 [
   {
     "name": "Typescript Support",
-    "description": "Type definitions for both server side and client side",
+    "description": "Type definitions built directly from your database schema",
     "badge": null,
     "url": "https://supabase.io/docs/client/generating-types"
   },
@@ -19,7 +19,7 @@
   },
   {
     "name": "Supabase CLI",
-    "description": "Manage your Supabase projects from your local machine",
+    "description": "Manage Supabase projects from your local machine",
     "badge": "Q2 2020",
     "url": "https://mailchi.mp/supabase/command-line"
   }
