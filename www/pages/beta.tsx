@@ -24,6 +24,7 @@ const NavFlyOutMenu = (props: any) => {
       <div className="col-span-12 grid grid-cols-12 items-center border-dark-300 dark:border-dark-400 sm:border-r border-b border-dashed">
         {segments.flat().map((segment: any) => (
           <div
+            key={segment.key}
             onClick={() => scrollTo(segment.key)}
             className={`
               col-span-12 lg:col-span-4 px-4 lg:px-6 py-4 lg:py-10 text-dark-300 dark:text-dark-400 cursor-pointer bg-white dark:bg-dark-600
