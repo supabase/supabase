@@ -66,7 +66,7 @@ const Product = () => {
       <div className="px-4 py-8 sm:py-12 sm:px-6 lg:px-8 xl:pl-12">
         <div>
           <h3 className="text-sm font-medium tracking-wide text-gray-500 dark:text-dark-300 uppercase">
-            Latest news
+            Latest case studies
           </h3>
           <ul className="mt-6 space-y-6">
             {CaseStudiesData.map((caseStudy: any, idx: number) => (
@@ -95,14 +95,14 @@ const Product = () => {
             ))}
           </ul>
         </div>
-        <div className="mt-6 text-sm font-medium">
+        {/* <div className="mt-6 text-sm font-medium">
           <a
             href="/blog"
             className="text-gray-600 hover:text-gray-500 dark:text-brand-600 dark:hover:text-brand-700 transition ease-in-out duration-150"
           >
             View all posts <span aria-hidden="true">&rarr;</span>
           </a>
-        </div>
+        </div> */}
       </div>
     </React.Fragment>
   )
