@@ -42,11 +42,10 @@ Luckily, Sarup discovered Supabase through the Vercel community. Open-source and
 
 ![This image shows a quote from his customers - The speed at which TAYFA is evolving is crazy. I've seen ideas translate into live features 10 minutes after speaking on the phone.](/img/tanmai-tayfa.png)
 
-Within a week, Sarup had a version ready for use that he could put in front of his customer. He went through a few iteration cycles based on feedback, and was able to satisfy all the high-level objections from 6 different stakeholders. Fast forward to a one-month later, and he had a paying business contract.  
 
 > *"It's not just a priority for me to be really productive and fast, if I'm successful for my clients then I should enable them to be really productive and fast too. With this approach, I was able to deliver a superhuman feature for my customer, the command K key"* 
 >
-> Sarup, founder of TAYFA
+> Sarup Banskota, founder of TAYFA
 
 ### Prototype fast, and keep going
 
