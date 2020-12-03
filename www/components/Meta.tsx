@@ -30,8 +30,21 @@ const Meta = () => {
       <meta name="msapplication-config" content={`${basePath}/favicon/browserconfig.xml`} />
       <meta name="theme-color" content="#1E1E1E" />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
+
       <meta name="description" content={DESCRIPTION} />
-      <meta property="og:image" content={`${basePath}/og/og-image.jpg`} />
+      <meta property="og:type" content="website" />
+
+      <meta name="og:description" property="og:description" content={DESCRIPTION} />
+      <meta property="og:site_name" content="" />
+      <meta property="og:url" content={`${basePath}/public/og/og-image.jpg`} />
+      <meta name="twitter:card" content="summary" />
+      <meta name="twitter:title" content="" />
+      <meta name="twitter:description" content={DESCRIPTION} />
+      <meta name="twitter:creator" content="supabase_io" />
+      <link rel="icon" type="image/png" href={`${basePath}/public/favicon/favicon.ico`} />
+      <link rel="apple-touch-icon" href={`${basePath}/public/favicon/favicon.ico`} />
+      <meta property="og:image" content={`${basePath}/public/og/og-image.jpg`} />
+      <meta name="twitter:image" content={`${basePath}/public/og/og-image.jpg`} />
     </Head>
   )
 }
