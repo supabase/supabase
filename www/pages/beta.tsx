@@ -11,6 +11,28 @@ const site_title = `${APP_NAME} | We are now in Beta`
 // Dark text: text-dark-400
 // Light text: text-dark-300
 
+const VideoShot = (props: any) => {
+  const { src } = props
+  return (
+    <div className="shadow-lg rounded-md" style={{ height: 'fit-content' }}>
+      <div className="w-full rounded-t-md h-5 bg-dark-400 flex items-center justify-start px-2">
+        <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
+        <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
+        <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
+      </div>
+      <video
+        className="rounded-b-md"
+        src={src}
+        autoPlay
+        loop
+        muted
+      >
+        Your browser does not support the video tag
+      </video>
+    </div>
+  )
+}
+
 const HamburgerMenu = () => (
   <div className="cursor-pointer">
     <svg
@@ -421,7 +443,7 @@ const NewFeaturesAndIntegrations = () => (
           <ul className="">
             <li className="mb-10">
               <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">Auth</p>
-              <p>
+              <p className="mb-5">
                 We provide an easy to use{' '}
                 <a
                   href="https://supabase.io/docs/client/auth-signup/"
@@ -446,6 +468,7 @@ const NewFeaturesAndIntegrations = () => (
                 can use to log them into your app, and even offer several OAuth providers including
                 Google, GitHub, and have more on the way.
               </p>
+              <VideoShot src="videos/tabAuthRules.mp4" />
             </li>
             <li className="mb-10">
               <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
@@ -504,19 +527,21 @@ const NewFeaturesAndIntegrations = () => (
               <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
                 Table View
               </p>
-              <p>
+              <p className="mb-5">
                 View and edit your data like a spreadsheet from within the Supabase dashboard,
                 create complex relationships, import and export to csv.
               </p>
+              <VideoShot src="videos/tabTableEditor.mp4" />
             </li>
             <li>
               <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
                 SQL Editor
               </p>
-              <p>
+              <p className="mb-5">
                 No need to install third party SQL tools, you can run queries directly from the
                 Supabase Dashbaord.
               </p>
+              <VideoShot src="videos/tabSqlEditor.mp4" />
             </li>
           </ul>
         </div>
