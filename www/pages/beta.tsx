@@ -94,25 +94,28 @@ const SectionHeader = (props: any) => {
   )
 }
 
-const Hero = () => (
-  <div
-    style={{
-      backgroundImage: "url('images/beta-hero.png')",
-      backgroundSize: '65%',
-      backgroundPosition: '120% 50%',
-    }}
-    className="w-screen py-16 lg:py-36 bg-dark-800 bg-no-repeat"
-  >
-    <div className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300">
-      <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-white">
-        <p className="mb-10 text-4xl">Supabase is an opensource Firebase alternative.</p>
-        <p className="text-2xl">
-          Today, we're moving to <span className="text-brand-700">Beta</span>
-        </p>
+const Hero = () => {
+  const { basePath } = useRouter()
+  return (
+    <div
+      style={{
+        backgroundImage: `url('${basePath}/images/beta-hero.png')`,
+        backgroundSize: '65%',
+        backgroundPosition: '120% 50%',
+      }}
+      className="w-screen py-16 lg:py-36 bg-dark-800 bg-no-repeat"
+    >
+      <div className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300">
+        <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-white">
+          <p className="mb-10 text-4xl">Supabase is an opensource Firebase alternative.</p>
+          <p className="text-2xl">
+            Today, we're moving to <span className="text-brand-700">Beta</span>
+          </p>
+        </div>
       </div>
     </div>
-  </div>
-)
+  )
+}
 
 const Introduction = () => {
   return (
