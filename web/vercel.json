@@ -1,5 +1,5 @@
 {
-  "redirects": [{ "source": "/home", "destination": "https://www-alpha.vercel.app/new" }],
+  "redirects": [{ "source": "/", "destination": "/home" }],
   "rewrites": [
     { "source": "/new/:match*", "destination": "https://www-alpha.vercel.app/new/:match*" },
     { "source": "/home", "destination": "https://www-alpha.vercel.app/new/" },
