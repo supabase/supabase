@@ -134,11 +134,11 @@ module.exports = {
             },
           ],
         },
-        {
-          to: '/showcase',
-          label: 'Showcase',
-          position: 'right',
-        },
+        // {
+        //   to: '/showcase',
+        //   label: 'Showcase',
+        //   position: 'right',
+        // },
         // { to: '/docs/pricing', label: 'Pricing', position: 'right' },
         { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
       ],
@@ -186,6 +186,10 @@ module.exports = {
             {
               label: 'Support',
               to: '/docs/support',
+            },
+            {
+              label: 'System Status',
+              to: 'https://status.supabase.io/',
             },
           ],
         },
