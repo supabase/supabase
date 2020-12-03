@@ -66,7 +66,7 @@ const CodeExamples = () => {
         key={id + '-button'}
         onClick={() => handleClick(id)}
         className={`
-          mb-2 rounded-md border border-gray-200 dark:border-dark-200 px-4 py-2 text-xs font-medium text-gray transition
+          mb-2 ml-1 mr-1 rounded-md border border-gray-200 dark:border-dark-200 px-4 py-2 text-xs font-medium text-gray transition
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-transparent sm:text-sm sm:w-auto
           ${
             example === id
