@@ -1,25 +1,31 @@
-import {
-  BarChart,
-  Bar,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Label,
-  LabelList,
-  ResponsiveContainer,
-} from 'recharts'
-
 import Head from 'next/head'
 import { useRef } from 'react'
 import Container from 'components/Container'
 import Layout from 'components/Layout'
 import CountUp from 'components/CountUp'
 import { APP_NAME, DESCRIPTION } from 'lib/constants'
-import { AlphaNumbers, IntroductionSegments, PerformanceComparisonData } from 'data/BetaPage'
+import { AlphaNumbers, IntroductionSegments } from 'data/BetaPage'
 
 const site_title = `${APP_NAME} | We are now in Beta`
+
+// Dark text: text-dark-400
+// Light text: text-dark-300
+
+const VideoShot = (props: any) => {
+  const { src } = props
+  return (
+    <div className="shadow-lg rounded-md" style={{ height: 'fit-content' }}>
+      <div className="w-full rounded-t-md h-5 bg-dark-400 flex items-center justify-start px-2">
+        <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
+        <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
+        <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
+      </div>
+      <video className="rounded-b-md" src={src} autoPlay loop muted>
+        Your browser does not support the video tag
+      </video>
+    </div>
+  )
+}
 
 const HamburgerMenu = () => (
   <div className="cursor-pointer">
@@ -54,8 +60,14 @@ const SectionHeader = (props: any) => {
 
 const Hero = () => (
   <div className="w-screen py-16 lg:py-36 bg-dark-800">
-    <div className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-white">
-      <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-2xl">
+    <div
+      // style={{ backgroundImage: "url('images/trial.png')", backgroundSize: "30%", backgroundPosition: "90% 50%"}}
+      className={`
+        container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300
+        bg-no-repeat
+      `}
+    >
+      <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-2xl text-white">
         <p className="mb-10">
           Supabase is an opensource Firebase alternative. We're building the features of Firebase
           using enterprise-grade, open source tools.
@@ -71,20 +83,27 @@ const Hero = () => (
 const Introduction = (props: any) => {
   const { scrollTo } = props
   return (
-    <div className="bg-gray-50 dark:bg-dark-700">
-      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-black dark:text-white">
-        <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base mb-20">
+    <div className="bg-dark-900">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-dark-300">
+        <div className="col-span-12 sm:col-span-9 xl:col-span-8">
           <p>
-            After the launch of our{' '}
-            <a
-              href="https://news.ycombinator.com/item?id=23319901"
-              target="_blank"
-              className="text-brand-700 hover:text-brand-800"
-            >
-              Alpha
-            </a>{' '}
-            Program in June, we've been fortunate to work with thousands of early adopters on
-            improving both our Open Source, and Hosted offerings.
+            <span className="text-2xl block text-white">
+              After the launch of our{' '}
+              <a
+                href="https://news.ycombinator.com/item?id=23319901"
+                target="_blank"
+                className="text-brand-700 hover:text-brand-800"
+              >
+                Alpha
+              </a>{' '}
+              Program in June,
+            </span>
+          </p>
+        </div>
+        <div className="col-span-12 sm:col-span-9 xl:col-span-6 text-base mb-20">
+          <p>
+            we've been fortunate to work with thousands of early adopters on improving both our Open
+            Source, and Hosted offerings.
           </p>
         </div>
 
@@ -132,10 +151,10 @@ const Introduction = (props: any) => {
                     className="flex items-center mb-5 cursor-pointer"
                     onClick={() => scrollTo(chapter.key)}
                   >
-                    <p className="font-mono text-xs text-dark-300 dark:text-dark-400">{`0${
-                      chapter.no
-                    }`}</p>
-                    <p className="ml-4 text-base border-b border-gray-400">{chapter.name}</p>
+                    <p className="font-mono text-xs text-dark-300 dark:text-dark-400">{`0${chapter.no}`}</p>
+                    <p className="ml-4 transition text-base border-b border-gray-400 hover:text-black">
+                      {chapter.name}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -148,106 +167,48 @@ const Introduction = (props: any) => {
 }
 
 const Performance = () => {
-  const readColors = ['#38BC81', 'red']
-  const writeColors = ['#65D9A5', 'pink']
-
-  function renderCustomizedLabel(props: any): any {
-    const { width, text } = props
-    const radius = 10
-
-    let x: number = props.x + width / 2
-    let y: number = props.y - radius
+  const ComparisonChart = () => {
     return (
-      <text x={x} y={y} fill="#000" textAnchor="middle" dominantBaseline="middle" fontSize={14}>
-        {text}
-      </text>
-    )
-  }
-
-  // Documentation on recharts:
-  // http://recharts.org/en-US/api/Bar
-  const ComparisonChart = () => (
-    <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={PerformanceComparisonData} barGap={10}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis type="number" padding={{ top: 20 }}>
-          <Label
-            value="requests/s"
-            position="insideLeft"
-            angle={-90}
-            style={{ textAnchor: 'middle' }}
-          />
-        </YAxis>
-        <Tooltip cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }} />
-        <Bar dataKey="read" name="Read" barSize={20} unit=" requests/s">
-          {PerformanceComparisonData.map((entry: any, idx: number) => (
-            <Cell key={`cell_${idx}`} fill={readColors[idx]} />
-          ))}
-          {/* @ts-ignore */}
-          <LabelList
-            content={(props) => {
-              const updatedProps = { ...props, text: 'Read' }
-              return renderCustomizedLabel(updatedProps)
-            }}
-            position="top"
-          />
-        </Bar>
-        <Bar dataKey="write" name="Write" barSize={20} unit=" requests/s">
-          {PerformanceComparisonData.map((entry: any, idx: number) => (
-            <Cell key={`cell_${idx}`} fill={writeColors[idx]} />
-          ))}
-          {/* @ts-ignore */}
-          <LabelList
-            content={(props) => {
-              const updatedProps = { ...props, text: 'Write' }
-              return renderCustomizedLabel(updatedProps)
-            }}
-            position="top"
-          />
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
-  )
-
-  const ComparisonChartV2 = () => {
-    return (
-      <div className="grid grid-cols-12 text-black dark:text-white items-center">
+      <div className="grid grid-cols-12 text-dark-400 dark:text-dark-300 items-center">
         <div className="col-span-12">
           <p className="w-36 pb-2 mb-4">Read (requests/s)</p>
         </div>
-        <div className="col-span-12 sm:col-span-9 grid grid-cols-12">
+        <div className="col-span-12 sm:col-span-10 grid grid-cols-12">
           <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-3 py-2 border-r-2 border-dark-200 dark:border-dark-400 mr-3">
+            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
               Supabase
             </div>
-            <div className="col-span-8 py-2">
+            <div className="col-span-9 py-2">
               <div
                 className="bg-brand-600 dark:bg-brand-700 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '100%' }}
               >
-                <p className="transition opacity-0 group-hover:opacity-100">1167</p>
+                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">
+                  1167 requests/s
+                </p>
               </div>
             </div>
             <div className="hidden col-span-1 sm:block" />
           </div>
           <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-3 py-2 border-r-2 border-dark-200 dark:border-dark-400 mr-3">
+            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
               Firestore
             </div>
-            <div className="col-span-8 py-2">
+            <div className="col-span-9 py-2">
               <div
                 className="bg-dark-300 dark:bg-dark-400 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '31.36%' }}
               >
-                <p className="transition opacity-0 group-hover:opacity-100">366</p>
+                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">
+                  366 requests/s
+                </p>
               </div>
             </div>
           </div>
         </div>
-        <div className="col-span-12 sm:col-span-3">
-          <p className="text-6xl sm:text-right">3.2x</p>
-          <p className="text-sm sm:text-right -mt-2">faster read requests</p>
+        <div className="col-span-12 sm:col-span-2">
+          <p className="text-6xl text-dark-700 sm:text-right">3.2x</p>
+          <p className="text-sm sm:text-right -mt-2">more read requests</p>
         </div>
 
         <div className="col-span-12 py-5" />
@@ -255,38 +216,42 @@ const Performance = () => {
         <div className="col-span-12">
           <p className="w-36 pb-2 mb-4">Write (requests/s)</p>
         </div>
-        <div className="col-span-12 sm:col-span-9 grid grid-cols-12">
+        <div className="col-span-12 sm:col-span-10 grid grid-cols-12">
           <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-3 py-2 border-r-2 border-dark-200 dark:border-dark-400 mr-3">
+            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
               Supabase
             </div>
-            <div className="col-span-8 py-2">
+            <div className="col-span-9 py-2">
               <div
                 className="bg-brand-600 dark:bg-brand-700 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '74.55%' }}
               >
-                <p className="transition opacity-0 group-hover:opacity-100">870</p>
+                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">
+                  870 requests/s
+                </p>
               </div>
             </div>
             <div className="hidden col-span-1 sm:block" />
           </div>
           <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-3 py-2 border-r-2 border-dark-200 dark:border-dark-400 mr-3">
+            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
               Firestore
             </div>
-            <div className="col-span-8 py-2">
+            <div className="col-span-9 py-2">
               <div
                 className="bg-dark-300 dark:bg-dark-400 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '23.99%' }}
               >
-                <p className="transition opacity-0 group-hover:opacity-100">280</p>
+                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">
+                  280 requests/s
+                </p>
               </div>
             </div>
           </div>
         </div>
-        <div className="col-span-12 sm:col-span-3">
-          <p className="text-6xl sm:text-right">3.1x</p>
-          <p className="text-sm sm:text-right -mt-2">faster write requests</p>
+        <div className="col-span-12 sm:col-span-2">
+          <p className="text-6xl text-dark-700 sm:text-right">3.1x</p>
+          <p className="text-sm sm:text-right -mt-2">more write requests</p>
         </div>
       </div>
     )
@@ -294,7 +259,7 @@ const Performance = () => {
 
   return (
     <div id="performance" className="bg-white dark:bg-dark-800">
-      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
         <SectionHeader sectionNumber={1} header="Performance" />
 
         <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10 items-center">
@@ -332,7 +297,7 @@ const Performance = () => {
               </a>{' '}
               team while they improved the performance of their auto-generated CRUD APIs.
             </p>
-            <p className="text-black dark:text-white">
+            <p className="text-dark-400 dark:text-dark-300">
               We are proud to publish the results of our benchmarks here and we'll continue to seek
               gains throughout our Beta program and beyond. Our{' '}
               <a
@@ -346,11 +311,8 @@ const Performance = () => {
               on our methodologies.
             </p>
           </div>
-          {/* <div className="col-span-12 sm:col-span-9 xl:col-span-7">
+          <div className="col-span-12 mt-10 mb-10">
             <ComparisonChart />
-          </div> */}
-          <div className="col-span-12 sm:col-span-9 xl:col-span-7 mt-10 mb-10">
-            <ComparisonChartV2 />
           </div>
           <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
             <p className="mb-10">
@@ -374,7 +336,7 @@ const Performance = () => {
 const Security = () => {
   return (
     <div id="security" className="bg-gray-50 dark:bg-dark-700">
-      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
         <SectionHeader sectionNumber={2} header="Security" />
 
         <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8">
@@ -437,7 +399,7 @@ const Security = () => {
 
 const Reliability = () => (
   <div id="reliability" className="bg-white dark:bg-dark-800">
-    <div className="container mx-auto px-8 lg:px-28 py-12 grid grid-cols-12 gap-y-10 text-black dark:text-white ">
+    <div className="container mx-auto px-8 lg:px-28 py-12 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300 ">
       <SectionHeader sectionNumber={3} header="Reliability" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
@@ -468,8 +430,10 @@ const Reliability = () => (
               https://status.supabase.io
             </a>{' '}
             to keep track of uptime across all of our services and critical infrastructure.
-            (Possibly drop a screen grab here)
           </p>
+          <div className="mb-10">
+            <VideoShot src="videos/statusPage.mp4" />
+          </div>
           <p>
             For our Alpha & Beta Users we take daily backups of your Database free of charge up to
             20GB and store them in an encrypted format. They are available to download at any time
@@ -483,7 +447,7 @@ const Reliability = () => (
 
 const NewFeaturesAndIntegrations = () => (
   <div id="newFeaturesAndIntegrations" className="bg-gray-50 dark:bg-dark-700">
-    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
       <SectionHeader sectionNumber={4} header="New Features & Integrations" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
@@ -495,7 +459,7 @@ const NewFeaturesAndIntegrations = () => (
           <ul className="">
             <li className="mb-10">
               <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">Auth</p>
-              <p>
+              <p className="mb-5">
                 We provide an easy to use{' '}
                 <a
                   href="https://supabase.io/docs/client/auth-signup/"
@@ -520,6 +484,7 @@ const NewFeaturesAndIntegrations = () => (
                 can use to log them into your app, and even offer several OAuth providers including
                 Google, GitHub, and have more on the way.
               </p>
+              <VideoShot src="videos/tabAuthRules.mp4" />
             </li>
             <li className="mb-10">
               <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
@@ -578,19 +543,21 @@ const NewFeaturesAndIntegrations = () => (
               <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
                 Table View
               </p>
-              <p>
+              <p className="mb-5">
                 View and edit your data like a spreadsheet from within the Supabase dashboard,
                 create complex relationships, import and export to csv.
               </p>
+              <VideoShot src="videos/tabTableEditor.mp4" />
             </li>
             <li>
               <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
                 SQL Editor
               </p>
-              <p>
+              <p className="mb-5">
                 No need to install third party SQL tools, you can run queries directly from the
                 Supabase Dashbaord.
               </p>
+              <VideoShot src="videos/tabSqlEditor.mp4" />
             </li>
           </ul>
         </div>
@@ -601,7 +568,7 @@ const NewFeaturesAndIntegrations = () => (
 
 const BetaPricing = () => (
   <div id="betaPricing" className="bg-white dark:bg-dark-800">
-    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
       <SectionHeader sectionNumber={5} header="Beta Pricing" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
@@ -663,7 +630,7 @@ const BetaPricing = () => (
 
 const OpenSource = () => (
   <div id="openSource" className="bg-gray-50 dark:bg-dark-700">
-    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
       <SectionHeader sectionNumber={6} header="Open Source" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
@@ -724,7 +691,7 @@ const FundingPartners = () => <div></div>
 
 const ScalingOurTeam = () => (
   <div id="scalingOurTeam" className="bg-white dark:bg-dark-800">
-    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
       <SectionHeader sectionNumber={7} header="Scaling Our Team" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
@@ -754,7 +721,7 @@ const WhatsNext = () => (
     id="whatsNext"
     className="border-b-2 border-gray-50 bg-gray-50 dark:bg-dark-700 dark:border-dark-800"
   >
-    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
       <SectionHeader sectionNumber={8} header="What's Next" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">

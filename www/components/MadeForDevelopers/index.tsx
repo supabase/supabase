@@ -36,10 +36,10 @@ const MadeForDevelopers = () => {
                     return (
                       <div className={blockClass} key={`dev_feature_${idx}`}>
                         <div className="lg:mt-5">
-                          <dt className="text-lg leading-6 font-medium text-gray-900 dark:text-white flex md:flex-col xl:flex-row">
+                          <dt className="text-lg leading-6 font-medium text-gray-900 dark:text-white flex flex-row sm:flex-col xl:flex-row">
                             {feature.name}
                             {feature.badge && (
-                              <Badge className="ml-3 md:ml-0 md:w-20 md:mt-2 xl:ml-3 xl:mt-0 xl:w-auto">
+                              <Badge className="ml-3 sm:ml-0 sm:w-20 sm:mt-2 xl:ml-3 xl:mt-0 xl:w-auto">
                                 {feature.badge}
                               </Badge>
                             )}
