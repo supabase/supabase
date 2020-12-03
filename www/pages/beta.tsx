@@ -8,6 +8,9 @@ import { AlphaNumbers, IntroductionSegments } from 'data/BetaPage'
 
 const site_title = `${APP_NAME} | We are now in Beta`
 
+// Dark text: text-dark-400
+// Light text: text-dark-300
+
 const HamburgerMenu = () => (
   <div className="cursor-pointer">
     <svg
@@ -41,8 +44,8 @@ const SectionHeader = (props: any) => {
 
 const Hero = () => (
   <div className="w-screen py-16 lg:py-36 bg-dark-800">
-    <div className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-white">
-      <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-2xl">
+    <div className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300">
+      <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-2xl text-white">
         <p className="mb-10">
           Supabase is an opensource Firebase alternative. We're building the features of Firebase
           using enterprise-grade, open source tools.
@@ -59,7 +62,7 @@ const Introduction = (props: any) => {
   const { scrollTo } = props
   return (
     <div className="bg-gray-50 dark:bg-dark-700">
-      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-black dark:text-white">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-dark-400 dark:text-dark-300">
         <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base mb-20">
           <p>
             After the launch of our{' '}
@@ -122,7 +125,7 @@ const Introduction = (props: any) => {
                     <p className="font-mono text-xs text-dark-300 dark:text-dark-400">{`0${
                       chapter.no
                     }`}</p>
-                    <p className="ml-4 text-base border-b border-gray-400">{chapter.name}</p>
+                    <p className="ml-4 transition text-base border-b border-gray-400 hover:text-black">{chapter.name}</p>
                   </div>
                 ))}
               </div>
@@ -138,7 +141,7 @@ const Performance = () => {
 
   const ComparisonChart = () => {
     return (
-      <div className="grid grid-cols-12 text-black dark:text-white items-center">
+      <div className="grid grid-cols-12 text-dark-400 dark:text-dark-300 items-center">
         <div className="col-span-12">
           <p className="w-36 pb-2 mb-4">Read (requests/s)</p>
         </div>
@@ -220,7 +223,7 @@ const Performance = () => {
 
   return (
     <div id="performance" className="bg-white dark:bg-dark-800">
-      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
         <SectionHeader sectionNumber={1} header="Performance" />
 
         <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10 items-center">
@@ -258,7 +261,7 @@ const Performance = () => {
               </a>{' '}
               team while they improved the performance of their auto-generated CRUD APIs.
             </p>
-            <p className="text-black dark:text-white">
+            <p className="text-dark-400 dark:text-dark-300">
               We are proud to publish the results of our benchmarks here and we'll continue to seek
               gains throughout our Beta program and beyond. Our{' '}
               <a
@@ -297,7 +300,7 @@ const Performance = () => {
 const Security = () => {
   return (
     <div id="security" className="bg-gray-50 dark:bg-dark-700">
-      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
         <SectionHeader sectionNumber={2} header="Security" />
 
         <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8">
@@ -360,7 +363,7 @@ const Security = () => {
 
 const Reliability = () => (
   <div id="reliability" className="bg-white dark:bg-dark-800">
-    <div className="container mx-auto px-8 lg:px-28 py-12 grid grid-cols-12 gap-y-10 text-black dark:text-white ">
+    <div className="container mx-auto px-8 lg:px-28 py-12 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300 ">
       <SectionHeader sectionNumber={3} header="Reliability" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
@@ -406,7 +409,7 @@ const Reliability = () => (
 
 const NewFeaturesAndIntegrations = () => (
   <div id="newFeaturesAndIntegrations" className="bg-gray-50 dark:bg-dark-700">
-    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
       <SectionHeader sectionNumber={4} header="New Features & Integrations" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
@@ -524,7 +527,7 @@ const NewFeaturesAndIntegrations = () => (
 
 const BetaPricing = () => (
   <div id="betaPricing" className="bg-white dark:bg-dark-800">
-    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
       <SectionHeader sectionNumber={5} header="Beta Pricing" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
@@ -586,7 +589,7 @@ const BetaPricing = () => (
 
 const OpenSource = () => (
   <div id="openSource" className="bg-gray-50 dark:bg-dark-700">
-    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
       <SectionHeader sectionNumber={6} header="Open Source" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
@@ -647,7 +650,7 @@ const FundingPartners = () => <div></div>
 
 const ScalingOurTeam = () => (
   <div id="scalingOurTeam" className="bg-white dark:bg-dark-800">
-    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
       <SectionHeader sectionNumber={7} header="Scaling Our Team" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
@@ -677,7 +680,7 @@ const WhatsNext = () => (
     id="whatsNext"
     className="border-b-2 border-gray-50 bg-gray-50 dark:bg-dark-700 dark:border-dark-800"
   >
-    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-black dark:text-white">
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300">
       <SectionHeader sectionNumber={8} header="What's Next" />
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
