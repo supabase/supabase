@@ -112,8 +112,7 @@ const Hero = () => (
   </div>
 )
 
-const Introduction = (props: any) => {
-  const { scrollTo } = props
+const Introduction = () => {
   return (
     <div className="bg-dark-900">
       <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-dark-300">
@@ -168,12 +167,6 @@ const Introduction = (props: any) => {
             </div>
           ))}
         </div>
-
-        <div className="col-span-12 text-base mb-10">
-          <p className="text-2xl text-white">
-            Supabase Beta is starting now.
-          </p>
-        </div>
       </div>
     </div>
   )
@@ -184,6 +177,11 @@ const TableOfContents = (props: any) => {
   return (
     <div className="bg-gray-50 dark:bg-dark-700 text-dark-400 dark:text-dark-300">
       <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4">
+        <div className="col-span-12 text-base mb-10">
+          <p className="text-2xl text-black dark:text-white">
+            Supabase <span className="text-brand-600 dark:text-brand-700">Beta</span> is starting now.
+          </p>
+        </div>
         <div className="col-span-12 grid grid-cols-12 gap-y-10">
           {IntroductionSegments.map((segment: any, segmentIdx: number) => (
             <div key={`introSegment_${segmentIdx}`} className="col-span-12 grid grid-cols-12">
@@ -827,7 +825,7 @@ const Beta = () => {
           </FlyOut>
         </div>
         <Hero />
-        <Introduction scrollTo={scrollTo} />
+        <Introduction />
         <TableOfContents scrollTo={scrollTo} />
         <div ref={references['performance']}>
           <Performance />
