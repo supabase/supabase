@@ -40,7 +40,7 @@ const Developers = () => {
     return url ? (
       <a
         key={text}
-        href="#"
+        href={url}
         className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150"
       >
         {content}
