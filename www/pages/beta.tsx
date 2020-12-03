@@ -746,7 +746,7 @@ const OpenSource = () => (
           <p className="mb-10">
             One of the biggest barriers to Open Source is knowing exactly how to get started. We're{' '}
             <a
-              href="https://strive.school/"
+              href="https://supabase.io/blog/2020/12/02/supabase-striveschool"
               target="_blank"
               className="text-brand-700 hover:text-brand-800"
             >
@@ -766,6 +766,16 @@ const OpenSource = () => (
               rory@supabase.io
             </a>{' '}
             to find out more.
+          </p>
+          <p>
+            Come and check out{' '}
+            <a
+              href="https://github.com/supabase"
+              target="_blank"
+              className="text-brand-700 hover:text-brand-800"
+            >
+              our GitHub.
+            </a>{' '}
           </p>
         </div>
       </div>
