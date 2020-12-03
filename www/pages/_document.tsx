@@ -3,7 +3,7 @@ import ReactGA from 'react-ga'
 
 export default class MyDocument extends Document {
   componentDidMount() {
-    ReactGA.initialize(process.env.NEXT_PUBLIC_GA_PROPERTY_ID)
+    ReactGA.initialize('UA-155232740-1')
     ReactGA.pageview(window.location.pathname + window.location.search)
   }
 
