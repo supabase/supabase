@@ -782,7 +782,7 @@ const Beta = () => {
       </Head>
       <Container>
         <div className="shadow-lg py-5 px-5 lg:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
-          <img className="h-5" src={`${basePath}/images/logo-dark.png}`} />
+          <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
           <HamburgerMenu />
         </div>
         <Hero />
