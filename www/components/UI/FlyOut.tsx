@@ -5,14 +5,13 @@ type Props = {
   title?: string
   children?: React.ReactNode
   className?: string
-  renderTriggerElement?: any
   open?: boolean
   handleCancel?: any
   singleBgColor?: boolean
 }
 
 const FlyOut = (props: Props) => {
-  const { title = '', children, className = '', renderTriggerElement = null, singleBgColor = false, handleCancel } = props
+  const { title = '', children, className = '', singleBgColor = false, handleCancel } = props
   const [show, setShow] = useState(false)
 
   useEffect(() => {
@@ -50,18 +49,6 @@ const FlyOut = (props: Props) => {
 
   return (
     <>
-      {renderTriggerElement && (
-        <div
-          className={`
-          inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700
-          dark:text-dark-100 ${
-            renderTriggerElement === null ? 'hover:border-gray-300 dark:hover:border-dark-100' : ''
-          }
-        `}
-        >
-          {renderTriggerElement()}
-        </div>
-      )}
       <Transition
         appear={true}
         show={props.open}
