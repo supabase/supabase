@@ -19,7 +19,7 @@ const CountUp = (props: Props) => {
   useEffect(() => {
     let frame = 0
     const totalFrames = Math.round(duration / frameDuration)
-    
+
     async function handleScroll() {
       const reference = document.getElementById(referenceElId)
       if (reference && !animTriggered) {
@@ -53,7 +53,6 @@ const CountUp = (props: Props) => {
     return () => {
       if (triggerAnimOnScroll) window.removeEventListener('scroll', handleScroll)
     }
-
   }, [animTriggered])
 
   return <span>{Math.floor(count)}</span>

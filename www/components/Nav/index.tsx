@@ -83,7 +83,7 @@ const Nav = (props: Props) => {
     return url ? (
       <a
         key={`solution_${idx}`}
-        href="#"
+        href={url}
         className="-m-3 p-3 my-2 flex flex-col justify-between rounded-lg hover:bg-gray-50 dark:hover:bg-dark-600 transition ease-in-out duration-150"
       >
         {content}
@@ -150,10 +150,12 @@ const Nav = (props: Props) => {
 
   const FlyOutNavButton = (props: any) => (
     <div
-      className={`
+      className={
+        `
                   inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700
                   dark:text-dark-100 cursor-pointer
-                ` + (props.active )}
+                ` + props.active
+      }
       onClick={props.onClick}
     >
       <>
@@ -188,12 +190,20 @@ const Nav = (props: Props) => {
             <div className="flex-shrink-0 flex items-center">
               <img
                 className="block lg:hidden h-6 w-auto"
-                src={darkMode ? `${basePath}/images/logo-dark.png` : `${basePath}/images/logo-light.png`}
+                src={
+                  darkMode
+                    ? `${basePath}/images/logo-dark.png`
+                    : `${basePath}/images/logo-light.png`
+                }
                 alt="Logo"
               />
               <img
                 className="hidden lg:block h-6 w-auto"
-                src={darkMode ? `${basePath}/images/logo-dark.png` : `${basePath}/images/logo-light.png`}
+                src={
+                  darkMode
+                    ? `${basePath}/images/logo-dark.png`
+                    : `${basePath}/images/logo-light.png`
+                }
                 alt="Logo"
               />
             </div>
@@ -252,7 +262,9 @@ const Nav = (props: Props) => {
                 inline-flex items-center border-b-2 border-transparent text-sm font-normal transition
                 rounded-md px-3 py-1 mr-5 bg-brand-700 text-white hover:bg-brand-800 hidden lg:block
               `}
-            >Start your project</a>
+            >
+              Start your project
+            </a>
             <a
               href="https://app.supabase.io?auth=signin"
               className={`

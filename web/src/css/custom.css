@@ -30,7 +30,7 @@
   --custom-primary-light: #65d9a5;
   --custom-primary-lighter: #9fe7c7;
   --custom-primary-lightest: #c5f1dd;
-  --custom-background-color: #fdfdfd;
+  --custom-background-color: #1f1f1f;
   --custom-background-color-highlight: #fff;
   --custom-background-color-diff: #f5f6f7;
   --custom-background-color-diff-1: #eee;
@@ -135,6 +135,10 @@
 
   /* Alerts */
   --ifm-alert-color: var(--custom-color-orange-600);
+}
+
+:root[data-theme='light'] {
+  --custom-background-color: #fdfdfd;
 }
 
 :root[data-theme='dark'] {
