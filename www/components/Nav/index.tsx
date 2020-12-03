@@ -151,7 +151,7 @@ const Nav = (props: Props) => {
             <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-8">
               <FlyOut />
               <a
-                href="https://supabase.io/docs"
+                href="/docs"
                 className={`
                   inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
                   text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
@@ -161,7 +161,7 @@ const Nav = (props: Props) => {
                 Developers
               </a>
               <a
-                href="https://supabase.io/docs/guides/platform"
+                href="/docs/guides/platform"
                 className={`
                   inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
                   text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
@@ -171,7 +171,7 @@ const Nav = (props: Props) => {
                 Company
               </a>
               <a
-                href="https://supabase.io/docs/pricing"
+                href="/docs/pricing"
                 className={`
                   inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
                   text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
@@ -257,25 +257,25 @@ const Nav = (props: Props) => {
             </div>
             <div className="pt-2 pb-4 space-y-1">
               <a
-                href="https://supabase.io/docs"
+                href="/docs"
                 className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
               >
                 Product
               </a>
               <a
-                href="https://supabase.io/docs"
+                href="/docs"
                 className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
               >
                 Developers
               </a>
               <a
-                href="https://supabase.io/docs"
+                href="/docs"
                 className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
               >
                 Company
               </a>
               <a
-                href="https://supabase.io/pricing"
+                href="/pricing"
                 className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
               >
                 Pricing
