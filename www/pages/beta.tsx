@@ -142,7 +142,7 @@ const Introduction = () => {
           </p>
         </div>
 
-        <div className="col-span-12 grid grid-cols-12 gap-y-12 lg:gap-y-20 mb-20">
+        <div id="alphaNumbers" className="col-span-12 grid grid-cols-12 gap-y-12 lg:gap-y-20 mb-20">
           {AlphaNumbers.map((stat: any, idx: number) => (
             <div
               key={`stat_${idx}`}
@@ -155,7 +155,7 @@ const Introduction = () => {
               </div>
               <div className="col-span-4 sm:col-span-9 xl:col-span-10">
                 <p className="text-5xl lg:text-6xl">
-                  <CountUp>{stat.value}</CountUp>
+                  <CountUp triggerAnimOnScroll={true} referenceElId="alphaNumbers">{stat.value}</CountUp>
                   {stat.unit && <span className="text-2xl ml-1">{stat.unit}</span>}
                 </p>
               </div>
