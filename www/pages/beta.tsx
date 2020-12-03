@@ -1017,7 +1017,7 @@ const Beta = () => {
         <div ref={references['next']}>
           <WhatsNext />
         </div>
-        <CTABanner bgClass="bg-dark-900" />
+        <CTABanner darkerBg={true} />
       </Container>
     </Layout>
   )
