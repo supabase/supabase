@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import Tabs from 'components/AdminAccess/tabs'
 import SectionHeader from 'components/UI/SectionHeader'
+import { useRouter } from 'next/router'
 
 const AdminAccess = () => {
+  const { basePath } = useRouter()
   const [tabId, setTabId] = useState('tabTableEditor')
 
   return (
@@ -27,7 +29,7 @@ const AdminAccess = () => {
                   {/* Joshen: Preload all videos to prevent the flickering of video when changing tabs */}
                   <video
                     className={`rounded-b-md ${tabId === 'tabTableEditor' ? 'block' : 'hidden'}`}
-                    src={`videos/tabTableEditor.mp4`}
+                    src={`${basePath}/videos/tabTableEditor.mp4`}
                     autoPlay
                     loop
                     muted
@@ -36,7 +38,7 @@ const AdminAccess = () => {
                   </video>
                   <video
                     className={`rounded-b-md ${tabId === 'tabSqlEditor' ? 'block' : 'hidden'}`}
-                    src={`videos/tabSqlEditor.mp4`}
+                    src={`${basePath}/videos/tabSqlEditor.mp4`}
                     autoPlay
                     loop
                     muted
@@ -45,7 +47,7 @@ const AdminAccess = () => {
                   </video>
                   <video
                     className={`rounded-b-md ${tabId === 'tabAuthRules' ? 'block' : 'hidden'}`}
-                    src={`videos/tabAuthRules.mp4`}
+                    src={`${basePath}/videos/tabAuthRules.mp4`}
                     autoPlay
                     loop
                     muted

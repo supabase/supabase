@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import FooterLinks from 'data/Footer.json'
+import { useRouter } from 'next/router'
 
 type Props = {
   darkMode: boolean
@@ -7,6 +8,7 @@ type Props = {
 }
 
 const Footer = (props: Props) => {
+  const { basePath } = useRouter()
   const { darkMode, updateTheme } = props
 
   const toggleDarkMode = () => {

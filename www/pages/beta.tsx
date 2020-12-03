@@ -449,7 +449,7 @@ const NewFeaturesAndIntegrations = () => (
               <p className="mb-5">
                 We provide an easy to use{' '}
                 <a
-                  href="https://supabase.io/docs/client/auth-signup/"
+                  href="https://supabase.io/docs/client/auth-signup"
                   target="_blank"
                   className="text-brand-700 hover:text-brand-800"
                 >
@@ -457,7 +457,7 @@ const NewFeaturesAndIntegrations = () => (
                 </a>{' '}
                 (and{' '}
                 <a
-                  href="https://supabase.io/docs/gotrue/server/about/#endpoints"
+                  href="https://supabase.io/docs/gotrue/server/about#endpoints"
                   target="_blank"
                   className="text-brand-700 hover:text-brand-800"
                 >
@@ -480,7 +480,7 @@ const NewFeaturesAndIntegrations = () => (
               <p>
                 You can{' '}
                 <a
-                  href="https://supabase.io/docs/guides/client-libraries/#realtime-changes"
+                  href="https://supabase.io/docs/guides/client-libraries#realtime-changes"
                   target="_blank"
                   className="text-brand-700 hover:text-brand-800"
                 >
@@ -499,7 +499,7 @@ const NewFeaturesAndIntegrations = () => (
                 You can start interacting with your data directly from your front end application
                 without the need for an ORM or building out an API backend. We support GraphQL-like{' '}
                 <a
-                  href="https://supabase.io/docs/client/select/#query-foreign-tables"
+                  href="https://supabase.io/docs/client/select#query-foreign-tables"
                   target="_blank"
                   className="text-brand-700 hover:text-brand-800"
                 >
@@ -507,7 +507,7 @@ const NewFeaturesAndIntegrations = () => (
                 </a>{' '}
                 in a single request, and you can even create and{' '}
                 <a
-                  href="https://supabase.io/docs/client/rpc/"
+                  href="https://supabase.io/docs/client/rpc"
                   target="_blank"
                   className="text-brand-700 hover:text-brand-800"
                 >

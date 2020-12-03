@@ -1,5 +1,5 @@
 ---
-title: Continuous PostgreSQL backups using WAL-G
+title: Continuous PostgreSQL Backups using WAL-G
 description: Have you ever wanted to restore your database's state to a particular moment in time? This post explains how, using WAL-G.
 author: Angelico de los Reyes
 author_title: Supabase

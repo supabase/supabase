@@ -2,8 +2,11 @@ import Card from 'components/Card'
 import Benchmark from 'components/CaseStudies/benchmark'
 import SectionHeader from 'components/UI/SectionHeader'
 import CaseStudiesData from 'data/CaseStudies.json'
+import { useRouter } from 'next/router'
 
 const CaseStudies = () => {
+  const { basePath } = useRouter()
+
   return (
     <div className="relative bg-gray-50 dark:bg-dark-600 pb-20">
       <div className="absolute inset-0">
@@ -28,7 +31,7 @@ const CaseStudies = () => {
                 title={caseStudy.title}
                 type={caseStudy.type}
                 description={caseStudy.description}
-                imgUrl={caseStudy.imgUrl}
+                imgUrl={`${basePath}/${caseStudy.imgUrl}`}
                 url={caseStudy.url}
                 logoUrl={caseStudy.logoUrl}
                 // postMeta={caseStudy.postMeta}

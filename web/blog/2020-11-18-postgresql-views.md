@@ -1,5 +1,5 @@
 ---
-title: Postgres views
+title: Postgres Views
 description: Creating and using a view in PostgreSQL.
 author: Angelico de los Reyes
 author_title: Supabase

@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import Badge from 'components/Badge'
 import FlyOut from '~/components/UI/FlyOut'
@@ -14,6 +16,7 @@ type Props = {
 }
 
 const Nav = (props: Props) => {
+  const { basePath } = useRouter()
   const { darkMode } = props
   const [open, setOpen] = useState(false)
 
@@ -185,12 +188,12 @@ const Nav = (props: Props) => {
             <div className="flex-shrink-0 flex items-center">
               <img
                 className="block lg:hidden h-6 w-auto"
-                src={darkMode ? 'images/logo-dark.png' : 'images/logo-light.png'}
+                src={darkMode ? `${basePath}/images/logo-dark.png` : `${basePath}/images/logo-light.png`}
                 alt="Logo"
               />
               <img
                 className="hidden lg:block h-6 w-auto"
-                src={darkMode ? 'images/logo-dark.png' : 'images/logo-light.png'}
+                src={darkMode ? `${basePath}/images/logo-dark.png` : `${basePath}/images/logo-light.png`}
                 alt="Logo"
               />
             </div>
@@ -221,7 +224,7 @@ const Nav = (props: Props) => {
                 <Company />
               </FlyOut>
               <a
-                href="https://supabase.io/docs/pricing"
+                href="/docs/pricing"
                 className={`
                   inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
                   text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
@@ -305,25 +308,25 @@ const Nav = (props: Props) => {
             </div>
             <div className="pt-2 pb-4 space-y-1">
               <a
-                href="https://supabase.io/docs"
+                href="/docs"
                 className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
               >
                 Product
               </a>
               <a
-                href="https://supabase.io/docs"
+                href="/docs"
                 className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
               >
                 Developers
               </a>
               <a
-                href="https://supabase.io/docs"
+                href="/docs"
                 className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
               >
                 Company
               </a>
               <a
-                href="https://supabase.io/pricing"
+                href="/pricing"
                 className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
               >
                 Pricing
