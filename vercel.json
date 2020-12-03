@@ -3,6 +3,6 @@
     { "source": "/new/:match*", "destination": "https://www-alpha.vercel.app/new/:match*" },
     { "source": "/", "destination": "https://www-alpha.vercel.app/new" },
     { "source": "/beta", "destination": "https://www-alpha.vercel.app/new/beta" },
-    { "source": "/(.*)", "destination": "https://docs-rose.vercel.app/*" }
+    { "source": "/:match*", "destination": "https://docs-rose.vercel.app/:match*" }
   ]
 }
