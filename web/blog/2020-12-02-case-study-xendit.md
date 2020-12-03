@@ -10,7 +10,7 @@ authorURL: https://github.com/roryw10
 image: /img/supabase-xendit.png
 tags: 
     - case-study
-    - nocode
+    - fintech
 ---
 
 [Xendit](https://www.xendit.co/) is one of South East Asia's largest payment processors. They use Supabase to run automated checks against international sanctions lists.
