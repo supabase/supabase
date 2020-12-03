@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Container from 'components/Container'
 import Layout from 'components/Layout'
 import CountUp from 'components/CountUp'
@@ -212,10 +212,54 @@ const TableOfContents = (props: any) => {
 }
 
 const Performance = () => {
+
+  const Bar = (props: any) => {
+    const { color, finalPercentage, duration = 2000 } = props
+    const countTo = parseInt(finalPercentage, 10)
+    const [count, setCount] = useState<number>(0)
+    const [animTriggered, setAnimTriggered] = useState<boolean>(false)
+
+    const easeOutQuad = (t: number) => t * (2 - t)
+    const frameDuration = 1000 / 60
+
+    useEffect(() => {
+      let frame = 0
+      const totalFrames = Math.round(duration / frameDuration)
+
+      async function handleScroll() {
+        const reference = document.getElementById("performanceCharts")
+        if (reference && !animTriggered) {
+          const yOffset = reference.getBoundingClientRect().top - window.innerHeight + 20
+          if (yOffset <= 0) {
+            setAnimTriggered(true)
+            setCount(0)
+            const counter = setInterval(() => {
+              frame++
+              const progress = easeOutQuad(frame / totalFrames)
+              setCount(countTo * progress)
+  
+              if (frame === totalFrames) clearInterval(counter)
+            }, frameDuration)
+          }
+        }
+      }
+
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      return () => window.removeEventListener('scroll', handleScroll)
+    }, [animTriggered])
+
+    return (
+      <div
+        className={`${color} rounded-full h-3`}
+        style={{ width: `${count.toFixed(2)}%`}}
+      />
+    )
+  }
+
   const ComparisonChart = () => {
     const maxValue = 1600
     return (
-      <div>
+      <div id="performanceCharts">
         {PerformanceComparisonData.map((metric: any) => {
           const multiplier = (metric.stats[0].value / metric.stats[1].value).toFixed(1)
           return (
@@ -226,10 +270,12 @@ const Performance = () => {
                   {metric.stats.map((stat: any, idx: number) => (
                     <div key={`metric_${metric.key}_${idx}`} className="flex items-center">
                       <p className="w-20 lg:w-24 border-r py-2 pr-4 mr-4 text-left sm:text-right">{stat.name}</p>
-                      <div
+                      {/* Default bar without anim below if something goes wrong */}
+                      {/* <div
                         className={`${stat.color} rounded-full h-3 transition-all`}
                         style={{ width: `calc(${((stat.value / maxValue) * 100)}%)`}}
-                      />
+                      /> */}
+                      <Bar color={stat.color} finalPercentage={Math.ceil((stat.value / maxValue) * 100)} />
                       <p className="ml-2">{stat.value}/s</p>
                     </div>
                   ))}
