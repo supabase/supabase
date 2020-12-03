@@ -35,21 +35,14 @@ const Company = () => {
         </div>
       </a>
     )
-    return url ? (
+    return (
       <a
-        key={name}
-        href="#"
+        key={text}
+        href={url}
         className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150"
       >
         {content}
       </a>
-    ) : (
-      <div
-        key={name}
-        className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150"
-      >
-        {content}
-      </div>
     )
   })
 
