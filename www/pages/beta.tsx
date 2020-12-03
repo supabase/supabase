@@ -91,20 +91,18 @@ const SectionHeader = (props: any) => {
 }
 
 const Hero = () => (
-  <div className="w-screen py-16 lg:py-36 bg-dark-800">
+  <div
+    style={{ backgroundImage: "url('images/beta-hero.png')", backgroundSize: "65%", backgroundPosition: "120% 50%"}}
+    className="w-screen py-16 lg:py-36 bg-dark-800 bg-no-repeat"
+  >
     <div
-      // style={{ backgroundImage: "url('images/trial.png')", backgroundSize: "30%", backgroundPosition: "90% 50%"}}
-      className={`
-        container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300
-        bg-no-repeat
-      `}
+      className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300"
     >
-      <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-2xl text-white">
-        <p className="mb-10">
-          Supabase is an opensource Firebase alternative. We're building the features of Firebase
-          using enterprise-grade, open source tools.
+      <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-white">
+        <p className="mb-10 text-4xl">
+          Supabase is an opensource Firebase alternative.
         </p>
-        <p>
+        <p className="text-2xl">
           Today, we're moving to <span className="text-brand-700">Beta</span>
         </p>
       </div>
