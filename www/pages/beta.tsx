@@ -183,14 +183,14 @@ const Introduction = () => {
           {AlphaNumbers.map((stat: any, idx: number) => (
             <div
               key={`stat_${idx}`}
-              className="col-span-6 sm:col-span-4 grid grid-cols-8 sm:grid-cols-12 xl:gap-x-6 items-center"
+              className="col-span-6 sm:col-span-4 grid grid-cols-8 sm:grid-cols-12 gap-x-1 md:gap-x-0 xl:gap-x-6 items-center"
             >
-              <div className="col-span-3 sm:col-span-3 xl:col-span-2">
+              <div className="col-span-4 sm:col-span-4 md:col-span-3 xl:col-span-2">
                 <div className="w-12 h-12 rounded-md bg-dark-700 flex items-center justify-center bg-gray-900 dark:bg-white">
                   {stat.icon}
                 </div>
               </div>
-              <div className="col-span-5 sm:col-span-9 xl:col-span-10">
+              <div className="col-span-7 sm-col-span-8 md:col-span-9 xl:col-span-10">
                 <p className="text-5xl lg:text-6xl">
                   <CountUp triggerAnimOnScroll={true} referenceElId="alphaNumbers">
                     {stat.value}
@@ -198,7 +198,7 @@ const Introduction = () => {
                   {stat.unit && <span className="text-2xl ml-1">{stat.unit}</span>}
                 </p>
               </div>
-              <div className="col-span-12 sm:col-span-10 sm:col-start-4 xl:col-start-3">
+              <div className="col-span-12 sm:col-span-9 md:col-span-10 col-start-0 sm:col-start-5 md:col-start-4 xl:col-start-3">
                 <p className="text-xs lg:text-base text-dark-300 dark:text-dark-400">{stat.name}</p>
               </div>
             </div>
