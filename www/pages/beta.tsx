@@ -1,11 +1,12 @@
 import Head from 'next/head'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import Container from 'components/Container'
 import Layout from 'components/Layout'
 import CountUp from 'components/CountUp'
 import FlyOut from 'components/UI/FlyOut'
 import { APP_NAME, DESCRIPTION } from 'lib/constants'
 import { AlphaNumbers, IntroductionSegments, PerformanceComparisonData } from 'data/BetaPage'
+import { render } from 'react-dom'
 
 const site_title = `${APP_NAME} | We are now in Beta`
 
@@ -55,24 +56,27 @@ const VideoShot = (props: any) => {
   )
 }
 
-const renderHamburgerMenu = () => (
-  <div className="cursor-pointer">
-    <svg
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      stroke="white"
-      strokeWidth="2"
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="3" y1="12" x2="21" y2="12" />
-      <line x1="3" y1="6" x2="21" y2="6" />
-      <line x1="3" y1="18" x2="21" y2="18" />
-    </svg>
-  </div>
-)
+const HamburgerMenu = (props: any) => {
+  const { openMenu } = props
+  return (
+    <div className="cursor-pointer" onClick={openMenu}>
+      <svg
+        viewBox="0 0 24 24"
+        width="24"
+        height="24"
+        stroke="white"
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </div>
+  )
+}
 
 const SectionHeader = (props: any) => {
   const { sectionNumber, header } = props
@@ -769,6 +773,9 @@ const WhatsNext = () => (
 )
 
 const Beta = () => {
+
+  const [ menuOpen, setMenuOpen ] = useState<boolean>(false)
+
   const references: any = {
     performance: useRef<HTMLDivElement>(null),
     security: useRef<HTMLDivElement>(null),
@@ -809,7 +816,13 @@ const Beta = () => {
       <Container>
         <div className="relative shadow-lg py-5 px-5 xl:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
           <img className="h-5" src="images/logo-dark.png" />
-          <FlyOut className="lg:col-span-1" renderTriggerElement={renderHamburgerMenu} singleBgColor={true}>
+          <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)}/>
+          <FlyOut
+            open={menuOpen}
+            handleCancel={() => setMenuOpen(false)}
+            className="lg:col-span-1"
+            singleBgColor={true}
+          >
             <NavFlyOutMenu scrollTo={scrollTo} />
           </FlyOut>
         </div>

@@ -12,8 +12,16 @@ type Props = {
 }
 
 const FlyOut = (props: Props) => {
-  const { title = '', children, className = '', renderTriggerElement = null, singleBgColor = false } = props
+  const { title = '', children, className = '', renderTriggerElement = null, singleBgColor = false, handleCancel } = props
   const [show, setShow] = useState(false)
+
+  useEffect(() => {
+    function handleScroll() {
+      if (window.pageYOffset > 96) handleCancel()
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  })
 
 
   // function handleToggle() {
