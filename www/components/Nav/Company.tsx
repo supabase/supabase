@@ -11,11 +11,11 @@ const Company = () => {
     const content = (
       <a
         href="#"
-        className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
+        className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition ease-in-out duration-150"
       >
         {/* <!-- Heroicon name: support --> */}
         <svg
-          className="flex-shrink-0 h-6 w-6 text-grey-600"
+          className="flex-shrink-0 h-6 w-6 stroke-gray dark:stroke-white "
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -30,8 +30,8 @@ const Company = () => {
           />
         </svg>
         <div className="ml-4">
-          <p className="text-base font-medium text-gray-900">{text}</p>
-          <p className="mt-1 text-sm text-gray-500">{description}</p>
+          <p className="text-base font-medium text-gray-900 dark:text-white">{text}</p>
+          <p className="mt-1 text-sm text-gray-500 dark:text-dark-300">{description}</p>
         </div>
       </a>
     )
@@ -39,7 +39,7 @@ const Company = () => {
       <a
         key={name}
         href="#"
-        className="-m-3 p-3 flex flex-col justify-between rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition ease-in-out duration-150"
+        className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150"
       >
         {content}
       </a>
@@ -66,12 +66,12 @@ const Company = () => {
           <h3 className="text-sm font-medium tracking-wide text-gray-500 dark:text-dark-300 uppercase">
             Latest blog posts
           </h3>
-          <ul className="mt-6 space-y-12">
+          <ul className="mt-6 space-y-6">
             {CaseStudiesData.map((caseStudy: any, idx: number) => (
               <li className="flow-root" key={`flyout_case_${idx}`}>
                 <a
                   href={caseStudy.url}
-                  className="-m-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-600 transition ease-in-out duration-150"
+                  className="-m-3 py-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-600 transition ease-in-out duration-150"
                 >
                   <div className="min-w-0 flex-1 sm:ml-3">
                     <h4 className="text-base font-medium text-gray-900 dark:text-white truncate">
