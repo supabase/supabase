@@ -3,6 +3,7 @@ import { useRef } from 'react'
 import Container from 'components/Container'
 import Layout from 'components/Layout'
 import CountUp from 'components/CountUp'
+import FlyOut from 'components/UI/FlyOut'
 import { APP_NAME, DESCRIPTION } from 'lib/constants'
 import { AlphaNumbers, IntroductionSegments } from 'data/BetaPage'
 
@@ -10,6 +11,29 @@ const site_title = `${APP_NAME} | We are now in Beta`
 
 // Dark text: text-dark-400
 // Light text: text-dark-300
+
+const NavFlyOutMenu = (props: any) => {
+  const { scrollTo } = props
+  const segments = IntroductionSegments.map((segment: any) => segment.chapters)
+  
+  return (
+    <>
+      <div className="col-span-12 grid grid-cols-12 items-center">
+        {segments.flat().map((segment: any) => (
+          <div
+            onClick={() => scrollTo(segment.key)}
+            className="col-span-4 px-6 py-8 text-dark-300 dark:text-dark-400 cursor-pointer bg-white hover:bg-dark-100"
+          >
+            <p className="flex items-center text-black dark:text-white">
+              <span className="font-mono text-xs text-dark-300 dark:text-dark-400 mr-2">0{segment.no}</span>
+              <span>{segment.name}</span>
+            </p>
+          </div>
+        ))}
+      </div>
+    </>
+  )
+}
 
 const VideoShot = (props: any) => {
   const { src } = props
@@ -27,7 +51,7 @@ const VideoShot = (props: any) => {
   )
 }
 
-const HamburgerMenu = () => (
+const renderHamburgerMenu = () => (
   <div className="cursor-pointer">
     <svg
       viewBox="0 0 24 24"
@@ -151,8 +175,8 @@ const Introduction = (props: any) => {
                     className="flex items-center mb-5 cursor-pointer"
                     onClick={() => scrollTo(chapter.key)}
                   >
-                    <p className="font-mono text-xs text-dark-300 dark:text-dark-400">{`0${chapter.no}`}</p>
-                    <p className="ml-4 transition text-base border-b border-gray-400 hover:text-black">
+                    <p className="font-mono text-xs text-dark-400">{`0${chapter.no}`}</p>
+                    <p className="ml-4 transition text-base border-b border-gray-400 hover:text-white">
                       {chapter.name}
                     </p>
                   </div>
@@ -820,9 +844,11 @@ const Beta = () => {
         <meta name="twitter:image" content="/public/og/og-image.jpg" />
       </Head>
       <Container>
-        <div className="shadow-lg py-5 px-5 lg:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
+        <div className="relative shadow-lg py-5 px-5 lg:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
           <img className="h-5" src="images/logo-dark.png" />
-          <HamburgerMenu />
+          <FlyOut className="lg:col-span-1" renderTriggerElement={renderHamburgerMenu}>
+            <NavFlyOutMenu scrollTo={scrollTo} />
+          </FlyOut>
         </div>
         <Hero />
         <Introduction scrollTo={scrollTo} />

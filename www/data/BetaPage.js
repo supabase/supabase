@@ -163,6 +163,7 @@ export const IntroductionSegments = [
   },
 ]
 
+// Currently unused
 export const PerformanceComparisonData = [
   {
     name: 'Supabase',
