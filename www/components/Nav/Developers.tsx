@@ -1,6 +1,8 @@
 import React from 'react'
 import DevelopersData from 'data/Developers.json'
 import AnnouncementsData from 'data/Announcements.json'
+import { useRouter } from 'next/router'
+
 
 type Props = {
   text: string
@@ -11,6 +13,7 @@ type Props = {
 
 
 const Developers = () => {
+  const { basePath } = useRouter()
   const iconSections = Object.values(DevelopersData).map((company : Props) => {
     const { text, description, url, icon } = company
 
@@ -82,7 +85,7 @@ const Developers = () => {
                   <div className="hidden sm:block flex-shrink-0">
                     <img
                       className="w-32 h-20 object-cover rounded-md"
-                      src={caseStudy.imgUrl}
+                      src={`${basePath}/${caseStudy.imgUrl}`}
                       alt="caseStudyThumb"
                     />
                   </div>
