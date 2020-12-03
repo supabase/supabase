@@ -603,3 +603,13 @@ function Home() {
 }
 
 export default Home
+// export default () => {
+//   if (typeof window !== 'undefined') {
+//     if (window.location.href.indexOf('localhost') === -1) {
+//       window.location.replace('https://supabase.io')
+//     } else {
+//       window.location.replace('/docs')
+//     }
+//   }
+//   return null
+// }

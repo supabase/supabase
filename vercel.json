@@ -1,7 +1,8 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "https://www.supabase.vercel.app/" },
-    { "source": "/beta", "destination": "https://www.supabase.vercel.app/beta" },
-    { "source": "/(.*)", "destination": "https://docs.supabase.vercel.app/*" }
+    { "source": "/new/:match*", "destination": "https://www-alpha.vercel.app/new/:match*" },
+    { "source": "/", "destination": "https://www-alpha.vercel.app/new" },
+    { "source": "/beta", "destination": "https://www-alpha.vercel.app/new/beta" },
+    { "source": "/:match*", "destination": "https://docs-rose.vercel.app/:match*" }
   ]
 }

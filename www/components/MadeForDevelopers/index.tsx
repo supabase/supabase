@@ -50,7 +50,7 @@ const MadeForDevelopers = () => {
                           <Button
                             type="secondary"
                             text={feature.badge ? 'Get notified' : 'Explore more'}
-                            url="#"
+                            url={feature.url}
                           />
                         </div>
                       </div>
