@@ -94,25 +94,28 @@ const SectionHeader = (props: any) => {
   )
 }
 
-const Hero = () => (
-  <div
-    style={{
-      backgroundImage: "url('images/beta-hero.png')",
-      backgroundSize: '65%',
-      backgroundPosition: '120% 50%',
-    }}
-    className="w-screen py-16 lg:py-36 bg-dark-800 bg-no-repeat"
-  >
-    <div className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300">
-      <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-white">
-        <p className="mb-10 text-4xl">Supabase is an opensource Firebase alternative.</p>
-        <p className="text-2xl">
-          Today, we're moving to <span className="text-brand-700">Beta</span>
-        </p>
+const Hero = () => {
+  const { basePath } = useRouter()
+  return (
+    <div
+      style={{
+        backgroundImage: `url('${basePath}/images/beta-hero.png')`,
+        backgroundSize: '65%',
+        backgroundPosition: '120% 50%',
+      }}
+      className="w-screen py-16 lg:py-36 bg-dark-800 bg-no-repeat"
+    >
+      <div className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300">
+        <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-white">
+          <p className="mb-10 text-4xl">Supabase is an opensource Firebase alternative.</p>
+          <p className="text-2xl">
+            Today, we're moving to <span className="text-brand-700">Beta</span>
+          </p>
+        </div>
       </div>
     </div>
-  </div>
-)
+  )
+}
 
 const Introduction = () => {
   return (
@@ -271,13 +274,12 @@ const Performance = () => {
                       <p className="w-20 lg:w-24 border-r py-2 pr-4 mr-4 text-left sm:text-right">
                         {stat.name}
                       </p>
-                      {/* Default bar without anim below if something goes wrong */}
-                      {/* <div
-                        className={`${stat.color} rounded-full h-3 transition-all`}
-                        style={{ width: `calc(${((stat.value / maxValue) * 100)}%)`}}
-                      /> */}
                       <Bar
-                        color={stat.color}
+                        color={
+                          stat.name === 'Supabase'
+                            ? 'bg-brand-600 dark:bg-brand-700'
+                            : 'bg-dark-300 dark:bg-dark-400'
+                        }
                         finalPercentage={Math.ceil((stat.value / maxValue) * 100)}
                       />
                       <p className="ml-2">{stat.value}/s</p>
@@ -866,9 +868,9 @@ const Beta = () => {
       </Head>
       <Container>
         <div className="relative shadow-lg py-5 px-5 xl:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
-          <Link href="/">
-            <img className="h-5 cursor-pointer" src={`${basePath}/images/logo-dark.png`} />
-          </Link>
+          <a href="/">
+            <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
+          </a>
           <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)} />
           <FlyOut
             open={menuOpen}
