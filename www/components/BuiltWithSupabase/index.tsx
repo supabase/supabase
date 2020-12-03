@@ -1,8 +1,10 @@
 import Card from 'components/Card'
 import SectionHeader from 'components/UI/SectionHeader'
 import ProjectExamples from 'data/ProjectExamples.json'
+import { useRouter } from 'next/router'
 
 const BuiltExamples = () => {
+  const { basePath } = useRouter()
   return (
     <div className="relative bg-gray-50 dark:bg-dark-600 pt-12 pb-16">
       <div className="absolute inset-0">
@@ -30,7 +32,7 @@ const BuiltExamples = () => {
                 title={example.title}
                 type="Project Example"
                 description={example.description}
-                imgUrl={example.imgUrl}
+                imgUrl={`${basePath}/${example.imgUrl}`}
                 url={example.url}
                 icons={example.icons}
               />

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import Badge from 'components/Badge'
 import FlyOut from 'components/Nav/FlyOut'
@@ -11,6 +12,7 @@ type Props = {
 }
 
 const Nav = (props: Props) => {
+  const { basePath } = useRouter()
   const { darkMode } = props
   const [open, setOpen] = useState(false)
 
@@ -137,12 +139,12 @@ const Nav = (props: Props) => {
             <div className="flex-shrink-0 flex items-center">
               <img
                 className="block lg:hidden h-6 w-auto"
-                src={darkMode ? 'images/logo-dark.png' : 'images/logo-light.png'}
+                src={darkMode ? `${basePath}/images/logo-dark.png` : `${basePath}/images/logo-light.png`}
                 alt="Logo"
               />
               <img
                 className="hidden lg:block h-6 w-auto"
-                src={darkMode ? 'images/logo-dark.png' : 'images/logo-light.png'}
+                src={darkMode ? `${basePath}/images/logo-dark.png` : `${basePath}/images/logo-light.png`}
                 alt="Logo"
               />
             </div>
