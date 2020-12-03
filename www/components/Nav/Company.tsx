@@ -2,9 +2,16 @@ import React from 'react'
 import CompanyData from 'data/Company.json'
 import BlogPostsData from 'data/BlogPosts.json'
 
+type Props = {
+  text: string
+  description? : string
+  url? : string
+  icon? : string
+}
+
 const Company = () => {
-  const iconSections = Object.values(CompanyData).map((company) => {
-    const { text, description, url } = company
+  const iconSections = Object.values(CompanyData).map((company : Props) => {
+    const { text, description, url, icon } = company
 
     const content = (
       <a
@@ -24,7 +31,7 @@ const Company = () => {
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
+            d={icon}
           />
         </svg>
         <div className="ml-4">
