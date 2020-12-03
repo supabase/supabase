@@ -92,7 +92,7 @@ const SectionHeader = (props: any) => {
 
 const Hero = () => (
   <div
-    style={{ backgroundImage: "url('images/beta-hero.png')", backgroundSize: "65%", backgroundPosition: "120% 50%"}}
+    style={{ backgroundImage: "url('images/beta-hero.svg')", backgroundSize: "65%", backgroundPosition: "120% 50%"}}
     className="w-screen py-16 lg:py-36 bg-dark-800 bg-no-repeat"
   >
     <div
