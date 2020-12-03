@@ -49,4 +49,4 @@ Luckily, Sarup discovered Supabase through the Vercel community. Open-source and
 
 ### Prototype fast, and keep going
 
-Thanks to Supabase, Sarup can focus on what he does best and get his final product in front of his customer. Thanks to Supabase there was no need to worry about choosing and setting up back-ends, Sarup could focus on launching fast.
+Thanks to Supabase, Sarup can focus on what he does best and get his final product in front of his customer. There was no need to worry about choosing and setting up back-ends, Sarup could focus on launching fast.

@@ -758,7 +758,7 @@ const OpenSource = () => (
             to educate the next generation of programmers in Open Source - providing tutorials,
             Founder Office Hours, and other free resources.
           </p>
-          <p>
+          <p className="mb-10">
             If you teach programming, and you're interested in offering OSS tuition to your
             students, we're actively looking for more education partners. Email{' '}
             <a
@@ -771,7 +771,7 @@ const OpenSource = () => (
             to find out more.
           </p>
           <p>
-            Come and check out{' '}
+            Come and get involved in{' '}
             <a
               href="https://github.com/supabase"
               target="_blank"
