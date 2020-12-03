@@ -150,7 +150,7 @@ const Nav = (props: Props) => {
       className={`
                   inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700
                   dark:text-dark-100 cursor-pointer
-                `}
+                ` + (props.active )}
       onClick={props.onClick}
     >
       <>
@@ -205,11 +205,11 @@ const Nav = (props: Props) => {
                 onClick={() => handleToggle(() => setOpenDevelopers(!openDevelopers))}
                 active={openDevelopers}
               />
-              <FlyOutNavButton
+              {/* <FlyOutNavButton
                 title={'Company'}
                 onClick={() => handleToggle(() => setOpenCompany(!openCompany))}
                 active={openCompany}
-              />
+              /> */}
 
               <FlyOut open={openProduct} handleCancel={handleCancel}>
                 <Solutions />
@@ -217,9 +217,19 @@ const Nav = (props: Props) => {
               <FlyOut open={openDevelopers} handleCancel={handleCancel}>
                 <Developers />
               </FlyOut>
-              <FlyOut open={openCompany} handleCancel={handleCancel}>
+              {/* <FlyOut open={openCompany} handleCancel={handleCancel}>
                 <Company />
-              </FlyOut>
+              </FlyOut> */}
+              <a
+                href="/beta"
+                className={`
+                  inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
+                  text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
+                  dark:text-dark-100 dark:hover:border-dark-100
+                `}
+              >
+                Beta
+              </a>
               <a
                 href="https://supabase.io/docs/pricing"
                 className={`
