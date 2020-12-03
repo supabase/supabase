@@ -3,15 +3,15 @@ import Transition from 'lib/Transition'
 
 type Props = {
   title?: string
-  children?: React.ReactNode,
-  className?: string,
-  renderTriggerElement?: any,
+  children?: React.ReactNode
+  className?: string
+  renderTriggerElement?: any
 }
 
-const FlyOut = (props :Props) => {
+const FlyOut = (props: Props) => {
   const { title = '', children, className = '', renderTriggerElement = null } = props
   const [show, setShow] = useState(false)
-  
+
   function handleToggle() {
     setShow(!show)
   }
@@ -31,32 +31,32 @@ const FlyOut = (props :Props) => {
       <div
         className={`
           inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700
-          dark:text-dark-100 ${renderTriggerElement === null ? 'hover:border-gray-300 dark:hover:border-dark-100' : ''}
+          dark:text-dark-100 ${
+            renderTriggerElement === null ? 'hover:border-gray-300 dark:hover:border-dark-100' : ''
+          }
         `}
         onClick={() => handleToggle()}
       >
-        {
-          renderTriggerElement !== null
-            ? <>{renderTriggerElement()}</>
-            : (
-              <>
-                <span>{title}</span>
-                <svg
-                  className="ml-2 h-5 w-5 text-gray-300 group-hover:text-gray-300 transition ease-in-out duration-150"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </>
-            )
-        }
+        {renderTriggerElement !== null ? (
+          <>{renderTriggerElement()}</>
+        ) : (
+          <>
+            <span>{title}</span>
+            <svg
+              className="ml-2 h-5 w-5 text-gray-300 group-hover:text-gray-300 transition ease-in-out duration-150"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </>
+        )}
       </div>
       <Transition
         appear={true}
@@ -87,7 +87,9 @@ const FlyOut = (props :Props) => {
               <div className="bg-gray-50 dark:bg-dark-500 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full"></div>
               {/* <div className="bg-gray-50 dark:bg-dark-300 md:hidden lg:block lg:w-1/2"></div> */}
             </div>
-            <div className={`relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 ${className}`}>
+            <div
+              className={`relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 ${className}`}
+            >
               {children}
             </div>
           </div>
