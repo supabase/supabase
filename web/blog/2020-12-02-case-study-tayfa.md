@@ -55,7 +55,7 @@ Within a week, Sarup had a version ready for use that he could put in front of h
 > 
 > <small><a href="https://www.linkedin.com/in/tanmai-sharma-9b1777/" target="_blank" rel="noopener noreferrer">Tanmai Sharma</a>, CEO at Canopy & early TAYFA customer</small>
 
-Quote from Sarup "It's not just a priority for me to be really productive and fast, if I'm successful for my clients then I should enable them to be really productive and fast too. With this approach, I was able to deliver a superhuman feature for my customer, the command K key" (Sarup)
+*"It's not just a priority for me to be really productive and fast, if I'm successful for my clients then I should enable them to be really productive and fast too. With this approach, I was able to deliver a superhuman feature for my customer, the command K key"* (Sarup Banskota)
 
 ## Prototype fast, and keep going
 
