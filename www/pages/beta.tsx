@@ -1,11 +1,12 @@
 import Head from 'next/head'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import Container from 'components/Container'
 import Layout from 'components/Layout'
 import CountUp from 'components/CountUp'
 import FlyOut from 'components/UI/FlyOut'
 import { APP_NAME, DESCRIPTION } from 'lib/constants'
 import { AlphaNumbers, IntroductionSegments, PerformanceComparisonData } from 'data/BetaPage'
+import { render } from 'react-dom'
 
 const site_title = `${APP_NAME} | We are now in Beta`
 
@@ -18,11 +19,13 @@ const NavFlyOutMenu = (props: any) => {
 
   return (
     <>
-      <div className="col-span-12 grid grid-cols-12 items-center">
+      <div className="col-span-12 grid grid-cols-12 items-center border-dark-300 dark:border-dark-400 sm:border-r border-b border-dashed">
         {segments.flat().map((segment: any) => (
           <div
             onClick={() => scrollTo(segment.key)}
-            className="col-span-4 px-6 py-10 text-dark-300 dark:text-dark-400 cursor-pointer bg-white dark:bg-dark-600 hover:bg-dark-100 dark:hover:bg-dark-500"
+            className={`
+              col-span-12 lg:col-span-4 px-4 lg:px-6 py-4 lg:py-10 text-dark-300 dark:text-dark-400 cursor-pointer bg-white dark:bg-dark-600
+              hover:bg-dark-100 dark:hover:bg-dark-500 border-dark-300 dark:border-dark-400 border-t sm:border-l border-dashed`}
           >
             <p className="flex items-center text-black dark:text-white">
               <span className="font-mono text-xs text-dark-300 dark:text-dark-400 mr-2">
@@ -53,24 +56,27 @@ const VideoShot = (props: any) => {
   )
 }
 
-const renderHamburgerMenu = () => (
-  <div className="cursor-pointer">
-    <svg
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      stroke="white"
-      strokeWidth="2"
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="3" y1="12" x2="21" y2="12" />
-      <line x1="3" y1="6" x2="21" y2="6" />
-      <line x1="3" y1="18" x2="21" y2="18" />
-    </svg>
-  </div>
-)
+const HamburgerMenu = (props: any) => {
+  const { openMenu } = props
+  return (
+    <div className="cursor-pointer" onClick={openMenu}>
+      <svg
+        viewBox="0 0 24 24"
+        width="24"
+        height="24"
+        stroke="white"
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </div>
+  )
+}
 
 const SectionHeader = (props: any) => {
   const { sectionNumber, header } = props
@@ -209,7 +215,7 @@ const TableOfContents = (props: any) => {
 
 const Performance = () => {
   const ComparisonChart = () => {
-    const maxValue = 1500
+    const maxValue = 1600
     return (
       <div>
         {PerformanceComparisonData.map((metric: any) => {
@@ -767,6 +773,9 @@ const WhatsNext = () => (
 )
 
 const Beta = () => {
+
+  const [ menuOpen, setMenuOpen ] = useState<boolean>(false)
+
   const references: any = {
     performance: useRef<HTMLDivElement>(null),
     security: useRef<HTMLDivElement>(null),
@@ -805,9 +814,15 @@ const Beta = () => {
         <meta name="twitter:image" content="/public/og/og-image.jpg" />
       </Head>
       <Container>
-        <div className="relative shadow-lg py-5 px-5 lg:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
+        <div className="relative shadow-lg py-5 px-5 xl:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
           <img className="h-5" src="images/logo-dark.png" />
-          <FlyOut className="lg:col-span-1" renderTriggerElement={renderHamburgerMenu} singleBgColor={true}>
+          <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)}/>
+          <FlyOut
+            open={menuOpen}
+            handleCancel={() => setMenuOpen(false)}
+            className="lg:col-span-1"
+            singleBgColor={true}
+          >
             <NavFlyOutMenu scrollTo={scrollTo} />
           </FlyOut>
         </div>
