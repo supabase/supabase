@@ -32,7 +32,7 @@ You can enable providers by navigating to Authentication > Settings > External O
 To fetch these you need to:
 
 1. Generate `Client ID` and `Secret` ([google](https://console.developers.google.com/apis/credentials), [github](https://github.com/settings/applications/new), [gitlab](https://gitlab.com/oauth/applications), [bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/))
-2. Enter Authorized Redirect URI: `http://<your-project>.supabase.co/auth/v1/callback` on provider dashboard
+2. Enter Authorized Redirect URI: `https://<your-project>.supabase.co/auth/v1/callback` on provider dashboard
 
 ### Row Level Security
 
@@ -97,6 +97,25 @@ These should never be used in the browser or exposed to customers, but they are 
 Even though Supabase provides an `auth.users` table, it is helpful to also create a users table in the `public` schema, which uses the same UUID Primary Key as the `auth.users`.
 For security purposes, the `auth` schema is not exposed on the auto-generated API. Created a `public.users` table allows you to interact via the Supabase client - 
 especially useful for cross-table queries.
+
+Pro tip: if you want to add a row to your `public.users` table every time a user signs up, you can use triggers. For example:
+
+```sql
+-- inserts a row into public.users
+create function public.handle_new_user() 
+returns trigger as $$
+begin
+  insert into public.users (id)
+  values (new.id);
+  return new;
+end;
+$$ language plpgsql security definer;
+
+-- trigger the function every time a user is created
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+```
 
 ### Policies are like where clauses.
 
