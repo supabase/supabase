@@ -43,8 +43,8 @@ const Hero = () => {
                         <span className="text-brand-600 md:ml-0 block">Firebase Alternative</span>
                       </h1>
                       <p className="mt-5 text-base text-dark-200 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                        Create your new project backend in less than 2 minutes with easy to use
-                        Postgres Database and Authentication.
+                        Create a backend in less than 2 minutes.
+                        Start your project with a Postgres Database, Authentication, instant APIs, and realtime subscriptions.
                       </p>
                       <p className="mt-3 text-base text-dark-400">
                         Storage and serverless functions coming soon

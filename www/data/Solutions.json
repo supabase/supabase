@@ -2,7 +2,7 @@
   "database": {
     "name": "Database",
     "icon" : "M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4",
-    "description": "Built with Postgres, the world's most trusted and versatile relational database.",
+    "description": "Every project is a full Postgres database, the world's most trusted relational database.",
     "description_short": "",
     "label": "",
     "url" : "https://supabase.io/docs/guides/database"
@@ -26,7 +26,7 @@
   "functions": {
     "name": "Functions",
     "icon" : "M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
-    "description": "Write custom code without worrying about deploying servers.",
+    "description": "Write custom code and cron jobs without deploying or scaling servers.",
     "description_short": "",
     "label": "Coming soon",
     "url" : "https://mailchi.mp/supabase/functions"

@@ -16,14 +16,12 @@ const Benchmark = () => {
             src={`${basePath}/images/benchmark--mobile.svg`}
           />
           <div className="px-12 py-5 lg:px-0 lg:py-0">
-            <p className="text-xl text-white">Record breaking speed and reliability</p>
+            <p className="text-xl text-white">Built for speed and reliability</p>
             <p className="text-dark-300 mt-2">
               <span className="block">
-                Supabase is already enterprise level and we’re blown away by the speed!
+                Supabase outperforms equivalent systems by more than 300%.
               </span>
-              <span className="block">
-                Sign up for our public benchmark release and we’ll email it to you
-              </span>
+              <span className="block">Sign up for our public benchmark release and we'll send it to your inbox.</span>
             </p>
           </div>
         </div>
