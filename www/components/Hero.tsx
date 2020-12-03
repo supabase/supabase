@@ -1,7 +1,10 @@
 import Link from 'next/link'
 import Button from 'components/Button'
+import { useRouter } from 'next/router'
 
 const Hero = () => {
+  const { basePath } = useRouter()
+
   return (
     <div className="relative bg-dark-800 overflow-hidden">
       <div className="container mx-auto px-8 sm:px-16 xl:px-20">
@@ -56,12 +59,12 @@ const Hero = () => {
                         <div className="flex flex-wrap items-center lg:justify-start">
                           <img
                             className="h-8 sm:h-10 pr-10"
-                            src="images/logos/yc--grey.png"
+                            src={`${basePath}/images/logos/yc--grey.png`}
                             alt="Y Combinator"
                           />
                           <img
                             className="relative -top-1 h-5 sm:h-7 pr-10"
-                            src="images/logos/mozilla--grey.png"
+                            src={`${basePath}/images/logos/mozilla--grey.png`}
                             alt="Mozilla"
                           />
                         </div>

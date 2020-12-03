@@ -6,9 +6,9 @@
     "imgUrl": "images/case-study-monitoro.jpg",
     "logoUrl": "images/logos/monitoro.png",
     "organization": "Monitoro",
-    "url": "/casestudies/monitoro",
+    "url": "https://supabase.io/blog/2020/12/02/case-study-monitoro",
     "postMeta": {
-      "name" : "Paul Copplestone",
+      "name": "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
       "publishDate": "Mar 16, 2020",
       "readLength": 6
@@ -22,9 +22,9 @@
     "imgUrl": "images/case-study-tayfab.jpg",
     "logoUrl": "images/logos/monitoro.png",
     "organization": "Tayfab",
-    "url": "/casestudies/monitoro",
+    "url": "https://supabase.io/blog/2020/12/02/case-study-tayfa",
     "postMeta": {
-      "name" : "Paul Copplestone",
+      "name": "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
       "publishDate": "Mar 27, 2020",
       "readLength": 5
@@ -38,9 +38,9 @@
     "imgUrl": "images/case-study-xendit.jpg",
     "logoUrl": "images/logos/xendit.png",
     "organization": "Llama Lab",
-    "url": "/casestudies/monitoro",
+    "url": "https://supabase.io/blog/2020/12/02/case-study-xendit",
     "postMeta": {
-      "name" : "Paul Copplestone",
+      "name": "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
       "publishDate": "Mar 20, 2020",
       "readLength": 10

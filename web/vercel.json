@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "https://www-alpha.vercel.app/new" },
+    { "source": "/beta", "destination": "https://www-alpha.vercel.app/new/beta" }
+  ]
+}
