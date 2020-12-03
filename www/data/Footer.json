@@ -4,11 +4,11 @@
     "links": [
       {
         "text": "Database",
-        "url": "https://supabase.io/docs/guides/database"
+        "url": "https://beta.supabase.io/docs/guides/database"
       },
       {
         "text": "Authentication",
-        "url": "https://supabase.io/docs/guides/auth"
+        "url": "https://beta.supabase.io/docs/guides/auth"
       },
       {
         "text": "Storage",
@@ -20,7 +20,7 @@
       },
       {
         "text": "Pricing",
-        "url": "https://supabase.io/docs/pricing"
+        "url": "https://beta.supabase.io/docs/pricing"
       }
     ]
   },
@@ -29,7 +29,7 @@
     "links": [
       {
         "text": "Support",
-        "url": "https://supabase.io/docs/support"
+        "url": "https://beta.supabase.io/docs/support"
       },
       {
         "text": "Case Studies",
@@ -41,7 +41,7 @@
       },
       {
         "text": "Terms of service",
-        "url": "https://supabase.io/docs/company/terms"
+        "url": "https://beta.supabase.io/docs/company/terms"
       }
     ]
   },
