@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Typescript Support",
+    "description": "Type definitions for both server side and client side",
+    "badge": null,
+    "url": "https://supabase.io/docs/client/generating-types/"
+  },
+  {
+    "name": "Install from CDN",
+    "description": "Use Supabase in the browser without a build process",
+    "badge": null,
+    "url": "https://supabase.io/docs/client/initializing"
+  },
+  {
+    "name": "Local emulator",
+    "description": "Develop locally and push to production when you're ready",
+    "badge": "Q1 2020",
+    "url": "https://mailchi.mp/supabase/local-emulator"
+  },
+  {
+    "name": "Supabase CLI",
+    "description": "Manage your Supabase projects from your local machine",
+    "badge": "Q2 2020",
+    "url": "https://mailchi.mp/supabase/command-line"
+  }
+]
