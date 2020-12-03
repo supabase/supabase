@@ -1,3 +1,4 @@
+
 @tailwind base;
 
 /* Write your own custom base styles here */
@@ -13,3 +14,77 @@
 /* Stop purging. */
 
 /* Your own custom utilities */
+
+
+@font-face {
+  font-family: "custom-font";
+  src: url(/new/fonts/custom/CustomFont-Book.woff2)
+      format('woff2'),
+    url(/new/fonts/custom/CustomFont-Book.woff)
+      format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+/* @font-face {
+  font-family: "custom-font";
+  src: url(/new/fonts/custom/CustomFont-BookItalic.woff2)
+      format('woff2'),
+    url(/new/fonts/custom/CustomFont-BookItalic.woff)
+      format('woff');
+  font-weight: 400;
+  font-style: italic;
+} */
+@font-face {
+  font-family: "custom-font";
+  src: url(/new/fonts/custom/CustomFont-Medium.woff2)
+      format('woff2'),
+    url(/new/fonts/custom/CustomFont-Medium.woff)
+      format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+/* @font-face {
+  font-family: "custom-font";
+  src: url(/new/fonts/custom/CustomFont-MediumItalic.woff2)
+      format('woff2'),
+    url(/new/fonts/custom/CustomFont-MediumItalic.woff)
+      format('woff');
+  font-weight: 500;
+  font-style: italic;
+} */
+/* @font-face {
+  font-family: "custom-font";
+  src: url(/new/fonts/custom/CustomFont-Bold.woff2)
+      format('woff2'),
+    url(/new/fonts/custom/CustomFont-Bold.woff)
+      format('woff');
+  font-weight: 700;
+  font-style: 600;
+} */
+/* @font-face {
+  font-family: "custom-font";
+  src: url(/new/fonts/custom/CustomFont-BoldItalic.woff2)
+      format('woff2'),
+    url(/new/fonts/custom/CustomFont-BoldItalic.woff)
+      format('woff');
+  font-style: 600;
+  font-style: italic;
+} */
+/* @font-face {
+  font-family: "custom-font";
+  src: url(/new/fonts/custom/CustomFont-Black.woff2)
+      format('woff2'),
+    url(/new/fonts/custom/CustomFont-Black.woff)
+      format('woff');
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: "custom-font";
+  src: url(/new/fonts/custom/CustomFont-BlackItalic.woff2)
+      format('woff2'),
+    url(/new/fonts/custom/CustomFont-BlackItalic.woff)
+      format('woff');
+  font-weight: 800;
+  font-style: italic;
+} */

@@ -81,9 +81,7 @@ module.exports = {
       },
       fontFamily: {
         sans: [
-          'Circular Std',
-          'Circular',
-          'circular',
+          'custom-font',
           'BlinkMacSystemFont',
           '-apple-system',
           'Segoe UI',
