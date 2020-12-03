@@ -3,9 +3,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import Badge from 'components/Badge'
-import FlyOut from 'components/Nav/FlyOut'
+import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
-import Solutions from 'data/Solutions.json'
+import SolutionsData from 'data/Solutions.json'
+
+import Solutions from '~/components/Nav/Product'
+import Developers from './Developers'
+import Company from './Company'
 
 type Props = {
   darkMode: boolean
@@ -15,6 +19,10 @@ const Nav = (props: Props) => {
   const { basePath } = useRouter()
   const { darkMode } = props
   const [open, setOpen] = useState(false)
+
+  const [openProduct, setOpenProduct] = useState(false)
+  const [openDevelopers, setOpenDevelopers] = useState(false)
+  const [openCompany, setOpenCompany] = useState(false)
 
   React.useEffect(() => {
     if (open) {
@@ -26,7 +34,18 @@ const Nav = (props: Props) => {
     }
   }, [open])
 
-  const iconSections = Object.values(Solutions).map((solution: any, idx: number) => {
+  function handleToggle(callback: any) {
+    handleCancel()
+    callback()
+  }
+
+  function handleCancel() {
+    setOpenProduct(false)
+    setOpenDevelopers(false)
+    setOpenCompany(false)
+  }
+
+  const iconSections = Object.values(SolutionsData).map((solution: any, idx: number) => {
     const { name, description, icon, label, url } = solution
 
     const content = (
@@ -129,6 +148,36 @@ const Nav = (props: Props) => {
     </div>
   )
 
+  const FlyOutNavButton = (props: any) => (
+    <div
+      className={`
+                  inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700
+                  dark:text-dark-100 cursor-pointer
+                ` + (props.active )}
+      onClick={props.onClick}
+    >
+      <>
+        <span>{props.title}</span>
+        <svg
+          className={
+            'ml-2 h-5 w-5 text-gray-300 group-hover:text-gray-300 transition ease-in-out duration-150' +
+            (props.active && ' transform rotate-180')
+          }
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            fillRule="evenodd"
+            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </>
+    </div>
+  )
+
   return (
     <nav className="bg-white dark:bg-dark-700 z-50 sticky">
       <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0">
@@ -149,26 +198,40 @@ const Nav = (props: Props) => {
               />
             </div>
             <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-8">
-              <FlyOut />
+              <FlyOutNavButton
+                title={'Product'}
+                onClick={() => handleToggle(() => setOpenProduct(!openProduct))}
+                active={openProduct}
+              />
+              <FlyOutNavButton
+                title={'Developers'}
+                onClick={() => handleToggle(() => setOpenDevelopers(!openDevelopers))}
+                active={openDevelopers}
+              />
+              {/* <FlyOutNavButton
+                title={'Company'}
+                onClick={() => handleToggle(() => setOpenCompany(!openCompany))}
+                active={openCompany}
+              /> */}
+
+              <FlyOut open={openProduct} handleCancel={handleCancel}>
+                <Solutions />
+              </FlyOut>
+              <FlyOut open={openDevelopers} handleCancel={handleCancel}>
+                <Developers />
+              </FlyOut>
+              {/* <FlyOut open={openCompany} handleCancel={handleCancel}>
+                <Company />
+              </FlyOut> */}
               <a
-                href="/docs"
+                href="/beta"
                 className={`
                   inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
                   text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
                   dark:text-dark-100 dark:hover:border-dark-100
                 `}
               >
-                Developers
-              </a>
-              <a
-                href="/docs/guides/platform"
-                className={`
-                  inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                  text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
-                  dark:text-dark-100 dark:hover:border-dark-100
-                `}
-              >
-                Company
+                Beta
               </a>
               <a
                 href="/docs/pricing"
@@ -187,11 +250,9 @@ const Nav = (props: Props) => {
               href="https://app.supabase.io?auth=signup"
               className={`
                 inline-flex items-center border-b-2 border-transparent text-sm font-normal transition
-                rounded-md px-3 py-1 mr-5 bg-brand-600 text-white hover:bg-brand-700 hidden lg:block
+                rounded-md px-3 py-1 mr-5 bg-brand-700 text-white hover:bg-brand-800 hidden lg:block
               `}
-            >
-              Start your project
-            </a>
+            >Start your project</a>
             <a
               href="https://app.supabase.io?auth=signin"
               className={`

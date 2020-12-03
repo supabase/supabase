@@ -1,35 +1,82 @@
 import Head from 'next/head'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import Container from 'components/Container'
 import Layout from 'components/Layout'
 import CountUp from 'components/CountUp'
+import FlyOut from 'components/UI/FlyOut'
 import { APP_NAME, DESCRIPTION } from 'lib/constants'
-import { AlphaNumbers, IntroductionSegments } from 'data/BetaPage'
-import { useRouter } from 'next/router'
+import { AlphaNumbers, IntroductionSegments, PerformanceComparisonData } from 'data/BetaPage'
+import { render } from 'react-dom'
 
 const site_title = `${APP_NAME} | We are now in Beta`
 
 // Dark text: text-dark-400
 // Light text: text-dark-300
 
-const HamburgerMenu = () => (
-  <div className="cursor-pointer">
-    <svg
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      stroke="white"
-      strokeWidth="2"
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="3" y1="12" x2="21" y2="12" />
-      <line x1="3" y1="6" x2="21" y2="6" />
-      <line x1="3" y1="18" x2="21" y2="18" />
-    </svg>
-  </div>
-)
+const NavFlyOutMenu = (props: any) => {
+  const { scrollTo } = props
+  const segments = IntroductionSegments.map((segment: any) => segment.chapters)
+
+  return (
+    <>
+      <div className="col-span-12 grid grid-cols-12 items-center border-dark-300 dark:border-dark-400 sm:border-r border-b border-dashed">
+        {segments.flat().map((segment: any) => (
+          <div
+            onClick={() => scrollTo(segment.key)}
+            className={`
+              col-span-12 lg:col-span-4 px-4 lg:px-6 py-4 lg:py-10 text-dark-300 dark:text-dark-400 cursor-pointer bg-white dark:bg-dark-600
+              hover:bg-dark-100 dark:hover:bg-dark-500 border-dark-300 dark:border-dark-400 border-t sm:border-l border-dashed`}
+          >
+            <p className="flex items-center text-black dark:text-white">
+              <span className="font-mono text-xs text-dark-300 dark:text-dark-400 mr-2">
+                0{segment.no}
+              </span>
+              <span>{segment.name}</span>
+            </p>
+          </div>
+        ))}
+      </div>
+    </>
+  )
+}
+
+const VideoShot = (props: any) => {
+  const { src } = props
+  return (
+    <div className="shadow-lg rounded-md" style={{ height: 'fit-content' }}>
+      <div className="w-full rounded-t-md h-5 bg-dark-400 flex items-center justify-start px-2">
+        <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
+        <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
+        <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
+      </div>
+      <video className="rounded-b-md" src={src} autoPlay loop muted>
+        Your browser does not support the video tag
+      </video>
+    </div>
+  )
+}
+
+const HamburgerMenu = (props: any) => {
+  const { openMenu } = props
+  return (
+    <div className="cursor-pointer" onClick={openMenu}>
+      <svg
+        viewBox="0 0 24 24"
+        width="24"
+        height="24"
+        stroke="white"
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </div>
+  )
+}
 
 const SectionHeader = (props: any) => {
   const { sectionNumber, header } = props
@@ -44,14 +91,18 @@ const SectionHeader = (props: any) => {
 }
 
 const Hero = () => (
-  <div className="w-screen py-16 lg:py-36 bg-dark-800">
-    <div className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300">
-      <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-2xl text-white">
-        <p className="mb-10">
-          Supabase is an opensource Firebase alternative. We're building the features of Firebase
-          using enterprise-grade, open source tools.
+  <div
+    style={{ backgroundImage: "url('images/beta-hero.png')", backgroundSize: "65%", backgroundPosition: "120% 50%"}}
+    className="w-screen py-16 lg:py-36 bg-dark-800 bg-no-repeat"
+  >
+    <div
+      className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300"
+    >
+      <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-white">
+        <p className="mb-10 text-4xl">
+          Supabase is an opensource Firebase alternative.
         </p>
-        <p>
+        <p className="text-2xl">
           Today, we're moving to <span className="text-brand-700">Beta</span>
         </p>
       </div>
@@ -59,23 +110,29 @@ const Hero = () => (
   </div>
 )
 
-const Introduction = (props: any) => {
-  const { scrollTo } = props
+const Introduction = () => {
   return (
-    <div className="bg-gray-50 dark:bg-dark-700">
-      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-dark-400 dark:text-dark-300">
-        <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base mb-20">
+    <div className="bg-dark-900">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-dark-300">
+        <div className="col-span-12 sm:col-span-9 xl:col-span-8">
           <p>
-            After the launch of our{' '}
-            <a
-              href="https://news.ycombinator.com/item?id=23319901"
-              target="_blank"
-              className="text-brand-700 hover:text-brand-800"
-            >
-              Alpha
-            </a>{' '}
-            Program in June, we've been fortunate to work with thousands of early adopters on
-            improving both our Open Source, and Hosted offerings.
+            <span className="text-2xl block text-white">
+              After the launch of our{' '}
+              <a
+                href="https://news.ycombinator.com/item?id=23319901"
+                target="_blank"
+                className="text-brand-700 hover:text-brand-800"
+              >
+                Alpha
+              </a>{' '}
+              Program in June,
+            </span>
+          </p>
+        </div>
+        <div className="col-span-12 sm:col-span-9 xl:col-span-6 text-base mb-20">
+          <p>
+            we've been fortunate to work with thousands of early adopters on improving both our Open
+            Source, and Hosted offerings.
           </p>
         </div>
 
@@ -108,7 +165,21 @@ const Introduction = (props: any) => {
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  )
+}
 
+const TableOfContents = (props: any) => {
+  const { scrollTo } = props
+  return (
+    <div className="bg-gray-50 dark:bg-dark-700 text-dark-400 dark:text-dark-300">
+      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4">
+        <div className="col-span-12 text-base mb-10">
+          <p className="text-2xl text-black dark:text-white">
+            Supabase <span className="text-brand-600 dark:text-brand-700">Beta</span> is starting now.
+          </p>
+        </div>
         <div className="col-span-12 grid grid-cols-12 gap-y-10">
           {IntroductionSegments.map((segment: any, segmentIdx: number) => (
             <div key={`introSegment_${segmentIdx}`} className="col-span-12 grid grid-cols-12">
@@ -123,10 +194,10 @@ const Introduction = (props: any) => {
                     className="flex items-center mb-5 cursor-pointer"
                     onClick={() => scrollTo(chapter.key)}
                   >
-                    <p className="font-mono text-xs text-dark-300 dark:text-dark-400">{`0${
-                      chapter.no
-                    }`}</p>
-                    <p className="ml-4 transition text-base border-b border-gray-400 hover:text-black">{chapter.name}</p>
+                    <p className="font-mono text-xs text-dark-300 dark:text-dark-400">{`0${chapter.no}`}</p>
+                    <p className="ml-4 transition text-base border-b border-gray-400 hover:text-black">
+                      {chapter.name}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -139,85 +210,36 @@ const Introduction = (props: any) => {
 }
 
 const Performance = () => {
-
   const ComparisonChart = () => {
+    const maxValue = 1600
     return (
-      <div className="grid grid-cols-12 text-dark-400 dark:text-dark-300 items-center">
-        <div className="col-span-12">
-          <p className="w-36 pb-2 mb-4">Read (requests/s)</p>
-        </div>
-        <div className="col-span-12 sm:col-span-10 grid grid-cols-12">
-          <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
-              Supabase
-            </div>
-            <div className="col-span-9 py-2">
-              <div
-                className="bg-brand-600 dark:bg-brand-700 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
-                style={{ width: '100%' }}
-              >
-                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">1167 requests/s</p>
+      <div>
+        {PerformanceComparisonData.map((metric: any) => {
+          const multiplier = (metric.stats[0].value / metric.stats[1].value).toFixed(1)
+          return (
+            <div key={`${metric.key}`} className="mb-10 text-dark-400 dark:text-dark-300">
+              <p className="sm:w-36 pb-2 mb-4">{metric.title}</p>
+              <div className="flex flex-col sm:flex-row sm:items-center">
+                <div className="w-full sm:w-5/6">
+                  {metric.stats.map((stat: any, idx: number) => (
+                    <div key={`metric_${metric.key}_${idx}`} className="flex items-center">
+                      <p className="w-20 lg:w-24 border-r py-2 pr-4 mr-4 text-left sm:text-right">{stat.name}</p>
+                      <div
+                        className={`${stat.color} rounded-full h-3 transition-all`}
+                        style={{ width: `calc(${((stat.value / maxValue) * 100)}%)`}}
+                      />
+                      <p className="ml-2">{stat.value}/s</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-left sm:w-1/6 sm:text-right flex flex-col">
+                  <p className="text-6xl text-dark-700 dark:text-dark-100">{multiplier}x</p>
+                  <p className="text-sm -mt-2">more {metric.key}s per second</p>
+                </div>
               </div>
             </div>
-            <div className="hidden col-span-1 sm:block" />
-          </div>
-          <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
-              Firestore
-            </div>
-            <div className="col-span-9 py-2">
-              <div
-                className="bg-dark-300 dark:bg-dark-400 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
-                style={{ width: '31.36%' }}
-              >
-                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">366 requests/s</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="col-span-12 sm:col-span-2">
-          <p className="text-6xl text-dark-700 sm:text-right">3.2x</p>
-          <p className="text-sm sm:text-right -mt-2">faster read requests</p>
-        </div>
-
-        <div className="col-span-12 py-5" />
-
-        <div className="col-span-12">
-          <p className="w-36 pb-2 mb-4">Write (requests/s)</p>
-        </div>
-        <div className="col-span-12 sm:col-span-10 grid grid-cols-12">
-          <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
-              Supabase
-            </div>
-            <div className="col-span-9 py-2">
-              <div
-                className="bg-brand-600 dark:bg-brand-700 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
-                style={{ width: '74.55%' }}
-              >
-                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">870 requests/s</p>
-              </div>
-            </div>
-            <div className="hidden col-span-1 sm:block" />
-          </div>
-          <div className="col-span-12 grid grid-cols-12 items-center">
-            <div className="col-span-4 sm:col-span-2 py-2 border-r border-dark-200 dark:border-dark-400 mr-3">
-              Firestore
-            </div>
-            <div className="col-span-9 py-2">
-              <div
-                className="bg-dark-300 dark:bg-dark-400 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
-                style={{ width: '23.99%' }}
-              >
-                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">280 requests/s</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="col-span-12 sm:col-span-2">
-          <p className="text-6xl text-dark-700 sm:text-right">3.1x</p>
-          <p className="text-sm sm:text-right -mt-2">faster write requests</p>
-        </div>
+          )
+        })}
       </div>
     )
   }
@@ -395,8 +417,10 @@ const Reliability = () => (
               https://status.supabase.io
             </a>{' '}
             to keep track of uptime across all of our services and critical infrastructure.
-            (Possibly drop a screen grab here)
           </p>
+          <div className="mb-10">
+            <VideoShot src="videos/statusPage.mp4" />
+          </div>
           <p>
             For our Alpha & Beta Users we take daily backups of your Database free of charge up to
             20GB and store them in an encrypted format. They are available to download at any time
@@ -422,7 +446,7 @@ const NewFeaturesAndIntegrations = () => (
           <ul className="">
             <li className="mb-10">
               <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">Auth</p>
-              <p>
+              <p className="mb-5">
                 We provide an easy to use{' '}
                 <a
                   href="https://supabase.io/docs/client/auth-signup"
@@ -447,6 +471,7 @@ const NewFeaturesAndIntegrations = () => (
                 can use to log them into your app, and even offer several OAuth providers including
                 Google, GitHub, and have more on the way.
               </p>
+              <VideoShot src="videos/tabAuthRules.mp4" />
             </li>
             <li className="mb-10">
               <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
@@ -505,19 +530,21 @@ const NewFeaturesAndIntegrations = () => (
               <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
                 Table View
               </p>
-              <p>
+              <p className="mb-5">
                 View and edit your data like a spreadsheet from within the Supabase dashboard,
                 create complex relationships, import and export to csv.
               </p>
+              <VideoShot src="videos/tabTableEditor.mp4" />
             </li>
             <li>
               <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
                 SQL Editor
               </p>
-              <p>
+              <p className="mb-5">
                 No need to install third party SQL tools, you can run queries directly from the
                 Supabase Dashbaord.
               </p>
+              <VideoShot src="videos/tabSqlEditor.mp4" />
             </li>
           </ul>
         </div>
@@ -742,7 +769,9 @@ const WhatsNext = () => (
 )
 
 const Beta = () => {
-  const { basePath } = useRouter()
+
+  const [ menuOpen, setMenuOpen ] = useState<boolean>(false)
+
   const references: any = {
     performance: useRef<HTMLDivElement>(null),
     security: useRef<HTMLDivElement>(null),
@@ -781,12 +810,21 @@ const Beta = () => {
         <meta name="twitter:image" content="/public/og/og-image.jpg" />
       </Head>
       <Container>
-        <div className="shadow-lg py-5 px-5 lg:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
-          <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
-          <HamburgerMenu />
+        <div className="relative shadow-lg py-5 px-5 xl:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
+          <img className="h-5" src="images/logo-dark.png" />
+          <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)}/>
+          <FlyOut
+            open={menuOpen}
+            handleCancel={() => setMenuOpen(false)}
+            className="lg:col-span-1"
+            singleBgColor={true}
+          >
+            <NavFlyOutMenu scrollTo={scrollTo} />
+          </FlyOut>
         </div>
         <Hero />
-        <Introduction scrollTo={scrollTo} />
+        <Introduction />
+        <TableOfContents scrollTo={scrollTo} />
         <div ref={references['performance']}>
           <Performance />
         </div>
