@@ -38,7 +38,17 @@ const CountUp = (props: Props) => {
       }
     }
 
-    if (triggerAnimOnScroll) window.addEventListener('scroll', handleScroll, { passive: true })
+    if (triggerAnimOnScroll) {
+      window.addEventListener('scroll', handleScroll, { passive: true })
+    } else {
+      const counter = setInterval(() => {
+        frame++
+        const progress = easeOutQuad(frame / totalFrames)
+        setCount(countTo * progress)
+
+        if (frame === totalFrames) clearInterval(counter)
+      }, frameDuration)
+    }
 
     return () => {
       if (triggerAnimOnScroll) window.removeEventListener('scroll', handleScroll)
