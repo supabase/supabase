@@ -7,16 +7,20 @@ author_title: Supabase
 author_url: https://github.com/roryw10
 author_image_url: https://github.com/roryw10.png
 authorURL: https://github.com/roryw10
-image: 
+image: /img/supabase-strive-school.png
 tags: 
     - supabase
     - strive
 ---
 
+
+
 <!--truncate-->
 ### Supabase and Strive School - YC Summmer 20 batchmates 
 
 We are proud to announce we are teaming up with fellow YC Summer 20 Alumni [Strive School](https://strive.school/), to help teach the next generation of software developers about open source software development.
+
+![Supabase and Strive are partnering up to teach OSS.](/img/strive-supabase.png)
 
 Strive School is on a mission to train the next generation of Computer Engineers, starting from Europe. 
 
