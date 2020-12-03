@@ -155,7 +155,7 @@ const Performance = () => {
                 className="bg-brand-600 dark:bg-brand-700 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '100%' }}
               >
-                <p className="transition opacity-0 group-hover:opacity-100">1167</p>
+                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">1167 requests/s</p>
               </div>
             </div>
             <div className="hidden col-span-1 sm:block" />
@@ -169,13 +169,13 @@ const Performance = () => {
                 className="bg-dark-300 dark:bg-dark-400 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '31.36%' }}
               >
-                <p className="transition opacity-0 group-hover:opacity-100">366</p>
+                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">366 requests/s</p>
               </div>
             </div>
           </div>
         </div>
         <div className="col-span-12 sm:col-span-2">
-          <p className="text-6xl sm:text-right">3.2x</p>
+          <p className="text-6xl text-dark-700 sm:text-right">3.2x</p>
           <p className="text-sm sm:text-right -mt-2">faster read requests</p>
         </div>
 
@@ -194,7 +194,7 @@ const Performance = () => {
                 className="bg-brand-600 dark:bg-brand-700 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '74.55%' }}
               >
-                <p className="transition opacity-0 group-hover:opacity-100">870</p>
+                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">870 requests/s</p>
               </div>
             </div>
             <div className="hidden col-span-1 sm:block" />
@@ -208,13 +208,13 @@ const Performance = () => {
                 className="bg-dark-300 dark:bg-dark-400 transition-all flex items-center justify-center group rounded-full h-3 hover:h-6"
                 style={{ width: '23.99%' }}
               >
-                <p className="transition opacity-0 group-hover:opacity-100">280</p>
+                <p className="transition text-dark-700 opacity-0 group-hover:opacity-100">280 requests/s</p>
               </div>
             </div>
           </div>
         </div>
         <div className="col-span-12 sm:col-span-2">
-          <p className="text-6xl sm:text-right">3.1x</p>
+          <p className="text-6xl text-dark-700 sm:text-right">3.1x</p>
           <p className="text-sm sm:text-right -mt-2">faster write requests</p>
         </div>
       </div>
