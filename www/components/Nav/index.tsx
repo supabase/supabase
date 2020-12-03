@@ -156,7 +156,6 @@ const Nav = (props: Props) => {
               />
             </div>
             <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-8">
-              <button onClick={() => handleNavClick()}>make me do something</button>
               <FlyOut title={'Product'}>
                 <Solutions />
               </FlyOut>
