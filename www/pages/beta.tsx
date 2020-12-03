@@ -1,13 +1,14 @@
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import Container from 'components/Container'
 import Layout from 'components/Layout'
 import CountUp from 'components/CountUp'
 import FlyOut from 'components/UI/FlyOut'
+import CTABanner from 'components/CTABanner/index'
 import { APP_NAME, DESCRIPTION } from 'lib/constants'
 import { AlphaNumbers, IntroductionSegments, PerformanceComparisonData } from 'data/BetaPage'
 import { render } from 'react-dom'
-import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { addBasePath } from 'next/dist/next-server/lib/router/router'
 
@@ -1016,6 +1017,7 @@ const Beta = () => {
         <div ref={references['next']}>
           <WhatsNext />
         </div>
+        <CTABanner darkerBg={true} />
       </Container>
     </Layout>
   )
