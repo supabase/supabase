@@ -44,7 +44,7 @@ const Meta = () => {
       <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon.ico`} />
       <link rel="apple-touch-icon" href={`${basePath}/favicon/favicon.ico`} />
       <meta property="og:image" content={`${basePath}/og/og-image.jpg`} />
-      <meta name="twitter:image" content={`https://beta.supabase.io${basePath}/og/og-image.jpg`} />
+      <meta name="twitter:image" content={`https://supabase.io${basePath}/og/og-image.jpg`} />
     </Head>
   )
 }
