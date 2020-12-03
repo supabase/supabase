@@ -125,9 +125,9 @@ export const AlphaNumbers = [
         <line x1="12" y1="19" x2="20" y2="19" />
       </svg>
     ),
-    value: 80.6,
-    unit: 'M',
-    name: 'Database queries'
+    value: 236,
+    unit: 'K',
+    name: 'Lines of code'
   },
 ]
 
