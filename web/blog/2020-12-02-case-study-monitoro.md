@@ -44,7 +44,7 @@ Fast forward to today, and Monitoro's user base has been ramping up, as they use
 
 ### Prototype fast, and keep going
 
-Thanks to Supabase, Monitoro could deliver the features required needed faster than they anticipated. This meant the team could spend more time focusing on speaking to customers and marketing. As a result, their user base has grown massively in a short space of time. Thanks to Supabase, there was no need to worry about how to create a database which had real-time functionality which could be set up quickly and scale. Monitoro could focus on launching fast.
+Thanks to Supabase, Monitoro could deliver the features required needed faster than they anticipated. This meant the team could spend more time focusing on speaking to customers and marketing. As a result, their user base has grown massively in a short space of time. There was no need to worry about how to create a database which had real-time functionality which could be set up quickly and scale. Monitoro could focus on launching fast.
 
 Learn more about Monitoro:
 
