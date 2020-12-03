@@ -17,9 +17,15 @@ Log in an existing user, or login via a third-party provider.
 <TabItem value="js">
 
 ```js
+// with email and password
 const { user, error } = await auth.signIn({
   email: 'example@email.com',
   password: 'example-password',
+})
+
+// send magic link (passwordless link)
+const { user, error } = await auth.signIn({
+  email: 'example@email.com',
 })
 ```
 
@@ -65,18 +71,18 @@ The user login details.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      provider
+      email
     </span>
     <span className="method-list-item-label-badge false">
       optional
     </span>
     <span className="method-list-item-validation">
-      Provider
+       | 
     </span>
   </h4>
   <div class="method-list-item-description">
 
-One of the providers supported by GoTrue.
+The user's email address.
   
   </div>
   
@@ -107,18 +113,18 @@ The user's password.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      email
+      provider
     </span>
     <span className="method-list-item-label-badge false">
       optional
     </span>
     <span className="method-list-item-validation">
-       | 
+      Provider
     </span>
   </h4>
   <div class="method-list-item-description">
 
-The user's email address.
+One of the providers supported by GoTrue.
   
   </div>
   
@@ -157,9 +163,15 @@ The user's email address.
 <TabItem value="js">
 
 ```js
+// with email and password
 const { user, error } = await auth.signIn({
   email: 'example@email.com',
   password: 'example-password',
+})
+
+// send magic link (passwordless link)
+const { user, error } = await auth.signIn({
+  email: 'example@email.com',
 })
 ```
 
