@@ -32,14 +32,8 @@ const Button = (props: Props) => {
         className={`
         relative transition-all ${url ? textClass : ''}
       `}
-      >
-        {text}
-      </span>
-      {url && (
-        <span className={`ml-2 transition-all opacity-0 group-hover:opacity-100 ${arrowClass}`}>
-          →
-        </span>
-      )}
+      >{text}</span>
+      {url && (<span className={`ml-2 transition-all opacity-0 group-hover:opacity-100 ${arrowClass}`}>→</span>)}
     </button>
   )
 
