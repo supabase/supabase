@@ -1,14 +1,14 @@
 openref: 0.1
 
 info:
-  title:  GoTrue Client
+  title: GoTrue Client
   description: |
     GoTrue is an authentication server.
 
     Supabase provides client libraries to interact with the server
-    
+
   definition: spec/gotrue.json
-  libraries: 
+  libraries:
     - name: 'JavaScript'
       id: 'js'
       version: '0.0.1'
@@ -36,6 +36,8 @@ info:
         items:
           - api.signUpWithEmail
           - api.signInWithEmail
+          - api.sendMagicLinkEmail
+          - api.inviteUserByEmail
           - api.resetPasswordForEmail
           - api.signOut
           - api.getUser
@@ -43,11 +45,10 @@ info:
           - api.refreshAccessToken
 
 pages:
-
-  Installing: 
+  Installing:
     description: |
       All JavaScript libraries are built directly by the Supabase team. 
-      
+
       Other languages are built by the community and supported by Supabase.
 
       ## Javascript
@@ -62,8 +63,29 @@ pages:
       # Not yet implemented
       ```
 
-  Initializing: 
+  Initializing:
     $ref: '"GoTrueClient".GoTrueClient.constructor'
+    examples:
+      - name: Initialize a GoTrue client
+        isSpotlight: true
+        js: |
+          ```js
+          import { GoTrueClient } from '@supabase/gotrue-js'
+
+          const auth = new GoTrueClient({
+            url: "https://your-gotrue-url.com",
+            headers: {
+              apikey:
+                "<SOME-API-KEY>",
+              Authorization:
+                "Bearer <SOME-JWT>",
+            },
+          })
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
 
   signUp:
     $ref: '"GoTrueClient".GoTrueClient.signUp'
@@ -80,7 +102,7 @@ pages:
             password: 'example-password',
           })
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -92,12 +114,18 @@ pages:
         isSpotlight: true
         js: |
           ```js
+          // with email and password
           const { user, error } = await auth.signIn({
             email: 'example@email.com',
             password: 'example-password',
           })
+
+          // send magic link (passwordless link)
+          const { user, error } = await auth.signIn({
+            email: 'example@email.com',
+          })
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -140,12 +168,12 @@ pages:
             data: { hello: 'world' } 
           })
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
 
-  onAuthStateChange: 
+  onAuthStateChange:
     # $ref: onAuthStateChange
 
   api.signUpWithEmail:
@@ -160,18 +188,80 @@ pages:
 
   api.signInWithEmail:
     $ref: '"GoTrueApi".GoTrueApi.signInWithEmail'
+    examples:
+      - name: Sign up a new user with email
+        js: |
+          ```js
+          const { error, data } = await api
+            .signIpWithEmail('example@email.com', 'example-password')
+            ```
+
+  api.sendMagicLinkEmail:
+    $ref: '"GoTrueApi".GoTrueApi.sendMagicLinkEmail'
+    examples:
+      - name: Send user a passwordless login link via email
+        js: |
+          ```js
+          const { error, data } = await api
+            .sendMagicLinkEmail('example@email.com')
+            ```
+
+  api.inviteUserByEmail:
+    $ref: '"GoTrueApi".GoTrueApi.inviteUserByEmail'
+    examples:
+      - name: Send a user an invite link to sign up via email
+        js: |
+          ```js
+          const { error, data } = await api
+            .inviteUserByEmail('example@email.com')
+            ```
 
   api.resetPasswordForEmail:
     $ref: '"GoTrueApi".GoTrueApi.resetPasswordForEmail'
+    examples:
+      - name: Send a user a password reset email
+        js: |
+          ```js
+          const { error, data } = await api
+            .resetPasswordForEmail('example@email.com')
+            ```
 
   api.signOut:
     $ref: '"GoTrueApi".GoTrueApi.signOut'
+    examples:
+      - name: Sign a user out
+        js: |
+          ```js
+          const { error, data } = await api
+            .signOut(access_token)
+            ```
 
   api.getUser:
     $ref: '"GoTrueApi".GoTrueApi.getUser'
+    examples:
+      - name: Get the user details for a given user
+        js: |
+          ```js
+          const { error, data } = await api
+            .getUser(access_token)
+            ```
 
   api.updateUser:
     $ref: '"GoTrueApi".GoTrueApi.updateUser'
-     
+    examples:
+      - name: Update user info that Gotrue holds (also used for setting new passwords)
+        js: |
+          ```js
+          const { error, data } = await api
+            .updateUser(access_token, { password : 'Why Shinji?' })
+            ```
+
   api.refreshAccessToken:
     $ref: '"GoTrueApi".GoTrueApi.refreshAccessToken'
+    examples:
+      - name: Get a new access and refresh token using a valied refresh_token
+        js: |
+          ```js
+          const { error, data } = await api
+            .refreshAccessToken(refresh_token)
+            ```

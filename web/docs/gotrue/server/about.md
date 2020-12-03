@@ -233,6 +233,10 @@ Email subject to use for signup confirmation. Defaults to `Confirm Your Signup`.
 
 Email subject to use for password reset. Defaults to `Reset Your Password`.
 
+`MAILER_SUBJECTS_MAGIC_LINK` - `string`
+
+Email subject to use for magic link email. Defaults to `Your Magic Link`.
+
 `MAILER_SUBJECTS_EMAIL_CHANGE` - `string`
 
 Email subject to use for email change confirmation. Defaults to `Confirm Email Change`.
@@ -279,6 +283,20 @@ Default Content (if template is unavailable):
 <p><a href="{{ .ConfirmationURL }}">Reset Password</a></p>
 ```
 
+`MAILER_TEMPLATES_MAGIC_LINK` - `string`
+
+URL path to an email template to use when sending magic link.
+`SiteURL`, `Email`, and `ConfirmationURL` variables are available.
+
+Default Content (if template is unavailable):
+
+```html
+<h2>Magic Link</h2>
+
+<p>Follow this link to login:</p>
+<p><a href="{{ .ConfirmationURL }}">Log In</a></p>
+```
+
 `MAILER_TEMPLATES_EMAIL_CHANGE` - `string`
 
 URL path to an email template to use when confirming the change of an email address.
@@ -297,7 +315,7 @@ Default Content (if template is unavailable):
 
 GoTrue exposes the following endpoints:
 
-* **GET /settings**
+### **GET /settings**
 
   Returns the publicly available settings for this gotrue instance.
 
@@ -314,7 +332,7 @@ GoTrue exposes the following endpoints:
   }
   ```
 
-* **POST /signup**
+### **POST /signup**
 
   Register a new user with an email and password.
 
@@ -337,9 +355,17 @@ GoTrue exposes the following endpoints:
   }
   ```
 
-* **POST /invite**
+### **POST /invite**
 
   Invites a new user with an email.
+  This endpoint requires the `service_role` or `supabase_admin` JWT set as an Auth Bearer header:
+
+  e.g.
+  ```json
+  headers: {
+    "Authorization" : "Bearer eyJhbGciOiJI...M3A90LCkxxtX9oNP9KZO"
+  }
+  ```
 
   ```json
   {
@@ -360,16 +386,15 @@ GoTrue exposes the following endpoints:
   }
   ```
 
-* **POST /verify**
+### **POST /verify**
 
-  Verify a registration or a password recovery. Type can be `signup` or `recovery`
+  Verify a registration or a password recovery. Type can be `signup` or `recovery` or `invite`
   and the `token` is a token returned from either `/signup` or `/recover`.
 
   ```json
   {
     "type": "signup",
-    "token": "confirmation-code-delivered-in-email",
-    "password": "12345abcdef" // only required if responding to an 'invite'
+    "token": "confirmation-code-delivered-in-email"
   }
   ```
   
@@ -382,34 +407,62 @@ GoTrue exposes the following endpoints:
     "access_token": "jwt-token-representing-the-user",
     "token_type": "bearer",
     "expires_in": 3600,
-    "refresh_token": "a-refresh-token"
+    "refresh_token": "a-refresh-token",
+    "type": "signup | recovery | invite"
   }
   ```
 
-* **GET /verify**
+### **GET /verify**
 
-  Verify a registration or a password recovery. Type can be `signup` or `recovery`
-  and the `token` is a token returned from either `/signup` or `/recover`.
+  Verify a registration or a password recovery. Type can be `signup` or `recovery` or `magiclink` or `invite`
+  and the `token` is a token returned from either `/signup` or `/recover` or `/magiclink`.
 
+  query params:
   ```json
   {
     "type": "signup",
     "token": "confirmation-code-delivered-in-email",
   }
   ```
-  
-  `password` is required for signup verification if no existing password exists.
 
   User will be logged in and redirected to:
 
   ```json
-  SITE_URL/#access_token=jwt-token-representing-the-user&token_type=bearer&expires_in=3600&refresh_token=a-refresh-token
+  SITE_URL/#access_token=jwt-token-representing-the-user&token_type=bearer&expires_in=3600&refresh_token=a-refresh-token&type=invite
   ```
 
-* **POST /recover**
+  Your app should detect the query params in the fragment and use them to set the session (supabase-js does this automatically)
+
+  You can use the `type` param to redirect the user to a password set form in the case of `invite` or `recovery`,
+  or show an account confirmed/welcome message in the case of `signup`, or direct them to some additional onboarding flow
+
+### **POST /magiclink**
+
+  Magic Link. Will deliver a link (e.g. `/verify?type=magiclink&token=fgtyuf68ddqdaDd`) to the user based on
+  email address which they can use to redeem an access_token.
+  
+  By default Magic Links can only be sent once every 60 seconds
+
+  ```json
+  {
+    "email": "email@example.com"
+  }
+  ```
+
+  Returns:
+
+  ```json
+  {}
+  ```
+  
+  when clicked the magic link will redirect the user to `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=magiclink` (see `/verify` above)
+
+### **POST /recover**
 
   Password recovery. Will deliver a password recovery mail to the user based on
   email address.
+  
+  By default recovery links can only be sent once every 60 seconds
 
   ```json
   {
@@ -423,7 +476,7 @@ GoTrue exposes the following endpoints:
   {}
   ```
 
-* **POST /token**
+### **POST /token**
 
   This is an OAuth2 endpoint that currently implements
   the password and refresh_token grant types
@@ -469,7 +522,7 @@ GoTrue exposes the following endpoints:
   }
   ```
 
-* **GET /user**
+### **GET /user**
 
   Get the JSON object for the logged in user (requires authentication)
 
@@ -485,7 +538,7 @@ GoTrue exposes the following endpoints:
   }
   ```
 
-* **PUT /user**
+### **PUT /user**
 
   Update a user (Requires authentication). Apart from changing email/password, this
   method can be used to set custom user data.
@@ -514,7 +567,7 @@ GoTrue exposes the following endpoints:
   }
   ```
 
-* **POST /logout**
+### **POST /logout**
 
   Logout a user (Requires authentication).
 
@@ -522,7 +575,7 @@ GoTrue exposes the following endpoints:
   will still be valid for stateless auth until they expires.
 
 
-* **GET /authorize**
+### **GET /authorize**
 
   Get access_token from external oauth provider
 
@@ -533,11 +586,12 @@ GoTrue exposes the following endpoints:
  
   Redirects to provider and then to `/callback`
   
-* **GET /callback**
+### **GET /callback**
 
   External provider should redirect to here
  
   Redirects to `<GOTRUE_SITE_URL>#access_token=<access_token>&refresh_token=<refresh_token>&expires_in=3600&provider=<provider_name>`
+  
   
 ## Pre-built
 
