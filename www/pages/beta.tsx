@@ -868,9 +868,9 @@ const Beta = () => {
       </Head>
       <Container>
         <div className="relative shadow-lg py-5 px-5 xl:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
-          <Link href="/">
-            <img className="h-5 cursor-pointer" src={`${basePath}/images/logo-dark.png`} />
-          </Link>
+          <a href="/">
+            <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
+          </a>
           <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)} />
           <FlyOut
             open={menuOpen}
