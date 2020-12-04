@@ -43,9 +43,9 @@ Luckily, Sarup discovered Supabase through the Vercel community. Open-source and
 ![This image shows a quote from his customers - The speed at which TAYFA is evolving is crazy. I've seen ideas translate into live features 10 minutes after speaking on the phone.](/img/tanmai-tayfa.png)
 
 
-> *"If my product helps customers move fast, then I need to move fast.
-
->Luckily with Supabase, I haven't had to worry about the health of my backend systems, and can focus on what I enjoy most: shipping frontend."* 
+> *"If my product helps customers move fast, then I need to move fast.*
+> 
+> *Luckily with Supabase, I haven't had to worry about the health of my backend systems, and can focus on what I enjoy most: shipping frontend."* 
 >
 > Sarup Banskota, founder of TAYFA
 
