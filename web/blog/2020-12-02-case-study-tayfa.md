@@ -11,7 +11,7 @@ tags:
     - case-study
     - no-code
 ---
-[**TAYFA**](https://usetayfa.com) is the fastest no-code approach to create and iterate on bespoke frontends. Learn how its solo founder, Sarup Banskota, was able to launch quickly with [Supabase](https://supabase.io), Next.js, and Vercel.
+[**TAYFA**](https://usetayfa.com) is the fastest no-code approach to create and iterate on bespoke frontends. Learn how its solo founder, [Sarup Banskota](https://twitter.com/sarupbanskota?lang=en), was able to launch quickly with [Supabase](https://supabase.io), Next.js, and Vercel.
 
 
 <!--truncate-->
