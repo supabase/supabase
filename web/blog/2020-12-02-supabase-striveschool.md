@@ -10,7 +10,7 @@ authorURL: https://github.com/roryw10
 image: /img/supabase-strive-school.png
 tags: 
     - supabase
-    - strive
+    - Striveschool
 ---
 
 
