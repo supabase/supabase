@@ -11,7 +11,7 @@ tags:
     - supabase
 ---
 
-We've been building for 9 months now, are we're getting even closer to Beta. 
+We've been building for 9 months now, and we're getting even closer to Beta. 
 
 <!--truncate-->
 
