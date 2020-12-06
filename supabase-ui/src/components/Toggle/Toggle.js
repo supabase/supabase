@@ -13,7 +13,7 @@ export default function ({ label }) {
         onChange={setSwitchValue}
         className={`${
           switchValue ? 'bg-indigo-600' : 'bg-gray-200'
-        } p-0 relative inline-flex flex-shrink-0 h-6 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer w-11 focus:outline-none focus:shadow-outline`}
+        } p-0 relative inline-flex flex-shrink-0 h-6 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer w-11 focus:outline-none focus:ring`}
       >
         {({ checked }) => (
           <span

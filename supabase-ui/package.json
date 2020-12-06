@@ -28,19 +28,17 @@
     "@babel/preset-env": "^7.11.5",
     "@babel/preset-react": "^7.10.4",
     "@babel/runtime": "^7.11.2",
-    "@fullhuman/postcss-purgecss": "^3.0.0",
     "@rollup/plugin-babel": "^5.2.1",
     "@storybook/addon-actions": "^6.0.26",
     "@storybook/addon-essentials": "^6.0.26",
     "@storybook/addon-links": "^6.0.26",
     "@storybook/react": "^6.0.26",
-    "@tailwindcss/custom-forms": "^0.2.1",
-    "@tailwindcss/ui": "^0.6.2",
+    "@tailwindcss/forms": "^0.2.1",
     "@tailwindcssinjs/macro": "^0.10.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.0.4",
     "@testing-library/user-event": "^12.1.7",
-    "autoprefixer": "^10.0.1",
+    "autoprefixer": "^9.8.6",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
     "babel-plugin-add-react-displayname": "^0.0.5",
@@ -48,6 +46,7 @@
     "eslint-config-prettier": "^6.12.0",
     "eslint-plugin-prettier": "^3.1.4",
     "npm-run-all": "^4.1.5",
+    "postcss": "^7.0.35",
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.1.2",
     "react-is": "^16.13.1",
@@ -56,7 +55,7 @@
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-peer-deps-external": "^2.2.3",
     "rollup-plugin-postcss": "^3.1.8",
-    "tailwindcss": "^1.8.11"
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.1"
   },
   "browserslist": {
     "production": [
