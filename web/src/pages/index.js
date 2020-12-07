@@ -204,7 +204,7 @@ function Home() {
                     to={'https://app.supabase.io'}
                     style={{ marginTop: 10 }}
                   >
-                    Alpha sign up →
+                    Beta sign up →
                   </Link>
                 </div>
               </div>
@@ -592,7 +592,7 @@ function Home() {
                 to={'https://app.supabase.io'}
                 style={{ margin: 5 }}
               >
-                Alpha sign up →
+                Beta sign up →
               </Link>
             </div>
           </div>
@@ -602,14 +602,14 @@ function Home() {
   )
 }
 
-export default Home
-// export default () => {
-//   if (typeof window !== 'undefined') {
-//     if (window.location.href.indexOf('localhost') === -1) {
-//       window.location.replace('https://supabase.io')
-//     } else {
-//       window.location.replace('/docs')
-//     }
-//   }
-//   return null
-// }
+// export default Home
+export default () => {
+  if (typeof window !== 'undefined') {
+    if (window.location.href.indexOf('localhost') === -1) {
+      window.location.replace('https://supabase.io')
+    } else {
+      window.location.replace('/docs')
+    }
+  }
+  return null
+}

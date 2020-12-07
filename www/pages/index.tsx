@@ -23,21 +23,9 @@ const Index = ({}: Props) => {
           <title>
             {DESCRIPTION} | {site_title}
           </title>
-          <meta name="description" content={DESCRIPTION} />
-          <meta property="og:type" content="website" />
           <meta name="og:title" property="og:title" content={site_title} />
-          <meta name="og:description" property="og:description" content={DESCRIPTION} />
-          <meta property="og:site_name" content="" />
-          <meta property="og:url" content="/public/og/og-image.jpg" />
-          <meta name="twitter:card" content="summary" />
-          <meta name="twitter:title" content="" />
-          <meta name="twitter:description" content={DESCRIPTION} />
           <meta name="twitter:site" content={site_title} />
-          <meta name="twitter:creator" content="supabase_io" />
-          <link rel="icon" type="image/png" href="/public/favicon/favicon.ico" />
-          <link rel="apple-touch-icon" href="/public/favicon/favicon.ico" />
-          <meta property="og:image" content="/public/og/og-image.jpg" />
-          <meta name="twitter:image" content="/public/og/og-image.jpg" />
+          <meta name="twitter:text:title" content={site_title} />
         </Head>
         <Container>
           <Hero />

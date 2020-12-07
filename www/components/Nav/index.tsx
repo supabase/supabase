@@ -257,7 +257,7 @@ const Nav = (props: Props) => {
           </div>
           <div className="flex items-center">
             <a
-              href="https://app.supabase.io?auth=signup"
+              href="https://app.supabase.io/api/login"
               className={`
                 inline-flex items-center border-b-2 border-transparent text-sm font-normal transition
                 rounded-md px-3 py-1 mr-5 bg-brand-700 text-white hover:bg-brand-800 hidden lg:block
@@ -266,7 +266,7 @@ const Nav = (props: Props) => {
               Start your project
             </a>
             <a
-              href="https://app.supabase.io?auth=signin"
+              href="https://app.supabase.io/api/login"
               className={`
                 inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
                 text-gray-500 hover:text-gray-700 hidden lg:block dark:text-dark-100 dark:hover:text-white
@@ -322,7 +322,7 @@ const Nav = (props: Props) => {
           <div className="mt-6 mb-12">
             <div className="pt-2 pb-4 space-y-1">
               <a
-                href="https://app.supabase.io?auth=signin"
+                href="https://app.supabase.io/api/login"
                 className="block pl-3 pr-4 text-base font-medium text-gray-600 dark:text-white"
               >
                 Sign in
@@ -348,7 +348,7 @@ const Nav = (props: Props) => {
                 Company
               </a>
               <a
-                href="/pricing"
+                href="/docs/pricing"
                 className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
               >
                 Pricing
