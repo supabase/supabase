@@ -2,7 +2,7 @@
   {
     "imgUrl": "images/stripe.jpg",
     "title": "Stripe SaaS starter",
-    "url": "https://github.com/supabase/supabase/tree/master/examples",
+    "url": "https://github.com/thorwebdev/nextjs-saas-starter",
     "description": "Build a SaaS business with Stripe subscriptions and Supabase.",
     "icons": [
       {
