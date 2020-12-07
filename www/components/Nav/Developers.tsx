@@ -17,7 +17,7 @@ const Developers = () => {
 
     const content = (
       <a
-        href="#"
+        href={url}
         className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition ease-in-out duration-150"
       >
         {/* <!-- Heroicon name: support --> */}
@@ -40,7 +40,7 @@ const Developers = () => {
     return url ? (
       <a
         key={text}
-        href="#"
+        href={url}
         className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150"
       >
         {content}
