@@ -3,11 +3,11 @@
     { "source": "/new/:match*", "destination": "https://www.supabase.vercel.app/new/:match*" },
     { "source": "/", "destination": "https://www.supabase.vercel.app/new" },
     { "source": "/beta", "destination": "https://www.supabase.vercel.app/new/beta" },
-    { "source": "/:match*", "destination": "https://docs.supabase.vercel.app/:match*" },
     {
       "source": "/blog/2020/07/10/surviving-hacker-news",
       "destination": "/blog/2020/07/10/alpha-launch-postmortem"
-    }
+    },
+    { "source": "/:match*", "destination": "https://docs.supabase.vercel.app/:match*" }
   ],
   "trailingSlash": false
 }
