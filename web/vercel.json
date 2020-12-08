@@ -2,5 +2,6 @@
   "rewrites": [
     { "source": "/", "destination": "https://www.supabase.vercel.app/new" },
     { "source": "/beta", "destination": "https://www.supabase.vercel.app/new/beta" }
-  ]
+  ],
+  "trailingSlash": false
 }
