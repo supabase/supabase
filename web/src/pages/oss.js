@@ -1,7 +1,7 @@
 import React from 'react'
 import Layout from '@theme/Layout'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
-import * as sponsorThisMonth from '../data/sponsors.json'
+import sponsorThisMonth from '../data/sponsors.json'
 import sponsorsPreviousMonth from '../data/sponsorsPreviousMonth.json'
 import maintainers from '../data/maintainers.json'
 import GithubCard from '../components/GithubCard'
@@ -17,7 +17,7 @@ export default function Oss() {
   oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
   const sponsors = sponsorThisMonth
     .concat(sponsorsPreviousMonth)
-    .filter(x => {
+    .filter((x) => {
       let paid = x.transactions.some((t) => t.transaction_date > oneMonthAgo.toISOString())
       return paid
     })
