@@ -69,11 +69,7 @@ cd with-supabase-auth-realtime-db
 
 ### Using this repo
 
-Clone this repo locally, then run:
-```bash
-npm install
-npm run dev
-```
+Simply clone this repo locally and proceed to the next section.
 
 ### Required configuration
 
