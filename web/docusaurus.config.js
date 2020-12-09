@@ -50,13 +50,6 @@ module.exports = {
     googleAnalytics: {
       trackingID: 'UA-155232740-1',
     },
-    // announcementBar: {
-    //   id: 'support_us', // Any value that will identify this message
-    //   content:
-    //     'Join our early alpha: <a target="_blank" rel="noopener noreferrer" href="https://app.supabase.io">app.supabase.io</a>',
-    //   backgroundColor: '#111111', // Defaults to `#fff`
-    //   textColor: '#ddd', // Defaults to `#000`
-    // },
     navbar: {
       // classNames: 'shadow--md',
       // title: 'supabase',
@@ -215,10 +208,10 @@ module.exports = {
           ],
         },
         {
-          title: 'Alpha',
+          title: 'Beta',
           items: [
             {
-              label: 'Join our alpha',
+              label: 'Join our beta',
               href: 'https://app.supabase.io',
             },
           ],
