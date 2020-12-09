@@ -67,6 +67,15 @@ curl https://codeload.github.com/vercel/next.js/tar.gz/canary | tar -xz --strip=
 cd with-supabase-auth-realtime-db
 ```
 
+### Using this repo
+
+Clone this repo locally, then run:
+```bash
+npm install
+npm run dev
+```
+
+
 ### Required configuration
 
 Copy the `.env.local.example` file into a file named `.env.local` in the root directory of the example:
