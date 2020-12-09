@@ -75,7 +75,6 @@ npm install
 npm run dev
 ```
 
-
 ### Required configuration
 
 Copy the `.env.local.example` file into a file named `.env.local` in the root directory of the example:
