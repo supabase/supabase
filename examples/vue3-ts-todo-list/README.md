@@ -30,7 +30,17 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/git?s=https://github.com/chiubaca/supabase/tree/vue3-ts-example/examples/todo-vue3-ts&env=VUE_APP_SUPABASE_URL,VUE_APP_SUPABASE_KEY&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.io&project-name=supabase-todo-list&repo-name=supabase-todo-list)
 
+Here, we recommend forking this repo so you can deploy through Vercel by clicking the button above. When you click the button, replace the repo URL with your fork's URL.
+
 You will be asked for a `VUE_APP_SUPABASE_URL` and `VUE_APP_SUPABASE_KEY`. Use the API URL and `anon` key from [step 3](#3.-get-the-url-and-key).
+
+### 5. Change authentication settings if necessary
+
+![Change auth settings](https://user-images.githubusercontent.com/1811651/101840012-39be3800-3af8-11eb-8c32-73f2fae6299e.png)
+
+On [app.supabase.io](https://app.supabase.io), you can go to Authentication -> Settings to change your auth settings for your project if necessary. Here, you can change the site URL, which is used for determining where to redirect users after they confirm their email addresses or attempt to use a magic link to log in.
+
+Here, you can also enable external oauth providers, such as Google and GitHub.
 
 ## Supabase details
 
@@ -71,6 +81,7 @@ create policy "Individuals can delete their own todos." on todos for
 
 - [Supabase](https://supabase.io)
 - [Alex Chiu](https://github.com/chiubaca)
+- [YK Sugi](https://twitter.com/ykdojo)
 
 Supabase is open source, we'd love for you to follow along and get involved at https://github.com/supabase/supabase
 
