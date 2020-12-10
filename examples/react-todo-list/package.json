@@ -17,7 +17,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "react-scripts build && cd build && now --prod"
+    "deploy": "react-scripts build && cd build && vercel --prod"
   },
   "eslintConfig": {
     "extends": "react-app"
