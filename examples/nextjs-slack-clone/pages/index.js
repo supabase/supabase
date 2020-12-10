@@ -15,6 +15,9 @@ const Home = () => {
         type === 'LOGIN'
           ? await supabase.auth.login(username, password)
           : await supabase.auth.signup(username, password)
+      // If the user doesn't exist here and an error hasn't been raised yet,
+      // that must mean that a confirmation email has been sent.
+      if (!user) alert('Signup successful, confirmation mail should be sent soon!')
       if (!!user) signIn(user.id, user.email)
     } catch (error) {
       console.log('error', error)
