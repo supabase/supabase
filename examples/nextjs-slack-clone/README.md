@@ -46,6 +46,16 @@ Here, we recommend forking this repo so you can deploy through Vercel by clickin
 
 You will be asked for a `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_KEY`. Use the API URL and `anon` key from [step 3](#3-get-the-url-and-key).
 
+### 5. Change authentication settings if necessary
+
+![Change auth settings](https://user-images.githubusercontent.com/1811651/101840012-39be3800-3af8-11eb-8c32-73f2fae6299e.png)
+
+On [app.supabase.io](https://app.supabase.io), you can go to Authentication -> Settings to change your auth settings for your project if necessary. Here, you can change the site URL, which is used for determining where to redirect users after they confirm their email addresses or attempt to use a magic link to log in.
+
+You can also enable external oauth providers, such as Google and GitHub.
+
+
+
 ## How to use
 
 ### Using `create-next-app`
