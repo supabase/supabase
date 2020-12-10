@@ -35,7 +35,7 @@ async function handleSignup(credentials: Credentials) {
     const { email, password } = credentials
     // prompt user if they have not filled populated thier credentials
     if (!email || !password) {
-      alert("Please provide both your email and password.")
+      alert('Please provide both your email and password.')
       return
     }
     const { error } = await supabase.auth.signUp({ email, password })
