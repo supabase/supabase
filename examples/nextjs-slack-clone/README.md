@@ -52,9 +52,7 @@ You will be asked for a `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_KEY
 
 On [app.supabase.io](https://app.supabase.io), you can go to Authentication -> Settings to change your auth settings for your project if necessary. Here, you can change the site URL, which is used for determining where to redirect users after they confirm their email addresses or attempt to use a magic link to log in.
 
-You can also enable external oauth providers, such as Google and GitHub.
-
-
+Here, ou can also enable external oauth providers, such as Google and GitHub.
 
 ## How to use
 
