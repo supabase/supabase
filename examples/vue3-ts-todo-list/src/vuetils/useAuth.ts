@@ -15,8 +15,7 @@ async function handleLogin(credentials: Credentials) {
       password: credentials.password,
     })
     if (error) {
-      alert('Error logging in')
-      console.error('Error returned:', error.message)
+      alert('Error logging in: ' + error.message)
     }
     // No error throw, but no user detected so send magic link
     if (!error && !user) {
@@ -35,8 +34,8 @@ async function handleSignup(credentials: Credentials) {
   try {
     const { email, password } = credentials
     // prompt user if they have not filled populated thier credentials
-    if (email === undefined || password === undefined) {
-      alert('Form cant be empty')
+    if (!email || !password) {
+      alert("Please provide both your email and password.")
       return
     }
     const { error } = await supabase.auth.signUp({ email, password })
@@ -45,7 +44,7 @@ async function handleSignup(credentials: Credentials) {
       console.error(error, error.message)
       return
     }
-    alert('Successfully signed up!')
+    alert('Signup successful, confirmation mail should be sent soon!')
   } catch (err) {
     alert('Fatal error signing up')
     console.error('signup error', err)
