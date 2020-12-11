@@ -4,7 +4,6 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 module.exports = {
   title: 'Supabase',
   tagline: 'The open source Firebase alternative.',
@@ -51,13 +50,6 @@ module.exports = {
     googleAnalytics: {
       trackingID: 'UA-155232740-1',
     },
-    // announcementBar: {
-    //   id: 'support_us', // Any value that will identify this message
-    //   content:
-    //     'Join our early alpha: <a target="_blank" rel="noopener noreferrer" href="https://app.supabase.io">app.supabase.io</a>',
-    //   backgroundColor: '#111111', // Defaults to `#fff`
-    //   textColor: '#ddd', // Defaults to `#000`
-    // },
     navbar: {
       // classNames: 'shadow--md',
       // title: 'supabase',
@@ -135,6 +127,11 @@ module.exports = {
             },
           ],
         },
+        // {
+        //   to: '/showcase',
+        //   label: 'Showcase',
+        //   position: 'right',
+        // },
         // { to: '/docs/pricing', label: 'Pricing', position: 'right' },
         { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
       ],
@@ -183,6 +180,10 @@ module.exports = {
               label: 'Support',
               to: '/docs/support',
             },
+            {
+              label: 'System Status',
+              to: 'https://status.supabase.io/',
+            },
           ],
         },
         {
@@ -207,10 +208,10 @@ module.exports = {
           ],
         },
         {
-          title: 'Alpha',
+          title: 'Beta',
           items: [
             {
-              label: 'Join our alpha',
+              label: 'Join our beta',
               href: 'https://app.supabase.io',
             },
           ],

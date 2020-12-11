@@ -181,7 +181,7 @@ const { user, error } = await supabase.auth.signIn({
 
 ### Sign in with magic link.
 
-If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session.
+If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
 
 <Tabs
   defaultValue="js"

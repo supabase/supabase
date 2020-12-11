@@ -1,0 +1,86 @@
+[
+  {
+    "title": "Product",
+    "links": [
+      {
+        "text": "Database",
+        "url": "https://supabase.io/docs/guides/database"
+      },
+      {
+        "text": "Authentication",
+        "url": "https://supabase.io/docs/guides/auth"
+      },
+      {
+        "text": "Storage",
+        "url": null
+      },
+      {
+        "text": "Functions",
+        "url": null
+      },
+      {
+        "text": "Pricing",
+        "url": "https://supabase.io/docs/pricing"
+      }
+    ]
+  },
+  {
+    "title": "Resources",
+    "links": [
+      {
+        "text": "Support",
+        "url": "https://supabase.io/docs/support"
+      },
+      {
+        "text": "Case Studies",
+        "url": "https://supabase.io/blog/tags/case-study"
+      },
+      {
+        "text": "System Status",
+        "url": "https://status.supabase.io/"
+      },
+      {
+        "text": "Terms of service",
+        "url": "https://supabase.io/docs/company/terms"
+      }
+    ]
+  },
+  {
+    "title": "Developers",
+    "links": [
+      {
+        "text": "Documentation",
+        "url": "/docs"
+      },
+      {
+        "text": "API Reference",
+        "url": "/docs/client/supabase-client"
+      },
+      {
+        "text": "Guides",
+        "url": "/docs/guides/examples"
+      }
+    ]
+  },
+  {
+    "title": "Company",
+    "links": [
+      {
+        "text": "Blog",
+        "url": "/blog"
+      },
+      {
+        "text": "Open Source",
+        "url": "/oss"
+      },
+      {
+        "text": "Humans.txt",
+        "url": "/humans.txt"
+      },
+      {
+        "text": "Lawyers.txt",
+        "url": "/lawyers.txt"
+      }
+    ]
+  }
+]

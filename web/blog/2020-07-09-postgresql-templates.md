@@ -1,5 +1,5 @@
 ---
-title: What are PostgreSQL templates?
+title: What are PostgreSQL Templates?
 description: What are PostgreSQL templates and what are they used for?
 author: Angelico de los Reyes
 author_title: Supabase

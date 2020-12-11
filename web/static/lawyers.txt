@@ -3,7 +3,9 @@ Lawyers.txt
 
 ____________
 
-For compliance, lawyers want us to disclose every piece of "software" that we use. 
+For compliance.
+
+Supabase™ is a trademark of Supabase Inc.
 
 If you're a creator/contributor to one of these packages, thanks!
 

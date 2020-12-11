@@ -255,7 +255,7 @@ pages:
           # Not yet implemented
           ```
       - name: Sign in with magic link.
-        description: If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session.
+        description: If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
         js: |
           ```js
           const { user, error } = await supabase.auth.signIn({
@@ -897,7 +897,7 @@ pages:
           const { data, error } = await supabase
             .from('cities')
             .delete()
-            .filter({'name', 'eq', 'Paris'})
+            .filter('name', 'eq', 'Paris')
           ```
         py: | 
           ```py
@@ -909,7 +909,7 @@ pages:
           // Only valid if the Stored Procedure returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
-            .filter({'name', 'eq', 'Paris'})
+            .filter('name', 'eq', 'Paris')
           ```
         py: | 
           ```py
@@ -918,12 +918,10 @@ pages:
       - name: Filter embedded resources
         js: |
           ```js
-          export const getFilterJsEmbedded = `
           const { data, error } = await supabase
             .from('cities')
             .select('name, countries ( name )')
             .filter('countries.name', 'eq', 'France')
-          `.trim()
           ```
         py: | 
           ```py

@@ -197,7 +197,7 @@ const { data, error } = await supabase
 const { data, error } = await supabase
   .from('cities')
   .delete()
-  .filter({'name', 'eq', 'Paris'})
+  .filter('name', 'eq', 'Paris')
 ```
 
 
@@ -228,7 +228,7 @@ const { data, error } = await supabase
 // Only valid if the Stored Procedure returns a table type.
 const { data, error } = await supabase
   .rpc('echo_all_cities')
-  .filter({'name', 'eq', 'Paris'})
+  .filter('name', 'eq', 'Paris')
 ```
 
 
