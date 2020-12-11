@@ -94,7 +94,7 @@ NEXT_PUBLIC_SUPABASE_URL=<replace-with-your-API-url>
 NEXT_PUBLIC_SUPABASE_KEY=<replace-with-your-anon-key>
 ```
 
-### Change authentication settings necessary
+### Change authentication settings if necessary
 
 Follow [Step #5](#5-change-authentication-settings-if-necessary) above if you want to change the auth settings.
 
