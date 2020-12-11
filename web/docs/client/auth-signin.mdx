@@ -135,6 +135,7 @@ The user's email address.
 
 - A user can sign up either via email or OAuth.
 - If you provide `email` without a `password`, the user will be sent a magic link.
+- The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
 - Specifying a `provider` will open the browser to the relevant login page.
 
 
