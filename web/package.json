@@ -20,7 +20,7 @@
     "mermaid": "^8.6.4",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "react-inlinesvg": "^2.0.1"
+    "react-inlinesvg": "^2.2.1"
   },
   "browserslist": {
     "production": [
