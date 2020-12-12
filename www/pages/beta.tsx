@@ -144,7 +144,7 @@ const Introduction = () => {
             we've been fortunate to work with thousands of early adopters on improving both our Open
             Source, and Hosted offerings. Companies like{' '}
             <a
-              href="https://supabase.io/blog/2020/12/02/case-study-xendit"
+              href="/blog/2020/12/02/case-study-xendit"
               target="_blank"
               className="text-brand-700 hover:text-brand-800"
             >
@@ -152,7 +152,7 @@ const Introduction = () => {
             </a>
             ,{' '}
             <a
-              href="https://supabase.io/blog/2020/12/02/case-study-monitoro"
+              href="/blog/2020/12/02/case-study-monitoro"
               target="_blank"
               className="text-brand-700 hover:text-brand-800"
             >
@@ -160,7 +160,7 @@ const Introduction = () => {
             </a>
             , and{' '}
             <a
-              href="https://supabase.io/blog/2020/12/02/case-study-tayfa"
+              href="/blog/2020/12/02/case-study-tayfa"
               target="_blank"
               className="text-brand-700 hover:text-brand-800"
             >
@@ -549,7 +549,7 @@ const NewFeaturesAndIntegrations = () => {
                   If you're new to Supabase, here's a few of the things you get when you choose us
                   as your backend. We provide{' '}
                   <a
-                    href="https://supabase.io/docs/client/auth-signup"
+                    href="/docs/client/auth-signup"
                     target="_blank"
                     className="text-brand-700 hover:text-brand-800"
                   >
@@ -557,7 +557,7 @@ const NewFeaturesAndIntegrations = () => {
                   </a>{' '}
                   (and{' '}
                   <a
-                    href="https://supabase.io/docs/gotrue/server/about#endpoints"
+                    href="/docs/gotrue/server/about#endpoints"
                     target="_blank"
                     className="text-brand-700 hover:text-brand-800"
                   >
@@ -579,7 +579,7 @@ const NewFeaturesAndIntegrations = () => {
                 <p>
                   You can{' '}
                   <a
-                    href="https://supabase.io/docs/guides/client-libraries#realtime-changes"
+                    href="/docs/guides/client-libraries#realtime-changes"
                     target="_blank"
                     className="text-brand-700 hover:text-brand-800"
                   >
@@ -598,7 +598,7 @@ const NewFeaturesAndIntegrations = () => {
                   You can use your database immediately, without an ORM or an API backend. We
                   support GraphQL-like{' '}
                   <a
-                    href="https://supabase.io/docs/client/select#query-foreign-tables"
+                    href="/docs/client/select#query-foreign-tables"
                     target="_blank"
                     className="text-brand-700 hover:text-brand-800"
                   >
@@ -606,7 +606,7 @@ const NewFeaturesAndIntegrations = () => {
                   </a>{' '}
                   in a single request, and you can even{' '}
                   <a
-                    href="https://supabase.io/docs/client/rpc"
+                    href="/docs/client/rpc"
                     target="_blank"
                     className="text-brand-700 hover:text-brand-800"
                   >
@@ -680,8 +680,8 @@ const BetaPricing = () => (
             </li>
           </ul>
           <p className="mb-10">
-            Whilst we're not yet ready to publish a standardized pricing model, we are committing to the
-            following initiatives:
+            Whilst we're not yet ready to publish a standardized pricing model, we are committing to
+            the following initiatives:
           </p>
           <ul className="list-decimal list-outside ml-6 mb-10">
             <li className="mb-5">
@@ -694,8 +694,8 @@ const BetaPricing = () => (
               for free.
             </li>
             <li className="mb-5">
-              University (and participating code school) Students will be eligible for 2 years
-              of base tier usage (Code Schools can contact{' '}
+              University (and participating code school) Students will be eligible for 2 years of
+              base tier usage (Code Schools can contact{' '}
               <a
                 href="mailto:rory@supabase.io"
                 target="_blank"
@@ -750,7 +750,7 @@ const OpenSource = () => (
           <p className="mb-10">
             One of the biggest barriers to Open Source is knowing exactly how to get started. We're{' '}
             <a
-              href="https://supabase.io/blog/2020/12/02/supabase-striveschool"
+              href="/blog/2020/12/02/supabase-striveschool"
               target="_blank"
               className="text-brand-700 hover:text-brand-800"
             >

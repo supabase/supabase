@@ -43,7 +43,7 @@ const Button = (props: Props) => {
     </button>
   )
 
-  return url ? <Link href={url}>{renderButton()}</Link> : renderButton()
+  return url ? <a href={url}>{renderButton()}</a> : renderButton()
 }
 
 export default Button

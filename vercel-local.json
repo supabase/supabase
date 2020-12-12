@@ -1,0 +1,63 @@
+{
+  "rewrites": [
+    { "source": "/new/:match*", "destination": "http://localhost:3000/new/:match*" },
+    { "source": "/", "destination": "http://localhost:3000/new" },
+    { "source": "/beta", "destination": "http://localhost:3000/new/beta" },
+    { "source": "/:name.:extension", "destination": "http://localhost:3005/:name.:extension" },
+    { "source": "/:match*", "destination": "http://localhost:3005/:match*/" }
+  ],
+  "redirects": [
+    {
+      "source": "/blog/2020/07/10/surviving-hacker-news",
+      "destination": "/blog/2020/07/10/alpha-launch-postmortem"
+    },
+    {
+      "source": "/docs/common/_CommonResponses",
+      "destination": "/docs"
+    },
+    { "source": "/docs/common/_DummyData", "destination": "/docs" },
+    { "source": "/docs/common/_FromFunction", "destination": "/docs" },
+    { "source": "/docs/common/filters/_adj", "destination": "/docs/client/ajv" },
+    { "source": "/docs/common/filters/_cd", "destination": "/docs/client/cd" },
+    { "source": "/docs/common/filters/_cs", "destination": "/docs/client/cs" },
+    { "source": "/docs/common/filters/_eq", "destination": "/docs/client/eq" },
+    { "source": "/docs/common/filters/_filter", "destination": "/docs/client/filter" },
+    { "source": "/docs/common/filters/_gt", "destination": "/docs/client/gt" },
+    { "source": "/docs/common/filters/_gte", "destination": "/docs/client/gte" },
+    { "source": "/docs/common/filters/_ilike", "destination": "/docs/client/ilike" },
+    { "source": "/docs/common/filters/_in", "destination": "/docs/client/in" },
+    { "source": "/docs/common/filters/_is", "destination": "/docs/client/is" },
+    { "source": "/docs/common/filters/_like", "destination": "/docs/client/like" },
+    { "source": "/docs/common/filters/_lt", "destination": "/docs/client/lt" },
+    { "source": "/docs/common/filters/_lte", "destination": "/docs/client/lte" },
+    { "source": "/docs/common/filters/_match", "destination": "/docs/client/match" },
+    { "source": "/docs/common/filters/_neq", "destination": "/docs/client/neq" },
+    { "source": "/docs/common/filters/_not", "destination": "/docs/client/not" },
+    { "source": "/docs/common/filters/_nxl", "destination": "/docs/client/nxl" },
+    { "source": "/docs/common/filters/_nxr", "destination": "/docs/client/nxr" },
+    { "source": "/docs/common/filters/_or", "destination": "/docs/client/or" },
+    { "source": "/docs/common/filters/_ova", "destination": "/docs/client/ov" },
+    { "source": "/docs/common/filters/_ovr", "destination": "/docs/client/ov" },
+    { "source": "/docs/common/filters/_sl", "destination": "/docs/client/sl" },
+    { "source": "/docs/common/filters/_sr", "destination": "/docs/client/sr" },
+    { "source": "/docs/library/authentication", "destination": "/docs/guides/auth" },
+    { "source": "/docs/library/delete", "destination": "/docs/client/delete" },
+    { "source": "/docs/library/get", "destination": "/docs/client/select" },
+    { "source": "/docs/library/getting-started", "destination": "/docs/client/supabase-client" },
+    { "source": "/docs/library/patch", "destination": "/docs/client/update" },
+    { "source": "/docs/library/post", "destination": "/docs/client/insert" },
+    { "source": "/docs/library/stored-procedures", "destination": "/docs/client/rpc" },
+    { "source": "/docs/library/subscribe", "destination": "/docs/client/subscribe" },
+    { "source": "/docs/library/user-management", "destination": "/docs/guides/auth" },
+    { "source": "/docs/postgres/postgres-intro", "destination": "/docs/postgres/server/about" },
+    { "source": "/docs/realtime/about", "destination": "/docs/realtime/server/about" },
+    { "source": "/docs/realtime/aws", "destination": "/docs/postgres/server/aws" },
+    {
+      "source": "/docs/realtime/digitalocean",
+      "destination": "/docs/postgres/server/digitalocean"
+    },
+    { "source": "/docs/realtime/docker", "destination": "/docs/postgres/server/docker" },
+    { "source": "/docs/realtime/source", "destination": "/docs/postgres/server/about" }
+  ],
+  "trailingSlash": false
+}

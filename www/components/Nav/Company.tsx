@@ -81,7 +81,7 @@ const Company = () => {
         </div>
         <div className="mt-6 text-sm font-medium">
           <a
-            href="https://supabase.io/blog"
+            href="/blog"
             className="text-gray-600 hover:text-gray-500 dark:text-brand-600 dark:hover:text-brand-700 transition ease-in-out duration-150"
           >
             View all posts <span aria-hidden="true">&rarr;</span>

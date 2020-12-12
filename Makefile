@@ -35,3 +35,6 @@ github.repos.%:
 github.traction:
 	cd "$(REPO_DIR)"/web && \
 	npm run traction
+
+dev:
+	vercel dev --listen 8080 --local-config vercel-local.json
