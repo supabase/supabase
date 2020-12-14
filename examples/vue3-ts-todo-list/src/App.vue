@@ -40,19 +40,6 @@ export default {
     Footer,
   },
   setup() {
-    // Get the auth token in the local storage.
-    const json = localStorage.getItem('supabase.auth.token')
-    if (json) {
-      const data = JSON.parse(json)    
-      const { currentSession, expiresAt } = data
-      const timeNow = Math.round(Date.now() / 1000)
-      // If it hasn't expired yet, update userSession.
-      if (timeNow < expiresAt) {
-        userSession.value = currentSession
-      }
-    }
-    // NOTE: The pattern above is similar to that of the _recoverSession() function
-    // in supabase/gotrue-js: https://github.com/supabase/gotrue-js/blob/dc6cf10dcac016ba4831efdb9b8683bda109dab0/src/GoTrueClient.ts#L328
     return { userSession, handleLogout }
   },
 }
