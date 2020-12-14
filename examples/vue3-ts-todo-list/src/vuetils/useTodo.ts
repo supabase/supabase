@@ -9,6 +9,10 @@ const allTodos = ref<Todo[]>([])
  */
 async function fetchTodos() {
   try {
+    // Wait for the supabase client to be fully initialized
+    // before making the following query. Without this line,
+    // this query would return an empty array.
+    await supabase
     const { data: todos, error } = await supabase
       .from('todos')
       .select('*')
