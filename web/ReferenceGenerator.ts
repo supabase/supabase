@@ -1,6 +1,9 @@
 /**
  * Usage:
- *    ts-node docGen.ts -o {output_dir} {input}.yml
+ *    ts-node ReferenceGenerator.ts -o {output_dir} {input}.yml
+ * 
+ * Example:
+ *    ts-node ReferenceGenerator.ts -o docs/client spec/supabase.yml
  */
 
 import Example from './spec/gen/components/Example'

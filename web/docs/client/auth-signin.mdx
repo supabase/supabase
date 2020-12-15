@@ -65,18 +65,18 @@ The user login details.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      provider
+      email
     </span>
     <span className="method-list-item-label-badge false">
       optional
     </span>
     <span className="method-list-item-validation">
-      Provider
+       | 
     </span>
   </h4>
   <div class="method-list-item-description">
 
-One of the providers supported by GoTrue.
+The user's email address.
   
   </div>
   
@@ -107,18 +107,18 @@ The user's password.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      email
+      provider
     </span>
     <span className="method-list-item-label-badge false">
       optional
     </span>
     <span className="method-list-item-validation">
-       | 
+      Provider
     </span>
   </h4>
   <div class="method-list-item-description">
 
-The user's email address.
+One of the providers supported by GoTrue.
   
   </div>
   
@@ -235,6 +235,7 @@ const { user, error } = await supabase.auth.signIn({
 ```py
 # Not yet implemented
 ```
+
 
 </TabItem>
 
