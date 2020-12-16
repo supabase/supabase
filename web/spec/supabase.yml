@@ -100,7 +100,7 @@ pages:
       
       Other languages are built by the community and supported by Supabase.
 
-      ## Javascript
+      ## JavaScript
 
       ```bash
       npm install @supabase/supabase-js

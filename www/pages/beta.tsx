@@ -553,7 +553,7 @@ const NewFeaturesAndIntegrations = () => {
                     target="_blank"
                     className="text-brand-700 hover:text-brand-800"
                   >
-                    Javascript
+                    JavaScript
                   </a>{' '}
                   (and{' '}
                   <a
@@ -901,7 +901,7 @@ const WhatsNext = () => (
             </li>
             <li>
               More client libraries - members of the community are helping us build client libraries
-              for many different languages including Typescript, Python, Dart, C#, and Rust. Come
+              for many different languages including TypeScript, Python, Dart, C#, and Rust. Come
               and help us bring Supabase to your favourite language or framework.
             </li>
           </ul>

@@ -28,7 +28,7 @@
               },
               "comment": {
                 "shortText": "Supabase Client.",
-                "text": "An isomorphic Javascript client for interacting with Postgres.\n"
+                "text": "An isomorphic JavaScript client for interacting with Postgres.\n"
               },
               "children": [
                 {
