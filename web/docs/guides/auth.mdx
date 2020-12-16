@@ -75,6 +75,23 @@ let user = await supabase
 // Still => { id: 'd0714948', name: 'Jane' }
 ```
 
+### Policies are like where clauses.
+
+Policies are easy to understand once you get the hang of them. You can just think of them as adding a `WHERE` clause to every query. For example if you had a policy like this:
+
+```sql
+create policy "Individuals can view their own todos." on todos for
+    select using (auth.uid() = user_id);
+```
+
+It would translate to this whenever a user tries to select from the todos table:
+
+```sql
+select *
+from todos
+where auth.uid() = todos.user_id; -- Policy is implicitly added.
+```
+
 ## How it works
 
 1. A user signs up. Supabase creates a new user in the `auth.users` table.
@@ -124,24 +141,6 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 ```
-
-### Policies are like where clauses.
-
-Policies are easy to understand once you get the hang of them. You can just think of them as adding a `WHERE` clause to every query. For example if you had a policy like this:
-
-```sql
-create policy "Individuals can view their own todos." on todos for
-    select using (auth.uid() = user_id);
-```
-
-It would translate to this whenever a user tries to select from the todos table:
-
-```sql
-select *
-from todos
-where auth.uid() = todos.user_id; -- Policy is implicitly added.
-```
-
 
 ## Next steps
 
