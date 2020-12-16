@@ -80,16 +80,16 @@ let user = await supabase
 Policies are easy to understand once you get the hang of them. You can just think of them as adding a `WHERE` clause to every query. For example if you had a policy like this:
 
 ```sql
-create policy "Individuals can view their own todos." on todos for
-    select using (auth.uid() = user_id);
+CREATE POLICY "Individuals can view their own todos." ON todos FOR
+    SELECT USING (auth.uid() = user_id);
 ```
 
 It would translate to this whenever a user tries to select from the todos table:
 
 ```sql
-select *
-from todos
-where auth.uid() = todos.user_id; -- Policy is implicitly added.
+SELECT *
+FROM todos
+WHERE auth.uid() = todos.user_id; -- Policy is implicitly added.
 ```
 
 ## How it works
