@@ -219,6 +219,9 @@ pages:
 
   auth.signUp():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signUp'
+    notes: |
+      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable email confirmations by going to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
+      - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
     examples:
       - name: Sign up
         isSpotlight: true
@@ -239,6 +242,7 @@ pages:
     notes: |
       - A user can sign up either via email or OAuth.
       - If you provide `email` without a `password`, the user will be sent a magic link.
+      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
       - Specifying a `provider` will open the browser to the relevant login page.
     examples:
       - name: Sign in with email.

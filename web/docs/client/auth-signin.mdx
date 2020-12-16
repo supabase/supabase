@@ -65,18 +65,18 @@ The user login details.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      provider
+      email
     </span>
     <span className="method-list-item-label-badge false">
       optional
     </span>
     <span className="method-list-item-validation">
-      Provider
+       | 
     </span>
   </h4>
   <div class="method-list-item-description">
 
-One of the providers supported by GoTrue.
+The user's email address.
   
   </div>
   
@@ -107,18 +107,18 @@ The user's password.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      email
+      provider
     </span>
     <span className="method-list-item-label-badge false">
       optional
     </span>
     <span className="method-list-item-validation">
-       | 
+      Provider
     </span>
   </h4>
   <div class="method-list-item-description">
 
-The user's email address.
+One of the providers supported by GoTrue.
   
   </div>
   
@@ -135,6 +135,7 @@ The user's email address.
 
 - A user can sign up either via email or OAuth.
 - If you provide `email` without a `password`, the user will be sent a magic link.
+- The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
 - Specifying a `provider` will open the browser to the relevant login page.
 
 
