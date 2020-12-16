@@ -43,7 +43,7 @@ We have set up some simple examples that show how to use this server:
 
 ## Client libraries
 
-- Javascript: [@supabase/realtime-js](https://github.com/supabase/realtime-js)
+- JavaScript: [@supabase/realtime-js](https://github.com/supabase/realtime-js)
 
 
 ## Server

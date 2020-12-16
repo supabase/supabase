@@ -46,9 +46,9 @@ You can now enable Email Confirmations for new users. This can be toggled on or 
 <source src="/videos/confirm-email.mp4" type="video/mp4" loop muted playsInline />
 </video>
 
-### Typescript support
+### TypeScript support
 
-The biggest communty contribution to date, [@thorwebdev](https://twitter.com/thorwebdev) added Typescript support to Supabase. He even [live streamed the process](https://twitter.com/thorwebdev/status/1292722189788016641).
+The biggest communty contribution to date, [@thorwebdev](https://twitter.com/thorwebdev) added TypeScript support to Supabase. He even [live streamed the process](https://twitter.com/thorwebdev/status/1292722189788016641).
 
 
 ![This git shows how TypeScript makes it even easier to use Supabase, through VSCode's intellisense.](/img/typescript-support.gif)
