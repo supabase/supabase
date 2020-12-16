@@ -14,7 +14,7 @@ Supabase makes it simple to manage your users.
 
 When a user signs up, Supabase assigns them a unique ID. You can reference this ID anywhere in your database. For example, you might create a `profiles` table referencing the user using a `user_id` field.
 
-Supabase provides the routes to [sign up](/docs/client/auth-signup), [login](/docs/client/auth-signin), [log out](/docs/client/auth-signout), and manage users in your apps and websites.
+Supabase provides the routes to [sign up](/docs/client/auth-signup), [log in](/docs/client/auth-signin), [log out](/docs/client/auth-signout), and manage users in your apps and websites.
 
 
 ### Third Party Logins
@@ -87,6 +87,14 @@ Supabase provides a special function in Postgres, `auth.uid()`, which extracts t
  
 ## Tips
 
+### Check authentication settings on Supabase
+
+Navigate to Authentication > Settings on [app.supabase.io](https://app.supabase.io), and you'll be able to change settings for things like:
+
+- SITE URL, which is used for determining where to redirect users after they confirm their email addresses or attempt to use a magic link to log in.
+- Disabling email confirmations
+- Enabling external OAuth providers, such as Google and GitHub
+
 ### Never use a service key on the client.
 
 Supabase provides special "Service" keys, which can be used to bypass all Row Level Security. 
@@ -119,7 +127,7 @@ create trigger on_auth_user_created
 
 ### Policies are like where clauses.
 
-Policies are easy to understand once you get the hang of them. You can just think of the as adding a `WHERE` clause to every query. For example if you had a policy like this:
+Policies are easy to understand once you get the hang of them. You can just think of them as adding a `WHERE` clause to every query. For example if you had a policy like this:
 
 ```sql
 create policy "Individuals can view their own todos." on todos for

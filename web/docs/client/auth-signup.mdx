@@ -65,27 +65,6 @@ The user login details.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      email
-    </span>
-    <span className="method-list-item-label-badge required">
-      required
-    </span>
-    <span className="method-list-item-validation">
-      string
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-The user's email address.
-  
-  </div>
-  
-</li>
-
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
       password
     </span>
     <span className="method-list-item-label-badge required">
@@ -103,6 +82,27 @@ The user's password.
   
 </li>
 
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      email
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      string
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The user's email address.
+  
+  </div>
+  
+</li>
+
 </ul>
 
 </li>
@@ -110,8 +110,10 @@ The user's password.
 </ul>
 
 
+## Notes
 
-
+- By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable email confirmations by going to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
+- When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
 
 
 
