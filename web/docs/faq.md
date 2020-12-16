@@ -12,7 +12,7 @@ We're building as fast as we can! And we are even adding a few things that Fireb
 - User Authentication to sign up users and edit access rules on your database.
 - Real-time database listeners
 - JS library and APIs
-- Functions (kinda). These exist as database stored procedures, which can be written in SQL, Javascript, Python, and Java.
+- Functions (kinda). These exist as database stored procedures, which can be written in SQL, JavaScript, Python, and Java.
 
 ### How can you be a Firebase alternative if you're built with a relational database?
 
@@ -28,5 +28,5 @@ At the moment we only support PostgreSQL. It's unlikely we'll ever move away fro
 
 ### Do you have a library for `[some other language]`?
 
-We currently have a Javascript library. You can [vote on a new client library](https://github.com/supabase/supabase/issues/5) for your favourite language.
+We currently have a JavaScript library. You can [vote on a new client library](https://github.com/supabase/supabase/issues/5) for your favourite language.
 
