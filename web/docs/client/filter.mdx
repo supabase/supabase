@@ -256,12 +256,10 @@ const { data, error } = await supabase
 <TabItem value="js">
 
 ```js
-export const getFilterJsEmbedded = `
 const { data, error } = await supabase
   .from('cities')
   .select('name, countries ( name )')
   .filter('countries.name', 'eq', 'France')
-`.trim()
 ```
 
 
