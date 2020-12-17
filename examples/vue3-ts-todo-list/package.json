@@ -8,7 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^1.0.3",
+    "@supabase/supabase-js": "^1.1.2",
     "core-js": "^3.6.5",
     "vue": "^3.0.0"
   },
