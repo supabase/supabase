@@ -121,7 +121,7 @@ const umdExample = `
 export const examples = {
   createUserExample: {
     name: 'Create user',
-    description: 'Sign up a new user in an example chat rooom',
+    description: 'Sign up a new user in an example chat room',
     code: {
       javascript: `
   import { createClient } from '@supabase/supabase-js'
