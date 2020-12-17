@@ -1,7 +1,8 @@
 import React from 'react'
 import Layout from '@theme/Layout'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
-import sponsors from '../data/sponsors.json'
+import sponsorThisMonth from '../data/sponsors.json'
+import sponsorsPreviousMonth from '../data/sponsorsPreviousMonth.json'
 import maintainers from '../data/maintainers.json'
 import GithubCard from '../components/GithubCard'
 import { repos } from '../data/github'
@@ -10,6 +11,18 @@ export default function Oss() {
   const [activePill, setActivePill] = React.useState('All')
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
+
+  // Hacky solution to get sponsors for the past 1 month
+  let oneMonthAgo = new Date()
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+  const sponsors = sponsorThisMonth
+    .concat(sponsorsPreviousMonth)
+    .filter((x) => {
+      let paid = x.transactions.some((t) => t.transaction_date > oneMonthAgo.toISOString())
+      return paid
+    })
+    .sort((a, b) => a.sponsor_handle.localeCompare(b.sponsor_handle))
+
   const maintainerTags = maintainers
     .reduce((acc, x) => acc.concat(x.tags), []) // get all tags
     .filter((v, i, a) => a.indexOf(v) === i) // remove duplicates
@@ -21,7 +34,8 @@ export default function Oss() {
       heading: 'Enterprise: $5,000 per month',
       transactions: sponsors.filter(
         (x) =>
-          x.transactions[0]?.tier_name == '$5,000 a month' && x.transactions[0]?.status == 'settled'
+          x.transactions[0]?.tier_name == '$5,000 a month' &&
+          x.transactions[0]?.status != 'processor_declined'
       ),
     },
     {
@@ -29,7 +43,8 @@ export default function Oss() {
       heading: 'Agency: $2,500 per month',
       transactions: sponsors.filter(
         (x) =>
-          x.transactions[0]?.tier_name == '$2,500 a month' && x.transactions[0]?.status == 'settled'
+          x.transactions[0]?.tier_name == '$2,500 a month' &&
+          x.transactions[0]?.status != 'processor_declined'
       ),
     },
     {
@@ -37,7 +52,8 @@ export default function Oss() {
       heading: 'Startup: $1,000 per month',
       transactions: sponsors.filter(
         (x) =>
-          x.transactions[0]?.tier_name == '$1,000 a month' && x.transactions[0]?.status == 'settled'
+          x.transactions[0]?.tier_name == '$1,000 a month' &&
+          x.transactions[0]?.status != 'processor_declined'
       ),
     },
     {
@@ -45,7 +61,8 @@ export default function Oss() {
       heading: 'Evangelist: $49 per month',
       transactions: sponsors.filter(
         (x) =>
-          x.transactions[0]?.tier_name == '$49 a month' && x.transactions[0]?.status == 'settled'
+          x.transactions[0]?.tier_name == '$49 a month' &&
+          x.transactions[0]?.status != 'processor_declined'
       ),
     },
     {
@@ -53,7 +70,8 @@ export default function Oss() {
       heading: 'Supporter: $19 per month',
       transactions: sponsors.filter(
         (x) =>
-          x.transactions[0]?.tier_name == '$19 a month' && x.transactions[0]?.status == 'settled'
+          x.transactions[0]?.tier_name == '$19 a month' &&
+          x.transactions[0]?.status != 'processor_declined'
       ),
     },
     {
@@ -61,7 +79,8 @@ export default function Oss() {
       heading: 'Contributor: $5 per month',
       transactions: sponsors.filter(
         (x) =>
-          x.transactions[0]?.tier_name == '$5 a month' && x.transactions[0]?.status == 'settled'
+          x.transactions[0]?.tier_name == '$5 a month' &&
+          x.transactions[0]?.status != 'processor_declined'
       ),
     },
   ]
@@ -133,7 +152,7 @@ export default function Oss() {
           <div className="row is-multiline">
             {maintainers
               .filter((x) => activePill == 'All' || x.tags.includes(activePill))
-              .sort((a,b) => a.handle.localeCompare(b.handle))
+              .sort((a, b) => a.handle.localeCompare(b.handle))
               .map((x, idx) => (
                 <div className={'col col--4'} key={idx}>
                   <a className="card" href={`https://github.com/${x.handle}`} target="_blank">

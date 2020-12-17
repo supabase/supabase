@@ -1,0 +1,310 @@
+---
+id: client-libraries
+title: Client Libraries
+description: 'Supabase provides client libraries in several languages.'
+---
+
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+The [Supabase Client](/docs/client/supabase-client) makes it simple for developers to build secure and scalable products. 
+
+## Auth
+
+
+Create new users using [`signUp()`](/docs/client/auth-signup).
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { error, data } = await supabase.auth.signUp({
+  email: 'example@email.com',
+  password: 'example-password',
+})
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+
+
+Existing users can log in using [`signIn()`](/docs/client/auth-signin).
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { error, data } = await supabase.auth.signIn({
+  email: 'example@email.com',
+  password: 'example-password',
+})
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+
+If there is an email, but no password passed to [`signIn()`](/docs/client/auth-signin), the user will receive a magic link.
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { error, data } = await supabase.auth.signIn({
+  email: 'example@email.com'
+})
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+
+Third party logins are also handled through [`signIn()`](/docs/client/auth-signin).
+
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { user, error } = await supabase.auth.signIn({
+  // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
+  provider: 'github'
+})
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+## Managing data
+
+Since Postgres is a Relational database, the client makes it simple to query tables and fetch related data in one round-trip, using [`select()`](/docs/client/select).
+
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select(`
+    name,
+    cities (
+      name
+    )
+  `)
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+
+You can do advanced [filtering](/docs/client/using-filters) to extract only the data that you need.
+
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .lt('country_id', 100)
+  .limit(10)
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+
+You can create data easily using [`insert()`](/docs/client/insert).
+
+
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .insert([
+    { name: 'The Shire', country_id: 554 },
+    { name: 'Rohan', country_id: 555 },
+  ])
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+
+## Realtime Changes
+
+The Supabase client makes it simple to listen to realtime database changes, using [`subscribe()`](/docs/client/subscribe).
+
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const mySubscription = supabase
+  .from('countries')
+  .on('*', payload => {
+    console.log('Change received!', payload)
+  })
+  .subscribe()
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+
+You can even [listen to Row Level changes](/docs/client/subscribe#listening-to-row-level-changes).
+
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const mySubscription = supabase
+  .from('countries:id.eq.200')
+  .on('UPDATE', handleRecordUpdated)
+  .subscribe()
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+
+
+## Next steps
+
+- View the [Client Docs](/docs/client/supabase-client)
+- Sign in: [app.supabase.io](https://app.supabase.io)

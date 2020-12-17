@@ -1,0 +1,79 @@
+openref: 0.1
+
+info:
+  title:  Realtime Client
+  description: |
+    Listens to changes in a PostgreSQL Database and via websockets.
+
+    This is for usage with Supabase Realtime server.
+    
+  definition: spec/realtime.json
+  libraries: 
+    - name: 'JavaScript'
+      id: 'js'
+      version: '0.0.1'
+    - name: 'Python'
+      id: 'py'
+      version: '0.0.1'
+  docs:
+    path: realtime/client/
+    sidebar:
+      - name: 'About'
+        items:
+          - index
+          - Installing
+          - Initializing
+      - name: 'Client functions'
+        items:
+          - connect
+          - disconnect
+
+pages:
+
+  Installing: 
+    description: |
+      All JavaScript libraries are built directly by the Supabase team. 
+      
+      Other languages are built by the community and supported by Supabase.
+
+      ## JavaScript
+
+      ```bash
+      npm install @supabase/realtime-js
+      ```
+
+      ## Python
+
+      ```bash
+      # Not yet implemented
+      ```
+
+  Initializing: 
+    $ref: '"RealtimeClient".RealtimeClient.constructor'
+
+  connect:
+    $ref: '"RealtimeClient".RealtimeClient.connect'
+    examples:
+      - name: Connect
+        js: |
+          ```js
+          realtime.connect()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+
+  disconnect:
+    $ref: '"RealtimeClient".RealtimeClient.disconnect'
+    examples:
+      - name: Connect
+        js: |
+          ```js
+          realtime.disconnect()
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+

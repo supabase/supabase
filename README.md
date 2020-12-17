@@ -9,16 +9,24 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) adds realtime and RESTful APIs to your existing PostgreSQL database without a single line of code.
+[Supabase](https://supabase.io) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools. 
+
+- [x] Hosted Postgres Database
+- [x] Realtime subscriptions
+- [x] Authentication and authorization
+- [x] Auto-generated APIs
+- [x] Dashboard
+- [ ] Storage (coming soon)
+- [ ] Functions (coming soon)
 
 ## Status
 
 - [x] Alpha: We are testing Supabase with a closed set of customers
 - [x] Public Alpha: Anyone can sign up over at [app.supabase.io](https://app.supabase.io). But go easy on us, there are a few kinks.
-- [ ] Public Beta: Stable enough for most non-enterprise use-cases
+- [x] Public Beta: Stable enough for most non-enterprise use-cases
 - [ ] Public: Production-ready
 
-We are currently in Public Alpha. Watch "releases" of this repo to get notified of major updates.
+We are currently in Public Beta. Watch "releases" of this repo to get notified of major updates.
 
 
 
@@ -31,7 +39,7 @@ We are currently in Public Alpha. Watch "releases" of this repo to get notified 
 
 ## How it works
 
-Supabase is a combination of open source tools. We’re building the features of Firebase using enterprise-grade, open source products. If the tools and communities exist, with an MIT, Apache 2, or equivelant open license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves. Supabase is not a 1-to-1 mapping of Firebase. Our aim is to give developers a Firebase-like developer experience using open source tools.
+Supabase is a combination of open source tools. We’re building the features of Firebase using enterprise-grade, open source products. If the tools and communities exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves. Supabase is not a 1-to-1 mapping of Firebase. Our aim is to give developers a Firebase-like developer experience using open source tools.
 
 **Current architecture**
 
@@ -62,10 +70,10 @@ Our client library is modular. Each sub-library is a standalone implementation f
  
 | Repo                                                                                       | Official                                         | Community        |
 |-----------------------|--------------------------------------------------|------------------|
-| **`supabase-{lang}`**     | [`JS`](https://github.com/supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` |
-| `postgrest-{lang}` | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
-| `realtime-{lang}`  | [`JS`](https://github.com/supabase/realtime-js) | `C#` \| `Python` \| `Rust` |
-| `gotrue-{lang}`    | [`JS`](https://github.com/supabase/gotrue-js) | `C#` \| `Python` \| `Rust` |
+| **`supabase-{lang}`**     | [`JS`](https://github.com/supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp) \| `Dart` \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` |
+| `postgrest-{lang}` | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
+| `realtime-{lang}`  | [`JS`](https://github.com/supabase/realtime-js) | `C#` \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust` |
+| `gotrue-{lang}`    | [`JS`](https://github.com/supabase/gotrue-js) | `C#` \| `Dart` \| `Python` \| `Rust` |
 
 
 
@@ -73,8 +81,5 @@ Our client library is modular. Each sub-library is a standalone implementation f
 
 ## Sponsors
 
-Thanks to these sponsors who are making the OSS ecosystem better for everyone.
-
-[![Worklife VC](https://user-images.githubusercontent.com/10214025/90451355-34d71200-e11e-11ea-81f9-1592fd1e9146.png)](https://www.worklife.vc)
 [![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
 

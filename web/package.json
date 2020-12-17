@@ -6,18 +6,21 @@
     "start": "docusaurus start --port 3005",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
-    "traction": "node traction.js"
+    "traction": "node traction.js",
+    "gen:gotrue": "ts-node ReferenceGenerator.ts -o docs/gotrue/client spec/gotrue.yml",
+    "gen:postgrest": "ts-node ReferenceGenerator.ts -o docs/postgrest/client spec/postgrest.yml",
+    "gen:realtime": "ts-node ReferenceGenerator.ts -o docs/realtime/client spec/realtime.yml",
+    "gen:supabase": "ts-node ReferenceGenerator.ts -o docs/client spec/supabase.yml"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.0.0-alpha.62",
-    "@docusaurus/preset-classic": "^2.0.0-alpha.62",
+    "@docusaurus/core": "^2.0.0-alpha.63",
+    "@docusaurus/preset-classic": "^2.0.0-alpha.63",
     "@kiwicopple/prism-react-renderer": "github:kiwicopple/prism-react-renderer",
     "classnames": "^2.2.6",
     "mermaid": "^8.6.4",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "react-inlinesvg": "^2.0.1",
-    "recharts": "^2.0.0-beta.6"
+    "react-inlinesvg": "^2.0.1"
   },
   "browserslist": {
     "production": [
@@ -32,8 +35,13 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "^14.14.13",
     "axios": "^0.19.2",
     "babel-plugin-css-modules-transform": "^1.6.2",
-    "clsx": "^1.1.1"
+    "clsx": "^1.1.1",
+    "js-yaml": "^3.14.0",
+    "minimist": "^1.2.5",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.1.3"
   }
 }

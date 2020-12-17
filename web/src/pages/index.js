@@ -169,25 +169,6 @@ const features = [
   },
 ]
 
-function Feature({ imageUrl, title, description, href }) {
-  const imgUrl = useBaseUrl(imageUrl)
-  return (
-    <div className={classnames('col col--4 m-b-md', styles.feature)}>
-      <Link className={classnames('card', styles.featureCard)} to={href}>
-        <div className="card__body">
-          {imgUrl && (
-            <div className="">
-              <img className={styles.featureImage} src={imgUrl} alt={title} />
-            </div>
-          )}
-          <h3>{title}</h3>
-          <p>{description}</p>
-        </div>
-      </Link>
-    </div>
-  )
-}
-
 function Home() {
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
@@ -223,7 +204,7 @@ function Home() {
                     to={'https://app.supabase.io'}
                     style={{ marginTop: 10 }}
                   >
-                    Alpha sign up →
+                    Beta sign up →
                   </Link>
                 </div>
               </div>
@@ -531,7 +512,7 @@ function Home() {
           </div>
         </section>
 
-        <section
+        {/* <section
           style={{
             marginTop: 100,
             padding: '50px 0',
@@ -572,10 +553,63 @@ function Home() {
               </a>
             </div>
           </div>
+        </section> */}
+
+        <section
+          style={{
+            marginTop: 100,
+            padding: '50px 0',
+            borderTop: '1px solid var(--custom-border-color)',
+          }}
+          className="hero is--dark"
+        >
+          <div className="container text--center">
+            {/* <div>
+              <h2>Get Early Access</h2>
+            </div> */}
+            <div className="">
+              <a
+                className={classnames(
+                  'button hero--button button--md responsive-button',
+                  styles.button
+                )}
+                href="https://www.producthunt.com/posts/supabase?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-supabase"
+                style={{ width: 250, height: 54, margin: 0, padding: 0, display: 'inline-block' }}
+              >
+                <img
+                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=203792&theme=dark"
+                  alt="Supabase - An open source Firebase alternative | Product Hunt Embed"
+                  style={{ width: 250, height: 54 }}
+                  width="250px"
+                  height="54px"
+                />
+              </a>
+              <Link
+                className={classnames(
+                  'button hero--button button--md button--primary responsive-button',
+                  styles.button
+                )}
+                to={'https://app.supabase.io'}
+                style={{ margin: 5 }}
+              >
+                Beta sign up →
+              </Link>
+            </div>
+          </div>
         </section>
       </main>
     </Layout>
   )
 }
 
-export default Home
+// export default Home
+export default () => {
+  if (typeof window !== 'undefined') {
+    if (window.location.href.indexOf('localhost') === -1) {
+      window.location.replace('https://supabase.io')
+    } else {
+      window.location.replace('/docs')
+    }
+  }
+  return null
+}

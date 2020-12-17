@@ -1,5 +1,5 @@
 ---
-title: What are PostgreSQL templates?
+title: What are PostgreSQL Templates?
 description: What are PostgreSQL templates and what are they used for?
 author: Angelico de los Reyes
 author_title: Supabase
@@ -14,7 +14,7 @@ Whenever you create a new database in Postgres, you are actually [basing it off 
 
 <!--truncate-->
 
-This database, `template1`, and another, called `template0`, are standard system databases that exist in every newly created database cluster. Don't believe me? Why not quickly [spin up a database](/docs/postgres/postgres-intro) and see it for yourself with this query:
+This database, `template1`, and another, called `template0`, are standard system databases that exist in every newly created database cluster. Don't believe me? Why not quickly [spin up a database](/docs/postgres/server/about) and see it for yourself with this query:
 ```sql
 SELECT * FROM pg_database;
 ```
