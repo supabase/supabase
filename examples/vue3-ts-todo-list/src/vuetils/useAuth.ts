@@ -70,7 +70,7 @@ async function handlePasswordReset() {
   } else {
     const { error } = await supabase.auth.api.resetPasswordForEmail(email)
     if (error) {
-      console.log('Error: ' + error.message)
+      alert('Error: ' + error.message)
     } else {
       alert('Password recovery email has been sent.')
     }
