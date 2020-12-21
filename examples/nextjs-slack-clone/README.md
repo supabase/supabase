@@ -87,7 +87,7 @@ Copy the `.env.local.example` file into a file named `.env.local` in the root di
 cp .env.local.example .env.local
 ```
 
-Set your Supabase details from from [step 3](#3.-get-the-url-and-key) above:
+Set your Supabase details from from [step 3](#3-get-the-url-and-key) above:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=<replace-with-your-API-url>
