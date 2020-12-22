@@ -11,12 +11,6 @@ const ChannelsPage = (props) => {
   const { user, authLoaded, signOut } = useContext(UserContext)
   const messagesEndRef = useRef(null)
 
-  // Redirect if not signed in.
-  useEffect(() => {
-    if (authLoaded && !user) signOut()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, router])
-
   // Else load up the page
   const { id: channelId } = router.query
   const { messages, channels } = useStore({ channelId })
@@ -41,7 +35,7 @@ const ChannelsPage = (props) => {
           </div>
         </div>
         <div className="p-2 absolute bottom-0 left-0 w-full">
-          <MessageInput onSubmit={async (text) => addMessage(text, channelId, user)} />
+          <MessageInput onSubmit={async (text) => addMessage(text, channelId, user.id)} />
         </div>
       </div>
     </Layout>
