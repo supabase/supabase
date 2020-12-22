@@ -3,6 +3,8 @@ import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, View, Platform } from 'react-native'
 import { ThemeProvider, colors, Text } from 'react-native-elements'
 import { Styles } from './lib/constants'
+import { UserContextProvider, useUser } from './components/UserContext'
+import List from './components/List'
 import Auth from './components/Auth'
 
 const theme = {
@@ -14,17 +16,25 @@ const theme = {
   },
 }
 
+const Container = () => {
+  const { user } = useUser()
+
+  return user ? <List /> : <Auth />
+}
+
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <View style={styles.container}>
-        <View style={styles.verticallySpaced}>
-          <Text h1>Todo List</Text>
+    <UserContextProvider>
+      <ThemeProvider theme={theme}>
+        <View style={styles.container}>
+          <View style={styles.verticallySpaced}>
+            <Text h1>Todo List</Text>
+          </View>
+          <Container />
+          <StatusBar style="auto" />
         </View>
-        <Auth />
-        <StatusBar style="auto" />
-      </View>
-    </ThemeProvider>
+      </ThemeProvider>
+    </UserContextProvider>
   )
 }
 
