@@ -1,21 +1,18 @@
-import useSWR from 'swr';
-import { useUser } from '../utils/useUser';
-import { supabase } from '../utils/initSupabase';
-import SupabaseAuth from '../components/SupabaseAuth';
+import useSWR from 'swr'
+import { useUser } from '../components/UserContext'
+import { supabase } from '../utils/initSupabase'
+import SupabaseAuth from '../components/SupabaseAuth'
 
 const fetcher = (url, token) =>
   fetch(url, {
     method: 'GET',
     headers: new Headers({ 'Content-Type': 'application/json', token }),
     credentials: 'same-origin',
-  }).then((res) => res.json());
+  }).then((res) => res.json())
 
 const Index = () => {
-  const { user, session } = useUser();
-  const { data, error } = useSWR(
-    session ? ['/api/getUser', session.access_token] : null,
-    fetcher
-  );
+  const { user, session } = useUser()
+  const { data, error } = useSWR(session ? ['/api/getUser', session.access_token] : null, fetcher)
   if (!user) {
     return (
       <>
@@ -25,7 +22,7 @@ const Index = () => {
           <SupabaseAuth />
         </div>
       </>
-    );
+    )
   }
 
   return (
@@ -54,7 +51,7 @@ const Index = () => {
         <div>Loading...</div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Index;
+export default Index
