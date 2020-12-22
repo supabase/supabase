@@ -127,8 +127,8 @@ export const fetchMessages = async (channelId, setState) => {
   try {
     let { body } = await supabase
       .from('messages')
-      .eq('channel_id', channelId)
       .select(`*, author:user_id(*)`)
+      .eq('channel_id', channelId)
       .order('inserted_at', true)
     if (setState) setState(body)
     return body
