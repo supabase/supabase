@@ -4,7 +4,7 @@ import { StyleSheet, View, Platform } from 'react-native'
 import { ThemeProvider, colors, Text } from 'react-native-elements'
 import { Styles } from './lib/constants'
 import { UserContextProvider, useUser } from './components/UserContext'
-import List from './components/List'
+import List from './components/TodoList'
 import Auth from './components/Auth'
 
 const theme = {
