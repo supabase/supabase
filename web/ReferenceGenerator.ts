@@ -97,7 +97,9 @@ function generateParameters(tsDefinition: any) {
   } else functionDeclaration = tsDefinition?.type?.declaration
   if (!functionDeclaration) return ''
 
-  const paramDefinitions: TsDoc.TypeDefinition[] = functionDeclaration.signatures[0].parameters // PMC: seems flaky.. why the [0]?
+  const paramDefinitions: TsDoc.TypeDefinition[] = functionDeclaration.signatures[0].parameters.sort(
+    (a, b) => a.name.localeCompare(b.name)
+  ) // PMC: seems flaky.. why the [0]?
   if (!paramDefinitions) return ''
 
   // const paramsComments: TsDoc.CommentTag = tsDefinition.comment?.tags?.filter(x => x.tag == 'param')
