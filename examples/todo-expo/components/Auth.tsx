@@ -1,14 +1,9 @@
 import React, { useState } from 'react'
 import { Alert, StyleSheet, View } from 'react-native'
-import AsyncStorage from '@react-native-community/async-storage'
-import { createClient } from '@supabase/supabase-js'
-import { Styles, SUPABASE_URL, SUPABASE_ANON_KEY } from '../lib/constants'
+import { Styles } from '../lib/constants'
+import { supabase } from '../lib/initSupabase'
 
 import { Button, Input } from 'react-native-elements'
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  localStorage: AsyncStorage as any,
-})
 
 export default function Auth() {
   const [email, setEmail] = useState('')
@@ -23,8 +18,6 @@ export default function Auth() {
         : await supabase.auth.signUp({ email, password })
     if (!error && !user) Alert.alert('Check your email for the login link!')
     if (error) Alert.alert(error.message)
-    console.log('user', user)
-    console.log('error', error)
     setLoading('')
   }
 
