@@ -50,7 +50,7 @@ const { data, error } = await supabase
       required
     </span>
     <span className="method-list-item-validation">
-      Partial
+      <code>Partial</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -59,6 +59,52 @@ The values to update.
   
   </div>
   
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      __namedParameters
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided. 
+  
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      returning
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>minimal</code> | <code>representation</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+By default the updated record is returned. Set this to 'minimal' if you don't need this value.
+  
+  </div>
+  
+</li>
+
+</ul>
+
 </li>
 
 </ul>
