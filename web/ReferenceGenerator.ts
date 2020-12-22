@@ -1,7 +1,7 @@
 /**
  * Usage:
  *    ts-node ReferenceGenerator.ts -o {output_dir} {input}.yml
- * 
+ *
  * Example:
  *    ts-node ReferenceGenerator.ts -o docs/client spec/supabase.yml
  */
@@ -97,9 +97,7 @@ function generateParameters(tsDefinition: any) {
   } else functionDeclaration = tsDefinition?.type?.declaration
   if (!functionDeclaration) return ''
 
-  const paramDefinitions: TsDoc.TypeDefinition[] = functionDeclaration.signatures[0].parameters.sort(
-    (a, b) => a.name.localeCompare(b.name)
-  ) // PMC: seems flaky.. why the [0]?
+  const paramDefinitions: TsDoc.TypeDefinition[] = functionDeclaration.signatures[0].parameters // PMC: seems flaky.. why the [0]?
   if (!paramDefinitions) return ''
 
   // const paramsComments: TsDoc.CommentTag = tsDefinition.comment?.tags?.filter(x => x.tag == 'param')
@@ -126,6 +124,7 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
 
   if (!!children) {
     let properties = children
+      .sort((a, b) => (a.name.localeCompare(b.name))) // first alphabetical
       .sort((a, b) => (a.flags?.isOptional ? 1 : -1)) // required params first
       .map((x) => recurseThroughParams(x))
     let heading = `<h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>`
@@ -198,12 +197,22 @@ Not yet implemented
 
 function extractParamTypeAsString(paramDefinition) {
   if (paramDefinition.type?.name) {
-    return paramDefinition.type.name
+    return `<code>${paramDefinition.type.name}</code>`
   }
   if (paramDefinition.type?.type == 'union') {
-    return paramDefinition.type.types.map((x) => x.value).join(' | ')
+    return paramDefinition.type.types
+      .map((x) =>
+        x.value
+          ? `<code>${x.value}</code>`
+          : x.name
+          ? `<code>${x.name}</code>`
+          : x.type
+          ? `<code>${x.type}</code>`
+          : ''
+      )
+      .join(' | ')
   } else {
-    return 'object'
+    return '<code>object</code>'
   }
 }
 
