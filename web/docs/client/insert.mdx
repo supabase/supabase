@@ -51,7 +51,7 @@ const { data, error } = await supabase
       required
     </span>
     <span className="method-list-item-validation">
-       | 
+      <code>Partial</code> | <code>array</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -72,7 +72,7 @@ The values to insert.
       required
     </span>
     <span className="method-list-item-validation">
-      object
+      <code>object</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -87,18 +87,18 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      onConflict
+      upsert
     </span>
     <span className="method-list-item-label-badge required">
       required
     </span>
     <span className="method-list-item-validation">
-       | 
+      <code>boolean</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-By specifying the `on_conflict` query parameter, you can make UPSERT work on a column(s) that has a UNIQUE constraint.
+If `true`, performs an UPSERT.
   
   </div>
   
@@ -108,18 +108,39 @@ By specifying the `on_conflict` query parameter, you can make UPSERT work on a c
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      upsert
+      returning
     </span>
     <span className="method-list-item-label-badge required">
       required
     </span>
     <span className="method-list-item-validation">
-      boolean
+      <code>minimal</code> | <code>representation</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-If `true`, performs an UPSERT.
+By default the new record is returned. Set this to 'minimal' if you don't need this value.
+  
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      onConflict
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>undefined</code> | <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+By specifying the `on_conflict` query parameter, you can make UPSERT work on a column(s) that has a UNIQUE constraint.
   
   </div>
   

@@ -50,7 +50,7 @@ const { data, error } = await supabase
       required
     </span>
     <span className="method-list-item-validation">
-      object
+      <code>object</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -71,7 +71,7 @@ The column to order on.
       required
     </span>
     <span className="method-list-item-validation">
-      object
+      <code>object</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -86,18 +86,18 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      ascending
+      nullsFirst
     </span>
     <span className="method-list-item-label-badge required">
       required
     </span>
     <span className="method-list-item-validation">
-      boolean
+      <code>boolean</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-If `true`, the result will be in ascending order.
+If `true`, `null`s appear first.
   
   </div>
   
@@ -113,7 +113,7 @@ If `true`, the result will be in ascending order.
       required
     </span>
     <span className="method-list-item-validation">
-       | 
+      <code>undefined</code> | <code>string</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -128,18 +128,18 @@ The foreign table to use (if `column` is a foreign column).
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      nullsFirst
+      ascending
     </span>
     <span className="method-list-item-label-badge required">
       required
     </span>
     <span className="method-list-item-validation">
-      boolean
+      <code>boolean</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-If `true`, `null`s appear first.
+If `true`, the result will be in ascending order.
   
   </div>
   
