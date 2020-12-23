@@ -20,9 +20,6 @@ const Home = () => {
         alert('Error with auth: ' + error.message)
       }
       else if (!user) alert('Signup successful, confirmation mail should be sent soon!')
-      // When the user signs in, we should be able to listen for that event
-      // with supabase.auth.authEventListner (or something like that)
-      // if (!!user) signIn(user.id, user.email)
     } catch (error) {
       console.log('error', error)
       alert(error.error_description || error)
