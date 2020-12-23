@@ -201,6 +201,10 @@ module.exports = {
               label: 'DevTo',
               href: 'https://dev.to/supabase',
             },
+            {
+              label: 'RSS',
+              href: 'https://supabase.io/blog/rss.xml',
+            },
             // {
             //   label: "Discord",
             //   href: "https://discordapp.com/invite/docusaurus"
