@@ -1,7 +1,0 @@
-.form-select:disabled {
-  @apply bg-gray-100 cursor-not-allowed;
-}
-
-.form-select--error {
-  @apply border-red-500;
-}
