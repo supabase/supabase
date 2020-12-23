@@ -24,7 +24,7 @@ export default function SupabaseSlackClone({Component, pageProps}){
         setSession(session);
         const currentUser = session?.user
         setUser(currentUser ?? null);
-        setUserLoaded(true)
+        setUserLoaded(!!currentUser)
         if (currentUser) {
           signIn(currentUser.id, currentUser.email)
           Router.push('/channels/[id]', '/channels/1')
