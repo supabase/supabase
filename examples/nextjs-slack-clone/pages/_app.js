@@ -5,7 +5,7 @@ import UserContext from 'lib/UserContext'
 import { supabase } from 'lib/Store'
 
 export default function SupabaseSlackClone({Component, pageProps}){
-  const [authLoaded, setAuthLoaded] = useState(false)
+  const [userLoaded, setUserLoaded] = useState(false)
   const [user, setUser] = useState(null)
   const [session, setSession] = useState(null);
 
@@ -13,14 +13,20 @@ export default function SupabaseSlackClone({Component, pageProps}){
     const session = supabase.auth.session();
     setSession(session);
     setUser(session?.user ?? null);
-    setAuthLoaded(session ? true : false)
+    setUserLoaded(session ? true : false)
+    if (user) {
+      signIn(user.id, user.email)
+      Router.push('/channels/[id]', '/channels/1')
+    }
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
-        setUser(session?.user ?? null);
-        setAuthLoaded(true)
-        if (session) {
+        const currentUser = session?.user
+        setUser(currentUser ?? null);
+        setUserLoaded(true)
+        if (currentUser) {
+          signIn(currentUser.id, currentUser.email)
           Router.push('/channels/[id]', '/channels/1')
         }
       }
@@ -29,23 +35,31 @@ export default function SupabaseSlackClone({Component, pageProps}){
     return () => {
       authListener.unsubscribe()
     }
-  })
+  }, [user])
 
   const signIn = async (id, username) => {
+    let { body } = await supabase.from('users').select('id, username').eq('id', id)
+    const result = body[0]
+
+    // If the user exists in the users table, update the username.
+    // If not, create a new row.
+    let { body2 } = result?.id
+      ? await supabase.from('users').update({ id, username }).match({ id }).single()
+      : await supabase.from('users').insert([{ id, username }]).single()
   }
   
-  const signOut = () => {
-    supabase.auth.signOut()
+  const signOut = async () => {
+    const result = await supabase.auth.signOut()
     setUser(null)
     setSession(null)
-    setAuthLoaded(null)
+    setUserLoaded(null)
     Router.push('/')
   }  
 
   return (
     <UserContext.Provider
       value={{
-        authLoaded,
+        userLoaded,
         user,
         signIn,
         signOut
