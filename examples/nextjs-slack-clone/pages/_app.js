@@ -38,12 +38,12 @@ export default function SupabaseSlackClone({Component, pageProps}){
   }, [user])
 
   const signIn = async (id, username) => {
-    let { body } = await supabase.from('users').select('id, username').eq('id', id)
+    const { body } = await supabase.from('users').select('id, username').eq('id', id)
     const result = body[0]
 
     // If the user exists in the users table, update the username.
     // If not, create a new row.
-    let { body2 } = result?.id
+    result?.id
       ? await supabase.from('users').update({ id, username }).match({ id }).single()
       : await supabase.from('users').insert([{ id, username }]).single()
   }
