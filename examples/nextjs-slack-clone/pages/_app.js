@@ -1,59 +1,68 @@
 import '~/styles/style.scss'
-import React from 'react'
-import App from 'next/app'
+import React, { useState, useEffect } from 'react'
 import Router from 'next/router'
 import UserContext from 'lib/UserContext'
 import { supabase } from 'lib/Store'
 
-export default class SupabaseSlackClone extends App {
-  state = {
-    authLoaded: false,
-    user: null,
-  }
+export default function SupabaseSlackClone({Component, pageProps}){
+  const [userLoaded, setUserLoaded] = useState(false)
+  const [user, setUser] = useState(null)
+  const [session, setSession] = useState(null);
 
-  componentDidMount = () => {
-    const user = localStorage.getItem('supabase-slack-clone')
-    if (user) this.setState({ user, authLoaded: true })
-    else Router.push('/')
-  }
-
-  signIn = async (id, username) => {
-    try {
-      let { body } = await supabase.from('users').match({ username }).select('id, username')
-      const existing = body[0]
-      const { body: user } = existing?.id
-        ? await supabase.from('users').update({ id, username }).match({ id }).single()
-        : await supabase.from('users').insert([{ id, username }]).single()
-
-      localStorage.setItem('supabase-slack-clone', user.id)
-      this.setState({ user: user.id }, () => {
-        Router.push('/channels/[id]', '/channels/1')
-      })
-    } catch (error) {
-      console.log('error', error)
+  useEffect(() => {
+    const session = supabase.auth.session();
+    setSession(session);
+    setUser(session?.user ?? null);
+    setUserLoaded(session ? true : false)
+    if (user) {
+      signIn(user.id, user.email)
+      Router.push('/channels/[id]', '/channels/1')
     }
-  }
 
-  signOut = () => {
-    supabase.auth.logout()
-    localStorage.removeItem('supabase-slack-clone')
-    this.setState({ user: null })
-    Router.push('/')
-  }
-
-  render() {
-    const { Component, pageProps } = this.props
-    return (
-      <UserContext.Provider
-        value={{
-          authLoaded: this.state.authLoaded,
-          user: this.state.user,
-          signIn: this.signIn,
-          signOut: this.signOut,
-        }}
-      >
-        <Component {...pageProps} />
-      </UserContext.Provider>
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        const currentUser = session?.user
+        setUser(currentUser ?? null);
+        setUserLoaded(!!currentUser)
+        if (currentUser) {
+          signIn(currentUser.id, currentUser.email)
+          Router.push('/channels/[id]', '/channels/1')
+        }
+      }
     )
+
+    return () => {
+      authListener.unsubscribe()
+    }
+  }, [user])
+
+  const signIn = async (id, username) => {
+    const { body } = await supabase.from('users').select('id, username').eq('id', id)
+    const result = body[0]
+
+    // If the user exists in the users table, update the username.
+    // If not, create a new row.
+    result?.id
+      ? await supabase.from('users').update({ id, username }).match({ id }).single()
+      : await supabase.from('users').insert([{ id, username }]).single()
   }
+  
+  const signOut = async () => {
+    const result = await supabase.auth.signOut()
+    Router.push('/')
+  }  
+
+  return (
+    <UserContext.Provider
+      value={{
+        userLoaded,
+        user,
+        signIn,
+        signOut
+      }}
+    >
+      <Component {...pageProps} />
+    </UserContext.Provider>
+  )
 }
