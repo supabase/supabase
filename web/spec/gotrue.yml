@@ -189,11 +189,11 @@ pages:
   api.signInWithEmail:
     $ref: '"GoTrueApi".GoTrueApi.signInWithEmail'
     examples:
-      - name: Sign up a new user with email
+      - name: Sign in a user with email
         js: |
           ```js
           const { error, data } = await api
-            .signIpWithEmail('example@email.com', 'example-password')
+            .signInWithEmail('example@email.com', 'example-password')
             ```
 
   api.sendMagicLinkEmail:

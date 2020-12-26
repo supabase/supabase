@@ -1188,7 +1188,7 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "Logs in an existing using their email address."
+										"shortText": "Logs in an existing user using their email address."
 									},
 									"parameters": [
 										{
