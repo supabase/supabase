@@ -7,7 +7,7 @@ slug: api-signinwithemail
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Logs in an existing using their email address.
+Logs in an existing user using their email address.
 
 
 
@@ -74,7 +74,7 @@ The password of the user.
 
 ## Examples
 
-### Sign up a new user with email
+### Sign in a user with email
 
 
 
@@ -87,7 +87,7 @@ The password of the user.
 
 ```js
 const { error, data } = await api
-  .signIpWithEmail('example@email.com', 'example-password')
+  .signInWithEmail('example@email.com', 'example-password')
   ```
 
 
