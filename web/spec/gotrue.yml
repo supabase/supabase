@@ -259,7 +259,7 @@ pages:
   api.refreshAccessToken:
     $ref: '"GoTrueApi".GoTrueApi.refreshAccessToken'
     examples:
-      - name: Get a new access and refresh token using a valied refresh_token
+      - name: Get a new access and refresh token using a valid refresh_token
         js: |
           ```js
           const { error, data } = await api
