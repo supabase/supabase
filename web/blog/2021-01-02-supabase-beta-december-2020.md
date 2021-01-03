@@ -30,7 +30,7 @@ We spent months working on Performance, Security, and Reliability. Read more on 
 
 ### Improve your docs inline
 
-Add comments and descriptions to your Tables directly from our auto-generated docs.
+Add comments and descriptions to your Tables directly from our auto-generated docs. Descriptions are stored as PostgreSQL comments (https://postgresql.org/docs/current/sql-comment.html), and are exposed over your OpenAPI spec.
 
 <video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
 <source src="/videos/update-docs.mp4" type="video/mp4" muted playsInline />
