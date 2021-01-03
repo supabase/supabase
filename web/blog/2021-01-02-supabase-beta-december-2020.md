@@ -67,6 +67,7 @@ We raised $6M from Y Combinator, Mozilla, and Coatue. You can read more on [Tech
 
 ### Community
 
+- We were featured on the GitHub release radar. [Link](https://github.blog/2020-12-07-release-radar-dec-2020/)
 - [@kiwicopple](https://twitter.com/kiwicopple) appeared on  [Open Core Summit](https://2020.opencoresummit.com/)
 - [@aaronksaunders](https://twitter.com/aaronksaunders) created a video series on Supabase + Vue. [Link](https://twitter.com/aaronksaunders/status/1339981480202743811).
 - [@CodeByCorey](https://twitter.com/CodeByCorey) tracks realtime page views using Supabase. [Link](https://twitter.com/CodeByCorey/status/1344650699645325312).
@@ -80,7 +81,9 @@ If you want to keep up to date, make sure you [subscribe to our YouTube channel]
 
 ### Coming next
 
-We've go a lot of exciting things planned for Q1 2021. We're already planning out Supabase Storage and a Supabase CLI for better local development. Let us know if there's something you want us to release as a priority!
+We've go a lot of exciting things planned for Q1 2021. We're already planning out Supabase Storage and a Supabase CLI for better local development. Let us know if there's something you want us to release as a priority! 
+
+We also have something exciting planned with Vercel and Stripe ... [stay tuned](https://twitter.com/rauchg/status/1331021818681978881).
 
 ### Get started
 
