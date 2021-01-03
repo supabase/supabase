@@ -19,10 +19,7 @@ After 10 hectic months of building, Supabase is now in Beta.
 
 Watch a full demo:
 
-<!-- <iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube.com/embed/unC_de7iytA" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe> -->
-
-`TBD`
-
+<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube.com/embed/ofSm4BJkZ1g" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
 
 ### Supabase is now in Beta
 
