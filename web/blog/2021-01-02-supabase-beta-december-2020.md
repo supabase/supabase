@@ -36,7 +36,7 @@ Add comments and descriptions to your Tables directly from our auto-generated do
 <source src="/videos/update-docs.mp4" type="video/mp4" muted playsInline />
 </video>
 
-### Table View now has realtime chages
+### Table View now has realtime changes
 
 Any updates that happen to your database are reflected in the Table View immediately.
 
