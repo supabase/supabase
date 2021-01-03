@@ -4,7 +4,7 @@ description: Ten months of building.
 author: Paul Copplestone
 author_title: Supabase
 author_url: https://github.com/kiwicopple
-author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
+author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
 image: /img/supabase-december-2020.png
 tags: 
@@ -27,8 +27,6 @@ Watch a full demo:
 ### Supabase is now in Beta
 
 We spent months working on Performance, Security, and Reliability. Read more on our [Beta Page](https://supabase.io/beta).
-
-aws.com/secure.notion-static.com/996da831-f70f-44e2-bde3-1e8e1669f399/Untitled.png)
 
 ![This image shows our Beta Page.](/img/blog/dec-beta.png)
 
@@ -76,7 +74,10 @@ We raised $6M from Y Combinator, Mozilla, and Coatue. You can read more on [Tech
 - [@aaronksaunders](https://twitter.com/aaronksaunders) created a video series on Supabase + Vue. [Link](https://twitter.com/aaronksaunders/status/1339981480202743811).
 - [@CodeByCorey](https://twitter.com/CodeByCorey) tracks realtime page views using Supabase. [Link](https://twitter.com/CodeByCorey/status/1344650699645325312).
 - [@ffbass](https://github.com/ffabss) started working on gotrue-java. [Link](https://github.com/supabase/gotrue-java).
-- 
+- We've grown more than 50% (GitHub star count) since moving into Beta. [Link](https://twitter.com/supabase_io/status/1345410714836594693)
+
+
+![This image shows GitHub star growth.](/img/blog/dec-starcount.png)
 
 If you want to keep up to date, make sure you [subscribe to our YouTube channel](https://www.youtube.com/channel/UCNTVzV1InxHV-YR0fSajqPQ) or [follow us on Twitter](https://twitter.com/supabase_io).
 
