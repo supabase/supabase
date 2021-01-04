@@ -142,6 +142,30 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 ```
 
+### Disable realtime for private tables
+
+Our realtime server doesn't provide per-user security. Until we build a more robust auth system for websockets, 
+you disable realtime functionality for any private tables. To do this, you can manage the underlying Postgres replication publication:
+
+```sql
+
+/**
+ * REALTIME SUBSCRIPTIONS
+ * Only allow realtime listening on public tables.
+ */
+
+drop publication if exists supabase_realtime;
+
+-- create the publication with "supabase_realtime" to start realtime again
+create publication supabase_realtime for table products;
+
+-- add other tables to the publication
+alter publication supabase_realtime add table posts;
+
+```
+
+We are aiming to deliver enhanced realtime security by Q1 2021.
+
 ## Next steps
 
 - Read more about [Row Level Security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
