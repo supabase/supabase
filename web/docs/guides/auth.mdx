@@ -148,7 +148,6 @@ Our realtime server doesn't provide per-user security. Until we build a more rob
 you disable realtime functionality for any private tables. To do this, you can manage the underlying Postgres replication publication:
 
 ```sql
-
 /**
  * REALTIME SUBSCRIPTIONS
  * Only allow realtime listening on public tables.
@@ -161,7 +160,6 @@ create publication supabase_realtime for table products;
 
 -- add other tables to the publication
 alter publication supabase_realtime add table posts;
-
 ```
 
 We are aiming to deliver enhanced realtime security by Q1 2021.
