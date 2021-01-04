@@ -32,7 +32,7 @@ Check out the [blog post](https://supabase.io/blog/2020/10/30/improved-dx) to le
 
 Although it was only intended to be a temporary feature, the SQL Editor has become one of the most useful features of Supabase. This month we decided to make give it some attention, adding Tabs and making it full-screen. This is the first of many updates, we've got some exciting things planned for the SQL Editor.
 
-![This image shows a SQL Editor with tabs. Originally our SQL editor was very basic, but we're moving towards somethign very powerful.](/img/sql-editor.png)
+![This image shows a SQL Editor with tabs. Originally our SQL editor was very basic, but we're moving towards something very powerful.](/img/sql-editor.png)
 
 ### Key commands for Power Users
 
