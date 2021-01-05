@@ -42,17 +42,7 @@
     "sponsorship_started_on": "2020-05-27T23:07:56.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1HlfJuEQsq43iHhXInxecTx6",
-        "tier_name": "$19 a month",
-        "tier_monthly_amount": "$19.00",
-        "processed_amount": "$19.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2020-11-10T02:42:34.000+08:00"
-      }
-    ]
+    "transactions": []
   },
   {
     "sponsor_handle": "saphp",
@@ -81,13 +71,13 @@
     "is_yearly": false,
     "transactions": [
       {
-        "transaction_id": "ch_1Hkw6zEQsq43iHhXSoQJQzm1",
+        "transaction_id": "ch_1HvoQZEQsq43iHhXpzDA60pg",
         "tier_name": "$5 a month",
         "tier_monthly_amount": "$5.00",
         "processed_amount": "$5.00",
         "is_prorated": false,
         "status": "settled",
-        "transaction_date": "2020-11-08T02:26:12.000+08:00"
+        "transaction_date": "2020-12-08T02:27:23.000+08:00"
       }
     ]
   },
@@ -98,17 +88,7 @@
     "sponsorship_started_on": "2020-06-06T18:20:23.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1HkZx8EQsq43iHhXTjyQY0VT",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2020-11-07T02:46:35.000+08:00"
-      }
-    ]
+    "transactions": []
   },
   {
     "sponsor_handle": "Julianwan",
@@ -117,17 +97,7 @@
     "sponsorship_started_on": "2020-06-16T03:30:05.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "4E503578B0685535M",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2020-11-16T02:32:06.000+08:00"
-      }
-    ]
+    "transactions": []
   },
   {
     "sponsor_handle": "affluent-bilby-classifieds",
@@ -136,17 +106,7 @@
     "sponsorship_started_on": "2020-06-22T19:09:58.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1HqNIREQsq43iHhXN3Uow6Qn",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2020-11-23T02:28:48.000+08:00"
-      }
-    ]
+    "transactions": []
   },
   {
     "sponsor_handle": "KoreyPeters",
@@ -157,13 +117,13 @@
     "is_yearly": false,
     "transactions": [
       {
-        "transaction_id": "ch_1Hj7uUEQsq43iHhX170svzrn",
+        "transaction_id": "ch_1Hu0GEEQsq43iHhX9z9vQv67",
         "tier_name": "$5 a month",
         "tier_monthly_amount": "$5.00",
         "processed_amount": "$5.00",
         "is_prorated": false,
         "status": "settled",
-        "transaction_date": "2020-11-03T02:37:49.000+08:00"
+        "transaction_date": "2020-12-03T02:41:16.000+08:00"
       }
     ]
   },
@@ -183,17 +143,7 @@
     "sponsorship_started_on": "2020-07-18T01:44:44.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "91M688022A525590D",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2020-11-18T03:11:32.000+08:00"
-      }
-    ]
+    "transactions": []
   },
   {
     "sponsor_handle": "StephaneP",
@@ -211,17 +161,7 @@
     "sponsorship_started_on": "2020-08-08T02:08:34.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1HnTahEQsq43iHhXJf6SjuvG",
-        "tier_name": "$19 a month",
-        "tier_monthly_amount": "$19.00",
-        "processed_amount": "$19.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2020-11-15T02:35:23.000+08:00"
-      }
-    ]
+    "transactions": []
   },
   {
     "sponsor_handle": "briannekimmel",
@@ -230,17 +170,7 @@
     "sponsorship_started_on": "2020-08-11T01:25:23.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "CBA-00028766",
-        "tier_name": "$49 a month",
-        "tier_monthly_amount": "$49.00",
-        "processed_amount": "$49.00",
-        "is_prorated": false,
-        "status": null,
-        "transaction_date": "2020-11-11T02:12:09.000+08:00"
-      }
-    ]
+    "transactions": []
   },
   {
     "sponsor_handle": "Idered",
@@ -249,17 +179,7 @@
     "sponsorship_started_on": "2020-08-19T04:03:03.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1Hov5IEQsq43iHhXAEHuIU1y",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2020-11-19T02:08:56.000+08:00"
-      }
-    ]
+    "transactions": []
   },
   {
     "sponsor_handle": "singareddynm",
@@ -268,17 +188,7 @@
     "sponsorship_started_on": "2020-08-25T14:55:22.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1Hr6LHEQsq43iHhX6gwYoMgI",
-        "tier_name": "$19 a month",
-        "tier_monthly_amount": "$19.00",
-        "processed_amount": "$19.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2020-11-25T02:34:27.000+08:00"
-      }
-    ]
+    "transactions": []
   },
   {
     "sponsor_handle": "zlwaterfield",
@@ -296,17 +206,7 @@
     "sponsorship_started_on": "2020-10-16T16:05:31.000+08:00",
     "is_public": true,
     "is_yearly": true,
-    "transactions": [
-      {
-        "transaction_id": "85C12590BC309815N",
-        "tier_name": "$19 a month",
-        "tier_monthly_amount": "$19.00",
-        "processed_amount": "$228.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2020-11-12T02:40:31.000+08:00"
-      }
-    ]
+    "transactions": []
   },
   {
     "sponsor_handle": "harrisi",
@@ -315,17 +215,7 @@
     "sponsorship_started_on": "2020-10-21T12:04:49.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1HtGx6EQsq43iHhXnNPHyUvW",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2020-12-01T02:18:27.000+08:00"
-      }
-    ]
+    "transactions": []
   },
   {
     "sponsor_handle": "CodeByCorey",
@@ -334,17 +224,7 @@
     "sponsorship_started_on": "2020-11-18T04:32:48.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1Hoar9EQsq43iHhXqxdhzTwE",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2020-11-18T04:32:58.000+08:00"
-      }
-    ]
+    "transactions": []
   },
   {
     "sponsor_handle": "deanpress",
@@ -353,17 +233,7 @@
     "sponsorship_started_on": "2020-11-19T02:12:34.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "7CK91391T4472072D",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2020-11-19T02:12:45.000+08:00"
-      }
-    ]
+    "transactions": []
   },
   {
     "sponsor_handle": "kopi-cloud",
@@ -372,17 +242,7 @@
     "sponsorship_started_on": "2020-11-26T12:51:03.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1HrcRiEQsq43iHhX0sfaKQ7o",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2020-11-26T12:51:14.000+08:00"
-      }
-    ]
+    "transactions": []
   },
   {
     "sponsor_handle": "jvieirar",
@@ -391,7 +251,17 @@
     "sponsorship_started_on": "2020-12-01T13:22:27.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": []
+    "transactions": [
+      {
+        "transaction_id": "49371497AL360554T",
+        "tier_name": "$5 a month",
+        "tier_monthly_amount": "$5.00",
+        "processed_amount": "$5.00",
+        "is_prorated": false,
+        "status": "settled",
+        "transaction_date": "2020-12-01T13:22:37.000+08:00"
+      }
+    ]
   },
   {
     "sponsor_handle": "tmm",
@@ -400,7 +270,17 @@
     "sponsorship_started_on": "2020-12-04T13:40:45.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": []
+    "transactions": [
+      {
+        "transaction_id": "ch_1HuX2DEQsq43iHhXKScHn97t",
+        "tier_name": "$49 a month",
+        "tier_monthly_amount": "$49.00",
+        "processed_amount": "$49.00",
+        "is_prorated": true,
+        "status": "settled",
+        "transaction_date": "2020-12-04T13:40:58.000+08:00"
+      }
+    ]
   },
   {
     "sponsor_handle": "gregaltuna",
@@ -409,7 +289,17 @@
     "sponsorship_started_on": "2020-12-05T01:50:46.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": []
+    "transactions": [
+      {
+        "transaction_id": "ch_1HuiQgEQsq43iHhXprUB2yh2",
+        "tier_name": "$5 a month",
+        "tier_monthly_amount": "$5.00",
+        "processed_amount": "$5.00",
+        "is_prorated": false,
+        "status": "settled",
+        "transaction_date": "2020-12-05T01:50:57.000+08:00"
+      }
+    ]
   },
   {
     "sponsor_handle": "lIIIIIIIIIIIIIIIIIIIII",
@@ -418,7 +308,17 @@
     "sponsorship_started_on": "2020-12-06T07:48:00.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": []
+    "transactions": [
+      {
+        "transaction_id": "50081267YL212870G",
+        "tier_name": "$19 a month",
+        "tier_monthly_amount": "$19.00",
+        "processed_amount": "$19.00",
+        "is_prorated": false,
+        "status": "settled",
+        "transaction_date": "2020-12-06T07:48:10.000+08:00"
+      }
+    ]
   },
   {
     "sponsor_handle": "peachp",
@@ -427,7 +327,17 @@
     "sponsorship_started_on": "2020-12-07T00:07:37.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": []
+    "transactions": [
+      {
+        "transaction_id": "ch_1HvPlwEQsq43iHhX2sEHSp7C",
+        "tier_name": "$19 a month",
+        "tier_monthly_amount": "$19.00",
+        "processed_amount": "$19.00",
+        "is_prorated": false,
+        "status": "settled",
+        "transaction_date": "2020-12-07T00:07:49.000+08:00"
+      }
+    ]
   },
   {
     "sponsor_handle": "guido4000",
@@ -436,7 +346,17 @@
     "sponsorship_started_on": "2020-12-08T04:17:27.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": []
+    "transactions": [
+      {
+        "transaction_id": "ch_1Hvq9HEQsq43iHhXJINN2jKb",
+        "tier_name": "$5 a month",
+        "tier_monthly_amount": "$5.00",
+        "processed_amount": "$5.00",
+        "is_prorated": true,
+        "status": "settled",
+        "transaction_date": "2020-12-08T04:17:38.000+08:00"
+      }
+    ]
   },
   {
     "sponsor_handle": "calendee",
@@ -445,6 +365,16 @@
     "sponsorship_started_on": "2020-12-09T03:46:00.000+08:00",
     "is_public": true,
     "is_yearly": false,
-    "transactions": []
+    "transactions": [
+      {
+        "transaction_id": "ch_1HwC8NEQsq43iHhXo1KdUWCm",
+        "tier_name": "$5 a month",
+        "tier_monthly_amount": "$5.00",
+        "processed_amount": "$5.00",
+        "is_prorated": true,
+        "status": "settled",
+        "transaction_date": "2020-12-09T03:46:11.000+08:00"
+      }
+    ]
   }
 ]
