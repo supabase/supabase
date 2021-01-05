@@ -51,7 +51,7 @@ After testing this for a while we're very happy with this pattern. Errors are ha
 
 ### We created `gotrue-js`
 
-Our goal for `supabase-js` is to tie together many sub-libaries. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing open source tools.
+Our goal for `supabase-js` is to tie together many sub-libraries. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing open source tools.
 
 To maintain this philosophy, we created [`gotrue-js`](https://github.com/supabase/gotrue-js), a library for Netlify's GoTrue auth server. This libary includes a number of new additions, including third-party logins.
 
