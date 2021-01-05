@@ -1,7 +1,10 @@
+const EDIT_BASE_URL = 'https://github.com/supabase/supabase/edit/master/web';
+
 type PageParmas = {
   id: string
   title: string
   slug: string
+  specFileName: string
   description?: string
   parameters?: string
   examples?: string[]
@@ -15,6 +18,7 @@ const Page = ({
   id,
   title,
   slug,
+  specFileName,
   description = '',
   parameters = '',
   examples = [],
@@ -28,6 +32,7 @@ const Page = ({
 id: ${id}
 title: "${title}"
 slug: ${slug}
+custom_edit_url: ${EDIT_BASE_URL}/${specFileName}
 ---
 
 import Tabs from '@theme/Tabs';
