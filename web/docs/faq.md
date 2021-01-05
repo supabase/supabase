@@ -16,7 +16,7 @@ We're building as fast as we can! And we are even adding a few things that Fireb
 
 ### How can you be a Firebase alternative if you're built with a relational database?
 
-We started Supabase because we love the functionality of Firebase, but we personally experienced the scaling issues that many others experienced. We chose Postgres because it's well-trusted and is has phenomenal scalability. Our goal is to make Postgres as easy to use as Firebase, so that you no longer have to choose between usability and scalability. Also, we're sure that once you start using Postgres, you'll love it more than any other database.
+We started Supabase because we love the functionality of Firebase, but we personally experienced the scaling issues that many others experienced. We chose Postgres because it's well-trusted and it has phenomenal scalability. Our goal is to make Postgres as easy to use as Firebase, so that you no longer have to choose between usability and scalability. Also, we're sure that once you start using Postgres, you'll love it more than any other database.
 
 ### How do I host Supabase?
 
