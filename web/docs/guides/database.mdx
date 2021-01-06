@@ -59,6 +59,20 @@ Supabase comes with a SQL Editor. You can also save your favorite queries to run
 - Data imports - import directly from a CSV or excel spreadsheet.
 
 
+## Tips
+
+
+### Changing the timezone of your server.
+
+You datatbase is initialized with the UTC timezone. We recommend keeping it this way, as it is helpful for time calculation. 
+If, however, you want to update the timezone, you can do so using any of the [database timezones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+
+For example:
+
+```sql
+alter database postgres set timezone to 'Asia/Singapore';
+```
+
 ## Next steps
 
 - Read more about [Postgres](/docs/postgres/server/about)
