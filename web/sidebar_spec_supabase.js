@@ -9,7 +9,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Auth',
-      items: ['client/auth-signup', 'client/auth-signin', 'client/auth-signout', 'client/auth-session', 'client/auth-user', 'client/auth-update', 'client/auth-onauthstatechange', 'client/reset-password-email'],
+      items: ['client/auth-signup', 'client/auth-signin', 'client/auth-signout', 'client/auth-session', 'client/auth-user', 'client/auth-update', 'client/auth-onauthstatechange', 'client/auth-resetpasswordforemail'],
       collapsed: false,
     },
     {
