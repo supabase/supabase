@@ -182,7 +182,7 @@ pages:
       - name: Sign up a new user with email
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .signUpWithEmail('example@email.com', 'example-password')
           ```
 
@@ -192,7 +192,7 @@ pages:
       - name: Sign in a user with email
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .signInWithEmail('example@email.com', 'example-password')
             ```
 
@@ -202,7 +202,7 @@ pages:
       - name: Send user a passwordless login link via email
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .sendMagicLinkEmail('example@email.com')
             ```
 
@@ -212,7 +212,7 @@ pages:
       - name: Send a user an invite link to sign up via email
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .inviteUserByEmail('example@email.com')
             ```
 
@@ -222,7 +222,7 @@ pages:
       - name: Send a user a password reset email
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .resetPasswordForEmail('example@email.com')
             ```
 
@@ -232,7 +232,7 @@ pages:
       - name: Sign a user out
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .signOut(access_token)
             ```
 
@@ -242,7 +242,7 @@ pages:
       - name: Get the user details for a given user
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .getUser(access_token)
             ```
 
@@ -252,7 +252,7 @@ pages:
       - name: Update user info that Gotrue holds (also used for setting new passwords)
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .updateUser(access_token, { password : 'Why Shinji?' })
             ```
 
@@ -262,6 +262,6 @@ pages:
       - name: Get a new access and refresh token using a valid refresh_token
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .refreshAccessToken(refresh_token)
             ```
