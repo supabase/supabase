@@ -1,6 +1,6 @@
 {
   "name": "supabase-slack-clone-basic",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "scripts": {
     "dev": "next",
