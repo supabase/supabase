@@ -42,7 +42,7 @@ info:
           - auth.user()
           - auth.update()
           - auth.onAuthStateChange()
-          - auth.resetPasswordForEmail()
+          - Reset Password (Email)
       - name: 'Data'
         items:
           - select()
@@ -361,7 +361,7 @@ pages:
           # Not yet implemented
           ```
 
-  auth.resetPasswordForEmail():
+  Reset Password (Email):
     $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.resetPasswordForEmail'
     examples:
       - name: Reset password
