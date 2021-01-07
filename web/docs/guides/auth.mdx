@@ -153,10 +153,16 @@ you disable realtime functionality for any private tables. To do this, you can m
  * Only allow realtime listening on public tables.
  */
 
-drop publication if exists supabase_realtime;
+begin; 
+  -- remove the realtime publication
+  drop publication if exists supabase_realtime; 
 
--- create the publication with "supabase_realtime" to start realtime again
-create publication supabase_realtime for table products;
+  -- re-create the publication but don't enable it for any tables
+  create publication supabase_realtime;  
+commit;
+
+-- add a table to the publication
+alter publication supabase_realtime add table products;
 
 -- add other tables to the publication
 alter publication supabase_realtime add table posts;
