@@ -872,7 +872,7 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "Sends a reset request to an email address."
+										"shortText": "<Tabs\n  defaultValue=\"js\"\n  groupId=\"libraries\"\n  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>\n\n<TabItem value=\"js\">\n\n```js\nconst { data, error } = supabase.auth.api.resetPasswordForEmail('user@email.com')\n```\n\n\n</TabItem>\n<TabItem value=\"py\">\n\n```py\n# Not yet implemented\n```\n\n\n</TabItem>\n\n</Tabs>\n\nSends a reset request to an email address.\n\nWhen the user clicks the reset link in the email they will be forwarded to:\n`<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`\n\nYour app must detect `type=recovery` in the fragment and display a password reset form to the user.\n\nYou should then use the access_token in the url and new password to update the user as follows:\n\n```js\nconst { error, data } = await auth.api\n  .updateUser(access_token, { password : new_password })\n```"
 									},
 									"parameters": [
 										{
