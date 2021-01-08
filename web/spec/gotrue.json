@@ -872,7 +872,7 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "<Tabs\n  defaultValue=\"js\"\n  groupId=\"libraries\"\n  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>\n\n<TabItem value=\"js\">\n\n```js\nconst { data, error } = supabase.auth.api.resetPasswordForEmail('user@email.com')\n```\n\n\n</TabItem>\n<TabItem value=\"py\">\n\n```py\n# Not yet implemented\n```\n\n\n</TabItem>\n\n</Tabs>\n\nSends a reset request to an email address.\n\nWhen the user clicks the reset link in the email they will be forwarded to:\n`<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`\n\nYour app must detect `type=recovery` in the fragment and display a password reset form to the user.\n\nYou should then use the access_token in the url and new password to update the user as follows:\n\n```js\nconst { error, data } = await auth.api\n  .updateUser(access_token, { password : new_password })\n```"
+										"shortText": "Sends a reset request to an email address."
 									},
 									"parameters": [
 										{
@@ -2207,7 +2207,7 @@
 								{
 									"fileName": "GoTrueClient.ts",
 									"line": 31,
-									"character": 71
+									"character": 70
 								}
 							]
 						},
@@ -2368,7 +2368,7 @@
 						},
 						{
 							"id": 202,
-							"name": "stateChangeEmmitters",
+							"name": "stateChangeEmitters",
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {
@@ -2379,7 +2379,7 @@
 								{
 									"fileName": "GoTrueClient.ts",
 									"line": 31,
-									"character": 32
+									"character": 31
 								}
 							],
 							"type": {
@@ -2595,7 +2595,7 @@
 						},
 						{
 							"id": 278,
-							"name": "_handeEmailSignIn",
+							"name": "_handleEmailSignIn",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {
@@ -2605,7 +2605,7 @@
 							"signatures": [
 								{
 									"id": 279,
-									"name": "_handeEmailSignIn",
+									"name": "_handleEmailSignIn",
 									"kind": 4096,
 									"kindString": "Call signature",
 									"flags": {
@@ -2832,13 +2832,13 @@
 								{
 									"fileName": "GoTrueClient.ts",
 									"line": 269,
-									"character": 33
+									"character": 34
 								}
 							]
 						},
 						{
 							"id": 290,
-							"name": "_handeProviderSignIn",
+							"name": "_handleProviderSignIn",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {
@@ -2848,7 +2848,7 @@
 							"signatures": [
 								{
 									"id": 291,
-									"name": "_handeProviderSignIn",
+									"name": "_handleProviderSignIn",
 									"kind": 4096,
 									"kindString": "Call signature",
 									"flags": {
@@ -3099,7 +3099,7 @@
 								{
 									"fileName": "GoTrueClient.ts",
 									"line": 285,
-									"character": 30
+									"character": 31
 								}
 							]
 						},
@@ -3562,7 +3562,7 @@
 									},
 									"comment": {
 										"shortText": "Receive a notification every time an auth event happens.",
-										"returns": "A subscription object which can be used to unsubcribe itself.\n"
+										"returns": "A subscription object which can be used to unsubscribe itself.\n"
 									},
 									"parameters": [
 										{
@@ -5215,7 +5215,7 @@
 						"type": "intrinsic",
 						"name": "string"
 					},
-					"defaultValue": "process.env.AUDIENCE || ''"
+					"defaultValue": "process?.env?.AUDIENCE || ''"
 				},
 				{
 					"id": 190,
@@ -5275,7 +5275,7 @@
 							}
 						]
 					},
-					"defaultValue": "process.env.EXPIRY_MARGIN || 60 * 1000"
+					"defaultValue": "process?.env?.EXPIRY_MARGIN || 60 * 1000"
 				},
 				{
 					"id": 188,
@@ -5297,7 +5297,7 @@
 						"type": "intrinsic",
 						"name": "string"
 					},
-					"defaultValue": "process.env.GOTRUE_URL || 'http://localhost:9999'"
+					"defaultValue": "process?.env?.GOTRUE_URL || 'http://localhost:9999'"
 				},
 				{
 					"id": 193,
@@ -5319,7 +5319,7 @@
 						"type": "intrinsic",
 						"name": "string"
 					},
-					"defaultValue": "process.env.STORAGE_KEY || 'supabase.auth.token'"
+					"defaultValue": "process?.env?.STORAGE_KEY || 'supabase.auth.token'"
 				}
 			],
 			"groups": [
