@@ -38,7 +38,7 @@ import TodoList from '@/components/TodoList.vue'
 import Loading from '@/components/Loading.vue'
 import Footer from '@/components/Footer.vue'
 import { userSession, handleLogout } from '@/vuetils/useAuth'
-import { getParameterByName } from './lib/helpers'
+import { getParameterByName } from '@/lib/helpers'
 
 export default {
   components: {
