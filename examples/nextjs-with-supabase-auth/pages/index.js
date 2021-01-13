@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import useSWR from 'swr'
-import { Auth } from '@supabase/ui'
+import { Auth, Card, Typography, Space, Button, Icon } from '@supabase/ui'
 import { supabase } from '../utils/initSupabase'
 import { useEffect, useState } from 'react'
 
@@ -35,43 +35,68 @@ const Index = () => {
     }
   }, [])
 
-  if (!user)
-    return <Auth supabaseClient={supabase} providers={['google', 'github']} view={authView} />
+  const View = () => {
+    if (!user)
+      return (
+        <Space direction="vertical" size={8}>
+          <div>
+            <img src="https://app.supabase.io/img/supabase-dark.svg" width="96" />
+            <Typography.Title level={3}>Welcome to Supabase Auth</Typography.Title>
+          </div>
+          <Auth
+            supabaseClient={supabase}
+            providers={['google', 'github']}
+            view={authView}
+            socialLayout="horizontal"
+            socialButtonSize="xlarge"
+          />
+        </Space>
+      )
+
+    return (
+      <>
+        {authView === 'update_password' && <Auth.UpdatePassword supabaseClient={supabase} />}
+        {user && (
+          <Space direction="vertical" size={6}>
+            <Typography.Text>You're signed in</Typography.Text>
+            <Typography.Text strong>Email: {user.email}</Typography.Text>
+
+            <Button
+              icon={<Icon type="LogOut" />}
+              type="outline"
+              onClick={() => supabase.auth.signOut()}
+            >
+              Log out
+            </Button>
+            {error && <Typography.Text danger>Failed to fetch user!</Typography.Text>}
+            {data && !error ? (
+              <>
+                <Typography.Text type="success">
+                  User data retrieved server-side (in API route):
+                </Typography.Text>
+
+                <Typography.Text>
+                  <pre>{JSON.stringify(data, null, 2)}</pre>
+                </Typography.Text>
+              </>
+            ) : (
+              <div>Loading...</div>
+            )}
+
+            <Typography.Link href="/profile">
+              <a>SSR example with getServerSideProps</a>
+            </Typography.Link>
+          </Space>
+        )}
+      </>
+    )
+  }
 
   return (
-    <div>
-      {authView === 'update_password' && <Auth.UpdatePassword supabaseClient={supabase} />}
-      {user && (
-        <div>
-          <p
-            style={{
-              display: 'inline-block',
-              color: 'blue',
-              textDecoration: 'underline',
-              cursor: 'pointer',
-            }}
-            onClick={() => supabase.auth.signOut()}
-          >
-            Log out
-          </p>
-          <div>
-            <p>You're signed in. Email: {user.email}</p>
-          </div>
-          {error && <div>Failed to fetch user!</div>}
-          {data && !error ? (
-            <div>
-              <span>User data retrieved server-side (in API route):</span>
-              <pre>{JSON.stringify(data, null, 2)}</pre>
-            </div>
-          ) : (
-            <div>Loading...</div>
-          )}
-
-          <Link href="/profile">
-            <a>SSR example with getServerSideProps</a>
-          </Link>
-        </div>
-      )}
+    <div style={{ maxWidth: '420px', margin: '96px auto' }}>
+      <Card>
+        <View />
+      </Card>
     </div>
   )
 }
