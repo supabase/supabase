@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import useSWR from 'swr'
 import { Auth } from '@supabase/ui'
 import { supabase } from '../utils/initSupabase'
@@ -19,6 +20,14 @@ const Index = () => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') setAuthView('update_password')
       if (event === 'USER_UPDATED') setTimeout(() => setAuthView('sign_in'), 1000)
+      // Send session to /api/auth route to set the auth cookie.
+      // NOTE: this is only needed if you're doing SSR (getServerSideProps)!
+      fetch('/api/auth', {
+        method: 'POST',
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+        credentials: 'same-origin',
+        body: JSON.stringify({ event, session }),
+      }).then((res) => res.json())
     })
 
     return () => {
@@ -57,6 +66,10 @@ const Index = () => {
           ) : (
             <div>Loading...</div>
           )}
+
+          <Link href="/profile">
+            <a>SSR example with getServerSideProps</a>
+          </Link>
         </div>
       )}
     </div>
