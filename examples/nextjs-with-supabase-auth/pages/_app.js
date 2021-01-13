@@ -1,9 +1,10 @@
-import { UserContextProvider } from '../components/UserContext'
+import { Auth } from '@supabase/ui'
+import { supabase } from '../utils/initSupabase'
 
 export default function MyApp({ Component, pageProps }) {
   return (
-    <UserContextProvider>
+    <Auth.UserContextProvider supabaseClient={supabase}>
       <Component {...pageProps} />
-    </UserContextProvider>
+    </Auth.UserContextProvider>
   )
 }
