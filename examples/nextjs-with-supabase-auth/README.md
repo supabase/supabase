@@ -48,7 +48,7 @@ yarn dev
 
 ### 4. Deploy with Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/git?s=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fnextjs-with-supabase-auth&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_KEY&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20your%20auto-generated%20docs%20at%20app.supabase.io&project-name=nextjs-with-supabase-auth&repo-name=nextjs-with-supabase-auth)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fnextjs-with-supabase-auth&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_KEY&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20your%20auto-generated%20docs%20at%20app.supabase.io&project-name=nextjs-with-supabase-auth&repo-name=nextjs-with-supabase-auth)
 
 You will be asked for the `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_KEY` from step 2 above.
 
