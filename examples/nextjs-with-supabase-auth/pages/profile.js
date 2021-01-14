@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Auth, Card, Typography, Space, Button, Icon } from '@supabase/ui'
+import { Card, Typography, Space } from '@supabase/ui'
 import { supabase } from '../utils/initSupabase'
 
 export default function Profile({ user }) {
