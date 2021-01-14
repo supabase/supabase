@@ -54,10 +54,10 @@ const Index = () => {
       )
 
     return (
-      <>
+      <Space direction="vertical" size={6}>
         {authView === 'update_password' && <Auth.UpdatePassword supabaseClient={supabase} />}
         {user && (
-          <Space direction="vertical" size={6}>
+          <>
             <Typography.Text>You're signed in</Typography.Text>
             <Typography.Text strong>Email: {user.email}</Typography.Text>
 
@@ -83,12 +83,14 @@ const Index = () => {
               <div>Loading...</div>
             )}
 
-            <Typography.Link href="/profile">
-              <a>SSR example with getServerSideProps</a>
-            </Typography.Link>
-          </Space>
+            <Typography.Text>
+              <Link href="/profile">
+                <a>SSR example with getServerSideProps</a>
+              </Link>
+            </Typography.Text>
+          </>
         )}
-      </>
+      </Space>
     )
   }
 
