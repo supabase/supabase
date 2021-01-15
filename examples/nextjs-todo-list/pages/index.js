@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/api'
+import { supabase } from '../lib/initSupabase'
 import Auth from '../components/Auth'
 import TodoList from '../components/TodoList'
 
