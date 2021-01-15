@@ -11,7 +11,6 @@
 ## Demo
 
 - Live demo: https://supabase-nextjs-todo-list.vercel.app/
-- CodeSandbox: https://codesandbox.io/s/github/supabase/supabase/tree/master/examples/nextjs-todo-list
 
 
 ## Deploy with Vercel
