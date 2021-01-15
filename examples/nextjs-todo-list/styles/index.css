@@ -26,7 +26,7 @@
 
 /* Your own custom utilities */
 
-html, body, #__next {
+html, body, #__next, #__next > div {
   height: 100vh;
   min-height: 100vh;
 }
