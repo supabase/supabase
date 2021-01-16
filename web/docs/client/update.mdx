@@ -2,6 +2,7 @@
 id: update
 title: "Modify data: update()"
 slug: update
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
 import Tabs from '@theme/Tabs';
@@ -56,7 +57,7 @@ const { data, error } = await supabase
   <div class="method-list-item-description">
 
 The values to update.
-  
+
   </div>
   
 </li>
@@ -77,7 +78,7 @@ The values to update.
   <div class="method-list-item-description">
 
 No description provided. 
-  
+
   </div>
   
 <ul className="method-list-group">
@@ -98,7 +99,7 @@ No description provided.
   <div class="method-list-item-description">
 
 By default the updated record is returned. Set this to 'minimal' if you don't need this value.
-  
+
   </div>
   
 </li>
@@ -141,6 +142,46 @@ const { data, error } = await supabase
   .from('cities')
   .update({ name: 'Middle Earth' })
   .match({ name: 'Auckland' })
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+### Updating JSON data
+
+Postgres offers a 
+[number of operators](https://www.postgresql.org/docs/current/functions-json.html) 
+for working with JSON data. Right now it is only possible to update an entire JSON document, 
+but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys. 
+
+
+<Tabs
+  defaultValue="js"
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .from('users')
+  .update(`
+    address: { 
+      street: 'Melrose Place',
+      postcode: 90210
+    }
+  `)
+  .eq('address->postcode', 90210)
 ```
 
 

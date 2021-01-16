@@ -2,6 +2,7 @@
 id: select
 title: "Fetch data: select()"
 slug: select
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
 import Tabs from '@theme/Tabs';
@@ -55,7 +56,7 @@ const { data, error } = await supabase
   <div class="method-list-item-description">
 
 The columns to retrieve, separated by commas.
-  
+
   </div>
   
 </li>
@@ -218,7 +219,7 @@ const { data, error } = await supabase
 
 If you have data inside of a JSONB column, you can apply select 
 and query filters to the data values. Postgres offers a 
-[number of operators](https://www.postgresql.org/docs/9.5/functions-json.html) 
+[number of operators](https://www.postgresql.org/docs/current/functions-json.html) 
 for querying JSON data. Also see 
 [PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
 
@@ -232,12 +233,12 @@ for querying JSON data. Also see
 
 ```js
 const { data, error } = await supabase
-  .from('products')
+  .from('users')
   .select(`
-    id,
-    supplier:supplier_id ( name ),
-    purchaser:purchaser_id ( name )
+    id, name,
+    address->street
   `)
+  .eq('address->postcode', 90210)
 ```
 
 
