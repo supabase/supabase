@@ -41,8 +41,25 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 **_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
 
-
 You will be asked for a `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_KEY`. Use the API URL and `anon` key from [step 3](#3.-get-the-url-and-key).
+
+
+## Local development
+
+First, clone this repo.
+
+Then, run the following command and edit the content based on your API URL and `anon` key.
+
+```
+cp .env.local.example .env.local
+```
+
+Then, run the following commands:
+
+```
+npm install
+npm run dev
+```
 
 ## Supabase details
 

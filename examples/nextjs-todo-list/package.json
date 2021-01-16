@@ -8,8 +8,8 @@
     "clean": "rm package-lock.json & rm -rf node_modules/ dist/ .next/"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^1.0.5",
-    "next": "^10.0.1",
+    "@supabase/supabase-js": "^1.2.1",
+    "next": "^10.0.5",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
   },

@@ -4,7 +4,7 @@ import Auth from '../components/Auth'
 import TodoList from '../components/TodoList'
 
 export default function IndexPage() {
-  let [session, setSession] = useState(null)
+  let [session, setSession] = useState(supabase.auth.session())
 
   useEffect(() => {
     setSession(supabase.auth.session())
