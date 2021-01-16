@@ -51,7 +51,7 @@ async function gen(inputFileName, outputDir) {
 
   // Index Page
   const indexFilename = outputDir + `/index.mdx`
-  const index = generateDocsIndexPage(docSpec)
+  const index = generateDocsIndexPage(docSpec, inputFileName)
   await writeToDisk(indexFilename, index)
   console.log('The index was saved: ', indexFilename)
 
@@ -70,6 +70,7 @@ async function gen(inputFileName, outputDir) {
       const content = Page({
         slug,
         id: slug,
+        specFileName: inputFileName,
         title: pageSpec.title || pageSpec.pageName,
         description,
         parameters: hasTsRef ? generateParameters(tsDefinition) : '',
@@ -156,7 +157,7 @@ const methodListItemLabel = ({ name, isOptional, type, description }, subContent
   <div class="method-list-item-description">
 
 ${description ? description : 'No description provided. '}
-  
+
   </div>
   ${subContent}
 </li>
@@ -244,11 +245,12 @@ function generateSidebar(docSpec: any) {
   return Sidebar(categories)
 }
 
-function generateDocsIndexPage(docSpec: any) {
+function generateDocsIndexPage(docSpec: any, inputFileName: string) {
   return Page({
     slug: slugify(docSpec.info.title),
     id: 'index',
     title: docSpec.info.title,
+    specFileName: inputFileName,
     description: docSpec.info.description,
   })
 }

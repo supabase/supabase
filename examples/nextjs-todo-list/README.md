@@ -1,26 +1,21 @@
 # Todo example using Supabase
 
 - Frontend:
-  - [Next.js](https://github.com/vercel/next.js). The React Framework for Production.
+  - [Next.js](https://github.com/vercel/next.js) - a React framework for production.
   - [Tailwind](https://tailwindcss.com/) for styling and layout.
   - [Supabase.js](https://supabase.io/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
-  - [app.supabase.io/](https://app.supabase.io/): hosted Postgres database with restful API for usage with Supabase.js.
-  
+  - [app.supabase.io](https://app.supabase.io/): hosted Postgres database with restful API for usage with Supabase.js.
 
 ## Demo
 
 - Live demo: https://supabase-nextjs-todo-list.vercel.app/
-- CodeSandbox: https://codesandbox.io/s/github/supabase/supabase/tree/master/examples/nextjs-todo-list
-
 
 ## Deploy with Vercel
 
 The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀
 
-
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fnextjs-todo-list&project-name=supabase-todo-list&repository-name=supabase-todo-list&demo-title=Todo%20list&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-todo-list.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FGJauPlN.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=supabase-todo-list)
-
 
 ## Build from scratch
 
@@ -41,9 +36,6 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 ![image](https://user-images.githubusercontent.com/10214025/88916245-528c2680-d298-11ea-8a71-708f93e1ce4f.png)
 
 **_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
-
-
-You will be asked for a `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_KEY`. Use the API URL and `anon` key from [step 3](#3.-get-the-url-and-key).
 
 ## Supabase details
 
@@ -84,4 +76,4 @@ create policy "Individuals can delete their own todos." on todos for
 
 - [Supabase](https://supabase.io)
 
-Supabase is open source, we'd love for you to follow along and get involved at https://github.com/supabase/supabase
+Supabase is open source. We'd love for you to follow along and get involved at https://github.com/supabase/supabase
