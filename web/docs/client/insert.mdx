@@ -2,6 +2,7 @@
 id: insert
 title: "Create data: insert()"
 slug: insert
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
 import Tabs from '@theme/Tabs';
@@ -57,7 +58,7 @@ const { data, error } = await supabase
   <div class="method-list-item-description">
 
 The values to insert.
-  
+
   </div>
   
 </li>
@@ -78,7 +79,7 @@ The values to insert.
   <div class="method-list-item-description">
 
 No description provided. 
-  
+
   </div>
   
 <ul className="method-list-group">
@@ -99,7 +100,7 @@ No description provided.
   <div class="method-list-item-description">
 
 If `true`, performs an UPSERT.
-  
+
   </div>
   
 </li>
@@ -120,7 +121,7 @@ If `true`, performs an UPSERT.
   <div class="method-list-item-description">
 
 By default the new record is returned. Set this to 'minimal' if you don't need this value.
-  
+
   </div>
   
 </li>
@@ -141,7 +142,7 @@ By default the new record is returned. Set this to 'minimal' if you don't need t
   <div class="method-list-item-description">
 
 By specifying the `on_conflict` query parameter, you can make UPSERT work on a column(s) that has a UNIQUE constraint.
-  
+
   </div>
   
 </li>
