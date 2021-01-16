@@ -218,6 +218,21 @@ pages:
 
   api.resetPasswordForEmail:
     $ref: '"GoTrueApi".GoTrueApi.resetPasswordForEmail'
+    notes: |
+      Sends a reset request to an email address.
+
+      When the user clicks the reset link in the email they will be forwarded to:
+      
+      `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`
+
+      Your app must detect `type=recovery` in the fragment and display a password reset form to the user.
+
+      You should then use the access_token in the url and new password to update the user as follows:
+
+      ```js
+      const { error, data } = await auth.api
+            .updateUser(access_token, { password : new_password })
+      ```
     examples:
       - name: Send a user a password reset email
         js: |

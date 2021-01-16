@@ -6673,7 +6673,7 @@
                         "isExported": true
                       },
                       "comment": {
-                        "shortText": "<Tabs\n  defaultValue=\"js\"\n  groupId=\"libraries\"\n  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>\n\n<TabItem value=\"js\">\n\n```js\nconst { data, error } = supabase.auth.api.resetPasswordForEmail('user@email.com')\n```\n\n\n</TabItem>\n<TabItem value=\"py\">\n\n```py\n# Not yet implemented\n```\n\n\n</TabItem>\n\n</Tabs>\n\nSends a reset request to an email address.\n\nWhen the user clicks the reset link in the email they will be forwarded to:\n`<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`\n\nYour app must detect `type=recovery` in the fragment and display a password reset form to the user.\n\nYou should then use the access_token in the url and new password to update the user as follows:\n\n```js\nconst { error, data } = await auth.api\n  .updateUser(access_token, { password : new_password })\n```"
+                        "shortText": "Sends a reset request to an email address."
                       },
                       "parameters": [
                         {
@@ -6989,7 +6989,7 @@
                         "isExported": true
                       },
                       "comment": {
-                        "shortText": "Logs in an existing using their email address."
+                        "shortText": "Logs in an existing user using their email address."
                       },
                       "parameters": [
                         {
@@ -8008,7 +8008,7 @@
                     {
                       "fileName": "GoTrueClient.ts",
                       "line": 31,
-                      "character": 71
+                      "character": 70
                     }
                   ]
                 },
@@ -8169,7 +8169,7 @@
                 },
                 {
                   "id": 202,
-                  "name": "stateChangeEmmitters",
+                  "name": "stateChangeEmitters",
                   "kind": 1024,
                   "kindString": "Property",
                   "flags": {
@@ -8180,7 +8180,7 @@
                     {
                       "fileName": "GoTrueClient.ts",
                       "line": 31,
-                      "character": 32
+                      "character": 31
                     }
                   ],
                   "type": {
@@ -8396,7 +8396,7 @@
                 },
                 {
                   "id": 278,
-                  "name": "_handeEmailSignIn",
+                  "name": "_handleEmailSignIn",
                   "kind": 2048,
                   "kindString": "Method",
                   "flags": {
@@ -8406,7 +8406,7 @@
                   "signatures": [
                     {
                       "id": 279,
-                      "name": "_handeEmailSignIn",
+                      "name": "_handleEmailSignIn",
                       "kind": 4096,
                       "kindString": "Call signature",
                       "flags": {
@@ -8633,13 +8633,13 @@
                     {
                       "fileName": "GoTrueClient.ts",
                       "line": 269,
-                      "character": 33
+                      "character": 34
                     }
                   ]
                 },
                 {
                   "id": 290,
-                  "name": "_handeProviderSignIn",
+                  "name": "_handleProviderSignIn",
                   "kind": 2048,
                   "kindString": "Method",
                   "flags": {
@@ -8649,7 +8649,7 @@
                   "signatures": [
                     {
                       "id": 291,
-                      "name": "_handeProviderSignIn",
+                      "name": "_handleProviderSignIn",
                       "kind": 4096,
                       "kindString": "Call signature",
                       "flags": {
@@ -8900,7 +8900,7 @@
                     {
                       "fileName": "GoTrueClient.ts",
                       "line": 285,
-                      "character": 30
+                      "character": 31
                     }
                   ]
                 },
@@ -9363,7 +9363,7 @@
                       },
                       "comment": {
                         "shortText": "Receive a notification every time an auth event happens.",
-                        "returns": "A subscription object which can be used to unsubcribe itself.\n"
+                        "returns": "A subscription object which can be used to unsubscribe itself.\n"
                       },
                       "parameters": [
                         {
@@ -11016,7 +11016,7 @@
                 "type": "intrinsic",
                 "name": "string"
               },
-              "defaultValue": "process.env.AUDIENCE || ''"
+              "defaultValue": "process?.env?.AUDIENCE || ''"
             },
             {
               "id": 190,
@@ -11076,7 +11076,7 @@
                   }
                 ]
               },
-              "defaultValue": "process.env.EXPIRY_MARGIN || 60 * 1000"
+              "defaultValue": "process?.env?.EXPIRY_MARGIN || 60 * 1000"
             },
             {
               "id": 188,
@@ -11098,7 +11098,7 @@
                 "type": "intrinsic",
                 "name": "string"
               },
-              "defaultValue": "process.env.GOTRUE_URL || 'http://localhost:9999'"
+              "defaultValue": "process?.env?.GOTRUE_URL || 'http://localhost:9999'"
             },
             {
               "id": 193,
@@ -11120,7 +11120,7 @@
                 "type": "intrinsic",
                 "name": "string"
               },
-              "defaultValue": "process.env.STORAGE_KEY || 'supabase.auth.token'"
+              "defaultValue": "process?.env?.STORAGE_KEY || 'supabase.auth.token'"
             }
           ],
           "groups": [
@@ -13227,7 +13227,7 @@
       "originalName": "",
       "children": [
         {
-          "id": 338,
+          "id": 344,
           "name": "\"PostgrestClient\"",
           "kind": 1,
           "kindString": "Module",
@@ -13237,7 +13237,7 @@
           "originalName": "/home/runner/work/postgrest-js/postgrest-js/src/PostgrestClient.ts",
           "children": [
             {
-              "id": 339,
+              "id": 345,
               "name": "PostgrestClient",
               "kind": 128,
               "kindString": "Class",
@@ -13246,7 +13246,7 @@
               },
               "children": [
                 {
-                  "id": 346,
+                  "id": 352,
                   "name": "constructor",
                   "kind": 512,
                   "kindString": "Constructor",
@@ -13258,7 +13258,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 347,
+                      "id": 353,
                       "name": "new PostgrestClient",
                       "kind": 16384,
                       "kindString": "Constructor signature",
@@ -13270,7 +13270,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 348,
+                          "id": 354,
                           "name": "url",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -13286,7 +13286,7 @@
                           }
                         },
                         {
-                          "id": 349,
+                          "id": 355,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -13297,7 +13297,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 350,
+                              "id": 356,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -13306,7 +13306,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 351,
+                                  "id": 357,
                                   "name": "headers",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -13319,14 +13319,14 @@
                                   "sources": [
                                     {
                                       "fileName": "PostgrestClient.ts",
-                                      "line": 18,
+                                      "line": 19,
                                       "character": 13
                                     }
                                   ],
                                   "type": {
                                     "type": "reflection",
                                     "declaration": {
-                                      "id": 352,
+                                      "id": 358,
                                       "name": "__type",
                                       "kind": 65536,
                                       "kindString": "Type literal",
@@ -13335,7 +13335,7 @@
                                       },
                                       "indexSignature": [
                                         {
-                                          "id": 353,
+                                          "id": 359,
                                           "name": "__index",
                                           "kind": 8192,
                                           "kindString": "Index signature",
@@ -13344,7 +13344,7 @@
                                           },
                                           "parameters": [
                                             {
-                                              "id": 354,
+                                              "id": 360,
                                               "name": "key",
                                               "kind": 32768,
                                               "kindString": "Parameter",
@@ -13367,7 +13367,7 @@
                                   }
                                 },
                                 {
-                                  "id": 355,
+                                  "id": 361,
                                   "name": "schema",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -13380,7 +13380,7 @@
                                   "sources": [
                                     {
                                       "fileName": "PostgrestClient.ts",
-                                      "line": 18,
+                                      "line": 19,
                                       "character": 26
                                     }
                                   ],
@@ -13404,15 +13404,15 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    351,
-                                    355
+                                    357,
+                                    361
                                   ]
                                 }
                               ],
                               "sources": [
                                 {
                                   "fileName": "PostgrestClient.ts",
-                                  "line": 17,
+                                  "line": 18,
                                   "character": 16
                                 }
                               ]
@@ -13423,7 +13423,7 @@
                       ],
                       "type": {
                         "type": "reference",
-                        "id": 339,
+                        "id": 345,
                         "name": "PostgrestClient"
                       }
                     }
@@ -13431,13 +13431,13 @@
                   "sources": [
                     {
                       "fileName": "PostgrestClient.ts",
-                      "line": 7,
+                      "line": 8,
                       "character": 17
                     }
                   ]
                 },
                 {
-                  "id": 341,
+                  "id": 347,
                   "name": "headers",
                   "kind": 1024,
                   "kindString": "Property",
@@ -13447,14 +13447,14 @@
                   "sources": [
                     {
                       "fileName": "PostgrestClient.ts",
-                      "line": 6,
+                      "line": 7,
                       "character": 9
                     }
                   ],
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 342,
+                      "id": 348,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
@@ -13463,7 +13463,7 @@
                       },
                       "indexSignature": [
                         {
-                          "id": 343,
+                          "id": 349,
                           "name": "__index",
                           "kind": 8192,
                           "kindString": "Index signature",
@@ -13472,7 +13472,7 @@
                           },
                           "parameters": [
                             {
-                              "id": 344,
+                              "id": 350,
                               "name": "key",
                               "kind": 32768,
                               "kindString": "Parameter",
@@ -13494,7 +13494,7 @@
                       "sources": [
                         {
                           "fileName": "PostgrestClient.ts",
-                          "line": 6,
+                          "line": 7,
                           "character": 10
                         }
                       ]
@@ -13502,7 +13502,7 @@
                   }
                 },
                 {
-                  "id": 345,
+                  "id": 351,
                   "name": "schema",
                   "kind": 1024,
                   "kindString": "Property",
@@ -13513,7 +13513,7 @@
                   "sources": [
                     {
                       "fileName": "PostgrestClient.ts",
-                      "line": 7,
+                      "line": 8,
                       "character": 8
                     }
                   ],
@@ -13532,7 +13532,7 @@
                   }
                 },
                 {
-                  "id": 340,
+                  "id": 346,
                   "name": "url",
                   "kind": 1024,
                   "kindString": "Property",
@@ -13542,7 +13542,7 @@
                   "sources": [
                     {
                       "fileName": "PostgrestClient.ts",
-                      "line": 5,
+                      "line": 6,
                       "character": 5
                     }
                   ],
@@ -13552,7 +13552,7 @@
                   }
                 },
                 {
-                  "id": 356,
+                  "id": 362,
                   "name": "auth",
                   "kind": 2048,
                   "kindString": "Method",
@@ -13561,7 +13561,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 357,
+                      "id": 363,
                       "name": "auth",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -13573,7 +13573,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 358,
+                          "id": 364,
                           "name": "token",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -13598,13 +13598,13 @@
                   "sources": [
                     {
                       "fileName": "PostgrestClient.ts",
-                      "line": 30,
+                      "line": 31,
                       "character": 6
                     }
                   ]
                 },
                 {
-                  "id": 359,
+                  "id": 365,
                   "name": "from",
                   "kind": 2048,
                   "kindString": "Method",
@@ -13613,7 +13613,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 360,
+                      "id": 366,
                       "name": "from",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -13625,7 +13625,7 @@
                       },
                       "typeParameter": [
                         {
-                          "id": 361,
+                          "id": 367,
                           "name": "T",
                           "kind": 131072,
                           "kindString": "Type parameter",
@@ -13636,7 +13636,7 @@
                       ],
                       "parameters": [
                         {
-                          "id": 362,
+                          "id": 368,
                           "name": "table",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -13654,7 +13654,7 @@
                       ],
                       "type": {
                         "type": "reference",
-                        "id": 281,
+                        "id": 287,
                         "typeArguments": [
                           {
                             "type": "typeParameter",
@@ -13672,13 +13672,13 @@
                   "sources": [
                     {
                       "fileName": "PostgrestClient.ts",
-                      "line": 40,
+                      "line": 41,
                       "character": 6
                     }
                   ]
                 },
                 {
-                  "id": 363,
+                  "id": 369,
                   "name": "rpc",
                   "kind": 2048,
                   "kindString": "Method",
@@ -13687,7 +13687,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 364,
+                      "id": 370,
                       "name": "rpc",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -13699,7 +13699,7 @@
                       },
                       "typeParameter": [
                         {
-                          "id": 365,
+                          "id": 371,
                           "name": "T",
                           "kind": 131072,
                           "kindString": "Type parameter",
@@ -13710,7 +13710,7 @@
                       ],
                       "parameters": [
                         {
-                          "id": 366,
+                          "id": 372,
                           "name": "fn",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -13726,7 +13726,7 @@
                           }
                         },
                         {
-                          "id": 367,
+                          "id": 373,
                           "name": "params",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -13754,7 +13754,7 @@
                       ],
                       "type": {
                         "type": "reference",
-                        "id": 29,
+                        "id": 59,
                         "typeArguments": [
                           {
                             "type": "typeParameter",
@@ -13765,14 +13765,14 @@
                             }
                           }
                         ],
-                        "name": "PostgrestBuilder"
+                        "name": "PostgrestTransformBuilder"
                       }
                     }
                   ],
                   "sources": [
                     {
                       "fileName": "PostgrestClient.ts",
-                      "line": 51,
+                      "line": 52,
                       "character": 5
                     }
                   ]
@@ -13783,32 +13783,32 @@
                   "title": "Constructors",
                   "kind": 512,
                   "children": [
-                    346
+                    352
                   ]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
                   "children": [
-                    341,
-                    345,
-                    340
+                    347,
+                    351,
+                    346
                   ]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
                   "children": [
-                    356,
-                    359,
-                    363
+                    362,
+                    365,
+                    369
                   ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "PostgrestClient.ts",
-                  "line": 4,
+                  "line": 5,
                   "character": 36
                 }
               ]
@@ -13819,7 +13819,7 @@
               "title": "Classes",
               "kind": 128,
               "children": [
-                339
+                345
               ]
             }
           ],
@@ -13832,7 +13832,7 @@
           ]
         },
         {
-          "id": 368,
+          "id": 374,
           "name": "\"index\"",
           "kind": 1,
           "kindString": "Module",
@@ -13849,7 +13849,7 @@
           ]
         },
         {
-          "id": 107,
+          "id": 110,
           "name": "\"lib/PostgrestFilterBuilder\"",
           "kind": 1,
           "kindString": "Module",
@@ -13859,7 +13859,7 @@
           "originalName": "/home/runner/work/postgrest-js/postgrest-js/src/lib/PostgrestFilterBuilder.ts",
           "children": [
             {
-              "id": 108,
+              "id": 111,
               "name": "PostgrestFilterBuilder",
               "kind": 128,
               "kindString": "Class",
@@ -13868,7 +13868,7 @@
               },
               "typeParameter": [
                 {
-                  "id": 109,
+                  "id": 112,
                   "name": "T",
                   "kind": 131072,
                   "kindString": "Type parameter",
@@ -13879,7 +13879,7 @@
               ],
               "children": [
                 {
-                  "id": 260,
+                  "id": 266,
                   "name": "constructor",
                   "kind": 512,
                   "kindString": "Constructor",
@@ -13888,7 +13888,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 261,
+                      "id": 267,
                       "name": "new PostgrestFilterBuilder",
                       "kind": 16384,
                       "kindString": "Constructor signature",
@@ -13897,7 +13897,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 262,
+                          "id": 268,
                           "name": "builder",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -13919,7 +13919,7 @@
                       ],
                       "type": {
                         "type": "reference",
-                        "id": 108,
+                        "id": 111,
                         "name": "PostgrestFilterBuilder"
                       },
                       "inheritedFrom": {
@@ -13943,7 +13943,7 @@
                   }
                 },
                 {
-                  "id": 259,
+                  "id": 265,
                   "name": "body",
                   "kind": 1024,
                   "kindString": "Property",
@@ -13994,7 +13994,7 @@
                   }
                 },
                 {
-                  "id": 254,
+                  "id": 260,
                   "name": "headers",
                   "kind": 1024,
                   "kindString": "Property",
@@ -14012,7 +14012,7 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 255,
+                      "id": 261,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
@@ -14021,7 +14021,7 @@
                       },
                       "indexSignature": [
                         {
-                          "id": 256,
+                          "id": 262,
                           "name": "__index",
                           "kind": 8192,
                           "kindString": "Index signature",
@@ -14030,7 +14030,7 @@
                           },
                           "parameters": [
                             {
-                              "id": 257,
+                              "id": 263,
                               "name": "key",
                               "kind": 32768,
                               "kindString": "Parameter",
@@ -14065,7 +14065,7 @@
                   }
                 },
                 {
-                  "id": 252,
+                  "id": 258,
                   "name": "method",
                   "kind": 1024,
                   "kindString": "Property",
@@ -14112,7 +14112,7 @@
                   }
                 },
                 {
-                  "id": 258,
+                  "id": 264,
                   "name": "schema",
                   "kind": 1024,
                   "kindString": "Property",
@@ -14148,7 +14148,7 @@
                   }
                 },
                 {
-                  "id": 253,
+                  "id": 259,
                   "name": "url",
                   "kind": 1024,
                   "kindString": "Property",
@@ -14174,7 +14174,7 @@
                   }
                 },
                 {
-                  "id": 182,
+                  "id": 185,
                   "name": "adj",
                   "kind": 2048,
                   "kindString": "Method",
@@ -14183,7 +14183,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 183,
+                      "id": 186,
                       "name": "adj",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -14195,7 +14195,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 184,
+                          "id": 187,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14215,7 +14215,7 @@
                           }
                         },
                         {
-                          "id": 185,
+                          "id": 188,
                           "name": "range",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14246,7 +14246,7 @@
                   ]
                 },
                 {
-                  "id": 162,
+                  "id": 165,
                   "name": "cd",
                   "kind": 2048,
                   "kindString": "Method",
@@ -14255,7 +14255,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 163,
+                      "id": 166,
                       "name": "cd",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -14267,7 +14267,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 164,
+                          "id": 167,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14287,7 +14287,7 @@
                           }
                         },
                         {
-                          "id": 165,
+                          "id": 168,
                           "name": "value",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14345,7 +14345,7 @@
                   ]
                 },
                 {
-                  "id": 158,
+                  "id": 161,
                   "name": "cs",
                   "kind": 2048,
                   "kindString": "Method",
@@ -14354,7 +14354,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 159,
+                      "id": 162,
                       "name": "cs",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -14366,7 +14366,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 160,
+                          "id": 163,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14386,7 +14386,7 @@
                           }
                         },
                         {
-                          "id": 161,
+                          "id": 164,
                           "name": "value",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14444,7 +14444,7 @@
                   ]
                 },
                 {
-                  "id": 118,
+                  "id": 121,
                   "name": "eq",
                   "kind": 2048,
                   "kindString": "Method",
@@ -14453,7 +14453,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 119,
+                      "id": 122,
                       "name": "eq",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -14465,7 +14465,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 120,
+                          "id": 123,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14485,7 +14485,7 @@
                           }
                         },
                         {
-                          "id": 121,
+                          "id": 124,
                           "name": "value",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14527,7 +14527,7 @@
                   ]
                 },
                 {
-                  "id": 218,
+                  "id": 221,
                   "name": "filter",
                   "kind": 2048,
                   "kindString": "Method",
@@ -14536,7 +14536,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 219,
+                      "id": 222,
                       "name": "filter",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -14548,7 +14548,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 220,
+                          "id": 223,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14568,7 +14568,7 @@
                           }
                         },
                         {
-                          "id": 221,
+                          "id": 224,
                           "name": "operator",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14580,12 +14580,12 @@
                           },
                           "type": {
                             "type": "reference",
-                            "id": 279,
+                            "id": 285,
                             "name": "FilterOperator"
                           }
                         },
                         {
-                          "id": 222,
+                          "id": 225,
                           "name": "value",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14616,7 +14616,7 @@
                   ]
                 },
                 {
-                  "id": 190,
+                  "id": 193,
                   "name": "fts",
                   "kind": 2048,
                   "kindString": "Method",
@@ -14625,7 +14625,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 191,
+                      "id": 194,
                       "name": "fts",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -14637,7 +14637,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 192,
+                          "id": 195,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14657,7 +14657,7 @@
                           }
                         },
                         {
-                          "id": 193,
+                          "id": 196,
                           "name": "query",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14673,7 +14673,7 @@
                           }
                         },
                         {
-                          "id": 194,
+                          "id": 197,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14684,7 +14684,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 195,
+                              "id": 198,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -14693,7 +14693,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 196,
+                                  "id": 199,
                                   "name": "config",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -14730,7 +14730,7 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    196
+                                    199
                                   ]
                                 }
                               ],
@@ -14761,7 +14761,7 @@
                   ]
                 },
                 {
-                  "id": 126,
+                  "id": 129,
                   "name": "gt",
                   "kind": 2048,
                   "kindString": "Method",
@@ -14770,7 +14770,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 127,
+                      "id": 130,
                       "name": "gt",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -14782,7 +14782,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 128,
+                          "id": 131,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14802,7 +14802,7 @@
                           }
                         },
                         {
-                          "id": 129,
+                          "id": 132,
                           "name": "value",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14844,7 +14844,7 @@
                   ]
                 },
                 {
-                  "id": 130,
+                  "id": 133,
                   "name": "gte",
                   "kind": 2048,
                   "kindString": "Method",
@@ -14853,7 +14853,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 131,
+                      "id": 134,
                       "name": "gte",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -14865,7 +14865,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 132,
+                          "id": 135,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14885,7 +14885,7 @@
                           }
                         },
                         {
-                          "id": 133,
+                          "id": 136,
                           "name": "value",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14927,7 +14927,7 @@
                   ]
                 },
                 {
-                  "id": 146,
+                  "id": 149,
                   "name": "ilike",
                   "kind": 2048,
                   "kindString": "Method",
@@ -14936,7 +14936,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 147,
+                      "id": 150,
                       "name": "ilike",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -14948,7 +14948,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 148,
+                          "id": 151,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14968,7 +14968,7 @@
                           }
                         },
                         {
-                          "id": 149,
+                          "id": 152,
                           "name": "pattern",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -14999,7 +14999,7 @@
                   ]
                 },
                 {
-                  "id": 154,
+                  "id": 157,
                   "name": "in",
                   "kind": 2048,
                   "kindString": "Method",
@@ -15008,7 +15008,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 155,
+                      "id": 158,
                       "name": "in",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -15020,7 +15020,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 156,
+                          "id": 159,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15040,7 +15040,7 @@
                           }
                         },
                         {
-                          "id": 157,
+                          "id": 160,
                           "name": "values",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15085,7 +15085,7 @@
                   ]
                 },
                 {
-                  "id": 150,
+                  "id": 153,
                   "name": "is",
                   "kind": 2048,
                   "kindString": "Method",
@@ -15094,7 +15094,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 151,
+                      "id": 154,
                       "name": "is",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -15106,7 +15106,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 152,
+                          "id": 155,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15126,7 +15126,7 @@
                           }
                         },
                         {
-                          "id": 153,
+                          "id": 156,
                           "name": "value",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15166,7 +15166,7 @@
                   ]
                 },
                 {
-                  "id": 142,
+                  "id": 145,
                   "name": "like",
                   "kind": 2048,
                   "kindString": "Method",
@@ -15175,7 +15175,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 143,
+                      "id": 146,
                       "name": "like",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -15187,7 +15187,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 144,
+                          "id": 147,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15207,7 +15207,7 @@
                           }
                         },
                         {
-                          "id": 145,
+                          "id": 148,
                           "name": "pattern",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15238,7 +15238,7 @@
                   ]
                 },
                 {
-                  "id": 237,
+                  "id": 243,
                   "name": "limit",
                   "kind": 2048,
                   "kindString": "Method",
@@ -15247,7 +15247,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 238,
+                      "id": 244,
                       "name": "limit",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -15259,7 +15259,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 239,
+                          "id": 245,
                           "name": "count",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15275,7 +15275,7 @@
                           }
                         },
                         {
-                          "id": 240,
+                          "id": 246,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15286,7 +15286,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 241,
+                              "id": 247,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -15295,7 +15295,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 242,
+                                  "id": 248,
                                   "name": "foreignTable",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -15308,7 +15308,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                                      "line": 40,
+                                      "line": 64,
                                       "character": 18
                                     }
                                   ],
@@ -15332,14 +15332,14 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    242
+                                    248
                                   ]
                                 }
                               ],
                               "sources": [
                                 {
                                   "fileName": "lib/PostgrestTransformBuilder.ts",
-                                  "line": 39,
+                                  "line": 63,
                                   "character": 18
                                 }
                               ]
@@ -15349,19 +15349,12 @@
                         }
                       ],
                       "type": {
-                        "type": "reference",
-                        "id": 59,
-                        "typeArguments": [
-                          {
-                            "type": "typeParameter",
-                            "name": "T"
-                          }
-                        ],
-                        "name": "PostgrestTransformBuilder"
+                        "type": "intrinsic",
+                        "name": "this"
                       },
                       "inheritedFrom": {
                         "type": "reference",
-                        "id": 69,
+                        "id": 72,
                         "name": "PostgrestTransformBuilder.limit"
                       }
                     }
@@ -15369,18 +15362,18 @@
                   "sources": [
                     {
                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                      "line": 38,
+                      "line": 62,
                       "character": 7
                     }
                   ],
                   "inheritedFrom": {
                     "type": "reference",
-                    "id": 69,
+                    "id": 72,
                     "name": "PostgrestTransformBuilder.limit"
                   }
                 },
                 {
-                  "id": 134,
+                  "id": 137,
                   "name": "lt",
                   "kind": 2048,
                   "kindString": "Method",
@@ -15389,7 +15382,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 135,
+                      "id": 138,
                       "name": "lt",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -15401,7 +15394,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 136,
+                          "id": 139,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15421,7 +15414,7 @@
                           }
                         },
                         {
-                          "id": 137,
+                          "id": 140,
                           "name": "value",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15463,7 +15456,7 @@
                   ]
                 },
                 {
-                  "id": 138,
+                  "id": 141,
                   "name": "lte",
                   "kind": 2048,
                   "kindString": "Method",
@@ -15472,7 +15465,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 139,
+                      "id": 142,
                       "name": "lte",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -15484,7 +15477,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 140,
+                          "id": 143,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15504,7 +15497,7 @@
                           }
                         },
                         {
-                          "id": 141,
+                          "id": 144,
                           "name": "value",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15546,7 +15539,7 @@
                   ]
                 },
                 {
-                  "id": 223,
+                  "id": 226,
                   "name": "match",
                   "kind": 2048,
                   "kindString": "Method",
@@ -15555,7 +15548,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 224,
+                      "id": 227,
                       "name": "match",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -15567,7 +15560,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 225,
+                          "id": 228,
                           "name": "query",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15580,7 +15573,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 226,
+                              "id": 229,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -15589,7 +15582,7 @@
                               },
                               "indexSignature": [
                                 {
-                                  "id": 227,
+                                  "id": 230,
                                   "name": "__index",
                                   "kind": 8192,
                                   "kindString": "Index signature",
@@ -15598,7 +15591,7 @@
                                   },
                                   "parameters": [
                                     {
-                                      "id": 228,
+                                      "id": 231,
                                       "name": "key",
                                       "kind": 32768,
                                       "kindString": "Parameter",
@@ -15643,7 +15636,7 @@
                   ]
                 },
                 {
-                  "id": 122,
+                  "id": 125,
                   "name": "neq",
                   "kind": 2048,
                   "kindString": "Method",
@@ -15652,7 +15645,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 123,
+                      "id": 126,
                       "name": "neq",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -15664,7 +15657,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 124,
+                          "id": 127,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15684,7 +15677,7 @@
                           }
                         },
                         {
-                          "id": 125,
+                          "id": 128,
                           "name": "value",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15726,7 +15719,7 @@
                   ]
                 },
                 {
-                  "id": 110,
+                  "id": 113,
                   "name": "not",
                   "kind": 2048,
                   "kindString": "Method",
@@ -15735,7 +15728,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 111,
+                      "id": 114,
                       "name": "not",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -15747,7 +15740,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 112,
+                          "id": 115,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15767,7 +15760,7 @@
                           }
                         },
                         {
-                          "id": 113,
+                          "id": 116,
                           "name": "operator",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15779,12 +15772,12 @@
                           },
                           "type": {
                             "type": "reference",
-                            "id": 279,
+                            "id": 285,
                             "name": "FilterOperator"
                           }
                         },
                         {
-                          "id": 114,
+                          "id": 117,
                           "name": "value",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15815,7 +15808,7 @@
                   ]
                 },
                 {
-                  "id": 174,
+                  "id": 177,
                   "name": "nxl",
                   "kind": 2048,
                   "kindString": "Method",
@@ -15824,7 +15817,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 175,
+                      "id": 178,
                       "name": "nxl",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -15836,7 +15829,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 176,
+                          "id": 179,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15856,7 +15849,7 @@
                           }
                         },
                         {
-                          "id": 177,
+                          "id": 180,
                           "name": "range",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15887,7 +15880,7 @@
                   ]
                 },
                 {
-                  "id": 178,
+                  "id": 181,
                   "name": "nxr",
                   "kind": 2048,
                   "kindString": "Method",
@@ -15896,7 +15889,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 179,
+                      "id": 182,
                       "name": "nxr",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -15908,7 +15901,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 180,
+                          "id": 183,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15928,7 +15921,7 @@
                           }
                         },
                         {
-                          "id": 181,
+                          "id": 184,
                           "name": "range",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -15959,7 +15952,7 @@
                   ]
                 },
                 {
-                  "id": 115,
+                  "id": 118,
                   "name": "or",
                   "kind": 2048,
                   "kindString": "Method",
@@ -15968,7 +15961,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 116,
+                      "id": 119,
                       "name": "or",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -15980,7 +15973,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 117,
+                          "id": 120,
                           "name": "filters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16011,7 +16004,7 @@
                   ]
                 },
                 {
-                  "id": 229,
+                  "id": 235,
                   "name": "order",
                   "kind": 2048,
                   "kindString": "Method",
@@ -16020,7 +16013,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 230,
+                      "id": 236,
                       "name": "order",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -16032,7 +16025,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 231,
+                          "id": 237,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16052,7 +16045,7 @@
                           }
                         },
                         {
-                          "id": 232,
+                          "id": 238,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16063,7 +16056,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 233,
+                              "id": 239,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -16072,7 +16065,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 234,
+                                  "id": 240,
                                   "name": "ascending",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -16085,7 +16078,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                                      "line": 19,
+                                      "line": 43,
                                       "character": 15
                                     }
                                   ],
@@ -16096,7 +16089,7 @@
                                   "defaultValue": "true"
                                 },
                                 {
-                                  "id": 236,
+                                  "id": 242,
                                   "name": "foreignTable",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -16109,7 +16102,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                                      "line": 21,
+                                      "line": 45,
                                       "character": 18
                                     }
                                   ],
@@ -16128,7 +16121,7 @@
                                   }
                                 },
                                 {
-                                  "id": 235,
+                                  "id": 241,
                                   "name": "nullsFirst",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -16141,7 +16134,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                                      "line": 20,
+                                      "line": 44,
                                       "character": 16
                                     }
                                   ],
@@ -16157,16 +16150,16 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    234,
-                                    236,
-                                    235
+                                    240,
+                                    242,
+                                    241
                                   ]
                                 }
                               ],
                               "sources": [
                                 {
                                   "fileName": "lib/PostgrestTransformBuilder.ts",
-                                  "line": 17,
+                                  "line": 41,
                                   "character": 20
                                 }
                               ]
@@ -16176,19 +16169,12 @@
                         }
                       ],
                       "type": {
-                        "type": "reference",
-                        "id": 59,
-                        "typeArguments": [
-                          {
-                            "type": "typeParameter",
-                            "name": "T"
-                          }
-                        ],
-                        "name": "PostgrestTransformBuilder"
+                        "type": "intrinsic",
+                        "name": "this"
                       },
                       "inheritedFrom": {
                         "type": "reference",
-                        "id": 61,
+                        "id": 64,
                         "name": "PostgrestTransformBuilder.order"
                       }
                     }
@@ -16196,18 +16182,18 @@
                   "sources": [
                     {
                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                      "line": 16,
+                      "line": 40,
                       "character": 7
                     }
                   ],
                   "inheritedFrom": {
                     "type": "reference",
-                    "id": 61,
+                    "id": 64,
                     "name": "PostgrestTransformBuilder.order"
                   }
                 },
                 {
-                  "id": 186,
+                  "id": 189,
                   "name": "ov",
                   "kind": 2048,
                   "kindString": "Method",
@@ -16216,7 +16202,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 187,
+                      "id": 190,
                       "name": "ov",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -16228,7 +16214,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 188,
+                          "id": 191,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16248,7 +16234,7 @@
                           }
                         },
                         {
-                          "id": 189,
+                          "id": 192,
                           "name": "value",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16302,7 +16288,7 @@
                   ]
                 },
                 {
-                  "id": 204,
+                  "id": 207,
                   "name": "phfts",
                   "kind": 2048,
                   "kindString": "Method",
@@ -16311,7 +16297,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 205,
+                      "id": 208,
                       "name": "phfts",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -16323,7 +16309,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 206,
+                          "id": 209,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16343,7 +16329,7 @@
                           }
                         },
                         {
-                          "id": 207,
+                          "id": 210,
                           "name": "query",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16359,7 +16345,7 @@
                           }
                         },
                         {
-                          "id": 208,
+                          "id": 211,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16370,7 +16356,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 209,
+                              "id": 212,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -16379,7 +16365,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 210,
+                                  "id": 213,
                                   "name": "config",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -16416,7 +16402,7 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    210
+                                    213
                                   ]
                                 }
                               ],
@@ -16447,7 +16433,7 @@
                   ]
                 },
                 {
-                  "id": 197,
+                  "id": 200,
                   "name": "plfts",
                   "kind": 2048,
                   "kindString": "Method",
@@ -16456,7 +16442,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 198,
+                      "id": 201,
                       "name": "plfts",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -16468,7 +16454,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 199,
+                          "id": 202,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16488,7 +16474,7 @@
                           }
                         },
                         {
-                          "id": 200,
+                          "id": 203,
                           "name": "query",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16504,7 +16490,7 @@
                           }
                         },
                         {
-                          "id": 201,
+                          "id": 204,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16515,7 +16501,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 202,
+                              "id": 205,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -16524,7 +16510,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 203,
+                                  "id": 206,
                                   "name": "config",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -16561,7 +16547,7 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    203
+                                    206
                                   ]
                                 }
                               ],
@@ -16592,7 +16578,7 @@
                   ]
                 },
                 {
-                  "id": 243,
+                  "id": 249,
                   "name": "range",
                   "kind": 2048,
                   "kindString": "Method",
@@ -16601,7 +16587,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 244,
+                      "id": 250,
                       "name": "range",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -16613,7 +16599,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 245,
+                          "id": 251,
                           "name": "from",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16629,7 +16615,7 @@
                           }
                         },
                         {
-                          "id": 246,
+                          "id": 252,
                           "name": "to",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16645,7 +16631,7 @@
                           }
                         },
                         {
-                          "id": 247,
+                          "id": 253,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16656,7 +16642,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 248,
+                              "id": 254,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -16665,7 +16651,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 249,
+                                  "id": 255,
                                   "name": "foreignTable",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -16678,7 +16664,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                                      "line": 57,
+                                      "line": 81,
                                       "character": 18
                                     }
                                   ],
@@ -16702,14 +16688,14 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    249
+                                    255
                                   ]
                                 }
                               ],
                               "sources": [
                                 {
                                   "fileName": "lib/PostgrestTransformBuilder.ts",
-                                  "line": 56,
+                                  "line": 80,
                                   "character": 15
                                 }
                               ]
@@ -16719,19 +16705,12 @@
                         }
                       ],
                       "type": {
-                        "type": "reference",
-                        "id": 59,
-                        "typeArguments": [
-                          {
-                            "type": "typeParameter",
-                            "name": "T"
-                          }
-                        ],
-                        "name": "PostgrestTransformBuilder"
+                        "type": "intrinsic",
+                        "name": "this"
                       },
                       "inheritedFrom": {
                         "type": "reference",
-                        "id": 75,
+                        "id": 78,
                         "name": "PostgrestTransformBuilder.range"
                       }
                     }
@@ -16739,18 +16718,81 @@
                   "sources": [
                     {
                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                      "line": 54,
+                      "line": 78,
                       "character": 7
                     }
                   ],
                   "inheritedFrom": {
                     "type": "reference",
-                    "id": 75,
+                    "id": 78,
                     "name": "PostgrestTransformBuilder.range"
                   }
                 },
                 {
-                  "id": 250,
+                  "id": 232,
+                  "name": "select",
+                  "kind": 2048,
+                  "kindString": "Method",
+                  "flags": {
+                    "isExported": true
+                  },
+                  "signatures": [
+                    {
+                      "id": 233,
+                      "name": "select",
+                      "kind": 4096,
+                      "kindString": "Call signature",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "comment": {
+                        "shortText": "Performs vertical filtering with SELECT."
+                      },
+                      "parameters": [
+                        {
+                          "id": 234,
+                          "name": "columns",
+                          "kind": 32768,
+                          "kindString": "Parameter",
+                          "flags": {
+                            "isExported": true
+                          },
+                          "comment": {
+                            "text": "The columns to retrieve, separated by commas.\n"
+                          },
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "defaultValue": "\"*\""
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "this"
+                      },
+                      "inheritedFrom": {
+                        "type": "reference",
+                        "id": 61,
+                        "name": "PostgrestTransformBuilder.select"
+                      }
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "lib/PostgrestTransformBuilder.ts",
+                      "line": 13,
+                      "character": 8
+                    }
+                  ],
+                  "inheritedFrom": {
+                    "type": "reference",
+                    "id": 61,
+                    "name": "PostgrestTransformBuilder.select"
+                  }
+                },
+                {
+                  "id": 256,
                   "name": "single",
                   "kind": 2048,
                   "kindString": "Method",
@@ -16759,7 +16801,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 251,
+                      "id": 257,
                       "name": "single",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -16788,7 +16830,7 @@
                       },
                       "inheritedFrom": {
                         "type": "reference",
-                        "id": 82,
+                        "id": 85,
                         "name": "PostgrestTransformBuilder.single"
                       }
                     }
@@ -16796,18 +16838,18 @@
                   "sources": [
                     {
                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                      "line": 71,
+                      "line": 95,
                       "character": 8
                     }
                   ],
                   "inheritedFrom": {
                     "type": "reference",
-                    "id": 82,
+                    "id": 85,
                     "name": "PostgrestTransformBuilder.single"
                   }
                 },
                 {
-                  "id": 166,
+                  "id": 169,
                   "name": "sl",
                   "kind": 2048,
                   "kindString": "Method",
@@ -16816,7 +16858,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 167,
+                      "id": 170,
                       "name": "sl",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -16828,7 +16870,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 168,
+                          "id": 171,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16848,7 +16890,7 @@
                           }
                         },
                         {
-                          "id": 169,
+                          "id": 172,
                           "name": "range",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16879,7 +16921,7 @@
                   ]
                 },
                 {
-                  "id": 170,
+                  "id": 173,
                   "name": "sr",
                   "kind": 2048,
                   "kindString": "Method",
@@ -16888,7 +16930,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 171,
+                      "id": 174,
                       "name": "sr",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -16900,7 +16942,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 172,
+                          "id": 175,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16920,7 +16962,7 @@
                           }
                         },
                         {
-                          "id": 173,
+                          "id": 176,
                           "name": "range",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -16951,7 +16993,7 @@
                   ]
                 },
                 {
-                  "id": 263,
+                  "id": 269,
                   "name": "then",
                   "kind": 2048,
                   "kindString": "Method",
@@ -16960,7 +17002,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 264,
+                      "id": 270,
                       "name": "then",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -16969,7 +17011,7 @@
                       },
                       "typeParameter": [
                         {
-                          "id": 265,
+                          "id": 271,
                           "name": "TResult1",
                           "kind": 131072,
                           "kindString": "Type parameter",
@@ -16978,7 +17020,7 @@
                           }
                         },
                         {
-                          "id": 266,
+                          "id": 272,
                           "name": "TResult2",
                           "kind": 131072,
                           "kindString": "Type parameter",
@@ -16989,7 +17031,7 @@
                       ],
                       "parameters": [
                         {
-                          "id": 267,
+                          "id": 273,
                           "name": "onfulfilled",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -17003,7 +17045,7 @@
                               {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 268,
+                                  "id": 274,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
@@ -17012,7 +17054,7 @@
                                   },
                                   "signatures": [
                                     {
-                                      "id": 269,
+                                      "id": 275,
                                       "name": "__call",
                                       "kind": 4096,
                                       "kindString": "Call signature",
@@ -17021,7 +17063,7 @@
                                       },
                                       "parameters": [
                                         {
-                                          "id": 270,
+                                          "id": 276,
                                           "name": "value",
                                           "kind": 32768,
                                           "kindString": "Parameter",
@@ -17103,7 +17145,7 @@
                           }
                         },
                         {
-                          "id": 271,
+                          "id": 277,
                           "name": "onrejected",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -17117,7 +17159,7 @@
                               {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 272,
+                                  "id": 278,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
@@ -17126,7 +17168,7 @@
                                   },
                                   "signatures": [
                                     {
-                                      "id": 273,
+                                      "id": 279,
                                       "name": "__call",
                                       "kind": 4096,
                                       "kindString": "Call signature",
@@ -17135,7 +17177,7 @@
                                       },
                                       "parameters": [
                                         {
-                                          "id": 274,
+                                          "id": 280,
                                           "name": "reason",
                                           "kind": 32768,
                                           "kindString": "Parameter",
@@ -17252,7 +17294,7 @@
                   }
                 },
                 {
-                  "id": 211,
+                  "id": 214,
                   "name": "wfts",
                   "kind": 2048,
                   "kindString": "Method",
@@ -17261,7 +17303,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 212,
+                      "id": 215,
                       "name": "wfts",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -17273,7 +17315,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 213,
+                          "id": 216,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -17293,7 +17335,7 @@
                           }
                         },
                         {
-                          "id": 214,
+                          "id": 217,
                           "name": "query",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -17309,7 +17351,7 @@
                           }
                         },
                         {
-                          "id": 215,
+                          "id": 218,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -17320,7 +17362,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 216,
+                              "id": 219,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -17329,7 +17371,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 217,
+                                  "id": 220,
                                   "name": "config",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -17366,7 +17408,7 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    217
+                                    220
                                   ]
                                 }
                               ],
@@ -17402,55 +17444,56 @@
                   "title": "Constructors",
                   "kind": 512,
                   "children": [
-                    260
+                    266
                   ]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
                   "children": [
-                    259,
-                    254,
-                    252,
+                    265,
+                    260,
                     258,
-                    253
+                    264,
+                    259
                   ]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
                   "children": [
-                    182,
-                    162,
-                    158,
-                    118,
-                    218,
-                    190,
-                    126,
-                    130,
-                    146,
-                    154,
-                    150,
-                    142,
-                    237,
-                    134,
-                    138,
-                    223,
-                    122,
-                    110,
-                    174,
-                    178,
-                    115,
-                    229,
-                    186,
-                    204,
-                    197,
+                    185,
+                    165,
+                    161,
+                    121,
+                    221,
+                    193,
+                    129,
+                    133,
+                    149,
+                    157,
+                    153,
+                    145,
                     243,
-                    250,
-                    166,
-                    170,
-                    263,
-                    211
+                    137,
+                    141,
+                    226,
+                    125,
+                    113,
+                    177,
+                    181,
+                    118,
+                    235,
+                    189,
+                    207,
+                    200,
+                    249,
+                    232,
+                    256,
+                    169,
+                    173,
+                    269,
+                    214
                   ]
                 }
               ],
@@ -17495,7 +17538,7 @@
               ]
             },
             {
-              "id": 279,
+              "id": 285,
               "name": "FilterOperator",
               "kind": 4194304,
               "kindString": "Type alias",
@@ -17602,7 +17645,7 @@
               }
             },
             {
-              "id": 275,
+              "id": 281,
               "name": "cleanFilterArray",
               "kind": 64,
               "kindString": "Function",
@@ -17614,7 +17657,7 @@
               },
               "signatures": [
                 {
-                  "id": 276,
+                  "id": 282,
                   "name": "cleanFilterArray",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -17624,7 +17667,7 @@
                   },
                   "typeParameter": [
                     {
-                      "id": 277,
+                      "id": 283,
                       "name": "T",
                       "kind": 131072,
                       "kindString": "Type parameter",
@@ -17633,7 +17676,7 @@
                   ],
                   "parameters": [
                     {
-                      "id": 278,
+                      "id": 284,
                       "name": "filter",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -17678,21 +17721,21 @@
               "title": "Classes",
               "kind": 128,
               "children": [
-                108
+                111
               ]
             },
             {
               "title": "Type aliases",
               "kind": 4194304,
               "children": [
-                279
+                285
               ]
             },
             {
               "title": "Functions",
               "kind": 64,
               "children": [
-                275
+                281
               ]
             }
           ],
@@ -17705,7 +17748,7 @@
           ]
         },
         {
-          "id": 280,
+          "id": 286,
           "name": "\"lib/PostgrestQueryBuilder\"",
           "kind": 1,
           "kindString": "Module",
@@ -17715,19 +17758,16 @@
           "originalName": "/home/runner/work/postgrest-js/postgrest-js/src/lib/PostgrestQueryBuilder.ts",
           "children": [
             {
-              "id": 281,
+              "id": 287,
               "name": "PostgrestQueryBuilder",
               "kind": 128,
               "kindString": "Class",
               "flags": {
                 "isExported": true
               },
-              "comment": {
-                "shortText": "CRUD"
-              },
               "typeParameter": [
                 {
-                  "id": 282,
+                  "id": 288,
                   "name": "T",
                   "kind": 131072,
                   "kindString": "Type parameter",
@@ -17738,7 +17778,7 @@
               ],
               "children": [
                 {
-                  "id": 283,
+                  "id": 289,
                   "name": "constructor",
                   "kind": 512,
                   "kindString": "Constructor",
@@ -17747,7 +17787,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 284,
+                      "id": 290,
                       "name": "new PostgrestQueryBuilder",
                       "kind": 16384,
                       "kindString": "Constructor signature",
@@ -17756,7 +17796,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 285,
+                          "id": 291,
                           "name": "url",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -17769,7 +17809,7 @@
                           }
                         },
                         {
-                          "id": 286,
+                          "id": 292,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -17780,7 +17820,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 287,
+                              "id": 293,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -17789,7 +17829,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 288,
+                                  "id": 294,
                                   "name": "headers",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -17799,14 +17839,14 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestQueryBuilder.ts",
-                                      "line": 11,
+                                      "line": 8,
                                       "character": 13
                                     }
                                   ],
                                   "type": {
                                     "type": "reflection",
                                     "declaration": {
-                                      "id": 289,
+                                      "id": 295,
                                       "name": "__type",
                                       "kind": 65536,
                                       "kindString": "Type literal",
@@ -17815,7 +17855,7 @@
                                       },
                                       "indexSignature": [
                                         {
-                                          "id": 290,
+                                          "id": 296,
                                           "name": "__index",
                                           "kind": 8192,
                                           "kindString": "Index signature",
@@ -17824,7 +17864,7 @@
                                           },
                                           "parameters": [
                                             {
-                                              "id": 291,
+                                              "id": 297,
                                               "name": "key",
                                               "kind": 32768,
                                               "kindString": "Parameter",
@@ -17847,7 +17887,7 @@
                                   }
                                 },
                                 {
-                                  "id": 292,
+                                  "id": 298,
                                   "name": "schema",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -17857,7 +17897,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestQueryBuilder.ts",
-                                      "line": 11,
+                                      "line": 8,
                                       "character": 26
                                     }
                                   ],
@@ -17881,15 +17921,15 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    288,
-                                    292
+                                    294,
+                                    298
                                   ]
                                 }
                               ],
                               "sources": [
                                 {
                                   "fileName": "lib/PostgrestQueryBuilder.ts",
-                                  "line": 10,
+                                  "line": 7,
                                   "character": 16
                                 }
                               ]
@@ -17900,7 +17940,7 @@
                       ],
                       "type": {
                         "type": "reference",
-                        "id": 281,
+                        "id": 287,
                         "name": "PostgrestQueryBuilder"
                       },
                       "overwrites": {
@@ -17913,7 +17953,7 @@
                   "sources": [
                     {
                       "fileName": "lib/PostgrestQueryBuilder.ts",
-                      "line": 8,
+                      "line": 5,
                       "character": 75
                     }
                   ],
@@ -17924,7 +17964,7 @@
                   }
                 },
                 {
-                  "id": 325,
+                  "id": 331,
                   "name": "body",
                   "kind": 1024,
                   "kindString": "Property",
@@ -17975,7 +18015,7 @@
                   }
                 },
                 {
-                  "id": 320,
+                  "id": 326,
                   "name": "headers",
                   "kind": 1024,
                   "kindString": "Property",
@@ -17993,7 +18033,7 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 321,
+                      "id": 327,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
@@ -18002,7 +18042,7 @@
                       },
                       "indexSignature": [
                         {
-                          "id": 322,
+                          "id": 328,
                           "name": "__index",
                           "kind": 8192,
                           "kindString": "Index signature",
@@ -18011,7 +18051,7 @@
                           },
                           "parameters": [
                             {
-                              "id": 323,
+                              "id": 329,
                               "name": "key",
                               "kind": 32768,
                               "kindString": "Parameter",
@@ -18046,7 +18086,7 @@
                   }
                 },
                 {
-                  "id": 318,
+                  "id": 324,
                   "name": "method",
                   "kind": 1024,
                   "kindString": "Property",
@@ -18093,7 +18133,7 @@
                   }
                 },
                 {
-                  "id": 324,
+                  "id": 330,
                   "name": "schema",
                   "kind": 1024,
                   "kindString": "Property",
@@ -18129,7 +18169,7 @@
                   }
                 },
                 {
-                  "id": 319,
+                  "id": 325,
                   "name": "url",
                   "kind": 1024,
                   "kindString": "Property",
@@ -18155,7 +18195,7 @@
                   }
                 },
                 {
-                  "id": 310,
+                  "id": 316,
                   "name": "delete",
                   "kind": 2048,
                   "kindString": "Method",
@@ -18164,7 +18204,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 311,
+                      "id": 317,
                       "name": "delete",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -18176,7 +18216,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 312,
+                          "id": 318,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -18187,7 +18227,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 313,
+                              "id": 319,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -18196,7 +18236,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 314,
+                                  "id": 320,
                                   "name": "returning",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -18209,7 +18249,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestQueryBuilder.ts",
-                                      "line": 98,
+                                      "line": 95,
                                       "character": 13
                                     }
                                   ],
@@ -18234,14 +18274,14 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    314
+                                    320
                                   ]
                                 }
                               ],
                               "sources": [
                                 {
                                   "fileName": "lib/PostgrestQueryBuilder.ts",
-                                  "line": 97,
+                                  "line": 94,
                                   "character": 9
                                 }
                               ]
@@ -18252,7 +18292,7 @@
                       ],
                       "type": {
                         "type": "reference",
-                        "id": 108,
+                        "id": 111,
                         "typeArguments": [
                           {
                             "type": "typeParameter",
@@ -18266,13 +18306,13 @@
                   "sources": [
                     {
                       "fileName": "lib/PostgrestQueryBuilder.ts",
-                      "line": 97,
+                      "line": 94,
                       "character": 8
                     }
                   ]
                 },
                 {
-                  "id": 296,
+                  "id": 302,
                   "name": "insert",
                   "kind": 2048,
                   "kindString": "Method",
@@ -18281,7 +18321,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 297,
+                      "id": 303,
                       "name": "insert",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -18293,7 +18333,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 298,
+                          "id": 304,
                           "name": "values",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -18333,7 +18373,7 @@
                           }
                         },
                         {
-                          "id": 299,
+                          "id": 305,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -18344,7 +18384,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 300,
+                              "id": 306,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -18353,7 +18393,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 302,
+                                  "id": 308,
                                   "name": "onConflict",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -18366,7 +18406,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestQueryBuilder.ts",
-                                      "line": 56,
+                                      "line": 53,
                                       "character": 16
                                     }
                                   ],
@@ -18385,7 +18425,7 @@
                                   }
                                 },
                                 {
-                                  "id": 303,
+                                  "id": 309,
                                   "name": "returning",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -18398,7 +18438,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestQueryBuilder.ts",
-                                      "line": 57,
+                                      "line": 54,
                                       "character": 15
                                     }
                                   ],
@@ -18418,7 +18458,7 @@
                                   "defaultValue": "\"representation\""
                                 },
                                 {
-                                  "id": 301,
+                                  "id": 307,
                                   "name": "upsert",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -18431,7 +18471,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestQueryBuilder.ts",
-                                      "line": 55,
+                                      "line": 52,
                                       "character": 12
                                     }
                                   ],
@@ -18447,16 +18487,16 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    302,
-                                    303,
-                                    301
+                                    308,
+                                    309,
+                                    307
                                   ]
                                 }
                               ],
                               "sources": [
                                 {
                                   "fileName": "lib/PostgrestQueryBuilder.ts",
-                                  "line": 53,
+                                  "line": 50,
                                   "character": 38
                                 }
                               ]
@@ -18467,7 +18507,7 @@
                       ],
                       "type": {
                         "type": "reference",
-                        "id": 108,
+                        "id": 111,
                         "typeArguments": [
                           {
                             "type": "typeParameter",
@@ -18481,13 +18521,13 @@
                   "sources": [
                     {
                       "fileName": "lib/PostgrestQueryBuilder.ts",
-                      "line": 52,
+                      "line": 49,
                       "character": 8
                     }
                   ]
                 },
                 {
-                  "id": 293,
+                  "id": 299,
                   "name": "select",
                   "kind": 2048,
                   "kindString": "Method",
@@ -18496,7 +18536,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 294,
+                      "id": 300,
                       "name": "select",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -18504,11 +18544,11 @@
                         "isExported": true
                       },
                       "comment": {
-                        "shortText": "Performs horizontal filtering with SELECT."
+                        "shortText": "Performs vertical filtering with SELECT."
                       },
                       "parameters": [
                         {
-                          "id": 295,
+                          "id": 301,
                           "name": "columns",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -18527,7 +18567,7 @@
                       ],
                       "type": {
                         "type": "reference",
-                        "id": 108,
+                        "id": 111,
                         "typeArguments": [
                           {
                             "type": "typeParameter",
@@ -18541,13 +18581,13 @@
                   "sources": [
                     {
                       "fileName": "lib/PostgrestQueryBuilder.ts",
-                      "line": 24,
+                      "line": 21,
                       "character": 8
                     }
                   ]
                 },
                 {
-                  "id": 326,
+                  "id": 332,
                   "name": "then",
                   "kind": 2048,
                   "kindString": "Method",
@@ -18556,7 +18596,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 327,
+                      "id": 333,
                       "name": "then",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -18565,7 +18605,7 @@
                       },
                       "typeParameter": [
                         {
-                          "id": 328,
+                          "id": 334,
                           "name": "TResult1",
                           "kind": 131072,
                           "kindString": "Type parameter",
@@ -18574,7 +18614,7 @@
                           }
                         },
                         {
-                          "id": 329,
+                          "id": 335,
                           "name": "TResult2",
                           "kind": 131072,
                           "kindString": "Type parameter",
@@ -18585,7 +18625,7 @@
                       ],
                       "parameters": [
                         {
-                          "id": 330,
+                          "id": 336,
                           "name": "onfulfilled",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -18599,7 +18639,7 @@
                               {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 331,
+                                  "id": 337,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
@@ -18608,7 +18648,7 @@
                                   },
                                   "signatures": [
                                     {
-                                      "id": 332,
+                                      "id": 338,
                                       "name": "__call",
                                       "kind": 4096,
                                       "kindString": "Call signature",
@@ -18617,7 +18657,7 @@
                                       },
                                       "parameters": [
                                         {
-                                          "id": 333,
+                                          "id": 339,
                                           "name": "value",
                                           "kind": 32768,
                                           "kindString": "Parameter",
@@ -18699,7 +18739,7 @@
                           }
                         },
                         {
-                          "id": 334,
+                          "id": 340,
                           "name": "onrejected",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -18713,7 +18753,7 @@
                               {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 335,
+                                  "id": 341,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
@@ -18722,7 +18762,7 @@
                                   },
                                   "signatures": [
                                     {
-                                      "id": 336,
+                                      "id": 342,
                                       "name": "__call",
                                       "kind": 4096,
                                       "kindString": "Call signature",
@@ -18731,7 +18771,7 @@
                                       },
                                       "parameters": [
                                         {
-                                          "id": 337,
+                                          "id": 343,
                                           "name": "reason",
                                           "kind": 32768,
                                           "kindString": "Parameter",
@@ -18848,7 +18888,7 @@
                   }
                 },
                 {
-                  "id": 304,
+                  "id": 310,
                   "name": "update",
                   "kind": 2048,
                   "kindString": "Method",
@@ -18857,7 +18897,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 305,
+                      "id": 311,
                       "name": "update",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -18869,7 +18909,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 306,
+                          "id": 312,
                           "name": "values",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -18891,7 +18931,7 @@
                           }
                         },
                         {
-                          "id": 307,
+                          "id": 313,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -18902,7 +18942,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 308,
+                              "id": 314,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -18911,7 +18951,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 309,
+                                  "id": 315,
                                   "name": "returning",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -18924,7 +18964,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestQueryBuilder.ts",
-                                      "line": 84,
+                                      "line": 81,
                                       "character": 15
                                     }
                                   ],
@@ -18949,14 +18989,14 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    309
+                                    315
                                   ]
                                 }
                               ],
                               "sources": [
                                 {
                                   "fileName": "lib/PostgrestQueryBuilder.ts",
-                                  "line": 83,
+                                  "line": 80,
                                   "character": 23
                                 }
                               ]
@@ -18967,7 +19007,7 @@
                       ],
                       "type": {
                         "type": "reference",
-                        "id": 108,
+                        "id": 111,
                         "typeArguments": [
                           {
                             "type": "typeParameter",
@@ -18981,7 +19021,7 @@
                   "sources": [
                     {
                       "fileName": "lib/PostgrestQueryBuilder.ts",
-                      "line": 82,
+                      "line": 79,
                       "character": 8
                     }
                   ]
@@ -18992,36 +19032,36 @@
                   "title": "Constructors",
                   "kind": 512,
                   "children": [
-                    283
+                    289
                   ]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
                   "children": [
-                    325,
-                    320,
-                    318,
+                    331,
+                    326,
                     324,
-                    319
+                    330,
+                    325
                   ]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
                   "children": [
-                    310,
-                    296,
-                    293,
-                    326,
-                    304
+                    316,
+                    302,
+                    299,
+                    332,
+                    310
                   ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "lib/PostgrestQueryBuilder.ts",
-                  "line": 8,
+                  "line": 5,
                   "character": 42
                 }
               ],
@@ -19064,7 +19104,7 @@
               "title": "Classes",
               "kind": 128,
               "children": [
-                281
+                287
               ]
             }
           ],
@@ -19110,7 +19150,7 @@
               ],
               "children": [
                 {
-                  "id": 92,
+                  "id": 95,
                   "name": "constructor",
                   "kind": 512,
                   "kindString": "Constructor",
@@ -19119,7 +19159,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 93,
+                      "id": 96,
                       "name": "new PostgrestTransformBuilder",
                       "kind": 16384,
                       "kindString": "Constructor signature",
@@ -19128,7 +19168,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 94,
+                          "id": 97,
                           "name": "builder",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -19174,7 +19214,7 @@
                   }
                 },
                 {
-                  "id": 91,
+                  "id": 94,
                   "name": "body",
                   "kind": 1024,
                   "kindString": "Property",
@@ -19225,7 +19265,7 @@
                   }
                 },
                 {
-                  "id": 86,
+                  "id": 89,
                   "name": "headers",
                   "kind": 1024,
                   "kindString": "Property",
@@ -19243,7 +19283,7 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 87,
+                      "id": 90,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
@@ -19252,7 +19292,7 @@
                       },
                       "indexSignature": [
                         {
-                          "id": 88,
+                          "id": 91,
                           "name": "__index",
                           "kind": 8192,
                           "kindString": "Index signature",
@@ -19261,7 +19301,7 @@
                           },
                           "parameters": [
                             {
-                              "id": 89,
+                              "id": 92,
                               "name": "key",
                               "kind": 32768,
                               "kindString": "Parameter",
@@ -19296,7 +19336,7 @@
                   }
                 },
                 {
-                  "id": 84,
+                  "id": 87,
                   "name": "method",
                   "kind": 1024,
                   "kindString": "Property",
@@ -19343,7 +19383,7 @@
                   }
                 },
                 {
-                  "id": 90,
+                  "id": 93,
                   "name": "schema",
                   "kind": 1024,
                   "kindString": "Property",
@@ -19379,7 +19419,7 @@
                   }
                 },
                 {
-                  "id": 85,
+                  "id": 88,
                   "name": "url",
                   "kind": 1024,
                   "kindString": "Property",
@@ -19405,7 +19445,7 @@
                   }
                 },
                 {
-                  "id": 69,
+                  "id": 72,
                   "name": "limit",
                   "kind": 2048,
                   "kindString": "Method",
@@ -19414,7 +19454,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 70,
+                      "id": 73,
                       "name": "limit",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -19426,7 +19466,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 71,
+                          "id": 74,
                           "name": "count",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -19442,7 +19482,7 @@
                           }
                         },
                         {
-                          "id": 72,
+                          "id": 75,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -19453,7 +19493,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 73,
+                              "id": 76,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -19462,7 +19502,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 74,
+                                  "id": 77,
                                   "name": "foreignTable",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -19475,7 +19515,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                                      "line": 40,
+                                      "line": 64,
                                       "character": 18
                                     }
                                   ],
@@ -19499,14 +19539,14 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    74
+                                    77
                                   ]
                                 }
                               ],
                               "sources": [
                                 {
                                   "fileName": "lib/PostgrestTransformBuilder.ts",
-                                  "line": 39,
+                                  "line": 63,
                                   "character": 18
                                 }
                               ]
@@ -19516,28 +19556,21 @@
                         }
                       ],
                       "type": {
-                        "type": "reference",
-                        "id": 59,
-                        "typeArguments": [
-                          {
-                            "type": "typeParameter",
-                            "name": "T"
-                          }
-                        ],
-                        "name": "PostgrestTransformBuilder"
+                        "type": "intrinsic",
+                        "name": "this"
                       }
                     }
                   ],
                   "sources": [
                     {
                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                      "line": 38,
+                      "line": 62,
                       "character": 7
                     }
                   ]
                 },
                 {
-                  "id": 61,
+                  "id": 64,
                   "name": "order",
                   "kind": 2048,
                   "kindString": "Method",
@@ -19546,7 +19579,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 62,
+                      "id": 65,
                       "name": "order",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -19558,7 +19591,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 63,
+                          "id": 66,
                           "name": "column",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -19578,7 +19611,7 @@
                           }
                         },
                         {
-                          "id": 64,
+                          "id": 67,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -19589,7 +19622,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 65,
+                              "id": 68,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -19598,7 +19631,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 66,
+                                  "id": 69,
                                   "name": "ascending",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -19611,7 +19644,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                                      "line": 19,
+                                      "line": 43,
                                       "character": 15
                                     }
                                   ],
@@ -19622,7 +19655,7 @@
                                   "defaultValue": "true"
                                 },
                                 {
-                                  "id": 68,
+                                  "id": 71,
                                   "name": "foreignTable",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -19635,7 +19668,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                                      "line": 21,
+                                      "line": 45,
                                       "character": 18
                                     }
                                   ],
@@ -19654,7 +19687,7 @@
                                   }
                                 },
                                 {
-                                  "id": 67,
+                                  "id": 70,
                                   "name": "nullsFirst",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -19667,7 +19700,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                                      "line": 20,
+                                      "line": 44,
                                       "character": 16
                                     }
                                   ],
@@ -19683,16 +19716,16 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    66,
-                                    68,
-                                    67
+                                    69,
+                                    71,
+                                    70
                                   ]
                                 }
                               ],
                               "sources": [
                                 {
                                   "fileName": "lib/PostgrestTransformBuilder.ts",
-                                  "line": 17,
+                                  "line": 41,
                                   "character": 20
                                 }
                               ]
@@ -19702,28 +19735,21 @@
                         }
                       ],
                       "type": {
-                        "type": "reference",
-                        "id": 59,
-                        "typeArguments": [
-                          {
-                            "type": "typeParameter",
-                            "name": "T"
-                          }
-                        ],
-                        "name": "PostgrestTransformBuilder"
+                        "type": "intrinsic",
+                        "name": "this"
                       }
                     }
                   ],
                   "sources": [
                     {
                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                      "line": 16,
+                      "line": 40,
                       "character": 7
                     }
                   ]
                 },
                 {
-                  "id": 75,
+                  "id": 78,
                   "name": "range",
                   "kind": 2048,
                   "kindString": "Method",
@@ -19732,7 +19758,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 76,
+                      "id": 79,
                       "name": "range",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -19744,7 +19770,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 77,
+                          "id": 80,
                           "name": "from",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -19760,7 +19786,7 @@
                           }
                         },
                         {
-                          "id": 78,
+                          "id": 81,
                           "name": "to",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -19776,7 +19802,7 @@
                           }
                         },
                         {
-                          "id": 79,
+                          "id": 82,
                           "name": "__namedParameters",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -19787,7 +19813,7 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 80,
+                              "id": 83,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
@@ -19796,7 +19822,7 @@
                               },
                               "children": [
                                 {
-                                  "id": 81,
+                                  "id": 84,
                                   "name": "foreignTable",
                                   "kind": 32,
                                   "kindString": "Variable",
@@ -19809,7 +19835,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                                      "line": 57,
+                                      "line": 81,
                                       "character": 18
                                     }
                                   ],
@@ -19833,14 +19859,14 @@
                                   "title": "Variables",
                                   "kind": 32,
                                   "children": [
-                                    81
+                                    84
                                   ]
                                 }
                               ],
                               "sources": [
                                 {
                                   "fileName": "lib/PostgrestTransformBuilder.ts",
-                                  "line": 56,
+                                  "line": 80,
                                   "character": 15
                                 }
                               ]
@@ -19850,28 +19876,74 @@
                         }
                       ],
                       "type": {
-                        "type": "reference",
-                        "id": 59,
-                        "typeArguments": [
-                          {
-                            "type": "typeParameter",
-                            "name": "T"
-                          }
-                        ],
-                        "name": "PostgrestTransformBuilder"
+                        "type": "intrinsic",
+                        "name": "this"
                       }
                     }
                   ],
                   "sources": [
                     {
                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                      "line": 54,
+                      "line": 78,
                       "character": 7
                     }
                   ]
                 },
                 {
-                  "id": 82,
+                  "id": 61,
+                  "name": "select",
+                  "kind": 2048,
+                  "kindString": "Method",
+                  "flags": {
+                    "isExported": true
+                  },
+                  "signatures": [
+                    {
+                      "id": 62,
+                      "name": "select",
+                      "kind": 4096,
+                      "kindString": "Call signature",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "comment": {
+                        "shortText": "Performs vertical filtering with SELECT."
+                      },
+                      "parameters": [
+                        {
+                          "id": 63,
+                          "name": "columns",
+                          "kind": 32768,
+                          "kindString": "Parameter",
+                          "flags": {
+                            "isExported": true
+                          },
+                          "comment": {
+                            "text": "The columns to retrieve, separated by commas.\n"
+                          },
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "defaultValue": "\"*\""
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "this"
+                      }
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "lib/PostgrestTransformBuilder.ts",
+                      "line": 13,
+                      "character": 8
+                    }
+                  ]
+                },
+                {
+                  "id": 85,
                   "name": "single",
                   "kind": 2048,
                   "kindString": "Method",
@@ -19880,7 +19952,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 83,
+                      "id": 86,
                       "name": "single",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -19912,13 +19984,13 @@
                   "sources": [
                     {
                       "fileName": "lib/PostgrestTransformBuilder.ts",
-                      "line": 71,
+                      "line": 95,
                       "character": 8
                     }
                   ]
                 },
                 {
-                  "id": 95,
+                  "id": 98,
                   "name": "then",
                   "kind": 2048,
                   "kindString": "Method",
@@ -19927,7 +19999,7 @@
                   },
                   "signatures": [
                     {
-                      "id": 96,
+                      "id": 99,
                       "name": "then",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -19936,7 +20008,7 @@
                       },
                       "typeParameter": [
                         {
-                          "id": 97,
+                          "id": 100,
                           "name": "TResult1",
                           "kind": 131072,
                           "kindString": "Type parameter",
@@ -19945,7 +20017,7 @@
                           }
                         },
                         {
-                          "id": 98,
+                          "id": 101,
                           "name": "TResult2",
                           "kind": 131072,
                           "kindString": "Type parameter",
@@ -19956,7 +20028,7 @@
                       ],
                       "parameters": [
                         {
-                          "id": 99,
+                          "id": 102,
                           "name": "onfulfilled",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -19970,7 +20042,7 @@
                               {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 100,
+                                  "id": 103,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
@@ -19979,7 +20051,7 @@
                                   },
                                   "signatures": [
                                     {
-                                      "id": 101,
+                                      "id": 104,
                                       "name": "__call",
                                       "kind": 4096,
                                       "kindString": "Call signature",
@@ -19988,7 +20060,7 @@
                                       },
                                       "parameters": [
                                         {
-                                          "id": 102,
+                                          "id": 105,
                                           "name": "value",
                                           "kind": 32768,
                                           "kindString": "Parameter",
@@ -20070,7 +20142,7 @@
                           }
                         },
                         {
-                          "id": 103,
+                          "id": 106,
                           "name": "onrejected",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -20084,7 +20156,7 @@
                               {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 104,
+                                  "id": 107,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
@@ -20093,7 +20165,7 @@
                                   },
                                   "signatures": [
                                     {
-                                      "id": 105,
+                                      "id": 108,
                                       "name": "__call",
                                       "kind": 4096,
                                       "kindString": "Call signature",
@@ -20102,7 +20174,7 @@
                                       },
                                       "parameters": [
                                         {
-                                          "id": 106,
+                                          "id": 109,
                                           "name": "reason",
                                           "kind": 32768,
                                           "kindString": "Parameter",
@@ -20224,29 +20296,30 @@
                   "title": "Constructors",
                   "kind": 512,
                   "children": [
-                    92
+                    95
                   ]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
                   "children": [
-                    91,
-                    86,
-                    84,
-                    90,
-                    85
+                    94,
+                    89,
+                    87,
+                    93,
+                    88
                   ]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
                   "children": [
-                    69,
+                    72,
+                    64,
+                    78,
                     61,
-                    75,
-                    82,
-                    95
+                    85,
+                    98
                   ]
                 }
               ],
@@ -20273,7 +20346,7 @@
               "extendedBy": [
                 {
                   "type": "reference",
-                  "id": 108,
+                  "id": 111,
                   "name": "PostgrestFilterBuilder"
                 }
               ],
@@ -20940,7 +21013,7 @@
                 },
                 {
                   "type": "reference",
-                  "id": 281,
+                  "id": 287,
                   "name": "PostgrestQueryBuilder"
                 }
               ],
@@ -21704,10 +21777,10 @@
           "title": "Modules",
           "kind": 1,
           "children": [
-            338,
-            368,
-            107,
-            280,
+            344,
+            374,
+            110,
+            286,
             58,
             1
           ]
