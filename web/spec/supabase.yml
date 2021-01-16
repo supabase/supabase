@@ -449,18 +449,18 @@ pages:
         description: | 
           If you have data inside of a JSONB column, you can apply select 
           and query filters to the data values. Postgres offers a 
-          [number of operators](https://www.postgresql.org/docs/9.5/functions-json.html) 
+          [number of operators](https://www.postgresql.org/docs/current/functions-json.html) 
           for querying JSON data. Also see 
           [PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
         js: |
           ```js
           const { data, error } = await supabase
-            .from('products')
+            .from('users')
             .select(`
-              id,
-              supplier:supplier_id ( name ),
-              purchaser:purchaser_id ( name )
+              id, name,
+              address->street
             `)
+            .eq('address->postcode', 90210)
           ```
         py: | 
           ```py
@@ -537,6 +537,28 @@ pages:
             .from('cities')
             .update({ name: 'Middle Earth' })
             .match({ name: 'Auckland' })
+          ```
+        py: | 
+          ```py
+          # Not yet implemented
+          ```
+      - name: Updating JSON data
+        description: | 
+          Postgres offers a 
+          [number of operators](https://www.postgresql.org/docs/current/functions-json.html) 
+          for working with JSON data. Right now it is only possible to update an entire JSON document, 
+          but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys. 
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('users')
+            .update(`
+              address: { 
+                street: 'Melrose Place',
+                postcode: 90210
+              }
+            `)
+            .eq('address->postcode', 90210)
           ```
         py: | 
           ```py
