@@ -1,16 +1,15 @@
 # Todo example using Supabase
 
 - Frontend:
-  - [Next.js](https://github.com/vercel/next.js). The React Framework for Production.
+  - [Next.js](https://github.com/vercel/next.js) - a React framework for production.
   - [Tailwind](https://tailwindcss.com/) for styling and layout.
   - [Supabase.js](https://supabase.io/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
-  - [app.supabase.io/](https://app.supabase.io/): hosted Postgres database with restful API for usage with Supabase.js.
+  - [app.supabase.io](https://app.supabase.io/): hosted Postgres database with restful API for usage with Supabase.js.
 
 ## Demo
 
 - Live demo: https://supabase-nextjs-todo-list.vercel.app/
-- CodeSandbox: https://codesandbox.io/s/github/supabase/supabase/tree/master/examples/nextjs-todo-list
 
 ## Deploy with Vercel
 
@@ -77,4 +76,4 @@ create policy "Individuals can delete their own todos." on todos for
 
 - [Supabase](https://supabase.io)
 
-Supabase is open source, we'd love for you to follow along and get involved at https://github.com/supabase/supabase
+Supabase is open source. We'd love for you to follow along and get involved at https://github.com/supabase/supabase
