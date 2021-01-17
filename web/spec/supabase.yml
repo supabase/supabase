@@ -149,9 +149,9 @@ pages:
 
       ## Usage with TypeScript
 
-      `supabase-js` ships with type definitions for usage with TypeScript and for convenient IntelliSense autocomplete and documentation in your editor.
+      `supabase-js` ships with type definitions for usage with TypeScript and for convenient IntelliSense auto-complete and documentation in your editor.
 
-      When using TypeScript, you can pass the type of database row as a type parameter to the `from` method to get better autocompletion support down the chain. 
+      When using TypeScript, you can pass the type of database row as a type parameter to the `from` method to get better auto-completion support down the chain. 
       If you don't provide a type for the row you need to explicitly pass `from<any>('tableName')`.
 
       ```ts
@@ -162,20 +162,20 @@ pages:
         user_id: string;
         channel_id: number;
         author: { username: string };
-      };
+      }
 
       const response = await supabase
         .from<Message>('messages') // Message maps to the type of the row in your database.
         .select('*, author:user_id(username)')
-        .match({ channel_id: 2 }); // Your IDE will be able to help with automcompletion.
-      response.body // Response body will be of type Array<Message>.
+        .match({ channel_id: 2 }) // Your IDE will be able to help with auto-completion.
+      response.data // Response data will be of type Array<Message>.
 
       // If you don't provide a type for the row you need to explicitly pass `from<any>('tableName')`.
       const response = await supabase
         .from<any>('messages')
         .select('*, author:user_id(username)')
-        .match({ channel_id: 2 });
-      response.body // Response body will be of type Array<any>.
+        .match({ channel_id: 2 })
+      response.data // Response data will be of type Array<any>.
       ```
 
       ### Generate database types from Swagger OpenAPI specification
@@ -713,6 +713,9 @@ pages:
           # Not yet implemented
           ```
       - name: Listening to updates
+        description: |
+          By default Supabase will send only the updated record. If you want to receive the previous values as well you can 
+          enable full replication for the table you are listening too: `alter table "your_table" replica identity full;`
         js: |
           ```js
           const mySubscription = supabase
@@ -727,6 +730,9 @@ pages:
           # Not yet implemented
           ```
       - name: Listening to deletes
+        description: |
+          By default Supabase not send deleted records. If you want to receive the deleted record you can 
+          enable full replication for the table you are listening too: `alter table "your_table" replica identity full;`
         js: |
           ```js
           const mySubscription = supabase
