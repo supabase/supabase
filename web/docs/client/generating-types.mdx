@@ -12,9 +12,9 @@ Supabase will soon release native type generators that dump your database types 
 
 ## Usage with TypeScript
 
-`supabase-js` ships with type definitions for usage with TypeScript and for convenient IntelliSense autocomplete and documentation in your editor.
+`supabase-js` ships with type definitions for usage with TypeScript and for convenient IntelliSense auto-complete and documentation in your editor.
 
-When using TypeScript, you can pass the type of database row as a type parameter to the `from` method to get better autocompletion support down the chain. 
+When using TypeScript, you can pass the type of database row as a type parameter to the `from` method to get better auto-completion support down the chain. 
 If you don't provide a type for the row you need to explicitly pass `from<any>('tableName')`.
 
 ```ts
@@ -25,13 +25,13 @@ type Message = {
   user_id: string;
   channel_id: number;
   author: { username: string };
-};
+}
 
 const response = await supabase
   .from<Message>('messages') // Message maps to the type of the row in your database.
   .select('*, author:user_id(username)')
-  .match({ channel_id: 2 }) // Your IDE will be able to help with automcompletion.
-response.data // Response body will be of type Array<Message>.
+  .match({ channel_id: 2 }) // Your IDE will be able to help with auto-completion.
+response.data // Response data will be of type Array<Message>.
 
 // If you don't provide a type for the row you need to explicitly pass `from<any>('tableName')`.
 const response = await supabase
@@ -51,10 +51,10 @@ The Swagger specification for your Supabase project can be accessed as follows:
 https://your-project.supabase.co/rest/v1/?apikey=your-anon-key
 ```
 
-Using the open source [swagger-to-ts](https://github.com/drwpow/openapi-typescript#%EF%B8%8F-reading-specs-from-remote-resource) tool you can generate your types and store them locally:
+Using the open source [swagger-to-ts](https://github.com/manifoldco/swagger-to-ts#%EF%B8%8F-reading-specs-from-remote-resource) tool you can generate your types and store them locally:
 
 ```bash
-npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/supabase.ts
+npx @manifoldco/swagger-to-ts https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/supabase.ts
 ```
 
 **Note:** Do note that your local types won't automatically stay in sync with your database, so make sure to regenerate your types after your make changes to your database.
