@@ -715,7 +715,11 @@ pages:
       - name: Listening to updates
         description: |
           By default Supabase will send only the updated record. If you want to receive the previous values as well you can 
-          enable full replication for the table you are listening too: `alter table "your_table" replica identity full;`
+          enable full replication for the table you are listening too: 
+          
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
         js: |
           ```js
           const mySubscription = supabase
@@ -732,7 +736,11 @@ pages:
       - name: Listening to deletes
         description: |
           By default Supabase not send deleted records. If you want to receive the deleted record you can 
-          enable full replication for the table you are listening too: `alter table "your_table" replica identity full;`
+          enable full replication for the table you are listening too: 
+          
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
         js: |
           ```js
           const mySubscription = supabase
