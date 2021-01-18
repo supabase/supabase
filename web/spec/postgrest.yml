@@ -1,14 +1,14 @@
 openref: 0.1
 
 info:
-  title:  PostgREST Client
+  title: PostgREST Client
   description: |
     PostgREST is a standalone web server that turns your PostgreSQL database directly into a RESTful API.
 
     Supabase provides client libraries to interact with the PostgREST.
-    
+
   definition: spec/postgrest.json
-  libraries: 
+  libraries:
     - name: 'JavaScript'
       id: 'js'
       version: '0.0.1'
@@ -59,11 +59,10 @@ info:
           - wfts
 
 pages:
-
-  Installing: 
+  Installing:
     description: |
       All JavaScript libraries are built directly by the Supabase team. 
-      
+
       Other languages are built by the community and supported by Supabase.
 
       ## JavaScript
@@ -79,7 +78,7 @@ pages:
       ```bash
       # Not yet implemented
 
-  Initializing: 
+  Initializing:
     $ref: '"PostgrestClient".PostgrestClient.constructor'
 
   from:
@@ -96,7 +95,7 @@ pages:
             .from('cities')
             .select()
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -108,7 +107,7 @@ pages:
             .from('cities')
             .select('name')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -125,12 +124,12 @@ pages:
               )
             `)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
       - name: Query the same foreign table multiple times
-        description: | 
+        description: |
           Sometimes you will need to query the same foreign table twice. 
           In this case, you can use the name of the joined column to identify 
           which join you intend to use. For convenience, you can also give an 
@@ -147,12 +146,36 @@ pages:
               purchaser:purchaser_id ( name )
             `)
           ```
-        py: | 
+        py: |
+          ```py
+          # Not yet implemented
+          ```
+      - name: Selecting specific columns
+        description: You can select specific fields from your tables.
+        js: |
+          ```js
+          const { data, error } = await postgrest
+            .from('cities')
+            .select('name')
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
+      - name: Selecting with count option
+        description: You can get the number of rows by using the count option. Values can be 'exact', 'planned' or 'estimated'.
+        js: |
+          ```js
+          const { data, error, count } = await postgrest
+            .from('cities')
+            .select('name', {count: 'exact'})
+          ```
+        py: |
           ```py
           # Not yet implemented
           ```
       - name: Quering JSON data
-        description: | 
+        description: |
           If you have data inside of a JSONB column, you can apply select 
           and query filters to the data values. Postgres offers a 
           [number of operators](https://www.postgresql.org/docs/9.5/functions-json.html) 
@@ -168,11 +191,11 @@ pages:
               purchaser:purchaser_id ( name )
             `)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
-  
+
   insert:
     $ref: '"lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
     examples:
@@ -186,7 +209,7 @@ pages:
               { name: 'The Shire', country_id: 554 }
             ])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -200,12 +223,12 @@ pages:
               { name: 'Rohan', country_id: 555 },
             ])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
       - name: Upsert
-        description: | 
+        description: |
           For upsert, if set to true, primary key columns would need to be included 
           in the data parameter in order for an update to properly happen. Also, primary keys 
           used must be natural, not surrogate. There are however, 
@@ -223,7 +246,7 @@ pages:
               ],
               { upsert: true })
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -240,7 +263,7 @@ pages:
             .update({ name: 'Middle Earth' })
             .match({ name: 'Auckland' })
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -257,14 +280,14 @@ pages:
             .delete()
             .match({ id: 666 })
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
 
   rpc:
-    title: "Stored Procedures: rpc()"
-    description: | 
+    title: 'Stored Procedures: rpc()'
+    description: |
       You can call stored procedures as a "Remote Procedure Call".
 
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
@@ -280,7 +303,7 @@ pages:
             .rpc('hello_world')
           }
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -291,7 +314,7 @@ pages:
             .rpc('echo_city', { name: 'The Shire' })
           }
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -305,12 +328,12 @@ pages:
             ])
           }
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
       - name: With filters.
-        description: | 
+        description: |
           Stored procedures that return tables can also be combined with 
           [Modifiers](/docs/postgrest/client/using-modifiers) and 
           [Filters](/docs/postgrest/client/using-filters).
@@ -320,7 +343,7 @@ pages:
             .rpc('echo_all_cities')
             .eq('name', 'The Shire')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -337,7 +360,7 @@ pages:
             .select('name, country_id')
             .filter('name', 'eq', 'Paris')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -349,7 +372,7 @@ pages:
             .update({ name: 'Mordor' })
             .filter('name', 'eq', 'Paris')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -361,7 +384,7 @@ pages:
             .delete()
             .filter('name', 'eq', 'Paris')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -373,7 +396,7 @@ pages:
             .rpc('echo_all_cities')
             .filter('name', 'eq', 'Paris')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -385,7 +408,7 @@ pages:
             .select('name, countries ( name )')
             .filter('countries.name', 'eq', 'France')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -402,7 +425,7 @@ pages:
             .select('name, country_id')
             .not('name', 'eq', 'Paris')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -414,7 +437,7 @@ pages:
             .update({ name: 'Mordor' })
             .not('name', 'eq', 'Paris')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -426,7 +449,7 @@ pages:
             .delete()
             .not('name', 'eq', 'Paris')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -438,7 +461,7 @@ pages:
             .rpc('echo_all_cities)
             .not('name', 'eq', 'Paris')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -455,7 +478,7 @@ pages:
             .select('name, country_id')
             .eq('name', 'The shire')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -467,7 +490,7 @@ pages:
             .update({ name: 'Mordor' })
             .eq('name', 'San Francisco')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -479,7 +502,7 @@ pages:
             .delete()
             .eq('name', 'Mordor')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -491,7 +514,7 @@ pages:
             .rpc('echo_all_cities')
             .eq('name', 'San Francisco')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -508,7 +531,7 @@ pages:
             .select('name, country_id')
             .neq('name', 'The shire')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -520,7 +543,7 @@ pages:
             .update({ name: 'Mordor' })
             .neq('name', 'San Francisco')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -532,7 +555,7 @@ pages:
             .delete()
             .neq('name', 'Mordor')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -544,7 +567,7 @@ pages:
             .rpc('echo_all_cities')
             .neq('name', 'Lagos')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -561,7 +584,7 @@ pages:
             .select('name, country_id')
             .gt('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -573,7 +596,7 @@ pages:
             .update({ name: 'Mordor' })
             .gt('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -585,7 +608,7 @@ pages:
             .delete()
             .gt('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -597,7 +620,7 @@ pages:
             .rpc('echo_all_cities')
             .gt('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -614,7 +637,7 @@ pages:
             .select('name, country_id')
             .gte('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -626,7 +649,7 @@ pages:
             .update({ name: 'Mordor' })
             .gte('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -638,7 +661,7 @@ pages:
             .delete()
             .gte('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -650,7 +673,7 @@ pages:
             .rpc('echo_all_cities')
             .gte('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -667,7 +690,7 @@ pages:
             .select('name, country_id')
             .lt('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -679,7 +702,7 @@ pages:
             .update({ name: 'Mordor' })
             .lt('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -691,7 +714,7 @@ pages:
             .delete()
             .lt('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -703,7 +726,7 @@ pages:
             .rpc('echo_all_cities')
             .lt('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -720,7 +743,7 @@ pages:
             .select('name, country_id')
             .lte('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -732,7 +755,7 @@ pages:
             .update({ name: 'Mordor' })
             .lte('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -744,7 +767,7 @@ pages:
             .delete()
             .lte('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -756,7 +779,7 @@ pages:
             .rpc('echo_all_cities')
             .lte('country_id', 250)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -773,7 +796,7 @@ pages:
             .select('name, country_id')
             .like('name', '%la%')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -785,7 +808,7 @@ pages:
             .update({ name: 'Mordor' })
             .like('name', '%la%')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -797,7 +820,7 @@ pages:
             .delete()
             .like('name', '%la%')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -809,7 +832,7 @@ pages:
             .rpc('echo_all_cities')
             .like('name', '%la%')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -826,7 +849,7 @@ pages:
             .select('name, country_id')
             .ilike('name', '%la%')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -838,7 +861,7 @@ pages:
             .update({ name: 'Mordor' })
             .ilike('name', '%la%')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -850,7 +873,7 @@ pages:
             .delete()
             .ilike('name', '%la%')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -862,7 +885,7 @@ pages:
             .rpc('echo_all_cities')
             .ilike('name', '%la%')
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -879,7 +902,7 @@ pages:
             .select('name, country_id')
             .is('name', null)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -891,7 +914,7 @@ pages:
             .update({ name: 'Mordor' })
             .is('name', null)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -903,7 +926,7 @@ pages:
             .delete()
             .is('name', null)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -915,7 +938,7 @@ pages:
             .rpc('echo_all_cities')
             .is('name', null)
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -932,7 +955,7 @@ pages:
             .select('name, country_id')
             .in('name', ['Rio de Janeiro', 'San Francisco'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -944,7 +967,7 @@ pages:
             .update({ name: 'Mordor' })
             .in('name', ['Rio de Janeiro', 'San Francisco'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -956,7 +979,7 @@ pages:
             .delete()
             .in('name', ['Rio de Janeiro', 'San Francisco'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -968,7 +991,7 @@ pages:
             .rpc('echo_all_cities')
             .in('name', ['Rio de Janeiro', 'San Francisco'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -985,7 +1008,7 @@ pages:
             .select('name, id, main_exports')
             .cs('main_exports', ['oil'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -997,7 +1020,7 @@ pages:
             .update({ name: 'Mordor' })
             .cs('main_exports', ['oil'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1009,7 +1032,7 @@ pages:
             .delete()
             .cs('main_exports', ['oil'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1021,7 +1044,7 @@ pages:
             .rpc('echo_all_countries')
             .cs('main_exports', ['oil'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1038,7 +1061,7 @@ pages:
             .select('name, id, main_exports')
             .cd('main_exports', ['cars', 'food', 'machine'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1050,7 +1073,7 @@ pages:
             .update({ name: 'Mordor' })
             .cd('main_exports', ['orks', 'surveillance', 'evil'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1062,7 +1085,7 @@ pages:
             .delete()
             .cd('main_exports', ['cars', 'food', 'machine'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1074,7 +1097,7 @@ pages:
             .rpc('echo_all_countries')
             .cd('main_exports', ['cars', 'food', 'machine'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1091,7 +1114,7 @@ pages:
             .select('name, id, population_range_millions')
             .sl('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1103,7 +1126,7 @@ pages:
             .update({ name: 'Mordor' })
             .sl('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1115,7 +1138,7 @@ pages:
             .delete()
             .sl('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1127,7 +1150,7 @@ pages:
             .rpc('echo_all_countries')
             .sl('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1144,7 +1167,7 @@ pages:
             .select('name, id, population_range_millions')
             .sr('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1156,7 +1179,7 @@ pages:
             .update({ name: 'Mordor' })
             .sr('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1168,7 +1191,7 @@ pages:
             .delete()
             .sr('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1180,7 +1203,7 @@ pages:
             .rpc('echo_all_countries')
             .sr('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1197,7 +1220,7 @@ pages:
             .select('name, id, population_range_millions')
             .nxl('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1209,7 +1232,7 @@ pages:
             .update({ name: 'Mordor' })
             .nxl('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1221,7 +1244,7 @@ pages:
             .delete()
             .nxl('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1233,7 +1256,7 @@ pages:
             .rpc('echo_all_countries')
             .nxl('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1250,7 +1273,7 @@ pages:
             .select('name, id, population_range_millions')
             .nxr('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1262,7 +1285,7 @@ pages:
             .update({ name: 'Mordor' })
             .nxr('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1274,7 +1297,7 @@ pages:
             .delete()
             .nxr('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1286,7 +1309,7 @@ pages:
             .rpc('echo_all_countries')
             .nxr('population_range_millions', [150, 250])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1303,7 +1326,7 @@ pages:
             .select('name, id, population_range_millions')
             .adj('population_range_millions', [70, 185])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1315,7 +1338,7 @@ pages:
             .update({ name: 'Mordor' })
             .adj('population_range_millions', [70, 185])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1327,7 +1350,7 @@ pages:
             .delete()
             .adj('population_range_millions', [70, 185])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1339,7 +1362,7 @@ pages:
             .rpc('echo_all_countries')
             .adj('population_range_millions', [70, 185])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1356,7 +1379,7 @@ pages:
             .select('name, id, main_exports')
             .ova('main_exports', ['computers', 'minerals'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1368,7 +1391,7 @@ pages:
             .update({ name: 'Mordor' })
             .ova('main_exports', ['computers', 'minerals'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1380,7 +1403,7 @@ pages:
             .delete()
             .ova('main_exports', ['computers', 'minerals'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
@@ -1392,7 +1415,7 @@ pages:
             .rpc('echo_all_countries')
             .ova('main_exports', ['computers', 'minerals'])
           ```
-        py: | 
+        py: |
           ```py
           # Not yet implemented
           ```
