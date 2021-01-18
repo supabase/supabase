@@ -162,7 +162,7 @@ pages:
           ```py
           # Not yet implemented
           ```
-      - name: Selecting with count option
+      - name: Querying with count option
         description: |
           You can get the number of rows by using the count option.
           Allowed values for count option are 'exact', 'planned' and 'estimated'.
