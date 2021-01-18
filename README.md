@@ -19,6 +19,17 @@
 - [ ] Storage (coming soon)
 - [ ] Functions (coming soon)
 
+## Documentation
+
+For full documentation, visit [supabase.io/docs](https://supabase.io/docs)
+
+## Community
+
+For help, discussion about best practices, or any other conversation that would benefit from being searchable:
+
+[Discuss Supabase on GitHub](https://github.com/supabase/supabase/discussions)
+
+
 ## Status
 
 - [x] Alpha: We are testing Supabase with a closed set of customers
@@ -30,9 +41,8 @@ We are currently in Public Beta. Watch "releases" of this repo to get notified o
 
 
 
-<p align="center">
 <kbd><img src="https://gitcdn.xyz/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
-</p>
+
 
 ----
 
