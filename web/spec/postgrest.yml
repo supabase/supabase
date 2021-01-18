@@ -163,12 +163,14 @@ pages:
           # Not yet implemented
           ```
       - name: Selecting with count option
-        description: You can get the number of rows by using the count option. Values can be 'exact', 'planned' or 'estimated'.
+        description: |
+          You can get the number of rows by using the count option.
+          Allowed values for count option are 'exact', 'planned' and 'estimated'.
         js: |
           ```js
           const { data, error, count } = await postgrest
             .from('cities')
-            .select('name', {count: 'exact'})
+            .select('name', { count: 'exact' })
           ```
         py: |
           ```py
@@ -347,7 +349,21 @@ pages:
           ```py
           # Not yet implemented
           ```
-
+      - name: With count option
+        description: |
+          You can specify a count option to get the row count along with your data.
+          Allowed values for count option are 'exact', 'planned' and 'estimated'.
+        js: |
+          ```js
+          const { data, error, count } = await postgrest
+            .from('cities')
+            .rpc('hello_world', { count: 'exact' })
+          }
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
   filter:
     $ref: '"lib/PostgrestFilterBuilder".PostgrestFilterBuilder.filter'
     examples:
