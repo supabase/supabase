@@ -2,6 +2,7 @@
 id: initializing
 title: "Initializing"
 slug: initializing
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/gotrue.yml
 ---
 
 import Tabs from '@theme/Tabs';
@@ -63,7 +64,7 @@ const auth = new GoTrueClient({
   <div class="method-list-item-description">
 
 No description provided. 
-  
+
   </div>
   
 <ul className="method-list-group">
@@ -84,7 +85,28 @@ No description provided.
   <div class="method-list-item-description">
 
 Set to "true" if you want to automatically refresh the token before expiring.
+
+  </div>
   
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      cookieOptions
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>CookieOptions</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided. 
+
   </div>
   
 </li>
@@ -105,7 +127,7 @@ Set to "true" if you want to automatically refresh the token before expiring.
   <div class="method-list-item-description">
 
 Set to "true" if you want to automatically detects OAuth grants in the URL and signs in the user.
-  
+
   </div>
   
 </li>
@@ -126,7 +148,7 @@ Set to "true" if you want to automatically detects OAuth grants in the URL and s
   <div class="method-list-item-description">
 
 Any additional headers to send to the GoTrue server.
-  
+
   </div>
   
 </li>
@@ -147,7 +169,7 @@ Any additional headers to send to the GoTrue server.
   <div class="method-list-item-description">
 
 No description provided. 
-  
+
   </div>
   
 </li>
@@ -168,7 +190,7 @@ No description provided.
   <div class="method-list-item-description">
 
 Set to "true" if you want to automatically save the user session into local storage.
-  
+
   </div>
   
 </li>
@@ -189,7 +211,7 @@ Set to "true" if you want to automatically save the user session into local stor
   <div class="method-list-item-description">
 
 The URL of the GoTrue server.
-  
+
   </div>
   
 </li>

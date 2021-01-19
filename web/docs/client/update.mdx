@@ -104,6 +104,27 @@ By default the updated record is returned. Set this to 'minimal' if you don't ne
   
 </li>
 
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      count
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>null</code> | <code>exact</code> | <code>planned</code> | <code>estimated</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided. 
+
+  </div>
+  
+</li>
+
 </ul>
 
 </li>
@@ -162,7 +183,7 @@ const { data, error } = await supabase
 Postgres offers a 
 [number of operators](https://www.postgresql.org/docs/current/functions-json.html) 
 for working with JSON data. Right now it is only possible to update an entire JSON document, 
-but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys. 
+but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys.
 
 
 <Tabs
