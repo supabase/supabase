@@ -337,8 +337,8 @@ pages:
       - name: With filters.
         description: |
           Stored procedures that return tables can also be combined with 
-          [Modifiers](/docs/postgrest/client/using-modifiers) and 
-          [Filters](/docs/postgrest/client/using-filters).
+          `modifiers` and 
+          `filters`.
         js: |
           ```js
           const { data, error } = await postgrest

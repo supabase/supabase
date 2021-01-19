@@ -199,8 +199,8 @@ const { data, error } = await postgrest
 ### With filters.
 
 Stored procedures that return tables can also be combined with 
-[Modifiers](/docs/postgrest/client/using-modifiers) and 
-[Filters](/docs/postgrest/client/using-filters).
+`modifiers` and 
+`filters`.
 
 
 <Tabs
@@ -214,6 +214,39 @@ Stored procedures that return tables can also be combined with
 const { data, error } = await postgrest
   .rpc('echo_all_cities')
   .eq('name', 'The Shire')
+```
+
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+
+</TabItem>
+
+</Tabs>
+
+### With count option
+
+You can specify a count option to get the row count along with your data.
+Allowed values for count option are `null`, `exact`, `planned` and `estimated`.
+
+
+<Tabs
+  defaultValue="js"
+  groupId="libraries"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error, count } = await postgrest
+  .from('cities')
+  .rpc('hello_world', { count: 'exact' })
+}
 ```
 
 
