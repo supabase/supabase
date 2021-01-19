@@ -165,7 +165,7 @@ pages:
       - name: Querying with count option
         description: |
           You can get the number of rows by using the count option.
-          Allowed values for count option are 'exact', 'planned' and 'estimated'.
+          Allowed values for count option are `null`, `exact`, `planned` and `estimated`.
         js: |
           ```js
           const { data, error, count } = await postgrest
@@ -352,7 +352,7 @@ pages:
       - name: With count option
         description: |
           You can specify a count option to get the row count along with your data.
-          Allowed values for count option are 'exact', 'planned' and 'estimated'.
+          Allowed values for count option are `null`, `exact`, `planned` and `estimated`.
         js: |
           ```js
           const { data, error, count } = await postgrest
