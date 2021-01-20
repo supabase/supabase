@@ -2,7 +2,7 @@
   "name": "supabase-nextjs-todo-list",
   "version": "1.0.0",
   "scripts": {
-    "dev": "next --port 4001",
+    "dev": "next",
     "build": "next build",
     "start": "next start",
     "clean": "rm package-lock.json & rm -rf node_modules/ dist/ .next/"
