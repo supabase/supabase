@@ -2,13 +2,13 @@
   "name": "supabase-nextjs-todo-list",
   "version": "1.0.0",
   "scripts": {
-    "dev": "next",
+    "dev": "next --port 4001",
     "build": "next build",
     "start": "next start",
     "clean": "rm package-lock.json & rm -rf node_modules/ dist/ .next/"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^1.2.1",
+    "@supabase/supabase-js": "^1.3.2",
     "@supabase/ui": "^0.6.1",
     "next": "^10.0.1",
     "react": "^17.0.1",
