@@ -419,7 +419,7 @@ a.card:hover {
 }
 @media screen and (max-width: 996px) {
   .menu.menu--responsive {
-    padding-left: 16px;
+    padding-left: 24px;
   }
 }
 .menu > ul.menu__list li {
