@@ -16,7 +16,6 @@
     "@docusaurus/core": "^2.0.0-alpha.63",
     "@docusaurus/preset-classic": "^2.0.0-alpha.63",
     "@kiwicopple/prism-react-renderer": "github:kiwicopple/prism-react-renderer",
-    "classnames": "^2.2.6",
     "mermaid": "^8.6.4",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
