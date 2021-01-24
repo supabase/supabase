@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import classnames from 'classnames'
+import clsx from 'clsx'
 import Layout from '@theme/Layout'
 import Link from '@docusaurus/Link'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
@@ -177,7 +177,7 @@ function Home() {
     <Layout title={`${siteConfig.title}`} description={siteConfig.tagline}>
       <main className="HomePage">
         {/* HEADER */}
-        <header className={classnames('hero full', styles.heroBanner)}>
+        <header className={clsx('hero full', styles.heroBanner)}>
           <div className="container">
             <div className="row">
               <div className="col col--5">
@@ -187,7 +187,7 @@ function Home() {
                 </p>
                 <div>
                   <Link
-                    className={classnames(
+                    className={clsx(
                       'button hero--button button--md button--secondary button--outline responsive-button',
                       styles.button
                     )}
@@ -197,7 +197,7 @@ function Home() {
                     Learn More
                   </Link>
                   <Link
-                    className={classnames(
+                    className={clsx(
                       'button hero--button button--md button--primary responsive-button',
                       styles.button
                     )}
@@ -245,7 +245,7 @@ function Home() {
         {/* HOW */}
         <section className={'section-lg'}>
           <div className="container">
-            <div className={classnames('row', styles.responsiveCentered)}>
+            <div className={clsx('row', styles.responsiveCentered)}>
               <div className="col col--6 col--offset-3">
                 <h2 className="">How it works</h2>
                 <p className="">
@@ -321,7 +321,7 @@ function Home() {
         {/* For Devs */}
         <section className={styles.forDevelopers}>
           <div className="container">
-            <div className={classnames('row', styles.responsiveCentered)}>
+            <div className={clsx('row', styles.responsiveCentered)}>
               <div className="col col--6 col--offset-3">
                 <h2 className="">For Developers</h2>
                 <p className="">
@@ -433,7 +433,7 @@ function Home() {
 
         <section className={'section-lg'}>
           <div className="container">
-            <div className={classnames('row', styles.centered)}>
+            <div className={clsx('row', styles.centered)}>
               <div className="col col--6 col--offset-3">
                 <h2 className="">Self-documenting</h2>
                 <p className="">
@@ -443,7 +443,7 @@ function Home() {
               </div>
             </div>
 
-            <div className={classnames('row', styles.centered)}>
+            <div className={clsx('row', styles.centered)}>
               <div className="col">
                 <img
                   className={''}
@@ -457,14 +457,14 @@ function Home() {
 
         {/* <section className={'section-lg'}>
           <div className="container">
-            <div className={classnames('row', styles.centered)}>
+            <div className={clsx('row', styles.centered)}>
               <div className="col col--6 col--offset-3">
                 <h2 className="">Table view</h2>
                 <p className="">Start building your database directly from the dashboard.</p>
               </div>
             </div>
 
-            <div className={classnames('row', styles.centered)}>
+            <div className={clsx('row', styles.centered)}>
               <div className="col">
                 <img
                   className={''}
@@ -479,7 +479,7 @@ function Home() {
         {/* OSS */}
         <section className={'section-lg'}>
           <div className="container">
-            <div className={classnames('row', styles.responsiveCentered)}>
+            <div className={clsx('row', styles.responsiveCentered)}>
               <div className="col col--6 col--offset-3">
                 <h2 className="">Open source</h2>
                 <p className="">
@@ -569,10 +569,7 @@ function Home() {
             </div> */}
             <div className="">
               <a
-                className={classnames(
-                  'button hero--button button--md responsive-button',
-                  styles.button
-                )}
+                className={clsx('button hero--button button--md responsive-button', styles.button)}
                 href="https://www.producthunt.com/posts/supabase?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-supabase"
                 style={{ width: 250, height: 54, margin: 0, padding: 0, display: 'inline-block' }}
               >
@@ -585,7 +582,7 @@ function Home() {
                 />
               </a>
               <Link
-                className={classnames(
+                className={clsx(
                   'button hero--button button--md button--primary responsive-button',
                   styles.button
                 )}
