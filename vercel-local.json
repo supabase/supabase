@@ -4,10 +4,6 @@
     { "source": "/", "destination": "http://localhost:3000/new" },
     { "source": "/beta", "destination": "http://localhost:3000/new/beta" },
     { "source": "/:name.:extension", "destination": "http://localhost:3005/:name.:extension" },
-    {
-      "source": "/:asset/:name.:extension",
-      "destination": "http://localhost:3005/:asset/:name.:extension"
-    },
     { "source": "/:match*", "destination": "http://localhost:3005/:match*/" }
   ],
   "redirects": [
