@@ -47,6 +47,9 @@ module.exports = {
     },
     image: '/img/supabase-og-image.png', // used for meta tag, in particular og:image and twitter:image
     metaImage: '/img/supabase-og-image.png',
+    googleAnalytics: {
+      trackingID: 'UA-155232740-1',
+    },
     navbar: {
       // classNames: 'shadow--md',
       // title: 'supabase',
@@ -241,7 +244,6 @@ module.exports = {
       },
     ],
   ],
-  scripts: [{ src: '/scripts/telemetry.js' }],
   // plugins: [
   //   // [
   //   //   '@docusaurus/plugin-content-docs',
