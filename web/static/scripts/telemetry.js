@@ -1,6 +1,6 @@
 function telemetry() {
   return fetch('https://app.supabase.io/api/telemetry/page', {
-    mode: 'no-cors', // 'cors' by default,
+    mode: 'cors', // 'cors' by default,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
