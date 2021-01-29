@@ -5,12 +5,12 @@ interface DataProps {
 
 export const post = (url: string, data: DataProps, options = {}) => {
   return fetch(url, {
-    mode: 'cors', // 'cors' by default,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
+    referrerPolicy: 'no-referrer-when-downgrade',
     body: JSON.stringify(data),
     ...options,
   }).catch((error) => {
