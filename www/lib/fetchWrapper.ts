@@ -5,7 +5,7 @@ interface DataProps {
 
 export const post = (url: string, data: DataProps, options = {}) => {
   return fetch(url, {
-    mode: 'no-cors', // 'cors' by default,
+    mode: 'cors', // 'cors' by default,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
