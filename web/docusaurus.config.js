@@ -63,12 +63,12 @@ module.exports = {
         {
           href: 'https://github.com/supabase/supabase',
           className: 'navbar-item-github',
-          position: 'left',
+          position: 'right',
         },
         {
           href: 'https://twitter.com/supabase_io',
           className: 'navbar-item-twitter',
-          position: 'left',
+          position: 'right',
         },
         {
           to: '/docs',
@@ -77,7 +77,7 @@ module.exports = {
           position: 'left',
         },
         {
-          label: 'Docs',
+          label: 'Libraries',
           activeBasePath: '/docs/client/',
           to: '/docs/client/supabase-client',
           position: 'left',
