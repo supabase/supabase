@@ -145,7 +145,7 @@ pages:
       - name: Get user
         js: |
           ```js
-          const user = auth.user()
+          const user = await auth.user()
           ```
 
   session:
