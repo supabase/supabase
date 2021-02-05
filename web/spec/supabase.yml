@@ -114,6 +114,10 @@ pages:
     $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.constructor'
     description: |
       You can initialize a new Supabase client using the `createClient()` method.
+
+      The Supabase client is your entrypoint to the rest of the Supabase functionality
+      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+      
     examples:
       - name: createClient()
         js: |
@@ -316,7 +320,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const user = supabase.auth.user()
+          const user = await supabase.auth.user()
           ```
         py: |
           ```py
