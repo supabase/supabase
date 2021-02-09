@@ -1,6 +1,6 @@
 ---
-title: Roboflow and Paint.WTF handle two submissions every second 
-description: Roboflow.ai choose Supabase to power Paint.wtf leaderboard
+title: Roboflow.ai choose Supabase to power Paint.wtf leaderboard
+description: Learn how Roboflow.ai used Supabase to build their Paint.wtf leaderboard
 author: Rory Wilding
 author_title: Supabase
 author_url: https://github.com/roryw10
