@@ -74,7 +74,7 @@ module.exports = {
           position: 'left',
         },
         {
-          label: 'API Reference',
+          label: 'Reference',
           activeBasePath: '/docs/client/',
           to: '/docs/client/supabase-client',
           position: 'left',

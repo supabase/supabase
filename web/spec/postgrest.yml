@@ -3,9 +3,16 @@ openref: 0.1
 info:
   title: PostgREST Client
   description: |
+    This is an isomorphic JavaScript client for [PostgREST](https://postgrest.org/). 
+
     PostgREST is a standalone web server that turns your PostgreSQL database directly into a RESTful API.
 
     Supabase provides client libraries to interact with the PostgREST.
+
+    ### Links 
+
+    - [Source code](https://github.com/supabase/postgrest-js)
+    - [PostgREST](https://postgrest.org/)
 
   definition: spec/postgrest.json
   libraries:
@@ -71,15 +78,23 @@ pages:
       npm install @supabase/postgrest-js
       ```
 
-      - [Source code](https://github.com/supabase/postgrest-js)
-
-      ## Python
-
-      ```bash
-      # Not yet implemented
 
   Initializing:
     $ref: '"PostgrestClient".PostgrestClient.constructor'
+      
+    examples:
+      - name: createClient()
+        js: |
+          ```js
+          import { PostgrestClient } from '@supabase/postgrest-js'
+
+          const REST_URL = 'http://localhost:3000'
+          const postgrest = new PostgrestClient(REST_URL)
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
 
   from:
     $ref: '"PostgrestClient".PostgrestClient.from'
