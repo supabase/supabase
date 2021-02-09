@@ -1,6 +1,6 @@
 ---
-title: Roboflow and Paint.WTF handle two users per second 
-description: Learn how Roboflow handled the traffic generated from the front page of of Hacker News
+title: Roboflow and Paint.WTF handle two submissions every second 
+description: Roboflow.ai choose Supabase to power Paint.wtf leaderboard
 author: Rory Wilding
 author_title: Supabase
 author_url: https://github.com/roryw10
