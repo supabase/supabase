@@ -265,7 +265,7 @@ pages:
         description: If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
         js: |
           ```js
-          const { user, error } = await supabase.auth.signIn({
+          const { user, session, error } = await supabase.auth.signIn({
             email: 'example@email.com'
           })
           ```
