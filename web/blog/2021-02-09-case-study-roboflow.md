@@ -14,7 +14,7 @@ tags:
 
 Brad Dwyer is the founder of [Roboflow](https://roboflow.com/?ref=supabase), a startup helping developers build computer vision into their applications. Their solution allows developers, with zero computer vision experience, to go from images to a trained computer vision model in minutes.
 
-Learn how Brad and Roboflow used Supabase to launch [paint.wtf](https://paint.wtf), a product which survived traffic generated from the front page of Hacker News, Reddit, and Product Hunt.
+Learn how Brad and Roboflow used Supabase to launch [Paint.wtf](https://paint.wtf), a product which survived traffic generated from the front page of Hacker News, Reddit, and Product Hunt.
 
 **From idea to a launch in a weekend**
 
