@@ -12,6 +12,7 @@
     "prettier": "prettier --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\""
   },
   "dependencies": {
+    "@supabase/ui": "^0.13.0",
     "classnames": "2.2.6",
     "date-fns": "2.10.0",
     "gray-matter": "4.0.2",

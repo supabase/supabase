@@ -1,5 +1,4 @@
-import Link from 'next/link'
-import Button from 'components/Button'
+import { Button } from '@supabase/ui'
 import { useRouter } from 'next/router'
 
 const Hero = () => {
@@ -49,11 +48,11 @@ const Hero = () => {
                       <p className="mt-3 text-base text-dark-400">
                         Storage and serverless functions coming soon
                       </p>
-                      <Button
-                        className="mt-10 py-3"
-                        text="Start your project"
-                        url="https://app.supabase.io/api/login"
-                      />
+                      <a href="https://app.supabase.io/api/login">
+                        <Button className="mt-10 py-3" size="medium">
+                          Start your project
+                        </Button>
+                      </a>
                       <p className="mt-8 text-sm text-dark-400 tracking-wide sm:mt-10">backed by</p>
                       <div className="mt-5 w-full sm:mx-auto sm:max-w-lg lg:ml-0">
                         <div className="flex flex-wrap items-center lg:justify-start">

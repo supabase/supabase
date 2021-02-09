@@ -1,5 +1,4 @@
-import Badge from 'components/Badge'
-import Button from 'components/Button'
+import { Button, Badge, Typography } from '@supabase/ui'
 import SectionHeader from 'components/UI/SectionHeader'
 import Solutions from 'data/Solutions.json'
 
@@ -20,15 +19,25 @@ const Features = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
             </svg>
           </div>
-          <dt className="flex flex-row xl:flex-col ml-4 text-lg leading-6 font-medium text-gray-900 dark:text-white">
-            {name}
+          <dt className="flex flex-row xl:flex-col ml-4">
+            <Typography.Title level={4}>{name}</Typography.Title>
           </dt>
         </div>
         <div className="mt-5">
-          <dd className="mt-2 text-base text-gray-500 dark:text-dark-100">{description}</dd>
+          <Typography.Text>{description}</Typography.Text>
         </div>
-        {url && <Button className="mt-5" type="secondary" text="Learn more" url={url} />}
-        {label && <Badge className="mt-5">{label}</Badge>}
+        {label && (
+          <div className="mt-3">
+            <Badge dot>{label}</Badge>
+          </div>
+        )}
+        {url && (
+          <a href={url} className="block mt-3">
+            <Typography.Link style={{ textDecoration: 'underline' }} className="mt-5">
+              Learn more
+            </Typography.Link>
+          </a>
+        )}
       </div>
     )
   })
@@ -42,7 +51,7 @@ const Features = () => {
             title_alt={' and Focus on Your Products'}
             subtitle={'What you get with Supabase'}
           />
-          <dl className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+          <dl className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:gap-16">
             {IconSections}
           </dl>
         </div>

@@ -1,9 +1,10 @@
-import Button from 'components/Button'
+import { Button } from '@supabase/ui'
 
 const CTABanner = (props: any) => {
   const { darkerBg } = props
   return (
-    <div className={`
+    <div
+      className={`
         py-32 grid grid-cols-12 gap-4 items-center text-center bg-dark-800 
         ${darkerBg ? 'dark:bg-dark-900' : ''} px-16
       `}
@@ -17,7 +18,9 @@ const CTABanner = (props: any) => {
 				</p> */}
       </div>
       <div className="col-span-12">
-        <Button text="Start your project" url="https://app.supabase.io/api/login" />
+        <a href="https://app.supabase.io/api/login">
+          <Button>Start your project</Button>
+        </a>
       </div>
     </div>
   )
