@@ -19,6 +19,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5 {
+  @apply text-gray-800 !important;
+  @apply dark:text-white !important;
+}
+
 @font-face {
   font-family: 'custom-font';
   src: url(/new/fonts/custom/CustomFont-Book.woff2) format('woff2'),
