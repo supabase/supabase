@@ -18,7 +18,7 @@ const AdminAccess = () => {
                 title_alt={' without leaving the dashboard'}
                 subtitle={'Admin Access'}
               />
-              <div className="flex flex-col-reverse lg:flex-row lg:grid lg:grid-cols-2 gap-28">
+              <div className="flex flex-col-reverse lg:flex-row lg:grid lg:grid-cols-2 gap-32">
                 <Tabs tabId={tabId} setTabId={setTabId} />
                 <div className="shadow-lg rounded-md" style={{ height: 'fit-content' }}>
                   <div className="w-full rounded-t-md h-5 bg-dark-400 flex items-center justify-start px-2">

@@ -1,4 +1,4 @@
-import Button from 'components/Button'
+import { Button } from '@supabase/ui'
 import { useRouter } from 'next/router'
 
 const Benchmark = () => {
@@ -21,12 +21,16 @@ const Benchmark = () => {
               <span className="block">
                 Supabase outperforms equivalent systems by more than 300%.
               </span>
-              <span className="block">Sign up for our public benchmark release and we'll send it to your inbox.</span>
+              <span className="block">
+                Sign up for our public benchmark release and we'll send it to your inbox.
+              </span>
             </p>
           </div>
         </div>
         <div className="pb-12 px-12 col-span-1 lg:pb-0 lg:px-0 lg:col-span-2 rounded-r-md">
-          <Button text="Get notified" url="https://mailchi.mp/supabase/enterprise-benchmarks" />
+          <a href="https://mailchi.mp/supabase/enterprise-benchmarks">
+            <Button>Get notified</Button>
+          </a>
         </div>
       </div>
     </div>
