@@ -97,7 +97,7 @@ pages:
       - name: Sign up
         js: |
           ```js
-          const { error, data } = await auth.signUp({
+          const { user, session, error } = await auth.signUp({
             email: 'example@email.com',
             password: 'example-password',
           })
@@ -121,7 +121,7 @@ pages:
           })
 
           // send magic link (passwordless link)
-          const { user, error } = await auth.signIn({
+          const { user, session, error } = await auth.signIn({
             email: 'example@email.com',
           })
           ```

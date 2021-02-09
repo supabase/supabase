@@ -221,14 +221,16 @@ pages:
   auth.signUp():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signUp'
     notes: |
-      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable email confirmations by going to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
+      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
+      - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
+      - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
       - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
     examples:
       - name: Sign up
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.signUp({
+          const { user, session, error } = await supabase.auth.signUp({
             email: 'example@email.com',
             password: 'example-password',
           })
@@ -250,7 +252,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.signIn({
+          const { user, session, error } = await supabase.auth.signIn({
             email: 'example@email.com',
             password: 'example-password',
           })
@@ -275,7 +277,7 @@ pages:
         description: Supabase supports OAuth logins.
         js: |
           ```js
-          const { user, error } = await supabase.auth.signIn({
+          const { user, session, error } = await supabase.auth.signIn({
             // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
             provider: 'github'
           })
