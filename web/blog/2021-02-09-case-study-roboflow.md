@@ -6,39 +6,51 @@ author_title: Supabase
 author_url: https://github.com/roryw10
 author_image_url: https://github.com/roryw10.png
 authorURL: https://github.com/roryw10
-image: 
-tags: 
-    - case-study
-    - AI
+image: /img/roboflow-og.png
+tags:
+  - case-study
+  - AI
 ---
 
 Brad Dwyer is the founder of [Roboflow](https://roboflow.com/?ref=supabase), a startup helping developers build computer vision into their applications. Their solution allows developers, with zero computer vision experience, to go from images to a trained computer vision model in minutes.
 
 Learn how Brad and Roboflow used Supabase to launch [Paint.wtf](https://paint.wtf), a product which survived traffic generated from the front page of Hacker News, Reddit, and Product Hunt.
 
+![Supabase and Strive are partnering up to teach OSS.](/img/roboflow-website.png)
+
 **From idea to a launch in a weekend**
 
-Brad and the Roboflow team wanted to experiment with OpenAI's new [CLIP](https://openai.com/blog/clip/) model through a side project they could build in a weekend. CLIP classifies a wide range of images by flipping image classification into a text similarity task. Current image classifiers are limited because they are trained on a fixed number of categories. In contrast, CLIP learns from the raw text describing the images meaning the classifier isn't limited by labels and supervised learning. The team recognised that CLIP opens up a vast range of use cases that have been difficult previously due to the time required to collect images and train the model. 
+Brad and the Roboflow team wanted to experiment with OpenAI's new [CLIP](https://openai.com/blog/clip/) model through a side project they could build in a weekend. CLIP classifies a wide range of images by flipping image classification into a text similarity task. Current image classifiers are limited because they are trained on a fixed number of categories. In contrast, CLIP learns from the raw text describing the images meaning the classifier isn't limited by labels and supervised learning. The team recognised that CLIP opens up a vast range of use cases that have been difficult previously due to the time required to collect images and train the model.
 
 Roboflow settled on a straightforward concept: they prompt users to draw an image which is then fed into CLIP. The AI then judges how close the drawing is to the given prompt and assigns it a score. Users' performance is tracked on a leaderboard for each prompt and users can see how well they performed against their peers according to the model.
 
 **Leaderboards that Count**
 
-Brad and the team needed a leaderboard to make this idea work. While their first intuition was to use Firebase, it lacks the functionality for counting the number of documents in a collection - a critical function for implementing their leaderboard design. Firebase lacks a built-in API that can count the number of documents in a collection. To implement Count functionality, Firebase users have to download all documents to count them. For large document collections, this is unfeasible. To achieve the leaderboard functionality, Brad knew from experience that Firebase would not cut it. Brad knew that Count isn't a problem with PostgreSQL and felt like this would be the perfect opportunity to test out Supabase and get the functionality he needed for the leaderboards to work flawlessly.
+Brad and the team needed a leaderboard to make this idea work. While their first intuition was to use Firebase, it lacks the functionality for counting the number of documents in a collection - a critical function for implementing their leaderboard design. Firebase lacks a built-in API that can count the number of documents in a collection. To implement Count functionality, Firebase users have to download all documents to count them.
+
+![Supabase and Strive are partnering up to teach OSS.](/img/roboflow-stat.png)
+
+For large document collections, this is unfeasible. To achieve the leaderboard functionality, Brad knew from experience that Firebase would not cut it. Brad knew that Count isn't a problem with PostgreSQL and felt like this would be the perfect opportunity to test out Supabase and get the functionality he needed for the leaderboards to work flawlessly.
 
 **One weekend to break the internet**
 
-Brad and the team built the product overnight and launched it on Hacker News. Paint.wtf went on to make it to Hacker News and Reddit's first page, and getting traction on Product Hunt. As a result, they had to handle serious user volumes; at its peak, users were submitting over 2 new drawings every second. Over 100K users submitted drawings in a 24 hour span. At this point, Brad knew he had picked the right setup for his leaderboard as even with this massive spike in usage it continued to perform reliably so his users could get accurate and up to date rankings for their submissions.
+Brad and the team built the product overnight and launched it on Hacker News. Paint.wtf went on to make it to Hacker News and Reddit's first page, and getting traction on Product Hunt. As a result, they had to handle serious user volumes; at its peak, users were submitting over 2 new drawings every second.
+
+Over 100K users submitted drawings in a 24 hour span. At this point, Brad knew he had picked the right setup for his leaderboard as even with this massive spike in usage it continued to perform reliably so his users could get accurate and up to date rankings for their submissions.
+
+![Supabase and Strive are partnering up to teach OSS.](/img/roboflow-gallery.png)
 
 Paint.Wtf has continued to get sustained coverage in the media and has continued to pick up new and unexpected use cases. For example, remote teams are using Paint.wtf as part of their daily ice breaker activities during COVID to keep up team social cohesion.
 
->*"Supabase meant we could have the exact functionality we needed for our leaderboard.* 
+<!-- > _"Supabase meant we could have the exact functionality we needed for our leaderboard._
 >
->*We got the benefits of PostgreSQL with a great developer experience.* 
+> _We got the benefits of PostgreSQL with a great developer experience._
 >
->*With Supabase we could launch our product quickly and yet still handle the huge user volumes that Paint.wtf generated."*
+> _With Supabase we could launch our product quickly and yet still handle the huge user volumes that Paint.wtf generated."_
 >
->Brad Dwyer, CTO Roboflow.
+> Brad Dwyer, CTO Roboflow. -->
+
+![Supabase and Strive are partnering up to teach OSS.](/img/roboflow-quote.png)
 
 **Ship fast, and carry on scaling**
 
