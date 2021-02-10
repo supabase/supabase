@@ -29,7 +29,24 @@ module.exports = {
       collapsed: false,
       items: ['guides/examples', 'pricing', 'support', 'handbook/contributing', 'company/terms'],
     },
-    // Handbook: ['handbook/introduction', 'handbook/contributing'],
+  ],
+  resources: [
+    'resources',
+    {
+      type: 'category',
+      label: 'Learn',
+      items: [
+        {
+          'Auth Deep Dive': [
+            'resources/learn/auth-deep-dive/auth-deep-dive-jwts',
+            'resources/learn/auth-deep-dive/auth-row-level-security',
+            'resources/learn/auth-deep-dive/auth-policies',
+            'resources/learn/auth-deep-dive/auth-gotrue',
+            'resources/learn/auth-deep-dive/auth-google-oauth',
+          ],
+        },
+      ],
+    },
   ],
   goTrueServer: [
     {

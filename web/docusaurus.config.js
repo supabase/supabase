@@ -124,12 +124,12 @@ module.exports = {
             },
           ],
         },
-        // {
-        //   to: '/showcase',
-        //   label: 'Showcase',
-        //   position: 'right',
-        // },
-        // { to: '/docs/pricing', label: 'Pricing', position: 'right' },
+        {
+          to: '/docs/resources',
+          activeBasePath: '/docs/resources',
+          label: 'Resources',
+          position: 'left',
+        },
         { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
       ],
     },
