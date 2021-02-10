@@ -1,6 +1,6 @@
 ---
 id: about
-title: GoTrue
+title: GoTrue Auth Server
 description: An SWT based API for managing users and issuing SWT tokens
 ---
 
