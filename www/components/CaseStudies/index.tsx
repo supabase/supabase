@@ -1,8 +1,8 @@
-import Card from 'components/Card'
+import { useRouter } from 'next/router'
 import Benchmark from 'components/CaseStudies/benchmark'
 import SectionHeader from 'components/UI/SectionHeader'
 import CaseStudiesData from 'data/CaseStudies.json'
-import { useRouter } from 'next/router'
+import { Card, Space, Typography } from '@supabase/ui'
 
 const CaseStudies = () => {
   const { basePath } = useRouter()
@@ -26,17 +26,23 @@ const CaseStudies = () => {
           </div>
           <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
             {CaseStudiesData.map((caseStudy: any, idx: number) => (
-              <Card
-                key={`caseStudy_${idx}`}
-                title={caseStudy.title}
-                type={caseStudy.type}
-                description={caseStudy.description}
-                imgUrl={`${basePath}/${caseStudy.imgUrl}`}
-                url={caseStudy.url}
-                logoUrl={caseStudy.logoUrl}
-                // postMeta={caseStudy.postMeta}
-                // ctaText={caseStudy.ctaText}
-              />
+              <a href={caseStudy.url}>
+                <Card
+                  key={`caseStudy_${idx}`}
+                  hoverable
+                  cover={<img src={`${basePath}/${caseStudy.imgUrl}`} />}
+                >
+                  <Space className="justify-between h-40" direction="vertical">
+                    <div>
+                      <Typography.Text small type="secondary">
+                        Project example
+                      </Typography.Text>
+                      <Typography.Title level={3}>{caseStudy.title}</Typography.Title>
+                    </div>
+                    <Typography.Text type="default">{caseStudy.description}</Typography.Text>
+                  </Space>
+                </Card>
+              </a>
             ))}
           </div>
           <Benchmark />
