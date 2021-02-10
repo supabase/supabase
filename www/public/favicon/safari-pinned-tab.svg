@@ -1,10 +1,19 @@
-<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="50" y="50" width="924" height="924" rx="190" fill="#292929" stroke="white" stroke-width="100"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M509.372 261.637C509.034 239.134 480.659 229.477 466.664 247.102L255.477 513.078C230.551 544.472 252.907 590.77 292.994 590.77H511.394L513.962 762.168C514.299 784.671 542.674 794.328 556.669 776.703L767.856 510.727C792.783 479.333 770.426 433.035 730.34 433.035L511.939 433.035L509.372 261.637Z" fill="url(#paint0_angular)"/>
-<defs>
-<radialGradient id="paint0_angular" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(513.262 410.454) rotate(90) scale(349.699 340.461)">
-<stop stop-color="#37E290"/>
-<stop offset="1" stop-color="#00B05C"/>
-</radialGradient>
-</defs>
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+ "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+ width="512.000000pt" height="512.000000pt" viewBox="0 0 512.000000 512.000000"
+ preserveAspectRatio="xMidYMid meet">
+<metadata>
+Created by potrace 1.11, written by Peter Selinger 2001-2013
+</metadata>
+<g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+fill="#000000" stroke="none">
+<path d="M1040 5110 c-25 -4 -63 -11 -84 -14 -60 -10 -207 -61 -287 -101 -165
+-81 -317 -208 -430 -358 -106 -141 -203 -370 -226 -534 -4 -32 -8 -735 -8
+-1563 l0 -1505 22 -93 c116 -485 498 -847 979 -926 135 -23 2988 -22 3114 0
+303 54 576 222 761 466 99 132 190 340 225 513 11 55 15 3029 5 3085 -5 25
+-12 63 -15 84 -8 49 -57 197 -87 262 -163 351 -504 610 -894 678 -66 12 -334
+14 -1555 14 -811 0 -1495 -4 -1520 -8z"/>
+</g>
 </svg>
