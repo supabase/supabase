@@ -1,7 +1,7 @@
 ---
 id: about
-title: About
-description: 'Host your own Realtime server'
+title: Realtime Server
+description: 'Supabase Realtime is a Change Data Capture server'
 ---
 
 Supabase Realtime is a Change Data Capture server. It allows you to listen to Postgres changes.
