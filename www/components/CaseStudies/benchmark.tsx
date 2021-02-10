@@ -16,7 +16,6 @@ const Benchmark = () => {
             src={`${basePath}/images/benchmark--mobile.svg`}
           />
           <div className="px-12 py-5 lg:px-0 lg:py-0">
-            {/* <p className="text-xl text-white">Built for speed and reliability</p> */}
             <Typography.Title level={4}>
               <span className="text-white">Built for speed and reliability</span>
             </Typography.Title>
