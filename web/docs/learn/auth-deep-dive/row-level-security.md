@@ -20,9 +20,9 @@ Learn how to restrict access to your database tables by enabling Row Level Secur
 
 ### Next steps
 
-- Watch [Part One: JWTs](/docs/resources/learn/auth-deep-dive/auth-deep-dive-jwts)
-<!-- - Watch [Part Two: Row Level Security](/docs/resources/learn/auth-deep-dive/auth-row-level-security) -->
-- Watch [Part Three: Policies](/docs/resources/learn/auth-deep-dive/auth-policies)
-- Watch [Part Four: GoTrue](/docs/resources/learn/auth-deep-dive/auth-gotrue)
-- Watch [Part Five: Google Oauth](/docs/resources/learn/auth-deep-dive/auth-google-oauth)
+- Watch [Part One: JWTs](/docs/learn/auth-deep-dive/auth-deep-dive-jwts)
+<!-- - Watch [Part Two: Row Level Security](/docs/learn/auth-deep-dive/auth-row-level-security) -->
+- Watch [Part Three: Policies](/docs/learn/auth-deep-dive/auth-policies)
+- Watch [Part Four: GoTrue](/docs/learn/auth-deep-dive/auth-gotrue)
+- Watch [Part Five: Google Oauth](/docs/learn/auth-deep-dive/auth-google-oauth)
 - Sign up for Supabase: [app.supabase.io](https://app.supabase.io)
