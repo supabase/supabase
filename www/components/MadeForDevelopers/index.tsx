@@ -1,5 +1,6 @@
-import Button from 'components/Button'
-import Badge from 'components/Badge'
+// import Button from 'components/Button'
+// import Badge from 'components/Badge'
+import { Badge, Button, Typography } from '@supabase/ui'
 import SectionHeader from 'components/UI/SectionHeader'
 import CodeExamples from 'components/MadeForDevelopers/CodeExamples'
 
@@ -36,22 +37,28 @@ const MadeForDevelopers = () => {
                     return (
                       <div className={blockClass} key={`dev_feature_${idx}`}>
                         <div className="lg:mt-5">
-                          <dt className="text-lg leading-6 font-medium text-gray-900 dark:text-white flex flex-row sm:flex-col xl:flex-row">
-                            {feature.name}
+                          <dt className="flex flex-row sm:flex-col xl:flex-row">
+                            <Typography.Title level={4}>{feature.name}</Typography.Title>
                             {feature.badge && (
-                              <Badge className="ml-3 sm:ml-0 sm:w-20 sm:mt-2 xl:ml-3 xl:mt-0 xl:w-auto">
-                                {feature.badge}
-                              </Badge>
+                              <div className="block xl:ml-3">
+                                <Badge
+                                  dot
+                                  // className="ml-3 sm:ml-0 sm:w-20 sm:mt-2 xl:ml-3 xl:mt-0 xl:w-auto"
+                                >
+                                  {feature.badge}
+                                </Badge>
+                              </div>
                             )}
                           </dt>
-                          <dd className="mt-3 text-base text-gray-500 mb-6 dark:text-dark-300">
-                            {feature.description}
+                          <dd className="my-3">
+                            <Typography.Text type="secondary">
+                              {feature.description}
+                            </Typography.Text>
                           </dd>
-                          <Button
-                            type="secondary"
-                            text={feature.badge ? 'Get notified' : 'Explore more'}
-                            url={feature.url}
-                          />
+
+                          <Typography.Link href={feature.url}>
+                            {feature.badge ? 'Get notified' : 'Explore more'}
+                          </Typography.Link>
                         </div>
                       </div>
                     )
