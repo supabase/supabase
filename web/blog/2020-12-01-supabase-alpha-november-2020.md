@@ -7,11 +7,11 @@ author_url: https://github.com/kiwicopple
 author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
 authorURL: https://github.com/kiwicopple
 image: /img/supabase-november-2020.png
-tags: 
-    - supabase
+tags:
+  - supabase
 ---
 
-We've been building for 9 months now, and we're getting even closer to Beta. 
+We've been building for 9 months now, and we're getting even closer to Beta.
 
 <!--truncate-->
 
@@ -19,8 +19,7 @@ We've been building for 9 months now, and we're getting even closer to Beta.
 
 Watch a full demo:
 
-<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube.com/embed/unC_de7iytA" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
-
+<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/unC_de7iytA" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
 
 ### Add users
 
@@ -34,20 +33,17 @@ You can also perform admin functions on existing users - send password reset ema
 
 ![This image shows how to delete a user directly from the dashboard.](/img/delete-users.gif)
 
-
 ### Even more powerful SQL Editor
 
 Last month we [announced](/blog/2020/11/02/supabase-alpha-october-2020#more-powerful-sql-editor) an improved SQL Editor, and this month we've taken it even further. The SQL Editor is now a full Monaco editor, like you'd find in VS Code. Build your database directly from the browser.
 
 ![This image shows our improved SQL Editor.](/img/supabase-monaco-editor.png)
 
-
 ### Status page
 
 We added a [Status Page](https://status.supabase.io/) which tracks the uptime and latency of the Supabase platform.
 
 ![This image shows our new status page.](/img/status-page.png)
-
 
 ### Kaizen
 
@@ -65,7 +61,6 @@ We had a crazy month during Hacktoberfest. In case you missed it, here are some 
 - [@duncanhealy](https://github.com/duncanhealy) is [updating the Redwood example](https://github.com/redwoodjs/redwood/pull/1474) to work with Supabase.js v1.0
 
 If you want to keep up to date, make sure you [subscribe to our YouTube channel](https://www.youtube.com/channel/UCNTVzV1InxHV-YR0fSajqPQ) or [follow us on Twitter](https://twitter.com/supabase_io).
-
 
 ### Coming next
 

@@ -7,8 +7,8 @@ author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
 image: /img/supabase-january-2021.png
-tags: 
-    - supabase
+tags:
+  - supabase
 ---
 
 New year, new features. We've been busy at Supabase during January and our community has been even busier. Here's a few things you'll find interesting.
@@ -19,8 +19,7 @@ New year, new features. We've been busy at Supabase during January and our commu
 
 Watch a full demo:
 
-<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube.com/embed/DlybOLANG4s" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
-
+<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/DlybOLANG4s" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
 
 ### Count functionality
 
@@ -34,7 +33,6 @@ We enabled 2 new Auth providers - Facebook and Azure. Thanks to [@Levet](https:/
 
 ![Supabase now supports Azure and Facebook Oauth providers](/img/blog/auth-azure-and-facebook.png)
 
-
 ### Auth Audit Trail
 
 We have exposed the audit trail directly in the dashboard, as well as the GoTrue logs. Great for security and debugging.
@@ -43,14 +41,13 @@ We have exposed the audit trail directly in the dashboard, as well as the GoTrue
 
 ### Auth UI widget
 
-In case our Auth endpoints aren't easy enough already, we've built a React [Auth Widget](http://ui.supabase.com/?path=/story/auth-auth--default) for you to drop into your app and to get up-and-running in minutes. 
+In case our Auth endpoints aren't easy enough already, we've built a React [Auth Widget](http://ui.supabase.com/?path=/story/auth-auth--default) for you to drop into your app and to get up-and-running in minutes.
 
 ![Supabase has released a React Auth widget](/img/blog/auth-widget.png)
 
-
 ### New `auth.email()` function
 
-We added a helper function for extracting the logged in user's email address. 
+We added a helper function for extracting the logged in user's email address.
 
 ![Supabase added an email function for using with Policies](/img/blog/policies-email.png)
 
@@ -64,9 +61,7 @@ Launch your database in London or Sydney!
 
 You can now copy SQL results as Markdown - super useful for adding to blogs and issues.
 
-
 ![Copy query results as markdown](/img/blog/countries.gif)
-
 
 ### React server components
 
@@ -92,18 +87,18 @@ We know that Auth can be a bit daunting when you're just starting out, so we hav
 ### Community
 
 - @kiwicopple chats to @bdougie on HeavyBit's Jamstack Radio: [Link](https://www.heavybit.com/library/podcasts/jamstack-radio/ep-71-open-source-firebase-alternative-with-paul-copplestone-of-supabase)
-- Watch @leerob from Vercel deploy a full Next.js app with Supabase in just 2 minutes: 
-[Link](https://twitter.com/leeerob/status/1351576575888797696)
+- Watch @leerob from Vercel deploy a full Next.js app with Supabase in just 2 minutes:
+  [Link](https://twitter.com/leeerob/status/1351576575888797696)
 - Redwood now supports Supabase:
-[Link](https://twitter.com/redwoodjs/status/1347311574415863811)
-- Deploy a full analytics solution using Umami: 
-[Link](https://twitter.com/mkalvas/status/1353880637506260994)
+  [Link](https://twitter.com/redwoodjs/status/1347311574415863811)
+- Deploy a full analytics solution using Umami:
+  [Link](https://twitter.com/mkalvas/status/1353880637506260994)
 - Check out this open source Trello Clone:
-[Link](https://twitter.com/joshnuss/status/1352094804335857664)
+  [Link](https://twitter.com/joshnuss/status/1352094804335857664)
 - Get started with Expo + Supabase using this starter template from Kiki:
-[Link](https://twitter.com/kikiding/status/1352086899242856449)
-- Use Supabase Auth with NestJS: 
-[Link](https://twitter.com/atsuhio/status/1348516650144780288?s=21)
+  [Link](https://twitter.com/kikiding/status/1352086899242856449)
+- Use Supabase Auth with NestJS:
+  [Link](https://twitter.com/atsuhio/status/1348516650144780288?s=21)
 - The community has made some serious advances on the [Dart](https://github.com/supabase?q=dart&type=&language=), [C#](https://github.com/supabase?q=csharp&type=&language=), [Python](https://github.com/supabase?q=python&type=&language=), and [Kotlin](https://github.com/supabase?q=kotlin&type=&language=) libraries.
 - We were one of the fastest growing open source startups in Q4 last year: [Link](https://twitter.com/RunaCapital/status/1351122231791910916)
 

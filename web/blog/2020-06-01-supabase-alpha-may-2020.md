@@ -6,15 +6,15 @@ author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
 authorURL: https://github.com/kiwicopple
-tags: 
-    - supabase
+tags:
+  - supabase
 ---
 
-It has been a monster month at [Supabase](https://supabase.io) and we're back with a video update. It's a longer video this month because we have a couple of housekeeping items. 
+It has been a monster month at [Supabase](https://supabase.io) and we're back with a video update. It's a longer video this month because we have a couple of housekeeping items.
 
 <!--truncate-->
 
-<iframe className="w-full" width="700" height="350" src="https://www.youtube.com/embed/e4qXmcEFaUs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe className="w-full" width="700" height="350" src="https://www.youtube-nocookie.com/embed/e4qXmcEFaUs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Housekeeping
 
@@ -30,10 +30,9 @@ OK now for the important part - as promised, we will continue to release our upd
 
 ### Fresh UI
 
-We've revamped the UI to fit in some more features that we're building. 
+We've revamped the UI to fit in some more features that we're building.
 
 ![Fresh UI](https://dev-to-uploads.s3.amazonaws.com/i/jzzm7u56ns6ega9uyc4j.png)
-
 
 ### Table View
 
@@ -41,21 +40,14 @@ This one is still very unstable, but we wanted to ship it anyway. It's a little 
 
 ![Table view](https://dev-to-uploads.s3.amazonaws.com/i/jalcaoz4lsp2b6wegah5.png)
 
-
-
 #### And more
 
 - ⚡ Realtime listeners! Subscribe to your database just like you would with Firebase.
 - 🤖 Instant RESTful APIs that update when you update your schema. Supabase introspects your schema and updates your API and documentation.
 - 📓 Auto-documentation for your APIs and Postgres schema. What's better than documentation? Documentation that you don't have to manually keep up to date.
 
-
 ## Follow us
 
 Start using Supabase today: [app.supabase.io](https://app.supabase.io)
 
 Make sure to star us on github! [github.com/supabase/supabase](https://github.com/supabase/supabase)
-
-
-
- 
