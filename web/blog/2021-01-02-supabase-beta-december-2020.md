@@ -7,8 +7,8 @@ author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
 image: /img/supabase-december-2020.png
-tags: 
-    - supabase
+tags:
+  - supabase
 ---
 
 After 10 hectic months of building, Supabase is now in Beta.
@@ -19,14 +19,13 @@ After 10 hectic months of building, Supabase is now in Beta.
 
 Watch a full demo:
 
-<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube.com/embed/ofSm4BJkZ1g" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/ofSm4BJkZ1g" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
 
 ### Supabase is now in Beta
 
 We spent months working on Performance, Security, and Reliability. Read more on our [Beta Page](https://supabase.io/beta).
 
 ![This image shows our Beta Page.](/img/blog/dec-beta.png)
-
 
 ### Improve your docs inline
 
@@ -52,7 +51,6 @@ Our table view now has pagination - better for working with large data sets.
 <source src="/videos/table-pagination.mp4" type="video/mp4" muted playsInline />
 </video>
 
-
 ### Supabase raised a Seed Round
 
 We raised $6M from Y Combinator, Mozilla, and Coatue. You can read more on [TechCrunch](https://techcrunch.com/2020/12/15/supabase-raises-6m-for-its-open-source-firebase-alternative).
@@ -68,12 +66,11 @@ We raised $6M from Y Combinator, Mozilla, and Coatue. You can read more on [Tech
 ### Community
 
 - We were featured on the GitHub release radar. [Link](https://github.blog/2020-12-07-release-radar-dec-2020/)
-- [@kiwicopple](https://twitter.com/kiwicopple) appeared on  [Open Core Summit](https://2020.opencoresummit.com/)
+- [@kiwicopple](https://twitter.com/kiwicopple) appeared on [Open Core Summit](https://2020.opencoresummit.com/)
 - [@aaronksaunders](https://twitter.com/aaronksaunders) created a video series on Supabase + Vue. [Link](https://twitter.com/aaronksaunders/status/1339981480202743811).
 - [@CodeByCorey](https://twitter.com/CodeByCorey) tracks realtime page views using Supabase. [Link](https://twitter.com/CodeByCorey/status/1344650699645325312).
 - [@ffbass](https://github.com/ffabss) started working on gotrue-java. [Link](https://github.com/supabase/gotrue-java).
 - We've grown more than 50% (GitHub star count) since moving into Beta. [Link](https://twitter.com/supabase_io/status/1345410714836594693)
-
 
 ![This image shows GitHub star growth.](/img/blog/dec-starcount.png)
 
@@ -81,7 +78,7 @@ If you want to keep up to date, make sure you [subscribe to our YouTube channel]
 
 ### Coming next
 
-We've go a lot of exciting things planned for Q1 2021. We're already planning out Supabase Storage and a Supabase CLI for better local development. Let us know if there's something you want us to release as a priority! 
+We've go a lot of exciting things planned for Q1 2021. We're already planning out Supabase Storage and a Supabase CLI for better local development. Let us know if there's something you want us to release as a priority!
 
 We also have something exciting planned with Vercel and Stripe ... [stay tuned](https://twitter.com/rauchg/status/1331021818681978881).
 

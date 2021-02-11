@@ -7,14 +7,14 @@ author_url: https://github.com/roryw10
 author_image_url: https://github.com/roryw10.png
 authorURL: https://github.com/roryw10
 image: /img/supabase-monitoro.png
-tags: 
-    - case-study
-    - nocode
+tags:
+  - case-study
+  - nocode
 ---
 
-Omar Kamali is the founder of [Monitoro](https://www.monitoro.xyz/), a service for scraping countless websites 24/7 to notify customers when these websites change. To create this product, Monitoro's team needed to handle massive data throughput whilst ensuring the product was reliable and resilient to satisfy a rapidly growing user base. 
+Omar Kamali is the founder of [Monitoro](https://www.monitoro.xyz/), a service for scraping countless websites 24/7 to notify customers when these websites change. To create this product, Monitoro's team needed to handle massive data throughput whilst ensuring the product was reliable and resilient to satisfy a rapidly growing user base.
 
-Learn how Monitoro was able to build fast, ensure reliability, and keep scaling by building with Supabase and Svelte. 
+Learn how Monitoro was able to build fast, ensure reliability, and keep scaling by building with Supabase and Svelte.
 
 <!--truncate-->
 
@@ -38,9 +38,7 @@ Within a couple of days, the team had a version ready they could deploy. Monitor
 
 Fast forward to today, and Monitoro's user base has been ramping up, as they use Monitoro to monitor changes to websites all over the world. Despite how fast their user base has grown, the Monitoro team have peace of mind as they scale because they used Supabase, knowing it will just work without worrying about DevOps.
 
-
 ![Quote from Omar - Supabase was exactly the solution I needed so when I saw it on Hacker News I was instantly excited. Supabase allowed us to go further, faster, with our product functionality. We had a fast-growing user base which would have been challenging to support without being able to depend on Supabase.](/img/omar-monitoro.png)
-
 
 ### Prototype fast, and keep going
 
@@ -48,5 +46,4 @@ Thanks to Supabase, Monitoro could deliver the features required needed faster t
 
 Learn more about Monitoro:
 
-
-<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube.com/embed/8A6_pg41M2s" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/8A6_pg41M2s" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
