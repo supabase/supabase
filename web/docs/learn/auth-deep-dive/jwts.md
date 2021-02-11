@@ -11,7 +11,7 @@ An introduction to JWTs and how they are used in Supabase Auth
 
 ### Watch
 
-<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube.com/embed/v3Exg5YpJvE" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/v3Exg5YpJvE" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
 
 
 ### Resources
