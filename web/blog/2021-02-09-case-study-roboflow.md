@@ -1,6 +1,6 @@
 ---
-title: Roboflow.ai choose Supabase to power Paint.wtf leaderboard
-description: Learn how Roboflow.ai used Supabase to build their Paint.wtf leaderboard
+title: Roboflow.com choose Supabase to power Paint.wtf leaderboard
+description: Learn how Roboflow.com used Supabase to build their Paint.wtf leaderboard
 author: Rory Wilding
 author_title: Supabase
 author_url: https://github.com/roryw10
@@ -20,7 +20,7 @@ Learn how Brad and Roboflow used Supabase to launch [Paint.wtf](https://paint.wt
 
 **From idea to a launch in a weekend**
 
-Brad and the Roboflow team wanted to experiment with OpenAI's new [CLIP](https://openai.com/blog/clip/) model through a side project they could build in a weekend. CLIP classifies a wide range of images by flipping image classification into a text similarity task. Current image classifiers are limited because they are trained on a fixed number of categories. In contrast, CLIP learns from the raw text describing the images meaning the classifier isn't limited by labels and supervised learning. The team recognised that CLIP opens up a vast range of use cases that have been difficult previously due to the time required to collect images and train the model.
+Brad and a friend ([Erik Dunteman](https://twitter.com/erikdoingthings)) wanted to experiment with OpenAI's new [CLIP](https://openai.com/blog/clip/) model through a side project they could build in a weekend. CLIP classifies a wide range of images by flipping image classification into a text similarity task. Current image classifiers are limited because they are trained on a fixed number of categories. In contrast, CLIP learns from the raw text describing the images meaning the classifier isn't limited by labels and supervised learning. The team recognised that CLIP opens up a vast range of use cases that have been difficult previously due to the time required to collect images and train the model.
 
 Roboflow settled on a straightforward concept: they prompt users to draw an image which is then fed into CLIP. The AI then judges how close the drawing is to the given prompt and assigns it a score. Users' performance is tracked on a leaderboard for each prompt and users can see how well they performed against their peers according to the model.
 
