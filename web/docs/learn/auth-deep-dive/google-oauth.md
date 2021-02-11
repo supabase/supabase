@@ -10,7 +10,7 @@ How to add Google OAuth Logins to your Supabase Application.
 
 ### Watch
 
-<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube.com/embed/_XM9ziOzWk4" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/_XM9ziOzWk4" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
 
 ### Resources
 

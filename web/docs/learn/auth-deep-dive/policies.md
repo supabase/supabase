@@ -10,7 +10,7 @@ How to restrict table access to authenticated users, row level policies, and ema
 
 ### Watch
 
-<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube.com/embed/0LvCOlELs5U" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/0LvCOlELs5U" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
 
 
 ### Resources

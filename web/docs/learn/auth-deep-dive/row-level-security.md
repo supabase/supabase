@@ -11,7 +11,7 @@ Learn how to restrict access to your database tables by enabling Row Level Secur
 
 ### Watch
 
-<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube.com/embed/qY_iQ10IUhs" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/qY_iQ10IUhs" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
 
 ### Resources
 
