@@ -502,6 +502,10 @@ pages:
   insert():
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
+    notes: | 
+      - By default, every time you run `insert()`, the client library will make a `select` to return the full record. 
+      This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation. 
+      If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
     examples:
       - name: Create a record
         isSpotlight: true
