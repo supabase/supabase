@@ -29,35 +29,56 @@ module.exports = {
       collapsed: false,
       items: ['guides/examples', 'pricing', 'support', 'handbook/contributing', 'company/terms'],
     },
-    // Handbook: ['handbook/introduction', 'handbook/contributing'],
   ],
-  goTrueServer: [
+  resources: [
+    'resources',
     {
       type: 'category',
-      label: 'GoTrue',
-      collapsed: false,
-      items: ['gotrue/server/about'],
-    },
-  ],
-  realtimeServer: [
-    {
-      type: 'category',
-      label: 'Realtime',
-      collapsed: false,
-      items: ['realtime/server/about'],
-    },
-    {
-      type: 'category',
-      label: 'Self hosting',
-      collapsed: false,
+      label: 'Learn',
       items: [
-        'realtime/server/docker',
-        'realtime/server/aws',
-        'realtime/server/digitalocean',
-        'realtime/server/source',
+        {
+          'Auth Deep Dive': [
+            'learn/auth-deep-dive/auth-deep-dive-jwts',
+            'learn/auth-deep-dive/auth-row-level-security',
+            'learn/auth-deep-dive/auth-policies',
+            'learn/auth-deep-dive/auth-gotrue',
+            'learn/auth-deep-dive/auth-google-oauth',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Tools',
+      items: [
+        'gotrue/server/about',
+        'gotrue/client/index',
+        'postgrest/server/about',
+        'postgrest/client/index',
+        'realtime/server/about',
+        'realtime/client/index',
       ],
     },
   ],
+  // realtimeServer: [
+  //   {
+  //     type: 'category',
+  //     label: 'Realtime',
+  //     collapsed: false,
+  //     items: ['realtime/server/about'],
+  //   },
+  //   {
+  //     type: 'category',
+  //     label: 'Self hosting',
+  //     collapsed: false,
+  //     items: [
+  //       'realtime/server/docker',
+  //       'realtime/server/aws',
+  //       'realtime/server/digitalocean',
+  //       'realtime/server/source',
+  //     ],
+  //   },
+  // ],
   // realtimeClient: [
   //   {
   //     type: 'category',
@@ -66,14 +87,14 @@ module.exports = {
   //     items: ['realtime/client/about'],
   //   },
   // ],
-  postgrestServer: [
-    {
-      type: 'category',
-      label: 'PostgREST',
-      collapsed: false,
-      items: ['postgrest/server/about'],
-    },
-  ],
+  // postgrestServer: [
+  //   {
+  //     type: 'category',
+  //     label: 'PostgREST',
+  //     collapsed: false,
+  //     items: ['postgrest/server/about'],
+  //   },
+  // ],
   postgresServer: [
     {
       type: 'category',
