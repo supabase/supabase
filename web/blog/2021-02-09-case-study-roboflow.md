@@ -26,11 +26,11 @@ Roboflow settled on a straightforward concept: they prompt users to draw an imag
 
 **Leaderboards that Count**
 
-Brad and the team needed a leaderboard to make this idea work. While their first intuition was to use Firebase, it lacks the functionality for counting the number of documents in a collection - a critical function for implementing their leaderboard design. Firebase lacks a built-in API that can count the number of documents in a collection. To implement Count functionality, Firebase users have to download all documents to count them.
+Brad and the team needed a leaderboard to make this idea work. While their first intuition was to use Firebase, it lacks the built-in functionality for counting the number of documents in a collection - a critical function for implementing their leaderboard design.
 
 ![Supabase and Strive are partnering up to teach OSS.](/img/roboflow-stat.png)
 
-For large document collections, this is unfeasible. To achieve the leaderboard functionality, Brad knew from experience that Firebase would not cut it. Brad knew that Count isn't a problem with PostgreSQL and felt like this would be the perfect opportunity to test out Supabase and get the functionality he needed for the leaderboards to work flawlessly.
+You might export data to BigQuery, or implement an increment function on collection change, however PostgreSQL has great built in support for counting and Brad felt like this would be the perfect opportunity to test out Supabase and get the functionality he needed for the leaderboards to work reliably and without implementing add-ons.
 
 **One weekend to break the internet**
 
