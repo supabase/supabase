@@ -1,6 +1,6 @@
 {
-  "short_name": "CRA Supabase TodoList Example",
-  "name": "Create React App Supabase TodoList Example",
+  "short_name": "React App",
+  "name": "Create React App Sample",
   "icons": [
     {
       "src": "favicon.ico",
