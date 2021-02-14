@@ -67,6 +67,11 @@ const Hero = () => {
                             src={`${basePath}/images/logos/mozilla--grey.png`}
                             alt="Mozilla"
                           />
+                          <img
+                            className="relative -top-1 h-5 sm:h-7 pr-10"
+                            src={`${basePath}/images/logos/coatue.png`}
+                            alt="Coatue"
+                          />
                         </div>
                       </div>
                     </div>
