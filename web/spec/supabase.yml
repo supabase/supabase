@@ -322,7 +322,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const user = await supabase.auth.user()
+          const user = supabase.auth.user()
           ```
         py: |
           ```py
