@@ -1,4 +1,15 @@
 {
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Strict-Transport-Security",
+          "value": ""
+        }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/new/:match*", "destination": "https://www.supabase.vercel.app/new/:match*" },
     { "source": "/", "destination": "https://www.supabase.vercel.app/new" },
