@@ -26,7 +26,7 @@ github.repos: \
 	github.repos.supabase \
 	github.repos.realtime  \
 	github.repos.postgres \
-	github.repos.pg-api
+	github.repos.postgres-meta
 
 github.repos.%:
 	curl -sS https://api.github.com/repos/supabase/$* \
