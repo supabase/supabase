@@ -260,7 +260,7 @@ const Nav = (props: Props) => {
               href="https://app.supabase.io/api/login"
               className={`
                 inline-flex items-center border-b-2 border-transparent text-sm font-normal transition
-                rounded-md px-3 py-1 mr-5 bg-brand-700 text-white hover:bg-brand-800 hidden lg:block
+                rounded-md px-3 py-1 mr-5 bg-brand-700 text-black hover:bg-brand-800 hidden lg:block
               `}
             >
               Start your project
