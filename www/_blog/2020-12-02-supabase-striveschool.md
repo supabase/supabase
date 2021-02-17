@@ -6,7 +6,7 @@ author_title: Supabase
 author_url: https://github.com/roryw10
 author_image_url: https://github.com/roryw10.png
 authorURL: https://github.com/roryw10
-image: /img/supabase-strive-school.png
+image: supabase-strive-school.png
 tags:
   - supabase
   - Striveschool

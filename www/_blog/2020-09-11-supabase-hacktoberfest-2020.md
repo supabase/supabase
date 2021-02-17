@@ -1,11 +1,11 @@
 ---
 title: Supabase Hacktoberfest 2020
 description: Join us for a celebration of open source software and learn how to contribute to Supabase.
-author: Thor 雷神 Schaeff
+author: thor_schaeff
 author_title: Supabase community contributor
 author_url: https://github.com/thorwebdev
 author_image_url: https://github.com/thorwebdev.png
-image: /img/hacktoberfest.png
+image: hacktoberfest.png
 tags:
   - supabase
   - hacktoberfest
