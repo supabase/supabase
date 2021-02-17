@@ -12,19 +12,24 @@
     "prettier": "prettier --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\""
   },
   "dependencies": {
+    "@mdx-js/loader": "^1.6.22",
+    "@next/mdx": "^10.0.7",
+    "@supabase/ui": "^0.13.3",
     "classnames": "2.2.6",
     "date-fns": "2.10.0",
-    "gray-matter": "4.0.2",
+    "gray-matter": "^4.0.2",
     "next": "latest",
     "react": "^16.13.0",
     "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "^16.13.0",
     "react-ga": "^3.3.0",
+    "react-markdown": "^5.0.3",
     "react-syntax-highlighter": "^15.3.1",
     "react-transition-group": "^4.4.1",
     "remark": "11.0.2",
     "remark-html": "10.0.0",
-    "typescript": "^4.0.3"
+    "typescript": "^4.0.3",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/classnames": "^2.2.10",

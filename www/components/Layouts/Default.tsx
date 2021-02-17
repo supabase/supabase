@@ -9,7 +9,7 @@ type Props = {
   children: React.ReactNode
 }
 
-const Layout = (props: Props) => {
+const DefaultLayout = (props: Props) => {
   const { hideHeader = false, hideFooter = false, children } = props
   const [darkMode, setDarkMode] = useState<boolean>(true)
 
@@ -30,7 +30,7 @@ const Layout = (props: Props) => {
     <>
       <Meta />
       {!hideHeader && <Nav darkMode={darkMode} />}
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
         <main>{children}</main>
       </div>
       {!hideFooter && <Footer darkMode={darkMode} updateTheme={updateTheme} />}
@@ -38,4 +38,4 @@ const Layout = (props: Props) => {
   )
 }
 
-export default Layout
+export default DefaultLayout
