@@ -55,23 +55,23 @@ const Hero = () => {
                         url="https://app.supabase.io/api/login"
                       />
                       <p className="mt-8 text-sm text-dark-400 tracking-wide sm:mt-10">backed by</p>
-                      <div className="mt-5 w-full sm:mx-auto sm:max-w-lg lg:ml-0">
-                        <div className="flex flex-wrap items-center lg:justify-start">
+                      <div className="mt-5 w-full sm:max-w-lg lg:ml-0">
+                        <div className="flex flex-wrap items-center justify-start">
                           <img
-                            className="h-8 sm:h-10 pr-10"
+                            className="h-8 sm:h-10 pr-10 mb-5"
                             src={`${basePath}/images/logos/yc--grey.png`}
                             alt="Y Combinator"
                           />
                           <img
-                            className="relative -top-1 h-5 sm:h-7 pr-10"
+                            className="relative h-5 sm:h-7 pr-10 mb-5"
                             src={`${basePath}/images/logos/mozilla--grey.png`}
                             alt="Mozilla"
                           />
-                          {/* <img
-                            className="relative -top-1 h-5 sm:h-7 pr-10"
+                          <img
+                            className="relative h-5 sm:h-7 pr-10 mb-5"
                             src={`${basePath}/images/logos/coatue.png`}
                             alt="Coatue"
-                          /> */}
+                          />
                         </div>
                       </div>
                     </div>
