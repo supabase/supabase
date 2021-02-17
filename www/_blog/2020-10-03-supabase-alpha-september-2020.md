@@ -1,12 +1,12 @@
 ---
 title: Supabase Alpha September 2020
 description: Seven months of building.
-author: Paul Copplestone
+author: paul_copplestone
 author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
 authorURL: https://github.com/kiwicopple
-image: /img/supabase-september-2020.png
+image: supabase-september-2020.png
 tags:
   - supabase
 date: '03-10-2021'

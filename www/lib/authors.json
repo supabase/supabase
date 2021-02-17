@@ -12,5 +12,26 @@
     "author_image_url": "https://github.com/kiwicopple.png",
     "authorURL": "https://github.com/kiwicopple",
     "position": "CEO and Co-Founder"
+  },
+  "angelico_de_los_reyes": {
+    "author": "Angelico de los Reyes",
+    "author_url": "https://github.com/dragarcia",
+    "author_image_url": "https://avatars0.githubusercontent.com/u/26374889?s=400&u=f5e35e9b47a50fa2b4d8c4bb96babd921071bcf1&v=4",
+    "authorURL": "https://github.com/dragarcia",
+    "position": ""
+  },
+  "thor_schaeff": {
+    "author": "Thor 雷神 Schaeff",
+    "author_url": "https://github.com/thorwebdev",
+    "author_image_url": "https://github.com/thorwebdev.png",
+    "authorURL": "https://github.com/thorwebdev",
+    "position": ""
+  },
+  "supabase": {
+    "author": "Supabase",
+    "author_url": "https://github.com/supabase",
+    "author_image_url": "https://github.com/supabase.png",
+    "authorURL": "https://github.com/supabase",
+    "position": ""
   }
 }

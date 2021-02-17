@@ -1,12 +1,12 @@
 ---
 title: Monitoro Built a Web Crawler Handling Millions of API Requests
 description: See how Monitoro built an automated scraping platform using Supabase.
-author: Rory Wilding
+author: rory_wilding
 author_title: Supabase
 author_url: https://github.com/roryw10
 author_image_url: https://github.com/roryw10.png
 authorURL: https://github.com/roryw10
-image: /img/supabase-monitoro.png
+image: supabase-monitoro.png
 tags:
   - case-study
   - nocode

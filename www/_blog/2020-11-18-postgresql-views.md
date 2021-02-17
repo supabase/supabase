@@ -1,12 +1,12 @@
 ---
 title: Postgres Views
 description: Creating and using a view in PostgreSQL.
-author: Angelico de los Reyes
+author: paul_copplestone
 author_title: Supabase
 author_url: https://github.com/dragarcia
 author_image_url: https://avatars0.githubusercontent.com/u/26374889?s=400&u=f5e35e9b47a50fa2b4d8c4bb96babd921071bcf1&v=4
 authorURL: https://github.com/dragarcia
-image: /img/postgres-views.png
+image: postgres-views.png
 tags:
   - postgres
 date: '18-11-2021'

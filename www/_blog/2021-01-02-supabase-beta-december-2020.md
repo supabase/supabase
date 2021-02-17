@@ -6,7 +6,7 @@ author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
-image: /img/supabase-december-2020.png
+image: supabase-december-2020.png
 tags:
   - supabase
 date: '02-01-2021'

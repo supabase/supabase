@@ -6,7 +6,8 @@ author_title: Supabase
 author_url: https://github.com/roryw10
 author_image_url: https://github.com/roryw10.png
 authorURL: https://github.com/roryw10
-image: /img/roboflow-og.png
+image: roboflow-og.png
+thumb: roboflow-website.png
 tags:
   - case-study
   - AI
@@ -17,7 +18,7 @@ Brad Dwyer is the founder of [Roboflow](https://roboflow.com/?ref=supabase), a s
 
 Learn how Brad and Roboflow used Supabase to launch [Paint.wtf](https://paint.wtf), a product which survived traffic generated from the front page of Hacker News, Reddit, and Product Hunt.
 
-![Supabase and Strive are partnering up to teach OSS.](/img/roboflow-website.png)
+![Supabase and Strive are partnering up to teach OSS.](/new/images/blog/roboflow-website.png)
 
 **From idea to a launch in a weekend**
 
@@ -29,7 +30,7 @@ Roboflow settled on a straightforward concept: they prompt users to draw an imag
 
 Brad and the team needed a leaderboard to make this idea work. While their first intuition was to use Firebase, it lacks the built-in functionality for counting the number of documents in a collection - a critical function for implementing their leaderboard design.
 
-![Supabase and Strive are partnering up to teach OSS.](/img/roboflow-stat.png)
+![Supabase and Strive are partnering up to teach OSS.](/new/images/blog/roboflow-stat.png)
 
 You might export data to BigQuery, or implement an increment function on collection change, however PostgreSQL has great built in support for counting and Brad felt like this would be the perfect opportunity to test out Supabase and get the functionality he needed for the leaderboards to work reliably and without implementing add-ons.
 
@@ -39,7 +40,7 @@ Brad and the team built the product overnight and launched it on Hacker News. Pa
 
 Over 100K users submitted drawings in a 24 hour span. At this point, Brad knew he had picked the right setup for his leaderboard as even with this massive spike in usage it continued to perform reliably so his users could get accurate and up to date rankings for their submissions.
 
-![Supabase and Strive are partnering up to teach OSS.](/img/roboflow-gallery.png)
+![Supabase and Strive are partnering up to teach OSS.](/new/images/blog/roboflow-gallery.png)
 
 Paint.Wtf has continued to get sustained coverage in the media and has continued to pick up new and unexpected use cases. For example, remote teams are using Paint.wtf as part of their daily ice breaker activities during COVID to keep up team social cohesion.
 
@@ -51,7 +52,7 @@ Paint.Wtf has continued to get sustained coverage in the media and has continued
 >
 > Brad Dwyer, CTO Roboflow. -->
 
-![Supabase and Strive are partnering up to teach OSS.](/img/roboflow-quote.png)
+![Supabase and Strive are partnering up to teach OSS.](/new/images/blog/roboflow-quote.png)
 
 **Ship fast, and carry on scaling**
 
