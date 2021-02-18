@@ -1,0 +1,51 @@
+.toc a {
+  text-decoration: none !important;
+  font-weight: 400 !important;
+}
+
+.toc > ul > li {
+  padding-left: 0 !important;
+}
+
+.toc li {
+  @apply text-sm !important;
+  padding-left: 1rem !important;
+}
+
+/* .toc ul,
+.toc ol,
+.toc li {
+  list-style: none !important;
+  list-style-type: none !important;
+}
+
+.toc ul li::marker,
+.toc ol li::marker {
+  color: red !important;
+  font-size: 1.5em !important;
+} */
+
+.toc ul > li:before {
+  content: '';
+  position: absolute;
+  background-color: none;
+  border-radius: 50%;
+  width: 0 !important;
+  height: 0 !important;
+  top: 0.6875em;
+  left: 0.25em;
+
+  /* content: "";
+  position: absolute;
+  background-color: #bbb;
+  border-radius: 50%;
+  width: .375em;
+  height: .375em;
+  top: .6875em;
+  left: .25em; */
+}
+
+.header:hover svg,
+.header svg:hover {
+  display: inline-block;
+}

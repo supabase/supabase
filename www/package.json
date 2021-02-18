@@ -18,6 +18,7 @@
     "classnames": "2.2.6",
     "date-fns": "2.10.0",
     "gray-matter": "^4.0.2",
+    "markdown-toc": "^1.2.0",
     "next": "latest",
     "react": "^16.13.0",
     "react-copy-to-clipboard": "^5.0.2",
