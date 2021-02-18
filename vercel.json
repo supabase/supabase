@@ -6,6 +6,10 @@
         {
           "key": "Strict-Transport-Security",
           "value": ""
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "all"
         }
       ]
     }
