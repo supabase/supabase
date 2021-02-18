@@ -1,7 +1,7 @@
 ---
 title: Supabase Beta December 2020
 description: Ten months of building.
-author: Paul Copplestone
+author: paul_copplestone
 author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png

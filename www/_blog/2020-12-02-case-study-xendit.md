@@ -7,6 +7,7 @@ author_url: https://github.com/roryw10
 author_image_url: https://github.com/roryw10.png
 authorURL: https://github.com/roryw10
 image: supabase-xendit.png
+thumb: supabase-xendit-thumb.jpg
 tags:
   - case-study
   - fintech

@@ -64,10 +64,10 @@ function Blog(props: any) {
             </div>
           </div>
         </div>
-        <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
+        <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-32">
           <div className=" mx-auto max-w-7xl">
             <Typography.Title level={2}>More posts from the team</Typography.Title>
-            <div className="mt-5 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none">
+            <div className="mt-12 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none">
               {/* <ul> */}
               {props.blogs.slice(2).map((blog: any, idx: any) => {
                 return BlogListItem(blog)

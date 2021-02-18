@@ -20,13 +20,13 @@ Learn how Brad and Roboflow used Supabase to launch [Paint.wtf](https://paint.wt
 
 ![Supabase and Strive are partnering up to teach OSS.](/new/images/blog/roboflow-website.png)
 
-**From idea to a launch in a weekend**
+## From idea to a launch in a weekend
 
 Brad and a friend ([Erik Dunteman](https://twitter.com/erikdoingthings)) wanted to experiment with OpenAI's new [CLIP](https://openai.com/blog/clip/) model through a side project they could build in a weekend. CLIP classifies a wide range of images by flipping image classification into a text similarity task. Current image classifiers are limited because they are trained on a fixed number of categories. In contrast, CLIP learns from the raw text describing the images meaning the classifier isn't limited by labels and supervised learning. The team recognised that CLIP opens up a vast range of use cases that have been difficult previously due to the time required to collect images and train the model.
 
 Roboflow settled on a straightforward concept: they prompt users to draw an image which is then fed into CLIP. The AI then judges how close the drawing is to the given prompt and assigns it a score. Users' performance is tracked on a leaderboard for each prompt and users can see how well they performed against their peers according to the model.
 
-**Leaderboards that Count**
+## Leaderboards that Count
 
 Brad and the team needed a leaderboard to make this idea work. While their first intuition was to use Firebase, it lacks the built-in functionality for counting the number of documents in a collection - a critical function for implementing their leaderboard design.
 
@@ -34,7 +34,7 @@ Brad and the team needed a leaderboard to make this idea work. While their first
 
 You might export data to BigQuery, or implement an increment function on collection change, however PostgreSQL has great built in support for counting and Brad felt like this would be the perfect opportunity to test out Supabase and get the functionality he needed for the leaderboards to work reliably and without implementing add-ons.
 
-**One weekend to break the internet**
+## One weekend to break the internet
 
 Brad and the team built the product overnight and launched it on Hacker News. Paint.wtf went on to make it to Hacker News and Reddit's first page, and getting traction on Product Hunt. As a result, they had to handle serious user volumes; at its peak, users were submitting over 2 new drawings every second.
 
@@ -54,6 +54,6 @@ Paint.Wtf has continued to get sustained coverage in the media and has continued
 
 ![Supabase and Strive are partnering up to teach OSS.](/new/images/blog/roboflow-quote.png)
 
-**Ship fast, and carry on scaling**
+## Ship fast, and carry on scaling
 
 Thanks to Supabase, Roboflow could launch quickly and keep scaling despite the huge user volumes their innovative project generated overnight.
