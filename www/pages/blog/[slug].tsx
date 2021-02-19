@@ -6,6 +6,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import authors from 'lib/authors.json'
 import blogStyles from './[slug].module.css'
 const toc = require('markdown-toc')
+const gfm = require('remark-gfm')
 
 function BlogPostPage(props: any) {
   // @ts-ignore
@@ -62,14 +63,14 @@ function BlogPostPage(props: any) {
           <Typography.Text className="block mb-4 underline">Table of contents</Typography.Text>
           <Typography>
             <div className={blogStyles['toc']}>
-              <ReactMarkdown>{props.blog.toc.content}</ReactMarkdown>
+              <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
             </div>
           </Typography>
         </div>
         <div className="container mx-auto px-8 sm:px-16 xl:px-20">
           <div className="max-w-7xl">
             <Typography>
-              <ReactMarkdown renderers={{ heading: HeadingRenderer }}>
+              <ReactMarkdown plugins={[gfm]} renderers={{ heading: HeadingRenderer }}>
                 {props.blog.content}
               </ReactMarkdown>
             </Typography>
@@ -104,10 +105,6 @@ export async function getStaticProps(context: any) {
   //   .use(highlight) // highlight code block
   //   .use(html)
   //   .process(content) // pass content to process)
-
-  console.log(toc(content))
-
-  console.log(typeof content)
 
   return {
     props: {
