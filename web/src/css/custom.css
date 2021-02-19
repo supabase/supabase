@@ -806,7 +806,7 @@ a.hash-link {
 .DocSearch-Button {
   border-radius: 8px !important;
 }
-.DocSearch-Button svg {
+.DocSearch-Button>svg {
   display: none;
 }
 .DocSearch-Button-Placeholder {
