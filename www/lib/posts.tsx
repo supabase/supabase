@@ -1,14 +1,12 @@
-// ./lib/posts.js
-
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
+import { generateReadingTime } from './helpers'
 
 //Finding directory named "blog" from the current working directory of Node.
 const postDirectory = path.join(process.cwd(), '_blog')
 
 export const getSortedPosts = (limit?: number, tags?: any) => {
-  console.log(tags)
   //Reads all the files in the post directory
   const fileNames = fs.readdirSync(postDirectory)
 
@@ -20,24 +18,17 @@ export const getSortedPosts = (limit?: number, tags?: any) => {
     const fullPath = path.join(postDirectory, filename)
     //Extracts contents of the MDX file
     const fileContents = fs.readFileSync(fullPath, 'utf8')
-    const { data } = matter(fileContents)
+    const { data, content } = matter(fileContents)
 
     const options = { month: 'long', day: 'numeric', year: 'numeric' }
     const formattedDate = new Date(data.date).toLocaleDateString('en-IN', options)
 
-    // // add tags into categories array
-    // data.tags.map((tag: string) => {
-    //   if (!categories.includes(tag)) return categories.push(tag)
-    // })
-
-    //   if(this.items.indexOf(item) === -1) {
-    //     this.items.push(item);
-    //     console.log(this.items);
-    // }
+    const readingTime = generateReadingTime(content)
 
     const frontmatter = {
       ...data,
       date: formattedDate,
+      readingTime,
     }
     return {
       slug,
@@ -55,7 +46,6 @@ export const getSortedPosts = (limit?: number, tags?: any) => {
 
   if (tags) {
     allPostsData = allPostsData.filter((post: any) => {
-      console.log(post)
       const found = tags.some((tag: any) => post.tags.includes(tag))
       return found
     })
