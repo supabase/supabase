@@ -1,8 +1,7 @@
 import Head from 'next/head'
-import { DESCRIPTION } from '../lib/constants'
 import { useRouter } from 'next/router'
 
-const Meta = () => {
+const Favicons = () => {
   const { basePath } = useRouter()
   return (
     <Head>
@@ -30,23 +29,10 @@ const Meta = () => {
       <meta name="msapplication-config" content={`${basePath}/favicon/browserconfig.xml`} />
       <meta name="theme-color" content="#1E1E1E" />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
-
-      <meta name="description" content={DESCRIPTION} />
-      <meta property="og:type" content="website" />
-
-      <meta name="og:description" property="og:description" content={DESCRIPTION} />
-      <meta property="og:site_name" content="" />
-      <meta property="og:url" content={`${basePath}/og/og-image.jpg`} />
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="" />
-      <meta name="twitter:description" content={DESCRIPTION} />
-      <meta name="twitter:creator" content="supabase_io" />
       <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon.ico`} />
       <link rel="apple-touch-icon" href={`${basePath}/favicon/favicon.ico`} />
-      <meta property="og:image" content={`${basePath}/og/og-image.jpg`} />
-      <meta name="twitter:image" content={`https://supabase.io${basePath}/og/og-image.jpg`} />
     </Head>
   )
 }
 
-export default Meta
+export default Favicons

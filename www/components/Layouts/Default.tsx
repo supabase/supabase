@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import Nav from 'components/Nav/index'
 import Footer from 'components/Footer/index'
-import Meta from 'components/Meta'
 
 type Props = {
   hideHeader?: boolean
@@ -28,7 +27,6 @@ const DefaultLayout = (props: Props) => {
 
   return (
     <>
-      <Meta />
       {!hideHeader && <Nav darkMode={darkMode} />}
       <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
         <main>{children}</main>
