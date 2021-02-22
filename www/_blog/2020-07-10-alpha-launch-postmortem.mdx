@@ -8,7 +8,7 @@ author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c677
 authorURL: https://github.com/kiwicopple
 tags:
   - supabase
-date: '10-07-2020'
+date: '07-10-2020'
 ---
 
 On May 27 Supabase hit the [top of Hacker News](https://news.ycombinator.com/item?id=23319901) and stayed on the front page for more than 24 hours.
@@ -25,15 +25,15 @@ Before we get into the details, here are some high-level numbers for the week fo
 
 We had 30,000 new website visitors to [supabase.io](http://supabase.io):
 
-![This graph shows the traffic to our website, that peaks at 15,000 the first day and tails off throughout the week. We had a total of 30,000 visitors to our site. That's according to Google Analytics though, and everyone on HN blocks GA so who knows what the real number is.](/img/supabase-traffic-may.png)
+![This graph shows the traffic to our website, that peaks at 15,000 the first day and tails off throughout the week. We had a total of 30,000 visitors to our site. That's according to Google Analytics though, and everyone on HN blocks GA so who knows what the real number is.](/new/images/blog/supabase-traffic-may.png)
 
 <br />
 
 We had over 1400 signups in 7 days:
-![This graph shows our signups. Before the launch we had around 100 signups. After the launch it sky-rocketed to 600 in the first day, 900 by the second, and 1000 by the third day. By the end of the week we had over 1400 signups.](/img/hn-launch.png)
+![This graph shows our signups. Before the launch we had around 100 signups. After the launch it sky-rocketed to 600 in the first day, 900 by the second, and 1000 by the third day. By the end of the week we had over 1400 signups.](/new/images/blog/hn-launch.png)
 
 Github stars rocketed for our two main repos, [supabase](https://github.com/supabase/supabase) and [realtime](https://github.com/supabase/realtime).
-![This graph shows our github stars. It's basically a vertical line. Our main repo went from 300 stars to 1300 overnight.](/img/supabase-github-stars-june.png)
+![This graph shows our github stars. It's basically a vertical line. Our main repo went from 300 stars to 1300 overnight.](/new/images/blog/supabase-github-stars-june.png)
 
 ## The good
 
@@ -43,7 +43,7 @@ Here are the things that survived well.
 
 This was the most surprising survivor. Our middleware was served from a single Ubuntu server with 4 CPUs and 8GB of RAM. This server was running our middleware using `docker-compose up`:
 
-![This image shows in middleware architecture. We used docker-compose to pull up 5 open source tools: Kong, Realtime, PostgREST, PG-API, and PG-BOSS.](/img/supabase-middleware-docker.png)
+![This image shows in middleware architecture. We used docker-compose to pull up 5 open source tools: Kong, Realtime, PostgREST, PG-API, and PG-BOSS.](/new/images/blog/supabase-middleware-docker.png)
 
 In case you're wondering why any sane company would use that in production, it's because we weren't planning to launch - the HackerNews post was created by an early GitHub follower, while we were alpha testing, and it was too scary to migrate the middleware while it was servicing the thundering herd. All Supabase projects use the same middleware stack (sans docker-compose), so I guess this counts as as a successful load test.
 
@@ -77,7 +77,7 @@ Let me start by saying that Digital Ocean have been great for getting up and run
 
 The first sign of problems were the frequent production errors. This is a screenshot of emails from Digital ocean for the month of June.
 
-![This image shows all the emails I was receiving from Digital Ocean. I was receiving an email every other day about servers which needed to be migrated.](/img/digital-ocean-emails-errors.png)
+![This image shows all the emails I was receiving from Digital Ocean. I was receiving an email every other day about servers which needed to be migrated.](/new/images/blog/digital-ocean-emails-errors.png)
 
 Each of these emails represents one or more servers that has a critical issue:
 

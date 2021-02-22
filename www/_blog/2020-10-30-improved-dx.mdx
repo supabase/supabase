@@ -9,7 +9,7 @@ authorURL: https://github.com/kiwicopple
 image: supabase-js-1-0.png
 tags:
   - supabase
-date: '30-10-2021'
+date: '10-30-2020'
 ---
 
 Today we're releasing [supabase-js](https://github.com/supabase/supabase-js) version 1.0, and it comes with some major Developer Experience improvements.
@@ -26,24 +26,28 @@ Before digging into the improvements, we're excited to point out our new [develo
 
 ### Errors are returned, not thrown
 
-We attribute this improvement to community feedback. This has significantly improved the developer experience. Previously we would throw errors:
+We attribute this improvement to community feedback. This has significantly improved the developer experience.
 
-```js
-try {
+Previously we would throw errors:
+
+<CodeBlock
+  code={`try {
   const { body } = supabase.from('todos').select('*')
 } catch (error) {
   console.log(error)
-}
-```
+}`}
+  lang="js"
+  hideCopy
+/>
 
 And now we simply return them:
 
-```js
-const { data, error } = supabase.from('todos').select('*')
-if (error) console.log(error)
-
-// else, carry on ..
-```
+<CodeBlock
+  code={`const { data, error } = supabase.from('todos').select('*')
+if (error) console.log(error)\n
+// else, carry on ..`}
+  lang="js"
+/>
 
 After testing this for a while we're very happy with this pattern. Errors are handled next to the offending function. Of course you can always rethrow the error if that's your preference.
 
@@ -55,20 +59,23 @@ To maintain this philosophy, we created [`gotrue-js`](https://github.com/supabas
 
 Previously:
 
-```js
-const {
+<CodeBlock
+  code={`const {
   body: { user },
-} = await supabase.auth.signup('someone@email.com', 'password')
-```
+} = await supabase.auth.signup('someone@email.com', 'password')`}
+  lang="js"
+  hideCopy
+/>
 
 Now:
 
-```js
-const { user, error } = await supabase.auth.signUp({
+<CodeBlock
+  code={`const { user, error } = await supabase.auth.signUp({
   email: 'someone@email.com',
   password: 'password',
-})
-```
+})`}
+  lang="js"
+/>
 
 ### Enhancements and fixes
 
@@ -90,15 +97,11 @@ We've bumped the major version because there are a number of breaking changes. W
 
 Previously:
 
-```js
-const { body } = supabase.from('todos').select('*')
-```
+<CodeBlock code={`const {body} = supabase.from('todos').select('*')`} lang="js" hideCopy />
 
 Now:
 
-```js
-const { data } = supabase.from('todos').select()
-```
+<CodeBlock code={`const {data} = supabase.from('todos').select()`} lang="js" />
 
 ### Upgrading
 
