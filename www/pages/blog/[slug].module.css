@@ -49,3 +49,15 @@
 .header svg:hover {
   display: inline-block;
 }
+
+.article h1,
+.article h2,
+.article h3,
+.article h4,
+.article h5 {
+  font-weight: 500 !important;
+}
+
+.article {
+  @apply mb-16;
+}
