@@ -1,6 +1,3 @@
-import Head from 'next/head'
-import { APP_NAME, DESCRIPTION } from 'lib/constants'
-
 import Container from 'components/Container'
 import Layout from '~/components/Layouts/Default'
 import Hero from 'components/Hero'
@@ -13,20 +10,10 @@ import CTABanner from 'components/CTABanner/index'
 
 type Props = {}
 
-const site_title = `The Open Source Firebase Alternative | ${APP_NAME}`
-
 const Index = ({}: Props) => {
   return (
     <>
       <Layout>
-        <Head>
-          <title>
-            {DESCRIPTION} | {site_title}
-          </title>
-          <meta name="og:title" property="og:title" content={site_title} />
-          <meta name="twitter:site" content={site_title} />
-          <meta name="twitter:text:title" content={site_title} />
-        </Head>
         <Container>
           <Hero />
           <Features />

@@ -1,5 +1,6 @@
 // file: pages/blog/[slug].js
 import React from 'react'
+import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
 import { NextSeo } from 'next-seo'
 
@@ -11,7 +12,7 @@ import matter from 'gray-matter'
 import renderToString from 'next-mdx-remote/render-to-string'
 import hydrate from 'next-mdx-remote/hydrate'
 
-import { IconFile, IconLink, Space, Typography, Badge } from '@supabase/ui'
+import { IconFile, Space, Typography, Badge } from '@supabase/ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 import blogStyles from './[slug].module.css'
@@ -32,6 +33,8 @@ function BlogPostPage(props: any) {
   const author = props.blog.author ? authors[props.blog.author] : authors['supabase']
   const content = hydrate(props.blog.content, { components })
 
+  const { basePath } = useRouter()
+
   return (
     <>
       <NextSeo
@@ -39,7 +42,7 @@ function BlogPostPage(props: any) {
         openGraph={{
           title: props.blog.title,
           description: 'Description of open graph article',
-          url: `https://supabase.io/blog/${props.blog.slug}`,
+          url: `${basePath}/blog/${props.blog.slug}`,
           type: 'article',
           article: {
             //
@@ -56,7 +59,7 @@ function BlogPostPage(props: any) {
           },
           images: [
             {
-              url: `https://supabase.io/new/images/blog/${
+              url: `${basePath}/images/blog/${
                 props.blog.thumb ? props.blog.thumb : props.blog.image
               }`,
             },
