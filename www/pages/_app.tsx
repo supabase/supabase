@@ -56,7 +56,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
               url: `${basePath}/images/og/og-image.jpg`,
               width: 800,
               height: 600,
-              alt: 'Og Image Alt',
+              alt: 'Supabase Og Image',
             },
           ],
         }}

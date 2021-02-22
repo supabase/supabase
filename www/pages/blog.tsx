@@ -152,7 +152,7 @@ function BlogListItem(blog: any) {
 
   // console.log(blog.content.substring(0, 120))
   return (
-    <div key={blog.id} className="py-4 border-b border-gray-100 dark:border-gray-600 mb-8">
+    <div key={blog.id} className="pt-4 pb-12 border-b border-gray-100 dark:border-gray-600 mb-8">
       <div className="mx-auto max-w-7xl cursor-pointer">
         <Link href={`/blog/${blog.slug}`} as={`/blog/${blog.slug}`}>
           <div>

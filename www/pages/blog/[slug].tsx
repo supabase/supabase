@@ -16,6 +16,7 @@ import { IconFile, Space, Typography, Badge } from '@supabase/ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 import blogStyles from './[slug].module.css'
+import Link from 'next/link'
 
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
@@ -136,12 +137,18 @@ function BlogPostPage(props: any) {
                     </Typography.Title>
                     <Space direction="vertical">
                       {props.relatedPosts.map((post: any) => (
-                        <Typography.Text>
-                          <Space>
-                            <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
-                            <span>{post.title}</span>
-                          </Space>
-                        </Typography.Text>
+                        <Link href={`/blog/${post.slug}`} as={`/blog/${post.slug}`}>
+                          <div>
+                            <Typography.Text className="cursor-pointer">
+                              <Space>
+                                <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
+                                <span className="hover:text-gray-900 dark:hover:text-white">
+                                  {post.title}
+                                </span>
+                              </Space>
+                            </Typography.Text>
+                          </div>
+                        </Link>
                       ))}
                     </Space>
                   </div>
@@ -176,7 +183,9 @@ export async function getStaticProps({ params }: any) {
     },
   })
 
-  const relatedPosts = getSortedPosts(5, mdxSource.tags)
+  console.log('tagsss', mdxSource.scope.tags)
+
+  const relatedPosts = getSortedPosts(5, mdxSource.scope.tags)
 
   return {
     props: {
