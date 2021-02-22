@@ -8,7 +8,7 @@ author_image_url: https://avatars3.githubusercontent.com/u/2155545
 authorURL: https://github.com/inian
 tags:
   - supabase
-date: '13-12-2021'
+date: '12-13-2020'
 ---
 
 <!--truncate-->
@@ -27,11 +27,11 @@ There was some low-hanging fruit to improve performance, but we had one importan
 
 Our dashboard is JavaScript heavy, so we started by setting up analytics to track our bundle sizes. [Next-bundle-analyzer](https://www.npmjs.com/package/@next/bundle-analyzer) (or [webpack-bundle-analyzer](https://www.npmjs.com/package/webpack-bundle-analyzer)) provides an interactive treemap of your generated JavaScript bundles. This is our treemap when we started. It gave us a clear indication what changes we needed to achieve the most impact.
 
-![Nextjs tree analyzer](/img/blog/nextjs-tree-analyzer.png)
+![Nextjs tree analyzer](/new/images/blog/blog/nextjs-tree-analyzer.png)
 
 There are some great tools when it comes to Real User Monitoring (RUM). We chose the newly-launched [Sentry performance monitoring](https://sentry.io/for/performance/) product since we already use Sentry for error tracking and we wanted to minimize new tools in our stack. It also supports reporting [Core Web Vitals](https://web.dev/vitals/), the performance metrics created by Google to track initial loading performance, responsiveness and visual stability. Core Web Vitals come with recommended target values, giving us clear goals to hit.
 
-![Core Web Vitals](/img/blog/core-web-vitals.png)
+![Core Web Vitals](/new/images/blog/blog/core-web-vitals.png)
 
 ## Improving our JavaScript bundle size
 
@@ -45,7 +45,7 @@ We used [Bundlephobia](https://bundlephobia.com/) on our largest modules. This i
 
 We migrated from `Joi` to `ajv` for our schema validation which was 32% smaller. `ajv` was already bundled as a transitive dependency of other modules, making it a no-brainer.
 
-![NPM dependencies](/img/blog/npm-dependencies.png)
+![NPM dependencies](/new/images/blog/blog/npm-dependencies.png)
 
 We reverted our [crypto-js](https://github.com/brix/crypto-js) module from version 4.0 to 3.3.0. Version 4.0 [injects more than 400kb code](https://github.com/brix/crypto-js/issues/276) when used in a browser context. The newer version replaces `Math.random` with node's implementation, injecting the entire node crypto module into the browser context. We use `crypto-js` for decrypting user's API keys and so we're not reliant on the randomness of the PRNG. We might move to a dedicated module like [aes-js](https://www.npmjs.com/package/aes-js) in the future since it has a much smaller surface area than `crypto-js` (in terms of security and performance).
 
@@ -78,7 +78,7 @@ Thanks to some skilled haxors (well, weak passwords mainly) we had crypto miners
 The spreadsheet import is triggered when the user is creating a new table. However the code was previously loaded every time the page was visited - even when a new table was not being created. This made it a good candidate for lazy loading. Using [Next.js dynamic imports](https://nextjs.org/docs/advanced-features/dynamic-import) we are able to load this component (313 kb brotlied) dynamically, whenever the user clicks the "Add content" button.
 
 <video width="99%" muted playsInline controls="true">
-<source src="/videos/lazy_loading.mov" type="video/mp4" muted playsInline />
+  <source src="/videos/lazy_loading.mov" type="video/mp4" muted playsInline />
 </video>
 
 We use the same technique to lazy load some Lottie animations which are relatively large.
@@ -113,7 +113,7 @@ During our transition from Alpha to Beta, performance was one of the important f
 
 With these changes, we have a respectable Core Web Vitals score. This is a snapshot from Sentry with RUM data from the last week. We are within the recommended threshold for all the 3 Web Vitals.
 
-![Sentry results](/img/blog/sentry-results.png)
+![Sentry results](/new/images/blog/blog/sentry-results.png)
 
 Our Next.js build output also shows that users download < 200 kb of JavaScript between any two page transitions. We're still improving too - even though we provide a lot of functionality in our dashboard, we will continue to reduce our bundle sizes.
 

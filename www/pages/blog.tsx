@@ -1,47 +1,39 @@
 import DefaultLayout from '~/components/Layouts/Default'
 import Link from 'next/link'
-import { Typography, Card, Badge, Space } from '@supabase/ui'
+import { Typography, Badge, Space, Button } from '@supabase/ui'
 import authors from 'lib/authors.json'
-import ReactMarkdown from 'react-markdown'
+import { getSortedPosts, getAllCategories } from '~/lib/posts'
+import { useEffect, useState } from 'react'
 
-// function Blog(props: any) {
-//   return (
-//     <DefaultLayout>
-//       <h1>Blog</h1>
-//     </DefaultLayout>
-//   )
-// }
-
-// This function gets called at build time on server-side.
 export async function getStaticProps() {
-  const fs = require('fs')
-  const matter = require('gray-matter')
-  const { v4: uuid } = require('uuid')
+  const allPostsData = getSortedPosts()
+  const categories = getAllCategories()
 
-  const files = fs.readdirSync(`${process.cwd()}/_blog`, 'utf-8')
-
-  const blogs = files
-    .filter((fn: any) => fn.endsWith('.md'))
-    .map((fn: any) => {
-      const path = `${process.cwd()}/_blog/${fn}`
-      const rawContent = fs.readFileSync(path, {
-        encoding: 'utf-8',
-      })
-      const { data, content } = matter(rawContent)
-
-      data.path = fn.replace('.md', '').replace('.mdx', '')
-      return { ...data, content: content, id: uuid() }
-    })
-    .reverse()
-
-  // By returning { props: blogs }, the IndexPage component
-  // will receive `blogs` as a prop at build time
+  console.log(categories)
   return {
-    props: { blogs },
+    props: {
+      blogs: allPostsData,
+      categories,
+    },
   }
 }
 
 function Blog(props: any) {
+  const [category, setCategory] = useState('')
+  const [blogs, setBlogs] = useState(props.blogs)
+
+  useEffect(() => {
+    // Update the document title using the browser API
+    setBlogs(
+      category
+        ? props.blogs.filter((post: any) => {
+            const found = post.tags.includes(category)
+            return found
+          })
+        : blogs
+    )
+  }, [category])
+
   return (
     <DefaultLayout>
       <div className="bg-white dark:bg-dark-700 overflow-hidden py-12">
@@ -66,10 +58,32 @@ function Blog(props: any) {
         </div>
         <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-32">
           <div className=" mx-auto max-w-7xl">
-            <Typography.Title level={2}>More posts from the team</Typography.Title>
+            <div className="grid grid-cols-12">
+              <div className="col-span-8">
+                <Typography.Title level={2}>More posts from the team</Typography.Title>
+              </div>
+              {/* <Select className="sbui-border-fix col-span-4">
+                <Select.Option value="" selected>
+                  Choose a category
+                </Select.Option>
+                <Select.Option value="case-study">Case study</Select.Option>
+                <Select.Option value="supabase">Supabase</Select.Option>
+              </Select> */}
+            </div>
+            <Space className="mt-6">
+              {props.categories.map((categoryId: string) => (
+                <Button
+                  type={category === categoryId ? 'primary' : 'outline'}
+                  key={categoryId}
+                  onClick={() => setCategory(categoryId)}
+                >
+                  {categoryId}
+                </Button>
+              ))}
+            </Space>
             <div className="mt-12 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none">
               {/* <ul> */}
-              {props.blogs.slice(2).map((blog: any, idx: any) => {
+              {blogs.map((blog: any, idx: any) => {
                 return BlogListItem(blog)
               })}
               {/* </ul> */}
@@ -84,9 +98,10 @@ function Blog(props: any) {
 function FeaturedThumb(blog: any) {
   // @ts-ignore
   const author = blog.author ? authors[blog.author] : authors['supabase']
+
   return (
     <div key={blog.id} className="my-6">
-      <Link href={`/blog/${blog.path}`}>
+      <Link href={`/blog/${blog.slug}`} as={`/blog/${blog.slug}`}>
         <div>
           <img
             className="h-96 w-full object-cover"
@@ -137,11 +152,11 @@ function BlogListItem(blog: any) {
   // @ts-ignore
   const author = blog.author ? authors[blog.author] : authors['supabase']
 
-  console.log(blog.content.substring(0, 120))
+  // console.log(blog.content.substring(0, 120))
   return (
     <div key={blog.id} className="py-4 border-b border-gray-100 dark:border-gray-600 mb-8">
       <div className=" mx-auto max-w-7xl">
-        <Link href={`/blog/${blog.path}`}>
+        <Link href={`/blog/${blog.slug}`} as={`/blog/${blog.slug}`}>
           <div>
             <Space direction="vertical" size={5} className="">
               <div>
