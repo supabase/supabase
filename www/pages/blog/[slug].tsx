@@ -12,7 +12,7 @@ import matter from 'gray-matter'
 import renderToString from 'next-mdx-remote/render-to-string'
 import hydrate from 'next-mdx-remote/hydrate'
 
-import { IconFile, Space, Typography, Badge } from '@supabase/ui'
+import { IconFile, Space, Typography, Badge, Divider } from '@supabase/ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 import blogStyles from './[slug].module.css'
@@ -73,10 +73,19 @@ function BlogPostPage(props: any) {
             <div className="max-w-6xl mx-auto">
               <div className="py-12 grid grid-cols-12 gap-16">
                 <div className="col-span-10">
-                  <Space className="mb-4">
-                    <Typography.Text type="secondary">{props.blog.date}</Typography.Text>
+                  <Link href={`/blog`} as={`/blog`}>
+                    <div>
+                      <Typography.Text type="secondary">
+                        <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
+                          View more posts
+                        </span>
+                      </Typography.Text>
+                    </div>
+                  </Link>
+                  <Space className="my-4">
+                    <Typography.Text>{props.blog.date}</Typography.Text>
                     <Typography.Text type="secondary">•</Typography.Text>
-                    <Typography.Text type="secondary">
+                    <Typography.Text>
                       {generateReadingTime(props.blog.content.renderedOutput)}
                     </Typography.Text>
                   </Space>
@@ -147,9 +156,19 @@ function BlogPostPage(props: any) {
                                 </span>
                               </Space>
                             </Typography.Text>
+                            <Divider light className="mt-2" />
                           </div>
                         </Link>
                       ))}
+                      <Link href={`/blog`} as={`/blog`}>
+                        <div>
+                          <Typography.Text type="secondary">
+                            <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
+                              View all posts
+                            </span>
+                          </Typography.Text>
+                        </div>
+                      </Link>
                     </Space>
                   </div>
                 </Space>
