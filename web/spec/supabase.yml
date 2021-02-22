@@ -226,13 +226,29 @@ pages:
       - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
       - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
     examples:
-      - name: Sign up
+      - name: Sign up.
         isSpotlight: true
         js: |
           ```js
           const { user, session, error } = await supabase.auth.signUp({
             email: 'example@email.com',
             password: 'example-password',
+          })
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
+      - name: Sign up with redirect.
+        description: |
+          Sometime you want to control where the user is redirected to after they are logged in. Supabase supports this for 
+          any URL path on your website (the base domain must be the same as the domain in your Auth settings).
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signUp({
+            provider: 'github'
+          }, {
+            redirectTo: 'https://example.com/welcome'
           })
           ```
         py: |
@@ -280,6 +296,22 @@ pages:
           const { user, session, error } = await supabase.auth.signIn({
             // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
             provider: 'github'
+          })
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
+      - name: Sign in with redirect.
+        description: |
+          Sometime you want to control where the user is redirected to after they are logged in. Supabase supports this for 
+          any URL path on your website (the base domain must be the same as the domain in your Auth settings).
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            provider: 'github'
+          }, {
+            redirectTo: 'https://example.com/welcome'
           })
           ```
         py: |
