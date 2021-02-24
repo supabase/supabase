@@ -14,13 +14,14 @@ import hydrate from 'next-mdx-remote/hydrate'
 
 import { IconFile, Space, Typography, Badge, Divider } from '@supabase/ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import Quote from '~/components/Quote'
 
 import blogStyles from './[slug].module.css'
 import Link from 'next/link'
 
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
-const components = { CodeBlock }
+const components = { CodeBlock, Quote }
 
 // plugins for next-mdx-remote
 const gfm = require('remark-gfm')
@@ -68,7 +69,7 @@ function BlogPostPage(props: any) {
         }}
       />
       <DefaultLayout>
-        <div className="bg-white dark:bg-dark-700 overflow-hidden py-12">
+        <div className="bg-white dark:bg-dark-800 overflow-hidden py-12">
           <div className="container px-8 sm:px-16 xl:px-20 mt-16 mx-auto">
             <div className="max-w-6xl mx-auto">
               <div className="py-12 grid grid-cols-12 gap-16">
@@ -117,7 +118,7 @@ function BlogPostPage(props: any) {
                 {props.blog.thumb && (
                   <img
                     src={'/new/images/blog/' + props.blog.thumb}
-                    className="object-cover -mt-32 mb-8"
+                    className="object-cover -mt-32 mb-8 border dark:border-gray-600"
                     style={{ maxHeight: '520px', width: '100%' }}
                   />
                 )}
