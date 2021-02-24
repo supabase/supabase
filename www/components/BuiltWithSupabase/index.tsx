@@ -25,7 +25,9 @@ const BuiltExamples = () => {
                 <Card
                   key={`example_${idx}`}
                   hoverable
-                  cover={<img src={`${basePath}/${example.imgUrl}`} />}
+                  cover={
+                    <img src={`${basePath}/${example.imgUrl}`} className="h-64 object-cover" />
+                  }
                 >
                   <Space className="justify-between h-40" direction="vertical">
                     <div>
