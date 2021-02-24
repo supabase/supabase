@@ -60,20 +60,21 @@ Authentication only gets you so far. When you need granular authorization rules,
 
 With policies, your database becomes the rules engine. Instead of repetitively filtering your queries, like this ...
 
-```js
-const loggedInUserId = 'd0714948'
-let user = await supabase.from('users').select('user_id, name').eq('user_id', loggedInUserId)
-
-// Returns { id: 'd0714948', name: 'Jane' }
-```
+<CodeBlock
+  code={`const loggedInUserId = 'd0714948'
+let user = await supabase.from('users').select('user_id, name').eq('user_id', loggedInUserId)\n
+// Returns { id: 'd0714948', name: 'Jane'
+`}
+  lang="js"
+/>
 
 ... you can simply define a rule on your database table, `auth.uid() = user_id`, and your request will return the rows which pass the rule, even when you remove the filter from your middleware:
 
-```js
-let user = await supabase.from('users').select('user_id, name')
-
-// Still returns { id: 'd0714948', name: 'Jane' }
-```
+<CodeBlock
+  code={`let user = await supabase.from('users').select('user_id, name')\n
+// Still returns { id: 'd0714948', name: 'Jane' }`}
+  lang="js"
+/>
 
 ### Open source
 
