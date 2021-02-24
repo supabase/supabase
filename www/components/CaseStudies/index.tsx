@@ -30,7 +30,9 @@ const CaseStudies = () => {
                 <Card
                   key={`caseStudy_${idx}`}
                   hoverable
-                  cover={<img src={`${basePath}/${caseStudy.imgUrl}`} />}
+                  cover={
+                    <img src={`${basePath}/${caseStudy.imgUrl}`} className="h-64 object-cover" />
+                  }
                 >
                   <Space className="justify-between h-40" direction="vertical">
                     <div>
