@@ -11,7 +11,7 @@ export default function Quote(props: Props) {
   const { children, caption, img } = props
 
   return (
-    <figure className="border border-gray-300 dark:border-gray-600 p-8">
+    <figure className="border border-gray-100 dark:border-gray-600 p-8">
       <Space direction="vertical" size={5}>
         <blockquote className="border-none mb-4" style={{ margin: 0, padding: 0 }}>
           "{children}"
