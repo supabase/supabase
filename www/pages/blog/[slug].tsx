@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
 import { NextSeo } from 'next-seo'
 
-import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import { getAllPostSlugs, getPostdata, getSortedPosts, getLastPost } from '~/lib/posts'
 import { generateReadingTime } from '~/lib/helpers'
 import ReactMarkdown from 'react-markdown'
 import authors from 'lib/authors.json'
@@ -12,7 +12,7 @@ import matter from 'gray-matter'
 import renderToString from 'next-mdx-remote/render-to-string'
 import hydrate from 'next-mdx-remote/hydrate'
 
-import { IconFile, Space, Typography, Badge, Divider } from '@supabase/ui'
+import { IconFile, Space, Typography, Badge, Divider, Card } from '@supabase/ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import Quote from '~/components/Quote'
 
@@ -30,12 +30,88 @@ const slug = require('rehype-slug')
 // table of contents extractor
 const toc = require('markdown-toc')
 
+export async function getStaticPaths() {
+  const paths = getAllPostSlugs()
+  return {
+    paths,
+    fallback: false,
+  }
+}
+
+export async function getStaticProps({ params }: any) {
+  const postContent = await getPostdata(params.slug)
+  const { data, content } = matter(postContent)
+
+  const mdxSource: any = await renderToString(content, {
+    components,
+    scope: data,
+    mdxOptions: {
+      remarkPlugins: [gfm],
+      rehypePlugins: [slug],
+    },
+  })
+
+  // console.log('tagsss', mdxSource.scope.tags)
+
+  const relatedPosts = getSortedPosts(5, mdxSource.scope.tags)
+
+  const allPosts = getSortedPosts()
+
+  // console.log(lastPost.indexOf())
+
+  const currentIndex = allPosts
+    .map(function (e) {
+      return e.slug
+    })
+    .indexOf(params.slug)
+
+  return {
+    props: {
+      prevPost: currentIndex === 0 ? null : allPosts[currentIndex - 1],
+      nextPost: currentIndex === allPosts.length ? null : allPosts[currentIndex + 1],
+      relatedPosts,
+      blog: {
+        slug: params.slug,
+        content: mdxSource,
+        ...data,
+        toc: toc(content),
+      },
+    },
+  }
+}
+
 function BlogPostPage(props: any) {
   // @ts-ignore
   const author = props.blog.author ? authors[props.blog.author] : authors['supabase']
   const content = hydrate(props.blog.content, { components })
 
   const { basePath } = useRouter()
+
+  const NextCard = (props: any) => {
+    const { post, label, className } = props
+    return (
+      <Link href={post.slug} as={post.slug}>
+        <div className={className}>
+          <Card className="cursor-pointer" hoverable>
+            <Space direction="vertical">
+              <div>
+                <Typography.Text>{label}</Typography.Text>
+              </div>
+              <div>
+                <Typography.Title level={4}>{post.title}</Typography.Title>
+                <Typography.Text>{post.date}</Typography.Text>
+              </div>
+              <div>
+                {post.tags.map((tag: string) => {
+                  return <Badge key={`categroy-badge-${tag}`}>{tag}</Badge>
+                })}
+              </div>
+            </Space>
+          </Card>
+        </div>
+      </Link>
+    )
+  }
 
   return (
     <>
@@ -111,7 +187,7 @@ function BlogPostPage(props: any) {
             </div>
           </div>
         </div>
-        <div className="container px-8 sm:px-16 xl:px-20 mt-16 mx-auto">
+        <div className="container px-8 sm:px-16 xl:px-20 py-16 mx-auto">
           <div className="max-w-6xl mx-auto">
             <div className="py-4 grid grid-cols-12 gap-16">
               <div className="col-span-8">
@@ -175,49 +251,19 @@ function BlogPostPage(props: any) {
                 </Space>
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-8 py-8">
+              <div>{props.prevPost && <NextCard post={props.prevPost} label="Last post" />}</div>
+              <div>
+                {props.nextPost && (
+                  <NextCard post={props.nextPost} label="Next post" className="text-right" />
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </DefaultLayout>
     </>
   )
-}
-
-export async function getStaticPaths() {
-  const paths = getAllPostSlugs()
-  return {
-    paths,
-    fallback: false,
-  }
-}
-
-export async function getStaticProps({ params }: any) {
-  const postContent = await getPostdata(params.slug)
-  const { data, content } = matter(postContent)
-
-  const mdxSource: any = await renderToString(content, {
-    components,
-    scope: data,
-    mdxOptions: {
-      remarkPlugins: [gfm],
-      rehypePlugins: [slug],
-    },
-  })
-
-  console.log('tagsss', mdxSource.scope.tags)
-
-  const relatedPosts = getSortedPosts(5, mdxSource.scope.tags)
-
-  return {
-    props: {
-      relatedPosts,
-      blog: {
-        slug: params.slug,
-        content: mdxSource,
-        ...data,
-        toc: toc(content),
-      },
-    },
-  }
 }
 
 export default BlogPostPage
