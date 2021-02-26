@@ -1,29 +1,29 @@
 
 
-create table public.category (
+create table public.categories (
 	id serial NOT NULL PRIMARY KEY,
 	name text NOT NULL
 );
 
-insert into public.category (id, name) values
+insert into public.categories (id, name) values
 (1, 'Funny'),
 (2, 'Weird'),
 (3, 'Dumb'),
 (4, 'Cute'),
 (5, 'Interesting');
 
-CREATE TYPE meme_status AS ENUM ('new', 'old', 'retired');
+create type meme_status AS enum ('new', 'old', 'retired');
 
 create table public.memes (
 	id serial NOT NULL PRIMARY KEY,
 	name text NOT NULL,
-	category INTEGER REFERENCES category(id),
+	category_id INTEGER REFERENCES categories(id),
 	metadata jsonb,
 	created_at TIMESTAMP NOT NULL,
 	status meme_status DEFAULT 'old'
 );
 
-insert into public.memes (name, category, created_at) values
+insert into public.memes (name, category_id, created_at) values
 ('NO. Rage Face', 5, NOW()),
 ('"Not Bad" Obama Face', 5, NOW()),
 ('You Know I Had to Do It to Em', 5, NOW()),
@@ -2421,3 +2421,6 @@ insert into public.memes (name, category, created_at) values
 ('Drinking Out of Cups', 4, NOW()),
 ('Sonic the Hedgehog (2020 Film)', 4, NOW()),
 ('Art Student Owl', 4, NOW());
+
+update memes set status = 'retired' where id < 1000;
+update memes set status = 'new' where id > 2000;
