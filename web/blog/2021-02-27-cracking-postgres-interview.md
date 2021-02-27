@@ -49,11 +49,8 @@ CREATE INDEX idx_students_surname
 ON students(surname);
 ```
 
-<<<<<<< HEAD
 The default index type used here is `btree` (you could have specified this as `USING btree`), but there are other types of indexes, such as `BRIN`, `GiST`, `GIN`, `hash`, and more. Readers wanting to go deeper may also want to explore [Partial](https://www.postgresql.org/docs/current/indexes-partial.html) or [Multicolumn](https://www.postgresql.org/docs/13/indexes-multicolumn.html) Indexes.
 
-=======
->>>>>>> b06114ac5c02bb1a584bd30ef4cef74b3d72af88
 ### Know how to analyze with EXPLAIN ANALYZE
 
 Running 
@@ -153,6 +150,8 @@ FROM ten_strumpers
 WHERE first_name LIKE "S%";
 ```
 
-Thanks Steve Chavez for providing all the good bits of this post :)
+If you can reason about most of the topics in this post then you'll be in a very strong position. As with all programming topics however, the real learning starts when you put these things into practice. At Supabase we offer a very very fast (the fastest?) way to spin up a PostgreSQL database and start querying it, and our browser based SQL editor is getting more powerful every day.
 
-[Get started on Supabase for free](https://app.supabase.io)
+[Get started on Supabase for free here](https://app.supabase.io)
+
+Thanks Steve Chavez for providing all the good bits of this post :)
