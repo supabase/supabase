@@ -38,32 +38,36 @@ In Supabase for example we keep system schemas such as 'extensions' and 'auth' i
 
 ## 2. INDEX
 
-### Knows how speed up queries with indexes.
+### Know how speed up queries with indexes.
 
-If your students table is most frequently queried on surname, you may want to create an index: 
+The art of indexing in Postgres could fill an entire book. In some circumstances it can happen that a bad index is worse for performance than no index, so it's worth spending a little time to learn some of the common strategies.
+
+An index can be simple, for example, if your students table is most frequently queried on surname alone, you create an index: 
 
 ```sql
 CREATE INDEX idx_students_surname 
 ON students(surname);
 ```
 
-### Knows how to analyze with EXPLAIN ANALYZE
+The default index type used here is `btree` (you could have specified this as `USING btree`), but there are other types of indexes, such as `BRIN`, `GiST`, `GIN`, `hash`, and more. Readers wanting to go deeper may also want to explore [Partial](https://www.postgresql.org/docs/current/indexes-partial.html) or [Multicolumn](https://www.postgresql.org/docs/13/indexes-multicolumn.html) Indexes.
+
+### Know how to analyze with EXPLAIN ANALYZE
 
 Running 
 
 ```sql
-EXPLAIN SELECT *
+EXPLAIN (ANALYZE) SELECT *
 FROM students
 WHERE surname = 'Krobb';
 ```
 
-Before and after adding your index will show you the difference in approach Postgres took to finding your data.
+Before and after adding your index will show you the difference in approach the query planner took to finding your data. Note that using EXPLAIN alone will give us estimated plan costs. When used together with ANALYZE like: `EXPLAIN (ANALYZE)` you will receive both estimated and actual costs.
 
 ## 3. VIEWs
 
 ### Knows how to create different representations of data with [VIEWs](https://supabase.io/blog/2020/11/18/postgresql-views).
 
-We might create a VIEW `transcripts` which pulls out data from `students`, `courses`, and `grades`. It's useful for security, and logical abstractions. Check out our longer post on VIEWs here: [https://supabase.io/blog/2020/11/18/postgresql-views](https://supabase.io/blog/2020/11/18/postgresql-views)
+We might create a VIEW `transcripts` which pulls out data from `students`, `courses`, and `grades`. It's useful for security, and logical abstractions. Check out our longer post on VIEWs here: [https://supabase.io/blog/2020/11/18/postgresql-views](https://supabase.io/blog/2020/11/18/postgresql-views). Some purists may argue that you should always query VIEWs and never TABLEs.
 
 ### Knows about Autoupdatable views.
 
