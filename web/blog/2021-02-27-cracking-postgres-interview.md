@@ -6,7 +6,7 @@ author_title: Supabase
 author_url: https://github.com/awalias
 author_image_url: https://github.com/awalias.png
 authorURL: https://github.com/awalias
-image: /img/roboflow-og.png
+image: /img/elephants.png
 tags:
   - SQL
   - Postgres
