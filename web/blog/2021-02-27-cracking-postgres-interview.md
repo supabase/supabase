@@ -21,7 +21,7 @@ Here, we're going to focus on the transactional side of PostgreSQL, and offer so
 
 ### Know how to model 1-M, M-M, 1-1 relationships. And know how to use foreign keys.
 
-A review of [database normalization](https://ocw.mit.edu/courses/civil-and-environmental-engineering/1-264j-database-internet-and-systems-integration-technologies-fall-2013/lecture-notes-exercises/MIT1_264JF13_lect_10.pdf) is a great place to start when thinking about how to correctly model relationships. However if you don't have the time to read through lecture notes, head over to [DBDesigner](https://app.dbdesigner.net/designer/schema/guest_template) and inspect their example schema. The table StudentCourses is a great example of how to model a Many-to-Many relationship, by using a joining table. (side note: you can export these visual schemas to SQL using Ctrl+E). Modelling your data correctly is arguably the most important part of any software project, writing applications becomes a breeze if you can get the data layer right.
+A review of [database normalization](https://ocw.mit.edu/courses/civil-and-environmental-engineering/1-264j-database-internet-and-systems-integration-technologies-fall-2013/lecture-notes-exercises/MIT1_264JF13_lect_10.pdf) is a great place to start when thinking about how to correctly model relationships. However if you don't have the time to read through lecture notes, head over to [DBDesigner](https://app.dbdesigner.net/designer/schema/guest_template) and inspect their example schema. The table StudentCourses is a great example of how to model a Many-to-Many relationship, by using a join table. (side note: you can export these visual schemas to SQL using Ctrl+E). Modelling your data correctly is arguably the most important part of any software project, writing applications becomes a breeze if you can get the data layer right.
 
 ### Know how to use pg rich type system: [arrays](https://www.postgresql.org/docs/current/arrays.html), [domains](https://www.postgresql.org/docs/current/domains.html), [JSONB](https://www.postgresql.org/docs/13/datatype-json.html), [timestamptz](https://www.postgresql.org/docs/current/functions-datetime.html), [enums](https://www.postgresql.org/docs/13/datatype-enum.html)
 
@@ -40,30 +40,34 @@ In Supabase for example we keep system schemas such as `extensions` and `auth` i
 
 ### Know how speed up queries with indexes.
 
-If your students table is most frequently queried on surname, you may want to create an index: 
+The art of indexing in Postgres could fill an entire book. In some circumstances it can happen that a bad index is worse for performance than no index, so it's worth spending a little time to learn some of the common strategies.
+
+An index can be simple, for example, if your students table is most frequently queried on surname alone, you create an index: 
 
 ```sql
 CREATE INDEX idx_students_surname 
 ON students(surname);
 ```
 
+The default index type used here is `btree` (you could have specified this as `USING btree`), but there are other types of indexes, such as `BRIN`, `GiST`, `GIN`, `hash`, and more. Readers wanting to go deeper may also want to explore [Partial](https://www.postgresql.org/docs/current/indexes-partial.html) or [Multicolumn](https://www.postgresql.org/docs/13/indexes-multicolumn.html) Indexes.
+
 ### Know how to analyze with EXPLAIN ANALYZE
 
 Running 
 
 ```sql
-EXPLAIN SELECT *
+EXPLAIN (ANALYZE) SELECT *
 FROM students
 WHERE surname = 'Krobb';
 ```
 
-Before and after adding your index will show you the difference in approach Postgres took to finding your data.
+Before and after adding your index will show you the difference in approach the query planner took to finding your data. Note that using EXPLAIN alone will give us estimated plan costs. When used together with ANALYZE like: `EXPLAIN (ANALYZE)` you will receive both estimated and actual costs.
 
 ## 3. VIEWs
 
 ### Know how to create different representations of data with [VIEWs](https://supabase.io/blog/2020/11/18/postgresql-views).
 
-We might create a VIEW `transcripts` which pulls out data from `students`, `courses`, and `grades`. It's useful for security, and logical abstractions. Check out our longer post on VIEWs here: [https://supabase.io/blog/2020/11/18/postgresql-views](https://supabase.io/blog/2020/11/18/postgresql-views)
+We might create a VIEW `transcripts` which pulls out data from `students`, `courses`, and `grades`. It's useful for security, and logical abstractions. Check out our longer post on VIEWs here: [https://supabase.io/blog/2020/11/18/postgresql-views](https://supabase.io/blog/2020/11/18/postgresql-views). Some purists may argue that you should always query VIEWs and never TABLEs.
 
 ### Know about Autoupdatable views.
 
@@ -146,6 +150,8 @@ FROM ten_strumpers
 WHERE first_name LIKE "S%";
 ```
 
-Thanks Steve Chavez for providing all the good bits of this post :)
+If you can reason about most of the topics in this post then you'll be in a very strong position. As with all programming topics however, the real learning starts when you put these things into practice. At Supabase we offer a very very fast (the fastest?) way to spin up a PostgreSQL database and start querying it, and our browser based SQL editor is getting more powerful every day.
 
-[Get started on Supabase for free](https://app.supabase.io)
+[Get started on Supabase for free here](https://app.supabase.io)
+
+Thanks Steve Chavez for providing all the good bits of this post :)
