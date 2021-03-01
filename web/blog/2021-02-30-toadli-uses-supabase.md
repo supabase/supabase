@@ -1,7 +1,7 @@
 ---
-title: Toadli uses Supabase
+title: Toad, a link shorterner with simple APIs for low-coders 
 description: An easy-to-use link shortening tool with simple APIs
-author: Paul Copplestone
+author: Rory Wilding
 author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
@@ -20,7 +20,7 @@ Learn why Zach used Supabase as part of his serverless SAAS setup.
 
 Zach loves link shorteners. However, for low-coders, link shorteners tend to have cumbersome APIs limiting their utility. He wanted to build a link shortening tool with simple APIs that are simple for no-coders to use.
 
-## T**he power of a serverless Supa-stack**
+## **The power of a serverless Supa-stack**
 
 Zach started this project with a low-management overhead in mind. He needed a robust and scalable stack that doesn't need refactoring when his service user volume grows. Zach knew that a back-end as-a-service abstracts away many of the dev-ops tasks, such as provisioning server instances and setting up databases. From experience, he knew that Firebase would be too cumbersome.
 
