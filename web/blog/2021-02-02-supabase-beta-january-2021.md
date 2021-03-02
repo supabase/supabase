@@ -6,9 +6,9 @@ author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
-image: /img/supabase-january-2021.png
+image: /img/release-jan-2021.jpg
 tags:
-  - supabase
+  - release-notes
 ---
 
 New year, new features. We've been busy at Supabase during January and our community has been even busier. Here's a few things you'll find interesting.
