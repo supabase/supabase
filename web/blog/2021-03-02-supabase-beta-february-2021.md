@@ -42,6 +42,12 @@ Redirect your users to specific route within your site on [`signIn()`](https://s
 
 ![Redirect your users after sign up](/img/blog/feb/auth-redirect.png)
 
+### Replication management
+
+We added a page to the Database section for managing Postgres Replication. It's still basic, but you can use it to manage your realtime API - choosing which tables are enabled, and which events to send.
+
+![Replication management](/img/blog/feb/manage-replication.png)
+
 
 ### Learning Resources
 
