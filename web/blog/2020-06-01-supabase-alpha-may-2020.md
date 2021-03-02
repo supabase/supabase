@@ -7,7 +7,7 @@ author_url: https://github.com/kiwicopple
 author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
 authorURL: https://github.com/kiwicopple
 tags:
-  - supabase
+  - release-notes
 ---
 
 It has been a monster month at [Supabase](https://supabase.io) and we're back with a video update. It's a longer video this month because we have a couple of housekeeping items.

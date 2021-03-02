@@ -6,8 +6,8 @@ author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
 authorURL: https://github.com/kiwicopple
-tags: 
-    - supabase
+tags:
+  - release-notes
 ---
 
 We're 6 months into building our hosted database platform and we've made some major improvements to our auth system and table view.
