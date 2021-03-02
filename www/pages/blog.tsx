@@ -1,17 +1,27 @@
-import DefaultLayout from '~/components/Layouts/Default'
-import Link from 'next/link'
-import { Typography, Badge, Space, Button } from '@supabase/ui'
-import authors from 'lib/authors.json'
-import { getSortedPosts, getAllCategories } from '~/lib/posts'
+import fs from 'fs'
 import { useEffect, useState } from 'react'
 
+import { useRouter } from 'next/router'
+import Head from 'next/head'
+import Link from 'next/link'
+
 import { NextSeo } from 'next-seo'
+import { generateRss } from '~/lib/rss'
+import { getSortedPosts, getAllCategories } from '~/lib/posts'
+import authors from 'lib/authors.json'
+
+import DefaultLayout from '~/components/Layouts/Default'
+import { Typography, Badge, Space, Button } from '@supabase/ui'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts()
   const categories = getAllCategories()
+  const rss = generateRss(allPostsData)
 
-  console.log(categories)
+  // create a rss feed in public directory
+  // rss feed is added via <Head> component in render return
+  fs.writeFileSync('./public/rss.xml', rss)
+
   return {
     props: {
       blogs: allPostsData,
@@ -23,6 +33,8 @@ export async function getStaticProps() {
 function Blog(props: any) {
   const [category, setCategory] = useState('')
   const [blogs, setBlogs] = useState(props.blogs)
+
+  const { basePath } = useRouter()
 
   useEffect(() => {
     // Update the document title using the browser API
@@ -38,6 +50,14 @@ function Blog(props: any) {
 
   return (
     <>
+      <Head>
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="RSS feed for blog posts"
+          href={`${basePath}/rss.xml`}
+        />
+      </Head>
       <NextSeo title="Blog" description="Latest news from the Supabase team." />
       <DefaultLayout>
         <div className="bg-white dark:bg-dark-700 overflow-hidden py-12">
