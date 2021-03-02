@@ -88,6 +88,7 @@ const Hero = () => {
                         style={{ padding: '56.25% 0 0 0' }}
                       >
                         <iframe
+                          title="Demo video showcasing Supabase"
                           className="absolute w-full h-full rounded-b-md"
                           src="https://www.youtube-nocookie.com/embed/dBOSUER_5T4?playlist=dBOSUER_5T4&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&muted=1"
                           style={{ top: 0, left: 0 }}
@@ -95,7 +96,7 @@ const Hero = () => {
                           allow="autoplay; modestbranding; encrypted-media"
                         />
                       </div>
-                      {/* 
+                      {/*
                       Replace src with the following if have preference:
                       Vimeo:   https://player.vimeo.com/video/485959063?loop=1&autoplay=1
                       Youtube: https://www.youtube-nocookie.com/embed/dBOSUER_5T4?playlist=dBOSUER_5T4&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&muted=1

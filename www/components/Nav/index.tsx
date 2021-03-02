@@ -189,16 +189,7 @@ const Nav = (props: Props) => {
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
               <img
-                className="block lg:hidden h-6 w-auto"
-                src={
-                  darkMode
-                    ? `${basePath}/images/logo-dark.png`
-                    : `${basePath}/images/logo-light.png`
-                }
-                alt="Logo"
-              />
-              <img
-                className="hidden lg:block h-6 w-auto"
+                className="block h-6 w-auto"
                 src={
                   darkMode
                     ? `${basePath}/images/logo-dark.png`
