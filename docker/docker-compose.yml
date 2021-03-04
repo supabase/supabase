@@ -9,7 +9,7 @@ services:
         ports:
         - 8000:8000/tcp
         - 8443:8443/tcp
-    gotrue:
+    auth:
       image: supabase/gotrue:latest
       ports:
         - '9999:9999'
