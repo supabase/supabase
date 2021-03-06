@@ -16,6 +16,7 @@ services:
       environment:
         GOTRUE_JWT_SECRET: super-secret-jwt-token
         GOTRUE_JWT_EXP: 3600
+        GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
         GOTRUE_DB_DRIVER: postgres
         DB_NAMESPACE: auth
         API_EXTERNAL_URL: localhost
