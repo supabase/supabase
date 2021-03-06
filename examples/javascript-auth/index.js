@@ -56,15 +56,9 @@ const logInSubmitted = (event) => {
 }
 
 const fetchUserDetails = () => {
-  supabase.auth
-    .user()
-    .then((response) => {
-      alert(JSON.stringify(response))
-    })
-    .catch((err) => {
-      alert(err.response.text)
-    })
+      alert(JSON.stringify(supabase.auth.user()))
 }
+
 
 const logoutSubmitted = (event) => {
   event.preventDefault()
