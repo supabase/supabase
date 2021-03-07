@@ -1,10 +1,10 @@
 
 ## Docker
 
-You can emulate Supabase using `docker-compose` by following these steps inside the `./docker` folder.
+You can run Supabase on your local machine using `docker-compose`:
 
-- Starting the emulator: `docker-compose up -d`
-- Stopping the emulator: `docker-compose down`
+- Starting all services: `docker-compose up -d`
+- Stopping all services: `docker-compose down`
 
 **Usage**
 

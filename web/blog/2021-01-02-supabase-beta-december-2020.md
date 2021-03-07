@@ -6,9 +6,9 @@ author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
-image: /img/supabase-december-2020.png
+image: /img/release-dec-2020.jpg
 tags:
-  - supabase
+  - release-notes
 ---
 
 After 10 hectic months of building, Supabase is now in Beta.

@@ -80,10 +80,10 @@ Our client library is modular. Each sub-library is a standalone implementation f
  
 | Repo                                                                                       | Official                                         | Community        |
 |-----------------------|--------------------------------------------------|------------------|
-| **`supabase-{lang}`**     | [`JS`](https://github.com/supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp) \| `Dart` \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` |
+| **`supabase-{lang}`**     | [`JS`](https://github.com/supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` |
 | `postgrest-{lang}` | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
 | `realtime-{lang}`  | [`JS`](https://github.com/supabase/realtime-js) | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust` |
-| `gotrue-{lang}`    | [`JS`](https://github.com/supabase/gotrue-js) | [`C#`](https://github.com/supabase/gotrue-csharp) \| `Dart` \| `Python` \| `Rust` |
+| `gotrue-{lang}`    | [`JS`](https://github.com/supabase/gotrue-js) | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| `Python` \| `Rust` |
 
 
 
