@@ -8,7 +8,7 @@ author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c677
 authorURL: https://github.com/kiwicopple
 image: /img/supabase-october-2020.png
 tags:
-  - supabase
+  - release-notes
 ---
 
 We're now 8 months into building Supabase. We're focused on performance, stability, and reliability but that hasn't prevented us from shipping some great features.

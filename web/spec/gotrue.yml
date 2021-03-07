@@ -174,7 +174,20 @@ pages:
           ```
 
   onAuthStateChange:
-    # $ref: onAuthStateChange
+    $ref: '"GoTrueClient".GoTrueClient.onAuthStateChange'
+    examples:
+      - name: Listen to auth changes
+        isSpotlight: true
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            console.log(event, session)
+          })
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
 
   api.signUpWithEmail:
     $ref: '"GoTrueApi".GoTrueApi.signUpWithEmail'

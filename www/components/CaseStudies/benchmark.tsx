@@ -10,10 +10,12 @@ const Benchmark = () => {
           <img
             className="mb-10 w-full lg:w-auto lg:mb-0 lg:h-44 lg:mr-14 hidden lg:block"
             src={`${basePath}/images/benchmark.svg`}
+            alt="Benchmark illustration"
           />
           <img
             className="mb-10 w-full lg:w-auto lg:mb-0 lg:h-44 lg:mr-14 lg:hidden"
             src={`${basePath}/images/benchmark--mobile.svg`}
+            alt="Benchmark illustration"
           />
           <div className="px-12 py-5 lg:px-0 lg:py-0">
             <p className="text-xl text-white">Built for speed and reliability</p>
@@ -21,7 +23,9 @@ const Benchmark = () => {
               <span className="block">
                 Supabase outperforms equivalent systems by more than 300%.
               </span>
-              <span className="block">Sign up for our public benchmark release and we'll send it to your inbox.</span>
+              <span className="block">
+                Sign up for our public benchmark release and we'll send it to your inbox.
+              </span>
             </p>
           </div>
         </div>
