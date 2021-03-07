@@ -117,7 +117,7 @@ pages:
 
       The Supabase client is your entrypoint to the rest of the Supabase functionality
       and is the easiest way to interact with everything we offer within the Supabase ecosystem.
-      
+
     examples:
       - name: createClient()
         js: |
@@ -534,8 +534,8 @@ pages:
   insert():
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
-    notes: | 
-      - By default, every time you run `insert()`, the client library will make a `select` to return the full record. 
+    notes: |
+      - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
       This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation. 
       If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
     examples:
@@ -1067,7 +1067,7 @@ pages:
           ```py
           # Not yet implemented
           ```
-      - name: User `or` with `and`
+      - name: Use `or` with `and`
         isSpotlight: true
         js: |
           ```js
@@ -1075,6 +1075,19 @@ pages:
             .from('cities')
             .select('name, country_id')
             .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
+      - name: Use `or` on foreign tables
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('id, cities(*)')
+            .or('name.eq.Wellington,name.eq.Paris', { foreignTable: "cities" })
           ```
         py: |
           ```py
