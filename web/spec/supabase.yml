@@ -255,6 +255,22 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: Sign up with scopes.
+        description: |
+          If you need more than just an email address from an OAuth provider (e.g. access to a user's Github repos), you can include additional
+          scopes as a space-seperated string. Depending on the provider, you may also need to specify the scopes in the provider's OAuth app settings.
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            provider: 'github'
+          }, {
+            scopes: 'repo gist notifications'
+          })
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
 
   auth.signIn():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signIn'
@@ -304,7 +320,7 @@ pages:
           ```
       - name: Sign in with redirect.
         description: |
-          Sometime you want to control where the user is redirected to after they are logged in. Supabase supports this for 
+          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
           any URL path on your website (the base domain must be the same as the domain in your Auth settings).
         js: |
           ```js
@@ -312,6 +328,22 @@ pages:
             provider: 'github'
           }, {
             redirectTo: 'https://example.com/welcome'
+          })
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
+      - name: Sign in with scopes.
+        description: |
+          If you need more than just an email address from an OAuth provider (e.g. access to a user's Github repos), you can include additional
+          scopes as a space-seperated string. Depending on the provider, you may also need to specify the scopes in the provider's OAuth app settings.
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            provider: 'github'
+          }, {
+            scopes: 'repo gist notifications'
           })
           ```
         py: |
