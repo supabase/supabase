@@ -2,6 +2,7 @@
 title: Postgres as a CRON Server
 description: Running repetitive tasks with your Postgres database.
 author: Paul Copplestone
+author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple

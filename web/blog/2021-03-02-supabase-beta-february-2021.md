@@ -2,6 +2,7 @@
 title: Supabase Beta February 2021
 description: One year of building.
 author: Paul Copplestone
+author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
