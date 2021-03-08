@@ -3,9 +3,9 @@ title: Toad, a link shorterner with simple APIs for low-coders
 description: An easy-to-use link shortening tool with simple APIs
 author: Rory Wilding
 author_title: Supabase
-author_url: https://github.com/kiwicopple
-author_image_url: https://github.com/kiwicopple.png
-authorURL: https://github.com/kiwicopple
+author_url: https://github.com/roryw10
+author_image_url: https://github.com/roryw10.png
+authorURL: https://github.com/roryw10
 image: /toadli-og.png
 tags:
   - supabase
