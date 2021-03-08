@@ -1,6 +1,6 @@
 ---
-title: Cracking the PostgreSQL Interview
-description: Transactional SQL to Show Off Your Data Skills
+title: Cracking PostgreSQL Interview Questions 
+description: Understand the top PostgreSQL Interview Questions 
 author: Ant Wilson
 author_title: Supabase
 author_url: https://github.com/awalias
@@ -13,9 +13,9 @@ tags:
 ---
 
 
-There are plenty of resources out there for preparing for technical interviews with a focus on PostgreSQL, however many just cover the basics and the advanced resources often conflate transactional SQL with analytical SQL (WINDOW/RANK functions, aggregates etc.).
+There are plenty of resources out there for preparing for PostgreSQL interview questions. Most posts are for technical interviews with a focus on PostgreSQL, however many just cover the basics and the advanced resources often conflate transactional SQL with analytical SQL (WINDOW/RANK functions, aggregates etc.).
 
-Here, we're going to focus on the transactional side of PostgreSQL, and offer some areas that you may want to go a little deeper on in order to really impress your interviewer (and more importantly, become a kick-ass software engineer).
+Here, we're going to focus on PostgreSQL interview questions that are aimed to understand the transactional side of PostgreSQL, and offer some areas that you may want to go a little deeper on in order to really impress your interviewer (and more importantly, become a kick-ass software engineer). 
 
 ## 1. Modeling
 
@@ -150,7 +150,7 @@ FROM ten_strumpers
 WHERE first_name LIKE "S%";
 ```
 
-If you can reason about most of the topics in this post then you'll be in a very strong position. As with all programming topics however, the real learning starts when you put these things into practice. At Supabase we offer a very very fast (the fastest?) way to spin up a PostgreSQL database and start querying it, and our browser based SQL editor is getting more powerful every day.
+If you can reason about most of the topics in this post then you'll be in a very strong position to impress with your answers to PostgreSQL interview questions. As with all programming topics however, the real learning starts when you put these things into practice. At Supabase we offer a very very fast (the fastest?) way to spin up a PostgreSQL database and start querying it, and our browser based SQL editor is getting more powerful every day.
 
 [Get started on Supabase for free here](https://app.supabase.io)
 
