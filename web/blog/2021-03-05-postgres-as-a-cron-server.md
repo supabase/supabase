@@ -103,7 +103,7 @@ Now when we see that the payload is sent every minute, exactly on the minute.
 
 And that's it! We've built a cron webhook. Breaking down the code example above we have 2 key parts:
 
-**POSTing data**
+#### POSTing data
 
 This is the part that sends the data to the website:
 
@@ -117,7 +117,7 @@ from
   )
 ```
 
-**Scheduling the job**
+#### Scheduling the job
 
 The HTTP function is wrapped with the CRON scheduler:
 
@@ -154,7 +154,25 @@ If you're unfamiliar with the cron syntax, useful shortcuts can be found on [cro
 0 0 * * *       # every day
 ```
 
+#### Managing your cron jobs
 
+To see a list of all your cron jobs, run:
+
+```sql
+select * from cron.job;
+```
+
+And if you need to see the results of each cron iterations, you can find them in `cron.job_run_details`:
+
+```sql
+select * from cron.job_run_details;
+```
+
+To stop a running cron job, you can run:
+
+```sql
+select cron.unschedule('webhook-every-minute'); -- pass the name of the cron job
+```
 ### What can I do with this?
 
 There are plenty use-cases for this. For example:
