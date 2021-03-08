@@ -5,7 +5,7 @@ author: Paul Copplestone
 author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
-image: /img/release-feb-2021.jpg
+image: /img/blog/supabase-postgres-cron.png
 tags:
   - postgres
 ---
