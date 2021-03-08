@@ -13,9 +13,9 @@ tags:
 ---
 
 
-There are plenty of resources out there for preparing for PostgreSQL Interview Questions. Most posts are for technical interviews with a focus on PostgreSQL, however many just cover the basics and the advanced resources often conflate transactional SQL with analytical SQL (WINDOW/RANK functions, aggregates etc.).
+There are plenty of resources out there for preparing for PostgreSQL interview questions. Most posts are for technical interviews with a focus on PostgreSQL, however many just cover the basics and the advanced resources often conflate transactional SQL with analytical SQL (WINDOW/RANK functions, aggregates etc.).
 
-Here, we're going to focus on PostgreSQL Interview Questions that are aimed to understand the transactional side of PostgreSQL, and offer some areas that you may want to go a little deeper on in order to really impress your interviewer (and more importantly, become a kick-ass software engineer). 
+Here, we're going to focus on PostgreSQL interview questions that are aimed to understand the transactional side of PostgreSQL, and offer some areas that you may want to go a little deeper on in order to really impress your interviewer (and more importantly, become a kick-ass software engineer). 
 
 ## 1. Modeling
 
