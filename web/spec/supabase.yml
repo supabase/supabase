@@ -909,7 +909,7 @@ pages:
             .from('cities')
             .select('name, cities(name)')
             .eq('name', 'United States')
-            .limit(1, 'cities')
+            .limit(1, { foreignTable: 'cities' })
           ```
         py: |
           ```py
