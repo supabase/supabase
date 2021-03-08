@@ -89,7 +89,7 @@ select
     select status
     from
       http_post(
-        'https://webhook.site/223c8a43-725b-4cbd-b1fe-d0da73353a6b', -- webhook URL
+        'https://webhook.site/223c8a43-725b-4cbd-b1fe-d0da73353a6b', -- webhook URL, replace the ID(223c8..) with your own
         '{"hello": "world"}', -- payload
         'application/json'
       )
