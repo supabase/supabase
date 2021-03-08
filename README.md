@@ -68,7 +68,7 @@ Supabase is a [hosted platform](https://app.supabase.io). You can sign up and st
 
  
 
-**Client libraries**
+#### Client libraries
 
 Our client library is modular. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing tools.
 
