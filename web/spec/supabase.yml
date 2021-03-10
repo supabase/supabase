@@ -179,20 +179,20 @@ pages:
       response.data // Response data will be of type Array<any>.
       ```
 
-      ### Generate database types from Swagger OpenAPI specification
+      ### Generate database types from OpenAPI specification
 
-      Supabase generates a Swagger specification file for your database which can be used to generate your data types for usage with TypeScript.
+      Supabase generates a OpenAPI specification file for your database which can be used to generate your data types for usage with TypeScript.
 
-      The Swagger specification for your Supabase project can be accessed as follows:
+      The OpenAPI specification for your Supabase project can be accessed as follows:
 
       ```txt
       https://your-project.supabase.co/rest/v1/?apikey=your-anon-key
       ```
 
-      Using the open source [swagger-to-ts](https://github.com/manifoldco/swagger-to-ts#%EF%B8%8F-reading-specs-from-remote-resource) tool you can generate your types and store them locally:
+      Using the open source [openapi-typescript](https://github.com/drwpow/openapi-typescript#%EF%B8%8F-reading-specs-from-remote-resource) tool you can generate your types and store them locally:
 
       ```bash
-      npx @manifoldco/swagger-to-ts https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/supabase.ts
+      npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/supabase.ts
       ```
 
       **Note:** Do note that your local types won't automatically stay in sync with your database, so make sure to regenerate your types after your make changes to your database.
