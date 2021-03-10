@@ -5,4 +5,4 @@ docs/client
 docs/gotrue/client
 docs/postgrest/client
 docs/realtime/client
-# docs/reference
+docs/reference
