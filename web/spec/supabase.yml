@@ -888,6 +888,8 @@ pages:
   removeSubscription():
     title: 'removeSubscription()'
     $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.removeSubscription'
+    notes: |
+      - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
     examples:
       - name: Remove a subscription
         isSpotlight: true
