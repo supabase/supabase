@@ -255,6 +255,23 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: Sign up with scopes.
+        description: |
+          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
+          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            provider: 'github'
+          }, {
+            scopes: 'repo gist notifications'
+          })
+          const oAuthToken = session.provider_token // use to access provider API
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
 
   auth.signIn():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signIn'
@@ -304,7 +321,7 @@ pages:
           ```
       - name: Sign in with redirect.
         description: |
-          Sometime you want to control where the user is redirected to after they are logged in. Supabase supports this for 
+          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
           any URL path on your website (the base domain must be the same as the domain in your Auth settings).
         js: |
           ```js
@@ -313,6 +330,23 @@ pages:
           }, {
             redirectTo: 'https://example.com/welcome'
           })
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
+      - name: Sign in with scopes.
+        description: |
+          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
+          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            provider: 'github'
+          }, {
+            scopes: 'repo gist notifications'
+          })
+          const oAuthToken = session.provider_token // use to access provider API
           ```
         py: |
           ```py
