@@ -15,12 +15,12 @@
     "name": "Local emulator",
     "description": "Develop locally and push to production when you're ready",
     "badge": "Q1 2021",
-    "url": "https://mailchi.mp/supabase/local-emulator"
+    "url": "https://supabasesubscribe.vercel.app/subscription/localEmulator"
   },
   {
     "name": "Supabase CLI",
     "description": "Manage Supabase projects from your local machine",
     "badge": "Q2 2021",
-    "url": "https://mailchi.mp/supabase/command-line"
+    "url": "https://supabasesubscribe.vercel.app/subscription/commandLine"
   }
 ]

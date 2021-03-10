@@ -21,7 +21,7 @@
     "description": "Store, organize, and serve large files. Any media, including videos and images.",
     "description_short": "",
     "label": "Coming soon",
-    "url": "https://mailchi.mp/supabase/storage"
+    "url": "https://supabasesubscribe.vercel.app/subscription/storage"
   },
   "functions": {
     "name": "Functions",
@@ -29,6 +29,6 @@
     "description": "Write custom code and cron jobs without deploying or scaling servers.",
     "description_short": "",
     "label": "Coming soon",
-    "url": "https://mailchi.mp/supabase/functions"
+    "url": "https://supabasesubscribe.vercel.app/subscription/functions"
   }
 }
