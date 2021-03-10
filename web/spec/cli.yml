@@ -1,0 +1,56 @@
+openref: 0.1
+
+info:
+  title: Getting started
+  description: |
+
+    Supabase CLI.
+
+  definition: spec/combined.json
+  libraries:
+    - name: 'sh'
+      id: 'sh'
+      version: '0.0.1'
+  docs:
+    path: reference/cli/
+    sidebar:
+      - name: 'About'
+        items:
+          - index
+          - supa init
+      - name: 'Local Development'
+        items:
+          - supa dev
+          - supa eject
+
+pages:
+  supa init:
+    description: |
+      init
+
+    examples:
+      - name: supa init
+        sh: |
+          ```sh
+          supa init
+          ```
+  supa dev:
+    description: |
+      dev
+
+    examples:
+      - name: supa dev
+        sh: |
+          ```sh
+          supa dev
+          ```
+  supa eject:
+    description: |
+      eject
+
+    examples:
+      - name: supa eject
+        sh: |
+          ```sh
+          supa eject
+          ```
