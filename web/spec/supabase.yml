@@ -257,8 +257,8 @@ pages:
           ```
       - name: Sign up with scopes.
         description: |
-          If you need more than just an email address from an OAuth provider (e.g. access to a user's Github repos), you can include additional
-          scopes as a space-seperated string. Depending on the provider, you may also need to specify the scopes in the provider's OAuth app settings.
+          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request.
+          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
         js: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
@@ -266,6 +266,7 @@ pages:
           }, {
             scopes: 'repo gist notifications'
           })
+          const oAuthToken = session.provider_token // use to access provider API
           ```
         py: |
           ```py
@@ -336,8 +337,8 @@ pages:
           ```
       - name: Sign in with scopes.
         description: |
-          If you need more than just an email address from an OAuth provider (e.g. access to a user's Github repos), you can include additional
-          scopes as a space-seperated string. Depending on the provider, you may also need to specify the scopes in the provider's OAuth app settings.
+          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request.
+          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
         js: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
@@ -345,6 +346,7 @@ pages:
           }, {
             scopes: 'repo gist notifications'
           })
+          const oAuthToken = session.provider_token // use to access provider API
           ```
         py: |
           ```py
