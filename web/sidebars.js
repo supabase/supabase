@@ -9,12 +9,18 @@ const goTrueClient = require('./sidebar_spec_gotrue')
 const postgrestClient = require('./sidebar_spec_postgrest')
 const realtimeClient = require('./sidebar_spec_realtime')
 const supabaseClient = require('./sidebar_spec_supabase')
+const supabaseCli = require('./sidebar_spec_cli')
+const postgres = require('./sidebar_spec_postgres')
 
 module.exports = {
   goTrueClient: goTrueClient.docs,
   postgrestClient: postgrestClient.docs,
   realtimeClient: realtimeClient.docs,
-  supabaseClient: supabaseClient.docs,
+  supabaseClient: [
+    { Postgres: postgres.docs },
+    { Javascript: supabaseClient.docs },
+    { CLI: supabaseCli.docs },
+  ],
   docs: [
     { type: 'category', label: 'Introduction', items: ['about', 'faq'], collapsed: false },
     {
