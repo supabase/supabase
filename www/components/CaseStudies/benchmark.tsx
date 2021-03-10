@@ -30,7 +30,7 @@ const Benchmark = () => {
           </div>
         </div>
         <div className="pb-12 px-12 col-span-1 lg:pb-0 lg:px-0 lg:col-span-2 rounded-r-md">
-          <Button text="Get notified" url="https://mailchi.mp/supabase/enterprise-benchmarks" />
+          <Button text="Get notified" url="https://supabasesubscribe.vercel.app/subscription/enterpriseBenchmarks" />
         </div>
       </div>
     </div>
