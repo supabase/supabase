@@ -34,7 +34,7 @@ const BuiltExamples = () => {
           </div>
           <p className="mt-10 text-base text-gray-500 dark:text-dark-400">
             See all examples on our{' '}
-            <a className="text-brand-700" href="https://github.com/supabase">
+            <a className="text-brand-700" href="https://github.com/supabase/supabase/tree/master/examples">
               Github
             </a>
           </p>
