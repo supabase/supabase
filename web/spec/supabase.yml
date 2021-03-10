@@ -853,6 +853,8 @@ pages:
   removeSubscription():
     title: 'removeSubscription()'
     $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.removeSubscription'
+    notes: |
+      - Removing subscriptions will keep your Realtime Elixir server performant. Failing to do so will increase message latency and eventually cause message delivery failures as more of your users are simultaneously subscribed.
     examples:
       - name: Remove a subscription
         isSpotlight: true
