@@ -1,5 +1,22 @@
-@import url('https://rsms.me/inter/inter.css');
+/* 
+  Font import 
+*/
 
+@font-face {
+  font-family: 'custom-font';
+  src: url(/fonts/custom/CustomFont-Book.woff2) format('woff2'),
+    url(/fonts/custom/CustomFont-Book.woff) format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'custom-font';
+  src: url(/fonts/custom/CustomFont-Medium.woff2) format('woff2'),
+    url(/fonts/custom/CustomFont-Medium.woff) format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
 
 /**
  * Root variables
@@ -16,9 +33,9 @@
   /* 
     Customisation here for both Light and Dark themes
   */
-  --custom-font-base: 'Inter', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial',
-    sans-serif;
+  --custom-font-base: 'custom-font', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto',
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica',
+    'Arial', sans-serif;
   --custom-font-code: 'Source Code Pro', Menlo, monospace;
   --custom-font-size-base: 1rem;
   --custom-border-radius: 3px;
