@@ -241,7 +241,7 @@ pages:
           ```
       - name: Sign up with redirect.
         description: |
-          Sometime you want to control where the user is redirected to after they are logged in. Supabase supports this for 
+          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
           any URL path on your website (the base domain must be the same as the domain in your Auth settings).
         js: |
           ```js
@@ -255,10 +255,22 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: Sign up with third-party providers.
+        description: |
+          You can sign up with OAuth providers using the [`signIn()`](/docs/client/auth-signin#sign-in-using-third-party-providers) method.
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            provider: 'github'
+          })
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
       - name: Sign up with scopes.
         description: |
-          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
-          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
+          You can provide additional scopes to OAuth providers using the [`signIn()`](/docs/client/auth-signin#sign-in-with-scopes) method.
         js: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
