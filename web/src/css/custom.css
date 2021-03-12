@@ -370,7 +370,7 @@ article header {
 /* Sidebar */
 
 .navbar__logo {
-  max-width: 160px;
+  max-width: 196px;
 }
 
 @media (max-width: 750px) {
