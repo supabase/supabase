@@ -1,6 +1,7 @@
 openref: 0.1
 
 info:
+  id: reference/supabase-js
   title: Supabase Client
   description: |
 
