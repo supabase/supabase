@@ -5,7 +5,10 @@ info:
   title: Getting started
   description: |
 
-    PostgreSQL
+    PostgreSQL, also known as Postgres, is a free and open-source relational 
+    database management system emphasizing extensibility and SQL compliance. 
+    It was originally named POSTGRES, referring to its origins as a successor 
+    to the Ingres database developed at the University of California, Berkeley.
 
   definition: spec/combined.json
   libraries:
@@ -20,18 +23,18 @@ info:
           - index
       - name: 'Database'
         items:
-          - Database Users
+          # - Database Users
           - Database Passwords
-      - name: 'Schemas'
-        items:
-          - Creating schemas
+      # - name: 'Schemas'
+      #   items:
+      #     - Creating schemas
       - name: 'Tables'
         items:
           - Creating tables
-      - name: 'Columns'
-        items:
-          - Creating columns
-          - Column types
+      # - name: 'Columns'
+      #   items:
+      #     - Creating columns
+          # - Column types
 
 pages:
   Database Users:
@@ -47,7 +50,7 @@ pages:
           ```
   Database Passwords:
     description: |
-      Resetting passwords.
+      You can manage the passwords of your database users using any super user.
 
     examples:
       - name: Password reset
@@ -68,34 +71,59 @@ pages:
           ```
   Creating tables:
     description: |
-      Creating tables.
+      A relational database consists of multiple related tables. A table consists of rows and columns.
 
     examples:
       - name: Create table
+        isSpotlight: true
         sql: |
           ```sql
-          create table new_table;
+          create table table_name (
+            id integer primary key,
+            data jsonb,
+            name text
+          );
+          ```
+      - name: Primary keys using multiple columns
+        sql: |
+          ```sql
+          create table table_name (
+            column_1 data_type,
+            column_2 data_type
+            -- Constraints:
+            primary key (column_1, column_2)
+          );
           ```
   Creating columns:
     description: |
       Creating columns.
 
     examples:
+      - name: During table creation
+        isSpotlight: true
+        sql: |
+          ```sql
+          create table table_name (
+            id integer primary key,
+            data jsonb,
+            name text
+          );
+          ```
       - name: Create column
         sql: |
           ```sql
           alter table new_table
           add new_column text;
           ```
-  Column types:
-    description: |
-      Column types.
+  # Data types:
+  #   description: |
+  #     Data types.
 
-    examples:
-      - name: Create column
-        sql: |
-          ```sql
-          alter table new_table
-          add new_column text;
-          ```
+  #   examples:
+  #     - name: Create columns and data types
+  #       sql: |
+  #         ```sql
+  #         alter table new_table
+  #         add new_column text;
+  #         ```
   
