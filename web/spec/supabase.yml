@@ -906,7 +906,7 @@ pages:
         js: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .select('name, cities(name)')
             .eq('name', 'United States')
             .limit(1, { foreignTable: 'cities' })
