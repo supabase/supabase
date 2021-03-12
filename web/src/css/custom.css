@@ -235,10 +235,6 @@ body {
   display: inline-block;
 }
 
-.navbar__logo {
-  max-width: 160px;
-}
-
 .button {
   font-family: var(--custom-font-base);
 }
@@ -371,11 +367,45 @@ article header {
 
 /* Sidebar */
 
-@media screen and (max-width: 996px) {
-  .navbar .navbar__items--right {
-    display: none;
+.navbar__logo {
+  max-width: 160px;
+}
+
+@media (max-width: 750px) {
+  .DocSearch-Button-Key,
+  .DocSearch-Button-KeySeparator,
+  .DocSearch-Button-Placeholder {
+    display: block !important;
+    font-size: 0.8rem !important;
+    margin-top: 0 !important;
+  }
+
+  .navbar__logo {
+    max-width: 128px;
   }
 }
+
+@media (max-width: 360px) {
+  .DocSearch {
+    display: none !important;
+  }
+}
+
+@media (max-width: 750px) {
+  .navbar-sidebar__items {
+    padding-left: 1rem;
+    margin-right: 6rem !important;
+  }
+}
+
+.menu--responsive {
+  padding-right: 2rem !important;
+}
+
+.navbar__toggle svg {
+  width: 21px;
+}
+
 .navbar-sidebar__brand .navbar__brand {
   flex: 1 0;
 }
@@ -486,7 +516,7 @@ a.card:hover {
 /* Sidebar nav header  */
 .menu > .menu__list > .menu__list-item > .menu__link {
   margin-bottom: 4px;
-  pointer-events: none;
+  /* pointer-events: none; */
   color: gray;
 }
 
