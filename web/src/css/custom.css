@@ -21,12 +21,12 @@
 /* mono font */
 
 @font-face {
-  font-family: 'source code pro';
-  src: url('/fonts/source-code-pro/SourceCodePro-Regular.eot');
-  src: url('/fonts/source-code-pro/SourceCodePro-Regular.woff2') format('woff2'),
-    url('/fonts/source-code-pro/SourceCodePro-Regular.woff') format('woff'),
-    url('/fonts/source-code-pro/SourceCodePro-Regular.ttf') format('truetype'),
-    url('/fonts/source-code-pro/SourceCodePro-Regular.svg#SourceCodePro-Regular') format('svg');
+  font-family: 'office code pro';
+  src: url('/fonts/office-code-pro/OfficeCodePro-Regular.eot');
+  src: url('/fonts/office-code-pro/OfficeCodePro-Regular.woff2') format('woff2'),
+    url('/fonts/office-code-pro/OfficeCodePro-Regular.woff') format('woff'),
+    url('/fonts/office-code-pro/OfficeCodePro-Regular.ttf') format('truetype'),
+    url('/fonts/office-code-pro/OfficeCodePro-Regular.svg#SourceCodePro-Regular') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -50,7 +50,7 @@
   --custom-font-base: 'custom-font', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto',
     'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica',
     'Arial', sans-serif;
-  --custom-font-code: 'Source Code Pro', Menlo, monospace;
+  --custom-font-code: 'office code pro', Menlo, monospace;
   --custom-font-size-base: 1rem;
   --custom-border-radius: 3px;
   --custom-border-radius-md: 6px;
