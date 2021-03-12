@@ -1,6 +1,7 @@
 openref: 0.1
 
 info:
+  id: reference/postgrest-js
   title: PostgREST Client
   description: |
     This is an isomorphic JavaScript client for [PostgREST](https://postgrest.org/). 

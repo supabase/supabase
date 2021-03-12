@@ -9,12 +9,54 @@ const goTrueClient = require('./sidebar_spec_gotrue')
 const postgrestClient = require('./sidebar_spec_postgrest')
 const realtimeClient = require('./sidebar_spec_realtime')
 const supabaseClient = require('./sidebar_spec_supabase')
+// const supabaseCli = require('./sidebar_spec_cli')
+const postgres = require('./sidebar_spec_postgres')
 
 module.exports = {
-  goTrueClient: goTrueClient.docs,
-  postgrestClient: postgrestClient.docs,
-  realtimeClient: realtimeClient.docs,
-  supabaseClient: supabaseClient.docs,
+  goTrueClient: [
+    {
+      type: 'category',
+      label: 'Javascript',
+      collapsed: false,
+      items: goTrueClient.docs,
+    },
+  ],
+  postgrestClient: [
+    {
+      type: 'category',
+      label: 'Javascript',
+      collapsed: false,
+      items: postgrestClient.docs,
+    },
+  ],
+  realtimeClient: [
+    {
+      type: 'category',
+      label: 'Javascript',
+      collapsed: false,
+      items: realtimeClient.docs,
+    },
+  ],
+  supabaseClient: [
+    {
+      type: 'category',
+      label: 'Javascript',
+      collapsed: false,
+      items: supabaseClient.docs,
+    },
+    {
+      type: 'category',
+      label: 'Postgres',
+      collapsed: false,
+      items: postgres.docs,
+    },
+    // {
+    //   type: 'category',
+    //   label: 'CLI',
+    //   collapsed: false,
+    //   items: supabaseCli.docs,
+    // },
+  ],
   docs: [
     { type: 'category', label: 'Introduction', items: ['about', 'faq'], collapsed: false },
     {
@@ -31,13 +73,18 @@ module.exports = {
     },
   ],
   resources: [
-    'resources',
+    { type: 'category', label: 'Resources', items: ['resources'], collapsed: false },
+    // { type: 'category', label: 'Resources', collapsed: false },
     {
       type: 'category',
       label: 'Learn',
+      collapsed: false,
       items: [
         {
-          'Auth Deep Dive': [
+          type: 'category',
+          label: 'Auth Deep Dive',
+          collapsed: false,
+          items: [
             'learn/auth-deep-dive/auth-deep-dive-jwts',
             'learn/auth-deep-dive/auth-row-level-security',
             'learn/auth-deep-dive/auth-policies',
@@ -50,6 +97,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Tools',
+      collapsed: false,
       items: [
         'gotrue/server/about',
         'gotrue/client/index',
