@@ -61,11 +61,13 @@ module.exports = {
           href: 'https://github.com/supabase/supabase',
           className: 'navbar-item-github',
           position: 'right',
+          label: 'Github',
         },
         {
           href: 'https://twitter.com/supabase_io',
           className: 'navbar-item-twitter',
           position: 'right',
+          label: 'Twitter',
         },
         {
           to: '/docs',
