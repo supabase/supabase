@@ -122,7 +122,7 @@ These should never be used in the browser or exposed to customers, but they are 
 ### Create a `public.users` table.
 
 Even though Supabase provides an `auth.users` table, it is helpful to also create a users table in the `public` schema, which uses the same UID Primary Key as the `auth.users`.
-For security purposes, the `auth` schema is not exposed on the auto-generated API. Created a `public.users` table allows you to interact via the Supabase client - 
+For security purposes, the `auth` schema is not exposed on the auto-generated API. Creating a `public.users` table allows you to interact via the Supabase client - 
 especially useful for cross-table queries.
 
 Pro tip: if you want to add a row to your `public.users` table every time a user signs up, you can use triggers. For example:
