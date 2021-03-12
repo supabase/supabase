@@ -1008,6 +1008,12 @@ html[data-theme='dark'] .DocSearch {
   justify-content: end;
 }
 
+@media screen and (max-width: 580px) {
+  .navbar__items .navbar-item-github {
+    display: none !important;
+  }
+}
+
 .navbar-item-github:hover {
   opacity: 0.6;
 }
@@ -1035,6 +1041,12 @@ html[data-theme='dark'] .navbar-item-github:before {
   align-items: center;
   justify-items: center;
   justify-content: end;
+}
+
+@media screen and (max-width: 580px) {
+  .navbar__items .navbar-item-twitter {
+    display: none !important;
+  }
 }
 
 .navbar-item-twitter:hover {
