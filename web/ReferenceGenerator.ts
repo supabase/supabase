@@ -75,7 +75,7 @@ async function gen(inputFileName, outputDir) {
         title: pageSpec.title || pageSpec.pageName,
         description,
         parameters: hasTsRef ? generateParameters(tsDefinition) : '',
-        spotlight: generateSpotlight(pageSpec['examples'] || [], allLanguages),
+        spotlight: generateSpotlight(id, pageSpec['examples'] || [], allLanguages),
         examples: generateExamples(id, pageSpec['examples'] || [], allLanguages),
         notes: pageSpec.notes,
       })
@@ -174,11 +174,11 @@ function generateExamples(id: string, specExamples: any, allLanguages: any) {
 /**
  * A spotlight is an example which appears at the top of the page.
  */
-function generateSpotlight(specExamples: any, allLanguages: any) {
+function generateSpotlight(id: string, specExamples: any, allLanguages: any) {
   const spotlight = specExamples.find((x) => x.isSpotlight) || null
   const spotlightContent = !spotlight
     ? ''
-    : Tabs(allLanguages, generateTabs(allLanguages, spotlight))
+    : Tabs(id, allLanguages, generateTabs(allLanguages, spotlight))
   return spotlightContent
 }
 
