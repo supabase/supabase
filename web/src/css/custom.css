@@ -16,6 +16,7 @@
     url(/fonts/custom/CustomFont-Medium.woff) format('woff');
   font-weight: 500;
   font-style: normal;
+}
 
 /* mono font */
 
@@ -407,12 +408,12 @@ article header {
 @media (max-width: 750px) {
   .navbar-sidebar__items {
     padding-left: 1rem;
-    margin-right: 6rem !important;
+    /* margin-right: 6rem !important; */
   }
 }
 
 .menu--responsive {
-  padding-right: 2rem !important;
+  /* padding-right: 2rem !important; */
 }
 
 .navbar__toggle svg {
@@ -529,7 +530,7 @@ a.card:hover {
 /* Sidebar nav header  */
 .menu > .menu__list > .menu__list-item > .menu__link {
   margin-bottom: 4px;
-  /* pointer-events: none; */
+  pointer-events: none;
   color: gray;
 }
 
