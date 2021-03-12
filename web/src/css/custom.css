@@ -16,6 +16,19 @@
     url(/fonts/custom/CustomFont-Medium.woff) format('woff');
   font-weight: 500;
   font-style: normal;
+
+/* mono font */
+
+@font-face {
+  font-family: 'source code pro';
+  src: url('/fonts/source-code-pro/SourceCodePro-Regular.eot');
+  src: url('/fonts/source-code-pro/SourceCodePro-Regular.woff2') format('woff2'),
+    url('/fonts/source-code-pro/SourceCodePro-Regular.woff') format('woff'),
+    url('/fonts/source-code-pro/SourceCodePro-Regular.ttf') format('truetype'),
+    url('/fonts/source-code-pro/SourceCodePro-Regular.svg#SourceCodePro-Regular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
 /**
