@@ -2,6 +2,7 @@
 title: Supabase Beta February 2021
 description: One year of building.
 author: Paul Copplestone
+author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
@@ -41,6 +42,12 @@ Writing SQL just got 10x easier. We added autocomplete to the SQL editor, includ
 Redirect your users to specific route within your site on [`signIn()`](https://supabase.io/docs/client/auth-signin#sign-in-with-redirect) and [`signUp()`](https://supabase.io/docs/client/auth-signup#sign-up-with-redirect). 
 
 ![Redirect your users after sign up](/img/blog/feb/auth-redirect.png)
+
+### Replication management
+
+We added a page to the Database section for managing Postgres Replication. It's still basic, but you can use it to manage your realtime API - choosing which tables are enabled, and which events to send.
+
+![Replication management](/img/blog/feb/manage-replication.png)
 
 
 ### Learning Resources
