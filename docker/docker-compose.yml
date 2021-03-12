@@ -9,13 +9,14 @@ services:
         ports:
         - 8000:8000/tcp
         - 8443:8443/tcp
-    gotrue:
+    auth:
       image: supabase/gotrue:latest
       ports:
         - '9999:9999'
       environment:
         GOTRUE_JWT_SECRET: super-secret-jwt-token
         GOTRUE_JWT_EXP: 3600
+        GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
         GOTRUE_DB_DRIVER: postgres
         DB_NAMESPACE: auth
         API_EXTERNAL_URL: localhost
@@ -58,11 +59,10 @@ services:
           HOSTNAME: localhost
           JWT_SECRET: super-secret-jwt-token
     db:
-      image: supabase/postgres:latest
+      build:
+          context: ./postgres
       ports:
       - 5432:5432
-      volumes:
-      - ./docker/db:/docker-entrypoint-initdb.d/
       command:
       - postgres
       - -c

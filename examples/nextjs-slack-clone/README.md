@@ -154,7 +154,7 @@ CREATE TABLE public.messages (
   channel_id bigint REFERENCES public.channels NOT NULL
 );
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow logged-in read access" on public.messages USING ( auth.role() = 'authenticated' );
+CREATE POLICY "Allow logged-in read access" on public.messages FOR SELECT USING ( auth.role() = 'authenticated' );
 CREATE POLICY "Allow individual insert access" on public.messages FOR INSERT WITH CHECK ( auth.uid() = user_id );
 CREATE POLICY "Allow individual update access" on public.messages FOR UPDATE USING ( auth.uid() = user_id );
 ```

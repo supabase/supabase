@@ -1,5 +1,18 @@
 @import url('https://rsms.me/inter/inter.css');
 
+/* mono font */
+
+@font-face {
+  font-family: 'source code pro';
+  src: url('/fonts/source-code-pro/SourceCodePro-Regular.eot');
+  src: url('/fonts/source-code-pro/SourceCodePro-Regular.woff2') format('woff2'),
+    url('/fonts/source-code-pro/SourceCodePro-Regular.woff') format('woff'),
+    url('/fonts/source-code-pro/SourceCodePro-Regular.ttf') format('truetype'),
+    url('/fonts/source-code-pro/SourceCodePro-Regular.svg#SourceCodePro-Regular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 /**
  * Root variables
@@ -19,7 +32,7 @@
   --custom-font-base: 'Inter', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial',
     sans-serif;
-  --custom-font-code: 'Source Code Pro', Menlo, monospace;
+  --custom-font-code: 'source code pro', Menlo, monospace;
   --custom-font-size-base: 1rem;
   --custom-border-radius: 3px;
   --custom-border-radius-md: 6px;
@@ -41,14 +54,14 @@
   --custom-content-color-emphasis: #000;
   --custom-border-color: #e0e0e0;
   --custom-color-subtle: #ccc;
-  --custom-color-orange-100: #FDF0EA;
-  --custom-color-orange-200: #FBE2D5;
-  --custom-color-orange-300: #F9D3C0;
-  --custom-color-orange-400: #F5B796;
-  --custom-color-orange-500: #F08B57;
-  --custom-color-orange-600: #EC6E2D;
-  --custom-color-orange-700: #D75614;
-  --custom-color-orange-800: #A93C04;
+  --custom-color-orange-100: #fdf0ea;
+  --custom-color-orange-200: #fbe2d5;
+  --custom-color-orange-300: #f9d3c0;
+  --custom-color-orange-400: #f5b796;
+  --custom-color-orange-500: #f08b57;
+  --custom-color-orange-600: #ec6e2d;
+  --custom-color-orange-700: #d75614;
+  --custom-color-orange-800: #a93c04;
   --custom-shadow-lw: 0 3px 5px 0px rgba(0, 0, 0, 0.1);
   --custom-shadow-md: 0 3px 5px 0px rgba(0, 0, 0, 0.1);
   --custom-shadow-tl: 0 12px 28px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
@@ -251,13 +264,15 @@ blockquote p {
   color: var(--custom-content-color);
 }
 
-div[class^="announcementBar"] , div[class*=" announcementBar"] {
-    padding-bottom: 5px;
+div[class^='announcementBar'],
+div[class*=' announcementBar'] {
+  padding-bottom: 5px;
 }
-div[class^="announcementBar"] button span, div[class*=" announcementBar"] button span {
-    color: #fff !important;
-    padding-bottom: 5px;
-    display: inline-block;
+div[class^='announcementBar'] button span,
+div[class*=' announcementBar'] button span {
+  color: #fff !important;
+  padding-bottom: 5px;
+  display: inline-block;
 }
 .docusaurus-highlight-code-line {
   background-color: rgb(72, 77, 91);
@@ -379,7 +394,7 @@ article header {
 .navbar-sidebar__items .menu .menu__link.menu__link--sublist::after {
   display: none;
 }
-.navbar-sidebar__items .menu .menu__list-item .menu__list-item a.menu__link{
+.navbar-sidebar__items .menu .menu__list-item .menu__list-item a.menu__link {
   margin-left: 30px;
 }
 
@@ -508,14 +523,13 @@ a.card:hover {
   vertical-align: middle;
 }
 
-
 /* Make the Docs page take up full height to fix the left sidebar */
 div.container.padding-vert--lg .row {
-    min-height: 100vh;
+  min-height: 100vh;
 }
 /* Disable full height for child rows */
 div.container.padding-vert--lg .row .row {
-    min-height: auto;
+  min-height: auto;
 }
 div[class^='docItemContainer_'] {
   max-width: none;
@@ -583,7 +597,9 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   cursor: pointer;
 }
 
-div[class^="codeBlockContent"] , div[class*=" codeBlockContent"], .prism-code {
+div[class^='codeBlockContent'],
+div[class*=' codeBlockContent'],
+.prism-code {
   background-color: var(--ifm-code-background-dark) !important;
 }
 .code-with-header {
@@ -598,7 +614,7 @@ div[class^="codeBlockContent"] , div[class*=" codeBlockContent"], .prism-code {
 .code-with-header pre {
   border-radius: 0 0 4px 4px;
 }
-.code-with-header.code-with-response  {
+.code-with-header.code-with-response {
   border-radius: 0;
 }
 .code-header {
@@ -806,14 +822,13 @@ a.hash-link {
 .DocSearch-Button {
   border-radius: 8px !important;
 }
-.DocSearch-Button svg {
+.DocSearch-Button > svg {
   display: none;
 }
 .DocSearch-Button-Placeholder {
   font-family: var(--ifm-font-family-base);
   line-height: 10px;
 }
-
 
 .prism-code {
   background-color: none;
@@ -822,8 +837,8 @@ a.hash-link {
   font-size: 0.8rem;
   outline: none !important;
 }
-.prism-code div, 
-.prism-code div:focus, 
+.prism-code div,
+.prism-code div:focus,
 .prism-code div:active {
   outline: none !important;
 }
@@ -874,12 +889,10 @@ a.hash-link {
   @apply text-green-500;
 }
 
-
-
-
-html[data-theme='light'] .DocSearch, html[data-theme='dark'] .DocSearch {
+html[data-theme='light'] .DocSearch,
+html[data-theme='dark'] .DocSearch {
   --docsearch-text-color: var(--custom-content-color);
-  --docsearch-muted-color:  var(--custom-content-color-light);
+  --docsearch-muted-color: var(--custom-content-color-light);
   --docsearch-modal-background: var(--custom-background-color-diff);
 }
 
@@ -903,14 +916,13 @@ html[data-theme='light'] .DocSearch, html[data-theme='dark'] .DocSearch {
   box-sizing: initial;
   margin-top: 3px;
 }
- .DocSearch-SearchBar form {
+.DocSearch-SearchBar form {
   background: var(--custom-background-color-diff) !important;
   color: var(--custom-content-color) !important;
 }
 .DocSearch-Footer {
   display: none !important;
 }
-
 
 .navbar-item-github:hover {
   opacity: 0.6;
@@ -1010,7 +1022,7 @@ html[data-theme='dark'] .navbar-item-twitter:before {
   width: 100%;
   display: -webkit-box;
   -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;  
+  -webkit-box-orient: vertical;
   overflow: hidden;
   margin: 0;
 }
@@ -1060,7 +1072,7 @@ html[data-theme='dark'] .navbar-item-twitter:before {
 }
 
 .ShowcaseCard-Footer-Spaced .ShowcaseCard-Footer-Item:nth-child(even) {
-  margin-left:  4px;
+  margin-left: 4px;
   margin-right: 4px;
 }
 
@@ -1134,16 +1146,15 @@ html[data-theme='dark'] .navbar-item-twitter:before {
   }
 
   .ShowcaseCard-Footer-Spaced .ShowcaseCard-Footer-Item:nth-child(even) {
-    margin-left:  0px;
+    margin-left: 0px;
     margin-right: 0px;
   }
 }
 
-
 /* New CSS */
 
 .tabs {
-  margin:0;
+  margin: 0;
   font-size: 0.7rem;
   background-color: var(--ifm-code-background-dark);
   border-top-left-radius: 5px;
@@ -1159,13 +1170,13 @@ html[data-theme='dark'] .navbar-item-twitter:before {
 .tabs li.tabs__item--active {
   color: var(--custom-primary);
 }
-div[role=tabpanel], div[role=tabpanel] div {
+div[role='tabpanel'],
+div[role='tabpanel'] div {
   margin-top: 0 !important;
   outline: none !important;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
-
 
 .method-list-group {
   list-style: none;
@@ -1200,7 +1211,6 @@ h4.method-list-item-label .method-list-item-validation {
   font-weight: 300;
 }
 
-
 .method-list-group .method-list-group {
   border: 1px solid var(--custom-border-color);
   border-radius: 8px;
@@ -1215,8 +1225,8 @@ h4.method-list-item-label .method-list-item-validation {
   margin: 0;
   padding: 6px 12px;
 }
-.method-list-group .method-list-group li div, 
-.method-list-group .method-list-group li h4, 
+.method-list-group .method-list-group li div,
+.method-list-group .method-list-group li h4,
 .method-list-group .method-list-group li p {
   padding: 0;
   margin: 0;
