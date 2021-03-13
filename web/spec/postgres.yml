@@ -12,7 +12,7 @@ info:
 
   definition: spec/combined.json
   libraries:
-    - name: 'sql'
+    - name: 'SQL'
       id: 'sql'
       version: '0.0.1'
   docs:
