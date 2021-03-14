@@ -14,7 +14,7 @@ services:
       ports:
         - '9999:9999'
       environment:
-        GOTRUE_JWT_SECRET: super-secret-jwt-token
+        GOTRUE_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
         GOTRUE_JWT_EXP: 3600
         GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
         GOTRUE_DB_DRIVER: postgres
@@ -41,7 +41,7 @@ services:
           PGRST_DB_URI: postgres://postgres:postgres@db:5432/postgres
           PGRST_DB_SCHEMA: public
           PGRST_DB_ANON_ROLE: postgres
-          PGRST_JWT_SECRET: super-secret-jwt-token
+          PGRST_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
     realtime:
       image: supabase/realtime:latest
       ports:
@@ -57,7 +57,9 @@ services:
           DB_PORT: 5432
           PORT: 4000
           HOSTNAME: localhost
-          JWT_SECRET: super-secret-jwt-token
+          # Disable JWT Auth locally. The JWT_SECRET will be ignored.
+          SECURE_CHANNELS: 'false'
+          JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
     db:
       build:
           context: ./postgres
