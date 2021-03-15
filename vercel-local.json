@@ -77,7 +77,6 @@
       "destination": "/docs/postgres/server/digitalocean"
     },
     { "source": "/docs/realtime/docker", "destination": "/docs/postgres/server/docker" },
-    { "source": "/docs/realtime/source", "destination": "/docs/postgres/server/about" },
 
     { "source": "/docs/realtime/source", "destination": "/docs/postgres/server/about" },
 
