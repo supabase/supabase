@@ -38,9 +38,6 @@ function Blog(props: any) {
 
   useEffect(() => {
     // Update the document title using the browser API
-    console.log('useeffect')
-    console.log(category)
-    console.log(props.blogs)
     setBlogs(
       category === 'all'
         ? props.blogs
@@ -75,11 +72,9 @@ function Blog(props: any) {
             <div className="mx-auto max-w-7xl">
               <Typography.Title level={2}>Latests posts</Typography.Title>
               <div className="mt-5 max-w-lg mx-auto grid gap-16 lg:grid-cols-2 lg:max-w-none">
-                {/* <ul> */}
                 {props.blogs.slice(0, 2).map((blog: any, idx: any) => {
                   return FeaturedThumb(blog)
                 })}
-                {/* </ul> */}
               </div>
             </div>
           </div>
@@ -90,7 +85,7 @@ function Blog(props: any) {
                   <Typography.Title level={2}>More posts from the team</Typography.Title>
                 </div>
                 <div className="col-span-12 lg:col-span-4 mt-4 lg:mt-0">
-                  <Space className="lg:justify-end">
+                  <Space className="lg:justify-end" size={6}>
                     <Typography.Text>Select a category</Typography.Text>
                     <Select
                       onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
@@ -129,7 +124,7 @@ function FeaturedThumb(blog: any) {
   const author = blog.author ? authors[blog.author] : authors['supabase']
 
   return (
-    <div key={blog.id} className="my-6 cursor-pointer">
+    <div key={blog.slug} className="my-6 cursor-pointer">
       <Link href={`/blog/${blog.slug}`} as={`/blog/${blog.slug}`}>
         <div>
           <img
@@ -150,7 +145,12 @@ function FeaturedThumb(blog: any) {
                 </Typography.Title>
 
                 <Space className="block">
-                  {blog.tags && blog.tags.map((tag: string) => <Badge dot={false}>{tag}</Badge>)}
+                  {blog.tags &&
+                    blog.tags.map((tag: string) => (
+                      <Badge key={`${blog.slug}-${tag}-tag`} dot={false}>
+                        {tag}
+                      </Badge>
+                    ))}
                 </Space>
               </Space>
             </div>
@@ -183,7 +183,7 @@ function BlogListItem(blog: any) {
 
   // console.log(blog.content.substring(0, 120))
   return (
-    <div key={blog.id} className="pt-4 pb-12 border-b border-gray-100 dark:border-gray-600 mb-8">
+    <div key={blog.slug} className="pt-4 pb-12 border-b border-gray-100 dark:border-gray-600 mb-8">
       <div className="mx-auto max-w-7xl cursor-pointer">
         <Link href={`/blog/${blog.slug}`} as={`/blog/${blog.slug}`}>
           <div>
@@ -201,7 +201,12 @@ function BlogListItem(blog: any) {
                   </Typography.Title>
 
                   <Space className="block">
-                    {blog.tags && blog.tags.map((tag: string) => <Badge dot={false}>{tag}</Badge>)}
+                    {blog.tags &&
+                      blog.tags.map((tag: string) => (
+                        <Badge key={`${blog.slug}-${tag}-tag`} dot={false}>
+                          {tag}
+                        </Badge>
+                      ))}
                   </Space>
                 </Space>
               </div>
