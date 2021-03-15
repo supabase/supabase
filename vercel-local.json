@@ -172,6 +172,26 @@
     {
       "source": "/blog/2021/02/09/case-study-roboflow",
       "destination": "/new/blog/2021-02-09-case-study-roboflow"
+    },
+    {
+      "source": "/blog/2021/02/27/cracking-postgres-interview",
+      "destination": "/new/blog/2021-02-27-cracking-postgres-interview"
+    },
+    {
+      "source": "/blog/2021/03/02/supabase-beta-february-2021",
+      "destination": "/new/blog/2021-03-02-supabase-beta-february-202w"
+    },
+    {
+      "source": "/blog/2021/03/05/postgres-as-a-cron-server",
+      "destination": "/new/blog/2021-03-05-postgres-as-a-cron-servew"
+    },
+    {
+      "source": "/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders",
+      "destination": "/new/blog/2021-03-08-toad-a-link-shorterner-with-simple-apis-for-low-coderw"
+    },
+    {
+      "source": "/blog/2021/03/11/using-supabase-replit",
+      "destination": "/new/blog/2021-03-11-using-supabase-repliw"
     }
   ],
   "trailingSlash": false
