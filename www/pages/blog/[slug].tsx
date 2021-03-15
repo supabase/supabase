@@ -32,7 +32,6 @@ const components = {
 // plugins for next-mdx-remote
 const gfm = require('remark-gfm')
 const slug = require('rehype-slug')
-const highlight = require('remark-highlight.js')
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -216,14 +215,16 @@ function BlogPostPage(props: any) {
                       return <Badge key={`categroy-badge-${tag}`}>{tag}</Badge>
                     })}
                   </Space>
-                  <div>
-                    <Typography.Title level={5}>Table of contents</Typography.Title>
-                    <Typography>
-                      <div className={blogStyles['toc']}>
-                        <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
-                      </div>
-                    </Typography>
-                  </div>
+                  {props.blog.toc && (
+                    <div>
+                      <Typography.Title level={5}>Table of contents</Typography.Title>
+                      <Typography>
+                        <div className={blogStyles['toc']}>
+                          <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
+                        </div>
+                      </Typography>
+                    </div>
+                  )}
                   <div>
                     <Typography.Title className="mb-4" level={5}>
                       Related articles
