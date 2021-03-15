@@ -61,3 +61,8 @@
 .article {
   @apply mb-16;
 }
+
+.article > div > pre {
+  padding: 0;
+  background: none;
+}
