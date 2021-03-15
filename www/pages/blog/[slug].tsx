@@ -80,7 +80,7 @@ export async function getStaticProps({ params }: any) {
         slug: params.slug,
         content: mdxSource,
         ...data,
-        toc: toc(content),
+        toc: toc(content, { maxdepth: 2 }),
       },
     },
   }
