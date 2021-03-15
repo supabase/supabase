@@ -30,24 +30,21 @@ We attribute this improvement to community feedback. This has significantly impr
 
 Previously we would throw errors:
 
-<CodeBlock
-  code={`try {
+```js
+try {
   const { body } = supabase.from('todos').select('*')
 } catch (error) {
   console.log(error)
-}`}
-  lang="js"
-  hideCopy
-/>
+}
+```
 
 And now we simply return them:
 
-<CodeBlock
-  code={`const { data, error } = supabase.from('todos').select('*')
+```js
+const { data, error } = supabase.from('todos').select('*')
 if (error) console.log(error)\n
-// else, carry on ..`}
-  lang="js"
-/>
+// else, carry on ..
+```
 
 After testing this for a while we're very happy with this pattern. Errors are handled next to the offending function. Of course you can always rethrow the error if that's your preference.
 
@@ -59,23 +56,20 @@ To maintain this philosophy, we created [`gotrue-js`](https://github.com/supabas
 
 Previously:
 
-<CodeBlock
-  code={`const {
+```js
+const {
   body: { user },
-} = await supabase.auth.signup('someone@email.com', 'password')`}
-  lang="js"
-  hideCopy
-/>
+} = await supabase.auth.signup('someone@email.com', 'password')
+```
 
 Now:
 
-<CodeBlock
-  code={`const { user, error } = await supabase.auth.signUp({
+```js
+const { user, error } = await supabase.auth.signUp({
   email: 'someone@email.com',
   password: 'password',
-})`}
-  lang="js"
-/>
+})
+```
 
 ### Enhancements and fixes
 
@@ -97,11 +91,15 @@ We've bumped the major version because there are a number of breaking changes. W
 
 Previously:
 
-<CodeBlock code={`const {body} = supabase.from('todos').select('*')`} lang="js" hideCopy />
+```js
+const { body } = supabase.from('todos').select('*')
+```
 
 Now:
 
-<CodeBlock code={`const {data} = supabase.from('todos').select()`} lang="js" />
+```js
+const { data } = supabase.from('todos').select()
+```
 
 ### Upgrading
 
