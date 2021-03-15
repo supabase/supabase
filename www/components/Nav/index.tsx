@@ -188,15 +188,17 @@ const Nav = (props: Props) => {
         <div className="flex-1 flex items-center justify-center sm:px-10 sm:items-stretch lg:justify-between">
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <img
-                className="block h-6 w-auto"
-                src={
-                  darkMode
-                    ? `${basePath}/images/logo-dark.png`
-                    : `${basePath}/images/logo-light.png`
-                }
-                alt="Logo"
-              />
+              <Link href="/" as="/">
+                <img
+                  className="block h-6 w-auto"
+                  src={
+                    darkMode
+                      ? `${basePath}/images/logo-dark.png`
+                      : `${basePath}/images/logo-light.png`
+                  }
+                  alt="Logo"
+                />
+              </Link>
             </div>
             <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-8">
               <FlyOutNavButton
