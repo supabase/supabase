@@ -277,9 +277,9 @@ function BlogPostPage(props: any) {
             <div className="grid lg:grid-cols-2 gap-8 py-8">
               <div>{props.prevPost && <NextCard post={props.prevPost} label="Last post" />}</div>
               <div>
-                {/* {props.nextPost && (
+                {props.nextPost && (
                   <NextCard post={props.nextPost} label="Next post" className="text-right" />
-                )} */}
+                )}
               </div>
             </div>
           </div>
