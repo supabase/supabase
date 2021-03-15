@@ -5,7 +5,6 @@ import { Button, IconCopy } from '@supabase/ui'
 import CopyToClipboard from 'react-copy-to-clipboard'
 
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
-import jsx from 'react-syntax-highlighter/dist/cjs/languages/prism/jsx'
 import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 
@@ -27,7 +26,6 @@ function CodeBlock(props: Props) {
   if (lang === 'jsx') lang = 'js'
 
   SyntaxHighlighter.registerLanguage('js', js)
-  SyntaxHighlighter.registerLanguage('jsx', jsx)
   SyntaxHighlighter.registerLanguage('py', py)
   SyntaxHighlighter.registerLanguage('sql', sql)
 
