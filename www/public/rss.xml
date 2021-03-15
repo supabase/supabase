@@ -5,9 +5,49 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sat, 20 Feb 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Invalid Date</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.io/blog/2021-03-11-using-supabase-replit</guid>
+  <title>Using Supabase in Replit</title>
+  <link>https://supabase.io/blog/2021-03-11-using-supabase-replit</link>
+  <description>Free hosted relational database from within your node.js repl</description>
+  <pubDate>Invalid Date</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021-03-08-toad-a-link-shorterner-with-simple-apis-for-low-coders</guid>
+  <title>Toad, a link shorterner with simple APIs for low-coders</title>
+  <link>https://supabase.io/blog/2021-03-08-toad-a-link-shorterner-with-simple-apis-for-low-coders</link>
+  <description>An easy-to-use link shortening tool with simple APIs</description>
+  <pubDate>Invalid Date</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021-03-05-postgres-as-a-cron-server</guid>
+  <title>Postgres as a CRON Server</title>
+  <link>https://supabase.io/blog/2021-03-05-postgres-as-a-cron-server</link>
+  <description>Running repetitive tasks with your Postgres database.</description>
+  <pubDate>Invalid Date</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021-03-02-supabase-beta-february-2021</guid>
+  <title>Supabase Beta February 2021</title>
+  <link>https://supabase.io/blog/2021-03-02-supabase-beta-february-2021</link>
+  <description>One year of building.</description>
+  <pubDate>Invalid Date</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021-02-27-cracking-postgres-interview</guid>
+  <title>Cracking PostgreSQL Interview Questions</title>
+  <link>https://supabase.io/blog/2021-02-27-cracking-postgres-interview</link>
+  <description>Understand the top PostgreSQL Interview Questions</description>
+  <pubDate>Invalid Date</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.io/blog/2021-02-21-toadli</guid>
   <title>Toadli.Co</title>
