@@ -53,17 +53,15 @@ We reverted our [crypto-js](https://github.com/brix/crypto-js) module from versi
 
 By selectively importing functions from modules like `lodash`, we cut the gzipped size by another 40kb across all our bundles.
 
-<CodeBlock
-  code={`// before
+```js
+// before
 import _ from 'lodash'\n
 // maunally cherry picking modules
 import find from 'lodash/find'
 import debounce from 'lodash/debounce'\n
 // using babel-plugin-lodash
 import { find, debounce } from 'lodash'
-`}
-  lang="js"
-/>
+```
 
 In the above example, we added [babel-plugin-lodash](https://github.com/lodash/babel-plugin-lodash) to our babel configuration which cherry picks the exact `lodash` functions we import. This makes it easier to import from `lodash` without cluttering the code with selective import statements.
 

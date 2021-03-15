@@ -71,10 +71,18 @@ export async function getStaticProps({ params }: any) {
     })
     .indexOf(params.slug)
 
+  console.log('currentIndex', currentIndex)
+  console.log('allPosts.length', allPosts.length)
+
+  console.log('nextPost', allPosts[currentIndex + 1])
+
+  const nextPost = allPosts[currentIndex + 1]
+  const prevPost = allPosts[currentIndex - 1]
+
   return {
     props: {
-      prevPost: currentIndex === 0 ? null : allPosts[currentIndex - 1],
-      nextPost: currentIndex === allPosts.length ? null : allPosts[currentIndex + 1],
+      prevPost: currentIndex === 0 ? null : prevPost ? prevPost : null,
+      nextPost: currentIndex === allPosts.length ? null : nextPost ? nextPost : null,
       relatedPosts,
       blog: {
         slug: params.slug,
@@ -269,9 +277,9 @@ function BlogPostPage(props: any) {
             <div className="grid lg:grid-cols-2 gap-8 py-8">
               <div>{props.prevPost && <NextCard post={props.prevPost} label="Last post" />}</div>
               <div>
-                {props.nextPost && (
+                {/* {props.nextPost && (
                   <NextCard post={props.nextPost} label="Next post" className="text-right" />
-                )}
+                )} */}
               </div>
             </div>
           </div>
