@@ -59,7 +59,7 @@ function CodeBlock(props: Props) {
       >
         {props.children}
       </SyntaxHighlighter>
-      {!props.hideCopy && (
+      {!props.hideCopy && props.children ? (
         <div className="absolute right-2 top-2 dark">
           <CopyToClipboard text={props.children}>
             <Button type="outline" icon={<IconCopy />}>
@@ -67,7 +67,7 @@ function CodeBlock(props: Props) {
             </Button>
           </CopyToClipboard>
         </div>
-      )}
+      ) : null}
     </div>
   )
 }
