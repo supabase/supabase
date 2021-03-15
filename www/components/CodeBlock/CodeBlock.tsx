@@ -1,41 +1,50 @@
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
-import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import monokaiCustomTheme from 'data/CodeEditorTheme'
 import CodeBlockStyles from './CodeBlock.module.css'
 import { Button, IconCopy } from '@supabase/ui'
 import CopyToClipboard from 'react-copy-to-clipboard'
 
+import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
+import jsx from 'react-syntax-highlighter/dist/cjs/languages/prism/jsx'
+import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
+import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
+
 interface Props {
   lang: 'js'
-  code: 'string'
   startingLineNumber?: number
   hideCopy?: boolean
+  className?: string
+  children?: string
 }
-function CodeBlock(props: Props) {
-  // const {
-  //   lang = 'js',
-  //   code,
-  //   startingLineNumber = 1
-  // } = props
 
-  SyntaxHighlighter.registerLanguage('javascript', js)
+function CodeBlock(props: Props) {
+  let lang = props.lang
+    ? props.lang
+    : props.className
+    ? props.className.replace('language-', '')
+    : 'js'
+  // force jsx to be js highlighted
+  if (lang === 'jsx') lang = 'js'
+
+  SyntaxHighlighter.registerLanguage('js', js)
+  SyntaxHighlighter.registerLanguage('jsx', jsx)
+  SyntaxHighlighter.registerLanguage('py', py)
+  SyntaxHighlighter.registerLanguage('sql', sql)
 
   return (
     <div className="relative">
       <SyntaxHighlighter
-        // startingLineNumber={startingLineNumber}
-        language="javascript"
+        language={lang}
         style={monokaiCustomTheme}
         className={CodeBlockStyles['code-block']}
         customStyle={{
           padding: 0,
-          // paddingTop: '32px',
           fontSize: 12,
           lineHeight: 1.2,
           borderTop: '1px solid #393939',
           background: '#181818',
         }}
-        showLineNumbers
+        showLineNumbers={lang === 'cli' ? false : true}
         lineNumberContainerStyle={{
           paddingTop: '128px',
         }}
@@ -50,11 +59,11 @@ function CodeBlock(props: Props) {
           paddingBottom: '4px',
         }}
       >
-        {props.code}
+        {props.children}
       </SyntaxHighlighter>
       {!props.hideCopy && (
         <div className="absolute right-2 top-2 dark">
-          <CopyToClipboard text={props.code}>
+          <CopyToClipboard text={props.children}>
             <Button type="outline" icon={<IconCopy />}>
               Copy
             </Button>

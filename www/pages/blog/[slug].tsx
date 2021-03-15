@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
 import { NextSeo } from 'next-seo'
 
-import { getAllPostSlugs, getPostdata, getSortedPosts, getLastPost } from '~/lib/posts'
+import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import { generateReadingTime } from '~/lib/helpers'
 import ReactMarkdown from 'react-markdown'
 import authors from 'lib/authors.json'
@@ -21,11 +21,18 @@ import Link from 'next/link'
 
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
-const components = { CodeBlock, Quote }
+const components = {
+  CodeBlock,
+  Quote,
+  code: (props: any) => {
+    return <CodeBlock {...props} />
+  },
+}
 
 // plugins for next-mdx-remote
 const gfm = require('remark-gfm')
 const slug = require('rehype-slug')
+const highlight = require('remark-highlight.js')
 
 // table of contents extractor
 const toc = require('markdown-toc')
