@@ -1,6 +1,7 @@
 openref: 0.1
 
 info:
+  id: reference/supabase-js
   title: Supabase Client
   description: |
 
@@ -18,9 +19,6 @@ info:
   libraries:
     - name: 'JavaScript'
       id: 'js'
-      version: '0.0.1'
-    - name: 'Python'
-      id: 'py'
       version: '0.0.1'
   docs:
     path: client/
@@ -105,11 +103,6 @@ pages:
 
       Find the source code on [GitHub](https://github.com/supabase/supabase-js).
 
-      ## Python
-
-      ```bash
-      # Not yet implemented
-
   Initializing:
     $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.constructor'
     description: |
@@ -127,10 +120,6 @@ pages:
           // Create a single supabase client for interacting with your database 
           const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With additional parameters
         js: |
           ```js
@@ -138,10 +127,6 @@ pages:
 
           const options = { }
           const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   Generating Types:
@@ -235,10 +220,6 @@ pages:
             password: 'example-password',
           })
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: Sign up with redirect.
         description: |
           Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
@@ -251,10 +232,6 @@ pages:
             redirectTo: 'https://example.com/welcome'
           })
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: Sign up with third-party providers.
         description: |
           You can sign up with OAuth providers using the [`signIn()`](/docs/client/auth-signin#sign-in-using-third-party-providers) method.
@@ -263,10 +240,6 @@ pages:
           const { user, session, error } = await supabase.auth.signIn({
             provider: 'github'
           })
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: Sign up with scopes.
         description: |
@@ -279,10 +252,6 @@ pages:
             scopes: 'repo gist notifications'
           })
           const oAuthToken = session.provider_token // use to access provider API
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   auth.signIn():
@@ -302,10 +271,6 @@ pages:
             password: 'example-password',
           })
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: Sign in with magic link.
         description: If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
         js: |
@@ -313,10 +278,6 @@ pages:
           const { user, session, error } = await supabase.auth.signIn({
             email: 'example@email.com'
           })
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: Sign in using third-party providers.
         description: Supabase supports OAuth logins.
@@ -326,10 +287,6 @@ pages:
             // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
             provider: 'github'
           })
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: Sign in with redirect.
         description: |
@@ -342,10 +299,6 @@ pages:
           }, {
             redirectTo: 'https://example.com/welcome'
           })
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: Sign in with scopes.
         description: |
@@ -360,10 +313,6 @@ pages:
           })
           const oAuthToken = session.provider_token // use to access provider API
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
 
   auth.signOut():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signOut'
@@ -373,10 +322,6 @@ pages:
         js: |
           ```js
           const { error } = supabase.auth.signOut()
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   auth.session():
@@ -388,10 +333,6 @@ pages:
           ```js
           const session = supabase.auth.session()
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
 
   auth.user():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.user'
@@ -401,10 +342,6 @@ pages:
         js: |
           ```js
           const user = supabase.auth.user()
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   auth.update():
@@ -421,10 +358,6 @@ pages:
             data: { hello: 'world' } 
           })
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
 
   auth.onAuthStateChange():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.onAuthStateChange'
@@ -436,10 +369,6 @@ pages:
           supabase.auth.onAuthStateChange((event, session) => {
             console.log(event, session)
           })
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   Reset Password (Email):
@@ -466,10 +395,6 @@ pages:
           ```js
           const { data, error } = supabase.auth.api.resetPasswordForEmail('user@email.com')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
 
   select():
     title: 'Fetch data: select()'
@@ -487,10 +412,6 @@ pages:
             .from('cities')
             .select()
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: Selecting specific columns
         description: You can select specific fields from your tables.
         js: |
@@ -498,10 +419,6 @@ pages:
           const { data, error } = await supabase
             .from('cities')
             .select('name')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: Query foreign tables
         description: If your database has relationships, you can query related tables too.
@@ -515,10 +432,6 @@ pages:
                 name
               )
             `)
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: Query the same foreign table multiple times
         description: |
@@ -538,10 +451,6 @@ pages:
               purchaser:purchaser_id ( name )
             `)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: Querying with count option
         description: |
           You can get the number of rows by using the count option.
@@ -551,10 +460,6 @@ pages:
           const { data, error, count } = await postgrest
             .from('cities')
             .select('name', { count: 'exact' })
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: Quering JSON data
         description: |
@@ -572,10 +477,6 @@ pages:
               address->street
             `)
             .eq('address->postcode', 90210)
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   insert():
@@ -596,10 +497,6 @@ pages:
               { name: 'The Shire', country_id: 554 }
             ])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: Bulk create
         js: |
           ```js
@@ -609,10 +506,6 @@ pages:
               { name: 'The Shire', country_id: 554 },
               { name: 'Rohan', country_id: 555 },
             ])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: Upsert
         description: |
@@ -633,10 +526,6 @@ pages:
               ],
               { upsert: true })
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
 
   update():
     title: 'Modify data: update()'
@@ -652,10 +541,6 @@ pages:
             .from('cities')
             .update({ name: 'Middle Earth' })
             .match({ name: 'Auckland' })
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: Updating JSON data
         description: |
@@ -675,10 +560,6 @@ pages:
             `)
             .eq('address->postcode', 90210)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
 
   delete():
     title: 'Delete data: delete()'
@@ -694,10 +575,6 @@ pages:
             .from('cities')
             .delete()
             .match({ id: 666 })
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   rpc():
@@ -718,20 +595,12 @@ pages:
             .rpc('hello_world')
           }
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With Parameters
         js: |
           ```js
           const { data, error } = await supabase
             .rpc('echo_city', { name: 'The Shire' })
           }
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: Bulk call
         js: |
@@ -742,10 +611,6 @@ pages:
               { name: 'Mordor' }
             ])
           }
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With filters.
         description: |
@@ -758,10 +623,6 @@ pages:
             .rpc('echo_all_cities')
             .eq('name', 'The Shire')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With count option
         description: |
           You can specify a count option to get the row count along with your data.
@@ -772,10 +633,6 @@ pages:
             .from('cities')
             .rpc('hello_world', { count: 'exact' })
           }
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   subscribe():
@@ -795,10 +652,6 @@ pages:
             })
             .subscribe()
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: Listening to a specific table
         js: |
           ```js
@@ -809,10 +662,6 @@ pages:
             })
             .subscribe()
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: Listening to inserts
         js: |
           ```js
@@ -822,10 +671,6 @@ pages:
               console.log('Change received!', payload)
             })
             .subscribe()
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: Listening to updates
         description: |
@@ -844,10 +689,6 @@ pages:
             })
             .subscribe()
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: Listening to deletes
         description: |
           By default Supabase not send deleted records. If you want to receive the deleted record you can 
@@ -865,10 +706,6 @@ pages:
             })
             .subscribe()
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: Listening to multiple events
         description: You can chain listeners if you want to listen to multiple events for each table.
         js: |
@@ -879,10 +716,6 @@ pages:
             .on('DELETE', handleRecordDeleted)
             .subscribe()
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: Listening to row level changes
         description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
         js: |
@@ -891,10 +724,6 @@ pages:
             .from('countries:id=eq.200')
             .on('UPDATE', handleRecordUpdated)
             .subscribe()
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   removeSubscription():
@@ -909,10 +738,6 @@ pages:
           ```js
           supabase.removeSubscription(mySubscription)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
 
   getSubscriptions():
     title: 'getSubscriptions()'
@@ -923,10 +748,6 @@ pages:
         js: |
           ```js
           const subscriptions = supabase.getSubscriptions()
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   Using Modifiers:
@@ -947,22 +768,14 @@ pages:
             .select('name, country_id')
             .limit(1)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With embedded resources
         js: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .select('name, cities(name)')
             .eq('name', 'United States')
-            .limit(1, 'cities')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
+            .limit(1, { foreignTable: 'cities' })
           ```
 
   order():
@@ -977,10 +790,6 @@ pages:
             .select('name', 'country_id')
             .order('id', { ascending: false })
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With embedded resources
         js: |
           ```js
@@ -989,10 +798,6 @@ pages:
             .select('name, cities(name)')
             .eq('name', 'United States')
             .order('cities.name')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   range():
@@ -1007,10 +812,6 @@ pages:
             .select('name, country_id')
             .range(0,3)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
 
   single():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.single'
@@ -1023,10 +824,6 @@ pages:
             .from('cities')
             .select('name, country_id')
             .single()
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   Using Filters:
@@ -1047,10 +844,6 @@ pages:
             .select('name, country_id')
             .filter('name', 'eq', 'Paris')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1058,10 +851,6 @@ pages:
             .from('cities')
             .update({ name: 'Mordor' })
             .filter('name', 'eq', 'Paris')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1071,10 +860,6 @@ pages:
             .delete()
             .filter('name', 'eq', 'Paris')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1083,10 +868,6 @@ pages:
             .rpc('echo_all_cities')
             .filter('name', 'eq', 'Paris')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: Filter embedded resources
         js: |
           ```js
@@ -1094,10 +875,6 @@ pages:
             .from('cities')
             .select('name, countries ( name )')
             .filter('countries.name', 'eq', 'France')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .or():
@@ -1112,10 +889,6 @@ pages:
             .select('name, country_id')
             .or('id.eq.20,id.eq.30')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: Use `or` with `and`
         isSpotlight: true
         js: |
@@ -1125,10 +898,6 @@ pages:
             .select('name, country_id')
             .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: Use `or` on foreign tables
         isSpotlight: true
         js: |
@@ -1137,10 +906,6 @@ pages:
             .from('countries')
             .select('id, cities(*)')
             .or('name.eq.Wellington,name.eq.Paris', { foreignTable: "cities" })
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .not():
@@ -1155,10 +920,6 @@ pages:
             .select('name, country_id')
             .not('name', 'eq', 'Paris')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1166,10 +927,6 @@ pages:
             .from('cities')
             .update({ name: 'Mordor' })
             .not('name', 'eq', 'Paris')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1179,10 +936,6 @@ pages:
             .delete()
             .not('name', 'eq', 'Paris')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1190,10 +943,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_cities)
             .not('name', 'eq', 'Paris')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .match():
@@ -1208,10 +957,6 @@ pages:
             .select('name, country_id')
             .match({name: 'Beijing', country_id: 156})
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1219,10 +964,6 @@ pages:
             .from('cities')
             .update({ name: 'Mordor' })
             .match({name: 'Beijing', country_id: 156})
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1232,10 +973,6 @@ pages:
             .delete()
             .match({name: 'Beijing', country_id: 156})
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1243,10 +980,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .match({name: 'Beijing', country_id: 156})
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .eq():
@@ -1261,10 +994,6 @@ pages:
             .select('name, country_id')
             .eq('name', 'The shire')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1272,10 +1001,6 @@ pages:
             .from('cities')
             .update({ name: 'Mordor' })
             .eq('name', 'San Francisco')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1285,10 +1010,6 @@ pages:
             .delete()
             .eq('name', 'Mordor')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1296,10 +1017,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .eq('name', 'San Francisco')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .neq():
@@ -1314,10 +1031,6 @@ pages:
             .select('name, country_id')
             .neq('name', 'The shire')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1325,10 +1038,6 @@ pages:
             .from('cities')
             .update({ name: 'Mordor' })
             .neq('name', 'San Francisco')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1338,10 +1047,6 @@ pages:
             .delete()
             .neq('name', 'Mordor')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1349,10 +1054,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .neq('name', 'Lagos')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .gt():
@@ -1367,10 +1068,6 @@ pages:
             .select('name, country_id')
             .gt('country_id', 250)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1378,10 +1075,6 @@ pages:
             .from('cities')
             .update({ name: 'Mordor' })
             .gt('country_id', 250)
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1391,10 +1084,6 @@ pages:
             .delete()
             .gt('country_id', 250)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1402,10 +1091,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .gt('country_id', 250)
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .gte():
@@ -1420,10 +1105,6 @@ pages:
             .select('name, country_id')
             .gte('country_id', 250)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1431,10 +1112,6 @@ pages:
             .from('cities')
             .update({ name: 'Mordor' })
             .gte('country_id', 250)
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1444,10 +1121,6 @@ pages:
             .delete()
             .gte('country_id', 250)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1455,10 +1128,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .gte('country_id', 250)
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .lt():
@@ -1473,10 +1142,6 @@ pages:
             .select('name, country_id')
             .lt('country_id', 250)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1484,10 +1149,6 @@ pages:
             .from('cities')
             .update({ name: 'Mordor' })
             .lt('country_id', 250)
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1497,10 +1158,6 @@ pages:
             .delete()
             .lt('country_id', 250)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1508,10 +1165,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .lt('country_id', 250)
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .lte():
@@ -1526,10 +1179,6 @@ pages:
             .select('name, country_id')
             .lte('country_id', 250)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1537,10 +1186,6 @@ pages:
             .from('cities')
             .update({ name: 'Mordor' })
             .lte('country_id', 250)
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1550,10 +1195,6 @@ pages:
             .delete()
             .lte('country_id', 250)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1561,10 +1202,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .lte('country_id', 250)
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .like():
@@ -1579,10 +1216,6 @@ pages:
             .select('name, country_id')
             .like('name', '%la%')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1590,10 +1223,6 @@ pages:
             .from('cities')
             .update({ name: 'Mordor' })
             .like('name', '%la%')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1603,10 +1232,6 @@ pages:
             .delete()
             .like('name', '%la%')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1614,10 +1239,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .like('name', '%la%')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .ilike():
@@ -1632,10 +1253,6 @@ pages:
             .select('name, country_id')
             .ilike('name', '%la%')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1643,10 +1260,6 @@ pages:
             .from('cities')
             .update({ name: 'Mordor' })
             .ilike('name', '%la%')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1656,10 +1269,6 @@ pages:
             .delete()
             .ilike('name', '%la%')
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1667,10 +1276,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .ilike('name', '%la%')
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .is():
@@ -1685,10 +1290,6 @@ pages:
             .select('name, country_id')
             .is('name', null)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1696,10 +1297,6 @@ pages:
             .from('cities')
             .update({ name: 'Mordor' })
             .is('name', null)
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1709,10 +1306,6 @@ pages:
             .delete()
             .is('name', null)
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1720,10 +1313,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .is('name', null)
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .in():
@@ -1738,10 +1327,6 @@ pages:
             .select('name, country_id')
             .in('name', ['Rio de Janeiro', 'San Francisco'])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1749,10 +1334,6 @@ pages:
             .from('cities')
             .update({ name: 'Mordor' })
             .in('name', ['Rio de Janeiro', 'San Francisco'])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1762,10 +1343,6 @@ pages:
             .delete()
             .in('name', ['Rio de Janeiro', 'San Francisco'])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1773,10 +1350,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .in('name', ['Rio de Janeiro', 'San Francisco'])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .cs():
@@ -1791,10 +1364,6 @@ pages:
             .select('name, id, main_exports')
             .cs('main_exports', ['oil'])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1802,10 +1371,6 @@ pages:
             .from('countries')
             .update({ name: 'Mordor' })
             .cs('main_exports', ['oil'])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1815,10 +1380,6 @@ pages:
             .delete()
             .cs('main_exports', ['oil'])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1826,10 +1387,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .cs('main_exports', ['oil'])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .cd():
@@ -1844,10 +1401,6 @@ pages:
             .select('name, id, main_exports')
             .cd('main_exports', ['cars', 'food', 'machine'])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1855,10 +1408,6 @@ pages:
             .from('countries')
             .update({ name: 'Mordor' })
             .cd('main_exports', ['orks', 'surveillance', 'evil'])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1868,10 +1417,6 @@ pages:
             .delete()
             .cd('main_exports', ['cars', 'food', 'machine'])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1879,10 +1424,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .cd('main_exports', ['cars', 'food', 'machine'])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .sl():
@@ -1897,10 +1438,6 @@ pages:
             .select('name, id, population_range_millions')
             .sl('population_range_millions', [150, 250])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1908,10 +1445,6 @@ pages:
             .from('countries')
             .update({ name: 'Mordor' })
             .sl('population_range_millions', [150, 250])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1921,10 +1454,6 @@ pages:
             .delete()
             .sl('population_range_millions', [150, 250])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1932,10 +1461,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .sl('population_range_millions', [150, 250])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .sr():
@@ -1950,10 +1475,6 @@ pages:
             .select('name, id, population_range_millions')
             .sr('population_range_millions', [150, 250])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -1961,10 +1482,6 @@ pages:
             .from('countries')
             .update({ name: 'Mordor' })
             .sr('population_range_millions', [150, 250])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -1974,10 +1491,6 @@ pages:
             .delete()
             .sr('population_range_millions', [150, 250])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -1985,10 +1498,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .sr('population_range_millions', [150, 250])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .nxl():
@@ -2003,10 +1512,6 @@ pages:
             .select('name, id, population_range_millions')
             .nxl('population_range_millions', [150, 250])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -2014,10 +1519,6 @@ pages:
             .from('countries')
             .update({ name: 'Mordor' })
             .nxl('population_range_millions', [150, 250])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -2027,10 +1528,6 @@ pages:
             .delete()
             .nxl('population_range_millions', [150, 250])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -2038,10 +1535,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .nxl('population_range_millions', [150, 250])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .nxr():
@@ -2056,10 +1549,6 @@ pages:
             .select('name, id, population_range_millions')
             .nxr('population_range_millions', [150, 250])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -2067,10 +1556,6 @@ pages:
             .from('countries')
             .update({ name: 'Mordor' })
             .nxr('population_range_millions', [150, 250])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -2080,10 +1565,6 @@ pages:
             .delete()
             .nxr('population_range_millions', [150, 250])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -2091,10 +1572,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .nxr('population_range_millions', [150, 250])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .adj():
@@ -2109,10 +1586,6 @@ pages:
             .select('name, id, population_range_millions')
             .adj('population_range_millions', [70, 185])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -2120,10 +1593,6 @@ pages:
             .from('countries')
             .update({ name: 'Mordor' })
             .adj('population_range_millions', [70, 185])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -2133,10 +1602,6 @@ pages:
             .delete()
             .adj('population_range_millions', [70, 185])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -2144,10 +1609,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .adj('population_range_millions', [70, 185])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .ov():
@@ -2162,10 +1623,6 @@ pages:
             .select('name, id, main_exports')
             .ova('main_exports', ['computers', 'minerals'])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `update()`
         js: |
           ```js
@@ -2173,10 +1630,6 @@ pages:
             .from('countries')
             .update({ name: 'Mordor' })
             .ova('main_exports', ['computers', 'minerals'])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
       - name: With `delete()`
         js: |
@@ -2186,10 +1639,6 @@ pages:
             .delete()
             .ova('main_exports', ['computers', 'minerals'])
           ```
-        py: |
-          ```py
-          # Not yet implemented
-          ```
       - name: With `rpc()`
         js: |
           ```js
@@ -2197,10 +1646,6 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .ova('main_exports', ['computers', 'minerals'])
-          ```
-        py: |
-          ```py
-          # Not yet implemented
           ```
 
   .fts():

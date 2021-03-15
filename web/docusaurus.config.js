@@ -40,7 +40,7 @@ module.exports = {
         },
       },
     },
-    sidebarCollapsible: false,
+    sidebarCollapsible: true,
     algolia: {
       apiKey: '766d56f13dd1e82f43253559b7c86636',
       indexName: 'supabase',

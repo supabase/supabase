@@ -1,6 +1,7 @@
 openref: 0.1
 
 info:
+  id: reference/gotrue-js
   title: GoTrue Client
   description: |
     GoTrue is an authentication server.

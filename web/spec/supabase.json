@@ -4104,7 +4104,7 @@
                     "isExported": true
                   },
                   "comment": {
-                    "shortText": "Subscribe to realtime changes in your database."
+                    "shortText": "Subscribe to realtime changes in your databse."
                   },
                   "parameters": [
                     {
