@@ -11,7 +11,7 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { Typography, Badge, Space, Button } from '@supabase/ui'
+import { Typography, Badge, Space, Select } from '@supabase/ui'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts()
@@ -31,20 +31,23 @@ export async function getStaticProps() {
 }
 
 function Blog(props: any) {
-  const [category, setCategory] = useState('')
+  const [category, setCategory] = useState('all')
   const [blogs, setBlogs] = useState(props.blogs)
 
   const { basePath } = useRouter()
 
   useEffect(() => {
     // Update the document title using the browser API
+    console.log('useeffect')
+    console.log(category)
+    console.log(props.blogs)
     setBlogs(
-      category
-        ? props.blogs.filter((post: any) => {
+      category === 'all'
+        ? props.blogs
+        : props.blogs.filter((post: any) => {
             const found = post.tags.includes(category)
             return found
           })
-        : blogs
     )
   }, [category])
 
@@ -81,23 +84,31 @@ function Blog(props: any) {
             </div>
           </div>
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-32">
-            <div className=" mx-auto max-w-7xl">
+            <div className="mx-auto max-w-7xl">
               <div className="grid grid-cols-12">
-                <div className="col-span-8">
+                <div className="col-span-12 lg:col-span-8">
                   <Typography.Title level={2}>More posts from the team</Typography.Title>
                 </div>
+                <div className="col-span-12 lg:col-span-4 mt-4 lg:mt-0">
+                  <Space className="lg:justify-end">
+                    <Typography.Text>Select a category</Typography.Text>
+                    <Select
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                        setCategory(e.target.value)
+                      }
+                    >
+                      <Select.Option key={'all'} value={'all'}>
+                        Show all
+                      </Select.Option>
+                      {props.categories.map((categoryId: string) => (
+                        <Select.Option key={categoryId} value={categoryId}>
+                          {categoryId}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Space>
+                </div>
               </div>
-              <Space className="mt-6">
-                {props.categories.map((categoryId: string) => (
-                  <Button
-                    type={category === categoryId ? 'primary' : 'outline'}
-                    key={categoryId}
-                    onClick={() => setCategory(categoryId)}
-                  >
-                    {categoryId}
-                  </Button>
-                ))}
-              </Space>
               <div className="mt-12 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none">
                 {/* <ul> */}
                 {blogs.map((blog: any, idx: any) => {
