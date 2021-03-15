@@ -119,6 +119,26 @@ function BlogPostPage(props: any) {
     )
   }
 
+  const toc = props.blog.toc && (
+    <Space direction="vertical" size={8} className="py-8 lg:py-0">
+      <div>
+        <Space>
+          {props.blog.tags.map((tag: string) => {
+            return <Badge key={`categroy-badge-${tag}`}>{tag}</Badge>
+          })}
+        </Space>
+      </div>
+      <div>
+        <Typography.Title level={5}>Table of contents</Typography.Title>
+        <Typography>
+          <div className={blogStyles['toc']}>
+            <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
+          </div>
+        </Typography>
+      </div>
+    </Space>
+  )
+
   return (
     <>
       <NextSeo
@@ -152,10 +172,10 @@ function BlogPostPage(props: any) {
       />
       <DefaultLayout>
         <div className="bg-white dark:bg-dark-800 overflow-hidden py-12">
-          <div className="container px-8 sm:px-16 xl:px-20 mt-16 mx-auto">
+          <div className="container px-8 sm:px-16 xl:px-20 lg:mt-16 mx-auto">
             <div className="max-w-6xl mx-auto">
-              <div className="py-12 grid grid-cols-12 gap-16">
-                <div className="col-span-10">
+              <div className="lg:py-12 grid grid-cols-12 lg:gap-16">
+                <div className="col-span-12 lg:col-span-10">
                   <Link href={`/blog`} as={`/blog`}>
                     <div>
                       <Typography.Text type="secondary">
@@ -174,7 +194,7 @@ function BlogPostPage(props: any) {
                   </Space>
                   <Typography.Title>{props.blog.title}</Typography.Title>
                   {author && (
-                    <div className="mt-6">
+                    <div className="mt-6 mb-8 lg:mb-0">
                       <Space size={4}>
                         {author.author_image_url && (
                           <img src={author.author_image_url} className="rounded-full w-10" />
@@ -195,8 +215,8 @@ function BlogPostPage(props: any) {
         </div>
         <div className="container px-8 sm:px-16 xl:px-20 py-16 mx-auto">
           <div className="max-w-6xl mx-auto">
-            <div className="py-4 grid grid-cols-12 gap-16">
-              <div className="col-span-8">
+            <div className="py-4 grid grid-cols-12 lg:gap-16">
+              <div className="col-span-12 lg:col-span-8">
                 {props.blog.thumb && (
                   <img
                     src={'/new/images/blog/' + props.blog.thumb}
@@ -204,27 +224,14 @@ function BlogPostPage(props: any) {
                     style={{ maxHeight: '520px', width: '100%' }}
                   />
                 )}
+                <div className="lg:hidden">{toc}</div>
                 <article className={blogStyles['article']}>
                   <Typography>{content}</Typography>
                 </article>
               </div>
-              <div className="col-span-4">
+              <div className="col-span-12 lg:col-span-4">
                 <Space direction="vertical" size={8}>
-                  <Space>
-                    {props.blog.tags.map((tag: string) => {
-                      return <Badge key={`categroy-badge-${tag}`}>{tag}</Badge>
-                    })}
-                  </Space>
-                  {props.blog.toc && (
-                    <div>
-                      <Typography.Title level={5}>Table of contents</Typography.Title>
-                      <Typography>
-                        <div className={blogStyles['toc']}>
-                          <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
-                        </div>
-                      </Typography>
-                    </div>
-                  )}
+                  <div className="hidden lg:block">{toc}</div>
                   <div>
                     <Typography.Title className="mb-4" level={5}>
                       Related articles
@@ -259,7 +266,7 @@ function BlogPostPage(props: any) {
                 </Space>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-8 py-8">
+            <div className="grid lg:grid-cols-2 gap-8 py-8">
               <div>{props.prevPost && <NextCard post={props.prevPost} label="Last post" />}</div>
               <div>
                 {props.nextPost && (
