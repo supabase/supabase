@@ -121,7 +121,6 @@ function Blog(props: any) {
 }
 
 function FeaturedThumb(blog: PostTypes) {
-  console.log(blog)
   // @ts-ignore
   const author = blog.author ? authors[blog.author] : authors['supabase']
 
@@ -182,8 +181,6 @@ function FeaturedThumb(blog: PostTypes) {
 function BlogListItem(blog: PostTypes) {
   // @ts-ignore
   const author = blog.author ? authors[blog.author] : authors['supabase']
-
-  // console.log(blog.content.substring(0, 120))
   return (
     <div key={blog.slug} className="pt-4 pb-12 border-b border-gray-100 dark:border-gray-600 mb-8">
       <div className="mx-auto max-w-7xl cursor-pointer">
