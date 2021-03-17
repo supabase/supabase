@@ -38,7 +38,6 @@ const toc = require('markdown-toc')
 
 export async function getStaticPaths() {
   const paths = getAllPostSlugs()
-  console.log(paths)
   return {
     paths,
     fallback: false,
@@ -46,8 +45,6 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: any) {
-  console.log('hello world')
-  console.log('params', params.slug)
   const postContent = await getPostdata(
     `${params.year}-${params.month}-${params.day}-${params.slug}`
   )
@@ -62,24 +59,15 @@ export async function getStaticProps({ params }: any) {
     },
   })
 
-  // console.log('tagsss', mdxSource.scope.tags)
-
   const relatedPosts = getSortedPosts(5, mdxSource.scope.tags)
 
   const allPosts = getSortedPosts()
-
-  // console.log(lastPost.indexOf())
 
   const currentIndex = allPosts
     .map(function (e) {
       return e.slug
     })
     .indexOf(params.slug)
-
-  console.log('currentIndex', currentIndex)
-  console.log('allPosts.length', allPosts.length)
-
-  console.log('nextPost', allPosts[currentIndex + 1])
 
   const nextPost = allPosts[currentIndex + 1]
   const prevPost = allPosts[currentIndex - 1]
