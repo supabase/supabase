@@ -6,7 +6,8 @@ author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
-image: /img/blog/supabase-postgres-cron.png
+image: supabase-postgres-cron.png
+thumb: supabase-postgres-cron.png
 tags:
   - postgres
 date: '03-05-2021'
@@ -50,7 +51,7 @@ create extension if not exists pg_cron;
 
 If you're using Supabase you can also enable it in the Dashboard.
 
-![This image shows that pg_cron is enabled in the Supabase Dashboard](/img/blog/supabase-extensions.png)
+![This image shows that pg_cron is enabled in the Supabase Dashboard](/new/images/blog/supabase-extensions.png)
 
 ### Postgres + webhooks
 
@@ -94,7 +95,7 @@ select
 
 Now when we see that the payload is sent every minute, exactly on the minute.
 
-![This image shows the website that receives our webhook every minute.](/img/blog/website-hook.jpeg)
+![This image shows the website that receives our webhook every minute.](/new/images/blog/website-hook.jpeg)
 
 And that's it! We've built a cron webhook. Breaking down the code example above we have 2 key parts:
 
