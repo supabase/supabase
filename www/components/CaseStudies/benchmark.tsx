@@ -10,10 +10,12 @@ const Benchmark = () => {
           <img
             className="mb-10 w-full lg:w-auto lg:mb-0 lg:h-44 lg:mr-14 hidden lg:block"
             src={`${basePath}/images/benchmark.svg`}
+            alt="Benchmark illustration"
           />
           <img
             className="mb-10 w-full lg:w-auto lg:mb-0 lg:h-44 lg:mr-14 lg:hidden"
             src={`${basePath}/images/benchmark--mobile.svg`}
+            alt="Benchmark illustration"
           />
           <div className="px-12 py-5 lg:px-0 lg:py-0">
             <Typography.Title level={4}>
@@ -30,7 +32,7 @@ const Benchmark = () => {
           </div>
         </div>
         <div className="pb-12 px-12 col-span-1 lg:pb-0 lg:px-0 lg:col-span-2 rounded-r-md">
-          <a href="https://mailchi.mp/supabase/enterprise-benchmarks">
+          <a href="https://supabasesubscribe.vercel.app/subscription/enterpriseBenchmarks">
             <Button>Get notified</Button>
           </a>
         </div>

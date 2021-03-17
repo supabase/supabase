@@ -40,7 +40,7 @@ module.exports = {
         },
       },
     },
-    sidebarCollapsible: false,
+    sidebarCollapsible: true,
     algolia: {
       apiKey: '766d56f13dd1e82f43253559b7c86636',
       indexName: 'supabase',
@@ -69,68 +69,68 @@ module.exports = {
         },
         {
           to: '/docs',
-          activeBasePath: '/docs/guides/',
-          label: 'Guides',
+          activeBaseRegex: '(^/docs$)|(/docs/faq)|(/docs/guides)',
+          label: 'Overview',
           position: 'left',
         },
         {
-          label: 'Libraries',
+          label: 'Reference',
           activeBasePath: '/docs/client/',
           to: '/docs/client/supabase-client',
           position: 'left',
         },
-        {
-          label: 'Blog',
-          to: '/blog',
-          position: 'right',
-        },
-        {
-          to: 'docs/',
-          activeBasePath: 'Tools',
-          label: 'Tools',
-          position: 'left',
-          items: [
-            {
-              label: 'GoTrue',
-              to: '/docs/gotrue/server/about',
-            },
-            {
-              label: 'GoTrue Client',
-              to: '/docs/gotrue/client/gotrue-client',
-            },
-            {
-              label: 'Postgres',
-              to: '/docs/postgres/server/about',
-            },
-            {
-              label: 'Postgres API',
-              to: '/docs/postgres/api/about',
-            },
-            {
-              label: 'PostgREST',
-              to: '/docs/postgrest/server/about',
-            },
-            {
-              label: 'PostgREST Client',
-              to: '/docs/postgrest/client/postgrest-client',
-            },
-            {
-              label: 'Realtime',
-              to: '/docs/realtime/server/about',
-            },
-            {
-              label: 'Realtime Client',
-              to: '/docs/realtime/client/realtime-client',
-            },
-          ],
-        },
         // {
-        //   to: '/showcase',
-        //   label: 'Showcase',
+        //   label: 'Blog',
+        //   to: '/blog',
         //   position: 'right',
         // },
-        // { to: '/docs/pricing', label: 'Pricing', position: 'right' },
-        { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
+        // {
+        //   to: 'docs/',
+        //   activeBasePath: 'Tools',
+        //   label: 'Tools',
+        //   position: 'left',
+        //   items: [
+        //     {
+        //       label: 'GoTrue',
+        //       to: '/docs/gotrue/server/about',
+        //     },
+        //     {
+        //       label: 'GoTrue Client',
+        //       to: '/docs/gotrue/client/gotrue-client',
+        //     },
+        //     {
+        //       label: 'Postgres',
+        //       to: '/docs/postgres/server/about',
+        //     },
+        //     {
+        //       label: 'Postgres API',
+        //       to: '/docs/postgres/api/about',
+        //     },
+        //     {
+        //       label: 'PostgREST',
+        //       to: '/docs/postgrest/server/about',
+        //     },
+        //     {
+        //       label: 'PostgREST Client',
+        //       to: '/docs/postgrest/client/postgrest-client',
+        //     },
+        //     {
+        //       label: 'Realtime',
+        //       to: '/docs/realtime/server/about',
+        //     },
+        //     {
+        //       label: 'Realtime Client',
+        //       to: '/docs/realtime/client/realtime-client',
+        //     },
+        //   ],
+        // },
+        {
+          to: '/docs/resources',
+          activeBaseRegex: 'docs/(resources|learn|gotrue|postgrest|realtime)',
+          label: 'Resources',
+          position: 'left',
+        },
+        { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
       ],
     },
     prism: {

@@ -45,7 +45,9 @@ const BuiltExamples = () => {
           <div className={'mt-8'}>
             <Typography.Text type="secondary">
               See all examples on our{' '}
-              <Typography.Link href="https://github.com/supabase">Github</Typography.Link>
+              <Typography.Link href="https://github.com/supabase/supabase/tree/master/examples">
+                Github
+              </Typography.Link>
             </Typography.Text>
           </div>
         </div>

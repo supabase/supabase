@@ -108,7 +108,7 @@ const Nav = (props: Props) => {
       onClick={() => props.toggleFlyOut()}
     >
       <button
-        className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+        className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-700"
         aria-expanded="false"
       >
         <span className="sr-only">Open main menu</span>
@@ -189,16 +189,7 @@ const Nav = (props: Props) => {
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
               <img
-                className="block lg:hidden h-6 w-auto"
-                src={
-                  darkMode
-                    ? `${basePath}/images/logo-dark.png`
-                    : `${basePath}/images/logo-light.png`
-                }
-                alt="Logo"
-              />
-              <img
-                className="hidden lg:block h-6 w-auto"
+                className="block h-6 w-auto"
                 src={
                   darkMode
                     ? `${basePath}/images/logo-dark.png`

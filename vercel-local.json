@@ -1,4 +1,15 @@
 {
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Strict-Transport-Security",
+          "value": ""
+        }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/new/:match*", "destination": "http://localhost:3000/new/:match*" },
     { "source": "/", "destination": "http://localhost:3000/new" },
