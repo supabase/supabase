@@ -38,6 +38,7 @@ const toc = require('markdown-toc')
 
 export async function getStaticPaths() {
   const paths = getAllPostSlugs()
+  console.log(paths)
   return {
     paths,
     fallback: false,
@@ -45,7 +46,11 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: any) {
-  const postContent = await getPostdata(params.slug)
+  console.log('hello world')
+  console.log('params', params.slug)
+  const postContent = await getPostdata(
+    `${params.year}-${params.month}-${params.day}-${params.slug}`
+  )
   const { data, content } = matter(postContent)
 
   const mdxSource: any = await renderToString(content, {
@@ -288,5 +293,9 @@ function BlogPostPage(props: any) {
     </>
   )
 }
+
+// function BlogPostPage() {
+//   return <h1>blog post</h1>
+// }
 
 export default BlogPostPage

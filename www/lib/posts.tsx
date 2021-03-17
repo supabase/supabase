@@ -61,9 +61,17 @@ export const getAllPostSlugs = () => {
   const fileNames = fs.readdirSync(postDirectory)
 
   return fileNames.map((filename) => {
+    // extract YYYY, MM, DD from post name
+    const year = filename.substring(0, 4)
+    const month = filename.substring(5, 7)
+    const day = filename.substring(8, 10)
+
     return {
       params: {
-        slug: filename.replace('.mdx', ''),
+        slug: filename.replace('.mdx', '').substring(11),
+        year,
+        month,
+        day,
       },
     }
   })
