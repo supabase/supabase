@@ -12,6 +12,7 @@ import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { Typography, Badge, Space, Select } from '@supabase/ui'
+import PostTypes from '~/types/post'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts()
@@ -119,13 +120,14 @@ function Blog(props: any) {
   )
 }
 
-function FeaturedThumb(blog: any) {
+function FeaturedThumb(blog: PostTypes) {
+  console.log(blog)
   // @ts-ignore
   const author = blog.author ? authors[blog.author] : authors['supabase']
 
   return (
     <div key={blog.slug} className="my-6 cursor-pointer">
-      <Link href={`/blog/${blog.slug}`} as={`/blog/${blog.slug}`}>
+      <Link href={`/blog/${blog.url}`} as={`/blog/${blog.url}`}>
         <div>
           <img
             className="h-96 w-full object-cover"
@@ -177,7 +179,7 @@ function FeaturedThumb(blog: any) {
   )
 }
 
-function BlogListItem(blog: any) {
+function BlogListItem(blog: PostTypes) {
   // @ts-ignore
   const author = blog.author ? authors[blog.author] : authors['supabase']
 
@@ -185,7 +187,7 @@ function BlogListItem(blog: any) {
   return (
     <div key={blog.slug} className="pt-4 pb-12 border-b border-gray-100 dark:border-gray-600 mb-8">
       <div className="mx-auto max-w-7xl cursor-pointer">
-        <Link href={`/blog/${blog.slug}`} as={`/blog/${blog.slug}`}>
+        <Link href={`/blog/${blog.url}`} as={`/blog/${blog.url}`}>
           <div>
             <Space direction="vertical" size={5} className="">
               <div>
