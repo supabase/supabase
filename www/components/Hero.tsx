@@ -54,17 +54,22 @@ const Hero = () => {
                         </Button>
                       </a>
                       <p className="mt-8 text-sm text-dark-400 tracking-wide sm:mt-10">backed by</p>
-                      <div className="mt-5 w-full sm:mx-auto sm:max-w-lg lg:ml-0">
-                        <div className="flex flex-wrap items-center lg:justify-start">
+                      <div className="mt-5 w-full sm:max-w-lg lg:ml-0">
+                        <div className="flex flex-wrap items-center justify-start">
                           <img
-                            className="h-8 sm:h-10 pr-10"
+                            className="h-8 sm:h-10 pr-10 mb-5"
                             src={`${basePath}/images/logos/yc--grey.png`}
                             alt="Y Combinator"
                           />
                           <img
-                            className="relative -top-1 h-5 sm:h-7 pr-10"
+                            className="relative h-5 sm:h-7 pr-10 mb-5"
                             src={`${basePath}/images/logos/mozilla--grey.png`}
                             alt="Mozilla"
+                          />
+                          <img
+                            className="relative h-5 sm:h-7 pr-10 mb-5"
+                            src={`${basePath}/images/logos/coatue.png`}
+                            alt="Coatue"
                           />
                         </div>
                       </div>
@@ -82,17 +87,18 @@ const Hero = () => {
                         style={{ padding: '56.25% 0 0 0' }}
                       >
                         <iframe
+                          title="Demo video showcasing Supabase"
                           className="absolute w-full h-full rounded-b-md"
-                          src="https://www.youtube.com/embed/dBOSUER_5T4?playlist=dBOSUER_5T4&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&muted=1"
+                          src="https://www.youtube-nocookie.com/embed/dBOSUER_5T4?playlist=dBOSUER_5T4&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&muted=1"
                           style={{ top: 0, left: 0 }}
                           frameBorder="0"
-                          allow="autoplay; modestbranding"
+                          allow="autoplay; modestbranding; encrypted-media"
                         />
                       </div>
-                      {/* 
+                      {/*
                       Replace src with the following if have preference:
                       Vimeo:   https://player.vimeo.com/video/485959063?loop=1&autoplay=1
-                      Youtube: https://www.youtube.com/embed/dBOSUER_5T4?playlist=dBOSUER_5T4&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&muted=1
+                      Youtube: https://www.youtube-nocookie.com/embed/dBOSUER_5T4?playlist=dBOSUER_5T4&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&muted=1
                      */}
                     </div>
                   </div>

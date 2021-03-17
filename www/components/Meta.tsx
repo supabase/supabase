@@ -24,7 +24,7 @@ const Meta = () => {
         href={`${basePath}/favicon/favicon-16x16.png`}
       />
       <link rel="manifest" href={`${basePath}/favicon/site.webmanifest`} />
-      <link rel="mask-icon" href={`${basePath}/favicon/safari-pinned-tab.svg`} color="#000000" />
+      {/* <link rel="mask-icon" href={`${basePath}/favicon/safari-pinned-tab.svg`} color="#333333" /> */}
       <link rel="shortcut icon" href={`${basePath}/favicon/favicon.ico`} />
       <meta name="msapplication-TileColor" content="#1E1E1E" />
       <meta name="msapplication-config" content={`${basePath}/favicon/browserconfig.xml`} />

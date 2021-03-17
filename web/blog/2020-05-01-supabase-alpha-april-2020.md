@@ -6,8 +6,8 @@ author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
 authorURL: https://github.com/kiwicopple
-tags: 
-    - supabase
+tags:
+  - release-notes
 ---
 
 Now in [Supabase](https://app.supabase.io):
@@ -19,7 +19,7 @@ Now in [Supabase](https://app.supabase.io):
 
 <!--truncate-->
 
-<iframe className="w-full" width="700" height="350" src="https://www.youtube.com/embed/ck5MM_PD4Co" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe className="w-full" width="700" height="350" src="https://www.youtube-nocookie.com/embed/ck5MM_PD4Co" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Important Notes
 
@@ -29,20 +29,19 @@ Now in [Supabase](https://app.supabase.io):
 
 3/ The database takes about 2 minutes to build. It's worth it, we promise. If you've ever wanted use Postgres, we're the easiest in the market.
 
-
 ## Coming soon
 
 At Supabase, we're building some amazing tools that make Postgres as easy to use as Firebase. Some of the things we're working on:
 
-#### Simple interface 
+#### Simple interface
+
 Why are database interfaces so hard to use? The Supabase team has built products for 70-year-olds, so we're confident we can make something easier for developers:
 ![Supabase table view](https://dev-to-uploads.s3.amazonaws.com/i/b4o39am95zcl5vl54j75.png)
 
-
 #### Connectors
+
 Send realtime database changes to other systems, like queues or webhooks (Slack notifications!):
 ![Supabase connectors](https://dev-to-uploads.s3.amazonaws.com/i/aom5r917s792cc081bbz.png)
-
 
 #### And more
 
@@ -55,4 +54,3 @@ Send realtime database changes to other systems, like queues or webhooks (Slack 
 Start using Supabase today: [app.supabase.io](https://app.supabase.io)
 
 Make sure to star us on github! [github.com/supabase/supabase](https://github.com/supabase/supabase)
-

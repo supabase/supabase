@@ -492,7 +492,9 @@ function Home() {
 
             <div className="row is-multiline">
               {repos
-                .filter((x) => ['supabase', 'realtime', 'postgres', 'pg-api'].includes(x.name))
+                .filter((x) =>
+                  ['supabase', 'realtime', 'postgres', 'postgres-meta'].includes(x.name)
+                )
                 .map((props, idx) => (
                   <div className={'col col--6'} key={idx}>
                     <GithubCard
