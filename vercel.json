@@ -17,6 +17,11 @@
   "rewrites": [
     { "source": "/new/:match*", "destination": "https://www-internal.supabase.io/new/:match*" },
     { "source": "/", "destination": "https://www-internal.supabase.io/new" },
+    { "source": "/blog", "destination": "https://www-internal.supabase.io/new/blog" },
+    {
+      "source": "/blog/:match*",
+      "destination": "https://www-internal.supabase.io/new/blog/:match*"
+    },
     { "source": "/beta", "destination": "https://www-internal.supabase.io/new/beta" },
     { "source": "/:match*", "destination": "https://docs-rose.vercel.app/:match*" }
   ],
