@@ -109,7 +109,7 @@ function BlogPostPage(props: any) {
   const NextCard = (props: any) => {
     const { post, label, className } = props
     return (
-      <Link href={post.slug} as={post.slug}>
+      <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
         <div className={className}>
           <Card className="cursor-pointer" hoverable>
             <Space direction="vertical">
@@ -251,7 +251,7 @@ function BlogPostPage(props: any) {
                     </Typography.Title>
                     <Space direction="vertical">
                       {props.relatedPosts.map((post: any) => (
-                        <Link href={`/blog/${post.slug}`} as={`/blog/${post.slug}`}>
+                        <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
                           <div>
                             <Typography.Text className="cursor-pointer">
                               <Space>

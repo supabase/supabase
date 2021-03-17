@@ -3,6 +3,10 @@ import path from 'path'
 import matter from 'gray-matter'
 import { generateReadingTime } from './helpers'
 
+// substring amount for file names
+// based on YYYY-MM-DD format
+const FILENAME_SUBSTRING = 11
+
 //Finding directory named "blog" from the current working directory of Node.
 const postDirectory = path.join(process.cwd(), '_blog')
 
@@ -24,11 +28,17 @@ export const getSortedPosts = (limit?: number, tags?: any) => {
     const formattedDate = new Date(data.date).toLocaleDateString('en-IN', options)
 
     const readingTime = generateReadingTime(content)
+    const dates = getDatesFromFileName(filename)
+
+    // construct url to link to blog posts
+    // based on datestamp in file name
+    const url = `${dates.year}/${dates.month}/${dates.day}/${slug.substring(FILENAME_SUBSTRING)}`
 
     const frontmatter = {
       ...data,
       date: formattedDate,
       readingTime,
+      url: url,
     }
     return {
       slug,
@@ -56,28 +66,21 @@ export const getSortedPosts = (limit?: number, tags?: any) => {
   return allPostsData
 }
 
-//Get Slugs
+// Get Slugs
 export const getAllPostSlugs = () => {
   const fileNames = fs.readdirSync(postDirectory)
 
   return fileNames.map((filename) => {
-    // extract YYYY, MM, DD from post name
-    const year = filename.substring(0, 4)
-    const month = filename.substring(5, 7)
-    const day = filename.substring(8, 10)
-
     return {
       params: {
-        slug: filename.replace('.mdx', '').substring(11),
-        year,
-        month,
-        day,
+        slug: filename.replace('.mdx', '').substring(FILENAME_SUBSTRING),
+        ...getDatesFromFileName(filename),
       },
     }
   })
 }
 
-//Get Post based on Slug
+// Get Post based on Slug
 export const getPostdata = async (slug: string) => {
   const fullPath = path.join(postDirectory, `${slug}.mdx`)
   const postContent = fs.readFileSync(fullPath, 'utf8')
@@ -97,4 +100,17 @@ export const getAllCategories = () => {
   })
 
   return categories
+}
+
+const getDatesFromFileName = (filename: string) => {
+  // extract YYYY, MM, DD from post name
+  const year = filename.substring(0, 4)
+  const month = filename.substring(5, 7)
+  const day = filename.substring(8, 10)
+
+  return {
+    year,
+    month,
+    day,
+  }
 }
