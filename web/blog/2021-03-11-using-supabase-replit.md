@@ -91,12 +91,12 @@ main()
 
 Once this is working, if you want to learn more about the [query interface](https://supabase.io/docs/client/filter) you might want to try some of these challenges:
 
-```jsx
-// 1. List all the countries in Antarctica
-// 2. Fetch the iso3 code of the country with ID 3
-// 3. List the countries with 'Island' in the name
-// 4. Count the number of countries that start with 'Z' or 'Q'
-// 5. Fetch all the Countries where continents is null
+```
+ 1. List all the countries in Antarctica
+ 2. Fetch the iso3 code of the country with ID 3
+ 3. List the countries with 'Island' in the name
+ 4. Count the number of countries that start with 'Z' or 'Q'
+ 5. Fetch all the Countries where continents is null
 ```
 
 There are full solutions provided in the video version of this blog, but some examples you may find useful are:
