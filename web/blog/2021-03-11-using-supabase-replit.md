@@ -13,7 +13,7 @@ tags:
   - Postgres
 ---
 
-[Replit.com](http://replit.com) is an awesome new browser based IDE where you can code alone or collaboratively with friends using their awesome multiplayer features! It's particularly useful for education, and sharing code examples with others.
+[Replit.com](http://replit.com) is an awesome new browser based IDE where you can code alone or collaboratively with friends using their amazing multiplayer features! It's particularly useful for education, and sharing code examples with others.
 
 They support a ton of different languages and execution environments and even recently introduced a simple key value store you can use to persist data.
 
