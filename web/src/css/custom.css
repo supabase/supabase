@@ -1268,6 +1268,10 @@ html[data-theme='dark'] .navbar-item-twitter:before {
 
 /* New CSS */
 
+code {
+  border: 1px solid var(--ifm-hr-border-color);
+}
+
 .tabs {
   margin: 0;
   font-size: 0.7rem;
