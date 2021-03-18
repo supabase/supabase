@@ -45,9 +45,8 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: any) {
-  const postContent = await getPostdata(
-    `${params.year}-${params.month}-${params.day}-${params.slug}`
-  )
+  const filePath = `${params.year}-${params.month}-${params.day}-${params.slug}`
+  const postContent = await getPostdata(filePath)
   const { data, content } = matter(postContent)
 
   const mdxSource: any = await renderToString(content, {
@@ -67,7 +66,7 @@ export async function getStaticProps({ params }: any) {
     .map(function (e) {
       return e.slug
     })
-    .indexOf(params.slug)
+    .indexOf(filePath)
 
   const nextPost = allPosts[currentIndex + 1]
   const prevPost = allPosts[currentIndex - 1]
