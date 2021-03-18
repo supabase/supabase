@@ -19,6 +19,7 @@
       "source": "/blog/:match*",
       "destination": "http://localhost:3000/new/blog/:match*"
     },
+    { "source": "/rss", "destination": "http://localhost:3000/new/rss.xml" },
     { "source": "/:name.:extension", "destination": "http://localhost:3005/:name.:extension" },
     {
       "source": "/:asset/:name.:extension",
