@@ -41,13 +41,13 @@ info:
 pages:
   Schemas:
     description: |
-      Schemas are like "folders". They are a to keep your database organized. 
+      Schemas are like "folders". They help to keep your database organized. 
 
-      This is particularly useful for security. You can set different permissions on each schema. 
+      Schemas are particularly useful for security. You can set different permissions on each schema. 
       For example, you might want to use a `public` schema for user-facing data, and an `auth` schema for all logins and secured data.
 
     notes: |
-      - Schemas contain tables, columns, triggers, functions, etc.
+      - Schemas contain [tables](/docs/reference/postgres/tables), columns, triggers, functions, etc.
       - Postgres comes with a `public` schema set up by default.
       - It is best practice to use lowercase and underscores when naming schemas. For example: `schema_name`, not `Schema Name`.
 
