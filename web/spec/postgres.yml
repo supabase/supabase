@@ -81,6 +81,7 @@ pages:
     notes: |
       - Tables contain columns, rows, triggers, comments, 
       - It is best practice to use lowercase and underscores when naming tables. For example: `table_name`, not `Table Name`.
+      - Tables belong to [schemas](/docs/reference/postgres/schemas). If you don't explicitly pass the schema, Postgres will assume that you want to create the table in the `public` schema.
 
     examples:
       - name: Create table
@@ -88,6 +89,13 @@ pages:
         sql: |
           ```sql
           create table table_name (
+            id integer primary key,
+            data jsonb,
+            name text
+          );
+
+          # with schema 
+          create table schema_name.table_name (
             id integer primary key,
             data jsonb,
             name text
@@ -102,6 +110,11 @@ pages:
             -- Constraints:
             primary key (column_1, column_2)
           );
+          ```
+      - name: Delete a table
+        sql: |
+          ```sql
+          delete table if exists table_name;
           ```
   Columns:
     description: |
