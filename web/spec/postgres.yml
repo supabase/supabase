@@ -21,57 +21,66 @@ info:
       - name: 'About'
         items:
           - index
-      - name: 'Database'
+      - name: 'Managing Tables'
         items:
-          # - Database Users
-          - Database Passwords
-      # - name: 'Schemas'
-      #   items:
-      #     - Creating schemas
-      - name: 'Tables'
-        items:
-          - Creating tables
+          - Schemas
+          - Tables
       # - name: 'Columns'
       #   items:
       #     - Creating columns
           # - Column types
+      - name: 'Replication'
+        items:
+          - Publications
+      - name: 'Database Configuration'
+        items:
+          # - Database Users
+          - Database Passwords
+          - Changing Timezones
 
 pages:
-  Database Users:
+  Schemas:
     description: |
-      Users and Roles are almost interchangable.
+      Schemas are like "folders". They are a to keep your database organized. 
+
+      This is particularly useful for security. You can set different permissions on each schema. 
+      For example, you might want to use a `public` schema for user-facing data, and an `auth` schema for all logins and secured data.
+
+    notes: |
+      - Schemas contain tables, columns, triggers, functions, etc.
+      - Postgres comes with a `public` schema set up by default.
+      - It is best practice to use lowercase and underscores when naming schemas. For example: `schema_name`, not `Schema Name`.
 
     examples:
-      - name: Create New User
+      - name: Creating a schema
+        isSpotlight: true
         sql: |
           ```sql
-          create user prisma 
-          with password 'hello';
+          create schema schema_name;
           ```
-  Database Passwords:
+      - name: Removing a schema
+        sql: |
+          ```sql
+          drop schema if exists schema_name;
+          ```
+      - name: Using special characters
+        description: |
+          Although it's not recommended, you can use uppercase and spaces when naming your schema by wrapping the name with double-quotes.
+          As a result, you will always need to use double-quotes when referencing your schema.
+        sql: |
+          ```sql
+          create schema "Schema Name";
+          ```
+  Tables:
     description: |
-      You can manage the passwords of your database users using any super user.
+      Tables are similar to excel spreadsheets. They contain columns & rows of data. There are a few key differences from a spreadsheet however:
+      
+      - Every column is a strict type of data. When you set up a column, you must define what "data type" it is.
+      - Tables can be joined together through relationships. For example you can have a "users" table, which is joined to a "teams" table.
 
-    examples:
-      - name: Password reset
-        sql: |
-          ```sql
-          alter user postgres 
-          with password 'new_password';
-          ```
-  Creating schemas:
-    description: |
-      Creating schemas.
-
-    examples:
-      - name: Create schema
-        sql: |
-          ```sql
-          create schema new_schema;
-          ```
-  Creating tables:
-    description: |
-      A relational database consists of multiple related tables. A table consists of rows and columns.
+    notes: |
+      - Tables contain columns, rows, triggers, comments, 
+      - It is best practice to use lowercase and underscores when naming tables. For example: `table_name`, not `Table Name`.
 
     examples:
       - name: Create table
@@ -94,7 +103,7 @@ pages:
             primary key (column_1, column_2)
           );
           ```
-  Creating columns:
+  Columns:
     description: |
       Creating columns.
 
@@ -126,4 +135,130 @@ pages:
   #         alter table new_table
   #         add new_column text;
   #         ```
+
+  Publications:
+    description: |
+      Publications are a way of grouping changes generated from a table or a group of tables. 
+      These changes can then be sent to other systems (usually another Postgres database).
+
+    examples:
+      - name: Create a Publication
+        description: |
+          This publication will contain all changes to all tables.
+        sql: |
+          ```sql
+          create publication publication_name 
+          for all tables;
+          ```
+      - name: Create a Publication which listens to individual tables
+        sql: |
+          ```sql
+          create publication publication_name 
+          for table table_one, table_two;
+          ```
+      - name: Add tables to an existing publication
+        sql: |
+          ```sql
+          alter publication publication_name 
+          add table table_name;
+          ```
+      - name: Listens to inserts only
+        sql: |
+          ```sql
+          create publication publication_name 
+          for all tables
+          with (publish = 'insert');
+          ```
+      - name: Listens to updates only
+        sql: |
+          ```sql
+          create publication publication_name 
+          for all tables
+          with (publish = 'update');
+          ```
+      - name: Listens to deletions only
+        sql: |
+          ```sql
+          create publication publication_name 
+          for all tables
+          with (publish = 'delete');
+          ```
+      - name: Remove a Publication
+        sql: |
+          ```sql
+          drop publication if exists publication_name;
+          ```
+      - name: Recreate a Publication
+        description: |
+          If you are planning to re-create a publication, it's best to do it in a transaction to ensure the operation succeeds.
+        sql: |
+          ```sql
+          begin; 
+            -- remove the realtime publication
+            drop publication if exists publication_name; 
+
+            -- re-create the publication but don't enable it for any tables
+            create publication publication_name;  
+          commit;
+          ```
+          
+  Database Users:
+    description: |
+      Users and Roles are almost interchangable.
+
+    examples:
+      - name: Create New User
+        sql: |
+          ```sql
+          create user new_user
+          with password 'hello';
+          ```
+  Database Passwords:
+    description: |
+      Manage the passwords of your database users using any super user.
+
+    examples:
+      - name: Password reset
+        sql: |
+          ```sql
+          alter user postgres 
+          with password 'new_password';
+          ```
+  Changing Timezones:
+    description: |
+      Data types.
+    notes: |
+      - View a full list of timezones on [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+
+    examples:
+      - name: Change timezone
+        isSpotlight: true
+        sql: |
+          ```sql
+          alter database postgres 
+          set timezone to 'America/New_York';
+          ```
+      - name: Full list of timezones
+        description: |
+          Get a full list of timezones supported by your database. This will return the following columns:
+
+          - `name`: Time zone name
+          - `abbrev`: Time zone abbreviation
+          - `utc_offset`: Offset from UTC (positive means east of Greenwich)
+          - `is_dst`: True if currently observing daylight savings
+
+        sql: |
+          ```sql
+          select name, abbrev, utc_offset, is_dst
+          from pg_timezone_names() 
+          order by name;
+          ```
+      - name: Search for a specific timezone
+        description: Use `ilike` (case insensitive search) to find specific timezones.
+        sql: |
+          ```sql
+          select * 
+          from pg_timezone_names() 
+          where name ilike '%york%';
+          ```
   

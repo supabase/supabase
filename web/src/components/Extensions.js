@@ -22,7 +22,9 @@ export default function Extensions() {
                 <h3>
                   <code style={styles.title}>{extension.name}</code>
                 </h3>
-                <p style={styles.description}>{extension.comment}</p>
+                <p style={styles.description}>
+                  {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
+                </p>
               </div>
             </div>
           ))}
@@ -59,7 +61,6 @@ const styles = {
     border: '1px solid var(--ifm-panel-border-color)',
   },
   description: {
-    textTransform: 'capitalize',
     fontSize: '0.8rem',
     margin: 0,
   },
