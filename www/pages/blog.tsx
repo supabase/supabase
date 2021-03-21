@@ -127,7 +127,7 @@ function FeaturedThumb(blog: PostTypes) {
   return (
     <div key={blog.slug} className="my-6 cursor-pointer">
       <Link href={`/blog/${blog.url}`} as={`/blog/${blog.url}`}>
-        <div>
+        <a className="inline-block">
           <img
             className="h-96 w-full object-cover"
             src={`/new/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
@@ -172,7 +172,7 @@ function FeaturedThumb(blog: PostTypes) {
               </div>
             )}
           </Space>
-        </div>
+        </a>
       </Link>
     </div>
   )
@@ -185,7 +185,7 @@ function BlogListItem(blog: PostTypes) {
     <div key={blog.slug} className="pt-4 pb-12 border-b border-gray-100 dark:border-gray-600 mb-8">
       <div className="mx-auto max-w-7xl cursor-pointer">
         <Link href={`/blog/${blog.url}`} as={`/blog/${blog.url}`}>
-          <div>
+          <a className="inline-block">
             <Space direction="vertical" size={5} className="">
               <div>
                 <Space className="mb-2">
@@ -230,7 +230,7 @@ function BlogListItem(blog: PostTypes) {
               </Typography>
               <Typography.Link>Read more</Typography.Link> */}
             </Space>
-          </div>
+          </a>
         </Link>
       </div>
     </div>

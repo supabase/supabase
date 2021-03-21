@@ -65,6 +65,14 @@
 </item>
 
 <item>
+  <guid>https://supabase.io/blog/2021-01-02-supabase-beta-december-2020</guid>
+  <title>Supabase Beta December 2020</title>
+  <link>https://supabase.io/blog/2021-01-02-supabase-beta-december-2020</link>
+  <description>Ten months of building.</description>
+  <pubDate>Fri, 01 Jan 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
   <guid>https://supabase.io/blog/2020-12-13-supabase-dashboard-performance</guid>
   <title>Making the Supabase Dashboard Supa-fast</title>
   <link>https://supabase.io/blog/2020-12-13-supabase-dashboard-performance</link>
@@ -238,14 +246,6 @@
   <link>https://supabase.io/blog/2020-05-01-supabase-alpha-april-2020</link>
   <description>Two months of building</description>
   <pubDate>Sun, 31 May 2020 16:00:00 GMT</pubDate>
-</item>
-
-<item>
-  <guid>https://supabase.io/blog/2021-01-02-supabase-beta-december-2020</guid>
-  <title>Supabase Beta December 2020</title>
-  <link>https://supabase.io/blog/2021-01-02-supabase-beta-december-2020</link>
-  <description>Ten months of building.</description>
-  <pubDate>Wed, 01 Jan 2020 16:00:00 GMT</pubDate>
 </item>
 
     </channel>
