@@ -33,7 +33,7 @@ const Auth = () => {
     };
 
     const forgotPassword = async (e) => {
-        // Read more on https://supabase.io/docs/client/reset-password-email#notes
+        // Read more on https://supabase.io/docs/reference/javascript/reset-password-email#notes
         e.preventDefault();
         const email = prompt("Please enter your email:");
 
