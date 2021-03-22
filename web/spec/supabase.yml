@@ -1359,7 +1359,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .select('name, id, main_exports')
-            .cs('main_exports', ['oil'])
+            .contains('main_exports', ['oil'])
           ```
       - name: With `update()`
         js: |
@@ -1367,7 +1367,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .update({ name: 'Mordor' })
-            .cs('main_exports', ['oil'])
+            .contains('main_exports', ['oil'])
           ```
       - name: With `delete()`
         js: |
@@ -1375,7 +1375,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
-            .cs('main_exports', ['oil'])
+            .contains('main_exports', ['oil'])
           ```
       - name: With `rpc()`
         js: |
@@ -1383,7 +1383,7 @@ pages:
           // Only valid if the Stored Procedure returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
-            .cs('main_exports', ['oil'])
+            .contains('main_exports', ['oil'])
           ```
 
   .containedBy():
@@ -1396,7 +1396,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .select('name, id, main_exports')
-            .cd('main_exports', ['cars', 'food', 'machine'])
+            .containedBy('main_exports', ['cars', 'food', 'machine'])
           ```
       - name: With `update()`
         js: |
@@ -1404,7 +1404,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .update({ name: 'Mordor' })
-            .cd('main_exports', ['orks', 'surveillance', 'evil'])
+            .containedBy('main_exports', ['orks', 'surveillance', 'evil'])
           ```
       - name: With `delete()`
         js: |
@@ -1412,7 +1412,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
-            .cd('main_exports', ['cars', 'food', 'machine'])
+            .containedBy('main_exports', ['cars', 'food', 'machine'])
           ```
       - name: With `rpc()`
         js: |
@@ -1420,7 +1420,7 @@ pages:
           // Only valid if the Stored Procedure returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
-            .cd('main_exports', ['cars', 'food', 'machine'])
+            .containedBy('main_exports', ['cars', 'food', 'machine'])
           ```
 
   .rangeLt():
@@ -1433,7 +1433,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .sl('population_range_millions', [150, 250])
+            .rangeLt('population_range_millions', [150, 250])
           ```
       - name: With `update()`
         js: |
@@ -1441,7 +1441,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .update({ name: 'Mordor' })
-            .sl('population_range_millions', [150, 250])
+            .rangeLt('population_range_millions', [150, 250])
           ```
       - name: With `delete()`
         js: |
@@ -1449,7 +1449,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
-            .sl('population_range_millions', [150, 250])
+            .rangeLt('population_range_millions', [150, 250])
           ```
       - name: With `rpc()`
         js: |
@@ -1457,7 +1457,7 @@ pages:
           // Only valid if the Stored Procedure returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
-            .sl('population_range_millions', [150, 250])
+            .rangeLt('population_range_millions', [150, 250])
           ```
 
   .rangeGt():
@@ -1470,7 +1470,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .sr('population_range_millions', [150, 250])
+            .rangeGt('population_range_millions', [150, 250])
           ```
       - name: With `update()`
         js: |
@@ -1478,7 +1478,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .update({ name: 'Mordor' })
-            .sr('population_range_millions', [150, 250])
+            .rangeGt('population_range_millions', [150, 250])
           ```
       - name: With `delete()`
         js: |
@@ -1486,7 +1486,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
-            .sr('population_range_millions', [150, 250])
+            .rangeGt('population_range_millions', [150, 250])
           ```
       - name: With `rpc()`
         js: |
@@ -1494,7 +1494,7 @@ pages:
           // Only valid if the Stored Procedure returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
-            .sr('population_range_millions', [150, 250])
+            .rangeGt('population_range_millions', [150, 250])
           ```
 
   .rangeGte():
@@ -1507,7 +1507,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .nxl('population_range_millions', [150, 250])
+            .rangeGte('population_range_millions', [150, 250])
           ```
       - name: With `update()`
         js: |
@@ -1515,7 +1515,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .update({ name: 'Mordor' })
-            .nxl('population_range_millions', [150, 250])
+            .rangeGte('population_range_millions', [150, 250])
           ```
       - name: With `delete()`
         js: |
@@ -1523,7 +1523,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
-            .nxl('population_range_millions', [150, 250])
+            .rangeGte('population_range_millions', [150, 250])
           ```
       - name: With `rpc()`
         js: |
@@ -1531,7 +1531,7 @@ pages:
           // Only valid if the Stored Procedure returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
-            .nxl('population_range_millions', [150, 250])
+            .rangeGte('population_range_millions', [150, 250])
           ```
 
   .rangeLte():
@@ -1544,7 +1544,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .nxr('population_range_millions', [150, 250])
+            .rangeLte('population_range_millions', [150, 250])
           ```
       - name: With `update()`
         js: |
@@ -1552,7 +1552,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .update({ name: 'Mordor' })
-            .nxr('population_range_millions', [150, 250])
+            .rangeLte('population_range_millions', [150, 250])
           ```
       - name: With `delete()`
         js: |
@@ -1560,7 +1560,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
-            .nxr('population_range_millions', [150, 250])
+            .rangeLte('population_range_millions', [150, 250])
           ```
       - name: With `rpc()`
         js: |
@@ -1568,7 +1568,7 @@ pages:
           // Only valid if the Stored Procedure returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
-            .nxr('population_range_millions', [150, 250])
+            .rangeLte('population_range_millions', [150, 250])
           ```
 
   .rangeAdjacent():
@@ -1581,7 +1581,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .adj('population_range_millions', [70, 185])
+            .rangeAdjacent('population_range_millions', [70, 185])
           ```
       - name: With `update()`
         js: |
@@ -1589,7 +1589,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .update({ name: 'Mordor' })
-            .adj('population_range_millions', [70, 185])
+            .rangeAdjacent('population_range_millions', [70, 185])
           ```
       - name: With `delete()`
         js: |
@@ -1597,7 +1597,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
-            .adj('population_range_millions', [70, 185])
+            .rangeAdjacent('population_range_millions', [70, 185])
           ```
       - name: With `rpc()`
         js: |
@@ -1605,7 +1605,7 @@ pages:
           // Only valid if the Stored Procedure returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
-            .adj('population_range_millions', [70, 185])
+            .rangeAdjacent('population_range_millions', [70, 185])
           ```
 
   .overlaps():
@@ -1618,7 +1618,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .select('name, id, main_exports')
-            .ova('main_exports', ['computers', 'minerals'])
+            .overlaps('main_exports', ['computers', 'minerals'])
           ```
       - name: With `update()`
         js: |
@@ -1626,7 +1626,7 @@ pages:
           let countries = await supabase
             .from('countries')
             .update({ name: 'Mordor' })
-            .ova('main_exports', ['computers', 'minerals'])
+            .overlaps('main_exports', ['computers', 'minerals'])
           ```
       - name: With `delete()`
         js: |
@@ -1634,7 +1634,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
-            .ova('main_exports', ['computers', 'minerals'])
+            .overlaps('main_exports', ['computers', 'minerals'])
           ```
       - name: With `rpc()`
         js: |
@@ -1642,7 +1642,7 @@ pages:
           // Only valid if the Stored Procedure returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
-            .ova('main_exports', ['computers', 'minerals'])
+            .overlaps('main_exports', ['computers', 'minerals'])
           ```
 
   .textSearch():
