@@ -232,7 +232,7 @@ pages:
           ```
       - name: Sign up with third-party providers.
         description: |
-          You can sign up with OAuth providers using the [`signIn()`](/docs/client/auth-signin#sign-in-using-third-party-providers) method.
+          You can sign up with OAuth providers using the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers) method.
         js: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
@@ -241,7 +241,7 @@ pages:
           ```
       - name: Sign up with scopes.
         description: |
-          You can provide additional scopes to OAuth providers using the [`signIn()`](/docs/client/auth-signin#sign-in-with-scopes) method.
+          You can provide additional scopes to OAuth providers using the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-with-scopes) method.
         js: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
@@ -399,8 +399,8 @@ pages:
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.select'
     notes: |
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
-      - `select()` can be combined with [Modifiers](/docs/client/using-modifiers)
-      - `select()` can be combined with [Filters](/docs/client/using-filters)
+      - `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
+      - `select()` can be combined with [Filters](/docs/reference/javascript/using-filters)
     examples:
       - name: Getting your data
         isSpotlight: true
@@ -529,7 +529,7 @@ pages:
     title: 'Modify data: update()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.update'
     notes: |
-      - `update()` should always be combined with [Filters](/docs/client/using-filters) to target the item(s) you wish to update.
+      - `update()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to update.
     examples:
       - name: Updating your data
         isSpotlight: true
@@ -600,7 +600,7 @@ pages:
     title: 'Delete data: delete()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.delete'
     notes: |
-      - `delete()` should always be combined with [Filters](/docs/client/using-filters) to target the item(s) you wish to delete.
+      - `delete()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
     examples:
       - name: Delete records
         isSpotlight: true
@@ -650,8 +650,8 @@ pages:
       - name: With filters.
         description: |
           Stored procedures that return tables can also be combined with 
-          [Modifiers](/docs/client/using-modifiers) and 
-          [Filters](/docs/client/using-filters).
+          [Modifiers](/docs/reference/javascript/using-modifiers) and 
+          [Filters](/docs/reference/javascript/using-filters).
         js: |
           ```js
           const { data, error } = await supabase
