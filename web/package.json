@@ -11,7 +11,7 @@
     "gen:gotrue": "ts-node ReferenceGenerator.ts -o docs/gotrue/client spec/gotrue.yml",
     "gen:postgrest": "ts-node ReferenceGenerator.ts -o docs/postgrest/client spec/postgrest.yml",
     "gen:realtime": "ts-node ReferenceGenerator.ts -o docs/realtime/client spec/realtime.yml",
-    "gen:supabase": "ts-node ReferenceGenerator.ts -o docs/reference/supabase spec/supabase.yml",
+    "gen:supabase": "ts-node ReferenceGenerator.ts -o docs/reference/javascript spec/supabase.yml",
     "gen:cli": "ts-node ReferenceGenerator.ts -o docs/reference/cli spec/cli.yml",
     "gen:postgres": "ts-node ReferenceGenerator.ts -o docs/reference/postgres spec/postgres.yml"
   },

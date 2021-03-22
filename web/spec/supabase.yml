@@ -21,7 +21,7 @@ info:
       id: 'js'
       version: '0.0.1'
   docs:
-    path: client/
+    path: reference/javascript/
     sidebar:
       - name: 'About'
         items:
@@ -75,18 +75,15 @@ info:
           - .ilike()
           - .is()
           - .in()
-          - .cs()
-          - .cd()
-          - .sl()
-          - .sr()
-          - .nxl()
-          - .nxr()
-          - .adj()
-          - .ov()
-          - .fts()
-          - .plfts()
-          - .phfts()
-          - .wfts()
+          - .contains()
+          - .containedBy()
+          - .rangeLt()
+          - .rangeGt()
+          - .rangeGte()
+          - .rangeLte()
+          - .rangeAdjacent()
+          - .overlaps()
+          - .textSearch()
 
 pages:
   Installing:
@@ -1352,7 +1349,7 @@ pages:
             .in('name', ['Rio de Janeiro', 'San Francisco'])
           ```
 
-  .cs():
+  .contains():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cs'
     examples:
       - name: With `select()`
@@ -1389,7 +1386,7 @@ pages:
             .cs('main_exports', ['oil'])
           ```
 
-  .cd():
+  .containedBy():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cd'
     examples:
       - name: With `select()`
@@ -1426,7 +1423,7 @@ pages:
             .cd('main_exports', ['cars', 'food', 'machine'])
           ```
 
-  .sl():
+  .rangeLt():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.sl'
     examples:
       - name: With `select()`
@@ -1463,7 +1460,7 @@ pages:
             .sl('population_range_millions', [150, 250])
           ```
 
-  .sr():
+  .rangeGt():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.sr'
     examples:
       - name: With `select()`
@@ -1500,7 +1497,7 @@ pages:
             .sr('population_range_millions', [150, 250])
           ```
 
-  .nxl():
+  .rangeGte():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxl'
     examples:
       - name: With `select()`
@@ -1537,7 +1534,7 @@ pages:
             .nxl('population_range_millions', [150, 250])
           ```
 
-  .nxr():
+  .rangeLte():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxr'
     examples:
       - name: With `select()`
@@ -1574,7 +1571,7 @@ pages:
             .nxr('population_range_millions', [150, 250])
           ```
 
-  .adj():
+  .rangeAdjacent():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.adj'
     examples:
       - name: With `select()`
@@ -1611,7 +1608,7 @@ pages:
             .adj('population_range_millions', [70, 185])
           ```
 
-  .ov():
+  .overlaps():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.ov'
     examples:
       - name: With `select()`
@@ -1648,14 +1645,5 @@ pages:
             .ova('main_exports', ['computers', 'minerals'])
           ```
 
-  .fts():
+  .textSearch():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.fts'
-
-  .plfts():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.plfts'
-
-  .phfts():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.phfts'
-
-  .wfts():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.wfts'
