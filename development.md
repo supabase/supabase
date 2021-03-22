@@ -6,7 +6,7 @@ The beta website has a `basePath` of `new` and using `vercel.json`. This is to d
 
 To run this locally, run the following commands. This will start the website at http://localhost:8080/ and requests will be automatically proxied (via vercel rewrites) to the docs website (running at http://localhost:3005/) and the beta website (running at http://localhost:3000)
 
-On Windows, you will need to install [Make for Windows](http://gnuwin32.sourceforge.net/packages/make.htm) and then to add `C:\Program Files (x86)\GnuWin32\bin` to the system PATH **OR** just run the dev command in `Makefile` directly in the terminal: `vercel dev --listen 8080 --local-config vercel-local.json`.
+On Windows, you will need to install [Make for Windows](http://gnuwin32.sourceforge.net/packages/make.htm) and then to add `C:\Program Files (x86)\GnuWin32\bin` to the system PATH **OR** just run the dev command in the `Makefile` directly in the terminal: `vercel dev --listen 8080 --local-config vercel-local.json`.
 
 For every OS, the Vercel CLI must me installed: `npm i -g vercel@latest` or `yarn global add vercel@latest`.
 
@@ -24,7 +24,6 @@ npm run start
 ```
 
 In production, this setup runs as three separate vercel websites (`docs`, `www` and `main`)
-
 ## Known issues
 
 - Some hardcoding of `/new` in `www`. Should be fine as long as the basePath doesn't change.
