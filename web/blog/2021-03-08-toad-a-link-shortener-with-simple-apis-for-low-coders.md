@@ -1,5 +1,5 @@
 ---
-title: Toad, a link shorterner with simple APIs for low-coders 
+title: Toad, a link shortener with simple APIs for low-coders 
 description: An easy-to-use link shortening tool with simple APIs
 author: Rory Wilding
 author_title: Supabase
