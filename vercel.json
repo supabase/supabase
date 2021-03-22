@@ -23,6 +23,7 @@
       "destination": "https://www-internal.supabase.io/new/blog/:match*"
     },
     { "source": "/rss", "destination": "https://www-internal.supabase.io/new/rss.xml" },
+    { "source": "/rss.xml", "destination": "https://www-internal.supabase.io/new/rss.xml" },
     { "source": "/beta", "destination": "https://www-internal.supabase.io/new/beta" },
     { "source": "/:match*", "destination": "https://docs-rose.vercel.app/:match*" }
   ],
