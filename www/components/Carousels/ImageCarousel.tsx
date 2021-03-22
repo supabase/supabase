@@ -17,7 +17,19 @@ import TweetCard from '../TweetCard'
 
 SwiperCore.use([EffectFade])
 
-function ImageCarousel() {
+interface Content {
+  title: string
+  label?: string
+  img_url: string
+  text: string
+}
+
+interface ImageCaoursel {
+  content: Content
+  footer?: React.ReactNode
+}
+
+function ImageCarousel(props: ImageCaoursel) {
   // base path for images
   const { basePath } = useRouter()
 
@@ -63,24 +75,13 @@ function ImageCarousel() {
             // @ts-ignore
             onChange={(id: string) => handleImageSwiperNav(Number(id))}
           >
-            <Tabs.Panel label="Fast column navigation" id="0">
-              <span></span>
-            </Tabs.Panel>
-            <Tabs.Panel label="Fast column navigation" id="1">
-              <span></span>
-            </Tabs.Panel>
-            <Tabs.Panel label="Fast column navigation" id="2">
-              <span></span>
-            </Tabs.Panel>
-            <Tabs.Panel label="Fast column navigation" id="3">
-              <span></span>
-            </Tabs.Panel>
-            <Tabs.Panel label="Fast column navigation" id="4">
-              <span></span>
-            </Tabs.Panel>
-            <Tabs.Panel label="Fast column navigation" id="5">
-              <span></span>
-            </Tabs.Panel>
+            {props.content.map((content, i) => {
+              return (
+                <Tabs.Panel label={content.label ? content.label : content.title} id={i.toString()}>
+                  <span></span>
+                </Tabs.Panel>
+              )
+            })}
           </Tabs>
           <div
             className={`border border-gray-100 dark:border-gray-600 rounded-md bg-gray-800 overflow-hidden ${ImageCarouselStyles['gradient-bg']}`}
@@ -89,31 +90,20 @@ function ImageCarousel() {
               // @ts-ignore
               onSwiper={setImageSwiper}
               style={{ zIndex: 0 }}
-              initialSlide={2}
+              initialSlide={0}
               spaceBetween={0}
               slidesPerView={1}
-              speed={800}
+              speed={400}
               autoHeight={true}
               allowTouchMove={false}
             >
-              <SwiperSlide>
-                <img src={`${basePath}/images/product/database/table-view/test.png`} />
-              </SwiperSlide>
-              <SwiperSlide>
-                <img src={`${basePath}/images/product/database/table-view/test.png`} />
-              </SwiperSlide>
-              <SwiperSlide>
-                <img src={`${basePath}/images/product/database/table-view/test.png`} />
-              </SwiperSlide>
-              <SwiperSlide>
-                <img src={`${basePath}/images/product/database/table-view/test.png`} />
-              </SwiperSlide>
-              <SwiperSlide>
-                <img src={`${basePath}/images/product/database/table-view/test.png`} />
-              </SwiperSlide>
-              <SwiperSlide>
-                <img src={`${basePath}/images/product/database/table-view/test.png`} />
-              </SwiperSlide>
+              {props.content.map((content, i) => {
+                return (
+                  <SwiperSlide key={i}>
+                    <img src={`${basePath}${content.img_url}`} />
+                  </SwiperSlide>
+                )
+              })}
             </Swiper>
           </div>
         </div>
@@ -123,87 +113,29 @@ function ImageCarousel() {
           // @ts-ignore
           onSwiper={setSwiperDetails}
           // style={{ zIndex: 0 }}
-          // initialSlide={2}
+          initialSlide={0}
           // spaceBetween={0}
           // slidesPerView={1}
           // direction="horizontal"
           // style={{ overflow: 'hidden' }}
-          speed={800}
+          speed={400}
           allowTouchMove={false}
           autoHeight={true}
         >
-          <SwiperSlide>
-            <div className="bg-white dark:bg-gray-800">
-              <Typography.Title level={4}>Create a table</Typography.Title>
-              <Typography.Text>
-                <p className="text-base">Write, save, and execute SQL queries directly on our</p>
-                <Button className="mb-8">See documentation</Button>
-              </Typography.Text>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="bg-white dark:bg-gray-800">
-              <Typography.Title level={4}>Create a row</Typography.Title>
-              <Typography.Text>
-                <p className="text-base">
-                  Write, save, and execute SQL queries directly on our dashboard, with templates to
-                  help you save time from common queries and even build applications.
-                </p>
-                <Button className="mb-8">See documentation</Button>
-              </Typography.Text>
-              dddddd adsdsdasdas asdasd
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="bg-white dark:bg-gray-800">
-              <Typography.Title level={4}>Create a adsdsdasdas</Typography.Title>
-              <Typography.Text>
-                <p className="text-base">
-                  Write, save, and execute SQL queries directly on our dashboard, with templates to
-                  help you save time from common queries and even build applications.
-                </p>
-                <Button className="mb-8">See documentation</Button>
-              </Typography.Text>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="bg-white dark:bg-gray-800">
-              <Typography.Title level={4}>Create a table</Typography.Title>
-              <Typography.Text>
-                <p className="text-base">
-                  Write, save, and execute SQL queries directly on our dashboard, with templates to
-                  help you save time from common queries and even build applications.
-                </p>
-                <Button className="mb-8">See documentation</Button>
-              </Typography.Text>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="bg-white dark:bg-gray-800">
-              <Typography.Title level={4}>Create a table</Typography.Title>
-              <Typography.Text>
-                <p className="text-base">
-                  Write, save, and execute SQL queries directly on our dashboard, with templates to
-                  help you save time from common queries and even build applications.
-                </p>
-                <Button className="mb-8">See documentation</Button>
-              </Typography.Text>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="bg-white dark:bg-gray-800">
-              <Typography.Title level={4}>Create a table</Typography.Title>
-              <Typography.Text>
-                <p className="text-base">
-                  Write, save, and execute SQL queries directly on our dashboard, with templates to
-                  help you save time from common queries and even build applications.
-                </p>
-                <Button className="mb-8">See documentation</Button>
-              </Typography.Text>
-              sdasd
-            </div>
-          </SwiperSlide>
-          <TweetCard />
+          {props.content.map((content, i) => {
+            return (
+              <SwiperSlide key={i}>
+                <div className="bg-white dark:bg-gray-800">
+                  <Typography.Title level={4}>{content.title}</Typography.Title>
+                  <Typography.Text>
+                    <p className="text-base">{content.text}</p>
+                    <Button className="mb-8">See documentation</Button>
+                  </Typography.Text>
+                </div>
+              </SwiperSlide>
+            )
+          })}
+          {props.footer && <div className="my-8">{props.footer}</div>}
         </Swiper>
       </div>
     </div>

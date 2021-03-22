@@ -1,11 +1,22 @@
 import { useState } from 'react'
 // Import Swiper React components
-import { Button, IconBriefcase, IconEye, Tabs, Typography } from '@supabase/ui'
+import { Button, Tabs, Typography } from '@supabase/ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import CodeBlock from '../CodeBlock/CodeBlock'
-import FeatureColumn from '../FeatureColumn'
 
-function APISection() {
+interface APIExample {
+  lang: 'js' | 'py' | 'sql'
+  code: string
+  title: string
+}
+
+interface Props {
+  content?: APIExample
+  title: string
+  footer?: React.ReactNode
+}
+
+function APISection(props: Props) {
   // store API swiper instance
   const [apiSwiper, setApiSwiper] = useState(undefined)
   const [apiSwiperActiveIndex, setApiSwiperActiveIndex] = useState(0)
@@ -18,11 +29,8 @@ function APISection() {
 
   return (
     <div className="grid grid-cols-12 lg:gap-16">
-      <div className="col-span-12 lg:col-span-5">
-        <Typography.Title level={2}>
-          Sleek dashboard
-          <br /> for managing your media
-        </Typography.Title>
+      <div className="col-span-12 lg:col-span-5 pb-8">
+        <Typography.Title level={2}>{props.title}</Typography.Title>
         <p className="text-lg">
           An API built from the groud up for server and client side authentication that is fast to
           implement.
@@ -34,22 +42,7 @@ function APISection() {
         <Button size="small" className="mt-4">
           Expore documentation
         </Button>
-        <div className="grid grid-cols-12 gap-16 mt-8">
-          <div className="col-span-4">
-            <FeatureColumn
-              icon={<IconBriefcase />}
-              title="Enterprise logins"
-              text="Type definitions for both server side and client side"
-            />
-          </div>
-          <div className="col-span-4">
-            <FeatureColumn
-              icon={<IconEye />}
-              title="Social login scopes"
-              text="Request additonal user data permissions when using social logins"
-            />
-          </div>
-        </div>
+        {props.footer && <div className="py-8">{props.footer}</div>}
       </div>
       <div className="col-span-12 lg:col-span-6 lg:col-start-7">
         <Tabs
@@ -59,24 +52,12 @@ function APISection() {
           // @ts-ignore
           onChange={(id: string) => handleApiSwiperNavChange(Number(id))}
         >
-          <Tabs.Panel label="Fast column navigation" id="0">
-            <span></span>
-          </Tabs.Panel>
-          <Tabs.Panel label="Fast column navigation" id="1">
-            <span></span>
-          </Tabs.Panel>
-          <Tabs.Panel label="Fast column navigation" id="2">
-            <span></span>
-          </Tabs.Panel>
-          <Tabs.Panel label="Fast column navigation" id="3">
-            <span></span>
-          </Tabs.Panel>
-          <Tabs.Panel label="Fast column navigation" id="4">
-            <span></span>
-          </Tabs.Panel>
-          <Tabs.Panel label="Fast column navigation" id="5">
-            <span></span>
-          </Tabs.Panel>
+          {props.content &&
+            props.content.map((content, i) => (
+              <Tabs.Panel label={content.title} id={i.toString()}>
+                <span></span>
+              </Tabs.Panel>
+            ))}
         </Tabs>
         <div className="border border-gray-100 dark:border-gray-600 rounded-md bg-gray-800 overflow-hidden">
           <Swiper
@@ -86,171 +67,17 @@ function APISection() {
             initialSlide={apiSwiperActiveIndex}
             spaceBetween={0}
             slidesPerView={1}
-            speed={800}
+            speed={400}
             allowTouchMove={false}
           >
-            <SwiperSlide>
-              <CodeBlock lang="js">
-                {`import { createClient } from '@supabase/supabase-js'
-
-// Initialize 
-const supabaseUrl = 'https://chat-room.supabase.co'
-const supabaseKey = 'public-anon-key'
-const supabase = createClient(supabaseUrl, supabaseKey)
-  
-// Create a new user
-const { user, error } = await supabase.auth.signUp({
-  email: 'example@email.com',
-  password: 'example-password',
-})
-
-
-
-
-
-
-
-
-
-
-`}
-              </CodeBlock>
-            </SwiperSlide>
-            <SwiperSlide>
-              <CodeBlock lang="js">
-                {`import { createClient } from '@supabase/supabase-js'
-
-// Initialize 2nd ONE
-const supabaseUrl = 'https://chat-room.supabase.co'
-const supabaseKey = 'public-anon-key'
-const supabase = createClient(supabaseUrl, supabaseKey)
-  
-// Create a new user
-const { user, error } = await supabase.auth.signUp({
-  email: 'example@email.com',
-  password: 'example-password',
-})
-
-
-
-
-
-
-
-
-
-
-`}
-              </CodeBlock>
-            </SwiperSlide>
-            <SwiperSlide>
-              <CodeBlock lang="js">
-                {`import { createClient } from '@supabase/supabase-js'
-
-// Initialize 2nd ONE
-const supabaseUrl = 'https://chat-room.supabase.co'
-const supabaseKey = 'public-anon-key'
-const supabase = createClient(supabaseUrl, supabaseKey)
-  
-// Create a new user
-const { user, error } = await supabase.auth.signUp({
-  email: 'example@email.com',
-  password: 'example-password',
-})
-
-
-
-
-
-
-
-
-
-
-`}
-              </CodeBlock>
-            </SwiperSlide>
-            <SwiperSlide>
-              <CodeBlock lang="js">
-                {`import { createClient } from '@supabase/supabase-js'
-
-// Initialize 2nd ONE
-const supabaseUrl = 'https://chat-room.supabase.co'
-const supabaseKey = 'public-anon-key'
-const supabase = createClient(supabaseUrl, supabaseKey)
-  
-// Create a new user
-const { user, error } = await supabase.auth.signUp({
-  email: 'example@email.com',
-  password: 'example-password',
-})
-
-
-
-
-
-
-
-
-
-
-`}
-              </CodeBlock>
-            </SwiperSlide>
-            <SwiperSlide>
-              <CodeBlock lang="js">
-                {`import { createClient } from '@supabase/supabase-js'
-
-// Initialize 2nd ONE
-const supabaseUrl = 'https://chat-room.supabase.co'
-const supabaseKey = 'public-anon-key'
-const supabase = createClient(supabaseUrl, supabaseKey)
-  
-// Create a new user
-const { user, error } = await supabase.auth.signUp({
-  email: 'example@email.com',
-  password: 'example-password',
-})
-
-
-
-
-
-
-
-
-
-
-`}
-              </CodeBlock>
-            </SwiperSlide>
-            <SwiperSlide>
-              <CodeBlock lang="js">
-                {`import { createClient } from '@supabase/supabase-js'
-
-// Initialize 2nd ONE
-const supabaseUrl = 'https://chat-room.supabase.co'
-const supabaseKey = 'public-anon-key'
-const supabase = createClient(supabaseUrl, supabaseKey)
-  
-// Create a new user
-const { user, error } = await supabase.auth.signUp({
-  email: 'example@email.com',
-  password: 'example-password',
-})
-
-
-
-
-
-
-
-
-
-
-`}
-              </CodeBlock>
-            </SwiperSlide>
+            {props.content &&
+              props.content.map((content, i) => (
+                <SwiperSlide>
+                  <CodeBlock key={i} lang={content.lang} size={'large'}>
+                    {content.code}
+                  </CodeBlock>
+                </SwiperSlide>
+              ))}
           </Swiper>
         </div>
       </div>

@@ -8,7 +8,7 @@ const AdminAccess = () => {
   const [tabId, setTabId] = useState('tabTableEditor')
 
   return (
-    <div className="py-16 bg-gray-50 dark:bg-dark-700 overflow-hidden lg:py-24">
+    <div className="py-16 bg-gray-50 dark:bg-dark-800 overflow-hidden lg:py-24">
       <div className="container mx-auto px-8 sm:px-16 xl:px-20">
         <div className="mx-auto max-w-7xl">
           <div className="relative items-center">
