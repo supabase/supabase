@@ -128,6 +128,7 @@
     { "source": "/docs/client/nxl", "destination": "/docs/reference/javascript/rangeGte" },
     { "source": "/docs/client/nxr", "destination": "/docs/reference/javascript/rangeLte" },
     { "source": "/docs/client/adj", "destination": "/docs/reference/javascript/rangeAdjacent" },
+    { "source": "/docs/client/ov", "destination": "/docs/reference/javascript/overlaps" },
     { "source": "/docs/client/ova", "destination": "/docs/reference/javascript/overlaps" },
     { "source": "/docs/client/fts", "destination": "/docs/reference/javascript/textSearch" },
     { "source": "/docs/client/plfts", "destination": "/docs/reference/javascript/textSearch" },
