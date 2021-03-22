@@ -6,9 +6,9 @@ import { useRouter } from 'next/router'
 const BuiltExamples = () => {
   const { basePath } = useRouter()
   return (
-    <div className="relative bg-gray-50 dark:bg-dark-600 pt-12 pb-16">
+    <div className="relative bg-gray-50 dark:bg-dark-800 pt-12 pb-16">
       <div className="absolute inset-0">
-        <div className="mx-auto bg-white dark:bg-dark-600 w-full h-1/3 sm:h-2/3 lg:h-1/2"></div>
+        <div className="mx-auto bg-white dark:bg-dark-800 w-full h-1/3 sm:h-2/3 lg:h-1/2"></div>
       </div>
       <div className="container mx-auto px-8 sm:px-16 xl:px-20 relative">
         <div className="mx-auto max-w-7xl">
@@ -34,7 +34,10 @@ const BuiltExamples = () => {
           </div>
           <p className="mt-10 text-base text-gray-500 dark:text-dark-400">
             See all examples on our{' '}
-            <a className="text-brand-700" href="https://github.com/supabase/supabase/tree/master/examples">
+            <a
+              className="text-brand-700"
+              href="https://github.com/supabase/supabase/tree/master/examples"
+            >
               Github
             </a>
           </p>

@@ -19,7 +19,7 @@ import { createClient } from '@supabase/supabase-js'
 import DefaultLayout from '~/components/Layouts/Default'
 
 import AuthStyles from './Auth.module.css'
-import { useState } from 'react'
+
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import FeatureSection from '~/components/Sections/FeatureSection'
@@ -30,6 +30,9 @@ import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import FeatureColumn from '~/components/FeatureColumn'
 import FloatingIcons from '~/components/FloatingIcons'
+
+import ApiExamples from 'data/products/database/api-examples'
+import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 
 function AuthPage() {
   // base path for images
@@ -61,7 +64,28 @@ function AuthPage() {
       </SectionContainer>
 
       <SectionContainer className="-mb-48">
-        <APISection />
+        <APISection
+          title="Simple and convenient APIs"
+          content={ApiExamples}
+          footer={[
+            <div className="grid grid-cols-12 gap-16 mt-8">
+              <div className="col-span-4">
+                <FeatureColumn
+                  icon={<IconBriefcase />}
+                  title="Enterprise logins"
+                  text="Type definitions for both server side and client side"
+                />
+              </div>
+              <div className="col-span-4">
+                <FeatureColumn
+                  icon={<IconEye />}
+                  title="Social login scopes"
+                  text="Request additonal user data permissions when using social logins"
+                />
+              </div>
+            </div>,
+          ]}
+        />
       </SectionContainer>
 
       <div className="relative">
@@ -97,7 +121,7 @@ function AuthPage() {
             </Button>
           </div>
           <div className="col-span-12 lg:col-span-6 lg:col-start-7">
-            <SplitCodeBlockCarousel />
+            <SplitCodeBlockCarousel content={AuthSqlRulesExamples} />
           </div>
         </div>
       </SectionContainer>

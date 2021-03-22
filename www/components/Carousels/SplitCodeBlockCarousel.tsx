@@ -2,13 +2,18 @@ import { useState } from 'react'
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
 
-import { Tabs, Typography, Button } from '@supabase/ui'
+import { Tabs, Typography, Button, Space } from '@supabase/ui'
 import CodeBlock from '../CodeBlock/CodeBlock'
 
 // Import Swiper styles
 import 'swiper/swiper.min.css'
+import Badge from '../Badge'
 
-function SplitCodeBlockCarousel() {
+interface SplitCodeBlockCarousel {
+  content: any
+}
+
+function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
   // store API swiper instance
   const [apiSwiper, setApiSwiper] = useState(undefined)
   const [swiperDetails, setSwiperDetails] = useState(undefined)
@@ -49,24 +54,13 @@ function SplitCodeBlockCarousel() {
         // @ts-ignore
         onChange={(id: string) => handleApiSwiperNavChange(Number(id))}
       >
-        <Tabs.Panel label="Fast column navigation" id="0">
-          <span></span>
-        </Tabs.Panel>
-        <Tabs.Panel label="Fast column navigation" id="1">
-          <span></span>
-        </Tabs.Panel>
-        <Tabs.Panel label="Fast column navigation" id="2">
-          <span></span>
-        </Tabs.Panel>
-        <Tabs.Panel label="Fast column navigation" id="3">
-          <span></span>
-        </Tabs.Panel>
-        <Tabs.Panel label="Fast column navigation" id="4">
-          <span></span>
-        </Tabs.Panel>
-        <Tabs.Panel label="Fast column navigation" id="5">
-          <span></span>
-        </Tabs.Panel>
+        {props.content.map((extension, i) => {
+          return (
+            <Tabs.Panel label={extension.title} id={i.toString()}>
+              <span></span>
+            </Tabs.Panel>
+          )
+        })}
       </Tabs>
       <div className="border border-gray-100 dark:border-gray-600 rounded-md bg-gray-800 overflow-hidden">
         <Swiper
@@ -76,70 +70,22 @@ function SplitCodeBlockCarousel() {
           initialSlide={apiSwiperActiveIndex}
           spaceBetween={0}
           slidesPerView={1}
-          speed={800}
+          speed={400}
           autoHeight={true}
           allowTouchMove={false}
         >
-          <SwiperSlide>
-            <CodeBlock lang="sql">
-              {`-- Secure the tables
-alter table public.users enable row level security;
-alter table public.channels enable row level security;
-alter table public.messages enable row level security;
-create policy "Allow logged-in read access" on public.users for select using ( auth.role() = 'authenticated' );
-create policy "Allow individual insert access" on public.users for insert with check ( auth.uid() = id );
-create policy "Allow individual update access" on public.users for update using ( auth.uid() = id );
-`}
-            </CodeBlock>
-          </SwiperSlide>
-          <SwiperSlide>
-            <CodeBlock lang="sql">
-              {`-- Secure the tables
-alter table public.users enable row level security;
-alter table public.channels enable row level security;
-alter table public.messages enable row level security;
-`}
-            </CodeBlock>
-          </SwiperSlide>
-          <SwiperSlide>
-            <CodeBlock lang="sql">
-              {`-- Secure the tables
-alter table public.users enable row level security;
-alter table public.channels enable row level security;
-alter table public.messages enable row level security;
-`}
-            </CodeBlock>
-          </SwiperSlide>
-          <SwiperSlide>
-            <CodeBlock lang="sql">
-              {`-- Secure the tables
-alter table public.users enable row level security;
-alter table public.channels enable row level security;
-alter table public.messages enable row level security;
-`}
-            </CodeBlock>
-          </SwiperSlide>
-          <SwiperSlide>
-            <CodeBlock lang="sql">
-              {`-- Secure the tables
-alter table public.users enable row level security;
-alter table public.channels enable row level security;
-alter table public.messages enable row level security;
-`}
-            </CodeBlock>
-          </SwiperSlide>
-          <SwiperSlide>
-            <CodeBlock lang="sql">
-              {`-- Secure the tables
-alter table public.users enable row level security;
-alter table public.channels enable row level security;
-alter table public.messages enable row level security;
-`}
-            </CodeBlock>
-          </SwiperSlide>
+          {props.content.map((extension, i) => {
+            return (
+              <SwiperSlide>
+                <CodeBlock key={i} lang={extension.lang}>
+                  {extension.code}
+                </CodeBlock>
+              </SwiperSlide>
+            )
+          })}
         </Swiper>
 
-        <div className="overflow-hidden bg-gray-900 p-8 dark rounded-md border border-t-none border-t-0 border-gray-600">
+        <div className="overflow-hidden bg-gray-800 p-8 dark rounded-md border border-t-none border-t-0 border-gray-600">
           <Swiper
             // @ts-ignore
             onSwiper={setSwiperDetails}
@@ -149,15 +95,39 @@ alter table public.messages enable row level security;
             slidesPerView={1}
             direction="horizontal"
             // style={{ overflow: 'hidden' }}
-            speed={800}
+            speed={400}
             allowTouchMove={false}
           >
-            <SwiperSlide>{details}</SwiperSlide>
-            <SwiperSlide>{details}</SwiperSlide>
-            <SwiperSlide>{details}</SwiperSlide>
-            <SwiperSlide>{details}</SwiperSlide>
-            <SwiperSlide>{details}</SwiperSlide>
-            <SwiperSlide>{details}</SwiperSlide>
+            {props.content.map((extension, i) => {
+              return (
+                <SwiperSlide key={i}>
+                  <div className="">
+                    <Typography.Text>
+                      <span className="block text-lg text-white mb-4">
+                        {extension.detail_title}
+                      </span>
+                    </Typography.Text>
+                    <Typography.Text type="secondary" className="block mb-6">
+                      <p>{extension.detail_text}</p>
+                    </Typography.Text>
+                    <Space className="justify-between">
+                      <Typography.Text>
+                        <Button type="outline">View documentation</Button>
+                      </Typography.Text>
+                      <div>
+                        <Typography.Text type="secondary" className="mr-4">
+                          {extension.badges_label}
+                        </Typography.Text>
+                        {extension.badges &&
+                          extension.badges.map((badge, i) => {
+                            return <Badge>{badge}</Badge>
+                          })}
+                      </div>
+                    </Space>
+                  </div>
+                </SwiperSlide>
+              )
+            })}
           </Swiper>
         </div>
       </div>

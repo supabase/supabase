@@ -14,6 +14,7 @@ interface Props {
   hideCopy?: boolean
   className?: string
   children?: string
+  size?: 'small' | 'medium' | 'large'
 }
 
 function CodeBlock(props: Props) {
@@ -29,6 +30,8 @@ function CodeBlock(props: Props) {
   SyntaxHighlighter.registerLanguage('py', py)
   SyntaxHighlighter.registerLanguage('sql', sql)
 
+  const large = props.size === 'large' ? true : false
+
   return (
     <div className="relative">
       <SyntaxHighlighter
@@ -37,8 +40,8 @@ function CodeBlock(props: Props) {
         className={CodeBlockStyles['code-block']}
         customStyle={{
           padding: 0,
-          fontSize: 12,
-          lineHeight: 1.2,
+          fontSize: large ? 18 : 12,
+          lineHeight: large ? 1.2 : 1.2,
           borderTop: '1px solid #393939',
           background: '#181818',
         }}
@@ -52,7 +55,7 @@ function CodeBlock(props: Props) {
           paddingLeft: '21px',
           marginRight: '12px',
           color: '#828282',
-          fontSize: 12,
+          fontSize: large ? 14 : 12,
           paddingTop: '4px',
           paddingBottom: '4px',
         }}

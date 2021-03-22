@@ -34,7 +34,7 @@ const Features = () => {
   })
 
   return (
-    <div className="bg-gray-50 dark:bg-dark-700 overflow-hidden py-12">
+    <div className="bg-gray-50 dark:bg-dark-800 overflow-hidden py-12">
       <div className="container mx-auto px-8 sm:px-16 xl:px-20">
         <div className="mx-auto max-w-7xl">
           <SectionHeader
