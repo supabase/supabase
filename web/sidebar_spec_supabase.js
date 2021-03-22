@@ -15,7 +15,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Data',
-      items: ['reference/javascript/select', 'reference/javascript/insert', 'reference/javascript/update', 'reference/javascript/delete', 'reference/javascript/rpc'],
+      items: ['reference/javascript/select', 'reference/javascript/insert', 'reference/javascript/update', 'reference/javascript/upsert', 'reference/javascript/delete', 'reference/javascript/rpc'],
       collapsed: true,
     },
     {
