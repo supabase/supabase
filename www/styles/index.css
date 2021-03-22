@@ -83,10 +83,12 @@
   font-style: italic;
 } */
 
-@layer base {
-  ::-webkit-scrollbar,
-  ::-webkit-scrollbar-corner,
-  ::-webkit-scrollbar-track {
-    @apply;
-  }
+.sbui-border-fix select {
+  @apply border-solid;
+  border-width: 1px;
+}
+
+body {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
 }
