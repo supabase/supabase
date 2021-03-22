@@ -21,15 +21,6 @@
   font-weight: 400;
   font-style: normal;
 }
-/* @font-face {
-  font-family: "custom-font";
-  src: url(/new/fonts/custom/CustomFont-BookItalic.woff2)
-      format('woff2'),
-    url(/new/fonts/custom/CustomFont-BookItalic.woff)
-      format('woff');
-  font-weight: 400;
-  font-style: italic;
-} */
 @font-face {
   font-family: 'custom-font';
   src: url(/new/fonts/custom/CustomFont-Medium.woff2) format('woff2'),
@@ -37,51 +28,24 @@
   font-weight: 500;
   font-style: normal;
 }
-/* @font-face {
-  font-family: "custom-font";
-  src: url(/new/fonts/custom/CustomFont-MediumItalic.woff2)
-      format('woff2'),
-    url(/new/fonts/custom/CustomFont-MediumItalic.woff)
-      format('woff');
-  font-weight: 500;
-  font-style: italic;
-} */
-/* @font-face {
-  font-family: "custom-font";
-  src: url(/new/fonts/custom/CustomFont-Bold.woff2)
-      format('woff2'),
-    url(/new/fonts/custom/CustomFont-Bold.woff)
-      format('woff');
-  font-weight: 700;
-  font-style: 600;
-} */
-/* @font-face {
-  font-family: "custom-font";
-  src: url(/new/fonts/custom/CustomFont-BoldItalic.woff2)
-      format('woff2'),
-    url(/new/fonts/custom/CustomFont-BoldItalic.woff)
-      format('woff');
-  font-style: 600;
-  font-style: italic;
-} */
-/* @font-face {
-  font-family: "custom-font";
-  src: url(/new/fonts/custom/CustomFont-Black.woff2)
-      format('woff2'),
-    url(/new/fonts/custom/CustomFont-Black.woff)
-      format('woff');
-  font-weight: 800;
-  font-style: normal;
+
+/*
+  Typography
+*/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-bottom: 16px;
 }
-@font-face {
-  font-family: "custom-font";
-  src: url(/new/fonts/custom/CustomFont-BlackItalic.woff2)
-      format('woff2'),
-    url(/new/fonts/custom/CustomFont-BlackItalic.woff)
-      format('woff');
-  font-weight: 800;
-  font-style: italic;
-} */
+
+p {
+  @apply text-gray-light dark:text-gray-dark;
+  margin-bottom: 16px;
+}
 
 .sbui-border-fix select {
   @apply border-solid;
@@ -91,4 +55,50 @@
 body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
+}
+
+.section--masked {
+  /* overflow: hidden; */
+}
+
+.section--bg-masked {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  /* overflow: visible; */
+}
+
+.section--bg {
+  @apply bg-gray-50 dark:bg-gray-800;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  transform-origin: 100% 0;
+  transform: skewY(-2deg);
+  overflow: hidden;
+  /* transform-origin: var(--sectionTransformOrigin);
+    transform: skewY(var(--sectionAngle));
+    background: var(--backgroundColor);
+    overflow: 
+    hidden; */
+}
+
+.section-container {
+  position: relative;
+  /* z-index: 1; */
+  /* display: flex;
+  justify-content: center; */
+}
+
+/* Database page */
+
+/* override position of tabs  */
+.dashboard-tabs > div > div > div > div {
+  justify-content: center;
+}
+
+.dashboard-tabs div[role='seperator'] {
+  @apply border border-gray-50 dark:border-gray-600;
 }
