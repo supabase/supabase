@@ -1,9 +1,9 @@
 
-var SUPABASE_URL = '<supabase url - retrieve from supabase dashboard>'
+var SUPABASE_URL = 'https://ernhobnpmmupjnmxpfbt.supabase.co'
 var SUPABASE_KEY =
-  '<client key - retrieve from supabase dashboard>'
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxMzA5ODU0NCwiZXhwIjoxOTI4Njc0NTQ0fQ.Z9bRrfaL2oGhSuyBckFcdcnRIJDelWJ1II98OnEtLO0'
 
-var supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+var supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 window.userToken = null
 
 document.addEventListener('DOMContentLoaded', function (event) {
