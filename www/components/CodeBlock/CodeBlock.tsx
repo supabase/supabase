@@ -9,7 +9,7 @@ import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 
 interface Props {
-  lang: 'js'
+  lang: 'js' | 'sql' | 'py'
   startingLineNumber?: number
   hideCopy?: boolean
   className?: string
@@ -62,7 +62,7 @@ function CodeBlock(props: Props) {
       {!props.hideCopy && props.children ? (
         <div className="absolute right-2 top-2 dark">
           <CopyToClipboard text={props.children}>
-            <Button type="outline" icon={<IconCopy />}>
+            <Button type="outline" className="dark:bg-dark-800" icon={<IconCopy />}>
               Copy
             </Button>
           </CopyToClipboard>
