@@ -1647,3 +1647,55 @@ pages:
 
   .textSearch():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.fts'
+    examples:
+      - name: Text search
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('quotes')
+            .textSearch('catchphrase', `'fat' & 'cat'`, { 
+              config: 'english' 
+            })
+          ```
+      - name: Basic normalization
+        description: Uses PostgreSQL's `plainto_tsquery` function.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('quotes')
+            .textSearch('catchphrase', `'fat' & 'cat'`, { 
+              type: 'plain',
+              config: 'english' 
+            })
+          ```
+      - name: Full normalization
+        description: Uses PostgreSQL's `phraseto_tsquery` function.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('quotes')
+            .textSearch('catchphrase', `'fat' & 'cat'`, { 
+              type: 'phrase',
+              config: 'english' 
+            })
+          ```
+      - name: Full normalization
+        description: |
+          Uses PostgreSQL's `websearch_to_tsquery` function. 
+          This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used 
+          with advanced operators.
+
+          - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
+          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+          - `OR`: the word “or” will be converted to the | operator.
+          - `-`: a dash will be converted to the ! operator.
+
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('quotes')
+            .textSearch('catchphrase', `'fat or cat'`, { 
+              type: 'websearch',
+              config: 'english'
+            })
+          ```
