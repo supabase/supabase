@@ -26,13 +26,16 @@ const Nav = (props: Props) => {
 
   React.useEffect(() => {
     if (open) {
-      console.log('open if')
       // Prevent scrolling on mount
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'auto'
     }
   }, [open])
+
+  // React.useEffect(() => {
+  //   document.body.classList.toggle("overflow-hidden"); // + body.lg:overflow-auto
+  // }, [open])
 
   function handleToggle(callback: any) {
     handleCancel()
