@@ -69,7 +69,7 @@ const Footer = (props: Props) => {
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
             <img
-              className="h-10 w-auto"
+              className="w-40"
               src={
                 darkMode ? `${basePath}/images/logo-dark.png` : `${basePath}/images/logo-light.png`
               }
