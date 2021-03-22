@@ -89,7 +89,7 @@ const main = async() => {
 main()
 ```
 
-Once this is working, if you want to learn more about the [query interface](https://supabase.io/docs/client/filter) you might want to try some of these challenges:
+Once this is working, if you want to learn more about the [query interface](https://supabase.io/docs/reference/javascript/filter) you might want to try some of these challenges:
 
 ```
  1. List all the countries in Antarctica
@@ -126,7 +126,7 @@ const { data, error } = await supabase
   .select('name, country_id')
   .neq('name', 'The shire')
 
-// full docs here: https://supabase.io/docs/client/filter
+// full docs here: https://supabase.io/docs/reference/javascript/filter
 ```
 
 We look forward to showing off some more Supabase + Replit examples.
