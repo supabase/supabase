@@ -26,16 +26,11 @@ const Nav = (props: Props) => {
 
   React.useEffect(() => {
     if (open) {
-      // Prevent scrolling on mount
-      document.body.style.overflow = 'hidden'
+      document.body.classList.add('overflow-hidden')
     } else {
-      document.body.style.overflow = 'auto'
+      document.body.classList.remove('overflow-hidden')
     }
   }, [open])
-
-  // React.useEffect(() => {
-  //   document.body.classList.toggle("overflow-hidden"); // + body.lg:overflow-auto
-  // }, [open])
 
   function handleToggle(callback: any) {
     handleCancel()
@@ -87,7 +82,7 @@ const Nav = (props: Props) => {
       <a
         key={`solution_${idx}`}
         href={url}
-        className="-m-3 p-3 my-2 flex flex-col justify-between rounded-lg hover:bg-gray-50 dark:hover:bg-dark-600 transition ease-in-out duration-150"
+        className="-m-3 p-3 my-2 flex flex-col justify-between rounded-lg hover:bg-gray-100 hover:bg-opacity-75 dark:hover:bg-dark-600 transition ease-in-out duration-150"
       >
         {content}
       </a>
@@ -111,7 +106,7 @@ const Nav = (props: Props) => {
       onClick={() => props.toggleFlyOut()}
     >
       <button
-        className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-700"
+        className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-700"
         aria-expanded="false"
       >
         <span className="sr-only">Open main menu</span>
@@ -235,6 +230,7 @@ const Nav = (props: Props) => {
                   inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
                   text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
                   dark:text-dark-100 dark:hover:border-dark-100
+                  transition-colors
                 `}
               >
                 Beta
@@ -245,6 +241,7 @@ const Nav = (props: Props) => {
                   inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
                   text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
                   dark:text-dark-100 dark:hover:border-dark-100
+                  transition-colors
                 `}
               >
                 Pricing
@@ -292,7 +289,7 @@ const Nav = (props: Props) => {
               <button
                 onClick={() => setOpen(false)}
                 type="button"
-                className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 dark:bg-dark-800"
+                className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-700 dark:bg-dark-800 transition-colors"
               >
                 <span className="sr-only">Close menu</span>
 
@@ -327,25 +324,25 @@ const Nav = (props: Props) => {
             <div className="pt-2 pb-4 space-y-1">
               <a
                 href="/docs"
-                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md transition-colors"
               >
                 Product
               </a>
               <a
                 href="/docs"
-                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md transition-colors"
               >
                 Developers
               </a>
               <a
                 href="/docs"
-                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md transition-colors"
               >
                 Company
               </a>
               <a
                 href="/docs/pricing"
-                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md transition-colors"
               >
                 Pricing
               </a>

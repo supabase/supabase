@@ -105,7 +105,7 @@ const CodeExamples = () => {
             >
               <button
                 type="button"
-                className="inline-flex items-center px-2.5 py-1.5 border border-dark-300 shadow-sm text-xs font-medium rounded text-dark-100 hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-2.5 py-1.5 border border-dark-300 shadow-sm text-xs font-medium rounded text-dark-100 hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-700"
               >
                 <span className="hidden sm:block">{copied ? 'Copied!' : 'Copy code'}</span>
                 <span className="block sm:hidden">

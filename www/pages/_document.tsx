@@ -5,7 +5,7 @@ export default class MyDocument extends Document {
     return (
       <Html lang="en" className="dark">
         <Head></Head>
-        <body>
+        <body className="lg:overflow-auto">
           <Main />
           <NextScript />
         </body>

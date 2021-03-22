@@ -46,9 +46,10 @@
     "@types/react-dom": "^16.9.8",
     "@types/react-syntax-highlighter": "^13.5.0",
     "file-loader": "^6.2.0",
+    "postcss": "^8.2.8",
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.2.1",
-    "tailwindcss": "^2.0.1"
+    "tailwindcss": "2.0.4"
   },
   "license": "MIT"
 }

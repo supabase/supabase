@@ -60,16 +60,11 @@ const FlyOut = (props: Props) => {
       >
         <>
           <div
-            className="absolute inset-x-0 transform shadow-lg border-t border-gray-100 dark:border-dark-500"
+            className="fixed top-0 left-0 w-screen transform shadow-lg border-t border-gray-100 dark:border-dark-500"
             style={{
               zIndex: 999,
-              position: 'absolute',
-              width: '100vw',
               margin: '0 auto',
               marginTop: '63px',
-              left: '-50vw',
-              right: '-50vw',
-              top: 0,
             }}
           >
             <div className="absolute inset-0 flex sm:flex-col lg:flex-row" aria-hidden="true">
