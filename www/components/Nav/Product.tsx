@@ -1,10 +1,9 @@
 import React from 'react'
-import Badge from 'components/Badge'
 import SolutionsData from 'data/Solutions.json'
 import CaseStudiesData from 'data/CaseStudies.json'
 import { useRouter } from 'next/router'
-import { Typography } from '@supabase/ui'
 import ProductIcon from '../ProductIcon'
+import { Typography, Badge } from '@supabase/ui'
 
 const Product = () => {
   const { basePath } = useRouter()
@@ -16,7 +15,12 @@ const Product = () => {
         <div className="flex flex-row items-center">
           <ProductIcon icon={icon} />
           <Typography.Title level={5} className="ml-3 mb-0">
-            {name} {label && <Badge className="ml-3">{label}</Badge>}
+            {name}{' '}
+            {label && (
+              <div className="ml-3">
+                <Badge>{label}</Badge>
+              </div>
+            )}
           </Typography.Title>
         </div>
         <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
@@ -54,9 +58,7 @@ const Product = () => {
       </nav>
       <div className="px-4 py-8 sm:py-12 sm:px-6 lg:px-8 xl:pl-12">
         <div>
-          <h3 className="text-sm font-medium tracking-wide text-gray-500 dark:text-dark-300 uppercase">
-            Latest case studies
-          </h3>
+          <Typography.Text type="secondary">Latest case studies</Typography.Text>
           <ul className="mt-6 space-y-6">
             {CaseStudiesData.map((caseStudy: any, idx: number) => (
               <li className="flow-root" key={`flyout_case_${idx}`}>
@@ -72,26 +74,14 @@ const Product = () => {
                     />
                   </div>
                   <div className="min-w-0 flex-1 sm:ml-8">
-                    <h4 className="text-base font-medium text-gray-900 dark:text-white truncate">
-                      {caseStudy.title}
-                    </h4>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-dark-300">
-                      {caseStudy.description}
-                    </p>
+                    <Typography.Title level={5}>{caseStudy.title}</Typography.Title>
+                    <Typography.Text type="secondary">{caseStudy.description}</Typography.Text>
                   </div>
                 </a>
               </li>
             ))}
           </ul>
         </div>
-        {/* <div className="mt-6 text-sm font-medium">
-          <a
-            href="/blog"
-            className="text-gray-600 hover:text-gray-500 dark:text-brand-600 dark:hover:text-brand-700 transition ease-in-out duration-150"
-          >
-            View all posts <span aria-hidden="true">&rarr;</span>
-          </a>
-        </div> */}
       </div>
     </React.Fragment>
   )
