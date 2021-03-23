@@ -1,4 +1,4 @@
-import { Button, IconKey, Space, Typography } from '@supabase/ui'
+import { Button, IconBookOpen, IconKey, Space, Typography } from '@supabase/ui'
 
 type subheader = string
 interface Types {
@@ -28,7 +28,7 @@ const ProductHeader = (props: Types) => (
         )}
         <Space className="mt-12">
           <Button size="medium">Start a project</Button>
-          <Button type="text" size="medium">
+          <Button type="text" size="medium" icon={<IconBookOpen />}>
             See documentation
           </Button>
         </Space>

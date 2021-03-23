@@ -91,7 +91,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
             // @ts-ignore
             onSwiper={setSwiperDetails}
             style={{ zIndex: 0 }}
-            initialSlide={2}
+            initialSlide={0}
             spaceBetween={0}
             slidesPerView={1}
             direction="horizontal"
