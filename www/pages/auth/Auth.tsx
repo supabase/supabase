@@ -22,11 +22,8 @@ import {
 import { createClient } from '@supabase/supabase-js'
 import DefaultLayout from '~/components/Layouts/Default'
 
-import AuthStyles from './Auth.module.css'
-
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import FeatureSection from '~/components/Sections/FeatureSection'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
@@ -38,8 +35,9 @@ import FloatingIcons from '~/components/FloatingIcons'
 import ApiExamples from 'data/products/database/api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 
-import styles from './Auth.module.css'
 import CTABanner from '~/components/CTABanner'
+
+import Solutions from 'data/Solutions.json'
 
 function AuthPage() {
   // base path for images
@@ -54,6 +52,8 @@ function AuthPage() {
   return (
     <DefaultLayout>
       <ProductHeader
+        icon={Solutions['authentication'].icon}
+        title={Solutions['authentication'].name}
         h1={[
           <span>
             Built-in user mangement

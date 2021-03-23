@@ -27,6 +27,8 @@ import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
 import TweetCard from '~/components/TweetCard'
 import FeatureColumn from '~/components/FeatureColumn'
 
+import Solutions from 'data/Solutions.json'
+
 // install Swiper's Controller component
 // SwiperCore.use([Controller])
 
@@ -43,6 +45,8 @@ function Database() {
   return (
     <DefaultLayout>
       <ProductHeader
+        icon={Solutions['database'].icon}
+        title={Solutions['database'].name}
         h1={[
           <span>
             Open source SQL Database
