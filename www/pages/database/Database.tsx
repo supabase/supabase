@@ -4,7 +4,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductHeader from '~/components/Sections/ProductHeader'
 
-import { Button, Tabs, Typography } from '@supabase/ui'
+import { Badge, Button, IconArrowUpRight, Space, Tabs, Typography } from '@supabase/ui'
 
 import { Swiper, SwiperSlide } from 'swiper/react'
 import SwiperCore, { Controller } from 'swiper'
@@ -45,13 +45,13 @@ function Database() {
       <ProductHeader
         h1={[
           <span>
-            A Database ready for millions
-            <br /> and the weekend project
+            Open source SQL Database
+            <br /> (without the hassle)
           </span>,
         ]}
         subheader={[
-          'A postgres SQL database, trusted by 100,000s of developers, with built in row level security hosted on a dedicated instance.',
-          'It is the industry standard database used by AWS architecture, data scientists and backend engineers.',
+          'Every supabase project has a dedicated PostgreSQL database, trusted by millions of developers, with built in row level security.',
+          'PostgreSQL is the industry standard database used by AWS architecture, data scientists and backend engineers. ',
         ]}
       />
 
@@ -60,18 +60,17 @@ function Database() {
         <SectionContainer className="text-center pb-8">
           <div className="grid grid-cols-12">
             <div className="col-span-8 col-start-3">
-              <Typography.Title level={2}>Easy to update, maintain and grow </Typography.Title>
+              <Typography.Title level={2}>Easy to use dashboard</Typography.Title>
               <Typography.Text>
                 <p className="text-lg">
-                  Let your international customers pay with their preferred payment method, and
-                  improve conversion. Stripe supports 135+ currencies and offers a unified API for
-                  cards, wallets, bank debits, and more.
+                  Use your database the way you want, with an interactive dashboard for both
+                  spreadsheet style tables and also a full SQL editor.
                 </p>
               </Typography.Text>
             </div>
           </div>
         </SectionContainer>
-        <div className={'dashboard-tabs'}>
+        <div className={'dashboard-tabs sbui-tabs--underline-alt'}>
           <Tabs
             size="xlarge"
             activeId={dashboardSwiperActiveIndex.toString()}
@@ -141,14 +140,43 @@ function Database() {
         <APISection
           content={ApiExamplesData}
           title="Never write an API again"
+          text={[
+            <p>
+              We inspect your database and provide APIs instantly so you can stop building
+              repetitive CRUD endpoints and focus on your product.
+            </p>,
+          ]}
           footer={[
-            <TweetCard
-              handle="@eunjae_lee"
-              img_url="https://pbs.twimg.com/profile_images/1188191474401320965/eGjSYbQd_400x400.jpg"
-              quote="So they just help me use @PostgreSQL better. They don't try to invent a wheel and trap me
+            <div className="grid grid-cols-12">
+              <div className="mt-0 col-span-12 lg:col-span-6 xl:col-span-12 xl:mb-8">
+                <Space>
+                  <Typography.Text type="secondary">
+                    <p className="m-0">Libraries coming soon:</p>{' '}
+                  </Typography.Text>
+                  <Badge dot={false} color="blue">
+                    Python
+                  </Badge>
+                  <Badge dot={false} color="blue">
+                    Dart
+                  </Badge>
+                  <Badge dot={false} color="blue">
+                    C#
+                  </Badge>
+                  <Badge dot={false} color="blue">
+                    Kotlin
+                  </Badge>
+                </Space>
+              </div>
+              <div className="col-span-12 lg:col-span-6 xl:col-span-10 hidden xl:block">
+                <TweetCard
+                  handle="@eunjae_lee"
+                  img_url="https://pbs.twimg.com/profile_images/1188191474401320965/eGjSYbQd_400x400.jpg"
+                  quote="So they just help me use @PostgreSQL better. They don't try to invent a wheel and trap me
           in it. Whereas they provide a good abstraction overall, they also provide a raw access to
           the database."
-            />,
+                />
+              </div>
+            </div>,
           ]}
         />
       </SectionContainer>
@@ -169,11 +197,11 @@ function Database() {
         </div>
       </div>
 
-      <SectionContainer>
+      <SectionContainer className="lg:py-48">
         <div className="grid grid-cols-12 lg:gap-16">
-          <div className="col-span-12 lg:col-span-5 mb-8">
+          <div className="col-span-12 lg:col-span-6 xl:col-span-5 mb-8">
             <Typography.Title level={2}>Extend your database</Typography.Title>
-            <Typography.Text>
+            <Typography.Text className="block mb-8">
               <p className="text-lg">
                 Your PostgreSQL database can be extended with any PostgreSQL extension.
               </p>
@@ -186,11 +214,11 @@ function Database() {
               title="40+ preinstalled extensions"
               text="We only show a few of the extensions supported by Supabase here, but we preinstall many more that you can use right away."
             />
-            <Button size="small" className="mt-4">
+            <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
               Expore documentation
             </Button>
           </div>
-          <div className="col-span-12 lg:col-span-6 lg:col-start-7">
+          <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-6 lg:col-start-7">
             <SplitCodeBlockCarousel content={ExtensionsExamplesData} />
           </div>
         </div>

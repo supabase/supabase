@@ -27,7 +27,7 @@ $2a$04$1bfMQDOR6aLyD4q3KVb8/ujG7ZAkyie4d/s3ABwuZNbzkFFgXtC76
 
 -- We can now execute the statement below to store the string safely in the database:
 INSERT INTO users (user_id,enc_pass) VALUES (1,'$2a$04$1bfMQDOR6aLyD4q3KVb8/ujG7ZAkyie4d/s3ABwuZNbzkFFgXtC76');`,
-    detail_title: 'The pgcrypto module provides cryptographic functions for PostgreSQL.',
+    detail_title: 'Cryptographic functions for PostgreSQL.',
     detail_text:
       'The pgcrypto module is a cryptographic extension that provides a number of hashing and cryptographic functions.',
     badges_label: 'Extensions used:',
