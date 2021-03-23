@@ -17,6 +17,7 @@ import {
   IconDatabase,
   IconShield,
   IconLink,
+  IconArrowUpRight,
 } from '@supabase/ui'
 import { createClient } from '@supabase/supabase-js'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -38,6 +39,7 @@ import ApiExamples from 'data/products/database/api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 
 import styles from './Auth.module.css'
+import CTABanner from '~/components/CTABanner'
 
 function AuthPage() {
   // base path for images
@@ -54,8 +56,8 @@ function AuthPage() {
       <ProductHeader
         h1={[
           <span>
-            Unlimited users
-            <br /> with social providers
+            Built-in user mangement
+            <br /> (that you can afford)
           </span>,
         ]}
         subheader={[
@@ -148,15 +150,15 @@ function AuthPage() {
             </p>,
           ]}
           footer={[
-            <div className="grid grid-cols-12 gap-16 mt-8">
-              <div className="col-span-4">
+            <div className="grid grid-cols-12 gap-8 lg:gap-0 xl:gap-16 mt-8">
+              <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                 <FeatureColumn
                   icon={<IconBriefcase />}
                   title="Enterprise logins"
                   text="Type definitions for both server side and client side"
                 />
               </div>
-              <div className="col-span-4">
+              <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                 <FeatureColumn
                   icon={<IconEye />}
                   title="Social login scopes"
@@ -196,7 +198,7 @@ function AuthPage() {
               Set up user profiles in your app using methods such as auth.user() so you can spend
               more time building an app, rather than user profile forms.
             </p>
-            <Button size="small" className="mt-4">
+            <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
               Expore documentation
             </Button>
           </div>
@@ -208,7 +210,7 @@ function AuthPage() {
 
       <div className="container mx-auto px-8 sm:px-16 xl:px-20 relative py-32">
         <div className="grid grid-cols-12 lg:gap-16">
-          <div className="col-span-12 lg:col-span-6">
+          <div className="order-last col-span-12 lg:order-first lg:col-span-6 mt-8 lg:mt-0">
             <div
               className={`relative bg-white dark:bg-gray-800 py-2 pb-16 border dark:border-gray-600 auth-container`}
             >
@@ -283,7 +285,7 @@ export default function app() {
               </div>
             </div>
           </div>
-          <div className="col-span-12 lg:col-span-4 lg:col-start-8 mt-8 lg:mt-0">
+          <div className="col-span-12 lg:col-span-6 lg:col-start-7 xl:col-span-4 xl:col-start-8">
             <Space className="mb-4">
               <div className="w-8 h-8 rounded-md bg-gray-900 dark:bg-white text-white dark:text-gray-900  flex justify-center items-center">
                 <IconKey size="small" strokeWidth={1.5} />
@@ -306,27 +308,30 @@ export default function app() {
                 signing up, magic link and forgot password forms.
               </p>
             </Typography.Text>
-            <Button>Explore documentation</Button>
+            <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
+              Explore documentation
+            </Button>
 
-            <div className="grid grid-cols-12 gap-16 mt-8">
-              <div className="col-span-4">
+            <div className="grid grid-cols-12 gap-8 lg:gap-0 xl:gap-16 mt-8">
+              <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                 <FeatureColumn
                   icon={<IconBriefcase />}
                   title="Social login support"
                   text="Support for Social logins are built in and the component "
                 />
               </div>
-              <div className="col-span-4">
+              <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                 <FeatureColumn
                   icon={<IconEye />}
                   title="User context"
-                  text="includes a React hook that provides a User Session context provider so you can display the right parts of your app for logged in and logged out users."
+                  text="Includes a React hook that provides a User Session context provider so you can display the right parts of your app for logged in users."
                 />
               </div>
             </div>
           </div>
         </div>
       </div>
+      <CTABanner />
     </DefaultLayout>
   )
 }
