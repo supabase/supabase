@@ -30,7 +30,7 @@ const MadeForDevelopers = () => {
                   {DeveloperFeatures.map((feature: any, idx: number) => {
                     const blockClass =
                       idx !== DeveloperFeatures.length - 1
-                        ? 'col-span-12 mb-10 sm:mb-0 sm:col-span-3 md:col-span-6 mb-12 lg:col-span-3 sm:border-gray-200 sm:pr-4 md:pr-6 lg:border-r-2 dark:border-dark-500 even:rotate-45'
+                        ? 'col-span-12 mb-10 sm:mb-0 sm:col-span-3 md:col-span-6 mb-12 lg:col-span-3 sm:border-gray-200 sm:pr-4 md:pr-6 lg:border-r dark:border-dark-600 even:rotate-45'
                         : 'col-span-12 sm:col-span-3'
 
                     return (

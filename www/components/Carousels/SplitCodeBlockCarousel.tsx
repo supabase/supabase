@@ -46,8 +46,9 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
   )
 
   return (
-    <div className="col-span-12 lg:col-span-6 lg:col-start-7">
+    <div className="col-span-12 lg:col-span-6 lg:col-start-7 sbui-tabs--alt">
       <Tabs
+        className="alt-tabs"
         scrollable
         // @ts-ignore
         activeId={apiSwiperActiveIndex.toString()}

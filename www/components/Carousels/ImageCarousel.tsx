@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Tabs, Typography, Button } from '@supabase/ui'
+import { Tabs, Typography, Button, IconCornerRightUp, IconArrowUpRight } from '@supabase/ui'
 import { useState } from 'react'
 
 // Import Swiper React components
@@ -59,17 +59,20 @@ function ImageCarousel(props: ImageCaoursel) {
         </p>
       </Typography.Text>
       <Typography.Text>
-        <Button type="outline">View documentation</Button>
+        <Button type="outline" size="small" icon={<IconCornerRightUp />}>
+          View documentation
+        </Button>
       </Typography.Text>
     </div>
   )
 
   return (
     <div className="grid grid-cols-12">
-      <div className="col-span-6 w-full">
-        <div className="col-span-12 lg:col-span-7">
+      <div className="col-span-12 lg:col-span-6 w-full">
+        <div className="col-span-12 lg:col-span-7 sbui-tabs--alt">
           <Tabs
             scrollable
+            type="pills"
             // @ts-ignore
             activeId={imageSwiperActiveIndex.toString()}
             // @ts-ignore
@@ -108,7 +111,7 @@ function ImageCarousel(props: ImageCaoursel) {
           </div>
         </div>
       </div>
-      <div className="col-span-4 col-start-9">
+      <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-5 lg:col-start-8 xl:col-span-4 xl:col-start-9">
         <Swiper
           // @ts-ignore
           onSwiper={setSwiperDetails}
@@ -129,7 +132,14 @@ function ImageCarousel(props: ImageCaoursel) {
                   <Typography.Title level={4}>{content.title}</Typography.Title>
                   <Typography.Text>
                     <p className="text-base">{content.text}</p>
-                    <Button className="mb-8">See documentation</Button>
+                    <Button
+                      className="mb-8"
+                      type="outline"
+                      size="small"
+                      icon={<IconArrowUpRight />}
+                    >
+                      View documentation
+                    </Button>
                   </Typography.Text>
                 </div>
               </SwiperSlide>

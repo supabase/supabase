@@ -1,6 +1,6 @@
 import { useState } from 'react'
 // Import Swiper React components
-import { Button, Tabs, Typography } from '@supabase/ui'
+import { Button, IconArrowUpRight, Tabs, Typography } from '@supabase/ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import CodeBlock from '../CodeBlock/CodeBlock'
 
@@ -14,6 +14,7 @@ interface Props {
   content?: APIExample
   title: string
   footer?: React.ReactNode
+  text?: React.ReactNode
 }
 
 function APISection(props: Props) {
@@ -29,22 +30,15 @@ function APISection(props: Props) {
 
   return (
     <div className="grid grid-cols-12 lg:gap-16">
-      <div className="col-span-12 lg:col-span-5 pb-8">
+      <div className="col-span-12 lg:col-span-12 xl:col-span-5 pb-8">
         <Typography.Title level={2}>{props.title}</Typography.Title>
-        <p className="text-lg">
-          An API built from the groud up for server and client side authentication that is fast to
-          implement.
-        </p>
-        <p className="text-lg">
-          With powerful library clients coming soon that allow for asset optimasation and image
-          transformation
-        </p>
-        <Button size="small" className="mt-4">
+        {props.text}
+        <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
           Expore documentation
         </Button>
         {props.footer && <div className="py-8">{props.footer}</div>}
       </div>
-      <div className="col-span-12 lg:col-span-6 lg:col-start-7">
+      <div className="col-span-12 xl:col-span-6 xl:col-start-7 sbui-tabs--alt">
         <Tabs
           scrollable
           // @ts-ignore

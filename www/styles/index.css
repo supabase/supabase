@@ -42,6 +42,11 @@ h6 {
   margin-bottom: 16px;
 }
 
+h1,
+h2 {
+  line-height: 1.2 !important;
+}
+
 p {
   @apply text-gray-light dark:text-gray-dark;
   margin-bottom: 16px;
@@ -94,11 +99,29 @@ body {
 
 /* Database page */
 
+.dashboard-tabs div[role='seperator'] {
+  @apply border border-gray-50 dark:border-gray-700;
+}
+
+a {
+  @apply hover:text-black dark:hover:text-white;
+}
+
+.sbui-tabs--alt div[role='tablist'] .sbui-btn-primary {
+  @apply bg-gray-800 text-white dark:bg-gray-600 dark:text-white;
+  text-shadow: none;
+  font-weight: 400;
+}
+.sbui-tabs--alt div[role='tablist'] .sbui-btn-text {
+  @apply dark:text-gray-400;
+  font-weight: 400;
+  shadow: none;
+}
+
+.sbui-tabs--underline-alt div[role='tablist'] .sbui-tab-button-underline--active {
+  @apply border-gray-900 dark:border-white;
+}
 /* override position of tabs  */
 .dashboard-tabs > div > div > div > div {
   justify-content: center;
-}
-
-.dashboard-tabs div[role='seperator'] {
-  @apply border border-gray-50 dark:border-gray-600;
 }
