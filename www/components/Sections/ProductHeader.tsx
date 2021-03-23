@@ -1,23 +1,28 @@
 import { Button, IconBookOpen, IconKey, Space, Typography } from '@supabase/ui'
+import ProductIcon from '../ProductIcon'
 
 type subheader = string
 interface Types {
   h1: string | React.ReactNode
   subheader: string[]
+  icon?: string
+  title?: string
 }
 
 const ProductHeader = (props: Types) => (
   <div className="container mx-auto px-8 sm:px-16 xl:px-20 relative py-32">
     <div className="grid grid-cols-12">
       <div className="col-span-12 lg:col-span-6">
-        <div className="flex flex-row mb-4 item-center">
-          <div className="w-8 h-8 bg-gray-800 dark:bg-white text-white dark:text-gray-800 flex rounded items-center justify-center">
-            <IconKey strokeWidth="2px" size="tiny" />
+        {props.icon || props.title ? (
+          <div className="flex flex-row mb-4 item-center">
+            {props.icon && <ProductIcon icon={props.icon} />}
+            {props.title && (
+              <Typography.Title level={4} className="ml-3">
+                {props.title}
+              </Typography.Title>
+            )}
           </div>
-          <Typography.Title level={4} className="ml-3">
-            Auth
-          </Typography.Title>
-        </div>
+        ) : null}
         <Typography.Title>{props.h1}</Typography.Title>
         {props.subheader && (
           <Typography.Text>

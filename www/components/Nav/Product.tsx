@@ -4,6 +4,7 @@ import SolutionsData from 'data/Solutions.json'
 import CaseStudiesData from 'data/CaseStudies.json'
 import { useRouter } from 'next/router'
 import { Typography } from '@supabase/ui'
+import ProductIcon from '../ProductIcon'
 
 const Product = () => {
   const { basePath } = useRouter()
@@ -13,17 +14,7 @@ const Product = () => {
     const content = (
       <div className="flex lg:flex-col">
         <div className="flex flex-row items-center">
-          <div className="inline-flex items-center justify-center rounded-md bg-gray-900 dark:bg-white text-white sm:h-8 sm:w-8">
-            <svg
-              className="h-4 w-4 stroke-white dark:stroke-black"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
-            </svg>
-          </div>
+          <ProductIcon icon={icon} />
           <Typography.Title level={5} className="ml-3 mb-0">
             {name} {label && <Badge className="ml-3">{label}</Badge>}
           </Typography.Title>
