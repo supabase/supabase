@@ -1,7 +1,7 @@
-import Card from 'components/Card'
+import { useRouter } from 'next/router'
 import SectionHeader from 'components/UI/SectionHeader'
 import ProjectExamples from 'data/ProjectExamples.json'
-import { useRouter } from 'next/router'
+import { Card, Typography, Space } from '@supabase/ui'
 
 const BuiltExamples = () => {
   const { basePath } = useRouter()
@@ -21,26 +21,35 @@ const BuiltExamples = () => {
         <div className="relative max-w-7xl mx-auto">
           <div className="mt-12 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
             {ProjectExamples.map((example: any, idx: number) => (
-              <Card
-                key={`example_${idx}`}
-                title={example.title}
-                type="Project Example"
-                description={example.description}
-                imgUrl={`${basePath}/${example.imgUrl}`}
-                url={example.url}
-                icons={example.icons}
-              />
+              <a href={example.url}>
+                <Card
+                  key={`example_${idx}`}
+                  hoverable
+                  cover={
+                    <img src={`${basePath}/${example.imgUrl}`} className="h-64 object-cover" />
+                  }
+                >
+                  <Space className="justify-between h-40" direction="vertical">
+                    <div>
+                      <Typography.Text small type="secondary">
+                        Project example
+                      </Typography.Text>
+                      <Typography.Title level={3}>{example.title}</Typography.Title>
+                    </div>
+                    <Typography.Text type="default">{example.description}</Typography.Text>
+                  </Space>
+                </Card>
+              </a>
             ))}
           </div>
-          <p className="mt-10 text-base text-gray-500 dark:text-dark-400">
-            See all examples on our{' '}
-            <a
-              className="text-brand-700"
-              href="https://github.com/supabase/supabase/tree/master/examples"
-            >
-              Github
-            </a>
-          </p>
+          <div className={'mt-8'}>
+            <Typography.Text type="secondary">
+              See all examples on our{' '}
+              <Typography.Link href="https://github.com/supabase/supabase/tree/master/examples">
+                Github
+              </Typography.Link>
+            </Typography.Text>
+          </div>
         </div>
       </div>
     </div>

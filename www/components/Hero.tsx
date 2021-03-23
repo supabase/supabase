@@ -1,5 +1,4 @@
-import Link from 'next/link'
-import Button from 'components/Button'
+import { Button, Typography } from '@supabase/ui'
 import { useRouter } from 'next/router'
 
 const Hero = () => {
@@ -39,7 +38,7 @@ const Hero = () => {
                   <div className="md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left lg:flex lg:items-center">
                     <div className="sm:mx-auto md:w-3/4 lg:w-full lg:mx-0">
                       <h1 className="mt-4 text-4xl text-white sm:mt-5 sm:leading-none lg:mt-6 lg:text-5xl xl:text-6xl">
-                        <span className="block">The Open Source</span>
+                        <span className="block text-white">The Open Source</span>
                         <span className="text-brand-600 md:ml-0 block">Firebase Alternative</span>
                       </h1>
                       <p className="mt-5 text-base text-dark-200 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
@@ -49,11 +48,11 @@ const Hero = () => {
                       <p className="mt-3 text-base text-dark-400">
                         Storage and serverless functions coming soon
                       </p>
-                      <Button
-                        className="mt-10 py-3"
-                        text="Start your project"
-                        url="https://app.supabase.io/api/login"
-                      />
+                      <a href="https://app.supabase.io/api/login">
+                        <Button className="mt-10 py-3" size="medium">
+                          Start your project
+                        </Button>
+                      </a>
                       <p className="mt-8 text-sm text-dark-400 tracking-wide sm:mt-10">backed by</p>
                       <div className="mt-5 w-full sm:max-w-lg lg:ml-0">
                         <div className="flex flex-wrap items-center justify-start">
