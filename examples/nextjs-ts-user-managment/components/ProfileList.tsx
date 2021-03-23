@@ -1,35 +1,50 @@
 import ProfileCard from '../components/ProfileCard'
 import { Profile } from '../lib/constants'
 import { supabase } from '../lib/supabaseClient'
-import { useState, useEffect } from 'react'
+import { useEffect, useReducer } from 'react'
 
-export default function ProfileList() {
-  const [profiles, setProfiles] = useState<Profile[]>([])
+/**
+ * Since we want this component to update in realtime,
+ * we should use "useReducer" for sending Realtime events
+ */
+
+type State = {
+  profiles: Profile[]
+}
+type Action = {
+  payload: Profile
+}
+type ProfileListProps = {
+  profiles: Profile[]
+}
+
+const handleDatabaseEvent = (state: State, action: Action) => {
+  const otherProfiles = state.profiles.filter((x) => x.id != action.payload.id)
+  return {
+    profiles: [action.payload, ...otherProfiles],
+  }
+}
+
+export default function ProfileList({ profiles }: ProfileListProps) {
+  const initialState: State = { profiles }
+  const [state, dispatch] = useReducer(handleDatabaseEvent, initialState)
 
   useEffect(() => {
-    getPublicProfiles()
-  }, [])
+    const subscription = supabase
+      .from('profiles')
+      .on('*', (payload) => {
+        dispatch({ payload: payload.new })
+      })
+      .subscribe()
 
-  async function getPublicProfiles() {
-    try {
-      const { data, error } = await supabase
-        .from<Profile>('profiles')
-        .select('id, username, avatar_url, website, updated_at')
-        .order('updated_at', { ascending: false })
-
-      if (error || ! data) {
-        throw error || new Error('No data')
-      }
-      
-      setProfiles(data)
-    } catch (error) {
-      console.log('error', error.message)
+    return () => {
+      supabase.removeSubscription(subscription)
     }
-  }
+  }, [])
 
   return (
     <>
-      {profiles?.map((profile) => (
+      {state.profiles?.map((profile) => (
         <ProfileCard profile={profile} key={profile.id} />
       ))}
     </>

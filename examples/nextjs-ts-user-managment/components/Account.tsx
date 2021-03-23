@@ -25,16 +25,15 @@ export default function Account({ session }: { session: AuthSession }) {
   async function getProfile() {
     try {
       setLoading(true)
-      const user = supabase.auth.user()
 
       let { data, error } = await supabase
         .from<Profile>('profiles')
         .select(`username, website, avatar_url`)
-        .eq('id', user.id)
+        .eq('id', session.user.id)
         .single()
 
-      if (error) {
-        throw error
+      if (error || !data) {
+        throw error || new Error('Profile not found')
       }
 
       setProfile(data)
@@ -48,10 +47,9 @@ export default function Account({ session }: { session: AuthSession }) {
   async function updateProfile() {
     try {
       setLoading(true)
-      const user = supabase.auth.user()
 
       const updates = {
-        id: user.id,
+        id: session.user.id,
         username,
         website,
         updated_at: new Date(),
