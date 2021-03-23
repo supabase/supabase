@@ -1,4 +1,4 @@
-# Live Tracker Map [WIP]
+# Live Tracker Map
 
 Build with supabase-js and leafletjs. [[Demo App]](https://realtime-map.vercel.app)
 
