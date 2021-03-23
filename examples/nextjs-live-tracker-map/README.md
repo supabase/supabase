@@ -25,7 +25,6 @@ CREATE TABLE public.locations (
   longitude numeric NOT NULL,
   user_id uuid REFERENCES auth.users NOT NULL
 );
-ALTER TABLE public.locations REPLICA IDENTITY FULL; -- Send "previous data" on change
 ALTER TABLE public.locations ENABLE ROW LEVEL SECURITY;
 COMMENT ON table public.locations IS 'Individual locations sent by each user.';
 CREATE POLICY "Allow logged-in read access" on public.locations USING ( auth.role() = 'authenticated' );
