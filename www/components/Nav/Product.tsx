@@ -3,6 +3,7 @@ import Badge from 'components/Badge'
 import SolutionsData from 'data/Solutions.json'
 import CaseStudiesData from 'data/CaseStudies.json'
 import { useRouter } from 'next/router'
+import { Typography } from '@supabase/ui'
 
 const Product = () => {
   const { basePath } = useRouter()
@@ -10,11 +11,11 @@ const Product = () => {
     const { name, description, icon, label, url } = solution
 
     const content = (
-      <div className="flex md:h-full lg:flex-col">
-        <div className="flex-shrink-0">
-          <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-gray-900 dark:bg-white text-white sm:h-12 sm:w-12">
+      <div className="flex lg:flex-col">
+        <div className="flex flex-row items-center">
+          <div className="inline-flex items-center justify-center rounded-md bg-gray-900 dark:bg-white text-white sm:h-8 sm:w-8">
             <svg
-              className="h-6 w-6 stroke-white dark:stroke-black"
+              className="h-4 w-4 stroke-white dark:stroke-black"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -23,19 +24,14 @@ const Product = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
             </svg>
           </div>
+          <Typography.Title level={5} className="ml-3 mb-0">
+            {name} {label && <Badge className="ml-3">{label}</Badge>}
+          </Typography.Title>
         </div>
         <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
-          <div>
-            <p className="text-base font-medium text-gray-900 dark:text-white">
-              {name} {label && <Badge className="ml-3">{label}</Badge>}
-            </p>
-            <p className="mt-1 text-sm text-gray-500 dark:text-dark-300">{description}</p>
-          </div>
-          {url && (
-            <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
-              Learn more <span aria-hidden="true">&rarr;</span>
-            </p>
-          )}
+          <Typography.Text>
+            <p className="mt-1 text-sm">{description}</p>
+          </Typography.Text>
         </div>
       </div>
     )

@@ -51,7 +51,7 @@ const Nav = (props: Props) => {
     const content = (
       <div className="mb-3 flex md:h-full lg:flex-col">
         <div className="flex-shrink-0">
-          <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-dark-800 text-white sm:h-12 sm:w-12">
+          <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-gray-800 text-white sm:h-12 sm:w-12">
             {/* <!-- Heroicon name: chart-bar --> */}
             <svg
               className="h-6 w-6"
@@ -181,7 +181,7 @@ const Nav = (props: Props) => {
   )
 
   return (
-    <nav className="bg-white dark:bg-dark-700 z-50 sticky">
+    <nav className="bg-white dark:bg-gray-800 border-b dark:border-gray-600 z-50 sticky">
       {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
       <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-16 xl:px-20">
         <HamburgerButton toggleFlyOut={() => setOpen(true)} />
