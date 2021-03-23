@@ -11,6 +11,7 @@ import Solutions from '~/components/Nav/Product'
 import Developers from './Developers'
 import Company from './Company'
 import SectionContainer from '../Layouts/SectionContainer'
+import { Button } from '@supabase/ui'
 
 type Props = {
   darkMode: boolean
@@ -201,7 +202,7 @@ const Nav = (props: Props) => {
                 />
               </Link>
             </div>
-            <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-8">
+            <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-4">
               <FlyOutNavButton
                 title={'Product'}
                 onClick={() => handleToggle(() => setOpenProduct(!openProduct))}
@@ -249,15 +250,9 @@ const Nav = (props: Props) => {
               </a>
             </div>
           </div>
-          <div className="flex items-center">
-            <a
-              href="https://app.supabase.io/api/login"
-              className={`
-                inline-flex items-center border-b-2 border-transparent text-sm font-normal transition
-                rounded-md px-3 py-1 mr-5 bg-brand-700 text-white hover:bg-brand-800 hidden lg:block
-              `}
-            >
-              Start your project
+          <div className="flex items-center sm:space-x-4">
+            <a href="https://app.supabase.io/api/login">
+              <Button>Start your project</Button>
             </a>
             <a
               href="https://app.supabase.io/api/login"

@@ -7,12 +7,14 @@ interface Types {
   subheader: string[]
   icon?: string
   title?: string
+  image?: React.ReactNode
+  footer?: React.ReactNode
 }
 
 const ProductHeader = (props: Types) => (
-  <div className="container mx-auto px-8 sm:px-16 xl:px-20 relative py-32">
+  <div className="container mx-auto px-8 sm:px-16 xl:px-20 relative pt-32 pb-0">
     <div className="grid grid-cols-12">
-      <div className="col-span-12 lg:col-span-6">
+      <div className="col-span-12 lg:col-span-5">
         {props.icon || props.title ? (
           <div className="flex flex-row mb-4 item-center">
             {props.icon && <ProductIcon icon={props.icon} />}
@@ -23,7 +25,7 @@ const ProductHeader = (props: Types) => (
             )}
           </div>
         ) : null}
-        <Typography.Title>{props.h1}</Typography.Title>
+        <Typography.Title level={1}>{props.h1}</Typography.Title>
         {props.subheader && (
           <Typography.Text>
             {props.subheader.map((subheader) => {
@@ -37,7 +39,13 @@ const ProductHeader = (props: Types) => (
             See documentation
           </Button>
         </Space>
+        {props.footer && <div className="mb-4">{props.footer}</div>}
       </div>
+      {props.image && (
+        <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7">
+          {props.image}
+        </div>
+      )}
     </div>
   </div>
 )

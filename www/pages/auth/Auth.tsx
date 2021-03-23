@@ -64,6 +64,16 @@ function AuthPage() {
           'An open source scalable object store, capable of holding any file and file size you like.',
           'With custom policies and permissions that are familair, easy to implement and unlimited scalable storage.',
         ]}
+        image={[
+          <img
+            className="w-full header--light block"
+            src={`${basePath}/images/product/auth/header--light.png`}
+          />,
+          <img
+            className="w-full header--dark mr-0 dark:block"
+            src={`${basePath}/images/product/auth/header--dark.png`}
+          />,
+        ]}
       />
 
       <SectionContainer>

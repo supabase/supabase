@@ -33,8 +33,8 @@ function TwitterSocialProof() {
               Supabase would not be possible without them.
             </p>
             <Space className="justify-center mt-8">
-              <Button size="small" iconRight={<IconMessageCircle size="tiny" />} type="outline">
-                Join the discussion
+              <Button size="small" iconRight={<IconMessageCircle size="tiny" />} type="default">
+                Github discussion
               </Button>
               <Button
                 size="small"

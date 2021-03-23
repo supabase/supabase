@@ -23,8 +23,6 @@ const Index = ({}: Props) => {
         <Container>
           <Hero />
           <Features />
-          <BuiltExamples />
-          <MadeForDevelopers />
           <div className="relative">
             <div className="section--masked">
               <div className="section--bg-masked">
@@ -39,6 +37,8 @@ const Index = ({}: Props) => {
               </div>
             </div>
           </div>
+          <BuiltExamples />
+          <MadeForDevelopers />
           <AdminAccess />
           <CaseStudies />
           <CTABanner />
