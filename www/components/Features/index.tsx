@@ -1,6 +1,8 @@
 import { Button, Badge, Typography } from '@supabase/ui'
 import SectionHeader from 'components/UI/SectionHeader'
 import Solutions from 'data/Solutions.json'
+import SectionContainer from '../Layouts/SectionContainer'
+import ProductIcon from '../ProductIcon'
 
 const Features = () => {
   const IconSections = Object.values(Solutions).map((solution: any) => {
@@ -8,19 +10,11 @@ const Features = () => {
     return (
       <div key={name} className="mb-16">
         <div className="flex items-center">
-          <div className="flex items-center justify-center h-12 w-12 rounded-md bg-gray-900 text-white dark:bg-white">
-            <svg
-              className="h-6 w-6 stroke-white dark:stroke-black"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
-            </svg>
-          </div>
+          <ProductIcon icon={icon} />
           <dt className="flex flex-row xl:flex-col ml-4">
-            <Typography.Title level={4}>{name}</Typography.Title>
+            <Typography.Title level={4} className="m-0">
+              {name}
+            </Typography.Title>
           </dt>
         </div>
         <div className="mt-5">
@@ -43,20 +37,14 @@ const Features = () => {
   })
 
   return (
-    <div className="bg-gray-50 dark:bg-dark-800 overflow-hidden py-12">
-      <div className="container mx-auto px-8 sm:px-16 xl:px-20">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeader
-            title={'Build Faster'}
-            title_alt={' and Focus on Your Products'}
-            subtitle={'What you get with Supabase'}
-          />
-          <dl className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:gap-16">
-            {IconSections}
-          </dl>
-        </div>
-      </div>
-    </div>
+    <SectionContainer className="pb-0">
+      <Typography.Title level={2} className="mb-16">
+        Build faster and focus on your products
+      </Typography.Title>
+      <dl className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:gap-16 lg:gap-x-8 xl:gap-x-24">
+        {IconSections}
+      </dl>
+    </SectionContainer>
   )
 }
 

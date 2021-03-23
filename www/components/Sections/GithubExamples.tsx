@@ -39,7 +39,9 @@ function GithubExamples() {
             {Object.values(Examples).map((example: any, i: number) => {
               return (
                 <SwiperSlide>
-                  <ExampleCard i={i} {...example} />
+                  <div className="my-8 mr-3 ml-3">
+                    <ExampleCard i={i} {...example} />
+                  </div>
                 </SwiperSlide>
               )
             })}

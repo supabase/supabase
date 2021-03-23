@@ -11,7 +11,7 @@ import Link from 'next/link'
 
 function ExampleCard(props: any) {
   return (
-    <div className="my-8 mr-3 ml-3">
+    <>
       <div
         className="
           bg-white dark:bg-gray-700 
@@ -95,7 +95,7 @@ function ExampleCard(props: any) {
           </Space>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

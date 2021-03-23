@@ -12,7 +12,7 @@ interface APIExample {
 
 interface Props {
   content?: APIExample
-  title: string
+  title: string | React.ReactNode
   footer?: React.ReactNode
   text?: React.ReactNode
 }
