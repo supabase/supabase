@@ -107,8 +107,8 @@ Supabase provides a special function in Postgres, `auth.uid()`, which extracts t
 
 ## Policy Examples
 
-Here are some example policies to show you the power of Postgres Row level security. Each policy is attached to a table, and the policy is run
-every time a user queries that table.
+Here are some examples to show you the power of PostgreSQL's Row Level Security. Each policy is attached to a table, and the policy is executed
+every time a the table is accessed.
 
 ### Allow read access 
 
@@ -270,8 +270,13 @@ using (
 
 ### You don't have to use Policies 
 
-If you don't want to use Policies, you don't have to. You can put your authorization
-rules in your middleware, similar to how you would create security rules with any other `backend <-> middleware <-> frontend` architecture.
+You can also put your authorization rules in your middleware, 
+similar to how you would create security rules with any other `backend <-> middleware <-> frontend` architecture.
+
+Policies are a tool. In the case of "serverless/Jastack" setups, they are especially effective because you don't have to deploy any middleware at all.
+
+However if you want to use another Authorization method for your applications, that's also fine. Supabase is "just Postgres", so if your application 
+works with Postgres, then it also works with Supabase. 
 
 Tip: make sure to enable Row Level Security for all your tables, so that your tables are inaccessible. Then use the "Service" which we provide. 
 "Service" are designed to bypass RLS.
