@@ -11,6 +11,7 @@ import {
   IconArrowUpRight,
   IconLock,
   IconShield,
+  IconShuffle,
   IconX,
   Space,
   Tabs,
@@ -75,18 +76,18 @@ function Database() {
         image={[
           <img
             className="w-full header--light block"
-            src={`${basePath}/images/product/database/header--light.png`}
+            src={`${basePath}/images/product/database/header--light-2.png`}
           />,
           <img
             className="w-full header--dark mr-0 dark:block"
-            src={`${basePath}/images/product/database/header--dark.png`}
+            src={`${basePath}/images/product/database/header--dark-2.png`}
           />,
         ]}
       />
 
       <SectionContainer>
         <div className="grid grid-cols-12">
-          <div className="col-span-3">
+          <div className="mb-8 lg:mb-0 col-span-12 lg:col-span-3">
             <p className="mb-4">
               <Space>
                 <ProductIcon icon={Solutions['database'].icon} />
@@ -100,12 +101,12 @@ function Database() {
                 Our database is PostgreSQL, which is an open source object-relational database.
               </p>
               <p>
-                With Supabase’s APIs and easy to use dashboard, it makes designing relational
+                With supabase’s APIs and easy to use dashboard, it makes designing relational
                 databases easy.
               </p>
             </Typography.Text>
           </div>
-          <div className="col-span-3 col-start-5">
+          <div className="mb-8 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
             <p className="mb-4">
               <Space>
                 <ProductIcon icon={Solutions['database'].icon} />
@@ -115,16 +116,13 @@ function Database() {
             </p>
             <Typography.Title level={4}>Auth</Typography.Title>
             <Typography.Text>
-              <p className="text-lg">
-                With 30 years in the making, it is the worlds most trusted and advanced relational
-                database.
-              </p>
-              <p>Our PostgreSQL databases have a reputation for realiability and robustness.</p>
+              <p className="text-lg">Auth permissions built in with supabase Auth</p>
+              <p>Control exactly which user roles can read or write what rows in your database.</p>
             </Typography.Text>
           </div>
-          <div className="col-span-3 col-start-9">
+          <div className="col-span-12 lg:col-span-3 lg:col-start-9">
             <p className="mb-4">
-              <IconShield />
+              <IconShuffle />
             </p>
             <Typography.Title level={4}>Realtime</Typography.Title>
             <Typography.Text>
@@ -295,7 +293,7 @@ function Database() {
             </Typography.Text>
             <FeatureColumn
               title="40+ preinstalled extensions"
-              text="We only show a few of the extensions supported by Supabase here, but we preinstall many more that you can use right away."
+              text="We only show a few of the extensions supported by supabase here, but we preinstall many more that you can use right away."
             />
             <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
               Expore documentation

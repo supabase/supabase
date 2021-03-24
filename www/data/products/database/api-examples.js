@@ -2,6 +2,7 @@ export default [
   {
     lang: 'js',
     title: 'Create a record',
+    size: 'large',
     code: `// 
 //  Create a record in a table
 //  Insert new record into a table called \`rooms\`
@@ -21,11 +22,13 @@ const { data, error } = await supabase
 
 
 
+
 `,
   },
   {
     lang: 'js',
     title: 'Read a record',
+    size: 'large',
     code: `// 
 //  reading a record from a table
 //  with column \`public\` equals true
@@ -39,6 +42,13 @@ const { data, error } = await supabase
 
 // \`data\` returns data
 // \`error\` for handling errors
+
+
+
+
+
+
+
 `,
   },
 ]

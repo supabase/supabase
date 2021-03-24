@@ -8,6 +8,7 @@ interface APIExample {
   lang: 'js' | 'py' | 'sql'
   code: string
   title: string
+  size?: 'small' | 'large'
 }
 
 interface Props {
@@ -67,7 +68,11 @@ function APISection(props: Props) {
             {props.content &&
               props.content.map((content, i) => (
                 <SwiperSlide>
-                  <CodeBlock key={i} lang={content.lang} size={'large'}>
+                  <CodeBlock
+                    key={i}
+                    lang={content.lang}
+                    size={content.size ? content.size : 'small'}
+                  >
                     {content.code}
                   </CodeBlock>
                 </SwiperSlide>
