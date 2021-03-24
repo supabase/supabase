@@ -9,7 +9,7 @@ import SolutionsData from 'data/Solutions.json'
 
 import Solutions from '~/components/Nav/Product'
 import Developers from './Developers'
-import Company from './Company'
+import { Button } from '@supabase/ui'
 
 type Props = {
   darkMode: boolean
@@ -22,7 +22,6 @@ const Nav = (props: Props) => {
 
   const [openProduct, setOpenProduct] = useState(false)
   const [openDevelopers, setOpenDevelopers] = useState(false)
-  const [openCompany, setOpenCompany] = useState(false)
 
   React.useEffect(() => {
     if (open) {
@@ -41,7 +40,6 @@ const Nav = (props: Props) => {
   function handleCancel() {
     setOpenProduct(false)
     setOpenDevelopers(false)
-    setOpenCompany(false)
   }
 
   const iconSections = Object.values(SolutionsData).map((solution: any, idx: number) => {
@@ -50,7 +48,7 @@ const Nav = (props: Props) => {
     const content = (
       <div className="mb-3 flex md:h-full lg:flex-col">
         <div className="flex-shrink-0">
-          <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-dark-800 text-white sm:h-12 sm:w-12">
+          <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-gray-800 text-white sm:h-12 sm:w-12">
             {/* <!-- Heroicon name: chart-bar --> */}
             <svg
               className="h-6 w-6"
@@ -180,11 +178,12 @@ const Nav = (props: Props) => {
   )
 
   return (
-    <nav className="bg-white dark:bg-dark-700 z-50 sticky">
-      <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0">
+    <nav className="bg-white dark:bg-gray-800 border-b dark:border-gray-600 z-50 sticky">
+      {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
+      <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-16 xl:px-20">
         <HamburgerButton toggleFlyOut={() => setOpen(true)} />
 
-        <div className="flex-1 flex items-center justify-center sm:px-10 sm:items-stretch lg:justify-between">
+        <div className="flex-1 flex items-center justify-center sm:items-stretch lg:justify-between">
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" as="/">
@@ -199,7 +198,7 @@ const Nav = (props: Props) => {
                 />
               </Link>
             </div>
-            <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-8">
+            <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-4">
               <FlyOutNavButton
                 title={'Product'}
                 onClick={() => handleToggle(() => setOpenProduct(!openProduct))}
@@ -210,21 +209,12 @@ const Nav = (props: Props) => {
                 onClick={() => handleToggle(() => setOpenDevelopers(!openDevelopers))}
                 active={openDevelopers}
               />
-              {/* <FlyOutNavButton
-                title={'Company'}
-                onClick={() => handleToggle(() => setOpenCompany(!openCompany))}
-                active={openCompany}
-              /> */}
-
               <FlyOut open={openProduct} handleCancel={handleCancel}>
                 <Solutions />
               </FlyOut>
               <FlyOut open={openDevelopers} handleCancel={handleCancel}>
                 <Developers />
               </FlyOut>
-              {/* <FlyOut open={openCompany} handleCancel={handleCancel}>
-                <Company />
-              </FlyOut> */}
               <a
                 href="/beta"
                 className={`
@@ -247,15 +237,9 @@ const Nav = (props: Props) => {
               </a>
             </div>
           </div>
-          <div className="flex items-center">
-            <a
-              href="https://app.supabase.io/api/login"
-              className={`
-                inline-flex items-center border-b-2 border-transparent text-sm font-normal transition
-                rounded-md px-3 py-1 mr-5 bg-brand-700 text-white hover:bg-brand-800 hidden lg:block
-              `}
-            >
-              Start your project
+          <div className="flex items-center sm:space-x-4">
+            <a href="https://app.supabase.io/api/login">
+              <Button>Start your project</Button>
             </a>
             <a
               href="https://app.supabase.io/api/login"
@@ -270,6 +254,7 @@ const Nav = (props: Props) => {
         </div>
         {/* <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"></div> */}
       </div>
+      {/* </div> */}
 
       {/* Mobile Nav Menu */}
       <Transition
