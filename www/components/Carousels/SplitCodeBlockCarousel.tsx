@@ -9,8 +9,21 @@ import CodeBlock from '../CodeBlock/CodeBlock'
 import 'swiper/swiper.min.css'
 import Badge from '../Badge'
 
+interface Content {
+  lang: 'js' | 'py' | 'sql'
+  title: string
+  code: string
+  detail_title?: string
+  detail_text?: string
+  badges_label?: string
+  badges?: string[]
+  url?: string
+}
+
 interface SplitCodeBlockCarousel {
-  content: any
+  content: Content[]
+  footer?: React.ReactNode
+  altTabView?: boolean
 }
 
 function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
@@ -48,7 +61,6 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
   return (
     <div className="col-span-12 lg:col-span-6 lg:col-start-7 sbui-tabs--alt">
       <Tabs
-        className="alt-tabs"
         scrollable
         // @ts-ignore
         activeId={apiSwiperActiveIndex.toString()}

@@ -1,8 +1,8 @@
 export default [
   {
+    lang: 'js',
     title: 'Create user',
     description: 'Sign up a new user in an example chat room',
-    lang: 'js',
     code: `import { createClient } from '@supabase/supabase-js'
     
 // Initialize 
@@ -18,9 +18,9 @@ const { user, error } = await supabase.auth.signUp({
     `,
   },
   {
+    lang: 'js',
     title: 'Realtime subscriptions',
     description: 'Receive realtime messages in an example chat room',
-    lang: 'js',
     code: `import { createClient } from '@supabase/supabase-js'
     
 // Initialize 
@@ -38,9 +38,9 @@ const realtime = supabase
     `,
   },
   {
+    lang: 'js',
     title: 'Read a record',
     description: 'Get all public rooms and their messages',
-    lang: 'js',
     code: `m '@supabase/supabase-js'
 
 // Initialize 
@@ -59,9 +59,9 @@ const publicRooms = await supabase
     `,
   },
   {
+    lang: 'js',
     title: 'Create a record',
     description: 'Create a new chat room',
-    lang: 'js',
     code: `import { createClient } from '@supabase/supabase-js'
 
 // Initialize 
@@ -76,9 +76,9 @@ const newRoom = await supabase
   `,
   },
   {
+    lang: 'js',
     title: 'Update a record',
     description: 'Update a user',
-    lang: 'js',
     code: `import { createClient } from '@supabase/supabase-js'
     
 // Initialize 
