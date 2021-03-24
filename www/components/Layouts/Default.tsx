@@ -16,12 +16,20 @@ const DefaultLayout = (props: Props) => {
     const isDarkMode = localStorage.getItem('supabaseDarkMode')
     if (isDarkMode) {
       setDarkMode(isDarkMode === 'true')
-      document.documentElement.className = isDarkMode === 'true' ? 'dark' : ''
+      if (isDarkMode === 'true') {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
     }
   }, [])
 
   const updateTheme = (isDarkMode: boolean) => {
-    document.documentElement.className = isDarkMode ? 'dark' : ''
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
     setDarkMode(isDarkMode)
   }
 
