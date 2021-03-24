@@ -74,7 +74,7 @@ function ImageCarousel(props: ImageCaoursel) {
           <div className={props.altTabView ? 'hidden' : 'block'}>
             <Tabs
               scrollable
-              type="underlined"
+              type={props.altTabView ? 'underlined' : 'pills'}
               // @ts-ignore
               activeId={imageSwiperActiveIndex.toString()}
               // @ts-ignore

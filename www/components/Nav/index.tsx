@@ -9,8 +9,6 @@ import SolutionsData from 'data/Solutions.json'
 
 import Solutions from '~/components/Nav/Product'
 import Developers from './Developers'
-import Company from './Company'
-import SectionContainer from '../Layouts/SectionContainer'
 import { Button } from '@supabase/ui'
 
 type Props = {
@@ -24,7 +22,6 @@ const Nav = (props: Props) => {
 
   const [openProduct, setOpenProduct] = useState(false)
   const [openDevelopers, setOpenDevelopers] = useState(false)
-  const [openCompany, setOpenCompany] = useState(false)
 
   React.useEffect(() => {
     if (open) {
@@ -43,7 +40,6 @@ const Nav = (props: Props) => {
   function handleCancel() {
     setOpenProduct(false)
     setOpenDevelopers(false)
-    setOpenCompany(false)
   }
 
   const iconSections = Object.values(SolutionsData).map((solution: any, idx: number) => {
@@ -213,21 +209,12 @@ const Nav = (props: Props) => {
                 onClick={() => handleToggle(() => setOpenDevelopers(!openDevelopers))}
                 active={openDevelopers}
               />
-              {/* <FlyOutNavButton
-                title={'Company'}
-                onClick={() => handleToggle(() => setOpenCompany(!openCompany))}
-                active={openCompany}
-              /> */}
-
               <FlyOut open={openProduct} handleCancel={handleCancel}>
                 <Solutions />
               </FlyOut>
               <FlyOut open={openDevelopers} handleCancel={handleCancel}>
                 <Developers />
               </FlyOut>
-              {/* <FlyOut open={openCompany} handleCancel={handleCancel}>
-                <Company />
-              </FlyOut> */}
               <a
                 href="/beta"
                 className={`
