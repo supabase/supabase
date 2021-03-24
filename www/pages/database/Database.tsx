@@ -11,6 +11,7 @@ import {
   IconArrowUpRight,
   IconLock,
   IconShield,
+  IconX,
   Space,
   Tabs,
   Typography,
@@ -38,6 +39,7 @@ import TweetCard from '~/components/TweetCard'
 import FeatureColumn from '~/components/FeatureColumn'
 
 import Solutions from 'data/Solutions.json'
+import ProductIcon from '~/components/ProductIcon'
 
 // install Swiper's Controller component
 // SwiperCore.use([Controller])
@@ -87,65 +89,50 @@ function Database() {
           <div className="col-span-3">
             <p className="mb-4">
               <Space>
-                <img src={`${basePath}/images/product/auth/google-icon.svg`} width={21} />
-                <img src={`${basePath}/images/product/auth/facebook-icon.svg`} width={21} />
-                <div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 32.58 31.77"
-                    width={21}
-                    className="text-gray-800 dark:text-white"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M16.29,0a16.29,16.29,0,0,0-5.15,31.75c.82.15,1.11-.36,1.11-.79s0-1.41,0-2.77C7.7,29.18,6.74,26,6.74,26a4.36,4.36,0,0,0-1.81-2.39c-1.47-1,.12-1,.12-1a3.43,3.43,0,0,1,2.49,1.68,3.48,3.48,0,0,0,4.74,1.36,3.46,3.46,0,0,1,1-2.18c-3.62-.41-7.42-1.81-7.42-8a6.3,6.3,0,0,1,1.67-4.37,5.94,5.94,0,0,1,.16-4.31s1.37-.44,4.48,1.67a15.41,15.41,0,0,1,8.16,0c3.11-2.11,4.47-1.67,4.47-1.67A5.91,5.91,0,0,1,25,11.07a6.3,6.3,0,0,1,1.67,4.37c0,6.26-3.81,7.63-7.44,8a3.85,3.85,0,0,1,1.11,3c0,2.18,0,3.94,0,4.47s.29.94,1.12.78A16.29,16.29,0,0,0,16.29,0Z"
-                    />
-                  </svg>
-                </div>
-                <img src={`${basePath}/images/product/auth/gitlab-icon.svg`} width={21} />
-                <img src={`${basePath}/images/product/auth/bitbucket-icon.svg`} width={21} />
+                <ProductIcon icon={Solutions['database'].icon} />
+                <IconX />
+                <img src={`${basePath}/images/product/database/postgresql-icon.svg`} width={30} />
               </Space>
             </p>
-            <Typography.Title level={4}>All the social providers</Typography.Title>
+            <Typography.Title level={4}>PostgreSQL Relational</Typography.Title>
             <Typography.Text>
               <p className="text-lg">
-                We provide all the popular social logins you expect. Google, Facebook, Github,
-                Azure, Gitlab and Bitbucket.
+                Our database is PostgreSQL, which is an open source object-relational database.
               </p>
-              <Space>
-                <img src={`${basePath}/images/product/auth/twitter-icon.svg`} width={21} />
-                <p className="m-0">
-                  <span className="text-gray-800 dark:text-white">Twitter</span> coming soon
-                </p>
-              </Space>
+              <p>
+                With Supabase’s APIs and easy to use dashboard, it makes designing relational
+                databases easy.
+              </p>
             </Typography.Text>
           </div>
           <div className="col-span-3 col-start-5">
             <p className="mb-4">
-              <IconLock />
+              <Space>
+                <ProductIcon icon={Solutions['database'].icon} />
+                <IconX />
+                <ProductIcon icon={Solutions['authentication'].icon} />
+              </Space>
             </p>
-            <Typography.Title level={4}>Fully integrated</Typography.Title>
+            <Typography.Title level={4}>Auth</Typography.Title>
             <Typography.Text>
               <p className="text-lg">
-                Auth built into your project, no external services (liek auth0)ZERO setup.
+                With 30 years in the making, it is the worlds most trusted and advanced relational
+                database.
               </p>
-              <p>
-                Send authentication emails from your own custom domain.Set up once and all email
-                templates will come from your desired email address.
-              </p>
+              <p>Our PostgreSQL databases have a reputation for realiability and robustness.</p>
             </Typography.Text>
           </div>
           <div className="col-span-3 col-start-9">
             <p className="mb-4">
               <IconShield />
             </p>
-            <Typography.Title level={4}>Own your data</Typography.Title>
+            <Typography.Title level={4}>Realtime</Typography.Title>
             <Typography.Text>
-              <p className="text-lg">
-                Use media in your project without needing to reply on external services or learn new
-                frameworks.
+              <p className="text-lg">We built realtime functionality right into the database.</p>
+              <p>
+                Our powerful APIs allow you to watch for specific row and column changes so you can
+                easily make smart apps quicker.
               </p>
-              <p>Supabase is GDPR / CPA Compliant</p>
             </Typography.Text>
           </div>
         </div>

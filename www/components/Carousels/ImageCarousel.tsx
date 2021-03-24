@@ -27,6 +27,7 @@ interface Content {
 interface ImageCaoursel {
   content: Content
   footer?: React.ReactNode
+  altTabView?: boolean
 }
 
 function ImageCarousel(props: ImageCaoursel) {
@@ -70,22 +71,27 @@ function ImageCarousel(props: ImageCaoursel) {
     <div className="grid grid-cols-12">
       <div className="col-span-12 lg:col-span-6 w-full">
         <div className="col-span-12 lg:col-span-7 sbui-tabs--alt">
-          <Tabs
-            scrollable
-            type="pills"
-            // @ts-ignore
-            activeId={imageSwiperActiveIndex.toString()}
-            // @ts-ignore
-            onChange={(id: string) => handleImageSwiperNav(Number(id))}
-          >
-            {props.content.map((content, i) => {
-              return (
-                <Tabs.Panel label={content.label ? content.label : content.title} id={i.toString()}>
-                  <span></span>
-                </Tabs.Panel>
-              )
-            })}
-          </Tabs>
+          <div className={props.altTabView ? 'hidden' : 'block'}>
+            <Tabs
+              scrollable
+              type="underlined"
+              // @ts-ignore
+              activeId={imageSwiperActiveIndex.toString()}
+              // @ts-ignore
+              onChange={(id: string) => handleImageSwiperNav(Number(id))}
+            >
+              {props.content.map((content, i) => {
+                return (
+                  <Tabs.Panel
+                    label={content.label ? content.label : content.title}
+                    id={i.toString()}
+                  >
+                    <span></span>
+                  </Tabs.Panel>
+                )
+              })}
+            </Tabs>
+          </div>
           <div
             className={`border border-gray-100 dark:border-gray-600 rounded-md bg-gray-800 overflow-hidden ${ImageCarouselStyles['gradient-bg']}`}
           >
@@ -103,7 +109,18 @@ function ImageCarousel(props: ImageCaoursel) {
               {props.content.map((content, i) => {
                 return (
                   <SwiperSlide key={i}>
-                    <img src={`${basePath}${content.img_url}`} />
+                    {content.img_url && <img src={`${basePath}${content.img_url}`} />}
+                    {content.video_url && (
+                      <video
+                        src={`${basePath}/${content.video_url}`}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                      >
+                        Your browser does not support the video tag
+                      </video>
+                    )}
                   </SwiperSlide>
                 )
               })}
@@ -112,15 +129,30 @@ function ImageCarousel(props: ImageCaoursel) {
         </div>
       </div>
       <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-5 lg:col-start-8 xl:col-span-4 xl:col-start-9">
+        <div className={`sbui-tabs--underline-alt ${props.altTabView ? 'block' : 'hidden'} mb-3`}>
+          <Tabs
+            scrollable
+            type="underlined"
+            size="small"
+            // @ts-ignore
+            activeId={imageSwiperActiveIndex.toString()}
+            // @ts-ignore
+            onChange={(id: string) => handleImageSwiperNav(Number(id))}
+            block
+          >
+            {props.content.map((content, i) => {
+              return (
+                <Tabs.Panel label={content.label ? content.label : content.title} id={i.toString()}>
+                  <span></span>
+                </Tabs.Panel>
+              )
+            })}
+          </Tabs>
+        </div>
         <Swiper
           // @ts-ignore
           onSwiper={setSwiperDetails}
-          // style={{ zIndex: 0 }}
           initialSlide={0}
-          // spaceBetween={0}
-          // slidesPerView={1}
-          // direction="horizontal"
-          // style={{ overflow: 'hidden' }}
           speed={400}
           allowTouchMove={false}
           autoHeight={true}
