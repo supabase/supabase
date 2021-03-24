@@ -21,6 +21,8 @@ import {
   IconArrowUpRight,
   IconShuffle,
   IconWifi,
+  IconChevronsRight,
+  IconCheckSquare,
 } from '@supabase/ui'
 import { createClient } from '@supabase/supabase-js'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -46,6 +48,7 @@ import TweetCard from '~/components/TweetCard'
 
 import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
 import ExampleCard from '~/components/ExampleCard'
+import ProductIcon from '~/components/ProductIcon'
 
 function AuthPage() {
   // base path for images
@@ -89,30 +92,18 @@ function AuthPage() {
           <div className="col-span-3">
             <p className="mb-4">
               <Space>
-                <img src={`${basePath}/images/product/auth/google-icon.svg`} width={21} />
-                <img src={`${basePath}/images/product/auth/facebook-icon.svg`} width={21} />
-                <div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 32.58 31.77"
-                    width={21}
-                    className="text-gray-800 dark:text-white"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M16.29,0a16.29,16.29,0,0,0-5.15,31.75c.82.15,1.11-.36,1.11-.79s0-1.41,0-2.77C7.7,29.18,6.74,26,6.74,26a4.36,4.36,0,0,0-1.81-2.39c-1.47-1,.12-1,.12-1a3.43,3.43,0,0,1,2.49,1.68,3.48,3.48,0,0,0,4.74,1.36,3.46,3.46,0,0,1,1-2.18c-3.62-.41-7.42-1.81-7.42-8a6.3,6.3,0,0,1,1.67-4.37,5.94,5.94,0,0,1,.16-4.31s1.37-.44,4.48,1.67a15.41,15.41,0,0,1,8.16,0c3.11-2.11,4.47-1.67,4.47-1.67A5.91,5.91,0,0,1,25,11.07a6.3,6.3,0,0,1,1.67,4.37c0,6.26-3.81,7.63-7.44,8a3.85,3.85,0,0,1,1.11,3c0,2.18,0,3.94,0,4.47s.29.94,1.12.78A16.29,16.29,0,0,0,16.29,0Z"
-                    />
-                  </svg>
-                </div>
-                <img src={`${basePath}/images/product/auth/gitlab-icon.svg`} width={21} />
-                <img src={`${basePath}/images/product/auth/bitbucket-icon.svg`} width={21} />
+                <ProductIcon icon={Solutions['storage'].icon} />
+                <IconX />
+                <ProductIcon icon={Solutions['authentication'].icon} />
+                <IconX />
+                <ProductIcon icon={Solutions['database'].icon} />
               </Space>
             </p>
             <Typography.Title level={4}>Write less code</Typography.Title>
             <Typography.Text>
               <p className="text-lg">
-                Use media in your project without needing to reply on external services or learn new
-                frameworks.
+                Use media in your project without needing to rely on external services or learn new
+                frameworks - integrates with supabase Auth and Database.
               </p>
               <p>
                 Familiar and easy to use permissions mean that your content is secure and accessible
@@ -122,7 +113,7 @@ function AuthPage() {
           </div>
           <div className="col-span-3 col-start-5">
             <p className="mb-4">
-              <IconLink />
+              <IconChevronsRight />
             </p>
             <Typography.Title level={4}>Blazing fast</Typography.Title>
             <Typography.Text>
@@ -135,7 +126,7 @@ function AuthPage() {
           </div>
           <div className="col-span-3 col-start-9">
             <p className="mb-4">
-              <IconShield />
+              <IconCheckSquare />
             </p>
             <Typography.Title level={4}>Dependable</Typography.Title>
             <Typography.Text>
