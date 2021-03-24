@@ -38,6 +38,7 @@ import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 import CTABanner from '~/components/CTABanner'
 
 import Solutions from 'data/Solutions.json'
+import AuthComponentExample from '~/components/AuthWidget/AuthComponentExample'
 
 function AuthPage() {
   // base path for images
@@ -223,79 +224,7 @@ function AuthPage() {
       <div className="container mx-auto px-8 sm:px-16 xl:px-20 relative py-32">
         <div className="grid grid-cols-12 lg:gap-16">
           <div className="order-last col-span-12 lg:order-first lg:col-span-6 mt-8 lg:mt-0">
-            <div
-              className={`relative bg-white dark:bg-gray-800 py-2 pb-16 border dark:border-gray-600 auth-container`}
-            >
-              <div className="w-full h-full left-0 top-2">
-                <Tabs
-                  size="medium"
-                  defaultActiveId="panel-1"
-                  type="underlined"
-                  tabBarStyle={{ padding: '0 16px' }}
-                  addOnAfter={[
-                    <Space>
-                      <Button type="default" icon={<IconCopy />}>
-                        Copy code
-                      </Button>
-                    </Space>,
-                  ]}
-                >
-                  <Tabs.Panel label="Preview" id="panel-1" icon={<IconZoomIn />}>
-                    <div style={{ maxWidth: '420px', margin: '0 auto' }}>
-                      <Card>
-                        <Space size={8} direction="vertical">
-                          <div>
-                            <Space size={3} direction="vertical">
-                              <img src="https://app.supabase.io/img/supabase-dark.svg" width="96" />
-                              <Typography.Title level={3}>{'Acme Company'}</Typography.Title>
-                            </Space>
-                          </div>
-                          <Auth
-                            providers={['facebook', 'google', 'github', 'bitbucket', 'gitlab']}
-                            socialButtonSize={'medium'}
-                            socialLayout={'horizontal'}
-                            supabaseClient={supabase}
-                            socialColors={false}
-                          />
-                        </Space>
-                      </Card>
-                    </div>
-                  </Tabs.Panel>
-                  <Tabs.Panel label="Code" icon={<IconCode />} id="panel-2">
-                    <div className="h-full">
-                      <CodeBlock
-                        hideCopy
-                        children={`// Auth example
-                      
-import React, { useState } from 'react'
-import { Auth } from './'
-import { createClient } from '@supabase/supabase-js'
-// @ts-ignore
-import { Typography, Button, Space } from '../../index'
-
-export default function app() { 
-
-    const supabase = createClient(
-        'https://YOUR-PROJECT-ID.supabase.co',
-        'YOUR-PUBLIC-ANON-KEY'
-    )
-
-    return (
-        <Auth.UserContextProvider {...args}>
-            <Container {...args}>
-                <Auth {...args} />
-            </Container>
-        </Auth.UserContextProvider>
-    )
-}
-`}
-                        lang="js"
-                      />
-                    </div>
-                  </Tabs.Panel>
-                </Tabs>
-              </div>
-            </div>
+            <AuthComponentExample />
           </div>
           <div className="col-span-12 lg:col-span-6 lg:col-start-7 xl:col-span-4 xl:col-start-8">
             <Space className="mb-4">

@@ -128,10 +128,9 @@ a {
 
 /* Auth page */
 
-.auth-container > div:nth-child(2) {
+/* .auth-container > div:nth-child(2) {
   width: 420px;
-  margin: 0 auto;
-}
+} */
 
 .auth-container {
   @apply rounded;
