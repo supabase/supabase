@@ -52,6 +52,9 @@ info:
           - subscribe()
           - removeSubscription()
           - getSubscriptions()
+      - name: 'Storage'
+        items:
+          - storage.downloadFile()
       - name: 'Modifiers'
         items:
           - Using Modifiers
@@ -776,6 +779,16 @@ pages:
 
   getSubscriptions():
     title: 'getSubscriptions()'
+    $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.getSubscriptions'
+    examples:
+      - name: Get all subscriptions
+        isSpotlight: true
+        js: |
+          ```js
+          const subscriptions = supabase.getSubscriptions()
+          ```
+  storage.downloadFile():
+    title: 'storage.downloadFile()'
     $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.getSubscriptions'
     examples:
       - name: Get all subscriptions
