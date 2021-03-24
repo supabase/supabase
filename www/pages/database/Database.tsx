@@ -79,7 +79,7 @@ function Database() {
           />,
           <img
             className="w-full header--dark mr-0 dark:block"
-            src={`${basePath}/images/product/database/header--light.png`}
+            src={`${basePath}/images/product/database/header--dark.png`}
           />,
         ]}
       />

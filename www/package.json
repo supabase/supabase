@@ -36,6 +36,7 @@
     "remark-gfm": "^1.0.0",
     "remark-html": "10.0.0",
     "swiper": "^6.5.0",
+    "swr": "^0.5.4",
     "typescript": "^4.0.3",
     "uuid": "^8.3.2"
   },

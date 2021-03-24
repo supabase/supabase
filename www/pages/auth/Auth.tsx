@@ -121,11 +121,10 @@ function AuthPage() {
             <Typography.Title level={4}>Fully integrated</Typography.Title>
             <Typography.Text>
               <p className="text-lg">
-                Auth built into your project, no external services (liek auth0)ZERO setup.
+                Auth built into your project, with no need for external authentication services.
               </p>
               <p>
-                Send authentication emails from your own custom domain.Set up once and all email
-                templates will come from your desired email address.
+                Use your own custom domains with SMTP settings.
               </p>
             </Typography.Text>
           </div>
@@ -136,10 +135,9 @@ function AuthPage() {
             <Typography.Title level={4}>Own your data</Typography.Title>
             <Typography.Text>
               <p className="text-lg">
-                Use media in your project without needing to reply on external services or learn new
-                frameworks.
+                Keep all your user data in your supabase project so you never have to worry about 3rd party privacy issues.
               </p>
-              <p>Supabase is GDPR / CPA Compliant</p>
+              <p>Supabase is GDPR / CPA Compliant.</p>
             </Typography.Text>
           </div>
         </div>
