@@ -135,7 +135,10 @@
     { "source": "/docs/client/fts", "destination": "/docs/reference/javascript/textSearch" },
     { "source": "/docs/client/plfts", "destination": "/docs/reference/javascript/textSearch" },
     { "source": "/docs/client/phfts", "destination": "/docs/reference/javascript/textSearch" },
-    { "source": "/docs/client/wfts", "destination": "/docs/reference/javascript/textSearch" }
+    { "source": "/docs/client/wfts", "destination": "/docs/reference/javascript/textSearch" },
+
+    { "source": "/blog/page/:match*", "destination": "/blog" },
+    { "source": "/blog/tags", "destination": "/blog" }
   ],
   "trailingSlash": false
 }
