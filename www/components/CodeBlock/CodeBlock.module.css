@@ -1,5 +1,5 @@
 .code-block {
-  @apply rounded-b-lg;
+  @apply rounded-lg;
   /* padding-top: 8px !important; */
   @apply border border-gray-600;
 }
