@@ -5,9 +5,33 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 10 Mar 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Wed, 24 Mar 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.io/blog/2021-03-25-launch-week</guid>
+  <title>Launch week</title>
+  <link>https://supabase.io/blog/2021-03-25-launch-week</link>
+  <description>Five days of Supabase.</description>
+  <pubDate>Wed, 24 Mar 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021-03-25-angels-of-supabase</guid>
+  <title>Angels of Supabase</title>
+  <link>https://supabase.io/blog/2021-03-25-angels-of-supabase</link>
+  <description>Meet the investors of Supabase.</description>
+  <pubDate>Wed, 24 Mar 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021-03-22-In-The-Loop</guid>
+  <title>Developers stay up to date with intheloop.dev</title>
+  <link>https://supabase.io/blog/2021-03-22-In-The-Loop</link>
+  <description>Learn why Kevin is building intheloop.dev with Supabase</description>
+  <pubDate>Sun, 21 Mar 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.io/blog/2021-03-11-using-supabase-replit</guid>
   <title>Using Supabase in Replit</title>
