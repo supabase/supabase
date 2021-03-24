@@ -29,8 +29,8 @@
   ],
   "redirects": [
     {
-      "source": "/new/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders",
-      "destination": "/new/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders"
+      "source": "/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders",
+      "destination": "/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders"
     },
     {
       "source": "/blog/2020/07/10/surviving-hacker-news",
