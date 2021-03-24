@@ -4,15 +4,15 @@ import { Button, IconArrowUpRight, Tabs, Typography } from '@supabase/ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import CodeBlock from '../CodeBlock/CodeBlock'
 
-interface APIExample {
+interface Example {
   lang: 'js' | 'py' | 'sql'
-  code: string
   title: string
-  size?: 'small' | 'large'
+  code: string
 }
 
 interface Props {
-  content?: APIExample
+  size?: 'small' | 'large'
+  content: Example[]
   title: string | React.ReactNode
   footer?: React.ReactNode
   text?: React.ReactNode
@@ -42,13 +42,11 @@ function APISection(props: Props) {
       <div className="col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 sbui-tabs--alt">
         <Tabs
           scrollable
-          // @ts-ignore
           activeId={apiSwiperActiveIndex.toString()}
-          // @ts-ignore
           onChange={(id: string) => handleApiSwiperNavChange(Number(id))}
         >
           {props.content &&
-            props.content.map((content, i) => (
+            props.content.map((content: Example, i) => (
               <Tabs.Panel label={content.title} id={i.toString()}>
                 <span></span>
               </Tabs.Panel>
@@ -66,13 +64,9 @@ function APISection(props: Props) {
             allowTouchMove={false}
           >
             {props.content &&
-              props.content.map((content, i) => (
+              props.content.map((content: Example, i) => (
                 <SwiperSlide>
-                  <CodeBlock
-                    key={i}
-                    lang={content.lang}
-                    size={content.size ? content.size : 'small'}
-                  >
+                  <CodeBlock key={i} lang={content.lang} size={props.size ? props.size : 'small'}>
                     {content.code}
                   </CodeBlock>
                 </SwiperSlide>

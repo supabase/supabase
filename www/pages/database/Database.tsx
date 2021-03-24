@@ -219,6 +219,7 @@ function Database() {
 
       <SectionContainer className="-mb-48">
         <APISection
+          // @ts-ignore
           content={ApiExamplesData}
           title="Never write an API again"
           text={[
@@ -300,7 +301,10 @@ function Database() {
             </Button>
           </div>
           <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-6 lg:col-start-7">
-            <SplitCodeBlockCarousel content={ExtensionsExamplesData} />
+            <SplitCodeBlockCarousel
+              // @ts-ignore
+              content={ExtensionsExamplesData}
+            />
           </div>
         </div>
       </SectionContainer>

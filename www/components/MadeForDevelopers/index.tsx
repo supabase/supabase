@@ -1,25 +1,11 @@
-// import Button from 'components/Button'
-// import Badge from 'components/Badge'
-import {
-  Badge,
-  Button,
-  IconAlignJustify,
-  IconArrowUpRight,
-  IconCode,
-  IconMail,
-  IconTerminal,
-  IconType,
-  Typography,
-} from '@supabase/ui'
-import SectionHeader from 'components/UI/SectionHeader'
-// import CodeExamples from 'components/MadeForDevelopers/CodeExamples'
-
-import CodeExamples from 'data/home/api-examples'
-
-import DeveloperFeatures from 'data/DeveloperFeatures.json'
+import { Badge, Button, IconArrowUpRight, IconMail } from '@supabase/ui'
 import APISection from '../Sections/APISection'
 import SectionContainer from '../Layouts/SectionContainer'
 import FeatureColumn from '../FeatureColumn'
+
+import CodeExamples from 'data/home/api-examples'
+import DeveloperFeatures from 'data/DeveloperFeatures.json'
+import Link from 'next/link'
 
 const MadeForDevelopers = () => {
   return (
@@ -37,10 +23,10 @@ const MadeForDevelopers = () => {
             endpoints and focus on your product.
           </p>,
         ]}
+        // @ts-ignore
         content={CodeExamples}
         size="small"
         footer={[
-          // <div className="grid grid-cols-12 gap-8 lg:gap-16">
           <dl className="grid grid-cols-12 gap-8">
             {DeveloperFeatures.map((feature: any, idx: number) => {
               return (
@@ -56,13 +42,21 @@ const MadeForDevelopers = () => {
                         </div>
                       )}
                       {feature.badge ? (
-                        <Button href={feature.url} type="default" icon={<IconMail />}>
-                          {'Get notified'}
-                        </Button>
+                        <Link href={feature.url} as={feature.url}>
+                          <a>
+                            <Button type="default" icon={<IconMail />}>
+                              {'Get notified'}
+                            </Button>
+                          </a>
+                        </Link>
                       ) : (
-                        <Button href={feature.url} type="default" icon={<IconArrowUpRight />}>
-                          {'Explore more'}
-                        </Button>
+                        <Link href={feature.url} as={feature.url}>
+                          <a>
+                            <Button type="default" icon={<IconArrowUpRight />}>
+                              {'Explore more'}
+                            </Button>
+                          </a>
+                        </Link>
                       )}
                     </dt>
                   </div>
@@ -70,7 +64,6 @@ const MadeForDevelopers = () => {
               )
             })}
           </dl>,
-          // </div>,
         ]}
       />
     </SectionContainer>

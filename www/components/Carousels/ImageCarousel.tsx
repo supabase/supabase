@@ -4,33 +4,27 @@ import { useState } from 'react'
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { EffectFade } from 'swiper'
 
 // Import Swiper styles
 import 'swiper/swiper.min.css'
-import 'swiper/components/effect-fade/effect-fade.min.css'
-
-import CodeBlock from '../CodeBlock/CodeBlock'
 
 import ImageCarouselStyles from './ImageCarousel.module.css'
-import TweetCard from '../TweetCard'
-
-SwiperCore.use([EffectFade])
 
 interface Content {
   title: string
   label?: string
-  img_url: string
-  text: string
+  img_url?: string
+  video_url?: string
+  text?: string
 }
 
-interface ImageCaoursel {
-  content: Content
+interface ImageCarouselProps {
+  content: Content[]
   footer?: React.ReactNode
   altTabView?: boolean
 }
 
-function ImageCarousel(props: ImageCaoursel) {
+function ImageCarousel(props: ImageCarouselProps) {
   // base path for images
   const { basePath } = useRouter()
 
@@ -80,7 +74,7 @@ function ImageCarousel(props: ImageCaoursel) {
               // @ts-ignore
               onChange={(id: string) => handleImageSwiperNav(Number(id))}
             >
-              {props.content.map((content, i) => {
+              {props.content.map((content: Content, i) => {
                 return (
                   <Tabs.Panel
                     label={content.label ? content.label : content.title}
@@ -106,7 +100,7 @@ function ImageCarousel(props: ImageCaoursel) {
               autoHeight={true}
               allowTouchMove={false}
             >
-              {props.content.map((content, i) => {
+              {props.content.map((content: Content, i: number) => {
                 return (
                   <SwiperSlide key={i}>
                     {content.img_url && <img src={`${basePath}${content.img_url}`} />}
@@ -140,7 +134,7 @@ function ImageCarousel(props: ImageCaoursel) {
             onChange={(id: string) => handleImageSwiperNav(Number(id))}
             block
           >
-            {props.content.map((content, i) => {
+            {props.content.map((content: Content, i: number) => {
               return (
                 <Tabs.Panel label={content.label ? content.label : content.title} id={i.toString()}>
                   <span></span>

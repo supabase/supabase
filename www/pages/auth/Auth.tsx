@@ -123,9 +123,7 @@ function AuthPage() {
               <p className="text-lg">
                 Auth built into your project, with no need for external authentication services.
               </p>
-              <p>
-                Use your own custom domains with SMTP settings.
-              </p>
+              <p>Use your own custom domains with SMTP settings.</p>
             </Typography.Text>
           </div>
           <div className="col-span-3 col-start-9">
@@ -135,7 +133,8 @@ function AuthPage() {
             <Typography.Title level={4}>Own your data</Typography.Title>
             <Typography.Text>
               <p className="text-lg">
-                Keep all your user data in your supabase project so you never have to worry about 3rd party privacy issues.
+                Keep all your user data in your supabase project so you never have to worry about
+                3rd party privacy issues.
               </p>
               <p>Supabase is GDPR / CPA Compliant.</p>
             </Typography.Text>
@@ -146,7 +145,9 @@ function AuthPage() {
       <SectionContainer className="-mb-48">
         <APISection
           title="Simple and convenient APIs"
+          // @ts-ignore
           content={ApiExamples}
+          size="large"
           text={[
             <p>
               An API built from the groud up for server and client side authentication that is fast
@@ -211,7 +212,10 @@ function AuthPage() {
             </Button>
           </div>
           <div className="col-span-12 lg:col-span-6 lg:col-start-7">
-            <SplitCodeBlockCarousel content={AuthSqlRulesExamples} />
+            <SplitCodeBlockCarousel
+              // @ts-ignore
+              content={AuthSqlRulesExamples}
+            />
           </div>
         </div>
       </SectionContainer>

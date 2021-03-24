@@ -6,6 +6,7 @@ import SectionContainer from '../Layouts/SectionContainer'
 import ExampleCard from '../ExampleCard'
 
 import Examples from 'data/Examples.json'
+import Link from 'next/link'
 // import Button from '../Button'
 
 const BuiltExamples = () => {
@@ -17,20 +18,28 @@ const BuiltExamples = () => {
         <Typography.Text>
           <p className="text-lg">There's many example apps and starter projects to get going</p>
           <Space className="justify-center">
-            <Button type="outline" href="https://github.com/supabase/supabase/tree/master/examples">
-              View all examples
-            </Button>
-            <Button
-              type="outline"
-              icon={<IconGitHub />}
+            <Link
               href="https://github.com/supabase/supabase/tree/master/examples"
+              as="https://github.com/supabase/supabase/tree/master/examples"
             >
-              Official github library
-            </Button>
+              <a>
+                <Button type="outline">View all examples</Button>
+              </a>
+            </Link>
+            <Link
+              href="https://github.com/supabase/supabase/tree/master/examples"
+              as="https://github.com/supabase/supabase/tree/master/examples"
+            >
+              <a>
+                <Button type="outline" icon={<IconGitHub />}>
+                  Official github library
+                </Button>
+              </a>
+            </Link>
           </Space>
         </Typography.Text>
       </div>
-      <div class="grid grid-cols-12 gap-5 mt-16">
+      <div className="grid grid-cols-12 gap-5 mt-16">
         {Examples.slice(0, 6).map((example, i) => {
           return (
             <div className="col-span-12 lg:col-span-6 xl:col-span-4">
