@@ -5,245 +5,253 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 10 Mar 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Sun, 21 Mar 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
 <item>
-  <guid>https://supabase.io/blog/2021-03-11-using-supabase-replit</guid>
+  <guid>https://supabase.io/blog/2021/03/22/In-The-Loop</guid>
+  <title>Developers stay up to date with intheloop.dev</title>
+  <link>https://supabase.io/blog/2021/03/22/In-The-Loop</link>
+  <description>Learn why Kevin is building intheloop.dev with Supabase</description>
+  <pubDate>Sun, 21 Mar 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/03/11/using-supabase-replit</guid>
   <title>Using Supabase in Replit</title>
-  <link>https://supabase.io/blog/2021-03-11-using-supabase-replit</link>
+  <link>https://supabase.io/blog/2021/03/11/using-supabase-replit</link>
   <description>Free hosted relational database from within your node.js repl</description>
   <pubDate>Wed, 10 Mar 2021 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2021-03-08-toad-a-link-shorterner-with-simple-apis-for-low-coders</guid>
+  <guid>https://supabase.io/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders</guid>
   <title>Toad, a link shorterner with simple APIs for low-coders</title>
-  <link>https://supabase.io/blog/2021-03-08-toad-a-link-shorterner-with-simple-apis-for-low-coders</link>
+  <link>https://supabase.io/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders</link>
   <description>An easy-to-use link shortening tool with simple APIs</description>
   <pubDate>Sun, 07 Mar 2021 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2021-03-05-postgres-as-a-cron-server</guid>
+  <guid>https://supabase.io/blog/2021/03/05/postgres-as-a-cron-server</guid>
   <title>Postgres as a CRON Server</title>
-  <link>https://supabase.io/blog/2021-03-05-postgres-as-a-cron-server</link>
+  <link>https://supabase.io/blog/2021/03/05/postgres-as-a-cron-server</link>
   <description>Running repetitive tasks with your Postgres database.</description>
   <pubDate>Thu, 04 Mar 2021 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2021-03-02-supabase-beta-february-2021</guid>
+  <guid>https://supabase.io/blog/2021/03/02/supabase-beta-february-2021</guid>
   <title>Supabase Beta February 2021</title>
-  <link>https://supabase.io/blog/2021-03-02-supabase-beta-february-2021</link>
+  <link>https://supabase.io/blog/2021/03/02/supabase-beta-february-2021</link>
   <description>One year of building.</description>
   <pubDate>Mon, 01 Mar 2021 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2021-02-27-cracking-postgres-interview</guid>
+  <guid>https://supabase.io/blog/2021/02/27/cracking-postgres-interview</guid>
   <title>Cracking PostgreSQL Interview Questions</title>
-  <link>https://supabase.io/blog/2021-02-27-cracking-postgres-interview</link>
+  <link>https://supabase.io/blog/2021/02/27/cracking-postgres-interview</link>
   <description>Understand the top PostgreSQL Interview Questions</description>
   <pubDate>Fri, 26 Feb 2021 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2021-02-09-case-study-roboflow</guid>
+  <guid>https://supabase.io/blog/2021/02/09/case-study-roboflow</guid>
   <title>Roboflow.com choose Supabase to power Paint.wtf leaderboard</title>
-  <link>https://supabase.io/blog/2021-02-09-case-study-roboflow</link>
+  <link>https://supabase.io/blog/2021/02/09/case-study-roboflow</link>
   <description>Learn how Roboflow.com used Supabase to build their Paint.wtf leaderboard</description>
   <pubDate>Mon, 08 Feb 2021 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2021-02-02-supabase-beta-january-2021</guid>
+  <guid>https://supabase.io/blog/2021/02/02/supabase-beta-january-2021</guid>
   <title>Supabase Beta January 2021</title>
-  <link>https://supabase.io/blog/2021-02-02-supabase-beta-january-2021</link>
+  <link>https://supabase.io/blog/2021/02/02/supabase-beta-january-2021</link>
   <description>Eleven months of building.</description>
   <pubDate>Mon, 01 Feb 2021 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2021-01-02-supabase-beta-december-2020</guid>
+  <guid>https://supabase.io/blog/2021/01/02/supabase-beta-december-2020</guid>
   <title>Supabase Beta December 2020</title>
-  <link>https://supabase.io/blog/2021-01-02-supabase-beta-december-2020</link>
+  <link>https://supabase.io/blog/2021/01/02/supabase-beta-december-2020</link>
   <description>Ten months of building.</description>
   <pubDate>Fri, 01 Jan 2021 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-12-13-supabase-dashboard-performance</guid>
+  <guid>https://supabase.io/blog/2020/12/13/supabase-dashboard-performance</guid>
   <title>Making the Supabase Dashboard Supa-fast</title>
-  <link>https://supabase.io/blog/2020-12-13-supabase-dashboard-performance</link>
+  <link>https://supabase.io/blog/2020/12/13/supabase-dashboard-performance</link>
   <description>Improving the performance of the Supabase dashboard</description>
   <pubDate>Sat, 12 Dec 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-12-02-supabase-striveschool</guid>
+  <guid>https://supabase.io/blog/2020/12/02/supabase-striveschool</guid>
   <title>Supabase Partners With Strive School To Help Teach Open Source</title>
-  <link>https://supabase.io/blog/2020-12-02-supabase-striveschool</link>
+  <link>https://supabase.io/blog/2020/12/02/supabase-striveschool</link>
   <description>Supabase Partners With Strive School To Help Teach Open Source To The Next Generation Of Developers</description>
   <pubDate>Tue, 01 Dec 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-12-02-case-study-xendit</guid>
+  <guid>https://supabase.io/blog/2020/12/02/case-study-xendit</guid>
   <title>Xendit Built a Counter-Fraud Watchlist for the Fintech Industry</title>
-  <link>https://supabase.io/blog/2020-12-02-case-study-xendit</link>
+  <link>https://supabase.io/blog/2020/12/02/case-study-xendit</link>
   <description>See how Xendit use Supabase to build a full-text search engine.</description>
   <pubDate>Tue, 01 Dec 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-12-02-case-study-tayfa</guid>
+  <guid>https://supabase.io/blog/2020/12/02/case-study-tayfa</guid>
   <title>TAYFA Built a No-Code Website Builder in Seven Days</title>
-  <link>https://supabase.io/blog/2020-12-02-case-study-tayfa</link>
+  <link>https://supabase.io/blog/2020/12/02/case-study-tayfa</link>
   <description>See how Tayfa went from idea to paying customer in less than 30 days.</description>
   <pubDate>Tue, 01 Dec 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-12-02-case-study-monitoro</guid>
+  <guid>https://supabase.io/blog/2020/12/02/case-study-monitoro</guid>
   <title>Monitoro Built a Web Crawler Handling Millions of API Requests</title>
-  <link>https://supabase.io/blog/2020-12-02-case-study-monitoro</link>
+  <link>https://supabase.io/blog/2020/12/02/case-study-monitoro</link>
   <description>See how Monitoro built an automated scraping platform using Supabase.</description>
   <pubDate>Tue, 01 Dec 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-12-01-supabase-alpha-november-2020</guid>
+  <guid>https://supabase.io/blog/2020/12/01/supabase-alpha-november-2020</guid>
   <title>Supabase Alpha November 2020</title>
-  <link>https://supabase.io/blog/2020-12-01-supabase-alpha-november-2020</link>
+  <link>https://supabase.io/blog/2020/12/01/supabase-alpha-november-2020</link>
   <description>Nine months of building.</description>
   <pubDate>Mon, 30 Nov 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-11-18-postgresql-views</guid>
+  <guid>https://supabase.io/blog/2020/11/18/postgresql-views</guid>
   <title>Postgres Views</title>
-  <link>https://supabase.io/blog/2020-11-18-postgresql-views</link>
+  <link>https://supabase.io/blog/2020/11/18/postgresql-views</link>
   <description>Creating and using a view in PostgreSQL.</description>
   <pubDate>Tue, 17 Nov 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-11-02-supabase-alpha-october-2020</guid>
+  <guid>https://supabase.io/blog/2020/11/02/supabase-alpha-october-2020</guid>
   <title>Supabase Alpha October 2020</title>
-  <link>https://supabase.io/blog/2020-11-02-supabase-alpha-october-2020</link>
+  <link>https://supabase.io/blog/2020/11/02/supabase-alpha-october-2020</link>
   <description>Eight months of building.</description>
   <pubDate>Sun, 01 Nov 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-10-30-improved-dx</guid>
+  <guid>https://supabase.io/blog/2020/10/30/improved-dx</guid>
   <title>Supabase.js 1.0</title>
-  <link>https://supabase.io/blog/2020-10-30-improved-dx</link>
+  <link>https://supabase.io/blog/2020/10/30/improved-dx</link>
   <description>We're releasing a new version of our Supabase client with some awesome new improvements.</description>
   <pubDate>Thu, 29 Oct 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-10-03-supabase-alpha-september-2020</guid>
+  <guid>https://supabase.io/blog/2020/10/03/supabase-alpha-september-2020</guid>
   <title>Supabase Alpha September 2020</title>
-  <link>https://supabase.io/blog/2020-10-03-supabase-alpha-september-2020</link>
+  <link>https://supabase.io/blog/2020/10/03/supabase-alpha-september-2020</link>
   <description>Seven months of building.</description>
   <pubDate>Fri, 02 Oct 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-09-11-supabase-hacktoberfest-2020</guid>
+  <guid>https://supabase.io/blog/2020/09/11/supabase-hacktoberfest-2020</guid>
   <title>Supabase Hacktoberfest 2020</title>
-  <link>https://supabase.io/blog/2020-09-11-supabase-hacktoberfest-2020</link>
+  <link>https://supabase.io/blog/2020/09/11/supabase-hacktoberfest-2020</link>
   <description>Join us for a celebration of open source software and learn how to contribute to Supabase.</description>
   <pubDate>Thu, 10 Sep 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-09-03-supabase-alpha-august-2020</guid>
+  <guid>https://supabase.io/blog/2020/09/03/supabase-alpha-august-2020</guid>
   <title>Supabase Alpha August 2020</title>
-  <link>https://supabase.io/blog/2020-09-03-supabase-alpha-august-2020</link>
+  <link>https://supabase.io/blog/2020/09/03/supabase-alpha-august-2020</link>
   <description>Six months of building</description>
   <pubDate>Wed, 02 Sep 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-08-05-supabase-auth</guid>
+  <guid>https://supabase.io/blog/2020/08/05/supabase-auth</guid>
   <title>Supabase Auth</title>
-  <link>https://supabase.io/blog/2020-08-05-supabase-auth</link>
+  <link>https://supabase.io/blog/2020/08/05/supabase-auth</link>
   <description>Authenticate and authorize your users with Supabase Auth</description>
   <pubDate>Tue, 04 Aug 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-08-02-supabase-alpha-july-2020</guid>
+  <guid>https://supabase.io/blog/2020/08/02/supabase-alpha-july-2020</guid>
   <title>Supabase Alpha July 2020</title>
-  <link>https://supabase.io/blog/2020-08-02-supabase-alpha-july-2020</link>
+  <link>https://supabase.io/blog/2020/08/02/supabase-alpha-july-2020</link>
   <description>Five months of building</description>
   <pubDate>Sat, 01 Aug 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-08-02-continuous-postgresql-backup-walg</guid>
+  <guid>https://supabase.io/blog/2020/08/02/continuous-postgresql-backup-walg</guid>
   <title>Continuous PostgreSQL Backups using WAL-G</title>
-  <link>https://supabase.io/blog/2020-08-02-continuous-postgresql-backup-walg</link>
+  <link>https://supabase.io/blog/2020/08/02/continuous-postgresql-backup-walg</link>
   <description>Have you ever wanted to restore your database's state to a particular moment in time? This post explains how, using WAL-G.</description>
   <pubDate>Sat, 01 Aug 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-07-10-alpha-launch-postmortem</guid>
+  <guid>https://supabase.io/blog/2020/07/10/alpha-launch-postmortem</guid>
   <title>Alpha Launch Postmortem</title>
-  <link>https://supabase.io/blog/2020-07-10-alpha-launch-postmortem</link>
+  <link>https://supabase.io/blog/2020/07/10/alpha-launch-postmortem</link>
   <description>Everything that went wrong with Supabase's launch</description>
   <pubDate>Thu, 09 Jul 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-07-09-postgresql-templates</guid>
+  <guid>https://supabase.io/blog/2020/07/09/postgresql-templates</guid>
   <title>What are PostgreSQL Templates?</title>
-  <link>https://supabase.io/blog/2020-07-09-postgresql-templates</link>
+  <link>https://supabase.io/blog/2020/07/09/postgresql-templates</link>
   <description>What are PostgreSQL templates and what are they used for?</description>
   <pubDate>Wed, 08 Jul 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-07-17-postgresql-physical-logical-backups</guid>
+  <guid>https://supabase.io/blog/2020/07/17/postgresql-physical-logical-backups</guid>
   <title>Physical vs Logical Backups in PostgreSQL</title>
-  <link>https://supabase.io/blog/2020-07-17-postgresql-physical-logical-backups</link>
+  <link>https://supabase.io/blog/2020/07/17/postgresql-physical-logical-backups</link>
   <description>What are physical and logical backups in Postgres?</description>
   <pubDate>Mon, 06 Jul 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-07-01-supabase-alpha-june-2020</guid>
+  <guid>https://supabase.io/blog/2020/07/01/supabase-alpha-june-2020</guid>
   <title>Supabase Alpha June 2020</title>
-  <link>https://supabase.io/blog/2020-07-01-supabase-alpha-june-2020</link>
+  <link>https://supabase.io/blog/2020/07/01/supabase-alpha-june-2020</link>
   <description>Four months of building</description>
   <pubDate>Tue, 30 Jun 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-06-15-supabase-steve-chavez</guid>
+  <guid>https://supabase.io/blog/2020/06/15/supabase-steve-chavez</guid>
   <title>Steve Chavez has joined Supabase</title>
-  <link>https://supabase.io/blog/2020-06-15-supabase-steve-chavez</link>
+  <link>https://supabase.io/blog/2020/06/15/supabase-steve-chavez</link>
   <description>Steve joins Supabase to help build Auth.</description>
   <pubDate>Sun, 14 Jun 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-06-01-supabase-alpha-may-2020</guid>
+  <guid>https://supabase.io/blog/2020/06/01/supabase-alpha-may-2020</guid>
   <title>Supabase Alpha May 2020</title>
-  <link>https://supabase.io/blog/2020-06-01-supabase-alpha-may-2020</link>
+  <link>https://supabase.io/blog/2020/06/01/supabase-alpha-may-2020</link>
   <description>Three months of building</description>
   <pubDate>Sun, 31 May 2020 16:00:00 GMT</pubDate>
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2020-05-01-supabase-alpha-april-2020</guid>
+  <guid>https://supabase.io/blog/2020/05/01/supabase-alpha-april-2020</guid>
   <title>Supabase Alpha April 2020</title>
-  <link>https://supabase.io/blog/2020-05-01-supabase-alpha-april-2020</link>
+  <link>https://supabase.io/blog/2020/05/01/supabase-alpha-april-2020</link>
   <description>Two months of building</description>
   <pubDate>Sun, 31 May 2020 16:00:00 GMT</pubDate>
 </item>
