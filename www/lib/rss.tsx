@@ -1,8 +1,8 @@
 const generateRssItem = (post: any): string => `
 <item>
-  <guid>https://supabase.io/blog/${post.slug}</guid>
+  <guid>https://supabase.io/blog/${post.url}</guid>
   <title>${post.title}</title>
-  <link>https://supabase.io/blog/${post.slug}</link>
+  <link>https://supabase.io/blog/${post.url}</link>
   <description>${post.description}</description>
   <pubDate>${new Date(post.date).toUTCString()}</pubDate>
 </item>
