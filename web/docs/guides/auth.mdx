@@ -104,8 +104,177 @@ where auth.uid() = todos.user_id; -- Policy is implicitly added.
 5. The user's UID can be used in Policies to restrict access to rows. 
 
 Supabase provides a special function in Postgres, `auth.uid()`, which extracts the user's UID from the JWT. This is especially useful when creating Policies.
- 
+
+## Policy Examples
+
+Here are some example policies to show you the power of Postgres Row level security. Each policy is attached to a table, and the policy is run
+every time a user queries that table.
+
+### Allow read access 
+
+```sql
+-- 1. Create table
+create table profiles (
+  id uuid references auth.users,
+  avatar_url text
+);
+
+-- 2. Enable RLS
+alter table profiles 
+  enable row level security;
+
+-- 3. Create Policy
+create policy "Public profiles are viewable by everyone." 
+  on profiles for select using (
+    true
+  );
+```
+
+1. Creates a table called `profiles` in the public schema (default schema)
+2. Enables Row Level Security
+3. Creates a Policy which allows all `select` queries to run. 
+
+
+### Restrict updates 
+
+```sql
+-- 1. Create table
+create table profiles (
+  id uuid references auth.users,
+  avatar_url text
+);
+
+-- 2. Enable RLS
+alter table profiles 
+  enable row level security;
+
+-- 3. Create Policy
+create policy "Users can update their own profiles." 
+  on profiles for update using (
+    auth.uid() = id
+  );
+```
+
+1. Creates a table called `profiles` in the public schema (default schema)
+2. Enables Row Level Security
+3. Creates a Policy which allows logged in users to update their own data.
+
+
+### Policies with joins
+
+Policies can even include table joins. This example shows how you can query "external" tables to build more advanced rules.
+
+```sql
+create table teams (
+  id serial primary key,
+  name text
+);
+
+-- 2. Create many to many join
+create table members (
+  team_id bigint references teams,
+  user_id uuid references auth.users
+);
+
+-- 3. Enable RLS
+alter table teams 
+  enable row level security;
+
+-- 4. Create Policy
+create policy "Team members can update team details if they belong to the team."
+  on teams
+  for update using (
+    auth.uid() in ( 
+      select user_id from members 
+      where team_id = id 
+    )
+  );
+```
+
+### Verifying email domains
+
+Postgres has a function `right(string, n)` that returns the rightmost n characters of a string. 
+You could use this to match staff member's email domains. 
+
+```sql
+-- 1. Create table
+create table leaderboard (
+  id uuid references auth.users,
+  high_score bigint
+);
+
+-- 2. Enable RLS
+alter table leaderboard 
+  enable row level security;
+
+-- 3. Create Policy
+create policy "Only Blizzard staff can update leaderboard"
+  on leaderboard
+  for update using (
+    right(auth.email(), 13) = '@blizzard.com'
+  );
+```
+
+### Advanced Policies
+
+Use the full power of SQL to build extremely advanced rules.
+
+In this example we will create a `posts` and `comments` database and then create a policy that depends on another policy. 
+(In this case the comments policy depends on the posts policy.)
+
+```sql
+create table posts (
+  id            serial    primary key, 
+  creator_id    uuid      not null     references auth.users(id), 
+  title         text      not null, 
+  body          text      not null, 
+  publish_date  date      not null     default now(), 
+  audience      uuid[]    null -- many to many table ommited for brevity
+);
+
+create table comments (
+  id            serial    primary key, 
+  post_id       int       not null     references posts(id)  on delete cascade, 
+  user_id       uuid      not null     references auth.users(id), 
+  body          text      not null, 
+  comment_date  date      not null     default now()
+);
+
+create policy "Creator can see thier own posts"
+on posts
+for select
+using (
+  auth.uid() = posts.creator_id
+);
+
+create policy "Logged in users can see the posts if they belong to the post 'audience'."
+on posts
+for select
+using (
+  auth.uid() = any (posts.audience)
+);
+
+create policy "Users can see all comments for posts they have access to."
+on comments
+for select
+using (
+  exists (
+    select 1 from posts
+    where posts.id = comments.post_id
+  )
+);
+```
+
+
 ## Tips
+
+### You don't have to use Policies 
+
+If you don't want to use Policies, you don't have to. You can put your authorization
+rules in your middleware, similar to how you would create security rules with any other `backend <-> middleware <-> frontend` architecture.
+
+Tip: make sure to enable Row Level Security for all your tables, so that your tables are inaccessible. Then use the "Service" which we provide. 
+"Service" are designed to bypass RLS.
 
 ### Check authentication settings on Supabase
 
