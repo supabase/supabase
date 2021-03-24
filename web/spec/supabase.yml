@@ -54,7 +54,18 @@ info:
           - getSubscriptions()
       - name: 'Storage'
         items:
+          - storage.uploadFile()
           - storage.downloadFile()
+          - storage.updateFile()
+          - storage.renameFile()
+          - storage.deleteFile()
+          - storage.search()
+          - storage.createBucket()
+          - storage.getBucket()
+          - storage.deleteBucket()
+          - storage.emptyBucket()
+          - storage.getAllBuckets()
+          - storage.createSignedUrl()
       - name: 'Modifiers'
         items:
           - Using Modifiers
@@ -787,16 +798,54 @@ pages:
           ```js
           const subscriptions = supabase.getSubscriptions()
           ```
+          
+  storage.getAllBuckets():
+    title: 'storage.getAllBuckets()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.getAllBuckets'
+
+  storage.getBucket():
+    title: 'storage.getBucket()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.getBucket'
+
+  storage.createBucket():
+    title: 'storage.createBucket()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.createBucket'
+
+  storage.emptyBucket():
+    title: 'storage.emptyBucket()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.emptyBucket'
+
+  storage.deleteBucket():
+    title: 'storage.deleteBucket()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.deleteBucket'
+
+  storage.uploadFile():
+    title: 'storage.uploadFile()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.uploadFile'
+
+  storage.updateFile():
+    title: 'storage.updateFile()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.updateFile'
+
+  storage.renameFile():
+    title: 'storage.renameFile()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.renameFile'
+
+  storage.createSignedUrl():
+    title: 'storage.createSignedUrl()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.createSignedUrl'
+
   storage.downloadFile():
     title: 'storage.downloadFile()'
-    $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.getSubscriptions'
-    examples:
-      - name: Get all subscriptions
-        isSpotlight: true
-        js: |
-          ```js
-          const subscriptions = supabase.getSubscriptions()
-          ```
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.downloadFile'
+
+  storage.deleteFile():
+    title: 'storage.deleteFile()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.deleteFile'
+
+  storage.search():
+    title: 'storage.deleteFiles()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.search'
 
   Using Modifiers:
     description: |

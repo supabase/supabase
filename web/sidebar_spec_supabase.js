@@ -26,6 +26,12 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Storage',
+      items: ['reference/javascript/storage-uploadfile', 'reference/javascript/storage-downloadfile', 'reference/javascript/storage-updatefile', 'reference/javascript/storage-renamefile', 'reference/javascript/storage-deletefile', 'reference/javascript/storage-search', 'reference/javascript/storage-createbucket', 'reference/javascript/storage-getbucket', 'reference/javascript/storage-deletebucket', 'reference/javascript/storage-emptybucket', 'reference/javascript/storage-getallbuckets', 'reference/javascript/storage-createsignedurl'],
+      collapsed: true,
+    },
+    {
+      type: 'category',
       label: 'Modifiers',
       items: ['reference/javascript/using-modifiers', 'reference/javascript/limit', 'reference/javascript/order', 'reference/javascript/range', 'reference/javascript/single'],
       collapsed: true,
