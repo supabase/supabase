@@ -39,6 +39,7 @@ import CTABanner from '~/components/CTABanner'
 
 import Solutions from 'data/Solutions.json'
 import AuthComponentExample from '~/components/AuthWidget/AuthComponentExample'
+import Link from 'next/link'
 
 function AuthPage() {
   // base path for images
@@ -80,7 +81,7 @@ function AuthPage() {
 
       <SectionContainer>
         <div className="grid grid-cols-12">
-          <div className="col-span-3">
+          <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
             <p className="mb-4">
               <Space>
                 <img src={`${basePath}/images/product/auth/google-icon.svg`} width={21} />
@@ -104,7 +105,7 @@ function AuthPage() {
             </p>
             <Typography.Title level={4}>All the social providers</Typography.Title>
             <Typography.Text>
-              <p className="text-lg">
+              <p className="text-base lg:text-lg">
                 We provide all the popular social logins you expect. Google, Facebook, Github,
                 Azure, Gitlab and Bitbucket.
               </p>
@@ -116,25 +117,25 @@ function AuthPage() {
               </Space>
             </Typography.Text>
           </div>
-          <div className="col-span-3 col-start-5">
+          <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
             <p className="mb-4">
               <IconLink />
             </p>
             <Typography.Title level={4}>Fully integrated</Typography.Title>
             <Typography.Text>
-              <p className="text-lg">
+              <p className="text-base lg:text-lg">
                 Auth built into your project, with no need for external authentication services.
               </p>
               <p>Use your own custom domains with SMTP settings.</p>
             </Typography.Text>
           </div>
-          <div className="col-span-3 col-start-9">
+          <div className="col-span-12 lg:col-span-3 lg:col-start-9">
             <p className="mb-4">
               <IconShield />
             </p>
             <Typography.Title level={4}>Own your data</Typography.Title>
             <Typography.Text>
-              <p className="text-lg">
+              <p className="text-base lg:text-lg">
                 Keep all your user data in your supabase project so you never have to worry about
                 3rd party privacy issues.
               </p>
@@ -151,25 +152,27 @@ function AuthPage() {
           content={ApiExamples}
           size="large"
           text={[
-            <p>
-              An API built from the groud up for server and client side authentication that is fast
-              to implement.
-            </p>,
-            <p>
-              With powerful library clients coming soon that allow for asset optimasation and image
-              transformation
-            </p>,
+            <Typography.Text>
+              <p className="text-base lg:text-lg">
+                An API built from the groud up for server and client side authentication that is
+                fast to implement.
+              </p>
+              <p>
+                With powerful library clients coming soon that allow for asset optimasation and
+                image transformation
+              </p>
+            </Typography.Text>,
           ]}
           footer={[
-            <div className="grid grid-cols-12 gap-8 lg:gap-0 xl:gap-16 mt-8">
-              <div className="col-span-6 lg:col-span-12 xl:col-span-4">
+            <div className="grid grid-cols-12 md:gap-8 lg:gap-0 xl:gap-16 mt-8">
+              <div className="col-span-12 sm:col-span-6 lg:col-span-12 xl:col-span-4">
                 <FeatureColumn
                   icon={<IconBriefcase />}
                   title="Enterprise logins"
                   text="Type definitions for both server side and client side"
                 />
               </div>
-              <div className="col-span-6 lg:col-span-12 xl:col-span-4">
+              <div className="col-span-12 sm:col-span-6 lg:col-span-12 xl:col-span-4">
                 <FeatureColumn
                   icon={<IconEye />}
                   title="Social login scopes"
@@ -202,17 +205,23 @@ function AuthPage() {
         <div className="grid grid-cols-12 lg:gap-16">
           <div className="col-span-12 lg:col-span-5 mb-8">
             <Typography.Title level={2}>No middleware user permission</Typography.Title>
-            <p className="text-lg">
-              Restrict user access with row level security, even without prior knowledge of SQL.
-              Control who can create, edit and delete specific rows in your database.
-            </p>
-            <p>
-              Set up user profiles in your app using methods such as auth.user() so you can spend
-              more time building an app, rather than user profile forms.
-            </p>
-            <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
-              Expore documentation
-            </Button>
+            <Typography.Text>
+              <p className="text-base lg:text-lg">
+                Restrict user access with row level security, even without prior knowledge of SQL.
+                Control who can create, edit and delete specific rows in your database.
+              </p>
+              <p>
+                Set up user profiles in your app using methods such as auth.user() so you can spend
+                more time building an app, rather than user profile forms.
+              </p>
+            </Typography.Text>
+            <Link href="https://supabase.io/docs/guides/auth#policy-examples">
+              <a>
+                <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
+                  Expore documentation
+                </Button>
+              </a>
+            </Link>
           </div>
           <div className="col-span-12 lg:col-span-6 lg:col-start-7">
             <SplitCodeBlockCarousel
@@ -223,7 +232,7 @@ function AuthPage() {
         </div>
       </SectionContainer>
 
-      <div className="container mx-auto px-8 sm:px-16 xl:px-20 relative py-32">
+      <SectionContainer>
         <div className="grid grid-cols-12 lg:gap-16">
           <div className="order-last col-span-12 lg:order-first lg:col-span-6 mt-8 lg:mt-0">
             <AuthComponentExample />
@@ -243,27 +252,34 @@ function AuthPage() {
               ReactJS Auth Widget
             </Typography.Title>
             <Typography.Text>
-              <p className="text-lg">
+              <p className="text-base lg:text-lg">
                 Bring authentication to your ReactJS app without coding a single form.
               </p>
-              <p className="text-base">
+              <p>
                 We provide a ReactJS component that handles all the usual needs for logging in,
                 signing up, magic link and forgot password forms.
               </p>
             </Typography.Text>
-            <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
-              Explore documentation
-            </Button>
+            <Link
+              href="https://github.com/supabase/ui#using-supabase-ui-auth"
+              as="https://github.com/supabase/ui#using-supabase-ui-auth"
+            >
+              <a>
+                <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
+                  Explore documentation
+                </Button>
+              </a>
+            </Link>
 
-            <div className="grid grid-cols-12 gap-8 lg:gap-0 xl:gap-16 mt-8">
-              <div className="col-span-6 lg:col-span-12 xl:col-span-4">
+            <div className="grid grid-cols-12 md:gap-8 lg:gap-0 xl:gap-16 mt-8">
+              <div className="col-span-12 lg:col-span-12 xl:col-span-4">
                 <FeatureColumn
                   icon={<IconBriefcase />}
                   title="Social login support"
                   text="Support for Social logins are built in and the component "
                 />
               </div>
-              <div className="col-span-6 lg:col-span-12 xl:col-span-4">
+              <div className="col-span-12 lg:col-span-12 xl:col-span-4">
                 <FeatureColumn
                   icon={<IconEye />}
                   title="User context"
@@ -273,7 +289,7 @@ function AuthPage() {
             </div>
           </div>
         </div>
-      </div>
+        </SectionContainer>>
       <CTABanner />
     </DefaultLayout>
   )

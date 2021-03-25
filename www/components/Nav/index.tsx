@@ -237,7 +237,7 @@ const Nav = (props: Props) => {
               </a>
             </div>
           </div>
-          <div className="flex items-center sm:space-x-4">
+          <div className="hidden lg:flex items-center sm:space-x-4">
             <a href="https://app.supabase.io/api/login">
               <Button>Start your project</Button>
             </a>

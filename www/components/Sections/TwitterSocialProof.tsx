@@ -41,13 +41,13 @@ function TwitterSocialProof() {
         <div className="col-span-12 text-center">
           <Typography.Title level={2}>Join the community</Typography.Title>
           <Typography.Text>
-            <p className="text-lg">
+            <p className="lg:text-lg">
               The supabase team is overwhelmed with the support from early advocates, contributors,
               and champions.
               <br />
               Supabase would not be possible without them.
             </p>
-            <Space className="justify-center my-4">
+            <div className="my-4">
               <Link
                 href={'https://github.com/supabase/supabase/discussions'}
                 as={'https://github.com/supabase/supabase/discussions'}
@@ -58,7 +58,7 @@ function TwitterSocialProof() {
                   </Button>
                 </a>
               </Link>
-            </Space>
+            </div>
           </Typography.Text>
         </div>
       </div>
@@ -87,11 +87,17 @@ function TwitterSocialProof() {
               320: {
                 slidesPerView: 1,
               },
+              720: {
+                slidesPerView: 2,
+              },
               920: {
                 slidesPerView: 3,
               },
               1024: {
-                slidesPerView: 3,
+                slidesPerView: 4,
+              },
+              1208: {
+                slidesPerView: 5,
               },
             }}
           >

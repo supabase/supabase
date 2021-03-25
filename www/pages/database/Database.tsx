@@ -87,7 +87,7 @@ function Database() {
 
       <SectionContainer>
         <div className="grid grid-cols-12">
-          <div className="mb-8 lg:mb-0 col-span-12 lg:col-span-3">
+          <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
             <p className="mb-4">
               <Space>
                 <ProductIcon icon={Solutions['database'].icon} />
@@ -97,7 +97,7 @@ function Database() {
             </p>
             <Typography.Title level={4}>PostgreSQL Relational</Typography.Title>
             <Typography.Text>
-              <p className="text-lg">
+              <p className="text-base lg:text-lg">
                 Our database is PostgreSQL, which is an open source object-relational database.
               </p>
               <p>
@@ -106,7 +106,7 @@ function Database() {
               </p>
             </Typography.Text>
           </div>
-          <div className="mb-8 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
+          <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
             <p className="mb-4">
               <Space>
                 <ProductIcon icon={Solutions['database'].icon} />
@@ -116,7 +116,7 @@ function Database() {
             </p>
             <Typography.Title level={4}>Auth</Typography.Title>
             <Typography.Text>
-              <p className="text-lg">Auth permissions built in with supabase Auth</p>
+              <p className="text-base lg:text-lg">Auth permissions built in with supabase Auth</p>
               <p>Control exactly which user roles can read or write what rows in your database.</p>
             </Typography.Text>
           </div>
@@ -126,7 +126,9 @@ function Database() {
             </p>
             <Typography.Title level={4}>Realtime</Typography.Title>
             <Typography.Text>
-              <p className="text-lg">We built realtime functionality right into the database.</p>
+              <p className="text-base lg:text-lg">
+                We built realtime functionality right into the database.
+              </p>
               <p>
                 Our powerful APIs allow you to watch for specific row and column changes so you can
                 easily make smart apps quicker.
@@ -137,20 +139,20 @@ function Database() {
       </SectionContainer>
 
       {/* <SectionContainer>÷ */}
-      <div className="grid">
-        <SectionContainer className="text-center pb-8">
-          <div className="grid grid-cols-12">
-            <div className="col-span-8 col-start-3">
-              <Typography.Title level={2}>Easy to use dashboard</Typography.Title>
-              <Typography.Text>
-                <p className="text-lg">
-                  Use your database the way you want, with an interactive dashboard for both
-                  spreadsheet style tables and also a full SQL editor.
-                </p>
-              </Typography.Text>
-            </div>
+      <SectionContainer className="text-center md:pb-0 lg:pb-0">
+        <div className="grid grid-cols-12">
+          <div className="col-span-12 lg:col-span-8 lg:col-start-3">
+            <Typography.Title level={2}>Easy to use dashboard</Typography.Title>
+            <Typography.Text>
+              <p className="text-base lg:text-lg">
+                Use your database the way you want, with an interactive dashboard for both
+                spreadsheet style tables and also a full SQL editor.
+              </p>
+            </Typography.Text>
           </div>
-        </SectionContainer>
+        </div>
+      </SectionContainer>
+      <div className="grid">
         <div className={'dashboard-tabs sbui-tabs--underline-alt'}>
           <Tabs
             size="xlarge"
@@ -185,7 +187,7 @@ function Database() {
       >
         <div className="grid grid-cols-12">
           <SwiperSlide>
-            <SectionContainer className="pt-16">
+            <SectionContainer className="pt-16 pb-0">
               <ImageCarousel
                 content={TableViewCarouselData}
                 footer={[
@@ -201,7 +203,7 @@ function Database() {
             </SectionContainer>
           </SwiperSlide>
           <SwiperSlide>
-            <SectionContainer className="pt-16">
+            <SectionContainer className="pt-16 pb-0">
               <ImageCarousel
                 content={SqlViewCarouselData}
                 footer={[
@@ -271,7 +273,7 @@ function Database() {
           <div className="section-container pt-12 pb-0">
             <FloatingIcons />
             <div className="overflow-x-hidden">
-              <SectionContainer className="mb-0 pb-8">
+              <SectionContainer className="mb-0 pb-8 lg:pt-32">
                 <GithubExamples />
               </SectionContainer>
             </div>
@@ -284,7 +286,7 @@ function Database() {
           <div className="col-span-12 lg:col-span-6 xl:col-span-5 mb-8">
             <Typography.Title level={2}>Extend your database</Typography.Title>
             <Typography.Text className="block mb-8">
-              <p className="text-lg">
+              <p className="lg:text-lg">
                 Your PostgreSQL database can be extended with any PostgreSQL extension.
               </p>
               <p>

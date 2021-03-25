@@ -14,7 +14,7 @@ interface Types {
 }
 
 const ProductHeader = (props: Types) => (
-  <div className="container mx-auto px-8 sm:px-16 xl:px-20 relative pt-32 pb-0">
+  <div className="container mx-auto px-6 sm:px-16 xl:px-20 relative pt-16 lg:pt-32 pb-0">
     <div className="grid grid-cols-12">
       <div className="col-span-12 lg:col-span-5">
         {props.icon || props.title ? (
@@ -31,11 +31,11 @@ const ProductHeader = (props: Types) => (
         {props.subheader && (
           <Typography.Text>
             {props.subheader.map((subheader) => {
-              return <p className="text-lg">{subheader}</p>
+              return <p className="lg:text-lg">{subheader}</p>
             })}
           </Typography.Text>
         )}
-        <Space className="mt-12">
+        <div className="mt-12 flex flex-row md:flex-row md:items-center">
           <Link href="https://app.supabase.io/api/login" as="https://app.supabase.io/api/login">
             <a>
               <Button size="medium">Start a project</Button>
@@ -50,7 +50,7 @@ const ProductHeader = (props: Types) => (
               </a>
             </Link>
           )}
-        </Space>
+        </div>
         {props.footer && <div className="mb-4">{props.footer}</div>}
       </div>
       {props.image && (

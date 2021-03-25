@@ -47,6 +47,33 @@ h2 {
   line-height: 1.2 !important;
 }
 
+@media only screen and (max-width: 960px) {
+  h1 {
+    font-size: 2.2rem !important;
+  }
+  h2 {
+    font-size: 2rem !important;
+  }
+}
+
+@media only screen and (max-width: 720px) {
+  h1 {
+    font-size: 2rem !important;
+  }
+  h2 {
+    font-size: 1.8rem !important;
+  }
+}
+
+@media only screen and (max-width: 520px) {
+  h1 {
+    font-size: 1.8rem !important;
+  }
+  h2 {
+    font-size: 1.6rem !important;
+  }
+}
+
 p {
   @apply text-gray-light dark:text-gray-dark;
   margin-bottom: 16px;

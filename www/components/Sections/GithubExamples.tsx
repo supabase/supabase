@@ -37,15 +37,14 @@ function GithubExamples() {
           <Typography.Title level={2}>
             Community driven examples, libaries and guides
           </Typography.Title>
-          <Typography.Text>
-            <p className="text-lg">
+          <Typography.Text className="block mb-6">
+            <p className="text-base lg:text-lg">
               The supabase team is overwhelmed with the support from early advocates, contributors,
               and champions.
-              <br />
-              Supabase would not be possible without them.
             </p>
+            <p>Supabase would not be possible without them.</p>
           </Typography.Text>
-          <Space className="justify-center">
+          <div className="flex space-y-1.5 flex-col lg:space-y-0 lg:space-x-1.5 lg:flex-row justify-center">
             <Link
               href="https://supabase.io/docs/guides/examples#guides"
               as="https://supabase.io/docs/guides/examples#guides"
@@ -74,12 +73,12 @@ function GithubExamples() {
                 </Button>
               </a>
             </Link>
-          </Space>
+          </div>
         </div>
       </div>
 
       <div className="mt-4">
-        <div className={'-mr-32 -ml-32'}>
+        <div className={'lg:-mr-32 lg:-ml-32'}>
           <Swiper
             style={{ overflow: 'visible' }}
             initialSlide={3}
@@ -105,11 +104,14 @@ function GithubExamples() {
               320: {
                 slidesPerView: 1,
               },
+              720: {
+                slidesPerView: 2,
+              },
               920: {
                 slidesPerView: 3,
               },
               1024: {
-                slidesPerView: 3,
+                slidesPerView: 4,
               },
             }}
           >
