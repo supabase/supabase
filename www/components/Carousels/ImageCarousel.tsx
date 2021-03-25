@@ -87,12 +87,12 @@ function ImageCarousel(props: ImageCarouselProps) {
             </Tabs>
           </div>
           <div
-            className={`border border-gray-100 dark:border-gray-600 rounded-md bg-gray-800 overflow-hidden ${ImageCarouselStyles['gradient-bg']}`}
+            className={`border border-gray-100 dark:border-gray-600 rounded-md bg-gray-800 ${ImageCarouselStyles['gradient-bg']}`}
           >
             <Swiper
               // @ts-ignore
               onSwiper={setImageSwiper}
-              style={{ zIndex: 0 }}
+              style={{ zIndex: 0, overflow: 'auto' }}
               initialSlide={0}
               spaceBetween={0}
               slidesPerView={1}
