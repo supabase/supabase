@@ -13,6 +13,8 @@ import authors from 'lib/authors.json'
 import DefaultLayout from '~/components/Layouts/Default'
 import { Typography, Badge, Space, Select } from '@supabase/ui'
 import PostTypes from '~/types/post'
+import BlogListItem from '~/components/Blog/BlogListItem'
+import BlogHeader from '~/components/Blog/BlogHeader'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts()
@@ -43,9 +45,9 @@ function Blog(props: any) {
       category === 'all'
         ? props.blogs
         : props.blogs.filter((post: any) => {
-            const found = post.tags.includes(category)
-            return found
-          })
+          const found = post.tags.includes(category)
+          return found
+        })
     )
   }, [category])
 
@@ -61,13 +63,7 @@ function Blog(props: any) {
       </Head>
       <NextSeo title="Blog" description="Latest news from the Supabase team." />
       <DefaultLayout>
-        <div className="bg-white dark:bg-dark-700 overflow-hidden py-12">
-          <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
-            <div className="mx-auto max-w-7xl">
-              <Typography.Title>Blog</Typography.Title>
-            </div>
-          </div>
-        </div>
+        <BlogHeader title='Blog' />
         <div className="bg-gray-50 dark:bg-dark-800 overflow-hidden py-12">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
             <div className="mx-auto max-w-7xl">
@@ -107,9 +103,7 @@ function Blog(props: any) {
               </div>
               <div className="mt-12 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none">
                 {/* <ul> */}
-                {blogs.map((blog: any, idx: any) => {
-                  return BlogListItem(blog)
-                })}
+                {blogs.map((blog: PostTypes, idx: number) => <BlogListItem blog={blog} key={idx} />)}
                 {/* </ul> */}
               </div>{' '}
             </div>
@@ -127,7 +121,7 @@ function FeaturedThumb(blog: PostTypes) {
   return (
     <div key={blog.slug} className="my-6 cursor-pointer">
       <Link href={`/blog/${blog.url}`} as={`/blog/${blog.url}`}>
-        <div>
+        <a className="inline-block">
           <img
             className="h-96 w-full object-cover"
             src={`/new/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
@@ -148,9 +142,13 @@ function FeaturedThumb(blog: PostTypes) {
                 <Space className="block">
                   {blog.tags &&
                     blog.tags.map((tag: string) => (
-                      <Badge key={`${blog.slug}-${tag}-tag`} dot={false}>
-                        {tag}
-                      </Badge>
+                      <Link href={`/blog/tags/${tag}`} as={`/blog/tags/${tag}`}>
+                        <a>
+                          <Badge key={`${blog.slug}-${tag}-tag`} dot={false}>
+                            {tag}
+                          </Badge>
+                        </a>
+                      </Link>
                     ))}
                 </Space>
               </Space>
@@ -172,67 +170,8 @@ function FeaturedThumb(blog: PostTypes) {
               </div>
             )}
           </Space>
-        </div>
+        </a>
       </Link>
-    </div>
-  )
-}
-
-function BlogListItem(blog: PostTypes) {
-  // @ts-ignore
-  const author = blog.author ? authors[blog.author] : authors['supabase']
-  return (
-    <div key={blog.slug} className="pt-4 pb-12 border-b border-gray-100 dark:border-gray-600 mb-8">
-      <div className="mx-auto max-w-7xl cursor-pointer">
-        <Link href={`/blog/${blog.url}`} as={`/blog/${blog.url}`}>
-          <div>
-            <Space direction="vertical" size={5} className="">
-              <div>
-                <Space className="mb-2">
-                  <Typography.Text type="secondary">{blog.date}</Typography.Text>
-                  <Typography.Text type="secondary">•</Typography.Text>
-                  <Typography.Text type="secondary">{blog.readingTime}</Typography.Text>
-                </Space>
-
-                <Space direction="vertical" size={3}>
-                  <Typography.Title level={3} className="">
-                    {blog.title}
-                  </Typography.Title>
-
-                  <Space className="block">
-                    {blog.tags &&
-                      blog.tags.map((tag: string) => (
-                        <Badge key={`${blog.slug}-${tag}-tag`} dot={false}>
-                          {tag}
-                        </Badge>
-                      ))}
-                  </Space>
-                </Space>
-              </div>
-
-              {author && (
-                <div>
-                  <Space size={4}>
-                    {author.author_image_url && (
-                      <img src={author.author_image_url} className="rounded-full w-10" />
-                    )}
-                    <Space direction="vertical" size={0}>
-                      <Typography.Text>{author.author}</Typography.Text>
-                      <Typography.Text type="secondary" small>
-                        {author.position}
-                      </Typography.Text>
-                    </Space>
-                  </Space>
-                </div>
-              )}
-              {/* <Typography>
-                <ReactMarkdown>{blog.content.substring(0, 210) + '...'}</ReactMarkdown>
-              </Typography>
-              <Typography.Link>Read more</Typography.Link> */}
-            </Space>
-          </div>
-        </Link>
-      </div>
     </div>
   )
 }

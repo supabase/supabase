@@ -13,7 +13,7 @@ tags:
   - Postgres
 ---
 
-[Replit.com](http://replit.com) is an awesome new browser based IDE where you can code alone or collaboratively with friends using their awesome multiplayer features! It's particularly useful for education, and sharing code examples with others.
+[Replit.com](http://replit.com) is an awesome new browser based IDE where you can code alone or collaboratively with friends using their amazing multiplayer features! It's particularly useful for education, and sharing code examples with others.
 
 They support a ton of different languages and execution environments and even recently introduced a simple key value store you can use to persist data.
 
@@ -89,14 +89,14 @@ const main = async() => {
 main()
 ```
 
-Once this is working, if you want to learn more about the [query interface](https://supabase.io/docs/client/filter) you might want to try some of these challenges:
+Once this is working, if you want to learn more about the [query interface](https://supabase.io/docs/reference/javascript/filter) you might want to try some of these challenges:
 
-```jsx
-// 1. List all the countries in Antarctica
-// 2. Fetch the iso3 code of the country with ID 3
-// 3. List the countries with 'Island' in the name
-// 4. Count the number of countries that start with 'Z' or 'Q'
-// 5. Fetch all the Countries where continents is null
+```
+ 1. List all the countries in Antarctica
+ 2. Fetch the iso3 code of the country with ID 3
+ 3. List the countries with 'Island' in the name
+ 4. Count the number of countries that start with 'Z' or 'Q'
+ 5. Fetch all the Countries where continents is null
 ```
 
 There are full solutions provided in the video version of this blog, but some examples you may find useful are:
@@ -126,7 +126,7 @@ const { data, error } = await supabase
   .select('name, country_id')
   .neq('name', 'The shire')
 
-// full docs here: https://supabase.io/docs/client/filter
+// full docs here: https://supabase.io/docs/reference/javascript/filter
 ```
 
 We look forward to showing off some more Supabase + Replit examples.

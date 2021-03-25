@@ -13,7 +13,7 @@ An introduction to JWTs and how they are used in Supabase Auth
 
 <iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/v3Exg5YpJvE" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
 
-### What are JSON Web Tokens (JWTs)
+### What are JSON Web Tokens (JWTs)?
 
 JWTs are JSON objects that are encoded and signed and sent around as a string. They are distributed to users of a service or website, who can later show the JWT to the website or service, as proof that they have the right to access certain content.
 
@@ -47,7 +47,14 @@ Well, the JSON object starts out looking something like this:
 
 Just note that, the more data you store in your token, the longer the encoded string will be.
 
-When we want to send the JWT to the user, we first encode the data using an algorithm such as `HS256`, there are many libraries (and several different algorithms) that can be used to do this encoding/decoding such as [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken). The resulting string will look like this:
+When we want to send the JWT to the user, we first encode the data using an algorithm such as `HS256`, there are many libraries (and several different algorithms) that can be used to do this encoding/decoding such as [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken). I made a repl [here](https://replit.com/@awalias/jsonwebtokens#index.js) so you can try it for yourself. The signing is as simple as:
+
+```js
+// from https://replit.com/@awalias/jsonwebtokens#index.js
+let token = jwt.sign({ name: 'Sam Vimes' }, 'some-secret');
+```
+
+And the resulting string will look like this:
 
 ```js
 eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMDAxIiwibmFtZSI6IlNhbSBWaW1lcyIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjoxNTE4MjM5MDIyfQ.zMcHjKlkGhuVsiPIkyAkB2rjXzyzJsMMgpvEGvGtjvA

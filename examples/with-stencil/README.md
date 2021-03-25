@@ -42,7 +42,7 @@ const supabaseConfig = {
 };
 ```
 
-You can find more about _Supabase Client_ config [on the official documentation page](https://supabase.io/docs/client/initializing).
+You can find more about _Supabase Client_ config [on the official documentation page](https://supabase.io/docs/reference/javascript/initializing).
 
 To start a project, run:
 ```sh
