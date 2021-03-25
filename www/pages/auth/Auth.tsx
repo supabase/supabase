@@ -75,6 +75,7 @@ function AuthPage() {
             src={`${basePath}/images/product/auth/header--dark.png`}
           />,
         ]}
+        documentation_url={'https://supabase.io/docs/guides/auth'}
       />
 
       <SectionContainer>
@@ -177,6 +178,7 @@ function AuthPage() {
               </div>
             </div>,
           ]}
+          documentation_link={'https://supabase.io/docs/guides/auth'}
         />
       </SectionContainer>
 

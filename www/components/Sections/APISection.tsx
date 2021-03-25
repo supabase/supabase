@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Button, IconArrowUpRight, Tabs, Typography } from '@supabase/ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import CodeBlock from '../CodeBlock/CodeBlock'
+import Link from 'next/link'
 
 interface Example {
   lang: 'js' | 'py' | 'sql'
@@ -17,6 +18,7 @@ interface Props {
   footer?: React.ReactNode
   text?: React.ReactNode
   autoHeight?: boolean
+  documentation_link?: string
 }
 
 function APISection(props: Props) {
@@ -35,9 +37,15 @@ function APISection(props: Props) {
       <div className="col-span-12 lg:col-span-5 xl:col-span-5 pb-8">
         <Typography.Title level={2}>{props.title}</Typography.Title>
         {props.text}
-        <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-          Expore documentation
-        </Button>
+        {props.documentation_link && (
+          <Link href={props.documentation_link} as={props.documentation_link}>
+            <a>
+              <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
+                Expore documentation
+              </Button>
+            </a>
+          </Link>
+        )}
         {props.footer && <div className="py-8">{props.footer}</div>}
       </div>
       <div className="col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 sbui-tabs--alt">
