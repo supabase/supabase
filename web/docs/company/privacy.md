@@ -23,7 +23,7 @@ Wherever our customers use our Service to submit, manage, or otherwise use conte
 
 **Note for International Visitors:** Personal information may be transferred to, stored and processed in a country other than the one in which it was collected. For example, the Sites are primarily hosted in and provided from the United States. Please note the country to which personal data is transferred may not provide the same level of protection for personal information as the country from which it was transferred.
 
-1. **INFORMATION WE COLLECT AND OUR USE**
+### 1. **INFORMATION WE COLLECT AND OUR USE**
 
 We collect personal information in connection with your visits to and use of the Service. This collection includes information that you provide in connection with the Service, information from third parties, and information that is collected automatically such as through the use of cookies and other technologies.
 
@@ -61,7 +61,7 @@ In addition to the uses described above, we may collect and use personal informa
 - To fulfill any other purpose for which you provide personal information; and
 - For any other lawful purpose, or other purpose that you consent to.
 
-1. **HOW WE SHARE PERSONAL INFORMATION**
+### 2. **HOW WE SHARE PERSONAL INFORMATION**
 
 We may share your personal information in the instances described below. For further information on your choices regarding your information, see **Control Over Your Information**.
 
@@ -72,12 +72,12 @@ We may share your personal information in the instances described below. For fur
 - We may disclose your information publicly or with another third party with your prior authorization.
 - With others in an aggregated or otherwise anonymized form that does not reasonably identify you directly as an individual.
 
-1. **CONTROL OVER YOUR INFORMATION**
+### 3. **CONTROL OVER YOUR INFORMATION**
 
 - **_Email Communications._** From time to time, we may send you emails regarding updates to our Service, products or services, notices about our organization, or information about products/services we offer (or promotional offers from third parties) that we think may be of interest to you. If you wish to unsubscribe from such emails, simply click the “unsubscribe link” provided at the bottom of the email communication. Note that you cannot unsubscribe from certain services-related email communications (e.g., account verification, confirmations of transactions, technical or legal notices).
 - **_Modifying Account Information._** If you have an online account with us, you have the ability to modify certain information in your account (e.g., your contact information) through the account options provided on the Site. If there is personal information in your User Content, you can use the features and functionality of the Service to edit or delete the personal information or User Content. Not all personal information is maintained in a format that you can access or change. If you would like to request access to, or correction or deletion of personal information, you may send your request to us at the email provided below. We will review your request and may require you to provide additional information to identify yourself, but we do not promise that we will be able to satisfy your request.
 
-1. ` `**How We Use Cookies and Other Tracking Technology to Collect Information**
+### 4. ` `**How We Use Cookies and Other Tracking Technology to Collect Information**
 
 We, and our third-party partners, automatically collect certain types of usage information when you visit our Site, read our emails, or otherwise engage with us.  We typically collect this information through a variety of tracking technologies, including cookies, web beacons, embedded scripts, location-identifying technologies, file information, and similar technology (collectively, “**tracking technologies**”).
 
@@ -95,25 +95,25 @@ Note we do not engage in online targeted advertising.
 
 If you would prefer not to accept cookies, most browsers will allow you to: (i) change your browser settings to notify you when you receive a cookie, which lets you choose whether or not to accept it; (ii) disable existing cookies; or (iii) set your browser to automatically reject cookies. Please note that doing so may negatively impact your experience using the sites, as some features and services on our sites may not work properly. Depending on your mobile device and operating system, you may not be able to delete or block all cookies. You may also set your e-mail options to prevent the automatic downloading of images that may contain technologies that would allow us to know whether you have accessed our e-mail and performed certain functions with it.
 
-1. **Data Retention and Security**
+### 5. **Data Retention and Security**
 
 We will retain your personal information for the length of time needed to fulfill the purposes outlined in this Privacy Notice, unless a longer retention period is required or permitted by law. We store data on servers in the U.S. or any other country in which Supabase or its affiliates, subsidiaries, agents or contractors maintain facilities. If you are located in the European Union or other regions with laws governing data collection and use that may differ from U.S. law, please note that your personal information may be transferred to a country and jurisdiction that does not have the same data protection laws as your jurisdiction. When you register for use with Supabase you have the option of where you store your information and we will not transfer it without providing information to you in advance.
 
 Supabase cares about the security of your information and uses commercially reasonable physical, technical and organizational measures designed to preserve the integrity and security of all information we collect. However, no security system is impenetrable, and we cannot guarantee the security of our systems 100%. In the event that any information under our control is compromised as a result of a breach of security, we will take reasonable steps to investigate the situation and where appropriate, notify those individuals whose information may have been compromised and take other steps, in accordance with any applicable laws and regulations.
 
-1. **Links to Third-Party Websites and Services**
+### 6. **Links to Third-Party Websites and Services**
 
 For your convenience, our Site may provide links to third-party websites or services that we do not own or operate. We are not responsible for the practices employed by any websites or services linked to or from the services, including the information or content contained within them. Your browsing and interaction on any other website or service are subject to the applicable third party’s rules and policies, not ours. If you are using a third-party website or service, you do so at your own risk. We encourage you to review the privacy policies of any site or service before providing any personal information.
 
-1. **Children’s Privacy**
+### 7. **Children’s Privacy**
 
 Our services are not intended for children under the age of 13. We do not knowingly solicit or collect personal information from children under the age of 13. If we learn that any personal information has been collected inadvertently from a child under 13, we will delete the information as soon as possible. If you believe that we might have collected information from a child under 13, please contact us at privacy@supabase.com.
 
-1. **Changes to Privacy Notice**
+### 8. **Changes to Privacy Notice**
 
 We reserve the right to change this Privacy Notice from time to time in our sole discretion. We will notify you about material changes in the way we treat personal data by sending a notice to the primary email address specified in your Supabase account and/or by placing a prominent notice on our Site. It is your responsibility to review this Privacy Notice periodically. When we do change the Privacy Notice, we will also revise the “last modified” date.
 
-1. **Contact Us**
+### 9. **Contact Us**
 
 For additional inquiries about this Privacy Notice, please send us an email at privacy@supabase.com or contact us at:
 
@@ -125,7 +125,7 @@ Singapore 318992
 
 This Privacy Notice was last modified on 23th March 2021
 
-**PRIVACY DISCLOSURES FOR THE EUROPEAN ECONOMIC AREA, UNITED KINGDOM AND SWITZERLAND**
+## **PRIVACY DISCLOSURES FOR THE EUROPEAN ECONOMIC AREA, UNITED KINGDOM AND SWITZERLAND**
 
 While we are primarily based in the United States, Supabase maintains operations in Europe and may direct our services to individuals located in the European Economic Area (“**_EEA_**”), United Kingdom and Switzerland, including through our Site <https://supabase.io/> (collectively, our “**_European Services_**”). The following disclosures (“**_Privacy Disclosures_**”) apply to our processing of personal data in connection with our European Services.
 
@@ -133,11 +133,11 @@ Supabase, Inc. is the data controller responsible for the processing of personal
 
 **Personal Data:** When we use the term “personal data” in this section, we mean information relating to an identified or identifiable natural person.
 
-1. **PERSONAL DATA WE COLLECT FROM YOU WHEN YOU USE THE SUPABASE EUROPEAN SERVICES, AND HOW WE USE IT**
+### 1. **PERSONAL DATA WE COLLECT FROM YOU WHEN YOU USE THE SUPABASE EUROPEAN SERVICES, AND HOW WE USE IT**
 
 We collect the categories of personal data that you voluntarily submit directly to us when you use the European Services, as set forth in our Privacy Notice under the section entitled **Information We Collect and Our Use**. The table at **Annex 1** sets out in detail the categories of personal data we collect about you and how we use that information when you use the European Services, as well as the legal basis which we rely on to process the personal information and recipients of that personal information.
 
-1. **INFORMATION WE COLLECT ABOUT YOU AUTOMATICALLY**
+### 2. **INFORMATION WE COLLECT ABOUT YOU AUTOMATICALLY**
 
 We also automatically collect personal information indirectly about how you access and use the European Services, and information about the device you use to access the European Services. For example, we may collect:
 
@@ -155,36 +155,36 @@ We may link or combine the personal information we collect about you and the inf
 
 We may anonymise and aggregate any of the personal information we collect (so that it does not directly identify you). We may use anonymised information for purposes that include testing our IT systems, research, data analysis, improving the Supabase European Services. We may also share such anonymised and aggregated information with others.
 
-1. **HOW LONG WILL WE STORE YOUR PERSONAL INFORMATION**
+### 3. **HOW LONG WILL WE STORE YOUR PERSONAL INFORMATION**
 
 We will usually store the personal information we collect about you for no longer than necessary for the purposes set out in Annex 1 and Annex 2, in accordance with our legal obligations and legitimate business interests.
 
 The criteria used to determine the period for which personal information about you will be retained varies depending on the legal basis under which we process the personal information:
 
 1. **Legitimate Interests.** Where we are processing personal information based on our legitimate interests, we generally will retain such information for a reasonable period of time based on the particular interest, taking into account the fundamental interests and the rights and freedoms of data subjects.
-1. **Consent.** Where we are processing personal information based on your consent, we generally will retain the information until you withdraw your consent, or otherwise for the period of time necessary to fulfil the underlying agreement with you or provide you with the applicable service for which we process that personal information.
-1. **Contract.** Where we are processing personal information based on contract, we generally will retain the information for the duration of the contract plus some additional limited period of time that is necessary to comply with law or that represents the statute of limitations for legal claims that could arise from the contractual relationship.
-1. **Legal Obligation.** Where we are processing personal information based on a legal obligation, we generally will retain the information for the period of time necessary to fulfil the legal obligation.
-1. **Legal Claim.** We may need to apply a “legal hold” that retains information beyond our typical retention period where we face threat of legal claim.  In that case, we will retain the information until the hold is removed, which typically means the claim or threat of claim has been resolved.
+2. **Consent.** Where we are processing personal information based on your consent, we generally will retain the information until you withdraw your consent, or otherwise for the period of time necessary to fulfil the underlying agreement with you or provide you with the applicable service for which we process that personal information.
+3. **Contract.** Where we are processing personal information based on contract, we generally will retain the information for the duration of the contract plus some additional limited period of time that is necessary to comply with law or that represents the statute of limitations for legal claims that could arise from the contractual relationship.
+4. **Legal Obligation.** Where we are processing personal information based on a legal obligation, we generally will retain the information for the period of time necessary to fulfil the legal obligation.
+5. **Legal Claim.** We may need to apply a “legal hold” that retains information beyond our typical retention period where we face threat of legal claim.  In that case, we will retain the information until the hold is removed, which typically means the claim or threat of claim has been resolved.
 
 In all cases, in addition to the purposes and legal bases, we consider the amount, nature and sensitivity of the personal information, as well as the potential risk of harm from unauthorised use or disclosure of your personal information.
 
-1. **RECIPIENTS OF PERSONAL INFORMATION**
+### 4. **RECIPIENTS OF PERSONAL INFORMATION**
 
 In addition to the recipients listed in Annexes 1 and 2, we may also share your personal information with the following (as required in accordance with the uses set out in Annexes 1 and 2):
 
 1. **Service providers and advisors**: we may share your personal information with third party vendors and other service providers that perform services for us or on our behalf, which may include providing professional services, such as legal and accounting services, mailing, email or chat services, fraud prevention, web hosting, or providing analytic services.
-1. **Affiliates**. Other companies owned by or under common ownership as Supabase, including our subsidiaries (i.e., any organisation we own or control) and our ultimate holding company (i.e., any organisation that owns or controls us) and any subsidiaries it owns. These companies will use your personal information in the same way as we can under these Privacy Disclosures.
-1. **Purchasers and third parties in connection with a business transaction**: your personal information may be disclosed to third parties in connection with a transaction, such as a merger, sale of assets or shares, reorganisation, financing, change of control or acquisition of all or a portion of our business.
-1. **Law enforcement, regulators and other parties for legal reasons**: we may share your personal information with third parties as required by law or if we reasonably believe that such action is necessary to (i) comply with the law and the reasonable requests of law enforcement; (ii) detect and investigate illegal activities and breaches of agreements, including our Terms; and/or (iii) exercise or protect the rights, property, or personal safety of Supabase, its users or others.
+2. **Affiliates**. Other companies owned by or under common ownership as Supabase, including our subsidiaries (i.e., any organisation we own or control) and our ultimate holding company (i.e., any organisation that owns or controls us) and any subsidiaries it owns. These companies will use your personal information in the same way as we can under these Privacy Disclosures.
+3. **Purchasers and third parties in connection with a business transaction**: your personal information may be disclosed to third parties in connection with a transaction, such as a merger, sale of assets or shares, reorganisation, financing, change of control or acquisition of all or a portion of our business.
+4. **Law enforcement, regulators and other parties for legal reasons**: we may share your personal information with third parties as required by law or if we reasonably believe that such action is necessary to (i) comply with the law and the reasonable requests of law enforcement; (ii) detect and investigate illegal activities and breaches of agreements, including our Terms; and/or (iii) exercise or protect the rights, property, or personal safety of Supabase, its users or others.
 
-1) **MARKETING AND ADVERTISING**
+### 5. **MARKETING AND ADVERTISING**
 
 From time to time we may contact you with information about our services, including sending you marketing messages and asking for your feedback on our services. Most marketing messages we send will be by email. For some marketing messages, we may use personal information we collect about you to help us determine the most relevant marketing information to share with you.
 
 We will only send you marketing messages if you have given us your consent to do so. You can withdraw your consent at a later date by clicking on the unsubscribe link at the bottom of our marketing emails or by updating your preferences via your account on the Site.
 
-1. **STORING AND TRANSFERRING YOUR PERSONAL INFORMATION**
+### 6. **STORING AND TRANSFERRING YOUR PERSONAL INFORMATION**
 
 **Security**. We implement appropriate technical and organisational measures to protect your personal information against accidental or unlawful destruction, loss, change or damage. All personal information we collect will be stored by our cloud hosting provider on secure servers. We will never send you unsolicited emails or contact you by phone requesting credit or debit card information or national identification numbers.
 
@@ -194,24 +194,24 @@ In the event of such a transfer, we ensure that: (i) the personal information is
 
 If you wish to enquire further about these safeguards used, please contact us using the details set out at the end of these Privacy Disclosures.
 
-1. ` `**PROFILING**
+### 7. ` `**PROFILING**
 
 We may analyze personal data we have collected about you to create a profile of your interests and send product updates. We may also use personal data about you to detect and reduce fraud.
 
-1. **YOUR RIGHTS IN RESPECT OF YOUR PERSONAL INFORMATION**
+### 8. **YOUR RIGHTS IN RESPECT OF YOUR PERSONAL INFORMATION**
 
 In accordance with applicable privacy law, you have the following rights in respect of your personal information that we hold:
 
 1. **Right of access**. You have the right to obtain:
    1. confirmation of whether, and where, we are processing your personal information;
-   1. information about the categories of personal information we are processing, the purposes for which we process your personal information and information as to how we determine applicable retention periods;
-   1. information about the categories of recipients with whom we may share your personal information; and
-   1. a copy of the personal information we hold about you.
-1. **Right of portability**. You have the right, in certain circumstances, to receive a copy of the personal information you have provided to us in a structured, commonly used, machine-readable format that supports re-use, or to request the transfer of your personal data to another person.
-1. **Right to rectification**. You have the right to obtain rectification of any inaccurate or incomplete personal information we hold about you without undue delay.
-1. **Right to erasure**. You have the right, in some circumstances, to require us to erase your personal information without undue delay if the continued processing of that personal information is not justified.
-1. **Right to restriction**. You have the right, in some circumstances, to require us to limit the purposes for which we process your personal information if the continued processing of the personal information in this way is not justified, such as where the accuracy of the personal information is contested by you.
-1. **Right to withdraw consent**. There are certain circumstances where we require your consent to process your personal information. In these instances, and if you have provided consent, you have the right to withdraw your consent. If you withdraw your consent, this will not affect the lawfulness of our use of your personal information before your withdrawal.
+   2. information about the categories of personal information we are processing, the purposes for which we process your personal information and information as to how we determine applicable retention periods;
+   3. information about the categories of recipients with whom we may share your personal information; and
+   4. a copy of the personal information we hold about you.
+2. **Right of portability**. You have the right, in certain circumstances, to receive a copy of the personal information you have provided to us in a structured, commonly used, machine-readable format that supports re-use, or to request the transfer of your personal data to another person.
+3. **Right to rectification**. You have the right to obtain rectification of any inaccurate or incomplete personal information we hold about you without undue delay.
+4. **Right to erasure**. You have the right, in some circumstances, to require us to erase your personal information without undue delay if the continued processing of that personal information is not justified.
+5. **Right to restriction**. You have the right, in some circumstances, to require us to limit the purposes for which we process your personal information if the continued processing of the personal information in this way is not justified, such as where the accuracy of the personal information is contested by you.
+6. **Right to withdraw consent**. There are certain circumstances where we require your consent to process your personal information. In these instances, and if you have provided consent, you have the right to withdraw your consent. If you withdraw your consent, this will not affect the lawfulness of our use of your personal information before your withdrawal.
 
 **You also have the right to object to any processing based on our legitimate interests where there are grounds relating to your particular situation. There may be compelling reasons for continuing to process your personal information, and we will assess and inform you if that is the case. You can object to marketing activities for any reason.**
 
@@ -221,7 +221,7 @@ If you wish to exercise one of these rights, please contact us using the contact
 
 Due to the confidential nature of data processing we may ask you to provide proof of identity when exercising the above rights. This can be done by providing a scanned copy of a valid identity document or a signed photocopy of a valid identity document.
 
-1. **COOKIES AND SIMILAR TECHNOLOGIES USED ON OUR EUROPEAN SERVICES**
+### 9. **COOKIES AND SIMILAR TECHNOLOGIES USED ON OUR EUROPEAN SERVICES**
 
 Our European Services uses cookies and similar technologies such as pixels and Local Storage Objects (LSOs) like HTML5 (together "**_cookies_**") to distinguish you from other users of our European Services. This helps us to provide you with a good experience when you browse our European Services and also allows us to monitor and analyse how you use and interact with our European Services so that we can continue to improve our European Services.
 
@@ -247,7 +247,7 @@ If you would like to find out more about cookies and other similar technologies,
 
 Please note that deleting or blocking cookies may not be effective for all types of tracking technologies, such as Local Storage Objects (LSOs) like HTML5.
 
-1. **TRACKING TECHNOLOGIES USED IN OUR EMAILS**
+### 10. **TRACKING TECHNOLOGIES USED IN OUR EMAILS**
 
 Our emails may contain tracking pixels that identify if and when you have opened an email that we have sent you, how many times you have read it and whether you have clicked on any links in that email. This helps us measure the effectiveness of our marketing email campaigns, make the emails we send to you more relevant to your interests and to understand if you have opened and read any important administrative emails we might send you.
 
