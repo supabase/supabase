@@ -159,21 +159,23 @@ function ImageCarousel(props: ImageCarouselProps) {
               <SwiperSlide key={i}>
                 <div className="bg-white dark:bg-gray-800">
                   <Typography.Title level={4}>{content.title}</Typography.Title>
-                  <Typography.Text>
-                    <Link href={content.url} as={content.url}>
-                      <a>
-                        <p className="text-base">{content.text}</p>
-                        <Button
-                          className="mb-8"
-                          type="outline"
-                          size="small"
-                          icon={<IconArrowUpRight />}
-                        >
-                          {content.cta ? content.cta : 'View documentation'}
-                        </Button>
-                      </a>
-                    </Link>
-                  </Typography.Text>
+                  {content.url && (
+                    <Typography.Text>
+                      <Link href={content.url} as={content.url}>
+                        <a>
+                          <p className="text-base">{content.text}</p>
+                          <Button
+                            className="mb-8"
+                            type="outline"
+                            size="small"
+                            icon={<IconArrowUpRight />}
+                          >
+                            {content.cta ? content.cta : 'View documentation'}
+                          </Button>
+                        </a>
+                      </Link>
+                    </Typography.Text>
+                  )}
                 </div>
               </SwiperSlide>
             )
