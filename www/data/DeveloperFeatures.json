@@ -2,13 +2,13 @@
   {
     "name": "TypeScript Support",
     "description": "Type definitions built directly from your database schema",
-    "badge": null,
+    "badge": "",
     "url": "/docs/client/generating-types"
   },
   {
     "name": "Install from CDN",
     "description": "Use Supabase in the browser without a build process",
-    "badge": null,
+    "badge": "",
     "url": "/docs/client/initializing"
   },
   {

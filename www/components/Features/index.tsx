@@ -1,8 +1,10 @@
-import { Button, Badge, Typography } from '@supabase/ui'
+import { Button, Badge, Typography, IconArrowRight } from '@supabase/ui'
 import SectionHeader from 'components/UI/SectionHeader'
 import Solutions from 'data/Solutions.json'
+import Link from 'next/link'
 import SectionContainer from '../Layouts/SectionContainer'
 import ProductIcon from '../ProductIcon'
+import TextLink from '../TextLink'
 
 const Features = () => {
   const IconSections = Object.values(Solutions).map((solution: any) => {
@@ -25,13 +27,7 @@ const Features = () => {
             <Badge dot>{label}</Badge>
           </div>
         )}
-        {url && (
-          <a href={url} className="block mt-3">
-            <Typography.Link style={{ textDecoration: 'underline' }} className="mt-5">
-              Learn more
-            </Typography.Link>
-          </a>
-        )}
+        {url && <TextLink label={label ? 'Get notified' : 'Learn more'} url={url} />}
       </div>
     )
   })
