@@ -12,7 +12,7 @@ const Home = ({ user }) => {
     useEffect(() => {
         /* Recovery url is of the form
          * <SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery
-         * Read more on https://supabase.io/docs/client/reset-password-email#notes
+         * Read more on https://supabase.io/docs/reference/javascript/reset-password-email#notes
          */
         let url = window.location.hash;
         let query = url.substr(1);

@@ -4,6 +4,8 @@ title: Database
 description: Use Supabase to manage your data.
 ---
 
+import ExtensionsComponent from '../../src/components/Extensions'
+
 Supabase is built on top of [Postgres](/docs/postgres/server/about), an extremely scalable Relational Database.
 
 ## Features
@@ -33,14 +35,6 @@ You can duplicate your tables, just like you would inside a spreadsheet.
 <source src="/videos/duplicate-tables.mp4" type="video/mp4" muted playsInline />
 </video>
 
-### Enable and disable extensions
-
-Extensions are one of the best things about Postgres. You can enable Postgres extensions with the click of a button.
-
-<video width="99%" muted playsInline controls={true}>
-<source src="/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
-</video>
-
 
 ### The SQL Editor
 
@@ -58,20 +52,89 @@ Supabase comes with a SQL Editor. You can also save your favorite queries to run
 - Managed backups - Supabase handles all your database backups.
 - Data imports - import directly from a CSV or excel spreadsheet.
 
+## Extensions
+
+
+### Enable and disable extensions
+
+To expand the functionality of your Postgres database, you can use extensions.
+You can enable Postgres extensions with the click of a button within the Supabase dashboard.
+
+<video width="99%" muted playsInline controls={true}>
+<source src="/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
+</video>
+
+
+### Full list of extensions
+
+Supabase is pre-configured with over 50 extensions. You can also install your own SQL extensions directly into the database through our SQL editor.
+
+<ExtensionsComponent />
+
 
 ## Tips
 
+### Realtime 
+
+Supabase provides a realtime engine on top of Postgres, so that you can listen to changes as they happen. 
+Our realtime engine uses the built-in replication functionality of Postgres. 
+You can manage the realtime system, simply by 
+[updating](http://localhost:3006/docs/reference/postgres/publications) the `supabase_realtime` publication.
+
+For example to enable realtime only for individual tables:
+
+```sql
+begin; 
+  -- remove the realtime publication
+  drop publication if exists supabase_realtime; 
+
+  -- re-create the publication but don't enable it for any tables
+  create publication supabase_realtime;  
+commit;
+
+-- add a table to the publication
+alter publication supabase_realtime add table products;
+
+-- add other tables to the publication
+alter publication supabase_realtime add table posts;
+```
+
+By default only "new" values are sent, but if you want to receive the old record (previous values) whenever you `update` or `delete` a record, 
+you can update the replica identity of your tables, setting it to `full`:
+
+```sql
+alter table_name your_table 
+replica identity full;
+```
+
+
+### Resetting your project password
+
+When you create a new project in Supabase we ask for a password. You can use this password to connect direcly to your Postgres database.
+
+If you forget your password, you can reset it from the Dashboard SQL editor:
+
+For example:
+
+```sql
+alter user postgres 
+with password 'new_password';
+```
+
+Read more in [Database Configuration](/docs/reference/postgres/database-passwords).
 
 ### Changing the timezone of your server.
 
-Your database is initialized with the UTC timezone. We recommend keeping it this way, as it is helpful for time calculation. 
+Your database is initialized with the UTC timezone. We recommend keeping it this way, as it is helpful for time calculations.
 If, however, you want to update the timezone, you can do so using any of the [database timezones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
 For example:
 
 ```sql
-alter database postgres set timezone to 'Asia/Singapore';
+alter database postgres set timezone to 'America/New_York';
 ```
+
+Read more in [Database Configuration](/docs/reference/postgres/changing-timezones).
 
 ## Next steps
 
