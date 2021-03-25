@@ -10,7 +10,7 @@ function TweetCard(props: TweetCard) {
   return (
     <div className="bg-white dark:bg-dark-800 rounded-lg border border-gray-100 dark:border-gray-600 p-6">
       <div className="relative">
-        <img className="rounded-md w-12" src={props.img_url} />
+        <img className="rounded-md w-12 border dark:border-gray-600" src={props.img_url} />
         <div
           className="absolute -top-2 -left-2 w-6 h-6 flex justify-center items-center rounded-md"
           style={{ background: '#00acee' }}

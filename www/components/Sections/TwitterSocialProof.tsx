@@ -1,20 +1,8 @@
 import { useRouter } from 'next/router'
 import { Swiper, SwiperSlide } from 'swiper/react'
-
-import SectionContainer from '../Layouts/SectionContainer'
-import {
-  Button,
-  Typography,
-  IconGitHub,
-  IconSpeaker,
-  IconMessageCircle,
-  IconMail,
-  Space,
-  IconSlack,
-} from '@supabase/ui'
+import { Button, Typography, IconMessageCircle, Space } from '@supabase/ui'
 
 import Examples from '../../data/tweets/Tweets.json'
-import ExampleCard from '../ExampleCard'
 import TweetCard from '../TweetCard'
 
 function TwitterSocialProof() {
@@ -34,14 +22,7 @@ function TwitterSocialProof() {
             </p>
             <Space className="justify-center mt-8">
               <Button size="small" iconRight={<IconMessageCircle size="tiny" />} type="default">
-                Github discussion
-              </Button>
-              <Button
-                size="small"
-                iconRight={<img src={`${basePath}/images/index/slack-mark.svg`} width="16" />}
-                type="default"
-              >
-                Request Slack invite
+                GitHub discussions
               </Button>
             </Space>
           </Typography.Text>
@@ -69,7 +50,7 @@ function TwitterSocialProof() {
                       key={i}
                       handle={`@${tweet.handle}`}
                       quote={tweet.text}
-                      img_url={tweet.img_url}
+                      img_url={`${basePath}${tweet.img_url}`}
                     />
                   </div>
                 </SwiperSlide>
