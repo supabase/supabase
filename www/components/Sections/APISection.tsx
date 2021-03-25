@@ -56,8 +56,8 @@ function APISection(props: Props) {
         >
           {props.content &&
             props.content.map((content: Example, i) => (
-              <Tabs.Panel label={content.title} id={i.toString()}>
-                <span></span>
+              <Tabs.Panel label={content.title} id={i.toString()} key={i}>
+                <span key={i}></span>
               </Tabs.Panel>
             ))}
         </Tabs>
@@ -75,7 +75,7 @@ function APISection(props: Props) {
           >
             {props.content &&
               props.content.map((content: Example, i) => (
-                <SwiperSlide>
+                <SwiperSlide key={i}>
                   <CodeBlock key={i} lang={content.lang} size={props.size ? props.size : 'small'}>
                     {content.code}
                   </CodeBlock>

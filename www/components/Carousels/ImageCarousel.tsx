@@ -80,6 +80,7 @@ function ImageCarousel(props: ImageCarouselProps) {
               {props.content.map((content: Content, i) => {
                 return (
                   <Tabs.Panel
+                    key={i}
                     label={content.label ? content.label : content.title}
                     id={i.toString()}
                   >
@@ -139,7 +140,11 @@ function ImageCarousel(props: ImageCarouselProps) {
           >
             {props.content.map((content: Content, i: number) => {
               return (
-                <Tabs.Panel label={content.label ? content.label : content.title} id={i.toString()}>
+                <Tabs.Panel
+                  label={content.label ? content.label : content.title}
+                  id={i.toString()}
+                  key={i}
+                >
                   <span></span>
                 </Tabs.Panel>
               )

@@ -57,7 +57,7 @@ function AuthPage() {
         icon={Solutions['authentication'].icon}
         title={Solutions['authentication'].name}
         h1={[
-          <span>
+          <span key={'authentication-h1'}>
             Built-in user mangement
             <br /> (that you can afford)
           </span>,
@@ -68,10 +68,12 @@ function AuthPage() {
         ]}
         image={[
           <img
+            key={'authentication-header-img--light'}
             className="w-full header--light block"
             src={`${basePath}/images/product/auth/header--light.png`}
           />,
           <img
+            key={'authentication-header-img--dark'}
             className="w-full header--dark mr-0 dark:block"
             src={`${basePath}/images/product/auth/header--dark.png`}
           />,

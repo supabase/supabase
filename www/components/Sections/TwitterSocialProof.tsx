@@ -103,7 +103,7 @@ function TwitterSocialProof() {
           >
             {Examples.map((tweet: any, i: number) => {
               return (
-                <SwiperSlide>
+                <SwiperSlide key={i}>
                   <div className="mr-3 ml-3 cursor-move">
                     <TweetCard
                       key={i}

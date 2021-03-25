@@ -5,7 +5,6 @@ import FeatureColumn from '../FeatureColumn'
 
 import CodeExamples from 'data/home/api-examples'
 import DeveloperFeatures from 'data/DeveloperFeatures.json'
-import Link from 'next/link'
 import TextLink from '../TextLink'
 
 const MadeForDevelopers = () => {
@@ -14,14 +13,9 @@ const MadeForDevelopers = () => {
       <APISection
         autoHeight={true}
         size="large"
-        title={[
-          <span>
-            Instant APIs
-            <br /> that do the hard work for you
-          </span>,
-        ]}
+        title={"Instant APIs that do the hard work for you"}
         text={[
-          <p className="lg:text-lg">
+          <p className="lg:text-lg" key={'madefordeveloper-para-1'}>
             We introspect your database to provide APIs instantly. Stop building repetitive CRUD
             endpoints and focus on your product.
           </p>,
@@ -29,10 +23,10 @@ const MadeForDevelopers = () => {
         // @ts-ignore
         content={CodeExamples}
         footer={[
-          <dl className="grid gap-y-4 grid-cols-12 md:gap-8">
-            {DeveloperFeatures.map((feature: any, idx: number) => {
+          <dl className="grid gap-y-4 grid-cols-12 md:gap-8" key={'madefordeveloper-footer'}>
+            {DeveloperFeatures.map((feature: any, i: number) => {
               return (
-                <div className="col-span-12 md:col-span-6 lg:col-span-6" key={`dev_feature_${idx}`}>
+                <div className="col-span-12 md:col-span-6 lg:col-span-6" key={i}>
                   <div className="lg:mt-5">
                     <dt>
                       <FeatureColumn title={feature.name} text={feature.description} />
