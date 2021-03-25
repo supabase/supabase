@@ -289,7 +289,7 @@ function AuthPage() {
             </div>
           </div>
         </div>
-        </SectionContainer>>
+      </SectionContainer>
       <CTABanner />
     </DefaultLayout>
   )
