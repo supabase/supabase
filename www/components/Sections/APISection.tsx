@@ -16,6 +16,7 @@ interface Props {
   title: string | React.ReactNode
   footer?: React.ReactNode
   text?: React.ReactNode
+  autoHeight?: boolean
 }
 
 function APISection(props: Props) {
@@ -60,8 +61,9 @@ function APISection(props: Props) {
             initialSlide={apiSwiperActiveIndex}
             spaceBetween={0}
             slidesPerView={1}
-            speed={400}
+            speed={300}
             allowTouchMove={false}
+            autoHeight={props.autoHeight ? props.autoHeight : false}
           >
             {props.content &&
               props.content.map((content: Example, i) => (

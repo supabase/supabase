@@ -41,7 +41,7 @@ const realtime = supabase
     lang: 'js',
     title: 'Read a record',
     description: 'Get all public rooms and their messages',
-    code: `m '@supabase/supabase-js'
+    code: `import '@supabase/supabase-js'
 
 // Initialize 
 const supabaseUrl = 'https://chat-room.supabase.co'

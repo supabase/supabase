@@ -62,7 +62,7 @@ function AuthComponentExample() {
           initialSlide={0}
           spaceBetween={0}
           slidesPerView={1}
-          speed={400}
+          speed={300}
           autoHeight={true}
           allowTouchMove={false}
         >

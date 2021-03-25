@@ -11,6 +11,8 @@ const MadeForDevelopers = () => {
   return (
     <SectionContainer className="pb-0">
       <APISection
+        autoHeight={true}
+        size="large"
         title={[
           <span>
             Instant APIs
@@ -25,7 +27,6 @@ const MadeForDevelopers = () => {
         ]}
         // @ts-ignore
         content={CodeExamples}
-        size="small"
         footer={[
           <dl className="grid grid-cols-12 gap-8">
             {DeveloperFeatures.map((feature: any, idx: number) => {

@@ -1,13 +1,39 @@
+import { useRef } from 'react'
+
 import { useRouter } from 'next/router'
+
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Button, Typography, IconMessageCircle, Space } from '@supabase/ui'
+// import Swiper core and required modules
+import SwiperCore, { Navigation, Pagination } from 'swiper'
+
+import {
+  Button,
+  Typography,
+  IconMessageCircle,
+  Space,
+  IconAlignLeft,
+  IconArrowLeft,
+  IconArrowRight,
+} from '@supabase/ui'
 
 import Examples from '../../data/tweets/Tweets.json'
 import TweetCard from '../TweetCard'
 
+// Import Swiper styles
+import 'swiper/swiper.min.css'
+import 'swiper/components/navigation/navigation.min.css'
+import 'swiper/components/pagination/pagination.min.css'
+
+// install Swiper modules
+SwiperCore.use([Navigation, Pagination])
+
 function TwitterSocialProof() {
   // base path for images
   const { basePath } = useRouter()
+
+  const prevRef = useRef(null)
+  const nextRef = useRef(null)
+
   return (
     <>
       <div className="grid grid-cols-12">
@@ -28,24 +54,37 @@ function TwitterSocialProof() {
           </Typography.Text>
         </div>
       </div>
-
       <div className="mt-6">
-        <div className={'-mr-32 -ml-32'}>
+        <div className={'lg:-mr-32 lg:-ml-32'}>
           <Swiper
             style={{ overflow: 'visible' }}
             initialSlide={3}
             spaceBetween={0}
             slidesPerView={4}
-            autoplay={{
-              delay: 2400,
+            speed={300}
+            loop
+            navigation={{
+              prevEl: prevRef.current ? prevRef.current : undefined,
+              nextEl: nextRef.current ? nextRef.current : undefined,
             }}
-            loop={true}
-            speed={2400}
+            onInit={(swiper: any) => {
+              swiper.params.navigation.prevEl = prevRef.current
+              swiper.params.navigation.nextEl = nextRef.current
+              swiper.navigation.update()
+            }}
+            breakpoints={{
+              320: {
+                slidesPerView: 1,
+              },
+              991: {
+                slidesPerView: 3,
+              },
+            }}
           >
             {Examples.map((tweet: any, i: number) => {
               return (
                 <SwiperSlide>
-                  <div className="mr-3 ml-3 my-8 ">
+                  <div className="mr-3 ml-3 cursor-move">
                     <TweetCard
                       key={i}
                       handle={`@${tweet.handle}`}
@@ -56,6 +95,18 @@ function TwitterSocialProof() {
                 </SwiperSlide>
               )
             })}
+            <div className="container mx-auto hidden md:flex flex-row justify-between mt-3">
+              <div ref={prevRef} className="cursor-pointer">
+                <Typography.Text>
+                  <IconArrowLeft />
+                </Typography.Text>
+              </div>
+              <div ref={nextRef} className="cursor-pointer">
+                <Typography.Text>
+                  <IconArrowRight />
+                </Typography.Text>
+              </div>
+            </div>
           </Swiper>
         </div>
       </div>

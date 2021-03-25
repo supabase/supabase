@@ -83,7 +83,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
           initialSlide={apiSwiperActiveIndex}
           spaceBetween={0}
           slidesPerView={1}
-          speed={400}
+          speed={300}
           autoHeight={true}
           allowTouchMove={false}
         >
@@ -108,7 +108,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
             slidesPerView={1}
             direction="horizontal"
             // style={{ overflow: 'hidden' }}
-            speed={400}
+            speed={300}
             allowTouchMove={false}
           >
             {props.content.map((extension, i) => {
