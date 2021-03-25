@@ -267,7 +267,7 @@ const Nav = (props: Props) => {
         leaveFrom="opacity-100 translate-y-0"
         leaveTo="opacity-0 translate-y-1"
       >
-        <div className="p-4 md:p-8 h-screen fixed bg-white transform lg:hidden overflow-y-scroll -inset-y-0 z-50 dark:bg-dark-700">
+        <div className="p-4 md:p-8 h-screen w-screen fixed bg-white transform overflow-y-scroll -inset-y-0 z-50 dark:bg-dark-700">
           <div className="absolute right-4 top-4 items-center justify-between">
             <div className="-mr-2">
               <button
