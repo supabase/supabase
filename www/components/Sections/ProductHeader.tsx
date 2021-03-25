@@ -21,17 +21,17 @@ const ProductHeader = (props: Types) => (
           <div className="flex flex-row mb-4 item-center">
             {props.icon && <ProductIcon icon={props.icon} />}
             {props.title && (
-              <Typography.Title level={4} className="ml-3">
+              <Typography.Title level={4} className="ml-3" key={`product-name-${props.title}`}>
                 {props.title}
               </Typography.Title>
             )}
           </div>
         ) : null}
-        <Typography.Title level={1}>{props.h1}</Typography.Title>
+        <Typography.Title level={1} key={`h1`}>{props.h1}</Typography.Title>
         {props.subheader && (
           <Typography.Text>
-            {props.subheader.map((subheader) => {
-              return <p className="lg:text-lg">{subheader}</p>
+            {props.subheader.map((subheader, i) => {
+              return <p className="lg:text-lg" key={i}>{subheader}</p>
             })}
           </Typography.Text>
         )}

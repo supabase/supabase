@@ -64,7 +64,7 @@ function Database() {
         icon={Solutions['database'].icon}
         title={Solutions['database'].name}
         h1={[
-          <span>
+          <span key={'database-h1'}>
             Open source SQL Database
             <br /> (without the hassle)
           </span>,
@@ -75,10 +75,12 @@ function Database() {
         ]}
         image={[
           <img
+            key={'database-header-img--light'}
             className="w-full header--light block"
             src={`${basePath}/images/product/database/header--light-2.png`}
           />,
           <img
+            key={'database-header-img--dark'}
             className="w-full header--dark mr-0 dark:block"
             src={`${basePath}/images/product/database/header--dark-2.png`}
           />,
@@ -186,7 +188,7 @@ function Database() {
         allowTouchMove={false}
       >
         <div className="grid grid-cols-12">
-          <SwiperSlide>
+          <SwiperSlide key={0}>
             <SectionContainer className="pt-16 pb-0">
               <ImageCarousel
                 content={TableViewCarouselData}
@@ -202,7 +204,7 @@ function Database() {
               />
             </SectionContainer>
           </SwiperSlide>
-          <SwiperSlide>
+          <SwiperSlide key={1}>
             <SectionContainer className="pt-16 pb-0">
               <ImageCarousel
                 content={SqlViewCarouselData}

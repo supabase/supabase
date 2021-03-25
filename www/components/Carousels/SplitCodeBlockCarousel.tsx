@@ -90,7 +90,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
         >
           {props.content.map((extension, i) => {
             return (
-              <SwiperSlide>
+              <SwiperSlide key={i}>
                 <CodeBlock key={i} lang={extension.lang}>
                   {extension.code}
                 </CodeBlock>

@@ -43,7 +43,7 @@ const BuiltExamples = () => {
         {Examples.slice(0, 6).map((example, i) => {
           return (
             <div
-              className={`col-span-12 lg:col-span-6 xl:col-span-4 ${i > 2 && `sm:hidden lg:block`}`}
+              className={`col-span-12 lg:col-span-6 xl:col-span-4 ${i > 2 && `sm:hidden lg:block`}`} key={i}
             >
               <ExampleCard {...example} />
             </div>
