@@ -145,7 +145,7 @@ function BlogPostPage(props: any) {
         title={props.blog.title}
         openGraph={{
           title: props.blog.title,
-          description: 'Description of open graph article',
+          description: props.blog.description,
           url: `${basePath}/blog/${props.blog.slug}`,
           type: 'article',
           article: {
