@@ -6,6 +6,7 @@ import FeatureColumn from '../FeatureColumn'
 import CodeExamples from 'data/home/api-examples'
 import DeveloperFeatures from 'data/DeveloperFeatures.json'
 import Link from 'next/link'
+import TextLink from '../TextLink'
 
 const MadeForDevelopers = () => {
   return (
@@ -43,21 +44,9 @@ const MadeForDevelopers = () => {
                         </div>
                       )}
                       {feature.badge ? (
-                        <Link href={feature.url} as={feature.url}>
-                          <a>
-                            <Button type="default" icon={<IconMail />}>
-                              {'Get notified'}
-                            </Button>
-                          </a>
-                        </Link>
+                        <TextLink url={feature.url} label="Get notified" />
                       ) : (
-                        <Link href={feature.url} as={feature.url}>
-                          <a>
-                            <Button type="default" icon={<IconArrowUpRight />}>
-                              {'Explore more'}
-                            </Button>
-                          </a>
-                        </Link>
+                        <TextLink url={feature.url} label="Explore more" />
                       )}
                     </dt>
                   </div>
