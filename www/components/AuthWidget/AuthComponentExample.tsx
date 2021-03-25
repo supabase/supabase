@@ -95,7 +95,6 @@ function AuthComponentExample() {
           <SwiperSlide key={2}>
             <div className="p-8">
               <CodeBlock
-                hideCopy
                 children={`import React, { useState } from 'react'
 import { Auth, Typography, Button } from '@supabase/ui'
 import { createClient } from '@supabase/supabase-js'

@@ -3,24 +3,28 @@
     "title": "Edit in the table",
     "label": "Spreadsheet like editing",
     "img_url": "/images/product/database/table-view/spreadsheet-interface.png",
-    "text": "You can edit your database just like you edit a spreadsheet. Update rows easily by just typing in new data."
+    "text": "You can edit your database just like you edit a spreadsheet. Update rows easily by just typing in new data.",
+    "url": ""
   },
   {
     "title": "Create table",
     "label": "Create a table",
     "img_url": "/images/product/database/table-view/create-table.png",
-    "text": "Create tables, columns and rows right in the dashboard. Without the need to use SQL."
+    "text": "Create tables, columns and rows right in the dashboard. Without the need to use SQL.",
+    "url": ""
   },
   {
     "title": "Foreign keys",
     "label": "Set up foreign keys",
     "img_url": "/images/product/database/table-view/foreign-keys.png",
-    "text": "Set up columns to use foreign keys, joining your tables together with meaning."
+    "text": "Set up columns to use foreign keys, joining your tables together with meaning.",
+    "url": ""
   },
   {
     "title": "Export to CSV",
     "label": "Select and Export",
     "img_url": "/images/product/database/table-view/export.png",
-    "text": "Just pick the rows you want and you can export them into a CSV"
+    "text": "Just pick the rows you want and you can export them into a CSV",
+    "url": ""
   }
 ]

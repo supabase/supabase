@@ -8,6 +8,7 @@ import CodeBlock from '../CodeBlock/CodeBlock'
 // Import Swiper styles
 import 'swiper/swiper.min.css'
 import Badge from '../Badge'
+import Link from 'next/link'
 
 interface Content {
   lang: 'js' | 'py' | 'sql'
@@ -124,9 +125,15 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
                       <p>{extension.detail_text}</p>
                     </Typography.Text>
                     <Space className="justify-between">
-                      <Typography.Text>
-                        <Button type="outline">View documentation</Button>
-                      </Typography.Text>
+                      {extension.url && (
+                        <Link href={extension.url} as={extension.url}>
+                          <a>
+                            <Typography.Text>
+                              <Button type="outline">View documentation</Button>
+                            </Typography.Text>
+                          </a>
+                        </Link>
+                      )}
                       <div>
                         <Typography.Text type="secondary" className="mr-4">
                           {extension.badges_label}

@@ -1,13 +1,12 @@
 export default [
   {
     lang: 'sql',
-    title: 'Allow anyone to view',
-    detail_title: 'Spatial and Geographic objects for PostgreSQL',
-    detail_text:
-      'PostGIS is a spatial database extender for PostgreSQL object-relational database. It adds support for geographic objects allowing location queries to be run in SQL.',
-    badges_label: 'Extensions used:',
-    badges: ['PostGIS'],
-    url: '',
+    title: 'Allow read access',
+    detail_title: 'Public profiles are viewable by everyone',
+    detail_text: 'Create a policy that allows public access to a table',
+    badges_label: '',
+    badges: [],
+    url: 'https://supabase.io/docs/guides/auth#allow-read-access',
     code: `create table profiles (
   id serial primary key,
   username text unique,
@@ -24,37 +23,38 @@ create policy "Public profiles are viewable by everyone."
   },
   {
     lang: 'sql',
-    title: 'Users can only update their own profiles',
-    detail_title: 'Spatial and Geographic objects for PostgreSQL',
+    title: 'Restrict updates',
+    detail_title: 'Users can update their own profiles',
     detail_text:
-      'PostGIS is a spatial database extender for PostgreSQL object-relational database. It adds support for geographic objects allowing location queries to be run in SQL.',
-    badges_label: 'Extensions used:',
-    badges: ['PostGIS'],
-    url: '',
-    code: `create table profiles (
-  id serial primary key,
-  username text unique,
-  avatar_url 
-);
-
-alter table profiles 
-  enable row level security;
-
-create policy "Users can update their own profiles." 
-  on profiles for update using (
-    auth.uid() = id
-  );`,
+      'Create a policy that only allows a user to update rows that match their unique ID',
+    badges_label: '',
+    badges: [],
+    url: 'https://supabase.io/docs/guides/auth#restrict-updates',
+    code: `-- 1. Create table
+    create table profiles (
+      id uuid references auth.users,
+      avatar_url text
+    );
+    
+    -- 2. Enable RLS
+    alter table profiles 
+      enable row level security;
+    
+    -- 3. Create Policy
+    create policy "Users can update their own profiles." 
+      on profiles for update using (
+        auth.uid() = id
+      );`,
   },
   {
     lang: 'sql',
-    title: 'Detailed joins',
-    detail_title:
-      'Advance joins with many to many tables Allow any team member to update the team name',
+    title: 'Policies with joins',
+    detail_title: 'Team members can update team details',
     detail_text:
-      'PostGIS is a spatial database extender for PostgreSQL object-relational database. It adds support for geographic objects allowing location queries to be run in SQL.',
-    badges_label: 'Extensions used:',
-    badges: ['PostGIS'],
-    url: '',
+      'Create a policy that allows for team members to update only rows which match their team ID.',
+    badges_label: '',
+    badges: [],
+    url: 'https://supabase.io/docs/guides/auth#policies-with-joins',
     code: `create table teams (
   id serial primary key,
   name

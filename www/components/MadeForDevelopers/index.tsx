@@ -10,7 +10,7 @@ import TextLink from '../TextLink'
 
 const MadeForDevelopers = () => {
   return (
-    <SectionContainer className="pb-0">
+    <SectionContainer>
       <APISection
         autoHeight={true}
         size="large"
@@ -21,7 +21,7 @@ const MadeForDevelopers = () => {
           </span>,
         ]}
         text={[
-          <p className="text-lg">
+          <p className="lg:text-lg">
             We introspect your database to provide APIs instantly. Stop building repetitive CRUD
             endpoints and focus on your product.
           </p>,
@@ -29,10 +29,10 @@ const MadeForDevelopers = () => {
         // @ts-ignore
         content={CodeExamples}
         footer={[
-          <dl className="grid grid-cols-12 gap-8">
+          <dl className="grid gap-y-4 grid-cols-12 md:gap-8">
             {DeveloperFeatures.map((feature: any, idx: number) => {
               return (
-                <div className={'col-span-6 lg:col-span-6'} key={`dev_feature_${idx}`}>
+                <div className="col-span-12 md:col-span-6 lg:col-span-6" key={`dev_feature_${idx}`}>
                   <div className="lg:mt-5">
                     <dt>
                       <FeatureColumn title={feature.name} text={feature.description} />
