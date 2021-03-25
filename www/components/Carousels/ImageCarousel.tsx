@@ -9,6 +9,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
 
 import ImageCarouselStyles from './ImageCarousel.module.css'
+import Link from 'next/link'
 
 interface Content {
   title: string
@@ -16,6 +17,8 @@ interface Content {
   img_url?: string
   video_url?: string
   text?: string
+  cta?: string
+  url?: string
 }
 
 interface ImageCarouselProps {
@@ -157,15 +160,19 @@ function ImageCarousel(props: ImageCarouselProps) {
                 <div className="bg-white dark:bg-gray-800">
                   <Typography.Title level={4}>{content.title}</Typography.Title>
                   <Typography.Text>
-                    <p className="text-base">{content.text}</p>
-                    <Button
-                      className="mb-8"
-                      type="outline"
-                      size="small"
-                      icon={<IconArrowUpRight />}
-                    >
-                      View documentation
-                    </Button>
+                    <Link href={content.url} as={content.url}>
+                      <a>
+                        <p className="text-base">{content.text}</p>
+                        <Button
+                          className="mb-8"
+                          type="outline"
+                          size="small"
+                          icon={<IconArrowUpRight />}
+                        >
+                          {content.cta ? content.cta : 'View documentation'}
+                        </Button>
+                      </a>
+                    </Link>
                   </Typography.Text>
                 </div>
               </SwiperSlide>

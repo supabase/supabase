@@ -19,8 +19,8 @@ const BuiltExamples = () => {
           <p className="text-lg">There's many example apps and starter projects to get going</p>
           <Space className="justify-center">
             <Link
-              href="https://github.com/supabase/supabase/tree/master/examples"
-              as="https://github.com/supabase/supabase/tree/master/examples"
+              href="https://supabase.io/docs/guides/examples"
+              as="https://supabase.io/docs/guides/examples"
             >
               <a>
                 <Button type="outline">View all examples</Button>

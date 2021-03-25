@@ -23,6 +23,7 @@ import TweetCard from '../TweetCard'
 import 'swiper/swiper.min.css'
 import 'swiper/components/navigation/navigation.min.css'
 import 'swiper/components/pagination/pagination.min.css'
+import Link from 'next/link'
 
 // install Swiper modules
 SwiperCore.use([Navigation, Pagination])
@@ -46,10 +47,17 @@ function TwitterSocialProof() {
               <br />
               Supabase would not be possible without them.
             </p>
-            <Space className="justify-center mt-8">
-              <Button size="small" iconRight={<IconMessageCircle size="tiny" />} type="default">
-                GitHub discussions
-              </Button>
+            <Space className="justify-center my-4">
+              <Link
+                href={'https://github.com/supabase/supabase/discussions'}
+                as={'https://github.com/supabase/supabase/discussions'}
+              >
+                <a className="block text-sm text-gray-400 dark:text-gray-400 mt-3" target="_blank">
+                  <Button size="small" iconRight={<IconMessageCircle size="tiny" />} type="default">
+                    GitHub discussions
+                  </Button>
+                </a>
+              </Link>
             </Space>
           </Typography.Text>
         </div>
