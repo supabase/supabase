@@ -163,7 +163,7 @@ function BlogPostPage(props: any) {
           },
           images: [
             {
-              url: `${basePath}/images/blog/${
+              url: `https://supabase.io/${basePath}/images/blog/${
                 props.blog.thumb ? props.blog.thumb : props.blog.image
               }`,
             },
