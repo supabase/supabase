@@ -23,7 +23,7 @@ const BuiltExamples = () => {
               as="https://supabase.io/docs/guides/examples"
             >
               <a>
-                <Button type="outline">View all examples</Button>
+                <Button type="default">View all examples</Button>
               </a>
             </Link>
             <Link
@@ -31,7 +31,7 @@ const BuiltExamples = () => {
               as="https://github.com/supabase/supabase/tree/master/examples"
             >
               <a>
-                <Button type="outline" icon={<IconGitHub />}>
+                <Button type="default" icon={<IconGitHub />}>
                   Official github library
                 </Button>
               </a>

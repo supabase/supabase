@@ -42,7 +42,7 @@ function TwitterSocialProof() {
           <Typography.Title level={2}>Join the community</Typography.Title>
           <Typography.Text>
             <p className="text-lg">
-              The Supabase team is overwhelmed with the support from early advocates, contributors,
+              The supabase team is overwhelmed with the support from early advocates, contributors,
               and champions.
               <br />
               Supabase would not be possible without them.

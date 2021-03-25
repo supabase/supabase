@@ -1,4 +1,5 @@
 import { Button, IconBookOpen, IconKey, Space, Typography } from '@supabase/ui'
+import Link from 'next/link'
 import ProductIcon from '../ProductIcon'
 
 type subheader = string
@@ -9,6 +10,7 @@ interface Types {
   title?: string
   image?: React.ReactNode
   footer?: React.ReactNode
+  documentation_url?: string
 }
 
 const ProductHeader = (props: Types) => (
@@ -34,10 +36,20 @@ const ProductHeader = (props: Types) => (
           </Typography.Text>
         )}
         <Space className="mt-12">
-          <Button size="medium">Start a project</Button>
-          <Button type="text" size="medium" icon={<IconBookOpen />}>
-            See documentation
-          </Button>
+          <Link href="https://app.supabase.io/api/login" as="https://app.supabase.io/api/login">
+            <a>
+              <Button size="medium">Start a project</Button>
+            </a>
+          </Link>
+          {props.documentation_url && (
+            <Link href={props.documentation_url} as={props.documentation_url}>
+              <a>
+                <Button type="text" size="medium" icon={<IconBookOpen />}>
+                  See documentation
+                </Button>
+              </a>
+            </Link>
+          )}
         </Space>
         {props.footer && <div className="mb-4">{props.footer}</div>}
       </div>
