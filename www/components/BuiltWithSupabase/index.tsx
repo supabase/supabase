@@ -42,34 +42,14 @@ const BuiltExamples = () => {
       <div className="grid grid-cols-12 gap-5 mt-16">
         {Examples.slice(0, 6).map((example, i) => {
           return (
-            <div className="col-span-12 lg:col-span-6 xl:col-span-4">
+            <div
+              className={`col-span-12 lg:col-span-6 xl:col-span-4 ${i > 2 && `sm:hidden lg:block`}`}
+            >
               <ExampleCard {...example} />
             </div>
           )
         })}
       </div>
-
-      {/* <div className="mt-12 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
-        {ProjectExamples.map((example: any, idx: number) => (
-          <a href={example.url}>
-            <Card
-              key={`example_${idx}`}
-              hoverable
-              cover={<img src={`${basePath}/${example.imgUrl}`} className="h-64 object-cover" />}
-            >
-              <Space className="justify-between h-40" direction="vertical">
-                <div>
-                  <Typography.Text small type="secondary">
-                    Project example
-                  </Typography.Text>
-                  <Typography.Title level={3}>{example.title}</Typography.Title>
-                </div>
-                <Typography.Text type="default">{example.description}</Typography.Text>
-              </Space>
-            </Card>
-          </a>
-        ))}
-      </div> */}
     </SectionContainer>
   )
 }

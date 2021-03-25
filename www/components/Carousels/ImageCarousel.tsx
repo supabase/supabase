@@ -96,7 +96,7 @@ function ImageCarousel(props: ImageCarouselProps) {
               initialSlide={0}
               spaceBetween={0}
               slidesPerView={1}
-              speed={400}
+              speed={300}
               autoHeight={true}
               allowTouchMove={false}
             >
@@ -147,7 +147,7 @@ function ImageCarousel(props: ImageCarouselProps) {
           // @ts-ignore
           onSwiper={setSwiperDetails}
           initialSlide={0}
-          speed={400}
+          speed={300}
           allowTouchMove={false}
           autoHeight={true}
         >
