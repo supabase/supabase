@@ -42,8 +42,6 @@ function AuthComponentExample() {
       <Tabs
         activeId={imageSwiperActiveIndex.toString()}
         onChange={(id: string) => handleNavChange(Number(id))}
-        size="medium"
-        type="pills"
       >
         <Tabs.Panel label="Preview" id="0" icon={<IconSearch />}>
           <span></span>
