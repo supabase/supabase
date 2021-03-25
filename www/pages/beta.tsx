@@ -12,6 +12,9 @@ import { render } from 'react-dom'
 import Link from 'next/link'
 import { addBasePath } from 'next/dist/next-server/lib/router/router'
 
+import { NextSeo } from 'next-seo'
+import authors from 'lib/authors.json'
+
 const site_title = `${APP_NAME} | We are now in Beta`
 
 // Dark text: text-dark-400
@@ -960,8 +963,33 @@ const Beta = () => {
         <meta name="twitter:site" content={site_title} />
         <meta name="twitter:text:title" content={site_title} />
       </Head>
+      <NextSeo
+        title={site_title}
+        openGraph={{
+          title: site_title,
+          description: DESCRIPTION,
+          url: `https://supabase.io/beta`,
+          type: 'article',
+          article: {
+            //
+            // to do: add expiration and modified dates
+            // https://github.com/garmeeh/next-seo#article
+            publishedTime: '2020-12-03T00:00:00Z',
+            //
+            // to do: author urls should be internal in future
+            // currently we have external links to github profiles
+            authors: [authors['supabase'].authorURL],
+            tags: ['beta'],
+          },
+          images: [
+            {
+              url: 'https://supabase.io/new/og/og-image.jpg',
+            },
+          ],
+        }}
+      />
       <Container>
-        <div className="relative shadow-lg py-5 px-5 xl:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
+        <div className="shadow-lg py-5 px-5 xl:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
           <a href="/">
             <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
           </a>
