@@ -62,10 +62,13 @@ function TwitterSocialProof() {
             spaceBetween={0}
             slidesPerView={4}
             speed={300}
+            watchOverflow={true}
             loop
             navigation={{
-              prevEl: prevRef.current ? prevRef.current : undefined,
-              nextEl: nextRef.current ? nextRef.current : undefined,
+              prevEl: prevRef.current,
+              nextEl: nextRef.current,
+              // prevEl: prevRef.current ? prevRef.current : undefined,
+              // nextEl: nextRef.current ? nextRef.current : undefined,
             }}
             onInit={(swiper: any) => {
               swiper.params.navigation.prevEl = prevRef.current
