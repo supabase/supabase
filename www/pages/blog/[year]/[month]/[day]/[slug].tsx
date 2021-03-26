@@ -145,7 +145,7 @@ function BlogPostPage(props: any) {
         title={props.blog.title}
         openGraph={{
           title: props.blog.title,
-          description: 'Description of open graph article',
+          description: props.blog.description,
           url: `${basePath}/blog/${props.blog.slug}`,
           type: 'article',
           article: {
@@ -163,7 +163,7 @@ function BlogPostPage(props: any) {
           },
           images: [
             {
-              url: `${basePath}/images/blog/${
+              url: `https://supabase.io/${basePath}/images/blog/${
                 props.blog.thumb ? props.blog.thumb : props.blog.image
               }`,
             },
@@ -177,13 +177,13 @@ function BlogPostPage(props: any) {
               <div className="lg:py-12 grid grid-cols-12 lg:gap-16">
                 <div className="col-span-12 lg:col-span-10">
                   <Link href={`/blog`} as={`/blog`}>
-                    <div>
+                    <a>
                       <Typography.Text type="secondary">
                         <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
                           View more posts
                         </span>
                       </Typography.Text>
-                    </div>
+                    </a>
                   </Link>
                   <Space className="my-4">
                     <Typography.Text>{props.blog.date}</Typography.Text>
