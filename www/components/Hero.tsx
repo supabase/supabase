@@ -1,4 +1,5 @@
 import { Button, IconBookOpen, Space, Typography } from '@supabase/ui'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SectionContainer from './Layouts/SectionContainer'
 
@@ -6,7 +7,7 @@ const Hero = () => {
   const { basePath } = useRouter()
 
   return (
-    <div className="">
+    <div className="overflow-hidden">
       <SectionContainer className="pb-0 pt-24">
         <div className="relative">
           <main className="">
@@ -26,21 +27,28 @@ const Hero = () => {
                       <p className="mt-3 text-base">Storage and serverless functions coming soon</p>
                     </Typography.Text>
                     <Space>
-                      <a href="https://app.supabase.io/api/login">
-                        <Button className="mt-10 py-3" size="medium">
-                          Start your project
-                        </Button>
-                      </a>
-                      <a href="https://app.supabase.io/api/login">
-                        <Button
-                          className="mt-10 py-3"
-                          size="medium"
-                          type="text"
-                          icon={<IconBookOpen />}
-                        >
-                          Documentation
-                        </Button>
-                      </a>
+                      <Link
+                        href="https://app.supabase.io/api/login"
+                        as="https://app.supabase.io/api/login"
+                      >
+                        <a>
+                          <Button className="mt-10 py-3" size="medium">
+                            Start your project
+                          </Button>
+                        </a>
+                      </Link>
+                      <Link href="https://app.supabase.io/docs" as="https://app.supabase.io/docs">
+                        <a>
+                          <Button
+                            className="mt-10 py-3"
+                            size="medium"
+                            type="text"
+                            icon={<IconBookOpen />}
+                          >
+                            Documentation
+                          </Button>
+                        </a>
+                      </Link>
                     </Space>
                     <p className="mt-8 text-sm text-dark-400 tracking-wide sm:mt-10">backed by</p>
                     <div className="mt-5 w-full sm:max-w-lg lg:ml-0">
@@ -64,7 +72,7 @@ const Hero = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex content-center mt-16 sm:mt-24 lg:absolute lg:-right-80 lg:mt-4 lg:w-9/12 lg:mt-0 lg:col-span-6 xl:relative xl:right-0 xl:w-full">
+                <div className="flex content-center mt-16 sm:mt-24 lg:absolute lg:-right-80 lg:w-9/12 lg:mt-0 lg:col-span-6 xl:relative xl:right-0 xl:w-full">
                   <div className="flex flex-col items-center justify-center relative w-full rounded-md">
                     <div className="w-full rounded-t-md h-5 bg-dark-700 flex items-center justify-start px-2">
                       <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />

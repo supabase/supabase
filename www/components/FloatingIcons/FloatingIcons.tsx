@@ -7,7 +7,7 @@ function FloatingIcons() {
   const { basePath } = useRouter()
 
   return (
-    <div className="absolute w-full h-full">
+    <div className="absolute w-full h-full hidden lg:block">
       <div className="container max-w-screen-2xl h-full relative mx-auto">
         <img
           className={`${Styles['icon-react-one']}`}

@@ -13,12 +13,12 @@ function ExampleCard(props: any) {
   return (
     <>
       <div
-        className="
-          bg-white dark:bg-gray-700 
+        className="h-40 bg-white dark:bg-gray-700 
           border-t border-r border-l border-gray-100 dark:border-gray-600
           p-5
           flex flex-col justify-between
-          rounded rounded-b-none"
+          rounded rounded-b-none
+          "
       >
         <div className="mb-4">
           <Typography.Title level={5} className="mb-1">
@@ -41,7 +41,6 @@ function ExampleCard(props: any) {
       <div>
         <div
           className="
-       
           bg-white dark:bg-gray-800 
           border-b border-r border-l border-gray-100 dark:border-gray-600
           p-5
@@ -82,16 +81,6 @@ function ExampleCard(props: any) {
                 </a>
               </Link>
             )}
-            {/* <Link href={props.demo_url} as={props.demo_url}>
-              <a target="_blank">
-                <Button size="tiny" type="text" iconRight={<IconGitHub />}>
-                  Github
-                </Button>
-              </a>
-            </Link> */}
-            {/* <Button size="tiny" type="default">
-            Github
-          </Button> */}
           </Space>
         </div>
       </div>

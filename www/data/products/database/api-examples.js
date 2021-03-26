@@ -1,11 +1,15 @@
+
+/*
+ * description
+ */
 export default [
   {
     lang: 'js',
     title: 'Create a record',
-    code: `// 
-//  Create a record in a table
-//  Insert new record into a table called \`rooms\`
+    size: 'large',
+    code: `// Create a record
 
+// Insert new record into a table called \`rooms\`
 const { data, error } = await supabase
   .from('rooms')
   .insert({ 
@@ -13,8 +17,10 @@ const { data, error } = await supabase
     public: true 
   })
 
-// \`data\` returns data
-// \`error\` for handling errors
+
+  
+
+
 
 
 
@@ -26,19 +32,27 @@ const { data, error } = await supabase
   {
     lang: 'js',
     title: 'Read a record',
-    code: `// 
-//  reading a record from a table
-//  with column \`public\` equals true
-    
-const { data, error } = await supabase
-.from('rooms').select(\`
-  name,
-  messages ( text )
-\`)
-.eq('public', true)
+    size: 'large',
+    code: `// Read a record
 
-// \`data\` returns data
-// \`error\` for handling errors
+// Retrieve all of the \`rooms\`, 
+// and get all the messages for each room.
+const { data, error } = await supabase
+  .from('rooms').select(\`
+    name,
+    messages ( text )
+  \`)
+  .eq('public', true)
+
+
+
+
+
+
+
+
+
+
 `,
   },
 ]
