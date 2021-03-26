@@ -2,12 +2,7 @@
   <div class="account-container">
     <div>
       <label for="email">Email</label>
-      <input
-        id="email"
-        type="text"
-        v-model="state.propSession.user.email"
-        disabled
-      />
+      <input id="email" type="text" v-model="state.propSession.user.email" disabled />
     </div>
     <div>
       <label for="username">Username</label>
@@ -19,97 +14,93 @@
     </div>
 
     <div>
-      <button
-        class="button block primary"
-        @click="updateProfile"
-        :disabled="state.loading"
-      >
-        {{ state.loading ? "Loading ..." : "Update" }}
+      <button class="button block primary" @click="updateProfile" :disabled="state.loading">
+        {{ state.loading ? 'Loading ...' : 'Update' }}
       </button>
     </div>
 
     <div>
-      <button className="button block">Sign Out</button>
+      <button @click="signOut" className="button block">Sign Out</button>
     </div>
   </div>
 </template>
 
 <script>
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from '../lib/supabaseClient'
 export default {
-  props: ["session"],
+  props: ['session'],
   data() {
     return {
       state: {
         loading: true,
-        username: "",
-        website: "",
+        username: '',
+        website: '',
         propSession: this.session,
       },
-    };
+    }
   },
   mounted() {
-    this.getProfile();
+    this.getProfile()
   },
   methods: {
     async signOut() {
-      const { error } = await supabase.auth.signOut();
-      if (error) console.log("Error logging out:", error.message);
+      const { error } = await supabase.auth.signOut()
+      if (error) console.log('Error logging out:', error.message)
     },
 
     setProfile(profile) {
-      this.state.username = profile.username;
-      this.state.website = profile.website;
+      this.state.username = profile.username
+      this.state.website = profile.website
     },
 
     async getProfile() {
       try {
-        this.state.loading = true;
+        this.state.loading = true
 
         let { data, error } = await supabase
-          .from("profiles")
+          .from('profiles')
           .select(`username, website, avatar_url`)
-          .eq("id", this.stete.propSession.user.id)
-          .single();
+          .eq('id', this.stete.propSession.user.id)
+          .single()
 
         if (error || !data) {
-          throw error || new Error("Profile not found");
+          throw error || new Error('Profile not found')
         }
 
-        setProfile(data);
+        setProfile(data)
       } catch (error) {
-        console.log("error", error.message);
+        console.log('error', error.message)
       } finally {
-        this.state.loading = false;
+        this.state.loading = false
       }
     },
 
     async updateProfile() {
       try {
-        this.state.loading = true;
+        this.state.loading = true
 
         const updates = {
           id: this.state.propSession.user.id,
           username: this.state.username,
           website: this.state.website,
           updated_at: new Date(),
-        };
+        }
 
-        let { error } = await supabase.from("profiles").upsert(updates, {
-          returning: "minimal", // Don't return the value after inserting
-        });
+        let { error } = await supabase.from('profiles').upsert(updates, {
+          returning: 'minimal', // Don't return the value after inserting
+        })
 
         if (error) {
-          throw error;
+          throw error
         }
       } catch (error) {
-        alert(error.message);
+        alert(error.message)
       } finally {
-        this.state.loading = false;
+        this.state.loading = false
       }
     },
   },
-};
+}
 </script>
 
 <style scoped>
