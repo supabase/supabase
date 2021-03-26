@@ -85,7 +85,7 @@ function Database() {
           title={Solutions['database'].name}
           h1={[
             <span key={'database-h1'}>
-              Open source SQL Database
+              Open Source SQL Database
               <br /> (without the hassle)
             </span>,
           ]}
