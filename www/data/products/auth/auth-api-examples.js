@@ -1,38 +1,102 @@
 export default [
   {
     lang: 'js',
-    title: 'Create user',
-    description: 'Sign up a new user in an example chat room',
-    code: `import { createClient } from '@supabase/supabase-js'
-      
-  // Initialize 
-  const supabaseUrl = 'https://chat-room.supabase.co'
-  const supabaseKey = 'public-anon-key'
-  const supabase = createClient(supabaseUrl, supabaseKey)
-  
-  // Create a new user
+    title: 'Sign up',
+    description: '',
+    code: `
+  // Sign up with email
   const { user, error } = await supabase.auth.signUp({
     email: 'example@email.com',
     password: 'example-password',
   })
+
+
+
+
+
+
+
+
+
+
+
+
+
       `,
   },
   {
     lang: 'js',
-    title: 'Update a user',
-    description: 'Update a user',
-    code: `import { createClient } from '@supabase/supabase-js'
-      
-  // Initialize 
-  const supabaseUrl = 'https://chat-room.supabase.co'
-  const supabaseKey = 'public-anon-key'
-  const supabase = createClient(supabaseUrl, supabaseKey)
+    title: 'Sign in',
+    description: '',
+    code: `
+  // Sign in with email
+  const { user, error } = await supabase.auth.signIn({
+    email: 'example@email.com',
+    password: 'example-password',
+  })
+
+
+
+
+
+
+
+
+
+
+
+
+      `,
+  },
+  {
+    lang: 'js',
+    title: 'Magic Links',
+    description: '',
+    code: `
+  // Sign in with magic links
+  const { user, error } = await supabase.auth.signIn({
+    email: 'example@email.com'
+  })
+
+
+
+
+
   
-  // Update multiple users
-  const updatedUsers = await supabase
-    .from('users')
-    .eq('account_type', 'paid')
-    .update({ highlight_color: 'gold' })
-  `,
+
+
+
+
+
+
+
+
+      `,
+  },
+  {
+    lang: 'js',
+    title: 'OAuth logins',
+    description: '',
+    code: `
+  // Sign in with GitHub
+  // And request extra permissions!
+  const { user, error } = await supabase.auth.signIn({
+    provider: 'github',
+  }, {
+    scopes: 'repo gist notifications'
+  })
+
+
+
+
+
+
+
+
+
+
+
+
+      `,
   },
 ]
