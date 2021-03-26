@@ -32,7 +32,7 @@ import GithubExamples from '~/components/Sections/GithubExamples'
 import FeatureColumn from '~/components/FeatureColumn'
 import FloatingIcons from '~/components/FloatingIcons'
 
-import ApiExamples from 'data/products/database/api-examples'
+import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 
 import CTABanner from '~/components/CTABanner'
