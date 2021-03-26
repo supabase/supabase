@@ -2,42 +2,26 @@ import { useRouter } from 'next/router'
 
 import {
   Button,
-  Auth,
   Badge,
-  Card,
   Space,
-  Tabs,
   Typography,
-  IconCode,
-  IconZoomIn,
-  IconCopy,
-  IconKey,
-  IconBriefcase,
-  IconEye,
   IconX,
-  IconDatabase,
-  IconShield,
-  IconLink,
   IconArrowUpRight,
   IconShuffle,
   IconWifi,
-  IconChevronsRight,
   IconCheckSquare,
-  IconCloudLightning,
   IconBarChart,
 } from '@supabase/ui'
 import { createClient } from '@supabase/supabase-js'
 import DefaultLayout from '~/components/Layouts/Default'
 
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import APISection from '~/components/Sections/APISection'
-import GithubExamples from '~/components/Sections/GithubExamples'
+
 import FeatureColumn from '~/components/FeatureColumn'
-import FloatingIcons from '~/components/FloatingIcons'
 
 import ApiExamples from 'data/products/database/api-examples'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
@@ -46,7 +30,6 @@ import CTABanner from '~/components/CTABanner'
 
 import Solutions from 'data/Solutions.json'
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
-import TweetCard from '~/components/TweetCard'
 
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import ExampleCard from '~/components/ExampleCard'
