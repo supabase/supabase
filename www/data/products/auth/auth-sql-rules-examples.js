@@ -7,19 +7,21 @@ export default [
     badges_label: '',
     badges: [],
     url: 'https://supabase.io/docs/guides/auth#allow-read-access',
-    code: `create table profiles (
+    code: `
+-- 1. Create table
+create table profiles (
   id serial primary key,
-  username text unique,
-  avatar_url 
+  name text
 );
 
-alter table profiles 
-  enable row level security;
+-- 2. Enable RLS
+alter table profiles enable row level security;
 
+-- 3. Create Policy
 create policy "Public profiles are viewable by everyone." 
-  on profiles for select using (
-    true
-  );`,
+on profiles for select 
+using ( true );
+`.trim(),
   },
   {
     lang: 'sql',
@@ -30,52 +32,53 @@ create policy "Public profiles are viewable by everyone."
     badges_label: '',
     badges: [],
     url: 'https://supabase.io/docs/guides/auth#restrict-updates',
-    code: `-- 1. Create table
-    create table profiles (
-      id uuid references auth.users,
-      avatar_url text
-    );
-    
-    -- 2. Enable RLS
-    alter table profiles 
-      enable row level security;
-    
-    -- 3. Create Policy
-    create policy "Users can update their own profiles." 
-      on profiles for update using (
-        auth.uid() = id
-      );`,
+    code: `
+-- 1. Create table
+create table profiles (
+  id serial primary key,
+  name text
+);
+
+-- 2. Enable RLS
+alter table profiles enable row level security;
+
+-- 3. Create Policy
+create policy "Users can update their own profiles." 
+on profiles for update 
+using ( auth.uid() = id );
+`.trim(),
   },
   {
     lang: 'sql',
-    title: 'Policies with joins',
+    title: 'Advanced rules',
     detail_title: 'Team members can update team details',
     detail_text:
       'Create a policy that allows for team members to update only rows which match their team ID.',
     badges_label: '',
     badges: [],
     url: 'https://supabase.io/docs/guides/auth#policies-with-joins',
-    code: `create table teams (
+    code: `
+create table teams (
   id serial primary key,
-  name
+  name text
 );
--- Many to many joins
+
 create table members (
   team_id references team.id,
   user_id referenced auth.users.id
 );
 
-alter table teams 
-  enable row level security;
+alter table teams enable row level security;
 
+-- Create Advanced Policies
 create policy "Team members can update team details"
-  on teams
-  for update using (
-    auth.uid() in ( 
-      select user_id 
-      from memebers 
-      where team_id = id 
-    )
-  );`,
+on teams
+for update using (
+  auth.uid() in ( 
+    select user_id from members 
+    where team_id = id 
+  )
+);
+`.trim(),
   },
 ]

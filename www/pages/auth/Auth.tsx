@@ -78,13 +78,13 @@ function AuthPage() {
           title={Solutions['authentication'].name}
           h1={[
             <span key={'authentication-h1'}>
-              Built-in user mangement
-              <br /> (that you can afford)
+              Open Source Auth
+              <br /> (without the integrations)
             </span>,
           ]}
           subheader={[
-            'An open source scalable object store, capable of holding any file and file size you like.',
-            'With custom policies and permissions that are familair, easy to implement and unlimited scalable storage.',
+            'Every Supabase project comes with a complete User Management system that works without any additional tools.',
+            "Including PostgreSQL's policy engine, for fine-grained access rules.",
           ]}
           image={[
             <img
@@ -128,8 +128,8 @@ function AuthPage() {
               <Typography.Title level={4}>All the social providers</Typography.Title>
               <Typography.Text>
                 <p className="text-base lg:text-lg">
-                  We provide all the popular social logins you expect. Google, Facebook, Github,
-                  Azure, Gitlab and Bitbucket.
+                  Enable social logins with the click of a button. Google, Facebook, Github, Azure,
+                  Gitlab and Bitbucket.
                 </p>
                 <Space>
                   <img src={`${basePath}/images/product/auth/twitter-icon.svg`} width={21} />
@@ -146,9 +146,9 @@ function AuthPage() {
               <Typography.Title level={4}>Fully integrated</Typography.Title>
               <Typography.Text>
                 <p className="text-base lg:text-lg">
-                  Auth built into your project, with no need for external authentication services.
+                  Incredibly simple Auth, without a single external authentication service.
                 </p>
-                <p>Use your own custom domains with SMTP settings.</p>
+                <p>Built-in Authentication, Authorization, and User Management.</p>
               </Typography.Text>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
@@ -158,10 +158,10 @@ function AuthPage() {
               <Typography.Title level={4}>Own your data</Typography.Title>
               <Typography.Text>
                 <p className="text-base lg:text-lg">
-                  Keep all your user data in your supabase project so you never have to worry about
-                  3rd party privacy issues.
+                  User data stored in your Supabase database so you never have to worry about 3rd
+                  party privacy issues.
                 </p>
-                <p>Supabase is GDPR / CPA Compliant.</p>
+                <p>Host your data in 8 different regions.</p>
               </Typography.Text>
             </div>
           </div>
@@ -169,20 +169,21 @@ function AuthPage() {
 
         <SectionContainer className="-mb-48">
           <APISection
-            title="Simple and convenient APIs"
+            title="Simple APIs"
             // @ts-ignore
             content={ApiExamples}
             size="large"
             text={[
               <Typography.Text>
                 <p className="text-base lg:text-lg">
-                  An API built from the groud up for server and client side authentication that is
-                  fast to implement.
+                  APIs that you can understand. With powerful libraries that work on client and
+                  server-side applications.
                 </p>
-                <p>
-                  With powerful library clients coming soon that allow for asset optimasation and
-                  image transformation
-                </p>
+                {/* I think less is more here ... */}
+                {/* <p>
+                  With powerful client libraries that work on both client and server-side
+                  applications.
+                </p> */}
               </Typography.Text>,
             ]}
             footer={[
@@ -191,14 +192,14 @@ function AuthPage() {
                   <FeatureColumn
                     icon={<IconBriefcase />}
                     title="Enterprise logins"
-                    text="Support for SAML, Azure, and Okta."
+                    text="Support for SAML, Azure. More enterprise providers and SSO coming soon."
                   />
                 </div>
                 <div className="col-span-12 sm:col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
                     icon={<IconEye />}
                     title="Social login scopes"
-                    text="Request additonal user data permissions when using social logins"
+                    text="Request additonal user data permissions when using social logins."
                   />
                 </div>
               </div>,
@@ -226,13 +227,14 @@ function AuthPage() {
         <SectionContainer>
           <div className="grid grid-cols-12 lg:gap-16">
             <div className="col-span-12 lg:col-span-5 mb-8">
-              <Typography.Title level={2}>No middleware user permission</Typography.Title>
+              <Typography.Title level={2}>User permissions without the middleware</Typography.Title>
               <Typography.Text>
                 <p className="text-base lg:text-lg">
-                  Restrict user access with row level security, even without prior knowledge of SQL.
-                  Control who can create, edit and delete specific rows in your database.
+                  Supabase Auth works without any additional servers. Build Authorization rules with
+                  Postgres' Row Level Security, controlling who can create, edit
+                  and delete specific rows in your database.
                 </p>
-                <p>Polcies can be written in SQL or using the dashboard online.</p>
+                <p>Policies can be written in SQL or using the dashboard online.</p>
               </Typography.Text>
               <Link href="https://supabase.io/docs/guides/auth#policy-examples">
                 <a>
@@ -268,14 +270,14 @@ function AuthPage() {
               </Space>
 
               <Typography.Title level={2} className="mb-4">
-                React Auth component
+                React Auth
               </Typography.Title>
               <Typography.Text>
                 <p className="text-base lg:text-lg">
-                  Bring authentication to your React app without coding a single form.
+                  Pre-built auth widgets to get started in minutes.
                 </p>
                 <p>
-                  We provide a React component that handles all the usual needs for logging in,
+                  Supabase provides React libraries which handle common scenarios, including logging in,
                   signing up, magic link and forgot password forms.
                 </p>
               </Typography.Text>
@@ -301,8 +303,8 @@ function AuthPage() {
                 <div className="col-span-12 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
                     icon={<IconEye />}
-                    title="User context"
-                    text="Includes a React hook that provides a user session context provider so you can display the right parts of your app for logged in users."
+                    title="User context hooks"
+                    text="Access the auth status from any component."
                   />
                 </div>
               </div>
