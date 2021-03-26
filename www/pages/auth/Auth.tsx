@@ -191,7 +191,7 @@ function AuthPage() {
                   <FeatureColumn
                     icon={<IconBriefcase />}
                     title="Enterprise logins"
-                    text="Type definitions for both server side and client side"
+                    text="Support for SAML, Azure, and Okta."
                   />
                 </div>
                 <div className="col-span-12 sm:col-span-6 lg:col-span-12 xl:col-span-4">
@@ -232,10 +232,7 @@ function AuthPage() {
                   Restrict user access with row level security, even without prior knowledge of SQL.
                   Control who can create, edit and delete specific rows in your database.
                 </p>
-                <p>
-                  Set up user profiles in your app using methods such as auth.user() so you can
-                  spend more time building an app, rather than user profile forms.
-                </p>
+                <p>Polcies can be written in SQL or using the dashboard online.</p>
               </Typography.Text>
               <Link href="https://supabase.io/docs/guides/auth#policy-examples">
                 <a>
