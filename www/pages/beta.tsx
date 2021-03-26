@@ -549,7 +549,7 @@ const NewFeaturesAndIntegrations = () => {
                   If you're new to Supabase, here's a few of the things you get when you choose us
                   as your backend. We provide{' '}
                   <a
-                    href="/docs/client/auth-signup"
+                    href="/docs/reference/javascript/auth-signup"
                     target="_blank"
                     className="text-brand-700 hover:text-brand-800"
                   >
@@ -598,7 +598,7 @@ const NewFeaturesAndIntegrations = () => {
                   You can use your database immediately, without an ORM or an API backend. We
                   support GraphQL-like{' '}
                   <a
-                    href="/docs/client/select#query-foreign-tables"
+                    href="/docs/reference/javascript/select#query-foreign-tables"
                     target="_blank"
                     className="text-brand-700 hover:text-brand-800"
                   >
@@ -606,7 +606,7 @@ const NewFeaturesAndIntegrations = () => {
                   </a>{' '}
                   in a single request, and you can even{' '}
                   <a
-                    href="/docs/client/rpc"
+                    href="/docs/reference/javascript/rpc"
                     target="_blank"
                     className="text-brand-700 hover:text-brand-800"
                   >

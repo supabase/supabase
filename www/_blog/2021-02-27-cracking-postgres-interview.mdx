@@ -109,7 +109,7 @@ CREATE POLICY "Individuals can only write their own messages." ON messages FOR
 
 ### Know how to do business logic on SQL/[PLPGSQL](https://www.postgresql.org/docs/current/plpgsql-overview.html#PLPGSQL-ADVANTAGES)
 
-PL/pgSQL is a procedural programming language that can be used to write functions inside of your database. It can be useful for making [remote procedure calls](https://supabase.io/docs/client/rpc) from an API. You can go as deep as you want here, since it's an entire programming language, but understanding the basics will really go a long way, and give you super powers when working with your data.
+PL/pgSQL is a procedural programming language that can be used to write functions inside of your database. It can be useful for making [remote procedure calls](https://supabase.io/docs/reference/javascript/rpc) from an API. You can go as deep as you want here, since it's an entire programming language, but understanding the basics will really go a long way, and give you super powers when working with your data.
 
 You can use FUNCTIONs in combination with TRIGGERs to do cool stuff like have auto-updating `updated_at` columns on your data:
 

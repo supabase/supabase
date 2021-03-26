@@ -27,7 +27,7 @@ const DefaultLayout = (props: Props) => {
 
   return (
     <>
-      {!hideHeader && <Nav darkMode={darkMode} updateTheme={updateTheme} />}
+      {!hideHeader && <Nav darkMode={darkMode} />}
       <div className="min-h-screen bg-white dark:bg-gray-800">
         <main>{children}</main>
       </div>

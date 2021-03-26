@@ -3,18 +3,22 @@ import { useState } from 'react'
 import { Button, IconArrowUpRight, Tabs, Typography } from '@supabase/ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import CodeBlock from '../CodeBlock/CodeBlock'
+import Link from 'next/link'
 
-interface APIExample {
+interface Example {
   lang: 'js' | 'py' | 'sql'
-  code: string
   title: string
+  code: string
 }
 
 interface Props {
-  content?: APIExample
+  size?: 'small' | 'large'
+  content: Example[]
   title: string | React.ReactNode
   footer?: React.ReactNode
   text?: React.ReactNode
+  autoHeight?: boolean
+  documentation_link?: string
 }
 
 function APISection(props: Props) {
@@ -33,23 +37,27 @@ function APISection(props: Props) {
       <div className="col-span-12 lg:col-span-5 xl:col-span-5 pb-8">
         <Typography.Title level={2}>{props.title}</Typography.Title>
         {props.text}
-        <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-          Expore documentation
-        </Button>
+        {props.documentation_link && (
+          <Link href={props.documentation_link} as={props.documentation_link}>
+            <a>
+              <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
+                Expore documentation
+              </Button>
+            </a>
+          </Link>
+        )}
         {props.footer && <div className="py-8">{props.footer}</div>}
       </div>
       <div className="col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 sbui-tabs--alt">
         <Tabs
           scrollable
-          // @ts-ignore
           activeId={apiSwiperActiveIndex.toString()}
-          // @ts-ignore
           onChange={(id: string) => handleApiSwiperNavChange(Number(id))}
         >
           {props.content &&
-            props.content.map((content, i) => (
-              <Tabs.Panel label={content.title} id={i.toString()}>
-                <span></span>
+            props.content.map((content: Example, i) => (
+              <Tabs.Panel label={content.title} id={i.toString()} key={i}>
+                <span key={i}></span>
               </Tabs.Panel>
             ))}
         </Tabs>
@@ -61,13 +69,14 @@ function APISection(props: Props) {
             initialSlide={apiSwiperActiveIndex}
             spaceBetween={0}
             slidesPerView={1}
-            speed={400}
+            speed={300}
             allowTouchMove={false}
+            autoHeight={props.autoHeight ? props.autoHeight : false}
           >
             {props.content &&
-              props.content.map((content, i) => (
-                <SwiperSlide>
-                  <CodeBlock key={i} lang={content.lang} size={'large'}>
+              props.content.map((content: Example, i) => (
+                <SwiperSlide key={i}>
+                  <CodeBlock key={i} lang={content.lang} size={props.size ? props.size : 'small'}>
                     {content.code}
                   </CodeBlock>
                 </SwiperSlide>

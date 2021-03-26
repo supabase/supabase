@@ -3,37 +3,37 @@ module.exports = {
     {
       type: 'category',
       label: 'About',
-      items: ['client/index', 'client/installing', 'client/initializing', 'client/generating-types'],
+      items: ['reference/javascript/index', 'reference/javascript/installing', 'reference/javascript/initializing', 'reference/javascript/generating-types'],
       collapsed: true,
     },
     {
       type: 'category',
       label: 'Auth',
-      items: ['client/auth-signup', 'client/auth-signin', 'client/auth-signout', 'client/auth-session', 'client/auth-user', 'client/auth-update', 'client/auth-onauthstatechange', 'client/reset-password-email'],
+      items: ['reference/javascript/auth-signup', 'reference/javascript/auth-signin', 'reference/javascript/auth-signout', 'reference/javascript/auth-session', 'reference/javascript/auth-user', 'reference/javascript/auth-update', 'reference/javascript/auth-onauthstatechange', 'reference/javascript/reset-password-email'],
       collapsed: true,
     },
     {
       type: 'category',
       label: 'Data',
-      items: ['client/select', 'client/insert', 'client/update', 'client/delete', 'client/rpc'],
+      items: ['reference/javascript/select', 'reference/javascript/insert', 'reference/javascript/update', 'reference/javascript/upsert', 'reference/javascript/delete', 'reference/javascript/rpc'],
       collapsed: true,
     },
     {
       type: 'category',
       label: 'Realtime',
-      items: ['client/subscribe', 'client/removesubscription', 'client/getsubscriptions'],
+      items: ['reference/javascript/subscribe', 'reference/javascript/removesubscription', 'reference/javascript/getsubscriptions'],
       collapsed: true,
     },
     {
       type: 'category',
       label: 'Modifiers',
-      items: ['client/using-modifiers', 'client/limit', 'client/order', 'client/range', 'client/single'],
+      items: ['reference/javascript/using-modifiers', 'reference/javascript/limit', 'reference/javascript/order', 'reference/javascript/range', 'reference/javascript/single'],
       collapsed: true,
     },
     {
       type: 'category',
       label: 'Filters',
-      items: ['client/using-filters', 'client/filter', 'client/or', 'client/not', 'client/match', 'client/eq', 'client/neq', 'client/gt', 'client/gte', 'client/lt', 'client/lte', 'client/like', 'client/ilike', 'client/is', 'client/in', 'client/cs', 'client/cd', 'client/sl', 'client/sr', 'client/nxl', 'client/nxr', 'client/adj', 'client/ov', 'client/fts', 'client/plfts', 'client/phfts', 'client/wfts'],
+      items: ['reference/javascript/using-filters', 'reference/javascript/filter', 'reference/javascript/or', 'reference/javascript/not', 'reference/javascript/match', 'reference/javascript/eq', 'reference/javascript/neq', 'reference/javascript/gt', 'reference/javascript/gte', 'reference/javascript/lt', 'reference/javascript/lte', 'reference/javascript/like', 'reference/javascript/ilike', 'reference/javascript/is', 'reference/javascript/in', 'reference/javascript/contains', 'reference/javascript/containedby', 'reference/javascript/rangelt', 'reference/javascript/rangegt', 'reference/javascript/rangegte', 'reference/javascript/rangelte', 'reference/javascript/rangeadjacent', 'reference/javascript/overlaps', 'reference/javascript/textsearch'],
       collapsed: true,
     }
   ],
