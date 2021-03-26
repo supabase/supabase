@@ -107,12 +107,12 @@ export default function app() {
         const { user } = Auth.useUser()
         if (user) {
             return (
-            <>
-                <Typography.Text>Signed in: {user.email}</Typography.Text>
-                <Button block onClick={() => props.supabaseClient.auth.signOut()}>
-                Sign out
-                </Button>
-            </>
+              <div>
+                  <Typography.Text>Signed in: {user.email}</Typography.Text>
+                  <Button block onClick={() => props.supabaseClient.auth.signOut()}>
+                  Sign out
+                  </Button>
+              </div>
             )
         }
         return props.children
