@@ -1,0 +1,240 @@
+{
+  "database": {
+    "title": "Database",
+    "icon": "M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4",
+    "features": [
+      {
+        "title": "Full Postgres Database",
+        "tiers": {
+          "free": true,
+          "pro": true,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Unlimited API requests",
+        "tiers": {
+          "free": true,
+          "pro": true,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Realtime functionality",
+        "tiers": {
+          "free": true,
+          "pro": true,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Custom database instances",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Database space",
+        "tiers": {
+          "free": "Up to 500mb",
+          "pro": "Up to 8 Gb",
+          "enterprise": "0.125 per Gb"
+        }
+      },
+      {
+        "title": "Automatic backups",
+        "tiers": {
+          "free": false,
+          "pro": "7 days of backup",
+          "enterprise": "30 days Point in Time backup"
+        }
+      },
+      {
+        "title": "Pausing",
+        "tiers": {
+          "free": "Paused after 1 week inactivity",
+          "pro": "Never",
+          "enterprise": "Never"
+        }
+      }
+    ]
+  },
+  "auth": {
+    "title": "Auth",
+    "icon": "M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4",
+    "features": [
+      {
+        "title": "Users",
+        "tiers": {
+          "free": "10,000 Users",
+          "pro": "100,000 Users",
+          "enterprise": "Unlimited"
+        }
+      },
+      {
+        "title": "Social OAuth providers",
+        "tiers": {
+          "free": true,
+          "pro": true,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Custom SMTP server",
+        "tiers": {
+          "free": false,
+          "pro": true,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Remove Supabase branding from emails",
+        "tiers": {
+          "free": false,
+          "pro": true,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Enterprise OAuth providers",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Audit trails",
+        "tiers": {
+          "free": "1 hour",
+          "pro": "7 days",
+          "enterprise": true
+        }
+      }
+    ]
+  },
+  "storage": {
+    "title": "File storage",
+    "icon": "M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4",
+    "features": [
+      {
+        "title": "Storage total",
+        "tiers": {
+          "free": "Up to 1 GB",
+          "pro": "Up to 100 GB",
+          "enterprise": "$0.021 per GB"
+        }
+      },
+      {
+        "title": "Transfer limits",
+        "tiers": {
+          "free": "Up to 2 GB",
+          "pro": "Up to 200 GB",
+          "enterprise": "$0.07 per GB"
+        }
+      },
+      {
+        "title": "Custom access controls",
+        "tiers": {
+          "free": true,
+          "pro": true,
+          "enterprise": true
+        }
+      }
+    ]
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "icon": "",
+    "features": [
+      {
+        "title": "Team members",
+        "tiers": {
+          "free": "Unlimited",
+          "pro": "Unlimited",
+          "enterprise": "Unlimited"
+        }
+      },
+      {
+        "title": "Access controls",
+        "tiers": {
+          "free": false,
+          "pro": "Coming soon",
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Audit trails",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": true
+        }
+      }
+    ]
+  },
+  "support": {
+    "title": "Support and Compliance",
+    "icon": "",
+    "features": [
+      {
+        "title": "Community support",
+        "tiers": {
+          "free": true,
+          "pro": true,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Email support",
+        "tiers": {
+          "free": false,
+          "pro": true,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Dedicated support",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "On Premises / BYO cloud",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Log retention (API & Database)",
+        "tiers": {
+          "free": "1 day",
+          "pro": "7 days",
+          "enterprise": "3 months"
+        }
+      },
+      {
+        "title": "Log drain",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": "Coming soon"
+        }
+      },
+      {
+        "title": "SOC2",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": "Coming soon"
+        }
+      }
+    ]
+  }
+}
