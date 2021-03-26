@@ -23,6 +23,8 @@ import {
   IconWifi,
   IconChevronsRight,
   IconCheckSquare,
+  IconCloudLightning,
+  IconBarChart,
 } from '@supabase/ui'
 import { createClient } from '@supabase/supabase-js'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -46,7 +48,7 @@ import Solutions from 'data/Solutions.json'
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
 import TweetCard from '~/components/TweetCard'
 
-import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
+import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import ExampleCard from '~/components/ExampleCard'
 import ProductIcon from '~/components/ProductIcon'
 
@@ -78,11 +80,11 @@ function AuthPage() {
         image={[
           <img
             className="w-full header--light block"
-            src={`${basePath}/images/product/auth/header--light.png`}
+            src={`${basePath}/images/product/storage/header--light.png`}
           />,
           <img
             className="w-full header--dark mr-0 dark:block"
-            src={`${basePath}/images/product/auth/header--dark.png`}
+            src={`${basePath}/images/product/storage/header--dark.png`}
           />,
         ]}
       />
@@ -113,9 +115,9 @@ function AuthPage() {
           </div>
           <div className="col-span-3 col-start-5">
             <p className="mb-4">
-              <IconChevronsRight />
+              <IconBarChart />
             </p>
-            <Typography.Title level={4}>Blazing fast</Typography.Title>
+            <Typography.Title level={4}>Lighting fast</Typography.Title>
             <Typography.Text>
               <p className="text-lg">API server is a thin layer built on Fasitfy.</p>
               <p>
@@ -132,8 +134,9 @@ function AuthPage() {
             <Typography.Text>
               <p className="text-lg">
                 Enterprise level uptime with automatic backups of your content kept and maintained
-                all by Supabase.A durability rating of 99.999999999%.
+                all by Supabase.
               </p>
+              <p>A durability rating of 99.999999999%.</p>
             </Typography.Text>
           </div>
         </div>
@@ -153,7 +156,7 @@ function AuthPage() {
         </div>
         <ImageCarousel
           // @ts-ignore
-          content={TableViewCarouselData}
+          content={DashboardViewData}
           footer={[
             <Typography.Title level={4}>Check out our example app</Typography.Title>,
             // !! Update this example !!
@@ -169,7 +172,7 @@ function AuthPage() {
               repo_url={
                 'https://github.com/supabase/supabase/tree/master/examples/nextjs-slack-clone'
               }
-              vercel_deploy_url={''}
+              vercel_deploy_url={'a'}
               demo_url={'https://supabase-slack-clone-supabase.vercel.app/'}
             />,
           ]}
@@ -231,11 +234,11 @@ function AuthPage() {
                   <div className="col-span-12 lg:col-span-5 mb-8">
                     <Typography.Title level={2}>
                       Integrates natively <br />
-                      with Supabase Auth{' '}
+                      with supabase Auth
                     </Typography.Title>
                     <p className="text-lg">
-                      Why learn another syntax for writing policies when you can use the same SQL
-                      you use for your database permissions.
+                      No need to learn syntax for writing policies when you can use the same SQL you
+                      use for your database permissions.
                     </p>
                     <p>
                       Use any combination of postgres function, helper functions and even your own
