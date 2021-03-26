@@ -1,30 +1,30 @@
 [
   {
-    "title": "Edit in the table",
+    "title": "The simplicity of a spreadsheet",
     "label": "Spreadsheet like editing",
     "img_url": "/images/product/database/table-view/spreadsheet-interface.png",
-    "text": "You can edit your database just like you edit a spreadsheet. Update rows easily by just typing in new data.",
+    "text": "Add, edit, and update your data with the simplicity of a no-code tool.",
     "url": ""
   },
   {
-    "title": "Create table",
-    "label": "Create a table",
+    "title": "Create tables",
+    "label": "Create tables",
     "img_url": "/images/product/database/table-view/create-table.png",
-    "text": "Create tables, columns and rows right in the dashboard. Without the need to use SQL.",
+    "text": "Add tables, columns and rows right in the dashboard. Without a single line SQL.",
     "url": ""
   },
   {
-    "title": "Foreign keys",
+    "title": "Set up foreign keys",
     "label": "Set up foreign keys",
     "img_url": "/images/product/database/table-view/foreign-keys.png",
-    "text": "Set up columns to use foreign keys, joining your tables together with meaning.",
+    "text": "Build connections throughout your data with the full power of a Relational Database.",
     "url": ""
   },
   {
-    "title": "Export to CSV",
+    "title": "Select and Export",
     "label": "Select and Export",
     "img_url": "/images/product/database/table-view/export.png",
-    "text": "Just pick the rows you want and you can export them into a CSV",
+    "text": "Pick the rows you want and export them into a CSV. ",
     "url": ""
   }
 ]

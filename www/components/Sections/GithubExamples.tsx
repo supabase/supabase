@@ -39,10 +39,9 @@ function GithubExamples() {
           </Typography.Title>
           <Typography.Text className="block mb-6">
             <p className="text-base lg:text-lg">
-              The supabase team is overwhelmed with the support from early advocates, contributors,
+              Supported by a network of early advocates, contributors,
               and champions.
             </p>
-            <p>Supabase would not be possible without them.</p>
           </Typography.Text>
           <div className="flex space-y-1.5 flex-col lg:space-y-0 lg:space-x-1.5 lg:flex-row justify-center">
             <Link
