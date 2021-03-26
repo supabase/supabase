@@ -271,14 +271,14 @@ function AuthPage() {
               </Space>
 
               <Typography.Title level={2} className="mb-4">
-                ReactJS Auth Widget
+                React Auth component
               </Typography.Title>
               <Typography.Text>
                 <p className="text-base lg:text-lg">
-                  Bring authentication to your ReactJS app without coding a single form.
+                  Bring authentication to your React app without coding a single form.
                 </p>
                 <p>
-                  We provide a ReactJS component that handles all the usual needs for logging in,
+                  We provide a React component that handles all the usual needs for logging in,
                   signing up, magic link and forgot password forms.
                 </p>
               </Typography.Text>
@@ -298,14 +298,14 @@ function AuthPage() {
                   <FeatureColumn
                     icon={<IconBriefcase />}
                     title="Social login support"
-                    text="Support for Social logins are built in and the component "
+                    text="Support for social logins are built in and the component "
                   />
                 </div>
                 <div className="col-span-12 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
                     icon={<IconEye />}
                     title="User context"
-                    text="Includes a React hook that provides a User Session context provider so you can display the right parts of your app for logged in users."
+                    text="Includes a React hook that provides a user session context provider so you can display the right parts of your app for logged in users."
                   />
                 </div>
               </div>
