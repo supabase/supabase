@@ -42,6 +42,7 @@ import FeatureColumn from '~/components/FeatureColumn'
 import Solutions from 'data/Solutions.json'
 import ProductIcon from '~/components/ProductIcon'
 import { NextSeo } from 'next-seo'
+import Link from 'next/link'
 
 // install Swiper's Controller component
 // SwiperCore.use([Controller])
@@ -286,6 +287,7 @@ function Database() {
                 </div>
               </div>,
             ]}
+            documentation_link={'https://supabase.io/docs/guides/database'}
           />
         </SectionContainer>
 
@@ -322,9 +324,16 @@ function Database() {
                 title="40+ preinstalled extensions"
                 text="We only show a few of the extensions supported by supabase here, but we preinstall many more that you can use right away."
               />
-              <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-                Expore documentation
-              </Button>
+              <Link
+                href="https://supabase.io/docs/guides/database"
+                as="https://supabase.io/docs/guides/database"
+              >
+                <a>
+                  <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
+                    Expore documentation
+                  </Button>
+                </a>
+              </Link>
             </div>
             <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-6 lg:col-start-7">
               <SplitCodeBlockCarousel
