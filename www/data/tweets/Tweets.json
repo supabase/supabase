@@ -81,7 +81,7 @@
     "text": "This weekend I made a personal record 🥇 on the less time spent creating an application with social login / permissions, database, cdn, infinite scaling, git push to deploy and for free. Thanks to @supabase_io and @vercel",
     "url": "https://twitter.com/jperelli/status/1366195769657720834",
     "handle": "jperelli",
-    "img_url": "/images/twitter-profiles/8pv-JSoN_400x400.jpg"
+    "img_url": "/images/twitter-profiles/_ki30kYo_400x400.jpg"
   },
   {
     "text": "I'm excited to know that there's a Firebase alternative OSS project, @supabase_io. It's not a mere copy, you can use Postgre. I like Firebase but always miss the power of SQL.",
@@ -171,7 +171,7 @@
     "text": "Where has @supabase_io been all my life? 😍",
     "url": "https://twitter.com/Elsolo244/status/1360257201911320579",
     "handle": "Elsolo244",
-    "img_url": "/images/twitter-profiles/v6citnk33y2wpeyzrq05_400x400.jpg"
+    "img_url": "/images/twitter-profiles/v6citnk33y2wpeyzrq05_400x400.jpeg"
   },
   {
     "text": "Honestly Supabase is such a killer Firebase alternative.",
@@ -183,7 +183,7 @@
     "text": "I think you'll love @supabase_io :-) Open-source, PostgreSQL-based & zero magic.",
     "url": "https://twitter.com/zippoxer/status/1360021315852328961",
     "handle": "zippoxer",
-    "img_url": "/images/twitter-profiles/6rd3xub9_400x400.jpg"
+    "img_url": "/images/twitter-profiles/6rd3xub9_400x400.png"
   },
   {
     "text": "@supabase_io is the answer to all of firebase’s problems imo",
@@ -201,7 +201,7 @@
     "text": "It’s fun, feels lightweight, and really quick to spin up user auth and a few tables. Almost too easy! Highly recommend.",
     "url": "https://twitter.com/nerdburn/status/1356857261495214085",
     "handle": "nerdburn",
-    "img_url": "/images/twitter-profiles/66VSV9Mm_400x400.jpg"
+    "img_url": "/images/twitter-profiles/66VSV9Mm_400x400.png"
   },
   {
     "text": "I’m probably the wrong person to ask because I pick tools based on UX. Supabase was immediately approachable: instant setup, fast web app, auth, and easy APIs. Same reason I liked Firebase when I first discovered. Fauna didn’t do that for me and I unfortunately lost interest.",
@@ -226,12 +226,6 @@
     "url": "https://twitter.com/jasonbarone/status/1356765411832922115",
     "handle": "jasonbarone",
     "img_url": "/images/twitter-profiles/6zCnwpvi_400x400.jpg"
-  },
-  {
-    "text": "> So they just help me use @PostgreSQL better. They don't try to invent a wheel and trap me in it. Whereas they provide a good abstraction overall, they also provide a raw access to the database.",
-    "url": "https://twitter.com/supabase_io/status/1370652139152797698",
-    "handle": "supabase_io",
-    "img_url": "/images/twitter-profiles/Z_q3YLKR_400x400.jpg"
   },
   {
     "text": "I've really enjoyed the DX! Extremely fun to use, which is odd to say about a database at least for me.",
