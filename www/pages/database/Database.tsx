@@ -90,8 +90,8 @@ function Database() {
             </span>,
           ]}
           subheader={[
-            'Every supabase project has a dedicated PostgreSQL database, trusted by millions of developers, with built in row level security.',
-            'PostgreSQL is the industry standard database used by AWS architecture, data scientists and backend engineers. ',
+            'Every Supabase project is a dedicated PostgreSQL database, trusted by millions of developers.',
+            'PostgreSQL is one of the worlds most scalable databases.',
           ]}
           image={[
             <img
@@ -117,14 +117,13 @@ function Database() {
                   <img src={`${basePath}/images/product/database/postgresql-icon.svg`} width={30} />
                 </Space>
               </p>
-              <Typography.Title level={4}>PostgreSQL Relational</Typography.Title>
+              <Typography.Title level={4}>Just Postgres</Typography.Title>
               <Typography.Text>
                 <p className="text-base lg:text-lg">
-                  Our database is PostgreSQL, which is an open source object-relational database.
+                  Every Supabase project is a dedicated Postgres database.
                 </p>
                 <p>
-                  With supabase’s APIs and easy to use dashboard, it makes designing relational
-                  databases easy.
+                  100% portable. Bring your existing Postgres database, or migrate away at any time.
                 </p>
               </Typography.Text>
             </div>
@@ -136,11 +135,14 @@ function Database() {
                   <ProductIcon icon={Solutions['authentication'].icon} />
                 </Space>
               </p>
-              <Typography.Title level={4}>Auth</Typography.Title>
+              <Typography.Title level={4}>Built-in Auth</Typography.Title>
               <Typography.Text>
-                <p className="text-base lg:text-lg">Auth permissions built in with supabase Auth</p>
+                <p className="text-base lg:text-lg">
+                  Leveraging PostgreSQL's proven Row Level Security.
+                </p>
                 <p>
-                  Control exactly which user roles can read or write what rows in your database.
+                  Integrated with JWT authentication which controls exactly what your users can
+                  access.
                 </p>
               </Typography.Text>
             </div>
@@ -148,15 +150,10 @@ function Database() {
               <p className="mb-4">
                 <IconShuffle />
               </p>
-              <Typography.Title level={4}>Realtime</Typography.Title>
+              <Typography.Title level={4}>Realtime enabled</Typography.Title>
               <Typography.Text>
-                <p className="text-base lg:text-lg">
-                  We built realtime functionality right into the database.
-                </p>
-                <p>
-                  Our powerful APIs allow you to watch for specific row and column changes so you
-                  can easily make smart apps quicker.
-                </p>
+                <p className="text-base lg:text-lg">Data-change listeners over websockets.</p>
+                <p>Subscribe and react to database changes, milliseconds after they happen.</p>
               </Typography.Text>
             </div>
           </div>
@@ -169,8 +166,7 @@ function Database() {
               <Typography.Title level={2}>Easy to use dashboard</Typography.Title>
               <Typography.Text>
                 <p className="text-base lg:text-lg">
-                  Use your database the way you want, with an interactive dashboard for both
-                  spreadsheet style tables and also a full SQL editor.
+                  The simplicity of a Table Editor, or the power of a SQL editor. Your choice.
                 </p>
               </Typography.Text>
             </div>
@@ -250,8 +246,8 @@ function Database() {
             title="Never write an API again"
             text={[
               <p>
-                We inspect your database and provide APIs instantly so you can stop building
-                repetitive CRUD endpoints and focus on your product.
+                We introspect your database and provide instant APIs. 
+                Focus on building your product, while Supabase handles the CRUD.
               </p>,
             ]}
             footer={[
@@ -311,11 +307,10 @@ function Database() {
               <Typography.Title level={2}>Extend your database</Typography.Title>
               <Typography.Text className="block mb-8">
                 <p className="lg:text-lg">
-                  Your PostgreSQL database can be extended with any PostgreSQL extension.
+                  Supabase works natively with Postgres extensions.
                 </p>
                 <p>
-                  Install any extension you like, and even add your own as long as it's written in
-                  SQL.
+                  Choose from a huge collection of Postgres extensions, enabled with a single click.
                 </p>
               </Typography.Text>
               <FeatureColumn
