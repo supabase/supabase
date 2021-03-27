@@ -4,7 +4,7 @@ title: Terms of Service
 ---
 
 
-Last Modified: 20 November 2020
+`Last Modified: 20 November 2020`
 
 These Customer Terms and Conditions (this "**Agreement**"), effective as of the date on which you click a button or check a box (or something similar) acknowledging your acceptance of this Agreement (the "**Effective Date**"), is by and between Supabase, Inc., a Delaware corporation with offices located at 970 Toa Payoh North #07-04, Singapore 318992 ("**Supabase**") and the entity on whose behalf the individual accepting this Agreement accepts this Agreement ("**Customer**"). The individual accepting this Agreement hereby represents and warrants that it is duly authorized by the entity on whose behalf it accepts this Agreement to so accept this Agreement. Supabase and Customer may be referred to herein collectively as the "**Parties**" or individually as a "**Party**." The Parties agree as follows:
 
