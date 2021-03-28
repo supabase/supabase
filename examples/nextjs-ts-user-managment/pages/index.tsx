@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { AuthSession } from '@supabase/supabase-js'
 import { Profile } from '../lib/constants'
+import Footer from '../components/Footer'
 
 export default function Home() {
   const [session, setSession] = useState<AuthSession | null>(null)
@@ -49,16 +50,22 @@ export default function Home() {
         alignItems: 'center',
       }}
     >
-      <div className="flex" style={{ gap: 30 }}>
-        <div className="flex column w-half">
-          <h3>Account</h3>
-          {!session ? <Auth /> : <Account key={session.user.id} session={session} />}
+      {!session ? (
+        <Auth />
+      ) : (
+        <div className="flex" style={{ gap: 30 }}>
+          <div className="flex column w-half">
+            <h3>Account</h3>
+            <Account key={session.user.id} session={session} />
+          </div>
+          <div className="flex column w-half" style={{ gap: 20 }}>
+            <h3>Public Profiles</h3>
+            {profiles.length > 0 && <ProfileList profiles={profiles} />}
+          </div>
         </div>
-        <div className="flex column w-half" style={{ gap: 20 }}>
-          <h3>Public Profiles</h3>
-          {profiles.length > 0 && <ProfileList profiles={profiles} />}
-        </div>
-      </div>
+      )}
+
+      <Footer />
     </div>
   )
 }
