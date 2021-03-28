@@ -2,12 +2,12 @@ html,
 body {
   --custom-font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
     Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  --custom-bg-color: #1f1f1f;
+  --custom-bg-color: #101010;
   --custom-box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.8);
   --custom-color: #fff;
   --custom-color-brand: #24b47e;
   --custom-color-secondary: #666;
-  --custom-border: 1px solid #666;
+  --custom-border: 1px solid #333;
   --custom-border-radius: 5px;
   --custom-spacing: 5px;
 
@@ -52,7 +52,6 @@ input[disabled] {
 .w-half {
   width: 50%;
 }
-
 .block {
   display: block;
   width: 100%;
@@ -61,7 +60,6 @@ input[disabled] {
   display: inline-block;
   width: 100%;
 }
-
 .flex {
   display: flex;
 }
@@ -73,6 +71,16 @@ input[disabled] {
 }
 .flex.flex-1 {
   flex: 1 1 0;
+}
+.flex-end {
+  justify-content: flex-end;
+}
+.flex-center {
+  justify-content: center;
+}
+.text-sm {
+  font-size: 0.8rem;
+  font-weight: 300;
 }
 
 /* Button */
@@ -135,4 +143,180 @@ button.primary,
   -webkit-transform: translateY(-50%);
   transform: translateY(-50%);
   text-align: center;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-flow: row; 
+  border-top: var(--custom-border);
+}
+.footer div {
+  padding: var(--custom-spacing);
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.footer div > img {
+  height: 20px;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mainHeader {
+  width: 100%;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+}
+
+.avatarPlaceholder {
+  border: var(--custom-border);
+  border-radius: var(--custom-border-radius);
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Auth */
+
+.authContainer {
+  display: flex;
+  /* flex-direction: column; */
+  align-items: center;
+  justify-items: center;
+}
+
+.authContainer > .authTitle {
+  width: 22rem;
+  margin-right: 40px;
+}
+
+.authContainer > .authTitle > .header {
+  font-weight: 400;
+}
+
+.authContainer > .authTitle > .description {
+  opacity: 50%;
+  font-weight: 300;
+  line-height: 1.6em;
+}
+
+.authWidget {
+  background-color: #181818;
+  border: 1px solid #2a2a2a;
+  padding: 30px 30px;
+  border-radius: 5px;
+  width: 28rem;
+}
+
+.authWidget > .description {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.authWidget > .inputField {
+  border: none;
+  padding: 10px 10px;
+}
+
+.authWidget > .button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: #444444;
+  text-transform: none !important;
+  transition: all 0.2s ease;
+}
+
+.authWidget > .button:hover {
+  background-color: #2a2a2a;
+}
+
+.authWidget > .button > .loader {
+  width: 17px;
+  animation: spin 1s linear infinite;
+  filter: invert(1);
+}
+
+/* Account */
+
+.account {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.account > * > .avatarField {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.account > * > .avatarField > .avatarContainer {
+  margin-right: 20px;
+}
+
+/* Profile Card */
+
+.profileCard {
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #2a2a2a;
+  padding: 30px;
+}
+
+.profileCard > .avatarContainer {
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.profileCard > .avatar {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.profileCard > .userInfo {
+  width: 100%;
+  font-weight: 300;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.profileCard > .userInfo > p {
+  margin: 0;
+}
+
+.profileCard > .userInfo > .username {
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.profileCard > .userInfo > .website {
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  color: var(--custom-color-brand);
+  text-decoration: none;
 }

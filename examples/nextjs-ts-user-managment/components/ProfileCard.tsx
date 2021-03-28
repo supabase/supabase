@@ -6,6 +6,7 @@ export default function ProfileCard({ profile }: { profile: Profile }) {
     <div className="card">
       <p>Username: {profile.username}</p>
       <p>Website: {profile.website}</p>
+      <p>Avatar: {profile.avatar_url}</p>
       <p>
         <small>
           Last updated{' '}
