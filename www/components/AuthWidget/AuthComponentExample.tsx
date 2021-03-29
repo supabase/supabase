@@ -39,7 +39,7 @@ function AuthComponentExample() {
 
   return (
     <div className="sbui-tabs--alt">
-      <Tabs
+      {/* <Tabs
         activeId={imageSwiperActiveIndex.toString()}
         onChange={(id: string) => handleNavChange(Number(id))}
       >
@@ -49,7 +49,7 @@ function AuthComponentExample() {
         <Tabs.Panel label="Code" icon={<IconCode />} id="1">
           <span></span>
         </Tabs.Panel>
-      </Tabs>
+      </Tabs> */}
       <div
         className={`relative bg-white dark:bg-gray-800 py-2 pb-16 border dark:border-gray-600 auth-container`}
       >
