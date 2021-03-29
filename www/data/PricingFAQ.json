@@ -9,7 +9,7 @@
   },
   {
     "question": "Can I cap my usage so my bill doesn't run over?",
-    "answer": "Not yet, however we do not \"automatically\" upgrade you. This is to prevent surprise bill spikes. We have soft limits meaning if you do go over we will not automatically bill you. We will reach out first to discuss moving up a tier. What are soft limits? Soft limits mean if you cross your usage tier we will let you know and give you a grace period without charging you for exceeding your limits. We will email you to discuss moving up a tier and you will not be charged until you agree to move up a tier. If you do not respond, or do want to move up a tier and continue to exceed your limits then we may have to limit your projects consumption."
+    "answer": "Not yet, however we do not \"automatically\" upgrade you. This is to prevent surprise bill spikes. We have soft limits meaning if you do go over we will not automatically bill you. We will reach out first to discuss moving up a tier. What are soft limits? Soft limits mean if you cross your usage tier we will let you know and give you a grace period without charging you for exceeding your limits. We will email you to discuss moving up a tier and you will not be charged until you agree to move up a tier. If you do not respond, or do not want to move up a tier and continue to exceed your limits, then we may have to limit your project's consumption."
   },
   {
     "question": "How do I know which tier I need before I even finish building my project?",
@@ -17,7 +17,7 @@
   },
   {
     "question": "I'm worried I could end up with a huge bill at the end of the month",
-    "answer": "Your bill will not automatically run over the tier you have selected. We have soft limits meaning if you do go over we will not automatically bill you for the overrun. We will reach out first to discuss moving up a tier."
+    "answer": "Your bill will not automatically run over the tier you have selected. We have soft limits meaning if you do go over, we will not automatically bill you for the overage. We will reach out first to discuss moving up a tier."
   },
   {
     "question": "Is there a way for me to learn about Supabase without being billed?",
@@ -41,7 +41,7 @@
   },
   {
     "question": "I read that you are giving credits to users who sign up during beta, do I get those?",
-    "answer": "If you signed up before the end of launch week we will issue credits for the Pro tier. You can claim them by getting in touch on <support@supabase.io>[](mailto:support@supabase.io)."
+    "answer": "If you sign up before the end of launch week we will issue credits for the Pro tier. You can claim them by getting in touch via <support@supabase.io>[](mailto:support@supabase.io)."
   },
   {
     "question": "What if I want to cancel my monthly subscription?",
