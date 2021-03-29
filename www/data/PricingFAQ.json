@@ -12,7 +12,7 @@
     "answer": "Not yet, however we do not \"automatically\" upgrade you. This is to prevent surprise bill spikes. We have soft limits meaning if you do go over we will not automatically bill you. We will reach out first to discuss moving up a tier. What are soft limits? Soft limits mean if you cross your usage tier we will let you know and give you a grace period without charging you for exceeding your limits. We will email you to discuss moving up a tier and you will not be charged until you agree to move up a tier. If you do not respond, or do want to move up a tier and continue to exceed your limits then we may have to limit your projects consumption."
   },
   {
-    "question": "How do i know which tier i need before i even finish building my project?",
+    "question": "How do I know which tier I need before I even finish building my project?",
     "answer": "Start on the free tier and see what happens. We have soft limits and will reach out to you to let you know if you need to upgrade to a higher tier."
   },
   {
@@ -48,7 +48,7 @@
     "answer": "Simply delete your project within the Dashboard and your subscription will be cancelled."
   },
   {
-    "question": "Do i get a notification if i am approaching my usage limits?",
+    "question": "Do I get a notification if I am approaching my usage limits?",
     "answer": "Yes, we will email you when you are within 20% of your tier limits."
   },
   {
@@ -60,7 +60,7 @@
     "answer": "We have soft limits so we will reach out if you exceed resource limits on the Pro Tier. Your project plan will need to move to the Usage based pricing. We will work with you in advance to understand your project cost forecasts."
   },
   {
-    "question": "I need more than the Pro tier, what do i need to do?",
+    "question": "I need more than the Pro tier, what do I need to do?",
     "answer": "Contact us via <support@supabase.io>[](mailto:support@supabase.io) and we will be happy to help you upgrade."
   },
   {
