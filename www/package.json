@@ -30,6 +30,7 @@
     "react-ga": "^3.3.0",
     "react-markdown": "^5.0.3",
     "react-syntax-highlighter": "^15.3.1",
+    "react-tooltip": "^4.2.17",
     "react-transition-group": "^4.4.1",
     "rehype-slug": "^4.0.1",
     "remark": "^13.0.0",
