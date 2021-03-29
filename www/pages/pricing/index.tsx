@@ -9,21 +9,23 @@ import pricing from '~/data/Pricing.json'
 import pricingFaq from '~/data/PricingFAQ.json'
 import ReactMarkdown from 'react-markdown'
 
+import ReactTooltip from 'react-tooltip'
+
 export default function IndexPage() {
   return (
     <DefaultLayout>
       <div className="bg-white dark:bg-gray-800">
-        <div className="max-w-7xl mx-auto py-16 sm:py-24 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
           <div className="">
             <Typography.Title>Predictable pricing, no surprises</Typography.Title>
           </div>
         </div>
       </div>
       <div className="bg-white dark:bg-gray-800">
-        <div className="max-w-7xl mx-auto py-16 sm:py-24 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-0 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
           {/* <!-- xs to lg --> */}
 
-          <div className="max-w-2xl mx-auto lg:hidden">
+          <div className=" lg:hidden">
             {/* Free - Mobile  */}
             <div className="px-4">
               <h2 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">Free</h2>
@@ -274,9 +276,9 @@ export default function IndexPage() {
                       <Typography.Title level={4}>{faq.question}</Typography.Title>
                     </dt>
                     <dd className="mt-2 text-base ">
-                      <Typography.Text>
+                      <Typography>
                         <ReactMarkdown>{faq.answer}</ReactMarkdown>
-                      </Typography.Text>
+                      </Typography>
                     </dd>
                   </div>
                 )
