@@ -33,7 +33,7 @@ export default function Home() {
       if (error || !data) {
         throw error || new Error('No data')
       }
-      console.log('data', data)
+      console.log('Public profiles:', data)
       setProfiles(data)
     } catch (error) {
       console.log('error', error.message)
@@ -53,14 +53,14 @@ export default function Home() {
       {!session ? (
         <Auth />
       ) : (
-        <div className="flex" style={{ gap: 30 }}>
+        <div className="flex" style={{ width: '75%', maxWidth: '850px', gap: 30 }}>
           <div className="flex column w-half">
             <h3>Account</h3>
             <Account key={session.user.id} session={session} />
           </div>
           <div className="flex column w-half" style={{ gap: 20 }}>
             <h3>Public Profiles</h3>
-            {profiles.length > 0 && <ProfileList profiles={profiles} />}
+            <ProfileList profiles={profiles} />
           </div>
         </div>
       )}
