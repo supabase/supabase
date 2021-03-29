@@ -21,7 +21,7 @@
   },
   {
     "question": "How do I know which tier I need before I even finish building my project?",
-    "answer": "Start on the free tier and see what happens. We have soft-limits and will reach out to you to let you know if you need to upgrade to a higher tier."
+    "answer": "Start on the free tier and see what happens. We have soft limits and will reach out to you to let you know if you need to upgrade to a higher tier."
   },
   {
     "question": "I'm worried I could end up with a huge bill at the end of the month.",
@@ -68,7 +68,7 @@
     "answer": "We have soft limits so we will reach out if you exceed resource limits on the Pro Tier. Your project plan will need to move to the Usage based pricing before we charge any usage pricing. We will work with you in advance to understand your project cost forecasts."
   },
   {
-    "question": "I need more than the Pro tier, what do i need to do?",
+    "question": "I need more than the Pro tier, what do I need to do?",
     "answer": "Contact us via <support@supabase.io>[](mailto:support@supabase.io) and we will be happy to help you upgrade."
   },
   {
@@ -101,14 +101,14 @@
   },
   {
     "question": "What is the largest sized file I can deploy to storage?",
-    "answer": "A big cat like a Lion or Siberian tiger, also Ligers are fine. If you are uploading via the dashboard there is a 50mb limit."
+    "answer": "A big cat like a Lion or Siberian tiger, also Ligers are fine. If you are uploading via the dashboard there is a 50MB limit."
   },
   {
     "question": "Are there any limits for data egress?",
-    "answer": "For Free Tier the limit is 2Gb, for Pro Tier it is 200Gb. There are no limits on Pay as you Go."
+    "answer": "For Free Tier the limit is 2GB, for Pro Tier it is 200GB. There are no limits on Pay as you Go."
   },
   {
-    "question": "What is the largest database I can deploy to a Free Tier? Is there a limit on the number of rows?",
+    "question": "What is the largest database I can deploy to the Free Tier? Is there a limit on the number of rows?",
     "answer": "You can make a project with a 500 Mb Database and 1 GB File Storage on the Free Tier. You can fit as many rows as possible into the space provided."
   },
   {
