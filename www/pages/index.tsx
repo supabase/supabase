@@ -23,7 +23,7 @@ const Index = ({}: Props) => {
         <Container>
           <Hero />
           <Features />
-          {/* <div className="relative">
+          <div className="relative">
             <div className="section--masked">
               <div className="section--bg-masked">
                 <div className="section--bg border-t border-b border-gray-100 dark:border-gray-600"></div>
@@ -36,7 +36,7 @@ const Index = ({}: Props) => {
                 </div>
               </div>
             </div>
-          </div> */}
+          </div>
           <BuiltExamples />
           <MadeForDevelopers />
           <AdminAccess />
