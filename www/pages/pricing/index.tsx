@@ -1,9 +1,12 @@
 import React, { useState } from 'react'
-import { Badge, Button, Space, Typography } from '@supabase/ui'
-import pricing from '~/data/Pricing.json'
-import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/PricingTableRow'
-import DefaultLayout from '~/components/Layouts/Default'
 import Link from 'next/link'
+
+import DefaultLayout from '~/components/Layouts/Default'
+import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/PricingTableRow'
+import { Badge, Button, Divider, Space, Typography } from '@supabase/ui'
+
+import pricing from '~/data/Pricing.json'
+import pricingFaq from '~/data/PricingFAQ.json'
 
 export default function IndexPage() {
   return (
@@ -263,6 +266,19 @@ export default function IndexPage() {
           <h2 className="text-3xl text-gray-900 dark:text-white">Frequently asked questions</h2>
           <div className="mt-6 border-t border-gray-600 border-opacity-25 pt-10">
             <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:grid-rows-2 md:gap-x-8 md:gap-y-12">
+              {pricingFaq.map((faq, i) => {
+                return (
+                  <div>
+                    <dt className="text-lg leading-6 font-medium text-white">
+                      <Typography.Title level={4}>{faq.question}</Typography.Title>
+                    </dt>
+                    <dd className="mt-2 text-base ">
+                      <Typography.Text>{faq.answer}</Typography.Text>
+                    </dd>
+                  </div>
+                )
+              })}
+              <Divider />
               <div>
                 <dt className="text-lg leading-6 font-medium text-white">
                   <Typography.Title level={4}>
@@ -275,7 +291,6 @@ export default function IndexPage() {
                   </Typography.Text>
                 </dd>
               </div>
-
               <div>
                 <dt className="text-lg leading-6 font-medium text-white">
                   <Typography.Title level={4}>
@@ -289,7 +304,6 @@ export default function IndexPage() {
                   </Typography.Text>
                 </dd>
               </div>
-
               <div>
                 <dt className="text-lg leading-6 font-medium text-white">
                   <Typography.Title level={4}>
@@ -303,7 +317,6 @@ export default function IndexPage() {
                   </Typography.Text>
                 </dd>
               </div>
-
               <div>
                 <dt className="text-lg leading-6 font-medium text-white">
                   <Typography.Title level={4}>
@@ -314,7 +327,6 @@ export default function IndexPage() {
                   <Typography.Text>ARM because it's awesome. Add an ARM icon?</Typography.Text>
                 </dd>
               </div>
-
               <div>
                 <dt className="text-lg leading-6 font-medium text-white">
                   <Typography.Title level={4}>Database data egress</Typography.Title>
@@ -333,7 +345,6 @@ export default function IndexPage() {
                   <Typography.Text>Describe.</Typography.Text>
                 </dd>
               </div>
-
               <div>
                 <dt className="text-lg leading-6 font-medium text-white">
                   <Typography.Title level={4}>What about functions?</Typography.Title>
@@ -342,7 +353,6 @@ export default function IndexPage() {
                   <Typography.Text>You can use RPC or Serverless coming soon.</Typography.Text>
                 </dd>
               </div>
-
               <div>
                 <dt className="text-lg leading-6 font-medium text-white">
                   <Typography.Title level={4}>What are auth transactional emails?</Typography.Title>
@@ -351,7 +361,6 @@ export default function IndexPage() {
                   <Typography.Text>TBD.</Typography.Text>
                 </dd>
               </div>
-
               <div>
                 <dt className="text-lg leading-6 font-medium text-white">
                   <Typography.Title level={4}>Can I do annual pricing?</Typography.Title>
