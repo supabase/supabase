@@ -293,7 +293,7 @@ export default function IndexPage() {
                     <Link href="https://app.supabase.io" as="https://app.supabase.io">
                       <a>
                         <Button size="medium" type="outline" block>
-                          FREE Get started
+                          Get started
                         </Button>
                       </a>
                     </Link>
@@ -303,17 +303,17 @@ export default function IndexPage() {
                     <Link href="https://app.supabase.io" as="https://app.supabase.io">
                       <a>
                         <Button size="medium" type="outline" block>
-                          Pro | Get started
+                          Get started
                         </Button>
                       </a>
                     </Link>
                   </td>
 
                   <td className="pt-5 px-6">
-                    <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                    <Link href="mailto:support@supabase.io" as="mailto:support@supabase.io">
                       <a>
                         <Button size="medium" type="outline" block>
-                          Enterprise | Contact us
+                          Contact us
                         </Button>
                       </a>
                     </Link>
