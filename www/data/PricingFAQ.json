@@ -93,15 +93,15 @@
   },
   {
     "question": "What is the largest sized file I can deploy to storage?",
-    "answer": "A big cat like a Lion or Siberian tiger, also Ligers are fine. If you are uploading via the dashboard there is a 50mb limit."
+    "answer": "A big cat like a Lion or Siberian tiger, also Ligers are fine. If you are uploading via the dashboard there is a 50MB limit."
   },
   {
     "question": "Are there any limits for data egress?",
-    "answer": "For Free Tier the limit is 2Gb, for Pro Tier it is 200Gb. There are no limits on Pay as you Go."
+    "answer": "For Free Tier the limit is 2GB, for Pro Tier it is 200GB. There are no limits on Pay as you Go."
   },
   {
     "question": "What is the largest database I can deploy to a hobby Free Tier? Is there a limit on the number of rows?",
-    "answer": "You can make a project with a 500 Mb Database and 1 GB File Storage on the Free Tier. You can see our full breakdown of our pricing tiers and features here."
+    "answer": "You can make a project with a 500MB Database and 1GB File Storage on the Free Tier. You can see our full breakdown of our pricing tiers and features here."
   },
   {
     "question": "What if I need one project for development and one for production?",
