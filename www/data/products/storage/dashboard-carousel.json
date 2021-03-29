@@ -1,32 +1,32 @@
 [
   {
-    "title": "File preview anything",
+    "title": "File previews",
     "label": "File previews",
     "img_url": "/images/product/storage/dashboard-view/file-previews.jpg",
-    "text": "Easily view any type of media you have, with support for video and audio previews. "
+    "text": "Preview any media type, including video and audio. "
   },
   {
-    "title": "Miller based column view",
-    "label": "Column view ",
+    "title": "Column view",
+    "label": "Column view",
     "img_url": "/images/product/storage/dashboard-view/column-view.jpg",
-    "text": "Slick column navigation so you can quickly dig down into multiple folders."
+    "text": "Slick Miller-column navigation for rapid folder exploration."
   },
   {
-    "title": "List view for detailed info",
+    "title": "List view",
     "label": "List view",
     "img_url": "/images/product/storage/dashboard-view/list-view.jpg",
-    "text": "Traditional list view so you can easily view important info on your media."
+    "text": "List View to find detailed File meta data at a glance."
   },
   {
     "title": "Multi select actions",
     "label": "Multi select actions",
     "img_url": "/images/product/storage/dashboard-view/multi-column-selection.jpg",
-    "text": "Multi import and multi export, with the abilily to select multiple files from multiple folders."
+    "text": "Multi-import and multi-export. Select multiple files from multiple folders."
   },
   {
-    "title": "Path settings",
-    "label": "Path settings",
+    "title": "Path navigator",
+    "label": "Path navigator",
     "img_url": "/images/product/storage/dashboard-view/path-setting.jpg",
-    "text": "If you know the exact path of your file, you can easily paste it in and navigate straight to it."
+    "text": "If you know the exact path of your file, type it in and navigate directly."
   }
 ]
