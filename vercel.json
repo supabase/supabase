@@ -142,7 +142,9 @@
     { "source": "/docs/client/fts", "destination": "/docs/reference/javascript/textSearch" },
     { "source": "/docs/client/plfts", "destination": "/docs/reference/javascript/textSearch" },
     { "source": "/docs/client/phfts", "destination": "/docs/reference/javascript/textSearch" },
-    { "source": "/docs/client/wfts", "destination": "/docs/reference/javascript/textSearch" }
+    { "source": "/docs/client/wfts", "destination": "/docs/reference/javascript/textSearch" },
+
+    { "source": "/docs/pricing", "destination": "/pricing" }
   ],
   "trailingSlash": false
 }
