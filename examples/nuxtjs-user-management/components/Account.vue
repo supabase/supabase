@@ -102,17 +102,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.account-container {
-  min-width: 250;
-  max-width: 600;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-}
-
-.account-container > div {
-  margin: 10px;
-}
-</style>
