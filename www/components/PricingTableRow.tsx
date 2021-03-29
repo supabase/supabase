@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { IconHelpCircle, IconWatch, Space, Typography } from '@supabase/ui'
 import ReactTooltip from 'react-tooltip'
-import ProductIcon from './ProductIcon'
+import ProductIcon from 'components/ProductIcon'
 
 const Chevron = (props: any) => (
   <>

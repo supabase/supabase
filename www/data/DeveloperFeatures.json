@@ -2,14 +2,14 @@
   {
     "name": "TypeScript Support",
     "description": "Type definitions built directly from your database schema",
-    "badge": null,
-    "url": "/docs/client/generating-types"
+    "badge": "",
+    "url": "https://supabase.io/docs/client/generating-types"
   },
   {
     "name": "Install from CDN",
     "description": "Use Supabase in the browser without a build process",
-    "badge": null,
-    "url": "/docs/client/initializing"
+    "badge": "",
+    "url": "https://supabase.io/docs/client/initializing"
   },
   {
     "name": "Local emulator",
