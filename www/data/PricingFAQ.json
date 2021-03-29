@@ -29,7 +29,7 @@
   },
   {
     "question": "How do i upgrade or downgrade my tier?",
-    "answer": "Email us at support@supabase.com"
+    "answer": "Email us at <support@supabase.io>[mailto](mailto:support@supabase.io)"
   },
   {
     "question": "Will i hit any kind of API limits?",
@@ -45,7 +45,7 @@
   },
   {
     "question": "I read that you are giving credits to users who sign up during beta, do i get those?",
-    "answer": "If you signed up before the end of launch week we will issue credits for the Pro tier. You can claim them by getting in touch on support@supabase.com."
+    "answer": "If you signed up before the end of launch week we will issue credits for the Pro tier. You can claim them by getting in touch on <support@supabase.io>[mailto](mailto:support@supabase.io)."
   },
   {
     "question": "What if i want to cancel my monthly subscription?",
@@ -73,15 +73,15 @@
   },
   {
     "question": "I need more than the Pro tier, what do i need to do?",
-    "answer": "Contact us via support@supabase.com and we will be happy to help you upgrade."
+    "answer": "Contact us via <support@supabase.io>[mailto](mailto:support@supabase.io) and we will be happy to help you upgrade."
   },
   {
     "question": "I have special database requirements, can I request a larger server?",
-    "answer": "Contact us via support@supabase.com and we will be happy to help you upgrade."
+    "answer": "Contact us via <support@supabase.io>[mailto](mailto:support@supabase.io) and we will be happy to help you upgrade."
   },
   {
     "question": "What happens if i need to transfer my project to someone else in future?",
-    "answer": "Contact us via support@supabase.com and we will be happy to help migrate your project to a new / another account."
+    "answer": "Contact us via <support@supabase.io>[mailto](mailto:support@supabase.io) and we will be happy to help migrate your project to a new / another account."
   },
   {
     "question": "Do you offer a free trial?",
@@ -101,19 +101,19 @@
   },
   {
     "question": "Do you offer discounts or deals for non-profits and educational institutions or students?",
-    "answer": "We have the free tier which you are welcome to take advantage of. If you need more than the free tier you can reach out to us here for our consideration of merit on a case by case basis."
+    "answer": "We have the free tier which you are welcome to take advantage of. If you need more than the free tier you can reach out to us <here>[mailto](mailto:support@supabase.io) for our consideration of merit on a case by case basis."
   },
   {
     "question": "Do you cater to enterprise contracts, support, or dedicated infrastructure hosting?",
-    "answer": "Yes. Contact us via support@supabase.com and we will be happy to discuss your needs."
+    "answer": "Yes. Contact us via <support@supabase.io>[mailto](mailto:support@supabase.io) and we will be happy to discuss your needs."
   },
   {
     "question": "What if i need to deploy my project under certain regulatory constraints e.g. govcloud, HIPAA?",
-    "answer": "Yes. Contact us via support@supabase.com and we will be happy to discuss your needs."
+    "answer": "Yes. Contact us via <support@supabase.io>[mailto](mailto:support@supabase.io) and we will be happy to discuss your needs."
   },
   {
     "question": "Where can i find Privacy and Terms of Use information for Supabase?",
-    "answer": "You can check out our privacy policy here and terms of service here."
+    "answer": "You can check out our privacy policy here [here](https://supabase.io/docs/company/privacy) and terms of service [here](https://supabase.io/docs/company/terms)."
   },
   {
     "question": "What is the largest sized file i individual can deploy to storage?",
