@@ -60,7 +60,7 @@ const FlyOut = (props: Props) => {
       >
         <>
           <div
-            className="absolute inset-x-0 transform shadow-lg border-t border-gray-100 dark:border-dark-500"
+            className="absolute inset-x-0 transform shadow-lg border-gray-100 dark:border-dark-500"
             style={{
               zIndex: 999,
               position: 'absolute',
@@ -72,11 +72,14 @@ const FlyOut = (props: Props) => {
               top: 0,
             }}
           >
-            <div className="absolute inset-0 flex sm:flex-col lg:flex-row" aria-hidden="true">
-              <div className="bg-white dark:bg-dark-600 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full" />
+            <div
+              className="border-b dark:border-gray-600 absolute inset-0 flex sm:flex-col lg:flex-row"
+              aria-hidden="true"
+            >
+              <div className="bg-white dark:bg-gray-800 border-r dark:border-gray-600 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full" />
               <div
                 className={`${
-                  singleBgColor ? 'bg-white dark:bg-dark-600' : 'bg-gray-50 dark:bg-dark-500'
+                  singleBgColor ? 'bg-white dark:bg-dark-600' : 'bg-gray-50 dark:bg-gray-800'
                 } sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full`}
               />
               {/* <div className="bg-gray-50 dark:bg-dark-300 md:hidden lg:block lg:w-1/2"></div> */}
