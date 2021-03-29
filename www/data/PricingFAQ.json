@@ -12,10 +12,6 @@
     "answer": "Not yet, however we do not \"automatically\" upgrade you. This is to prevent surprise bill spikes. We have soft limits meaning if you do go over we will not automatically bill you. We will reach out first to discuss moving up a tier. What are soft limits? Soft limits mean if you cross your usage tier we will let you know and give you a grace period without charging you for exceeding your limits. We will email you to discuss moving up a tier and you will not be charged until you agree to move up a tier. If you do not respond, or do want to move up a tier and continue to exceed your limits then we may have to limit your projects consumption."
   },
   {
-    "question": "Will my data schema and query efficiency impact my billing?~~",
-    "answer": "Yes, factors such as indexes and query efficiency will impact your underlying resource utilisation. Our tiers are based on the underlying resources you have access to. If you find you are approaching your limits it may be possible to optimise your usage by writing more efficient code. You can see some best practices here.~~"
-  },
-  {
     "question": "How do i know which tier i need before i even finish building my project?",
     "answer": "Start on the free tier and see what happens. We have soft limits and will reach out to you to let you know if you need to upgrade to a higher tier."
   },
