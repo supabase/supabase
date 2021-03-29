@@ -39,9 +39,9 @@
       {
         "title": "Database space",
         "tiers": {
-          "free": "Up to 500mb",
-          "pro": "Up to 8 Gb",
-          "enterprise": "0.125 per Gb"
+          "free": "Up to 500 MB",
+          "pro": "Up to 8 GB",
+          "enterprise": "0.125 per GB"
         }
       },
       {
