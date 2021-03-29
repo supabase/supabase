@@ -42,6 +42,7 @@ import FeatureColumn from '~/components/FeatureColumn'
 import Solutions from 'data/Solutions.json'
 import ProductIcon from '~/components/ProductIcon'
 import { NextSeo } from 'next-seo'
+import Link from 'next/link'
 
 // install Swiper's Controller component
 // SwiperCore.use([Controller])
@@ -74,7 +75,7 @@ function Database() {
           url: `${basePath}/auth`,
           images: [
             {
-              url: `https://supabase.io/${basePath}/images/product/auth/auth-og.jpg`,
+              url: `https://supabase.io/${basePath}/images/product/database/database-og.jpg`,
             },
           ],
         }}
@@ -246,8 +247,8 @@ function Database() {
             title="Never write an API again"
             text={[
               <p>
-                We introspect your database and provide instant APIs. 
-                Focus on building your product, while Supabase handles the CRUD.
+                We introspect your database and provide instant APIs. Focus on building your
+                product, while Supabase handles the CRUD.
               </p>,
             ]}
             footer={[
@@ -282,6 +283,7 @@ function Database() {
                 </div>
               </div>,
             ]}
+            documentation_link={'https://supabase.io/docs/guides/database'}
           />
         </SectionContainer>
 
@@ -306,9 +308,7 @@ function Database() {
             <div className="col-span-12 lg:col-span-6 xl:col-span-5 mb-8">
               <Typography.Title level={2}>Extend your database</Typography.Title>
               <Typography.Text className="block mb-8">
-                <p className="lg:text-lg">
-                  Supabase works natively with Postgres extensions.
-                </p>
+                <p className="lg:text-lg">Supabase works natively with Postgres extensions.</p>
                 <p>
                   Choose from a huge collection of Postgres extensions, enabled with a single click.
                 </p>
@@ -317,9 +317,16 @@ function Database() {
                 title="40+ preinstalled extensions"
                 text="We only show a few of the extensions supported by supabase here, but we preinstall many more that you can use right away."
               />
-              <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-                Expore documentation
-              </Button>
+              <Link
+                href="https://supabase.io/docs/guides/database"
+                as="https://supabase.io/docs/guides/database"
+              >
+                <a>
+                  <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
+                    Expore documentation
+                  </Button>
+                </a>
+              </Link>
             </div>
             <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-6 lg:col-start-7">
               <SplitCodeBlockCarousel

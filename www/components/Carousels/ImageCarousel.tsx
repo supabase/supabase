@@ -91,7 +91,7 @@ function ImageCarousel(props: ImageCarouselProps) {
             </Tabs>
           </div>
           <div
-            className={`border border-gray-100 dark:border-gray-600 rounded-md bg-gray-800 ${ImageCarouselStyles['gradient-bg']}`}
+            className={`overflow-hidden border border-gray-100 dark:border-gray-600 rounded-md bg-gray-800 ${ImageCarouselStyles['gradient-bg']}`}
           >
             <Swiper
               // @ts-ignore
@@ -101,7 +101,6 @@ function ImageCarousel(props: ImageCarouselProps) {
               spaceBetween={0}
               slidesPerView={1}
               speed={300}
-              autoHeight={true}
               allowTouchMove={false}
             >
               {props.content.map((content: Content, i: number) => {

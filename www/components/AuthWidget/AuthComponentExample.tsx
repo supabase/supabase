@@ -39,7 +39,7 @@ function AuthComponentExample() {
 
   return (
     <div className="sbui-tabs--alt">
-      <Tabs
+      {/* <Tabs
         activeId={imageSwiperActiveIndex.toString()}
         onChange={(id: string) => handleNavChange(Number(id))}
       >
@@ -49,7 +49,7 @@ function AuthComponentExample() {
         <Tabs.Panel label="Code" icon={<IconCode />} id="1">
           <span></span>
         </Tabs.Panel>
-      </Tabs>
+      </Tabs> */}
       <div
         className={`relative bg-white dark:bg-gray-800 py-2 pb-16 border dark:border-gray-600 auth-container`}
       >
@@ -97,34 +97,34 @@ function AuthComponentExample() {
 import { Auth, Typography, Button } from '@supabase/ui'
 import { createClient } from '@supabase/supabase-js'
 
-export default function app() { 
-    const supabase = createClient(
-        'https://YOUR-PROJECT-ID.supabase.co',
-        'YOUR-PUBLIC-ANON-KEY'
-    )
+export default function app() {
+  const supabase = createClient(
+    "https://YOUR-PROJECT-ID.supabase.co",
+    "YOUR-PUBLIC-ANON-KEY"
+  );
 
-    const Container = (props: any) => {
-        const { user } = Auth.useUser()
-        if (user) {
-            return (
-              <div>
-                  <Typography.Text>Signed in: {user.email}</Typography.Text>
-                  <Button block onClick={() => props.supabaseClient.auth.signOut()}>
-                  Sign out
-                  </Button>
-              </div>
-            )
-        }
-        return props.children
+  function Container(props: any) {
+    const { user } = Auth.useUser();
+    if (user) {
+      return (
+        <div>
+          <Typography.Text>Signed in: {user.email}</Typography.Text>
+          <Button block onClick={() => props.supabaseClient.auth.signOut()}>
+            Sign out
+          </Button>
+        </div>
+      )
     }
+    return props.children;
+  };
 
-    return (
-        <Auth.UserContextProvider supabaseClient={supabase}>
-            <Container supabaseClient={supabase}>
-                <Auth supabaseClient={supabase} />
-            </Container>
-        </Auth.UserContextProvider>
-    )
+  return (
+    <Auth.UserContextProvider supabaseClient={supabase}>
+      <Container supabaseClient={supabase}>
+        <Auth supabaseClient={supabase} />
+      </Container>
+    </Auth.UserContextProvider>
+  );
 }
 `}
                 lang="js"
