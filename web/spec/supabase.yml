@@ -55,12 +55,12 @@ info:
       - name: 'Storage'
         items:
           - storage.uploadFile()
-          - storage.createSignedUrl()
           - storage.downloadFile()
           - storage.listFiles()
           - storage.updateFile()
           - storage.moveFile()
           - storage.deleteFile()
+          - storage.createSignedUrl()
           - storage.deleteFiles()
           - storage.createBucket()
           - storage.getBucket()

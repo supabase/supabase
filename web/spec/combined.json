@@ -7139,7 +7139,7 @@
                                           "children": [
                                             {
                                               "id": 524,
-                                              "name": "signedURL",
+                                              "name": "signedUrl",
                                               "kind": 32,
                                               "kindString": "Variable",
                                               "flags": {
@@ -9169,7 +9169,7 @@
                             "isExported": true
                           },
                           "comment": {
-                            "text": "The relative file path including the bucket ID. Should be of the format `bucket/folder/subfolder`. The bucket already exist before attempting to upload."
+                            "text": "The relative file path including the bucket ID. Should be of the format `bucket/folder/subfolder/filename.png`. The bucket must already exist before attempting to upload."
                           },
                           "type": {
                             "type": "intrinsic",
@@ -10011,7 +10011,7 @@
                                           "children": [
                                             {
                                               "id": 393,
-                                              "name": "signedURL",
+                                              "name": "signedUrl",
                                               "kind": 32,
                                               "kindString": "Variable",
                                               "flags": {
@@ -11931,7 +11931,7 @@
                             "isExported": true
                           },
                           "comment": {
-                            "text": "The relative file path including the bucket ID. Should be of the format `bucket/folder/subfolder`. The bucket already exist before attempting to upload."
+                            "text": "The relative file path including the bucket ID. Should be of the format `bucket/folder/subfolder/filename.png`. The bucket must already exist before attempting to upload."
                           },
                           "type": {
                             "type": "intrinsic",
