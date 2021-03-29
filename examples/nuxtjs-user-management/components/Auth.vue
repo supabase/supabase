@@ -55,10 +55,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.auth-container {
-  display: flex;
-  flex-direction: column;
-}
-</style>
