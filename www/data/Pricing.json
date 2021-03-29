@@ -45,6 +45,7 @@
       },
       {
         "title": "Automatic backups",
+        "tooltip": "Backups are entire copies of your database that can be restored in the future.",
         "tiers": {
           "free": false,
           "pro": "7 days of backup",
