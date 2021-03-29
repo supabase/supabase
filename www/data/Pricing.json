@@ -29,7 +29,7 @@
       },
       {
         "title": "Optimised database instances",
-        "tooltip": "Why? Unique workload requirements, Hhavy read and writes, compliance",
+        "tooltip": "Why? Unique workload requirements, heavy reads and writes, compliance",
         "tiers": {
           "free": false,
           "pro": false,
