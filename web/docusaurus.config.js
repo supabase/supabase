@@ -171,7 +171,7 @@ module.exports = {
             },
             {
               label: 'Pricing',
-              to: '/docs/pricing',
+              to: '/pricing',
             },
             {
               label: 'Support',
