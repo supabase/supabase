@@ -5,7 +5,7 @@
     "description": "Every project is a full Postgres database, the world's most trusted relational database.",
     "description_short": "",
     "label": "",
-    "url": "/docs/guides/database"
+    "url": "/database"
   },
   "authentication": {
     "name": "Authentication",
@@ -13,7 +13,7 @@
     "description": "Add user sign ups and logins, securing your data with Row Level Security.",
     "description_short": "",
     "label": "",
-    "url": "/docs/guides/auth"
+    "url": "/auth"
   },
   "storage": {
     "name": "Storage",
