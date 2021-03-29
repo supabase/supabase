@@ -28,7 +28,8 @@
         }
       },
       {
-        "title": "Custom database instances",
+        "title": "Optimised database instances",
+        "tooltip": "Why? Unique workload requirements, Hhavy read and writes, compliance",
         "tiers": {
           "free": false,
           "pro": false,
