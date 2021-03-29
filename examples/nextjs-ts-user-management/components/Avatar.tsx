@@ -24,6 +24,6 @@ export default function Avatar({ url, size }: { url: string | null; size: number
   return avatarUrl ? (
     <img src={avatarUrl} className="avatar image" style={{ height: size, width: size }} />
   ) : (
-    <div className="avatar no-image" style={{ height: size, width: size }} />
+    <div className="avatar no-image flex flex-center items-center" style={{ height: size, width: size }}>?</div>
   )
 }

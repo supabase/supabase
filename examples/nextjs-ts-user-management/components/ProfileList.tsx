@@ -12,17 +12,25 @@ type State = {
   profiles: Profile[]
 }
 type Action = {
-  payload: Profile
+  type?: string
+  payload: any
 }
 type ProfileListProps = {
   profiles: Profile[]
 }
 
 const handleDatabaseEvent = (state: State, action: Action) => {
-  const otherProfiles = state.profiles.filter((x) => x.id != action.payload.id)
-  return {
-    profiles: [action.payload, ...otherProfiles],
+  if (action.type === 'upsert') {
+    const otherProfiles = state.profiles.filter((x) => x.id != action.payload.id)
+    return {
+      profiles: [action.payload, ...otherProfiles],
+    }
+  } else if (action.type === 'set') {
+    return {
+      profiles: action.payload
+    }
   }
+  return { profiles: [] }
 }
 
 export default function ProfileList({ profiles }: ProfileListProps) {
@@ -33,7 +41,7 @@ export default function ProfileList({ profiles }: ProfileListProps) {
     const subscription = supabase
       .from('profiles')
       .on('*', (payload) => {
-        dispatch({ payload: payload.new })
+        dispatch({ type: 'upsert', payload: payload.new })
       })
       .subscribe()
 
@@ -42,11 +50,21 @@ export default function ProfileList({ profiles }: ProfileListProps) {
     }
   }, [])
 
+  useEffect(() => {
+    dispatch({ type: 'set', payload: profiles })
+  }, [profiles])
+
   return (
     <>
-      {state.profiles?.map((profile) => (
-        <ProfileCard profile={profile} key={profile.id} />
-      ))}
+      {state.profiles.length === 0 ? (
+        <p className="opacity-half font-light m-0">There are no public profiles created yet</p>
+      ) : (
+        <div className="profileList">
+          {state.profiles?.map((profile: any) => (
+            <ProfileCard profile={profile} key={profile.id} />
+          ))}
+        </div>
+      )}
     </>
   )
 }
