@@ -55,17 +55,18 @@ info:
       - name: 'Storage'
         items:
           - storage.uploadFile()
+          - storage.createSignedUrl()
           - storage.downloadFile()
+          - storage.listFiles()
           - storage.updateFile()
-          - storage.renameFile()
+          - storage.moveFile()
           - storage.deleteFile()
-          - storage.search()
+          - storage.deleteFiles()
           - storage.createBucket()
           - storage.getBucket()
           - storage.deleteBucket()
           - storage.emptyBucket()
-          - storage.getAllBuckets()
-          - storage.createSignedUrl()
+          - storage.listBuckets()
       - name: 'Modifiers'
         items:
           - Using Modifiers
@@ -799,53 +800,176 @@ pages:
           const subscriptions = supabase.getSubscriptions()
           ```
           
-  storage.getAllBuckets():
-    title: 'storage.getAllBuckets()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.getAllBuckets'
+  storage.listBuckets():
+    title: 'storage.listBuckets()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.listBuckets'
+    examples:
+      - name: List buckets
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .listBuckets()
+          ```
 
   storage.getBucket():
     title: 'storage.getBucket()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.getBucket'
+    examples:
+      - name: Get bucket
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .getBucket('avatars')
+          ```
 
   storage.createBucket():
     title: 'storage.createBucket()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.createBucket'
+    examples:
+      - name: Create bucket
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .createBucket('avatars')
+          ```
 
   storage.emptyBucket():
     title: 'storage.emptyBucket()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.emptyBucket'
+    examples:
+      - name: Empty bucket
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .emptyBucket('avatars')
+          ```
 
   storage.deleteBucket():
     title: 'storage.deleteBucket()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.deleteBucket'
+    examples:
+      - name: Delete bucket
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .deleteBucket('avatars')
+          ```
 
   storage.uploadFile():
     title: 'storage.uploadFile()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.uploadFile'
+    examples:
+      - name: Upload file
+        isSpotlight: true
+        js: |
+          ```js
+          const avatarFile = event.target.files[0]
+          const { data, error } = await supabase
+            .storage
+            .uploadFile('avatars/public/avatar1.png', avatarFile)
+          ```
 
   storage.updateFile():
     title: 'storage.updateFile()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.updateFile'
+    examples:
+      - name: Update file
+        isSpotlight: true
+        js: |
+          ```js
+          const avatarFile = event.target.files[0]
+          const { data, error } = await supabase
+            .storage
+            .updateFile('avatars/public/avatar1.png', avatarFile)
+          ```
 
-  storage.renameFile():
-    title: 'storage.renameFile()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.renameFile'
+  storage.moveFile():
+    title: 'storage.moveFile()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.moveFile'
+    examples:
+      - name: Move file
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .moveFile('avatars', '/avatar1.png', '/avatar2.png')
+          ```
 
   storage.createSignedUrl():
     title: 'storage.createSignedUrl()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.createSignedUrl'
+    examples:
+      - name: Update file
+        isSpotlight: true
+        js: |
+          ```js
+          const { signedUrl, data, error } = await supabase
+            .storage
+            .createSignedUrl('avatars/avatar1.png', 60)
+          ```
 
   storage.downloadFile():
     title: 'storage.downloadFile()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.downloadFile'
+    examples:
+      - name: Download file
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .downloadFile('avatars/avatar1.png', 60)
+          ```
 
   storage.deleteFile():
     title: 'storage.deleteFile()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.deleteFile'
+    examples:
+      - name: Delete file
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .deleteFile('avatars/avatar1.png')
+          ```
 
-  storage.search():
+  storage.deleteFiles():
     title: 'storage.deleteFiles()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.search'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.deleteFiles'
+    examples:
+      - name: Delete files
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .deleteFiles('avatars', ['public/avatar1.png', 'public/avatar2.png'])
+          ```
+
+  storage.listFiles():
+    title: 'storage.listFiles()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.listFiles'
+    examples:
+      - name: List files in a bucket
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .listFiles('avatars')
+          ```
 
   Using Modifiers:
     description: |
