@@ -1,46 +1,56 @@
-import Card from 'components/Card'
+import { useRouter } from 'next/router'
 import SectionHeader from 'components/UI/SectionHeader'
 import ProjectExamples from 'data/ProjectExamples.json'
-import { useRouter } from 'next/router'
+import { Button, Card, Typography, Space, IconGitHub } from '@supabase/ui'
+import SectionContainer from '../Layouts/SectionContainer'
+import ExampleCard from '../ExampleCard'
+
+import Examples from 'data/Examples.json'
+import Link from 'next/link'
+// import Button from '../Button'
 
 const BuiltExamples = () => {
   const { basePath } = useRouter()
   return (
-    <div className="relative bg-gray-50 dark:bg-dark-600 pt-12 pb-16">
-      <div className="absolute inset-0">
-        <div className="mx-auto bg-white dark:bg-dark-600 w-full h-1/3 sm:h-2/3 lg:h-1/2"></div>
+    <SectionContainer className="xl:pt-32">
+      <div className="text-center">
+        <Typography.Title level={2}>What can you build with supabase?</Typography.Title>
+        <Typography.Text>
+          <p className="lg:text-lg">There's many example apps and starter projects to get going</p>
+          <Space className="justify-center">
+            <Link
+              href="https://supabase.io/docs/guides/examples"
+              as="https://supabase.io/docs/guides/examples"
+            >
+              <a>
+                <Button type="default">View all examples</Button>
+              </a>
+            </Link>
+            <Link
+              href="https://github.com/supabase/supabase/tree/master/examples"
+              as="https://github.com/supabase/supabase/tree/master/examples"
+            >
+              <a>
+                <Button type="default" icon={<IconGitHub />}>
+                  Official github library
+                </Button>
+              </a>
+            </Link>
+          </Space>
+        </Typography.Text>
       </div>
-      <div className="container mx-auto px-8 sm:px-16 xl:px-20 relative">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeader
-            title={'What you can build'}
-            title_alt={' with Supabase'}
-            subtitle={'Built with supabase'}
-          />
-        </div>
-        <div className="relative max-w-7xl mx-auto">
-          <div className="mt-12 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
-            {ProjectExamples.map((example: any, idx: number) => (
-              <Card
-                key={`example_${idx}`}
-                title={example.title}
-                type="Project Example"
-                description={example.description}
-                imgUrl={`${basePath}/${example.imgUrl}`}
-                url={example.url}
-                icons={example.icons}
-              />
-            ))}
-          </div>
-          <p className="mt-10 text-base text-gray-500 dark:text-dark-400">
-            See all examples on our{' '}
-            <a className="text-brand-700" href="https://github.com/supabase/supabase/tree/master/examples">
-              Github
-            </a>
-          </p>
-        </div>
+      <div className="grid grid-cols-12 gap-5 mt-16">
+        {Examples.slice(0, 6).map((example, i) => {
+          return (
+            <div
+              className={`col-span-12 lg:col-span-6 xl:col-span-4 ${i > 2 && `sm:hidden lg:block`}`} key={i}
+            >
+              <ExampleCard {...example} />
+            </div>
+          )
+        })}
       </div>
-    </div>
+    </SectionContainer>
   )
 }
 
