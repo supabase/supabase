@@ -9,8 +9,9 @@ import { Badge, Button, Divider, Space, Typography } from '@supabase/ui'
 import pricing from '~/data/Pricing.json'
 import pricingFaq from '~/data/PricingFAQ.json'
 import ReactMarkdown from 'react-markdown'
+import CTABanner from '~/components/CTABanner'
 
-import ReactTooltip from 'react-tooltip'
+import Solutions from 'data/Solutions.json'
 
 export default function IndexPage() {
   const { basePath } = useRouter()
@@ -19,7 +20,7 @@ export default function IndexPage() {
     <DefaultLayout>
       <div className="bg-white dark:bg-gray-800">
         <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative pt-24 md:pt-24 lg:pt-24">
-          <div className="">
+          <div className="text-center">
             <Typography.Title>Predictable pricing, no surprises</Typography.Title>
             <Typography.Text>
               <p className="text-lg">
@@ -27,7 +28,7 @@ export default function IndexPage() {
               </p>
             </Typography.Text>
             <div className="grid grid-cols-12 gap-8 mt-16">
-              <div className="col-span-12 lg:col-span-6">
+              {/* <div className="col-span-12 lg:col-span-6">
                 <div className="rounded border border-green-500 dark:border-green-900 bg-green-500 bg-opacity-10 grid grid-cols-6">
                   <div className="p-6 col-span-6">
                     <Space className="mb-4">
@@ -43,8 +44,8 @@ export default function IndexPage() {
                     </Typography.Text>
                   </div>
                 </div>
-              </div>
-              <div className="col-span-12 lg:col-span-6">
+              </div> */}
+              {/* <div className="col-span-12 lg:col-span-6">
                 <div className="rounded border border-gray-200 dark:border-gray-600 grid grid-cols-12">
                   <img
                     src={`${basePath}/images/t-shirt-promo.jpg`}
@@ -57,7 +58,7 @@ export default function IndexPage() {
                     </Typography.Text>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -86,9 +87,9 @@ export default function IndexPage() {
               </Link>
             </div>
 
-            <PricingTableRowMobile category={pricing.database} tier={'free'} />
-            <PricingTableRowMobile category={pricing.auth} tier={'free'} />
-            <PricingTableRowMobile category={pricing.storage} tier={'free'} />
+            <PricingTableRowMobile category={pricing.database} tier={'free'} icon={Solutions['database'].icon}/>
+            <PricingTableRowMobile category={pricing.auth} tier={'free'} icon={Solutions['authentication'].icon}/>
+            <PricingTableRowMobile category={pricing.storage} tier={'free'} icon={Solutions['storage'].icon}/>
             <PricingTableRowMobile category={pricing.dashboard} tier={'free'} />
             <PricingTableRowMobile category={pricing.support} tier={'free'} />
 
@@ -111,9 +112,9 @@ export default function IndexPage() {
               </Link>
             </div>
 
-            <PricingTableRowMobile category={pricing.database} tier={'pro'} />
-            <PricingTableRowMobile category={pricing.auth} tier={'pro'} />
-            <PricingTableRowMobile category={pricing.storage} tier={'pro'} />
+            <PricingTableRowMobile category={pricing.database} tier={'pro'} icon={Solutions['database'].icon}/>
+            <PricingTableRowMobile category={pricing.auth} tier={'pro'} icon={Solutions['authentication'].icon}/>
+            <PricingTableRowMobile category={pricing.storage} tier={'pro'} icon={Solutions['storage'].icon}/>
             <PricingTableRowMobile category={pricing.dashboard} tier={'pro'} />
             <PricingTableRowMobile category={pricing.support} tier={'pro'} />
 
@@ -139,9 +140,9 @@ export default function IndexPage() {
               </Link>
             </div>
 
-            <PricingTableRowMobile category={pricing.database} tier={'enterprise'} />
-            <PricingTableRowMobile category={pricing.auth} tier={'enterprise'} />
-            <PricingTableRowMobile category={pricing.storage} tier={'enterprise'} />
+            <PricingTableRowMobile category={pricing.database} tier={'enterprise'} icon={Solutions['database'].icon}/>
+            <PricingTableRowMobile category={pricing.auth} tier={'enterprise'} icon={Solutions['authentication'].icon}/>
+            <PricingTableRowMobile category={pricing.storage} tier={'enterprise'} icon={Solutions['storage'].icon}/>
             <PricingTableRowMobile category={pricing.dashboard} tier={'enterprise'} />
             <PricingTableRowMobile category={pricing.support} tier={'enterprise'} />
           </div>
@@ -276,9 +277,9 @@ export default function IndexPage() {
                   </td>
                 </tr>
 
-                <PricingTableRowDesktop category={pricing.database} />
-                <PricingTableRowDesktop category={pricing.auth} />
-                <PricingTableRowDesktop category={pricing.storage} />
+                <PricingTableRowDesktop category={pricing.database} icon={Solutions['database'].icon}/>
+                <PricingTableRowDesktop category={pricing.auth} icon={Solutions['authentication'].icon}/>
+                <PricingTableRowDesktop category={pricing.storage} icon={Solutions['storage'].icon}/>
                 <PricingTableRowDesktop category={pricing.dashboard} />
                 <PricingTableRowDesktop category={pricing.support} />
               </tbody>
@@ -326,8 +327,8 @@ export default function IndexPage() {
 
       <div className="bg-gray-50 dark:bg-gray-800 border-t dark:border-gray-600">
         <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
-          <h2 className="text-3xl text-gray-900 dark:text-white">Frequently asked questions</h2>
-          <div className="mt-6 border-t border-gray-600 border-opacity-25 pt-10">
+          <Typography.Title level={2}>Frequently asked questions</Typography.Title>
+          <div className="mt-16">
             <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:grid-rows-2 md:gap-x-8 md:gap-y-12">
               {pricingFaq.map((faq, i) => {
                 return (
@@ -347,6 +348,7 @@ export default function IndexPage() {
           </div>
         </div>
       </div>
+      <CTABanner/>
     </DefaultLayout>
   )
 }
