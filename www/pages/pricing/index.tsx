@@ -3,6 +3,7 @@ import { Badge, Button, Space, Typography } from '@supabase/ui'
 import pricing from '~/data/Pricing.json'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/PricingTableRow'
 import DefaultLayout from '~/components/Layouts/Default'
+import Link from 'next/link'
 
 export default function IndexPage() {
   return (
@@ -27,11 +28,15 @@ export default function IndexPage() {
                 <Typography.Text type="secondary">/project /month</Typography.Text>
               </p>
               <p className="my-4 text-sm text-gray-500">
-                Quis suspendisse ut fermentum neque vivamus non tellus.
+                Perfect for hobby projects and experiments.
               </p>
-              <Button type="outline" size="medium" block>
-                Get started
-              </Button>
+              <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                <a>
+                  <Button type="outline" size="medium" block>
+                    Get started
+                  </Button>
+                </a>
+              </Link>
             </div>
 
             <PricingTableRowMobile category={pricing.database} tier={'free'} />
@@ -40,28 +45,23 @@ export default function IndexPage() {
             <PricingTableRowMobile category={pricing.dashboard} tier={'free'} />
             <PricingTableRowMobile category={pricing.support} tier={'free'} />
 
-            <div className="border-t border-gray-200 px-4 pt-5 dark:border-gray-600 mb-16">
-              <a
-                href="#"
-                className="block w-full bg-gray-800 border border-gray-800 rounded-md py-2 text-sm font-semibold text-white text-center hover:bg-gray-900"
-              >
-                Buy Basic
-              </a>
-            </div>
-
             {/* Pro - Mobile  */}
-            <div className="px-4">
+            <div className="px-4 mt-16">
               <h2 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">Pro</h2>
               <p className="mt-4">
                 <span className="text-4xl font-extrabold text-gray-900 dark:text-white">$25</span>
                 <Typography.Text type="secondary">/project /month</Typography.Text>
               </p>
               <p className="my-4 text-sm text-gray-500">
-                Quis suspendisse ut fermentum neque vivamus non tellus.
+                Everything you need to scale your project into production.
               </p>
-              <Button type="outline" size="medium" block>
-                Get started
-              </Button>
+              <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                <a>
+                  <Button type="outline" size="medium" block>
+                    Get started
+                  </Button>
+                </a>
+              </Link>
             </div>
 
             <PricingTableRowMobile category={pricing.database} tier={'pro'} />
@@ -70,17 +70,8 @@ export default function IndexPage() {
             <PricingTableRowMobile category={pricing.dashboard} tier={'pro'} />
             <PricingTableRowMobile category={pricing.support} tier={'pro'} />
 
-            <div className="border-t border-gray-200 px-4 pt-5 dark:border-gray-600 mb-16">
-              <a
-                href="#"
-                className="block w-full bg-gray-800 border border-gray-800 rounded-md py-2 text-sm font-semibold text-white text-center hover:bg-gray-900"
-              >
-                Buy Basic
-              </a>
-            </div>
-
             {/* Enterprise - Mobile  */}
-            <div className="px-4">
+            <div className="px-4 mt-16">
               <h2 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
                 Pay as you go
               </h2>
@@ -90,11 +81,15 @@ export default function IndexPage() {
                 </span>
               </p>
               <p className="my-4 text-sm text-gray-500">
-                Quis suspendisse ut fermentum neque vivamus non tellus.
+                Dedicated support team, account managaer and technical specialist.
               </p>
-              <Button type="outline" size="medium" block>
-                Get started
-              </Button>
+              <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                <a>
+                  <Button type="outline" size="medium" block>
+                    Get started
+                  </Button>
+                </a>
+              </Link>
             </div>
 
             <PricingTableRowMobile category={pricing.database} tier={'enterprise'} />
@@ -102,15 +97,6 @@ export default function IndexPage() {
             <PricingTableRowMobile category={pricing.storage} tier={'enterprise'} />
             <PricingTableRowMobile category={pricing.dashboard} tier={'enterprise'} />
             <PricingTableRowMobile category={pricing.support} tier={'enterprise'} />
-
-            <div className="border-t border-gray-200 px-4 pt-5 dark:border-gray-600 mb-16">
-              <a
-                href="#"
-                className="block w-full bg-gray-800 border border-gray-800 rounded-md py-2 text-sm font-semibold text-white text-center hover:bg-gray-900"
-              >
-                Buy Basic
-              </a>
-            </div>
           </div>
 
           {/* <!-- lg+ --> */}
@@ -168,9 +154,13 @@ export default function IndexPage() {
                           Perfect for hobby projects and experiments.
                         </Typography.Text>
                       </p>
-                      <Button size="medium" type="outline" className="absolute bottom-0">
-                        Get started
-                      </Button>
+                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                        <a>
+                          <Button size="medium" type="outline" className="absolute bottom-0">
+                            Get started
+                          </Button>
+                        </a>
+                      </Link>
                     </div>
                   </td>
 
@@ -187,9 +177,13 @@ export default function IndexPage() {
                           Everything you need to scale your project into production.
                         </Typography.Text>
                       </p>
-                      <Button size="medium" type="outline" className="absolute bottom-0">
-                        Get started
-                      </Button>
+                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                        <a>
+                          <Button size="medium" type="outline" className="absolute bottom-0">
+                            Get started
+                          </Button>
+                        </a>
+                      </Link>
                     </div>
                   </td>
 
@@ -205,9 +199,13 @@ export default function IndexPage() {
                           Dedicated support team, account managaer and technical specialist.
                         </Typography.Text>
                       </p>
-                      <Button size="medium" type="outline" className="absolute bottom-0">
-                        Get started
-                      </Button>
+                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                        <a>
+                          <Button size="medium" type="outline" className="absolute bottom-0">
+                            Get started
+                          </Button>
+                        </a>
+                      </Link>
                     </div>
                   </td>
                 </tr>
@@ -225,21 +223,33 @@ export default function IndexPage() {
                   </th>
 
                   <td className="pt-5 px-6">
-                    <Button size="medium" type="outline" block>
-                      FREE Get started
-                    </Button>
+                    <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                      <a>
+                        <Button size="medium" type="outline" block>
+                          FREE Get started
+                        </Button>
+                      </a>
+                    </Link>
                   </td>
 
                   <td className="pt-5 px-6">
-                    <Button size="medium" type="outline" block>
-                      Pro | Get started
-                    </Button>
+                    <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                      <a>
+                        <Button size="medium" type="outline" block>
+                          Pro | Get started
+                        </Button>
+                      </a>
+                    </Link>
                   </td>
 
                   <td className="pt-5 px-6">
-                    <Button size="medium" type="outline" block>
-                      Enterprise | Contact us
-                    </Button>
+                    <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                      <a>
+                        <Button size="medium" type="outline" block>
+                          Enterprise | Contact us
+                        </Button>
+                      </a>
+                    </Link>
                   </td>
                 </tr>
               </tfoot>
