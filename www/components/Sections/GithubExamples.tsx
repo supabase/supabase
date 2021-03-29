@@ -39,8 +39,7 @@ function GithubExamples() {
           </Typography.Title>
           <Typography.Text className="block mb-6">
             <p className="text-base lg:text-lg">
-              Supported by a network of early advocates, contributors,
-              and champions.
+              Supported by a network of early advocates, contributors, and champions.
             </p>
           </Typography.Text>
           <div className="flex space-y-1.5 flex-col lg:space-y-0 lg:space-x-1.5 lg:flex-row justify-center">
@@ -86,7 +85,6 @@ function GithubExamples() {
             autoplay={{
               delay: 2400,
             }}
-            loop={true}
             speed={300}
             navigation={{
               prevEl: prevRef.current,
