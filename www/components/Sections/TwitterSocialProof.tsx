@@ -62,13 +62,10 @@ function TwitterSocialProof() {
       <div className="mt-6">
         <div className={'lg:-mr-32 lg:-ml-32'}>
           <Swiper
-            style={{ overflow: 'visible' }}
             initialSlide={3}
             spaceBetween={0}
             slidesPerView={4}
             speed={300}
-            watchOverflow={true}
-            loop
             navigation={{
               prevEl: prevRef.current,
               nextEl: nextRef.current,
@@ -78,7 +75,7 @@ function TwitterSocialProof() {
             onInit={(swiper: any) => {
               swiper.params.navigation.prevEl = prevRef.current
               swiper.params.navigation.nextEl = nextRef.current
-              swiper.navigation.update()
+              // swiper.navigation.update()
             }}
             breakpoints={{
               320: {
