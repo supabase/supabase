@@ -265,7 +265,7 @@ export default function IndexPage() {
       </div>
 
       <div className="bg-gray-50 dark:bg-gray-800 border-t dark:border-gray-600">
-        <div className="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
           <h2 className="text-3xl text-gray-900 dark:text-white">Frequently asked questions</h2>
           <div className="mt-6 border-t border-gray-600 border-opacity-25 pt-10">
             <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:grid-rows-2 md:gap-x-8 md:gap-y-12">
