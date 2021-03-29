@@ -57,8 +57,8 @@ function AuthPage() {
           </span>,
         ]}
         subheader={[
-          'An open source scalable object store, capable of holding any file and file size you like.',
-          'With custom policies and permissions that are familair, easy to implement and unlimited scalable storage.',
+          'An open source scalable File store with unlimited scalability, for any file type.',
+          'With custom policies and permissions that are familiar and easy to implement.',
         ]}
         image={[
           <img
@@ -87,26 +87,27 @@ function AuthPage() {
             <Typography.Title level={4}>Write less code</Typography.Title>
             <Typography.Text>
               <p className="text-lg">
-                Use media in your project without needing to rely on external services or learn new
-                frameworks - integrates with supabase Auth and Database.
+                Interoperable with all other Supabase services, including Auth and Postgres.
               </p>
-              <p>
+              {/* <p>
                 Familiar and easy to use permissions mean that your content is secure and accessible
                 only to the right users
-              </p>
+              </p> */}
             </Typography.Text>
           </div>
           <div className="col-span-3 col-start-5">
             <p className="mb-4">
               <IconBarChart />
             </p>
-            <Typography.Title level={4}>Lighting fast</Typography.Title>
+            <Typography.Title level={4}>Lightning fast</Typography.Title>
             <Typography.Text>
-              <p className="text-lg">API server is a thin layer built on Fasitfy.</p>
-              <p>
+              <p className="text-lg">
+                Thin API server layer that leverages Postgres' permissions and performance.
+              </p>
+              {/* <p>
                 1.3x faster than XXX, your content can be delivered anywhere in the world at the
                 speed you expect.
-              </p>
+              </p> */}
             </Typography.Text>
           </div>
           <div className="col-span-3 col-start-9">
@@ -115,11 +116,8 @@ function AuthPage() {
             </p>
             <Typography.Title level={4}>Dependable</Typography.Title>
             <Typography.Text>
-              <p className="text-lg">
-                Enterprise level uptime with automatic backups of your content kept and maintained
-                all by Supabase.
-              </p>
-              <p>A durability rating of 99.999999999%.</p>
+              <p className="text-lg">Enterprise-level uptime complete with automatic backups.</p>
+              {/* <p>A durability rating of 99.999999999%.</p> */}
             </Typography.Text>
           </div>
         </div>
@@ -128,13 +126,10 @@ function AuthPage() {
       <SectionContainer className="pt-16">
         <div className="mb-16 block">
           <Typography.Title>Sleek dashboard for managing your media</Typography.Title>
-          <p className="text-lg">
-            We provide a full storage explorer so any of your team can easily traverse content and
-            files.
-          </p>
+          <p className="text-lg">A complete File Explorer so that any of your team can use.</p>
           <p>
-            Simple drag and drop uploading, file moving and multiple file selection so it’s as easy
-            as working on your desktop.
+            Drag and drop uploading, moving files, and multiple file selection. As easy as working
+            on your desktop.
           </p>
         </div>
         <ImageCarousel
@@ -168,13 +163,10 @@ function AuthPage() {
           // @ts-ignore
           content={ApiExamples}
           text={[
+            <p>Built from the ground-up for interoperable authentication.</p>,
             <p>
-              An API built from the groud up for server and client side authentication that is fast
-              to implement.
-            </p>,
-            <p>
-              With powerful library clients coming soon that allow for asset optimasation and image
-              transformation
+              Fast and easy to implement using our powerful library clients. Asset optimization and
+              image transformation coming soon!
             </p>,
           ]}
           footer={[
@@ -183,7 +175,7 @@ function AuthPage() {
                 <FeatureColumn
                   icon={<IconWifi />}
                   title="CDN integration"
-                  text="Request any kind of media in any format and size you like."
+                  text="Served from the edge to reduce latency."
                 />
                 <Badge color="blue">Coming soon</Badge>
               </div>
@@ -191,7 +183,7 @@ function AuthPage() {
                 <FeatureColumn
                   icon={<IconShuffle />}
                   title="Auto transformation & optimisation"
-                  text="Request any kind of media in any format and size you like."
+                  text="Resize and compress your media before you serve it."
                 />
                 <Badge color="blue">Coming soon</Badge>
               </div>
@@ -217,15 +209,14 @@ function AuthPage() {
                   <div className="col-span-12 lg:col-span-5 mb-8">
                     <Typography.Title level={2}>
                       Integrates natively <br />
-                      with supabase Auth
+                      with Supabase Auth
                     </Typography.Title>
                     <p className="text-lg">
-                      No need to learn syntax for writing policies when you can use the same SQL you
-                      use for your database permissions.
+                      Using Postgres Row Level Security to create File access rules.
                     </p>
                     <p>
-                      Use any combination of postgres function, helper functions and even your own
-                      metadata to write any policy.
+                      Supabase Storage is built around Postgres so that you can use any combination of SQL, Postgres functions,
+                      and even your own metadata to write policies.
                     </p>
                     <Button
                       size="small"
