@@ -75,7 +75,7 @@ function Database() {
           url: `${basePath}/auth`,
           images: [
             {
-              url: `https://supabase.io/${basePath}/images/product/auth/auth-og.jpg`,
+              url: `https://supabase.io/${basePath}/images/product/database/database-og.jpg`,
             },
           ],
         }}
@@ -247,8 +247,8 @@ function Database() {
             title="Never write an API again"
             text={[
               <p>
-                We introspect your database and provide instant APIs. 
-                Focus on building your product, while Supabase handles the CRUD.
+                We introspect your database and provide instant APIs. Focus on building your
+                product, while Supabase handles the CRUD.
               </p>,
             ]}
             footer={[
@@ -308,9 +308,7 @@ function Database() {
             <div className="col-span-12 lg:col-span-6 xl:col-span-5 mb-8">
               <Typography.Title level={2}>Extend your database</Typography.Title>
               <Typography.Text className="block mb-8">
-                <p className="lg:text-lg">
-                  Supabase works natively with Postgres extensions.
-                </p>
+                <p className="lg:text-lg">Supabase works natively with Postgres extensions.</p>
                 <p>
                   Choose from a huge collection of Postgres extensions, enabled with a single click.
                 </p>
