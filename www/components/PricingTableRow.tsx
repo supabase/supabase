@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { IconHelpCircle, IconWatch, Space, Typography } from '@supabase/ui'
 import ReactTooltip from 'react-tooltip'
+import ProductIcon from './ProductIcon'
 
 const Chevron = (props: any) => (
   <>
@@ -51,25 +52,10 @@ export const PricingTableRowDesktop = (props: any) => {
           scope="colgroup"
         >
           <Space size={4}>
-            {category.icon ? (
-              <div className="flex items-center justify-center h-8 w-8 rounded-md bg-gray-800 text-white dark:bg-white">
-                <svg
-                  className="h-4 w-4 stroke-white dark:stroke-black"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d={category.icon}
-                  />
-                </svg>
-              </div>
-            ) : null}
-            <Typography.Title level={4}>{category.title}</Typography.Title>
+            {props.icon && (
+              <ProductIcon icon={props.icon}/>
+            )}
+            <Typography.Title className="m-0" level={4}>{category.title}</Typography.Title>
           </Space>
         </th>
         <td className="pricing-table__product-row bg-gray-50 dark:bg-dark-700 py-5 px-6"></td>
@@ -126,24 +112,9 @@ export const PricingTableRowMobile = (props: any) => {
         <caption className="bg-gray-50 dark:bg-dark-900 border-t border-gray-200 dark:border-gray-600 py-3 px-4 text-sm font-medium text-gray-900 dark:text-white text-left">
           <Space size={4}>
             {category.icon ? (
-              <div className="flex items-center justify-center h-8 w-8 rounded-md bg-gray-900 text-white dark:bg-white">
-                <svg
-                  className="h-4 w-4 stroke-white dark:stroke-black"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d={category.icon}
-                  />
-                </svg>
-              </div>
+              <ProductIcon icon={props.icon}/>
             ) : null}
-            <Typography.Title level={4}>{category.title}</Typography.Title>
+            <Typography.Title className="m-0" level={4}>{category.title}</Typography.Title>
           </Space>
         </caption>
         <thead>
