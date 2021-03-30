@@ -78,9 +78,21 @@ input[disabled] {
 .flex-center {
   justify-content: center;
 }
+.items-center {
+  align-items: center;
+}
 .text-sm {
   font-size: 0.8rem;
   font-weight: 300;
+}
+.font-light {
+  font-weight: 300;
+}
+.opacity-half {
+  opacity: 50%;
+}
+.m-0 {
+  margin: 0;
 }
 
 /* Button */
@@ -124,25 +136,10 @@ button.primary,
 .avatar.image {
   object-fit: cover;
 }
-.avatar.noImage {
-  background-color: rgb(230, 230, 230);
-  border: 2px dotted rgb(200, 200, 200);
+.avatar.no-image {
+  background-color: #333;
+  border: 1px solid rgb(200, 200, 200);
   border-radius: 5px;
-}
-.avatar.noImage:after {
-  font-family: var(--custom-font-family);
-  content: 'No avatar photo';
-  display: block;
-  font-size: 16px;
-  color: rgb(100, 100, 100);
-
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  -webkit-transform: translateY(-50%);
-  transform: translateY(-50%);
-  text-align: center;
 }
 
 .footer {
@@ -275,29 +272,29 @@ button.primary,
 
 /* Profile Card */
 
+.profileList {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
 .profileCard {
   border-radius: 5px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   background-color: #2a2a2a;
-  padding: 30px;
+  padding: 20px 20px;
+  margin-bottom: 20px;
 }
 
-.profileCard > .avatarContainer {
-  border-radius: 50%;
-  overflow: hidden;
-  margin-bottom: 30px;
+.profileCard:last-child {
+  margin-bottom: 0px;
 }
 
 .profileCard > .avatar {
-  border-top-right-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
+  border-radius: 50%;
 }
 
 .profileCard > .userInfo {
-  width: 100%;
+  margin-left: 20px;
   font-weight: 300;
   display: flex;
   flex-direction: column;
@@ -311,12 +308,12 @@ button.primary,
 .profileCard > .userInfo > .username {
   font-size: 1.3rem;
   font-weight: 500;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .profileCard > .userInfo > .website {
   font-size: 0.9rem;
-  margin-bottom: 10px;
   color: var(--custom-color-brand);
+  margin-bottom: 10px;
   text-decoration: none;
 }

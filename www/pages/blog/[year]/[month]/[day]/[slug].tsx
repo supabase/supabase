@@ -18,6 +18,7 @@ import Quote from '~/components/Quote'
 
 import blogStyles from './[slug].module.css'
 import Link from 'next/link'
+import CTABanner from '~/components/CTABanner'
 
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
@@ -276,6 +277,7 @@ function BlogPostPage(props: any) {
             </div>
           </div>
         </div>
+        <CTABanner />
       </DefaultLayout>
     </>
   )

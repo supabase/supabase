@@ -663,6 +663,9 @@ const BetaPricing = () => (
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
         <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
+        <p className="mb-10">
+            For up to date pricing info see: https://supabase.io/pricing
+          </p>
           <p className="mb-10">
             We're working closely with many open source projects, infrastructure providers, and of
             course our Alpha Users, to provide a predictable and sustainable pricing model.
@@ -683,8 +686,7 @@ const BetaPricing = () => (
             </li>
           </ul>
           <p className="mb-10">
-            Whilst we're not yet ready to publish a standardized pricing model, we are committing to
-            the following initiatives:
+            We are committing to the following initiatives:
           </p>
           <ul className="list-decimal list-outside ml-6 mb-10">
             <li className="mb-5">
@@ -714,8 +716,7 @@ const BetaPricing = () => (
             </li>
           </ul>
           <p>
-            The Supabase Base Tier constitutes a Supabase Instance running in a single region, on 2
-            vCPUs, 1 GiB Memory, with 2 GB of storage, and daily backups.
+            The Supabase Base Tier is now called the Supabase Pro tier as per the pricing page: https://supabase.io/pricing
           </p>
         </div>
       </div>
