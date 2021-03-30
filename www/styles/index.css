@@ -191,15 +191,16 @@ table .thead--plans th {
   position: sticky;
   border-collapse: separate;
   top: 0;
-  z-index: 999;
+  z-index: 5;
 }
 
 .pricing-table__product-row {
   /* @apply py-4; */
   position: sticky;
   border-collapse: separate;
-  top: 60px;
-  z-index: 999;
+  top: 76px;
+  z-index: 5;
+  
 }
 
 /* th {

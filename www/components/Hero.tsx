@@ -37,7 +37,7 @@ const Hero = () => {
                           </Button>
                         </a>
                       </Link>
-                      <Link href="https://app.supabase.io/docs" as="https://app.supabase.io/docs">
+                      <Link href="https://app.supabase.io/docs" as="https://supabase.io/docs">
                         <a>
                           <Button
                             className="mt-10 py-3"
