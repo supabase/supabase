@@ -75,7 +75,6 @@ h2 {
 }
 
 p {
-  @apply text-gray-light dark:text-gray-dark;
   margin-bottom: 16px;
 }
 
@@ -200,7 +199,6 @@ table .thead--plans th {
   border-collapse: separate;
   top: 76px;
   z-index: 5;
-  
 }
 
 /* th {

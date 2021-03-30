@@ -16,7 +16,7 @@
     "@mdx-js/react": "^1.6.22",
     "@next/mdx": "^10.0.7",
     "@supabase/supabase-js": "^1.6.0",
-    "@supabase/ui": "^0.21.5",
+    "@supabase/ui": "^0.22.0",
     "classnames": "2.2.6",
     "date-fns": "2.10.0",
     "gray-matter": "^4.0.2",
