@@ -124,9 +124,9 @@ export default function IndexPage() {
                 Pay as you go
               </h2>
               <p className="mt-4">
-                <span className="text-4xl font-normal text-gray-900 dark:text-white">
-                  Contact us
-                </span>
+                  <p className="mt-4">
+                <span className="text-4xl font-normal text-gray-900 dark:text-white">$25</span>
+                <Typography.Text type="secondary">/project /month plus usage costs</Typography.Text>
               </p>
               <p className="my-4 text-sm text-gray-500">
                 Dedicated support team, account manager and technical specialist.
@@ -256,10 +256,10 @@ export default function IndexPage() {
 
                   <td className="h-full py-8 px-6 align-top">
                     <div className="relative h-full table">
-                      <p>
-                        <span className="text-4xl font-normal text-gray-900 dark:text-white">
-                          Contact us
+                      <span className="text-4xl font-normal text-gray-900 dark:text-white">
+                          $25
                         </span>
+                        <Typography.Text> /project /month plus usage costs</Typography.Text>
                       </p>
                       <p className="mt-4 mb-16 ">
                         <Typography.Text>
