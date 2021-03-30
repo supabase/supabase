@@ -89,15 +89,17 @@ function AuthPage() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
-              <p className="mb-4">
-                <Space>
-                  <ProductIcon icon={Solutions['storage'].icon} />
-                  <IconX />
-                  <ProductIcon icon={Solutions['authentication'].icon} />
-                  <IconX />
-                  <ProductIcon icon={Solutions['database'].icon} />
-                </Space>
-              </p>
+              <Typography.Text>
+                <p className="mb-4">
+                  <Space>
+                    <ProductIcon icon={Solutions['storage'].icon} />
+                    <IconX />
+                    <ProductIcon icon={Solutions['authentication'].icon} />
+                    <IconX />
+                    <ProductIcon icon={Solutions['database'].icon} />
+                  </Space>
+                </p>
+              </Typography.Text>
               <Typography.Title level={4}>Interoperable</Typography.Title>
               <Typography.Text>
                 <p className="text-lg">
@@ -110,9 +112,11 @@ function AuthPage() {
               </Typography.Text>
             </div>
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
-              <p className="mb-4">
-                <IconBarChart />
-              </p>
+              <Typography.Text>
+                <p className="mb-4">
+                  <IconBarChart />
+                </p>
+              </Typography.Text>
               <Typography.Title level={4}>Lightning fast</Typography.Title>
               <Typography.Text>
                 <p className="text-lg">
@@ -125,9 +129,11 @@ function AuthPage() {
               </Typography.Text>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <p className="mb-4">
-                <IconCheckSquare />
-              </p>
+              <Typography.Text>
+                <p className="mb-4">
+                  <IconCheckSquare />
+                </p>
+              </Typography.Text>
               <Typography.Title level={4}>Dependable</Typography.Title>
               <Typography.Text>
                 <p className="text-lg">Enterprise-level scalability and durability.</p>
@@ -140,11 +146,15 @@ function AuthPage() {
         <SectionContainer className="pt-16">
           <div className="mb-16 block">
             <Typography.Title>Sleek dashboard for managing your media</Typography.Title>
-            <p className="text-lg">A complete Object Explorer so that any of your team can use.</p>
-            <p>
-              Drag and drop uploading, moving objects, and multiple object selection. As easy as
-              working on your desktop.
-            </p>
+            <Typography.Text>
+              <p className="text-lg">
+                A complete Object Explorer so that any of your team can use.
+              </p>
+              <p>
+                Drag and drop uploading, moving objects, and multiple object selection. As easy as
+                working on your desktop.
+              </p>
+            </Typography.Text>
           </div>
           <ImageCarousel
             // @ts-ignore
@@ -229,14 +239,16 @@ function AuthPage() {
                         Integrates natively <br />
                         with Supabase Auth
                       </Typography.Title>
-                      <p className="text-lg">
-                        Using Postgres Row Level Security to create Object access rules.
-                      </p>
-                      <p>
-                        Storage Authorization is built around Postgres so that you can use any
-                        combination of SQL, Postgres functions, and even your own metadata to write
-                        policies.
-                      </p>
+                      <Typography.Text>
+                        <p className="text-lg">
+                          Using Postgres Row Level Security to create Object access rules.
+                        </p>
+                        <p>
+                          Storage Authorization is built around Postgres so that you can use any
+                          combination of SQL, Postgres functions, and even your own metadata to
+                          write policies.
+                        </p>
+                      </Typography.Text>
                       <Button
                         size="small"
                         type="default"
