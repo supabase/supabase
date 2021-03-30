@@ -98,10 +98,10 @@ function AuthPage() {
                   <ProductIcon icon={Solutions['database'].icon} />
                 </Space>
               </p>
-              <Typography.Title level={4}>Write less code</Typography.Title>
+              <Typography.Title level={4}>Interoperable</Typography.Title>
               <Typography.Text>
                 <p className="text-lg">
-                  Interoperable with all other Supabase services, including Auth and Postgres.
+                  Integrates well with the rest of Supabase ecosystem, including Auth and Postgres.
                 </p>
                 {/* <p>
                 Familiar and easy to use permissions mean that your content is secure and accessible
@@ -130,7 +130,7 @@ function AuthPage() {
               </p>
               <Typography.Title level={4}>Dependable</Typography.Title>
               <Typography.Text>
-                <p className="text-lg">Enterprise-level uptime complete with automatic backups.</p>
+                <p className="text-lg">Enterprise-level scalability and durability.</p>
                 {/* <p>A durability rating of 99.999999999%.</p> */}
               </Typography.Text>
             </div>
@@ -189,7 +189,7 @@ function AuthPage() {
                   <FeatureColumn
                     icon={<IconWifi />}
                     title="CDN integration"
-                    text="Served from the edge to reduce latency."
+                    text="Serve from the edge to reduce latency."
                   />
                   <Badge color="blue">Coming soon</Badge>
                 </div>
@@ -226,10 +226,10 @@ function AuthPage() {
                         with Supabase Auth
                       </Typography.Title>
                       <p className="text-lg">
-                        Using Postgres Row Level Security to create File access rules.
+                        Using Postgres Row Level Security to create Object access rules.
                       </p>
                       <p>
-                        Supabase Storage is built around Postgres so that you can use any
+                        Storage Authorization is built around Postgres so that you can use any
                         combination of SQL, Postgres functions, and even your own metadata to write
                         policies.
                       </p>
