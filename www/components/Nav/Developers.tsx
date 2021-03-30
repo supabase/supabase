@@ -2,6 +2,7 @@ import React from 'react'
 import DevelopersData from 'data/Developers.json'
 import AnnouncementsData from 'data/Announcements.json'
 import { useRouter } from 'next/router'
+import { Typography } from '@supabase/ui'
 
 type Props = {
   text: string
@@ -32,8 +33,8 @@ const Developers = () => {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icon} />
         </svg>
         <div className="ml-4">
-          <p className="text-base font-medium text-gray-900 dark:text-white">{text}</p>
-          <p className="mt-1 text-sm text-gray-500 dark:text-dark-300">{description}</p>
+          <Typography.Title level={5}>{text}</Typography.Title>
+          <Typography.Text>{description}</Typography.Text>
         </div>
       </a>
     )
@@ -65,9 +66,7 @@ const Developers = () => {
       </nav>
       <div className="px-4 py-8 sm:py-12 sm:px-6 lg:px-8 xl:pl-12">
         <div>
-          <h3 className="text-sm font-medium tracking-wide text-gray-500 dark:text-dark-300 uppercase">
-            Latest announcements
-          </h3>
+          <Typography.Text type="secondary">Latest announcements</Typography.Text>
           <ul className="mt-6 space-y-16">
             {AnnouncementsData.map((caseStudy: any, idx: number) => (
               <li className="flow-root" key={`flyout_case_${idx}`}>
@@ -83,12 +82,8 @@ const Developers = () => {
                     />
                   </div>
                   <div className="min-w-0 flex-1 sm:ml-8">
-                    <h4 className="text-base font-medium text-gray-900 dark:text-white truncate">
-                      {caseStudy.title}
-                    </h4>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-dark-300">
-                      {caseStudy.description}
-                    </p>
+                    <Typography.Title level={5}>{caseStudy.title}</Typography.Title>
+                    <Typography.Text type="secondary">{caseStudy.description}</Typography.Text>
                   </div>
                 </a>
               </li>
