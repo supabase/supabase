@@ -5,7 +5,7 @@
     "features": [
       {
         "title": "Dedicated Postgres Database",
-        "tooltip": "A Postgres database with no restrictions? You get it. No pseudo limited users, you get the postgres user (maximum privileged user, the “root” user).  No caveats.",
+        "tooltip": "A Postgres database with no restrictions? You get it. No pseudo limited users, you are the postgres root user.  No caveats.",
         "tiers": {
           "free": true,
           "pro": true,
