@@ -4,7 +4,7 @@ export default [
     title: 'Public access to a bucket',
     code: `create policy "Public Access" 
 on storage.objects for all 
-with check ( bucket_id = 'avatars' );
+using ( bucket_id = 'avatars' );
     `,
     detail_title: 'Allow public CRUD access to a bucket',
     detail_text: "This will allow any user access to the bucket named 'avatars'",
