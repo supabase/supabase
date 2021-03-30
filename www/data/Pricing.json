@@ -56,7 +56,7 @@
       },
       {
         "title": "Pausing",
-        "tooltip": "Unused projects that have no activity will be shut down. They can be reactivated by logging into the dashboard",
+        "tooltip": "Unused projects that have no activity or API requests will be shut down. They can be reactivated by logging into the dashboard",
         "tiers": {
           "free": "Paused after 1 week inactivity",
           "pro": "Never",
