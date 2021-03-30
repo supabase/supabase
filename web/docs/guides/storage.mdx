@@ -273,9 +273,7 @@ using (
 -- 1. Allow a user to access their own files
 create policy "Individual user Access" 
 on storage.objects for select 
-using (
-  and auth.ud() = owner
-);
+using ( auth.uid() = owner );
 ```
 
 ## Tips
