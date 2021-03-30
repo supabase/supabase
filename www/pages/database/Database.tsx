@@ -111,13 +111,18 @@ function Database() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
-              <p className="mb-4">
-                <Space>
-                  <ProductIcon icon={Solutions['database'].icon} />
-                  <IconX />
-                  <img src={`${basePath}/images/product/database/postgresql-icon.svg`} width={30} />
-                </Space>
-              </p>
+              <Typography.Text>
+                <p className="mb-4">
+                  <Space>
+                    <ProductIcon icon={Solutions['database'].icon} />
+                    <IconX />
+                    <img
+                      src={`${basePath}/images/product/database/postgresql-icon.svg`}
+                      width={30}
+                    />
+                  </Space>
+                </p>
+              </Typography.Text>
               <Typography.Title level={4}>Just Postgres</Typography.Title>
               <Typography.Text>
                 <p className="text-base lg:text-lg">
@@ -129,13 +134,15 @@ function Database() {
               </Typography.Text>
             </div>
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
-              <p className="mb-4">
-                <Space>
-                  <ProductIcon icon={Solutions['database'].icon} />
-                  <IconX />
-                  <ProductIcon icon={Solutions['authentication'].icon} />
-                </Space>
-              </p>
+              <Typography.Text>
+                <p className="mb-4">
+                  <Space>
+                    <ProductIcon icon={Solutions['database'].icon} />
+                    <IconX />
+                    <ProductIcon icon={Solutions['authentication'].icon} />
+                  </Space>
+                </p>
+              </Typography.Text>
               <Typography.Title level={4}>Built-in Auth</Typography.Title>
               <Typography.Text>
                 <p className="text-base lg:text-lg">
@@ -148,9 +155,11 @@ function Database() {
               </Typography.Text>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <p className="mb-4">
-                <IconShuffle />
-              </p>
+              <Typography.Text>
+                <p className="mb-4">
+                  <IconShuffle />
+                </p>
+              </Typography.Text>
               <Typography.Title level={4}>Realtime enabled</Typography.Title>
               <Typography.Text>
                 <p className="text-base lg:text-lg">Data-change listeners over websockets.</p>
