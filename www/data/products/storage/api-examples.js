@@ -7,7 +7,7 @@ export default [
   const { data, error } = await supabase
     .storage
     .from('avatars-bucket')
-    .uploadFile('avatar.png', avatarFile)
+    .upload('avatar.png', avatarFile)
   
   
   
@@ -22,7 +22,7 @@ export default [
     const { data, error } = await supabase
         .storage
         .from('avatars-bucket')
-        .downloadFile('avatar.png')
+        .download('avatar.png')
 
 
 
