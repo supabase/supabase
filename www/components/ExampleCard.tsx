@@ -59,18 +59,6 @@ function ExampleCard(props: any) {
           </Typography.Text>
           <Space className="mt-3">
             {props.vercel_deploy_url && (
-              // <Link href={props.vercel_deploy_url} as={props.vercel_deploy_url}>
-              //   <a target="_blank">
-              //     <Button
-              //       size="tiny"
-              //       type="outline"
-              //       icon={<IconTriangle />}
-              //       style={{ background: '#1F6FF0', color: 'white', borderColor: '#1F6FF0' }}
-              //     >
-              //       Deploy
-              //     </Button>
-              //   </a>
-              // </Link>
               <a target="_blank" href={props.vercel_deploy_url}>
                 <img src="https://vercel.com/button" />
               </a>
