@@ -5,9 +5,17 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sun, 28 Mar 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 29 Mar 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.io/blog/2021/03/30/supabase-storage</guid>
+  <title>Storage is now availble in Supabase</title>
+  <link>https://supabase.io/blog/2021/03/30/supabase-storage</link>
+  <description>Launching Supabase Storage and how you can use it in your apps</description>
+  <pubDate>Mon, 29 Mar 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.io/blog/2021/03/29/pricing</guid>
   <title>Supabase Beta Pricing</title>
