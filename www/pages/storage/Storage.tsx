@@ -154,9 +154,11 @@ function AuthPage() {
               // !! Update this example !!
               <ExampleCard
                 type={'example'}
-                products={['database']}
+                products={['database', 'auth', 'storage']}
                 title={'Profile managment example'}
-                description={'NextJS Slack clone app using Supabase realtime subscriptions'}
+                description={
+                  'Update a user account with public profile information, including uploading a profile image.'
+                }
                 author={'supabase'}
                 author_url={'https://github.com/supabase'}
                 author_img={'https://avatars.githubusercontent.com/u/54469796'}
