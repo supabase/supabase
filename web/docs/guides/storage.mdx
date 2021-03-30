@@ -121,10 +121,11 @@ values={[
 const avatarFile = event.target.files[0]
 const { data, error } = await supabase
   .storage
-  .uploadFile('avatars/public/avatar1.png', avatarFile)
+  .from('avatars')
+  .upload('public/avatar1.png', avatarFile)
 ```
 
-[Reference.](/docs/reference/javascript/storage-uploadfile)
+[Reference.](/docs/reference/javascript/storage-from-upload)
 
 </TabItem>
 </Tabs>
@@ -160,10 +161,11 @@ values={[
 
 const { data, error } = await supabase
   .storage
-  .downloadFile('avatars/avatar1.png', 60)
+  .from('avatars')
+  .download('avatars/avatar1.png', 60)
 ```
 
-[Reference.](/docs/reference/javascript/storage-downloadfile)
+[Reference.](/docs/reference/javascript/storage-from-download)
 
 </TabItem>
 </Tabs>
