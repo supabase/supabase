@@ -23,7 +23,7 @@
     "repo_name": "nextjs-slack-clone",
     "repo_url": "https://github.com/supabase/supabase/tree/master/examples/nextjs-slack-clone",
     "vercel_deploy_url": "",
-    "demo_url": "https://supabase-slack-clone-supabase.vercel.app/"
+    "demo_url": ""
   },
   {
     "type": "example",
