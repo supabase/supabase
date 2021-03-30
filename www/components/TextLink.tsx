@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 function TextLink({ url, label }: any) {
   return (
-    <Link href={url} as={url}>
+    <a href={url}>
       <a className="block text-sm text-gray-400 dark:text-gray-400 mt-3">
         <div className="flex items-center">
           <span>{label}</span>
@@ -12,7 +12,7 @@ function TextLink({ url, label }: any) {
           </span>
         </div>
       </a>
-    </Link>
+    </a>
   )
 }
 
