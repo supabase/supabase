@@ -54,19 +54,19 @@ info:
           - getSubscriptions()
       - name: 'Storage'
         items:
-          - storage.uploadFile()
-          - storage.downloadFile()
-          - storage.listFiles()
-          - storage.updateFile()
-          - storage.moveFile()
-          - storage.deleteFile()
-          - storage.createSignedUrl()
-          - storage.deleteFiles()
           - storage.createBucket()
           - storage.getBucket()
+          - storage.listBuckets()
           - storage.deleteBucket()
           - storage.emptyBucket()
-          - storage.listBuckets()
+          - storage.from.upload()
+          - storage.from.download()
+          - storage.from.list()
+          - storage.from.update()
+          - storage.from.move()
+          - storage.from.delete()
+          - storage.from.createSignedUrl()
+          - storage.from.deleteFiles()
       - name: 'Modifiers'
         items:
           - Using Modifiers
@@ -801,7 +801,7 @@ pages:
           ```
           
   storage.listBuckets():
-    title: 'storage.listBuckets()'
+    title: 'listBuckets()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.listBuckets'
     examples:
       - name: List buckets
@@ -814,7 +814,7 @@ pages:
           ```
 
   storage.getBucket():
-    title: 'storage.getBucket()'
+    title: 'getBucket()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.getBucket'
     examples:
       - name: Get bucket
@@ -827,7 +827,7 @@ pages:
           ```
 
   storage.createBucket():
-    title: 'storage.createBucket()'
+    title: 'createBucket()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.createBucket'
     examples:
       - name: Create bucket
@@ -840,7 +840,7 @@ pages:
           ```
 
   storage.emptyBucket():
-    title: 'storage.emptyBucket()'
+    title: 'emptyBucket()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.emptyBucket'
     examples:
       - name: Empty bucket
@@ -853,7 +853,7 @@ pages:
           ```
 
   storage.deleteBucket():
-    title: 'storage.deleteBucket()'
+    title: 'deleteBucket()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.deleteBucket'
     examples:
       - name: Delete bucket
@@ -865,8 +865,8 @@ pages:
             .deleteBucket('avatars')
           ```
 
-  storage.uploadFile():
-    title: 'storage.uploadFile()'
+  storage.from.upload():
+    title: 'from.upload()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.uploadFile'
     examples:
       - name: Upload file
@@ -876,11 +876,12 @@ pages:
           const avatarFile = event.target.files[0]
           const { data, error } = await supabase
             .storage
-            .uploadFile('avatars/public/avatar1.png', avatarFile)
+            .from('avatars')
+            .upload('public/avatar1.png', avatarFile)
           ```
 
-  storage.updateFile():
-    title: 'storage.updateFile()'
+  storage.from.update():
+    title: 'from.update()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.updateFile'
     examples:
       - name: Update file
@@ -890,11 +891,12 @@ pages:
           const avatarFile = event.target.files[0]
           const { data, error } = await supabase
             .storage
-            .updateFile('avatars/public/avatar1.png', avatarFile)
+            .from('avatars')
+            .update('public/avatar1.png', avatarFile)
           ```
 
-  storage.moveFile():
-    title: 'storage.moveFile()'
+  storage.from.move():
+    title: 'from.move()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.moveFile'
     examples:
       - name: Move file
@@ -903,11 +905,12 @@ pages:
           ```js
           const { data, error } = await supabase
             .storage
-            .moveFile('avatars', '/avatar1.png', '/avatar2.png')
+            .from('avatars')
+            .move('pubic/avatar1.png', 'private/avatar2.png')
           ```
 
-  storage.createSignedUrl():
-    title: 'storage.createSignedUrl()'
+  storage.from.createSignedUrl():
+    title: 'from.createSignedUrl()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.createSignedUrl'
     examples:
       - name: Update file
@@ -916,11 +919,12 @@ pages:
           ```js
           const { signedUrl, data, error } = await supabase
             .storage
-            .createSignedUrl('avatars/avatar1.png', 60)
+            .from('avatars')
+            .createSignedUrl('avatar1.png', 60)
           ```
 
-  storage.downloadFile():
-    title: 'storage.downloadFile()'
+  storage.from.download():
+    title: 'from.download()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.downloadFile'
     examples:
       - name: Download file
@@ -929,11 +933,12 @@ pages:
           ```js
           const { data, error } = await supabase
             .storage
-            .downloadFile('avatars/avatar1.png', 60)
+            .from('avatars')
+            .download('avatar1.png', 60)
           ```
 
-  storage.deleteFile():
-    title: 'storage.deleteFile()'
+  storage.from.delete():
+    title: 'from.delete()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.deleteFile'
     examples:
       - name: Delete file
@@ -942,11 +947,12 @@ pages:
           ```js
           const { data, error } = await supabase
             .storage
-            .deleteFile('avatars/avatar1.png')
+            .from('avatars')
+            .delete('avatar1.png')
           ```
 
-  storage.deleteFiles():
-    title: 'storage.deleteFiles()'
+  storage.from.deleteFiles():
+    title: 'from.deleteFiles()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.deleteFiles'
     examples:
       - name: Delete files
@@ -955,11 +961,12 @@ pages:
           ```js
           const { data, error } = await supabase
             .storage
-            .deleteFiles('avatars', ['public/avatar1.png', 'public/avatar2.png'])
+            .from('avatars')
+            .deleteFiles(['public/avatar1.png', 'public/avatar2.png'])
           ```
 
-  storage.listFiles():
-    title: 'storage.listFiles()'
+  storage.from.list():
+    title: 'from.list()'
     $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.listFiles'
     examples:
       - name: List files in a bucket
@@ -968,7 +975,8 @@ pages:
           ```js
           const { data, error } = await supabase
             .storage
-            .listFiles('avatars')
+            .from('avatars')
+            .list()
           ```
 
   Using Modifiers:
