@@ -82,10 +82,9 @@ const FlyOut = (props: Props) => {
                   singleBgColor ? 'bg-white dark:bg-dark-600' : 'bg-gray-50 dark:bg-gray-800'
                 } sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full`}
               />
-              {/* <div className="bg-gray-50 dark:bg-dark-300 md:hidden lg:block lg:w-1/2"></div> */}
             </div>
             <div
-              className={`relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 ${className}`}
+              className={`container relative mx-auto lg:grid-cols-2 px-6 lg:px-10 xl:px-14 py-2`}
             >
               {children}
             </div>

@@ -40,5 +40,12 @@
     "author_image_url": "https://github.com/supabase.png",
     "authorURL": "https://github.com/supabase",
     "position": ""
+  },
+  "inian": {
+    "author": "Inian Parameshwaran",
+    "author_url": "https://twitter.com/everConfusedGuy",
+    "position": "Engineering",
+    "username": "inian",
+    "author_image_url": "https://avatars.githubusercontent.com/u/2155545?v=4"
   }
 }
