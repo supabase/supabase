@@ -54,8 +54,15 @@ values={[
 <TabItem value="UI">
 
 ```sh
-Use the Supabase Dashboard to create a bucket.
+1. Go to the "Storage" section.
+2. Click "Create Bucket".
+3. Enter the bucket name.
+4. Click "Create Bucket".
 ```
+
+<video width="99%" muted playsInline controls="true">
+<source src="/videos/storage/create.mp4" type="video/mp4" muted playsInline />
+</video>
 
 
 </TabItem>
@@ -97,8 +104,15 @@ values={[
 <TabItem value="UI">
 
 ```sh
-Use the Supabase Dashboard to create a bucket.
+1. Go to the "Storage" section.
+2. Select the bucket you want to upload the file into.
+3. Click "Upload File".
+4. Select the file you want to upload in the dialog that appears.
 ```
+
+<video width="99%" muted playsInline controls="true">
+<source src="/videos/storage/create.mp4" type="video/mp4" muted playsInline />
+</video>
 
 </TabItem>
 <TabItem value="JS">
@@ -128,8 +142,15 @@ values={[
 <TabItem value="UI">
 
 ```sh
-Use the Supabase Dashboard to create a bucket.
+1. Go to the "Storage" section.
+2. Select the bucket that contains the file.
+3. Select the file that you want to download.
+4. Click the "Download" button.
 ```
+
+<video width="99%" muted playsInline controls="true">
+<source src="/videos/storage/download.mp4" type="video/mp4" muted playsInline />
+</video>
 
 </TabItem>
 <TabItem value="JS">
@@ -149,7 +170,7 @@ const { data, error } = await supabase
 
 ### Add security rules
 
-To restrict access to your files you can use either the Dashboard or SQL
+To restrict access to your files you can use either the Dashboard or SQL.
 
 <Tabs
 defaultValue="UI"
@@ -160,9 +181,17 @@ values={[
 <TabItem value="UI">
 
 ```sh
-Use the Supabase Dashboard to create Storage Policies.
+1. Go to the "Storage" section.
+2. Click "Policies" in the sidebar.
+3. Click "Add Policies" in the "OBJECTS" table to add policies for Files. You can also create Policies for Buckets.
+4. Choose whether you want the policy to apply to downloads (SELECT), uploads (INSERT), updates (UPDATE), or deletes (DELETE).
+5. Give your policy a unique name.
+6. Write the Policy using SQL.
 ```
 
+<video width="99%" muted playsInline controls="true">
+<source src="/videos/storage/policies.mp4" type="video/mp4" muted playsInline />
+</video>
 
 </TabItem>
 <TabItem value="SQL">
