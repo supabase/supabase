@@ -5,9 +5,33 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sun, 21 Mar 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Sun, 28 Mar 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.io/blog/2021/03/29/pricing</guid>
+  <title>Supabase Beta Pricing</title>
+  <link>https://supabase.io/blog/2021/03/29/pricing</link>
+  <description>Supabase launches Beta pricing structure</description>
+  <pubDate>Sun, 28 Mar 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/03/25/launch-week</guid>
+  <title>Launch week</title>
+  <link>https://supabase.io/blog/2021/03/25/launch-week</link>
+  <description>Five days of Supabase.</description>
+  <pubDate>Wed, 24 Mar 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/03/25/angels-of-supabase</guid>
+  <title>Angels of Supabase</title>
+  <link>https://supabase.io/blog/2021/03/25/angels-of-supabase</link>
+  <description>Meet the investors of Supabase.</description>
+  <pubDate>Wed, 24 Mar 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.io/blog/2021/03/22/In-The-Loop</guid>
   <title>Developers stay up to date with intheloop.dev</title>
@@ -25,9 +49,9 @@
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders</guid>
-  <title>Toad, a link shorterner with simple APIs for low-coders</title>
-  <link>https://supabase.io/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders</link>
+  <guid>https://supabase.io/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders</guid>
+  <title>Toad, a link shortener with simple APIs for low-coders</title>
+  <link>https://supabase.io/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders</link>
   <description>An easy-to-use link shortening tool with simple APIs</description>
   <pubDate>Sun, 07 Mar 2021 16:00:00 GMT</pubDate>
 </item>
