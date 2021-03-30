@@ -189,7 +189,7 @@ function AuthPage() {
                   <FeatureColumn
                     icon={<IconWifi />}
                     title="CDN integration"
-                    text="Served from the edge to reduce latency."
+                    text="Serve from the edge to reduce latency."
                   />
                   <Badge color="blue">Coming soon</Badge>
                 </div>
@@ -226,10 +226,10 @@ function AuthPage() {
                         with Supabase Auth
                       </Typography.Title>
                       <p className="text-lg">
-                        Using Postgres Row Level Security to create File access rules.
+                        Using Postgres Row Level Security to create Object access rules.
                       </p>
                       <p>
-                        Supabase Storage is built around Postgres so that you can use any
+                        Storage Authorization is built around Postgres so that you can use any
                         combination of SQL, Postgres functions, and even your own metadata to write
                         policies.
                       </p>
