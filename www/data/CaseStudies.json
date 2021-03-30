@@ -30,5 +30,21 @@
       "readLength": 10
     },
     "ctaText": "View case study"
+  },
+  {
+    "type": "Case Study",
+    "title": "A no-code website builder, deployed in seven days.",
+    "description": "See how Tayfa went from idea to paying customer in less than 30 days.",
+    "imgUrl": "images/case-study-tayfab.jpg",
+    "logoUrl": "images/logos/monitoro.png",
+    "organization": "Tayfab",
+    "url": "/blog/2020/12/02/case-study-tayfa",
+    "postMeta": {
+      "name": "Paul Copplestone",
+      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
+      "publishDate": "Mar 27, 2020",
+      "readLength": 5
+    },
+    "ctaText": "View case study"
   }
 ]

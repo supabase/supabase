@@ -55,28 +55,33 @@ const Product = () => {
         <div className="m-3 mx-6">
           <Typography.Text type="secondary">Latest case studies</Typography.Text>
           <ul className="mt-6 space-y-3">
-            {CaseStudiesData.map((caseStudy: any, idx: number) => (
-              <li className="flow-root" key={`flyout_case_${idx}`}>
-                <a
-                  href={caseStudy.url}
-                  className="p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition ease-in-out duration-150 border dark:border-gray-600"
-                >
-                  <div className="hidden sm:block flex-shrink-0">
-                    <img
-                      className="w-32 h-20 object-cover rounded-md"
-                      src={`${basePath}/${caseStudy.imgUrl}`}
-                      alt="caseStudyThumb"
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1 sm:ml-8">
-                    <Typography.Title level={5} className="mb-0">
-                      {caseStudy.title}
-                    </Typography.Title>
-                    <Typography.Text>{caseStudy.description}</Typography.Text>
-                  </div>
-                </a>
-              </li>
-            ))}
+            {CaseStudiesData.map((caseStudy: any, idx: number) => {
+              if (idx > 1) {
+                return null
+              }
+              return (
+                <li className="flow-root" key={`flyout_case_${idx}`}>
+                  <a
+                    href={caseStudy.url}
+                    className="p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition ease-in-out duration-150 border dark:border-gray-600"
+                  >
+                    <div className="hidden sm:block flex-shrink-0">
+                      <img
+                        className="w-32 h-20 object-cover rounded-md"
+                        src={`${basePath}/${caseStudy.imgUrl}`}
+                        alt="caseStudyThumb"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1 sm:ml-8">
+                      <Typography.Title level={5} className="mb-0">
+                        {caseStudy.title}
+                      </Typography.Title>
+                      <Typography.Text>{caseStudy.description}</Typography.Text>
+                    </div>
+                  </a>
+                </li>
+              )
+            })}
           </ul>
         </div>
       </div>
