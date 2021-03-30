@@ -124,7 +124,6 @@ export default function IndexPage() {
                 Pay as you go
               </h2>
               <p className="mt-4">
-                  <p className="mt-4">
                 <span className="text-4xl font-normal text-gray-900 dark:text-white">$25</span>
                 <Typography.Text type="secondary">/project /month plus usage costs</Typography.Text>
               </p>
@@ -256,6 +255,7 @@ export default function IndexPage() {
 
                   <td className="h-full py-8 px-6 align-top">
                     <div className="relative h-full table">
+                      <p>
                       <span className="text-4xl font-normal text-gray-900 dark:text-white">
                           $25
                         </span>
