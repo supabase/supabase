@@ -4,33 +4,30 @@ import { useState } from 'react'
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { EffectFade } from 'swiper'
 
 // Import Swiper styles
 import 'swiper/swiper.min.css'
-import 'swiper/components/effect-fade/effect-fade.min.css'
-
-import CodeBlock from '../CodeBlock/CodeBlock'
 
 import ImageCarouselStyles from './ImageCarousel.module.css'
-import TweetCard from '../TweetCard'
-
-SwiperCore.use([EffectFade])
+import Link from 'next/link'
 
 interface Content {
   title: string
   label?: string
-  img_url: string
-  text: string
+  img_url?: string
+  video_url?: string
+  text?: string
+  cta?: string
+  url?: string
 }
 
-interface ImageCaoursel {
-  content: Content
+interface ImageCarouselProps {
+  content: Content[]
   footer?: React.ReactNode
   altTabView?: boolean
 }
 
-function ImageCarousel(props: ImageCaoursel) {
+function ImageCarousel(props: ImageCarouselProps) {
   // base path for images
   const { basePath } = useRouter()
 
@@ -80,9 +77,10 @@ function ImageCarousel(props: ImageCaoursel) {
               // @ts-ignore
               onChange={(id: string) => handleImageSwiperNav(Number(id))}
             >
-              {props.content.map((content, i) => {
+              {props.content.map((content: Content, i) => {
                 return (
                   <Tabs.Panel
+                    key={i}
                     label={content.label ? content.label : content.title}
                     id={i.toString()}
                   >
@@ -93,20 +91,19 @@ function ImageCarousel(props: ImageCaoursel) {
             </Tabs>
           </div>
           <div
-            className={`border border-gray-100 dark:border-gray-600 rounded-md bg-gray-800 overflow-hidden ${ImageCarouselStyles['gradient-bg']}`}
+            className={`overflow-hidden border border-gray-100 dark:border-gray-600 rounded-md bg-gray-800 ${ImageCarouselStyles['gradient-bg']}`}
           >
             <Swiper
               // @ts-ignore
               onSwiper={setImageSwiper}
-              style={{ zIndex: 0 }}
+              style={{ zIndex: 0, overflow: 'auto' }}
               initialSlide={0}
               spaceBetween={0}
               slidesPerView={1}
-              speed={400}
-              autoHeight={true}
+              speed={300}
               allowTouchMove={false}
             >
-              {props.content.map((content, i) => {
+              {props.content.map((content: Content, i: number) => {
                 return (
                   <SwiperSlide key={i}>
                     {content.img_url && <img src={`${basePath}${content.img_url}`} />}
@@ -140,9 +137,13 @@ function ImageCarousel(props: ImageCaoursel) {
             onChange={(id: string) => handleImageSwiperNav(Number(id))}
             block
           >
-            {props.content.map((content, i) => {
+            {props.content.map((content: Content, i: number) => {
               return (
-                <Tabs.Panel label={content.label ? content.label : content.title} id={i.toString()}>
+                <Tabs.Panel
+                  label={content.label ? content.label : content.title}
+                  id={i.toString()}
+                  key={i}
+                >
                   <span></span>
                 </Tabs.Panel>
               )
@@ -153,7 +154,7 @@ function ImageCarousel(props: ImageCaoursel) {
           // @ts-ignore
           onSwiper={setSwiperDetails}
           initialSlide={0}
-          speed={400}
+          speed={300}
           allowTouchMove={false}
           autoHeight={true}
         >
@@ -162,17 +163,23 @@ function ImageCarousel(props: ImageCaoursel) {
               <SwiperSlide key={i}>
                 <div className="bg-white dark:bg-gray-800">
                   <Typography.Title level={4}>{content.title}</Typography.Title>
-                  <Typography.Text>
-                    <p className="text-base">{content.text}</p>
-                    <Button
-                      className="mb-8"
-                      type="outline"
-                      size="small"
-                      icon={<IconArrowUpRight />}
-                    >
-                      View documentation
-                    </Button>
-                  </Typography.Text>
+                  <p className="text-base">{content.text}</p>
+                  {content.url && (
+                    <Typography.Text>
+                      <Link href={content.url} as={content.url}>
+                        <a>
+                          <Button
+                            className="mb-8"
+                            type="outline"
+                            size="small"
+                            icon={<IconArrowUpRight />}
+                          >
+                            {content.cta ? content.cta : 'View documentation'}
+                          </Button>
+                        </a>
+                      </Link>
+                    </Typography.Text>
+                  )}
                 </div>
               </SwiperSlide>
             )

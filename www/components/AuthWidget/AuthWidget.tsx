@@ -142,7 +142,7 @@ function AuthPage() {
                 <Space size={12} direction="vertical">
                   <div>
                     <Typography.Title level={3}>Customise your login form</Typography.Title>
-                    <Typography.Text level={3}>
+                    <Typography.Text>
                       Our ReactJS Auth form will help you get going even quicker{' '}
                     </Typography.Text>
                   </div>

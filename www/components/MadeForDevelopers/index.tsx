@@ -1,50 +1,32 @@
-// import Button from 'components/Button'
-// import Badge from 'components/Badge'
-import {
-  Badge,
-  Button,
-  IconAlignJustify,
-  IconArrowUpRight,
-  IconCode,
-  IconMail,
-  IconTerminal,
-  IconType,
-  Typography,
-} from '@supabase/ui'
-import SectionHeader from 'components/UI/SectionHeader'
-// import CodeExamples from 'components/MadeForDevelopers/CodeExamples'
-
-import CodeExamples from 'data/home/api-examples'
-
-import DeveloperFeatures from 'data/DeveloperFeatures.json'
+import { Badge, Button, IconArrowUpRight, IconMail } from '@supabase/ui'
 import APISection from '../Sections/APISection'
 import SectionContainer from '../Layouts/SectionContainer'
 import FeatureColumn from '../FeatureColumn'
 
+import CodeExamples from 'data/home/api-examples'
+import DeveloperFeatures from 'data/DeveloperFeatures.json'
+import TextLink from '../TextLink'
+
 const MadeForDevelopers = () => {
   return (
-    <SectionContainer className="pb-0">
+    <SectionContainer>
       <APISection
-        title={[
-          <span>
-            Instant APIs
-            <br /> that do the hard work for you
-          </span>,
-        ]}
+        autoHeight={true}
+        size="large"
+        title={"Instant APIs that do the hard work for you"}
         text={[
-          <p className="text-lg">
+          <p className="lg:text-lg" key={'madefordeveloper-para-1'}>
             We introspect your database to provide APIs instantly. Stop building repetitive CRUD
             endpoints and focus on your product.
           </p>,
         ]}
+        // @ts-ignore
         content={CodeExamples}
-        size="small"
         footer={[
-          // <div className="grid grid-cols-12 gap-8 lg:gap-16">
-          <dl className="grid grid-cols-12 gap-8">
-            {DeveloperFeatures.map((feature: any, idx: number) => {
+          <dl className="grid gap-y-4 grid-cols-12 md:gap-8" key={'madefordeveloper-footer'}>
+            {DeveloperFeatures.map((feature: any, i: number) => {
               return (
-                <div className={'col-span-6 lg:col-span-6'} key={`dev_feature_${idx}`}>
+                <div className="col-span-12 md:col-span-6 lg:col-span-6" key={i}>
                   <div className="lg:mt-5">
                     <dt>
                       <FeatureColumn title={feature.name} text={feature.description} />
@@ -56,13 +38,9 @@ const MadeForDevelopers = () => {
                         </div>
                       )}
                       {feature.badge ? (
-                        <Button href={feature.url} type="default" icon={<IconMail />}>
-                          {'Get notified'}
-                        </Button>
+                        <TextLink url={feature.url} label="Get notified" />
                       ) : (
-                        <Button href={feature.url} type="default" icon={<IconArrowUpRight />}>
-                          {'Explore more'}
-                        </Button>
+                        <TextLink url={feature.url} label="Explore more" />
                       )}
                     </dt>
                   </div>
@@ -70,7 +48,6 @@ const MadeForDevelopers = () => {
               )
             })}
           </dl>,
-          // </div>,
         ]}
       />
     </SectionContainer>

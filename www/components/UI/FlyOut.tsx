@@ -92,7 +92,7 @@ const FlyOut = (props: Props) => {
           <div
             className="fixed inset-0 t-63 transition-opacity bg-red"
             style={{
-              zIndex: 10,
+              zIndex: 100,
               top: '63px',
               marginLeft: 0,
               pointerEvents: 'visiblePainted',
