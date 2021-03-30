@@ -23,7 +23,7 @@ import APISection from '~/components/Sections/APISection'
 
 import FeatureColumn from '~/components/FeatureColumn'
 
-import ApiExamples from 'data/products/database/api-examples'
+import ApiExamples from 'data/products/storage/api-examples'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
 
 import CTABanner from '~/components/CTABanner'
@@ -57,7 +57,7 @@ function AuthPage() {
           </span>,
         ]}
         subheader={[
-          'An open source scalable File store with unlimited scalability, for any file type.',
+          'An open source Object store service with unlimited scalability, for any file type.',
           'With custom policies and permissions that are familiar and easy to implement.',
         ]}
         image={[
@@ -126,10 +126,10 @@ function AuthPage() {
       <SectionContainer className="pt-16">
         <div className="mb-16 block">
           <Typography.Title>Sleek dashboard for managing your media</Typography.Title>
-          <p className="text-lg">A complete File Explorer so that any of your team can use.</p>
+          <p className="text-lg">A complete Object Explorer so that any of your team can use.</p>
           <p>
-            Drag and drop uploading, moving files, and multiple file selection. As easy as working
-            on your desktop.
+            Drag and drop uploading, moving objects, and multiple object selection. As easy as
+            working on your desktop.
           </p>
         </div>
         <ImageCarousel
@@ -215,8 +215,8 @@ function AuthPage() {
                       Using Postgres Row Level Security to create File access rules.
                     </p>
                     <p>
-                      Supabase Storage is built around Postgres so that you can use any combination of SQL, Postgres functions,
-                      and even your own metadata to write policies.
+                      Supabase Storage is built around Postgres so that you can use any combination
+                      of SQL, Postgres functions, and even your own metadata to write policies.
                     </p>
                     <Button
                       size="small"
