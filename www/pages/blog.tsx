@@ -121,7 +121,7 @@ function FeaturedThumb(blog: PostTypes) {
 
   return (
     <div key={blog.slug} className="my-6 cursor-pointer">
-      <a href={`/blog/${blog.url}`} as={`/blog/${blog.url}`}>
+      <a href={`/blog/${blog.url}`}>
         <a className="inline-block">
           <img
             className="h-96 w-full object-cover  border dark:border-dark-600"
