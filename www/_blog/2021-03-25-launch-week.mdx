@@ -65,8 +65,22 @@ If you aren’t confident in our business model though, we’re open source. You
 ## Tuesday: Storage
 
 - 30 March 2021
-- Details: [Coming soon]
-- Get Notified: Follow us on [Twitter](https://twitter.com/supabase_io), or visit this page on Tuesday.
+
+Checkout the launch post here: [Supabase Storage](https://supabase.io/blog/2021/03/30/supabase-storage)
+
+As with anything that we build in Supabase, Storage is fast, secure and scalable. It's integrated well with the rest of the Supabase ecosystem. 
+
+**Security** 🔒
+
+The authentication is handled by Kong and the authorization policies are implemented via Row Level Security policies in Postgres. This way we didn't have to implement a new language for implementing authorization policies. Check out our blog post for more details on how this works. 
+
+**Performance** ⚡️
+
+Our storage API is a thin layer built with Fastify, a [blazing fast](https://www.fastify.io/benchmarks/) Node.js framework. The security policies are directly evaluated in Postgres. The object explorer in dashboard makes navigation easy even when you have deeply nested folders or millions of objects in your buckets. 
+
+**Scalability** 📈
+
+You can use storage for your terabytes of ML training data, e-commerce product gallery, or just your growing collection of JPEGS featuring cat's playing synths in space. You can truly build in a weekend and scale to millions.
 
 ![Supabase Storage](/new/images/blog/launch-week/bernie-2.png)
 
