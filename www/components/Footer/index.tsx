@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react'
-import FooterLinks from 'data/Footer.json'
 import { useRouter } from 'next/router'
+import FooterLinks from 'data/Footer.json'
 import SectionContainer from '../Layouts/SectionContainer'
 import DarkModeToggle from '../DarkModeToggle'
-import SupabaseStatus from './SupabaseStatus'
 
 type Props = {
   darkMode: boolean

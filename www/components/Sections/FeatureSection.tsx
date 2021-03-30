@@ -9,7 +9,7 @@ const FeatureSection = (props: any) => {
         </p>
         <Typography.Title level={4}>Write less code</Typography.Title>
         <Typography.Text>
-          <p className="text-lg">
+          <p className="lg:text-lg">
             Use media in your project without needing to reply on external services or learn new
             frameworks.
           </p>
@@ -25,7 +25,7 @@ const FeatureSection = (props: any) => {
         </p>
         <Typography.Title level={4}>Blazing fast</Typography.Title>
         <Typography.Text>
-          <p className="text-lg">
+          <p className="lg:text-lg">
             Use media in your project without needing to reply on external services or learn new
             frameworks.
           </p>
@@ -41,7 +41,7 @@ const FeatureSection = (props: any) => {
         </p>
         <Typography.Title level={4}>Dependable</Typography.Title>
         <Typography.Text>
-          <p className="text-lg">
+          <p className="lg:text-lg">
             Use media in your project without needing to reply on external services or learn new
             frameworks.
           </p>

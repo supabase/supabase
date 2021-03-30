@@ -8,9 +8,23 @@ import CodeBlock from '../CodeBlock/CodeBlock'
 // Import Swiper styles
 import 'swiper/swiper.min.css'
 import Badge from '../Badge'
+import Link from 'next/link'
+
+interface Content {
+  lang: 'js' | 'py' | 'sql'
+  title: string
+  code: string
+  detail_title?: string
+  detail_text?: string
+  badges_label?: string
+  badges?: string[]
+  url?: string
+}
 
 interface SplitCodeBlockCarousel {
-  content: any
+  content: Content[]
+  footer?: React.ReactNode
+  altTabView?: boolean
 }
 
 function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
@@ -48,7 +62,6 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
   return (
     <div className="col-span-12 lg:col-span-6 lg:col-start-7 sbui-tabs--alt">
       <Tabs
-        className="alt-tabs"
         scrollable
         // @ts-ignore
         activeId={apiSwiperActiveIndex.toString()}
@@ -71,13 +84,13 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
           initialSlide={apiSwiperActiveIndex}
           spaceBetween={0}
           slidesPerView={1}
-          speed={400}
+          speed={300}
           autoHeight={true}
           allowTouchMove={false}
         >
           {props.content.map((extension, i) => {
             return (
-              <SwiperSlide>
+              <SwiperSlide key={i}>
                 <CodeBlock key={i} lang={extension.lang}>
                   {extension.code}
                 </CodeBlock>
@@ -96,7 +109,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
             slidesPerView={1}
             direction="horizontal"
             // style={{ overflow: 'hidden' }}
-            speed={400}
+            speed={300}
             allowTouchMove={false}
           >
             {props.content.map((extension, i) => {
@@ -112,9 +125,15 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
                       <p>{extension.detail_text}</p>
                     </Typography.Text>
                     <Space className="justify-between">
-                      <Typography.Text>
-                        <Button type="outline">View documentation</Button>
-                      </Typography.Text>
+                      {extension.url && (
+                        <Link href={extension.url} as={extension.url}>
+                          <a>
+                            <Typography.Text>
+                              <Button type="outline">View documentation</Button>
+                            </Typography.Text>
+                          </a>
+                        </Link>
+                      )}
                       <div>
                         <Typography.Text type="secondary" className="mr-4">
                           {extension.badges_label}
