@@ -5,11 +5,7 @@ import Avatar from './Avatar'
 import { AuthSession } from '@supabase/supabase-js'
 import { DEFAULT_AVATARS_BUCKET, Profile } from '../lib/constants'
 
-export default function Account({
-  session,
-}: {
-  session: AuthSession
-}) {
+export default function Account({ session }: { session: AuthSession }) {
   const [loading, setLoading] = useState<boolean>(true)
   const [uploading, setUploading] = useState<boolean>(false)
   const [avatar, setAvatar] = useState<string | null>(null)
@@ -37,9 +33,11 @@ export default function Account({
       const file = event.target.files[0]
       const fileExt = file.name.split('.').pop()
       const fileName = `${session?.user.id}${Math.random()}.${fileExt}`
-      const filePath = `${DEFAULT_AVATARS_BUCKET}/${fileName}`
+      const filePath = `${fileName}`
 
-      let { error: uploadError } = await supabase.storage.uploadFile(filePath, file)
+      let { error: uploadError } = await supabase.storage
+        .from(DEFAULT_AVATARS_BUCKET)
+        .upload(filePath, file)
 
       if (uploadError) {
         throw uploadError
