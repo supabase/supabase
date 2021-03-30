@@ -199,10 +199,11 @@ values={[
 <TabItem value="SQL">
 
 ```sql
--- Use the SQL to create a bucket.
+-- Use the SQL to create a policy.
 
-insert into storage.buckets (id, name)
-values ('avatars', 'avatars');
+create policy "Public Access" 
+  on storage.objects for select 
+  using ( bucket_id = 'public' );
 ```
 
 </TabItem>
