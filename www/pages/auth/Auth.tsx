@@ -140,9 +140,11 @@ function AuthPage() {
               </Typography.Text>
             </div>
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
-              <p className="mb-4">
-                <IconLink />
-              </p>
+              <Typography.Text>
+                <p className="mb-4">
+                  <IconLink />
+                </p>
+              </Typography.Text>
               <Typography.Title level={4}>Fully integrated</Typography.Title>
               <Typography.Text>
                 <p className="text-base lg:text-lg">
@@ -152,9 +154,11 @@ function AuthPage() {
               </Typography.Text>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <p className="mb-4">
-                <IconShield />
-              </p>
+              <Typography.Text>
+                <p className="mb-4">
+                  <IconShield />
+                </p>
+              </Typography.Text>
               <Typography.Title level={4}>Own your data</Typography.Title>
               <Typography.Text>
                 <p className="text-base lg:text-lg">
@@ -231,8 +235,8 @@ function AuthPage() {
               <Typography.Text>
                 <p className="text-base lg:text-lg">
                   Supabase Auth works without any additional servers. Build Authorization rules with
-                  Postgres' Row Level Security, controlling who can create, edit
-                  and delete specific rows in your database.
+                  Postgres' Row Level Security, controlling who can create, edit and delete specific
+                  rows in your database.
                 </p>
                 <p>Policies can be written in SQL or using the dashboard online.</p>
               </Typography.Text>
@@ -277,8 +281,8 @@ function AuthPage() {
                   Pre-built auth widgets to get started in minutes.
                 </p>
                 <p>
-                  Supabase provides React libraries which handle common scenarios, including logging in,
-                  signing up, magic link and forgot password forms.
+                  Supabase provides React libraries which handle common scenarios, including logging
+                  in, signing up, magic link and forgot password forms.
                 </p>
               </Typography.Text>
               <Link
