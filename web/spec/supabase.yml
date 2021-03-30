@@ -973,7 +973,7 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .download('avatar1.png', 60)
+            .download('avatar1.png')
           ```
 
   storage.from.remove():
