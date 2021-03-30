@@ -1,0 +1,323 @@
+---
+id: storage
+title: Storage
+description: Use Supabase to store and serve files.
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+## Storage
+
+Supabase Storage makes it simple to store and serve large files.
+
+### Files 
+
+Files can be any sort of media file. This includes will be images, gifs, and videos. Because of the size of these files, it's best-practice to store them outside of your database.
+
+### Folders 
+
+Folder are a way to organize your files (just like on your own computer). 
+There is no right or wrong way to 
+organize your files. You can store them in whichever folder structure suits your project.
+
+
+### Buckets 
+
+Buckets are distinct containers for files and folders. You can think of them like "super folders".
+Generally you would create distinct buckets for different Security and Access Rules. For example, you might
+keep all public files in a "public" bucket, and other files that require logged-in access in a "restricted" bucket.
+
+
+## Getting started
+
+A quick guide that shows the basic functions of Supabase Storage. Find a full 
+[example application in GitHub](https://github.com/supabase/supabase/edit/master/examples/nextjs-ts-user-management), 
+which you can deploy yourself.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fnextjs-ts-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-ts-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management)
+
+### Create a bucket
+
+You can create a bucket using the Supabase Dashboard. 
+Since the storage is interoperable with your Postgres database, you can also use SQL or our
+client libraries. Here we create a bucket called "avatars":
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'SQL', value: 'SQL'},
+  {label: 'JavaScript', value: 'JS'},
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "Storage" section.
+2. Click "Create Bucket".
+3. Enter the bucket name.
+4. Click "Create Bucket".
+```
+
+<video width="99%" muted playsInline controls="true">
+<source src="/videos/storage/create.mp4" type="video/mp4" muted playsInline />
+</video>
+
+
+</TabItem>
+<TabItem value="SQL">
+
+```sql
+-- Use Postgres to create a bucket.
+
+insert into storage.buckets (id, name)
+values ('avatars', 'avatars');
+```
+
+</TabItem>
+<TabItem value="JS">
+
+```js
+// Use the JS library to create a bucket.
+
+const { data, error } = await supabase
+  .storage
+  .createBucket('avatars')
+```
+
+[Reference.](/docs/reference/javascript/storage-createbucket)
+</TabItem>
+</Tabs>
+
+
+### Upload a file
+
+You can upload a file from the Dashboard, or within a browser using our JS libraries.
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'JavaScript', value: 'JS'},
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "Storage" section.
+2. Select the bucket you want to upload the file into.
+3. Click "Upload File".
+4. Select the file you want to upload in the dialog that appears.
+```
+
+<video width="99%" muted playsInline controls="true">
+<source src="/videos/storage/create.mp4" type="video/mp4" muted playsInline />
+</video>
+
+</TabItem>
+<TabItem value="JS">
+
+```js
+const avatarFile = event.target.files[0]
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .upload('public/avatar1.png', avatarFile)
+```
+
+[Reference.](/docs/reference/javascript/storage-from-upload)
+
+</TabItem>
+</Tabs>
+
+### Download a file
+
+You can download a file from the Dashboard, or within a browser using our JS libraries.
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'JavaScript', value: 'JS'},
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "Storage" section.
+2. Select the bucket that contains the file.
+3. Select the file that you want to download.
+4. Click the "Download" button.
+```
+
+<video width="99%" muted playsInline controls="true">
+<source src="/videos/storage/download.mp4" type="video/mp4" muted playsInline />
+</video>
+
+</TabItem>
+<TabItem value="JS">
+
+```js
+// Use the JS library to create a bucket.
+
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .download('avatars/avatar1.png', 60)
+```
+
+[Reference.](/docs/reference/javascript/storage-from-download)
+
+</TabItem>
+</Tabs>
+
+### Add security rules
+
+To restrict access to your files you can use either the Dashboard or SQL.
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'SQL', value: 'SQL'}
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "Storage" section.
+2. Click "Policies" in the sidebar.
+3. Click "Add Policies" in the "OBJECTS" table to add policies for Files. You can also create Policies for Buckets.
+4. Choose whether you want the policy to apply to downloads (SELECT), uploads (INSERT), updates (UPDATE), or deletes (DELETE).
+5. Give your policy a unique name.
+6. Write the Policy using SQL.
+```
+
+<video width="99%" muted playsInline controls="true">
+<source src="/videos/storage/policies.mp4" type="video/mp4" muted playsInline />
+</video>
+
+</TabItem>
+<TabItem value="SQL">
+
+```sql
+-- Use the SQL to create a policy.
+
+create policy "Public Access" 
+  on storage.objects for select 
+  using ( bucket_id = 'public' );
+```
+
+</TabItem>
+</Tabs>
+
+
+## Helpers
+
+Supabase Storage is configured with database SQL helper functions which you can use in your database queries and 
+policies.
+
+----
+
+#### `storage.filename()`
+
+Returns the name of a file.
+
+```sql 
+select storage.filename(name)
+from storage.objects;
+```
+
+
+For example, if your file is stored in `public/subfolder/avatar.png` it would return:
+
+`'avatar.png'`
+
+----
+
+#### `storage.foldername()`
+
+Returns an array path, with all of the subfolders that a file belongs to.
+
+```sql 
+select storage.foldername(name)
+from storage.objects;
+```
+
+
+For example, if your file is stored in `public/subfolder/avatar.png` it would return:
+
+`[ 'public', 'subfolder' ]`
+
+----
+
+#### `storage.extension()`
+
+Returns the extension of a file.
+
+```sql 
+select storage.extension(name)
+from storage.objects;
+```
+
+For example, if your file is stored in `public/subfolder/avatar.png` it would return:
+
+`'png'`
+
+----
+
+
+
+## Security
+
+Supabase Storage is integrated with your [Postgres Database](/docs/guides/database).
+This means that you can use the same [Policy](http://localhost:3005/docs/guides/auth#policies) engine 
+for managing access to your files.
+
+
+## Policy Examples
+
+Here are some examples to show you the power of PostgreSQL's Row Level Security. Each policy is attached to a table, and the policy is executed
+every time a the table is accessed.
+
+### Allow public access to a bucket
+
+```sql
+-- 1. Allow public access to any files in the "public" bucket
+create policy "Public Access" 
+on storage.objects for select 
+using ( bucket_id = 'public' );
+```
+
+### Allow logged-in access to a bucket
+
+```sql
+-- 1. Allow logged-in access to any files in the "restricted" bucket
+create policy "Restricted Access" 
+on storage.objects for select 
+using ( 
+  bucket_id = 'restricted' 
+  and auth.role() = 'authenticated'
+);
+```
+
+### Allow individual access to a file
+
+```sql
+-- 1. Allow a user to access their own files
+create policy "Individual user Access" 
+on storage.objects for select 
+using ( auth.uid() = owner );
+```
+
+## Tips
+
+### Go Easy  
+
+Supabase Storage is in Alpha. If you're experiencing any issues, 
+let us know on our [GitHub](https://github.com/supabase/supabase/discussions) and we will fix it as fast as we can.
+
+
+## Next steps
+
+- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
+- Read more about storage in our [blog post](https://supabase.io/blog/2021/03/29/storage).
+- Sign in: [app.supabase.io](https://app.supabase.io)

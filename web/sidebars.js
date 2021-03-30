@@ -63,7 +63,13 @@ module.exports = {
       type: 'category',
       label: 'Getting Started',
       collapsed: false,
-      items: ['guides/platform', 'guides/database', 'guides/auth', 'guides/client-libraries'],
+      items: [
+        'guides/platform',
+        'guides/database',
+        'guides/auth',
+        'guides/storage',
+        'guides/client-libraries',
+      ],
     },
     {
       type: 'category',

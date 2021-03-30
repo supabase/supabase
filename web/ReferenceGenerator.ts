@@ -66,7 +66,7 @@ async function gen(inputFileName, outputDir) {
 
       const description =
         pageSpec.description || tsDocCommentToMdComment(getDescriptionFromDefintion(tsDefinition))
-      
+
       // Create page
       const content = Page({
         slug,
@@ -126,7 +126,7 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
 
   if (!!children) {
     let properties = children
-      .sort((a, b) => (a.name.localeCompare(b.name))) // first alphabetical
+      .sort((a, b) => a.name.localeCompare(b.name)) // first alphabetical
       .sort((a, b) => (a.flags?.isOptional ? 1 : -1)) // required params first
       .map((x) => recurseThroughParams(x))
     let heading = `<h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>`
@@ -225,10 +225,15 @@ function extractParamTypeAsString(paramDefinition) {
 function extractTsDocNode(nodeToFind: string, definition: any) {
   const nodePath = nodeToFind.split('.')
   let i = 0
+  let previousNode = definition 
   let currentNode = definition
   while (i < nodePath.length) {
-    currentNode = currentNode.children.find((x) => x.name == nodePath[i]) || null
-    if (currentNode == null) break
+    previousNode = currentNode
+    currentNode = previousNode.children.find((x) => x.name == nodePath[i]) || null
+    if (currentNode == null) {
+      console.log(`Cant find ${nodePath[i]} in ${previousNode.children.map((x) => '\n' + x.name)}`)
+      break
+    }
     i++
   }
   return currentNode
