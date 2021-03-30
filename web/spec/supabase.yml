@@ -64,9 +64,9 @@ info:
           - storage.from.list()
           - storage.from.update()
           - storage.from.move()
-          - storage.from.delete()
+          - storage.from.remove()
           - storage.from.createSignedUrl()
-          - storage.from.deleteFiles()
+          - storage.from.removeFiles()
       - name: 'Modifiers'
         items:
           - Using Modifiers
@@ -802,7 +802,7 @@ pages:
           
   storage.listBuckets():
     title: 'listBuckets()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.listBuckets'
+    $ref: '@supabase/supabase-js."lib/storage/StorageBucketApi".StorageBucketApi.listBuckets'
     examples:
       - name: List buckets
         isSpotlight: true
@@ -815,7 +815,7 @@ pages:
 
   storage.getBucket():
     title: 'getBucket()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.getBucket'
+    $ref: '@supabase/supabase-js."lib/storage/StorageBucketApi".StorageBucketApi.getBucket'
     examples:
       - name: Get bucket
         isSpotlight: true
@@ -828,7 +828,7 @@ pages:
 
   storage.createBucket():
     title: 'createBucket()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.createBucket'
+    $ref: '@supabase/supabase-js."lib/storage/StorageBucketApi".StorageBucketApi.createBucket'
     examples:
       - name: Create bucket
         isSpotlight: true
@@ -841,7 +841,7 @@ pages:
 
   storage.emptyBucket():
     title: 'emptyBucket()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.emptyBucket'
+    $ref: '@supabase/supabase-js."lib/storage/StorageBucketApi".StorageBucketApi.emptyBucket'
     examples:
       - name: Empty bucket
         isSpotlight: true
@@ -854,7 +854,7 @@ pages:
 
   storage.deleteBucket():
     title: 'deleteBucket()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.deleteBucket'
+    $ref: '@supabase/supabase-js."lib/storage/StorageBucketApi".StorageBucketApi.deleteBucket'
     examples:
       - name: Delete bucket
         isSpotlight: true
@@ -867,7 +867,7 @@ pages:
 
   storage.from.upload():
     title: 'from.upload()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.uploadFile'
+    $ref: '@supabase/supabase-js."lib/storage/StorageFileApi".StorageFileApi.upload'
     examples:
       - name: Upload file
         isSpotlight: true
@@ -882,7 +882,7 @@ pages:
 
   storage.from.update():
     title: 'from.update()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.updateFile'
+    $ref: '@supabase/supabase-js."lib/storage/StorageFileApi".StorageFileApi.update'
     examples:
       - name: Update file
         isSpotlight: true
@@ -897,7 +897,7 @@ pages:
 
   storage.from.move():
     title: 'from.move()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.moveFile'
+    $ref: '@supabase/supabase-js."lib/storage/StorageFileApi".StorageFileApi.move'
     examples:
       - name: Move file
         isSpotlight: true
@@ -911,7 +911,7 @@ pages:
 
   storage.from.createSignedUrl():
     title: 'from.createSignedUrl()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.createSignedUrl'
+    $ref: '@supabase/supabase-js."lib/storage/StorageFileApi".StorageFileApi.createSignedUrl'
     examples:
       - name: Update file
         isSpotlight: true
@@ -925,7 +925,7 @@ pages:
 
   storage.from.download():
     title: 'from.download()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.downloadFile'
+    $ref: '@supabase/supabase-js."lib/storage/StorageFileApi".StorageFileApi.download'
     examples:
       - name: Download file
         isSpotlight: true
@@ -937,9 +937,9 @@ pages:
             .download('avatar1.png', 60)
           ```
 
-  storage.from.delete():
-    title: 'from.delete()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.deleteFile'
+  storage.from.remove():
+    title: 'from.remove()'
+    $ref: '@supabase/supabase-js."lib/storage/StorageFileApi".StorageFileApi.remove'
     examples:
       - name: Delete file
         isSpotlight: true
@@ -948,26 +948,12 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .delete('avatar1.png')
-          ```
-
-  storage.from.deleteFiles():
-    title: 'from.deleteFiles()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.deleteFiles'
-    examples:
-      - name: Delete files
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .deleteFiles(['public/avatar1.png', 'public/avatar2.png'])
+            .remove(['avatar1.png'])
           ```
 
   storage.from.list():
     title: 'from.list()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageApi".StorageApi.listFiles'
+    $ref: '@supabase/supabase-js."lib/storage/StorageFileApi".StorageFileApi.list'
     examples:
       - name: List files in a bucket
         isSpotlight: true
