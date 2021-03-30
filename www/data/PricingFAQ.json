@@ -1,5 +1,9 @@
 [
   {
+    "question": "Do i get full access to my database?",
+    "answer": "Yes, you can create your own roles, set your timezone, etc, all through plain SQL."
+  },
+  {
     "question": "Is there a cap on the number of projects for the Free Tier?",
     "answer": "Yes, on the Free Tier you can have a maximum of two organizations, each with up to two projects. This means that you can have a maximum of four free projects in your account."
   },

@@ -4,7 +4,8 @@
     "icon": "M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4",
     "features": [
       {
-        "title": "Full Postgres Database",
+        "title": "Dedicated Postgres Database",
+        "tooltip": "A Postgres database with no restrictions? You get it. No pseudo limited users, you are the postgres root user.  No caveats.",
         "tiers": {
           "free": true,
           "pro": true,
@@ -55,7 +56,7 @@
       },
       {
         "title": "Pausing",
-        "tooltip": "Unused projects that have no activity will be shut down. They can be reactivated by logging into the dashboard",
+        "tooltip": "Unused projects that have no activity or API requests will be shut down. They can be reactivated by logging into the dashboard",
         "tiers": {
           "free": "Paused after 1 week inactivity",
           "pro": "Never",
@@ -132,6 +133,7 @@
       },
       {
         "title": "Transfer limits",
+        "tooltip": "Good news, only download operations are counted towards the limit",
         "tiers": {
           "free": "Up to 2 GB",
           "pro": "Up to 200 GB",

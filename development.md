@@ -25,3 +25,4 @@ In production, this setup runs as three separate vercel websites (`docs`, `www` 
 
 - Some hardcoding of `/new` in `www`. Should be fine as long as the basePath doesn't change.
 - Referencing resources in nested folders may not work for `web` (eg `/web/static/folder/nestedfolder/asset`) may not work.
+- Don't use `Link` since that adds `/new` to the links. Use plain `a` tags when possible.
