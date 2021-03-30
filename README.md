@@ -13,7 +13,7 @@
 - [x] Authentication and authorization
 - [x] Auto-generated APIs
 - [x] Dashboard
-- [ ] Storage (coming soon)
+- [x] Storage
 - [ ] Functions (coming soon)
 
 ## Documentation

@@ -21,9 +21,9 @@ const Hero = () => {
                     <Typography.Text>
                       <p className="mt-5 text-base sm:mt-5 lg:text-lg ">
                         Create a backend in less than 2 minutes. Start your project with a Postgres
-                        Database, Authentication, instant APIs, and realtime subscriptions.
+                        Database, Authentication, instant APIs, realtime subscriptions and Storage.
                       </p>
-                      <p className="mt-3 text-base">Storage and serverless functions coming soon</p>
+                      <p className="mt-3 text-base">Serverless functions coming soon</p>
                     </Typography.Text>
                     <Space>
                       <a href="https://app.supabase.io/api/login">
