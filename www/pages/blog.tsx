@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-import Link from 'next/link'
 
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
@@ -45,9 +44,9 @@ function Blog(props: any) {
       category === 'all'
         ? props.blogs
         : props.blogs.filter((post: any) => {
-          const found = post.tags.includes(category)
-          return found
-        })
+            const found = post.tags.includes(category)
+            return found
+          })
     )
   }, [category])
 
@@ -63,7 +62,7 @@ function Blog(props: any) {
       </Head>
       <NextSeo title="Blog" description="Latest news from the Supabase team." />
       <DefaultLayout>
-        <BlogHeader title='Blog' />
+        <BlogHeader title="Blog" />
         <div className="bg-gray-50 dark:bg-dark-800 overflow-hidden py-12">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
             <div className="mx-auto max-w-7xl">
@@ -103,7 +102,9 @@ function Blog(props: any) {
               </div>
               <div className="mt-12 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none">
                 {/* <ul> */}
-                {blogs.map((blog: PostTypes, idx: number) => <BlogListItem blog={blog} key={idx} />)}
+                {blogs.map((blog: PostTypes, idx: number) => (
+                  <BlogListItem blog={blog} key={idx} />
+                ))}
                 {/* </ul> */}
               </div>{' '}
             </div>
@@ -120,7 +121,7 @@ function FeaturedThumb(blog: PostTypes) {
 
   return (
     <div key={blog.slug} className="my-6 cursor-pointer">
-      <Link href={`/blog/${blog.url}`} as={`/blog/${blog.url}`}>
+      <a href={`/blog/${blog.url}`}>
         <a className="inline-block">
           <img
             className="h-96 w-full object-cover  border dark:border-dark-600"
@@ -142,13 +143,13 @@ function FeaturedThumb(blog: PostTypes) {
                 <Space className="block">
                   {blog.tags &&
                     blog.tags.map((tag: string) => (
-                      <Link href={`/blog/tags/${tag}`} as={`/blog/tags/${tag}`}>
+                      <a href={`/blog/tags/${tag}`}>
                         <a>
                           <Badge key={`${blog.slug}-${tag}-tag`} dot={false}>
                             {tag}
                           </Badge>
                         </a>
-                      </Link>
+                      </a>
                     ))}
                 </Space>
               </Space>
@@ -171,7 +172,7 @@ function FeaturedThumb(blog: PostTypes) {
             )}
           </Space>
         </a>
-      </Link>
+      </a>
     </div>
   )
 }
