@@ -6869,7 +6869,7 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "Retrieves the details of an existing Storage bucket."
+										"shortText": "Creates a new Storage bucket"
 									},
 									"parameters": [
 										{
@@ -8158,7 +8158,7 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "Retrieves the details of an existing Storage bucket."
+										"shortText": "Creates a new Storage bucket"
 									},
 									"parameters": [
 										{
