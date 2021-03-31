@@ -101,7 +101,7 @@ At Supabase, we do have one strong preference. We like schema "diffing" over "ma
 Manual migrations work like this:
 
 - A developer thinks about all the changes they want to make to their database
-- They write create a SQL script which will cause those changes
+- They create a SQL script which will cause those changes
 - They run that script on their database
 
 After a while though, these scripts pile up - the `migrations` folder can contain hundreds of migration scripts. This method is also "version control" on top of another version control system (i.e. git).
@@ -127,7 +127,7 @@ After evaluating these OSS tools:
 
 We found that the most complete one was the pgAdmin Schema Diff, migra came a close second.
 
-The deciding factor was if the tool could track a owner change for a VIEW.
+The deciding factor was if the tool could track an owner change for a VIEW.
 
 ```sql
 ALTER VIEW my_view OWNER TO authenticated;
