@@ -1,62 +1,33 @@
 ---
 id: self-hosting
-title: Local Development and Self Hosting
-description: How to use.
+title: Self Hosting
+description: How to use configure and deploy Supabase.
 ---
 
+Supabase is a [Hosted Platform](https://app.supabase.io), so you don't _have_ to deploy it yourself. 
+However, if you _want_ to configure and deploy it yourself, this is also possible.
 
-You can develop an application either locally and deploy to a service of your choice, or using our hosted platform.
 
-## Local development 
 
-Local development (will be released 1 April). Our CLI makes heavy use of [Docker](https://www.docker.com/), so make sure it is installed and configured on your machine before starting.
+## Get the Docker Compose
 
-### Install our CLI
+You can download this Docker set up to your local machine in various ways:
+
+### Option 1: Using our CLI 
+
+Make sure the CLI is installed:
 
 ```bash
 npm install -g supabase
 ```
 
-### Initialize your project 
-
-```bash
-supabase init 
-```
-
-This command will create a `.supabase` folder which holds all the configuration for developing your project locally.
-
-### Start  
-
-```bash
-supabase start 
-```
-
-This command uses Docker Compose to start all the services that make up Supabase. You can find the full Docker Compose [in our repo](https://github.com/supabase/supabase/blob/master/docker). 
-
-### Stop  
-
-```bash
-supabase stop 
-```
-
-## Self hosting
-
-Every Supabase project is an amalgamation of open source tools. We provide a [Docker Compose](https://github.com/supabase/supabase/blob/master/docker) setup which makes it simple to get started.
-
-
-### Get the Docker Compose
-
-You can download this Docker set up to your local machine in various ways:
-
-#### Using our CLI (will be released 1 April).
+Then run in any folder to create a `docker` folder with a `docker-compose.yml`:
 
 ```bash
 supabase eject
 ```
 
-Run this in any folder to create a `docker` folder with a `docker-compose.yml`
-
-#### Clone our repo
+### Option 2: Clone our repo
 
 ```bash
 # 1. Copy an empty repo
@@ -66,7 +37,7 @@ git clone https://github.com/supabase/supabase
 cd supabase/docker
 ```
 
-#### Using a shallow clone
+### Option 3: Using a shallow clone
 
 If you use Git version >2.25, you can use a shallow clone to download this folder to your local machine:
 
@@ -80,7 +51,7 @@ cd supabase
 # 3. Initialize sparse-checkout
 git sparse-checkout init --cone
 
-#4. Checkout the folder
+# 4. Checkout the folder
 git sparse-checkout set docker
 ```
 

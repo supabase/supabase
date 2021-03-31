@@ -74,6 +74,7 @@ module.exports = {
         'guides/auth',
         'guides/storage',
         'guides/client-libraries',
+        'guides/local-development',
         'guides/self-hosting',
       ],
     },
