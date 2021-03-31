@@ -17,67 +17,57 @@ services:
       - ${AUTH_PORT}
     depends_on:
       - db
-    environment:
-      GOTRUE_JWT_SECRET: ${JWT_SECRET}
-      GOTRUE_JWT_EXP: 3600
-      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
-      GOTRUE_DB_DRIVER: postgres
-      DB_NAMESPACE: auth
-      API_EXTERNAL_URL: localhost
-      GOTRUE_API_HOST: 0.0.0.0
-      PORT: ${AUTH_PORT}
-
-      GOTRUE_SMTP_HOST: ${SMTP_HOST}
-      GOTRUE_SMTP_PORT: ${SMTP_PORT}
-      GOTRUE_SMTP_USER: ${SMTP_USER}
-      GOTRUE_SMTP_PASS: ${SMTP_PASS}
-
-      GOTRUE_DISABLE_SIGNUP: 'false'
-      GOTRUE_SITE_URL: localhost
-      GOTRUE_MAILER_AUTOCONFIRM: 'true'
-      GOTRUE_LOG_LEVEL: DEBUG
-      GOTRUE_OPERATOR_TOKEN: ${OPERATOR_TOKEN}
-      DATABASE_URL: 'postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres?sslmode=disable'
-
-  rest:
-    container_name: supabase-rest
-    image: postgrest/postgrest:latest
-    ports:
-      - ${REST_PORT}:3000
-    depends_on:
+      restart: always
+      environment:
+          PGRST_DB_URI: postgres://postgres:postgres@db:5432/postgres
+          PGRST_DB_SCHEMA: public, storage
+          PGRST_DB_ANON_ROLE: postgres
+          PGRST_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+    realtime:
+      image: supabase/realtime:latest
+      ports:
+        - '4000:4000'
+      depends_on:
       - db
-    restart: always
-    environment:
-      PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres
-      PGRST_DB_SCHEMA: public
-      PGRST_DB_ANON_ROLE: anon
-      PGRST_JWT_SECRET: ${JWT_SECRET}
-  realtime:
-    container_name: supabase-realtime
-    image: supabase/realtime:latest
-    ports:
-      - ${REALTIME_PORT}
-    depends_on:
+      restart: on-failure
+      environment:
+          DB_HOST: db
+          DB_NAME: postgres
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_PORT: 5432
+          PORT: 4000
+          HOSTNAME: localhost
+          # Disable JWT Auth locally. The JWT_SECRET will be ignored.
+          SECURE_CHANNELS: 'false'
+          JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+    storage:
+      image: supabase/storage-api:v0.1.4
+      ports:
+        - '5000:5000'
+      depends_on:
       - db
-    restart: on-failure
-    environment:
-      DB_HOST: db
-      DB_NAME: postgres
-      DB_USER: postgres
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_PORT: ${POSTGRES_PORT}
-      PORT: ${REALTIME_PORT}
-      HOSTNAME: localhost
-      # Disable JWT Auth locally. The JWT_SECRET will be ignored.
-      SECURE_CHANNELS: 'false'
-      JWT_SECRET: ${JWT_SECRET}
-  db:
-    container_name: supabase-db
-    build:
-      context: ./dockerfiles/postgres
-    ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
-    command:
+      - rest
+      restart: on-failure
+      environment:
+          ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxMzUzMTk4NSwiZXhwIjoxOTI5MTA3OTg1fQ.ReNhHIoXIOa-8tL1DO3e26mJmOTnYuvdgobwIYGzrLQ
+          SERVICE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaWF0IjoxNjEzNTMxOTg1LCJleHAiOjE5MjkxMDc5ODV9.FhK1kZdHmWdCIEZELt0QDCw6FIlCS8rVmp4RzaeI2LM
+          PROJECT_REF: bjwdssmqcnupljrqypxz # can be any random string
+          REGION: us-east-1 # region where your bucket is located
+          POSTGREST_URL: http://rest:3000
+          GLOBAL_S3_BUCKET: supa-storage-testing  # name of s3 bucket where you want to store objects
+          PGRST_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+          DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
+          PGOPTIONS: "-c search_path=storage"
+          AWS_ACCESS_KEY_ID: replace-with-your-aws-key
+          AWS_SECRET_ACCESS_KEY: replace-with-your-aws-secret
+          FILE_SIZE_LIMIT: 52428800
+    db:
+      build:
+          context: ./postgres
+      ports:
+      - 5432:5432
+      command:
       - postgres
       - -c
       - wal_level=logical
