@@ -20,11 +20,12 @@ Our CLI is still under heavy development, and is missing features which will dep
 
 Our CLI makes heavy use of [Docker Compose](https://docs.docker.com/compose/install), so make sure it is installed and configured on your machine before starting.
 
+You will also need to install [Node]() and [NPM](). In the future we will make our CLI available on `brew` and `apt`.
+
 ## Install the CLI
 
 ```bash
-npx create-react-app react-demo --use-npm
-cd create-react-app
+npm install -g supabase
 ```
 
 
@@ -44,7 +45,7 @@ Supabase URL: http://localhost:8000
 Supabase Key: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJhdWQiOiIiLCJzdWIiOiIiLCJSb2xlIjoicG9zdGdyZXMifQ.magCcozTMKNrl76Tj2dsM7XTl_YH0v0ilajzAvIlw3U
 Database URL: postgres://postgres:postgres@localhost:5432/postgres
 
-Run supabase start to start the local emulator.
+Run supabase start to start local Supabase.
 ```
 
 This command will create a `.supabase` folder which holds all the configuration for developing your project locally. You don't need to check this into version control. 
@@ -127,7 +128,7 @@ This quick start will show you how you can configure a React app which uses Supa
 
 ```bash
 # create a fresh React app
-npx create-react-app react-demo
+npx create-react-app react-demo --use-npm
 
 # move into the new folder
 cd react-demo
