@@ -146,7 +146,7 @@ module.exports = {
           items: [
             {
               label: 'Blog',
-              to: '/blog',
+              to: 'https://supabase.io/blog',
             },
             {
               label: 'Open source',
@@ -171,7 +171,7 @@ module.exports = {
             },
             {
               label: 'Pricing',
-              to: '/docs/pricing',
+              to: 'https://supabase.io/pricing',
             },
             {
               label: 'Support',

@@ -240,7 +240,7 @@ create table comments (
   comment_date  date      not null     default now()
 );
 
-create policy "Creator can see thier own posts"
+create policy "Creator can see their own posts"
 on posts
 for select
 using (
