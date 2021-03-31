@@ -1,8 +1,8 @@
-import React from 'react'
-import Link from 'next/link'
-import { Typography, Badge, Space } from '@supabase/ui'
-import PostTypes from '~/types/post'
+import { Badge, Space, Typography } from '@supabase/ui'
 import authors from 'lib/authors.json'
+import Link from 'next/link'
+import React from 'react'
+import PostTypes from '~/types/post'
 
 interface Props {
   blog: PostTypes
@@ -14,7 +14,7 @@ const BlogListItem = ({ blog }: Props) => {
   return (
     <div key={blog.slug} className="pt-4 pb-12 border-b border-gray-100 dark:border-gray-600 mb-8">
       <div className="mx-auto max-w-7xl cursor-pointer">
-        <Link href={`/blog/${blog.url}`} as={`/blog/${blog.url}`}>
+        <a href={`/blog/${blog.url}`}>
           <a className="inline-block">
             <Space direction="vertical" size={5} className="">
               <div>
@@ -65,7 +65,7 @@ const BlogListItem = ({ blog }: Props) => {
               <Typography.Link>Read more</Typography.Link> */}
             </Space>
           </a>
-        </Link>
+        </a>
       </div>
     </div>
   )
