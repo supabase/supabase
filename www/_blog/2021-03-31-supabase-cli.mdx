@@ -63,7 +63,7 @@ supabase init
 # Database URL: postgres://postgres:postgres@localhost:5432/postgres 
 ```
 
-Now that your application is now prepared, you can use Supabase anywhere in your application:
+Now that your application is now prepared, you can use Supabase anywhere in your application (for example, `App.js`):
 
 ```jsx
 import { createClient } from '@supabase/supabase-js'
@@ -72,7 +72,7 @@ const SUPABASE_ANON_KEY = SUPABASE_ANON_KEY
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 ```
 
-Copy this snippet into `App.js`, and then start the backend and the frontend:
+Then start the backend and the frontend:
 
 ```bash
 supabase start  # Start Supabase
