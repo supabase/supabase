@@ -5,7 +5,24 @@ info:
   title: Getting started
   description: |
 
-    Supabase CLI.
+    The Supabase CLI can be found in our [CLI](https://github.com/supabase/cli) repository.
+
+    The CLI is still under heavy development, but it will contain all the functionality for working with Supabase projects and the Supabase platform.
+
+    - [x] Running Supabase locally
+    - [x] Self-hosting
+    - [ ] Managing database migrations (in progress)
+    - [ ] Pushing your local changes to production
+    - [ ] Manage your Supabase Account
+    - [ ] Manage your Supabase Projects
+    - [ ] Generating types directly from your database schema
+    - [ ] Generating API and validation schemas from your database
+
+    ## Installing the CLI
+
+    ```bash
+    npm install supabase -g
+    ```
 
   definition: spec/combined.json
   libraries:
@@ -18,40 +35,62 @@ info:
       - name: 'About'
         items:
           - index
-          - supa init
+          - supabase init
       - name: 'Local Development'
         items:
-          - supa dev
-          - supa eject
+          - supabase start
+          - supabase stop
+          - supabase eject
 
 pages:
-  supa init:
+  supabase init:
     description: |
-      init
+      ```bash
+      supabase init
+      ```
 
-    examples:
-      - name: supa init
-        sh: |
-          ```sh
-          supa init
-          ```
-  supa dev:
+      This command will create a .supabase folder which holds all the configuration for developing your project locally. You don't need to check this into version control.
+
+      After you run `supabase init` you will be guided through a series of questions, and if everything went well, you will see an output similar to this:
+
+      ```txt
+      ✔ Port for Supabase URL: · 8000
+      ✔ Port for PostgreSQL database: · 5432
+      ✔ Project initialized.
+      Supabase URL: http://localhost:8000
+      Supabase Key: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJhdWQiOiIiLCJzdWIiOiIiLCJSb2xlIjoicG9zdGdyZXMifQ.magCcozTMKNrl76Tj2dsM7XTl_YH0v0ilajzAvIlw3U
+      Database URL: postgres://postgres:postgres@localhost:5432/postgres
+
+      Run supabase start to start the local emulator.
+      ```
+
+  supabase start:
     description: |
-      dev
+      ```bash
+      supabase start
+      ```
 
-    examples:
-      - name: supa dev
-        sh: |
-          ```sh
-          supa dev
-          ```
-  supa eject:
+      This command uses Docker Compose to start all the open sources [services](/docs/#how-it-works) of Supabase. This command will take a while to run, there are a lot of services to build.
+
+      Once this is running, you will see the healthy services in Docker Dashboard:
+
+      ![Docker Supabase](/img/docker-supabase.png)
+
+  supabase stop:
     description: |
-      eject
+      ```bash
+      supabase stop
+      ```
 
-    examples:
-      - name: supa eject
-        sh: |
-          ```sh
-          supa eject
-          ```
+      When you are finished with Supabase, run `supabase stop` to stop the Docker services.
+
+  supabase eject:
+    description: |
+      ```bash
+      supabase eject
+      ```
+      
+      Run in any folder to create a `docker` folder with a `docker-compose.yml`. This is useful for self-hosting or adding custom configuration. 
+
+      See our [Self Hosting](/docs/guides/self-hosting) docs for more details.
+
