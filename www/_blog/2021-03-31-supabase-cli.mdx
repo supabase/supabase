@@ -176,7 +176,7 @@ On these [lines](https://gist.github.com/steve-chavez/3f286a233806aeee0bcea4a47f
 Also, similarly to the pgAdmin GUI:
 
 - You can include and exclude database objects from the diff with `--include-objects` or `--exclude-objects`
-- You can choose a single schema to diff with the `--schema` argument. We recommend you do this for Supabase databases. Diffing the whole database can take a while because of the `extensions` schema (especially if you enable PostGIS, which adds many functions).
+- You can choose a single schema to diff with the `--schema` argument or you can pick different schemas to compare with the --source-schema and --target-schema arguments. We recommend you do this for Supabase databases. Diffing the whole database can take a while because of the `extensions` schema (especially if you enable PostGIS, which adds many functions).
 
 ### Next steps
 
