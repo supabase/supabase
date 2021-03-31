@@ -146,7 +146,7 @@ module.exports = {
           items: [
             {
               label: 'Blog',
-              to: '/blog',
+              to: 'https://supabase.io/blog',
             },
             {
               label: 'Open source',
