@@ -129,7 +129,7 @@ We found that the most complete one was the pgAdmin Schema Diff, migra came a cl
 The deciding factor was if the tool could track a owner change for a VIEW.
 
 ```sql
-ALTER VIEW my_view OWNER authenticated;
+ALTER VIEW my_view OWNER TO authenticated;
 ```
 
 This is critical for Row Level Security to work with views. For policies to kick in on views, the owner must not have `superuser` or `bypassrls` privileges. Currently migra doesn't track this change ([issue](https://github.com/djrobstep/migra/issues/160)), while the pgAdmin Schema Diff does.
