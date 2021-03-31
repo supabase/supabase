@@ -171,7 +171,7 @@ module.exports = {
             },
             {
               label: 'Pricing',
-              to: '/docs/pricing',
+              to: 'https://supabase.io/pricing',
             },
             {
               label: 'Support',
