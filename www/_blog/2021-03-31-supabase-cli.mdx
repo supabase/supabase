@@ -27,7 +27,7 @@ Here are some of the items we have completed so far.
 
 You can now run Supabase on your local machine, using Docker Compose. This Docker setup is 100% compatible with every project on Supabase - the tools used for local development are exactly the same as production.
 
-We have released a full set of documentation [here](https://supabase.io/docs/guides/local-development). In this post we thought it would be useful to highlight how easy it is to get started. 
+We have released a full set of documentation [here](https://supabase.io/docs/guides/local-development). In this post we thought it would be useful to highlight how easy it is to get started.
 
 A lot of Supabase developers are familiar with React, so here are the steps you would use to create a new React project which uses Supabase as a backend.
 
@@ -60,7 +60,7 @@ supabase init
 # ✔ Project initialized.
 # Supabase URL: http://localhost:8000
 # Supabase Key: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJhdWQiOiIiLCJzdWIiOiIiLCJSb2xlIjoicG9zdGdyZXMifQ.magCcozTMKNrl76Tj2dsM7XTl_YH0v0ilajzAvIlw3U
-# Database URL: postgres://postgres:postgres@localhost:5432/postgres 
+# Database URL: postgres://postgres:postgres@localhost:5432/postgres
 ```
 
 Now that your application is now prepared, you can use Supabase anywhere in your application (for example, `App.js`):
@@ -91,7 +91,7 @@ Database Migrations are a process to "change" your database schema. In a NoSQL d
 
 Just like an application though, a database schema needs to be constantly updated. And that's where migrations fit! Migrations are simply a set of SQL scripts which change your database schema.
 
-There is one problem however: there is [no "right" way](https://news.ycombinator.com/item?id=21405501) to do migrations. 
+There is one problem however: there is [no "right" way](https://news.ycombinator.com/item?id=21405501) to do migrations.
 
 ### Diffs
 
@@ -103,7 +103,7 @@ Manual migrations work like this:
 - They write create a SQL script which will cause those changes
 - They run that script on their database
 
-After a while though, these scripts pile up - the `migrations` folder can contain hundreds of migration scripts. This method is also "version control" on top of another version control system (i.e. git). 
+After a while though, these scripts pile up - the `migrations` folder can contain hundreds of migration scripts. This method is also "version control" on top of another version control system (i.e. git).
 
 A "diff" tool works like this:
 
@@ -180,19 +180,19 @@ Also, similarly to the pgAdmin GUI:
 
 ### Next steps
 
-Once we have added logins to the CLI, we will be able to use Migrations to create a seamless workflow between local development and your production database. 
+Once we have added logins to the CLI, we will be able to use Migrations to create a seamless workflow between local development and your production database.
 
-Also, the pgAdmin team has showed [interest](https://www.postgresql.org/message-id/CA%2BOCxoyjZhV9stFMAQ-QhHuA0%2BdLQD5XD_YT%2BQo2vY0GhkBKFw%40mail.gmail.com) in including our Schema Diff CLI in the official pgAdmin. We'll be working with them to include this change upstream to benefit the whole community. 
+Also, the pgAdmin team has showed [interest](https://www.postgresql.org/message-id/CA%2BOCxoyjZhV9stFMAQ-QhHuA0%2BdLQD5XD_YT%2BQo2vY0GhkBKFw%40mail.gmail.com) in including our Schema Diff CLI in the official pgAdmin. We'll be working with them to include this change upstream to benefit the whole community.
 
 ## Self Hosting
 
-Finally, we are adding one critical command to our CLI for everybody who wants to self-host: 
+Finally, we are adding one critical command to our CLI for everybody who wants to self-host:
 
 ```bash
 supabase eject
 ```
 
-This gives you everything you need to run the Supabase stack. 
+This gives you everything you need to run the Supabase stack.
 
 After running the command inside the terminal, you will see three items:
 
@@ -220,4 +220,4 @@ Head over to the [Self Hosting Docs](https://docs-git-docs-self-hosting-supabase
 
 If you require any assistance feel free to reach out in our [github discussions](https://github.com/supabase/supabase/discussions) or at beta@supabase.io.
 
-Check out what else we've [launched this week](https://supabase.io/new/blog/2021/03/25/launch-week), contribute to the [CLI repo](https://github.com/supabase/cli), or go here for the [hosted version](https://app.supabase.io).
+Check out what else we've [launched this week](https://supabase.io/blog/2021/03/25/launch-week), contribute to the [CLI repo](https://github.com/supabase/cli), or go here for the [hosted version](https://app.supabase.io).
