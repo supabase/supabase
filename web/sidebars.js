@@ -9,7 +9,7 @@ const goTrueClient = require('./sidebar_spec_gotrue')
 const postgrestClient = require('./sidebar_spec_postgrest')
 const realtimeClient = require('./sidebar_spec_realtime')
 const supabaseClient = require('./sidebar_spec_supabase')
-// const supabaseCli = require('./sidebar_spec_cli')
+const supabaseCli = require('./sidebar_spec_cli')
 const postgres = require('./sidebar_spec_postgres')
 
 module.exports = {
@@ -50,12 +50,12 @@ module.exports = {
       collapsed: false,
       items: postgres.docs,
     },
-    // {
-    //   type: 'category',
-    //   label: 'CLI',
-    //   collapsed: false,
-    //   items: supabaseCli.docs,
-    // },
+    {
+      type: 'category',
+      label: 'CLI',
+      collapsed: false,
+      items: supabaseCli.docs,
+    },
   ],
   docs: [
     {
