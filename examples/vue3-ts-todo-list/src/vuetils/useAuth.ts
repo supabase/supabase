@@ -33,7 +33,7 @@ async function handleLogin(credentials: Credentials) {
 async function handleSignup(credentials: Credentials) {
   try {
     const { email, password } = credentials
-    // prompt user if they have not filled populated thier credentials
+    // prompt user if they have not filled populated their credentials
     if (!email || !password) {
       alert('Please provide both your email and password.')
       return
