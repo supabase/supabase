@@ -23,3 +23,8 @@
 .code-block code .linenumber {
   margin-right: 4px;
 }
+
+.code-block code::after,
+.code-block code::before {
+  content: none !important;
+}
