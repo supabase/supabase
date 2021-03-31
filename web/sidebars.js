@@ -58,7 +58,12 @@ module.exports = {
     // },
   ],
   docs: [
-    { type: 'category', label: 'Introduction', items: ['about', 'faq'], collapsed: false },
+    {
+      type: 'category',
+      label: 'Introduction',
+      items: ['about', 'faq'],
+      collapsed: false,
+    },
     {
       type: 'category',
       label: 'Getting Started',
@@ -69,6 +74,7 @@ module.exports = {
         'guides/auth',
         'guides/storage',
         'guides/client-libraries',
+        'guides/self-hosting',
       ],
     },
     {
