@@ -56,7 +56,7 @@ git sparse-checkout init --cone
 git sparse-checkout set docker
 ```
 
-### Running Supabase
+## Running Supabase
 
 Now that you have the Docker set up on your local machine, you can start it here by running 
 
@@ -64,7 +64,7 @@ Now that you have the Docker set up on your local machine, you can start it here
 docker-compose up
 ```
 
-### Configuring each service
+## Configuring each service
 
 Supabase is made up of several services. We have prefilled the `docker-compose` file with all the configuration you need to get started. 
 If you would like to change any of the configuration, you can update the env variables in the `docker-compose` file.
@@ -77,8 +77,25 @@ Here are a list of environment variables for each service:
 - [GoTrue](https://github.com/supabase/gotrue)
 - [Kong](https://docs.konghq.com/install/docker/)
 
+### Configuring email 
 
-### Deploying
+GoTrue requires an SMTP server to send emails for all authentication actions. 
+You will need to provide the following [settings](https://github.com/supabase/gotrue#e-mail) inside the `docker-compose.yml` under `services.auth.environment`:
+
+- `GOTRUE_SMTP_HOST` - The mail server hostname to send emails through.
+- `GOTRUE_SMTP_PORT` - The port number to connect to the mail server on.
+- `GOTRUE_SMTP_USER` - If the mail server requires authentication, the username to use.
+- `GOTRUE_SMTP_PASS` - If the mail server requires authentication, the password to use.
+
+### API Keys 
+
+All config for the API Gateway is stored in the `kong` directory. Inside `kong.yml` you'll find the routing for all services, the routing rules, 
+and down the bottom you'll find the JWTs capable of accessing services that require API Key access.
+
+See the full docs [here](https://docs.konghq.com/hub/kong-inc/key-auth/).
+
+
+## Deploying
 
 See the following guides to deploy Docker Compose setup using your preferred tool and platform: 
 
