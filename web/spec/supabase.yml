@@ -937,7 +937,7 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .move('pubic/avatar1.png', 'private/avatar2.png')
+            .move('public/avatar1.png', 'private/avatar2.png')
           ```
 
   storage.from.createSignedUrl():

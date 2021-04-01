@@ -59,7 +59,8 @@ supabase init
 # ✔ Port for PostgreSQL database: · 5432
 # ✔ Project initialized.
 # Supabase URL: http://localhost:8000
-# Supabase Key: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJhdWQiOiIiLCJzdWIiOiIiLCJSb2xlIjoicG9zdGdyZXMifQ.magCcozTMKNrl76Tj2dsM7XTl_YH0v0ilajzAvIlw3U
+# Supabase Key (anon, public): eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJyb2xlIjoiYW5vbiJ9.36fUebxgx1mcBo4s19v0SzqmzunP--hm_hep0uLX0ew
+# Supabase Key (service_role, private): eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJyb2xlIjoiYW5vbiJ9.36fUebxgx1mcBo4s19v0SzqmzunP--hm_hep0uLX0ew
 # Database URL: postgres://postgres:postgres@localhost:5432/postgres
 ```
 
@@ -68,7 +69,7 @@ Now that your application is now prepared, you can use Supabase anywhere in your
 ```jsx
 import { createClient } from '@supabase/supabase-js'
 const SUPABASE_URL = 'http://localhost:8000'
-const SUPABASE_ANON_KEY = SUPABASE_ANON_KEY
+const SUPABASE_ANON_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJyb2xlIjoiYW5vbiJ9.36fUebxgx1mcBo4s19v0SzqmzunP--hm_hep0uLX0ew'
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 ```
 
@@ -100,7 +101,7 @@ At Supabase, we do have one strong preference. We like schema "diffing" over "ma
 Manual migrations work like this:
 
 - A developer thinks about all the changes they want to make to their database
-- They write create a SQL script which will cause those changes
+- They create a SQL script which will cause those changes
 - They run that script on their database
 
 After a while though, these scripts pile up - the `migrations` folder can contain hundreds of migration scripts. This method is also "version control" on top of another version control system (i.e. git).
@@ -126,7 +127,7 @@ After evaluating these OSS tools:
 
 We found that the most complete one was the pgAdmin Schema Diff, migra came a close second.
 
-The deciding factor was if the tool could track a owner change for a VIEW.
+The deciding factor was if the tool could track an owner change for a VIEW.
 
 ```sql
 ALTER VIEW my_view OWNER TO authenticated;
