@@ -20,7 +20,7 @@ We started Supabase because we love the functionality of Firebase, but we person
 
 ### How do I host Supabase?
 
-Supabase is an amalgamation of 5 open source tools (and growing). Some of these tools are made by Supabase (like our [Realtime Server](https://github.com/supabase/realtime)), some we support indirectly (like [PostgREST](http://postgrest.org/en/v7.0.0/)), and some are 3rd-party tools (like [Kong](https://github.com/Kong/kong)). All of the tools we use in Supabase are MIT, Apache 2.0, or PostgreSQL licensed. You can use the docker-compose script [here](https://github.com/supabase/supabase/tree/master/docker) to build Supabase on your own environment.
+Supabase is an amalgamation of 5 open source tools (and growing). Some of these tools are made by Supabase (like our [Realtime Server](https://github.com/supabase/realtime)), some we support indirectly (like [PostgREST](http://postgrest.org/en/v7.0.0/)), and some are 3rd-party tools (like [Kong](https://github.com/Kong/kong)). All of the tools we use in Supabase are MIT, Apache 2.0, or PostgreSQL licensed. You can use the docker-compose script [here](https://github.com/supabase/supabase/tree/master/docker) to build Supabase on your own environment, and find detailed instructions [here](/docs/guides/self-hosting).
 
 ### Do you support `[some other database]`?
 
