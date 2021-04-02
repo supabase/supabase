@@ -1,48 +1,37 @@
-import { useState } from 'react'
-import { useRouter } from 'next/router'
-
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import ProductHeader from '~/components/Sections/ProductHeader'
-
 import {
   Badge,
   Button,
   IconArrowUpRight,
-  IconLock,
-  IconShield,
   IconShuffle,
   IconX,
   Space,
   Tabs,
   Typography,
 } from '@supabase/ui'
-
-import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { Controller } from 'swiper'
-
-// Import Swiper styles
-import 'swiper/swiper.min.css'
-import ImageCarousel from '~/components/Carousels/ImageCarousel'
-import APISection from '~/components/Sections/APISection'
-import GithubExamples from '~/components/Sections/GithubExamples'
-import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
-import FloatingIcons from '~/components/FloatingIcons'
-
 // data
 import ApiExamplesData from 'data/products/database/api-examples'
 import ExtensionsExamplesData from 'data/products/database/extensions-examples'
-
-import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
 import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
-
-import TweetCard from '~/components/TweetCard'
-import FeatureColumn from '~/components/FeatureColumn'
-
+import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
 import Solutions from 'data/Solutions.json'
-import ProductIcon from '~/components/ProductIcon'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+// Import Swiper styles
+import 'swiper/swiper.min.css'
+import ImageCarousel from '~/components/Carousels/ImageCarousel'
+import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
+import FeatureColumn from '~/components/FeatureColumn'
+import FloatingIcons from '~/components/FloatingIcons'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import ProductIcon from '~/components/ProductIcon'
+import APISection from '~/components/Sections/APISection'
+import GithubExamples from '~/components/Sections/GithubExamples'
+import ProductHeader from '~/components/Sections/ProductHeader'
+import TweetCard from '~/components/TweetCard'
 
 // install Swiper's Controller component
 // SwiperCore.use([Controller])
@@ -75,7 +64,7 @@ function Database() {
           url: `${basePath}/auth`,
           images: [
             {
-              url: `https://supabase.io/${basePath}/images/product/database/database-og.jpg`,
+              url: `https://supabase.io${basePath}/images/product/database/database-og.jpg`,
             },
           ],
         }}

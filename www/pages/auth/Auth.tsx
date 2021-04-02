@@ -1,46 +1,32 @@
-import { useRouter } from 'next/router'
-
+import { createClient } from '@supabase/supabase-js'
 import {
   Button,
-  Auth,
-  Card,
-  Space,
-  Tabs,
-  Typography,
-  IconCode,
-  IconZoomIn,
-  IconCopy,
-  IconKey,
+  IconArrowUpRight,
   IconBriefcase,
   IconEye,
-  IconX,
-  IconDatabase,
-  IconShield,
+  IconKey,
   IconLink,
-  IconArrowUpRight,
+  IconShield,
+  IconX,
+  Space,
+  Typography,
 } from '@supabase/ui'
-import { createClient } from '@supabase/supabase-js'
-import DefaultLayout from '~/components/Layouts/Default'
-
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import ProductHeader from '~/components/Sections/ProductHeader'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-
-import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
-import APISection from '~/components/Sections/APISection'
-import GithubExamples from '~/components/Sections/GithubExamples'
-import FeatureColumn from '~/components/FeatureColumn'
-import FloatingIcons from '~/components/FloatingIcons'
-
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
-
-import CTABanner from '~/components/CTABanner'
-
 import Solutions from 'data/Solutions.json'
-import AuthComponentExample from '~/components/AuthWidget/AuthComponentExample'
-import Link from 'next/link'
 import { NextSeo } from 'next-seo'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import AuthComponentExample from '~/components/AuthWidget/AuthComponentExample'
+import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
+import CTABanner from '~/components/CTABanner'
+import FeatureColumn from '~/components/FeatureColumn'
+import FloatingIcons from '~/components/FloatingIcons'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import APISection from '~/components/Sections/APISection'
+import GithubExamples from '~/components/Sections/GithubExamples'
+import ProductHeader from '~/components/Sections/ProductHeader'
 
 function AuthPage() {
   // base path for images
@@ -67,7 +53,7 @@ function AuthPage() {
           url: `${basePath}/auth`,
           images: [
             {
-              url: `https://supabase.io/${basePath}/images/product/auth/auth-og.jpg`,
+              url: `https://supabase.io${basePath}/images/product/auth/auth-og.jpg`,
             },
           ],
         }}
