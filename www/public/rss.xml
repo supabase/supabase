@@ -5,9 +5,33 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 31 Mar 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 01 Apr 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.io/blog/2021/04/02/supabase-workflows</guid>
+  <title>Workflows are coming to Supabase</title>
+  <link>https://supabase.io/blog/2021/04/02/supabase-workflows</link>
+  <description>Functions are great, but you know what's better?</description>
+  <pubDate>Thu, 01 Apr 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/04/02/supabase-pgbouncer</guid>
+  <title>PgBouncer is now available in Supabase</title>
+  <link>https://supabase.io/blog/2021/04/02/supabase-pgbouncer</link>
+  <description>Better support for Serverless and Postgres.</description>
+  <pubDate>Thu, 01 Apr 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/04/02/supabase-dot-com</guid>
+  <title>Supabase Dot Com</title>
+  <link>https://supabase.io/blog/2021/04/02/supabase-dot-com</link>
+  <description>The Supabase Domain name is changing.</description>
+  <pubDate>Thu, 01 Apr 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.io/blog/2021/04/01/supabase-nft-marketplace</guid>
   <title>Supabase Launches NFT Marketplace</title>
