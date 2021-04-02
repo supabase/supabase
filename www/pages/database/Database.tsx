@@ -61,7 +61,7 @@ function Database() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `${basePath}/auth`,
+          url: `https://supabase.io/auth`,
           images: [
             {
               url: `https://supabase.io${basePath}/images/product/database/database-og.jpg`,
