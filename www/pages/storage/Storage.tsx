@@ -156,7 +156,7 @@ function AuthPage() {
               <ExampleCard
                 type={'example'}
                 products={['database', 'auth', 'storage']}
-                title={'Profile managment example'}
+                title={'Profile management example'}
                 description={
                   'Update a user account with public profile information, including uploading a profile image.'
                 }
