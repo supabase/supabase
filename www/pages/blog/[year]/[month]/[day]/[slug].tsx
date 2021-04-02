@@ -17,9 +17,6 @@ import { generateReadingTime } from '~/lib/helpers'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import blogStyles from './[slug].module.css'
 
-
-
-
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
 const components = {
@@ -147,7 +144,7 @@ function BlogPostPage(props: any) {
         openGraph={{
           title: props.blog.title,
           description: props.blog.description,
-          url: `${basePath}/blog/${props.blog.slug}`,
+          url: `https://supabase.io/blog/${props.blog.slug}`,
           type: 'article',
           article: {
             //

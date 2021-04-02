@@ -43,7 +43,7 @@ function AuthPage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `${basePath}/storage`,
+          url: `https://supabase.io/storage`,
           images: [
             {
               url: `https://supabase.io${basePath}/images/product/storage/storage-og.jpg`,
