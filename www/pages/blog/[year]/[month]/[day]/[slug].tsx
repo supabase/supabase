@@ -75,7 +75,7 @@ export async function getStaticProps({ params }: any) {
       nextPost: currentIndex === allPosts.length ? null : nextPost ? nextPost : null,
       relatedPosts,
       blog: {
-        slug: params.slug,
+        slug: `${params.year}/${params.month}/${params.day}/${params.slug}`,
         content: mdxSource,
         ...data,
         toc: toc(content, { maxdepth: 2 }),
