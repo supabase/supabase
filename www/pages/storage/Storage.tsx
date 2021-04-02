@@ -1,40 +1,31 @@
-import { useRouter } from 'next/router'
-
 import {
-  Button,
   Badge,
-  Space,
-  Typography,
-  IconX,
+  Button,
   IconArrowUpRight,
+  IconBarChart,
+  IconCheckSquare,
   IconShuffle,
   IconWifi,
-  IconCheckSquare,
-  IconBarChart,
+  IconX,
+  Space,
+  Typography,
 } from '@supabase/ui'
-
-import DefaultLayout from '~/components/Layouts/Default'
-
-import ProductHeader from '~/components/Sections/ProductHeader'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-
-import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
-import APISection from '~/components/Sections/APISection'
-
-import FeatureColumn from '~/components/FeatureColumn'
-
 import ApiExamples from 'data/products/storage/api-examples'
-import StoragePermissionsData from 'data/products/storage/permissions-examples'
-
-import CTABanner from '~/components/CTABanner'
-
-import Solutions from 'data/Solutions.json'
-import ImageCarousel from '~/components/Carousels/ImageCarousel'
-
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
-import ExampleCard from '~/components/ExampleCard'
-import ProductIcon from '~/components/ProductIcon'
+import StoragePermissionsData from 'data/products/storage/permissions-examples'
+import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/router'
+import ImageCarousel from '~/components/Carousels/ImageCarousel'
+import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
+import CTABanner from '~/components/CTABanner'
+import ExampleCard from '~/components/ExampleCard'
+import FeatureColumn from '~/components/FeatureColumn'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import ProductIcon from '~/components/ProductIcon'
+import APISection from '~/components/Sections/APISection'
+import ProductHeader from '~/components/Sections/ProductHeader'
 
 function AuthPage() {
   // base path for images
@@ -55,7 +46,7 @@ function AuthPage() {
           url: `${basePath}/storage`,
           images: [
             {
-              url: `https://supabase.io/${basePath}/images/product/storage/storage-og.jpg`,
+              url: `https://supabase.io${basePath}/images/product/storage/storage-og.jpg`,
             },
           ],
         }}
