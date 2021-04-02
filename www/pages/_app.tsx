@@ -1,11 +1,11 @@
+import { APP_NAME, DESCRIPTION } from 'lib/constants'
 import { DefaultSeo } from 'next-seo'
-import Meta from '~/components/Favicons'
 import { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import Meta from '~/components/Favicons'
 import '../styles/index.css'
 import { post } from './../lib/fetchWrapper'
-import { APP_NAME, DESCRIPTION } from 'lib/constants'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -53,7 +53,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           site_name: 'Supabase',
           images: [
             {
-              url: `${basePath}/images/og/og-image.jpg`,
+              url: `https://supabase.io${basePath}/images/og/og-image.jpg`,
               width: 800,
               height: 600,
               alt: 'Supabase Og Image',
