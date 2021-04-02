@@ -54,5 +54,12 @@
     "position": "Engineering",
     "username": "soedirgo",
     "author_image_url": "https://github.com/soedirgo.png"
+  },
+  "fracek": {
+    "author": "Francesco Ceccon",
+    "author_url": "https://github.com/fracek",
+    "position": "Engineering",
+    "username": "fracek",
+    "author_image_url": "https://github.com/fracek.png"
   }
 }
