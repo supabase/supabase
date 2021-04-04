@@ -678,7 +678,7 @@ pages:
           Allowed values for count option are `null`, `exact`, `planned` and `estimated`.
         js: |
           ```js
-          const { data, error, count } = await postgrest
+          const { data, error, count } = await supabase
             .from('cities')
             .rpc('hello_world', { count: 'exact' })
           }
