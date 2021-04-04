@@ -111,6 +111,13 @@ pages:
             primary key (column_1, column_2)
           );
           ```
+      - name: Multiple foreign keys to the same table
+        sql: |
+          ```sql
+          alter table table_name
+            add constraint constraint_name_1 foreign key (colum_1) references foreign_table(id),
+            add constraint constraint_name_2 foreign key (colum_2) references foreign_table(id);
+          ```
       - name: Delete a table
         sql: |
           ```sql
