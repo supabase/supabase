@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, View, Platform } from 'react-native'
 import { ThemeProvider, colors, Text } from 'react-native-elements'
@@ -6,6 +6,7 @@ import { Styles } from './lib/constants'
 import { UserContextProvider, useUser } from './components/UserContext'
 import List from './components/TodoList'
 import Auth from './components/Auth'
+import { supabasePromise } from './lib/initSupabase'
 
 const theme = {
   colors: {
@@ -23,7 +24,13 @@ const Container = () => {
 }
 
 export default function App() {
-  return (
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    supabasePromise.then(() => setReady(true))
+  }, [])
+
+  return ready ? (
     <UserContextProvider>
       <ThemeProvider theme={theme}>
         <View style={styles.container}>
@@ -35,7 +42,7 @@ export default function App() {
         </View>
       </ThemeProvider>
     </UserContextProvider>
-  )
+  ) : null
 }
 
 const styles = StyleSheet.create({
