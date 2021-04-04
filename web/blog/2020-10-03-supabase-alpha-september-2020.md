@@ -43,9 +43,9 @@ Extensions are easier to use. You can enable Postgres extensions with the click 
 <source src="/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
 </video>
 
-### Save your favorite queries
+### Save your favourite queries
 
-The SQL editor now stores your query history in your browser. You can also save your favorite queries to run later! 
+The SQL editor now stores your query history in your browser. You can also save your favourite queries to run later! 
 
 <video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
 <source src="/videos/favourites.mp4" type="video/mp4" muted playsInline />
