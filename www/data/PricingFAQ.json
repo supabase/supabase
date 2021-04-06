@@ -1,6 +1,6 @@
 [
   {
-    "question": "Do i get full access to my database?",
+    "question": "Do I get full access to my database?",
     "answer": "Yes, you can create your own roles, set your timezone, etc, all through plain SQL."
   },
   {
