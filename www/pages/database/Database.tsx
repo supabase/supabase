@@ -90,8 +90,8 @@ function Database() {
                 src={`${basePath}/images/product/database/header--light-2.png`}
                 alt="database header"
                 layout="responsive"
-                width="720"
-                height="520"
+                width="1680"
+                height="1116"
               />
             </div>,
             <div className="w-full header--dark mr-0 dark:block">
@@ -99,8 +99,8 @@ function Database() {
                 src={`${basePath}/images/product/database/header--dark-2.png`}
                 alt="database header"
                 layout="responsive"
-                width="720"
-                height="520"
+                width="1680"
+                height="1116"
               />
             </div>,
           ]}
