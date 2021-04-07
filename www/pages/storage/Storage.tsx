@@ -72,8 +72,8 @@ function AuthPage() {
                 src={`${basePath}/images/product/storage/header--light.png`}
                 alt="storage header"
                 layout="responsive"
-                width="720"
-                height="520"
+                width="1386"
+                height="1067"
               />
             </div>,
             <div className="w-full header--dark mr-0 dark:block">
@@ -81,8 +81,8 @@ function AuthPage() {
                 src={`${basePath}/images/product/storage/header--dark.png`}
                 alt="storage header"
                 layout="responsive"
-                width="720"
-                height="520"
+                width="1386"
+                height="1067"
               />
             </div>,
           ]}
