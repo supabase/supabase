@@ -11,6 +11,7 @@ services:
       - 8000:8000/tcp
       - 8443:8443/tcp
     auth:
+      container_name: supabase-auth
       image: supabase/gotrue:latest
       ports:
         - '9999:9999'
