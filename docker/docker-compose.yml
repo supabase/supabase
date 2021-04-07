@@ -1,15 +1,17 @@
 version: '3.6'
 services:
     kong:
-        build:
-            context: ./kong
-        environment:
-            KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
-            KONG_PLUGINS: request-transformer,cors,key-auth,http-log
-        ports:
-        - 8000:8000/tcp
-        - 8443:8443/tcp
+      container_name: supabase-kong
+      build:
+          context: ./kong
+      environment:
+          KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+          KONG_PLUGINS: request-transformer,cors,key-auth,http-log
+      ports:
+      - 8000:8000/tcp
+      - 8443:8443/tcp
     auth:
+      container_name: supabase-auth
       image: supabase/gotrue:latest
       ports:
         - '9999:9999'
@@ -31,6 +33,7 @@ services:
       depends_on:
         - db
     rest:
+      container_name: supabase-rest
       image: postgrest/postgrest:latest
       ports:
         - '3000:3000'
@@ -43,6 +46,7 @@ services:
           PGRST_DB_ANON_ROLE: postgres
           PGRST_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
     realtime:
+      container_name: supabase-realtime
       image: supabase/realtime:latest
       ports:
         - '4000:4000'
@@ -61,6 +65,7 @@ services:
           SECURE_CHANNELS: 'false'
           JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
     db:
+      container_name: supabase-db
       build:
           context: ./postgres
       ports:
