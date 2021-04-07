@@ -10,6 +10,7 @@ import 'swiper/swiper.min.css'
 
 import ImageCarouselStyles from './ImageCarousel.module.css'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface Content {
   title: string
@@ -106,7 +107,14 @@ function ImageCarousel(props: ImageCarouselProps) {
               {props.content.map((content: Content, i: number) => {
                 return (
                   <SwiperSlide key={i}>
-                    {content.img_url && <img src={`${basePath}${content.img_url}`} />}
+                    {content.img_url && (
+                      <Image
+                        src={`${basePath}${content.img_url}`}
+                        layout="responsive"
+                        width="1460"
+                        height="960"
+                      />
+                    )}
                     {content.video_url && (
                       <video
                         src={`${basePath}/${content.video_url}`}
