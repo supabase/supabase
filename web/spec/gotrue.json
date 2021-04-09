@@ -5532,7 +5532,7 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "Inside a browser context, `signOut()` will remove extract the logged in user from the browser session\nand log them out - removing all items from localstorage and then trigger a \"SIGNED_OUT\" event.",
+										"shortText": "Inside a browser context, `signOut()` will extract the logged in user from the browser session\nand log them out - removing all items from localstorage and then trigger a \"SIGNED_OUT\" event.",
 										"text": "For server-side management, you can disable sessions by passing a JWT through to `auth.api.signOut(JWT: string)`\n"
 									},
 									"type": {
