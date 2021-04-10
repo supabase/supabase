@@ -5,9 +5,17 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 01 Apr 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 05 Apr 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.io/blog/2021/04/06/supabase-beta-march-2021</guid>
+  <title>Supabase Beta March 2021</title>
+  <link>https://supabase.io/blog/2021/04/06/supabase-beta-march-2021</link>
+  <description>Launch week, Storage, Supabase CLI, Connection Pooling, Supabase UI, and Pricing.</description>
+  <pubDate>Mon, 05 Apr 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.io/blog/2021/04/02/supabase-workflows</guid>
   <title>Workflows are coming to Supabase</title>

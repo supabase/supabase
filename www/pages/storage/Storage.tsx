@@ -16,6 +16,7 @@ import StoragePermissionsData from 'data/products/storage/permissions-examples'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
+import Image from 'next/image'
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import CTABanner from '~/components/CTABanner'
@@ -66,14 +67,24 @@ function AuthPage() {
             'With custom policies and permissions that are familiar and easy to implement.',
           ]}
           image={[
-            <img
-              className="w-full header--light block"
-              src={`${basePath}/images/product/storage/header--light.png`}
-            />,
-            <img
-              className="w-full header--dark mr-0 dark:block"
-              src={`${basePath}/images/product/storage/header--dark.png`}
-            />,
+            <div className="w-full header--light block">
+              <Image
+                src={`${basePath}/images/product/storage/header--light.png`}
+                alt="storage header"
+                layout="responsive"
+                width="1386"
+                height="1067"
+              />
+            </div>,
+            <div className="w-full header--dark mr-0 dark:block">
+              <Image
+                src={`${basePath}/images/product/storage/header--dark.png`}
+                alt="storage header"
+                layout="responsive"
+                width="1386"
+                height="1067"
+              />
+            </div>,
           ]}
         />
 
