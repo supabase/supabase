@@ -1059,7 +1059,7 @@ pages:
             .from('countries')
             .select('name, cities(name)')
             .eq('name', 'United States')
-            .order('cities.name')
+            .order('name', {foreignTable: 'cities'})
           ```
 
   range():
