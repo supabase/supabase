@@ -15,6 +15,7 @@ import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -84,16 +85,24 @@ function Database() {
             'PostgreSQL is one of the worlds most scalable databases.',
           ]}
           image={[
-            <img
-              key={'database-header-img--light'}
-              className="w-full header--light block"
-              src={`${basePath}/images/product/database/header--light-2.png`}
-            />,
-            <img
-              key={'database-header-img--dark'}
-              className="w-full header--dark mr-0 dark:block"
-              src={`${basePath}/images/product/database/header--dark-2.png`}
-            />,
+            <div className="w-full header--light block">
+              <Image
+                src={`${basePath}/images/product/database/header--light-2.png`}
+                alt="database header"
+                layout="responsive"
+                width="1680"
+                height="1116"
+              />
+            </div>,
+            <div className="w-full header--dark mr-0 dark:block">
+              <Image
+                src={`${basePath}/images/product/database/header--dark-2.png`}
+                alt="database header"
+                layout="responsive"
+                width="1680"
+                height="1116"
+              />
+            </div>,
           ]}
         />
 
@@ -212,7 +221,7 @@ function Database() {
                   footer={[
                     <TweetCard
                       handle="@Elsolo244"
-                      img_url="https://pbs.twimg.com/profile_images/2486328968/v6citnk33y2wpeyzrq05_400x400.jpeg"
+                      img_url={`${basePath}/images/twitter-profiles/v6citnk33y2wpeyzrq05_400x400.jpeg`}
                       quote="Where has
                 @supabase_io
                 been all my life? 😍"
@@ -228,7 +237,7 @@ function Database() {
                   footer={[
                     <TweetCard
                       handle="@jim_bisenius"
-                      img_url="https://pbs.twimg.com/profile_images/1372987165869760513/rLgwUZSB_400x400.jpg"
+                      img_url={`${basePath}/images/twitter-profiles/rLgwUZSB_400x400.jpg`}
                       quote="@MongoDB or @MySQL?!?! Please, let me introduce you to @supabase_io and the wonderful world of @PostgreSQL before it's too late!!"
                     />,
                   ]}
@@ -271,13 +280,13 @@ function Database() {
                   </Space>
                 </div>
                 <div className="col-span-12 lg:col-span-6 xl:col-span-10 hidden xl:block">
-                  <TweetCard
+                  {/* <TweetCard
                     handle="@eunjae_lee"
                     img_url="https://pbs.twimg.com/profile_images/1188191474401320965/eGjSYbQd_400x400.jpg"
                     quote="So they just help me use @PostgreSQL better. They don't try to invent a wheel and trap me
           in it. Whereas they provide a good abstraction overall, they also provide a raw access to
           the database."
-                  />
+                  /> */}
                 </div>
               </div>,
             ]}

@@ -15,6 +15,7 @@ import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import AuthComponentExample from '~/components/AuthWidget/AuthComponentExample'
@@ -73,16 +74,24 @@ function AuthPage() {
             "Including PostgreSQL's policy engine, for fine-grained access rules.",
           ]}
           image={[
-            <img
-              key={'authentication-header-img--light'}
-              className="w-full header--light block"
-              src={`${basePath}/images/product/auth/header--light.png`}
-            />,
-            <img
-              key={'authentication-header-img--dark'}
-              className="w-full header--dark mr-0 dark:block"
-              src={`${basePath}/images/product/auth/header--dark.png`}
-            />,
+            <div className="w-full header--light block">
+              <Image
+                src={`${basePath}/images/product/auth/header--light.png`}
+                alt="auth header"
+                layout="responsive"
+                width="1372"
+                height="1074"
+              />
+            </div>,
+            <div className="w-full header--dark mr-0 dark:block">
+              <Image
+                src={`${basePath}/images/product/auth/header--dark.png`}
+                alt="auth header"
+                layout="responsive"
+                width="1372"
+                height="1074"
+              />
+            </div>,
           ]}
           documentation_url={'https://supabase.io/docs/guides/auth'}
         />

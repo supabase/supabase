@@ -9,13 +9,26 @@ import TabItem from '@theme/TabItem';
 
 Supabase provides a CLI so that you can develop your application locally, rather than connecting to a live project.
 
-:::note
+## Before you begin
 
-Our CLI is still under heavy development, and is missing features which will deploy your local changes to your live project. 
-We have not yet added Storage to the local development suite.
+If you using the CLI, please record your steps! You can help us improve by adding missing details and fixing errors. 
 
-:::
+Our CLI is still under heavy development, and is missing some features:
 
+- You cannot yet deploy your local changes to your live project using the CLI. You will need to take a "dump" of your database schema 
+and run it on your live database.
+- We have not yet added Storage to the local development suite.
+- The self-hosted version of Supabase does not include a UI yet. 
+We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) 
+([more context](https://github.com/supabase/supabase/discussions/1001#discussioncomment-558696)).
+
+In the meantime, here are some suggested tools for interacting with your Postgres Database:
+
+- `pgadmin`: https://www.pgadmin.org 
+- `dbeaver`: https://dbeaver.com 
+- `BeeKeeper`: https://beekeeperstudio.io
+- `HeidiSQL`: https://heidisql.com
+- `Table Plus`: https://www.tableplus.io
 
 ## Prerequisites
 
