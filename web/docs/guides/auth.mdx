@@ -259,7 +259,7 @@ create table posts (
   title         text      not null, 
   body          text      not null, 
   publish_date  date      not null     default now(), 
-  audience      uuid[]    null -- many to many table ommited for brevity
+  audience      uuid[]    null -- many to many table omitted for brevity
 );
 
 create table comments (

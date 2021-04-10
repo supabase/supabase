@@ -35,7 +35,7 @@ function GithubExamples() {
       <div className="grid grid-cols-12">
         <div className="col-span-12 text-center">
           <Typography.Title level={2}>
-            Community driven examples, libaries and guides
+            Community driven examples, libraries and guides
           </Typography.Title>
           <Typography.Text className="block mb-6">
             <p className="text-base lg:text-lg">
