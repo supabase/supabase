@@ -70,7 +70,7 @@ pages:
       supabase start
       ```
 
-      This command uses Docker Compose to start all the open sources [services](/docs/#how-it-works) of Supabase. This command will take a while to run, there are a lot of services to build.
+      This command uses Docker Compose to start all the open source [services](/docs/#how-it-works) of Supabase. This command will take a while to run, there are a lot of services to build.
 
       Once this is running, you will see the healthy services in Docker Dashboard:
 

@@ -189,7 +189,7 @@ function AuthPage() {
                   <FeatureColumn
                     icon={<IconEye />}
                     title="Social login scopes"
-                    text="Request additonal user data permissions when using social logins."
+                    text="Request additional user data permissions when using social logins."
                   />
                 </div>
               </div>,
@@ -229,7 +229,7 @@ function AuthPage() {
               <Link href="https://supabase.io/docs/guides/auth#policy-examples">
                 <a>
                   <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
-                    Expore documentation
+                    Explore documentation
                   </Button>
                 </a>
               </Link>
