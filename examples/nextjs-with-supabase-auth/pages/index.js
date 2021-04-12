@@ -68,7 +68,7 @@ const Index = () => {
             >
               Log out
             </Button>
-            {error && <Typography.Text danger>Failed to fetch user!</Typography.Text>}
+            {error && <Typography.Text type="danger">Failed to fetch user!</Typography.Text>}
             {data && !error ? (
               <>
                 <Typography.Text type="success">
