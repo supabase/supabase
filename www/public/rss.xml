@@ -5,9 +5,89 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sun, 21 Mar 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 05 Apr 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.io/blog/2021/04/06/supabase-beta-march-2021</guid>
+  <title>Supabase Beta March 2021</title>
+  <link>https://supabase.io/blog/2021/04/06/supabase-beta-march-2021</link>
+  <description>Launch week, Storage, Supabase CLI, Connection Pooling, Supabase UI, and Pricing.</description>
+  <pubDate>Mon, 05 Apr 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/04/02/supabase-workflows</guid>
+  <title>Workflows are coming to Supabase</title>
+  <link>https://supabase.io/blog/2021/04/02/supabase-workflows</link>
+  <description>Functions are great, but you know what's better?</description>
+  <pubDate>Thu, 01 Apr 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/04/02/supabase-pgbouncer</guid>
+  <title>PgBouncer is now available in Supabase</title>
+  <link>https://supabase.io/blog/2021/04/02/supabase-pgbouncer</link>
+  <description>Better support for Serverless and Postgres.</description>
+  <pubDate>Thu, 01 Apr 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/04/02/supabase-dot-com</guid>
+  <title>Supabase Dot Com</title>
+  <link>https://supabase.io/blog/2021/04/02/supabase-dot-com</link>
+  <description>The Supabase Domain name is changing.</description>
+  <pubDate>Thu, 01 Apr 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/04/01/supabase-nft-marketplace</guid>
+  <title>Supabase Launches NFT Marketplace</title>
+  <link>https://supabase.io/blog/2021/04/01/supabase-nft-marketplace</link>
+  <description>A fully encrypted NFT platform to protect and transact your digital assets</description>
+  <pubDate>Wed, 31 Mar 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/03/31/supabase-cli</guid>
+  <title>Supabase CLI</title>
+  <link>https://supabase.io/blog/2021/03/31/supabase-cli</link>
+  <description>Local development, database migrations, and self-hosting.</description>
+  <pubDate>Tue, 30 Mar 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/03/30/supabase-storage</guid>
+  <title>Storage is now available in Supabase</title>
+  <link>https://supabase.io/blog/2021/03/30/supabase-storage</link>
+  <description>Launching Supabase Storage and how you can use it in your apps</description>
+  <pubDate>Mon, 29 Mar 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/03/29/pricing</guid>
+  <title>Supabase Beta Pricing</title>
+  <link>https://supabase.io/blog/2021/03/29/pricing</link>
+  <description>Supabase launches Beta pricing structure</description>
+  <pubDate>Sun, 28 Mar 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/03/25/launch-week</guid>
+  <title>Launch week</title>
+  <link>https://supabase.io/blog/2021/03/25/launch-week</link>
+  <description>Five days of Supabase.</description>
+  <pubDate>Wed, 24 Mar 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/03/25/angels-of-supabase</guid>
+  <title>Angels of Supabase</title>
+  <link>https://supabase.io/blog/2021/03/25/angels-of-supabase</link>
+  <description>Meet the investors of Supabase.</description>
+  <pubDate>Wed, 24 Mar 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.io/blog/2021/03/22/In-The-Loop</guid>
   <title>Developers stay up to date with intheloop.dev</title>
@@ -25,9 +105,9 @@
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders</guid>
-  <title>Toad, a link shorterner with simple APIs for low-coders</title>
-  <link>https://supabase.io/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders</link>
+  <guid>https://supabase.io/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders</guid>
+  <title>Toad, a link shortener with simple APIs for low-coders</title>
+  <link>https://supabase.io/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders</link>
   <description>An easy-to-use link shortening tool with simple APIs</description>
   <pubDate>Sun, 07 Mar 2021 16:00:00 GMT</pubDate>
 </item>
