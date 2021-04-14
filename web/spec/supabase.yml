@@ -910,7 +910,7 @@ pages:
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
-        - `objects` permissions: `update` 
+        - `objects` permissions: `update` and `select`
     examples:
       - name: Update file
         isSpotlight: true
@@ -929,7 +929,7 @@ pages:
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
-        - `objects` permissions: `update` 
+        - `objects` permissions: `update` and `select`
     examples:
       - name: Move file
         isSpotlight: true
@@ -983,7 +983,7 @@ pages:
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
-        - `objects` permissions: `delete`
+        - `objects` permissions: `delete` and `select`
     examples:
       - name: Delete file
         isSpotlight: true
