@@ -1,6 +1,5 @@
 # Supabase Docs
 
-
 ### Contributing to the specs
 
 - `cd /web/spec/`
