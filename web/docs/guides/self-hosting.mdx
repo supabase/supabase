@@ -1,0 +1,144 @@
+---
+id: self-hosting
+title: Self Hosting
+description: How to use configure and deploy Supabase.
+---
+
+Supabase is a [Hosted Platform](https://app.supabase.io), so you don't _have_ to deploy it yourself. 
+However, if you _want_ to configure and deploy it yourself, this is also possible.
+
+## Before you begin
+
+If you are about to step through this Guide, please record your steps! You can help us improve by adding 
+missing details and fixing errors.
+
+The self-hosted version of Supabase does not include a UI yet. 
+We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) 
+([more context](https://github.com/supabase/supabase/discussions/1001#discussioncomment-558696)).
+
+In the meantime, here are some suggested tools for interacting with your Postgres Database:
+
+- `pgadmin`: https://www.pgadmin.org 
+- `dbeaver`: https://dbeaver.com 
+- `BeeKeeper`: https://beekeeperstudio.io
+- `HeidiSQL`: https://heidisql.com
+- `Table Plus`: https://www.tableplus.io
+
+## Get the Docker Compose
+
+We provide a Docker Compose directory which is includes all of the tools required for building on top of Supabase. 
+
+You can download the Docker files in various ways:
+
+### Option 1: Using our CLI 
+
+Make sure the CLI is installed:
+
+```bash
+npm install -g supabase
+```
+
+Then run in any folder to create a `docker` folder with a `docker-compose.yml`:
+
+```bash
+supabase eject
+```
+
+### Option 2: Clone our repo
+
+```bash
+# 1. Copy an empty repo
+git clone https://github.com/supabase/supabase
+
+# 2. Move into the empty repo
+cd supabase/docker
+```
+
+### Option 3: Using a shallow clone
+
+If you use Git version >2.25, you can use a shallow clone to download this folder to your local machine:
+
+```bash
+# 1. Copy an empty repo
+git clone --no-checkout https://github.com/supabase/supabase
+
+# 2. Move into the empty repo
+cd supabase
+
+# 3. Initialize sparse-checkout
+git sparse-checkout init --cone
+
+# 4. Checkout the folder
+git sparse-checkout set docker
+```
+
+## Running Supabase
+
+Now that you have the Docker set up on your local machine, you can start it here by running 
+
+```bash
+docker-compose up
+```
+
+## Configuring each service
+
+Supabase is made up of several services. We have prefilled the `docker-compose` file with all the configuration you need to get started. 
+If you would like to change any of the configuration, you can update the env variables in the `docker-compose` file.
+
+Here are a list of environment variables for each service:
+
+- [Postgres](https://hub.docker.com/_/postgres/)
+- [PostgREST](https://postgrest.org/en/v7.0.0/configuration.html)
+- [Realtime](https://github.com/supabase/realtime#server-set-up)
+- [GoTrue](https://github.com/supabase/gotrue)
+- [Kong](https://docs.konghq.com/install/docker/)
+
+### Configuring email 
+
+GoTrue requires an SMTP server to send emails for all authentication actions. 
+You will need to provide the following [settings](https://github.com/supabase/gotrue#e-mail) inside the `docker-compose.yml` under `services.auth.environment`:
+
+- `GOTRUE_SMTP_HOST` - The mail server hostname to send emails through.
+- `GOTRUE_SMTP_PORT` - The port number to connect to the mail server on.
+- `GOTRUE_SMTP_USER` - If the mail server requires authentication, the username to use.
+- `GOTRUE_SMTP_PASS` - If the mail server requires authentication, the password to use.
+
+### API Keys 
+
+All config for the API Gateway is stored in the `kong` directory. Inside `kong.yml` you'll find the routing for all services, the routing rules, 
+and down the bottom you'll find the JWTs capable of accessing services that require API Key access.
+
+See the full docs [here](https://docs.konghq.com/hub/kong-inc/key-auth/).
+
+
+## Deploying
+
+See the following guides to deploy Docker Compose setup using your preferred tool and platform: 
+
+- [AWS with Docker Machine](https://docs.docker.com/machine/get-started-cloud/#amazon-web-services-aws)
+- [Digital Ocean with Docker Machine](https://docs.docker.com/machine/get-started-cloud/#digitalocean)
+- [Docker Swarm](https://docs.docker.com/engine/swarm/stack-deploy/)
+- [AWS Fargate](https://aws.amazon.com/blogs/containers/deploy-applications-on-amazon-ecs-using-docker-compose/)
+- [Using Kompose for Kubernetes](https://kubernetes.io/docs/tasks/configure-pod-container/translate-compose-kubernetes/)
+
+## One-click deploys 
+
+For some individual tools, we also provide images and deployments into cloud marketplaces:
+
+### Postgres
+
+- AWS (Arm architecture) [one click deploy](https://aws.amazon.com/marketplace/pp/B08V22HK26?qid=1617156168590&sr=0-3)
+- AWS [one click deploy](https://aws.amazon.com/marketplace/pp/B08915TCJ2)
+- Digital Ocean [one click deploy](https://marketplace.digitalocean.com/apps/supabase-postgres)
+- Docker [image](https://hub.docker.com/r/supabase/postgres)
+
+### Realtime
+
+- AWS [one click deploy](https://aws.amazon.com/marketplace/pp/B089N4FH7N?qid=1617156168590&sr=0-2)
+- Digital Ocean [one click deploy](https://marketplace.digitalocean.com/apps/supabase-realtime)
+- Docker [image](https://hub.docker.com/r/supabase/postgres)
+
+## Next steps
+
+- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
+- Sign in: [app.supabase.io](https://app.supabase.io)

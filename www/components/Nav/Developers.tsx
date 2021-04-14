@@ -2,6 +2,7 @@ import React from 'react'
 import DevelopersData from 'data/Developers.json'
 import AnnouncementsData from 'data/Announcements.json'
 import { useRouter } from 'next/router'
+import { Typography } from '@supabase/ui'
 
 type Props = {
   text: string
@@ -32,8 +33,10 @@ const Developers = () => {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icon} />
         </svg>
         <div className="ml-4">
-          <p className="text-base font-medium text-gray-900 dark:text-white">{text}</p>
-          <p className="mt-1 text-sm text-gray-500 dark:text-dark-300">{description}</p>
+          <Typography.Title level={5}>{text}</Typography.Title>
+          <Typography.Text>
+            <p>{description}</p>
+          </Typography.Text>
         </div>
       </a>
     )
@@ -41,7 +44,7 @@ const Developers = () => {
       <a
         key={text}
         href={url}
-        className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150"
+        className="p-3 col-span-6 rounded hover:bg-gray-50 dark:hover:bg-dark-700 transition"
       >
         {content}
       </a>
@@ -56,24 +59,19 @@ const Developers = () => {
   })
 
   return (
-    <React.Fragment>
-      <nav
-        className="grid gap-y-10 px-4 py-8 sm:grid-cols-2 sm:gap-x-8 sm:py-12 sm:px-6 lg:px-8 xl:pr-12"
-        aria-labelledby="solutionsHeading"
-      >
-        {iconSections}
+    <div className="grid grid-cols-12">
+      <nav className="col-span-6" aria-labelledby="solutionsHeading">
+        <div className="grid grid-cols-12 m-3 gap-3">{iconSections}</div>
       </nav>
-      <div className="px-4 py-8 sm:py-12 sm:px-6 lg:px-8 xl:pl-12">
-        <div>
-          <h3 className="text-sm font-medium tracking-wide text-gray-500 dark:text-dark-300 uppercase">
-            Latest announcements
-          </h3>
+      <div className="col-span-6">
+        <div className="m-3 mx-6">
+          <Typography.Text type="secondary">Latest announcements</Typography.Text>
           <ul className="mt-6 space-y-16">
             {AnnouncementsData.map((caseStudy: any, idx: number) => (
               <li className="flow-root" key={`flyout_case_${idx}`}>
                 <a
                   href={caseStudy.url}
-                  className="-m-3 p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-600 transition ease-in-out duration-150"
+                  className="p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition ease-in-out duration-150 border dark:border-gray-600"
                 >
                   <div className="hidden sm:block flex-shrink-0">
                     <img
@@ -83,12 +81,10 @@ const Developers = () => {
                     />
                   </div>
                   <div className="min-w-0 flex-1 sm:ml-8">
-                    <h4 className="text-base font-medium text-gray-900 dark:text-white truncate">
+                    <Typography.Title level={5} className="mb-0">
                       {caseStudy.title}
-                    </h4>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-dark-300">
-                      {caseStudy.description}
-                    </p>
+                    </Typography.Title>
+                    <Typography.Text type="secondary">{caseStudy.description}</Typography.Text>
                   </div>
                 </a>
               </li>
@@ -96,7 +92,7 @@ const Developers = () => {
           </ul>
         </div>
       </div>
-    </React.Fragment>
+    </div>
   )
 }
 

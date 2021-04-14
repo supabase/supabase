@@ -6,6 +6,13 @@
     "authorURL": "https://github.com/roryw10",
     "position": "Head of Growth"
   },
+  "ant_wilson": {
+    "author": "Ant Wilson",
+    "author_url": "https://github.com/awalias",
+    "author_image_url": "https://github.com/awalias.png",
+    "authorURL": "https://github.com/awalias",
+    "position": "CTO and Co-Founder"
+  },
   "paul_copplestone": {
     "author": "Paul Copplestone",
     "author_url": "https://github.com/kiwicopple",
@@ -33,5 +40,26 @@
     "author_image_url": "https://github.com/supabase.png",
     "authorURL": "https://github.com/supabase",
     "position": ""
+  },
+  "inian": {
+    "author": "Inian Parameshwaran",
+    "author_url": "https://twitter.com/everConfusedGuy",
+    "position": "Engineering",
+    "username": "inian",
+    "author_image_url": "https://avatars.githubusercontent.com/u/2155545?v=4"
+  },
+  "soedirgo": {
+    "author": "Bobbie Soedirgo",
+    "author_url": "https://github.com/soedirgo",
+    "position": "Engineering",
+    "username": "soedirgo",
+    "author_image_url": "https://github.com/soedirgo.png"
+  },
+  "fracek": {
+    "author": "Francesco Ceccon",
+    "author_url": "https://github.com/fracek",
+    "position": "Engineering",
+    "username": "fracek",
+    "author_image_url": "https://github.com/fracek.png"
   }
 }

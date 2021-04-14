@@ -191,6 +191,36 @@ create policy "Team members can update team details if they belong to the team."
   );
 ```
 
+### Policies with security definer functions
+
+Policies can also make use of `security definer functions`, this is useful in a many-to-many relationship where you want to restrict access to the linking table. Following the `teams` and `members` example from above this example shows how you can use security definer function in combination with a policy to control access to the `members` table.
+
+```sql
+-- 1. Follow example for 'Policies with joins' above
+
+-- 2.  Enable RLS
+alter table members 
+  enable row level security
+
+-- 3.  Create security definer function
+create or replace function get_teams_for_user(user_id uuid)
+returns setof bigint as $$
+    select team_id 
+    from members 
+    where user_id = $1
+$$ stable language sql security definer;
+
+-- 4. Create Policy
+create policy "Team members can update team members if they belong to the team."
+  on members
+  for all using (
+    team_id in (
+      select get_teams_for_user(auth.uid())
+    )
+  );
+
+```
+
 ### Verifying email domains
 
 Postgres has a function `right(string, n)` that returns the rightmost n characters of a string. 
@@ -240,7 +270,7 @@ create table comments (
   comment_date  date      not null     default now()
 );
 
-create policy "Creator can see thier own posts"
+create policy "Creator can see their own posts"
 on posts
 for select
 using (
@@ -273,7 +303,7 @@ using (
 You can also put your authorization rules in your middleware, 
 similar to how you would create security rules with any other `backend <-> middleware <-> frontend` architecture.
 
-Policies are a tool. In the case of "serverless/Jastack" setups, they are especially effective because you don't have to deploy any middleware at all.
+Policies are a tool. In the case of "serverless/Jamstack" setups, they are especially effective because you don't have to deploy any middleware at all.
 
 However if you want to use another Authorization method for your applications, that's also fine. Supabase is "just Postgres", so if your application 
 works with Postgres, then it also works with Supabase. 
