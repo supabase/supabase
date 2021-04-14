@@ -75,13 +75,9 @@
     { "source": "/docs/postgres/postgres-intro", "destination": "/docs/postgres/server/about" },
     { "source": "/docs/realtime/about", "destination": "/docs/realtime/server/about" },
     { "source": "/docs/realtime/aws", "destination": "/docs/postgres/server/aws" },
-    {
-      "source": "/docs/realtime/digitalocean",
-      "destination": "/docs/postgres/server/digitalocean"
-    },
+    { "source": "/docs/realtime/digitalocean", "destination": "/docs/postgres/server/digitalocean" },
     { "source": "/docs/realtime/docker", "destination": "/docs/postgres/server/docker" },
     { "source": "/docs/realtime/source", "destination": "/docs/postgres/server/about" },
-
     { "source": "/docs/client/supabase-client", "destination": "/docs/reference/javascript/supabase-client" },
     { "source": "/docs/client/installing", "destination": "/docs/reference/javascript/installing" },
     { "source": "/docs/client/initializing", "destination": "/docs/reference/javascript/initializing" },
