@@ -1,23 +1,21 @@
 // file: pages/blog/[slug].js
-import React from 'react'
-import { useRouter } from 'next/router'
-import DefaultLayout from '~/components/Layouts/Default'
-import { NextSeo } from 'next-seo'
-
-import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
-import { generateReadingTime } from '~/lib/helpers'
-import ReactMarkdown from 'react-markdown'
-import authors from 'lib/authors.json'
+import { Badge, Card, Divider, IconFile, Space, Typography } from '@supabase/ui'
 import matter from 'gray-matter'
-import renderToString from 'next-mdx-remote/render-to-string'
+import authors from 'lib/authors.json'
 import hydrate from 'next-mdx-remote/hydrate'
-
-import { IconFile, Space, Typography, Badge, Divider, Card } from '@supabase/ui'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import Quote from '~/components/Quote'
-
-import blogStyles from './[slug].module.css'
+import renderToString from 'next-mdx-remote/render-to-string'
+import { NextSeo } from 'next-seo'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import React from 'react'
+import ReactMarkdown from 'react-markdown'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import CTABanner from '~/components/CTABanner'
+import DefaultLayout from '~/components/Layouts/Default'
+import Quote from '~/components/Quote'
+import { generateReadingTime } from '~/lib/helpers'
+import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import blogStyles from './[slug].module.css'
 
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
@@ -77,7 +75,7 @@ export async function getStaticProps({ params }: any) {
       nextPost: currentIndex === allPosts.length ? null : nextPost ? nextPost : null,
       relatedPosts,
       blog: {
-        slug: params.slug,
+        slug: `${params.year}/${params.month}/${params.day}/${params.slug}`,
         content: mdxSource,
         ...data,
         toc: toc(content, { maxdepth: 2 }),
@@ -145,8 +143,8 @@ function BlogPostPage(props: any) {
         title={props.blog.title}
         openGraph={{
           title: props.blog.title,
-          description: 'Description of open graph article',
-          url: `${basePath}/blog/${props.blog.slug}`,
+          description: props.blog.description,
+          url: `https://supabase.io/blog/${props.blog.slug}`,
           type: 'article',
           article: {
             //
@@ -163,7 +161,7 @@ function BlogPostPage(props: any) {
           },
           images: [
             {
-              url: `${basePath}/images/blog/${
+              url: `https://supabase.io${basePath}/images/blog/${
                 props.blog.thumb ? props.blog.thumb : props.blog.image
               }`,
             },
@@ -177,13 +175,13 @@ function BlogPostPage(props: any) {
               <div className="lg:py-12 grid grid-cols-12 lg:gap-16">
                 <div className="col-span-12 lg:col-span-10">
                   <Link href={`/blog`} as={`/blog`}>
-                    <div>
+                    <a>
                       <Typography.Text type="secondary">
                         <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
                           View more posts
                         </span>
                       </Typography.Text>
-                    </div>
+                    </a>
                   </Link>
                   <Space className="my-4">
                     <Typography.Text>{props.blog.date}</Typography.Text>
@@ -276,6 +274,7 @@ function BlogPostPage(props: any) {
             </div>
           </div>
         </div>
+        <CTABanner />
       </DefaultLayout>
     </>
   )

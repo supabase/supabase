@@ -12,6 +12,9 @@ import { render } from 'react-dom'
 import Link from 'next/link'
 import { addBasePath } from 'next/dist/next-server/lib/router/router'
 
+import { NextSeo } from 'next-seo'
+import authors from 'lib/authors.json'
+
 const site_title = `${APP_NAME} | We are now in Beta`
 
 // Dark text: text-dark-400
@@ -660,6 +663,9 @@ const BetaPricing = () => (
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
         <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
+        <p className="mb-10">
+            For up to date pricing info see: https://supabase.io/pricing
+          </p>
           <p className="mb-10">
             We're working closely with many open source projects, infrastructure providers, and of
             course our Alpha Users, to provide a predictable and sustainable pricing model.
@@ -680,8 +686,7 @@ const BetaPricing = () => (
             </li>
           </ul>
           <p className="mb-10">
-            Whilst we're not yet ready to publish a standardized pricing model, we are committing to
-            the following initiatives:
+            We are committing to the following initiatives:
           </p>
           <ul className="list-decimal list-outside ml-6 mb-10">
             <li className="mb-5">
@@ -711,8 +716,7 @@ const BetaPricing = () => (
             </li>
           </ul>
           <p>
-            The Supabase Base Tier constitutes a Supabase Instance running in a single region, on 2
-            vCPUs, 1 GiB Memory, with 2 GB of storage, and daily backups.
+            The Supabase Base Tier is now called the Supabase Pro tier as per the pricing page: https://supabase.io/pricing
           </p>
         </div>
       </div>
@@ -960,8 +964,33 @@ const Beta = () => {
         <meta name="twitter:site" content={site_title} />
         <meta name="twitter:text:title" content={site_title} />
       </Head>
+      <NextSeo
+        title={site_title}
+        openGraph={{
+          title: site_title,
+          description: DESCRIPTION,
+          url: `https://supabase.io/beta`,
+          type: 'article',
+          article: {
+            //
+            // to do: add expiration and modified dates
+            // https://github.com/garmeeh/next-seo#article
+            publishedTime: '2020-12-03T00:00:00Z',
+            //
+            // to do: author urls should be internal in future
+            // currently we have external links to github profiles
+            authors: [authors['supabase'].authorURL],
+            tags: ['beta'],
+          },
+          images: [
+            {
+              url: 'https://supabase.io/new/og/og-image.jpg',
+            },
+          ],
+        }}
+      />
       <Container>
-        <div className="relative shadow-lg py-5 px-5 xl:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
+        <div className="shadow-lg py-5 px-5 xl:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
           <a href="/">
             <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
           </a>

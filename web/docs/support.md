@@ -18,4 +18,4 @@ If you need SLAs, guaranteed response times, or other enterprise level services,
 
 ## Slack Support
 
-If you are building with Supabase and you would like to set up a hared Slack channel (via [Slack Connect](https://slack.com/connect)), please reach out to us at beta@supabase.io.
+If you are building with Supabase and you would like to set up a shared Slack channel (via [Slack Connect](https://slack.com/connect)), please reach out to us at beta@supabase.io.
