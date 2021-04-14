@@ -5,7 +5,7 @@ run: download combine
 download: supabase gotrue postgrest realtime
 
 supabase:
-	curl -sS https://raw.githubusercontent.com/kiwicopple/supabase-js/feature/migrate_to_typescript/docs/spec.json \
+	curl -sS https://supabase.github.io/supabase-js/spec.json \
 	> $(REPO_DIR)/supabase.json
 
 gotrue:

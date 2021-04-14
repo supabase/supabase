@@ -4,15 +4,15 @@
     "links": [
       {
         "text": "Database",
-        "url": "/docs/guides/database"
+        "url": "/database"
       },
       {
         "text": "Authentication",
-        "url": "/docs/guides/auth"
+        "url": "/auth"
       },
       {
         "text": "Storage",
-        "url": null
+        "url": "/storage"
       },
       {
         "text": "Functions",
@@ -20,7 +20,7 @@
       },
       {
         "text": "Pricing",
-        "url": "/docs/pricing"
+        "url": "/pricing"
       }
     ]
   },

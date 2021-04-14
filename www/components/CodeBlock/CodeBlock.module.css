@@ -1,5 +1,5 @@
 .code-block {
-  @apply rounded-b-lg;
+  @apply rounded-lg;
   /* padding-top: 8px !important; */
   @apply border border-gray-600;
 }
@@ -22,4 +22,9 @@
 
 .code-block code .linenumber {
   margin-right: 4px;
+}
+
+.code-block code::after,
+.code-block code::before {
+  content: none !important;
 }

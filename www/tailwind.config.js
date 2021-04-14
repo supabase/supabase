@@ -20,6 +20,8 @@ module.exports = {
         // => @media (min-width: 1536px) { ... }
       },
       colors: {
+        'gray-light': '#7B7F86',
+        'gray-dark': '#7B7F86',
         'accent-1': '#FAFAFA',
         'accent-2': '#EAEAEA',
         'accent-7': '#333',
@@ -76,8 +78,10 @@ module.exports = {
         '8xl': '6.25rem',
       },
       boxShadow: {
+        'light-small': '0px 4px 8px 2px rgba(107, 114, 128, 0.08)',
         small: '0 5px 10px rgba(0, 0, 0, 0.12)',
         medium: '0 8px 30px rgba(0, 0, 0, 0.12)',
+        override: '0px 0px 0px rgba(0, 0, 0, 0)',
       },
       fontFamily: {
         sans: [
@@ -112,4 +116,7 @@ module.exports = {
     },
   },
   plugins: [],
+  corePlugins: {
+    preflight: true,
+  },
 }

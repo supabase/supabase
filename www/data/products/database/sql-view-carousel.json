@@ -1,0 +1,30 @@
+[
+  {
+    "title": "Full SQL",
+    "label": "SQL Editor built in",
+    "img_url": "/images/product/database/sql-view/sql-editor.png",
+    "text": "Create tables, functions, join tables - A full SQL editor built into the dashboard",
+    "url": ""
+  },
+  {
+    "title": "Monaco editor",
+    "label": "Monaco editor",
+    "img_url": "/images/product/database/sql-view/manaco-editor.png",
+    "text": "Built in manaco editor, with rich validation and autocomplete.",
+    "url": ""
+  },
+  {
+    "title": "Favourite queries",
+    "label": "Favourite queries",
+    "img_url": "/images/product/database/sql-view/favourites.png",
+    "text": "Save your favourite queries to use again and again.",
+    "url": ""
+  },
+  {
+    "title": "Export to CSV",
+    "label": "Select and Export",
+    "img_url": "/images/product/database/sql-view/export.png",
+    "text": "Any output can be exported into a CSV",
+    "url": ""
+  }
+]
