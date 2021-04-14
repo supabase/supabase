@@ -140,8 +140,8 @@
     { "source": "/docs/client/plfts", "destination": "/docs/reference/javascript/textSearch" },
     { "source": "/docs/client/phfts", "destination": "/docs/reference/javascript/textSearch" },
     { "source": "/docs/client/wfts", "destination": "/docs/reference/javascript/textSearch" },
-    { "source": "/blog/page/*", "destination": "/blog" },
-    { "source": "/blog/tags", "destination": "/blog" }
+    { "source": "/blog/page/:number", "destination": "/blog" },
+    { "source": "/blog/tags", "destination": "/blog" },
     { "source": "/docs/pricing", "destination": "/pricing" }
   ],
   "trailingSlash": false
