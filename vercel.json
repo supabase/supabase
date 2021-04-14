@@ -61,7 +61,8 @@
     { "source": "/docs/common/filters/_like", "destination": "/docs/reference/javascript/like" },
     { "source": "/docs/common/filters/_lt", "destination": "/docs/reference/javascript/lt" },
     { "source": "/docs/common/filters/_lte", "destination": "/docs/reference/javascript/lte" },
-    { "source": "/docs/common/filters/_match", "destination": "/docs/reference/javascript/match" },
+    { "source": "/docs/common/filters/_
+     ", "destination": "/docs/reference/javascript/match" },
     { "source": "/docs/common/filters/_neq", "destination": "/docs/reference/javascript/neq" },
     { "source": "/docs/common/filters/_not", "destination": "/docs/reference/javascript/not" },
     { "source": "/docs/common/filters/_nxl", "destination": "/docs/reference/javascript/rangeGte" },
@@ -144,7 +145,7 @@
     { "source": "/docs/client/plfts", "destination": "/docs/reference/javascript/textSearch" },
     { "source": "/docs/client/phfts", "destination": "/docs/reference/javascript/textSearch" },
     { "source": "/docs/client/wfts", "destination": "/docs/reference/javascript/textSearch" },
-    { "source": "/blog/page/:match*", "destination": "/blog" },
+    { "source": "/blog/page/*", "destination": "/blog" },
     { "source": "/blog/tags", "destination": "/blog" }
     { "source": "/docs/pricing", "destination": "/pricing" }
   ],
