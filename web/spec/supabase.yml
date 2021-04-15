@@ -949,11 +949,11 @@ pages:
         - `buckets` permissions: none 
         - `objects` permissions: `select`
     examples:
-      - name: Update file
+      - name: Create Signed URL
         isSpotlight: true
         js: |
           ```js
-          const { signedUrl, data, error } = await supabase
+          const { data, error } = await supabase
             .storage
             .from('avatars')
             .createSignedUrl('avatar1.png', 60)
