@@ -41,7 +41,7 @@ function APISection(props: Props) {
           <Link href={props.documentation_link} as={props.documentation_link}>
             <a>
               <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-                Expore documentation
+                Explore documentation
               </Button>
             </a>
           </Link>

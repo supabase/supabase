@@ -16,7 +16,7 @@ const BuiltExamples = () => {
       <div className="text-center">
         <Typography.Title level={2}>What can you build with supabase?</Typography.Title>
         <Typography.Text>
-          <p className="lg:text-lg">There's many example apps and starter projects to get going</p>
+          <p className="lg:text-lg">There are many example apps and starter projects to get going</p>
           <Space className="justify-center">
             <Link
               href="https://supabase.io/docs/guides/examples"

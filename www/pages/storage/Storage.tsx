@@ -212,7 +212,7 @@ function AuthPage() {
                 <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
                     icon={<IconShuffle />}
-                    title="Auto transformation & optimisation"
+                    title="Auto transformation & optimization"
                     text="Resize and compress your media before you serve it."
                   />
                   <Badge color="blue">Coming soon</Badge>
@@ -257,7 +257,7 @@ function AuthPage() {
                         className="mt-4"
                         icon={<IconArrowUpRight />}
                       >
-                        Expore documentation
+                        Explore documentation
                       </Button>
                     </div>
                     <div className="col-span-12 lg:col-span-6 lg:col-start-7">

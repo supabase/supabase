@@ -330,7 +330,7 @@ function Database() {
               >
                 <a>
                   <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-                    Expore documentation
+                    Explore documentation
                   </Button>
                 </a>
               </Link>
