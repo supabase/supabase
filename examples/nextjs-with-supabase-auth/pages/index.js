@@ -18,7 +18,7 @@ const Index = () => {
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY') setAuthView('update_password')
+      if (event === 'PASSWORD_RECOVERY') setAuthView('forgotten_password')
       if (event === 'USER_UPDATED') setTimeout(() => setAuthView('sign_in'), 1000)
       // Send session to /api/auth route to set the auth cookie.
       // NOTE: this is only needed if you're doing SSR (getServerSideProps)!
@@ -55,7 +55,7 @@ const Index = () => {
 
     return (
       <Space direction="vertical" size={6}>
-        {authView === 'update_password' && <Auth.UpdatePassword supabaseClient={supabase} />}
+        {authView === 'forgotten_password' && <Auth.UpdatePassword supabaseClient={supabase} />}
         {user && (
           <>
             <Typography.Text>You're signed in</Typography.Text>
@@ -68,7 +68,7 @@ const Index = () => {
             >
               Log out
             </Button>
-            {error && <Typography.Text danger>Failed to fetch user!</Typography.Text>}
+            {error && <Typography.Text type="danger">Failed to fetch user!</Typography.Text>}
             {data && !error ? (
               <>
                 <Typography.Text type="success">
