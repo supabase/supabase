@@ -90,6 +90,7 @@ module.exports = {
         'handbook/contributing',
         'company/terms',
         'company/privacy',
+        'company/aup',
       ],
     },
   ],
