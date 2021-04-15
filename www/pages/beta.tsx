@@ -906,7 +906,7 @@ const WhatsNext = () => (
             <li>
               More client libraries - members of the community are helping us build client libraries
               for many different languages including TypeScript, Python, Dart, C#, and Rust. Come
-              and help us bring Supabase to your favourite language or framework.
+              and help us bring Supabase to your favorite language or framework.
             </li>
           </ul>
           <p className="mb-10">
