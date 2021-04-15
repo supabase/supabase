@@ -953,7 +953,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = await supabase
+          const { signedURL, error } = await supabase
             .storage
             .from('avatars')
             .createSignedUrl('avatar1.png', 60)
