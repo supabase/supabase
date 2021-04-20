@@ -3,6 +3,7 @@ body {
   --custom-font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
     Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   --custom-bg-color: #101010;
+  --custom-panel-color: #222;
   --custom-box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.8);
   --custom-color: #fff;
   --custom-color-brand: #24b47e;
@@ -23,6 +24,145 @@ body {
   box-sizing: border-box;
 }
 
+html,
+body,
+#__next {
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Grid */
+
+.container {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.row {
+  position: relative;
+  width: 100%;
+}
+.row [class^="col"] {
+  float: left;
+  margin: 0.5rem 2%;
+  min-height: 0.125rem;
+}
+.col-1,
+.col-2,
+.col-3,
+.col-4,
+.col-5,
+.col-6,
+.col-7,
+.col-8,
+.col-9,
+.col-10,
+.col-11,
+.col-12 {
+  width: 96%;
+}
+.col-1-sm {
+  width: 4.33%;
+}
+.col-2-sm {
+  width: 12.66%;
+}
+.col-3-sm {
+  width: 21%;
+}
+.col-4-sm {
+  width: 29.33%;
+}
+.col-5-sm {
+  width: 37.66%;
+}
+.col-6-sm {
+  width: 46%;
+}
+.col-7-sm {
+  width: 54.33%;
+}
+.col-8-sm {
+  width: 62.66%;
+}
+.col-9-sm {
+  width: 71%;
+}
+.col-10-sm {
+  width: 79.33%;
+}
+.col-11-sm {
+  width: 87.66%;
+}
+.col-12-sm {
+  width: 96%;
+}
+.row::after {
+	content: "";
+	display: table;
+	clear: both;
+}
+.hidden-sm {
+  display: none;
+}
+
+@media only screen and (min-width: 33.75em) {  /* 540px */
+  .container {
+    width: 80%;
+  }
+}
+
+@media only screen and (min-width: 45em) {  /* 720px */
+  .col-1 {
+    width: 4.33%;
+  }
+  .col-2 {
+    width: 12.66%;
+  }
+  .col-3 {
+    width: 21%;
+  }
+  .col-4 {
+    width: 29.33%;
+  }
+  .col-5 {
+    width: 37.66%;
+  }
+  .col-6 {
+    width: 46%;
+  }
+  .col-7 {
+    width: 54.33%;
+  }
+  .col-8 {
+    width: 62.66%;
+  }
+  .col-9 {
+    width: 71%;
+  }
+  .col-10 {
+    width: 79.33%;
+  }
+  .col-11 {
+    width: 87.66%;
+  }
+  .col-12 {
+    width: 96%;
+  }
+  .hidden-sm {
+    display: block;
+  }
+}
+
+@media only screen and (min-width: 60em) { /* 960px */
+  .container {
+    width: 75%;
+    max-width: 60rem;
+  }
+}
+
+
 /* Forms */
 
 label {
@@ -37,7 +177,7 @@ input {
   width: 100%;
   border-radius: 5px;
   border: var(--custom-border);
-  padding: 6px;
+  padding: 8px;
   font-size: 0.9rem;
   background-color: var(--custom-bg-color);
   color: var(--custom-color);
@@ -49,9 +189,6 @@ input[disabled] {
 
 /* Utils */
 
-.w-half {
-  width: 50%;
-}
 .block {
   display: block;
   width: 100%;
@@ -85,14 +222,14 @@ input[disabled] {
   font-size: 0.8rem;
   font-weight: 300;
 }
+.text-right {
+  text-align: right;
+}
 .font-light {
   font-weight: 300;
 }
 .opacity-half {
   opacity: 50%;
-}
-.m-0 {
-  margin: 0;
 }
 
 /* Button */
@@ -144,12 +281,14 @@ button.primary,
 
 .footer {
   position: absolute;
+  max-width: 100%;
   bottom: 0;
   left: 0;
   right: 0;
   display: flex;
   flex-flow: row; 
   border-top: var(--custom-border);
+  background-color: var(--custom-bg-color);
 }
 .footer div {
   padding: var(--custom-spacing);
@@ -161,6 +300,22 @@ button.primary,
   height: 20px;
   margin-left: 10px;
 }
+.footer > div:first-child  {
+  display: none;
+}
+.footer > div:nth-child(2)  {
+  justify-content: left;
+}
+
+@media only screen and (min-width: 60em) { /* 960px */
+  .footer > div:first-child  {
+    display: flex;
+  }
+  .footer > div:nth-child(2)  {
+    justify-content: center;
+  }
+}
+
 
 @keyframes spin {
   from {
@@ -180,8 +335,8 @@ button.primary,
 .avatarPlaceholder {
   border: var(--custom-border);
   border-radius: var(--custom-border-radius);
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   background-color: rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
@@ -190,47 +345,14 @@ button.primary,
 
 /* Auth */
 
-.authContainer {
+
+.auth-widget {
   display: flex;
-  /* flex-direction: column; */
-  align-items: center;
-  justify-items: center;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.authContainer > .authTitle {
-  width: 22rem;
-  margin-right: 40px;
-}
-
-.authContainer > .authTitle > .header {
-  font-weight: 400;
-}
-
-.authContainer > .authTitle > .description {
-  opacity: 50%;
-  font-weight: 300;
-  line-height: 1.6em;
-}
-
-.authWidget {
-  background-color: #181818;
-  border: 1px solid #2a2a2a;
-  padding: 30px 30px;
-  border-radius: 5px;
-  width: 28rem;
-}
-
-.authWidget > .description {
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-.authWidget > .inputField {
-  border: none;
-  padding: 10px 10px;
-}
-
-.authWidget > .button {
+.auth-widget > .button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -240,11 +362,11 @@ button.primary,
   transition: all 0.2s ease;
 }
 
-.authWidget > .button:hover {
+.auth-widget .button:hover {
   background-color: #2a2a2a;
 }
 
-.authWidget > .button > .loader {
+.auth-widget .button > .loader {
   width: 17px;
   animation: spin 1s linear infinite;
   filter: invert(1);
@@ -253,8 +375,6 @@ button.primary,
 /* Account */
 
 .account {
-  width: 100%;
-  max-width: 400px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -272,25 +392,17 @@ button.primary,
 
 /* Profile Card */
 
-.profileList {
-  max-height: 420px;
-  overflow-y: auto;
-}
-
 .profileCard {
   border-radius: 5px;
   display: flex;
-  background-color: #2a2a2a;
+  border: var(--custom-border);
+  background-color: var(--custom-panel-color);
   padding: 20px 20px;
   margin-bottom: 20px;
 }
 
 .profileCard:last-child {
   margin-bottom: 0px;
-}
-
-.profileCard > .avatar {
-  border-radius: 50%;
 }
 
 .profileCard > .userInfo {

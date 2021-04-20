@@ -41,24 +41,16 @@ export default function Home() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
+    <div className="container" style={{padding: '50px 0 100px 0'}}>
       {!session ? (
         <Auth />
       ) : (
-        <div className="flex" style={{ width: '75%', maxWidth: '850px', gap: 30 }}>
-          <div className="flex column w-half">
+        <div className="row">
+          <div className="col-6">
             <h3>Account</h3>
             <Account key={session.user.id} session={session} />
           </div>
-          <div className="flex column w-half" style={{ gap: 20 }}>
+          <div className="col-6" >
             <h3>Public Profiles</h3>
             <ProfileList profiles={profiles} />
           </div>

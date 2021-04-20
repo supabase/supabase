@@ -22,33 +22,37 @@ export default function Auth({}) {
   }
 
   return (
-    <div className="authContainer">
-      <div className="authTitle">
-        <h1 className="header">Experience our Auth and Storage system</h1>
-        <p className="description">
-          Through a simple profile management example. Create a user profile and upload an avatar
-          image. Fast, simple, secure.
+    <div className="row">
+      <div className="col-6">
+        <h1 className="header">Supabase Auth + Storage</h1>
+        <p className="">
+          Experience our Auth and Storage through a simple profile management example. Create a user
+          profile and upload an avatar image. Fast, simple, secure.
         </p>
       </div>
-      <div className="authWidget" style={{ display: 'flex', gap: 20, flexDirection: 'column' }}>
+      <div className="col-6 auth-widget">
         <p className="description">Sign in via magic link with your email below</p>
-        <input
-          className="inputField"
-          type="email"
-          placeholder="Your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <button
-          onClick={(e) => {
-            e.preventDefault()
-            handleLogin(email)
-          }}
-          className={'button block'}
-          disabled={loading}
-        >
-          {loading ? <img className="loader" src="loader.svg" /> : <span>Send magic link</span>}
-        </button>
+        <div>
+          <input
+            className="inputField"
+            type="email"
+            placeholder="Your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div>
+          <button
+            onClick={(e) => {
+              e.preventDefault()
+              handleLogin(email)
+            }}
+            className={'button block'}
+            disabled={loading}
+          >
+            {loading ? <img className="loader" src="loader.svg" /> : <span>Send magic link</span>}
+          </button>
+        </div>
       </div>
     </div>
   )
