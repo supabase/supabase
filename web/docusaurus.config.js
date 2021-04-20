@@ -79,55 +79,16 @@ module.exports = {
           to: '/docs/reference/javascript/supabase-client',
           position: 'left',
         },
-        // {
-        //   label: 'Blog',
-        //   to: '/blog',
-        //   position: 'right',
-        // },
-        // {
-        //   to: 'docs/',
-        //   activeBasePath: 'Tools',
-        //   label: 'Tools',
-        //   position: 'left',
-        //   items: [
-        //     {
-        //       label: 'GoTrue',
-        //       to: '/docs/gotrue/server/about',
-        //     },
-        //     {
-        //       label: 'GoTrue Client',
-        //       to: '/docs/gotrue/client/gotrue-client',
-        //     },
-        //     {
-        //       label: 'Postgres',
-        //       to: '/docs/postgres/server/about',
-        //     },
-        //     {
-        //       label: 'Postgres API',
-        //       to: '/docs/postgres/api/about',
-        //     },
-        //     {
-        //       label: 'PostgREST',
-        //       to: '/docs/postgrest/server/about',
-        //     },
-        //     {
-        //       label: 'PostgREST Client',
-        //       to: '/docs/postgrest/client/postgrest-client',
-        //     },
-        //     {
-        //       label: 'Realtime',
-        //       to: '/docs/realtime/server/about',
-        //     },
-        //     {
-        //       label: 'Realtime Client',
-        //       to: '/docs/realtime/client/realtime-client',
-        //     },
-        //   ],
-        // },
         {
           to: '/docs/resources',
           activeBaseRegex: 'docs/(resources|learn|gotrue|postgrest|realtime)',
           label: 'Resources',
+          position: 'left',
+        },
+        {
+          label: 'Jobs',
+          activeBasePath: '/docs/careers',
+          to: '/docs/careers',
           position: 'left',
         },
         { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
