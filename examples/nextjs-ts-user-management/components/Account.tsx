@@ -119,6 +119,19 @@ export default function Account({ session }: { session: AuthSession }) {
   return (
     <div className="account">
       <div>
+        <label htmlFor="avatar">Avatar image</label>
+        <div className="avatarField">
+          <div className="avatarContainer">
+            {avatar ? (
+              <Avatar url={avatar} size={35} />
+            ) : (
+              <div className="avatarPlaceholder">?</div>
+            )}
+          </div>
+          <UploadButton onUpload={uploadAvatar} loading={uploading} />
+        </div>
+      </div>
+      <div>
         <label htmlFor="email">Email</label>
         <input id="email" type="text" value={session.user.email} disabled />
       </div>
@@ -139,19 +152,6 @@ export default function Account({ session }: { session: AuthSession }) {
           value={website || ''}
           onChange={(e) => setWebsite(e.target.value)}
         />
-      </div>
-      <div>
-        <label htmlFor="avatar">Avatar image</label>
-        <div className="avatarField">
-          <div className="avatarContainer">
-            {avatar ? (
-              <Avatar url={avatar} size={40} />
-            ) : (
-              <div className="avatarPlaceholder">?</div>
-            )}
-          </div>
-          <UploadButton onUpload={uploadAvatar} loading={uploading} />
-        </div>
       </div>
 
       <div>
