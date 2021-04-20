@@ -191,8 +191,12 @@ pages:
       ```bash
       npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/supabase.ts
       ```
-
-      **Note:** Do note that your local types won't automatically stay in sync with your database, so make sure to regenerate your types after your make changes to your database.
+      
+      Important disclaimers:
+      
+      - The generator can't know if a column is specified as an array, and will thus just generate the type as `string`, even though supabase handles this automatically and returns arrays.
+        You can fix this manually in the files by changing the type, e.g. `names: string` -> `names: string[]`
+      - The types won't automatically stay in sync with your database, so make sure to regenerate your types after your make changes to your database.
 
       After you have generated your types, you can use them in your TypeScript projects:
 
