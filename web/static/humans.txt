@@ -17,7 +17,6 @@ Paul Copplestone
 Rory Wilding
 Steve Chavez
 Wen Bo Xie
-YK Sugi
 
 ____________
 
@@ -30,7 +29,7 @@ ___________
 
 TECHNOLOGIES 
 
-Supabase would not be possible without the work of some other amazing opensource contributors.
+Supabase would not be possible without the work of some other amazing open source contributors.
 
 - Postgres - https://www.postgresql.org/docs/devel/git.html
 - PostgREST - https://github.com/PostgREST
