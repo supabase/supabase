@@ -80,6 +80,10 @@
       {
         "text": "Lawyers.txt",
         "url": "/lawyers.txt"
+      },
+      {
+        "text": "Security.txt",
+        "url": "https://supabase.io/.well-known/security.txt"
       }
     ]
   }
