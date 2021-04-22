@@ -80,6 +80,24 @@ Now that you have the Docker set up on your local machine, you can start it here
 docker-compose up
 ```
 
+**Important** 
+
+Make sure you update the default passwords and secrets before running in Production:
+
+- Postgres 
+  - [POSTGRES_PASSWORD](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L80)
+- Realtime 
+  - [DB_PASSWORD](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L60)
+  - [JWT_SECRET](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L66)
+- PostgREST 
+  - [PGRST_DB_URI](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L44)
+  - [PGRST_JWT_SECRET](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L47)
+- GoTrue 
+  - [DATABASE_URL](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L32)
+  - [GOTRUE_OPERATOR_TOKEN](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L31)
+  - [GOTRUE_JWT_SECRET](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L19)
+  - [GOTRUE_JWT_SECRET](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L19)
+
 ## Configuring each service
 
 Supabase is made up of several services. We have prefilled the `docker-compose` file with all the configuration you need to get started. 
