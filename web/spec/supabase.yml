@@ -799,14 +799,14 @@ pages:
           ```js
           const subscriptions = supabase.getSubscriptions()
           ```
-          
+
   storage.listBuckets():
     title: 'listBuckets()'
     $ref: '@supabase/supabase-js."lib/storage/StorageBucketApi".StorageBucketApi.listBuckets'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
-        - `objects` permissions: none 
+        - `objects` permissions: none
     examples:
       - name: List buckets
         isSpotlight: true
@@ -823,7 +823,7 @@ pages:
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
-        - `objects` permissions: none 
+        - `objects` permissions: none
     examples:
       - name: Get bucket
         isSpotlight: true
@@ -840,7 +840,7 @@ pages:
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `insert` 
-        - `objects` permissions: none 
+        - `objects` permissions: none
     examples:
       - name: Create bucket
         isSpotlight: true
@@ -857,7 +857,7 @@ pages:
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
-        - `objects` permissions: `select` and `delete` 
+        - `objects` permissions: `select` and `delete`
     examples:
       - name: Empty bucket
         isSpotlight: true
@@ -874,7 +874,7 @@ pages:
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` and `delete`
-        - `objects` permissions: none 
+        - `objects` permissions: none
     examples:
       - name: Delete bucket
         isSpotlight: true
@@ -1919,6 +1919,7 @@ pages:
           ```js
           const { data, error } = await supabase
             .from('quotes')
+            .select('catchphrase')
             .textSearch('catchphrase', `'fat' & 'cat'`, { 
               config: 'english' 
             })
@@ -1929,6 +1930,7 @@ pages:
           ```js
           const { data, error } = await supabase
             .from('quotes')
+            .select('catchphrase')
             .textSearch('catchphrase', `'fat' & 'cat'`, { 
               type: 'plain',
               config: 'english' 
@@ -1940,6 +1942,7 @@ pages:
           ```js
           const { data, error } = await supabase
             .from('quotes')
+            .select('catchphrase')
             .textSearch('catchphrase', `'fat' & 'cat'`, { 
               type: 'phrase',
               config: 'english' 
@@ -1960,6 +1963,7 @@ pages:
           ```js
           const { data, error } = await supabase
             .from('quotes')
+            .select('catchphrase')
             .textSearch('catchphrase', `'fat or cat'`, { 
               type: 'websearch',
               config: 'english'
