@@ -212,6 +212,8 @@ pages:
 
   api.sendMagicLinkEmail:
     $ref: '"GoTrueApi".GoTrueApi.sendMagicLinkEmail'
+    notes: |
+      - An account is created when a non-existing user email is passed.
     examples:
       - name: Send user a passwordless login link via email
         js: |
