@@ -25,8 +25,8 @@
   src: url('/fonts/office-code-pro/OfficeCodePro-Regular.eot');
   src: url('/fonts/office-code-pro/OfficeCodePro-Regular.woff2') format('woff2'),
     url('/fonts/office-code-pro/OfficeCodePro-Regular.woff') format('woff'),
-    url('/fonts/office-code-pro/OfficeCodePro-Regular.ttf') format('truetype'),
-    url('/fonts/office-code-pro/OfficeCodePro-Regular.svg#SourceCodePro-Regular') format('svg');
+    url('/fonts/office-code-pro/OfficeCodePro-Regular.ttf') format('truetype');
+  /*url('/fonts/office-code-pro/OfficeCodePro-Regular.svg#SourceCodePro-Regular') format('svg');*/
   font-weight: normal;
   font-style: normal;
   font-display: swap;
