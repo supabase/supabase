@@ -13,8 +13,6 @@ module.exports = {
   organizationName: 'supabase', // Usually your GitHub org/user name.
   projectName: 'supabase', // Usually your repo name.
   themeConfig: {
-    forceDarkMode: true,
-    darkMode: true,
     colorMode: {
       // "light" | "dark"
       defaultMode: 'dark',
