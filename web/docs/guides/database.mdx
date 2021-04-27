@@ -107,6 +107,68 @@ alter table_name your_table
 replica identity full;
 ```
 
+### Migrating between projects
+
+If you have an existing Supabase Project and you want to migrate it into a new (fresh) Project, you can simply follow these steps:
+
+#### Before you begin
+
+- Make sure [Realtime is disabled](/docs/guides/api#managing-realtime). This will improve the performance of inserts on your new database.
+- Make sure you have [`psql`](https://www.postgresql.org/docs/13/app-psql.html) installed on your computer so that you can run `pg_dump`.
+
+#### Migrate the database
+
+First we want to grab the database structure only:
+
+```sh
+pg_dump \
+-h db.PROJECT_REF.supabase.co \
+-U postgres \
+--clean \
+--schema-only \
+> supabase_schema.sql
+```
+
+This command creates a file on your computer called `supabase_schema.sql`. 
+
+After creating a new Supabase project we can use it to restore the database structure:
+
+```sh
+psql \
+-h db.NEW_PROJECT_REF.supabase.co \
+-U postgres \
+< supabase_schema.sql
+```
+
+You may see some errors - the restore will attempt to drop any tables if they are present, 
+and if they aren't present then an error will be displayed. These errors are informative only and nothing to worry about.
+
+
+#### (Optionally) Migrate the data
+
+We can migrate everything in our database, however we don't want to migrate 
+the data in our `storage` schema because the files exist outside of the database. 
+For now, we can just get all the data inside the `public` and `auth` schemas:
+
+```sh
+pg_dump \
+-h db.PROJECT_REF.supabase.co \
+-U postgres \
+--data-only \
+-n public \
+-n auth \
+> supabase_data.sql
+```
+
+This command creates a file on your computer called `supabase_data.sql`.  We can use this file to restore the data in our new database:
+
+```sh
+psql \
+-h db.NEW_PROJECT_REF.supabase.co \
+-U postgres \
+< supabase_data.sql
+```
+
 
 ### Resetting your project password
 
@@ -140,3 +202,4 @@ Read more in [Database Configuration](/docs/reference/postgres/changing-timezone
 
 - Read more about [Postgres](/docs/postgres/server/about)
 - Sign in: [app.supabase.io](https://app.supabase.io)
+
