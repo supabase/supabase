@@ -54,8 +54,8 @@
   {
     "type": "example",
     "products": ["database", "auth"],
-    "title": "NextJS example",
-    "description": "NextJS example using Supabase Auth",
+    "title": "NestJS example",
+    "description": "NestJS example using Supabase Auth",
     "author": "hiro1107",
     "author_url": "https://github.com/hiro1107",
     "author_img": "https://avatars.githubusercontent.com/u/1423067",
