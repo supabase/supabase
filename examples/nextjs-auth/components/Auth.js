@@ -48,6 +48,17 @@ function Auth(props) {
     setLoading(false)
   }
 
+  const handleMagicLinkSignIn = async (e) => {
+    e.preventDefault()
+    setError('')
+    setMessage('')
+    setLoading(true)
+    const { error } = await supabaseClient.auth.signIn({ email })
+    if (error) setError(error.message)
+    else setMessage('Check your email for the magic link')
+    setLoading(false)
+  }
+
   return (
     <>
       {loading && <h3>Loading..</h3>}
@@ -57,13 +68,18 @@ function Auth(props) {
         <>
           <h4>Sign in</h4>
           <form onSubmit={(e) => handleSignIn(e)}>
+            <label for="sign-in__email">Email</label>
             <input
+              id="sign-in__email"
               label="Email address"
               autoComplete="email"
+              placeholder="Type in your email address"
               defaultValue={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+            <label for="sign-in__password">Password</label>
             <input
+              id="sign-in__password"
               label="Password"
               type="password"
               defaultValue={password}
@@ -75,18 +91,25 @@ function Auth(props) {
           <hr />
           <a onClick={() => setAuthView('sign_up')}>Don't have an account? Sign up</a>
           <a onClick={() => setAuthView('forgotten_password')}>Forgot my password</a>
+          <hr />
+          <a onClick={() => setAuthView('magic_link')}>Send magic link email</a>
         </>
       ) : authView === 'sign_up' ? (
         <>
           <h4>Sign up</h4>
           <form onSubmit={(e) => handleSignUp(e)}>
+            <label for="sign-up__email">Email</label>
             <input
+              id="sign-up__email"
               label="Email address"
               autoComplete="email"
+              placeholder="Type in your email address"
               defaultValue={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+            <label for="sign-up__password">Password</label>
             <input
+              id="sign-up__password"
               label="Password"
               type="password"
               defaultValue={password}
@@ -98,18 +121,42 @@ function Auth(props) {
           <hr />
           <a onClick={() => setAuthView('sign_in')}>Already have an account, Sign in</a>
           <a onClick={() => setAuthView('forgotten_password')}>Forgot my password</a>
+          <hr />
+          <a onClick={() => setAuthView('magic_link')}>Send magic link email</a>
         </>
       ) : authView === 'forgotten_password' ? (
         <>
           <h4>Forgotten password</h4>
           <form onSubmit={handlePasswordReset}>
+            <label for="forgotten_password__email">Email</label>
             <input
+              id="forgotten_password__email"
               label="Email address"
               autoComplete="email"
+              placeholder="Type in your email address"
               defaultValue={email}
               onChange={(e) => setEmail(e.target.value)}
             />
             <button type="submit">Send reset password instructions</button>
+          </form>
+          <hr />
+          <a onClick={() => setAuthView('sign_up')}>Don't have an account? Sign up</a>
+          <a onClick={() => setAuthView('sign_in')}>Already have an account, Sign in</a>
+          <hr />
+          <a onClick={() => setAuthView('magic_link')}>Send magic link email</a>
+        </>
+      ) : authView === 'magic_link' ? (
+        <>
+          <h4>Magic link</h4>
+          <form onSubmit={handleMagicLinkSignIn}>
+            <input
+              label="Email address"
+              autoComplete="email"
+              placeholder="Type in your email address"
+              defaultValue={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <button type="submit">Send magic link</button>
           </form>
           <hr />
           <a onClick={() => setAuthView('sign_up')}>Don't have an account? Sign up</a>
