@@ -36,6 +36,7 @@ async function gen(inputFileName, outputDir) {
   if (!defRef) return
 
   const definition = JSON.parse(defRef)
+  const id = docSpec.info.id
   const allLanguages = docSpec.info.libraries
   const pages = Object.entries(docSpec.pages).map(([name, x]: [string, OpenRef.Page]) => ({
     ...x,
@@ -74,8 +75,8 @@ async function gen(inputFileName, outputDir) {
         title: pageSpec.title || pageSpec.pageName,
         description,
         parameters: hasTsRef ? generateParameters(tsDefinition) : '',
-        spotlight: generateSpotlight(pageSpec['examples'] || [], allLanguages),
-        examples: generateExamples(pageSpec['examples'] || [], allLanguages),
+        spotlight: generateSpotlight(id, pageSpec['examples'] || [], allLanguages),
+        examples: generateExamples(id, pageSpec['examples'] || [], allLanguages),
         notes: pageSpec.notes,
       })
 
@@ -125,7 +126,7 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
 
   if (!!children) {
     let properties = children
-      .sort((a, b) => (a.name.localeCompare(b.name))) // first alphabetical
+      .sort((a, b) => a.name.localeCompare(b.name)) // first alphabetical
       .sort((a, b) => (a.flags?.isOptional ? 1 : -1)) // required params first
       .map((x) => recurseThroughParams(x))
     let heading = `<h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>`
@@ -163,9 +164,9 @@ ${description ? description : 'No description provided. '}
 </li>
 `
 
-function generateExamples(specExamples: any, allLanguages: any) {
+function generateExamples(id: string, specExamples: any, allLanguages: any) {
   return specExamples.map((example) => {
-    let allTabs = Tabs(allLanguages, generateTabs(allLanguages, example))
+    let allTabs = Tabs(id, allLanguages, generateTabs(allLanguages, example))
     return Example({ name: example.name, description: example.description, tabs: allTabs })
   })
 }
@@ -173,11 +174,11 @@ function generateExamples(specExamples: any, allLanguages: any) {
 /**
  * A spotlight is an example which appears at the top of the page.
  */
-function generateSpotlight(specExamples: any, allLanguages: any) {
+function generateSpotlight(id: string, specExamples: any, allLanguages: any) {
   const spotlight = specExamples.find((x) => x.isSpotlight) || null
   const spotlightContent = !spotlight
     ? ''
-    : Tabs(allLanguages, generateTabs(allLanguages, spotlight))
+    : Tabs(id, allLanguages, generateTabs(allLanguages, spotlight))
   return spotlightContent
 }
 
@@ -224,10 +225,15 @@ function extractParamTypeAsString(paramDefinition) {
 function extractTsDocNode(nodeToFind: string, definition: any) {
   const nodePath = nodeToFind.split('.')
   let i = 0
+  let previousNode = definition 
   let currentNode = definition
   while (i < nodePath.length) {
-    currentNode = currentNode.children.find((x) => x.name == nodePath[i]) || null
-    if (currentNode == null) break
+    previousNode = currentNode
+    currentNode = previousNode.children.find((x) => x.name == nodePath[i]) || null
+    if (currentNode == null) {
+      console.log(`Cant find ${nodePath[i]} in ${previousNode.children.map((x) => '\n' + x.name)}`)
+      break
+    }
     i++
   }
   return currentNode

@@ -40,7 +40,7 @@ module.exports = {
         },
       },
     },
-    sidebarCollapsible: false,
+    sidebarCollapsible: true,
     algolia: {
       apiKey: '766d56f13dd1e82f43253559b7c86636',
       indexName: 'supabase',
@@ -75,59 +75,20 @@ module.exports = {
         },
         {
           label: 'Reference',
-          activeBasePath: '/docs/client/',
-          to: '/docs/client/supabase-client',
+          activeBasePath: '/docs/reference/',
+          to: '/docs/reference/javascript/supabase-client',
           position: 'left',
         },
-        // {
-        //   label: 'Blog',
-        //   to: '/blog',
-        //   position: 'right',
-        // },
-        // {
-        //   to: 'docs/',
-        //   activeBasePath: 'Tools',
-        //   label: 'Tools',
-        //   position: 'left',
-        //   items: [
-        //     {
-        //       label: 'GoTrue',
-        //       to: '/docs/gotrue/server/about',
-        //     },
-        //     {
-        //       label: 'GoTrue Client',
-        //       to: '/docs/gotrue/client/gotrue-client',
-        //     },
-        //     {
-        //       label: 'Postgres',
-        //       to: '/docs/postgres/server/about',
-        //     },
-        //     {
-        //       label: 'Postgres API',
-        //       to: '/docs/postgres/api/about',
-        //     },
-        //     {
-        //       label: 'PostgREST',
-        //       to: '/docs/postgrest/server/about',
-        //     },
-        //     {
-        //       label: 'PostgREST Client',
-        //       to: '/docs/postgrest/client/postgrest-client',
-        //     },
-        //     {
-        //       label: 'Realtime',
-        //       to: '/docs/realtime/server/about',
-        //     },
-        //     {
-        //       label: 'Realtime Client',
-        //       to: '/docs/realtime/client/realtime-client',
-        //     },
-        //   ],
-        // },
         {
           to: '/docs/resources',
           activeBaseRegex: 'docs/(resources|learn|gotrue|postgrest|realtime)',
           label: 'Resources',
+          position: 'left',
+        },
+        {
+          label: 'Jobs',
+          activeBasePath: '/docs/careers',
+          to: '/docs/careers',
           position: 'left',
         },
         { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
@@ -146,7 +107,7 @@ module.exports = {
           items: [
             {
               label: 'Blog',
-              to: '/blog',
+              to: 'https://supabase.io/blog',
             },
             {
               label: 'Open source',
@@ -159,7 +120,7 @@ module.exports = {
             {
               label: 'Lawyers.txt',
               to: 'https://supabase.io/lawyers.txt',
-            },
+            }
           ],
         },
         {
@@ -171,7 +132,7 @@ module.exports = {
             },
             {
               label: 'Pricing',
-              to: '/docs/pricing',
+              to: 'https://supabase.io/pricing',
             },
             {
               label: 'Support',

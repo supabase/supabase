@@ -10,7 +10,7 @@ This is a full-stack Slack clone example using:
 
 ## Demo
 
-- Live demo: http://supabase-slack-clone.supabase.vercel.app/
+- Live demo: http://supabase-slack-clone-supabase.vercel.app/
 - CodeSandbox: https://codesandbox.io/s/github/supabase/supabase/tree/master/examples/nextjs-slack-clone
 - Video tutorial: https://www.loom.com/share/31eec9b656e44b8d87c88bde8a465676
 
@@ -154,7 +154,7 @@ CREATE TABLE public.messages (
   channel_id bigint REFERENCES public.channels NOT NULL
 );
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow logged-in read access" on public.messages USING ( auth.role() = 'authenticated' );
+CREATE POLICY "Allow logged-in read access" on public.messages FOR SELECT USING ( auth.role() = 'authenticated' );
 CREATE POLICY "Allow individual insert access" on public.messages FOR INSERT WITH CHECK ( auth.uid() = user_id );
 CREATE POLICY "Allow individual update access" on public.messages FOR UPDATE USING ( auth.uid() = user_id );
 ```
