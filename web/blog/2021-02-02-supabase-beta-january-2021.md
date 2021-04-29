@@ -6,9 +6,9 @@ author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
-image: /img/supabase-january-2021.png
+image: /img/release-jan-2021.jpg
 tags:
-  - supabase
+  - release-notes
 ---
 
 New year, new features. We've been busy at Supabase during January and our community has been even busier. Here's a few things you'll find interesting.
@@ -76,6 +76,8 @@ We know that Auth can be a bit daunting when you're just starting out, so we hav
 - [Supabase Auth Deep Dive Part 1: JWTs](https://youtu.be/v3Exg5YpJvE)
 - [Supabase Auth Deep Dive Part 2: Restrict Table Access](https://youtu.be/qY_iQ10IUhs)
 - [Supabase Auth Deep Dive Part 3: User Based Access Policies](https://youtu.be/0LvCOlELs5U)
+- [Supabase Auth Deep Dive Part 4: Gotrue Auth Server](https://youtu.be/neqfYym_84k)
+- [Supabase Auth Deep Dive Part 5: Google Oauth](https://youtu.be/_XM9ziOzWk4)
 
 ![We released a Auth Video Series](/img/blog/supabase-auth-series.png)
 

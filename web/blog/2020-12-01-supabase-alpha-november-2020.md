@@ -8,7 +8,7 @@ author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c677
 authorURL: https://github.com/kiwicopple
 image: /img/supabase-november-2020.png
 tags:
-  - supabase
+  - release-notes
 ---
 
 We've been building for 9 months now, and we're getting even closer to Beta.

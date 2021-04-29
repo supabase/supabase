@@ -8,7 +8,7 @@ author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c677
 authorURL: https://github.com/kiwicopple
 image: /img/supabase-october-2020.png
 tags:
-  - supabase
+  - release-notes
 ---
 
 We're now 8 months into building Supabase. We're focused on performance, stability, and reliability but that hasn't prevented us from shipping some great features.
@@ -47,7 +47,7 @@ One of the most requested Auth features was the ability to send magic links that
 
 ### Kaizen
 
-- We have new and improved [docs](https://supabase.io/docs/client/supabase-client).
+- We have new and improved [docs](https://supabase.io/docs/reference/javascript/supabase-client).
 - We converted [realtime-js](https://github.com/supabase/realtime-js/) to TypeScript.
 - Dashboard Performance: we heavily optimised our dashboard routes.
 - With the help of the community, we [closed a lot of issues](https://github.com/orgs/supabase/projects/5) during Hacktoberfest.
