@@ -16,8 +16,8 @@
     "gen:postgres": "ts-node ReferenceGenerator.ts -o docs/reference/postgres spec/postgres.yml"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.0.0-alpha.adf2a526e5",
-    "@docusaurus/preset-classic": "^2.0.0-alpha.adf2a526e5",
+    "@docusaurus/core": "^2.0.0-alpha.fd7aa2bf32",
+    "@docusaurus/preset-classic": "^2.0.0-alpha.fd7aa2bf32",
     "@kiwicopple/prism-react-renderer": "github:kiwicopple/prism-react-renderer",
     "mermaid": "^8.6.4",
     "react": "^17.0.2",
