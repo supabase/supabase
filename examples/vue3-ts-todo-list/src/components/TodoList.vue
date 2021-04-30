@@ -57,14 +57,15 @@ export default defineComponent({
         // Try and wrie the data to to the database
         const todo = await addTodo({ user_id: userSession.value.user.id, task: task.value })
 
-        // Reset inptut feild
-        task.value = ''
-
+        // If there was no response, dont do anything.
         if (!todo) {
           return
         }
         // Otherwise push the response into allTodos.
         allTodos.value.push(todo)
+
+        // Reset inptut feild
+        task.value = ''
       } catch (err) {
         console.error('Unknown error when adding todo', err)
       }
