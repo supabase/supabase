@@ -54,8 +54,12 @@ export default defineComponent({
         return
       }
       try {
+        // Try and wrie the data to to the database
         const todo = await addTodo({ user_id: userSession.value.user.id, task: task.value })
-        // If there was no response, dont do anything.
+
+        // Reset inptut feild
+        task.value = ''
+
         if (!todo) {
           return
         }
