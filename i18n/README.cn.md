@@ -18,26 +18,32 @@
 
 ## 文档
 
+如果你想看看我们的文档，请到 supabase.io/docs
+
 ## 社群与支援
+
+社区论坛。最适合: 帮助构建和讨论数据库最佳实践。
+Github Issues: 电子邮件支持。最适合: 报告使用 Supabase 时遇到的问题。
+电子邮件支持。最适合:使用数据库或基础设施时遇到的问题。
 
 ## 发展现状
 
-- [x] Alpha: 限られたユーザーで Supabase をテストしています。
-- [x] Public Alpha: 誰でも[app.supabase.io](https://app.supabase.io)から登録ができます。ただし、バグなどがある可能性がありますので、ご容赦ください。
-- [x] Public Beta: 企業以外のほとんどのユースケースに耐えうる十分な安定性を確保。
-- [ ] Public: 実用的な用途に対応
+- [x] Alpha: 我们正在对有限的一批客户进行 Supabase 测试
+- [x] Public Alpha: 任何人都可以在[app.supabase.io](https://app.supabase.io)上进行注册。
+- [x] Public Beta: 稳定,可以支持大多数非企业用例
+- [ ] Public: 生产就绪软件
 
-現在、Public Beta を実施しています。このリポジトリの"release"にてメジャーアップデートに関する情報を発信しています。
+我们目前处于公开测试阶段。访问这个存储库的发布页面以获得关于主要更新的通知。
 
 <kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
-## How it works
+## 系统的运行
 
 Supabase は、オープンソースのツールを組み合わせてできています。私たちは Firebase の機能を、エンタープライズグレードのオープンソース製品を使って構築しています。ツールやコミュニティが存在し、MIT、Apache 2、または同等のオープンライセンスであれば、私たちはそのツールを使用し、サポートします。ツールが存在しない場合は、自分たちで構築してオープンソース化します。Supabase は Firebase を 1 対 1 でマッピングしたものではありません。Supabase の目的は、オープンソースのツールを使って、Firebase のような開発体験を提供することです。
 
-**Current Architecture**
+**当前的体系结构**
 
 Supabase は[ホスティングされたプラットフォーム](https://app.supabase.io)です。登録するだけで、何もインストールせずに使い始めることができます。
 更に現在ローカルでの開発環境を整えており、これはプラットフォームの安定性と並んで今最優先で進めているプロジェクトになります。
@@ -52,16 +58,16 @@ Supabase は[ホスティングされたプラットフォーム](https://app.su
 - [GoTrue](https://github.com/netlify/gotrue) は、SWT をベースにしたユーザー管理と SWT トークンの発行のための API です。
 - [Kong](https://github.com/Kong/kong) は、クラウドネイティブな API ゲートウェイです。
 
-#### Client Libraries
+#### 客户端库
 
-Supabase クライアント・ライブラリはモジュール化されています。それぞれのサブライブラリが、一つの外部システムのための独立した実装となっています。こうすることで、既存のツールをサポートしています。
+Supabase 的客户端库由模块组成，每个模块的功能独立。通过这个结构，我们可以帮助支持现有的工具。
 
-- **`supabase-{lang}`**: 下記全てのライブラリを内包したクライアントライブラリ
-  - `postgrest-{lang}`: [PostgREST](https://github.com/postgrest/postgrest)用のクライアントライブラリ
-  - `realtime-{lang}`: [Realtime](https://github.com/supabase/realtime)用のクライアントライブラリ
-  - `gotrue-{lang}`: [GoTrue](https://github.com/netlify/gotrue)用のクライアントライブラリ
+- **`supabase-{lang}`**: 组合客户端库并对其进行增强
+  - `postgrest-{lang}`: [PostgREST](https://github.com/postgrest/postgrest)与 postgres 交互的客户端库
+  - `realtime-{lang}`: [Realtime](https://github.com/supabase/realtime)与 Realtime 交互的客户端库
+  - `gotrue-{lang}`: [GoTrue](https://github.com/netlify/gotrue)与 GoTrue 交互的客户端库
 
-| レポジトリ            | 公式                                             | コミュニティ                                                                                                                                                                                                               |
+| 代码存储库            | 正式版                                           | 社区版                                                                                                                                                                                                                     |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
