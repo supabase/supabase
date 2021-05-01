@@ -49,13 +49,13 @@ Supabase 是[託管平台](https://app.supabase.io)。只要註冊，不必安�
 
 ![架構](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
-- [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
-- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Supabase listens to Postgres' built-in replication functionality, converts the replication byte stream into JSON, then broadcasts the JSON over websockets.
+- [PostgreSQL](https://www.postgresql.org/) 是經歷 30 年活躍開發的關聯物件資料庫系統，因此擁有可靠度、功能細緻度與效能著稱。
+- [Realtime](https://github.com/supabase/realtime) 是利用 Websocket 監聽 PostgreSQL 的 insert、update 和 delete 的 Elixir 伺服器。Supabase 監聽 Postgres 內建的複寫 (Replication) 功能，將複寫的 byte stream 轉換為 JSON 格式，接著透過 Websocket 將 JSON 進行廣播。
 - [PostgREST](http://postgrest.org/) 是直接把 PostgreSQL 轉變成 RESTful API 的網頁伺服器
 - [Storage](https://github.com/supabase/storage-api) 提供管理放置在 S3 檔案的 RESTful 介面，使用 Postgres 管理權限。
 - [postgres-meta](https://github.com/supabase/postgres-meta) 是管理 Postgres 的 RESTful API，可以 fetch 資料表、新增角色以及執行查詢…等。
 - [GoTrue](https://github.com/netlify/gotrue) 是基於 SWT 的 API，用來管理使用者，以及發送 SWT token。
-- [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
+- [Kong](https://github.com/Kong/kong) 是雲端原生的 API Gateway。
 
 #### 客戶端 Library
 
