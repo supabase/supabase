@@ -18,7 +18,7 @@
 
 ## 文档
 
-如果你想看看我们的文档，请到 supabase.io/docs
+我们的文档，请到 [supabase.io/docs](supabase.io/docs)
 
 ## 社群与支援
 
@@ -41,22 +41,22 @@ Github Issues: 电子邮件支持。最适合: 报告使用 Supabase 时遇到�
 
 ## 系统的运行
 
-Supabase は、オープンソースのツールを組み合わせてできています。私たちは Firebase の機能を、エンタープライズグレードのオープンソース製品を使って構築しています。ツールやコミュニティが存在し、MIT、Apache 2、または同等のオープンライセンスであれば、私たちはそのツールを使用し、サポートします。ツールが存在しない場合は、自分たちで構築してオープンソース化します。Supabase は Firebase を 1 対 1 でマッピングしたものではありません。Supabase の目的は、オープンソースのツールを使って、Firebase のような開発体験を提供することです。
+Supabase 是一个开源工具的组合。我们使用企业级的开源产品来构建 Firebase 的特性。如果工具和社区存在，并且有 MIT、Apache 2 或同等的开放许可，我们将使用并支持该工具。如果这个工具不存在，我们将自己开发和开源它。Supabase 不是 Firebase 的一对一映射。我们的目标是让开发人员使用开源工具获得类似 firebase 的开发体验。
 
 **当前的体系结构**
 
-Supabase は[ホスティングされたプラットフォーム](https://app.supabase.io)です。登録するだけで、何もインストールせずに使い始めることができます。
-更に現在ローカルでの開発環境を整えており、これはプラットフォームの安定性と並んで今最優先で進めているプロジェクトになります。
+Supabase 是一个[托管平台](https://app.supabase.io)。您可以注册并开始使用 Supabase，而无需安装任何软件。我们仍在创造本地开发体验——这是我们现在的核心焦点，以及平台的稳定性。
 
-![アーキテクチャー](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![软件架构图](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
-- [PostgreSQL](https://www.postgresql.org/)は、30 年以上にわたって開発・改善されてきたオブジェクトリレーショナルデータベースシステムで、信頼性、機能の堅牢性、パフォーマンスの面で高い評価を得ています。
-- [Realtime](https://github.com/supabase/realtime)は、PostgreSQL の insert、update、delete の情報を Websocket リアルタイムで受信することができる Elixir サーバです。Supabase は Postgres に組み込まれたレプリケーション機能に対してリッスンし、レプリケーションのバイトストリームを JSON に変換し、その JSON を Websocket でブロードキャストします。
-- [PostgREST](http://postgrest.org/)は、PostgreSQL データベースを RESTful API に直接変換するウェブサーバです。
-- [Storage](https://github.com/supabase/storage-api)は、S3 に保存されたファイルを管理するための RESTful なインターフェイスで、パーミッションの管理には Postgres を使用しています。
-- [postgres-meta](https://github.com/supabase/postgres-meta) は、Postgres を管理するための RESTful API で、テーブルの取得、role の追加、クエリの実行などを行うことができます。
-- [GoTrue](https://github.com/netlify/gotrue) は、SWT をベースにしたユーザー管理と SWT トークンの発行のための API です。
-- [Kong](https://github.com/Kong/kong) は、クラウドネイティブな API ゲートウェイです。
+- [PostgreSQL](https://www.postgresql.org/)是一个对象关系数据库系统，经过了超过 30 年的积极开发，在可靠性、特性健壮性和性能方面赢得了声誉。
+- [Realtime](https://github.com/supabase/realtime)是一个 Elixir 服务器，允许你监听 PostgreSQL 插入，更新和删除使用 websockets。Supabase 监听 Postgres 内置的复制功能，将复制字节流转换成 JSON，然后通过 websocket 广播 JSON。
+- [PostgREST](http://postgrest.org/)是一个 web 服务器，把你的 PostgreSQL 数据库直接变成一个 RESTful API。
+- [Storage](https://github.com/supabase/storage-api)提供一个 RESTful 接口来管理存储在 S3 中的文件，使用 Postgres 管理权限。
+
+- [postgres-meta](https://github.com/supabase/postgres-meta) 是一个用于管理 Postgres 的 RESTful API，允许你获取表，添加角色，运行查询等。
+- [GoTrue](https://github.com/netlify/gotrue)这是一个基于 SWT 的 API，用于管理用户和发布 SWT 令牌 a。
+- [Kong](https://github.com/Kong/kong) 是一个原生云 API 网关。
 
 #### 客户端库
 
