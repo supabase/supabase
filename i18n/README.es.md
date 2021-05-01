@@ -32,12 +32,10 @@ Para ver la documentación completa, visita [supabase.io/docs](https://supabase.
 
 - [x] Alpha: We are testing Supabase with a closed set of customers
 - [x] Alpha: Estamos probando Supabase con un circulo cerrado de clientes
-- [x] Public Alpha: Anyone can sign up over at [app.supabase.io](https://app.supabase.io). But go easy on us, there are a few kinks.
 - [x] Public Alpha: Cualquiera puede registrarse en [app.supabase.io](https://app.supabase.io). Pero se flexible con nosotros, aún pueden existir detalles.
 - [x] Public Beta: Suficientemente estable para la mayoría de los casos no empresariales.
 - [ ] Public: Listo para producción
 
-We are currently in Public Beta. Watch "releases" of this repo to get notified of major updates.
 Acutamente estamos en la fase de Public Beta. Puedes suscribirte a los "releases" de este repositorio para mantenerte notificado de actualizaciones mayores.
 
 <kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
