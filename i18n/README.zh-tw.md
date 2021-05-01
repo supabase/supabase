@@ -31,7 +31,7 @@
 - [x] Alpha：與少部分特定客戶測試 Supabase。
 - [x] 公開 Alpha：任何人都可以在 [app.supabase.io](https://app.supabase.io) 報名。只是務必手下留情，還有一些糾結的地方。
 - [x] 公開 Beta：已能夠穩定在大多數非企業情境使用
-- [ ] 公開：可以在正是環境使用
+- [ ] 公開：可以在正式環境使用
 
 我們現在是公開 Beta。請看此 Repo 的 "Releases" 接收主要更新。
 
@@ -62,9 +62,9 @@ Supabase 是[託管平台](https://app.supabase.io)。只要註冊，不必安�
 客戶端 Library 是模組化的。每個子 Library 都是單一外部系統的獨立實作。這是支援既有工具的方法之一。
 
 - **`supabase-{lang}`**: Combines libraries and adds enrichments.
-  - `postgrest-{lang}`: Client library to work with [PostgREST](https://github.com/postgrest/postgrest)
-  - `realtime-{lang}`: Client library to work with [Realtime](https://github.com/supabase/realtime)
-  - `gotrue-{lang}`: Client library to work with [GoTrue](https://github.com/netlify/gotrue)
+  - `postgrest-{lang}`: 銜接 [PostgREST](https://github.com/postgrest/postgrest) 的客戶端 Library 
+  - `realtime-{lang}`: 銜接 [Realtime](https://github.com/supabase/realtime) 的客戶端 Library  
+  - `gotrue-{lang}`: 銜接 [GoTrue](https://github.com/netlify/gotrue) 的客戶端 Library 
 
 | Repo                  | 官方                                         | 社群                                                                                                                                                                                                                  |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -77,4 +77,4 @@ Supabase 是[託管平台](https://app.supabase.io)。只要註冊，不必安�
 
 ## 贊助
 
-[![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
+[![加入贊助](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
