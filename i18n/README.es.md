@@ -6,8 +6,6 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
-
 [Supabase](https://supabase.io) es una alternativa de código abierto a Firebase. Estamos construyendo las funcionalidades de Firebase usando herramientas de código abierto de nivel empresarial.
 
 - [x] Alojamiento base de datos Postgres
@@ -30,7 +28,6 @@ Para ver la documentación completa, visita [supabase.io/docs](https://supabase.
 
 ## Estatus
 
-- [x] Alpha: We are testing Supabase with a closed set of customers
 - [x] Alpha: Estamos probando Supabase con un circulo cerrado de clientes
 - [x] Public Alpha: Cualquiera puede registrarse en [app.supabase.io](https://app.supabase.io). Pero se flexible con nosotros, aún pueden existir detalles.
 - [x] Public Beta: Suficientemente estable para la mayoría de los casos no empresariales.
@@ -61,8 +58,6 @@ Supabase es una [plataforma alojada](https://app.supabase.io). Te puedes registr
 - [Kong](https://github.com/Kong/kong) es un API gateway nativo alojado en la nube.
 
 #### Librerías de cliente
-
-Our client library is modular. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing tools.
 
 Nuestra librería de cliente es modular. Cada sub-librería es una implementación independiente para cada sistema externo. Esta es una de las formas de apoyar las herramientas existentes.
 
