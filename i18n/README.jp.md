@@ -1,5 +1,5 @@
 <p align="center">
-<img width="300" src="https://gitcdn.xyz/repo/supabase/supabase/master/web/static/supabase-light.svg"/>
+<img width="300" src="https://gitcdn.xyz/repo/supabase/supabase/master/web/static/supabase-light-with-background.svg"/>
 </p>
 
 ---
@@ -73,6 +73,13 @@ Supabaseクライアント・ライブラリはモジュール化されていま
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
+
+## 翻訳
+
+- [ドイツ語](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
+- [日本語](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
+- [英語](https://github.com/supabase/supabase)
+- [トルコ語](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
 
 ---
 
