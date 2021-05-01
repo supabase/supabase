@@ -10,10 +10,10 @@
 
 - [x] Postgres 資料庫託管
 - [x] 即時訂閱
-- [x] Authentication and authorization
+- [x] 認證與授權
 - [x] 自動產生的 API
 - [x] 儀表版
-- [x] 儲存空間
+- [x] Storage
 - [ ] Functions（即將推出）
 
 ## 說明文件
@@ -33,7 +33,7 @@
 - [x] 公開 Beta：已能夠穩定在大多數非企業情境使用
 - [ ] 公開：可以在正式環境使用
 
-我們現在是公開 Beta。請看此 Repo 的 "Releases" 接收主要更新。
+我們現在是公開 Beta。追蹤 "Releases" 就可以收到此 Repo 的主要更新通知。
 
 <kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
@@ -51,10 +51,10 @@ Supabase 是[託管平台](https://app.supabase.io)。只要註冊，不必安�
 
 - [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
 - [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Supabase listens to Postgres' built-in replication functionality, converts the replication byte stream into JSON, then broadcasts the JSON over websockets.
-- [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
-- [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
-- [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries etc.
-- [GoTrue](https://github.com/netlify/gotrue) is an SWT based API for managing users and issuing SWT tokens.
+- [PostgREST](http://postgrest.org/) 是直接把 PostgreSQL 轉變成 RESTful API 的網頁伺服器
+- [Storage](https://github.com/supabase/storage-api) 提供管理放置在 S3 檔案的 RESTful 介面，使用 Postgres 管理權限。
+- [postgres-meta](https://github.com/supabase/postgres-meta) 是管理 Postgres 的 RESTful API，可以 fetch 資料表、新增角色以及執行查詢…等。
+- [GoTrue](https://github.com/netlify/gotrue) 是基於 SWT 的 API，用來管理使用者，以及發送 SWT token。
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
 
 #### 客戶端 Library
