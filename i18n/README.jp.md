@@ -22,7 +22,7 @@
 
 ## コミュニティとサポート
 
-- [コミュニティフォーラム]](https://github.com/supabase/supabase/discussions) どんな時に使うか：構築の手助け、データベースのベストプラクティスに関する議論など
+- [コミュニティフォーラム](https://github.com/supabase/supabase/discussions) どんな時に使うか：構築の手助け、データベースのベストプラクティスに関する議論など
 - [GitHub Issue](https://github.com/supabase/supabase/issues) どんな時に使うか: Supabaseをに関するバグやエラーについて
 - [Emailサポート](https://supabase.io/docs/support#business-support) どんな時に使うか: ユーザー自身ののデータベースやインフラに何か問題が発生した場合
 
