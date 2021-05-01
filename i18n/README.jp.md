@@ -31,7 +31,7 @@
 - [x] Alpha: 限られたユーザーでSupabaseをテストしています。
 - [x] Public Alpha: 誰でも[app.supabase.io](https://app.supabase.io)から登録ができます。ただし、バグなどがある可能性がありますので、ご容赦ください。
 - [x] Public Beta: 企業以外のほとんどのユースケースに耐えうる十分な安定性を確保。
-- [ ] Public: 実用的な用途に対応
+- [ ] Public: 実用的な用途に対応
 
 現在、Public Betaを実施しています。このリポジトリの"release"にてメジャーアップデートに関する情報を発信しています。
 
