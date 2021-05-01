@@ -73,14 +73,6 @@ Supabase 是[託管平台](https://app.supabase.io)。只要註冊，不必安�
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
-## 翻譯
-
-- [German](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
-- [Japanese](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [English](https://github.com/supabase/supabase)
-- [Turkish](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
-- [正體中文](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
-
 ---
 
 ## 贊助
