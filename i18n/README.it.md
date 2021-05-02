@@ -6,34 +6,34 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) è una alternativa a Firebase open source. Stiamo sviluppando le funzionalità offerte da Firebase utilizzando strumenti open source a livello professionale. 
+[Supabase](https://supabase.io) è una alternativa a Firebase con codice sorgente aperto. Stiamo sviluppando le funzionalità offerte da Firebase utilizzando strumenti con sorgente aperto a livello professionale. 
 
 - [x] Database Postgres ospitato
 - [x] Sottoscrizioni in tempo reale
 - [x] Autenticazione e autorizzazioni
 - [x] API generate automaticamente
-- [x] Dashboard
+- [x] Cruscotto
 - [x] Archiviazione
 - [ ] Funzioni (in arrivo)
 
 ## Documentazione
 
-Per ottenere la documentazione completa, visitare il sito [supabase.io/docs](https://supabase.io/docs)
+Per ottenere la documentazione completa, visitare il sito [supabase.io/docs](https://supabase.io/docs).
 
 ## Comunità e Supporto
 
-- [Forum della Community](https://github.com/supabase/supabase/discussions). Ottimo per: supporto per lo sviluppo, discussioni sulle buone pratiche nell'utilizzo dei database.
-- [Issues su GitHub](https://github.com/supabase/supabase/issues). Ottimo per: bug ed errori che potrebbero insorgere nell'utilizzo di Firebase.
-- [Email di Supporto](https://supabase.io/docs/support#business-support). Ottimo per: problemi che potrebbero insorgere con i database o l'infrastruttura.
+- [Forum della Comunità](https://github.com/supabase/supabase/discussions). Indicato per: supporto allo sviluppo, discussioni sulle buone pratiche nell'utilizzo dei database.
+- [Issues su GitHub](https://github.com/supabase/supabase/issues). Indicato per: bug ed errori che potrebbero insorgere nell'utilizzo di Supabase.
+- [Email di Supporto](https://supabase.io/docs/support#business-support). Indicato per: problemi che potrebbero insorgere con i database o l'infrastruttura.
 
 ## Stato
 
-- [x] Alfa: Stiamo testando Supabase con uno stretto numero di utenti
-- [x] Alfa Pubblica: Chiunque puó iscriversi a [app.supabase.io](https://app.supabase.io). Ma andateci piano, ci potrebbero essere dei problemini.
+- [x] Alfa: Stiamo testando Supabase con una ristretta cerchia di utenti
+- [x] Alfa Pubblica: Chiunque puó iscriversi a [app.supabase.io](https://app.supabase.io). Ma andateci piano, ci potrebbero essere degli inconvenienti.
 - [x] Beta Pubblica: Abbastanza stabile per i casi d'uso a livello non professionale
 - [ ] Pubblico: Pronto per la produzione
 
-Attualmente siamo in Beta Publbica. Tenete d'occhio (cliccando sul bottone "Watch") le "release" di questa repository per essere notificati sui nostri aggiornamenti piú importanti.
+Attualmente siamo in Beta Pubblica. Tenete d'occhio (cliccando sul bottone "Watch") le "release" di questa repository per essere notificati sui nostri aggiornamenti piú importanti.
 
 <kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
@@ -41,11 +41,11 @@ Attualmente siamo in Beta Publbica. Tenete d'occhio (cliccando sul bottone "Watc
 
 ## Come funziona
 
-Supabase è l'insieme di strumenti open source. Stiamo sviluppando le funzionalità offerte da Firebase utilizzando strumenti open source, a livello professionale. Finché esisteranno strumenti e comunità, con licenze MIT, Apache 2, o equivalenti, noi utilizzeremo e supporteremo questi strumenti. Se lo strumento non dovesse esistere, ne svilupperemo una versione open source noi stessi. Supabase non è una riproduzione 1-a-1 di Firebase. Il nostro obiettivo è quello di dare agli sviluppatori un'esperienza di sviluppo simile a quella offerta da Firebase, utilizzando strumenti open source.
+Supabase è un insieme di strumenti con sorgente aperto. Stiamo sviluppando le funzionalità offerte da Firebase utilizzando strumenti con sorgente aperto, a livello professionale. Finché esisteranno strumenti e comunità, con licenze MIT, Apache 2, o equivalenti, noi utilizzeremo e supporteremo questi strumenti. Se lo strumento non dovesse esistere, ne svilupperemo una versione con sorgente aperto noi stessi. Supabase non è una riproduzione uno-a-uno di Firebase. Il nostro obiettivo è quello di dare agli sviluppatori un'esperienza di sviluppo simile a quella offerta da Firebase, utilizzando solo strumenti con sorgente aperto.
 
 **Architettura attuale**
 
-Supabase è una [piattaforma ospitata](https://app.supabase.io). Ci si può iscrivere ed iniziare ad utilizzare Supabase senza la necessità di installare qualcosa. Ci impegnamo nel creare un'esperienza di sviluppo in locale - attualmente é il nostro obiettivo primario, così come la stabilità della piattaforma stessa.
+Supabase è una [piattaforma ospitata](https://app.supabase.io). Ci si può iscrivere ed iniziare ad utilizzare Supabase senza la necessità di installare qualcosa. Ci impegnamo nel creare un'esperienza di sviluppo interamente in locale - attualmente é il nostro obiettivo primario, così come lo è la stabilità della piattaforma stessa.
 
 ![Architettura](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
@@ -74,7 +74,7 @@ La nostra libreria utente è modulare. Ogni sotto-libreria è una implementazion
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
 
-- [Lista delle Traduzioni](/i18n/languages.md) <!--- Keep only the this-->
+- [Lista delle Traduzioni](/i18n/languages.md)
 
 ---
 
