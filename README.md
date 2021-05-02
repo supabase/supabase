@@ -75,6 +75,7 @@ Our client library is modular. Each sub-library is a standalone implementation f
 
 <!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
+
 ## Translations
 
 - [English](https://github.com/supabase/supabase)
@@ -88,6 +89,7 @@ Our client library is modular. Each sub-library is a standalone implementation f
 - [Spanish / Español](/i18n/README.es.md)
 - [Traditional Chinese / 繁体中文](/i18n/README.zh-tw.md)
 - [Turkish / Türkçe](/i18n/README.tr.md)
+- [Dutch / Nederlands](/i18n/README.nl.md)
 - [List of translations](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
