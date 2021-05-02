@@ -73,22 +73,7 @@ La nostra libreria utente è modulare. Ogni sotto-libreria è una implementazion
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
-<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
-<!--- Keep only the link to the list of translation files-->
-## Traduzioni
 
-- [Inglese / English](https://github.com/supabase/supabase)
-- [Francese / Français](/i18n/README.fr.md)
-- [Italiano](/i18n/README.it.md)
-- [Tedesco / Deutsche](/i18n/README.de.md)
-- [Hindi / हिंदी](/i18n/README.hi.md)
-- [Giapponese / 日本語](/i18n/README.jp.md)
-- [Portoghese Brasiliano / Português Brasileiro](/i18n/README.pt-br.md)
-- [Portoghese / Portuguese](/i18n/README.pt.md)
-- [Russo / Pусский](/i18n/README.ru.md)
-- [Spagnolo / Español](/i18n/README.es.md)
-- [Cinese Tradizionale / 繁体中文](/i18n/README.zh-tw.md)
-- [Turco / Türkçe](/i18n/README.tr.md)
 - [Lista delle Traduzioni](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
