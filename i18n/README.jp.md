@@ -74,13 +74,11 @@ Supabaseクライアントライブラリはモジュール化されています
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
+<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 ## 翻訳
 
-- [ドイツ語](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
-- [日本語](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [英語](https://github.com/supabase/supabase)
-- [トルコ語](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
-- [ポルトガル語](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
+- [翻訳](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 
