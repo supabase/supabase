@@ -14,7 +14,8 @@ The [Supabase Client](/docs/reference/javascript/supabase-client) makes it simpl
 ## Auth
 
 
-Create new users using [`signUp()`](/docs/reference/javascript/auth-signup). By default, the user will need to verify their email address before logging in.
+Create new users using [`signUp()`](/docs/reference/javascript/auth-signup). By default, the user will need to verify their email address before logging in.<br/>
+If confirmations are disabled the response will contain an access token and also a confirmed_at value, otherwise it will just contain a confirmation_sent_at attribute.
 
 <Tabs
   groupId="libraries"
