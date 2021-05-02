@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) é uma alternativa al Forebase de código aberto. Estamos reproduzindo as funcionalidades do Firebase usando ferramentas de código aberto de nivel empresarial.
+[Supabase](https://supabase.io) é uma alternativa al Firebase de código aberto. Estamos reproduzindo as funcionalidades do Firebase usando ferramentas de código aberto de nivel empresarial.
 
 - [x] Banco de dados hospedado Postgres
 - [x] Subscrições em tempo real
@@ -74,16 +74,11 @@ Nossa biblioteca cliente é modular. Cada sub-biblioteca é uma implementação 
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
+<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 ## Traduções
 
-- [Inglês/English](https://github.com/supabase/supabase)
-- [Francês/Français](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
-- [Alemão/Deutsche](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
-- [Japonês/日本語](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [Turco/Türkçe](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
-- [Chinês tradicional/繁體中文](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
-- [Espanhol/Español](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
-- [Hindi/हिंदी](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
+- [Traduções](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 

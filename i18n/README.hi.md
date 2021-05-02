@@ -73,16 +73,11 @@
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
+<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 ## अनुवाद
 
-- [जर्मन](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
-- [जापानी](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [अंग्रेज़ी](https://github.com/supabase/supabase)
-- [तुर्की](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
-- [परंपरागत चीनी](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
-- [फ्रेंच](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
-- [स्पेनिश](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
-- [स्पुर्तगाली](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
+- [अनुवाद की सूची](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 

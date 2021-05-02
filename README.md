@@ -73,18 +73,23 @@ Our client library is modular. Each sub-library is a standalone implementation f
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
+<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 ## Translations
 
 - [English](https://github.com/supabase/supabase)
-- [French](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
-- [German](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
-- [Japanese](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [Turkish](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
-- [Traditional Chinese](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
-- [Spanish](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
-- [Hindi](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
-- [Portuguese](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
-- [Português Brasileiro](https://github.com/supabase/supabase/blob/master/i18n/README.pt-br.md)
+- [French / Français](/i18n/README.fr.md)
+- [German / Deutsche](/i18n/README.de.md)
+- [Hindi / हिंदी](/i18n/README.hi.md)
+- [Japanese / 日本語](/i18n/README.jp.md)
+- [Brasilian Portuguese / Português Brasileiro](/i18n/README.pt-br.md)
+- [Portuguese / Portuguese](/i18n/README.pt.md)
+- [Russian / Pусский](/i18n/README.ru.md)
+- [Spanish / Español](/i18n/README.es.md)
+- [Traditional Chinese / 繁体中文](/i18n/README.zh-tw.md)
+- [Turkish / Türkçe](/i18n/README.tr.md)
+- [List of translations](/i18n/languages.md) <!--- Keep only the this-->
+
 ---
 
 ## Sponsors
