@@ -77,7 +77,7 @@ Notre bibliothèque client est modulaire. Chaque sous-bibliothèque est une impl
 <!--- Keep only the link to the list of translation files-->
 ## Traductions
 
-- [Liste des traductions](https://github.com/supabase/supabase/blob/master/i18n/languages.md) <!--- Keep only the this-->
+- [Liste des traductions](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 

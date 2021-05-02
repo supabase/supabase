@@ -78,7 +78,7 @@ Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici 
 <!--- Keep only the link to the list of translation files-->
 ## Çeviriler
 
-- [Çeviriler](https://github.com/supabase/supabase/blob/master/i18n/languages.md) <!--- Keep only the this-->
+- [Çeviriler](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 
