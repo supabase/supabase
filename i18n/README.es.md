@@ -73,14 +73,11 @@ Nuestra librería de cliente es modular. Cada sub-librería es una implementaci�
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
+<!--- Remove this list if youre translation for another language, its hard to keep updated across multiple files -->
+<!--- Keep only the lint to the list of translation files-->
 ## Traducciones
 
-- [Alemán](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
-- [Japonés](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [Inglés](https://github.com/supabase/supabase)
-- [Turco](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
-- [Español](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
-- [Portugués](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
+- [Lista de traducciones](https://github.com/supabase/supabase/blob/master/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 
