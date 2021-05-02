@@ -85,7 +85,7 @@ Das ist einer der Wege, wie wir unsere existierenden Tools unterstützen.
 <!--- Keep only the link to the list of translation files-->
 ## Übersetzungen
 
-- [Liste der Übersetzungen](https://github.com/supabase/supabase/blob/master/i18n/languages.md) <!--- Keep only the this-->
+- [Liste der Übersetzungen](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 
