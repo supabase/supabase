@@ -66,18 +66,24 @@ Nossa biblioteca de cliente é modular. Cada sub-biblioteca é uma implementaç�
   - `realtime-{lang}`: Biblioteca de cliente para trabalhar com [Realtime](https://github.com/supabase/realtime)
   - `gotrue-{lang}`: Biblioteca de cliente para trabalhar com [GoTrue](https://github.com/netlify/gotrue)
 
-| Repo                  | Oficial                                          | Comunidade                                                                                                                                                                                                                 |
+| Repo                  | Oficial                                         | Comunidade                                                                                                                                                                                                                  |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
-<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
-<!--- Keep only the link to the list of translation files-->
 ## Traduções
 
-- [Traduções](/i18n/languages.md) <!--- Keep only the this-->
+- [Alemão](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
+- [Chinês Tradicional](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
+- [Espanhol](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
+- [Francês](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
+- [Hindi](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
+- [Inglês](https://github.com/supabase/supabase)
+- [Japonês](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
+- [Português Brasileiro](https://github.com/supabase/supabase/blob/master/i18n/README.pt-br.md)
+- [Turco](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
 
 ---
 
