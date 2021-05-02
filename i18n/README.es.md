@@ -80,6 +80,7 @@ Nuestra librería de cliente es modular. Cada sub-librería es una implementaci�
 - [Inglés](https://github.com/supabase/supabase)
 - [Turco](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
 - [Español](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
+- [Portugués](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
 
 ---
 
