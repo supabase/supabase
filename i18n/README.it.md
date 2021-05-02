@@ -93,6 +93,6 @@ La nostra libreria utente è modulare. Ogni sotto-libreria è una implementazion
 
 ---
 
-## I nostri sponsor
+## I nostri Sponsor
 
-[![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
+[![Nuovo Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
