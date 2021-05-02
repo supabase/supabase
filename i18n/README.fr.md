@@ -79,6 +79,7 @@ Notre bibliothèque client est modulaire. Chaque sous-bibliothèque est une impl
 - [Japonais](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
 - [Anglais](https://github.com/supabase/supabase)
 - [Turque](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
+- [Portugais](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
 
 ---
 

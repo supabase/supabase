@@ -80,6 +80,7 @@ Supabaseクライアントライブラリはモジュール化されています
 - [日本語](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
 - [英語](https://github.com/supabase/supabase)
 - [トルコ語](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
+- [ポルトガル語](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
 
 ---
 
