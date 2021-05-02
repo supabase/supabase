@@ -26,7 +26,6 @@ Para ver a documentação completa, visite [supabase.io/docs](https://supabase.i
 - [Problemas do GitHub](https://github.com/supabase/supabase/issues). Indicado para: bugs e erros que você encontrar ao usar o Supabase.
 - [Suporte por e-mail](https://supabase.io/docs/support#business-support). Indicado para: problemas com seu banco de dados ou infraestrutura.
 
-
 ## Status
 
 - [x] Alpha: estamos testando o Supabase com um grupo fechado de clientes
@@ -63,9 +62,9 @@ Supabase é uma [plataforma hospedada](https://app.supabase.io). Você pode se i
 Nossa biblioteca cliente é modular. Cada sub-biblioteca é uma implementação independente para um único sistema externo. Esta é uma das maneiras pelas quais oferecemos suporte às ferramentas existentes.
 
 - **`supabase-{lang}`**: Combina bibliotecas e adiciona funcionalidades.
-   - `postgrest-{lang}`: Biblioteca cliente para trabalhar com [PostgREST](https://github.com/postgrest/postgrest)
-   - `realtime-{lang}`: Biblioteca cliente para trabalhar com [Realtime](https://github.com/supabase/realtime)
-   - `gotrue-{lang}`: Biblioteca cliente para trabalhar com [GoTrue](https://github.com/netlify/gotrue)
+  - `postgrest-{lang}`: Biblioteca cliente para trabalhar com [PostgREST](https://github.com/postgrest/postgrest)
+  - `realtime-{lang}`: Biblioteca cliente para trabalhar com [Realtime](https://github.com/supabase/realtime)
+  - `gotrue-{lang}`: Biblioteca cliente para trabalhar com [GoTrue](https://github.com/netlify/gotrue)
 
 | Repositório           | Oficial                                          | Comunidade                                                                                                                                                                                                                 |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -84,6 +83,7 @@ Nossa biblioteca cliente é modular. Cada sub-biblioteca é uma implementação 
 - [Chinês tradicional/繁體中文](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
 - [Espanhol/Español](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
 - [Hindi/हिंदी](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
+- [Polonês/Polish](https://github.com/supabase/supabase/blob/master/i18n/README.pl.md)
 
 ---
 

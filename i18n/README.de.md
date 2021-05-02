@@ -86,6 +86,7 @@ Das ist einer der Wege, wie wir unsere existierenden Tools unterstützen.
 - [Englisch](https://github.com/supabase/supabase)
 - [Japanisch](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
 - [Portugiesisch](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
+- [Polish](https://github.com/supabase/supabase/blob/master/i18n/README.pl.md)
 
 ---
 

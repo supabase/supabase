@@ -66,7 +66,7 @@ Nossa biblioteca de cliente é modular. Cada sub-biblioteca é uma implementaç�
   - `realtime-{lang}`: Biblioteca de cliente para trabalhar com [Realtime](https://github.com/supabase/realtime)
   - `gotrue-{lang}`: Biblioteca de cliente para trabalhar com [GoTrue](https://github.com/netlify/gotrue)
 
-| Repo                  | Oficial                                         | Comunidade                                                                                                                                                                                                                  |
+| Repo                  | Oficial                                          | Comunidade                                                                                                                                                                                                                 |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
@@ -84,6 +84,7 @@ Nossa biblioteca de cliente é modular. Cada sub-biblioteca é uma implementaç�
 - [Japonês](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
 - [Português Brasileiro](https://github.com/supabase/supabase/blob/master/i18n/README.pt-br.md)
 - [Turco](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
+- [Polonês](https://github.com/supabase/supabase/blob/master/i18n/README.pl.md)
 
 ---
 

@@ -25,7 +25,7 @@ Tam dokümantasyon için, ziyaret et [supabase.io/docs](https://supabase.io/docs
 - [Topluluk Forumu](https://github.com/supabase/supabase/discussions). Şunun için en iyisi: yapı ile ilgili yardım, veritabanı için en iyi pratikleri tartışmak.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Şunun için en iyisi: Supabase kullanırken karşılaştığınız problem ve hatalar.
 - [Email Desteği](https://supabase.io/docs/support#business-support). Şunun için en iyisi:
-veritabanınız veya altyapınızla ilgili sorunlar.
+  veritabanınız veya altyapınızla ilgili sorunlar.
 
 ## Durum
 
@@ -50,13 +50,13 @@ Supabase [barındırılan bir platformdur](https://app.supabase.io). Hiçbir şe
 
 ![Architecture](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
-- [PostgreSQL](https://www.postgresql.org/)  güvenilirlik, özellik sağlamlığı ve performans açısından güçlü bir üne kavuşan 30 yılı aşkın aktif geliştirmeye sahip bir nesne ilişkisel veritabanı sistemidir.
+- [PostgreSQL](https://www.postgresql.org/) güvenilirlik, özellik sağlamlığı ve performans açısından güçlü bir üne kavuşan 30 yılı aşkın aktif geliştirmeye sahip bir nesne ilişkisel veritabanı sistemidir.
 - [Realtime](https://github.com/supabase/realtime) Web soketleri kullanarak PostgreSQL eklerini, güncellemelerini ve silmelerini dinlemenizi sağlayan bir Elixir sunucusudur. Supabase, Postgres'in yerleşik çoğaltma işlevini dinler, çoğaltma bayt akışını JSON'a dönüştürür ve ardından JSON'yi web yuvaları üzerinden yayınlar.
-- [PostgREST](http://postgrest.org/)  PostgreSQL veritabanınızı doğrudan bir RESTful API'ye dönüştüren bir web sunucusudur.
+- [PostgREST](http://postgrest.org/) PostgreSQL veritabanınızı doğrudan bir RESTful API'ye dönüştüren bir web sunucusudur.
 - [Storage](https://github.com/supabase/storage-api) , izinleri yönetmek için Postgres kullanarak S3'te depolanan Dosyaları yönetmek için RESTful bir arayüz sağlar.
 - [postgres-meta](https://github.com/supabase/postgres-meta) Postgres'inizi yönetmeye yarayan RESTful bir API'dir ve tabloları getirmenize, roller eklemenize ve sorgu çalıştırmanıza vb. izin verir.
-- [GoTrue](https://github.com/netlify/gotrue)  kullanıcıları yönetmek ve SWT belirteçleri vermek için SWT tabanlı bir API'dir.
-- [Kong](https://github.com/Kong/kong)  bulutta yerel bir API ağ geçididir.
+- [GoTrue](https://github.com/netlify/gotrue) kullanıcıları yönetmek ve SWT belirteçleri vermek için SWT tabanlı bir API'dir.
+- [Kong](https://github.com/Kong/kong) bulutta yerel bir API ağ geçididir.
 
 #### İstemci kitaplıkları
 
@@ -67,7 +67,7 @@ Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici 
   - `realtime-{lang}`: [Realtime](https://github.com/supabase/realtime) ile çalışmak için istemci kitaplığı
   - `gotrue-{lang}`: [GoTrue](https://github.com/netlify/gotrue) ile çalışmak için istemci kitaplığı
 
-| Depo                  | Resmi                                         | Topluluk                                                                                                                                                                                                                  |
+| Depo                  | Resmi                                            | Topluluk                                                                                                                                                                                                                   |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
@@ -80,6 +80,7 @@ Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici 
 - [Japanese](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
 - [English](https://github.com/supabase/supabase)
 - [Portekizce](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
+- [Polish](https://github.com/supabase/supabase/blob/master/i18n/README.pl.md)
 
 ---
 

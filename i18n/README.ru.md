@@ -84,6 +84,7 @@ Supabase – это [облачная платформа](https://app.supabase.i
 - [Spanish](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
 - [Hindi](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
 - [Russian](https://github.com/supabase/supabase/blob/master/i18n/README.ru.md)
+- [Polish](https://github.com/supabase/supabase/blob/master/i18n/README.pl.md)
 
 ---
 
