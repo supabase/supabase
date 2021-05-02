@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) é uma alternativa al Forebase de código aberto. Estamos reproduzindo as funcionalidades do Firebase usando ferramentas de código aberto de nivel empresarial.
+[Supabase](https://supabase.io) é uma alternativa al Firebase de código aberto. Estamos reproduzindo as funcionalidades do Firebase usando ferramentas de código aberto de nivel empresarial.
 
 - [x] Banco de dados hospedado Postgres
 - [x] Subscrições em tempo real
@@ -75,7 +75,7 @@ Nossa biblioteca cliente é modular. Cada sub-biblioteca é uma implementação 
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
 <!--- Remove this list if youre translation for another language, its hard to keep updated across multiple files -->
-<!--- Keep only the lint to the list of translation files-->
+<!--- Keep only the link to the list of translation files-->
 ## Traduções
 
 - [Traduções](https://github.com/supabase/supabase/blob/master/i18n/languages.md) <!--- Keep only the this-->
