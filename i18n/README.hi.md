@@ -82,6 +82,8 @@
 - [परंपरागत चीनी](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
 - [फ्रेंच](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
 - [स्पेनिश](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
+- [स्पुर्तगाली](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
+
 ---
 
 ## प्रायोजकों

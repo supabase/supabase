@@ -79,6 +79,7 @@ Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici 
 - [Turkish](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
 - [Japanese](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
 - [English](https://github.com/supabase/supabase)
+- [Portekizce](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
 
 ---
 
