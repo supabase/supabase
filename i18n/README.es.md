@@ -8,40 +8,40 @@
 
 [Supabase](https://supabase.io) es una alternativa de código abierto a Firebase. Estamos construyendo las funcionalidades de Firebase usando herramientas de código abierto de nivel empresarial.
 
-- [x] Alojamiento base de datos Postgres
+- [x] Alojamiento de base de datos Postgres
 - [x] Suscripciones en tiempo real 
 - [x] Autenticación y autorización
-- [x] API auto generada
-- [x] Dashboard
+- [x] API autogenerada
+- [x] Panel
 - [x] Almacenamiento
-- [ ] Funciones (próximamente)
+- [ ] Funciones (próximamente).
 
 ## Documentación
 
-Para ver la documentación completa, visita [supabase.io/docs](https://supabase.io/docs)
+Para ver la documentación completa, visita [supabase.io/docs](https://supabase.io/docs).
 
-## Comunidad & Soporte
+## Comunidad y soporte
 
 - [Foro de la comunidad](https://github.com/supabase/supabase/discussions). Mejor para: ayuda construyendo, discusiones acerca de las mejores practicas de base de datos.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Mejor para: bugs y errores que te puedes encontrar utilizando supabase.
-- [Soporte por Email](https://supabase.io/docs/support#business-support). Mejor para: problemas con la base de datos o infraestructura.
+- [GitHub Issues](https://github.com/supabase/supabase/issues). Mejor para: bugs y errores que te puedes encontrar utilizando Supabase.
+- [Soporte por e-mail](https://supabase.io/docs/support#business-support). Mejor para: problemas con la base de datos o infraestructura.
 
 ## Estatus
 
-- [x] Alpha: Estamos probando Supabase con un circulo cerrado de clientes
-- [x] Public Alpha: Cualquiera puede registrarse en [app.supabase.io](https://app.supabase.io). Pero se flexible con nosotros, aún pueden existir detalles.
-- [x] Public Beta: Suficientemente estable para la mayoría de los casos no empresariales.
-- [ ] Public: Listo para producción
+- [x] Alfa: Estamos probando Supabase con un círculo cerrado de clientes.
+- [x] Alfa pública: Cualquiera puede registrarse en [app.supabase.io](https://app.supabase.io). Pero sé flexible con nosotros, aún pueden existir obstáculos.
+- [x] Beta pública: Suficientemente estable para la mayoría de los casos no empresariales.
+- [ ] Público: Listo para producción.
 
-Acutamente estamos en la fase de Public Beta. Puedes suscribirte a los "releases" de este repositorio para mantenerte notificado de actualizaciones mayores.
+Actualmente estamos en la fase de beta pública. Puedes suscribirte a los "releases" de este repositorio para mantenerte notificado de actualizaciones mayores.
 
 <kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
-## Como funciona
+## Cómo funciona
 
-Supabase es una combinación de herramientas de código abierto. Estamos construyendo las funcionalidades de Firebase utilizando soluciones de código abierto de nivel empresarial. Si las herramientas y comunidades existen con una licensia abierta MIT, Apache 2 o equivalente, usaremos y apoyaremos tal herramienta. Si la herramienta no existe, la desarrollaremos y la lanzaremos como herramienta de código abierto nosotros mismos. Supabase no es un mapeo 1-1 de Firebase. Nuestro objetivo es dar a los desarrolladores una experiencia parecida a la de Firebase utilizando herramientas de código abierto.
+Supabase es una combinación de herramientas de código abierto. Estamos construyendo las funcionalidades de Firebase utilizando soluciones de código abierto de nivel empresarial. Si las herramientas y comunidades existen con una licencia abierta MIT, Apache 2 o equivalente, usaremos y apoyaremos tal herramienta. Si la herramienta no existe, la desarrollaremos y la lanzaremos como herramienta de código abierto nosotros mismos. Supabase no es un mapeo 1-1 de Firebase. Nuestro objetivo es dar a los desarrolladores una experiencia parecida a la de Firebase utilizando herramientas de código abierto.
 
 **Arquitectura actual**
 
@@ -49,10 +49,10 @@ Supabase es una [plataforma alojada](https://app.supabase.io). Te puedes registr
 
 ![Arquitectura](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
-- [PostgreSQL](https://www.postgresql.org/) es un sistema de base de datos object-relational con mas de 30 años de desarrollo activo que se ha ganado su fuerte reputación por ser confiable, robustez y rendimiento.
-- [Tiempo Real](https://github.com/supabase/realtime) es un server construido en Elixir que permite escuchar a los inserts, updates y deletes de PostgreSQL utilizando websockets. Supabase escucha a la funcionalidad de replicación integrada de PostgreSQL, convierte el bite de replicación en un JSON, despues transmite el JSON a través de websockets.
+- [PostgreSQL](https://www.postgresql.org/) es un sistema de base de datos objeto-relacional con más de 30 años de desarrollo activo que se ha ganado su fuerte reputación por ser confiable, robusto y de alto rendimiento.
+- [Tiempo Real](https://github.com/supabase/realtime) es un server construido en Elixir que permite escuchar a los _inserts_, _updates_ y _deletes_ de PostgreSQL utilizando websockets. Supabase escucha a la funcionalidad de replicación integrada de PostgreSQL, convierte el bite de replicación en un JSON, despues transmite el JSON a través de websockets.
 - [PostgREST](http://postgrest.org/) es un servidor web que convierte la base de datos PostgreSQL directamente en una API RESTful.
-- [Almacenamiento](https://github.com/supabase/storage-api) proporciona una interfase RESTful para manipular los archivos alojados en S3, utilizando Postgres para manejar los permisos.
+- [Almacenamiento](https://github.com/supabase/storage-api) proporciona una interfaz RESTful para manipular los archivos alojados en S3, utilizando Postgres para manejar los permisos.
 - [postgres-meta](https://github.com/supabase/postgres-meta) es una API RESTful para manejar Postgres, permite obtener información de tablas, agregar roles, ejecutar consultas, etc.
 - [GoTrue](https://github.com/netlify/gotrue) es una API basada en SWT para administrar usuarios y distribuir tokens SWT.
 - [Kong](https://github.com/Kong/kong) es un API gateway nativo alojado en la nube.
@@ -77,7 +77,7 @@ Nuestra librería de cliente es modular. Cada sub-librería es una implementaci�
 
 - [Alemán](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
 - [Japonés](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [Ingles](https://github.com/supabase/supabase)
+- [Inglés](https://github.com/supabase/supabase)
 - [Turco](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
 - [Español](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
 
@@ -85,4 +85,4 @@ Nuestra librería de cliente es modular. Cada sub-librería es una implementaci�
 
 ## Patrocinadores
 
-[![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
+[![Nuevo Patrocinador](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
