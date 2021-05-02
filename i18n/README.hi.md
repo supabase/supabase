@@ -77,7 +77,7 @@
 <!--- Keep only the link to the list of translation files-->
 ## अनुवाद
 
-- [अनुवाद की सूची](https://github.com/supabase/supabase/blob/master/i18n/languages.md) <!--- Keep only the this-->
+- [अनुवाद की सूची](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 

@@ -77,7 +77,7 @@ Supabase 是[託管平台](https://app.supabase.io)。只要註冊，不必安�
 <!--- Keep only the link to the list of translation files-->
 ## 翻译
 
-- [翻译](https://github.com/supabase/supabase/blob/master/i18n/languages.md) <!--- Keep only the this-->
+- [翻译](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 
