@@ -14,7 +14,7 @@
 - [x] API autogenerada
 - [x] Panel
 - [x] Almacenamiento
-- [ ] Funciones (próximamente).
+- [ ] Funciones (próximamente)
 
 ## Documentación
 
