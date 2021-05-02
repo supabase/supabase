@@ -86,7 +86,6 @@ Nasza biblioteka klientów jest modularna. Każda pod biblioteka jest osobną im
 - [Hindi](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
 - [Portuguese](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
 - [Português Brasileiro](https://github.com/supabase/supabase/blob/master/i18n/README.pt-br.md)
-- [Polski](https://github.com/supabase/supabase/blob/master/i18n/README.pl.md)
 
 ---
 
