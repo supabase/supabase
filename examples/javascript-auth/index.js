@@ -27,7 +27,7 @@ const signUpSubmitted = (event) => {
   supabase.auth
     .signUp({ email, password })
     .then((response) => {
-      response.error ? alert(response.error.message) : alert('Confirmation Email Sent')
+      response.error ? alert(response.error.message) : setToken(response)
     })
     .catch((err) => {
       alert(err.response.text)
@@ -42,11 +42,7 @@ const logInSubmitted = (event) => {
   supabase.auth
     .signIn({ email, password })
     .then((response) => {
-      response.error
-        ? alert(response.error.message)
-        : (document.querySelector('#access-token').value = response.data.access_token)
-      document.querySelector('#refresh-token').value = response.data.refresh_token
-      alert('Logged in as ' + response.user.email)
+      response.error ? alert(response.error.message) : setToken(response)
     })
     .catch((err) => {
       alert(err.response.text)
@@ -70,4 +66,14 @@ const logoutSubmitted = (event) => {
     .catch((err) => {
       alert(err.response.text)
     })
+}
+
+function setToken(response) {
+  if (response.data.confirmation_sent_at && !response.data.access_token) {
+    alert('Confirmation Email Sent')
+  } else {
+    document.querySelector('#access-token').value = response.data.access_token
+    document.querySelector('#refresh-token').value = response.data.refresh_token
+    alert('Logged in as ' + response.user.email)
+  }
 }
