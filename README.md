@@ -75,11 +75,12 @@ Our client library is modular. Each sub-library is a standalone implementation f
 
 ## Translations
 
+- [English](https://github.com/supabase/supabase)
+- [French](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
 - [German](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
 - [Japanese](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [English](https://github.com/supabase/supabase)
 - [Turkish](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
-- [French](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
+- [Spanish](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
 
 ---
 
