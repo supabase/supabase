@@ -78,7 +78,7 @@ Supabaseクライアントライブラリはモジュール化されています
 <!--- Keep only the link to the list of translation files-->
 ## 翻訳
 
-- [翻訳](https://github.com/supabase/supabase/blob/master/i18n/languages.md) <!--- Keep only the this-->
+- [翻訳](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 
