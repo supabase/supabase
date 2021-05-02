@@ -74,7 +74,7 @@ Nuestra librería de cliente es modular. Cada sub-librería es una implementaci�
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
 <!--- Remove this list if youre translation for another language, its hard to keep updated across multiple files -->
-<!--- Keep only the lint to the list of translation files-->
+<!--- Keep only the link to the list of translation files-->
 ## Traducciones
 
 - [Lista de traducciones](https://github.com/supabase/supabase/blob/master/i18n/languages.md) <!--- Keep only the this-->
