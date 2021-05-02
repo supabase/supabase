@@ -29,9 +29,9 @@ Github Issues: 电子邮件支持。最适合: 报告使用 Supabase 时遇到�
 ## 发展现状
 
 - [x] Alpha: 我们正在对有限的一批客户进行 Supabase 测试
-- [x] Public Alpha: 任何人都可以在[app.supabase.io](https://app.supabase.io)上进行注册。
-- [x] Public Beta: 稳定,可以支持大多数非企业用例
-- [ ] Public: 生产就绪软件
+- [x] 公开 Alpha: 任何人都可以在[app.supabase.io](https://app.supabase.io)上进行注册。
+- [x] 公开 Beta: 稳定,可以支持大多数非企业用例
+- [ ] 公开: 生产就绪软件
 
 我们目前处于公开测试阶段。访问这个存储库的发布页面以获得关于主要更新的通知。
 
