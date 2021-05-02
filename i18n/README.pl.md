@@ -75,16 +75,7 @@ Nasza biblioteka kliencka jest modularna. Każda pod biblioteka jest osobną imp
 
 ## Tłumaczenia
 
-- [English](https://github.com/supabase/supabase)
-- [French](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
-- [German](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
-- [Japanese](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [Turkish](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
-- [Traditional Chinese](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
-- [Spanish](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
-- [Hindi](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
-- [Portuguese](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
-- [Português Brasileiro](https://github.com/supabase/supabase/blob/master/i18n/README.pt-br.md)
+- [Tłumaczenia](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 
