@@ -35,7 +35,7 @@ Para ver la documentación completa, visita [supabase.io/docs](https://supabase.
 
 Actualmente estamos en la fase de beta pública. Puedes suscribirte a los "releases" de este repositorio para mantenerte notificado de actualizaciones mayores.
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
+<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Seguir este repositorio"/></kbd>
 
 ---
 
