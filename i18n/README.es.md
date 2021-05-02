@@ -12,7 +12,7 @@
 - [x] Suscripciones en tiempo real 
 - [x] Autenticación y autorización
 - [x] API autogenerada
-- [x] Panel
+- [x] Panel de control
 - [x] Almacenamiento
 - [ ] Funciones (próximamente)
 
