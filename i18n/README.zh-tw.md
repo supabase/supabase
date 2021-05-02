@@ -73,6 +73,12 @@ Supabase 是[託管平台](https://app.supabase.io)。只要註冊，不必安�
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
+<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
+## 翻译
+
+- [翻译](/i18n/languages.md) <!--- Keep only the this-->
+
 ---
 
 ## 贊助
