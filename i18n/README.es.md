@@ -9,7 +9,7 @@
 [Supabase](https://supabase.io) es una alternativa de código abierto a Firebase. Estamos construyendo las funcionalidades de Firebase usando herramientas de código abierto de nivel empresarial.
 
 - [x] Alojamiento de base de datos Postgres
-- [x] Suscripciones en tiempo real
+- [x] Suscripciones en tiempo real 
 - [x] Autenticación y autorización
 - [x] API autogenerada
 - [x] Panel de control
@@ -66,18 +66,21 @@ Nuestra librería de cliente es modular. Cada sub-librería es una implementaci�
   - `realtime-{lang}`: Librería de cliente para trabajar con [Realtime](https://github.com/supabase/realtime)
   - `gotrue-{lang}`: Librería de cliente para trabajar con [GoTrue](https://github.com/netlify/gotrue)
 
-| Repo                  | Oficial                                          | Comunidad                                                                                                                                                                                                                  |
+| Repo                  | Oficial                                         | Comunidad                                                                                                                                                                                                                  |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
-<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
-<!--- Keep only the link to the list of translation files-->
 ## Traducciones
 
-- [Lista de traducciones](/i18n/languages.md) <!--- Keep only the this-->
+- [Alemán](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
+- [Japonés](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
+- [Inglés](https://github.com/supabase/supabase)
+- [Turco](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
+- [Español](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
+- [Portugués](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
 
 ---
 
