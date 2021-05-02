@@ -18,7 +18,7 @@
 
 ## 文档
 
-我们的文档，请到 [supabase.io/docs](supabase.io/docs)
+完整的说明文件请见[supabase.io/docs](supabase.io/docs)
 
 ## 社群与支援
 
