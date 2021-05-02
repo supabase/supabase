@@ -73,19 +73,22 @@ Our client library is modular. Each sub-library is a standalone implementation f
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
+<!--- Remove this list if youre translation for another language, its hard to keep updated across multiple files -->
+<!--- Keep only the lint to the list of translation files-->
 ## Translations
 
 - [English](https://github.com/supabase/supabase)
-- [French](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
-- [German](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
-- [Hindi](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
-- [Japanese](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [Português Brasileiro](https://github.com/supabase/supabase/blob/master/i18n/README.pt-br.md)
-- [Portuguese](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
-- [Pусский](https://github.com/supabase/supabase/blob/master/i18n/README.ru.md)
-- [Spanish](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
-- [Traditional Chinese](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
-- [Turkish](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
+- [French / Français](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
+- [German / Deutsche](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
+- [Hindi / हिंदी](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
+- [Japanese / 日本語](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
+- [Brasilian Portuguese / Português Brasileiro](https://github.com/supabase/supabase/blob/master/i18n/README.pt-br.md)
+- [Portuguese / Portuguese](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
+- [Russian / Pусский](https://github.com/supabase/supabase/blob/master/i18n/README.ru.md)
+- [Spanish / Español](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
+- [Traditional Chinese / 繁体中文](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
+- [Turkish / Türkçe](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
+- [List of translations](https://github.com/supabase/supabase/blob/master/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 
