@@ -78,13 +78,15 @@ Our client library is modular. Each sub-library is a standalone implementation f
 - [English](https://github.com/supabase/supabase)
 - [French](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
 - [German](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
-- [Japanese](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [Turkish](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
-- [Traditional Chinese](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
-- [Spanish](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
 - [Hindi](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
-- [Portuguese](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
+- [Japanese](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
 - [Português Brasileiro](https://github.com/supabase/supabase/blob/master/i18n/README.pt-br.md)
+- [Portuguese](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
+- [Pусский](https://github.com/supabase/supabase/blob/master/i18n/README.ru.md)
+- [Spanish](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
+- [Traditional Chinese](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
+- [Turkish](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
+
 ---
 
 ## Sponsors
