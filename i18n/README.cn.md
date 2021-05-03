@@ -8,23 +8,23 @@
 
 [Supabase](https://supabase.io)是一个开源的 Firebase 替代品。我们正在使用企业级开源工具构建 Firebase 的特性
 
-- [x] 主持 Postgres 数据库
+- [x] Postgres 数据库托管
 - [x] 实时订阅
 - [x] 身份验证和授权
 - [x] 自动生成的 api
-- [x] 指示板
+- [x] 仪表盘
 - [x] 存储
 - [ ] 函数(开发中)
 
 ## 文档
 
-我们的文档，请到 [supabase.io/docs](supabase.io/docs)
+完整文档[supabase.io/docs](supabase.io/docs)
 
 ## 社群与支援
 
-社区论坛。最适合: 帮助构建和讨论数据库最佳实践。
-Github Issues: 电子邮件支持。最适合: 报告使用 Supabase 时遇到的问题。
-电子邮件支持。最适合:使用数据库或基础设施时遇到的问题。
+社区论坛。适用于: 帮助构建和讨论数据库最佳实践。
+Github Issues: 适用于: 报告使用 Supabase 时遇到的问题。
+电子邮件支持。适用于: 使用数据库或基础设施时遇到的问题。
 
 ## 发展现状
 
