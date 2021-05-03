@@ -78,20 +78,22 @@ Our client library is modular. Each sub-library is a standalone implementation f
 
 ## Translations
 
+- [Dutch / Nederlands](/i18n/README.nl.md)
 - [English](https://github.com/supabase/supabase)
 - [French / Français](/i18n/README.fr.md)
 - [German / Deutsch](/i18n/README.de.md)
 - [Hindi / हिंदी](/i18n/README.hi.md)
 - [Nepali / नेपाली](/i18n/README.ne.md)
+- [Italiano / Italian](/i18n/README.it.md)
 - [Japanese / 日本語](/i18n/README.jp.md)
-- [Brasilian Portuguese / Português Brasileiro](/i18n/README.pt-br.md)
+- [Polish / Polski](/i18n/README.pl.md)
 - [Portuguese / Portuguese](/i18n/README.pt.md)
+- [Portuguese (Brazilian) / Português Brasileiro](/i18n/README.pt-br.md)
 - [Russian / Pусский](/i18n/README.ru.md)
 - [Spanish / Español](/i18n/README.es.md)
 - [Traditional Chinese / 繁体中文](/i18n/README.zh-tw.md)
 - [Turkish / Türkçe](/i18n/README.tr.md)
-- [Dutch / Nederlands](/i18n/README.nl.md)
-- [List of translations](/i18n/languages.md) <!--- Keep only the this-->
+- [List of translations](/i18n/languages.md) <!--- Keep only this -->
 
 ---
 
