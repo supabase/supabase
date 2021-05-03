@@ -79,7 +79,7 @@ Our client library is modular. Each sub-library is a standalone implementation f
 
 - [English](https://github.com/supabase/supabase)
 - [French / Français](/i18n/README.fr.md)
-- [German / Deutsche](/i18n/README.de.md)
+- [German / Deutsch](/i18n/README.de.md)
 - [Hindi / हिंदी](/i18n/README.hi.md)
 - [Japanese / 日本語](/i18n/README.jp.md)
 - [Brasilian Portuguese / Português Brasileiro](/i18n/README.pt-br.md)
