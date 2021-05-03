@@ -9,12 +9,12 @@
 [Supabase](https://supabase.io)は、オープンソースのFirebase代替製品です。エンタープライズグレードのオープンソースツールを使って、Firebaseの機能を構築しています。
 
 - [x] ホスティングされたPostgresデータベース
-- [x] リアルタイムサブスクリプション機能
+- [x] リアルタイムサブスクリプション
 - [x] 認証・認可
 - [x] APIを自動生成
 - [x] ダッシュボード
 - [x] ストレージ
-- [ ] ファンクションズ (近日公開)
+- [ ] 関数 (近日公開)
 
 ## ドキュメンテーション
 
@@ -23,8 +23,8 @@
 ## コミュニティとサポート
 
 - [コミュニティフォーラム](https://github.com/supabase/supabase/discussions) どんな時に使うか：構築の手助け、データベースのベストプラクティスに関する議論など
-- [GitHub Issue](https://github.com/supabase/supabase/issues) どんな時に使うか: Supabaseをに関するバグやエラーについて
-- [Emailサポート](https://supabase.io/docs/support#business-support) どんな時に使うか: ユーザー自身ののデータベースやインフラに何か問題が発生した場合
+- [GitHub Issue](https://github.com/supabase/supabase/issues) どんな時に使うか: Supabaseで起こったバグやエラーについて
+- [Emailサポート](https://supabase.io/docs/support#business-support) どんな時に使うか: ユーザー自身のデータベースやインフラに何か問題が発生した場合
 
 ## ステータス
 
@@ -51,16 +51,16 @@ Supabaseは[ホスティングされたプラットフォーム](https://app.sup
 ![アーキテクチャー](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/)は、30年以上にわたって開発・改善されてきたオブジェクトリレーショナルデータベースシステムで、信頼性、機能の堅牢性、パフォーマンスの面で高い評価を得ています。
-- [Realtime](https://github.com/supabase/realtime)は、PostgreSQLのinsert、update、deleteの情報をWebsocketリアルタイムで受信することができるElixirサーバです。SupabaseはPostgresに組み込まれたレプリケーション機能に対してリッスンし、レプリケーションのバイトストリームをJSONに変換し、そのJSONをWebsocketでブロードキャストします。
+- [Realtime](https://github.com/supabase/realtime)は、PostgreSQLのinsert、update、deleteの情報をWebSocketで受信できるElixirサーバです。SupabaseはPostgresに組み込まれたレプリケーション機能をリッスンし、レプリケーションのバイトストリームをJSONに変換し、そのJSONをWebSocketでブロードキャストします。
 - [PostgREST](http://postgrest.org/)は、PostgreSQLデータベースをRESTful APIに直接変換するウェブサーバです。
 - [Storage](https://github.com/supabase/storage-api)は、S3に保存されたファイルを管理するためのRESTfulなインターフェイスで、パーミッションの管理にはPostgresを使用しています。
-- [postgres-meta](https://github.com/supabase/postgres-meta) は、Postgresを管理するためのRESTful APIで、テーブルの取得、roleの追加、クエリの実行などを行うことができます。
-- [GoTrue](https://github.com/netlify/gotrue) は、SWTをベースにしたユーザー管理とSWTトークンの発行のためのAPIです。
+- [postgres-meta](https://github.com/supabase/postgres-meta) は、Postgresを管理するためのRESTful APIで、テーブルの取得、ロールの追加、クエリの実行などを行うことができます。
+- [GoTrue](https://github.com/netlify/gotrue) は、ユーザー管理とSWTトークン発行のためのSWTベースのAPIです。
 - [Kong](https://github.com/Kong/kong) は、クラウドネイティブなAPIゲートウェイです。
 
 #### クライアント・ライブラリ
 
-Supabaseクライアント・ライブラリはモジュール化されています。それぞれのサブライブラリが、一つの外部システムのための独立した実装となっています。こうすることで、既存のツールをサポートしています。
+Supabaseクライアントライブラリはモジュール化されています。それぞれのサブライブラリが、一つの外部システムのための独立した実装となっています。こうすることで、既存のツールをサポートしています。
 
 - **`supabase-{lang}`**: 下記全てのライブラリを内包したクライアントライブラリ
   - `postgrest-{lang}`: [PostgREST](https://github.com/postgrest/postgrest)用のクライアントライブラリ
@@ -74,12 +74,11 @@ Supabaseクライアント・ライブラリはモジュール化されていま
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
+<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 ## 翻訳
 
-- [ドイツ語](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
-- [日本語](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [英語](https://github.com/supabase/supabase)
-- [トルコ語](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
+- [翻訳](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 
