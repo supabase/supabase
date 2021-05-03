@@ -86,6 +86,7 @@ Our client library is modular. Each sub-library is a standalone implementation f
 - [Nepali / नेपाली](/i18n/README.ne.md)
 - [Italiano / Italian](/i18n/README.it.md)
 - [Japanese / 日本語](/i18n/README.jp.md)
+- [Norwegian (Bokmål) / Norsk (Bokmål)](/i18n/README.nb-no.md)
 - [Polish / Polski](/i18n/README.pl.md)
 - [Portuguese / Portuguese](/i18n/README.pt.md)
 - [Portuguese (Brazilian) / Português Brasileiro](/i18n/README.pt-br.md)
