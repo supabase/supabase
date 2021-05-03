@@ -16,11 +16,11 @@ We're building as fast as we can! And we are even adding a few things that Fireb
 
 ### How can you be a Firebase alternative if you're built with a relational database?
 
-We started Supabase because we love the functionality of Firebase, but we personally experienced the scaling issues that many others experienced. We chose Postgres because it's well-trusted and is has phenomenal scalability. Our goal is to make Postgres as easy to use as Firebase, so that you no longer have to choose between usability and scalability. Also, we're sure that once you start using Postgres, you'll love it more than any other database.
+We started Supabase because we love the functionality of Firebase, but we personally experienced the scaling issues that many others experienced. We chose Postgres because it's well-trusted and it has phenomenal scalability. Our goal is to make Postgres as easy to use as Firebase, so that you no longer have to choose between usability and scalability. Also, we're sure that once you start using Postgres, you'll love it more than any other database.
 
 ### How do I host Supabase?
 
-Supabase is an amalgamation of 5 open source tools (and growing). We don't have a simple way to install everything on a single server, but we will work on this as soon as we have a stable set of features. Each tool can be installed as a standalone product. Some of these tools are made by Supabase (like our [Realtime Server](https://github.com/supabase/realtime)), some we support indirectly (like [PostgREST](http://postgrest.org/en/v7.0.0/)), and some are 3rd-party tools (like [Kong](https://github.com/Kong/kong)). All of the tools we use in Supabase are MIT, Apache 2.0, or PostgreSQL licensed.
+Supabase is an amalgamation of 5 open source tools (and growing). Some of these tools are made by Supabase (like our [Realtime Server](https://github.com/supabase/realtime)), some we support indirectly (like [PostgREST](http://postgrest.org/en/v7.0.0/)), and some are 3rd-party tools (like [Kong](https://github.com/Kong/kong)). All of the tools we use in Supabase are MIT, Apache 2.0, or PostgreSQL licensed. You can use the docker-compose script [here](https://github.com/supabase/supabase/tree/master/docker) to build Supabase on your own environment, and find detailed instructions [here](/docs/guides/self-hosting).
 
 ### Do you support `[some other database]`?
 
@@ -28,5 +28,5 @@ At the moment we only support PostgreSQL. It's unlikely we'll ever move away fro
 
 ### Do you have a library for `[some other language]`?
 
-We currently have a JavaScript library. You can [vote on a new client library](https://github.com/supabase/supabase/issues/5) for your favourite language.
+We currently have a JavaScript library. You can [vote on a new client library](https://github.com/supabase/supabase/issues/5) for your favorite language.
 

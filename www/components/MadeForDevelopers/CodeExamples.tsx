@@ -2,8 +2,16 @@ import { useState } from 'react'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import CopyToClipboard from 'react-copy-to-clipboard'
-import { examples } from 'data/CodeExamples'
+import {
+  createUserExample,
+  subscribeExample,
+  readExample,
+  createExample,
+  updateExample,
+  ExampleProps,
+} from 'data/CodeExamples'
 import monokaiCustomTheme from 'data/CodeEditorTheme'
+import { Button, IconCopy, Space, Tabs } from '@supabase/ui'
 
 SyntaxHighlighter.registerLanguage('javascript', js)
 
@@ -44,13 +52,17 @@ const CodeExamples = () => {
   const [example, setExample] = useState('createUserExample')
   const [copied, setCopied] = useState(false)
 
-  const exampleList = [
-    'createUserExample',
-    'subscribeExample',
-    'readExample',
-    'createExample',
-    'updateExample',
-  ]
+  type exampleListProps = {
+    [key: string]: ExampleProps
+  }
+
+  const exampleList: exampleListProps = {
+    createUserExample,
+    subscribeExample,
+    readExample,
+    createExample,
+    updateExample,
+  }
 
   const lang = 'javascript'
 
@@ -59,96 +71,114 @@ const CodeExamples = () => {
     setCopied(false)
   }
 
-  const buttons = exampleList.map((id) => {
-    return (
-      <button
-        type="button"
-        key={id + '-button'}
-        onClick={() => handleClick(id)}
-        className={`
-          mb-2 ml-1 mr-1 rounded-md border border-gray-200 dark:border-dark-200 px-4 py-2 text-xs font-medium text-gray transition
-          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-transparent sm:text-sm sm:w-auto
-          ${
-            example === id
-              ? ' border-gray-900 bg-dark-600 dark:bg-white text-white dark:text-dark-600'
-              : ' hover:bg-gray-200 dark:hover:text-black'
-          }
-          dark:text-white lg:w-full
-      `}
-      >
-        {
-          // @ts-ignore
-          examples[id].name
-        }
-      </button>
-    )
-  })
+  const Buttons = () => (
+    <Space direction="vertical" size={1}>
+      {Object.values(exampleList).map((x, i) => {
+        const length: number = Object.values(exampleList).length - 1
+        // const radiusStyles = {
+        //   borderBottomRightRadius: i !== length ? '0' : undefined,
+        //   borderBottomLeftRadius: i !== length ? '0' : undefined,
+        //   borderTopLeftRadius: i !== length + 1 && i !== 0 ? '0' : undefined,
+        //   borderTopRightRadius: i !== length + 1 && i !== 0 ? '0' : undefined,
+        // }
+        return (
+          <Button
+            block
+            type={'outline'}
+            size="small"
+            key={x.id}
+            onClick={() => handleClick(x.id)}
+            style={
+              example === x.id
+                ? {
+                    background: 'white',
+                    color: '#3d3d3d',
+                    // borderBottom: i !== 0 ? 'none' : 'red',
+                    // ...radiusStyles,
+                  }
+                : {
+                    // borderBottom: i !== length ? 'none' : undefined,
+                    // ...radiusStyles,
+                  }
+            }
+          >
+            {x.name}
+          </Button>
+        )
+      })}
+    </Space>
+  )
+
+  const TabNav = () => (
+    <Tabs
+      key="mobile-tabs"
+      scrollable
+      onClick={(id: string) => handleClick(id)}
+      activeId={example}
+      type="underlined"
+    >
+      {Object.values(exampleList).map((x) => {
+        return (
+          <Tabs.Panel id={x.id} label={x.name}>
+            <span></span>
+          </Tabs.Panel>
+        )
+      })}
+    </Tabs>
+  )
 
   return (
-    <div className="grid grid-cols-12 gap-2 xl:gap-8">
-      <div className="col-span-12 text-center lg:col-span-3 lg:hidden">{buttons}</div>
-      <div className="col-span-12 lg:col-span-9">
-        <div className="rounded-md rounded-b-lg bg-dark-600 dark:bg-dark-700">
-          <div className="p-2 pl-5 flex justify-between items-center">
-            <p className="text-sm truncate mr-2 sm:text-base text-dark-100">
-              {
-                // @ts-ignore
-                examples[example].description
-              }
-            </p>
-            <CopyToClipboard
-              text={
-                // @ts-ignore
-                examples[example].code[lang]
-              }
-              onCopy={() => setCopied(true)}
+    <div>
+      <div className="grid grid-cols-12 gap-2 xl:gap-8">
+        <div className="col-span-12 text-center lg:col-span-3 lg:hidden">{<TabNav />}</div>
+        <div className="col-span-12 lg:col-span-9">
+          <div className="rounded-md rounded-b-lg bg-dark-600 dark:bg-dark-700">
+            <div className="p-2 pl-5 flex justify-between items-center">
+              <p className="text-sm truncate mr-2 sm:text-base text-dark-100">
+                {exampleList[example].description}
+              </p>
+              <div className="dark">
+                <CopyToClipboard
+                  text={exampleList[example].code[lang]}
+                  onCopy={() => setCopied(true)}
+                >
+                  <Button type="outline" icon={copied ? <CopiedIcon /> : <ClipboardIcon />}>
+                    <span className="hidden sm:block">{copied ? 'Copied!' : 'Copy code'}</span>
+                  </Button>
+                </CopyToClipboard>
+              </div>
+            </div>
+            <SyntaxHighlighter
+              language="javascript"
+              style={monokaiCustomTheme}
+              className="rounded-b-lg"
+              customStyle={{
+                padding: 0,
+                fontSize: 12,
+                lineHeight: 1.2,
+                borderTop: '1px solid #393939',
+                background: '#181818',
+              }}
+              showLineNumbers
+              lineNumberContainerStyle={{
+                paddingTop: '128px',
+              }}
+              lineNumberStyle={{
+                minWidth: '48px',
+                background: '#1e1e1e',
+                paddingLeft: '21px',
+                color: '#828282',
+                fontSize: 12,
+                paddingTop: '4px',
+                paddingBottom: '4px',
+              }}
             >
-              <button
-                type="button"
-                className="inline-flex items-center px-2.5 py-1.5 border border-dark-300 shadow-sm text-xs font-medium rounded text-dark-100 hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                <span className="hidden sm:block">{copied ? 'Copied!' : 'Copy code'}</span>
-                <span className="block sm:hidden">
-                  {copied ? <CopiedIcon /> : <ClipboardIcon />}
-                </span>
-              </button>
-            </CopyToClipboard>
+              {exampleList[example].code[lang]}
+            </SyntaxHighlighter>
           </div>
-          <SyntaxHighlighter
-            // startingLineNumber={3}
-            language="javascript"
-            style={monokaiCustomTheme}
-            className="rounded-b-lg"
-            customStyle={{
-              padding: 0,
-              // paddingTop: '32px',
-              fontSize: 12,
-              lineHeight: 1.2,
-              borderTop: '1px solid #393939',
-              background: '#181818',
-            }}
-            showLineNumbers
-            lineNumberContainerStyle={{
-              paddingTop: '128px',
-            }}
-            lineNumberStyle={{
-              minWidth: '48px',
-              background: '#1e1e1e',
-              paddingLeft: '21px',
-              color: '#828282',
-              fontSize: 12,
-              paddingTop: '4px',
-              paddingBottom: '4px',
-            }}
-          >
-            {
-              // @ts-ignore
-              examples[example].code[lang]
-            }
-          </SyntaxHighlighter>
         </div>
+        <div className="col-span-12 text-center hidden lg:col-span-3 lg:block">{<Buttons />}</div>
       </div>
-      <div className="col-span-12 text-center hidden lg:col-span-3 lg:block">{buttons}</div>
     </div>
   )
 }

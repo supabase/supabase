@@ -1,6 +1,6 @@
 {
   "name": "supabase-website",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Supabase main website",
   "private": true,
   "scripts": {
@@ -12,19 +12,34 @@
     "prettier": "prettier --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\""
   },
   "dependencies": {
+    "@mdx-js/loader": "^1.6.22",
+    "@mdx-js/react": "^1.6.22",
+    "@next/mdx": "^10.0.7",
+    "@supabase/supabase-js": "^1.6.0",
+    "@supabase/ui": "^0.22.0",
     "classnames": "2.2.6",
     "date-fns": "2.10.0",
-    "gray-matter": "4.0.2",
+    "gray-matter": "^4.0.2",
+    "markdown-toc": "^1.2.0",
     "next": "latest",
+    "next-mdx-remote": "^2.1.3",
+    "next-seo": "^4.20.0",
     "react": "^16.13.0",
     "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "^16.13.0",
     "react-ga": "^3.3.0",
+    "react-markdown": "^5.0.3",
     "react-syntax-highlighter": "^15.3.1",
+    "react-tooltip": "^4.2.17",
     "react-transition-group": "^4.4.1",
-    "remark": "11.0.2",
+    "rehype-slug": "^4.0.1",
+    "remark": "^13.0.0",
+    "remark-gfm": "^1.0.0",
     "remark-html": "10.0.0",
-    "typescript": "^4.0.3"
+    "swiper": "^6.5.0",
+    "swr": "^0.5.4",
+    "typescript": "^4.0.3",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/classnames": "^2.2.10",

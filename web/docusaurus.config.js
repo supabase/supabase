@@ -40,16 +40,13 @@ module.exports = {
         },
       },
     },
-    sidebarCollapsible: false,
+    sidebarCollapsible: true,
     algolia: {
       apiKey: '766d56f13dd1e82f43253559b7c86636',
       indexName: 'supabase',
     },
     image: '/img/supabase-og-image.png', // used for meta tag, in particular og:image and twitter:image
     metaImage: '/img/supabase-og-image.png',
-    googleAnalytics: {
-      trackingID: 'UA-155232740-1',
-    },
     navbar: {
       // classNames: 'shadow--md',
       // title: 'supabase',
@@ -63,77 +60,38 @@ module.exports = {
         {
           href: 'https://github.com/supabase/supabase',
           className: 'navbar-item-github',
-          position: 'left',
+          position: 'right',
         },
         {
           href: 'https://twitter.com/supabase_io',
           className: 'navbar-item-twitter',
-          position: 'left',
-        },
-        {
-          to: '/docs',
-          activeBasePath: '/docs/guides/',
-          label: 'Guides',
-          position: 'left',
-        },
-        {
-          label: 'Docs',
-          activeBasePath: '/docs/client/',
-          to: '/docs/client/supabase-client',
-          position: 'left',
-        },
-        {
-          label: 'Blog',
-          to: '/blog',
           position: 'right',
         },
         {
-          to: 'docs/',
-          activeBasePath: 'Tools',
-          label: 'Tools',
+          to: '/docs',
+          activeBaseRegex: '(^/docs$)|(/docs/faq)|(/docs/guides)',
+          label: 'Overview',
           position: 'left',
-          items: [
-            {
-              label: 'GoTrue',
-              to: '/docs/gotrue/server/about',
-            },
-            {
-              label: 'GoTrue Client',
-              to: '/docs/gotrue/client/gotrue-client',
-            },
-            {
-              label: 'Postgres',
-              to: '/docs/postgres/server/about',
-            },
-            {
-              label: 'Postgres API',
-              to: '/docs/postgres/api/about',
-            },
-            {
-              label: 'PostgREST',
-              to: '/docs/postgrest/server/about',
-            },
-            {
-              label: 'PostgREST Client',
-              to: '/docs/postgrest/client/postgrest-client',
-            },
-            {
-              label: 'Realtime',
-              to: '/docs/realtime/server/about',
-            },
-            {
-              label: 'Realtime Client',
-              to: '/docs/realtime/client/realtime-client',
-            },
-          ],
         },
-        // {
-        //   to: '/showcase',
-        //   label: 'Showcase',
-        //   position: 'right',
-        // },
-        // { to: '/docs/pricing', label: 'Pricing', position: 'right' },
-        { href: 'https://app.supabase.io', label: 'Login', position: 'right' },
+        {
+          label: 'Reference',
+          activeBasePath: '/docs/reference/',
+          to: '/docs/reference/javascript/supabase-client',
+          position: 'left',
+        },
+        {
+          to: '/docs/resources',
+          activeBaseRegex: 'docs/(resources|learn|gotrue|postgrest|realtime)',
+          label: 'Resources',
+          position: 'left',
+        },
+        {
+          label: 'Jobs',
+          activeBasePath: '/docs/careers',
+          to: '/docs/careers',
+          position: 'left',
+        },
+        { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
       ],
     },
     prism: {
@@ -149,7 +107,7 @@ module.exports = {
           items: [
             {
               label: 'Blog',
-              to: '/blog',
+              to: 'https://supabase.io/blog',
             },
             {
               label: 'Open source',
@@ -162,7 +120,7 @@ module.exports = {
             {
               label: 'Lawyers.txt',
               to: 'https://supabase.io/lawyers.txt',
-            },
+            }
           ],
         },
         {
@@ -174,7 +132,7 @@ module.exports = {
             },
             {
               label: 'Pricing',
-              to: '/docs/pricing',
+              to: 'https://supabase.io/pricing',
             },
             {
               label: 'Support',
@@ -230,6 +188,7 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
+          editUrl: 'https://github.com/supabase/supabase/edit/master/web',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -243,6 +202,7 @@ module.exports = {
       },
     ],
   ],
+  scripts: [{ src: '/scripts/telemetry.js' }],
   // plugins: [
   //   // [
   //   //   '@docusaurus/plugin-content-docs',

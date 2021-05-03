@@ -7,8 +7,8 @@ author_url: https://github.com/kiwicopple
 author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
 authorURL: https://github.com/kiwicopple
 image: /img/supabase-september-2020.png
-tags: 
-    - supabase
+tags:
+  - release-notes
 ---
 
 We're now 7 months into building Supabase. This update is a big one! 
@@ -48,7 +48,7 @@ Extensions are easier to use. You can enable Postgres extensions with the click 
 The SQL editor now stores your query history in your browser. You can also save your favorite queries to run later! 
 
 <video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
-<source src="/videos/favourites.mp4" type="video/mp4" muted playsInline />
+<source src="/videos/favorites.mp4" type="video/mp4" muted playsInline />
 </video>
 
 ### GitHub Discussions

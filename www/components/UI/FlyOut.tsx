@@ -60,11 +60,11 @@ const FlyOut = (props: Props) => {
       >
         <>
           <div
-            className="absolute inset-x-0 transform shadow-lg border-t border-gray-100 dark:border-dark-500"
+            className="absolute inset-x-0 transform shadow-lg border-gray-100 dark:border-dark-500"
             style={{
               zIndex: 999,
               position: 'absolute',
-              width: '100vw',
+              width: '100%',
               margin: '0 auto',
               marginTop: '63px',
               left: '-50vw',
@@ -72,17 +72,19 @@ const FlyOut = (props: Props) => {
               top: 0,
             }}
           >
-            <div className="absolute inset-0 flex sm:flex-col lg:flex-row" aria-hidden="true">
-              <div className="bg-white dark:bg-dark-600 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full" />
+            <div
+              className="border-b dark:border-gray-600 absolute inset-0 flex sm:flex-col lg:flex-row"
+              aria-hidden="true"
+            >
+              <div className="bg-white dark:bg-gray-800 border-r dark:border-gray-600 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full" />
               <div
                 className={`${
-                  singleBgColor ? 'bg-white dark:bg-dark-600' : 'bg-gray-50 dark:bg-dark-500'
+                  singleBgColor ? 'bg-white dark:bg-dark-600' : 'bg-gray-50 dark:bg-gray-800'
                 } sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full`}
               />
-              {/* <div className="bg-gray-50 dark:bg-dark-300 md:hidden lg:block lg:w-1/2"></div> */}
             </div>
             <div
-              className={`relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 ${className}`}
+              className={`container relative mx-auto lg:grid-cols-2 px-6 lg:px-10 xl:px-14 py-2`}
             >
               {children}
             </div>
@@ -90,7 +92,7 @@ const FlyOut = (props: Props) => {
           <div
             className="fixed inset-0 t-63 transition-opacity bg-red"
             style={{
-              zIndex: 10,
+              zIndex: 100,
               top: '63px',
               marginLeft: 0,
               pointerEvents: 'visiblePainted',

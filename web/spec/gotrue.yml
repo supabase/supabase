@@ -1,6 +1,7 @@
 openref: 0.1
 
 info:
+  id: reference/gotrue-js
   title: GoTrue Client
   description: |
     GoTrue is an authentication server.
@@ -97,7 +98,7 @@ pages:
       - name: Sign up
         js: |
           ```js
-          const { error, data } = await auth.signUp({
+          const { user, session, error } = await auth.signUp({
             email: 'example@email.com',
             password: 'example-password',
           })
@@ -121,7 +122,7 @@ pages:
           })
 
           // send magic link (passwordless link)
-          const { user, error } = await auth.signIn({
+          const { user, session, error } = await auth.signIn({
             email: 'example@email.com',
           })
           ```
@@ -145,7 +146,7 @@ pages:
       - name: Get user
         js: |
           ```js
-          const user = auth.user()
+          const user = await auth.user()
           ```
 
   session:
@@ -174,7 +175,20 @@ pages:
           ```
 
   onAuthStateChange:
-    # $ref: onAuthStateChange
+    $ref: '"GoTrueClient".GoTrueClient.onAuthStateChange'
+    examples:
+      - name: Listen to auth changes
+        isSpotlight: true
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            console.log(event, session)
+          })
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
 
   api.signUpWithEmail:
     $ref: '"GoTrueApi".GoTrueApi.signUpWithEmail'
@@ -182,7 +196,7 @@ pages:
       - name: Sign up a new user with email
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .signUpWithEmail('example@email.com', 'example-password')
           ```
 
@@ -192,17 +206,19 @@ pages:
       - name: Sign in a user with email
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .signInWithEmail('example@email.com', 'example-password')
             ```
 
   api.sendMagicLinkEmail:
     $ref: '"GoTrueApi".GoTrueApi.sendMagicLinkEmail'
+    notes: |
+      - An account is created when a non-existing user email is passed.
     examples:
       - name: Send user a passwordless login link via email
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .sendMagicLinkEmail('example@email.com')
             ```
 
@@ -212,17 +228,32 @@ pages:
       - name: Send a user an invite link to sign up via email
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .inviteUserByEmail('example@email.com')
             ```
 
   api.resetPasswordForEmail:
     $ref: '"GoTrueApi".GoTrueApi.resetPasswordForEmail'
+    notes: |
+      Sends a reset request to an email address.
+
+      When the user clicks the reset link in the email they will be forwarded to:
+      
+      `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`
+
+      Your app must detect `type=recovery` in the fragment and display a password reset form to the user.
+
+      You should then use the access_token in the url and new password to update the user as follows:
+
+      ```js
+      const { error, data } = await auth.api
+            .updateUser(access_token, { password : new_password })
+      ```
     examples:
       - name: Send a user a password reset email
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .resetPasswordForEmail('example@email.com')
             ```
 
@@ -232,7 +263,7 @@ pages:
       - name: Sign a user out
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .signOut(access_token)
             ```
 
@@ -242,7 +273,7 @@ pages:
       - name: Get the user details for a given user
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .getUser(access_token)
             ```
 
@@ -252,7 +283,7 @@ pages:
       - name: Update user info that Gotrue holds (also used for setting new passwords)
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .updateUser(access_token, { password : 'Why Shinji?' })
             ```
 
@@ -262,6 +293,6 @@ pages:
       - name: Get a new access and refresh token using a valid refresh_token
         js: |
           ```js
-          const { error, data } = await api
+          const { error, data } = await auth.api
             .refreshAccessToken(refresh_token)
             ```

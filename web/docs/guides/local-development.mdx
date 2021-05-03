@@ -1,0 +1,194 @@
+---
+id: local-development
+title: Local Development
+description: How to use Supabase on your local development machine.
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Supabase provides a CLI so that you can develop your application locally, rather than connecting to a live project.
+
+## Before you begin
+
+If you're using the CLI, please record your steps! You can help us improve by adding missing details and fixing errors. 
+
+Our CLI is still under heavy development, and is missing some features:
+
+- You cannot yet deploy your local changes to your live project using the CLI. You will need to take a "dump" of your database schema 
+and run it on your live database.
+- We have not yet added Storage to the local development suite.
+- The self-hosted version of Supabase does not include a UI yet. 
+We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) 
+([more context](https://github.com/supabase/supabase/discussions/1001#discussioncomment-558696)).
+
+In the meantime, here are some suggested tools for interacting with your Postgres Database:
+
+- `pgadmin`: https://www.pgadmin.org 
+- `dbeaver`: https://dbeaver.com 
+- `BeeKeeper`: https://beekeeperstudio.io
+- `HeidiSQL`: https://heidisql.com
+- `Table Plus`: https://www.tableplus.io
+
+## Prerequisites
+
+Our CLI makes heavy use of [Docker Compose](https://docs.docker.com/compose/install), so make sure it is installed and configured on your machine before starting.
+
+You will also need to install [NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+
+## Install the CLI
+
+```bash
+npm install -g supabase
+```
+
+
+## Initialize your project
+
+```bash
+supabase init
+```
+
+You will be guided through a series of questions, and if everything goes well, you will see an output similar to this:
+
+```txt
+✔ Port for Supabase URL: · 8000
+✔ Port for PostgreSQL database: · 5432
+✔ Project initialized.
+Supabase URL: http://localhost:8000
+Supabase Key: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJhdWQiOiIiLCJzdWIiOiIiLCJSb2xlIjoicG9zdGdyZXMifQ.magCcozTMKNrl76Tj2dsM7XTl_YH0v0ilajzAvIlw3U
+Database URL: postgres://postgres:postgres@localhost:5432/postgres
+
+Run supabase start to start local Supabase.
+```
+
+This command will create a `.supabase` folder which holds all the configuration for developing your project locally. You don't need to check this into version control. 
+
+
+## Start
+
+
+```bash
+supabase start
+```
+
+This command uses Docker Compose to start all the open source [services](/docs/#how-it-works) of Supabase. This command will take a while to run, there are a lot of services to build.
+
+Once this is running, you will see the healthy services in Docker Dashboard:
+
+![Docker Supabase](/img/docker-supabase.png)
+
+
+#### Accessing Services Directly
+
+
+<Tabs
+defaultValue="Postgres"
+values={[
+  {label: 'Postgres', value: 'Postgres'},
+  {label: 'API Gateway', value: 'Kong'},
+]}>
+<TabItem value="Postgres">
+
+```sh
+# Default URL:
+postgres://postgres:postgres@localhost:5432/postgres
+```
+
+The local Postgres instance can be accessed through [`psql`](https://www.postgresql.org/docs/current/app-psql.html) 
+or any other Postgres client, such as [pgadmin](https://www.pgadmin.org/).
+
+For example:
+
+```bash
+psql -h localhost -d postgres -U postgres -W
+
+# Enter your password (default is "postgres")
+```
+
+</TabItem>
+<TabItem value="Kong">
+
+```sh
+# Default URL:
+http://localhost:8000/v1?apikey=SUPABASE_KEY
+```
+
+All of the services are accessible through the API Gateway [Kong](https://github.com/Kong/kong)). 
+If you are accessing these services without the client libraries, you may need to pass the client keys as an `Authorization` header. 
+You can learn more about these JWT headers in our [Resources](http://localhost:3005/docs/learn/auth-deep-dive/auth-deep-dive-jwts).
+
+
+```sh
+curl 'http://localhost:8000/v1' \
+    -H "apikey: SUPABASE_KEY" \
+    -H "Authorization: Bearer SUPABASE_KEY"
+
+http://localhost:8000/v1/rest/v1/           # REST (PostgREST)
+http://localhost:8000/v1/realtime/v1/       # Realtime
+http://localhost:8000/v1/storage/v1/        # Storage
+http://localhost:8000/v1/auth/v1/           # Auth (GoTrue)
+```
+
+
+</TabItem>
+</Tabs>
+
+
+## Example application
+
+Now that we've learned how to install and start Supabase locally, let's see how you can use it with a frontend application. 
+This quick-start guide will show you, how you can configure a React app which uses the Supabase stack.
+
+```bash
+# create a fresh React app
+npx create-react-app react-demo --use-npm
+
+# move into the new folder
+cd react-demo
+
+# set up Supabase 
+supabase init 
+
+# Save the install supabase-js library
+npm install --save @supabase/supabase-js
+```
+
+Now that your application is prepared, you can use Supabase anywhere in your application:
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const SUPABASE_URL = 'http://localhost:8000'
+const SUPABASE_ANON_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJhdWQiOiIiLCJzdWIiOiIiLCJSb2xlIjoicG9zdGdyZXMifQ.magCcozTMKNrl76Tj2dsM7XTl_YH0v0ilajzAvIlw3U'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+```
+
+Copy this snippet into `App.js`, and then start the backend and the frontend:
+
+```bash
+supabase start  # Start Supabase
+npm start       # Start the React app
+```
+
+If everything is working, you should have a React app running on `http://localhost:3000` and Supabase services running on `http://localhost:8000`
+
+## Stop
+
+```bash
+supabase stop
+```
+
+When you're finished with Supabase, run `supabase stop` to stop the Docker services.
+
+## Migrations
+
+TBD
+
+
+## Next steps
+
+- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
+- CLI repository: [GitHub](https://github.com/supabase/cli).
+- Sign in: [app.supabase.io](https://app.supabase.io)

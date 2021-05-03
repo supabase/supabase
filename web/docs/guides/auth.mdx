@@ -12,9 +12,10 @@ Supabase makes it simple to manage your users.
 <source src="/videos/auth-zoom2.mp4" type="video/mp4" muted playsInline />
 </video>
 
-When a user signs up, Supabase assigns them a unique ID. You can reference this ID anywhere in your database. For example, you might create a `profiles` table referencing the user using a `user_id` field.
+When users sign up, Supabase assigns them a unique ID. You can reference this ID anywhere in your database. For example, you might create a `profiles` table referencing the user using a `user_id` field.
 
-Supabase provides the routes to [sign up](/docs/client/auth-signup), [log in](/docs/client/auth-signin), [log out](/docs/client/auth-signout), and manage users in your apps and websites.
+Supabase provides the routes to [sign up](/docs/reference/javascript/auth-signup), [log in](/docs/reference/javascript/auth-signin), 
+[log out](/docs/reference/javascript/auth-signout), and manage users in your apps and websites.
 
 
 ### Third Party Logins
@@ -23,6 +24,8 @@ We currently support the following OAuth providers:
 - Google
 - Github
 - Gitlab
+- Azure
+- Facebook
 - Bitbucket
 
 ![OAuth Logins.](/img/supabase-oauth-logins.png)
@@ -101,8 +104,212 @@ where auth.uid() = todos.user_id; -- Policy is implicitly added.
 5. The user's UID can be used in Policies to restrict access to rows. 
 
 Supabase provides a special function in Postgres, `auth.uid()`, which extracts the user's UID from the JWT. This is especially useful when creating Policies.
- 
+
+## Policy Examples
+
+Here are some examples to show you the power of PostgreSQL's Row Level Security. Each policy is attached to a table, and the policy is executed
+every time a the table is accessed.
+
+### Allow read access 
+
+```sql
+-- 1. Create table
+create table profiles (
+  id uuid references auth.users,
+  avatar_url text
+);
+
+-- 2. Enable RLS
+alter table profiles 
+  enable row level security;
+
+-- 3. Create Policy
+create policy "Public profiles are viewable by everyone." 
+  on profiles for select using (
+    true
+  );
+```
+
+1. Creates a table called `profiles` in the public schema (default schema)
+2. Enables Row Level Security
+3. Creates a Policy which allows all `select` queries to run. 
+
+
+### Restrict updates 
+
+```sql
+-- 1. Create table
+create table profiles (
+  id uuid references auth.users,
+  avatar_url text
+);
+
+-- 2. Enable RLS
+alter table profiles 
+  enable row level security;
+
+-- 3. Create Policy
+create policy "Users can update their own profiles." 
+  on profiles for update using (
+    auth.uid() = id
+  );
+```
+
+1. Creates a table called `profiles` in the public schema (default schema)
+2. Enables Row Level Security
+3. Creates a Policy which allows logged in users to update their own data.
+
+
+### Policies with joins
+
+Policies can even include table joins. This example shows how you can query "external" tables to build more advanced rules.
+
+```sql
+create table teams (
+  id serial primary key,
+  name text
+);
+
+-- 2. Create many to many join
+create table members (
+  team_id bigint references teams,
+  user_id uuid references auth.users
+);
+
+-- 3. Enable RLS
+alter table teams 
+  enable row level security;
+
+-- 4. Create Policy
+create policy "Team members can update team details if they belong to the team."
+  on teams
+  for update using (
+    auth.uid() in ( 
+      select user_id from members 
+      where team_id = id 
+    )
+  );
+```
+
+### Policies with security definer functions
+
+Policies can also make use of `security definer functions`, this is useful in a many-to-many relationship where you want to restrict access to the linking table. Following the `teams` and `members` example from above this example shows how you can use security definer function in combination with a policy to control access to the `members` table.
+
+```sql
+-- 1. Follow example for 'Policies with joins' above
+
+-- 2.  Enable RLS
+alter table members 
+  enable row level security
+
+-- 3.  Create security definer function
+create or replace function get_teams_for_user(user_id uuid)
+returns setof bigint as $$
+    select team_id 
+    from members 
+    where user_id = $1
+$$ stable language sql security definer;
+
+-- 4. Create Policy
+create policy "Team members can update team members if they belong to the team."
+  on members
+  for all using (
+    team_id in (
+      select get_teams_for_user(auth.uid())
+    )
+  );
+
+```
+
+### Verifying email domains
+
+Postgres has a function `right(string, n)` that returns the rightmost n characters of a string. 
+You could use this to match staff member's email domains. 
+
+```sql
+-- 1. Create table
+create table leaderboard (
+  id uuid references auth.users,
+  high_score bigint
+);
+
+-- 2. Enable RLS
+alter table leaderboard 
+  enable row level security;
+
+-- 3. Create Policy
+create policy "Only Blizzard staff can update leaderboard"
+  on leaderboard
+  for update using (
+    right(auth.email(), 13) = '@blizzard.com'
+  );
+```
+
+### Advanced Policies
+
+Use the full power of SQL to build extremely advanced rules.
+
+In this example we will create a `posts` and `comments` database and then create a policy that depends on another policy. 
+(In this case the comments policy depends on the posts policy.)
+
+```sql
+create table posts (
+  id            serial    primary key, 
+  creator_id    uuid      not null     references auth.users(id), 
+  title         text      not null, 
+  body          text      not null, 
+  publish_date  date      not null     default now(), 
+  audience      uuid[]    null -- many to many table omitted for brevity
+);
+
+create table comments (
+  id            serial    primary key, 
+  post_id       int       not null     references posts(id)  on delete cascade, 
+  user_id       uuid      not null     references auth.users(id), 
+  body          text      not null, 
+  comment_date  date      not null     default now()
+);
+
+create policy "Creator can see their own posts"
+on posts
+for select
+using (
+  auth.uid() = posts.creator_id
+);
+
+create policy "Logged in users can see the posts if they belong to the post 'audience'."
+on posts
+for select
+using (
+  auth.uid() = any (posts.audience)
+);
+
+create policy "Users can see all comments for posts they have access to."
+on comments
+for select
+using (
+  exists (
+    select 1 from posts
+    where posts.id = comments.post_id
+  )
+);
+```
+
+
 ## Tips
+
+### You don't have to use Policies 
+
+You can also put your authorization rules in your middleware, 
+similar to how you would create security rules with any other `backend <-> middleware <-> frontend` architecture.
+
+Policies are a tool. In the case of "serverless/Jamstack" setups, they are especially effective because you don't have to deploy any middleware at all.
+
+However if you want to use another Authorization method for your applications, that's also fine. Supabase is "just Postgres", so if your application 
+works with Postgres, then it also works with Supabase. 
+
+Tip: make sure to enable Row Level Security for all your tables, so that your tables are inaccessible. Then use the "Service" which we provide. 
+"Service" are designed to bypass RLS.
 
 ### Check authentication settings on Supabase
 
@@ -120,7 +327,7 @@ These should never be used in the browser or exposed to customers, but they are 
 ### Create a `public.users` table.
 
 Even though Supabase provides an `auth.users` table, it is helpful to also create a users table in the `public` schema, which uses the same UID Primary Key as the `auth.users`.
-For security purposes, the `auth` schema is not exposed on the auto-generated API. Created a `public.users` table allows you to interact via the Supabase client - 
+For security purposes, the `auth` schema is not exposed on the auto-generated API. Creating a `public.users` table allows you to interact via the Supabase client - 
 especially useful for cross-table queries.
 
 Pro tip: if you want to add a row to your `public.users` table every time a user signs up, you can use triggers. For example:
@@ -141,6 +348,34 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 ```
+
+### Disable realtime for private tables
+
+Our realtime server doesn't provide per-user security. Until we build a more robust auth system for websockets, 
+you can disable realtime functionality for any private tables. To do this, you can manage the underlying Postgres replication publication:
+
+```sql
+/**
+ * REALTIME SUBSCRIPTIONS
+ * Only allow realtime listening on public tables.
+ */
+
+begin; 
+  -- remove the realtime publication
+  drop publication if exists supabase_realtime; 
+
+  -- re-create the publication but don't enable it for any tables
+  create publication supabase_realtime;  
+commit;
+
+-- add a table to the publication
+alter publication supabase_realtime add table products;
+
+-- add other tables to the publication
+alter publication supabase_realtime add table posts;
+```
+
+We're in the process of building enhanced realtime security.
 
 ## Next steps
 

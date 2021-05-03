@@ -33,7 +33,7 @@ async function handleLogin(credentials: Credentials) {
 async function handleSignup(credentials: Credentials) {
   try {
     const { email, password } = credentials
-    // prompt user if they have not filled populated thier credentials
+    // prompt user if they have not filled populated their credentials
     if (!email || !password) {
       alert('Please provide both your email and password.')
       return
@@ -61,19 +61,33 @@ async function handleOAuthLogin(provider: Provider) {
 }
 
 /**
- * Handles password reset. Will send an email to the given email address .
+ * Handles password reset. Will send an email to the given email address.
  */
 async function handlePasswordReset() {
   const email = prompt('Please enter your email:')
-  if (email === null || email === '') {
-    window.alert('You must enter your email.')
+  if (!email) {
+    window.alert('Email address is required.')
   } else {
     const { error } = await supabase.auth.api.resetPasswordForEmail(email)
     if (error) {
-      console.log('Error: ', error.message)
+      alert('Error: ' + error.message)
     } else {
       alert('Password recovery email has been sent.')
     }
+  }
+}
+
+async function handleUpdateUser(credentials: Credentials) {
+  try {
+    const { error } = await supabase.auth.update(credentials)
+    if (error) {
+      alert('Error updating user info: ' + error.message)
+    } else {
+      alert('Successfully updated user info!')
+      window.location.href = '/'
+    }
+  } catch (error) {
+    alert('Error updating user info: ' + error.message)
   }
 }
 
@@ -105,4 +119,5 @@ export {
   handleSignup,
   handleLogout,
   handlePasswordReset,
+  handleUpdateUser,
 }

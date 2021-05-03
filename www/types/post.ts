@@ -1,6 +1,6 @@
 import Author from './author'
 
-type PostType = {
+type PostTypes = {
   slug: string
   title: string
   date: string
@@ -11,6 +11,11 @@ type PostType = {
     url: string
   }
   content: string
+  thumb: string
+  image: string
+  readingTime: string
+  url: string
+  tags: []
 }
 
-export default PostType
+export default PostTypes

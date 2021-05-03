@@ -1,9 +1,32 @@
 {
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Strict-Transport-Security",
+          "value": ""
+        }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/new/:match*", "destination": "http://localhost:3000/new/:match*" },
     { "source": "/", "destination": "http://localhost:3000/new" },
     { "source": "/beta", "destination": "http://localhost:3000/new/beta" },
+    { "source": "/blog", "destination": "http://localhost:3000/new/blog" },
+    { "source": "/database", "destination": "http://localhost:3000/new/database" },
+    { "source": "/auth", "destination": "http://localhost:3000/new/auth" },
+    {
+      "source": "/blog/:match*",
+      "destination": "http://localhost:3000/new/blog/:match*"
+    },
+    { "source": "/rss", "destination": "http://localhost:3000/new/rss.xml" },
     { "source": "/:name.:extension", "destination": "http://localhost:3005/:name.:extension" },
+    {
+      "source": "/:asset/:name.:extension",
+      "destination": "http://localhost:3005/:asset/:name.:extension"
+    },
     { "source": "/:match*", "destination": "http://localhost:3005/:match*/" }
   ],
   "redirects": [
@@ -57,6 +80,7 @@
       "destination": "/docs/postgres/server/digitalocean"
     },
     { "source": "/docs/realtime/docker", "destination": "/docs/postgres/server/docker" },
+
     { "source": "/docs/realtime/source", "destination": "/docs/postgres/server/about" }
   ],
   "trailingSlash": false

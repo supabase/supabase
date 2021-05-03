@@ -6,8 +6,8 @@ author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
 authorURL: https://github.com/kiwicopple
-tags: 
-    - supabase
+tags:
+  - release-notes
 ---
 
 After 5 months of building, we're releasing one of our most anticipated features: Supabase Auth. 
@@ -63,7 +63,7 @@ We have a number of small improvements:
 - Added Auth documentation to the auto-generated docs in each project
 - Added a new `or` filter [to the client library](https://supabase.io/docs/library/get#or)
 - Table View now remembers which tabs you had open.
-- We have [released](https://github.com/supabase/pg-api/releases) a lot of new functionality to [pg-api](https://github.com/supabase/pg-api), a server for for managing Postgres internals via a REST interface.
+- We have [released](https://github.com/supabase/postgres-meta/releases) a lot of new functionality to [postgres-meta](https://github.com/supabase/postgres-meta), a server for for managing Postgres internals via a REST interface.
 - Performance: the "flash of black" which was appearing on page transition is now gone
 
 ### Get started

@@ -1,6 +1,6 @@
 ---
 id: about
-title: PostgREST
+title: PostgREST API Server
 description: 'PostgREST is a standalone web server that turns your PostgreSQL database directly into a RESTful API.'
 ---
 
@@ -8,7 +8,7 @@ PostgREST is a standalone web server that turns your PostgreSQL database directl
 
 The structural constraints and permissions in the database determine the API endpoints and operations.
 
-## [Documentation](http://postgrest.org)
+## Documentation
 
 Latest documentation is at [postgrest.org](http://postgrest.org). You can contribute to the docs in [PostgREST/postgrest-docs](https://github.com/PostgREST/postgrest-docs).
 

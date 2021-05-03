@@ -10,7 +10,7 @@ This is a full-stack Slack clone example using:
 
 ## Demo
 
-- Live demo: http://supabase-slack-clone.supabase.vercel.app/
+- Live demo: http://supabase-slack-clone-supabase.vercel.app/
 - CodeSandbox: https://codesandbox.io/s/github/supabase/supabase/tree/master/examples/nextjs-slack-clone
 - Video tutorial: https://www.loom.com/share/31eec9b656e44b8d87c88bde8a465676
 
@@ -40,7 +40,7 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 ### 4. Deploy the Next.js client
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/git?s=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fnextjs-slack-clone&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_KEY&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.io&project-name=supabase-slack-clone&repo-name=supabase-slack-clone)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fnextjs-slack-clone&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_KEY&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.io&project-name=supabase-slack-clone&repo-name=supabase-slack-clone)
 
 Here, we recommend forking this repo so you can deploy through Vercel by clicking the button above. When you click the button, replace the repo URL with your fork's URL.
 
@@ -154,7 +154,7 @@ CREATE TABLE public.messages (
   channel_id bigint REFERENCES public.channels NOT NULL
 );
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow logged-in read access" on public.messages USING ( auth.role() = 'authenticated' );
+CREATE POLICY "Allow logged-in read access" on public.messages FOR SELECT USING ( auth.role() = 'authenticated' );
 CREATE POLICY "Allow individual insert access" on public.messages FOR INSERT WITH CHECK ( auth.uid() = user_id );
 CREATE POLICY "Allow individual update access" on public.messages FOR UPDATE USING ( auth.uid() = user_id );
 ```

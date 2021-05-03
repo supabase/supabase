@@ -67,7 +67,7 @@ const Card = (props: Props) => {
             </div>
           )} */}
           <p className="text-sm font-base capitalize text-gray-600 dark:text-dark-300">{type}</p>
-          <div className="block mt-2 flex flex-col justify-between h-32">
+          <div className="mt-2 flex flex-col justify-between h-32">
             {/* {logoUrl && <img src={logoUrl} className="h-9 my-4" />} */}
             {title && <p className="text-xl text-gray-900 dark:text-white">{title}</p>}
             <p className="mt-3 text-base text-gray-500 dark:text-dark-400">

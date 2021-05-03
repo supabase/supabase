@@ -16,7 +16,7 @@ tags:
 
 
 <!--truncate-->
-### Supabase and Strive School - YC Summmer 20 batchmates 
+### Supabase and Strive School - YC Summer 20 batchmates 
 
 We are proud to announce we are teaming up with fellow YC Summer 20 Alumni [Strive School](https://strive.school/), to help teach the next generation of software developers about open source software development.
 
