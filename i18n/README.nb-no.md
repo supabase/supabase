@@ -29,7 +29,7 @@ Besøk [supabase.io/docs](https://supabase.io/docs) for full dokumentasjon.
 ## Status
 
 - [x] Alpha: Vi tester Supabase med en lukket gruppe kunder
-- [x] Offentlig Alpha: Hvem som helst kan registrere seg på [app.supabase.io](https://app.supabase.io). Merk at Men være forberedt på at ikke alle småfeil er luket ut enda.
+- [x] Offentlig Alpha: Hvem som helst kan registrere seg på [app.supabase.io](https://app.supabase.io). Merk at enkelte feil og quirks kan forekomme.
 - [x] Offentlig Beta: Stabilt nok for de fleste ikke-enterprise-bruksområder
 - [ ] Offentlig: Produksjonsklar
 
