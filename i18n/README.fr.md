@@ -73,12 +73,11 @@ Notre bibliothèque client est modulaire. Chaque sous-bibliothèque est une impl
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
+<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 ## Traductions
 
-- [Allemand](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
-- [Japonais](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [Anglais](https://github.com/supabase/supabase)
-- [Turque](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
+- [Liste des traductions](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 
