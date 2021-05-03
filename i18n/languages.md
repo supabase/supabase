@@ -5,6 +5,7 @@
 - [French / Français](/i18n/README.fr.md)
 - [German / Deutsch](/i18n/README.de.md)
 - [Hindi / हिंदी](/i18n/README.hi.md)
+- [Italiano / Italian](/i18n/README.it.md)
 - [Japanese / 日本語](/i18n/README.jp.md)
 - [Brasilian Portuguese / Português Brasileiro](/i18n/README.pt-br.md)
 - [Portuguese / Portuguese](/i18n/README.pt.md)
