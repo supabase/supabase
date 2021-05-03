@@ -1,7 +1,7 @@
 ---
 id: about
-title: About
-description: 'Host your own Realtime server'
+title: Realtime Server
+description: 'Supabase Realtime is a Change Data Capture server'
 ---
 
 Supabase Realtime is a Change Data Capture server. It allows you to listen to Postgres changes.
@@ -57,7 +57,7 @@ There are a some requirements for your database
    1. it must have the `wal_level` set to logical. You can check this by running `SHOW wal_level;`. To set the `wal_level`, you can call `ALTER SYSTEM SET wal_level = logical;`
    2. You must set `max_replication_slots` to at least 1: `ALTER SYSTEM SET max_replication_slots = 5;`
 3. Create a `PUBLICATION` for this server to listen to: `CREATE PUBLICATION supabase_realtime FOR ALL TABLES;`
-4. [OPTIONAL] If you want to receive the old record (previous values) on UDPATE and DELETE, you can set the `REPLICA IDENTITY` to `FULL` like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`. This has to be set for each table unfortunately.
+4. [OPTIONAL] If you want to receive the old record (previous values) on UPDATE and DELETE, you can set the `REPLICA IDENTITY` to `FULL` like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`. This has to be set for each table unfortunately.
 
 ### Server set up
 

@@ -17,9 +17,9 @@ Today we're releasing [supabase-js](https://github.com/supabase/supabase-js) ver
 
 ### New Docs
 
-Before digging into the improvements, we're excited to point out our new [developer docs](/docs/client/supabase-client). While they're still a work in progress, here are some things we think you'll like:
+Before digging into the improvements, we're excited to point out our new [developer docs](/docs/reference/javascript/supabase-client). While they're still a work in progress, here are some things we think you'll like:
 
-- The [Reference Docs](/docs/client/supabase-client) are auto-generated from our TypeScript definitions and then enriched with examples. This forces us to document our code and makes it easier to keep everything in sync.
+- The [Reference Docs](/docs/reference/javascript/supabase-client) are auto-generated from our TypeScript definitions and then enriched with examples. This forces us to document our code and makes it easier to keep everything in sync.
 - We added placeholders for the other languages that the community is developing. They have already started with Python, C#, Dart, Rust, and Swift. Expect to see the docs filling up soon!
 - We've added sections for all of the open source tools we use, including [Postgres](/docs/postgres/server/about), [PostgREST](/docs/postgrest/server/about), [GoTrue](/docs/gotrue/server/about), and [Realtime](/docs/realtime/server/about). We'll be filling these with lots of valuable information including self-hosting, benchmarks, and simple guides.
 
@@ -51,7 +51,7 @@ After testing this for a while we're very happy with this pattern. Errors are ha
 
 ### We created `gotrue-js`
 
-Our goal for `supabase-js` is to tie together many sub-libaries. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing open source tools.
+Our goal for `supabase-js` is to tie together many sub-libraries. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing open source tools.
 
 To maintain this philosophy, we created [`gotrue-js`](https://github.com/supabase/gotrue-js), a library for Netlify's GoTrue auth server. This libary includes a number of new additions, including third-party logins.
 
@@ -114,7 +114,7 @@ To summarise the steps:
 
 1. Install the new version: `npm install @supabase/supabase-js@latest`
 2. Update all your `body` constants to `data`
-3. Update all your `supabase.auth` functions with the new [Auth interface](/docs/client/auth-signup)
+3. Update all your `supabase.auth` functions with the new [Auth interface](/docs/reference/javascript/auth-signup)
 
 ### Get started
 

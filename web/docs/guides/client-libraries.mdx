@@ -9,12 +9,12 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 
-The [Supabase Client](/docs/client/supabase-client) makes it simple for developers to build secure and scalable products. 
+The [Supabase Client](/docs/reference/javascript/supabase-client) makes it simple for developers to build secure and scalable products. 
 
 ## Auth
 
 
-Create new users using [`signUp()`](/docs/client/auth-signup).
+Create new users using [`signUp()`](/docs/reference/javascript/auth-signup).
 
 <Tabs
   groupId="libraries"
@@ -45,7 +45,7 @@ const { error, data } = await supabase.auth.signUp({
 
 
 
-Existing users can log in using [`signIn()`](/docs/client/auth-signin).
+Existing users can log in using [`signIn()`](/docs/reference/javascript/auth-signin).
 
 <Tabs
   groupId="libraries"
@@ -75,7 +75,7 @@ const { error, data } = await supabase.auth.signIn({
 </Tabs>
 
 
-If there is an email, but no password passed to [`signIn()`](/docs/client/auth-signin), the user will receive a magic link.
+If there is an email, but no password passed to [`signIn()`](/docs/reference/javascript/auth-signin), the user will receive a magic link.
 
 <Tabs
   groupId="libraries"
@@ -104,7 +104,7 @@ const { error, data } = await supabase.auth.signIn({
 </Tabs>
 
 
-Third party logins are also handled through [`signIn()`](/docs/client/auth-signin).
+Third party logins are also handled through [`signIn()`](/docs/reference/javascript/auth-signin).
 
 
 <Tabs
@@ -136,7 +136,7 @@ const { user, error } = await supabase.auth.signIn({
 
 ## Managing data
 
-Since Postgres is a Relational database, the client makes it simple to query tables and fetch related data in one round-trip, using [`select()`](/docs/client/select).
+Since Postgres is a Relational database, the client makes it simple to query tables and fetch related data in one round-trip, using [`select()`](/docs/reference/javascript/select).
 
 
 <Tabs
@@ -171,7 +171,7 @@ const { data, error } = await supabase
 </Tabs>
 
 
-You can do advanced [filtering](/docs/client/using-filters) to extract only the data that you need.
+You can do advanced [filtering](/docs/reference/javascript/using-filters) to extract only the data that you need.
 
 
 <Tabs
@@ -203,7 +203,7 @@ const { data, error } = await supabase
 </Tabs>
 
 
-You can create data easily using [`insert()`](/docs/client/insert).
+You can create data easily using [`insert()`](/docs/reference/javascript/insert).
 
 
 
@@ -239,7 +239,7 @@ const { data, error } = await supabase
 
 ## Realtime Changes
 
-The Supabase client makes it simple to listen to realtime database changes, using [`subscribe()`](/docs/client/subscribe).
+The Supabase client makes it simple to listen to realtime database changes, using [`subscribe()`](/docs/reference/javascript/subscribe).
 
 
 <Tabs
@@ -272,7 +272,7 @@ const mySubscription = supabase
 </Tabs>
 
 
-You can even [listen to Row Level changes](/docs/client/subscribe#listening-to-row-level-changes).
+You can even [listen to Row Level changes](/docs/reference/javascript/subscribe#listening-to-row-level-changes).
 
 
 <Tabs
@@ -306,5 +306,5 @@ const mySubscription = supabase
 
 ## Next steps
 
-- View the [Client Docs](/docs/client/supabase-client)
+- View the [Client Docs](/docs/reference/javascript/supabase-client)
 - Sign in: [app.supabase.io](https://app.supabase.io)

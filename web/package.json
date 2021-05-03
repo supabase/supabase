@@ -1,22 +1,24 @@
 {
   "name": "supabase",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "private": true,
   "scripts": {
     "start": "docusaurus start --port 3005",
-    "build": "docusaurus build",
+    "build": "npm run gen:all && docusaurus build",
     "swizzle": "docusaurus swizzle",
     "traction": "node traction.js",
+    "gen:all": "npm run gen:supabase && npm run gen:gotrue && npm run gen:postgrest && npm run gen:realtime && npm run gen:postgres && npm run gen:cli",
     "gen:gotrue": "ts-node ReferenceGenerator.ts -o docs/gotrue/client spec/gotrue.yml",
     "gen:postgrest": "ts-node ReferenceGenerator.ts -o docs/postgrest/client spec/postgrest.yml",
     "gen:realtime": "ts-node ReferenceGenerator.ts -o docs/realtime/client spec/realtime.yml",
-    "gen:supabase": "ts-node ReferenceGenerator.ts -o docs/client spec/supabase.yml"
+    "gen:supabase": "ts-node ReferenceGenerator.ts -o docs/reference/javascript spec/supabase.yml",
+    "gen:cli": "ts-node ReferenceGenerator.ts -o docs/reference/cli spec/cli.yml",
+    "gen:postgres": "ts-node ReferenceGenerator.ts -o docs/reference/postgres spec/postgres.yml"
   },
   "dependencies": {
     "@docusaurus/core": "^2.0.0-alpha.63",
     "@docusaurus/preset-classic": "^2.0.0-alpha.63",
     "@kiwicopple/prism-react-renderer": "github:kiwicopple/prism-react-renderer",
-    "classnames": "^2.2.6",
     "mermaid": "^8.6.4",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
@@ -36,7 +38,7 @@
   },
   "devDependencies": {
     "@types/node": "^14.14.14",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "babel-plugin-css-modules-transform": "^1.6.2",
     "clsx": "^1.1.1",
     "js-yaml": "^3.14.0",

@@ -1,0 +1,20 @@
+{
+  "private": true,
+  "author": "",
+  "name": "",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "patch-package"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^1.3.3"
+  },
+  "devDependencies": {
+    "patch-package": "^6.2.2",
+    "postinstall-postinstall": "^2.1.0"
+  }
+}

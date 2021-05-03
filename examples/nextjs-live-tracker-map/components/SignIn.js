@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
-import { auth } from 'lib/Store'
+import React, { useState } from "react";
+import { supabase } from "lib/api";
 
 /**
  * Sign in with username and password
- * 
- * @param {String}       role     DRIVER/MANAGER. default as DRIVER
+ *
+ * @param {String} role   DRIVER/MANAGER. default as DRIVER
  */
 export default function SignIn({ role = "DRIVER" }) {
   const [formData, updateFormData] = useState({ role });
@@ -15,22 +15,17 @@ export default function SignIn({ role = "DRIVER" }) {
       ...formData,
 
       // Trimming any whitespace
-      [e.target.name]: e.target.value.trim()
+      [e.target.name]: e.target.value.trim(),
     });
-  };
+  }
 
-  async function postAndWait(url, data, options = {}) {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify(data),
-      ...options,
-    })
-    const body = await response.json()
-    return body
+  async function updateUserRole(user) {
+    if (!user || user.user_metadata?.role) return;
+
+    // update user role
+    await supabase.auth.update({
+      data: { role },
+    });
   }
 
   async function onSubmit(event) {
@@ -38,52 +33,59 @@ export default function SignIn({ role = "DRIVER" }) {
 
     try {
       if (action === "SIGNUP") {
-        const signupResponse = await postAndWait(`/api/auth/signup`, formData)
-        await auth.loginWithRefreshToken(signupResponse.refresh_token, true)
-        window.location.reload();
+        const { email, password, role } = formData;
+        const { error, user } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+
+        // update user role
+        await supabase.auth.update({
+          data: { role },
+        });
       } else if (action === "LOGIN") {
-        const loginResponse = await postAndWait(`/api/auth/login`, formData)
-        await auth.loginWithRefreshToken(loginResponse.refresh_token, true)
-        window.location.reload();
+        const { error } = await supabase.auth.signIn(formData);
+        if (error) throw error;
       }
     } catch (error) {
-      console.log('error', error)
-      alert("Authentication failed. Please check your input.")
+      alert(error.message);
     }
   }
 
   return (
-    <form className="container" onSubmit={onSubmit}>
+    <form className="form-container" onSubmit={onSubmit}>
       <label>
         Email
-        <input name="email" type='email' onChange={onChange} />
+        <input name="email" type="email" onChange={onChange} />
       </label>
       <label>
         Password
-        <input name="password" type='password' onChange={onChange} />
+        <input name="password" type="password" onChange={onChange} />
       </label>
-      <button type='submit' onClick={() => setAction("SIGNUP")}>Sign up</button>
-      <button type='submit' onClick={() => setAction("LOGIN")}>Login</button>
+      <button type="submit" onClick={() => setAction("SIGNUP")}>
+        Sign up
+      </button>
+      <button type="submit" onClick={() => setAction("LOGIN")}>
+        Login
+      </button>
       <style jsx>{`
-        .container {
+        .form-container {
           min-width: 20rem;
           padding: 0 0.5rem;
           display: flex;
           flex-direction: column;
         }
-        
+
         label {
           display: flex;
           flex-direction: column;
           margin-bottom: 1rem;
         }
-        
+
         input {
           margin-top: 0.5rem;
           padding: 0.5rem;
           font-size: 1rem;
         }
-        
+
         button {
           margin-top: 0.5rem;
           padding: 0.5rem;
@@ -91,5 +93,5 @@ export default function SignIn({ role = "DRIVER" }) {
         }
       `}</style>
     </form>
-  )
+  );
 }

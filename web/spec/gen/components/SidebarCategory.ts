@@ -3,6 +3,6 @@ export default function SidebarCategory(name, items) {
       type: 'category',
       label: '${name}',
       items: [${items.join(', ')}],
-      collapsed: false,
+      collapsed: true,
     }`
 }

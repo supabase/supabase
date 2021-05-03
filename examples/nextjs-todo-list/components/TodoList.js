@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/api'
+import { supabase } from '../lib/initSupabase'
 
 export default function Todos({ user }) {
   const [todos, setTodos] = useState([])
@@ -71,14 +71,14 @@ const Todo = ({ todo, onDelete }) => {
 
   const toggle = async () => {
     try {
-      const { data,error } = await supabase
+      const { data, error } = await supabase
         .from('todos')
         .update({ is_complete: !isCompleted })
         .eq('id', todo.id)
         .single()
-        if(error){
-          throw new Error(error)
-        }
+      if (error) {
+        throw new Error(error)
+      }
       setIsCompleted(data.is_complete)
     } catch (error) {
       console.log('error', error)

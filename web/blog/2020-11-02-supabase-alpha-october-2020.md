@@ -7,8 +7,8 @@ author_url: https://github.com/kiwicopple
 author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
 authorURL: https://github.com/kiwicopple
 image: /img/supabase-october-2020.png
-tags: 
-    - supabase
+tags:
+  - release-notes
 ---
 
 We're now 8 months into building Supabase. We're focused on performance, stability, and reliability but that hasn't prevented us from shipping some great features.
@@ -19,8 +19,7 @@ We're now 8 months into building Supabase. We're focused on performance, stabili
 
 Watch a full demo:
 
-<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube.com/embed/1gNDMMsUPI0" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
-
+<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/1gNDMMsUPI0" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
 
 ### Supabase.js 1.0
 
@@ -32,11 +31,11 @@ Check out the [blog post](https://supabase.io/blog/2020/10/30/improved-dx) to le
 
 Although it was only intended to be a temporary feature, the SQL Editor has become one of the most useful features of Supabase. This month we decided to make give it some attention, adding Tabs and making it full-screen. This is the first of many updates, we've got some exciting things planned for the SQL Editor.
 
-![This image shows a SQL Editor with tabs. Originally our SQL editor was very basic, but we're moving towards somethign very powerful.](/img/sql-editor.png)
+![This image shows a SQL Editor with tabs. Originally our SQL editor was very basic, but we're moving towards something very powerful.](/img/sql-editor.png)
 
 ### Key commands for Power Users
 
-For the heavy table editor users, we've gone ahead and added a bunch of key commands and keyboard shortcuts so you can zip around and manipulate your tables faster than ever. 
+For the heavy table editor users, we've gone ahead and added a bunch of key commands and keyboard shortcuts so you can zip around and manipulate your tables faster than ever.
 
 ![This image shows some of the keyboard shortcuts we introduced on the table editor.](/img/keyboard-shortcuts.png)
 
@@ -46,10 +45,9 @@ One of the most requested Auth features was the ability to send magic links that
 
 ![This image shows a template where developers can edit the magic links email which is sent to their users on sign up.](/img/magic-links.png)
 
-
 ### Kaizen
 
-- We have new and improved [docs](https://supabase.io/docs/client/supabase-client).
+- We have new and improved [docs](https://supabase.io/docs/reference/javascript/supabase-client).
 - We converted [realtime-js](https://github.com/supabase/realtime-js/) to TypeScript.
 - Dashboard Performance: we heavily optimised our dashboard routes.
 - With the help of the community, we [closed a lot of issues](https://github.com/orgs/supabase/projects/5) during Hacktoberfest.
@@ -66,7 +64,6 @@ We had a crazy month during Hacktoberfest. In case you missed it, here are some 
 - [@thorwebdev](https://twitter.com/thorwebdev) shows the [Engineers.sg](http://engineers.sg) group how to [build a realtime Slack clone](https://engineers.sg/video/building-a-slack-clone-with-authentication-and-realtime-data-syncing-using-supabase-io-singaporejs--4119) with Supabase
 
 If you want to keep up to date, make sure you [subscribe to our YouTube channel](https://www.youtube.com/channel/UCNTVzV1InxHV-YR0fSajqPQ) or [follow us on Twitter](https://twitter.com/supabase_io).
-
 
 ### Coming next
 

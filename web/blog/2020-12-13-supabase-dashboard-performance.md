@@ -38,7 +38,7 @@ There are some great tools when it comes to Real User Monitoring (RUM). We chose
 
 ### Choosing smaller modules
 
-We used [Bundlephobia](https://bundlephobia.com/) on our largest modules. This is a great website to have in your JS-performace arsenal. It gives the size of npm modules across different versions and recommends alternate modules with similar functionality which are smaller.
+We used [Bundlephobia](https://bundlephobia.com/) on our largest modules. This is a great website to have in your JS-performance arsenal. It gives the size of npm modules across different versions and recommends alternate modules with similar functionality which are smaller.
 
 `Moment.js` is notorious for its large bundle size and we don't need complex date processing for our dashboard. It was straightforward to switch to [day-js](https://day.js.org/) which is largely API-compatible with `Moment.js`. This change reduced our gzipped bundle size by 68 KB.
 
@@ -114,7 +114,7 @@ With these changes, we have a respectable Core Web Vitals score. This is a snaps
 
 ![Sentry results](/img/blog/sentry-results.png)
 
-Our Next.js build output also shows that users download < 200 kb of JavaScript between any two page transitions. We're still improving too - even though we provide a lot of functionality in our dashbaord, we will continue to reduce our bundle sizes.
+Our Next.js build output also shows that users download < 200 kb of JavaScript between any two page transitions. We're still improving too - even though we provide a lot of functionality in our dashboard, we will continue to reduce our bundle sizes.
 
 ## Things that did not work
 
