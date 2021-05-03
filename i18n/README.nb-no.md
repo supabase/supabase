@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) er et åpent kildekode-alternativ til Firebase. Vi bygger funksjonaliteten til Firebase ved hjelp av enterprise-nivå åpen kildekode-verktøy.
+[Supabase](https://supabase.io) er et open source-alternativ til Firebase. Vi bygger funksjonaliteten til Firebase ved hjelp av enterprise-klare open source-verktøy.
 
 - [x] Hostet Postgres-database
 - [x] Sanntidsabonnementer
@@ -22,14 +22,14 @@ Besøk [supabase.io/docs](https://supabase.io/docs) for full dokumentasjon.
 
 ## Community & support
 
-- [Community-forum](https://github.com/supabase/supabase/discussions). Egnet for: hjelp med utvikling, diskusjon rundt database-best practices.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Egnet for: bugs og feil du måtte møte på med Supabase.
-- [Support på e-post](https://supabase.io/docs/support#business-support). Best for: problemer med databasen din eller infrastruktur.
+- [Community-forum](https://github.com/supabase/supabase/discussions). Egnet for: hjelp med utvikling, best practices-diskusjoner.
+- [GitHub Issues](https://github.com/supabase/supabase/issues). Egnet for: bugs og feil du opplever med Supabase.
+- [Support på e-post](https://supabase.io/docs/support#business-support). Egnet for: problemer med databasen din eller infrastruktur.
 
 ## Status
 
 - [x] Alpha: Vi tester Supabase med en lukket gruppe kunder
-- [x] Offentlig Alpha: Hvem som helst kan registrere seg på [app.supabase.io](https://app.supabase.io). Men være forberedt på at ikke alle småfeil er luket ut enda.
+- [x] Offentlig Alpha: Hvem som helst kan registrere seg på [app.supabase.io](https://app.supabase.io). Merk at Men være forberedt på at ikke alle småfeil er luket ut enda.
 - [x] Offentlig Beta: Stabilt nok for de fleste ikke-enterprise-bruksområder
 - [ ] Offentlig: Produksjonsklar
 
@@ -41,7 +41,7 @@ Vi er for øyeblikket i Offentlig Beta. Følg med på "releases" til dette repoe
 
 ## Slik fungerer det
 
-Supabase er en samling av åpen kildekode-verktøy. Vi bygger funksjonaliteten til Firebase ved hjelp av enterprise-nivå åpen kildekode-produkter. Dersom et eksisterende verktøy har et community rundt seg og en MIT, APache 2 eller tilsvarende åpen lisens, kommer vi til å bruke og støtte det. Hvis verktøyet ikke eksisterer, bygger vi det selv og gjøre kildekoden tilgjengelig. Supabase er ikke en 1-til-1-mapping av Firebase. Målet vårt er å gi utviklere en Firebase-lignende utvikleropplevelse ved hjelp av åpen kildekode-verktøy.
+Supabase er en samling av open source-verktøy. Vi bygger funksjonaliteten til Firebase ved hjelp av enterprise-klare open source-produkter. Dersom et eksisterende verktøy har et community rundt seg og en MIT, APache 2 eller tilsvarende åpen lisens, kommer vi til å bruke og støtte det. Hvis verktøyet ikke eksisterer, bygger vi det selv og gjøre kildekoden tilgjengelig. Supabase er ikke en 1-til-1-mapping av Firebase. Målet vårt er å gi utviklere en Firebase-lignende utvikleropplevelse ved hjelp av open source-verktøy.
 
 **Nåværende arkitektur**
 
