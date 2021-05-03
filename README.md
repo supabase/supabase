@@ -1,5 +1,5 @@
 <p align="center">
-<img width="300" src="https://gitcdn.xyz/repo/supabase/supabase/master/web/static/supabase-light.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-with-background.svg"/>
 </p>
 
 ---
@@ -75,10 +75,14 @@ Our client library is modular. Each sub-library is a standalone implementation f
 
 ## Translations
 
+- [English](https://github.com/supabase/supabase)
+- [French](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
 - [German](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
 - [Japanese](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [English](https://github.com/supabase/supabase)
 - [Turkish](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
+- [Traditional Chinese](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
+- [Spanish](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
+- [Hindi](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
 - [Chinese](https://github.com/supabase/supabase/blob/master/i18n/README.cn.md)
 
 ---
