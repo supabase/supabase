@@ -23,7 +23,7 @@ Para documentação completa, visite [supabase.io/docs](https://supabase.io/docs
 ## Comunidade & Suporte
 
 - [Fórum da comunidade](https://github.com/supabase/supabase/discussions). Melhor para: ajuda com a construção, discussões sobre melhores práticas em banco de dados.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Melhor para: problemas ou erros que você encontrar usando Supabase.
+- [GitHub Issues](https://github.com/supabase/supabase/issues). Melhor para: problemas ou erros que você encontrar usando o Supabase.
 - [Suporte por E-mail](https://supabase.io/docs/support#business-support). Melhor para: problemas com o seu banco de dados ou infraestrutura.
 
 ## Status
@@ -33,7 +33,7 @@ Para documentação completa, visite [supabase.io/docs](https://supabase.io/docs
 - [x] Beta Público: Estável o suficiente para a maioria dos casos não empresariais.
 - [ ] Público: Pronto para produção.
 
-Estamos atualmente na fase Beta Público. Siga as "entregas" (_releases_) deste repositório para receber uma notificação quando houver atualizações grandes (_major releases_).
+Estamos atualmente na fase Beta Público. Siga as "entregas" (_releases_) deste repositório para receber uma notificação quando houver uma grande atualização (_major releases_).
 
 <kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Seguir este repositório"/></kbd>
 
