@@ -15,6 +15,8 @@ services:
     image: supabase/gotrue:latest
     ports:
       - $AUTH_PORT
+    depends_on:
+      - db
     environment:
       GOTRUE_JWT_SECRET: $JWT_SECRET
       GOTRUE_JWT_EXP: 3600
@@ -36,8 +38,7 @@ services:
       GOTRUE_LOG_LEVEL: DEBUG
       GOTRUE_OPERATOR_TOKEN: $OPERATOR_TOKEN
       DATABASE_URL: 'postgres://postgres:$POSTGRES_PASSWORD@db:$POSTGRES_PORT/postgres?sslmode=disable'
-      depends_on:
-        - db
+
   rest:
     container_name: supabase-rest
     image: postgrest/postgrest:latest
@@ -55,7 +56,7 @@ services:
     container_name: supabase-realtime
     image: supabase/realtime:latest
     ports:
-      - $REALTIME_PORT:$REALTIME_PORT
+      - $REALTIME_PORT
     depends_on:
       - db
     restart: on-failure
