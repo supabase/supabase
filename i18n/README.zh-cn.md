@@ -22,18 +22,18 @@
 
 ## 社区与支持
 
-- [社区论坛](https://github.com/supabase/supabase/discussions)。最适合：帮助建立和讨论数据库的最佳实践。
-- [GitHub Issues](https://github.com/supabase/supabase/issues)。最适合：你在使用 Supabase 时遇到的 bug 和错误。
-- [电子邮件支持](https://supabase.io/docs/support#business-support)。最适合：你的数据库或基础设施的问题。
+- [社区论坛](https://github.com/supabase/supabase/discussions)。适用于：帮助建立和讨论数据库的最佳实践。
+- [GitHub Issues](https://github.com/supabase/supabase/issues)。适用于：你在使用 Supabase 时遇到的 bug 和错误。
+- [电子邮件支持](https://supabase.io/docs/support#business-support)。适用于：你的数据库或基础设施的问题。
 
 ## 状态
 
 - [x] Alpha：我们正在与一组封闭的客户测试 Supabase
-- [x] 公开 Alpha：任何人都可以在 [app.supabase.io]（https://app.supabase.io）上注册。只是务必手下留情，还有一些纠结的地方。
-- [x] 公开 Beta：足够稳定，适合大多数非企业使用场景
-- [ ] 公开：生产就绪
+- [x] Public Alpha：任何人都可以在 [app.supabase.io]（https://app.supabase.io）上注册。只是务必手下留情，还有一些纠结的地方。
+- [x] Public Beta：足够稳定，适合大多数非企业使用场景
+- [ ] Public：生产就绪
 
-我们目前正处于公开 Beta 阶段。关注这个存储库的 "Releases" 以获得关于重大更新的通知。
+我们目前正处于 Public Beta 阶段。关注这个存储库的 "Releases" 以获得关于重大更新的通知。
 
 <kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="关注这个存储库"/></kbd>
 
@@ -41,17 +41,17 @@
 
 ## 工作方式
 
-Supabase 是一个开源工具的组合。我们正在使用企业级的开源产品构建 Firebase 的功能。如果这些工具和社区存在，并且有MIT、Apache 2 或同等的开放许可，我们将使用并支持该工具。如果该工具不存在，我们就自己开发并开放源代码。Supabase 不是 Firebase 的一对一映射。我们的目标是使用开源工具为开发者提供类似 Firebase 的开发者体验。
+Supabase 是一个开源工具的组合。我们正在使用企业级的开源产品构建 Firebase 的功能。如果存在相应的工具和社区，并且有MIT、Apache 2 或同等的开放许可，我们将使用并支持该工具。如果该工具不存在，我们就自己开发并开放源代码。Supabase 不是 Firebase 的一对一映射。我们的目标是使用开源工具为开发者提供类似 Firebase 的开发者体验。
 
 **当前架构**
 
-Supabase 是一个[托管平台](https://app.supabase.io)。你可以注册并开始使用 Supabase，而无需安装任何软件。我们仍在打造本地开发体验--这和平台稳定性一起作为我们当前的核心关注点。
+Supabase 是一个[托管平台](https://app.supabase.io)。你可以注册并开始使用 Supabase，而无需安装任何软件。我们仍在优化本地开发体验，这和平台稳定性一起作为我们当前的核心目标。
 
 ![架构](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) 是一个对象关系型数据库系统，经过 30 多年的积极开发，它在可靠性、功能健壮性和性能方面赢得了很好的声誉。
 - [Realtime](https://github.com/supabase/realtime) 是一个 Elixir 服务器，允许你使用 websocket 监听 PostgreSQL 的插入、更新和删除。Supabase 监听 Postgres 的内置复制功能，将复制的字节流转换为 JSON，然后通过 websocket 广播 JSON。
-- [PostgREST](http://postgrest.org/) 是一个 web 服务器，可以将你的 PostgreSQL 数据库直接变成一个 RESTful API
+- [PostgREST](http://postgrest.org/) 是一个 web 服务器，可以将你的 PostgreSQL 数据库直接生成 RESTful API
 - [Storage](https://github.com/supabase/storage-api) 提供了一个 RESTful 接口，用于管理存储在 S3 中的文件，使用 Postgres 来管理权限。
 - [postgres-meta](https://github.com/supabase/postgres-meta) 是一个 RESTful API，用于管理你的 Postgres，允许你获取表、添加角色和运行查询等。
 - [GoTrue](https://github.com/netlify/gotrue) 是一个基于 SWT 的 API，用于管理用户和发布 SWT 令牌。
