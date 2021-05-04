@@ -1,18 +1,19 @@
 ---
-title: Supabase Beta March 2021
-description: Launch week, Storage, Supabase CLI, Connection Pooling, Supabase UI, and Pricing.
+title: Supabase Beta April 2021
+description: Supabase "gardening" - stability, security, and community support.
 author: paul_copplestone
 author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
-image: march-2021/release-mar-2021.jpg
-thumb: march-2021/release-mar-2021.jpg
+image: april-2021/release-apr-2021.jpg
+thumb: april-2021/release-apr-2021.jpg
 tags:
   - release-notes
-date: '2021-04-06'
+date: '2021-05-05'
 ---
 
-Launch week, Storage, Supabase CLI, Connection Pooling, Supabase UI, and Pricing. Here's what we released last month.
+This month was a "gardening" month for Supabase. The team focused on stability, security, and community support. 
+Check out what we were working on below, as well as some incredible Community contributions.
 
 ### Quick demo
 
@@ -29,76 +30,105 @@ Watch a full demo:
 ></iframe>
 
 
-## Supabase Storage
+## Light Mode
 
-Need to store images, audio, and video clips? Well now you can do it on [Supabase Storage](https://supabase.io/blog/2021/03/30/supabase-storage). It's backed by S3 and our new [OSS storage API](https://github.com/supabase/storage-api) written in Fastify and Typescript. Read the [full blog post](https://supabase.io/blog/2021/03/30/supabase-storage).
+We're a developer tool, which means that Dark Mode is [extremely popular](https://twitter.com/supabase_io/status/1388131942919376904).
 
-![Supabase Storage](/new/images/blog/storage/ph-1.png)
+![This poll on twitter shows that 78.5% of our developer base use Dark Mode for the IDE](/new/images/blog/april-2021/twitter-darkmode.png)
 
-## Connection Pooling
+Light Mode is important however: accessibility. Dark Mode is difficult to use for developers with astigmatisms, or even just working in brightly-lit environments.
 
-The Supabase API already handles Connection Pooling, but if you're connecting to your database directly (for example, with Prisma) we now [bundle PgBouncer](https://supabase.io/blog/2021/04/02/supabase-pgbouncer). Read the [full blog post](https://supabase.io/blog/2021/04/02/supabase-pgbouncer).
+So today we're shipping Light Mode. 
 
-![Connection Pooling](/new/images/blog/bouncer/pgbouncer-thumb.jpg)
+<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
+  <source src="/new/images/blog/april-2021/light-mode.mp4" type="video/mp4" muted playsInline />
+</video>
 
-## React UI Component Library
 
-We open sourced our internal UI component library, so that anyone can use and contribute to the Supabase aesthetic. It lives at [ui.supabase.io](https://ui.supabase.io/) . It was also the #1 Product of the Day [on Product Hunt](https://www.producthunt.com/posts/supabase-ui).
+## Translations
 
-![React UI Library](/new/images/blog/march-2021/supabase-ui.png)
+With the help of the community, we [started internationalizing](https://github.com/supabase/supabase/issues/1341) our main repository:
 
-## CLI
+- [Arabic | العربية](https://github.com/supabase/supabase/blob/master/i18n/README.ar.md)
+- [Chinese / 中文](https://github.com/supabase/supabase/blob/master/i18n/README.cn.md)
+- [Dutch / Nederlands](https://github.com/supabase/supabase/blob/master/i18n/README.nl.md)
+- [English](https://github.com/supabase/supabase)
+- [French / Français](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
+- [German / Deutsch](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
+- [Hindi / हिंदी](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
+- [Nepali / नेपाली](https://github.com/supabase/supabase/blob/master/i18n/README.ne.md)
+- [Italiano / Italian](https://github.com/supabase/supabase/blob/master/i18n/README.it.md)
+- [Japanese / 日本語](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
+- [Norwegian (Bokmål) / Norsk (Bokmål)](https://github.com/supabase/supabase/blob/master/i18n/README.nb-no.md)
+- [Polish / Polski](https://github.com/supabase/supabase/blob/master/i18n/README.pl.md)
+- [Portuguese / Portuguese](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
+- [Portuguese (Brazilian) / Português Brasileiro](https://github.com/supabase/supabase/blob/master/i18n/README.pt-br.md)
+- [Russian / Pусский](https://github.com/supabase/supabase/blob/master/i18n/README.ru.md)
+- [Spanish / Español](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
+- [Traditional Chinese / 正體中文](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
+- [Turkish / Türkçe](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
+- [Ukrainian / Українська](https://github.com/supabase/supabase/blob/master/i18n/README.uk.md)
 
-Now you can run Supabase locally in the terminal with `supabase start`. We have done some preliminary work on [diff-based schema migrations](https://supabase.io/blog/2021/03/31/supabase-cli#migrations), and added some new tooling for self-hosting Supabase with Docker. [Blog post here](https://supabase.io/new/blog/2021/03/31/supabase-cli).
+![Map of the world](/new/images/blog/april-2021/map.png)
 
-![Supabase CLI](/new/images/blog/march-2021/supabase-cli.png)
+## OpenAPI spec for Storage
 
-## Pricing
+We released [Storage Api docs](https://supabase.github.io/storage-api) built using OpenAPI (swagger). 
 
-Our most frequently asked question by far is "ok supabase is sweet, but how much is it going to cost?". TL;DR there's **Free Tier** up to 500mb + 10k auth users, a **Pro** **Tier** at $25/month for 8GB + 100k auth users, and anything additional is charged on a usage basis.
+![Storage API documentation](/new/images/blog/april-2021/storage-openapi.png)
 
-See [Pricing Page](https://supabase.io/pricing) for full details and also our blog on why [pricing is hard](https://supabase.io/blog/2021/03/29/pricing).
+## Stripe Sync Engine (Experimental)
 
-![Supabase Pricing](/new/images/blog/march-2021/supabase-pricing.jpg)
+We have [open-sourced a server](https://github.com/supabase/stripe-sync-engine) which keeps any Postgres database in sync with a Stripe account. This is experimental only. We're evaluating other tools such as [Singer](https://www.singer.io/tap/stripe/postgresql/), which provide a more general solution (but are less "realtime"), and we're opening it up here to gather feedback.
 
-## NFT Platform
+![Stripe sync engine](/new/images/blog/april-2021/stripe-sync-engine.jpg)
 
-Well... not really, but it made for a great [April Fools joke](https://supabase.io/blog/2021/04/01/supabase-nft-marketplace).
+## Community spotlight: Threaded comments
 
-![Supabase NFT marketplace BuyMeth.com](/new/images/blog/nft/nft-1.png)
+One of the most powerful Postgres features is "recursive CTEs" which can be used for nested items (comments, pages, friend-graphs). [@lawrencecchen](https://twitter.com/lawrencecchen) has built a full [Threaded Comments demo](https://github.com/lawrencecchen/threaded-comments) which you can [Deploy with a single click](https://github.com/lawrencecchen/threaded-comments#instant-deploy). Want to add comments to your blog with [Full Text Search](https://supabase.io/docs/reference/javascript/textsearch)? Just use Postgres.
 
-## Supabase Dot Com
+<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
+  <source src="/new/images/blog/april-2021/threaded-small.mp4" type="video/mp4" muted playsInline />
+</video>
 
-We are now dot com! We'll be porting across over the next few weeks. Read the origin story behind the name [here](https://supabase.io/blog/2021/04/02/supabase-dot-com).
+## Community spotlight: SupaScript
 
-![Supabase Dot Com](/new/images/blog/supabase-dot-com-og.jpg)
+It looks like [@burggraf2](https://twitter.com/burggraf2) got tired of waiting for us to ship Functions, and decided to build a whole JS ecosystem within his Supabase database. If you want to write PG functions in JS, import remote libraries from the web, and console log to your browser, check out this [SupaScript repo](https://github.com/burggraf/SupaScript).
 
-## OAuth Scopes
+![SupaScript to lookup users in the past 1 week](/new/images/blog/april-2021/supascript.png)
 
-Thanks to a comunity contribution ([@_mateomorris](https://twitter.com/_mateomorris) and [@Beamanator](https://twitter.com/Beamanator)), Supabase Auth now includes OAuth scopes. These allow you to request elevated access during login. For example, you may want to request access to a list of Repositories when users log in with GitHub. Check out the [Documentation](https://supabase.io/docs/reference/javascript/auth-signup#sign-up-with-scopes).
+## Community spotlight: Fireship
 
-![Oauth Scope](/new/images/blog/march-2021/oauth-scopes.png)
+Fireship reviewed Supabase last week, and despite being a (self-proclaimed) Firebase fan-boy, the review was very impartial.  
 
-## Kaizen
+<iframe
+  className="w-full video-with-border"
+  width="640"
+  height="385"
+  src="https://www.youtube-nocookie.com/embed/WiwfiVdfRIc"
+  frameBorder="1"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
 
-- You can now manage your PostgREST configuration inside the Dashboard.
-- Our website has been redesigned. Check out our new [Homepage](https://supabase.io/) and [Blog](https://supabase.io/blog), and our new  [Database](https://supabase.io/database), [Auth](https://supabase.io/auth), and [Storage](https://supabase.io/storage) product pages.
-- We refactored some of our Filter methods to make them even easier to use. Check out the [Full Text Search](https://supabase.io/docs/reference/javascript/textsearch) refactor.
-- We have added several new sections to our Docs including: [Local Dev](https://supabase.io/docs/guides/local-development), [Self Hosting](https://supabase.io/docs/guides/self-hosting), and [Postgres Reference](https://supabase.io/docs/reference/postgres/getting-started) docs (all still under development).
 
 ## Community
 
-- How to use Supabase inside Replit [[Video](https://www.youtube.com/watch?v=lQ5iIxaYduI)]
-- [Connecting Draftbit to Supabase](https://docs.draftbit.com/docs/supabase) by [@amanhimself](https://twitter.com/amanhimself)
-- [Creating Users in Next-js](https://t.co/IKcn3mgqW0?amp=1) by [@indigitalcolor](https://twitter.com/indigitalcolor)
-- [A Backend for IndieHackers](https://drew.tech/supabase-a-backend-for-indiehackers) by [@dbredvick](https://twitter.com/DBredvick)
-- The Firebase Alternative by [Simon Grimm](https://www.youtube.com/user/saimon1924) [[Video](https://www.youtube.com/watch?v=F6VyIXFQVtQ)]
-- Ionic Integration by [Simon Grimm](https://www.youtube.com/user/saimon1924) [[Video](https://www.youtube.com/watch?v=pl9XfIWutKE)]
-- Flutter Integration by [Aditya Thakur](https://www.youtube.com/channel/UChCAJNpMwoEUYCsE_eSyU4w) by [[Video](https://www.youtube.com/watch?v=fqfHEZvQPlY)]
-- Svelte Integration by [Khaerunnisa Isnaeni](https://www.youtube.com/channel/UCqNDj6eQeTLHuEwgEHWOGjw) [[Video](https://www.youtube.com/watch?v=odPYzJJyEJI)]
-- An [example app](https://github.com/supabase/supabase/tree/master/examples/nextjs-ts-user-management) for adding User Profiles to your Next.js app
+- Watch [@everConfusedGuy](https://twitter.com/everConfusedGuy)'s talk at DevX conf - Building Supabase Storage: [YouTube video](https://www.youtube.com/watch?v=YsUYOsq_o7g)
+- DuckDuckAbdaal by [@Nutlope](https://twitter.com/Nutlope) - a personalized search engine: [Twitter](https://twitter.com/Nutlope/status/1389082406477463557)
+- Supabase in 6 minutes by [Georges Duverger](https://www.youtube.com/channel/UCNERPJ-vs61KEsD_dRNWFIw): [YouTube video](https://www.youtube.com/watch?v=c8DNV9yl0mg)
+- Build a SaaS Platform with Stripe by [@__dijonmusters:](https://twitter.com/_dijonmusters) [DEV blog](https://dev.to/dijonmusters/series/12346)
+- Supabase & Sveltekit by Svelte Mastery: [YouTube video](https://www.youtube.com/watch?v=j4AV2Liojk0)
+- Firebase vs. Supabase - Draftbit Office Hours: [YouTube Livestream](https://www.youtube.com/watch?v=9Yg6i_zCuiM)
 
-![Supabase Stars march 2021](/new/images/blog/march-2021/supabase-stars-march-2021.png)
+
+**Supabase Github Star Growth**
+
+- Our [main GitHub repo](https://github.com/supabase/supabase) grew 60% (by stars) and we saw a flood of new contributors. 
+- Our [UI Library](https://github.com/supabase/ui) grew 175%
+- Our [Realtime Server](https://github.com/supabase/realtime) grew 39% after landing on the [front page of Hacker News](https://news.ycombinator.com/item?id=26968449).
+
+![Stars from github](/new/images/blog/april-2021/stars-all.png)
 
 <small>
   Source: <a href="https://repository.surf/supabase">repository.surf/supabase</a>
@@ -108,11 +138,17 @@ If you want to keep up to date, make sure you [subscribe to our YouTube channel]
 
 ## Coming Next
 
-Lets say for each new sign up, you want to trigger a slack alert, send them an email after 24 hours.
+You might have noticed our Dashboard slowly changing (improving), as we migrate the components out to our [open source UI Library](https://github.com/supabase/ui). This progression is an important step towards offering a UI for [Local Development](https://supabase.io/docs/guides/local-development) and [Self Hosting](https://supabase.io/docs/guides/self-hosting).
 
-For this we are working on our own [Workflow engine](https://supabase.io/blog/2021/04/02/supabase-workflows), it will eventually have a Zapier-like interface inside the dashboard. For now it's a state-machine interpreter (fully compatible with Amazon States Language) written in Elixir, [open source](https://github.com/supabase/workflows), and ready for community contributions.
+We're also working on our [Workflows engine](https://supabase.io/blog/2021/04/02/supabase-workflows). This is quite a large task, but we're making progress and aiming to ship sometime in July.
 
-![Workflows](/new/images/blog/workflows/workflows-thumb.jpg)
+## One more thing
+
+[We started hiring](https://supabase.io/docs/careers).
+
+![screenshot of our hiring page](/new/images/blog/april-2021/hiring.png)
+
+This month was a "gardening" month for Supabase. The team focused on stability, security, and community support. Check out what we were working on below, as well as some incredible Community contributions.
 
 ### Get started
 
