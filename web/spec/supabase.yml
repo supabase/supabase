@@ -201,17 +201,17 @@ pages:
       };
       ```
       
-      ### Update types automatically with a GitHub Action
+      ### Update types automatically with GitHub Actions
       
-      To keep your type definitions in sync with your database, you can setup a GitHub action that will update the type definitions on a schedule.
+      One way to keep your type definitions in sync with your database is to set up a GitHub action that runs on a schedule.
       
-      First, add a script to your package.json to generate the types.
+      Add a script to your package.json to generate the types:
       
       ```
       "update-types": "npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/supabase.ts"
       ```
       
-      Next, in your repo, create the file `.github/workflows/update-types.yml`. Then, add the following snippet into this file to define the action. This action will create updated types, then if there was an update, it will commit the change to your repo.
+      In your repo, create the file `.github/workflows/update-types.yml`. Add the following snippet into this file to define the action. If there is a change to your definitions, this script will commit the change to your repo.
       
       ```yml
       name: Update database types
