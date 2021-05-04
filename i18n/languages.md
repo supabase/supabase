@@ -15,6 +15,7 @@
 - [Portuguese (Brazilian) / Português Brasileiro](/i18n/README.pt-br.md)
 - [Russian / Pусский](/i18n/README.ru.md)
 - [Spanish / Español](/i18n/README.es.md)
+- [Simplified Chinese / 简体中文](/i18n/README.zh-cn.md)
 - [Traditional Chinese / 繁体中文](/i18n/README.zh-tw.md)
 - [Turkish / Türkçe](/i18n/README.tr.md)
 - [Ukrainian / Українська](/i18n/README.uk.md)
