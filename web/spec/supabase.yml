@@ -218,6 +218,57 @@ pages:
         res.status(200).json(allOnlineUsers);
       };
       ```
+      
+      ### Update types automatically with GitHub Actions
+      
+      One way to keep your type definitions in sync with your database is to set up a GitHub action that runs on a schedule.
+      
+      Add a script to your package.json to generate the types:
+      
+      ```
+      "update-types": "npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/supabase.ts"
+      ```
+      
+      In your repo, create the file `.github/workflows/update-types.yml`. Add the following snippet into this file to define the action. If there is a change to your definitions, this script will commit the change to your repo.
+      
+      ```yml
+      name: Update database types
+
+      on:
+        schedule:
+          # sets the action to run daily. You can modify this to run the action more or less freqently
+          - cron: '0 0 * * *'
+
+      jobs:
+        update:
+          runs-on: ubuntu-latest
+          steps:
+            - uses: actions/checkout@v2
+              with:
+                persist-credentials: false
+                fetch-depth: 0
+            - uses: actions/setup-node@v2.1.5
+              with:
+                node-version: 14
+            - run: npm run update-database-types
+            - name: check for file changes
+              id: git_status
+              run: |
+                echo "::set-output name=status::$(git status -s)"
+            - name: Commit files
+              if: ${{contains(steps.git_status.outputs.status, ' ')}}
+              run: |
+                git add types/database/index.ts
+                git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                git config --local user.name "github-actions[bot]"
+                git commit -m "Update database types" -a
+            - name: Push changes
+              if: ${{contains(steps.git_status.outputs.status, ' ')}}
+              uses: ad-m/github-push-action@master
+              with:
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                branch: ${{ github.ref }}
+      ```
 
   auth.signUp():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signUp'
