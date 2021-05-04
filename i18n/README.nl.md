@@ -41,7 +41,7 @@ Momenteel bevinden we ons in een publieke bèta. Bezoek de "releases" van deze r
 
 ## Hoe werkt het
 
-Supabase is een combinatie van open source software. Wij bouwen de functionaliteiten van Firebase en gebruiken daarvoor open-source-producten van de hoogste kwaliteit. Als er een product of community bestaat met een MIT, Apache 2 of gelijkaardige licentie dan maken wij er gebruik van en steunen we dit product. Als een product nog niet bestaat dan maken we het gewoon zelf. Helemaal open source natuurlijk. Supabase is geen exacte kopie van Firebase; we willen gebruikers de mogelijkheid geven om een product te gebruiken dat gelijkaardig is aan Firebase, maar dan volledig open-source.
+Supabase is een combinatie van open-source software. Wij bouwen de functionaliteiten van Firebase en gebruiken daarvoor open-source-producten van de hoogste kwaliteit. Als er een product of community bestaat met een MIT, Apache 2 of gelijkaardige licentie dan maken wij er gebruik van en steunen we dit product. Als een product nog niet bestaat dan maken we het gewoon zelf. Helemaal open-source natuurlijk. Supabase is geen exacte kopie van Firebase; we willen gebruikers de mogelijkheid geven om een product te gebruiken dat gelijkaardig is aan Firebase, maar dan volledig open-source.
 
 **Huidige architectuur**
 
