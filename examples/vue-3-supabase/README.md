@@ -80,12 +80,11 @@ In the **Composition API** you can use `inject('supabase')` to access the Supaba
 </template>
 
 <script setup>
-import { inject, onMounted } from 'vue'
-
-const supabase = inject('supabase')
+import { onMounted } from 'vue'
+import { useSupabase } from 'vue-3-supabase'
 
 onMounted(async () => {
-  const { user, session, error } = await supabase.auth.signUp({
+  const { user, session, error } = await useSupabase().auth.signUp({
     email: 'user@provider.com',
     password: 'myawesomepassword',
   })
