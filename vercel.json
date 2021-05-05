@@ -16,7 +16,7 @@
   ],
   "rewrites": [
     {
-      "source": "/new/_next/(:match*)",
+      "source": "/new/_next/:match*",
       "destination": "https://www-internal.supabase.io/_next/:match*"
     },
     { "source": "/new/:match*", "destination": "https://www-internal.supabase.io/new/:match*" },
