@@ -19,7 +19,7 @@ const Developers = () => {
     const content = (
       <a
         href={url}
-        className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition ease-in-out duration-150"
+        className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-100 hover:bg-opacity-70 dark:hover:bg-dark-700 transition ease-in-out duration-150"
       >
         {/* <!-- Heroicon name: support --> */}
         <svg
@@ -65,13 +65,13 @@ const Developers = () => {
       </nav>
       <div className="col-span-6">
         <div className="m-3 mx-6">
-          <Typography.Text type="secondary">Latest announcements</Typography.Text>
+          <Typography.Text>Latest announcements</Typography.Text>
           <ul className="mt-6 space-y-16">
             {AnnouncementsData.map((caseStudy: any, idx: number) => (
               <li className="flow-root" key={`flyout_case_${idx}`}>
                 <a
                   href={caseStudy.url}
-                  className="p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition ease-in-out duration-150 border dark:border-gray-600"
+                  className="p-3 flex rounded-lg bg-gray-50 bg-opacity-70 hover:bg-opacity-100 dark:bg-opacity-100 dark:bg-gray-600 dark:hover:bg-dark-500 transition ease-in-out duration-150 border dark:border-gray-600"
                 >
                   <div className="hidden sm:block flex-shrink-0">
                     <img

@@ -100,7 +100,7 @@ body {
 }
 
 .section--bg {
-  @apply bg-gray-50 dark:bg-gray-800;
+  @apply bg-gray-50 dark:bg-gray-700;
   position: relative;
   height: 100%;
   width: 100%;

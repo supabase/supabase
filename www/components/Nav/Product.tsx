@@ -38,7 +38,7 @@ const Product = () => {
         <a
           key={name}
           href={url}
-          className="p-3 col-span-6 rounded hover:bg-gray-50 dark:hover:bg-dark-700 transition"
+          className="p-3 col-span-6 rounded hover:bg-gray-100 hover:bg-opacity-70 dark:hover:bg-dark-700 transition"
         >
           {content}
         </a>
@@ -53,7 +53,7 @@ const Product = () => {
       </nav>
       <div className="col-span-6">
         <div className="m-3 mx-6">
-          <Typography.Text type="secondary">Latest case studies</Typography.Text>
+          <Typography.Text>Latest case studies</Typography.Text>
           <ul className="mt-6 space-y-3">
             {CaseStudiesData.map((caseStudy: any, idx: number) => {
               if (idx > 1) {
@@ -63,7 +63,7 @@ const Product = () => {
                 <li className="flow-root" key={`flyout_case_${idx}`}>
                   <a
                     href={caseStudy.url}
-                    className="p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition ease-in-out duration-150 border dark:border-gray-600"
+                    className="p-3 flex rounded-lg bg-gray-50 bg-opacity-70 dark:bg-opacity-100 dark:bg-gray-600 hover:bg-opacity-100 dark:hover:bg-dark-500 transition ease-in-out duration-150 border dark:border-gray-600"
                   >
                     <div className="hidden sm:block flex-shrink-0">
                       <img

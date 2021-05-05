@@ -8,7 +8,7 @@ const Hero = () => {
 
   return (
     <div className="overflow-hidden">
-      <SectionContainer className="pb-0 pt-24">
+      <SectionContainer className="pb-0 pt-16 md:pt-16 lg:pt-16">
         <div className="relative">
           <main className="">
             <div className="mx-auto">

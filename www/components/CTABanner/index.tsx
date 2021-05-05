@@ -5,7 +5,7 @@ const CTABanner = (props: any) => {
   return (
     <div
       className={`
-        py-32 grid grid-cols-12 gap-4 items-center text-center bg-dark-800 border-t dark:border-gray-600
+        py-32 grid grid-cols-12 gap-4 items-center text-center bg-dark-700 border-t dark:border-gray-600
         ${darkerBg ? 'dark:bg-dark-900' : ''} px-16
       `}
     >

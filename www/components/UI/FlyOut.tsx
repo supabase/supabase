@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
+import React, { useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react'
 import Transition from 'lib/Transition'
 
 type Props = {
@@ -14,13 +14,19 @@ const FlyOut = (props: Props) => {
   const { title = '', children, className = '', singleBgColor = false, handleCancel } = props
   const [show, setShow] = useState(false)
 
+  const node = useRef<HTMLDivElement>(null)
+
+  const handleClick = (e: any) => {
+    if (node.current?.contains(e.target)) return
+    handleCancel()
+  }
+
   useEffect(() => {
-    function handleScroll() {
-      if (window.pageYOffset > 96) handleCancel()
+    document.addEventListener('mousedown', handleClick)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
     }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  })
+  }, [])
 
   // function handleToggle() {
   //   setShow(!show)
@@ -60,46 +66,23 @@ const FlyOut = (props: Props) => {
       >
         <>
           <div
-            className="absolute inset-x-0 transform shadow-lg border-gray-100 dark:border-dark-500"
-            style={{
-              zIndex: 999,
-              position: 'absolute',
-              width: '100%',
-              margin: '0 auto',
-              marginTop: '63px',
-              left: '-50vw',
-              right: '-50vw',
-              top: 0,
-            }}
+            className="absolute inset-x-0 transform shadow-lg border-gray-100 dark:border-dark-500 w-full hidden lg:block bg-white dark:bg-gray-600"
+            ref={node}
           >
             <div
               className="border-b dark:border-gray-600 absolute inset-0 flex sm:flex-col lg:flex-row"
               aria-hidden="true"
             >
-              <div className="bg-white dark:bg-gray-800 border-r dark:border-gray-600 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full" />
+              <div className="bg-gray-50 dark:bg-gray-600 border-r dark:border-gray-500 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full" />
               <div
                 className={`${
-                  singleBgColor ? 'bg-white dark:bg-dark-600' : 'bg-gray-50 dark:bg-gray-800'
+                  singleBgColor ? 'bg-gray-50 dark:bg-dark-600' : 'bg-gray-100 bg-opacity-75 dark:bg-opacity-100 dark:bg-gray-700'
                 } sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full`}
               />
             </div>
-            <div
-              className={`container relative mx-auto lg:grid-cols-2 px-6 lg:px-10 xl:px-14 py-2`}
-            >
+            <div className="container relative mx-auto lg:grid-cols-2 px-6 lg:px-10 xl:px-14 py-2">
               {children}
             </div>
-          </div>
-          <div
-            className="fixed inset-0 t-63 transition-opacity bg-red"
-            style={{
-              zIndex: 100,
-              top: '63px',
-              marginLeft: 0,
-              pointerEvents: 'visiblePainted',
-            }}
-            onClick={() => props.handleCancel()}
-          >
-            <div className="absolute inset-0 opacity-0"></div>
           </div>
         </>
       </Transition>
