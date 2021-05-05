@@ -30,7 +30,7 @@ Well, the JSON object starts out looking something like this:
 }
 ```
 
-`sub` is the "subject", which is usually the uuid of the user. `name` is self explanitory, and `iat` is the unix timestamp at which the token was created. Many JWTs will also have an `exp` which is the data at which the token is set to expire, and can no longer be used. These are some of the standard fields you may find in a JWT, but you can pretty much store whatever you want in there, for example:
+`sub` is the "subject", which is usually the uuid of the user. `name` is self explanatory, and `iat` is the unix timestamp at which the token was created. Many JWTs will also have an `exp` which is the data at which the token is set to expire, and can no longer be used. These are some of the standard fields you may find in a JWT, but you can pretty much store whatever you want in there, for example:
 
 ```js
 {
