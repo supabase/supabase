@@ -528,7 +528,7 @@ pages:
             .from('cities')
             .select('name', { count: 'exact' })
           ```
-      - name: Quering JSON data
+      - name: Querying JSON data
         description: |
           If you have data inside of a JSONB column, you can apply select 
           and query filters to the data values. Postgres offers a 
