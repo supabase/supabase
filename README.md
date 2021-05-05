@@ -91,6 +91,7 @@ Our client library is modular. Each sub-library is a standalone implementation f
 - [Polish / Polski](/i18n/README.pl.md)
 - [Portuguese / Portuguese](/i18n/README.pt.md)
 - [Portuguese (Brazilian) / Português Brasileiro](/i18n/README.pt-br.md)
+- [Romanian / Română](/i18n/README.ro.md)
 - [Russian / Pусский](/i18n/README.ru.md)
 - [Spanish / Español](/i18n/README.es.md)
 - [Simplified Chinese / 简体中文](/i18n/README.zh-cn.md)
