@@ -115,8 +115,8 @@ pages:
         sql: |
           ```sql
           alter table table_name
-            add constraint constraint_name_1 foreign key (colum_1) references foreign_table(id),
-            add constraint constraint_name_2 foreign key (colum_2) references foreign_table(id);
+            add constraint constraint_name_1 foreign key (column_1) references foreign_table(id),
+            add constraint constraint_name_2 foreign key (column_2) references foreign_table(id);
           ```
       - name: Delete a table
         sql: |
@@ -224,7 +224,7 @@ pages:
           
   Database Users:
     description: |
-      Users and Roles are almost interchangable.
+      Users and Roles are almost interchangeable.
 
     examples:
       - name: Create New User

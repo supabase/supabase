@@ -1,5 +1,5 @@
 <p align="center">
-    <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-with-background.svg"/>
+   <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
 </p>
 
 ---
@@ -8,7 +8,8 @@
 
 [Supabase](https://supabase.io) é uma alternativa de código aberto ao Firebase. Estamos reproduzindo as funcionalidades do Firebase usando ferramentas de código aberto de nível empresarial.
 
-- [x] Banco de dados hospedado Postgres
+
+- [x] Base de dados Postgres hospedada
 - [x] Subscrições em tempo real
 - [x] Autenticação e autorização
 - [x] APIs geradas automaticamente
@@ -22,16 +23,16 @@ Para ver a documentação completa, visite [supabase.io/docs](https://supabase.i
 
 ## Comunidade & Suporte
 
-- [Fórum da comunidade](https://github.com/supabase/supabase/discussions). Indicado para: ajuda no desenvolviment, discussão sobre as melhores práticas de banco de dados.
-- [Problemas do GitHub](https://github.com/supabase/supabase/issues). Indicado para: bugs e erros que você encontrar ao usar o Supabase.
-- [Suporte por e-mail](https://supabase.io/docs/support#business-support). Indicado para: problemas com seu banco de dados ou infraestrutura.
+- [Fórum da comunidade](https://github.com/supabase/supabase/discussions). Indicado para: ajuda no desenvolvimento, discussão sobre as melhores práticas de base de dados.
+- [Problemas do GitHub](https://github.com/supabase/supabase/issues). Indicado para: bugs e erros que tu encontrares ao usar o Supabase.
+- [Suporte por e-mail](https://supabase.io/docs/support#business-support). Indicado para: problemas com a tua base de dados ou infraestrutura.
 
 
 ## Status
 
-- [x] Alpha: estamos testando o Supabase com um grupo fechado de clientes
-- [x] Alpha Público: Qualquer pessoa pode se inscrever em [app.supabase.io](https://app.supabase.io). Mas vá com calma, existem alguns problemas ainda.
-- [x] Beta público: estável o suficiente para a maioria dos casos de uso não empresariais
+- [x] Alpha: estamos a testar o Supabase com um grupo fechado de clientes
+- [x] Alpha Público: Qualquer pessoa pode se inscrever em [app.supabase.io](https://app.supabase.io). Mas vai com calma, ainda existem alguns problemas.
+- [x] Beta público: estável o suficiente para a maioria dos casos de uso não empresarial
 - [ ] Público: pronto para produção
 
 Estamos atualmente em Beta Público. Assista aos lançamentos deste repositório para ser notificado sobre as principais atualizações.
@@ -42,20 +43,20 @@ Estamos atualmente em Beta Público. Assista aos lançamentos deste repositório
 
 ## Como funciona
 
-Supabase é uma combinação de ferramentas de código aberto. Estamos construindo os recursos do Firebase usando produtos de código aberto de nível empresarial. Se as ferramentas e comunidades existirem, com uma licença MIT, Apache 2 ou licença aberta equivalente, usaremos e ofereceremos suporte para essa ferramenta. Se a ferramenta não existir, nós mesmos a construímos e abrimos o código-fonte. Supabase não é uma reprodução 1 para 1 do Firebase. Nosso objetivo é dar aos desenvolvedores uma experiência de desenvolvedor semelhante ao Firebase usando ferramentas de código aberto.
+Supabase é uma combinação de ferramentas de código aberto. Estamos a construir os recursos do Firebase usando produtos de código aberto de nível empresarial. Se as ferramentas e comunidades existirem, com uma licença MIT, Apache 2 ou licença aberta equivalente, usaremos e ofereceremos suporte para essa ferramenta. Se a ferramenta não existir, nós mesmos a construímos e abrimos o código-fonte. Supabase não é uma reprodução 1 para 1 do Firebase. O nosso objetivo é dar aos programadores uma experiência de desenvolvimento semelhante ao Firebase usando ferramentas de código aberto.
 
 **Arquitetura atual**
 
-Supabase é uma [plataforma hospedada](https://app.supabase.io). Você pode se inscrever e começar a usar o Supabase sem instalar nada. Ainda estamos criando a experiência de desenvolvimento local - agora esse é nosso foco principal, junto com a estabilidade da plataforma.
+Supabase é uma [plataforma hospedada](https://app.supabase.io). Podes-te inscrever e começar a usar o Supabase sem instalar nada. Ainda estamos a criar a experiência de desenvolvimento local - esse é nosso foco atual, juntamente com a estabilidade da plataforma.
 
 ! [Arquitetura](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
-- [PostgreSQL](https://www.postgresql.org/) é um sistema de banco de dados objeto-relacional com mais de 30 anos de desenvolvimento ativo que lhe rendeu uma forte reputação de confiabilidade, robustez de recursos e desempenho.
-- [Realtime](https://github.com/supabase/realtime) é um servidor Elixir que permite ouvir inserções, atualizações e exclusões PostgreSQL usando websockets. Supabase escuta a funcionalidade de replicação embutida do Postgres, converte o fluxo de bytes de replicação em JSON e, em seguida, transmite o JSON através de websockets.
-- [PostgREST](http://postgrest.org/) é um servidor web que transforma seu banco de dados PostgreSQL diretamente em uma API RESTful
-- [Storage](https://github.com/supabase/storage-api) fornece uma interface RESTful para gerenciar arquivos armazenados no S3, usando Postgres para gerenciar permissões.
-- [postgres-meta](https://github.com/supabase/postgres-meta) é uma API RESTful para gerenciar seu Postgres, permitindo que você busque tabelas, adicione funções e execute consultas etc.
-- [GoTrue](https://github.com/netlify/gotrue) é uma API baseada em SWT para gerenciar usuários e emitir tokens SWT.
+- [PostgreSQL](https://www.postgresql.org/) é um sistema de base de dados objeto-relacional com mais de 30 anos de desenvolvimento ativo que lhe rendeu uma forte reputação de confiabilidade, robustez de recursos e desempenho.
+- [Realtime](https://github.com/supabase/realtime) é um servidor Elixir que permite ouvir inserções, atualizações e exclusões PostgreSQL usando websockets. A Supabase escuta a funcionalidade de replicação embutida do Postgres, converte o fluxo de bytes de replicação em JSON e, de seguida, transmite o JSON através de websockets.
+- [PostgREST](http://postgrest.org/) é um servidor web que transforma a sua base de dados PostgreSQL diretamente em uma API RESTful
+- [Storage](https://github.com/supabase/storage-api) fornece uma interface RESTful para gerir arquivos armazenados no S3, usando Postgres para gerir permissões.
+- [postgres-meta](https://github.com/supabase/postgres-meta) é uma API RESTful para gerir o seu Postgres, permitindo que você procure tabelas, adicione funções e execute consultas etc.
+- [GoTrue](https://github.com/netlify/gotrue) é uma API baseada em SWT para gerir utilizadores e emitir tokens SWT.
 - [Kong](https://github.com/Kong/kong) é um gateway de API nativo da nuvem.
 
 #### Bibliotecas Cliente
@@ -74,16 +75,11 @@ Nossa biblioteca cliente é modular. Cada sub-biblioteca é uma implementação 
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
+<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 ## Traduções
 
-- [Inglês/English](https://github.com/supabase/supabase)
-- [Francês/Français](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
-- [Alemão/Deutsche](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
-- [Japonês/日本語](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [Turco/Türkçe](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
-- [Chinês tradicional/繁體中文](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
-- [Espanhol/Español](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
-- [Hindi/हिंदी](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
+- [Traduções](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 

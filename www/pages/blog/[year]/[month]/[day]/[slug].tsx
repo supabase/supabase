@@ -228,7 +228,7 @@ function BlogPostPage(props: any) {
                 </article>
               </div>
               <div className="col-span-12 lg:col-span-4">
-                <Space direction="vertical" size={8}>
+                <Space direction="vertical" size={8} className="lg:mb-16 lg:top-16 lg:sticky">
                   <div className="hidden lg:block">{toc}</div>
                   <div>
                     <Typography.Title className="mb-4" level={5}>
