@@ -45,7 +45,7 @@ Supabase este o combinație de unelte open source. Construim trăsăturile din F
 
 **Arhitectura actuală**
 
-Supabase este o [platformă găzduită](https://app.supabase.io). Puteți să vă înscrieți și să începeți să folosiți Firebase fără a instala orice. Experiența de developare locală încă mai este în dezvoltare, acesta fiind lucrul la care ne concentrăm cel mai mult, împreună cu stabilitatea platformei.
+Supabase este o [platformă găzduită](https://app.supabase.io). Puteți să vă înscrieți și să începeți să folosiți Supabase fără a instala orice. Experiența de developare locală încă mai este în dezvoltare, acesta fiind lucrul la care ne concentrăm cel mai mult, împreună cu stabilitatea platformei.
 
 ![Arhitectură](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
