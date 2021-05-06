@@ -2,6 +2,12 @@
 
 ## fill the .env file and reach the endpoints at
 
+### **pgadmin**
+```
+supabase.example.com/pgadmin/
+```
+
+
 ### **auth**
 
 ```

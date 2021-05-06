@@ -132,6 +132,29 @@ services:
       POSTGRES_PORT: ${POSTGRES_PORT}
     networks:
       - db
+  pgadmin:
+    container_name: supabase-pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      SCRIPT_NAME: /pgadmin
+      PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
+    volumes:
+      - ../config/pgadmin/servers.json:/pgadmin4/servers.json
+      - ../config/pgadmin/config.py:/pgadmin4/config.py
+    networks:
+      - db
+      - rp
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.supabase-pgadmin.entrypoints: ${TRAEFIK_SECURE_ENTRYPOINT}
+      traefik.http.services.supabase-pgadmin.loadbalancer.server.port: ${PGADMIN_PORT}
+      traefik.http.routers.supabase-pgadmin.tls: 'true'
+      traefik.docker.network: ${TRAEFIK_NETWORK}
+      traefik.http.routers.supabase-pgadmin.rule: 'Host(`${SUPABASE_HOSTNAME}`) && PathPrefix(`/pgadmin`)'
+
 networks:
   rp:
     name: ${TRAEFIK_NETWORK}
