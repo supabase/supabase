@@ -1,5 +1,5 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-with-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
 </p>
 
 ---
@@ -68,23 +68,39 @@ Our client library is modular. Each sub-library is a standalone implementation f
 
 | Repo                  | Official                                         | Community                                                                                                                                                                                                                  |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                |
-| `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
-| `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
-| `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
+| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                \| [`Ruby`](https://github.com/supabase/supabase-rb)
+| `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) \| [`Ruby`](https://github.com/supabase/postgrest-rb)
+| `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                \| `Ruby`                                                |
+| `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      \| `Ruby`                                                |
+
+<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 
 ## Translations
 
+- [Arabic | العربية](/i18n/README.ar.md)
+- [Dutch / Nederlands](/i18n/README.nl.md)
 - [English](https://github.com/supabase/supabase)
-- [French](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
-- [German](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
-- [Japanese](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [Turkish](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
-- [Traditional Chinese](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
-- [Spanish](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
-- [Hindi](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
-- [Portuguese](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
-- [Português Brasileiro](https://github.com/supabase/supabase/blob/master/i18n/README.pt-br.md)
+- [French / Français](/i18n/README.fr.md)
+- [German / Deutsch](/i18n/README.de.md)
+- [Hindi / हिंदी](/i18n/README.hi.md)
+- [Nepali / नेपाली](/i18n/README.ne.md)
+- [Italiano / Italian](/i18n/README.it.md)
+- [Japanese / 日本語](/i18n/README.jp.md)
+- [Norwegian (Bokmål) / Norsk (Bokmål)](/i18n/README.nb-no.md)
+- [Persian / فارسی](/i18n/README.fa.md)
+- [Polish / Polski](/i18n/README.pl.md)
+- [Portuguese / Portuguese](/i18n/README.pt.md)
+- [Portuguese (Brazilian) / Português Brasileiro](/i18n/README.pt-br.md)
+- [Romanian / Română](/i18n/README.ro.md)
+- [Russian / Pусский](/i18n/README.ru.md)
+- [Spanish / Español](/i18n/README.es.md)
+- [Simplified Chinese / 简体中文](/i18n/README.zh-cn.md)
+- [Traditional Chinese / 繁体中文](/i18n/README.zh-tw.md)
+- [Turkish / Türkçe](/i18n/README.tr.md)
+- [Ukrainian / Українська](/i18n/README.uk.md)
+- [List of translations](/i18n/languages.md) <!--- Keep only this -->
+
 ---
 
 ## Sponsors

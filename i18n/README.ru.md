@@ -1,5 +1,5 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-with-background.svg"/>
+  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
 </p>
 
 ---
@@ -12,7 +12,7 @@
 - [x] Подписки в режиме реального времени
 - [x] Аутентификация и авторизация
 - [x] Автоматически генерируемые API
-- [x] Dashboard
+- [x] Панель управления
 - [x] Хранилище
 - [ ] Функции (скоро)
 
@@ -59,9 +59,9 @@ Supabase – это [облачная платформа](https://app.supabase.i
 
 #### Клиентские библиотеки
 
-Наша клиентская библиотека является модульной. Каждая подбиблиотека представляет из собя отдельную реализацию для одной внешней системы. Это один из способов, с помощью которого мы поддерживаем существующие инструменты.
+Наша клиентская библиотека является модульной. Каждая подбиблиотека представляет из себя отдельную реализацию для одной внешней системы. Это один из способов, с помощью которого мы поддерживаем существующие инструменты.
 
-- **`supabase-{lang}`**: Объединяет библиотеки и добавляет обогащения.
+- **`supabase-{lang}`**: Объединяет библиотеки и расширяет их функциональность.
   - `postgrest-{lang}`: Клиентская библиотека для работы с [PostgREST](https://github.com/postgrest/postgrest)
   - `realtime-{lang}`: Клиентская библиотека для работы с [Realtime](https://github.com/supabase/realtime)
   - `gotrue-{lang}`: Клиентская библиотека для работы с [GoTrue](https://github.com/netlify/gotrue)
@@ -73,20 +73,14 @@ Supabase – это [облачная платформа](https://app.supabase.i
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
 
+<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 ## Переводы
 
-- [English](https://github.com/supabase/supabase)
-- [French](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
-- [German](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
-- [Japanese](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
-- [Turkish](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
-- [Traditional Chinese](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
-- [Spanish](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
-- [Hindi](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
-- [Russian](https://github.com/supabase/supabase/blob/master/i18n/README.ru.md)
+- [Переводы](/i18n/languages.md) <!--- Keep only the this-->
 
 ---
 
 ## Спонсоры
 
-[![Новый спонсор](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
+[![Стать спонсором](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)

@@ -161,7 +161,7 @@ module.exports = {
             },
             {
               label: 'RSS',
-              href: 'https://supabase.io/blog/rss.xml',
+              href: 'https://supabase.io/rss.xml',
             },
             // {
             //   label: "Discord",
