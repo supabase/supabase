@@ -97,7 +97,7 @@ function ImageCarousel(props: ImageCarouselProps) {
             <Swiper
               // @ts-ignore
               onSwiper={setImageSwiper}
-              style={{ zIndex: 0, overflow: 'auto', overflow-x: 'hidden' }}
+              style={{ zIndex: 0, overflow: 'auto', overflowX: 'hidden' }}
               initialSlide={0}
               spaceBetween={0}
               slidesPerView={1}
