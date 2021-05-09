@@ -24,6 +24,7 @@
     "next": "latest",
     "next-mdx-remote": "^2.1.3",
     "next-seo": "^4.20.0",
+    "postcss": "8",
     "react": "^16.13.0",
     "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "^16.13.0",
