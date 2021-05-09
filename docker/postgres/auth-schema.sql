@@ -89,3 +89,5 @@ GRANT ALL PRIVILEGES ON SCHEMA auth TO postgres;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA auth TO postgres;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA auth TO postgres;
 ALTER ROLE postgres SET search_path = "$user", public, auth;
+
+GRANT USAGE ON SCHEMA auth TO anon, authenticated, service_role;
