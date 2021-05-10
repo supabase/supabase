@@ -1,4 +1,3 @@
-
 var SUPABASE_URL = 'https://ernhobnpmmupjnmxpfbt.supabase.co'
 var SUPABASE_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxMzA5ODU0NCwiZXhwIjoxOTI4Njc0NTQ0fQ.Z9bRrfaL2oGhSuyBckFcdcnRIJDelWJ1II98OnEtLO0'
@@ -26,11 +25,9 @@ const signUpSubmitted = (event) => {
   const password = event.target[1].value
 
   supabase.auth
-    .signUp({email, password})
+    .signUp({ email, password })
     .then((response) => {
-      document.querySelector('#access-token').value = response.data.access_token
-      document.querySelector('#refresh-token').value = response.data.refresh_token
-      alert("Logged in as " + response.user.email)
+      response.error ? alert(response.error.message) : setToken(response)
     })
     .catch((err) => {
       alert(err.response.text)
@@ -43,12 +40,9 @@ const logInSubmitted = (event) => {
   const password = event.target[1].value
 
   supabase.auth
-    .signIn({email, password})
+    .signIn({ email, password })
     .then((response) => {
-      document.querySelector('#access-token').value = response.data.access_token
-      document.querySelector('#refresh-token').value = response.data.refresh_token
-      // response.error ?
-      alert("Logged in as " + response.user.email)
+      response.error ? alert(response.error.message) : setToken(response)
     })
     .catch((err) => {
       alert(err.response.text)
@@ -56,9 +50,8 @@ const logInSubmitted = (event) => {
 }
 
 const fetchUserDetails = () => {
-      alert(JSON.stringify(supabase.auth.user()))
+  alert(JSON.stringify(supabase.auth.user()))
 }
-
 
 const logoutSubmitted = (event) => {
   event.preventDefault()
@@ -68,9 +61,19 @@ const logoutSubmitted = (event) => {
     .then((response) => {
       document.querySelector('#access-token').value = ''
       document.querySelector('#refresh-token').value = ''
-      alert("Logout successful")
+      alert('Logout successful')
     })
     .catch((err) => {
       alert(err.response.text)
     })
+}
+
+function setToken(response) {
+  if (response.data.confirmation_sent_at && !response.data.access_token) {
+    alert('Confirmation Email Sent')
+  } else {
+    document.querySelector('#access-token').value = response.data.access_token
+    document.querySelector('#refresh-token').value = response.data.refresh_token
+    alert('Logged in as ' + response.user.email)
+  }
 }
