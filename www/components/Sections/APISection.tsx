@@ -61,11 +61,11 @@ function APISection(props: Props) {
               </Tabs.Panel>
             ))}
         </Tabs>
-        <div className="border border-gray-100 dark:border-gray-600 rounded-md bg-gray-800 overflow-hidden">
+        <div className="bg-gray-800 overflow-hidden">
           <Swiper
             // @ts-ignore
             onSwiper={setApiSwiper}
-            style={{ zIndex: 0 }}
+            style={{ zIndex: 0, marginRight:'1px' }}
             initialSlide={apiSwiperActiveIndex}
             spaceBetween={0}
             slidesPerView={1}
