@@ -64,11 +64,10 @@ const FlyOut = (props: Props) => {
             style={{
               zIndex: 999,
               position: 'absolute',
-              width: '100%',
-              margin: '0 auto',
+              width: '99.2vw',
+              margin: '0 -50vw',
               marginTop: '63px',
-              left: '-50vw',
-              right: '-50vw',
+              left: '50%',
               top: 0,
             }}
           >
