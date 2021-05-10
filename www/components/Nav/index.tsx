@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import Badge from 'components/Badge'
+import { Badge } from '@supabase/ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 import SolutionsData from 'data/Solutions.json'
@@ -64,8 +64,13 @@ const Nav = (props: Props) => {
         </div>
         <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
           <div>
-            <p className="text-base font-medium text-gray-900 dark:text-white">
-              {name} {label && <Badge className="ml-3">{label}</Badge>}
+            <p className="text-base font-medium text-gray-900 dark:text-white space-x-2">
+              <span>{name}</span>
+              {label && (
+                <Badge dot color="green">
+                  {label}
+                </Badge>
+              )}
             </p>
             <p className="mt-1 text-sm text-gray-500 dark:text-dark-100">{description}</p>
           </div>
