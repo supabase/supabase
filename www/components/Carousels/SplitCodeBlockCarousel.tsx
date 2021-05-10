@@ -7,7 +7,7 @@ import CodeBlock from '../CodeBlock/CodeBlock'
 
 // Import Swiper styles
 import 'swiper/swiper.min.css'
-import Badge from '../Badge'
+import { Badge } from '@supabase/ui'
 import Link from 'next/link'
 
 interface Content {
