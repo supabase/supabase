@@ -127,12 +127,7 @@ Here are a list of environment variables for each service:
 ### Configuring email 
 
 GoTrue requires an SMTP server to send emails for all authentication actions. 
-You will need to provide the following [settings](https://github.com/supabase/gotrue#e-mail) inside the `docker-compose.yml` under `services.auth.environment`:
-
-- `GOTRUE_SMTP_HOST` - The mail server hostname to send emails through.
-- `GOTRUE_SMTP_PORT` - The port number to connect to the mail server on.
-- `GOTRUE_SMTP_USER` - If the mail server requires authentication, the username to use.
-- `GOTRUE_SMTP_PASS` - If the mail server requires authentication, the password to use.
+You will need to provide the following [settings](https://github.com/supabase/gotrue#e-mail) inside the `.env` file [here](https://github.com/supabase/supabase/blob/027e7f7b97bbe7365db4f7f46abe480e05841006/docker/.env#L8).
 
 ### API Keys 
 
