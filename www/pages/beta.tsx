@@ -189,7 +189,7 @@ const Introduction = () => {
               className="col-span-6 sm:col-span-4 grid grid-cols-8 sm:grid-cols-12 gap-x-1 md:gap-x-0 xl:gap-x-6 items-center"
             >
               <div className="col-span-4 sm:col-span-4 md:col-span-3 xl:col-span-2">
-                <div className="w-12 h-12 rounded-md bg-dark-700 flex items-center justify-center bg-gray-900 dark:bg-white">
+                <div className="w-12 h-12 rounded-md bg-dark-700 flex items-center justify-center dark:bg-white">
                   {stat.icon}
                 </div>
               </div>
@@ -712,8 +712,11 @@ const BetaPricing = () => (
             </li>
           </ul>
           <p>
-            The Supabase Base Tier is now called the Supabase Pro tier as per the pricing page:
-            https://supabase.io/pricing
+            The Supabase Base Tier is now called the Supabase Pro tier as per the{' '}
+            <a href="https://supabase.io/pricing" className="text-brand-700 hover:text-brand-800">
+              pricing page
+            </a>
+            .
           </p>
         </div>
       </div>
@@ -990,7 +993,7 @@ const Beta = () => {
         <div className="sticky inset-0 z-50">
           <div className="shadow-lg py-5 px-5 xl:px-20 bg-dark-800 flex items-center justify-between">
             <a href="/">
-              <img className="h-5" src={`/images/logo-dark.png`} />
+              <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
             </a>
             <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)} />
           </div>
