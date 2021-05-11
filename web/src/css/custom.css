@@ -972,9 +972,6 @@ html[data-theme='dark'] .DocSearch {
   background: var(--custom-background-color-diff) !important;
   font-family: var(--ifm-font-family-base);
 }
-.DocSearch-Button svg {
-  display: none;
-}
 .DocSearch-Button-Placeholder {
   font-family: var(--ifm-font-family-base);
   line-height: 10px;
