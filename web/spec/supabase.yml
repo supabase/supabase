@@ -39,6 +39,7 @@ info:
           - auth.update()
           - auth.onAuthStateChange()
           - Reset Password (Email)
+          - Delete User
       - name: 'Data'
         items:
           - select()
@@ -452,7 +453,7 @@ pages:
       You should then use the access_token in the url and new password to update the user as follows:
 
       ```js
-      const { error, data } = await auth.api
+      const { error, data } = await supabase.auth.api
             .updateUser(access_token, { password : new_password })
       ```
     examples:
@@ -461,6 +462,19 @@ pages:
         js: |
           ```js
           const { data, error } = supabase.auth.api.resetPasswordForEmail('user@email.com')
+          ```
+
+  Delete User:
+    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.deleteUser'
+    examples:
+      - name: Remove a user completely.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.api.delete(
+            '715ed5db-f090-4b8c-a067-640ecee36aa0',
+            'YOUR_SERVICE_ROLE_KEY'
+          )
           ```
 
   select():

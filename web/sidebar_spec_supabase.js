@@ -9,7 +9,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Auth',
-      items: ['reference/javascript/auth-signup', 'reference/javascript/auth-signin', 'reference/javascript/auth-signout', 'reference/javascript/auth-session', 'reference/javascript/auth-user', 'reference/javascript/auth-update', 'reference/javascript/auth-onauthstatechange', 'reference/javascript/reset-password-email'],
+      items: ['reference/javascript/auth-signup', 'reference/javascript/auth-signin', 'reference/javascript/auth-signout', 'reference/javascript/auth-session', 'reference/javascript/auth-user', 'reference/javascript/auth-update', 'reference/javascript/auth-onauthstatechange', 'reference/javascript/reset-password-email', 'reference/javascript/delete-user'],
       collapsed: true,
     },
     {

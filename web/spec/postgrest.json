@@ -5568,7 +5568,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/PostgrestQueryBuilder.ts",
-																	"line": 183,
+																	"line": 189,
 																	"character": 9
 																}
 															],
@@ -5609,7 +5609,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/PostgrestQueryBuilder.ts",
-																	"line": 182,
+																	"line": 188,
 																	"character": 13
 																}
 															],
@@ -5642,7 +5642,7 @@
 													"sources": [
 														{
 															"fileName": "lib/PostgrestQueryBuilder.ts",
-															"line": 181,
+															"line": 187,
 															"character": 9
 														}
 													]
@@ -5667,7 +5667,7 @@
 							"sources": [
 								{
 									"fileName": "lib/PostgrestQueryBuilder.ts",
-									"line": 181,
+									"line": 187,
 									"character": 8
 								}
 							]
@@ -6665,7 +6665,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/PostgrestQueryBuilder.ts",
-																	"line": 159,
+																	"line": 165,
 																	"character": 11
 																}
 															],
@@ -6706,7 +6706,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/PostgrestQueryBuilder.ts",
-																	"line": 158,
+																	"line": 164,
 																	"character": 15
 																}
 															],
@@ -6739,7 +6739,7 @@
 													"sources": [
 														{
 															"fileName": "lib/PostgrestQueryBuilder.ts",
-															"line": 156,
+															"line": 162,
 															"character": 23
 														}
 													]
@@ -6764,7 +6764,7 @@
 							"sources": [
 								{
 									"fileName": "lib/PostgrestQueryBuilder.ts",
-									"line": 155,
+									"line": 161,
 									"character": 8
 								}
 							]
@@ -6864,7 +6864,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/PostgrestQueryBuilder.ts",
-																	"line": 126,
+																	"line": 132,
 																	"character": 11
 																}
 															],
@@ -6905,7 +6905,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/PostgrestQueryBuilder.ts",
-																	"line": 124,
+																	"line": 130,
 																	"character": 16
 																}
 															],
@@ -6937,7 +6937,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/PostgrestQueryBuilder.ts",
-																	"line": 125,
+																	"line": 131,
 																	"character": 15
 																}
 															],
@@ -6971,7 +6971,7 @@
 													"sources": [
 														{
 															"fileName": "lib/PostgrestQueryBuilder.ts",
-															"line": 122,
+															"line": 128,
 															"character": 38
 														}
 													]
@@ -6996,7 +6996,7 @@
 							"sources": [
 								{
 									"fileName": "lib/PostgrestQueryBuilder.ts",
-									"line": 121,
+									"line": 127,
 									"character": 8
 								}
 							]
