@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
@@ -183,7 +183,7 @@ const Nav = (props: Props) => {
   )
 
   return (
-    <Fragment>
+    <>
       {/* Announcement Nav */}
       <div className="sticky top-0 z-50">
         <nav className="bg-white dark:bg-gray-800 border-b dark:border-gray-600">
@@ -196,7 +196,7 @@ const Nav = (props: Props) => {
                   <Link href="/" as="/">
                     <img
                       className="block h-6 w-auto"
-                      src={darkMode ? `/images/logo-dark.png` : `/images/logo-light.png`}
+                      src={darkMode ? `${basePath}/images/logo-dark.png` : `${basePath}/images/logo-light.png`}
                       alt="Logo"
                     />
                   </Link>
@@ -341,7 +341,7 @@ const Nav = (props: Props) => {
           <Developers />
         </FlyOut>
       </div>
-    </Fragment>
+    </>
   )
 }
 
