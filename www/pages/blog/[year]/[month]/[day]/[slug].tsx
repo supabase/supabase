@@ -122,7 +122,11 @@ function BlogPostPage(props: any) {
       <div>
         <Space>
           {props.blog.tags.map((tag: string) => {
-            return <Badge key={`categroy-badge-${tag}`}>{tag}</Badge>
+            return (
+              <a href={`/blog/tags/${tag}`}>
+                <Badge key={`categroy-badge-`}>{tag}</Badge>
+              </a>
+            )
           })}
         </Space>
       </div>
