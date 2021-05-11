@@ -3,7 +3,7 @@ services:
   kong:
     container_name: supabase-kong
     build:
-      context: ../dockerfiles/kong
+      context: ./dockerfiles/kong
     environment:
       KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
       KONG_PLUGINS: request-transformer,cors,key-auth,http-log
@@ -74,7 +74,7 @@ services:
   db:
     container_name: supabase-db
     build:
-      context: ../dockerfiles/postgres
+      context: ./dockerfiles/postgres
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     command:
