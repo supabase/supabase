@@ -103,8 +103,7 @@ By default only "new" values are sent, but if you want to receive the old record
 you can update the replica identity of your tables, setting it to `full`:
 
 ```sql
-alter table_name your_table 
-replica identity full;
+alter table your_table replica identity full;
 ```
 
 ### Migrating between projects
