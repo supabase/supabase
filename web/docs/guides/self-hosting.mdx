@@ -82,20 +82,34 @@ docker-compose up
 
 **Important** 
 
-Make sure you update the default passwords and secrets before running in Production:
+Make sure you update the default [passwords and secrets](https://github.com/supabase/supabase/blob/master/docker/.env) 
+before running in Production.
+After you have regenerated the JWT secret, you will need to encode a new `anon` and `service_role` API key and update 
+them [here](https://github.com/supabase/supabase/blob/9131e670f2679b9305a67f54c15bdab17b2cfd5a/docker/dockerfiles/kong/kong.yml#L42). For example, using [jsonwebtoken.io](https://www.jsonwebtoken.io/).
 
-- Postgres 
-  - [POSTGRES_PASSWORD](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L80)
-- Realtime 
-  - [DB_PASSWORD](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L60)
-  - [JWT_SECRET](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L66)
-- PostgREST 
-  - [PGRST_DB_URI](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L44)
-  - [PGRST_JWT_SECRET](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L47)
-- GoTrue 
-  - [DATABASE_URL](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L32)
-  - [GOTRUE_OPERATOR_TOKEN](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L31)
-  - [GOTRUE_JWT_SECRET](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L19)
+The data you will need to encode includes:
+
+```bash
+# anon Payload:
+{
+ "iss": "supabase",
+ "iat": 1603968834,
+ "exp": 2550653634,
+ "aud": "",
+ "sub": "",
+ "Role": "anon"
+}
+# service_role Payload:
+{
+ "iss": "supabase",
+ "iat": 1603968834,
+ "exp": 2550653634,
+ "aud": "",
+ "sub": "",
+ "Role": "service_role"
+}
+```
+ 
 
 ## Configuring each service
 
