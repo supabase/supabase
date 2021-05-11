@@ -1,0 +1,161 @@
+version: '3.6'
+services:
+  kong:
+    container_name: supabase-kong
+    build:
+      context: ../dockerfiles/kong
+    environment:
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+      KONG_PLUGINS: request-transformer,cors,key-auth,http-log
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.supabase-kong.entrypoints: ${TRAEFIK_SECURE_ENTRYPOINT}
+      traefik.http.routers.supabase-kong.tls: 'true'
+      traefik.http.services.supabase-kong.loadbalancer.server.port: ${KONG_PORT}
+      traefik.docker.network: ${TRAEFIK_NETWORK}
+      traefik.http.routers.supabase-kong.rule: 'Host(`${SUPABASE_HOSTNAME}`) && PathPrefix(`/kong/`)'
+      traefik.http.routers.supabase-kong.middlewares: repl-supabase-kong@docker
+      traefik.http.middlewares.repl-supabase-kong.replacepathregex.regex: ^/kong/(.*)
+      traefik.http.middlewares.repl-supabase-kong.replacepathregex.replacement: /$$1
+    networks:
+      - rp
+      - db
+  auth:
+    container_name: supabase-auth
+    image: supabase/gotrue:latest
+    depends_on:
+      - db
+    ports:
+      - ${AUTH_PORT}
+    environment:
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      GOTRUE_JWT_EXP: 3600
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_DB_DRIVER: postgres
+      DB_NAMESPACE: auth
+      API_EXTERNAL_URL: ${SUPABASE_HOSTNAME}
+      GOTRUE_API_HOST: 0.0.0.0
+      PORT: ${AUTH_PORT}
+
+      GOTRUE_DISABLE_SIGNUP: 'false'
+      GOTRUE_SITE_URL: ${SUPABASE_HOSTNAME}
+      GOTRUE_MAILER_AUTOCONFIRM: 'true'
+      GOTRUE_LOG_LEVEL: DEBUG
+      GOTRUE_OPERATOR_TOKEN: ${OPERATOR_TOKEN}
+      DATABASE_URL: 'postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres?sslmode=disable'
+
+      GOTRUE_SMTP_HOST: ${SMTP_HOST}
+      GOTRUE_SMTP_PORT: ${SMTP_PORT}
+      GOTRUE_SMTP_USER: ${SMTP_USER}
+      GOTRUE_SMTP_PASS: ${SMTP_PASS}
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.supabase-auth.entrypoints: ${TRAEFIK_SECURE_ENTRYPOINT}
+      traefik.http.services.supabase-auth.loadbalancer.server.port: ${AUTH_PORT}
+      traefik.http.routers.supabase-auth.tls: 'true'
+      traefik.docker.network: ${TRAEFIK_NETWORK}
+      traefik.http.routers.supabase-auth.rule: 'Host(`${SUPABASE_HOSTNAME}`) && PathPrefix(`/auth/`)'
+      traefik.http.routers.supabase-auth.middlewares: repl-supabase-auth@docker
+      traefik.http.middlewares.repl-supabase-auth.replacepathregex.regex: ^/auth/(.*)
+      traefik.http.middlewares.repl-supabase-auth.replacepathregex.replacement: /$$1
+    networks:
+      - rp
+      - db
+  rest:
+    container_name: supabase-rest
+    image: postgrest/postgrest:latest
+    depends_on:
+      - db
+    restart: always
+    environment:
+      PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: postgres
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.supabase-rest.entrypoints: ${TRAEFIK_SECURE_ENTRYPOINT}
+      traefik.http.services.supabase-rest.loadbalancer.server.port: ${REST_PORT}
+      traefik.http.routers.supabase-rest.tls: 'true'
+      traefik.docker.network: ${TRAEFIK_NETWORK}
+      traefik.http.routers.supabase-rest.rule: 'Host(`${SUPABASE_HOSTNAME}`) && PathPrefix(`/rest/`)'
+      traefik.http.routers.supabase-rest.middlewares: repl-supabase-rest@docker
+      traefik.http.middlewares.repl-supabase-rest.replacepathregex.regex: ^/rest/(.*)
+      traefik.http.middlewares.repl-supabase-rest.replacepathregex.replacement: /$$1
+    networks:
+      - rp
+      - db
+  realtime:
+    container_name: supabase-realtime
+    image: supabase/realtime:latest
+    depends_on:
+      - db
+    restart: on-failure
+    environment:
+      DB_HOST: db
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_PORT: ${POSTGRES_PORT}
+      PORT: ${REALTIME_PORT}
+      HOSTNAME: localhost
+      # Disable JWT Auth locally. The JWT_SECRET will be ignored.
+      SECURE_CHANNELS: 'false'
+      JWT_SECRET: ${JWT_SECRET}
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.supabase-realtime.entrypoints: ${TRAEFIK_SECURE_ENTRYPOINT}
+      traefik.http.services.supabase-realtime.loadbalancer.server.port: ${REALTIME_PORT}
+      traefik.http.routers.supabase-realtime.tls: 'true'
+      traefik.docker.network: ${TRAEFIK_NETWORK}
+      traefik.http.routers.supabase-realtime.rule: 'Host(`${SUPABASE_HOSTNAME}`) && PathPrefix(`/realtime/`)'
+      traefik.http.routers.supabase-realtime.middlewares: repl-supabase-realtime@docker
+      traefik.http.middlewares.repl-supabase-realtime.replacepathregex.regex: ^/realtime/(.*)
+      traefik.http.middlewares.repl-supabase-realtime.replacepathregex.replacement: /$$1
+    networks:
+      - rp
+      - db
+  db:
+    container_name: supabase-db
+    build:
+      context: ../dockerfiles/postgres
+    ports:
+      - ${POSTGRES_PORT}
+    command:
+      - postgres
+      - -c
+      - wal_level=logical
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+    networks:
+      - db
+  pgadmin:
+    container_name: supabase-pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      SCRIPT_NAME: /pgadmin
+      PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
+    volumes:
+      - ../config/pgadmin/servers.json:/pgadmin4/servers.json
+      - ../config/pgadmin/config.py:/pgadmin4/config.py
+    networks:
+      - db
+      - rp
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.supabase-pgadmin.entrypoints: ${TRAEFIK_SECURE_ENTRYPOINT}
+      traefik.http.services.supabase-pgadmin.loadbalancer.server.port: ${PGADMIN_PORT}
+      traefik.http.routers.supabase-pgadmin.tls: 'true'
+      traefik.docker.network: ${TRAEFIK_NETWORK}
+      traefik.http.routers.supabase-pgadmin.rule: 'Host(`${SUPABASE_HOSTNAME}`) && PathPrefix(`/pgadmin`)'
+
+networks:
+  rp:
+    name: ${TRAEFIK_NETWORK}
+  db:
