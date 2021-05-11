@@ -1,11 +1,10 @@
-
-## Docker
+# Supabase Docker
 
 You can run Supabase on your local machine using `docker-compose`:
 
 - Add passwords to the .env file
 
-- Starting all services: `docker-compose up -d`
+- Starting all services: `docker-compose up`
 - Stopping all services: `docker-compose down`
 
 **Usage**
