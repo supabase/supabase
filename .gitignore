@@ -101,3 +101,7 @@ typings/
 
 .vscode
 .vercel
+
+#include template .env file for docker-compose
+!docker/supabase/.env
+!docker/supabase-traefik/.env

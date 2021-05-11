@@ -1,0 +1,88 @@
+version: '3.6'
+services:
+  kong:
+    container_name: supabase-kong
+    build:
+      context: ../dockerfiles/kong
+    environment:
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+      KONG_PLUGINS: request-transformer,cors,key-auth,http-log
+    ports:
+      - ${KONG_PORT}:8000/tcp
+      - ${KONG_PORT_TLS}:8443/tcp
+  auth:
+    container_name: supabase-auth
+    image: supabase/gotrue:latest
+    ports:
+      - ${AUTH_PORT}
+    depends_on:
+      - db
+    environment:
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      GOTRUE_JWT_EXP: 3600
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_DB_DRIVER: postgres
+      DB_NAMESPACE: auth
+      API_EXTERNAL_URL: localhost
+      GOTRUE_API_HOST: 0.0.0.0
+      PORT: ${AUTH_PORT}
+
+      GOTRUE_SMTP_HOST: ${SMTP_HOST}
+      GOTRUE_SMTP_PORT: ${SMTP_PORT}
+      GOTRUE_SMTP_USER: ${SMTP_USER}
+      GOTRUE_SMTP_PASS: ${SMTP_PASS}
+
+      GOTRUE_DISABLE_SIGNUP: 'false'
+      GOTRUE_SITE_URL: localhost
+      GOTRUE_MAILER_AUTOCONFIRM: 'true'
+      GOTRUE_LOG_LEVEL: DEBUG
+      GOTRUE_OPERATOR_TOKEN: ${OPERATOR_TOKEN}
+      DATABASE_URL: 'postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres?sslmode=disable'
+
+  rest:
+    container_name: supabase-rest
+    image: postgrest/postgrest:latest
+    ports:
+      - ${REST_PORT}:3000
+    depends_on:
+      - db
+    restart: always
+    environment:
+      PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: postgres
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+  realtime:
+    container_name: supabase-realtime
+    image: supabase/realtime:latest
+    ports:
+      - ${REALTIME_PORT}
+    depends_on:
+      - db
+    restart: on-failure
+    environment:
+      DB_HOST: db
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_PORT: ${POSTGRES_PORT}
+      PORT: ${REALTIME_PORT}
+      HOSTNAME: localhost
+      # Disable JWT Auth locally. The JWT_SECRET will be ignored.
+      SECURE_CHANNELS: 'false'
+      JWT_SECRET: ${JWT_SECRET}
+  db:
+    container_name: supabase-db
+    build:
+      context: ../dockerfiles/postgres
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    command:
+      - postgres
+      - -c
+      - wal_level=logical
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PORT: ${POSTGRES_PORT}
