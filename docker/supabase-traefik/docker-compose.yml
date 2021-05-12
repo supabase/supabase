@@ -155,6 +155,10 @@ services:
       traefik.docker.network: ${TRAEFIK_NETWORK}
       traefik.http.routers.supabase-pgadmin.rule: 'Host(`${SUPABASE_HOSTNAME}`) && PathPrefix(`/pgadmin`)'
 
+
+
+
+      
 networks:
   rp:
     name: ${TRAEFIK_NETWORK}
