@@ -24,7 +24,7 @@ Supabase is an amalgamation of five open source tools (and growing). Some of the
 
 ### Do you support `[some other database]`?
 
-At the moment, we only support PostgreSQL. It's unlikely we'll ever move away from Postgres, however you can [vote on a new database](https://github.com/supabase/supabase/issues/6) if you want us to start development.
+At the moment, we only support PostgreSQL. It's unlikely we'll ever move away from Postgres; however, you can [vote on a new database](https://github.com/supabase/supabase/issues/6) if you want us to start development.
 
 ### Do you have a library for `[some other language]`?
 
