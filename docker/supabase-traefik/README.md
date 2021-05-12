@@ -14,7 +14,7 @@
 - ports 443 and 80 aren't used yet
 
 
-## getting started without script
+## getting started
 traefik is a proxy that gets its configuration from the docker-compose labels.
 
 the labels needed for supabase are already provided in the docker-compose.yml.
