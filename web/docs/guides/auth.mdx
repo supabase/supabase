@@ -22,8 +22,8 @@ Supabase provides the routes to [sign up](/docs/reference/javascript/auth-signup
 
 We currently support the following OAuth providers:
 - Google
-- Github
-- Gitlab
+- GitHub
+- GitLab
 - Azure
 - Facebook
 - Bitbucket
@@ -32,14 +32,14 @@ We currently support the following OAuth providers:
 
 You can enable providers by navigating to Authentication > Settings > External OAuth Providers and inputting your `Client ID` and `Secret` for each.
 
-To fetch these you need to:
+To fetch these, you need to:
 
-1. Generate `Client ID` and `Secret` ([google](https://console.developers.google.com/apis/credentials), [github](https://github.com/settings/applications/new), [gitlab](https://gitlab.com/oauth/applications), [bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/))
-2. Enter Authorized Redirect URI: `https://<your-project>.supabase.co/auth/v1/callback` on provider dashboard
+1. Generate `Client ID` and `Secret` ([Google](https://console.developers.google.com/apis/credentials), [GitHub](https://github.com/settings/applications/new), [GitLab](https://gitlab.com/oauth/applications), [Bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)).
+2. Enter Authorized Redirect URI: `https://<your-project>.supabase.co/auth/v1/callback` on provider dashboard.
 
 ### Row Level Security
 
-Authentication only gets you so far. When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html). Supabase makes it simple to turn RLS on and off.
+Authentication only gets you so far. When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html). Supabase makes it simple to turn RLS on and off.
 
 <video width="99%" muted playsInline controls="true">
 <source src="/videos/rls-zoom2.mp4" type="video/mp4" muted playsInline />
@@ -78,7 +78,7 @@ let user = await supabase
 // Still => { id: 'd0714948', name: 'Jane' }
 ```
 
-### Policies are like where clauses.
+### Policies Are Like `WHERE` Clauses
 
 Policies are easy to understand once you get the hang of them. You can just think of them as adding a `WHERE` clause to every query. For example if you had a policy like this:
 
@@ -95,19 +95,19 @@ from todos
 where auth.uid() = todos.user_id; -- Policy is implicitly added.
 ```
 
-## How it works
+## How It Works
 
 1. A user signs up. Supabase creates a new user in the `auth.users` table.
 2. Supabase returns a new JWT, which contains the user's `UUID`.
 3. Every request to your database also sends the JWT.
 4. Postgres inspects the JWT to determine the user making the request.
-5. The user's UID can be used in Policies to restrict access to rows. 
+5. The user's UID can be used in policies to restrict access to rows. 
 
-Supabase provides a special function in Postgres, `auth.uid()`, which extracts the user's UID from the JWT. This is especially useful when creating Policies.
+Supabase provides a special function in Postgres, `auth.uid()`, which extracts the user's UID from the JWT. This is especially useful when creating policies.
 
 ## Policy Examples
 
-Here are some examples to show you the power of PostgreSQL's Row Level Security. Each policy is attached to a table, and the policy is executed
+Here are some examples to show you the power of PostgreSQL's RLS. Each policy is attached to a table, and the policy is executed
 every time a the table is accessed.
 
 ### Allow read access 
@@ -130,9 +130,9 @@ create policy "Public profiles are viewable by everyone."
   );
 ```
 
-1. Creates a table called `profiles` in the public schema (default schema)
-2. Enables Row Level Security
-3. Creates a Policy which allows all `select` queries to run. 
+1. Creates a table called `profiles` in the public schema (default schema).
+2. Enables Row Level Security.
+3. Creates a policy which allows all `select` queries to run. 
 
 
 ### Restrict updates 
@@ -155,9 +155,9 @@ create policy "Users can update their own profiles."
   );
 ```
 
-1. Creates a table called `profiles` in the public schema (default schema)
-2. Enables Row Level Security
-3. Creates a Policy which allows logged in users to update their own data.
+1. Creates a table called `profiles` in the public schema (default schema).
+2. Enables RLS.
+3. Creates a policy which allows logged in users to update their own data.
 
 
 ### Policies with joins
@@ -193,7 +193,7 @@ create policy "Team members can update team details if they belong to the team."
 
 ### Policies with security definer functions
 
-Policies can also make use of `security definer functions`, this is useful in a many-to-many relationship where you want to restrict access to the linking table. Following the `teams` and `members` example from above this example shows how you can use security definer function in combination with a policy to control access to the `members` table.
+Policies can also make use of `security definer functions`. This is useful in a many-to-many relationship where you want to restrict access to the linking table. Following the `teams` and `members` example from above, this example shows how you can use security definer function in combination with a policy to control access to the `members` table.
 
 ```sql
 -- 1. Follow example for 'Policies with joins' above
@@ -245,12 +245,12 @@ create policy "Only Blizzard staff can update leaderboard"
   );
 ```
 
-### Advanced Policies
+### Advanced policies
 
 Use the full power of SQL to build extremely advanced rules.
 
-In this example we will create a `posts` and `comments` database and then create a policy that depends on another policy. 
-(In this case the comments policy depends on the posts policy.)
+In this example, we will create a `posts` and `comments` database and then create a policy that depends on another policy. 
+(In this case, the comments policy depends on the posts policy.)
 
 ```sql
 create table posts (
@@ -298,39 +298,37 @@ using (
 
 ## Tips
 
-### You don't have to use Policies 
+### You don't have to use policies 
 
-You can also put your authorization rules in your middleware, 
-similar to how you would create security rules with any other `backend <-> middleware <-> frontend` architecture.
+You can also put your authorization rules in your middleware, similar to how you would create security rules with any other `backend <-> middleware <-> frontend` architecture.
 
 Policies are a tool. In the case of "serverless/Jamstack" setups, they are especially effective because you don't have to deploy any middleware at all.
 
-However if you want to use another Authorization method for your applications, that's also fine. Supabase is "just Postgres", so if your application 
+However, if you want to use another authorization method for your applications, that's also fine. Supabase is "just Postgres", so if your application 
 works with Postgres, then it also works with Supabase. 
 
-Tip: make sure to enable Row Level Security for all your tables, so that your tables are inaccessible. Then use the "Service" which we provide. 
-"Service" are designed to bypass RLS.
+Tip: Make sure to enable RLS for all your tables, so that your tables are inaccessible. Then use the "Service" which we provide, which is designed to bypass RLS.
 
 ### Check authentication settings on Supabase
 
 Navigate to Authentication > Settings on [app.supabase.io](https://app.supabase.io), and you'll be able to change settings for things like:
 
 - SITE URL, which is used for determining where to redirect users after they confirm their email addresses or attempt to use a magic link to log in.
-- Disabling email confirmations
-- Enabling external OAuth providers, such as Google and GitHub
+- Disabling email confirmations.
+- Enabling external OAuth providers, such as Google and GitHub.
 
-### Never use a service key on the client.
+### Never use a service key on the client
 
-Supabase provides special "Service" keys, which can be used to bypass all Row Level Security. 
+Supabase provides special "Service" keys, which can be used to bypass all RLS. 
 These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.
 
-### Create a `public.users` table.
+### Create a `public.users` table
 
 Even though Supabase provides an `auth.users` table, it is helpful to also create a users table in the `public` schema, which uses the same UID Primary Key as the `auth.users`.
-For security purposes, the `auth` schema is not exposed on the auto-generated API. Creating a `public.users` table allows you to interact via the Supabase client - 
+For security purposes, the `auth` schema is not exposed on the auto-generated API. Creating a `public.users` table allows you to interact via the Supabase client – 
 especially useful for cross-table queries.
 
-Pro tip: if you want to add a row to your `public.users` table every time a user signs up, you can use triggers. For example:
+Pro tip: If you want to add a row to your `public.users` table every time a user signs up, you can use triggers. For example:
 
 ```sql
 -- inserts a row into public.users
@@ -351,8 +349,7 @@ create trigger on_auth_user_created
 
 ### Disable realtime for private tables
 
-Our realtime server doesn't provide per-user security. Until we build a more robust auth system for websockets, 
-you can disable realtime functionality for any private tables. To do this, you can manage the underlying Postgres replication publication:
+Our realtime server doesn't provide per-user security. Until we build a more robust auth system for WebSockets, you can disable realtime functionality for any private tables. To do this, you can manage the underlying Postgres replication publication:
 
 ```sql
 /**
@@ -377,7 +374,7 @@ alter publication supabase_realtime add table posts;
 
 We're in the process of building enhanced realtime security.
 
-## Next steps
+## Next Steps
 
-- Read more about [Row Level Security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
+- Read more about [Row Level Security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html).
 - Sign in: [app.supabase.io](https://app.supabase.io)
