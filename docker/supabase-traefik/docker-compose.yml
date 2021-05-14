@@ -142,8 +142,8 @@ services:
       SCRIPT_NAME: /pgadmin
       PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
     volumes:
-      - ../config/pgadmin/servers.json:/pgadmin4/servers.json
-      - ../config/pgadmin/config.py:/pgadmin4/config.py
+      - ./config/pgadmin/servers.json:/pgadmin4/servers.json
+      - ./config/pgadmin/config.py:/pgadmin4/config.py
     networks:
       - db
       - rp

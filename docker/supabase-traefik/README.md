@@ -15,7 +15,7 @@
 
 
 ## getting started
-traefik is a proxy that gets its configuration from the docker-compose labels.
+traefik is a proxy that gets it's configuration from the docker-compose labels.
 
 the labels needed for supabase are already provided in the docker-compose.yml.
 
