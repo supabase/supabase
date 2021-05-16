@@ -106,29 +106,34 @@ supabase.example.com/pgadmin/
 ```
 
 
+### **kong**
+
+```
+supabase.example.com/kong/v1/
+```
+
 ### **auth**
 
 ```
-supabase.example.com/auth/
+supabase.example.com/auth/v1/
 ```
-you can test auth with 
+
+you can test auth with
 
 ```
-supabase.example.com/auth/settings 
+supabase.example.com/auth/v1/settings
 ```
+
 as the default path returns 404
 
 ### **realtime**
+
 ```
-supabase.example.com/realtime/
+supabase.example.com/realtime/v1/
 ```
 
 ### **rest**
-```
-supabase.example.com/rest/
-```
 
-### **kong**
 ```
-supabase.example.com/kong/
+supabase.example.com/rest/v1/
 ```
