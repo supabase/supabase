@@ -184,7 +184,6 @@ const Nav = (props: Props) => {
 
   return (
     <>
-      {/* Announcement Nav */}
       <div className="sticky top-0 z-50">
         <nav className="bg-white dark:bg-gray-800 border-b dark:border-gray-600">
           {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
@@ -196,7 +195,11 @@ const Nav = (props: Props) => {
                   <Link href="/" as="/">
                     <img
                       className="block h-6 w-auto"
-                      src={darkMode ? `${basePath}/images/logo-dark.png` : `${basePath}/images/logo-light.png`}
+                      src={
+                        darkMode
+                          ? `${basePath}/images/logo-dark.png`
+                          : `${basePath}/images/logo-light.png`
+                      }
                       alt="Logo"
                     />
                   </Link>
