@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
+import React, { useEffect } from 'react'
 import Transition from 'lib/Transition'
 
 type Props = {
@@ -12,7 +12,6 @@ type Props = {
 
 const FlyOut = (props: Props) => {
   const { title = '', children, className = '', singleBgColor = false, handleCancel } = props
-  const [show, setShow] = useState(false)
 
   useEffect(() => {
     function handleScroll() {
@@ -20,31 +19,7 @@ const FlyOut = (props: Props) => {
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
-  })
-
-  // function handleToggle() {
-  //   setShow(!show)
-  //   props.handleClick()
-  // }
-
-  // useImperativeHandle(
-  //   ref,
-  //   () => ({
-  //       close() {
-  //         setShow(false)
-  //       }
-  //   }),
-  // )
-
-  // useEffect(() => {
-  //   // window is accessible here.
-  //   window.addEventListener('scroll', function (e) {
-  //     // close Fly Out window if user scrolls past 96px from top
-  //     if (window.pageYOffset > 96) {
-  //       setShow(false)
-  //     }
-  //   })
-  // }, [])
+  }, [])
 
   return (
     <>
@@ -59,19 +34,7 @@ const FlyOut = (props: Props) => {
         leaveTo="opacity-0 translate-y-1"
       >
         <>
-          <div
-            className="absolute inset-x-0 transform shadow-lg border-gray-100 dark:border-dark-500"
-            style={{
-              zIndex: 999,
-              position: 'absolute',
-              width: '100%',
-              margin: '0 auto',
-              marginTop: '63px',
-              left: '-50vw',
-              right: '-50vw',
-              top: 0,
-            }}
-          >
+          <div className="absolute inset-x-0 transform shadow-lg border-gray-100 dark:border-dark-500 w-full hidden lg:block bg-white dark:bg-gray-600">
             <div
               className="border-b dark:border-gray-600 absolute inset-0 flex sm:flex-col lg:flex-row"
               aria-hidden="true"
@@ -83,23 +46,16 @@ const FlyOut = (props: Props) => {
                 } sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full`}
               />
             </div>
-            <div
-              className={`container relative mx-auto lg:grid-cols-2 px-6 lg:px-10 xl:px-14 py-2`}
-            >
+            <div className="container relative mx-auto lg:grid-cols-2 px-6 lg:px-10 xl:px-14 py-2">
               {children}
             </div>
-          </div>
-          <div
-            className="fixed inset-0 t-63 transition-opacity bg-red"
-            style={{
-              zIndex: 100,
-              top: '63px',
-              marginLeft: 0,
-              pointerEvents: 'visiblePainted',
-            }}
-            onClick={() => props.handleCancel()}
-          >
-            <div className="absolute inset-0 opacity-0"></div>
+            <div
+              className="z-50 w-full h-screen absolute opacity-0"
+              style={{
+                pointerEvents: 'visiblePainted',
+              }}
+              onClick={() => props.handleCancel()}
+            ></div>
           </div>
         </>
       </Transition>
