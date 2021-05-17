@@ -6,11 +6,11 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) adalah alternatif Firebase sumber terbuka. Kami membangun fitur-fitur Firebase menggunakan alat-alat sumber terbuka tingkat perusahaan.
+[Supabase](https://supabase.io) adalah alternatif sumber terbuka dari Firebase. Kami membangun fitur-fitur Firebase menggunakan alat-alat sumber terbuka tingkat perusahaan.
 
 - [x] Hosting database Postgres
 - [x] Langganan waktu nyata (Realtime)
-- [x] Autentikasi dan otorisasi
+- [x] Otentikasi dan otorisasi
 - [x] API-API yang dibuat otomatis
 - [x] Dasbor
 - [x] Penyimpanan
@@ -49,7 +49,7 @@ Supabase adalah sebuah [platform yang dihosting](https://app.supabase.io). Anda 
 
 ![Arsitektur](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
-- [PostgreSQL](https://www.postgresql.org/) adalah sebuah sistem basis data dengan pengembangan aktif lebih dari 30 tahun sehingga memiliki reputasi yang kuat dalam keandalan, ketahanan fitur, dan kinerja.
+- [PostgreSQL](https://www.postgresql.org/) adalah sebuah sistem database objek-relasional dengan pengembangan aktif lebih dari 30 tahun sehingga memiliki reputasi yang kuat dalam keandalan, ketahanan fitur, dan kinerja.
 - [Realtime](https://github.com/supabase/realtime) adalah sebuah server Elixir yang memungkinkan anda mendengarkan penyisipan, perubahan, dan penghapusan dari PostgreSQL menggunakan WebSocket. Supabase mendengarkan fungsionalitas replikasi bawaan Postgres, mengubah stream byte ke JSON, kemudian JSON tersebut disiarkan melalui WebSocket.
 - [PostgREST](http://postgrest.org/) adalah sebuah web server yang mengubah database PostgreSQL anda menjadi sebuah RESTful API secara langsung
 - [Storage](https://github.com/supabase/storage-api) menyediakan antarmuka RESTful untuk mengelola file-file yang disimpan di dalam S3, menggunakan Postgres untuk mengelola izin
