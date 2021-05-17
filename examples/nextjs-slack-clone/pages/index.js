@@ -1,9 +1,7 @@
-import { useState, useContext } from 'react'
-import UserContext from 'lib/UserContext'
+import { useState } from 'react'
 import { supabase } from 'lib/Store'
 
 const Home = () => {
-  const { signIn } = useContext(UserContext)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
