@@ -9,6 +9,7 @@
 - [Greek / Ελληνικά](/i18n/README.gr.md)
 - [Hindi / हिंदी](/i18n/README.hi.md)
 - [Nepali / नेपाली](/i18n/README.ne.md)
+- [Indonesian / Bahasa Indonesia](/i18n/README.id.md)
 - [Italiano / Italian](/i18n/README.it.md)
 - [Japanese / 日本語](/i18n/README.jp.md)
 - [Norwegian (Bokmål) / Norsk (Bokmål)](/i18n/README.nb-no.md)
