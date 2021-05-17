@@ -39,7 +39,7 @@ Kami saat ini dalam Public Beta. Amati "releases" dari repositori ini untuk pemb
 
 ---
 
-## Cara bekerja
+## Cara kerjanya
 
 Supabase adalah kombinasi dari alat-alat sumber terbuka. Kami membangun fitur-fitur Firebase menggunakan produk-produk sumber terbuka tingkat perusahaan. Jika ada alat dan komunitas, dengan  MIT, Apache 2, atau lisensi terbuka yang setara, kami akan menggunakan dan mendukung alat tersebut. Jika alat tersebut tidak ada, kami akan membuat dan membuka sumbernya sendiri. Supabase bukanlah salinan persis dari Firebase. Tujuan kami adalah memberi pengguna kemampuan untuk menggunakan produk yang mirip dengan Firebase, tetapi sepenuhnya bersumber terbuka.
 
@@ -73,15 +73,12 @@ Library klien kami bersifat modular. Setiap sub-library adalah sebuah implementa
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                \| `Ruby`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      \| `Ruby`                                                |
 
-<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
-<!--- Keep only the link to the list of translation files-->
-
 ## Terjemahan
 
-- [Daftar terjemahan](/i18n/languages.md) <!--- Keep only this -->
+- [Daftar terjemahan](/i18n/languages.md)
 
 ---
 
 ## Sponsor
 
-[![Sponsor Baru](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
+[![Menjadi sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
