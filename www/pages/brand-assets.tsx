@@ -24,7 +24,7 @@ const Index = () => {
               <div>
                 <Title>Brand assets</Title>
                 <Title level={3}>Download official Supabase logos</Title>
-                <Text type="secondary">
+                <Text>
                   All Supabase trademarks, logos, or other brand elements can never be modified or
                   used for any other purpose other than to represent Supabase Inc.
                 </Text>
