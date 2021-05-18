@@ -123,9 +123,11 @@ function BlogPostPage(props: any) {
         <Space>
           {props.blog.tags.map((tag: string) => {
             return (
-              <a href={`/blog/tags/${tag}`}>
-                <Badge key={`categroy-badge-`}>{tag}</Badge>
-              </a>
+              <Link href={`/blog/tags/${tag}`}>
+                <a>
+                  <Badge key={`categroy-badge-`}>{tag}</Badge>
+                </a>
+              </Link>
             )
           })}
         </Space>
@@ -221,7 +223,7 @@ function BlogPostPage(props: any) {
               <div className="col-span-12 lg:col-span-8">
                 {props.blog.thumb && (
                   <img
-                    src={'/new/images/blog/' + props.blog.thumb}
+                    src={'/images/blog/' + props.blog.thumb}
                     className="object-cover -mt-32 mb-8 border dark:border-gray-600"
                     style={{ maxHeight: '520px', width: '100%' }}
                   />

@@ -28,7 +28,7 @@ So today we are adding [PgBouncer](https://www.pgbouncer.org/), an open source c
 
 ## What is Connection Pooling?
 
-![Connection Pooling](/new/images/blog/bouncer/connection-pool.png)
+![Connection Pooling](/images/blog/bouncer/connection-pool.png)
 
 Typically when a client connects to a PostgreSQL database, they need to open and manage their own database connection. With a connection pool, 
 connections are already opened and available for use. When a client makes a request, they use a connection from the pool. When the transaction 
@@ -68,7 +68,7 @@ this is to increase your database resources so that it processes queries faster 
 
 ## Using Connection Pooling in Supabase
 
-![Pooling UI](/new/images/blog/bouncer/pooler-supabase.png)
+![Pooling UI](/images/blog/bouncer/pooler-supabase.png)
 
 From today, all new projects will include connection pooling. In the `Database` section of our dashboard, you will notice a new section for it. 
 Under the hood, we utilise PgBouncer which is installed in the same server as PostgreSQL. Through the dashboard, we provide you with the 

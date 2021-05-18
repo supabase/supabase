@@ -83,13 +83,11 @@ const Nav = (props: Props) => {
       </div>
     )
     return url ? (
-      <a
-        key={`solution_${idx}`}
-        href={url}
-        className="-m-3 p-3 my-2 flex flex-col justify-between rounded-lg hover:bg-gray-50 dark:hover:bg-dark-600 transition ease-in-out duration-150"
-      >
-        {content}
-      </a>
+      <Link href={url} key={`solution_`}>
+        <a className="-m-3 p-3 my-2 flex flex-col justify-between rounded-lg hover:bg-gray-50 dark:hover:bg-dark-600 transition ease-in-out duration-150">
+          {content}
+        </a>
+      </Link>
     ) : (
       <div
         key={`solution_${idx}`}
@@ -215,26 +213,28 @@ const Nav = (props: Props) => {
                     onClick={() => handleToggle(() => setOpenDevelopers(!openDevelopers))}
                     active={openDevelopers}
                   />
-                  <a
-                    href="/beta"
-                    className={`
-                    inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                    text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
-                    dark:text-dark-100 dark:hover:border-dark-100
-                  `}
-                  >
-                    Beta
-                  </a>
-                  <a
-                    href="/pricing"
-                    className={`
-                    inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                    text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
-                    dark:text-dark-100 dark:hover:border-dark-100
-                  `}
-                  >
-                    Pricing
-                  </a>
+                  <Link href="/beta">
+                    <a
+                      className={`
+                      inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
+                      text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
+                      dark:text-dark-100 dark:hover:border-dark-100
+                    `}
+                    >
+                      Beta
+                    </a>
+                  </Link>
+                  <Link href="/pricing">
+                    <a
+                      className={`
+                      inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
+                      text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
+                      dark:text-dark-100 dark:hover:border-dark-100
+                    `}
+                    >
+                      Pricing
+                    </a>
+                  </Link>
                 </div>
               </div>
               <div className="hidden lg:flex items-center sm:space-x-4">
@@ -293,41 +293,30 @@ const Nav = (props: Props) => {
                   </button>
                 </div>
               </div>
-              {/* </div> */}
               <div className="mt-6 mb-12">
                 <div className="pt-2 pb-4 space-y-1">
-                  <a
-                    href="https://app.supabase.io/api/login"
-                    className="block pl-3 pr-4 text-base font-medium text-gray-600 dark:text-white"
-                  >
-                    Sign in
-                  </a>
+                  <Link href="https://app.supabase.io/api/login">
+                    <a className="block pl-3 pr-4 text-base font-medium text-gray-600 dark:text-white">
+                      Sign in
+                    </a>
+                  </Link>
                 </div>
                 <div className="pt-2 pb-4 space-y-1">
-                  <a
-                    href="/docs"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
-                  >
-                    Product
-                  </a>
-                  <a
-                    href="/docs"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
-                  >
-                    Developers
-                  </a>
-                  <a
-                    href="/docs"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
-                  >
-                    Company
-                  </a>
-                  <a
-                    href="/pricing"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
-                  >
-                    Pricing
-                  </a>
+                  <Link href="/docs">
+                    <a className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white">
+                      Documentation
+                    </a>
+                  </Link>
+                  <Link href="/beta">
+                    <a className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white">
+                      Beta
+                    </a>
+                  </Link>
+                  <Link href="/pricing">
+                    <a className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white">
+                      Pricing
+                    </a>
+                  </Link>
                 </div>
                 <div className="p-3">
                   <p className="mb-6 text-sm text-gray-400">Products available:</p>

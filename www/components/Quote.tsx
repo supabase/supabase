@@ -18,7 +18,7 @@ export default function Quote(props: Props) {
         </blockquote>
         <Space size={4} className="align-center">
           <img
-            src={'/new/images/blog/avatars/' + img}
+            src={'/images/blog/avatars/' + img}
             className="rounded-full w-16 h-16 object-cover text-center"
             style={{ margin: 0 }}
           />

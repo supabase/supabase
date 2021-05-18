@@ -4,6 +4,7 @@ import CaseStudiesData from 'data/CaseStudies.json'
 import { useRouter } from 'next/router'
 import ProductIcon from '../ProductIcon'
 import { Typography, Badge } from '@supabase/ui'
+import Link from 'next/link'
 
 const Product = () => {
   const { basePath } = useRouter()
@@ -35,13 +36,11 @@ const Product = () => {
     )
     return (
       url && (
-        <a
-          key={name}
-          href={url}
-          className="p-3 col-span-6 rounded hover:bg-gray-50 dark:hover:bg-dark-700 transition"
-        >
-          {content}
-        </a>
+        <Link key={name} href={url}>
+          <a className="p-3 col-span-6 rounded hover:bg-gray-50 dark:hover:bg-dark-700 transition">
+            {content}
+          </a>
+        </Link>
       )
     )
   })
@@ -61,24 +60,23 @@ const Product = () => {
               }
               return (
                 <li className="flow-root" key={`flyout_case_${idx}`}>
-                  <a
-                    href={caseStudy.url}
-                    className="p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition ease-in-out duration-150 border dark:border-gray-600"
-                  >
-                    <div className="hidden sm:block flex-shrink-0">
-                      <img
-                        className="w-32 h-20 object-cover rounded-md"
-                        src={`${basePath}/${caseStudy.imgUrl}`}
-                        alt="caseStudyThumb"
-                      />
-                    </div>
-                    <div className="min-w-0 flex-1 sm:ml-8">
-                      <Typography.Title level={5} className="mb-0">
-                        {caseStudy.title}
-                      </Typography.Title>
-                      <Typography.Text>{caseStudy.description}</Typography.Text>
-                    </div>
-                  </a>
+                  <Link href={caseStudy.url}>
+                    <a className="p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition ease-in-out duration-150 border dark:border-gray-600">
+                      <div className="hidden sm:block flex-shrink-0">
+                        <img
+                          className="w-32 h-20 object-cover rounded-md"
+                          src={`/${caseStudy.imgUrl}`}
+                          alt="caseStudyThumb"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1 sm:ml-8">
+                        <Typography.Title level={5} className="mb-0">
+                          {caseStudy.title}
+                        </Typography.Title>
+                        <Typography.Text>{caseStudy.description}</Typography.Text>
+                      </div>
+                    </a>
+                  </Link>
                 </li>
               )
             })}
