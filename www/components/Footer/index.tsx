@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router'
 import FooterLinks from 'data/Footer.json'
 import SectionContainer from '../Layouts/SectionContainer'
 import DarkModeToggle from '../DarkModeToggle'
@@ -9,7 +8,6 @@ type Props = {
 }
 
 const Footer = (props: Props) => {
-  const { basePath } = useRouter()
   const { darkMode, updateTheme } = props
 
   return (
@@ -25,9 +23,7 @@ const Footer = (props: Props) => {
           <div className="space-y-8 xl:col-span-1">
             <img
               className="w-40"
-              src={
-                darkMode ? `${basePath}/images/logo-dark.png` : `${basePath}/images/logo-light.png`
-              }
+              src={`/images/logo-${darkMode ? 'dark' : 'light'}.png`}
               alt="Supabase"
             />
             <div className="flex space-x-6">

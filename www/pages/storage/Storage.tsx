@@ -15,7 +15,6 @@ import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
-import { useRouter } from 'next/router'
 import Image from 'next/image'
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
@@ -29,9 +28,6 @@ import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
 
 function AuthPage() {
-  // base path for images
-  const { basePath } = useRouter()
-
   const meta_title = 'Storage | Store any digital content'
   const meta_description =
     'An open source Object store service with unlimited scalability, for any file type.'
@@ -47,7 +43,7 @@ function AuthPage() {
           url: `https://supabase.io/storage`,
           images: [
             {
-              url: `https://supabase.io${basePath}/images/product/storage/storage-og.jpg`,
+              url: 'https://supabase.io/images/product/storage/storage-og.jpg',
             },
           ],
         }}
@@ -69,7 +65,7 @@ function AuthPage() {
           image={[
             <div className="w-full header--light block">
               <Image
-                src={`${basePath}/images/product/storage/header--light.png`}
+                src="/images/product/storage/header--light.png"
                 alt="storage header"
                 layout="responsive"
                 width="1386"
@@ -78,7 +74,7 @@ function AuthPage() {
             </div>,
             <div className="w-full header--dark mr-0 dark:block">
               <Image
-                src={`${basePath}/images/product/storage/header--dark.png`}
+                src="/images/product/storage/header--dark.png"
                 alt="storage header"
                 layout="responsive"
                 width="1386"

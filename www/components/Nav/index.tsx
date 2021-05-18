@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-
 import { Badge } from '@supabase/ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
@@ -16,7 +14,6 @@ type Props = {
 }
 
 const Nav = (props: Props) => {
-  const { basePath } = useRouter()
   const { darkMode } = props
   const [open, setOpen] = useState(false)
 
@@ -193,11 +190,7 @@ const Nav = (props: Props) => {
                   <Link href="/" as="/">
                     <img
                       className="block h-6 w-auto"
-                      src={
-                        darkMode
-                          ? `${basePath}/images/logo-dark.png`
-                          : `${basePath}/images/logo-light.png`
-                      }
+                      src={`/images/logo-${darkMode ? 'dark' : 'light'}.png`}
                       alt="Logo"
                     />
                   </Link>

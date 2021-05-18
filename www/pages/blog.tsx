@@ -1,7 +1,6 @@
 import fs from 'fs'
 import { useEffect, useState } from 'react'
 
-import { useRouter } from 'next/router'
 import Head from 'next/head'
 
 import { NextSeo } from 'next-seo'
@@ -37,8 +36,6 @@ function Blog(props: any) {
   const [category, setCategory] = useState('all')
   const [blogs, setBlogs] = useState(props.blogs)
 
-  const { basePath } = useRouter()
-
   useEffect(() => {
     // Update the document title using the browser API
     setBlogs(
@@ -58,7 +55,7 @@ function Blog(props: any) {
           rel="alternate"
           type="application/rss+xml"
           title="RSS feed for blog posts"
-          href={`${basePath}/rss.xml`}
+          href="/rss.xml"
         />
       </Head>
       <NextSeo title="Blog" description="Latest news from the Supabase team." />

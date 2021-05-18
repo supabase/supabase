@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import Tabs from 'components/AdminAccess/tabs'
 import SectionHeader from 'components/UI/SectionHeader'
-import { useRouter } from 'next/router'
 import SectionContainer from '../Layouts/SectionContainer'
 import ImageCarousel from '../Carousels/ImageCarousel'
 
@@ -11,7 +10,6 @@ import { Typography } from '@supabase/ui'
 import AdminAccessData from 'data/home/admin-access.json'
 
 const AdminAccess = () => {
-  const { basePath } = useRouter()
   const [tabId, setTabId] = useState('tabTableEditor')
 
   return (

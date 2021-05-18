@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router'
 import { Tabs, Typography, Button, IconCornerRightUp, IconArrowUpRight } from '@supabase/ui'
 import { useState } from 'react'
 
@@ -29,9 +28,6 @@ interface ImageCarouselProps {
 }
 
 function ImageCarousel(props: ImageCarouselProps) {
-  // base path for images
-  const { basePath } = useRouter()
-
   // store API swiper instance
   const [imageSwiper, setImageSwiper] = useState(undefined)
   const [swiperDetails, setSwiperDetails] = useState(undefined)
@@ -109,7 +105,7 @@ function ImageCarousel(props: ImageCarouselProps) {
                   <SwiperSlide key={i}>
                     {content.img_url && (
                       <Image
-                        src={`${basePath}${content.img_url}`}
+                        src={content.img_url}
                         layout="responsive"
                         width="1460"
                         height="960"
@@ -117,7 +113,7 @@ function ImageCarousel(props: ImageCarouselProps) {
                     )}
                     {content.video_url && (
                       <video
-                        src={`${basePath}/${content.video_url}`}
+                        src={content.video_url}
                         autoPlay
                         loop
                         muted

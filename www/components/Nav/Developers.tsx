@@ -1,7 +1,6 @@
 import React from 'react'
 import DevelopersData from 'data/Developers.json'
 import AnnouncementsData from 'data/Announcements.json'
-import { useRouter } from 'next/router'
 import { Typography } from '@supabase/ui'
 import Link from 'next/link'
 
@@ -13,7 +12,6 @@ type Props = {
 }
 
 const Developers = () => {
-  const { basePath } = useRouter()
   const iconSections = Object.values(DevelopersData).map((company: Props) => {
     const { text, description, url, icon } = company
 

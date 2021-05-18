@@ -1,7 +1,5 @@
 import { useRef } from 'react'
 
-import { useRouter } from 'next/router'
-
 import { Swiper, SwiperSlide } from 'swiper/react'
 // import Swiper core and required modules
 import SwiperCore, { Navigation, Pagination } from 'swiper'
@@ -29,9 +27,6 @@ import Link from 'next/link'
 SwiperCore.use([Navigation, Pagination])
 
 function TwitterSocialProof() {
-  // base path for images
-  const { basePath } = useRouter()
-
   const prevRef = useRef(null)
   const nextRef = useRef(null)
 
@@ -103,7 +98,7 @@ function TwitterSocialProof() {
                       key={i}
                       handle={`@${tweet.handle}`}
                       quote={tweet.text}
-                      img_url={`${basePath}${tweet.img_url}`}
+                      img_url={tweet.img_url}
                     />
                   </div>
                 </SwiperSlide>

@@ -17,7 +17,6 @@ import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import AuthComponentExample from '~/components/AuthWidget/AuthComponentExample'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import CTABanner from '~/components/CTABanner'
@@ -30,9 +29,6 @@ import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
 
 function AuthPage() {
-  // base path for images
-  const { basePath } = useRouter()
-
   // supabase auth widget project details
   const supabase = createClient(
     'https://rsnibhkhsbfnncjmwnkj.supabase.co',
@@ -54,7 +50,7 @@ function AuthPage() {
           url: `https://supabase.io/auth`,
           images: [
             {
-              url: `https://supabase.io${basePath}/images/product/auth/auth-og.jpg`,
+              url: 'https://supabase.io/images/product/auth/auth-og.jpg',
             },
           ],
         }}
@@ -76,7 +72,7 @@ function AuthPage() {
           image={[
             <div className="w-full header--light block">
               <Image
-                src={`${basePath}/images/product/auth/header--light.png`}
+                src="/images/product/auth/header--light.png"
                 alt="auth header"
                 layout="responsive"
                 width="1372"
@@ -85,7 +81,7 @@ function AuthPage() {
             </div>,
             <div className="w-full header--dark mr-0 dark:block">
               <Image
-                src={`${basePath}/images/product/auth/header--dark.png`}
+                src="/images/product/auth/header--dark.png"
                 alt="auth header"
                 layout="responsive"
                 width="1372"
@@ -101,8 +97,8 @@ function AuthPage() {
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
               <p className="mb-4">
                 <Space>
-                  <img src={`${basePath}/images/product/auth/google-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/facebook-icon.svg`} width={21} />
+                  <img src="/images/product/auth/google-icon.svg" width={21} />
+                  <img src="/images/product/auth/facebook-icon.svg" width={21} />
                   <div>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -116,8 +112,8 @@ function AuthPage() {
                       />
                     </svg>
                   </div>
-                  <img src={`${basePath}/images/product/auth/gitlab-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/bitbucket-icon.svg`} width={21} />
+                  <img src="/images/product/auth/gitlab-icon.svg" width={21} />
+                  <img src="/images/product/auth/bitbucket-icon.svg" width={21} />
                 </Space>
               </p>
               <Typography.Title level={4}>All the social providers</Typography.Title>
@@ -127,7 +123,7 @@ function AuthPage() {
                   Gitlab and Bitbucket.
                 </p>
                 <Space>
-                  <img src={`${basePath}/images/product/auth/twitter-icon.svg`} width={21} />
+                  <img src="/images/product/auth/twitter-icon.svg" width={21} />
                   <p className="m-0">
                     <span className="text-gray-800 dark:text-white">Twitter</span> coming soon
                   </p>
@@ -265,7 +261,7 @@ function AuthPage() {
                 <Typography.Text type="secondary">
                   <IconX />
                 </Typography.Text>
-                <img className="w-8" src={`${basePath}/images/product/auth/react-icon.svg`} />
+                <img className="w-8" src="/images/product/auth/react-icon.svg" />
               </Space>
 
               <Typography.Title level={2} className="mb-4">

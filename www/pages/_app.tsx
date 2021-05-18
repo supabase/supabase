@@ -39,7 +39,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   }, [router.events])
 
   const site_title = `The Open Source Firebase Alternative | ${APP_NAME}`
-  const { basePath } = useRouter()
 
   return (
     <>
@@ -53,7 +52,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           site_name: 'Supabase',
           images: [
             {
-              url: `https://supabase.io${basePath}/images/og/og-image.jpg`,
+              url: 'https://supabase.io/images/og/og-image.jpg',
               width: 800,
               height: 600,
               alt: 'Supabase Og Image',

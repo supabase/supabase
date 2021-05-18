@@ -6,7 +6,6 @@ import hydrate from 'next-mdx-remote/hydrate'
 import renderToString from 'next-mdx-remote/render-to-string'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -89,8 +88,6 @@ function BlogPostPage(props: any) {
   const author = props.blog.author ? authors[props.blog.author] : authors['supabase']
   const content = hydrate(props.blog.content, { components })
 
-  const { basePath } = useRouter()
-
   const NextCard = (props: any) => {
     const { post, label, className } = props
     return (
@@ -167,7 +164,7 @@ function BlogPostPage(props: any) {
           },
           images: [
             {
-              url: `https://supabase.io${basePath}/images/blog/${
+              url: `https://supabase.io/images/blog/${
                 props.blog.thumb ? props.blog.thumb : props.blog.image
               }`,
             },

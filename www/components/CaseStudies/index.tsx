@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router'
 import Benchmark from 'components/CaseStudies/benchmark'
 import SectionHeader from 'components/UI/SectionHeader'
 import CaseStudiesData from 'data/CaseStudies.json'
@@ -7,8 +6,6 @@ import SectionContainer from '../Layouts/SectionContainer'
 import Link from 'next/link'
 
 const CaseStudies = () => {
-  const { basePath } = useRouter()
-
   return (
     <SectionContainer>
       <div>
