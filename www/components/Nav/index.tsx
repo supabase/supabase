@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Badge } from '@supabase/ui'
-import { Button } from '@supabase/ui'
+import { Button, Badge } from '@supabase/ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
