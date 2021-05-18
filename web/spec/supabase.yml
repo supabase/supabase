@@ -748,7 +748,6 @@ pages:
         js: |
           ```js
           const { data, error, count } = await supabase
-            .from('cities')
             .rpc('hello_world', { count: 'exact' })
           }
           ```
