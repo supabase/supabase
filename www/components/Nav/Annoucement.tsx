@@ -18,7 +18,7 @@ const Annoucement = () => {
   if (!a.show) return (null)
   return (
     <div className="bg-brand-700 dark:bg-brand-800">
-      <div className="flex flex-col items-center justify-center py-2 mx-auto space-x-2 text-white sm:flex-row lg:container lg:px-16 xl:px-20">
+      <div className="flex items-center justify-center py-2 mx-auto space-x-2 text-white lg:container lg:px-16 xl:px-20 text-sm md:text-base">
         <span>{a.text}</span>
         <a
           href={a.link.url}
