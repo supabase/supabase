@@ -698,6 +698,12 @@ div[class*=' codeBlockContent'],
   /* text-transform: uppercase; */
   border-bottom: 1px solid #444;
 }
+div[class^='codeBlockTitle'],
+div[class*=' codeBlockTitle'] {
+  color:#ccc !important;
+  font-size: 0.8rem !important;
+  border-color: #444;
+}
 .repsonse-header {
   border-radius: 0 0 4px 4px;
 }
