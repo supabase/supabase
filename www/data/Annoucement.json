@@ -1,5 +1,5 @@
 {
-  "show": true,
+  "show": false,
   "text": "We have released the April recap!",
   "link": {
     "url": "https://supabase.io/blog/2021/05/03/supabase-beta-april-2021",
