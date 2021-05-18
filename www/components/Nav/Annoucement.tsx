@@ -15,7 +15,7 @@ type A = {
 const a: A = data;
 
 const Annoucement = () => {
-  if (!a.show) return (<></>)
+  if (!a.show) return (null)
   return (
     <div className="bg-brand-700 dark:bg-gray-700">
       <div className="flex flex-col items-center justify-center py-2 mx-auto space-x-2 text-white sm:flex-row lg:container lg:px-16 xl:px-20">
