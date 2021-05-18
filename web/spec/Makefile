@@ -25,7 +25,7 @@ storage:
 	> $(REPO_DIR)/storage.json
 
 combine:
-	jq -s '{ name: "Combined Specs", children: [.[0], .[1], .[2], .[3]] }' \
+	jq -s '{ name: "Combined Specs", children: [.[0], .[1], .[2], .[3], .[4]] }' \
 	$(REPO_DIR)/supabase.json \
 	$(REPO_DIR)/gotrue.json \
 	$(REPO_DIR)/postgrest.json \
