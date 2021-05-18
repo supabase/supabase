@@ -81,10 +81,18 @@ module.exports = {
     },
     {
       type: 'category',
-      label: 'See Also',
+      label: 'Guides',
       collapsed: false,
       items: [
         'guides/examples',
+        'guides/with-react',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'See Also',
+      collapsed: false,
+      items: [
         'pricing',
         'support',
         'handbook/contributing',

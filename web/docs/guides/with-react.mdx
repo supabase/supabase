@@ -1,0 +1,459 @@
+---
+id: with-react
+title: "Quickstart: React"
+description: Learn how to use Supabase in your React App.
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Intro
+
+Shows you how to build a simple user management app (from scratch!) using Supabase and React. It includes:
+
+- Supabase Auth: users can sign in with magic links (no passwords, only email).
+- Supabase Storage: users can upload a photo.
+- Row Level Security: data will be locked so that individuals can only access their own data.
+
+
+
+## Database set up
+
+### Create the scehma
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'SQL', value: 'SQL'},
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "SQL" section.
+2. Click "User Management Starter".
+4. Click "Run".
+```
+
+@todo - add video
+
+</TabItem>
+<TabItem value="SQL">
+
+```sql
+-- Create a table for public "profiles"
+create table profiles (
+  id uuid references auth.users not null,
+  updated_at timestamp with time zone,
+  username text unique,
+  avatar_url text,
+  website text,
+
+  primary key (id),
+  unique(username),
+  constraint username_length check (char_length(username) >= 3)
+);
+
+alter table profiles enable row level security;
+
+create policy "Public profiles are viewable by everyone."
+  on profiles for select
+  using ( true );
+
+create policy "Users can insert their own profile."
+  on profiles for insert
+  with check ( auth.uid() = id );
+
+create policy "Users can update own profile."
+  on profiles for update
+  using ( auth.uid() = id );
+
+-- Set up Realtime!
+begin;
+  drop publication if exists supabase_realtime;
+  create publication supabase_realtime;
+commit;
+alter publication supabase_realtime add table profiles;
+
+-- Set up Storage!
+insert into storage.buckets (id, name)
+values ('avatars', 'avatars');
+
+create policy "Avatar images are publicly accessible."
+  on storage.objects for select
+  using ( bucket_id = 'avatars' );
+
+create policy "Anyone can upload an avatar."
+  on storage.objects for insert
+  with check ( bucket_id = 'avatars' );
+
+```
+
+</TabItem>
+</Tabs>
+
+
+### Get the API Keys 
+
+@todo - record video
+
+
+## Basic App
+
+We're going to build XXX
+
+
+### Initialize a react app
+
+
+Create the react app:
+
+```bash
+npx create-react-app supabase-react  --use-npm
+cd supabase-react
+```
+
+Install all the dependencies:
+
+```bash
+npm install @supabase/supabase-js
+```
+
+
+create a `.env` file
+
+```bash
+# .env
+
+REACT_APP_SUPABASE_URL=YOUR_SUPABASE_URL
+REACT_APP_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+```
+
+set up the supabase library
+
+Helper to initialize the Supabase client.
+
+```js title="src/supabaseClient.js"
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_URL
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+```
+
+Update index.css 
+
+```css
+# Todo
+
+```
+
+
+### Set up a Login component
+
+create an auth component
+
+Component to manage logins and sign ups.
+
+```jsx title="/src/Auth.js"
+import { useState } from 'react'
+import { supabase } from './supabaseClient'
+
+export default function Auth({}) {
+  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('')
+
+  const handleLogin = async (email: string) => {
+    try {
+      setLoading(true)
+      const { error, user } = await supabase.auth.signIn({ email })
+      if (error) throw error
+      alert('Check your email for the login link!')
+    } catch (error) {
+      alert(error.error_description || error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="row">
+      <div className="col-6">
+        <h1 className="header">Supabase + React</h1>
+      </div>
+      <div className="col-6 auth-widget">
+        <p className="description">Sign in via magic link with your email below</p>
+        <div>
+          <input
+            className="inputField"
+            type="email"
+            placeholder="Your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div>
+          <button
+            onClick={(e) => {
+              e.preventDefault()
+              handleLogin(email)
+            }}
+            className={'button block'}
+            disabled={loading}
+          >
+            {loading ? <span>Loading</span> : <span>Send magic link</span>}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+```
+
+
+
+### Account page
+
+create an Account component: 
+
+Allow a logged-in user to manage their account.
+
+```jsx title="src/Account.js"
+import { useState, useEffect } from 'react'
+import { supabase } from './supabaseClient'
+
+export default function Account({ session }) {
+  const [loading, setLoading] = useState<boolean>(true)
+  const [username, setUsername] = useState<string | null>(null)
+  const [website, setWebsite] = useState<string | null>(null)
+
+  useEffect(() => {
+    getProfile()
+  }, [session])
+
+  async function signOut() {
+    const { error } = await supabase.auth.signOut()
+    if (error) console.log('Error logging out:', error.message)
+  }
+
+  async function getProfile() {
+    try {
+      setLoading(true)
+      const user = supabase.auth.user()
+
+      let { data, error } = await supabase
+        .from('profiles')
+        .select(`username, website, avatar_url`)
+        .eq('id', user.id)
+        .single()
+
+      if (error) {
+        throw error
+      }
+
+      setUsername(data.username)
+      setWebsite(data.website)
+    } catch (error) {
+      console.log('error', error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function updateProfile() {
+    try {
+      setLoading(true)
+      const user = supabase.auth.user()
+
+      const updates = {
+        id: user.id,
+        username,
+        website,
+        updated_at: new Date(),
+      }
+
+      let { error } = await supabase.from('profiles').upsert(updates, {
+        returning: 'minimal', // Don't return the value after inserting
+      })
+
+      if (error) {
+        throw error
+      }
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="account">
+      <div>
+        <label htmlFor="email">Email</label>
+        <input id="email" type="text" value={session.user.email} disabled />
+      </div>
+      <div>
+        <label htmlFor="username">Name</label>
+        <input
+          id="username"
+          type="text"
+          value={username || ''}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="website">Website</label>
+        <input
+          id="website"
+          type="website"
+          value={website || ''}
+          onChange={(e) => setWebsite(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <button className="button block primary" onClick={() => updateProfile()} disabled={loading}>
+          {loading ? 'Loading ...' : 'Update'}
+        </button>
+      </div>
+
+      <div>
+        <button className="button block" onClick={() => signOut()}>
+          Sign Out
+        </button>
+      </div>
+    </div>
+  )
+}
+```
+
+### Run!
+
+
+```bash
+npm install start
+```
+
+
+
+## Bonus: User avatar photos
+
+
+Add an uploader 
+
+
+```jsx title="src/Avatar.js"
+import { useEffect, useState } from 'react'
+import { supabase } from './supabaseClient'
+
+export default function Avatar({ url, size, onUpload }) {
+  const [avatarUrl, setAvatarUrl] = useState(null)
+  const [uploading, setUploading] = useState(false)
+
+  useEffect(() => {
+    if (url) downloadImage(url)
+  }, [url])
+
+  async function downloadImage(path) {
+    try {
+      const { data, error } = await supabase.storage.from('avatars').download(path)
+      if (error) {
+        throw error
+      }
+      const url = URL.createObjectURL(data)
+      setAvatarUrl(url)
+    } catch (error) {
+      console.log('Error downloading image: ', error.message)
+    }
+  }
+
+
+  async function uploadAvatar(event) {
+    try {
+      setUploading(true)
+
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error('You must select an image to upload.')
+      }
+
+      const file = event.target.files[0]
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Math.random()}.${fileExt}`
+      const filePath = `${fileName}`
+
+      let { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file)
+
+      if (uploadError) {
+        throw uploadError
+      }
+
+      onUpload(filePath)
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div>
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt="Avatar"
+          className="avatar image"
+          style={{ height: size, width: size }}
+        />
+      ) : (
+        <div className="avatar no-image" style={{ height: size, width: size }} />
+      )}
+      <div style={{ width: size }}>
+        <label className="button primary block" htmlFor="single">
+          {uploading ? 'Uploading ...' : 'Upload'}
+        </label>
+        <input
+          style={{
+            visibility: 'hidden',
+            position: 'absolute',
+          }}
+          type="file"
+          id="single"
+          accept="image/*"
+          onChange={uploadAvatar}
+          disabled={uploading}
+        />
+      </div>
+    </div>
+  )
+}
+```
+
+
+Add the widget to the Account page 
+
+
+
+```jsx title="src/Account.js"
+import Avatar from './Avatar'
+
+// ...
+
+return (
+  <div className="form-widget">
+  {/* Add to the body */}
+    <Avatar
+      url={avatar_url}
+      size={150}
+      onUpload={(url) => {
+        setAvatarUrl(url)
+        updateProfile({ username, website, avatar_url: url })
+      }}
+    />
+  {/* Add to the body */}
+  </div>
+)
+
+```
