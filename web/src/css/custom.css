@@ -484,6 +484,7 @@ a.card:hover {
 .menu > ul.menu__list li > a {
   padding-left: 0;
   padding-right: 0;
+  color: var(--custom-content-color)
 }
 .menu .menu__list-item-hidden {
   display: none;
