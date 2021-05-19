@@ -28,7 +28,7 @@ We currently support the following OAuth providers:
 - Facebook
 - Bitbucket
 - Twitter
-- Apple
+- Apple (See [this guide](https://medium.com/identity-beyond-borders/how-to-configure-sign-in-with-apple-77c61e336003) to generate an Apple `client_secret`)
 
 ![OAuth Logins.](/img/supabase-oauth-logins.png)
 
@@ -39,8 +39,6 @@ To fetch these, you need to:
 1. Generate `Client ID` and `Secret` ([Google](https://console.developers.google.com/apis/credentials), [GitHub](https://github.com/settings/applications/new), [GitLab](https://gitlab.com/oauth/applications), [Bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/), [Apple](https://developer.apple.com/account/ios/certificate), [Twitter](https://developer.twitter.com/en/portal/projects-and-apps) ).
 2. Enter Authorized Redirect URI: `https://<your-project>.supabase.co/auth/v1/callback` on provider dashboard.
 
-### Enable Sign-In with Apple
-Currently, we do not generate the `client_secret` the Apple requires, but here's a [useful guide](https://medium.com/identity-beyond-borders/how-to-configure-sign-in-with-apple-77c61e336003) on how you can generate it on your end!
 
 ## Row Level Security
 
