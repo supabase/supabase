@@ -615,7 +615,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 63,
+										"id": 115,
 										"typeArguments": [
 											{
 												"type": "typeParameter",
@@ -626,7 +626,7 @@
 												}
 											}
 										],
-										"name": "PostgrestTransformBuilder"
+										"name": "PostgrestFilterBuilder"
 									}
 								}
 							],
@@ -7665,14 +7665,14 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 63,
+										"id": 115,
 										"typeArguments": [
 											{
 												"type": "typeParameter",
 												"name": "T"
 											}
 										],
-										"name": "PostgrestTransformBuilder"
+										"name": "PostgrestFilterBuilder"
 									}
 								}
 							],

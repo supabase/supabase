@@ -425,7 +425,7 @@
 												"isExported": true
 											},
 											"comment": {
-												"text": "A valid, logged-in JWT.\n"
+												"text": "A valid JWT. Must be a full-access API key (e.g. service_role key).\n"
 											},
 											"type": {
 												"type": "intrinsic",

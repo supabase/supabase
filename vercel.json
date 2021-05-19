@@ -39,6 +39,7 @@
     { "source": "/database", "destination": "https://www-internal.supabase.io/new/database" },
     { "source": "/auth", "destination": "https://www-internal.supabase.io/new/auth" },
     { "source": "/storage", "destination": "https://www-internal.supabase.io/new/storage" },
+    { "source": "/brand-assets", "destination": "https://www-internal.supabase.io/new/brand-assets" },
     { "source": "/:match*", "destination": "https://docs-rose.vercel.app/:match*" }
   ],
   "redirects": [
