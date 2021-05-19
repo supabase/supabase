@@ -1,8 +1,3 @@
-/**
- * ./src/Auth.js
- * Component to manage logins and sign ups.
- */
-
 import { useState } from 'react'
 import { supabase } from './supabaseClient'
 
