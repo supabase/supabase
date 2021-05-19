@@ -183,167 +183,168 @@ const Nav = (props: Props) => {
   )
 
   return (
-    <nav className="bg-white dark:bg-gray-800 border-b dark:border-gray-600 z-50 sticky">
-      {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
-      <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-16 xl:px-20">
-        <HamburgerButton toggleFlyOut={() => setOpen(true)} />
-
-        <div className="flex-1 flex items-center justify-center sm:items-stretch lg:justify-between">
-          <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
-              <Link href="/" as="/">
-                <img
-                  className="block h-6 w-auto"
-                  src={
-                    darkMode
-                      ? `${basePath}/images/logo-dark.png`
-                      : `${basePath}/images/logo-light.png`
-                  }
-                  alt="Logo"
-                />
-              </Link>
-            </div>
-            <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-4">
-              <FlyOutNavButton
-                title={'Product'}
-                onClick={() => handleToggle(() => setOpenProduct(!openProduct))}
-                active={openProduct}
-              />
-              <FlyOutNavButton
-                title={'Developers'}
-                onClick={() => handleToggle(() => setOpenDevelopers(!openDevelopers))}
-                active={openDevelopers}
-              />
-              <FlyOut open={openProduct} handleCancel={handleCancel}>
-                <Solutions />
-              </FlyOut>
-              <FlyOut open={openDevelopers} handleCancel={handleCancel}>
-                <Developers />
-              </FlyOut>
-              <a
-                href="/beta"
-                className={`
-                  inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                  text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
-                  dark:text-dark-100 dark:hover:border-dark-100
-                `}
-              >
-                Beta
-              </a>
-              <a
-                href="/pricing"
-                className={`
-                  inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                  text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
-                  dark:text-dark-100 dark:hover:border-dark-100
-                `}
-              >
-                Pricing
-              </a>
-            </div>
-          </div>
-          <div className="hidden lg:flex items-center sm:space-x-4">
-            <a href="https://app.supabase.io/api/login">
-              <Button>Start your project</Button>
-            </a>
-            <a
-              href="https://app.supabase.io/api/login"
-              className={`
-                 items-center px-1 border-b-2 border-transparent text-sm font-medium
-                text-gray-500 hover:text-gray-700 hidden lg:block dark:text-dark-100 dark:hover:text-white
-              `}
-            >
-              Sign in
-            </a>
-          </div>
-        </div>
-        {/* <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"></div> */}
-      </div>
-      {/* </div> */}
-
-      {/* Mobile Nav Menu */}
-      <Transition
-        appear={true}
-        show={open}
-        enter="transition ease-out duration-200"
-        enterFrom="opacity-0 translate-y-1"
-        enterTo="opacity-100 translate-y-0"
-        leave="transition ease-in duration-150"
-        leaveFrom="opacity-100 translate-y-0"
-        leaveTo="opacity-0 translate-y-1"
-      >
-        <div className="p-4 md:p-8 h-screen w-screen fixed bg-white transform overflow-y-scroll -inset-y-0 z-50 dark:bg-dark-700">
-          <div className="absolute right-4 top-4 items-center justify-between">
-            <div className="-mr-2">
-              <button
-                onClick={() => setOpen(false)}
-                type="button"
-                className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 dark:bg-dark-800"
-              >
-                <span className="sr-only">Close menu</span>
-
-                <svg
-                  className="h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
+    <>
+      <div className="sticky top-0 z-50">
+        <nav className="bg-white dark:bg-gray-800 border-b dark:border-gray-600">
+          {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
+          <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-16 xl:px-20">
+            <HamburgerButton toggleFlyOut={() => setOpen(true)} />
+            <div className="flex-1 flex items-center justify-center sm:items-stretch lg:justify-between">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 flex items-center">
+                  <Link href="/" as="/">
+                    <img
+                      className="block h-6 w-auto"
+                      src={
+                        darkMode
+                          ? `${basePath}/images/logo-dark.png`
+                          : `${basePath}/images/logo-light.png`
+                      }
+                      alt="Logo"
+                    />
+                  </Link>
+                </div>
+                <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-4">
+                  <FlyOutNavButton
+                    title={'Product'}
+                    onClick={() => handleToggle(() => setOpenProduct(!openProduct))}
+                    active={openProduct}
                   />
-                </svg>
-              </button>
+                  <FlyOutNavButton
+                    title={'Developers'}
+                    onClick={() => handleToggle(() => setOpenDevelopers(!openDevelopers))}
+                    active={openDevelopers}
+                  />
+                  <a
+                    href="/beta"
+                    className={`
+                    inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
+                    text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
+                    dark:text-dark-100 dark:hover:border-dark-100
+                  `}
+                  >
+                    Beta
+                  </a>
+                  <a
+                    href="/pricing"
+                    className={`
+                    inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
+                    text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
+                    dark:text-dark-100 dark:hover:border-dark-100
+                  `}
+                  >
+                    Pricing
+                  </a>
+                </div>
+              </div>
+              <div className="hidden lg:flex items-center sm:space-x-4">
+                <a href="https://app.supabase.io/api/login">
+                  <Button>Start your project</Button>
+                </a>
+                <a
+                  href="https://app.supabase.io/api/login"
+                  className={`
+                   items-center px-1 border-b-2 border-transparent text-sm font-medium
+                  text-gray-500 hover:text-gray-700 hidden lg:block dark:text-dark-100 dark:hover:text-white
+                `}
+                >
+                  Sign in
+                </a>
+              </div>
             </div>
+            {/* <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"></div> */}
           </div>
           {/* </div> */}
-          <div className="mt-6 mb-12">
-            <div className="pt-2 pb-4 space-y-1">
-              <a
-                href="https://app.supabase.io/api/login"
-                className="block pl-3 pr-4 text-base font-medium text-gray-600 dark:text-white"
-              >
-                Sign in
-              </a>
+          {/* Mobile Nav Menu */}
+          <Transition
+            appear={true}
+            show={open}
+            enter="transition ease-out duration-200"
+            enterFrom="opacity-0 translate-y-1"
+            enterTo="opacity-100 translate-y-0"
+            leave="transition ease-in duration-150"
+            leaveFrom="opacity-100 translate-y-0"
+            leaveTo="opacity-0 translate-y-1"
+          >
+            <div className="p-4 md:p-8 h-screen w-screen fixed bg-white transform overflow-y-scroll -inset-y-0 z-50 dark:bg-dark-700">
+              <div className="absolute right-4 top-4 items-center justify-between">
+                <div className="-mr-2">
+                  <button
+                    onClick={() => setOpen(false)}
+                    type="button"
+                    className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 dark:bg-dark-800"
+                  >
+                    <span className="sr-only">Close menu</span>
+                    <svg
+                      className="h-6 w-6"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              {/* </div> */}
+              <div className="mt-6 mb-12">
+                <div className="pt-2 pb-4 space-y-1">
+                  <a
+                    href="https://app.supabase.io/api/login"
+                    className="block pl-3 pr-4 text-base font-medium text-gray-600 dark:text-white"
+                  >
+                    Sign in
+                  </a>
+                </div>
+                <div className="pt-2 pb-4 space-y-1">
+                  <a
+                    href="/docs"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                  >
+                    Product
+                  </a>
+                  <a
+                    href="/docs"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                  >
+                    Developers
+                  </a>
+                  <a
+                    href="/docs"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                  >
+                    Company
+                  </a>
+                  <a
+                    href="/pricing"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                  >
+                    Pricing
+                  </a>
+                </div>
+                <div className="p-3">
+                  <p className="mb-6 text-sm text-gray-400">Products available:</p>
+                  {iconSections}
+                </div>
+              </div>
             </div>
-            <div className="pt-2 pb-4 space-y-1">
-              <a
-                href="/docs"
-                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
-              >
-                Product
-              </a>
-              <a
-                href="/docs"
-                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
-              >
-                Developers
-              </a>
-              <a
-                href="/docs"
-                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
-              >
-                Company
-              </a>
-              <a
-                href="/pricing"
-                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
-              >
-                Pricing
-              </a>
-            </div>
-            <div className="p-3">
-              <p className="mb-6 text-sm text-gray-400">Products available:</p>
-              {iconSections}
-            </div>
-          </div>
-        </div>
-      </Transition>
-    </nav>
+          </Transition>
+        </nav>
+        <FlyOut open={openProduct} handleCancel={handleCancel}>
+          <Solutions />
+        </FlyOut>
+        <FlyOut open={openDevelopers} handleCancel={handleCancel}>
+          <Developers />
+        </FlyOut>
+      </div>
+    </>
   )
 }
 

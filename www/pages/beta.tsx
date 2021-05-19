@@ -189,7 +189,7 @@ const Introduction = () => {
               className="col-span-6 sm:col-span-4 grid grid-cols-8 sm:grid-cols-12 gap-x-1 md:gap-x-0 xl:gap-x-6 items-center"
             >
               <div className="col-span-4 sm:col-span-4 md:col-span-3 xl:col-span-2">
-                <div className="w-12 h-12 rounded-md bg-dark-700 flex items-center justify-center bg-gray-900 dark:bg-white">
+                <div className="w-12 h-12 rounded-md bg-dark-700 flex items-center justify-center dark:bg-white">
                   {stat.icon}
                 </div>
               </div>
@@ -663,9 +663,7 @@ const BetaPricing = () => (
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
         <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
-        <p className="mb-10">
-            For up to date pricing info see: https://supabase.io/pricing
-          </p>
+          <p className="mb-10">For up to date pricing info see: https://supabase.io/pricing</p>
           <p className="mb-10">
             We're working closely with many open source projects, infrastructure providers, and of
             course our Alpha Users, to provide a predictable and sustainable pricing model.
@@ -685,9 +683,7 @@ const BetaPricing = () => (
               them to create value for their customers
             </li>
           </ul>
-          <p className="mb-10">
-            We are committing to the following initiatives:
-          </p>
+          <p className="mb-10">We are committing to the following initiatives:</p>
           <ul className="list-decimal list-outside ml-6 mb-10">
             <li className="mb-5">
               All Alpha Users will receive credits equivalent of 2 years of base tier usage. These
@@ -716,7 +712,11 @@ const BetaPricing = () => (
             </li>
           </ul>
           <p>
-            The Supabase Base Tier is now called the Supabase Pro tier as per the pricing page: https://supabase.io/pricing
+            The Supabase Base Tier is now called the Supabase Pro tier as per the{' '}
+            <a href="https://supabase.io/pricing" className="text-brand-700 hover:text-brand-800">
+              pricing page
+            </a>
+            .
           </p>
         </div>
       </div>
@@ -990,11 +990,13 @@ const Beta = () => {
         }}
       />
       <Container>
-        <div className="shadow-lg py-5 px-5 xl:px-20 sticky inset-0 bg-dark-800 z-50 flex items-center justify-between">
-          <a href="/">
-            <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
-          </a>
-          <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)} />
+        <div className="sticky inset-0 z-50">
+          <div className="shadow-lg py-5 px-5 xl:px-20 bg-dark-800 flex items-center justify-between">
+            <a href="/">
+              <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
+            </a>
+            <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)} />
+          </div>
           <FlyOut
             open={menuOpen}
             handleCancel={() => setMenuOpen(false)}

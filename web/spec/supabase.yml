@@ -219,19 +219,19 @@ pages:
         res.status(200).json(allOnlineUsers);
       };
       ```
-      
+
       ### Update types automatically with GitHub Actions
-      
+
       One way to keep your type definitions in sync with your database is to set up a GitHub action that runs on a schedule.
-      
+
       Add a script to your package.json to generate the types:
-      
+
       ```
       "update-types": "npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/supabase.ts"
       ```
-      
+
       In your repo, create the file `.github/workflows/update-types.yml`. Add the following snippet into this file to define the action. If there is a change to your definitions, this script will commit the change to your repo.
-      
+
       ```yml
       name: Update database types
 
@@ -748,7 +748,6 @@ pages:
         js: |
           ```js
           const { data, error, count } = await supabase
-            .from('cities')
             .rpc('hello_world', { count: 'exact' })
           }
           ```
@@ -871,7 +870,7 @@ pages:
 
   storage.listBuckets():
     title: 'listBuckets()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageBucketApi".StorageBucketApi.listBuckets'
+    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.listBuckets'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
@@ -888,7 +887,7 @@ pages:
 
   storage.getBucket():
     title: 'getBucket()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageBucketApi".StorageBucketApi.getBucket'
+    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.getBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
@@ -905,7 +904,7 @@ pages:
 
   storage.createBucket():
     title: 'createBucket()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageBucketApi".StorageBucketApi.createBucket'
+    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.createBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `insert` 
@@ -922,7 +921,7 @@ pages:
 
   storage.emptyBucket():
     title: 'emptyBucket()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageBucketApi".StorageBucketApi.emptyBucket'
+    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.emptyBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
@@ -939,7 +938,7 @@ pages:
 
   storage.deleteBucket():
     title: 'deleteBucket()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageBucketApi".StorageBucketApi.deleteBucket'
+    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.deleteBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` and `delete`
@@ -956,7 +955,7 @@ pages:
 
   storage.from.upload():
     title: 'from.upload()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageFileApi".StorageFileApi.upload'
+    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.upload'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -975,7 +974,7 @@ pages:
 
   storage.from.update():
     title: 'from.update()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageFileApi".StorageFileApi.update'
+    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.update'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -994,7 +993,7 @@ pages:
 
   storage.from.move():
     title: 'from.move()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageFileApi".StorageFileApi.move'
+    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.move'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1012,7 +1011,7 @@ pages:
 
   storage.from.createSignedUrl():
     title: 'from.createSignedUrl()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageFileApi".StorageFileApi.createSignedUrl'
+    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.createSignedUrl'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1030,7 +1029,7 @@ pages:
 
   storage.from.download():
     title: 'from.download()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageFileApi".StorageFileApi.download'
+    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.download'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1048,7 +1047,7 @@ pages:
 
   storage.from.remove():
     title: 'from.remove()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageFileApi".StorageFileApi.remove'
+    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.remove'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1066,7 +1065,7 @@ pages:
 
   storage.from.list():
     title: 'from.list()'
-    $ref: '@supabase/supabase-js."lib/storage/StorageFileApi".StorageFileApi.list'
+    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.list'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
