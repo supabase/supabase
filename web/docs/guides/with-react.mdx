@@ -16,7 +16,7 @@ This example provides the steps to build a simple user management app (from scra
 - [Row Level Security](/docs/guides/auth#row-level-security): data is be protected so that individuals can only access their own data.
 - Instant [APIs](/docs/guides/api): APIs will be automatically generated when you create your database tables.
 
-## Video demo 
+<!-- ## Video demo 
 
 Coming soon.
 
@@ -35,7 +35,7 @@ Clicking this button the application will:
 - Fork the example into your own GitHub account.
 - Prepare the deployed application with all the necessary environment variables.
 
-If you want to do it yourself, let's get started:
+If you want to do it yourself, let's get started: -->
 
 ## Project set up
 
@@ -69,7 +69,9 @@ values={[
 4. Click "Run".
 ```
 
-@todo - add video
+<video width="99%" muted playsInline controls="true">
+<source src="/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
+</video>
 
 </TabItem>
 <TabItem value="SQL">
@@ -189,7 +191,7 @@ on the browser, and that's completely fine since we have [Row Level Security](/d
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_URL
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
@@ -199,22 +201,20 @@ You can find the full contents of this file [here](https://github.com/supabase/s
 
 ### Set up a Login component
 
-create an auth component
-
-Component to manage logins and sign ups.
+Let's set up a React componenet to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
 ```jsx title="/src/Auth.js"
 import { useState } from 'react'
 import { supabase } from './supabaseClient'
 
-export default function Auth({}) {
+export default function Auth() {
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState('')
 
-  const handleLogin = async (email: string) => {
+  const handleLogin = async (email) => {
     try {
       setLoading(true)
-      const { error, user } = await supabase.auth.signIn({ email })
+      const { error } = await supabase.auth.signIn({ email })
       if (error) throw error
       alert('Check your email for the login link!')
     } catch (error) {
@@ -225,11 +225,9 @@ export default function Auth({}) {
   }
 
   return (
-    <div className="row">
-      <div className="col-6">
+    <div className="row flex flex-center">
+      <div className="col-6 form-widget">
         <h1 className="header">Supabase + React</h1>
-      </div>
-      <div className="col-6 auth-widget">
         <p className="description">Sign in via magic link with your email below</p>
         <div>
           <input
@@ -258,31 +256,25 @@ export default function Auth({}) {
 }
 ```
 
-
-
 ### Account page
 
-create an Account component: 
+After a user is signed in we can allow them to edit their profile details and manage their account.
 
-Allow a logged-in user to manage their account.
+Let's create a new component for that called `Account.js`.
 
 ```jsx title="src/Account.js"
 import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 
 export default function Account({ session }) {
-  const [loading, setLoading] = useState<boolean>(true)
-  const [username, setUsername] = useState<string | null>(null)
-  const [website, setWebsite] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [username, setUsername] = useState(null)
+  const [website, setWebsite] = useState(null)
+  const [avatar_url, setAvatarUrl] = useState(null)
 
   useEffect(() => {
     getProfile()
   }, [session])
-
-  async function signOut() {
-    const { error } = await supabase.auth.signOut()
-    if (error) console.log('Error logging out:', error.message)
-  }
 
   async function getProfile() {
     try {
@@ -301,14 +293,15 @@ export default function Account({ session }) {
 
       setUsername(data.username)
       setWebsite(data.website)
+      setAvatarUrl(data.avatar_url)
     } catch (error) {
-      console.log('error', error.message)
+      alert(error.message)
     } finally {
       setLoading(false)
     }
   }
 
-  async function updateProfile() {
+  async function updateProfile({ username, website, avatar_url }) {
     try {
       setLoading(true)
       const user = supabase.auth.user()
@@ -317,6 +310,7 @@ export default function Account({ session }) {
         id: user.id,
         username,
         website,
+        avatar_url,
         updated_at: new Date(),
       }
 
@@ -335,7 +329,7 @@ export default function Account({ session }) {
   }
 
   return (
-    <div className="account">
+    <div className="form-widget">
       <div>
         <label htmlFor="email">Email</label>
         <input id="email" type="text" value={session.user.email} disabled />
@@ -360,13 +354,17 @@ export default function Account({ session }) {
       </div>
 
       <div>
-        <button className="button block primary" onClick={() => updateProfile()} disabled={loading}>
+        <button
+          className="button block primary"
+          onClick={() => updateProfile({ username, website, avatar_url })}
+          disabled={loading}
+        >
           {loading ? 'Loading ...' : 'Update'}
         </button>
       </div>
 
       <div>
-        <button className="button block" onClick={() => signOut()}>
+        <button className="button block" onClick={() => supabase.auth.signOut()}>
           Sign Out
         </button>
       </div>
@@ -375,9 +373,39 @@ export default function Account({ session }) {
 }
 ```
 
+
+
 ### Launch!
 
-Run this in a terminal window:
+Now that we have all the components in place, let's update `App.js`:
+
+```jsx title="src/App.js"
+import './index.css'
+import { useState, useEffect } from 'react'
+import { supabase } from './supabaseClient'
+import Auth from './Auth'
+import Account from './Account'
+
+export default function Home() {
+  const [session, setSession] = useState(null)
+
+  useEffect(() => {
+    setSession(supabase.auth.session())
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+  }, [])
+
+  return (
+    <div className="container" style={{ padding: '50px 0 100px 0' }}>
+      {!session ? <Auth /> : <Account key={session.user.id} session={session} />}
+    </div>
+  )
+}
+```
+
+Once that's done, run this in a terminal window:
 
 ```bash
 npm install start
@@ -385,6 +413,8 @@ npm install start
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
+
+![Supabase React](/img/supabase-react-demo.png)
 
 ## Bonus: Profile photos
 
