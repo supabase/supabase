@@ -6,7 +6,8 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) é uma alternativa ao Firebase de código aberto. Estamos a reproduzir as funcionalidades do Firebase usando ferramentas de código aberto de nivel empresarial.
+[Supabase](https://supabase.io) é uma alternativa de código aberto ao Firebase. Estamos reproduzindo as funcionalidades do Firebase usando ferramentas de código aberto de nível empresarial.
+
 
 - [x] Base de dados Postgres hospedada
 - [x] Subscrições em tempo real
@@ -34,7 +35,7 @@ Para ver a documentação completa, visite [supabase.io/docs](https://supabase.i
 - [x] Beta público: estável o suficiente para a maioria dos casos de uso não empresarial
 - [ ] Público: pronto para produção
 
-Atualmente estamos em Beta Público. Assiste aos "releases" deste repositório para seres notificado sobre as principais atualizações.
+Estamos atualmente em Beta Público. Assista aos lançamentos deste repositório para ser notificado sobre as principais atualizações.
 
 <kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
