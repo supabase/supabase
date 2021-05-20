@@ -14,9 +14,15 @@ make dev
 
 # tab 2
 cd www
+npm install
 npm run dev
 
 # tab 3
+cd web/spec
+make
+npm run gen:supabase
+npm run build
+
 cd web
 npm run start
 ```
