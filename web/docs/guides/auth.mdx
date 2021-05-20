@@ -4,7 +4,7 @@ title: Auth
 description: Use Supabase to Authenticate and Authorize your users.
 ---
 
-### User Management
+## User Management
 
 Supabase makes it simple to manage your users.
 
@@ -18,7 +18,7 @@ Supabase provides the routes to [sign up](/docs/reference/javascript/auth-signup
 [log out](/docs/reference/javascript/auth-signout), and manage users in your apps and websites.
 
 
-### Third Party Logins
+## Third Party Logins
 
 We currently support the following OAuth providers:
 - Google
@@ -27,6 +27,8 @@ We currently support the following OAuth providers:
 - Azure
 - Facebook
 - Bitbucket
+- Twitter
+- Apple (See [this guide](https://medium.com/identity-beyond-borders/how-to-configure-sign-in-with-apple-77c61e336003) to generate an Apple `client_secret`)
 
 ![OAuth Logins.](/img/supabase-oauth-logins.png)
 
@@ -34,10 +36,11 @@ You can enable providers by navigating to Authentication > Settings > External O
 
 To fetch these, you need to:
 
-1. Generate `Client ID` and `Secret` ([Google](https://console.developers.google.com/apis/credentials), [GitHub](https://github.com/settings/applications/new), [GitLab](https://gitlab.com/oauth/applications), [Bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)).
+1. Generate `Client ID` and `Secret` ([Google](https://console.developers.google.com/apis/credentials), [GitHub](https://github.com/settings/applications/new), [GitLab](https://gitlab.com/oauth/applications), [Bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/), [Apple](https://developer.apple.com/account/ios/certificate), [Twitter](https://developer.twitter.com/en/portal/projects-and-apps) ).
 2. Enter Authorized Redirect URI: `https://<your-project>.supabase.co/auth/v1/callback` on provider dashboard.
 
-### Row Level Security
+
+## Row Level Security
 
 Authentication only gets you so far. When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html). Supabase makes it simple to turn RLS on and off.
 
@@ -46,7 +49,7 @@ Authentication only gets you so far. When you need granular authorization rules,
 </video>
 
 
-### Policies
+## Policies
 
 [Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) are PostgreSQL's rule engine. They are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs. 
 
@@ -78,7 +81,7 @@ let user = await supabase
 // Still => { id: 'd0714948', name: 'Jane' }
 ```
 
-### Policies Are Like `WHERE` Clauses
+## Policies Are Like `WHERE` Clauses
 
 Policies are easy to understand once you get the hang of them. You can just think of them as adding a `WHERE` clause to every query. For example if you had a policy like this:
 
