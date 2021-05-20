@@ -1,13 +1,11 @@
-import { useRouter } from 'next/router'
 import Benchmark from 'components/CaseStudies/benchmark'
 import SectionHeader from 'components/UI/SectionHeader'
 import CaseStudiesData from 'data/CaseStudies.json'
 import { Card, Space, Typography } from '@supabase/ui'
 import SectionContainer from '../Layouts/SectionContainer'
+import Link from 'next/link'
 
 const CaseStudies = () => {
-  const { basePath } = useRouter()
-
   return (
     <SectionContainer>
       <div>
@@ -22,23 +20,25 @@ const CaseStudies = () => {
       </div>
       <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
         {CaseStudiesData.map((caseStudy: any, idx: number) => (
-          <a href={caseStudy.url} key={idx}>
-            <Card
-              key={`caseStudy_${idx}`}
-              hoverable
-              cover={<img src={`${basePath}/${caseStudy.imgUrl}`} className="h-64 object-cover" />}
-            >
-              <Space className="justify-between h-40" direction="vertical">
-                <div>
-                  <Typography.Text small type="secondary">
-                    Project example
-                  </Typography.Text>
-                  <Typography.Title level={3}>{caseStudy.title}</Typography.Title>
-                </div>
-                <Typography.Text type="default">{caseStudy.description}</Typography.Text>
-              </Space>
-            </Card>
-          </a>
+          <Link href={caseStudy.url} key={idx}>
+            <a>
+              <Card
+                key={`caseStudy_`}
+                hoverable
+                cover={<img src={`/${caseStudy.imgUrl}`} className="h-64 object-cover" />}
+              >
+                <Space className="justify-between h-40" direction="vertical">
+                  <div>
+                    <Typography.Text small type="secondary">
+                      Project example
+                    </Typography.Text>
+                    <Typography.Title level={3}>{caseStudy.title}</Typography.Title>
+                  </div>
+                  <Typography.Text type="default">{caseStudy.description}</Typography.Text>
+                </Space>
+              </Card>
+            </a>
+          </Link>
         ))}
       </div>
       <Benchmark />

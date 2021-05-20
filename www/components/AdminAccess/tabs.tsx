@@ -1,5 +1,6 @@
 import TabMarkup from 'data/AdminAccess.json'
 import { Tabs as SBTabs, Typography, Button } from '@supabase/ui'
+import Link from 'next/link'
 
 type Props = {
   tabId: string
@@ -31,9 +32,11 @@ function Tabs(props: Props) {
                   <Typography.Text>{TabMarkup['tabTableEditor'].description}</Typography.Text>
                 </dd>
               </div>
-              <a href={TabMarkup['tabTableEditor'].url}>
-                <Button className="mt-8">{TabMarkup['tabTableEditor'].cta}</Button>
-              </a>
+              <Link href={TabMarkup['tabTableEditor'].url}>
+                <a>
+                  <Button className="mt-8">{TabMarkup['tabTableEditor'].cta}</Button>
+                </a>
+              </Link>
             </SBTabs.Panel>
 
             <SBTabs.Panel id="tabSqlEditor" label=" SQL Editor">
@@ -43,9 +46,11 @@ function Tabs(props: Props) {
                   <Typography.Text>{TabMarkup['tabSqlEditor'].description}</Typography.Text>
                 </dd>
               </div>
-              <a href={TabMarkup['tabSqlEditor'].url}>
-                <Button className="mt-8">{TabMarkup['tabSqlEditor'].cta}</Button>
-              </a>
+              <Link href={TabMarkup['tabSqlEditor'].url}>
+                <a>
+                  <Button className="mt-8">{TabMarkup['tabSqlEditor'].cta}</Button>
+                </a>
+              </Link>
             </SBTabs.Panel>
             <SBTabs.Panel id="tabAuthRules" label="Auth Rules">
               <div className="mt-5">
@@ -54,9 +59,11 @@ function Tabs(props: Props) {
                   <Typography.Text>{TabMarkup['tabAuthRules'].description}</Typography.Text>
                 </dd>
               </div>
-              <a href={TabMarkup['tabAuthRules'].url}>
-                <Button className="mt-8">{TabMarkup['tabAuthRules'].cta}</Button>
-              </a>
+              <Link href={TabMarkup['tabAuthRules'].url}>
+                <a>
+                  <Button className="mt-8">{TabMarkup['tabAuthRules'].cta}</Button>
+                </a>
+              </Link>
             </SBTabs.Panel>
           </SBTabs>
         </div>

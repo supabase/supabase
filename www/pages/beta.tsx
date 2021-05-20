@@ -1,5 +1,4 @@
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import Container from 'components/Container'
 import Layout from '~/components/Layouts/Default'
@@ -101,11 +100,10 @@ const SectionHeader = (props: any) => {
 }
 
 const Hero = () => {
-  const { basePath } = useRouter()
   return (
     <div
       style={{
-        backgroundImage: `url('${basePath}/images/beta-hero.png')`,
+        backgroundImage: 'url("/images/beta-hero.png")',
         backgroundSize: '65%',
         backgroundPosition: '120% 50%',
       }}
@@ -478,7 +476,6 @@ const Security = () => {
 }
 
 const Reliability = () => {
-  const { basePath } = useRouter()
   return (
     <div id="reliability" className="bg-white dark:bg-dark-800">
       <div className="container mx-auto px-8 lg:px-28 py-12 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-300 ">
@@ -517,7 +514,7 @@ const Reliability = () => {
               to keep track of uptime across all of our services and critical infrastructure.
             </p>
             <div className="mb-10">
-              <VideoShot src={`${basePath}/videos/statusPage.mp4`} />
+              <VideoShot src="/videos/statusPage.mp4" />
             </div>
             <p>
               For our Alpha & Beta Users we take free, encrypted daily database backups up to 20GB.
@@ -531,7 +528,6 @@ const Reliability = () => {
 }
 
 const NewFeaturesAndIntegrations = () => {
-  const { basePath } = useRouter()
   return (
     <div id="newFeaturesAndIntegrations" className="bg-gray-50 dark:bg-dark-700">
       <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-200">
@@ -573,7 +569,7 @@ const NewFeaturesAndIntegrations = () => {
                   transactional emails for you. We support passwordless links, and we offer several
                   OAuth providers including Google, GitHub, with more on the way.
                 </p>
-                <VideoShot src={`${basePath}/videos/tabAuthRules.mp4`} />
+                <VideoShot src="/videos/tabAuthRules.mp4" />
               </li>
               <li className="mb-10">
                 <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
@@ -636,7 +632,7 @@ const NewFeaturesAndIntegrations = () => {
                   View and edit your data like a spreadsheet from within the Supabase dashboard.
                   Build your schema, create complex relationships, and import and export to csv.
                 </p>
-                <VideoShot src={`${basePath}/videos/tabTableEditor.mp4`} />
+                <VideoShot src="/videos/tabTableEditor.mp4" />
               </li>
               <li>
                 <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
@@ -646,7 +642,7 @@ const NewFeaturesAndIntegrations = () => {
                   No need to install third party SQL tools, you can run queries directly from the
                   Supabase Dashboard.
                 </p>
-                <VideoShot src={`${basePath}/videos/tabSqlEditor.mp4`} />
+                <VideoShot src="/videos/tabSqlEditor.mp4" />
               </li>
             </ul>
           </div>
@@ -936,7 +932,6 @@ const WhatsNext = () => (
 
 const Beta = () => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
-  const { basePath } = useRouter()
 
   const references: any = {
     performance: useRef<HTMLDivElement>(null),
@@ -984,7 +979,7 @@ const Beta = () => {
           },
           images: [
             {
-              url: 'https://supabase.io/new/og/og-image.jpg',
+              url: 'https://supabase.io/og/og-image.jpg',
             },
           ],
         }}
@@ -992,9 +987,11 @@ const Beta = () => {
       <Container>
         <div className="sticky inset-0 z-50">
           <div className="shadow-lg py-5 px-5 xl:px-20 bg-dark-800 flex items-center justify-between">
-            <a href="/">
-              <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
-            </a>
+            <Link href="/">
+              <a>
+                <img className="h-5" src={`/images/logo-dark.png`} />
+              </a>
+            </Link>
             <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)} />
           </div>
           <FlyOut

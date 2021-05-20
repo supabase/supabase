@@ -17,7 +17,6 @@ import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 // Import Swiper styles
@@ -38,9 +37,6 @@ import TweetCard from '~/components/TweetCard'
 // SwiperCore.use([Controller])
 
 function Database() {
-  // base path for images
-  const { basePath } = useRouter()
-
   const [dashboardSwiper, setDashboardSwiper] = useState(undefined)
   const [dashboardSwiperActiveIndex, setDashboardSwiperActiveIndex] = useState(0)
 
@@ -65,7 +61,7 @@ function Database() {
           url: `https://supabase.io/auth`,
           images: [
             {
-              url: `https://supabase.io${basePath}/images/product/database/database-og.jpg`,
+              url: 'https://supabase.io/images/product/database/database-og.jpg',
             },
           ],
         }}
@@ -87,7 +83,7 @@ function Database() {
           image={[
             <div className="w-full header--light block">
               <Image
-                src={`${basePath}/images/product/database/header--light-2.png`}
+                src="/images/product/database/header--light-2.png"
                 alt="database header"
                 layout="responsive"
                 width="1680"
@@ -96,7 +92,7 @@ function Database() {
             </div>,
             <div className="w-full header--dark mr-0 dark:block">
               <Image
-                src={`${basePath}/images/product/database/header--dark-2.png`}
+                src="/images/product/database/header--dark-2.png"
                 alt="database header"
                 layout="responsive"
                 width="1680"
@@ -115,7 +111,7 @@ function Database() {
                     <ProductIcon icon={Solutions['database'].icon} />
                     <IconX />
                     <img
-                      src={`${basePath}/images/product/database/postgresql-icon.svg`}
+                      src="/images/product/database/postgresql-icon.svg"
                       width={30}
                     />
                   </Space>
@@ -221,7 +217,7 @@ function Database() {
                   footer={[
                     <TweetCard
                       handle="@Elsolo244"
-                      img_url={`${basePath}/images/twitter-profiles/v6citnk33y2wpeyzrq05_400x400.jpeg`}
+                      img_url="/images/twitter-profiles/v6citnk33y2wpeyzrq05_400x400.jpeg"
                       quote="Where has
                 @supabase_io
                 been all my life? 😍"
@@ -237,7 +233,7 @@ function Database() {
                   footer={[
                     <TweetCard
                       handle="@jim_bisenius"
-                      img_url={`${basePath}/images/twitter-profiles/rLgwUZSB_400x400.jpg`}
+                      img_url="/images/twitter-profiles/rLgwUZSB_400x400.jpg"
                       quote="@MongoDB or @MySQL?!?! Please, let me introduce you to @supabase_io and the wonderful world of @PostgreSQL before it's too late!!"
                     />,
                   ]}

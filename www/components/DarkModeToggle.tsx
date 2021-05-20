@@ -1,5 +1,3 @@
-import { useRouter } from 'next/router'
-
 interface Props {
   darkMode: boolean
   updateTheme: Function

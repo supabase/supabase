@@ -1,7 +1,6 @@
 import fs from 'fs'
 import { useEffect, useState } from 'react'
 
-import { useRouter } from 'next/router'
 import Head from 'next/head'
 
 import { NextSeo } from 'next-seo'
@@ -14,6 +13,7 @@ import { Typography, Badge, Space, Select } from '@supabase/ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 import BlogHeader from '~/components/Blog/BlogHeader'
+import Link from 'next/link'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts()
@@ -36,8 +36,6 @@ function Blog(props: any) {
   const [category, setCategory] = useState('all')
   const [blogs, setBlogs] = useState(props.blogs)
 
-  const { basePath } = useRouter()
-
   useEffect(() => {
     // Update the document title using the browser API
     setBlogs(
@@ -57,7 +55,7 @@ function Blog(props: any) {
           rel="alternate"
           type="application/rss+xml"
           title="RSS feed for blog posts"
-          href={`${basePath}/rss.xml`}
+          href="/rss.xml"
         />
       </Head>
       <NextSeo title="Blog" description="Latest news from the Supabase team." />
@@ -121,11 +119,11 @@ function FeaturedThumb(blog: PostTypes) {
 
   return (
     <div key={blog.slug} className="my-6 cursor-pointer">
-      <a href={`/blog/${blog.url}`}>
+      <Link href={`/blog/${blog.url}`}>
         <a className="inline-block">
           <img
             className="h-96 w-full object-cover  border dark:border-dark-600"
-            src={`/new/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
+            src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
           />
           <Space direction="vertical" size={5} className="mt-4">
             <div>
@@ -143,13 +141,13 @@ function FeaturedThumb(blog: PostTypes) {
                 <Space className="block">
                   {blog.tags &&
                     blog.tags.map((tag: string) => (
-                      <a href={`/blog/tags/${tag}`}>
+                      <Link href={`/blog/tags/${tag}`}>
                         <a>
                           <Badge key={`${blog.slug}-${tag}-tag`} dot={false}>
                             {tag}
                           </Badge>
                         </a>
-                      </a>
+                      </Link>
                     ))}
                 </Space>
               </Space>
@@ -172,7 +170,7 @@ function FeaturedThumb(blog: PostTypes) {
             )}
           </Space>
         </a>
-      </a>
+      </Link>
     </div>
   )
 }

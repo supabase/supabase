@@ -1,11 +1,8 @@
 import { Button, IconBookOpen, Space, Typography } from '@supabase/ui'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import SectionContainer from './Layouts/SectionContainer'
 
 const Hero = () => {
-  const { basePath } = useRouter()
-
   return (
     <div className="overflow-hidden">
       <SectionContainer className="pb-0 pt-24">
@@ -55,17 +52,17 @@ const Hero = () => {
                       <div className="flex flex-wrap items-center justify-start">
                         <img
                           className="h-8 sm:h-10 pr-10 mb-5"
-                          src={`${basePath}/images/logos/yc--grey.png`}
+                          src="/images/logos/yc--grey.png"
                           alt="Y Combinator"
                         />
                         <img
                           className="relative h-5 sm:h-7 pr-10 mb-5"
-                          src={`${basePath}/images/logos/mozilla--grey.png`}
+                          src="/images/logos/mozilla--grey.png"
                           alt="Mozilla"
                         />
                         <img
                           className="relative h-5 sm:h-7 pr-10 mb-5"
-                          src={`${basePath}/images/logos/coatue.png`}
+                          src="/images/logos/coatue.png"
                           alt="Coatue"
                         />
                       </div>

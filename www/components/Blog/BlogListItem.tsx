@@ -14,7 +14,7 @@ const BlogListItem = ({ blog }: Props) => {
   return (
     <div key={blog.slug} className="pt-4 pb-12 border-b border-gray-100 dark:border-gray-600 mb-8">
       <div className="mx-auto max-w-7xl cursor-pointer">
-        <a href={`/blog/${blog.url}`}>
+        <Link href={`/blog/${blog.url}`}>
           <a className="inline-block">
             <Space direction="vertical" size={5} className="">
               <div>
@@ -65,7 +65,7 @@ const BlogListItem = ({ blog }: Props) => {
               <Typography.Link>Read more</Typography.Link> */}
             </Space>
           </a>
-        </a>
+        </Link>
       </div>
     </div>
   )

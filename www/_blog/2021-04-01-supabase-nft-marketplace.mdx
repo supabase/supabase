@@ -24,7 +24,7 @@ NFTs are now capturing the imagination of speculators everywhere, but NFTs as th
 
 As our latest foray into NFTs we’re announcing <a href="https://buymeth.com/" target="_blank">BuyMeth.com</a>, (Meth = [M]isleading [E]ncrypted [Th]umbnails) an NFT marketplace that solves the copy-paste problem of NFTs today. 
 
-![Supabase NFT marketplace BuyMeth.com](/new/images/blog/nft/nft-1.png)
+![Supabase NFT marketplace BuyMeth.com](/images/blog/nft/nft-1.png)
 
 ### How does it work?
 
@@ -32,8 +32,8 @@ Each NFT stores a blurhash representation of a full image, but also a link to th
 
 When a sale is initiated i.e. the seller accepts a buyers offer, Metamask re-encrypts the image with the public key of the buyer, and uploads it to IPFS, the url in the NFT is updated and the buyer assigned as the new owner. After the sale, a 1 week challenge period is initiated where the proceeds of the sale are kept in an escrow contract. The buyer can then decrypt the contents of the image, and can run an automated verification function to verify that the image received (when hashed) does indeed produce the publically available blurhash (or thumbnail). If it does not, then the buyer can submit a claim to the sales contract, along with a proof of the invalid file, and claim back the proceeds.
 
-![Most popular NFTs](/new/images/blog/nft/nft-2.png)
+![Most popular NFTs](/images/blog/nft/nft-2.png)
 
 As a way to dis-incentivise previous owners of the image to not reveal the original image, we bake in a royalty mechanism, whereby previous owners receive a fraction of the sale price each time, the artwork changes hands.
 
-Despite the undeniable value of such a platform, this announcement is of course an April Fools joke. We are not launching a Supabase NFT platform; but we are [Launching a TON of other stuff this week](https://supabase.io/new/blog/2021/03/25/launch-week).
+Despite the undeniable value of such a platform, this announcement is of course an April Fools joke. We are not launching a Supabase NFT platform; but we are [Launching a TON of other stuff this week](https://supabase.io/blog/2021/03/25/launch-week).

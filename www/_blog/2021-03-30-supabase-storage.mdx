@@ -24,7 +24,7 @@ There are three key components to Supabase Storage:
 - Middleware (access and permissions). This consists of an API Server and Postgres.
 - Frontend (a nice UI).
 
-![Storage Infrastructure](/new/images/blog/storage/infra.png)
+![Storage Infrastructure](/images/blog/storage/infra.png)
 
 The Storage API server sits behind Kong, an API Gateway. It talks to different storage backends like S3, Backblaze, etc to retrieve and store objects.
 
@@ -40,15 +40,15 @@ As avid Mac users, we've defaulted to using the column-based explorer in Finder 
 
 We put in a lot of effort to make sure that the dashboard is fast and easy to navigate with our miller-based column view, allowing you to get to deeply nested folders quickly. If you're a fan of List Views though, don't worry! We have that option available too. The choice is yours.
 
-![Frontend views](/new/images/blog/storage/ph-5.png)
+![Frontend views](/images/blog/storage/ph-5.png)
 
 Our File Browser also has a rich preview for a wide set of file types including images, audio, and videos.
 
-![Frontend preview](/new/images/blog/storage/ph-2.png)
+![Frontend preview](/images/blog/storage/ph-2.png)
 
 And if you already know the location of a file but want to save a few clicks, you can paste the path into the location bar and navigate to it directly.
 
-![Frontend navigation](/new/images/blog/storage/ph-4.png)
+![Frontend navigation](/images/blog/storage/ph-4.png)
 
 ## Designing the storage middleware
 
@@ -84,7 +84,7 @@ Our storage service sits behind [Kong](https://github.com/kong/kong) along with 
 
 For Authorization, we wanted to avoid creating a new DSL like Firebase. Instead, we created one where you can write policies in the One True Language - SQL!
 
-![One True Language](/new/images/blog/storage/true-language.png)
+![One True Language](/images/blog/storage/true-language.png)
 
 To do this, we leverage Postgres' Row Level Security. We create a table for `buckets` and `objects` inside each Supabase project. These tables are namespaced in a separate schema called `storage`.
 
@@ -148,9 +148,9 @@ We have intentionally kept the API surface for the storage backend very small, i
 
 You may be itching to get started tinkering around with our new Supabase storage - we have an example app prepared for you right [here](https://github.com/supabase/supabase-js/tree/master/example/next-storage) which simulates a simple context of setting an avatar image for a user. This will help you to get a high level overview of how to use your project's storage with our client library. For greater detail, refer to our storage API documentation [here](https://supabase.io/docs/reference/javascript/storage-createbucket).
 
-![Example app 1](/new/images/blog/storage/ph-7.png)
+![Example app 1](/images/blog/storage/ph-7.png)
 
-![Example app 2](/new/images/blog/storage/ph-6.png)
+![Example app 2](/images/blog/storage/ph-6.png)
 
 ## What's next
 

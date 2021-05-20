@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useRouter } from 'next/router'
 import Link from 'next/link'
 
 import DefaultLayout from '~/components/Layouts/Default'
@@ -14,8 +13,6 @@ import CTABanner from '~/components/CTABanner'
 import Solutions from 'data/Solutions.json'
 
 export default function IndexPage() {
-  const { basePath } = useRouter()
-
   return (
     <DefaultLayout>
       <div className="bg-white dark:bg-gray-800">
@@ -48,7 +45,7 @@ export default function IndexPage() {
               {/* <div className="col-span-12 lg:col-span-6">
                 <div className="rounded border border-gray-200 dark:border-gray-600 grid grid-cols-12">
                   <img
-                    src={`${basePath}/images/t-shirt-promo.jpg`}
+                    src="/images/t-shirt-promo.jpg"
                     className="col-span-6 h-30 object-cover"
                   />
                   <div className="p-6 lg:col-span-6">

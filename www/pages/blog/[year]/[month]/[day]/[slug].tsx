@@ -6,7 +6,6 @@ import hydrate from 'next-mdx-remote/hydrate'
 import renderToString from 'next-mdx-remote/render-to-string'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -89,8 +88,6 @@ function BlogPostPage(props: any) {
   const author = props.blog.author ? authors[props.blog.author] : authors['supabase']
   const content = hydrate(props.blog.content, { components })
 
-  const { basePath } = useRouter()
-
   const NextCard = (props: any) => {
     const { post, label, className } = props
     return (
@@ -123,9 +120,11 @@ function BlogPostPage(props: any) {
         <Space>
           {props.blog.tags.map((tag: string) => {
             return (
-              <a href={`/blog/tags/${tag}`}>
-                <Badge key={`categroy-badge-`}>{tag}</Badge>
-              </a>
+              <Link href={`/blog/tags/${tag}`}>
+                <a>
+                  <Badge key={`categroy-badge-`}>{tag}</Badge>
+                </a>
+              </Link>
             )
           })}
         </Space>
@@ -165,7 +164,7 @@ function BlogPostPage(props: any) {
           },
           images: [
             {
-              url: `https://supabase.io${basePath}/images/blog/${
+              url: `https://supabase.io/images/blog/${
                 props.blog.thumb ? props.blog.thumb : props.blog.image
               }`,
             },
@@ -221,7 +220,7 @@ function BlogPostPage(props: any) {
               <div className="col-span-12 lg:col-span-8">
                 {props.blog.thumb && (
                   <img
-                    src={'/new/images/blog/' + props.blog.thumb}
+                    src={'/images/blog/' + props.blog.thumb}
                     className="object-cover -mt-32 mb-8 border dark:border-gray-600"
                     style={{ maxHeight: '520px', width: '100%' }}
                   />
