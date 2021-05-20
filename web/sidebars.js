@@ -85,6 +85,7 @@ module.exports = {
       collapsed: false,
       items: [
         'guides/examples',
+        'guides/with-nextjs',
         'guides/with-react',
       ],
     },
