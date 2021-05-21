@@ -711,14 +711,12 @@ pages:
           ```js
           const { data, error } = await supabase
             .rpc('hello_world')
-          }
           ```
       - name: With Parameters
         js: |
           ```js
           const { data, error } = await supabase
             .rpc('echo_city', { name: 'The Shire' })
-          }
           ```
       - name: Bulk call
         js: |
@@ -728,7 +726,6 @@ pages:
               { name: 'The Shire' },
               { name: 'Mordor' }
             ])
-          }
           ```
       - name: With filters.
         description: |
@@ -749,7 +746,6 @@ pages:
           ```js
           const { data, error, count } = await supabase
             .rpc('hello_world', { count: 'exact' })
-          }
           ```
 
   subscribe():
