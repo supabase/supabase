@@ -20,7 +20,7 @@ const Index = ({}: Props) => {
   return (
     <>
       <Layout>
-        <Container>
+                              <Container>
           <Hero />
           <Features />
           <div className="relative">
