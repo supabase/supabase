@@ -2,14 +2,15 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Badge } from '@supabase/ui'
+import { Button, Badge } from '@supabase/ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
+
 import SolutionsData from 'data/Solutions.json'
 
 import Solutions from '~/components/Nav/Product'
-import Developers from './Developers'
-import { Button } from '@supabase/ui'
+import Developers from '~/components/Nav/Developers'
+import Annoucement from  '~/components/Nav/Annoucement'
 
 type Props = {
   darkMode: boolean
@@ -184,6 +185,7 @@ const Nav = (props: Props) => {
 
   return (
     <>
+      <Annoucement />
       <div className="sticky top-0 z-50">
         <nav className="bg-white dark:bg-gray-800 border-b dark:border-gray-600">
           {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
