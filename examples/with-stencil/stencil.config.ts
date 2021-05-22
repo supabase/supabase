@@ -12,13 +12,7 @@ export const config: Config = {
       // Comment the following line to disable service workers in production
       serviceWorker: null,
       baseUrl: 'https://stencil-supabase.local/',
-    }
+    },
   ],
-  plugins: [
-    sass(
-      {injectGlobalPaths: [
-        'src/assets/scss/helpers/variables.scss'
-      ]}
-    )
-  ]
+  plugins: [sass({ injectGlobalPaths: ['src/assets/scss/helpers/variables.scss'] })],
 };

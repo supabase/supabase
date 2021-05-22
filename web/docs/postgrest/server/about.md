@@ -4,7 +4,7 @@ title: PostgREST API Server
 description: 'PostgREST is a standalone web server that turns your PostgreSQL database directly into a RESTful API.'
 ---
 
-PostgREST is a standalone web server that turns your PostgreSQL database directly into a RESTful API. 
+PostgREST is a standalone web server that turns your PostgreSQL database directly into a RESTful API.
 
 The structural constraints and permissions in the database determine the API endpoints and operations.
 
@@ -15,7 +15,7 @@ Latest documentation is at [postgrest.org](http://postgrest.org). You can contri
 ## Performance
 
 TLDR; subsecond response times for up to 2000 requests/sec on Heroku
-free tier. If you're used to servers written in interpreted languages, 
+free tier. If you're used to servers written in interpreted languages,
 prepare to be pleasantly surprised by PostgREST performance.
 
 Three factors contribute to the speed. First the server is written
@@ -25,19 +25,19 @@ HTTP server (aka a compiled language with lightweight threads).
 Next it delegates as much calculation as possible to the database
 including
 
-* Serializing JSON responses directly in SQL
-* Data validation
-* Authorization
-* Combined row counting and retrieval
-* Data post in single command (`returning *`)
+- Serializing JSON responses directly in SQL
+- Data validation
+- Authorization
+- Combined row counting and retrieval
+- Data post in single command (`returning *`)
 
 Finally it uses the database efficiently with the
 [Hasql](https://nikita-volkov.github.io/hasql-benchmarks/) library
 by
 
-* Keeping a pool of db connections
-* Using the PostgreSQL binary protocol
-* Being stateless to allow horizontal scaling
+- Keeping a pool of db connections
+- Using the PostgreSQL binary protocol
+- Being stateless to allow horizontal scaling
 
 ## Security
 
@@ -45,7 +45,7 @@ PostgREST [handles
 authentication](http://postgrest.org/en/stable/auth.html) (via JSON Web
 Tokens) and delegates authorization to the role information defined in
 the database. This ensures there is a single declarative source of truth
-for security.  When dealing with the database the server assumes the
+for security. When dealing with the database the server assumes the
 identity of the currently authenticated user, and for the duration of
 the connection cannot do anything the user themselves couldn't. Other
 forms of authentication can be built on top of the JWT primitive. See
@@ -75,7 +75,7 @@ generate up-to-date documentation for APIs. You can use a tool like
 [Swagger-UI](https://github.com/swagger-api/swagger-ui) to render
 interactive documentation for demo requests against the live API server.
 
-This project uses HTTP to communicate other metadata as well.  For
+This project uses HTTP to communicate other metadata as well. For
 instance the number of rows returned by an endpoint is reported by -
 and limited with - range headers. More about
 [that](http://begriffs.com/posts/2014-03-06-beyond-http-header-links.html).

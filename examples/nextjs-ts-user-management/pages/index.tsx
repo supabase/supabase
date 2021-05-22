@@ -41,7 +41,7 @@ export default function Home() {
   }
 
   return (
-    <div className="container" style={{padding: '50px 0 100px 0'}}>
+    <div className="container" style={{ padding: '50px 0 100px 0' }}>
       {!session ? (
         <Auth />
       ) : (
@@ -50,7 +50,7 @@ export default function Home() {
             <h3>Account</h3>
             <Account key={session.user.id} session={session} />
           </div>
-          <div className="col-6" >
+          <div className="col-6">
             <h3>Public Profiles</h3>
             <ProfileList profiles={profiles} />
           </div>

@@ -9,38 +9,35 @@ const appMsg = (key: string): string => {
 };
 const checkEmpty = (value: any): boolean => {
   return value;
-}
+};
 const getFormValidations = (key, values = {}) => {
   const validations = {
     login: {
       email: {
         value: values['email'] ? values['email'] : null,
         validate: checkEmpty,
-        isValid: values['email'] ? true : false
+        isValid: values['email'] ? true : false,
       },
       password: {
         value: values['password'] ? values['password'] : null,
         validate: checkEmpty,
-        isValid: values['password'] ? true : false
-      }
+        isValid: values['password'] ? true : false,
+      },
     },
     register: {
       email: {
         value: values['email'] ? values['email'] : null,
         validate: checkEmpty,
-        isValid: values['email'] ? true : false
+        isValid: values['email'] ? true : false,
       },
       password: {
         value: values['password'] ? values['password'] : null,
         validate: checkEmpty,
-        isValid: values['password'] ? true : false
-      }
+        isValid: values['password'] ? true : false,
+      },
     },
   };
-  return validations[key] ? validations[key] : {}
-}
+  return validations[key] ? validations[key] : {};
+};
 
-export {
-  appMsg,
-  getFormValidations
-}
+export { appMsg, getFormValidations };

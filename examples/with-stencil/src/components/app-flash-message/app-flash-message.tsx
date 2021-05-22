@@ -6,26 +6,24 @@
 
 import { Component, h, Prop, Watch } from '@stencil/core';
 
-
 @Component({
   tag: 'app-flash-message',
-  styleUrl: 'app-flash-message.scss'
+  styleUrl: 'app-flash-message.scss',
 })
 export class AppFlashMessage {
-
   /**
-  * Message type
-  */
+   * Message type
+   */
   @Prop() type: string = '';
 
   /**
    * alert closable.
-  */
+   */
   @Prop() closable: boolean = true;
 
   /**
-  * Show/hide alert message
-  */
+   * Show/hide alert message
+   */
   @Prop({ mutable: true, reflect: true }) show = true;
 
   @Watch('show')
@@ -38,10 +36,10 @@ export class AppFlashMessage {
   }
 
   /**
-  * Hide message
-  *
-  * @returns {(null | void)}
-  */
+   * Hide message
+   *
+   * @returns {(null | void)}
+   */
   async hideMessage() {
     if (!this.show) {
       return null;
@@ -50,10 +48,10 @@ export class AppFlashMessage {
   }
 
   /**
-  * Show message
-  *
-  * @returns {(null | void)}
-  */
+   * Show message
+   *
+   * @returns {(null | void)}
+   */
   async showMessage() {
     if (this.show) {
       return null;
@@ -69,22 +67,26 @@ export class AppFlashMessage {
   }
 
   /**
-  * Render component <app-flash-message>
-  *
-  * @returns {void}
-  */
+   * Render component <app-flash-message>
+   *
+   * @returns {void}
+   */
   render() {
     return (
       <div
         class={{
           'app-alert': true,
           'success': this.type === 'success',
-          'hidden': this.show == false
+          'hidden': this.show == false,
         }}
         role="alert"
         aria-hidden={this.show == false ? true : false}
       >
-        {this.closable && (<span class="app-close-btn" onClick={() => this.hideMessage()}>&times;</span>)}
+        {this.closable && (
+          <span class="app-close-btn" onClick={() => this.hideMessage()}>
+            &times;
+          </span>
+        )}
         <slot></slot>
       </div>
     );

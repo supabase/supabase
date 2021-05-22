@@ -1,5 +1,4 @@
 ---
-
 title: Xendit Built a Counter-Fraud Watchlist for the Fintech Industry
 description: See how Xendit use Supabase to build a full-text search engine.
 author: Rory Wilding
@@ -8,9 +7,9 @@ author_url: https://github.com/roryw10
 author_image_url: https://github.com/roryw10.png
 authorURL: https://github.com/roryw10
 image: /img/supabase-xendit.png
-tags: 
-    - case-study
-    - fintech
+tags:
+  - case-study
+  - fintech
 ---
 
 [Xendit](https://www.xendit.co/) is one of South East Asia's largest payment processors. They use Supabase to run automated checks against international sanctions lists.
@@ -19,13 +18,11 @@ tags:
 
 ### About Xendit
 
-Xendit is a leading payment gateway for Indonesia and Southeast Asia. They enable businesses to accept payments in Indonesia with a single integration for  credit and debit cards, e-wallets, and bank transfer.
-
+Xendit is a leading payment gateway for Indonesia and Southeast Asia. They enable businesses to accept payments in Indonesia with a single integration for credit and debit cards, e-wallets, and bank transfer.
 
 ### Counter-fraud
 
 As a payment processor, Xendit are responsible for verifying that all transactions are legal. Any transactions which are suspicions must be verified against a strict set of criteria, and the parties involved need to be checked against international sanctions lists. This is a critical anti-money-laundering operation and needs to be performed in realtime to prevent any delays on legitimate payments.
-
 
 ### Why they chose Supabase
 
@@ -40,4 +37,3 @@ Supabase was perfect for their use case, as they needed something built fast. Th
 > The full solution was built and in production in less than one week.
 
 Xendit created a database function for searching, which they are able to call directly using their Python clients. They have plans to iterate on the current implementation using more advanced techniques, like machine learning, but for now the Supabase system has been in Production for 9 months without a problem.
-

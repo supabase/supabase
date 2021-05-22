@@ -27,7 +27,7 @@ const handleDatabaseEvent = (state: State, action: Action) => {
     }
   } else if (action.type === 'set') {
     return {
-      profiles: action.payload
+      profiles: action.payload,
     }
   }
   return { profiles: [] }

@@ -29,17 +29,17 @@ const styles = {
     padding: 10,
     textAlign: 'center',
     borderBottom: '1px solid #000',
-    margin: 0
+    margin: 0,
   },
   h5: {
     textTransform: 'uppercase',
     // opacity: 0.5,
     margin: '10px 0 0px 0',
-    fontSize: '0.9em'
+    fontSize: '0.9em',
   },
   card: {
     border: '1px solid #000',
-    boxShadow: 'none'
+    boxShadow: 'none',
   },
   cardBase: {
     fontSize: '0.9em',

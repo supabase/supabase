@@ -26,8 +26,8 @@ It makes it super easy to, for example, send magic link emails which your user's
 curl -X POST 'https://<project-ref>.supabase.co/auth/v1/magiclink' \
 -H "apikey: SUPABASE_KEY" \
 -H "Content-Type: application/json" \
--d '{ 
-  "email": "someone@email.com" 
+-d '{
+  "email": "someone@email.com"
 }'
 ```
 

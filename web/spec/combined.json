@@ -774,12 +774,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    278,
-                                    280,
-                                    281,
-                                    279
-                                  ]
+                                  "children": [278, 280, 281, 279]
                                 }
                               ],
                               "sources": [
@@ -1077,47 +1072,22 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    248
-                  ]
+                  "children": [248]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    241,
-                    245,
-                    247,
-                    244,
-                    243,
-                    242,
-                    246,
-                    250,
-                    249
-                  ]
+                  "children": [241, 245, 247, 244, 243, 242, 246, 250, 249]
                 },
                 {
                   "title": "Accessors",
                   "kind": 262144,
-                  "children": [
-                    255
-                  ]
+                  "children": [255]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    291,
-                    269,
-                    286,
-                    284,
-                    282,
-                    274,
-                    257,
-                    272,
-                    266,
-                    261
-                  ]
+                  "children": [291, 269, 286, 284, 282, 274, 257, 272, 266, 261]
                 }
               ],
               "sources": [
@@ -1262,14 +1232,7 @@
                 {
                   "title": "Variables",
                   "kind": 32,
-                  "children": [
-                    296,
-                    298,
-                    300,
-                    299,
-                    297,
-                    295
-                  ]
+                  "children": [296, 298, 300, 299, 297, 295]
                 }
               ],
               "sources": [
@@ -1289,16 +1252,12 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                240
-              ]
+              "children": [240]
             },
             {
               "title": "Object literals",
               "kind": 2097152,
-              "children": [
-                294
-              ]
+              "children": [294]
             }
           ],
           "sources": [
@@ -1406,9 +1365,7 @@
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                303
-              ]
+              "children": [303]
             }
           ],
           "sources": [
@@ -1701,14 +1658,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    38,
-                                    37,
-                                    33,
-                                    40,
-                                    39,
-                                    32
-                                  ]
+                                  "children": [38, 37, 33, 40, 39, 32]
                                 }
                               ],
                               "sources": [
@@ -2089,9 +2039,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        111
-                                      ]
+                                      "children": [111]
                                     }
                                   ]
                                 }
@@ -2177,10 +2125,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    113,
-                                    114
-                                  ]
+                                  "children": [113, 114]
                                 }
                               ],
                               "sources": [
@@ -2392,10 +2337,7 @@
                             {
                               "title": "Variables",
                               "kind": 32,
-                              "children": [
-                                127,
-                                128
-                              ]
+                              "children": [127, 128]
                             }
                           ],
                           "sources": [
@@ -2553,11 +2495,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    88,
-                                    90,
-                                    89
-                                  ]
+                                  "children": [88, 90, 89]
                                 }
                               ],
                               "sources": [
@@ -2822,10 +2760,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    103,
-                                    102
-                                  ]
+                                  "children": [103, 102]
                                 }
                               ],
                               "sources": [
@@ -3022,11 +2957,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    67,
-                                    68,
-                                    69
-                                  ]
+                                  "children": [67, 68, 69]
                                 }
                               ],
                               "sources": [
@@ -3131,10 +3062,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        72,
-                                        73
-                                      ]
+                                      "children": [72, 73]
                                     }
                                   ]
                                 }
@@ -3329,14 +3257,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    80,
-                                    79,
-                                    77,
-                                    75,
-                                    78,
-                                    76
-                                  ]
+                                  "children": [80, 79, 77, 75, 78, 76]
                                 }
                               ],
                               "sources": [
@@ -3440,9 +3361,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    118
-                                  ]
+                                  "children": [118]
                                 }
                               ],
                               "sources": [
@@ -3587,10 +3506,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    53,
-                                    54
-                                  ]
+                                  "children": [53, 54]
                                 }
                               ],
                               "sources": [
@@ -3665,9 +3581,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        57
-                                      ]
+                                      "children": [57]
                                     }
                                   ]
                                 }
@@ -3815,12 +3729,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    62,
-                                    61,
-                                    60,
-                                    59
-                                  ]
+                                  "children": [62, 61, 60, 59]
                                 }
                               ],
                               "sources": [
@@ -3996,11 +3905,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    95,
-                                    97,
-                                    96
-                                  ]
+                                  "children": [95, 97, 96]
                                 }
                               ],
                               "sources": [
@@ -4094,40 +3999,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    28
-                  ]
+                  "children": [28]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    41,
-                    44,
-                    43,
-                    42,
-                    46,
-                    45,
-                    48,
-                    47
-                  ]
+                  "children": [41, 44, 43, 42, 46, 45, 48, 47]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    107,
-                    119,
-                    85,
-                    83,
-                    104,
-                    98,
-                    63,
-                    115,
-                    49,
-                    91,
-                    81
-                  ]
+                  "children": [107, 119, 85, 83, 104, 98, 63, 115, 49, 91, 81]
                 }
               ],
               "sources": [
@@ -4149,9 +4031,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                27
-              ]
+              "children": [27]
             }
           ],
           "sources": [
@@ -4366,12 +4246,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    162,
-                                    167,
-                                    166,
-                                    168
-                                  ]
+                                  "children": [162, 167, 166, 168]
                                 }
                               ],
                               "sources": [
@@ -4809,10 +4684,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    218,
-                                    217
-                                  ]
+                                  "children": [218, 217]
                                 }
                               ],
                               "sources": [
@@ -5017,10 +4889,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        189,
-                                        188
-                                      ]
+                                      "children": [189, 188]
                                     }
                                   ]
                                 }
@@ -5263,12 +5132,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        197,
-                                        195,
-                                        196,
-                                        194
-                                      ]
+                                      "children": [197, 195, 196, 194]
                                     }
                                   ]
                                 }
@@ -5587,10 +5451,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    182,
-                                    181
-                                  ]
+                                  "children": [182, 181]
                                 }
                               ],
                               "sources": [
@@ -6083,10 +5944,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    212,
-                                    211
-                                  ]
+                                  "children": [212, 211]
                                 }
                               ],
                               "sources": [
@@ -6329,11 +6187,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    205,
-                                    203,
-                                    204
-                                  ]
+                                  "children": [205, 203, 204]
                                 }
                               ],
                               "sources": [
@@ -6382,35 +6236,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    157
-                  ]
+                  "children": [157]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    156,
-                    155,
-                    226,
-                    221,
-                    219,
-                    225,
-                    220
-                  ]
+                  "children": [156, 155, 226, 221, 219, 225, 220]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    213,
-                    183,
-                    169,
-                    176,
-                    227,
-                    206,
-                    198
-                  ]
+                  "children": [213, 183, 169, 176, 227, 206, 198]
                 }
               ],
               "sources": [
@@ -6456,9 +6292,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                153
-              ]
+              "children": [153]
             }
           ],
           "sources": [
@@ -6686,10 +6520,7 @@
                             {
                               "title": "Variables",
                               "kind": 32,
-                              "children": [
-                                141,
-                                143
-                              ]
+                              "children": [141, 143]
                             }
                           ]
                         }
@@ -6828,25 +6659,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    132
-                  ]
+                  "children": [132]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    131
-                  ]
+                  "children": [131]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    137,
-                    145,
-                    149
-                  ]
+                  "children": [137, 145, 149]
                 }
               ],
               "sources": [
@@ -6862,9 +6685,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                130
-              ]
+              "children": [130]
             }
           ],
           "sources": [
@@ -6919,9 +6740,7 @@
             {
               "title": "Variables",
               "kind": 32,
-              "children": [
-                2
-              ]
+              "children": [2]
             }
           ],
           "sources": [
@@ -6978,9 +6797,7 @@
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                309
-              ]
+              "children": [309]
             }
           ],
           "sources": [
@@ -7271,14 +7088,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        12,
-                        14,
-                        8,
-                        15,
-                        13,
-                        7
-                      ]
+                      "children": [12, 14, 8, 15, 13, 7]
                     }
                   ],
                   "sources": [
@@ -7509,14 +7319,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        19,
-                        20,
-                        23,
-                        24,
-                        21,
-                        22
-                      ]
+                      "children": [19, 20, 23, 24, 21, 22]
                     }
                   ],
                   "sources": [
@@ -7534,11 +7337,7 @@
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                5,
-                25,
-                16
-              ]
+              "children": [5, 25, 16]
             }
           ],
           "sources": [
@@ -7554,16 +7353,7 @@
         {
           "title": "Modules",
           "kind": 1,
-          "children": [
-            239,
-            302,
-            26,
-            152,
-            129,
-            1,
-            308,
-            4
-          ]
+          "children": [239, 302, 26, 152, 129, 1, 308, 4]
         }
       ]
     },
@@ -7745,11 +7535,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    213,
-                                    209,
-                                    208
-                                  ]
+                                  "children": [213, 209, 208]
                                 }
                               ],
                               "sources": [
@@ -8110,11 +7896,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    301,
-                                    302,
-                                    300
-                                  ]
+                                  "children": [301, 302, 300]
                                 }
                               ],
                               "sources": [
@@ -8261,10 +8043,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    278,
-                                    279
-                                  ]
+                                  "children": [278, 279]
                                 }
                               ],
                               "sources": [
@@ -8438,11 +8217,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    285,
-                                    286,
-                                    284
-                                  ]
+                                  "children": [285, 286, 284]
                                 }
                               ],
                               "sources": [
@@ -8610,11 +8385,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    318,
-                                    319,
-                                    317
-                                  ]
+                                  "children": [318, 319, 317]
                                 }
                               ],
                               "sources": [
@@ -8730,9 +8501,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    249
-                                  ]
+                                  "children": [249]
                                 }
                               ],
                               "sources": [
@@ -8839,10 +8608,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    251,
-                                    253
-                                  ]
+                                  "children": [251, 253]
                                 }
                               ],
                               "sources": [
@@ -8983,10 +8749,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    307,
-                                    308
-                                  ]
+                                  "children": [307, 308]
                                 }
                               ],
                               "sources": [
@@ -9102,9 +8865,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    259
-                                  ]
+                                  "children": [259]
                                 }
                               ],
                               "sources": [
@@ -9211,10 +8972,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    261,
-                                    263
-                                  ]
+                                  "children": [261, 263]
                                 }
                               ],
                               "sources": [
@@ -9330,9 +9088,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    239
-                                  ]
+                                  "children": [239]
                                 }
                               ],
                               "sources": [
@@ -9439,10 +9195,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    241,
-                                    243
-                                  ]
+                                  "children": [241, 243]
                                 }
                               ],
                               "sources": [
@@ -9636,9 +9389,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    230
-                                  ]
+                                  "children": [230]
                                 }
                               ],
                               "sources": [
@@ -9731,10 +9482,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    232,
-                                    233
-                                  ]
+                                  "children": [232, 233]
                                 }
                               ],
                               "sources": [
@@ -9845,9 +9593,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    272
-                                  ]
+                                  "children": [272]
                                 }
                               ],
                               "sources": [
@@ -9980,9 +9726,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    220
-                                  ]
+                                  "children": [220]
                                 }
                               ],
                               "sources": [
@@ -10080,10 +9824,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    222,
-                                    223
-                                  ]
+                                  "children": [222, 223]
                                 }
                               ],
                               "sources": [
@@ -10271,11 +10012,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    293,
-                                    294,
-                                    292
-                                  ]
+                                  "children": [293, 294, 292]
                                 }
                               ],
                               "sources": [
@@ -10305,38 +10042,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    204
-                  ]
+                  "children": [204]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    203,
-                    199,
-                    198
-                  ]
+                  "children": [203, 199, 198]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    264,
-                    295,
-                    273,
-                    280,
-                    313,
-                    244,
-                    303,
-                    254,
-                    234,
-                    309,
-                    224,
-                    268,
-                    214,
-                    287
-                  ]
+                  "children": [264, 295, 273, 280, 313, 244, 303, 254, 234, 309, 224, 268, 214, 287]
                 }
               ],
               "sources": [
@@ -10352,9 +10068,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                197
-              ]
+              "children": [197]
             }
           ],
           "sources": [
@@ -10693,15 +10407,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    343,
-                                    346,
-                                    342,
-                                    338,
-                                    345,
-                                    344,
-                                    337
-                                  ]
+                                  "children": [343, 346, 342, 338, 345, 344, 337]
                                 }
                               ],
                               "sources": [
@@ -11056,10 +10762,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        471,
-                                        472
-                                      ]
+                                      "children": [471, 472]
                                     }
                                   ]
                                 }
@@ -11121,10 +10824,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        474,
-                                        475
-                                      ]
+                                      "children": [474, 475]
                                     }
                                   ]
                                 }
@@ -11243,9 +10943,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    433
-                                  ]
+                                  "children": [433]
                                 }
                               ],
                               "sources": [
@@ -11377,12 +11075,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        435,
-                                        438,
-                                        437,
-                                        436
-                                      ]
+                                      "children": [435, 438, 437, 436]
                                     }
                                   ]
                                 }
@@ -11486,12 +11179,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        440,
-                                        443,
-                                        442,
-                                        441
-                                      ]
+                                      "children": [440, 443, 442, 441]
                                     }
                                   ]
                                 }
@@ -11628,10 +11316,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    449,
-                                    450
-                                  ]
+                                  "children": [449, 450]
                                 }
                               ],
                               "sources": [
@@ -11790,14 +11475,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    454,
-                                    457,
-                                    452,
-                                    455,
-                                    453,
-                                    456
-                                  ]
+                                  "children": [454, 457, 452, 455, 453, 456]
                                 }
                               ]
                             }
@@ -11901,12 +11579,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    459,
-                                    462,
-                                    461,
-                                    460
-                                  ]
+                                  "children": [459, 462, 461, 460]
                                 }
                               ]
                             }
@@ -12345,9 +12018,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        409
-                                      ]
+                                      "children": [409]
                                     }
                                   ]
                                 }
@@ -12434,10 +12105,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    411,
-                                    412
-                                  ]
+                                  "children": [411, 412]
                                 }
                               ],
                               "sources": [
@@ -12642,10 +12310,7 @@
                             {
                               "title": "Variables",
                               "kind": 32,
-                              "children": [
-                                425,
-                                426
-                              ]
+                              "children": [425, 426]
                             }
                           ],
                           "sources": [
@@ -12795,11 +12460,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    386,
-                                    388,
-                                    387
-                                  ]
+                                  "children": [386, 388, 387]
                                 }
                               ],
                               "sources": [
@@ -13037,10 +12698,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    401,
-                                    400
-                                  ]
+                                  "children": [401, 400]
                                 }
                               ],
                               "sources": [
@@ -13227,11 +12885,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    365,
-                                    366,
-                                    367
-                                  ]
+                                  "children": [365, 366, 367]
                                 }
                               ],
                               "sources": [
@@ -13328,10 +12982,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    370,
-                                    371
-                                  ]
+                                  "children": [370, 371]
                                 }
                               ],
                               "sources": [
@@ -13536,14 +13187,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    378,
-                                    377,
-                                    375,
-                                    373,
-                                    376,
-                                    374
-                                  ]
+                                  "children": [378, 377, 375, 373, 376, 374]
                                 }
                               ],
                               "sources": [
@@ -13637,9 +13281,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    416
-                                  ]
+                                  "children": [416]
                                 }
                               ],
                               "sources": [
@@ -13774,10 +13416,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    351,
-                                    352
-                                  ]
+                                  "children": [351, 352]
                                 }
                               ],
                               "sources": [
@@ -13844,9 +13483,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    355
-                                  ]
+                                  "children": [355]
                                 }
                               ],
                               "sources": [
@@ -14004,12 +13641,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    360,
-                                    359,
-                                    358,
-                                    357
-                                  ]
+                                  "children": [360, 359, 358, 357]
                                 }
                               ],
                               "sources": [
@@ -14178,11 +13810,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    393,
-                                    395,
-                                    394
-                                  ]
+                                  "children": [393, 395, 394]
                                 }
                               ],
                               "sources": [
@@ -14257,49 +13885,19 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    333
-                  ]
+                  "children": [333]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    325,
-                    328,
-                    327,
-                    326,
-                    330,
-                    329,
-                    332,
-                    331
-                  ]
+                  "children": [325, 328, 327, 326, 330, 329, 332, 331]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
                   "children": [
-                    467,
-                    427,
-                    444,
-                    476,
-                    482,
-                    465,
-                    463,
-                    485,
-                    479,
-                    487,
-                    405,
-                    417,
-                    383,
-                    381,
-                    402,
-                    396,
-                    361,
-                    413,
-                    347,
-                    389,
-                    379
+                    467, 427, 444, 476, 482, 465, 463, 485, 479, 487, 405, 417, 383, 381, 402, 396,
+                    361, 413, 347, 389, 379
                   ]
                 }
               ],
@@ -14445,14 +14043,7 @@
                 {
                   "title": "Variables",
                   "kind": 32,
-                  "children": [
-                    492,
-                    495,
-                    496,
-                    494,
-                    493,
-                    491
-                  ]
+                  "children": [492, 495, 496, 494, 493, 491]
                 }
               ],
               "sources": [
@@ -14472,16 +14063,12 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                324
-              ]
+              "children": [324]
             },
             {
               "title": "Object literals",
               "kind": 2097152,
-              "children": [
-                490
-              ]
+              "children": [490]
             }
           ],
           "sources": [
@@ -14587,16 +14174,7 @@
             {
               "title": "References",
               "kind": 16777216,
-              "children": [
-                500,
-                505,
-                499,
-                501,
-                504,
-                502,
-                503,
-                506
-              ]
+              "children": [500, 505, 499, 501, 504, 502, 503, 506]
             }
           ],
           "sources": [
@@ -14854,13 +14432,7 @@
                 {
                   "title": "Variables",
                   "kind": 32,
-                  "children": [
-                    114,
-                    113,
-                    112,
-                    115,
-                    116
-                  ]
+                  "children": [114, 113, 112, 115, 116]
                 }
               ],
               "sources": [
@@ -14880,20 +14452,12 @@
             {
               "title": "Variables",
               "kind": 32,
-              "children": [
-                106,
-                107,
-                109,
-                105,
-                110
-              ]
+              "children": [106, 107, 109, 105, 110]
             },
             {
               "title": "Object literals",
               "kind": 2097152,
-              "children": [
-                111
-              ]
+              "children": [111]
             }
           ],
           "sources": [
@@ -15082,14 +14646,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        123,
-                        122,
-                        120,
-                        124,
-                        125,
-                        121
-                      ]
+                      "children": [123, 122, 120, 124, 125, 121]
                     }
                   ],
                   "sources": [
@@ -15402,15 +14959,7 @@
                             {
                               "title": "Variables",
                               "kind": 32,
-                              "children": [
-                                133,
-                                135,
-                                136,
-                                132,
-                                134,
-                                138,
-                                137
-                              ]
+                              "children": [133, 135, 136, 132, 134, 138, 137]
                             }
                           ],
                           "sources": [
@@ -15656,21 +15205,12 @@
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                118
-              ]
+              "children": [118]
             },
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                156,
-                139,
-                126,
-                142,
-                151,
-                146
-              ]
+              "children": [156, 139, 126, 142, 151, 146]
             }
           ],
           "sources": [
@@ -15807,10 +15347,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    3,
-                    7
-                  ]
+                  "children": [3, 7]
                 }
               ],
               "sources": [
@@ -16474,30 +16011,17 @@
             {
               "title": "Interfaces",
               "kind": 256,
-              "children": [
-                2
-              ]
+              "children": [2]
             },
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                8
-              ]
+              "children": [8]
             },
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                9,
-                16,
-                24,
-                30,
-                12,
-                34,
-                39,
-                44
-              ]
+              "children": [9, 16, 24, 30, 12, 34, 39, 44]
             }
           ],
           "sources": [
@@ -16895,28 +16419,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    167
-                  ]
+                  "children": [167]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    166,
-                    163
-                  ]
+                  "children": [166, 163]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    170,
-                    179,
-                    172,
-                    182,
-                    175
-                  ]
+                  "children": [170, 179, 172, 182, 175]
                 }
               ],
               "sources": [
@@ -17125,19 +16638,12 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                162
-              ]
+              "children": [162]
             },
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                185,
-                192,
-                190,
-                188
-              ]
+              "children": [185, 192, 190, 188]
             }
           ],
           "sources": [
@@ -17197,9 +16703,7 @@
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                321
-              ]
+              "children": [321]
             }
           ],
           "sources": [
@@ -17384,13 +16888,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    95,
-                    94,
-                    93,
-                    96,
-                    97
-                  ]
+                  "children": [95, 94, 93, 96, 97]
                 }
               ],
               "sources": [
@@ -17611,15 +17109,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    52,
-                    54,
-                    53,
-                    51,
-                    55,
-                    56,
-                    57
-                  ]
+                  "children": [52, 54, 53, 51, 55, 56, 57]
                 }
               ],
               "sources": [
@@ -17812,11 +17302,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    84,
-                    83,
-                    89
-                  ]
+                  "children": [84, 83, 89]
                 }
               ],
               "sources": [
@@ -17927,9 +17413,7 @@
                         {
                           "title": "Variables",
                           "kind": 32,
-                          "children": [
-                            62
-                          ]
+                          "children": [62]
                         }
                       ],
                       "sources": [
@@ -18252,19 +17736,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    60,
-                    69,
-                    70,
-                    73,
-                    72,
-                    71,
-                    59,
-                    74,
-                    75,
-                    76,
-                    65
-                  ]
+                  "children": [60, 69, 70, 73, 72, 71, 59, 74, 75, 76, 65]
                 }
               ],
               "sources": [
@@ -18421,12 +17893,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    81,
-                    78,
-                    80,
-                    79
-                  ]
+                  "children": [81, 78, 80, 79]
                 }
               ],
               "sources": [
@@ -18533,11 +18000,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    99,
-                    100,
-                    101
-                  ]
+                  "children": [99, 100, 101]
                 }
               ],
               "sources": [
@@ -18639,22 +18102,12 @@
             {
               "title": "Interfaces",
               "kind": 256,
-              "children": [
-                92,
-                50,
-                82,
-                58,
-                77,
-                98
-              ]
+              "children": [92, 50, 82, 58, 77, 98]
             },
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                103,
-                102
-              ]
+              "children": [103, 102]
             }
           ],
           "sources": [
@@ -18670,17 +18123,7 @@
         {
           "title": "Modules",
           "kind": 1,
-          "children": [
-            196,
-            323,
-            498,
-            104,
-            117,
-            1,
-            161,
-            320,
-            49
-          ]
+          "children": [196, 323, 498, 104, 117, 1, 161, 320, 49]
         }
       ]
     },
@@ -18868,10 +18311,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    433,
-                                    437
-                                  ]
+                                  "children": [433, 437]
                                 }
                               ],
                               "sources": [
@@ -19282,9 +18722,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    452
-                                  ]
+                                  "children": [452]
                                 }
                               ],
                               "sources": [
@@ -19329,27 +18767,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    428
-                  ]
+                  "children": [428]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    423,
-                    427,
-                    422
-                  ]
+                  "children": [423, 427, 422]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    438,
-                    441,
-                    445
-                  ]
+                  "children": [438, 441, 445]
                 }
               ],
               "sources": [
@@ -19365,9 +18793,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                421
-              ]
+              "children": [421]
             }
           ],
           "sources": [
@@ -20450,9 +19876,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    222
-                                  ]
+                                  "children": [222]
                                 }
                               ],
                               "sources": [
@@ -21052,9 +20476,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    271
-                                  ]
+                                  "children": [271]
                                 }
                               ],
                               "sources": [
@@ -21622,9 +21044,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    127
-                                  ]
+                                  "children": [127]
                                 }
                               ],
                               "sources": [
@@ -21799,11 +21219,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    263,
-                                    265,
-                                    264
-                                  ]
+                                  "children": [263, 265, 264]
                                 }
                               ],
                               "sources": [
@@ -22057,9 +21473,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    236
-                                  ]
+                                  "children": [236]
                                 }
                               ],
                               "sources": [
@@ -22208,9 +21622,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    229
-                                  ]
+                                  "children": [229]
                                 }
                               ],
                               "sources": [
@@ -22349,9 +21761,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    278
-                                  ]
+                                  "children": [278]
                                 }
                               ],
                               "sources": [
@@ -23025,10 +22435,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    214,
-                                    215
-                                  ]
+                                  "children": [214, 215]
                                 }
                               ],
                               "sources": [
@@ -23478,9 +22885,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    243
-                                  ]
+                                  "children": [243]
                                 }
                               ],
                               "sources": [
@@ -23514,65 +22919,19 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    289
-                  ]
+                  "children": [289]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    202,
-                    288,
-                    177,
-                    172,
-                    283,
-                    281,
-                    192,
-                    197,
-                    207,
-                    287,
-                    182,
-                    187,
-                    282
-                  ]
+                  "children": [202, 288, 177, 172, 283, 281, 192, 197, 207, 287, 182, 187, 282]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
                   "children": [
-                    173,
-                    168,
-                    128,
-                    244,
-                    216,
-                    136,
-                    140,
-                    156,
-                    164,
-                    160,
-                    152,
-                    266,
-                    144,
-                    148,
-                    249,
-                    132,
-                    117,
-                    122,
-                    258,
-                    203,
-                    230,
-                    223,
-                    272,
-                    198,
-                    183,
-                    188,
-                    178,
-                    193,
-                    255,
-                    279,
-                    208,
-                    292,
+                    173, 168, 128, 244, 216, 136, 140, 156, 164, 160, 152, 266, 144, 148, 249, 132,
+                    117, 122, 258, 203, 230, 223, 272, 198, 183, 188, 178, 193, 255, 279, 208, 292,
                     237
                   ]
                 }
@@ -23732,16 +23091,12 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                115
-              ]
+              "children": [115]
             },
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                304
-              ]
+              "children": [304]
             }
           ],
           "sources": [
@@ -23925,10 +23280,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    313,
-                                    317
-                                  ]
+                                  "children": [313, 317]
                                 }
                               ],
                               "sources": [
@@ -24319,10 +23671,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    360,
-                                    359
-                                  ]
+                                  "children": [360, 359]
                                 }
                               ],
                               "sources": [
@@ -24519,10 +23868,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        331,
-                                        330
-                                      ]
+                                      "children": [331, 330]
                                     }
                                   ]
                                 }
@@ -24761,12 +24107,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        339,
-                                        337,
-                                        338,
-                                        336
-                                      ]
+                                      "children": [339, 337, 338, 336]
                                     }
                                   ]
                                 }
@@ -24934,10 +24275,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    324,
-                                    323
-                                  ]
+                                  "children": [324, 323]
                                 }
                               ],
                               "sources": [
@@ -25416,10 +24754,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    354,
-                                    353
-                                  ]
+                                  "children": [354, 353]
                                 }
                               ],
                               "sources": [
@@ -25647,11 +24982,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    347,
-                                    345,
-                                    346
-                                  ]
+                                  "children": [347, 345, 346]
                                 }
                               ],
                               "sources": [
@@ -25692,32 +25023,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    308
-                  ]
+                  "children": [308]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    368,
-                    363,
-                    361,
-                    367,
-                    362
-                  ]
+                  "children": [368, 363, 361, 367, 362]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    355,
-                    325,
-                    318,
-                    369,
-                    348,
-                    340
-                  ]
+                  "children": [355, 325, 318, 369, 348, 340]
                 }
               ],
               "sources": [
@@ -25765,9 +25081,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                306
-              ]
+              "children": [306]
             }
           ],
           "sources": [
@@ -25951,10 +25265,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    389,
-                                    393
-                                  ]
+                                  "children": [389, 393]
                                 }
                               ],
                               "sources": [
@@ -26332,9 +25643,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    399
-                                  ]
+                                  "children": [399]
                                 }
                               ],
                               "sources": [
@@ -26676,28 +25985,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    384
-                  ]
+                  "children": [384]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    407,
-                    402,
-                    400,
-                    406,
-                    401
-                  ]
+                  "children": [407, 402, 400, 406, 401]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    394,
-                    408
-                  ]
+                  "children": [394, 408]
                 }
               ],
               "sources": [
@@ -26745,9 +26043,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                382
-              ]
+              "children": [382]
             }
           ],
           "sources": [
@@ -27180,9 +26476,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    81
-                                  ]
+                                  "children": [81]
                                 }
                               ],
                               "sources": [
@@ -27357,11 +26651,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    73,
-                                    75,
-                                    74
-                                  ]
+                                  "children": [73, 75, 74]
                                 }
                               ],
                               "sources": [
@@ -27500,9 +26790,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    88
-                                  ]
+                                  "children": [88]
                                 }
                               ],
                               "sources": [
@@ -27937,32 +27225,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    99
-                  ]
+                  "children": [99]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    98,
-                    93,
-                    91,
-                    97,
-                    92
-                  ]
+                  "children": [98, 93, 91, 97, 92]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    76,
-                    68,
-                    82,
-                    65,
-                    89,
-                    102
-                  ]
+                  "children": [76, 68, 82, 65, 89, 102]
                 }
               ],
               "sources": [
@@ -28017,9 +27290,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                63
-              ]
+              "children": [63]
             }
           ],
           "sources": [
@@ -28617,27 +27888,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    37
-                  ]
+                  "children": [37]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    36,
-                    31,
-                    29,
-                    35,
-                    30
-                  ]
+                  "children": [36, 31, 29, 35, 30]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    40
-                  ]
+                  "children": [40]
                 }
               ],
               "sources": [
@@ -28736,10 +27997,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    3,
-                    4
-                  ]
+                  "children": [3, 4]
                 }
               ],
               "sources": [
@@ -28898,14 +28156,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    16,
-                    17,
-                    15,
-                    14,
-                    18,
-                    19
-                  ]
+                  "children": [16, 17, 15, 14, 18, 19]
                 }
               ],
               "sources": [
@@ -29077,14 +28328,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    9,
-                    10,
-                    8,
-                    7,
-                    11,
-                    12
-                  ]
+                  "children": [9, 10, 8, 7, 11, 12]
                 }
               ],
               "sources": [
@@ -29223,13 +28467,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    24,
-                    23,
-                    22,
-                    25,
-                    26
-                  ]
+                  "children": [24, 23, 22, 25, 26]
                 }
               ],
               "sources": [
@@ -29350,12 +28588,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        57,
-                        55,
-                        56,
-                        54
-                      ]
+                      "children": [57, 55, 56, 54]
                     }
                   ],
                   "sources": [
@@ -29469,28 +28702,17 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                27
-              ]
+              "children": [27]
             },
             {
               "title": "Interfaces",
               "kind": 256,
-              "children": [
-                2,
-                13,
-                5,
-                20
-              ]
+              "children": [2, 13, 5, 20]
             },
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                52,
-                58,
-                60
-              ]
+              "children": [52, 58, 60]
             }
           ],
           "sources": [
@@ -29506,15 +28728,7 @@
         {
           "title": "Modules",
           "kind": 1,
-          "children": [
-            420,
-            453,
-            114,
-            305,
-            381,
-            62,
-            1
-          ]
+          "children": [420, 453, 114, 305, 381, 62, 1]
         }
       ]
     },
@@ -30804,10 +30018,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    238,
-                                    237
-                                  ]
+                                  "children": [238, 237]
                                 }
                               ],
                               "sources": [
@@ -31498,12 +30709,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        223,
-                        224,
-                        225,
-                        222
-                      ]
+                      "children": [223, 224, 225, 222]
                     }
                   ],
                   "sources": [
@@ -31523,70 +30729,28 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    226
-                  ]
+                  "children": [226]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
                   "children": [
-                    196,
-                    218,
-                    216,
-                    215,
-                    197,
-                    198,
-                    208,
-                    210,
-                    214,
-                    209,
-                    202,
-                    211,
-                    217,
-                    213,
-                    212,
-                    219,
-                    220,
-                    206,
-                    207
+                    196, 218, 216, 215, 197, 198, 208, 210, 214, 209, 202, 211, 217, 213, 212, 219,
+                    220, 206, 207
                   ]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
                   "children": [
-                    288,
-                    295,
-                    280,
-                    283,
-                    278,
-                    297,
-                    299,
-                    286,
-                    263,
-                    230,
-                    256,
-                    232,
-                    274,
-                    258,
-                    239,
-                    276,
-                    247,
-                    271,
-                    250,
-                    253,
-                    244,
-                    268,
-                    260
+                    288, 295, 280, 283, 278, 297, 299, 286, 263, 230, 256, 232, 274, 258, 239, 276,
+                    247, 271, 250, 253, 244, 268, 260
                   ]
                 },
                 {
                   "title": "Object literals",
                   "kind": 2097152,
-                  "children": [
-                    221
-                  ]
+                  "children": [221]
                 }
               ],
               "sources": [
@@ -31696,12 +30860,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        322,
-                        323,
-                        324,
-                        321
-                      ]
+                      "children": [322, 323, 324, 321]
                     }
                   ],
                   "sources": [
@@ -32050,18 +31209,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        309,
-                        308,
-                        311,
-                        305,
-                        307,
-                        306,
-                        315,
-                        310,
-                        304,
-                        303
-                      ]
+                      "children": [309, 308, 311, 305, 307, 306, 315, 310, 304, 303]
                     }
                   ],
                   "sources": [
@@ -32108,24 +31256,17 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                195
-              ]
+              "children": [195]
             },
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                319,
-                301
-              ]
+              "children": [319, 301]
             },
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                325
-              ]
+              "children": [325]
             }
           ],
           "sources": [
@@ -33430,51 +32571,19 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    99
-                  ]
+                  "children": [99]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    92,
-                    96,
-                    95,
-                    101,
-                    98,
-                    97,
-                    102,
-                    94,
-                    93,
-                    100
-                  ]
+                  "children": [92, 96, 95, 101, 98, 97, 102, 94, 93, 100]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
                   "children": [
-                    125,
-                    159,
-                    161,
-                    163,
-                    165,
-                    167,
-                    140,
-                    143,
-                    122,
-                    118,
-                    112,
-                    115,
-                    135,
-                    127,
-                    148,
-                    107,
-                    156,
-                    145,
-                    109,
-                    151,
-                    132
+                    125, 159, 161, 163, 165, 167, 140, 143, 122, 118, 112, 115, 135, 127, 148, 107,
+                    156, 145, 109, 151, 132
                   ]
                 }
               ],
@@ -33491,9 +32600,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                91
-              ]
+              "children": [91]
             }
           ],
           "sources": [
@@ -33630,13 +32737,7 @@
                 {
                   "title": "Enumeration members",
                   "kind": 16,
-                  "children": [
-                    14,
-                    15,
-                    16,
-                    18,
-                    17
-                  ]
+                  "children": [14, 15, 16, 18, 17]
                 }
               ],
               "sources": [
@@ -33746,13 +32847,7 @@
                 {
                   "title": "Enumeration members",
                   "kind": 16,
-                  "children": [
-                    8,
-                    9,
-                    10,
-                    11,
-                    12
-                  ]
+                  "children": [8, 9, 10, 11, 12]
                 }
               ],
               "sources": [
@@ -33845,12 +32940,7 @@
                 {
                   "title": "Enumeration members",
                   "kind": 16,
-                  "children": [
-                    6,
-                    5,
-                    3,
-                    4
-                  ]
+                  "children": [6, 5, 3, 4]
                 }
               ],
               "sources": [
@@ -33892,9 +32982,7 @@
                 {
                   "title": "Enumeration members",
                   "kind": 16,
-                  "children": [
-                    20
-                  ]
+                  "children": [20]
                 }
               ],
               "sources": [
@@ -33976,21 +33064,12 @@
             {
               "title": "Enumerations",
               "kind": 4,
-              "children": [
-                13,
-                7,
-                2,
-                19
-              ]
+              "children": [13, 7, 2, 19]
             },
             {
               "title": "Variables",
               "kind": 32,
-              "children": [
-                22,
-                21,
-                23
-              ]
+              "children": [22, 21, 23]
             }
           ],
           "sources": [
@@ -34276,10 +33355,7 @@
                           {
                             "title": "Variables",
                             "kind": 32,
-                            "children": [
-                              50,
-                              49
-                            ]
+                            "children": [50, 49]
                           }
                         ],
                         "sources": [
@@ -34368,10 +33444,7 @@
                             {
                               "title": "Variables",
                               "kind": 32,
-                              "children": [
-                                46,
-                                45
-                              ]
+                              "children": [46, 45]
                             }
                           ],
                           "sources": [
@@ -34726,10 +33799,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    86,
-                                    85
-                                  ]
+                                  "children": [86, 85]
                                 }
                               ],
                               "sources": [
@@ -34988,40 +34058,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    52
-                  ]
+                  "children": [52]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    53,
-                    54,
-                    55,
-                    47,
-                    43,
-                    42,
-                    51,
-                    40,
-                    56,
-                    41
-                  ]
+                  "children": [53, 54, 55, 47, 43, 42, 51, 40, 56, 41]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    77,
-                    79,
-                    87,
-                    81,
-                    67,
-                    62,
-                    65,
-                    71,
-                    73
-                  ]
+                  "children": [77, 79, 87, 81, 67, 62, 65, 71, 73]
                 }
               ],
               "sources": [
@@ -35037,9 +34084,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                39
-              ]
+              "children": [39]
             }
           ],
           "sources": [
@@ -35219,12 +34264,7 @@
                             {
                               "title": "Variables",
                               "kind": 32,
-                              "children": [
-                                182,
-                                183,
-                                180,
-                                181
-                              ]
+                              "children": [182, 183, 180, 181]
                             }
                           ]
                         }
@@ -35394,12 +34434,7 @@
                             {
                               "title": "Variables",
                               "kind": 32,
-                              "children": [
-                                192,
-                                193,
-                                190,
-                                191
-                              ]
+                              "children": [192, 193, 190, 191]
                             }
                           ],
                           "sources": [
@@ -35494,18 +34529,12 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    171
-                  ]
+                  "children": [171]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    176,
-                    184,
-                    172
-                  ]
+                  "children": [176, 184, 172]
                 }
               ],
               "sources": [
@@ -35521,9 +34550,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                170
-              ]
+              "children": [170]
             }
           ],
           "sources": [
@@ -35784,27 +34811,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    28
-                  ]
+                  "children": [28]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    29,
-                    26,
-                    30,
-                    27
-                  ]
+                  "children": [29, 26, 30, 27]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    34,
-                    36
-                  ]
+                  "children": [34, 36]
                 }
               ],
               "sources": [
@@ -35820,9 +34837,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                25
-              ]
+              "children": [25]
             }
           ],
           "sources": [
@@ -36252,29 +35267,8 @@
                   "title": "Enumeration members",
                   "kind": 16,
                   "children": [
-                    329,
-                    330,
-                    331,
-                    332,
-                    333,
-                    334,
-                    335,
-                    336,
-                    337,
-                    338,
-                    339,
-                    340,
-                    341,
-                    342,
-                    343,
-                    344,
-                    345,
-                    346,
-                    347,
-                    348,
-                    349,
-                    350,
-                    351
+                    329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344,
+                    345, 346, 347, 348, 349, 350, 351
                   ]
                 }
               ],
@@ -36388,12 +35382,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        354,
-                        355,
-                        356,
-                        357
-                      ]
+                      "children": [354, 355, 356, 357]
                     }
                   ],
                   "sources": [
@@ -36683,9 +35672,7 @@
                             {
                               "title": "Variables",
                               "kind": 32,
-                              "children": [
-                                368
-                              ]
+                              "children": [368]
                             }
                           ],
                           "sources": [
@@ -37432,36 +36419,17 @@
             {
               "title": "Enumerations",
               "kind": 4,
-              "children": [
-                328
-              ]
+              "children": [328]
             },
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                352,
-                358
-              ]
+              "children": [352, 358]
             },
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                378,
-                362,
-                372,
-                382,
-                406,
-                385,
-                388,
-                391,
-                394,
-                397,
-                400,
-                403,
-                410
-              ]
+              "children": [378, 362, 372, 382, 406, 385, 388, 391, 394, 397, 400, 403, 410]
             }
           ],
           "sources": [
@@ -37477,16 +36445,7 @@
         {
           "title": "Modules",
           "kind": 1,
-          "children": [
-            194,
-            90,
-            413,
-            1,
-            38,
-            169,
-            24,
-            327
-          ]
+          "children": [194, 90, 413, 1, 38, 169, 24, 327]
         }
       ]
     },
@@ -37845,10 +36804,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    263,
-                                    264
-                                  ]
+                                  "children": [263, 264]
                                 }
                               ],
                               "sources": [
@@ -37989,9 +36945,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                279
-                                              ]
+                                              "children": [279]
                                             }
                                           ],
                                           "sources": [
@@ -38044,10 +36998,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    277,
-                                    280
-                                  ]
+                                  "children": [277, 280]
                                 }
                               ],
                               "sources": [
@@ -38188,9 +37139,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                271
-                                              ]
+                                              "children": [271]
                                             }
                                           ],
                                           "sources": [
@@ -38243,10 +37192,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    269,
-                                    272
-                                  ]
+                                  "children": [269, 272]
                                 }
                               ],
                               "sources": [
@@ -38450,10 +37396,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    257,
-                                    258
-                                  ]
+                                  "children": [257, 258]
                                 }
                               ],
                               "sources": [
@@ -38589,10 +37532,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    251,
-                                    252
-                                  ]
+                                  "children": [251, 252]
                                 }
                               ],
                               "sources": [
@@ -38632,29 +37572,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    233
-                  ]
+                  "children": [233]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    244,
-                    243
-                  ]
+                  "children": [244, 243]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    259,
-                    273,
-                    265,
-                    240,
-                    253,
-                    248
-                  ]
+                  "children": [259, 273, 265, 240, 253, 248]
                 }
               ],
               "sources": [
@@ -38677,9 +37605,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                232
-              ]
+              "children": [232]
             }
           ],
           "sources": [
@@ -38765,14 +37691,7 @@
             {
               "title": "References",
               "kind": 16777216,
-              "children": [
-                282,
-                283,
-                285,
-                287,
-                286,
-                284
-              ]
+              "children": [282, 283, 285, 287, 286, 284]
             }
           ],
           "sources": [
@@ -39111,10 +38030,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    115,
-                                    116
-                                  ]
+                                  "children": [115, 116]
                                 }
                               ],
                               "sources": [
@@ -39245,9 +38161,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                131
-                                              ]
+                                              "children": [131]
                                             }
                                           ],
                                           "sources": [
@@ -39300,10 +38214,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    129,
-                                    132
-                                  ]
+                                  "children": [129, 132]
                                 }
                               ],
                               "sources": [
@@ -39434,9 +38345,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                123
-                                              ]
+                                              "children": [123]
                                             }
                                           ],
                                           "sources": [
@@ -39489,10 +38398,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    121,
-                                    124
-                                  ]
+                                  "children": [121, 124]
                                 }
                               ],
                               "sources": [
@@ -39633,10 +38539,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    109,
-                                    110
-                                  ]
+                                  "children": [109, 110]
                                 }
                               ],
                               "sources": [
@@ -39762,10 +38665,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    103,
-                                    104
-                                  ]
+                                  "children": [103, 104]
                                 }
                               ],
                               "sources": [
@@ -39795,28 +38695,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    93
-                  ]
+                  "children": [93]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    89,
-                    88
-                  ]
+                  "children": [89, 88]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    111,
-                    125,
-                    117,
-                    105,
-                    100
-                  ]
+                  "children": [111, 125, 117, 105, 100]
                 }
               ],
               "sources": [
@@ -39839,9 +38728,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                87
-              ]
+              "children": [87]
             }
           ],
           "sources": [
@@ -40286,9 +39173,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                188
-                                              ]
+                                              "children": [188]
                                             }
                                           ],
                                           "sources": [
@@ -40370,11 +39255,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    186,
-                                    189,
-                                    190
-                                  ]
+                                  "children": [186, 189, 190]
                                 }
                               ],
                               "sources": [
@@ -40514,10 +39395,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    195,
-                                    196
-                                  ]
+                                  "children": [195, 196]
                                 }
                               ],
                               "sources": [
@@ -40707,10 +39585,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    209,
-                                    210
-                                  ]
+                                  "children": [209, 210]
                                 }
                               ],
                               "sources": [
@@ -40857,9 +39732,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                179
-                                              ]
+                                              "children": [179]
                                             }
                                           ],
                                           "sources": [
@@ -40912,10 +39785,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    177,
-                                    180
-                                  ]
+                                  "children": [177, 180]
                                 }
                               ],
                               "sources": [
@@ -41062,10 +39932,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    201,
-                                    202
-                                  ]
+                                  "children": [201, 202]
                                 }
                               ],
                               "sources": [
@@ -41230,9 +40097,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                170
-                                              ]
+                                              "children": [170]
                                             }
                                           ],
                                           "sources": [
@@ -41285,10 +40150,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    168,
-                                    171
-                                  ]
+                                  "children": [168, 171]
                                 }
                               ],
                               "sources": [
@@ -41453,9 +40315,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                160
-                                              ]
+                                              "children": [160]
                                             }
                                           ],
                                           "sources": [
@@ -41508,10 +40368,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    158,
-                                    161
-                                  ]
+                                  "children": [158, 161]
                                 }
                               ],
                               "sources": [
@@ -41541,32 +40398,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    144
-                  ]
+                  "children": [144]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    143,
-                    139,
-                    138
-                  ]
+                  "children": [143, 139, 138]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    211,
-                    181,
-                    191,
-                    203,
-                    172,
-                    197,
-                    162,
-                    152
-                  ]
+                  "children": [211, 181, 191, 203, 172, 197, 162, 152]
                 }
               ],
               "sources": [
@@ -41610,9 +40452,7 @@
                 {
                   "title": "Variables",
                   "kind": 32,
-                  "children": [
-                    221
-                  ]
+                  "children": [221]
                 }
               ],
               "sources": [
@@ -41724,10 +40564,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        218,
-                        219
-                      ]
+                      "children": [218, 219]
                     }
                   ],
                   "sources": [
@@ -41747,17 +40584,12 @@
                 {
                   "title": "Variables",
                   "kind": 32,
-                  "children": [
-                    215,
-                    216
-                  ]
+                  "children": [215, 216]
                 },
                 {
                   "title": "Object literals",
                   "kind": 2097152,
-                  "children": [
-                    217
-                  ]
+                  "children": [217]
                 }
               ],
               "sources": [
@@ -41777,17 +40609,12 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                137
-              ]
+              "children": [137]
             },
             {
               "title": "Object literals",
               "kind": 2097152,
-              "children": [
-                220,
-                214
-              ]
+              "children": [220, 214]
             }
           ],
           "sources": [
@@ -41924,10 +40751,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    3,
-                    7
-                  ]
+                  "children": [3, 7]
                 }
               ],
               "sources": [
@@ -41973,9 +40797,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    9
-                  ]
+                  "children": [9]
                 }
               ],
               "sources": [
@@ -42723,31 +41545,17 @@
             {
               "title": "Interfaces",
               "kind": 256,
-              "children": [
-                2,
-                8
-              ]
+              "children": [2, 8]
             },
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                10
-              ]
+              "children": [10]
             },
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                11,
-                18,
-                27,
-                34,
-                14,
-                39,
-                45,
-                51
-              ]
+              "children": [11, 18, 27, 34, 14, 39, 45, 51]
             }
           ],
           "sources": [
@@ -42805,9 +41613,7 @@
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                134
-              ]
+              "children": [134]
             }
           ],
           "sources": [
@@ -42913,16 +41719,7 @@
             {
               "title": "References",
               "kind": 16777216,
-              "children": [
-                225,
-                226,
-                228,
-                230,
-                229,
-                227,
-                223,
-                224
-              ]
+              "children": [225, 226, 228, 230, 229, 227, 223, 224]
             }
           ],
           "sources": [
@@ -43057,13 +41854,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    62,
-                    59,
-                    60,
-                    61,
-                    63
-                  ]
+                  "children": [62, 59, 60, 61, 63]
                 }
               ],
               "sources": [
@@ -43284,17 +42075,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    66,
-                    74,
-                    70,
-                    68,
-                    71,
-                    72,
-                    65,
-                    67,
-                    69
-                  ]
+                  "children": [66, 74, 70, 68, 71, 72, 65, 67, 69]
                 }
               ],
               "sources": [
@@ -43339,9 +42120,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    79
-                  ]
+                  "children": [79]
                 }
               ],
               "sources": [
@@ -43386,9 +42165,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    85
-                  ]
+                  "children": [85]
                 }
               ],
               "sources": [
@@ -43504,11 +42281,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    81,
-                    82,
-                    83
-                  ]
+                  "children": [81, 82, 83]
                 }
               ],
               "sources": [
@@ -43593,10 +42366,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    76,
-                    77
-                  ]
+                  "children": [76, 77]
                 }
               ],
               "sources": [
@@ -43612,14 +42382,7 @@
             {
               "title": "Interfaces",
               "kind": 256,
-              "children": [
-                58,
-                64,
-                78,
-                84,
-                80,
-                75
-              ]
+              "children": [58, 64, 78, 84, 80, 75]
             }
           ],
           "sources": [
@@ -43635,16 +42398,7 @@
         {
           "title": "Modules",
           "kind": 1,
-          "children": [
-            231,
-            281,
-            86,
-            136,
-            1,
-            133,
-            222,
-            57
-          ]
+          "children": [231, 281, 86, 136, 1, 133, 222, 57]
         }
       ]
     }

@@ -3,13 +3,12 @@ id: aup
 title: Acceptable Use Policy
 ---
 
-
 `Last Modified: 15 April 2021`
 
 This Acceptable Use Policy (this “Policy”) describes prohibited uses of the web services offered by Supabase, Inc. and its affiliates (the “Services”) and the website located at https://supabase.io (the “Supabase Site”). The examples described in this Policy are not exhaustive. We may modify this Policy at any time by posting a revised version on the Supabase Site. By using the Services or accessing the Supabase Site, you agree to the latest version of this Policy. If you violate the Policy or authorize or help others to do so, we may suspend or terminate your use of the Services.
 
-## No Illegal, Harmful, or Offensive Use or Content 
-  
+## No Illegal, Harmful, or Offensive Use or Content
+
 You may not use, or encourage, promote, facilitate or instruct others to use, the Services or Supabase Site for any illegal, harmful, fraudulent, infringing or offensive use, or to transmit, store, display, distribute or otherwise make available content that is illegal, harmful, fraudulent, infringing or offensive. Prohibited activities or content include:
 
 - **Illegal, Harmful or Fraudulent Activities.** Any activities that are illegal, that violate the rights of others, or that may be harmful to others, our operations or reputation, including disseminating, promoting or facilitating child pornography, offering or disseminating fraudulent goods, services, schemes, or promotions, make-money-fast schemes, ponzi and pyramid schemes, phishing, or pharming.
@@ -17,7 +16,6 @@ You may not use, or encourage, promote, facilitate or instruct others to use, th
 - **Offensive Content.** Content that is defamatory, obscene, abusive, invasive of privacy, or otherwise objectionable, including content that constitutes child pornography, relates to bestiality, or depicts non-consensual sex acts.
 - **Harmful Content.** Content or other computer technology that may damage, interfere with, surreptitiously intercept, or expropriate any system, program, or data, including viruses, Trojan horses, worms, time bombs, or cancelbots.
 - **Platform compliance.** Any activities that are deemed unacceptable by the platforms used by the Supabase Site and Services, including [AWS](https://aws.amazon.com/aup/).
-
 
 ## No Security Violations
 

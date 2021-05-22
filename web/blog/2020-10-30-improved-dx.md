@@ -7,8 +7,8 @@ author_url: https://github.com/kiwicopple
 author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
 authorURL: https://github.com/kiwicopple
 image: /img/supabase-js-1-0.png
-tags: 
-    - supabase
+tags:
+  - supabase
 ---
 
 Today we're releasing [supabase-js](https://github.com/supabase/supabase-js) version 1.0, and it comes with some major Developer Experience improvements.
@@ -23,7 +23,6 @@ Before digging into the improvements, we're excited to point out our new [develo
 - We added placeholders for the other languages that the community is developing. They have already started with Python, C#, Dart, Rust, and Swift. Expect to see the docs filling up soon!
 - We've added sections for all of the open source tools we use, including [Postgres](/docs/postgres/server/about), [PostgREST](/docs/postgrest/server/about), [GoTrue](/docs/gotrue/server/about), and [Realtime](/docs/realtime/server/about). We'll be filling these with lots of valuable information including self-hosting, benchmarks, and simple guides.
 
-
 ### Errors are returned, not thrown
 
 We attribute this improvement to community feedback. This has significantly improved the developer experience. Previously we would throw errors:
@@ -31,8 +30,7 @@ We attribute this improvement to community feedback. This has significantly impr
 ```js
 try {
   const { body } = supabase.from('todos').select('*')
-}
-catch (error) {
+} catch (error) {
   console.log(error)
 }
 ```
@@ -48,7 +46,6 @@ if (error) console.log(error)
 
 After testing this for a while we're very happy with this pattern. Errors are handled next to the offending function. Of course you can always rethrow the error if that's your preference.
 
-
 ### We created `gotrue-js`
 
 Our goal for `supabase-js` is to tie together many sub-libraries. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing open source tools.
@@ -60,10 +57,7 @@ Previously:
 ```js
 const {
   body: { user },
-} = await supabase.auth.signup(
-  'someone@email.com',
-  'password'
-)
+} = await supabase.auth.signup('someone@email.com', 'password')
 ```
 
 Now:
@@ -71,7 +65,7 @@ Now:
 ```js
 const { user, error } = await supabase.auth.signUp({
   email: 'someone@email.com',
-  password: 'password'
+  password: 'password',
 })
 ```
 
@@ -105,10 +99,9 @@ Now:
 const { data } = supabase.from('todos').select()
 ```
 
-
 ### Upgrading
 
-We have documented all of the changes in the [release notes](https://github.com/supabase/supabase-js/releases/tag/v1.0.1). 
+We have documented all of the changes in the [release notes](https://github.com/supabase/supabase-js/releases/tag/v1.0.1).
 
 To summarise the steps:
 
