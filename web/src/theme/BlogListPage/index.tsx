@@ -5,13 +5,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React from 'react';
+import React from 'react'
 
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import Layout from '@theme/Layout';
-import BlogPostItem from '@theme/BlogPostItem';
-import BlogListPaginator from '@theme/BlogListPaginator';
-import type {Props} from '@theme/BlogListPage';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
+import Layout from '@theme/Layout'
+import BlogPostItem from '@theme/BlogPostItem'
+import BlogListPaginator from '@theme/BlogListPaginator'
+import type { Props } from '@theme/BlogListPage'
 import Link from '@docusaurus/Link'
 import styles from './styles.module.css'
 import clsx from 'clsx'
@@ -32,14 +32,14 @@ const MONTHS = [
 ]
 
 function BlogListPage(props: Props): JSX.Element {
-  const {metadata, items} = props;
+  const { metadata, items } = props
   const {
-    siteConfig: {title: siteTitle},
-  } = useDocusaurusContext();
-  const isBlogOnlyMode = metadata.permalink === '/';
-  const title = isBlogOnlyMode ? siteTitle : 'Blog';
-  const {blogDescription} = metadata;
-  
+    siteConfig: { title: siteTitle },
+  } = useDocusaurusContext()
+  const isBlogOnlyMode = metadata.permalink === '/'
+  const title = isBlogOnlyMode ? siteTitle : 'Blog'
+  const { blogDescription } = metadata
+
   return (
     <Layout title={title} description={blogDescription}>
       <div className="BlogListPage container margin-vert--lg">
@@ -99,7 +99,7 @@ function BlogListPage(props: Props): JSX.Element {
                 )
               })}
             </div>
-            <div style={{paddingLeft: 12}}>
+            <div style={{ paddingLeft: 12 }}>
               <BlogListPaginator metadata={metadata} />
             </div>
           </main>
@@ -109,4 +109,4 @@ function BlogListPage(props: Props): JSX.Element {
   )
 }
 
-export default BlogListPage;
+export default BlogListPage

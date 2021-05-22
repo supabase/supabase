@@ -10,7 +10,7 @@ import SolutionsData from 'data/Solutions.json'
 
 import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
-import Annoucement from  '~/components/Nav/Annoucement'
+import Annoucement from '~/components/Nav/Annoucement'
 
 type Props = {
   darkMode: boolean

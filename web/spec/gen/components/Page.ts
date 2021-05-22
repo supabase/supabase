@@ -1,4 +1,4 @@
-const EDIT_BASE_URL = 'https://github.com/supabase/supabase/edit/master/web';
+const EDIT_BASE_URL = 'https://github.com/supabase/supabase/edit/master/web'
 
 type PageParmas = {
   id: string

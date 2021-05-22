@@ -7,18 +7,18 @@ author_url: https://github.com/roryw10
 author_image_url: https://github.com/roryw10.png
 authorURL: https://github.com/roryw10
 image: /img/supabase-tayfa.png
-tags: 
-    - case-study
-    - no-code
+tags:
+  - case-study
+  - no-code
 ---
+
 [**TAYFA**](https://usetayfa.com) is the fastest no-code approach to create and iterate on bespoke frontends. Learn how its solo founder, [Sarup Banskota](https://twitter.com/sarupbanskota?lang=en), was able to launch quickly with [Supabase](https://supabase.io), Next.js, and Vercel.
 
-
 <!--truncate-->
+
 ### Meet the founder
 
-Sarup's background is in open-source, web frontends, and devtools. In the summer of 2020, he was rapidly building MVPs as he explored different problem spaces. Sarup found that reusing his frontend work across projects, wasn't as simple as he'd have liked. 
-
+Sarup's background is in open-source, web frontends, and devtools. In the summer of 2020, he was rapidly building MVPs as he explored different problem spaces. Sarup found that reusing his frontend work across projects, wasn't as simple as he'd have liked.
 
 ![This image shows a quote from Sarup - Frontends should be as simple as: Sign-up, drag & drop, publish.](/img/sarup-tayfa.png)
 
@@ -28,24 +28,21 @@ Sarup's background is in open-source, web frontends, and devtools. In the summer
 
 ### The Maker Journey
 
-
 When Sarup found an interested customer, TAYFA was still a fuzzy idea in his head. As a workflow tool, the best way to demonstrate the concept was to build an MVP. His customer needed the product yesterday — there was no time to waste.
 
-He started out with a first iteration using Next.js and Vercel for the frontend — technologies he loved, and Firebase because he was familiar with it. However, he soon realised that for his enterprise customers, self-hosting capabilities would be a deal-breaker. Moreover, he'd require sensible RESTful APIs for developing the subsequent iterations of TAYFA. 
+He started out with a first iteration using Next.js and Vercel for the frontend — technologies he loved, and Firebase because he was familiar with it. However, he soon realised that for his enterprise customers, self-hosting capabilities would be a deal-breaker. Moreover, he'd require sensible RESTful APIs for developing the subsequent iterations of TAYFA.
 
-One option was to do it the "old-school" way: Postgres on a custom server, or MongoDB. But that would mean losing momentum by getting bogged down setting up a backend. 
+One option was to do it the "old-school" way: Postgres on a custom server, or MongoDB. But that would mean losing momentum by getting bogged down setting up a backend.
 
 ### Supabase helped shortcut development time
 
-Luckily, Sarup discovered Supabase through the Vercel community. Open-source and built on top of Postgres, it was perfect for his future self-hosting needs and also offered him an API out of the box. The current version of TAYFA is the third iteration, and also takes advantage of  Supabase Auth, an out of the box auth layer.
-
+Luckily, Sarup discovered Supabase through the Vercel community. Open-source and built on top of Postgres, it was perfect for his future self-hosting needs and also offered him an API out of the box. The current version of TAYFA is the third iteration, and also takes advantage of Supabase Auth, an out of the box auth layer.
 
 ![This image shows a quote from his customers - The speed at which TAYFA is evolving is crazy. I've seen ideas translate into live features 10 minutes after speaking on the phone.](/img/tanmai-tayfa.png)
 
-
-> *"If my product helps customers move fast, then I need to move fast.*
-> 
-> *Luckily with Supabase, I haven't had to worry about the health of my backend systems, and can focus on what I enjoy most: shipping frontend."* 
+> _"If my product helps customers move fast, then I need to move fast._
+>
+> _Luckily with Supabase, I haven't had to worry about the health of my backend systems, and can focus on what I enjoy most: shipping frontend."_
 >
 > Sarup Banskota, founder of TAYFA
 

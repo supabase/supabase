@@ -4,7 +4,7 @@ export default function TextLog({ log }) {
   const textLog = useRef(null)
 
   useEffect(() => {
-    textLog.current.scrollTop = textLog.current.scrollHeight;
+    textLog.current.scrollTop = textLog.current.scrollHeight
   }, [log])
 
   return (

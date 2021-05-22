@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import { supabase } from "lib/api";
+import React, { useState } from 'react'
+import { supabase } from 'lib/api'
 
 /**
  * Sign in with username and password
  *
  * @param {String} role   DRIVER/MANAGER. default as DRIVER
  */
-export default function SignIn({ role = "DRIVER" }) {
-  const [formData, updateFormData] = useState({ role });
-  const [action, setAction] = useState(null);
+export default function SignIn({ role = 'DRIVER' }) {
+  const [formData, updateFormData] = useState({ role })
+  const [action, setAction] = useState(null)
 
   function onChange(e) {
     updateFormData({
@@ -16,37 +16,37 @@ export default function SignIn({ role = "DRIVER" }) {
 
       // Trimming any whitespace
       [e.target.name]: e.target.value.trim(),
-    });
+    })
   }
 
   async function updateUserRole(user) {
-    if (!user || user.user_metadata?.role) return;
+    if (!user || user.user_metadata?.role) return
 
     // update user role
     await supabase.auth.update({
       data: { role },
-    });
+    })
   }
 
   async function onSubmit(event) {
-    event.preventDefault();
+    event.preventDefault()
 
     try {
-      if (action === "SIGNUP") {
-        const { email, password, role } = formData;
-        const { error, user } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
+      if (action === 'SIGNUP') {
+        const { email, password, role } = formData
+        const { error, user } = await supabase.auth.signUp({ email, password })
+        if (error) throw error
 
         // update user role
         await supabase.auth.update({
           data: { role },
-        });
-      } else if (action === "LOGIN") {
-        const { error } = await supabase.auth.signIn(formData);
-        if (error) throw error;
+        })
+      } else if (action === 'LOGIN') {
+        const { error } = await supabase.auth.signIn(formData)
+        if (error) throw error
       }
     } catch (error) {
-      alert(error.message);
+      alert(error.message)
     }
   }
 
@@ -60,10 +60,10 @@ export default function SignIn({ role = "DRIVER" }) {
         Password
         <input name="password" type="password" onChange={onChange} />
       </label>
-      <button type="submit" onClick={() => setAction("SIGNUP")}>
+      <button type="submit" onClick={() => setAction('SIGNUP')}>
         Sign up
       </button>
-      <button type="submit" onClick={() => setAction("LOGIN")}>
+      <button type="submit" onClick={() => setAction('LOGIN')}>
         Login
       </button>
       <style jsx>{`
@@ -93,5 +93,5 @@ export default function SignIn({ role = "DRIVER" }) {
         }
       `}</style>
     </form>
-  );
+  )
 }

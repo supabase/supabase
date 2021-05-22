@@ -6,11 +6,11 @@ author_title: Supabase
 author_url: https://github.com/dragarcia
 author_image_url: https://avatars0.githubusercontent.com/u/26374889?s=400&u=f5e35e9b47a50fa2b4d8c4bb96babd921071bcf1&v=4
 authorURL: https://github.com/dragarcia
-tags: 
-    - postgres
+tags:
+  - postgres
 ---
 
-PostgreSQL backups can be categorized into two types: *logical* and *physical*. This post briefly covers each type and discusses the situations where you would use either one.
+PostgreSQL backups can be categorized into two types: _logical_ and _physical_. This post briefly covers each type and discusses the situations where you would use either one.
 
 We'll cover some of the many tools you can use for Postgres backups in future posts.
 
@@ -64,13 +64,12 @@ As your database grows to the size of a few gigabytes, backing it up through phy
 
 Postgres also generates [Write Ahead Log](https://www.postgresql.org/docs/current/wal-intro.html) (WAL) files, which can be used together with a backed-up file system to [recover a database up to any chosen point in time](https://www.postgresql.org/docs/current/continuous-archiving.html). When disaster strikes, this is one of the best options for recreating your database up to the point right before the unfortunate happens. This greatly minimizes [Recovery Point Objective (RPO)](https://www.ibm.com/services/business-continuity/rpo) along the way. Even better, tools such as [WAL-G](https://github.com/wal-g/wal-g) are readily available to simplify the steps involved in setting this up.
 
-
 ## Conclusion
 
 All in all, logical and physical backups are generated differently from one another. Neither has an advantage over the other. Depending on your needs, each brings unique uses to the table:
 
-| Logical | Physical |
-|:--------|:---------|
-| Simpler way of getting started with backups. | Better way of handling backups for larger database clusters. |
-| Using it to migrate between different major versions of Postgres. | Using it for Point in Time Recovery. |
-| Having the option to back up a single database. |   |
+| Logical                                                           | Physical                                                     |
+| :---------------------------------------------------------------- | :----------------------------------------------------------- |
+| Simpler way of getting started with backups.                      | Better way of handling backups for larger database clusters. |
+| Using it to migrate between different major versions of Postgres. | Using it for Point in Time Recovery.                         |
+| Having the option to back up a single database.                   |                                                              |

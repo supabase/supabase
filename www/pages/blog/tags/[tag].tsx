@@ -19,7 +19,7 @@ export async function getStaticProps({ params }: any) {
 export async function getStaticPaths() {
   const categories = getAllCategories()
   return {
-    paths: categories.map(((category: any) => ({ params: { tag: category } }))),
+    paths: categories.map((category: any) => ({ params: { tag: category } })),
     fallback: false,
   }
 }
@@ -37,7 +37,9 @@ function TagBlogsPage(props: Props) {
       <DefaultLayout>
         <BlogHeader title={`${tag} posts`} />
         <div className="mt-12 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none">
-          {blogs.map((blog: PostTypes, idx: number) => <BlogListItem blog={blog} key={idx} />)}
+          {blogs.map((blog: PostTypes, idx: number) => (
+            <BlogListItem blog={blog} key={idx} />
+          ))}
         </div>
       </DefaultLayout>
     </>

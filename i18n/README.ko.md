@@ -67,7 +67,7 @@ Supabase 클라이언트 라이브러리는 모듈식 입니다. 각 하위 라�
   - `realtime-{lang}`: [Realtime](https://github.com/supabase/realtime)용 클라이언트 라이브러리
   - `gotrue-{lang}`: [GoTrue](https://github.com/netlify/gotrue)용 클라이언트 라이브러리
 
-| 저장소                  | 공식                                         | 커뮤니티                                                                                                                                                                                                                  |
+| 저장소                | 공식                                             | 커뮤니티                                                                                                                                                                                                                   |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
@@ -76,6 +76,7 @@ Supabase 클라이언트 라이브러리는 모듈식 입니다. 각 하위 라�
 
 <!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
+
 ## 번역
 
 - [번역](/i18n/languages.md) <!--- Keep only the this-->

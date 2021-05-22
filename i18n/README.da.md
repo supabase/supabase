@@ -41,7 +41,7 @@ Vi er i øjeblikket i Offentlig beta. Hold øje med udgivelser på denne side fo
 
 ## Hvordan virker det
 
-Supabase er en kombination af open source værktøjer. Vi bygger Firebase fuktioner med open source produkter der er egnede til anvendelse i virksomheder. Hvis der allerede eksisterer værktøjer med MIT, Apache 2 eller en  tilsvarende open source license, så vil vi anvende og støtte dette værktøj. Hvis sådan et værktøj ikke findes, så bygger vi det og udgiver det som open source. Supabase er ikke en en til en mapning af Firebase. Vores mål er at give udviklere en Firebase-lignende udvikleroplevelse ved hjælp af open source værktøjer.
+Supabase er en kombination af open source værktøjer. Vi bygger Firebase fuktioner med open source produkter der er egnede til anvendelse i virksomheder. Hvis der allerede eksisterer værktøjer med MIT, Apache 2 eller en tilsvarende open source license, så vil vi anvende og støtte dette værktøj. Hvis sådan et værktøj ikke findes, så bygger vi det og udgiver det som open source. Supabase er ikke en en til en mapning af Firebase. Vores mål er at give udviklere en Firebase-lignende udvikleroplevelse ved hjælp af open source værktøjer.
 
 **Nuværende arkitektur**
 
@@ -66,17 +66,18 @@ Vores klientbibliotek er opbygget modulært. Hvert underbibliotek er en selvstæ
   - `realtime-{lang}`: Klientbibliotek til at arbejde med [Realtime](https://github.com/supabase/realtime)
   - `gotrue-{lang}`: Klientbibliotek til at arbejde med [GoTrue](https://github.com/netlify/gotrue)
 
-| Repo                  | Officielt                                         | Fællesskab                                                                                                                                                                                                                  |
-| --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                \| [`Ruby`](https://github.com/supabase/supabase-rb)
-| `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) \| [`Ruby`](https://github.com/supabase/postgrest-rb)
-| `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                \| `Ruby`                                                |
-| `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      \| `Ruby`                                                |
+| Repo                  | Officielt                                        | Fællesskab                                                                                                                                                                                                                                                                       |
+| --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` \| [`Ruby`](https://github.com/supabase/supabase-rb)                                                 |
+| `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) \| [`Ruby`](https://github.com/supabase/postgrest-rb) |
+| `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust` \| `Ruby`                                                                                            |
+| `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust` \| `Ruby`                                                                                                  |
 
 <!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
 
 ## Oversættelser
+
 - [Liste med oversættelser](/i18n/languages.md) <!--- Keep only this -->
 
 ---
