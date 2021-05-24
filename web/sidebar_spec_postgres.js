@@ -23,6 +23,6 @@ module.exports = {
       label: 'Database Configuration',
       items: ['reference/postgres/database-passwords', 'reference/postgres/changing-timezones'],
       collapsed: true,
-    }
+    },
   ],
 }
