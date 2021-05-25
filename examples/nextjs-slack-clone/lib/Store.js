@@ -138,7 +138,7 @@ export const fetchUser = async (userId, setState) => {
  * Fetch all roles for the current user
  * @param {function} setState Optionally pass in a hook or callback to set the state
  */
- export const fetchUserRoles = async (setState) => {
+export const fetchUserRoles = async (setState) => {
   try {
     let { body } = await supabase.from('user_roles').select(`*`)
     if (setState) setState(body)

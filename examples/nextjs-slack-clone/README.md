@@ -115,7 +115,9 @@ Visit http://localhost:3000 and start chatting! Open a channel across two browse
 ## Supabase details
 
 ### Role-based access control (RBAC)
+
 Use [plus addressing](https://en.wikipedia.org/wiki/Email_address#Subaddressing) to sign up users with the `admin` & `moderator` roles. Email addresses including `+supaadmin@` will be assigned the `admin` role, and email addresses including `+supamod@` will be assigned the `moderator` role. For example:
+
 ```
 // admin user
 email+supaadmin@example.com
@@ -123,6 +125,7 @@ email+supaadmin@example.com
 // moderator user
 email+supamod@example.com
 ```
+
 Users with the `moderator` role can delete all messages. Users with the `admin` role can delete all messages and channels (note: it's not recommended to delete the `public` channel).
 
 ### Postgres Row level security
@@ -150,7 +153,7 @@ BEGIN
   WHERE role_permissions.permission = authorize.requested_permission
     AND user_roles.user_id = authorize.user_id
   INTO bind_permissions;
-  
+
   RETURN bind_permissions > 0;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
