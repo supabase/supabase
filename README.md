@@ -66,12 +66,12 @@ Our client library is modular. Each sub-library is a standalone implementation f
   - `realtime-{lang}`: Client library to work with [Realtime](https://github.com/supabase/realtime)
   - `gotrue-{lang}`: Client library to work with [GoTrue](https://github.com/netlify/gotrue)
 
-| Repo                  | Official                                         | Community                                                                                                                                                                                                                  |
-| --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                \| [`Ruby`](https://github.com/supabase/supabase-rb)
-| `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) \| [`Ruby`](https://github.com/supabase/postgrest-rb)
-| `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                \| `Ruby`                                                |
-| `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      \| `Ruby`                                                |
+| Repo                  | Official                                         | Community                                                                                                                                                                                                                                                                        |
+| --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` \| [`Ruby`](https://github.com/supabase/supabase-rb)                                                 |
+| `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) \| [`Ruby`](https://github.com/supabase/postgrest-rb) |
+| `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust` \| `Ruby`                                                                                            |
+| `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust` \| `Ruby`                                                                                                  |
 
 <!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
@@ -87,8 +87,10 @@ Our client library is modular. Each sub-library is a standalone implementation f
 - [Greek / Ελληνικά](/i18n/README.gr.md)
 - [Hindi / हिंदी](/i18n/README.hi.md)
 - [Nepali / नेपाली](/i18n/README.ne.md)
+- [Indonesian / Bahasa Indonesia](/i18n/README.id.md)
 - [Italiano / Italian](/i18n/README.it.md)
 - [Japanese / 日本語](/i18n/README.jp.md)
+- [Korean / 한국어](/i18n/README.ko.md)
 - [Norwegian (Bokmål) / Norsk (Bokmål)](/i18n/README.nb-no.md)
 - [Persian / فارسی](/i18n/README.fa.md)
 - [Polish / Polski](/i18n/README.pl.md)
@@ -98,6 +100,7 @@ Our client library is modular. Each sub-library is a standalone implementation f
 - [Russian / Pусский](/i18n/README.ru.md)
 - [Spanish / Español](/i18n/README.es.md)
 - [Simplified Chinese / 简体中文](/i18n/README.zh-cn.md)
+- [Swedish / Svenska](/i18n/README.sv.md)
 - [Traditional Chinese / 繁体中文](/i18n/README.zh-tw.md)
 - [Turkish / Türkçe](/i18n/README.tr.md)
 - [Ukrainian / Українська](/i18n/README.uk.md)

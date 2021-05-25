@@ -1,6 +1,6 @@
 # Stencil & Supabase Starter
 
-This is a boilerplate for creating a WebApp using [Stencil](https://github.com/ionic-team/stencil) + [Supabase](https://supabase.io/) + [Stencil Store](https://stenciljs.com/docs/stencil-store). 
+This is a boilerplate for creating a WebApp using [Stencil](https://github.com/ionic-team/stencil) + [Supabase](https://supabase.io/) + [Stencil Store](https://stenciljs.com/docs/stencil-store).
 
 <img src="./login-page.png" alt="Login Page">
 
@@ -38,13 +38,14 @@ src -> config -> config.ts
 ```js
 const supabaseConfig = {
   supabaseUrl: '',
-  supabaseKey: ''
+  supabaseKey: '',
 };
 ```
 
 You can find more about _Supabase Client_ config [on the official documentation page](https://supabase.io/docs/reference/javascript/initializing).
 
 To start a project, run:
+
 ```sh
 npm run start
 ```
@@ -72,7 +73,9 @@ npm run test.watch
 You can check the details of the [structure of our project through this file](./STRUCTURE.md)
 
 ## Contributing 👏
+
 - [Pull requests](https://github.com/ftonato/stencil-supabase/pulls) and 🌟 stars are always welcome.
 
 ## License
+
 [MIT &copy;](LICENSE)

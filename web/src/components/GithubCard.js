@@ -2,17 +2,19 @@ import React from 'react'
 
 export default function GithubCard({ title, description, href, stars, handle }) {
   return (
-      <a className={'card'} href={href} style={{height: '100%'}}>
-        <div className="card__body">
-          <h4 style={styles.h4} style={{margin: 0}}>{title.toUpperCase()}</h4>
-          <small>{description}</small>
-        </div>
-        <hr style={styles.hr} />
-        <div style={styles.cardBase}>
-          <div>@{handle}</div>
-          <div>{stars} ★</div>
-        </div>
-      </a>
+    <a className={'card'} href={href} style={{ height: '100%' }}>
+      <div className="card__body">
+        <h4 style={styles.h4} style={{ margin: 0 }}>
+          {title.toUpperCase()}
+        </h4>
+        <small>{description}</small>
+      </div>
+      <hr style={styles.hr} />
+      <div style={styles.cardBase}>
+        <div>@{handle}</div>
+        <div>{stars} ★</div>
+      </div>
+    </a>
   )
 }
 
@@ -22,7 +24,7 @@ const styles = {
   },
   h3: {
     margin: 0,
-    textTransform: 'capitalize'
+    textTransform: 'capitalize',
   },
   cardBase: {
     display: 'flex',

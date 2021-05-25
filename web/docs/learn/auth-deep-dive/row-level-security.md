@@ -8,7 +8,6 @@ description: Supabase Auth Deep Dive Part Two - Row Level Security
 
 Learn how to restrict access to your database tables by enabling Row Level Security and writing Postgres Policies in the Supabase Dashboard.
 
-
 ### Watch
 
 <iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/qY_iQ10IUhs" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
@@ -50,15 +49,13 @@ You can see that it's possible to freely read from and write to the table by usi
 
 ```js
 // Writing
-let { data, error } = await supabase
-  .from('leaderboard')
-  .insert({ name: 'Bob', score: 99999 })
+let { data, error } = await supabase.from('leaderboard').insert({ name: 'Bob', score: 99999 })
 
 // Reading
 let { data, error } = await supabase
   .from('leaderboard')
   .select('name, score')
-  .order('score', {ascending: false})
+  .order('score', { ascending: false })
 ```
 
 Now let's restrict access. We'll start by fully restricting the table. We can do this in the SQL editor by making a query:
@@ -105,7 +102,7 @@ $$ language sql stable;
 
 The purpose of the function is to extract the `role` claim from any JWTs that are passed to your API via the `Authorization: Bearer` header.
 
-Other available functions for use here include: `auth.email()` and `auth.uid()` which will fetch the `email` and `sub` claims respectively. 
+Other available functions for use here include: `auth.email()` and `auth.uid()` which will fetch the `email` and `sub` claims respectively.
 
 If you'd prefer to use the dashboard to add your policy you can do so by clicking "Add Policy" in the Policies tab and making a policy like this:
 

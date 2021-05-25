@@ -13,7 +13,7 @@ const MadeForDevelopers = () => {
       <APISection
         autoHeight={true}
         size="large"
-        title={"Instant APIs that do the hard work for you"}
+        title={'Instant APIs that do the hard work for you'}
         text={[
           <p className="lg:text-lg" key={'madefordeveloper-para-1'}>
             We introspect your database to provide APIs instantly. Stop building repetitive CRUD

@@ -66,7 +66,7 @@ Supabase 是一个[托管平台](https://app.supabase.io)。你可以注册并�
   - `realtime-{lang}`：与 [Realtime](https://github.com/supabase/realtime) 交互的客户端库
   - `gotrue-{lang}`：与 [GoTrue](https://github.com/netlify/gotrue) 交互的客户端库
 
-| 代码存储库            | 官方                                           | 社区                                                                                                                                                                                                                     |
+| 代码存储库            | 官方                                             | 社区                                                                                                                                                                                                                       |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |

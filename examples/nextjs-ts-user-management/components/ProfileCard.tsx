@@ -8,7 +8,9 @@ export default function ProfileCard({ profile }: { profile: Profile }) {
       <Avatar url={profile.avatar_url} size={100} />
       <div className="userInfo">
         <p className="username">{profile.username}</p>
-        <a className="website" href={profile.website} target="_blank">{profile.website}</a>
+        <a className="website" href={profile.website} target="_blank">
+          {profile.website}
+        </a>
         <p>
           <small>
             Last updated{' '}

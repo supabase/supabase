@@ -57,17 +57,17 @@ export default {
       try {
         this.state.loading = true
 
-        let { data, error } = await supabase
+        const { data, error } = await supabase
           .from('profiles')
           .select(`username, website, avatar_url`)
-          .eq('id', this.stete.propSession.user.id)
+          .eq('id', this.state.propSession.user.id)
           .single()
 
         if (error || !data) {
           throw error || new Error('Profile not found')
         }
 
-        setProfile(data)
+        this.setProfile(data)
       } catch (error) {
         console.log('error', error.message)
       } finally {
@@ -86,7 +86,7 @@ export default {
           updated_at: new Date(),
         }
 
-        let { error } = await supabase.from('profiles').upsert(updates, {
+        const { error } = await supabase.from('profiles').upsert(updates, {
           returning: 'minimal', // Don't return the value after inserting
         })
 

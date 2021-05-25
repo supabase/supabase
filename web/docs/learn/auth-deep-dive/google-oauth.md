@@ -1,7 +1,7 @@
 ---
 id: auth-google-oauth
 title: 'Part Five: Google Oauth'
-description: "Supabase Deep Dive Part 5: Google OAuth Provider"
+description: 'Supabase Deep Dive Part 5: Google OAuth Provider'
 ---
 
 ### About
@@ -75,7 +75,6 @@ Note however that your app will usually have to be verified by Google before you
 The only thing left to implement is the UI, but if you prefer to use something pre-built, we have a handy [Auth Widget](https://github.com/supabase/ui/#using-supabase-ui-auth), where you can enable/disable whichever auth providers you want to support.
 
 For any support please get in touch at beta at supabase.io or for feature requests open an issue in the [backend](https://github.com/supabase/gotrue) or [frontend](https://github.com/supabase/gotrue-js) repos.
-
 
 ### Resources
 
