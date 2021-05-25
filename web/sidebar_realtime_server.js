@@ -4,13 +4,7 @@ module.exports = {
       type: 'category',
       label: 'Realtime',
       collapsed: false,
-      items: [
-        'about',
-        'docker',
-        'aws',
-        'digitalocean',
-        'source',
-      ],
+      items: ['about', 'docker', 'aws', 'digitalocean', 'source'],
     },
   ],
 }

@@ -1,11 +1,11 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js'
 
 // Fill you client credential here.
-const db = createClient("YOUR_SUPABASE_URL", "YOUR_SUPABASE_KEY");
+const db = createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_KEY')
 
-addEventListener("fetch", (event) => {
-  event.respondWith(handleRequest(event.request));
-});
+addEventListener('fetch', (event) => {
+  event.respondWith(handleRequest(event.request))
+})
 
 async function handleRequest(request) {
   try {
@@ -16,10 +16,10 @@ async function handleRequest(request) {
     //   .select("name");
     // console.log(JSON.stringify(data, null, 2));
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
 
-  return new Response("Hello worker!", {
-    headers: { "content-type": "text/plain" },
-  });
+  return new Response('Hello worker!', {
+    headers: { 'content-type': 'text/plain' },
+  })
 }

@@ -1,6 +1,6 @@
 ---
-title: Using Supabase in Replit 
-description: Free hosted relational database from within your node.js repl 
+title: Using Supabase in Replit
+description: Free hosted relational database from within your node.js repl
 author: Ant Wilson
 author_title: Supabase
 author_url: https://github.com/awalias
@@ -25,15 +25,11 @@ Here's how to start a Supabase + Node.js repl:
 
 Sign up for [replit.com](http://replit.com) and hit new repl in the top left
 
-
-![Untitled-2](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/u3dljulzsyqu58i75epn.png) 
-
+![Untitled-2](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/u3dljulzsyqu58i75epn.png)
 
 Select node.js, give it a name, and click Create repl
 
-
-![Untitled-1](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/7rcfbb12sfabevto571j.png) 
-
+![Untitled-1](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/7rcfbb12sfabevto571j.png)
 
 Import supabase's createClient method and hit run to install the required libs:
 
@@ -50,15 +46,11 @@ const supabase = createClient(
 )
 ```
 
-
 ![Untitled-3](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/5j5aqyjdh74qm83slmli.png)
- 
 
 Now that supabase is connected you'll want to add some data to your db, you can grab any SQL dataset on the web, or make your own, but the fasted way to test is to open the SQL tab in the Supabase dashboard and click the Countries sample database and click Run.
 
-
-![Untitled-4](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/54yykm6h9hqpric87zad.png) 
-
+![Untitled-4](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/54yykm6h9hqpric87zad.png)
 
 From within your repl you can now query your countries table like:
 
@@ -109,10 +101,7 @@ const { data, error } = await supabase
   .or('id.eq.20,id.eq.30')
 
 // is
-const { data, error } = await supabase
-  .from('cities')
-  .select('name, country_id')
-  .is('name', null)
+const { data, error } = await supabase.from('cities').select('name, country_id').is('name', null)
 
 // in
 const { data, error } = await supabase

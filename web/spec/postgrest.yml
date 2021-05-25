@@ -372,7 +372,6 @@ pages:
         js: |
           ```js
           const { data, error, count } = await postgrest
-            .from('cities')
             .rpc('hello_world', { count: 'exact' })
           }
           ```

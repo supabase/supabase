@@ -75,6 +75,7 @@ Supabase – это [облачная платформа](https://app.supabase.i
 
 <!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
+
 ## Переводы
 
 - [Переводы](/i18n/languages.md) <!--- Keep only the this-->

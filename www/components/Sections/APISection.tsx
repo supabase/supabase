@@ -65,7 +65,7 @@ function APISection(props: Props) {
           <Swiper
             // @ts-ignore
             onSwiper={setApiSwiper}
-            style={{ zIndex: 0, marginRight:'1px' }}
+            style={{ zIndex: 0, marginRight: '1px' }}
             initialSlide={apiSwiperActiveIndex}
             spaceBetween={0}
             slidesPerView={1}

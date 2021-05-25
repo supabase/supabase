@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) è una alternativa a Firebase con codice sorgente aperto. Stiamo sviluppando le funzionalità offerte da Firebase utilizzando strumenti con sorgente aperto a livello professionale. 
+[Supabase](https://supabase.io) è una alternativa a Firebase con codice sorgente aperto. Stiamo sviluppando le funzionalità offerte da Firebase utilizzando strumenti con sorgente aperto a livello professionale.
 
 - [x] Database Postgres ospitato
 - [x] Sottoscrizioni in tempo reale
@@ -52,7 +52,7 @@ Supabase è una [piattaforma ospitata](https://app.supabase.io). Ci si può iscr
 - [PostgreSQL](https://www.postgresql.org/) è un sistema di database relazionali ad oggetti, con oltre 30 anni di sviluppo all'attivo che gli hanno permesso di ottenere una ottima reputazione in termini di affidabilità, robustezza delle funzionalità e prestazioni.
 - [Realtime](https://github.com/supabase/realtime) è un server Elixir che consente di ascoltare eventi PostreSQL quali inserimento, aggiornamenti e rimozioni utilizzando i websocket. Supabase rimane in ascolto della funzionalità incorporata di replicazione di Postgres, convertendo il flusso di byte replicato in JSON, dopodichè diffondendo il JSON attraverso i websocket.
 - [PostgREST](http://postgrest.org/) è un web server che trasforma il database PostreSQL direttamente in API di tipo RESTful.
-- [Storage](https://github.com/supabase/storage-api) fornisce un'interfaccia RESTful per gestire i File archiviati in S3, utilizzando Postgres per la gestione dei permessi. 
+- [Storage](https://github.com/supabase/storage-api) fornisce un'interfaccia RESTful per gestire i File archiviati in S3, utilizzando Postgres per la gestione dei permessi.
 - [postgres-meta](https://github.com/supabase/postgres-meta) è una API RESTful per gestire Postgres, permettendo di recuperare tabelle, aggiungere ruoli, lanciare interrogazioni ecc.
 - [GoTrue](https://github.com/netlify/gotrue) è una API basata su SWT per la gestione delle utenze e per generare token SWT.
 - [Kong](https://github.com/Kong/kong) è una porta per le API nativa del cloud.
@@ -66,13 +66,12 @@ La nostra libreria utente è modulare. Ogni sotto-libreria è una implementazion
   - `realtime-{lang}`: Libreria utente per lavorare con [Realtime](https://github.com/supabase/realtime)
   - `gotrue-{lang}`: Libreria utente per lavorare con [GoTrue](https://github.com/netlify/gotrue)
 
-| Repository                  | Ufficiale                                         | Comunità                                                                                                                                                                                                                  |
+| Repository            | Ufficiale                                        | Comunità                                                                                                                                                                                                                   |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
-
 
 - [Lista delle Traduzioni](/i18n/languages.md)
 

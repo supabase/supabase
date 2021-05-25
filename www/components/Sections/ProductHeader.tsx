@@ -27,11 +27,17 @@ const ProductHeader = (props: Types) => (
             )}
           </div>
         ) : null}
-        <Typography.Title level={1} key={`h1`}>{props.h1}</Typography.Title>
+        <Typography.Title level={1} key={`h1`}>
+          {props.h1}
+        </Typography.Title>
         {props.subheader && (
           <Typography.Text>
             {props.subheader.map((subheader, i) => {
-              return <p className="lg:text-lg" key={i}>{subheader}</p>
+              return (
+                <p className="lg:text-lg" key={i}>
+                  {subheader}
+                </p>
+              )
             })}
           </Typography.Text>
         )}

@@ -11,16 +11,15 @@ tags:
   - postgres
 ---
 
-A Supabase user asked recently if they can trigger a webhook periodically. We haven't yet released Functions yet, so we checked whether it's possible with Postgres. 
+A Supabase user asked recently if they can trigger a webhook periodically. We haven't yet released Functions yet, so we checked whether it's possible with Postgres.
 
 It is. Here's how.
-
 
 <!--truncate-->
 
 ### What's cron?
 
-A "cron job" is a script[^1] that runs periodically at fixed times, dates, or intervals. Traditionally you'd set it up on a Linux server. An example might be an hourly script that downloads emails to your computer. 
+A "cron job" is a script[^1] that runs periodically at fixed times, dates, or intervals. Traditionally you'd set it up on a Linux server. An example might be an hourly script that downloads emails to your computer.
 
 [^1]: Not necessarily a script. The cron is really a scheduler which triggers a job (of some sort, usually a bash script).
 
@@ -30,8 +29,7 @@ These days, cron jobs are set up on a remote servers and in the cloud to run int
 
 Postgres has "extensions" which allow you to, well, extend the database with "non-core" features. Extensions essentially turn Postgres into an application server.
 
-The team at [Citus](https://github.com/citusdata) created [`pg_cron`](https://github.com/citusdata/pg_cron) to run periodic jobs within your Postgres database. 
-
+The team at [Citus](https://github.com/citusdata) created [`pg_cron`](https://github.com/citusdata/pg_cron) to run periodic jobs within your Postgres database.
 
 #### Enabling the extension
 
@@ -45,17 +43,13 @@ where name = 'pg_cron';
 
 If it returns a result then the extension is supported and you can turn it on by running:
 
-
 ```sql
 create extension if not exists pg_cron;
 ```
 
 If you're using Supabase you can also enable it in the Dashboard.
 
-
 ![This image shows that pg_cron is enabled in the Supabase Dashboard](/img/blog/supabase-extensions.png)
-
-
 
 ### Postgres + webhooks
 
@@ -70,14 +64,13 @@ This extension can now be used for [sending](https://github.com/pramsey/pgsql-ht
 For example, this function would get all the people in Star Wars (using the [Star Wars API](https://swapi.dev)):
 
 ```sql
-select content::json->'results' 
+select content::json->'results'
 from http_get('https://swapi.dev/api/people');
 ```
 
-
 ### Postgres + cron + webhooks
 
-Now the fun stuff. For this example we're going to call [webhook.site](https://webhook.site) every minute with the payload `{ "hello": "world" }`. 
+Now the fun stuff. For this example we're going to call [webhook.site](https://webhook.site) every minute with the payload `{ "hello": "world" }`.
 
 Here's the code (with comments `--like this`).
 
@@ -86,7 +79,7 @@ select
   cron.schedule(
     'webhook-every-minute', -- name of the cron job
     '* * * * *', -- every minute
-    $$ 
+    $$
     select status
     from
       http_post(
@@ -127,7 +120,7 @@ select
   cron.schedule(
     'cron-name', -- name of the cron job
     '* * * * *', -- every minute
-    $$ 
+    $$
      -- Put your code between two dollar signs so that you can create full statements.
      -- Alternatively, you can write you code in a Postgres Function and call it here.
     $$
@@ -174,10 +167,10 @@ To stop a running cron job, you can run:
 ```sql
 select cron.unschedule('webhook-every-minute'); -- pass the name of the cron job
 ```
+
 ### What can I do with this?
 
 There are plenty use-cases for this. For example:
-
 
 - **Sending welcome emails.** If you use an email provider with an HTTP API, then you batch emails to that service. Write a function that `selects` all your signups yesterday, then sends them to your favorite transactional email service. Schedule it every day to run at midnight.
 - **Aggregating data.** If you're providing analytical data, you might want to aggregate it into time periods for faster querying (which serves a similar purpose as a [Materialized View](https://supabase.io/blog/2020/11/18/postgresql-views#materialized-views-vs-conventional-views)).
@@ -187,7 +180,6 @@ See a detailed list in the [`pg_cron` README](https://github.com/citusdata/pg_cr
 
 ## Addendum
 
-
 ### Postgres background workers
 
 You might have noticed [this](https://github.com/pramsey/pgsql-http#why-this-is-a-bad-idea) notice the warning at the bottom of the `http` readme:
@@ -196,12 +188,11 @@ You might have noticed [this](https://github.com/pramsey/pgsql-http#why-this-is-
 
 Luckily pg_cron implements [Background Workers](https://paquier.xyz/postgresql-2/postgres-9-3-feature-highlight-custom-background-workers/):
 
-> Care is taken that these extra processes do not interfere with other postmaster tasks: only one such process is started on each ServerLoop iteration.  This means a large number of them could be waiting to be started up and postmaster is still able to quickly service external connection requests.
+> Care is taken that these extra processes do not interfere with other postmaster tasks: only one such process is started on each ServerLoop iteration. This means a large number of them could be waiting to be started up and postmaster is still able to quickly service external connection requests.
 
 This means that even if your endpoint takes a long time to return, it's not going to be blocking your core Postgres functions. Either way, you should probably only call endpoints that will return a response quickly, or set the http extension to fail fast (`http.timeout_msec = 300`).
 
 If you're familiar with `C`, you could also help `@pramsey` to implement async functions: https://github.com/pramsey/pgsql-http/issues/105
-
 
 ### Should I use Postgres as a cron server?
 

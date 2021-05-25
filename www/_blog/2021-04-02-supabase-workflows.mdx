@@ -77,7 +77,7 @@ for most AWS resources).
 Workflows can be _persistent_ (the default). This means they are tolerant to server restarts, but it also means they need to use
 the database to store their state.
 
-Workers can be _transient._ These are are fully in-memory if you don't want to store the execution state (for example, IoT
+Workers can be _transient._ These are fully in-memory if you don't want to store the execution state (for example, IoT
 applications that trigger workflows very often). Transient workflows are not restarted if the server crashes or is restarted.
 
 ## Example

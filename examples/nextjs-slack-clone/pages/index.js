@@ -7,17 +7,16 @@ const Home = () => {
 
   const handleLogin = async (type, username, password) => {
     try {
-      const { error, user } = 
+      const { error, user } =
         type === 'LOGIN'
-          ? await supabase.auth.signIn({email: username, password})
-          : await supabase.auth.signUp({email: username, password})
+          ? await supabase.auth.signIn({ email: username, password })
+          : await supabase.auth.signUp({ email: username, password })
       // If the user doesn't exist here and an error hasn't been raised yet,
       // that must mean that a confirmation email has been sent.
       // NOTE: Confirming your email address is required by default.
       if (error) {
         alert('Error with auth: ' + error.message)
-      }
-      else if (!user) alert('Signup successful, confirmation mail should be sent soon!')
+      } else if (!user) alert('Signup successful, confirmation mail should be sent soon!')
     } catch (error) {
       console.log('error', error)
       alert(error.error_description || error)

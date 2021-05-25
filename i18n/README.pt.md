@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) é uma alternativa ao Firebase de código aberto. Estamos a reproduzir as funcionalidades do Firebase usando ferramentas de código aberto de nivel empresarial.
+[Supabase](https://supabase.io) é uma alternativa de código aberto ao Firebase. Estamos reproduzindo as funcionalidades do Firebase usando ferramentas de código aberto de nível empresarial.
 
 - [x] Base de dados Postgres hospedada
 - [x] Subscrições em tempo real
@@ -26,7 +26,6 @@ Para ver a documentação completa, visite [supabase.io/docs](https://supabase.i
 - [Problemas do GitHub](https://github.com/supabase/supabase/issues). Indicado para: bugs e erros que tu encontrares ao usar o Supabase.
 - [Suporte por e-mail](https://supabase.io/docs/support#business-support). Indicado para: problemas com a tua base de dados ou infraestrutura.
 
-
 ## Status
 
 - [x] Alpha: estamos a testar o Supabase com um grupo fechado de clientes
@@ -34,7 +33,7 @@ Para ver a documentação completa, visite [supabase.io/docs](https://supabase.i
 - [x] Beta público: estável o suficiente para a maioria dos casos de uso não empresarial
 - [ ] Público: pronto para produção
 
-Atualmente estamos em Beta Público. Assiste aos "releases" deste repositório para seres notificado sobre as principais atualizações.
+Estamos atualmente em Beta Público. Assista aos lançamentos deste repositório para ser notificado sobre as principais atualizações.
 
 <kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
@@ -63,9 +62,9 @@ Supabase é uma [plataforma hospedada](https://app.supabase.io). Podes-te inscre
 Nossa biblioteca cliente é modular. Cada sub-biblioteca é uma implementação independente para um único sistema externo. Esta é uma das maneiras pelas quais oferecemos suporte às ferramentas existentes.
 
 - **`supabase-{lang}`**: Combina bibliotecas e adiciona funcionalidades.
-   - `postgrest-{lang}`: Biblioteca cliente para trabalhar com [PostgREST](https://github.com/postgrest/postgrest)
-   - `realtime-{lang}`: Biblioteca cliente para trabalhar com [Realtime](https://github.com/supabase/realtime)
-   - `gotrue-{lang}`: Biblioteca cliente para trabalhar com [GoTrue](https://github.com/netlify/gotrue)
+  - `postgrest-{lang}`: Biblioteca cliente para trabalhar com [PostgREST](https://github.com/postgrest/postgrest)
+  - `realtime-{lang}`: Biblioteca cliente para trabalhar com [Realtime](https://github.com/supabase/realtime)
+  - `gotrue-{lang}`: Biblioteca cliente para trabalhar com [GoTrue](https://github.com/netlify/gotrue)
 
 | Repositório           | Oficial                                          | Comunidade                                                                                                                                                                                                                 |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -76,6 +75,7 @@ Nossa biblioteca cliente é modular. Cada sub-biblioteca é uma implementação 
 
 <!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
+
 ## Traduções
 
 - [Traduções](/i18n/languages.md) <!--- Keep only the this-->
