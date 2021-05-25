@@ -2,12 +2,13 @@ import '~/styles/style.scss'
 import React, { useState, useEffect } from 'react'
 import Router from 'next/router'
 import UserContext from 'lib/UserContext'
-import { supabase } from 'lib/Store'
+import { supabase, fetchUserRoles } from 'lib/Store'
 
 export default function SupabaseSlackClone({ Component, pageProps }) {
   const [userLoaded, setUserLoaded] = useState(false)
   const [user, setUser] = useState(null)
   const [session, setSession] = useState(null)
+  const [userRoles, setUserRoles] = useState([])
 
   useEffect(() => {
     const session = supabase.auth.session()
@@ -15,7 +16,7 @@ export default function SupabaseSlackClone({ Component, pageProps }) {
     setUser(session?.user ?? null)
     setUserLoaded(session ? true : false)
     if (user) {
-      signIn(user.id, user.email)
+      signIn()
       Router.push('/channels/[id]', '/channels/1')
     }
 
@@ -35,15 +36,8 @@ export default function SupabaseSlackClone({ Component, pageProps }) {
     }
   }, [user])
 
-  const signIn = async (id, username) => {
-    const { body } = await supabase.from('users').select('id, username').eq('id', id)
-    const result = body[0]
-
-    // If the user exists in the users table, update the username.
-    // If not, create a new row.
-    result?.id
-      ? await supabase.from('users').update({ id, username }).match({ id }).single()
-      : await supabase.from('users').insert([{ id, username }]).single()
+  const signIn = async () => {
+    await fetchUserRoles((userRoles) => setUserRoles(userRoles.map((userRole) => userRole.role)))
   }
 
   const signOut = async () => {
@@ -56,6 +50,7 @@ export default function SupabaseSlackClone({ Component, pageProps }) {
       value={{
         userLoaded,
         user,
+        userRoles,
         signIn,
         signOut,
       }}

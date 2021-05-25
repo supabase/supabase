@@ -114,6 +114,17 @@ Visit http://localhost:3000 and start chatting! Open a channel across two browse
 
 ## Supabase details
 
+### Role-based access control (RBAC)
+Use [plus addressing](https://en.wikipedia.org/wiki/Email_address#Subaddressing) to sign up users with the `admin` & `moderator` roles. Email addresses including `+supaadmin@` will be assigned the `admin` role, and email addresses including `+supamod@` will be assigned the `moderator` role. For example:
+```
+// admin user
+email+supaadmin@example.com
+
+// moderator user
+email+supamod@example.com
+```
+Users with the `moderator` role can delete all messages. Users with the `admin` role can delete all messages and channels (note: it's not recommended to delete the `public` channel).
+
 ### Postgres Row level security
 
 This project uses very high-level Authorization using Postgres' Role Level Security.
@@ -124,6 +135,26 @@ We can use these details to provide fine-grained control over what each user can
 This is a trimmed-down schema, with the policies:
 
 ```sql
+-- authorize with role-based access control (RBAC)
+CREATE FUNCTION public.authorize(
+  requested_permission app_permission,
+  user_id uuid
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+  bind_permissions int;
+BEGIN
+  SELECT count(*)
+  FROM public.role_permissions
+  INNER JOIN public.user_roles on role_permissions.role = user_roles.role
+  WHERE role_permissions.permission = authorize.requested_permission
+    AND user_roles.user_id = authorize.user_id
+  INTO bind_permissions;
+  
+  RETURN bind_permissions > 0;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- USER PROFILES
 CREATE TYPE public.user_status AS ENUM ('ONLINE', 'OFFLINE');
 CREATE TABLE public.users (
@@ -143,7 +174,11 @@ CREATE TABLE public.channels (
   slug text NOT NULL UNIQUE
 );
 ALTER TABLE public.channels ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow logged-in full access" on public.channels FOR ALL USING ( auth.role() = 'authenticated' );
+CREATE POLICY "Allow logged-in read access" on public.channels FOR SELECT USING ( auth.role() = 'authenticated' );
+CREATE POLICY "Allow individual insert access" on public.channels FOR INSERT WITH CHECK ( auth.uid() = created_by );
+CREATE POLICY "Allow individual update access" on public.channels FOR UPDATE USING ( auth.uid() = created_by );
+CREATE POLICY "Allow individual delete access" on public.channels FOR DELETE USING ( auth.uid() = created_by );
+CREATE POLICY "Allow authorized delete access" on public.channels FOR DELETE USING ( authorize('channels.delete', auth.uid()) );
 
 -- MESSAGES
 CREATE TABLE public.messages (
@@ -157,6 +192,8 @@ ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow logged-in read access" on public.messages FOR SELECT USING ( auth.role() = 'authenticated' );
 CREATE POLICY "Allow individual insert access" on public.messages FOR INSERT WITH CHECK ( auth.uid() = user_id );
 CREATE POLICY "Allow individual update access" on public.messages FOR UPDATE USING ( auth.uid() = user_id );
+CREATE POLICY "Allow individual delete access" on public.messages FOR DELETE USING ( auth.uid() = user_id );
+CREATE POLICY "Allow authorized delete access" on public.messages FOR DELETE USING ( authorize('messages.delete', auth.uid()) );
 ```
 
 ## Authors
