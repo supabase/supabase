@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import { useContext } from 'react'
 import UserContext from '~/lib/UserContext'
-import { addChannel } from '~/lib/Store'
+import { addChannel, deleteChannel } from '~/lib/Store'
+import TrashIcon from '~/components/TrashIcon'
 
 export default function Layout(props) {
-  const { signOut } = useContext(UserContext)
+  const { signOut, user, userRoles } = useContext(UserContext)
 
   const slugify = (text) => {
     return text
@@ -20,7 +21,7 @@ export default function Layout(props) {
   const newChannel = async () => {
     const slug = prompt('Please enter your name')
     if (slug) {
-      addChannel(slugify(slug))
+      addChannel(slugify(slug), user.id)
     }
   }
 
@@ -41,7 +42,8 @@ export default function Layout(props) {
             </button>
           </div>
           <hr className="m-2" />
-          <div className="p-2">
+          <div className="p-2 flex flex-col space-y-2">
+            <h6 className="text-xs">{user?.email}</h6>
             <button
               className="bg-blue-900 hover:bg-blue-800 text-white py-2 px-4 rounded w-full transition duration-150"
               onClick={() => signOut()}
@@ -57,6 +59,8 @@ export default function Layout(props) {
                 channel={x}
                 key={x.id}
                 isActiveChannel={x.id === props.activeChannelId}
+                user={user}
+                userRoles={userRoles}
               />
             ))}
           </ul>
@@ -69,12 +73,17 @@ export default function Layout(props) {
   )
 }
 
-const SidebarItem = ({ channel, isActiveChannel }) => (
+const SidebarItem = ({ channel, isActiveChannel, user, userRoles }) => (
   <>
-    <li>
+    <li className="flex items-center justify-between">
       <Link href="/channels/[id]" as={`/channels/${channel.id}`}>
         <a className={isActiveChannel ? 'font-bold' : ''}>{channel.slug}</a>
       </Link>
+      {channel.id !== 1 && (channel.created_by === user?.id || userRoles.includes('admin')) && (
+        <button onClick={() => deleteChannel(channel.id)}>
+          <TrashIcon />
+        </button>
+      )}
     </li>
   </>
 )
