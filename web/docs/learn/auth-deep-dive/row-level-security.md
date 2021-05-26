@@ -116,7 +116,7 @@ In the next guide we will look at using Policies in combination with User Accoun
 
 ### Resources
 
-- JWT debugger: https://jwt.io/​
+- JWT debugger: https://jwt.io/
 - RESTED: https://github.com/RESTEDClient/RESTED
 
 ### Next steps
