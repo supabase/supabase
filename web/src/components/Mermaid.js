@@ -24,7 +24,7 @@ export default function Mermaid({ graph, classNames, caption }) {
   let [rendered, setRendered] = useState(<div></div>)
 
   useEffect(() => {
-    mermaid.render('mermaid-ID', graph.toString(), html => setRendered(html))
+    mermaid.render('mermaid-ID', graph.toString(), (html) => setRendered(html))
   }, [graph])
 
   return (

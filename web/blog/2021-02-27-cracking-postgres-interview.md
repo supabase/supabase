@@ -1,6 +1,6 @@
 ---
-title: Cracking PostgreSQL Interview Questions 
-description: Understand the top PostgreSQL Interview Questions 
+title: Cracking PostgreSQL Interview Questions
+description: Understand the top PostgreSQL Interview Questions
 author: Ant Wilson
 author_title: Supabase
 author_url: https://github.com/awalias
@@ -12,10 +12,9 @@ tags:
   - Postgres
 ---
 
-
 There are plenty of resources out there for preparing for PostgreSQL interview questions. Most posts are for technical interviews with a focus on PostgreSQL, however many just cover the basics and the advanced resources often conflate transactional SQL with analytical SQL (WINDOW/RANK functions, aggregates etc.).
 
-Here, we're going to focus on PostgreSQL interview questions that are aimed to understand the transactional side of PostgreSQL, and offer some areas that you may want to go a little deeper on in order to really impress your interviewer (and more importantly, become a kick-ass software engineer). 
+Here, we're going to focus on PostgreSQL interview questions that are aimed to understand the transactional side of PostgreSQL, and offer some areas that you may want to go a little deeper on in order to really impress your interviewer (and more importantly, become a kick-ass software engineer).
 
 ## 1. Modeling
 
@@ -42,10 +41,10 @@ In Supabase for example we keep system schemas such as `extensions` and `auth` i
 
 The art of indexing in Postgres could fill an entire book. In some circumstances it can happen that a bad index is worse for performance than no index, so it's worth spending a little time to learn some of the common strategies.
 
-An index can be simple, for example, if your students table is most frequently queried on surname alone, you create an index: 
+An index can be simple, for example, if your students table is most frequently queried on surname alone, you create an index:
 
 ```sql
-CREATE INDEX idx_students_surname 
+CREATE INDEX idx_students_surname
 ON students(surname);
 ```
 
@@ -53,7 +52,7 @@ The default index type used here is `btree` (you could have specified this as `U
 
 ### Know how to analyze with EXPLAIN ANALYZE
 
-Running 
+Running
 
 ```sql
 EXPLAIN (ANALYZE) SELECT *
@@ -71,7 +70,7 @@ We might create a VIEW `transcripts` which pulls out data from `students`, `cour
 
 ### Know about Autoupdatable views.
 
-If a VIEW is named as the target relation in an INSERT, UPDATE, or DELETE and only SELECTs from a single base relation, then the underlying subquery is automatically rewritten to update the underlying base relation instead. 
+If a VIEW is named as the target relation in an INSERT, UPDATE, or DELETE and only SELECTs from a single base relation, then the underlying subquery is automatically rewritten to update the underlying base relation instead.
 
 ### Limitations on VIEWs
 
@@ -139,13 +138,13 @@ Common table expressions are temporary or intermediate result sets. They can mak
 
 ```sql
 WITH ten_strumpers AS (
-    SELECT id, first_name 
-    FROM students 
+    SELECT id, first_name
+    FROM students
     WHERE surname = 'Strumper'
     ORDER BY first_name
-    LIMIT 10 
+    LIMIT 10
 )
-SELECT id 
+SELECT id
 FROM ten_strumpers
 WHERE first_name LIKE "S%";
 ```

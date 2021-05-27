@@ -9,10 +9,7 @@ const allTodos = ref<Todo[]>([])
  */
 async function fetchTodos() {
   try {
-    const { data: todos, error } = await supabase
-      .from('todos')
-      .select('*')
-      .order('id')
+    const { data: todos, error } = await supabase.from('todos').select('*').order('id')
 
     if (error) {
       console.log('error', error)
@@ -36,10 +33,7 @@ async function fetchTodos() {
  */
 async function addTodo(todo: Todo): Promise<null | Todo> {
   try {
-    const { data, error } = await supabase
-      .from('todos')
-      .insert(todo)
-      .single()
+    const { data, error } = await supabase.from('todos').insert(todo).single()
 
     if (error) {
       alert(error.message)
@@ -85,10 +79,7 @@ async function updateTaskCompletion(todo: Todo, isCompleted: boolean) {
  */
 async function deleteTodo(todo: Todo) {
   try {
-    await supabase
-      .from('todos')
-      .delete()
-      .eq('id', todo.id)
+    await supabase.from('todos').delete().eq('id', todo.id)
     console.log('deleted todo', todo.id)
   } catch (error) {
     console.error('error', error)

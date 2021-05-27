@@ -120,7 +120,7 @@ module.exports = {
             {
               label: 'Lawyers.txt',
               to: 'https://supabase.io/lawyers.txt',
-            }
+            },
           ],
         },
         {

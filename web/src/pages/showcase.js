@@ -6,19 +6,17 @@ import Link from '@docusaurus/Link'
 
 import showcase from '../data/showcase.json'
 
-
 export default function Showcase() {
-  const { siteConfig = {} } = useDocusaurusContext();
-  const processedShowcase = showcase
-    .sort((a, b) => a.project_or_company.name.localeCompare(b.project_or_company.name))
+  const { siteConfig = {} } = useDocusaurusContext()
+  const processedShowcase = showcase.sort((a, b) =>
+    a.project_or_company.name.localeCompare(b.project_or_company.name)
+  )
 
   return (
     <Layout title={siteConfig.title} description={siteConfig.tagline}>
       <Section title="Built with Supabase!" style="underline">
-
         {/* Open Source */}
-        <ShowcaseSection
-          showcase={processedShowcase} />
+        <ShowcaseSection showcase={processedShowcase} />
       </Section>
 
       {/* Add */}
@@ -26,36 +24,38 @@ export default function Showcase() {
         <p>
           <Link href="docs/handbook/contributing#how-to-add-a-your-project-to-our-showcase">
             Learn how
-          </Link> to add your project to our showcase.
+          </Link>{' '}
+          to add your project to our showcase.
         </p>
       </Section>
     </Layout>
-  );
+  )
 }
 
 function ShowcaseSection({ showcase }) {
   return (
     <div className="row is-multiline">
       {/* Display showcase */}
-      {showcase.map((v, i) =>
-        (<div className="col col--4" key={`${i}-${v.project_or_company.image}`}>
+      {showcase.map((v, i) => (
+        <div className="col col--4" key={`${i}-${v.project_or_company.image}`}>
           <ShowcaseCard
             projectOrCompany={v.project_or_company}
             isOpenSource={v.is_open_source}
             publicRepo={v.public_repo}
           />
-        </div>))
-      }
+        </div>
+      ))}
     </div>
   )
 }
 
 function ShowcaseCard({ projectOrCompany, isOpenSource, publicRepo }) {
-  const spacedFooter = projectOrCompany.web_site && publicRepo && isOpenSource ? "ShowcaseCard-Footer-Spaced" : null;
+  const spacedFooter =
+    projectOrCompany.web_site && publicRepo && isOpenSource ? 'ShowcaseCard-Footer-Spaced' : null
   const button = (label, href) => (
-    <a className="button button--secondary ShowcaseCard-Footer-Item"
-      target="_blank"
-      href={href}>{label}</a>
+    <a className="button button--secondary ShowcaseCard-Footer-Item" target="_blank" href={href}>
+      {label}
+    </a>
   )
 
   return (
@@ -66,8 +66,8 @@ function ShowcaseCard({ projectOrCompany, isOpenSource, publicRepo }) {
         </div>
 
         <div className="ShowcaseCard-Text">
-          <h3 className="" >{projectOrCompany.name}</h3>
-          <span className="ShowcaseCard-Tag">{isOpenSource ? "#OpenSource" : null}</span>
+          <h3 className="">{projectOrCompany.name}</h3>
+          <span className="ShowcaseCard-Tag">{isOpenSource ? '#OpenSource' : null}</span>
           <p>{projectOrCompany.description}</p>
         </div>
       </div>
@@ -77,5 +77,5 @@ function ShowcaseCard({ projectOrCompany, isOpenSource, publicRepo }) {
         {publicRepo && isOpenSource ? button('View repo', publicRepo) : null}
       </div>
     </div>
-  );
+  )
 }

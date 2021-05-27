@@ -62,9 +62,9 @@ Supabase – це [хмарна платформа](https://app.supabase.io). В
 Наша клієнтська бібліотека модульна. Кожна підбібліотека є окремою реалізацією для однієї зовнішньої системи. Це один зі способів, за допомогою якого ми підтримуємо наявні інструменти.
 
 - **`supabase-{lang}`**: Об'єднує бібліотеки та збільшує функціонал.
-    - `postgrest-{lang}`: Клієнтська бібліотека для роботи з [PostgREST](https://github.com/postgrest/postgrest)
-    - `realtime-{lang}`: Клієнтська бібліотека для роботи з [Realtime](https://github.com/supabase/realtime)
-    - `gotrue-{lang}`: Клієнтська бібліотека для роботи з [GoTrue](https://github.com/netlify/gotrue)
+  - `postgrest-{lang}`: Клієнтська бібліотека для роботи з [PostgREST](https://github.com/postgrest/postgrest)
+  - `realtime-{lang}`: Клієнтська бібліотека для роботи з [Realtime](https://github.com/supabase/realtime)
+  - `gotrue-{lang}`: Клієнтська бібліотека для роботи з [GoTrue](https://github.com/netlify/gotrue)
 
 | Repo                  | Офіційні                                         | Спільноти                                                                                                                                                                                                                  |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -75,6 +75,7 @@ Supabase – це [хмарна платформа](https://app.supabase.io). В
 
 <!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
+
 ## Переклади
 
 - [Переклади](/i18n/languages.md) <!--- Keep only the this-->

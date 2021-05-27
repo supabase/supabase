@@ -11,7 +11,7 @@ tags:
   - release-notes
 ---
 
-We're now 7 months into building Supabase. This update is a big one! 
+We're now 7 months into building Supabase. This update is a big one!
 
 <!--truncate-->
 
@@ -45,7 +45,7 @@ Extensions are easier to use. You can enable Postgres extensions with the click 
 
 ### Save your favorite queries
 
-The SQL editor now stores your query history in your browser. You can also save your favorite queries to run later! 
+The SQL editor now stores your query history in your browser. You can also save your favorite queries to run later!
 
 <video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
 <source src="/videos/favorites.mp4" type="video/mp4" muted playsInline />

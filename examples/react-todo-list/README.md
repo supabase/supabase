@@ -1,12 +1,11 @@
 # Todo example using Supabase
 
-- Frontend:
-    - [create-react-app](https://reactjs.org/docs/create-a-new-react-app.html). React Framework for building single-page applications.
-    - [Tailwind](https://tailwindcss.com/) for styling and layout.
-    - [Supabase.js](https://supabase.io/docs/library/getting-started) for user management and realtime data syncing.
-- Backend:
-    - [app.supabase.io/](https://app.supabase.io/): hosted Postgres database with restful API for usage with Supabase.js.
-
+-   Frontend:
+    -   [create-react-app](https://reactjs.org/docs/create-a-new-react-app.html). React Framework for building single-page applications.
+    -   [Tailwind](https://tailwindcss.com/) for styling and layout.
+    -   [Supabase.js](https://supabase.io/docs/library/getting-started) for user management and realtime data syncing.
+-   Backend:
+    -   [app.supabase.io/](https://app.supabase.io/): hosted Postgres database with restful API for usage with Supabase.js.
 
 ## Demo
 
@@ -24,7 +23,7 @@ Sign up to Supabase - [https://app.supabase.io](https://app.supabase.io) and cre
 
 ### 2. Run "Todo List" Quickstart
 
-Once your database has started, run the "Todo List" quickstart. Inside of your project, enter the `SQL editor` tab and scroll down until you see `TODO LIST: Build a basic todo list with Row Level Security`  
+Once your database has started, run the "Todo List" quickstart. Inside of your project, enter the `SQL editor` tab and scroll down until you see `TODO LIST: Build a basic todo list with Row Level Security`
 
 ### 3. Get the URL and Key
 
@@ -35,7 +34,6 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 ![image](https://user-images.githubusercontent.com/10214025/88916245-528c2680-d298-11ea-8a71-708f93e1ce4f.png)
 
 **_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
-
 
 You will be asked for a `REACT_APP_SUPABASE_URL` and `REACT_APP_SUPABASE_KEY`. Use the API URL and `anon` key from [step 3](#3.-get-the-url-and-key).
 
@@ -76,6 +74,6 @@ create policy "Individuals can delete their own todos." on todos for
 
 ## Authors
 
-- [Supabase](https://supabase.io)
+-   [Supabase](https://supabase.io)
 
 Supabase is open source, we'd love for you to follow along and get involved at https://github.com/supabase/supabase

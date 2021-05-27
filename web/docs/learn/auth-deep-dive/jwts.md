@@ -8,7 +8,6 @@ description: Supabase Auth Deep Dive Part 1 - JWTs
 
 An introduction to JWTs and how they are used in Supabase Auth
 
-
 ### Watch
 
 <iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/v3Exg5YpJvE" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
@@ -30,7 +29,7 @@ Well, the JSON object starts out looking something like this:
 }
 ```
 
-`sub` is the "subject", which is usually the uuid of the user. `name` is self explanitory, and `iat` is the unix timestamp at which the token was created. Many JWTs will also have an `exp` which is the data at which the token is set to expire, and can no longer be used. These are some of the standard fields you may find in a JWT, but you can pretty much store whatever you want in there, for example:
+`sub` is the "subject", which is usually the uuid of the user. `name` is self explanatory, and `iat` is the unix timestamp at which the token was created. Many JWTs will also have an `exp` which is the data at which the token is set to expire, and can no longer be used. These are some of the standard fields you may find in a JWT, but you can pretty much store whatever you want in there, for example:
 
 ```js
 {
@@ -51,13 +50,15 @@ When we want to send the JWT to the user, we first encode the data using an algo
 
 ```js
 // from https://replit.com/@awalias/jsonwebtokens#index.js
-let token = jwt.sign({ name: 'Sam Vimes' }, 'some-secret');
+let token = jwt.sign({ name: 'Sam Vimes' }, 'some-secret')
 ```
 
 And the resulting string will look like this:
 
 ```js
-eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMDAxIiwibmFtZSI6IlNhbSBWaW1lcyIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjoxNTE4MjM5MDIyfQ.zMcHjKlkGhuVsiPIkyAkB2rjXzyzJsMMgpvEGvGtjvA
+eyJhbGciOiJIUzI1NiJ9
+  .eyJzdWIiOiIwMDAxIiwibmFtZSI6IlNhbSBWaW1lcyIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjoxNTE4MjM5MDIyfQ
+  .zMcHjKlkGhuVsiPIkyAkB2rjXzyzJsMMgpvEGvGtjvA
 ```
 
 You will notice that the string is actually made up of three components which we'll address one-by-one:
@@ -97,7 +98,7 @@ It is important to note that anyone who possesses the `jwt_secret` here can crea
 
 You may ask yourself why JWTs are so popular all of a sudden? The answer is that with the mass adoption of microservice architecture, we were in a situation where several distinct microservices (APIs, websites, servers etc.) want to easily validate that a user is who they say they are, or are in other words a "logged-in" user. Traditional session tokens are no use here, they would require each microservice to either maintain a record of currently valid session tokens, or query a central database each time a user wants to access a resource, to check the validity of the session token. Very inefficient indeed. JWT based auth in this sense is decentralised, since anyone with the `jwt_secret` can verify a token, without needing access to a centralised database.
 
-Note: one downside of JWTs is that they are not easily voidable, like session tokens. If a JWT is leaked to a malicious actor, they will be able to redeem it anywhere until the expiry date is reached. Unless of course the system owner updates the `jwt_secret` (which will of course invalidate *everyone's* existing tokens).
+Note: one downside of JWTs is that they are not easily voidable, like session tokens. If a JWT is leaked to a malicious actor, they will be able to redeem it anywhere until the expiry date is reached. Unless of course the system owner updates the `jwt_secret` (which will of course invalidate _everyone's_ existing tokens).
 
 ### JWTs in Supabase
 
@@ -128,7 +129,7 @@ if we put this token into https://jwt.io we see it decodes to:
 
 This JWT is signed by a `jwt_secret` specific to the developer's Supabase token (you can find this secret alongside this encoded "anon key" on your Dashboard under Settings > API page) and is required to get past the Supabase API gateway and access the developer's project.
 
-The idea with this particular key is that it's safe to put into your client, meaning it's ok if your end user's see this key. *But* only if you first enable Row Level Security, which is the topic of [Part Two](/docs/learn/auth-deep-dive/auth-row-level-security) in this series.
+The idea with this particular key is that it's safe to put into your client, meaning it's ok if your end user's see this key. _But_ only if you first enable Row Level Security, which is the topic of [Part Two](/docs/learn/auth-deep-dive/auth-row-level-security) in this series.
 
 The second key `service role key`, should only ever be used on one of your own servers or environments, and should never be shared with end users. You might use this token to do things like make batch inserts of data.
 
@@ -168,10 +169,10 @@ Now that you understand what JWTs are and where they're used in Supabase, you ca
 
 - JWT debugger: https://jwt.io/​
 
-
 ### Next steps
 
 <!-- - Watch [Part One: JWTs](/docs/learn/auth-deep-dive/auth-deep-dive-jwts) -->
+
 - [Part Two: Row Level Security](/docs/learn/auth-deep-dive/auth-row-level-security)
 - [Part Three: Policies](/docs/learn/auth-deep-dive/auth-policies)
 - [Part Four: GoTrue](/docs/learn/auth-deep-dive/auth-gotrue)

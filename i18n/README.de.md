@@ -33,7 +33,7 @@ Um die gesamte Dokumentation einzusehen, schaue auf [supabase.io/docs](https://s
 - [x] Public Beta: Stabil genug für die meisten Use-Cases außerhalb des Enterprise-Bereiches.
 - [ ] Public: Bereit für Produktion
 
-Aktuell befinden wir ins in der Public Beta. Beobachte "Releases" in diesem Repository um über größere Neuigkeiten benachrichtigt zu werden.
+Aktuell befinden wir uns in der Public Beta. Beobachte "Releases" in diesem Repository um über größere Neuigkeiten benachrichtigt zu werden.
 
 <kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watche dieses Repo"/></kbd>
 

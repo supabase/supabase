@@ -32,7 +32,6 @@ A few reasons:
 2. Decoupling. For example, if you want to send a new slack message every time someone makes a new purchase you might build that functionality directly into your API. This allows you to decouple your async functionality from your API.
 3. This is built with Phoenix, an [extremely scalable Elixir framework](https://www.phoenixframework.org/blog/the-road-to-2-million-websocket-connections)
 
-
 ## Quick start
 
 We have set up some simple examples that show how to use this server:
@@ -40,11 +39,9 @@ We have set up some simple examples that show how to use this server:
 - [Next.js example](https://github.com/supabase/realtime/tree/master/examples/next-js)
 - [NodeJS example](https://github.com/supabase/realtime/tree/master/examples/node-js)
 
-
 ## Client libraries
 
 - JavaScript: [@supabase/realtime-js](https://github.com/supabase/realtime-js)
-
 
 ## Server
 
@@ -113,4 +110,3 @@ git push origin 0.x.x
 ## License
 
 This repo is licensed under Apache 2.0.
-

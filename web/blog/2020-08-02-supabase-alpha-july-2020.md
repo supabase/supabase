@@ -10,7 +10,7 @@ tags:
   - release-notes
 ---
 
-After 5 months of building, we're releasing one of our most anticipated features: Supabase Auth. 
+After 5 months of building, we're releasing one of our most anticipated features: Supabase Auth.
 
 <!--truncate-->
 
@@ -32,12 +32,11 @@ We've made some massive improvements to our Table Editor that we're excited to s
 
 #### Relationship drill down
 
-Last month we made it easy to drill into your table relationships. This month, we make it possible to drill multiple levels deep. 
+Last month we made it easy to drill into your table relationships. This month, we make it possible to drill multiple levels deep.
 
 <video width="99%" autoPlay="" loop="" muted="" playsInline="" controls="true">
 <source src="/videos/relational-drilldown-zoom.mp4" type="video/mp4" />
 </video>
-
 
 #### Add, delete, and download rows
 

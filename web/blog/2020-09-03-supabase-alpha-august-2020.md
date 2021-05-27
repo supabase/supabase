@@ -20,8 +20,7 @@ Watch a full demo:
 
 <iframe className="w-full" width="640" height="385" src="https://www.loom.com/embed/a43084629c7e47828e3a292b60719393" frameBorder="0" allowFullScreen></iframe>
 
-
-### Easily create tables 
+### Easily create tables
 
 Set up tables and columns directly from the table view.
 
@@ -37,10 +36,9 @@ You can now invite team members to your organisation.
 <source src="/videos/invite-team.mp4" type="video/mp4" loop muted playsInline />
 </video>
 
-
 ### Auth: Email Confirmations
 
-You can now enable Email Confirmations for new users. This can be toggled on or off and the template for this email can be edited via the dashboard. 
+You can now enable Email Confirmations for new users. This can be toggled on or off and the template for this email can be edited via the dashboard.
 
 <video width="99%" autoPlay="autoplay" loop muted playsInline controls="true">
 <source src="/videos/confirm-email.mp4" type="video/mp4" loop muted playsInline />
@@ -49,7 +47,6 @@ You can now enable Email Confirmations for new users. This can be toggled on or 
 ### TypeScript support
 
 The biggest communty contribution to date, [@thorwebdev](https://twitter.com/thorwebdev) added TypeScript support to Supabase. He even [live streamed the process](https://twitter.com/thorwebdev/status/1292722189788016641).
-
 
 ![This git shows how TypeScript makes it even easier to use Supabase, through VSCode's intellisense.](/img/typescript-support.gif)
 
@@ -65,7 +62,6 @@ We have a number of small improvements:
 
 The release of Auth last month accelerated our community growth, based on [Orbit Levels.](https://github.com/orbit-love/orbit-model)
 
-
 ![This image shows our community growth. In August we had about 250 active members across GitHub and Twitter.](/img/community-august.png)
 
 - We received our first enterprise sponsor. Thanks to [@briannekimmel](https://twitter.com/briannekimmel) from [@WorkLifeVC](https://twitter.com/WorkLifeVC) for becoming an [Enterprise Sponsor](https://github.com/sponsors/supabase).
@@ -74,11 +70,9 @@ The release of Auth last month accelerated our community growth, based on [Orbit
 - Python Support: [@lqmanh](https://github.com/lqmanh) has agreed to lead the python support. He's already deployed [postgrest-py](https://github.com/supabase/postgrest-py) which is the first step towards a functioning supabase-py client lib.
 - [@phamhieu](https://github.com/phamhieu) built a [Live Map Tracker](https://github.com/phamhieu/supabase-realtime-map-v2) App using Supabase + Leafletjs
 
-
 ### Coming next
 
 Our focus now is to move from Alpha to Beta. This involves stabilising our Auth API, improving dashboard performance, and benchmarking all of our systems. This could take more than one month, as we have a number of company-related activities to wrap up ([we just finished YC](https://techcrunch.com/2020/08/25/here-are-the-94-companies-from-y-combinators-summer-2020-demo-day-2/)!).
-
 
 ### Get started
 
