@@ -658,6 +658,10 @@ pages:
             .upsert({ id: 3, message: 'foo', username: 'supabot' })
           ```
       - name: Upserting into tables with constraints
+        description: |
+          Running the following will cause supabase to upsert data into the `users` table. 
+          If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row 
+          based on the column passed into `onConflict`.
         isSpotlight: true
         js: |
           ```js
