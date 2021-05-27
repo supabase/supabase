@@ -484,6 +484,7 @@ a.card:hover {
 .menu > ul.menu__list li > a {
   padding-left: 0;
   padding-right: 0;
+  color: var(--custom-content-color)
 }
 .menu .menu__list-item-hidden {
   display: none;
@@ -697,6 +698,12 @@ div[class*=' codeBlockContent'],
   font-weight: bold;
   /* text-transform: uppercase; */
   border-bottom: 1px solid #444;
+}
+div[class^='codeBlockTitle'],
+div[class*=' codeBlockTitle'] {
+  color:#ccc !important;
+  font-size: 0.8rem !important;
+  border-color: #444;
 }
 .repsonse-header {
   border-radius: 0 0 4px 4px;
