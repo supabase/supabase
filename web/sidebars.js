@@ -76,18 +76,13 @@ module.exports = {
         'guides/api',
         'guides/client-libraries',
         'guides/local-development',
-        'guides/self-hosting',
       ],
     },
     {
       type: 'category',
       label: 'Guides',
       collapsed: false,
-      items: [
-        'guides/examples',
-        'guides/with-nextjs',
-        'guides/with-react',
-      ],
+      items: ['guides/examples', 'guides/with-nextjs', 'guides/with-react', 'guides/self-hosting'],
     },
     {
       type: 'category',
