@@ -286,13 +286,13 @@ export default function Account({ session }) {
       setLoading(true)
       const user = supabase.auth.user()
 
-      let { data, error } = await supabase
+      let { data, error, status } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
         .eq('id', user.id)
         .single()
 
-      if (error) {
+      if (error && status != 416) {
         throw error
       }
 

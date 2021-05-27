@@ -294,7 +294,7 @@ export default function Account({ session }) {
         .eq('id', user.id)
         .single()
 
-      if (error) {
+      if (error && status != 416) {
         throw error
       }
 
