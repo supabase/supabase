@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Supabase",
+      "Group": "Servers",
+      "Port": 5432,
+      "Username": "postgres",
+      "Host": "db",
+      "SSLMode": "disable",
+      "MaintenanceDB": "postgres"
+    }
+  }
+}

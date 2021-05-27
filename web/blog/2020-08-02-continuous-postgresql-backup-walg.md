@@ -6,8 +6,8 @@ author_title: Supabase
 author_url: https://github.com/dragarcia
 author_image_url: https://avatars0.githubusercontent.com/u/26374889?s=400&u=f5e35e9b47a50fa2b4d8c4bb96babd921071bcf1&v=4
 authorURL: https://github.com/dragarcia
-tags: 
-    - postgres
+tags:
+  - postgres
 ---
 
 Have you ever wanted to restore your database's state to a particular moment in time? This post explains how, using WAL-G.
@@ -33,7 +33,8 @@ A quick installation guide can be found [here](https://www.postgresql.org/downlo
 #### envdir
 
 [envdir](http://manpages.ubuntu.com/manpages/bionic/man8/envdir.8.html) allows us to run other programs with a modified environment based on the files in the provided directory. This can be installed through the [daemontools](https://cr.yp.to/daemontools.html) package:
-```shell 
+
+```shell
 $ sudo apt-get install -y daemontools
 ```
 
@@ -48,6 +49,7 @@ $ mv wal-g /usr/local/bin/
 ### AWS credentials and resources
 
 When storing backups, WAL-G has numerous [cloud storage provider options](https://github.com/wal-g/wal-g#configuration) for us to choose from. For this tutorial, we will be using AWS. Have the following prepared:
+
 - AWS Access & Secret keys.
 - An S3 bucket.
 
@@ -56,6 +58,7 @@ When storing backups, WAL-G has numerous [cloud storage provider options](https:
 ### 1. Configure environment variables
 
 The directory `/etc/wal-g.d/env` is created and contains files that stores environment variables. It would later be used in WAL-G commands via envdir.
+
 ```shell
 $ umask u=rwx,g=rx,o=
 $ mkdir -p /etc/wal-g.d/env
@@ -68,7 +71,8 @@ $ chown -R root:postgres /etc/wal-g.d
 
 ### 2. Enable WAL archiving
 
-Here, we enable [WAL archiving](https://www.postgresql.org/docs/12/continuous-archiving.html) and instruct Postgres to store the archives in the specified S3 bucket via WAL-G. 
+Here, we enable [WAL archiving](https://www.postgresql.org/docs/12/continuous-archiving.html) and instruct Postgres to store the archives in the specified S3 bucket via WAL-G.
+
 ```shell
 $ echo "archive_mode = yes" >> /etc/postgresql/12/main/postgresql.conf
 $ echo "archive_command = 'envdir /etc/wal-g.d/env /usr/local/bin/wal-g wal-push %p'" >> /etc/postgresql/12/main/postgresql.conf
@@ -78,6 +82,7 @@ $ echo "archive_timeout = 60" >> /etc/postgresql/12/main/postgresql.conf
 ### 3. Restart the database
 
 The database is restarted to let the changes in the configuration to take effect.
+
 ```shell
 $ sudo /etc/init.d/postgresql restart
 ```
@@ -97,9 +102,11 @@ From then on, subsequent physical backups would be found in the directory `baseb
 ### 5. [Optional] Schedule regular physical backups
 
 A CRON job can then be set to schedule physical backups to be performed everyday:
+
 ```shell
 $ echo "0 0 * * * postgres /usr/bin/envdir /etc/wal-g.d/env /usr/local/bin/wal-g backup-push /var/lib/postgresql/12/main" > /etc/cron.d/pg_backup
 ```
+
 Here, the instance has been instructed to back up the database at the start of each day at midnight. By physically backing up your instance regularly, overall recovery time could be faster. Restoring from a physical backup from yesterday would lead to fewer WAL archive files to be replayed as compared to restoring from one from a month ago.
 
 ---
@@ -111,6 +118,7 @@ Something goes wrong with the database or instance. We will now use what availab
 ### 1. Configure environment variables
 
 The configuration should be the **same** as the original instance. For recovery and restoration, we would not need the variable `PGPASSWORD`.
+
 ```shell
 $ umask u=rwx,g=rx,o=
 $ mkdir -p /etc/wal-g.d/env
@@ -137,13 +145,15 @@ $ sudo -su postgres
 #### Set restore_command
 
 Through [restore_command](https://www.postgresql.org/docs/12/continuous-archiving.html#:~:text=must%20specify%20is%20the%20restore_command,%20which%20tells%20PostgreSQL%20how%20to%20retrieve%20archived%20WAL%20file%20segments), we instruct Postgres to pull all WAL archives from our S3 bucket to use during recovery.
+
 ```shell
 $ echo "restore_command = '/usr/bin/envdir /etc/wal-g.d/env /usr/local/bin/wal-g wal-fetch \"%f\" \"%p\" >> /tmp/wal.log 2>&1'" >> /etc/postgresql/12/main/postgresql.conf
 ```
 
 #### [Optional] Achieve Point in Time Recovery (PITR)
 
-If we want to restore the database only up to a certain point in time (eg. right before the disaster), we can do so by setting both [recovery_target_time](https://www.postgresql.org/docs/12/runtime-config-wal.html#:~:text=recovery_target_time%20(timestamp)) and [recovery_target_action](https://www.postgresql.org/docs/12/runtime-config-wal.html#:~:text=recovery_target_action%20(enum)). Do note that the timezone would need to match that of the original instance. This is usually at the UTC (+00) timezone.
+If we want to restore the database only up to a certain point in time (eg. right before the disaster), we can do so by setting both [recovery_target_time](<https://www.postgresql.org/docs/12/runtime-config-wal.html#:~:text=recovery_target_time%20(timestamp)>) and [recovery_target_action](<https://www.postgresql.org/docs/12/runtime-config-wal.html#:~:text=recovery_target_action%20(enum)>). Do note that the timezone would need to match that of the original instance. This is usually at the UTC (+00) timezone.
+
 ```shell
 $ echo "recovery_target_time = '2020-07-27 01:23:00.000000+00'" >> /etc/postgresql/12/main/postgresql.conf
 $ echo "recovery_target_action = 'promote'" >> /etc/postgresql/12/main/postgresql.conf
@@ -152,6 +162,7 @@ $ echo "recovery_target_action = 'promote'" >> /etc/postgresql/12/main/postgresq
 ### 5. Restore from physical backup
 
 The current data directory is deleted and is replaced with the latest version of the physical backup from the S3 bucket.
+
 ```shell
 $ rm -rf /var/lib/postgresql/12/main
 $ envdir /etc/wal-g.d/env /usr/local/bin/wal-g backup-fetch /var/lib/postgresql/12/main LATEST
@@ -159,7 +170,8 @@ $ envdir /etc/wal-g.d/env /usr/local/bin/wal-g backup-fetch /var/lib/postgresql/
 
 ### 6. Create a `recovery.signal` file
 
-This file [instructs](https://www.postgresql.org/docs/12/continuous-archiving.html#:~:text=Set%20recovery%20configuration%20settings%20in%20postgresql.conf%20(see%20Section%2019.5.4)%20and%20create%20a%20file%20recovery.signal%20in%20the%20cluster%20data%20directory) Postgres that the database should undergo recovery mode upon start.
+This file [instructs](<https://www.postgresql.org/docs/12/continuous-archiving.html#:~:text=Set%20recovery%20configuration%20settings%20in%20postgresql.conf%20(see%20Section%2019.5.4)%20and%20create%20a%20file%20recovery.signal%20in%20the%20cluster%20data%20directory>) Postgres that the database should undergo recovery mode upon start.
+
 ```shell
 $ touch /var/lib/postgresql/12/main/recovery.signal
 ```

@@ -225,7 +225,7 @@ function extractParamTypeAsString(paramDefinition) {
 function extractTsDocNode(nodeToFind: string, definition: any) {
   const nodePath = nodeToFind.split('.')
   let i = 0
-  let previousNode = definition 
+  let previousNode = definition
   let currentNode = definition
   while (i < nodePath.length) {
     previousNode = currentNode

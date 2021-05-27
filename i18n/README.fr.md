@@ -29,7 +29,7 @@ Pour une documentation complète, visitez [supabase.io/docs](https://supabase.io
 ## Statut
 
 - [x] Alpha : Nous testons Supabase avec un groupe fermé de clients.
-- [X] Alpha publique : Tout le monde peut s'inscrire sur [app.supabase.io]((https://app.supabase.io)). Mais allez-y doucement, il y a quelques problèmes. 
+- [x] Alpha publique : Tout le monde peut s'inscrire sur [app.supabase.io](<(https://app.supabase.io)>). Mais allez-y doucement, il y a quelques problèmes.
 - [x] Bêta publique : Assez stable pour la plupart des cas d'utilisation hors entreprise
 - [ ] Public : Prêt pour la production
 
@@ -66,7 +66,7 @@ Notre bibliothèque client est modulaire. Chaque sous-bibliothèque est une impl
   - `realtime-{lang}`: Bibliothèque client pour travailler avec [Realtime](https://github.com/supabase/realtime)
   - `gotrue-{lang}`: Bibliothèque client pour travailler avec [GoTrue](https://github.com/netlify/gotrue)
 
-| Repo                  | Officiel                                         | Communauté                                                                                                                                                                                                                  |
+| Repo                  | Officiel                                         | Communauté                                                                                                                                                                                                                 |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
@@ -75,6 +75,7 @@ Notre bibliothèque client est modulaire. Chaque sous-bibliothèque est une impl
 
 <!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
+
 ## Traductions
 
 - [Liste des traductions](/i18n/languages.md) <!--- Keep only the this-->

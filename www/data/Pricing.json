@@ -42,7 +42,7 @@
         "tiers": {
           "free": "Up to 500 MB",
           "pro": "Up to 8 GB",
-          "enterprise": "0.125 per GB"
+          "enterprise": "$0.125 per GB"
         }
       },
       {

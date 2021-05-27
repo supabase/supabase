@@ -27,7 +27,6 @@ We've improved the UX of our Dashboard with sidebars in every section, including
 
 ![Our dashboard has sidebars](/img/blog/feb/sidebar-tables.png)
 
-
 ### SQL Autocomplete
 
 Writing SQL just got 10x easier. We added autocomplete to the SQL editor, including table & column suggestions.
@@ -36,10 +35,9 @@ Writing SQL just got 10x easier. We added autocomplete to the SQL editor, includ
 <source src="/img/blog/feb/autocomplete.mp4" type="video/mp4" muted playsInline />
 </video>
 
-
 ### Auth Redirects
 
-Redirect your users to specific route within your site on [`signIn()`](https://supabase.io/docs/reference/javascript/auth-signin#sign-in-with-redirect) and [`signUp()`](https://supabase.io/docs/reference/javascript/auth-signup#sign-up-with-redirect). 
+Redirect your users to specific route within your site on [`signIn()`](https://supabase.io/docs/reference/javascript/auth-signin#sign-in-with-redirect) and [`signUp()`](https://supabase.io/docs/reference/javascript/auth-signup#sign-up-with-redirect).
 
 ![Redirect your users after sign up](/img/blog/feb/auth-redirect.png)
 
@@ -48,7 +46,6 @@ Redirect your users to specific route within your site on [`signIn()`](https://s
 We added a page to the Database section for managing Postgres Replication. It's still basic, but you can use it to manage your realtime API - choosing which tables are enabled, and which events to send.
 
 ![Replication management](/img/blog/feb/manage-replication.png)
-
 
 ### Learning Resources
 
@@ -62,15 +59,13 @@ Launch your database in South Africa.
 
 ![Launch your database in South Africa](/img/blog/feb/new-region-south-africa.png)
 
-
 ### Kaizen
 
 - We filled up our [Examples](https://supabase.io/docs/guides/examples) page with a lot of new content.
 - We released a [Docker Compose](https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml) file for running Supabase locally. This will be used in our upcoming CLI.
 - We have a couple of pending RFCs which you may want to participate in:
-    - [Planning our CLI and Local Development](https://github.com/supabase/cli/pull/2)
-    - [Connection Pooling on Supabase](https://github.com/supabase/postgres/blob/rfc/connection_pooling/rfcs/0001-connection-pooling.md)
-
+  - [Planning our CLI and Local Development](https://github.com/supabase/cli/pull/2)
+  - [Connection Pooling on Supabase](https://github.com/supabase/postgres/blob/rfc/connection_pooling/rfcs/0001-connection-pooling.md)
 
 ### Community
 

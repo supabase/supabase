@@ -1,29 +1,24 @@
 interface ICM {
-    [key: string]: any
+  [key: string]: any;
 }
 interface IBaseRes {
-    status: number;
-    data: any,
-    message: string;
-    errors?: ICM
+  status: number;
+  data: any;
+  message: string;
+  errors?: ICM;
 }
 interface IUserBase {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 interface IUserRegister extends IUserBase {
-    name?: string
+  name?: string;
 }
 interface IUserLogin extends IUserBase {
-    stayLoggedIn?: boolean
+  stayLoggedIn?: boolean;
 }
 interface IErrorRes {
-    code: string;
-    message: any
+  code: string;
+  message: any;
 }
-export {
-    IBaseRes,
-    IUserRegister,
-    IUserLogin,
-    IErrorRes
-}
+export { IBaseRes, IUserRegister, IUserLogin, IErrorRes };

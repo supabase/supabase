@@ -1,6 +1,6 @@
 ---
 id: about
-title: Postgres 
+title: Postgres
 description: 'The easiest way to get started with Postgres.'
 ---
 
@@ -14,5 +14,3 @@ We want to solve that problem. So we packaged Postgres with some useful plugins 
 - Use with [Docker](https://github.com/supabase/postgres/wiki/Docker)
 - Install on [Digital Ocean](https://github.com/supabase/postgres/wiki/Digital-Ocean)
 - Install on [AWS](https://github.com/supabase/postgres/wiki/AWS-EC2)
-
-

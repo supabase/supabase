@@ -54,7 +54,7 @@ We have a number of small improvements:
 
 ### Hiring
 
-- This month we [welcome Steve Chavez to the team](/blog/2020/06/15/supabase-steve-chavez). Steve is a maintainer of PostgREST, one of the core tools which makes Supabase possible. 
+- This month we [welcome Steve Chavez to the team](/blog/2020/06/15/supabase-steve-chavez). Steve is a maintainer of PostgREST, one of the core tools which makes Supabase possible.
 - We're hiring a part-time designer or UX expert. See more [here](https://news.ycombinator.com/item?id=23708351).
 
 ### Get started
@@ -63,7 +63,3 @@ We have a number of small improvements:
 - Make sure to [star us on GitHub](https://github.com/supabase/supabase)
 - Follow us [on Twitter](https://twitter.com/supabase_io)
 - Become a [sponsor](https://github.com/sponsors/supabase)
-
-
-
- 

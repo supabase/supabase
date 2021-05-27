@@ -62,11 +62,11 @@ Supabase 是[託管平台](https://app.supabase.io)。只要註冊，不必安�
 客戶端 Library 是模組化的。每個子 Library 都是單一外部系統的獨立實作。這是支援既有工具的方法之一。
 
 - **`supabase-{lang}`**: Combines libraries and adds enrichments.
-  - `postgrest-{lang}`: 銜接 [PostgREST](https://github.com/postgrest/postgrest) 的客戶端 Library 
-  - `realtime-{lang}`: 銜接 [Realtime](https://github.com/supabase/realtime) 的客戶端 Library  
-  - `gotrue-{lang}`: 銜接 [GoTrue](https://github.com/netlify/gotrue) 的客戶端 Library 
+  - `postgrest-{lang}`: 銜接 [PostgREST](https://github.com/postgrest/postgrest) 的客戶端 Library
+  - `realtime-{lang}`: 銜接 [Realtime](https://github.com/supabase/realtime) 的客戶端 Library
+  - `gotrue-{lang}`: 銜接 [GoTrue](https://github.com/netlify/gotrue) 的客戶端 Library
 
-| Repo                  | 官方                                         | 社群                                                                                                                                                                                                                  |
+| Repo                  | 官方                                             | 社群                                                                                                                                                                                                                       |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
@@ -75,6 +75,7 @@ Supabase 是[託管平台](https://app.supabase.io)。只要註冊，不必安�
 
 <!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
+
 ## 翻譯
 
 - [翻譯](/i18n/languages.md) <!--- Keep only the this-->

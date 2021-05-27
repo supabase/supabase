@@ -7,7 +7,7 @@ This demonstrates how to use:
 - User signups using Supabase [Auth](https://supabase.io/auth).
 - User avatar images using Supabase [Storage](https://supabase.io/storage).
 - Public profiles restricted with [Policies](https://supabase.io/docs/guides/auth#policies).
-- Frontend using [Next.js]([nextjs.org/](https://nextjs.org/)).
+- Frontend using [Next.js](<[nextjs.org/](https://nextjs.org/)>).
 
 ## Technologies used
 
