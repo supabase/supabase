@@ -484,7 +484,7 @@ a.card:hover {
 .menu > ul.menu__list li > a {
   padding-left: 0;
   padding-right: 0;
-  color: var(--custom-content-color)
+  color: var(--custom-content-color);
 }
 .menu .menu__list-item-hidden {
   display: none;
@@ -701,7 +701,7 @@ div[class*=' codeBlockContent'],
 }
 div[class^='codeBlockTitle'],
 div[class*=' codeBlockTitle'] {
-  color:#ccc !important;
+  color: #ccc !important;
   font-size: 0.8rem !important;
   border-color: #444;
 }

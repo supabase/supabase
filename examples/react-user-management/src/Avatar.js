@@ -22,7 +22,6 @@ export default function Avatar({ url, size, onUpload }) {
     }
   }
 
-
   async function uploadAvatar(event) {
     try {
       setUploading(true)
@@ -36,9 +35,7 @@ export default function Avatar({ url, size, onUpload }) {
       const fileName = `${Math.random()}.${fileExt}`
       const filePath = `${fileName}`
 
-      let { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file)
+      let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
 
       if (uploadError) {
         throw uploadError
