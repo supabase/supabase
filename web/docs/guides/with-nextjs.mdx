@@ -294,13 +294,15 @@ export default function Account({ session }) {
         .eq('id', user.id)
         .single()
 
-      if (error && status != 416) {
+      if (error && status !== 406) {
         throw error
       }
 
-      setUsername(data.username)
-      setWebsite(data.website)
-      setAvatarUrl(data.avatar_url)
+      if (data) {
+        setUsername(data.username)
+        setWebsite(data.website)
+        setAvatarUrl(data.avatar_url)
+      }
     } catch (error) {
       alert(error.message)
     } finally {
