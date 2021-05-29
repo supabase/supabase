@@ -389,7 +389,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { error } = supabase.auth.signOut()
+          const { error } = await supabase.auth.signOut()
           ```
 
   auth.session():
