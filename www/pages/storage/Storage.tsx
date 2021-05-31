@@ -17,6 +17,7 @@ import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
+import Link from 'next/link'
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import CTABanner from '~/components/CTABanner'
@@ -28,7 +29,7 @@ import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
 
-function AuthPage() {
+function StoragePage() {
   // base path for images
   const { basePath } = useRouter()
 
@@ -251,14 +252,21 @@ function AuthPage() {
                           write policies.
                         </p>
                       </Typography.Text>
-                      <Button
-                        size="small"
-                        type="default"
-                        className="mt-4"
-                        icon={<IconArrowUpRight />}
+                      <Link
+                        href="https://supabase.io/docs/reference/javascript/storage-createbucket"
+                        as="https://supabase.io/docs/reference/javascript/storage-createbucket"
                       >
-                        Explore documentation
-                      </Button>
+                        <a>
+                          <Button
+                            size="small"
+                            type="default"
+                            className="mt-4"
+                            icon={<IconArrowUpRight />}
+                          >
+                            Explore documentation
+                          </Button>
+                        </a>
+                      </Link>
                     </div>
                     <div className="col-span-12 lg:col-span-6 lg:col-start-7">
                       <SplitCodeBlockCarousel
@@ -278,4 +286,4 @@ function AuthPage() {
   )
 }
 
-export default AuthPage
+export default StoragePage
