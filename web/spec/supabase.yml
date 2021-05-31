@@ -535,12 +535,12 @@ pages:
       - name: Querying with count option
         description: |
           You can get the number of rows by using the count option.
-          Allowed values for count option are `null`, `exact`, `planned` and `estimated`.
+          Allowed values for count option are `null`, [exact](https://postgrest.org/en/stable/api.html#exact-count), [planned](https://postgrest.org/en/stable/api.html#planned-count) and [estimated](https://postgrest.org/en/stable/api.html#estimated-count).
         js: |
           ```js
           const { data, error, count } = await postgrest
             .from('cities')
-            .select('name', { count: 'exact' })
+            .select('name', { count: 'exact' }) // if you don't want to return any rows, you can use { count: 'exact', head: true }
           ```
       - name: Querying JSON data
         description: |
