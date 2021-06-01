@@ -210,9 +210,9 @@ You can find the full contents of this file [here](https://raw.githubusercontent
 Let's set up a React component to manage logins and sign ups. 
 We'll use Magic Links, so users can sign in with their email without using passwords.
 
-```jsx title="/components/Auth.js"
+```jsx title="components/Auth.js"
 import { useState } from 'react'
-import { supabase } from './utils/supabaseClient'
+import { supabase } from '../utils/supabaseClient'
 
 export default function Auth() {
   const [loading, setLoading] = useState(false)
@@ -271,7 +271,7 @@ Let's create a new component for that called `Account.js`.
 
 ```jsx title="components/Account.js"
 import { useState, useEffect } from 'react'
-import { supabase } from './utils/supabaseClient'
+import { supabase } from '../utils/supabaseClient'
 
 export default function Account({ session }) {
   const [loading, setLoading] = useState(true)
@@ -288,7 +288,7 @@ export default function Account({ session }) {
       setLoading(true)
       const user = supabase.auth.user()
 
-      let { data, error } = await supabase
+      let { data, error, status } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
         .eq('id', user.id)
