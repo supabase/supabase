@@ -538,7 +538,7 @@ pages:
           Allowed values for count option are `null`, [exact](https://postgrest.org/en/stable/api.html#exact-count), [planned](https://postgrest.org/en/stable/api.html#planned-count) and [estimated](https://postgrest.org/en/stable/api.html#estimated-count).
         js: |
           ```js
-          const { data, error, count } = await postgrest
+          const { data, error, count } = await supabase
             .from('cities')
             .select('name', { count: 'exact' }) // if you don't want to return any rows, you can use { count: 'exact', head: true }
           ```
