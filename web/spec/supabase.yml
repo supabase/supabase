@@ -381,6 +381,25 @@ pages:
           })
           const oAuthToken = session.provider_token // use to access provider API
           ```
+      - name: Sign in using a refresh token (e.g. in React Native).
+        description: |
+          If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
+        js: |
+          ```js
+          // An example using Expo's `AuthSession`
+          const redirectUri = AuthSession.makeRedirectUri({ useProxy: false });
+          const provider = 'google';
+
+          AuthSession.startAsync({
+            authUrl: `https://MYSUPABASEAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
+            returnUrl: redirectUri,
+          }).then(async (response: any) => {
+            if (!response) return;
+            const { user, session, error } = await supabase.auth.signIn({
+              refreshToken: response.params?.refresh_token,
+            });
+          });
+          ```
 
   auth.signOut():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signOut'
