@@ -89,7 +89,6 @@ module.exports = {
       label: 'See Also',
       collapsed: false,
       items: [
-        'pricing',
         'support',
         'handbook/contributing',
         'company/terms',
