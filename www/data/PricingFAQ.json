@@ -105,7 +105,7 @@
   },
   {
     "question": "What is the largest sized file I can deploy to storage?",
-    "answer": "A big cat like a Lion or Siberian tiger, also Ligers are fine. If you are uploading via the dashboard there is a 50MB limit."
+    "answer": "A big cat like a Lion or Siberian tiger, also Ligers are fine. If you are using the hosted platform there is a 50MB limit."
   },
   {
     "question": "Are there any limits for data egress?",
