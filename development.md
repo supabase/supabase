@@ -20,6 +20,7 @@ npm run dev
 # tab 3
 cd web/spec
 make
+npm install
 npm run gen:supabase
 npm run build
 
