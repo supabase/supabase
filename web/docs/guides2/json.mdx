@@ -1,0 +1,383 @@
+---
+id: json
+title: "Working With JSON Data"
+description: How to use JSON Data in PostgreSQL and the Supabase Javascript API.
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+### How to use JSON Data in PostgreSQL and the Supabase Javascript API.
+
+## Description
+
+PostgreSQL supports [JSON functions and operators](https://www.postgresql.org/docs/12/functions-json.html) that can give you nearly unlimited flexiblity when storing data inside a database column.  In this document you'll learn how to:
+
+* create database columns that store JSON data
+* insert JSON data into a database
+* query JSON data stored in a database
+
+PostgreSQL supports two types of JSON columns: JSON and JSONB.  The recommended type is JSONB, so that's what we'll be using throughout this document.
+
+> The json data type stores an exact copy of the input text, which processing functions must reparse on each execution; while jsonb data is stored in a decomposed binary format that makes it slightly slower to input due to added conversion overhead, but significantly faster to process, since no reparsing is needed. jsonb also supports indexing, which can be a significant advantage.
+
+From: [PostgreSQL JSON types](https://www.postgresql.org/docs/12/datatype-json.html)
+
+## Environment
+
+* Supabase JS Client
+* Supabase (or any PostgreSQL) backend
+* Supabase Dashboard (UI)
+
+
+## Requirements
+* Supabase account or self-hosted Supabase instance
+* Javascript-based client application (Angular, React, Vue, etc.)
+
+
+## Steps
+
+### Create a table with a JSON column.  
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'SQL', value: 'SQL'},
+]}>
+<TabItem value="UI">
+
+- Table Editor
+- New Table
+- Create a new table named `game_log`
+    - include primary key `id`, type `UUID`, default value `Automatically generate UUID`
+    - Save the new table
+    - New Column
+        - Name the new column `game_data`
+        - Make it type `JSONB`
+        - Save the new column
+    - Add the other columns used by this demo
+        - game_date type DATE
+        - home_team type TEXT
+        - visiting_team type TEXT
+
+</TabItem>
+<TabItem value="SQL">
+
+```sql
+CREATE TABLE game_log (
+    id UUID DEFAULT uuid_generate_v4() NOT NULL,
+    game_date DATE,
+    home_team TEXT,
+    visiting_team TEXT,
+    game_data JSONB
+);
+```
+
+</TabItem>
+
+</Tabs>
+
+### Insert data into the table:
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'SQL', value: 'SQL'},
+  {label: 'JS', value: 'JavaScript'},
+]}>
+<TabItem value="UI">
+
+- Table Editor
+- Select `game_log`
+- Insert Row
+    - game_date: 2021-06-02
+    - home_team: 'Chicago Cubs'
+    - visiting_team: 'San Diego Padres'
+    - game_data: [COPY AND PASTE THE JSON BLOCK]
+
+  ```js
+  {
+    "winning_pitcher": "Alzolay", 
+    "losing_pitcher": "Johnson", 
+    "final_score": {
+      "visitors": {"runs": 1, "hits": 5, "errors": 2}, 
+      "home": {"runs": 6, "hits": 9, "errors": 0}
+    }, 
+    "innings": {
+      "visitors": [0,0,0,1,0,0,0,0,0], 
+      "home": [0,0,0,1,2,0,3,0]}
+  }
+  ```
+
+    - Save the new row
+
+</TabItem>
+
+<TabItem value="SQL">
+
+```sql
+INSERT into game_log (game_date, home_team, visiting_team, game_data)
+values (
+'2021-06-02',
+'Chicago Cubs',
+'San Diego Padres',
+'{"winning_pitcher": "Alzolay", 
+  "losing_pitcher": "Johnson", 
+  "final_score": {
+    "visitors": {"runs": 1, "hits": 5, "errors": 2}, 
+    "home": {"runs": 6, "hits": 9, "errors": 0}
+  }, 
+  "innings": {
+    "visitors": [0,0,0,1,0,0,0,0,0], 
+    "home": [0,0,0,1,2,0,3,0]}
+  }'
+);
+```
+
+</TabItem>
+<TabItem value="JavaScript">
+
+```js
+const { data, error } = await supabase
+.from('game_log')
+.insert([{ 
+  game_date: '2021-06-02',
+  home_team: 'Chicago Cubs',
+  visiting_team: 'San Diego Padres',
+  game_data: {
+    "winning_pitcher": "Alzolay", 
+    "losing_pitcher": "Johnson", 
+    "final_score": {
+      "visitors": {"runs": 1, "hits": 5, "errors": 2}, 
+      "home": {"runs": 6, "hits": 9, "errors": 0}
+    }, 
+    "innings": {
+      "visitors": [0,0,0,1,0,0,0,0,0], 
+      "home": [0,0,0,1,2,0,3,0]
+    }
+  }        
+}]);  
+```
+
+</TabItem>
+</Tabs>
+
+
+
+### View the data:
+
+<Tabs
+defaultValue="SQL"
+values={[
+  {label: 'SQL', value: 'SQL'},
+  {label: 'JS', value: 'JavaScript'},
+]}>
+<TabItem value="SQL">
+
+```sql
+SELECT * FROM game_log;
+```
+
+Resuls:
+
+| id                                   | game_date                | home_team    | visiting_team    | game_data                                                                                                                                                                                                                    |
+| ------------------------------------ | ------------------------ | ------------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 24550f27-28d2-46f3-b577-aeede4614018 | 2021-06-02T00:00:00.000Z | Chicago Cubs | San Diego Padres | {"innings":{"home":[0,0,0,1,2,0,3,0],"visitors":[0,0,0,1,0,0,0,0,0]},"final_score":{"home":{"hits":9,"runs":6,"errors":0},"visitors":{"hits":5,"runs":1,"errors":2}},"losing_pitcher":"Johnson","winning_pitcher":"Alzolay"} |
+
+</TabItem>
+<TabItem value="JavaScript">
+
+```js
+const { data, error } = await supabase
+.from('game_log')
+.select('*');
+console.log(JSON.stringify(data,null,2));
+```
+
+Results:
+
+```js
+[
+  {
+    "id": "a4c577bc-4343-440d-8f8b-9fef0af225cc",
+    "game_date": "2021-06-02",
+    "home_team": "Chicago Cubs",
+    "visiting_team": "San Diego Padres",
+    "game_data": {
+      "innings": {
+        "home": [0,0,0,1,2,0,3,0],
+        "visitors": [0,0,0,1,0,0,0,0,0]
+      },
+      "final_score": {
+        "home": {"hits": 9, "runs": 6, "errors": 0},
+        "visitors": {"hits": 5, "runs": 1, "errors": 2}
+      },
+      "losing_pitcher": "Johnson",
+      "winning_pitcher": "Alzolay"
+    }
+  }
+]
+```
+
+</TabItem>
+</Tabs>
+
+### Select the winning pitcher from the JSONB field:
+
+<Tabs
+defaultValue="SQL"
+values={[
+  {label: 'SQL', value: 'SQL'},
+  {label: 'JS', value: 'JavaScript'},
+]}>
+<TabItem value="SQL">
+
+```sql
+SELECT game_data -> 'winning_pitcher' AS winning_pitcher FROM game_log;
+```
+
+Resuls:
+
+| winning_pitcher |
+| --------------- |
+| Alzolay         |
+
+</TabItem>
+<TabItem value="JavaScript">
+
+```js
+const { data, error } = await supabase
+.from('game_log')
+.select('game_data->winning_pitcher');
+console.log(JSON.stringify(data,null,2));
+```
+
+Results:
+
+```js
+[
+  {
+    "winning_pitcher": "Alzolay"
+  }
+]
+```
+
+</TabItem>
+</Tabs>
+
+
+### Get the final scores:
+
+<Tabs
+defaultValue="SQL"
+values={[
+  {label: 'SQL', value: 'SQL'},
+  {label: 'JS', value: 'JavaScript'},
+]}>
+<TabItem value="SQL">
+
+```sql
+SELECT 
+  visiting_team, 
+  game_data -> 'final_score' -> 'visitors' -> 'runs' as visitors_runs,
+  home_team, 
+  game_data -> 'final_score' -> 'home' -> 'runs' as home_runs
+FROM game_log;
+```
+
+Results:
+
+| visiting_team    | visitors_runs | home_team    | home_runs |
+| ---------------- | ------------- | ------------ | --------- |
+| San Diego Padres | 1             | Chicago Cubs | 6         |
+
+</TabItem>
+<TabItem value="JavaScript">
+
+```js
+const { data, error } = await supabase
+.from('game_log')
+.select('visiting_team, visitors_runs:game_data->final_score->visitors->runs, home_team, home_runs:game_data->final_score->home->runs');
+console.log(JSON.stringify(data,null,2));
+```
+
+Results:
+
+```js
+[
+  {
+    "visiting_team": "San Diego Padres",
+    "visitors_runs": 1,
+    "home_team": "Chicago Cubs",
+    "home_runs": 6
+  }
+]
+```
+
+</TabItem>
+</Tabs>
+
+
+
+### How many runs did the home team score in the 7th inning?
+(Note that data is stored in a zero-based array, so to get data from the 7th inning, we use a 6.)
+
+<Tabs
+defaultValue="SQL"
+values={[
+  {label: 'SQL', value: 'SQL'},
+  {label: 'JS', value: 'JavaScript'},
+]}>
+<TabItem value="SQL">
+
+```sql
+SELECT home_team, 
+game_data -> 'innings' -> 'home' -> 6 as seventh_inning
+FROM game_log;
+```
+
+Results:
+
+| home_team    | seventh_inning |
+| ------------ | -------------- |
+| Chicago Cubs | 3              |
+
+</TabItem>
+<TabItem value="JavaScript">
+
+```js
+const { data, error } = await this.supabase
+.from('game_log')
+.select('home_team, seventh_inning_runs:game_data->innings->home->6');
+console.log(JSON.stringify(data,null,2));
+```
+
+Results:
+
+```js
+[
+  {
+    "home_team": "Chicago Cubs",
+    "seventh_inning_runs": 3
+  }
+]
+```
+
+</TabItem>
+</Tabs>
+
+
+#### Data Types
+One last thing to note:  the -> operator return JSONB data.  If you want TEXT/STRING data returned, you need to use the ->> operator.
+
+- game_data -> 'winning_pitcher' (this returns a JSON object)
+- game_data ->> 'winning_pitcher' (this returns STRING/TEXT data)
+
+## Resources
+
+* [Supabase Account - Free Tier OK](https://supabase.io)
+* [Supabase JS Client](https://github.com/supabase/supabase-js)
+* [PostgreSQL: JSON Functions and Operators](https://www.postgresql.org/docs/12/functions-json.html)
+* [PostgreSQL JSON types](https://www.postgresql.org/docs/12/datatype-json.html)
