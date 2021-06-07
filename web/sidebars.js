@@ -86,6 +86,12 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Guides2',
+      collapsed: false,
+      items: ['guides2/arrays'],
+    },
+    {
+      type: 'category',
       label: 'See Also',
       collapsed: false,
       items: [
