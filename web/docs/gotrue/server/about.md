@@ -575,6 +575,102 @@ Returns:
 }
 ```
 
+### **POST /admin/users**
+
+Creates a new user. Requires your `service_role` API key and thus should only be
+used in secure server-side environments.
+
+```json
+{
+  "email": "new-email@example.com",
+  "password": "new-password",
+  "data": {
+    "key": "value",
+    "number": 10,
+    "admin": false
+  }
+}
+```
+
+Returns:
+
+```json
+{
+  "id": "11111111-2222-3333-4444-5555555555555",
+  "aud": "authenticated",
+  "role": "authenticated",
+  "email": "email@example.com",
+  "app_metadata": {
+    "provider": "email"
+  },
+  "user_metadata": null,
+  "created_at": "2016-05-15T19:53:12.368652374-07:00",
+  "updated_at": "2016-05-15T19:53:12.368652374-07:00"
+}
+```
+
+### **GET /admin/users/{user_id}**
+
+Gets a user. Requires your `service_role` API key and thus should only be used
+in secure server-side environments.
+
+Returns:
+
+```json
+{
+  "id": "11111111-2222-3333-4444-5555555555555",
+  "aud": "authenticated",
+  "role": "authenticated",
+  "email": "email@example.com",
+  "app_metadata": {
+    "provider": "email"
+  },
+  "user_metadata": {},
+  "created_at": "2016-05-15T19:53:12.368652374-07:00",
+  "updated_at": "2016-05-15T19:53:12.368652374-07:00"
+}
+```
+
+
+### **PUT /admin/users/{user_id}**
+
+Updates a user. Requires your `service_role` API key and thus should only be
+used in secure server-side environments.
+
+```json
+{
+  "email": "email@example.com",
+  "password": "updated-password",
+  "data": {
+    "key": "updated-value",
+    "number": 10,
+    "admin": false
+  }
+}
+```
+
+Returns:
+
+```json
+{
+  "id": "11111111-2222-3333-4444-5555555555555",
+  "aud": "authenticated",
+  "role": "authenticated",
+  "email": "email@example.com",
+  "app_metadata": {
+    "provider": "email"
+  },
+  "user_metadata": {},
+  "created_at": "2016-05-15T19:53:12.368652374-07:00",
+  "updated_at": "2016-05-15T19:53:12.368652374-07:00"
+}
+```
+
+### **DELETE /admin/users/{user_id}**
+
+Deletes a user. Requires your `service_role` API key and thus should only be
+used in secure server-side environments.
+
 ### **POST /logout**
 
 Logout a user (Requires authentication).
