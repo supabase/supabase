@@ -224,6 +224,7 @@
 html,
 body {
   font-smoothing: antialiased;
+  scroll-behavior: smooth;
   text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
