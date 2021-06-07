@@ -88,7 +88,7 @@ module.exports = {
       type: 'category',
       label: 'Guides2',
       collapsed: false,
-      items: ['guides2/arrays', 'guides2/json'],
+      items: ['guides2/arrays', 'guides2/json', 'guides2/password-reset'],
     },
     {
       type: 'category',
