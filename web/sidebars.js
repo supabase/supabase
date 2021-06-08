@@ -122,7 +122,7 @@ module.exports = {
       type: 'category',
       label: 'Auth',
       collapsed: false,
-      items: ['guides/auth/auth-facebook'],
+      items: ['guides/auth/auth-facebook', 'guides/auth/auth-google'],
     },
     {
       type: 'category',
