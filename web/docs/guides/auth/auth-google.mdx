@@ -1,0 +1,123 @@
+---
+id: auth-google
+title: "Google Login"
+description: Setting up Google Login
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+### Setting up Google Login
+
+## Description
+
+Adding a Google Login button to your application is easy if you follow these steps.
+
+The setup process consists of three parts:
+
+* Create and configure a Google Project on the [Google Cloud Platform Console](https://console.cloud.google.com/home/dashboard)
+* Add your Facebook keys to your [Supabase Project](https://supabase.io)
+* Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+
+## Environment
+
+* [Supabase JS Client](https://github.com/supabase/supabase-js)
+* [Supabase Dashboard (UI)](https://supabase.io)
+* [Google Cloud Platform Console](https://console.cloud.google.com/home/dashboard)
+
+## Requirements
+* Supabase account (Free Tier OK)
+* Any existing Supabase Project
+* Javascript-based client application (Angular, React, Vue, etc.)
+
+## Steps
+
+### Create a Google Cloud Platform Account
+
+First, you'll need an Account at [Google Cloud Platform](https://console.cloud.google.com/home/dashboard).
+
+### Create a Google Cloud Platform Project
+
+Once logged into *"Google Cloud Platform"*:
+
+- Click on "Select a Project" at the top left.
+  - (Or, if a project is currently selected, click on the current project name at the top left.)
+- Click "New Project" at the top right.
+- Fill in your app information, then click "Create".
+  - (This can take a few minutes.)
+- This should bring you to the dashboard for your new project.
+
+### Create the OAauth Keys for your project
+
+From your project's dashboard screen:
+
+- In the search bar at the top labelled "Search products and resources" type "OAuth"
+- Click on "OAauth consent screen" from the list of results
+- On the "OAauth consent screen" page select "External"
+- Click "Create"
+- On the "Edit app registration" page fill out your app information
+- Click "Save and continue" at the bottom
+- Click "Credentials" at the left to go to the "Credentials" page
+- Click "Create Credentials" near the top then select "OAauth client ID"
+- On the "Create OAuth client ID" page, select your application type.  If you're not sure, choose "Web application".
+- Fill in your app name
+- At the bottom, under "Authorised redirect URIs" click "Add URI"
+- Enter your callback URI under "Authorised redirect URIs" at the bottom
+    - Your OAuth Redirect URI looks like this:
+      - https://xxxxxxxxxxxxxxxx.supabase.co/auth/v1/callback
+      - where https://xxxxxxxxxxxxxxxx.supabase.co is your Supabase Project API URL
+          - Go to your [Supasebase Project Dashboard](https://supabase.io)
+          - Click on the "Settings" icon at the bottom of the left sidebar
+          - Click on "API" in the list
+          - Under Config / URL you'll find your API URL, you can click "Copy" to copy it to the clipboard
+          - Now just add "/auth/v1/callback" to the end of that to get your full "OAauth Redirect URI"
+          - Enter this in the "Valid OAuth Redirect URIs" box
+          - Click "Save Changes" at the bottom right
+- Click "Create"
+- A box will appear called "OAuth client created"
+- Copy and save the values under "Your Client ID" and "Your Client Secret"
+
+
+### Enter your Google Client ID and Client Secret into your Supabase Project
+
+- Go to your [Supasebase Project Dashboard](https://supabase.io)
+- In the left sidebar, click the "Authentication" icon (near the top)
+- Click "Settings" from the list to go to the "Authentication Settings" page
+- Enter the final (hosted) URL of your app under "Site URL" (this is important)
+- Under "External OAuth Providers" turn "Google Enabled" to ON
+- Enter your "Google Client ID" and "Google Client Secret" saved in the previous step
+- Click "Save"
+
+### Add login code to your client app
+
+The JavaScript client code is documented here: [Supabase OAauth Client Code](https://supabase.io/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'google'
+})
+```
+
+Just put this code in a function and create a button or a link or any other UI element to call the function.
+
+```js
+function signInWithGoogle() {
+  const { user, session, error } = await supabase.auth.signIn({
+    provider: 'google'
+  });
+}
+```
+
+To log out:
+
+```js
+function signout() {
+  const { error } = await supabase.auth.signOut();
+}
+```
+
+## Resources
+
+* [Supabase Account - Free Tier OK](https://supabase.io)
+* [Supabase JS Client](https://github.com/supabase/supabase-js)
+* [Google Cloud Platform Console](https://console.cloud.google.com/home/dashboard)
