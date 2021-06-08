@@ -22,7 +22,6 @@ cd web/spec
 make
 npm install
 npm run gen:supabase
-npm run build
 npm run start
 ```
 
