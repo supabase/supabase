@@ -16,7 +16,7 @@ Adding a Google Login button to your application is easy if you follow these ste
 The setup process consists of three parts:
 
 * Create and configure a Google Project on the [Google Cloud Platform Console](https://console.cloud.google.com/home/dashboard)
-* Add your Facebook keys to your [Supabase Project](https://supabase.io)
+* Add your Google OAuth keys to your [Supabase Project](https://supabase.io)
 * Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
 ## Environment
@@ -55,8 +55,14 @@ From your project's dashboard screen:
 - Click on "OAauth consent screen" from the list of results
 - On the "OAauth consent screen" page select "External"
 - Click "Create"
+
+Edit your app information
+
 - On the "Edit app registration" page fill out your app information
 - Click "Save and continue" at the bottom
+
+Create your credentials
+
 - Click "Credentials" at the left to go to the "Credentials" page
 - Click "Create Credentials" near the top then select "OAauth client ID"
 - On the "Create OAuth client ID" page, select your application type.  If you're not sure, choose "Web application".
@@ -74,6 +80,9 @@ From your project's dashboard screen:
           - Enter this in the "Valid OAuth Redirect URIs" box
           - Click "Save Changes" at the bottom right
 - Click "Create"
+
+Copy your new OAuth credentials
+
 - A box will appear called "OAuth client created"
 - Copy and save the values under "Your Client ID" and "Your Client Secret"
 
