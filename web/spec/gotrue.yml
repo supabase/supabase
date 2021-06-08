@@ -173,6 +173,18 @@ pages:
           ```py
           # Not yet implemented
           ```
+      - name: Update a user's email address.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, error } = await auth.update({
+            email: 'new-email@example.com'
+          }) // Sends a "Confirm Email Change" email to the new email address
+          ```
+        py: |
+          ```py
+          # Not yet implemented
+          ```
 
   onAuthStateChange:
     $ref: '"GoTrueClient".GoTrueClient.onAuthStateChange'
