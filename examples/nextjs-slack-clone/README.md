@@ -206,7 +206,7 @@ begin
   where role_permissions.permission = authorize.requested_permission
     and user_roles.user_id = authorize.user_id
   into bind_permissions;
-  
+
   return bind_permissions > 0;
 end;
 $$ language plpgsql security definer;
@@ -231,27 +231,27 @@ create policy "Allow individual delete access" on public.messages for delete usi
 create policy "Allow authorized delete access" on public.messages for delete using ( authorize('messages.delete', auth.uid()) );
 create policy "Allow individual read access" on public.user_roles for select using ( auth.uid() = user_id );
 
--- Send "previous data" on change 
-alter table public.users replica identity full; 
-alter table public.channels replica identity full; 
+-- Send "previous data" on change
+alter table public.users replica identity full;
+alter table public.channels replica identity full;
 alter table public.messages replica identity full;
 
 -- inserts a row into public.users and assigns roles
-create function public.handle_new_user() 
+create function public.handle_new_user()
 returns trigger as $$
 declare is_admin boolean;
 begin
   insert into public.users (id, username)
   values (new.id, new.email);
-  
+
   select count(*) = 1 from auth.users into is_admin;
-  
+
   if position('+supaadmin@' in new.email) > 0 then
     insert into public.user_roles (user_id, role) values (new.id, 'admin');
   elsif position('+supamod@' in new.email) > 0 then
     insert into public.user_roles (user_id, role) values (new.id, 'moderator');
   end if;
-  
+
   return new;
 end;
 $$ language plpgsql security definer;
@@ -266,12 +266,12 @@ create trigger on_auth_user_created
  * Only allow realtime listening on public tables.
  */
 
-begin; 
+begin;
   -- remove the realtime publication
-  drop publication if exists supabase_realtime; 
+  drop publication if exists supabase_realtime;
 
   -- re-create the publication but don't enable it for any tables
-  create publication supabase_realtime;  
+  create publication supabase_realtime;
 commit;
 
 -- add tables to the publication
@@ -293,7 +293,7 @@ insert into public.messages (message, channel_id, user_id)
 values
     ('Hello World 👋', 1, '8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e'),
     ('Perfection is attained, not when there is nothing more to add, but when there is nothing left to take away.', 2, '8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e');
-  
+
 insert into public.role_permissions (role, permission)
 values
     ('admin', 'channels.delete'),
