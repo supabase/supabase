@@ -9,12 +9,8 @@ module.exports = {
     {
       type: 'category',
       label: 'Local Development',
-      items: [
-        'reference/cli/supabase-start',
-        'reference/cli/supabase-stop',
-        'reference/cli/supabase-eject',
-      ],
+      items: ['reference/cli/supabase-start', 'reference/cli/supabase-stop', 'reference/cli/supabase-eject'],
       collapsed: true,
-    },
+    }
   ],
 }
