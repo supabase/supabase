@@ -23,8 +23,6 @@ make
 npm install
 npm run gen:supabase
 npm run build
-
-cd web
 npm run start
 ```
 
