@@ -69,6 +69,7 @@ From the "Add Products to your App" screen:
 - Click "Settings / Basic" in the left sidebar
 - Copy your App ID from the top of the "Basic Settings" page 
 - Under "App Secret" click "Show" then copy your secret 
+- Make sure all required fields are completed on this screen.
 
 ### Enter your Facebook App ID and Secret into your Supabase Project
 
@@ -80,8 +81,33 @@ From the "Add Products to your App" screen:
 - Enter your "Facebook client ID" and "Facebook secret" saved in the previous step
 - Click "Save"
 
-### TODO - JavaScript Client API
+### Add login code to your client app
 
+The JavaScript client code is documented here: [Supabase OAauth Client Code](https://supabase.io/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'facebook'
+})
+```
+
+Just put this code in a function and create a button or a link or any other UI element to call the function.
+
+```js
+function signInWithFacebook() {
+  const { user, session, error } = await supabase.auth.signIn({
+    provider: 'facebook'
+  });
+}
+```
+
+To log out:
+
+```js
+function signout() {
+  const { error } = await supabase.auth.signOut();
+}
+```
 
 ## Resources
 
