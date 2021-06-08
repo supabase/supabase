@@ -86,12 +86,6 @@ module.exports = {
     },
     {
       type: 'category',
-      label: 'Guides2',
-      collapsed: false,
-      items: ['guides2/arrays', 'guides2/json', 'guides2/password-reset', 'guides2/auth-facebook'],
-    },
-    {
-      type: 'category',
       label: 'See Also',
       collapsed: false,
       items: [
@@ -115,6 +109,7 @@ module.exports = {
       label: 'Database',
       collapsed: false,
       items: [
+        'guides/database/arrays', 'guides/database/json', 'guides/database/password-reset',
         {
           type: 'category',
           label: 'Auth Deep Dive',
@@ -127,7 +122,7 @@ module.exports = {
       type: 'category',
       label: 'Auth',
       collapsed: false,
-      items: ['guides/auth/auth-apple'],
+      items: ['guides/auth/auth-facebook'],
     },
     {
       type: 'category',
