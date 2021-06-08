@@ -58,6 +58,7 @@ info:
           - storage.createBucket()
           - storage.getBucket()
           - storage.listBuckets()
+          - storage.updateBucket()
           - storage.deleteBucket()
           - storage.emptyBucket()
           - storage.from.upload()
@@ -67,6 +68,7 @@ info:
           - storage.from.move()
           - storage.from.remove()
           - storage.from.createSignedUrl()
+          - storage.from.getPublicUrl()
       - name: 'Modifiers'
         items:
           - Using Modifiers
@@ -964,6 +966,22 @@ pages:
             .storage
             .emptyBucket('avatars')
           ```
+  storage.updateBucket():
+    title: 'updateBucket()'
+    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.updateBucket'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `update`
+        - `objects` permissions: none
+    examples:
+      - name: Update bucket
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .updateBucket('avatars', { public: false })
+          ```
 
   storage.deleteBucket():
     title: 'deleteBucket()'
@@ -1054,6 +1072,24 @@ pages:
             .storage
             .from('avatars')
             .createSignedUrl('avatar1.png', 60)
+          ```
+
+  storage.from.getPublicUrl():
+    title: 'from.getPublicUrl()'
+    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.getPublicUrl'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none 
+        - `objects` permissions: none
+    examples:
+      - name: Returns the URL for an asset in a public bucket
+        isSpotlight: true
+        js: |
+          ```js
+          const { publicURL, error } = supabase
+            .storage
+            .from('public-bucket')
+            .getPublicUrl('avatar1.png')
           ```
 
   storage.from.download():
@@ -1191,11 +1227,11 @@ pages:
       Filters can be used on `select()`, `update()`, and `delete()` queries. 
 
       If a Stored Procedure returns a table response, you can also apply filters.
-      
+
       ### Applying Filters
 
       You must apply your filters to the end of your query. For example:
-      
+
       ```js
       const { data, error } = await supabase
         .from('cities')
@@ -1207,7 +1243,7 @@ pages:
         .eq('name', 'The Shire')    // Incorrect
         .select('name, country_id')
       ```
-      
+
       ### Chaining
 
       Filters can be chained together to produce advanced queries. For example:
