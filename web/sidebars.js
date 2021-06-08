@@ -103,6 +103,39 @@ module.exports = {
       ],
     },
   ],
+  guides: [
+    {
+      type: 'category',
+      label: 'Guides',
+      items: ['guides'],
+      collapsed: false,
+    },
+    {
+      type: 'category',
+      label: 'Database',
+      collapsed: false,
+      items: [
+        {
+          type: 'category',
+          label: 'Auth Deep Dive',
+          collapsed: false,
+          items: ['guides/auth/auth-apple'],
+        },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Auth',
+      collapsed: false,
+      items: ['guides/auth/auth-apple'],
+    },
+    {
+      type: 'category',
+      label: 'Storage',
+      collapsed: false,
+      items: ['guides/auth/auth-apple'],
+    },
+  ],
   resources: [
     { type: 'category', label: 'Resources', items: ['resources'], collapsed: false },
     // { type: 'category', label: 'Resources', collapsed: false },
