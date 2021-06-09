@@ -7,28 +7,15 @@ description: Setting up Facebook Login
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-### Setting up Facebook Login
-
 ## Description
 
-Adding a Facebook Login button to your application is easy if you follow these steps.
+How to set up Facebook Login
 
 The setup process consists of three parts:
 
 * Create and configure a Facebook Application on the [Facebook Devalopers Site](https://developers.facebook.com)
 * Add your Facebook keys to your [Supabase Project](https://supabase.io)
 * Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
-
-## Environment
-
-* [Supabase JS Client](https://github.com/supabase/supabase-js)
-* [Supabase Dashboard (UI)](https://supabase.io)
-* [Facebook Developers Dashboard](https://developers.facebook.com/)
-
-## Requirements
-* Supabase account (Free Tier OK)
-* Any existing Supabase Project
-* Javascript-based client application (Angular, React, Vue, etc.)
 
 ## Steps
 
@@ -54,8 +41,8 @@ From the "Add Products to your App" screen:
 - Skip the Quickstart screen, instead, in the left sidebar, click "Settings" under "Facebook Login"
 - Enter your callback URI under "Valid OAuth Redirect URIs" on the "Facebook Login Settings" page
     - Your OAuth Redirect URI looks like this:
-      - https://xxxxxxxxxxxxxxxx.supabase.co/auth/v1/callback
-      - where https://xxxxxxxxxxxxxxxx.supabase.co is your Supabase Project API URL
+      - `https://<project-ref>.supabase.co/auth/v1/callback`
+      - where `https://<project-ref>.supabase.co` is your Supabase Project API URL
           - Go to your [Supasebase Project Dashboard](https://supabase.io)
           - Click on the "Settings" icon at the bottom of the left sidebar
           - Click on "API" in the list

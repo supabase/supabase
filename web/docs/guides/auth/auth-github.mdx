@@ -7,28 +7,15 @@ description: Setting up Github Login
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-### Setting up Github Login
-
 ## Description
 
-Adding a Github Login button to your application is easy if you follow these steps.
+How to set up Github Login
 
 The setup process consists of three parts:
 
 * Create and configure a Github OAuth App on [Github](https://github.com)
 * Add your Github OAuth keys to your [Supabase Project](https://supabase.io)
 * Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
-
-## Environment
-
-* [Supabase JS Client](https://github.com/supabase/supabase-js)
-* [Supabase Dashboard (UI)](https://supabase.io)
-* [Github Developer Settings](https://github.com/settings/developers)
-
-## Requirements
-* Supabase account (Free Tier OK)
-* Any existing Supabase Project
-* Javascript-based client application (Angular, React, Vue, etc.)
 
 ## Steps
 
@@ -51,8 +38,8 @@ Register a new OAuth application
 - In "Homepage URL", type the full URL to your app's website.
 - In "Authorization callback URL", type the callback URL of your app.
     - Your OAuth Redirect URI looks like this:
-      - https://xxxxxxxxxxxxxxxx.supabase.co/auth/v1/callback
-      - where https://xxxxxxxxxxxxxxxx.supabase.co is your Supabase Project API URL
+      - `https://<project-ref>.supabase.co/auth/v1/callback`
+      - where `https://<project-ref>.supabase.co` is your Supabase Project API URL
           - Go to your [Supasebase Project Dashboard](https://supabase.io)
           - Click on the "Settings" icon at the bottom of the left sidebar
           - Click on "API" in the list
