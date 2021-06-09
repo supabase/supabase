@@ -7,28 +7,15 @@ description: Setting up Google Login
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-### Setting up Google Login
-
 ## Description
 
-Adding a Google Login button to your application is easy if you follow these steps.
+How to set up Google Login
 
 The setup process consists of three parts:
 
 * Create and configure a Google Project on the [Google Cloud Platform Console](https://console.cloud.google.com/home/dashboard)
 * Add your Google OAuth keys to your [Supabase Project](https://supabase.io)
 * Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
-
-## Environment
-
-* [Supabase JS Client](https://github.com/supabase/supabase-js)
-* [Supabase Dashboard (UI)](https://supabase.io)
-* [Google Cloud Platform Console](https://console.cloud.google.com/home/dashboard)
-
-## Requirements
-* Supabase account (Free Tier OK)
-* Any existing Supabase Project
-* Javascript-based client application (Angular, React, Vue, etc.)
 
 ## Steps
 
@@ -70,8 +57,8 @@ Create your credentials
 - At the bottom, under "Authorised redirect URIs" click "Add URI"
 - Enter your callback URI under "Authorised redirect URIs" at the bottom
     - Your OAuth Redirect URI looks like this:
-      - https://xxxxxxxxxxxxxxxx.supabase.co/auth/v1/callback
-      - where https://xxxxxxxxxxxxxxxx.supabase.co is your Supabase Project API URL
+      - `https://<project-ref>.supabase.co/auth/v1/callback`
+      - where `https://<project-ref>.supabase.co` is your Supabase Project API URL
           - Go to your [Supasebase Project Dashboard](https://supabase.io)
           - Click on the "Settings" icon at the bottom of the left sidebar
           - Click on "API" in the list
