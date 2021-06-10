@@ -128,7 +128,7 @@ module.exports = {
       type: 'category',
       label: 'Storage',
       collapsed: false,
-      items: ['guides/auth/auth-apple'],
+      items: ['guides/storage/storage-sample'],
     },
   ],
   resources: [
