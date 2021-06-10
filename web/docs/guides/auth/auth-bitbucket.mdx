@@ -52,7 +52,7 @@ Once logged into *"Bitbucket"*:
 - In the left sidebar, click the "Authentication" icon (near the top)
 - Click "Settings" from the list to go to the "Authentication Settings" page
 - Enter the final (hosted) URL of your app under "Site URL" (this is important)
-- Under "External OAuth Providers" turn "Github Enabled" to ON
+- Under "External OAuth Providers" turn "Bitbucket Enabled" to ON
 - Enter your `client_id` and `client_secret` saved in the previous step
 - Click "Save"
 
@@ -69,7 +69,7 @@ const { user, session, error } = await supabase.auth.signIn({
 Just put this code in a function and create a button or a link or any other UI element to call the function.
 
 ```js
-function signInWithGithub() {
+function signInWithBitbucket() {
   const { user, session, error } = await supabase.auth.signIn({
     provider: 'bitbucket'
   });
