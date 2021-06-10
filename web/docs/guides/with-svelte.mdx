@@ -269,7 +269,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
 
 ### User store
 To access the user information in other places, we use writable store. Create a new file called `sessionStore.js`
-```javascript title="src/sessionStore.svelte"
+```javascript title="src/sessionStore.js"
 import { writable } from 'svelte/store';
 
 export const user = writable(false);
@@ -279,9 +279,9 @@ export const user = writable(false);
 ### Account page
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
-Let's create a new component for that called `Account.svelte`.
+Let's create a new component for that called `Profile.svelte`.
 
-```html title="src/Account.svelte"
+```html title="src/Profile.svelte"
 <script>
   import { supabase } from './supabaseClient'
   import { user } from './sessionStore'
@@ -395,7 +395,7 @@ Let's create a new component for that called `Account.svelte`.
 
 Now that we have all the components in place, let's update `App.svelte`:
 
-```html title="src/App.js"
+```html title="src/App.svelte"
 <script>
 	import {user} from "./sessionStore"
 	import {supabase} from "./supabaseClient"
@@ -527,7 +527,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 And then we can add the widget to the Account page:
 
 
-```html title="src/Account.svelte"
+```html title="src/Profile.svelte"
 <script>
   // Import the new component
   import Avatar from './Avatar.svelte'
