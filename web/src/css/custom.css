@@ -512,6 +512,10 @@ a.card:hover {
 .menu > .menu__list > .menu__list-item > .menu__link {
   margin-bottom: 4px;
   color: gray;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 /* Disable click events for large screens  */
