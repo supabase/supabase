@@ -109,7 +109,9 @@ module.exports = {
       label: 'Database',
       collapsed: false,
       items: [
-        'guides/database/arrays', 'guides/database/json', 'guides/database/password-reset',
+        'guides/database/arrays', 
+        'guides/database/json', 
+        'guides/database/password-reset',
         {
           type: 'category',
           label: 'Auth Deep Dive',
@@ -122,7 +124,14 @@ module.exports = {
       type: 'category',
       label: 'Auth',
       collapsed: false,
-      items: ['guides/auth/auth-facebook', 'guides/auth/auth-google', 'guides/auth/auth-github', 'guides/auth/auth-apple', 'guides/auth/auth-bitbucket'],
+      items: [
+        'guides/auth/auth-facebook', 
+        'guides/auth/auth-google', 
+        'guides/auth/auth-github', 
+        'guides/auth/auth-apple', 
+        'guides/auth/auth-bitbucket',
+        'guides/auth/auth-gitlab',
+      ],
     },
     {
       type: 'category',
