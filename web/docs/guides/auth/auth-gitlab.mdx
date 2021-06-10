@@ -1,0 +1,90 @@
+---
+id: auth-gitlab
+title: "GitLab Login"
+description: Setting up GitLab Login
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Description
+
+How to set up GitLab Login
+
+The setup process consists of three parts:
+
+* Create and configure a GitLab Application on [GitLab](https://gitlab.com)
+* Add your GitLab Application keys to your [Supabase Project](https://supabase.io)
+* Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+
+## Steps
+
+### Log into your [GitLab](https://gitlab.com) Account
+
+Once logged into *"GitLab"*:
+
+### Create your GitLab Application
+
+- Click on your profile logo (avatar) in the top-right corner
+- Select Edit profile.
+- In the left sidebar, select Applications.
+- Enter your app information
+  - Enter the name of the application
+  - In the "Redirect URI" box, type the callback URL of your app.
+    - Your "Redirect URI" ("Callback URL") looks like this:
+      - `https://<project-ref>.supabase.co/auth/v1/callback`
+      - where `https://<project-ref>.supabase.co` is your Supabase Project API URL
+          - Go to your [Supasebase Project Dashboard](https://supabase.io)
+          - Click on the "Settings" icon at the bottom of the left sidebar
+          - Click on "API" in the list
+          - Under Config / URL you'll find your API URL, you can click "Copy" to copy it to the clipboard
+          - Now just add "/auth/v1/callback" to the end of that to get your full "OAauth Redirect URI"
+          - Enter this in the "Redirect URI" box
+  - Check the box next to "Confidential" (make sure it is checked)
+  - Check the scope named `read_user` (this is the only required scope)
+  - Click "Save Application" at the bottom
+  - Copy and save your "Application ID" (`client_id`) and "Secret" (`client_secret`) which you'll need later
+
+### Enter your GitLab `client_id` and `client_secret` into your Supabase Project
+
+- Go to your [Supasebase Project Dashboard](https://supabase.io)
+- In the left sidebar, click the "Authentication" icon (near the top)
+- Click "Settings" from the list to go to the "Authentication Settings" page
+- Enter the final (hosted) URL of your app under "Site URL" (this is important)
+- Under "External OAuth Providers" turn "GitLab Enabled" to ON
+- Enter your `client_id` and `client_secret` saved in the previous step
+- Click "Save"
+
+### Add login code to your client app
+
+The JavaScript client code is documented here: [Supabase OAauth Client Code](https://supabase.io/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'gitlab'
+})
+```
+
+Just put this code in a function and create a button or a link or any other UI element to call the function.
+
+```js
+function signInWithGitLab() {
+  const { user, session, error } = await supabase.auth.signIn({
+    provider: 'gitlab'
+  });
+}
+```
+
+To log out:
+
+```js
+function signout() {
+  const { error } = await supabase.auth.signOut();
+}
+```
+
+## Resources
+
+* [Supabase Account - Free Tier OK](https://supabase.io)
+* [Supabase JS Client](https://github.com/supabase/supabase-js)
+* [GitLab Account](https://gitlab.com)
