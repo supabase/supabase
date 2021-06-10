@@ -1,0 +1,91 @@
+---
+id: auth-bitbucket
+title: "Bitbucket Login"
+description: Setting up Bitbucket Login
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Description
+
+How to set up Bitbucket Login
+
+The setup process consists of three parts:
+
+* Create and configure a Bitbucket OAuth Consumer on [Bitbucket](https://bitbucket.org)
+* Add your Bitbucket OAuth Consumer keys to your [Supabase Project](https://supabase.io)
+* Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+
+## Steps
+
+### Log into your [Bitbucket](https://bitbucket.org) Account
+
+Once logged into *"Bitbucket"*:
+
+- Click on your profile icon at the bottom left
+- Click on "All Workspaces"
+- Select a workspace and click on it to select it
+- Click on "Settings" on the left
+- Click on "OAuth consumers" on the left under "Apps and Features" (near the bottom)
+- Click "Add Consumer" at the top
+- Enter your app data
+  - Enter the name of your app under "Name"
+- In "Callback URL", type the callback URL of your app.
+    - Your OAuth Redirect URI ("Callback URL") looks like this:
+      - `https://<project-ref>.supabase.co/auth/v1/callback`
+      - where `https://<project-ref>.supabase.co` is your Supabase Project API URL
+          - Go to your [Supasebase Project Dashboard](https://supabase.io)
+          - Click on the "Settings" icon at the bottom of the left sidebar
+          - Click on "API" in the list
+          - Under Config / URL you'll find your API URL, you can click "Copy" to copy it to the clipboard
+          - Now just add "/auth/v1/callback" to the end of that to get your full "OAauth Redirect URI"
+          - Enter this in the "Callback URL" box
+          - Check the permissions you need (Email, Read should be enough)
+          - Click "Save" at the bottom
+- Click on your app name (the name of your new OAuth Consumer)
+- Copy your "Key" (`client_key`) and "Secret" (`client_secret`) codes
+
+### Enter your Bitbucket `client_id` and `client_secret` into your Supabase Project
+
+- Go to your [Supasebase Project Dashboard](https://supabase.io)
+- In the left sidebar, click the "Authentication" icon (near the top)
+- Click "Settings" from the list to go to the "Authentication Settings" page
+- Enter the final (hosted) URL of your app under "Site URL" (this is important)
+- Under "External OAuth Providers" turn "Github Enabled" to ON
+- Enter your `client_id` and `client_secret` saved in the previous step
+- Click "Save"
+
+### Add login code to your client app
+
+The JavaScript client code is documented here: [Supabase OAauth Client Code](https://supabase.io/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'bitbucket'
+})
+```
+
+Just put this code in a function and create a button or a link or any other UI element to call the function.
+
+```js
+function signInWithGithub() {
+  const { user, session, error } = await supabase.auth.signIn({
+    provider: 'bitbucket'
+  });
+}
+```
+
+To log out:
+
+```js
+function signout() {
+  const { error } = await supabase.auth.signOut();
+}
+```
+
+## Resources
+
+* [Supabase Account - Free Tier OK](https://supabase.io)
+* [Supabase JS Client](https://github.com/supabase/supabase-js)
+* [Bitbucket Account](https://bitbucket.org)
