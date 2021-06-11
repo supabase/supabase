@@ -1,18 +1,13 @@
 ---
 id: auth-apple
-title: "Apple Login"
-description: Setting up Apple Login
+title: "Setting up Apple Auth"
+description: Add Apple OAuth to your Supabase project
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-## Description
-
-How to set up Apple Login ("Sign In With Apple")
-
-
-The setup process consists of six parts:
+Setting up Apple logins for your application consists of six parts:
 
 * obtain an `App Id` with “Sign In with Apple” capabilities
 * obtain a `Services Id` - this will serve as the `client_id`
@@ -32,7 +27,7 @@ Once logged into your *"Apple Deveoper Account"*:
 
 ### Obtain an App Id with “Sign In with Apple” capabilities.
 
-- Go to Certificates, Identifiers & Profiles
+- Go to "Certificates, Identifiers & Profiles"
 - Click on "Identifiers" at the left
 - Click on the + sign in the upper left next to “Identifiers”
 - Select "App IDs" and click "Continue"
@@ -73,7 +68,7 @@ This will serve as the `cliend_id` when you make API calls to authenticate the u
           - Click on the "Settings" icon at the bottom of the left sidebar
           - Click on "API" in the list
           - Under Config / URL you'll find your API URL, you can click "Copy" to copy it to the clipboard
-          - Now just add "/auth/v1/callback" to the end of that to get your full "OAauth Redirect URI"
+          - Now just add "/auth/v1/callback" to the end of that to get your full "OAuth Redirect URI"
           - Enter this in the "Return URLs" box
           - Click "Next" at the bottom right
 - Click "Done" at the bottom
@@ -179,7 +174,7 @@ You should now have a `client_id` and `client_secret`
 
 ### Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAauth Client Code](https://supabase.io/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+The JavaScript client code is documented here: [Supabase OAuth Client Code](https://supabase.io/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
 
 ```js
 const { user, session, error } = await supabase.auth.signIn({
@@ -187,7 +182,7 @@ const { user, session, error } = await supabase.auth.signIn({
 })
 ```
 
-Just put this code in a function and create a button or a link or any other UI element to call the function.
+Add this function which you can call from a button, link, or UI element.
 
 ```js
 function signInWithGithub() {
@@ -212,7 +207,5 @@ function signout() {
 * [Apple Developer Account](https://developer.apple.com)
 * [Ruby](https://www.ruby-lang.org/en/)
 * [ruby-jwt](https://github.com/jwt/ruby-jwt)
+* Thanks to [Janak Amarasena](https://medium.com/@janakda) who did all the heavy lifting in [How to configure Sign In with Apple](https://medium.com/identity-beyond-borders/how-to-configure-sign-in-with-apple-77c61e336003)
 
-## Thanks to
-
-* [Janak Amarasena](https://medium.com/@janakda) who did all the heavy lifting in [How to configure Sign In with Apple](https://medium.com/identity-beyond-borders/how-to-configure-sign-in-with-apple-77c61e336003)

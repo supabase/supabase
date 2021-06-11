@@ -1,17 +1,13 @@
 ---
 id: auth-bitbucket
-title: "Bitbucket Login"
-description: Setting up Bitbucket Login
+title: "Setting up Bitbucket Auth"
+description: Add Bitbucket OAuth to your Supabase project
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-## Description
-
-How to set up Bitbucket Login
-
-The setup process consists of three parts:
+Setting up Bitbucket logins for your application consists of 3 parts:
 
 * Create and configure a Bitbucket OAuth Consumer on [Bitbucket](https://bitbucket.org)
 * Add your Bitbucket OAuth Consumer keys to your [Supabase Project](https://supabase.io)
@@ -39,7 +35,7 @@ Once logged into *"Bitbucket"*:
           - Click on the "Settings" icon at the bottom of the left sidebar
           - Click on "API" in the list
           - Under Config / URL you'll find your API URL, you can click "Copy" to copy it to the clipboard
-          - Now just add "/auth/v1/callback" to the end of that to get your full "OAauth Redirect URI"
+          - Now just add "/auth/v1/callback" to the end of that to get your full "OAuth Redirect URI"
           - Enter this in the "Callback URL" box
           - Check the permissions you need (Email, Read should be enough)
           - Click "Save" at the bottom
@@ -58,7 +54,7 @@ Once logged into *"Bitbucket"*:
 
 ### Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAauth Client Code](https://supabase.io/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+The JavaScript client code is documented here: [Supabase OAuth Client Code](https://supabase.io/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
 
 ```js
 const { user, session, error } = await supabase.auth.signIn({
