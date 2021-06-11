@@ -1,17 +1,13 @@
 ---
 id: auth-gitlab
-title: "GitLab Login"
-description: Setting up GitLab Login
+title: "Setting up GitLab Auth"
+description: Add GitLab OAuth to your Supabase project
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-## Description
-
-How to set up GitLab Login
-
-The setup process consists of three parts:
+Setting up GitLab logins for your application consists of 3 parts:
 
 * Create and configure a GitLab Application on [GitLab](https://gitlab.com)
 * Add your GitLab Application keys to your [Supabase Project](https://supabase.io)
@@ -38,7 +34,7 @@ Once logged into *"GitLab"*:
           - Click on the "Settings" icon at the bottom of the left sidebar
           - Click on "API" in the list
           - Under Config / URL you'll find your API URL, you can click "Copy" to copy it to the clipboard
-          - Now just add "/auth/v1/callback" to the end of that to get your full "OAauth Redirect URI"
+          - Now just add "/auth/v1/callback" to the end of that to get your full "OAuth Redirect URI"
           - Enter this in the "Redirect URI" box
   - Check the box next to "Confidential" (make sure it is checked)
   - Check the scope named `read_user` (this is the only required scope)
@@ -57,7 +53,7 @@ Once logged into *"GitLab"*:
 
 ### Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAauth Client Code](https://supabase.io/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+The JavaScript client code is documented here: [Supabase OAuth Client Code](https://supabase.io/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
 
 ```js
 const { user, session, error } = await supabase.auth.signIn({
