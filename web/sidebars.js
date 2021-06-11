@@ -131,6 +131,7 @@ module.exports = {
         'guides/auth/auth-apple', 
         'guides/auth/auth-bitbucket',
         'guides/auth/auth-gitlab',
+        'guides/auth/auth-twitter',
       ],
     },
     {
