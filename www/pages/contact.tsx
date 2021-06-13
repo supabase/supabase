@@ -64,7 +64,8 @@ const Index = ({}: Props) => {
                       GitHub Issues
                     </Typography.Title>
                     <Typography.Text className="block">
-                      <p>Description Description Description Description DescriptionDescription escription Description Description DescriptionDescription Description </p>
+                      <p>Have a general issue or bug that you've found? We'd love to hear about it in our GitHub issues. This can be feature requests too!</p>
+                      <p><span className = 'font-bold'>Use this for:</span> Bugs and other issues</p>
                     </Typography.Text>
                   </div>
                 </div>
@@ -104,7 +105,8 @@ const Index = ({}: Props) => {
                       GitHub Discussions
                     </Typography.Title>
                     <Typography.Text className="block">
-                      <p>For help and questions about best practices, join our GitHub discussions. Browse and ask questions, talk to other Supabase Developers, and more.</p>
+                      <p>For help and questions about best practices, join our GitHub discussions. Browse and ask questions.</p>
+                      <p><span className = 'font-bold'>Use this for:</span> General questions</p>
                     </Typography.Text>
                   </div>
                 </div>
@@ -145,7 +147,8 @@ const Index = ({}: Props) => {
                       Email Support
                     </Typography.Title>
                     <Typography.Text className="block">
-                      <p>We offer email based support. You can email us at beta@supabase.io. If you need SLAs, guaranteed response times, or other enterprise level services, please contact us at this email address.</p>
+                      <p>We offer email based support. If you need SLAs, guaranteed response times, or have an issue, please contact us here.</p>
+                      <p><span className = 'font-bold'>Use this for:</span> Issues or questions specific to you</p>
                     </Typography.Text>
                   </div>
                 </div>
