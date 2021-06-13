@@ -48,7 +48,7 @@ const Index = ({}: Props) => {
                 </p>
               </Typography.Text>
             </div>
-            <div className="grid grid-cols-12 gap-5 mt-16">
+            <div className="grid sm:grid-cols-3 md:grid-cols-12 gap-5 mt-16">
               <div className='col-span-12 lg:col-span-6 xl:col-span-4'>
                 <div
                   className="h-40 bg-white dark:bg-gray-700 
