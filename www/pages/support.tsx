@@ -33,23 +33,22 @@ import 'swiper/swiper.min.css'
 type Props = {}
 
 const Index = ({}: Props) => {
-
   return (
     <>
       <Layout>
         <Container>
-          
           <SectionContainer className="">
             <div className="text-center">
               <Typography.Title level={2}>Get Support</Typography.Title>
               <Typography.Text>
                 <p className="lg:text-lg">
-                  Need a bit of help? We're here for you. Check out our current issues, GitHub discussions, or get email support.
+                  Need a bit of help? We're here for you. Check out our current issues, GitHub
+                  discussions, or get email support.
                 </p>
               </Typography.Text>
             </div>
             <div className="grid sm:grid-cols-3 md:grid-cols-12 gap-5 mt-16">
-              <div className='col-span-12 lg:col-span-6 xl:col-span-4'>
+              <div className="col-span-12 lg:col-span-6 xl:col-span-4">
                 <div
                   className="h-40 bg-white dark:bg-gray-700 
                     border-t border-r border-l border-gray-100 dark:border-gray-600
@@ -63,8 +62,13 @@ const Index = ({}: Props) => {
                       GitHub Issues
                     </Typography.Title>
                     <Typography.Text className="block">
-                      <p>Have a general issue or bug that you've found? We'd love to hear about it in our GitHub issues. This can be feature requests too!</p>
-                      <p><span className = 'font-bold'>Use this for:</span> Bugs and other issues</p>
+                      <p>
+                        Have a general issue or bug that you've found? We'd love to hear about it in
+                        our GitHub issues. This can be feature requests too!
+                      </p>
+                      <p>
+                        <span className="font-bold">Use this for:</span> Bugs and other issues
+                      </p>
                     </Typography.Text>
                   </div>
                 </div>
@@ -79,18 +83,21 @@ const Index = ({}: Props) => {
                     rounded rounded-t-none"
                   >
                     <Space className="">
-                        <Link href='https://github.com/supabase/supabase/issues' as='https://github.com/supabase/supabase/issues'>
-                          <a target="_blank">
-                            <Button size="medium" type="default" iconRight={<IconGitHub />}>
-                              Go To Issues
-                            </Button>
-                          </a>
-                        </Link>
+                      <Link
+                        href="https://github.com/supabase/supabase/issues"
+                        as="https://github.com/supabase/supabase/issues"
+                      >
+                        <a target="_blank">
+                          <Button size="medium" type="default" iconRight={<IconGitHub />}>
+                            Go To Issues
+                          </Button>
+                        </a>
+                      </Link>
                     </Space>
                   </div>
                 </div>
               </div>
-              <div className='col-span-12 lg:col-span-6 xl:col-span-4'>
+              <div className="col-span-12 lg:col-span-6 xl:col-span-4">
                 <div
                   className="h-40 bg-white dark:bg-gray-700 
                     border-t border-r border-l border-gray-100 dark:border-gray-600
@@ -104,8 +111,13 @@ const Index = ({}: Props) => {
                       GitHub Discussions
                     </Typography.Title>
                     <Typography.Text className="block">
-                      <p>For help and questions about best practices, join our GitHub discussions. Browse and ask questions.</p>
-                      <p><span className = 'font-bold'>Use this for:</span> General questions</p>
+                      <p>
+                        For help and questions about best practices, join our GitHub discussions.
+                        Browse and ask questions.
+                      </p>
+                      <p>
+                        <span className="font-bold">Use this for:</span> General questions
+                      </p>
                     </Typography.Text>
                   </div>
                 </div>
@@ -120,19 +132,22 @@ const Index = ({}: Props) => {
                     rounded rounded-t-none"
                   >
                     <Space className="">
-                        <Link href='https://github.com/supabase/supabase/discussions' as='https://github.com/supabase/supabase/discussions'>
-                          <a target="_blank">
-                            <Button size="medium" type="default" iconRight={<IconMessageCircle />}>
-                              Join The Discussion
-                            </Button>
-                          </a>
-                        </Link>
+                      <Link
+                        href="https://github.com/supabase/supabase/discussions"
+                        as="https://github.com/supabase/supabase/discussions"
+                      >
+                        <a target="_blank">
+                          <Button size="medium" type="default" iconRight={<IconMessageCircle />}>
+                            Join The Discussion
+                          </Button>
+                        </a>
+                      </Link>
                     </Space>
                   </div>
                 </div>
               </div>
 
-              <div className='col-span-12 lg:col-span-6 xl:col-span-4'>
+              <div className="col-span-12 lg:col-span-6 xl:col-span-4">
                 <div
                   className="h-40 bg-white dark:bg-gray-700 
                     border-t border-r border-l border-gray-100 dark:border-gray-600
@@ -146,8 +161,14 @@ const Index = ({}: Props) => {
                       Email Support
                     </Typography.Title>
                     <Typography.Text className="block">
-                      <p>We offer email based support. If you need SLAs, guaranteed response times, or have an issue, please contact us here.</p>
-                      <p><span className = 'font-bold'>Use this for:</span> Issues or questions specific to you</p>
+                      <p>
+                        We offer email based support. If you need SLAs, guaranteed response times,
+                        or have an issue, please contact us here.
+                      </p>
+                      <p>
+                        <span className="font-bold">Use this for:</span> Issues or questions
+                        specific to you
+                      </p>
                     </Typography.Text>
                   </div>
                 </div>
@@ -171,12 +192,10 @@ const Index = ({}: Props) => {
                   </div>
                 </div>
               </div>
-
             </div>
           </SectionContainer>
         </Container>
       </Layout>
-
     </>
   )
 }
