@@ -81,10 +81,6 @@ $$ language sql stable;
 create or replace function auth.role() returns text as $$
   select nullif(current_setting('request.jwt.claim.role', true), '')::text;
 $$ language sql stable;
--- Gets the User Email from the request cookie
-create or replace function auth.email() returns text as $$
-  select nullif(current_setting('request.jwt.claim.email', true), '')::text;
-$$ language sql stable;
 GRANT ALL PRIVILEGES ON SCHEMA auth TO postgres;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA auth TO postgres;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA auth TO postgres;
