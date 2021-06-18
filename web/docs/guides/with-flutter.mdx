@@ -1,0 +1,718 @@
+---
+id: with-flutter
+title: 'Quickstart: Flutter'
+description: Learn how to use Supabase in your Flutter App.
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+## Intro
+
+This example provides the steps to build a simple user management app (from scratch!) using Supabase and Flutter. It includes:
+
+- Supabase [Auth](/docs/guides/auth): users can sign in and sign up with email and password.
+
+By the end of this guide you'll have an app which allows users to register and login with supabase:
+
+![Supabase Login and Register with Flutter](/img/supabase_flutter.gif)
+
+### Github
+
+Whenever you get stuck at any point, take a look at [this repo](https://github.com/fabiojansenbr/supabase_flutter).
+
+## Project set up
+
+Before we start building we're going to set up our Supabase account.
+
+### Create a project
+
+1. Go to [app.supabase.io](https://app.supabase.io).
+1. Click on "New Project".
+1. Enter your project details.
+1. Wait for the new database to launch.
+
+### Disable email confirmations
+
+To make the process easier, let's remove the email confirmation constraint on the supabase portal.
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "Authentication" section.
+2. Click "Settings menu item".
+4. Click "Disable email confirmations".
+```
+
+![Disable Email Confirmation](/img/disable_email_confirmation.png)
+
+</TabItem>
+</Tabs>
+
+### Get the API Keys
+
+Now that you've setup your Supabase account, you are ready login and register your users.
+We just need to get the `URL` and `anon` key from the API settings.
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'}
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "Settings" section.
+2. Click "API" in the sidebar.
+3. Find your API URL in this page.
+4. Find your "anon" key on this page.
+```
+
+</TabItem>
+</Tabs>
+
+## Building the App
+
+Let's start building the Flutter app from scratch.
+
+### Initialize a Flutter App
+
+```bash
+flutter create supabase_flutter
+cd supabase_flutter
+```
+
+Then open the supabase_flutter folder on your favorite editor.
+
+### Install some dependencies
+
+Let's install some dependencies to help us:
+
+- [Supabase - Supabase client for Flutter](https://pub.dev/packages/supabase)
+- [get_it - Service locator to help us inject Supabase Client on our pages](https://pub.dev/packages/get_it)
+- [shared_preferences - To persist the user session on our app](https://pub.dev/packages/shared_preferences)
+
+```bash
+flutter pub add supabase
+flutter pub add get_it
+flutter pub add supabase
+```
+
+And check the pubspec.yaml file:
+
+![Folder structure](/img/pubspec_yaml.png)
+
+### Creating our project folder/files structure:
+
+![Folder structure](/img/flutter_folder_structure.png)
+
+### Configure app routes and Supabase client on main.dart
+
+Let's open the main.dart file to setup the Supabase client as Singleton instance and configure the app routes:
+
+```dart title="main.dart"
+import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:supabase/supabase.dart';
+import 'package:supabase_flutter/views/home_view.dart';
+import 'package:supabase_flutter/views/login_view.dart';
+import 'package:supabase_flutter/views/register_view.dart';
+import 'package:supabase_flutter/views/splash_view.dart';
+
+void main() {
+  GetIt locator = GetIt.instance;
+  locator.registerSingleton<SupabaseClient>(SupabaseClient(
+      'SUPABASE_URL',
+      'SUPABASE_ANON_KEY'));
+
+  runApp(
+    MyApp(),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Material App',
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      routes: {
+        '/': (_) => const SplashView(),
+        '/login': (_) => const LoginView(),
+        '/register': (_) => const RegisterView(),
+        '/home': (_) => const HomeView(),
+      },
+    );
+  }
+}
+```
+
+On the main() method we are creating a singleton instance of SupabaseClient, using the supabase_url and supabase_anon_key to link this project with our Supabase account. and
+in the MyApp method we are defining the routes off our app.
+
+### Creating the register view
+
+Open the register_view.dart file and place the following code:
+
+```dart title="register_view.dart"
+import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:supabase/supabase.dart';
+
+class RegisterView extends StatefulWidget {
+  const RegisterView({Key? key}) : super(key: key);
+
+  @override
+  _RegisterViewState createState() => _RegisterViewState();
+}
+
+class _RegisterViewState extends State<RegisterView> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _buildBody(context),
+      backgroundColor: Color(0XFF181818),
+    );
+  }
+
+  Widget _buildBody(context) {
+    final size = MediaQuery.of(context).size;
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(
+            height: 120,
+          ),
+          Container(
+              child: Image.network(
+            'https://supabase.io/new/images/logo-dark.png',
+            width: 300,
+          )),
+          SizedBox(
+            height: 100,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Card(
+              elevation: 1,
+              child: Container(
+                padding: EdgeInsets.only(bottom: 40),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: TextFormField(
+                          controller: _emailController,
+                          cursorColor: Colors.black,
+                          style: TextStyle(),
+                          decoration: InputDecoration(
+                            labelText: 'E-mail',
+                            labelStyle: TextStyle(color: Colors.black),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: new BorderSide(color: Colors.black),
+                            ),
+                          ),
+                          validator: (String? value) {
+                            if (value!.isEmpty || !value.contains('@')) {
+                              return 'Invalid e-mail';
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: TextFormField(
+                          controller: _passwordController,
+                          cursorColor: Colors.black,
+                          obscureText: true,
+                          style: TextStyle(),
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            labelStyle: TextStyle(color: Colors.black),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: new BorderSide(color: Colors.black),
+                            ),
+                          ),
+                          validator: (String? value) {
+                            if (value!.isEmpty) {
+                              return 'Invalid password';
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: TextFormField(
+                          cursorColor: Colors.black,
+                          obscureText: true,
+                          style: TextStyle(),
+                          decoration: InputDecoration(
+                            labelText: 'Confirm Password',
+                            labelStyle: TextStyle(color: Colors.black),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: new BorderSide(color: Colors.black),
+                            ),
+                          ),
+                          validator: (String? value) {
+                            if (value!.isEmpty ||
+                                value != _passwordController.text) {
+                              return 'Passwords don\'t match';
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        width: size.width,
+                        height: 45,
+                        child: MaterialButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              _register();
+                            }
+                          },
+                          color: Colors.black,
+                          child: Text(
+                            'Register',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Already have an account?'),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              'Login',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Future _register() async {
+    final result = await GetIt.instance<SupabaseClient>()
+        .auth
+        .signUp(_emailController.text, _passwordController.text);
+
+    if (result.data != null) {
+      Navigator.pushReplacementNamed(context, '/login');
+      _showDialog(context, title: 'Success', message: 'Register Successful');
+    } else if (result.error?.message != null) {
+      _showDialog(context, title: 'Error', message: result.error?.message);
+    }
+
+    setState(() {
+      // just for simplicity reasons (clean the textfields)
+    });
+  }
+
+  void _showDialog(context, {String? title, String? message}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // retorna um objeto do tipo Dialog
+        return AlertDialog(
+          title: new Text(title ?? ''),
+          content: new Text(message ?? ''),
+          actions: <Widget>[
+            // define os botões na base do dialogo
+            new MaterialButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+```
+
+In this code, we are defining tree TextFormField(), email, password and password confirm and a \_register() method wich will be called on press of the Register button.
+
+When the \_register() method is called, an instance of SupabaseClient is called and the method .auth.signup is invoked with the e-mail and password fields provided.
+
+If the result.data is different than null, we are redirected to the Login view and a Dialog is shown. If we have some problem on registration, like duplicated e-mail field,
+an error dialog is shown, with the register error message.
+
+![Register ok](/img/register_ok_and_with_error.png)
+
+### Creating the login view
+
+Open the login_view.dart file and place the following code:
+
+```dart title="login_view.dart"
+import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase/supabase.dart';
+
+class LoginView extends StatefulWidget {
+  const LoginView({Key? key}) : super(key: key);
+
+  @override
+  _LoginViewState createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _buildBody(context),
+      backgroundColor: Color(0XFF181818),
+    );
+  }
+
+  Widget _buildBody(context) {
+    final size = MediaQuery.of(context).size;
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(
+            height: 120,
+          ),
+          Container(
+              child: Image.network(
+            'https://supabase.io/new/images/logo-dark.png',
+            width: 300,
+          )),
+          SizedBox(
+            height: 100,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Card(
+              elevation: 1,
+              child: Container(
+                padding: EdgeInsets.only(bottom: 40),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: TextFormField(
+                          controller: _emailController,
+                          cursorColor: Colors.black,
+                          style: TextStyle(),
+                          decoration: InputDecoration(
+                            labelText: 'E-mail',
+                            labelStyle: TextStyle(color: Colors.black),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: new BorderSide(color: Colors.black),
+                            ),
+                          ),
+                          validator: (String? value) {
+                            if (value!.isEmpty || !value.contains('@')) {
+                              return 'Invalid e-mail';
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: TextFormField(
+                          controller: _passwordController,
+                          cursorColor: Colors.black,
+                          obscureText: true,
+                          style: TextStyle(),
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            labelStyle: TextStyle(color: Colors.black),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: new BorderSide(color: Colors.black),
+                            ),
+                          ),
+                          validator: (String? value) {
+                            if (value!.isEmpty) {
+                              return 'Invalid password';
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        width: size.width,
+                        height: 45,
+                        child: MaterialButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              _login();
+                            }
+                          },
+                          color: Colors.black,
+                          child: Text(
+                            'Login',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Don\'t have an account?'),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/register');
+                            },
+                            child: Text(
+                              'Register',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Future _login() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+
+    final result = await GetIt.I.get<SupabaseClient>().auth.signIn(
+        email: _emailController.text, password: _passwordController.text);
+
+    if (result.data != null) {
+      await sharedPreferences.setString(
+          'user', result.data!.persistSessionString);
+      Navigator.pushReplacementNamed(context, '/home');
+    } else if (result.error?.message != null) {
+      _showDialog(context, title: 'Error', message: result.error?.message);
+    }
+  }
+}
+
+void _showDialog(context, {String? title, String? message}) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      // retorna um objeto do tipo Dialog
+      return AlertDialog(
+        title: new Text(title ?? ''),
+        content: new Text(message ?? ''),
+        actions: <Widget>[
+          // define os botões na base do dialogo
+          new MaterialButton(
+            child: new Text("Close"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+```
+
+In this code, we are defining two TextFormField(), email and password and a \_login() method wich will be called on press of the Login button.
+
+When the \_login() method is called, an instance of SupabaseClient is called and the method .auth.signin is invoked with the e-mail and password fields provided.
+
+If the result.data is different than null, we are using shared_preferences to set an String 'user' key with the value of the persistSessionString returned from the signin method. This key will be used
+on the SplashView (we will create this on the next steps) to check if the user is already logged in on the application and redirects user to the HomeView and renew the Supabase credentials (token) without need to login again.
+
+### Home View
+
+This view is quite straightforward. There's only a Text() widget which shows the Logged User's Email and a Logout button.
+
+```dart title="home_view.dart"
+import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase/supabase.dart';
+
+class HomeView extends StatefulWidget {
+  const HomeView({Key? key}) : super(key: key);
+
+  @override
+  _HomeViewState createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  @override
+  Widget build(BuildContext context) {
+    final currentUser = GetIt.instance<SupabaseClient>().auth.user();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Home'),
+      ),
+      body: Container(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Hi ${currentUser?.email}'),
+              SizedBox(
+                height: 30,
+              ),
+              MaterialButton(
+                color: Colors.red,
+                onPressed: () {
+                  _logout();
+                },
+                child: Text('Logout'),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  _logout() async {
+    await GetIt.I.get<SupabaseClient>().auth.signOut();
+
+    final sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.clear();
+
+    Navigator.pushReplacementNamed(context, '/');
+  }
+}
+```
+
+![Flutter Home](/img/flutter_home.png)
+
+On the build() method we are getting the current logged in user with `final currentUser = GetIt.instance<SupabaseClient>().auth.user();` and using
+the currentUser.email property to show the User e-mail on the screen.
+
+The \_logout() method is responsible to signOut the user from the Supabase server and clean the shared_preferences so the user will need to login again.
+
+### Splash View
+
+As i mentioned before, the Splash View will be the entrypoint route ('/') of our app. It will check if the user already has a session on the app. If there's a session, the user
+will be redirected to the Home View and their credentials will be renewed. If the session is not present, the user will be redirected to the Login View.
+
+```dart title="splash_view.dart"
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase/supabase.dart';
+
+class SplashView extends StatefulWidget {
+  const SplashView({Key? key}) : super(key: key);
+
+  @override
+  _SplashViewState createState() => _SplashViewState();
+}
+
+class _SplashViewState extends State<SplashView> {
+  @override
+  void initState() {
+    super.initState();
+
+    checkLogin();
+  }
+
+  void checkLogin() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    final session = sharedPreferences.getString('user');
+
+    if (session == null) {
+      Navigator.pushReplacementNamed(context, '/login');
+    } else {
+      final response =
+          await GetIt.instance<SupabaseClient>().auth.recoverSession(session);
+
+      sharedPreferences.setString('user', response.data!.persistSessionString);
+
+      Navigator.pushReplacementNamed(context, '/home');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: CupertinoActivityIndicator(),
+      ),
+    );
+  }
+}
+```
+
+At this stage you have a fully functional application!
+
+\*\*Some design patterns could have been used to make the code better, but they would increase the difficulty level of this getting started .
+
+## Next steps
+
+- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
+- Sign in: app.supabase.io

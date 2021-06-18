@@ -82,7 +82,14 @@ module.exports = {
       type: 'category',
       label: 'Guides',
       collapsed: false,
-      items: ['guides/examples', 'guides/with-nextjs', 'guides/with-react', 'guides/with-svelte', 'guides/self-hosting'],
+      items: [
+        'guides/examples',
+        'guides/with-flutter',
+        'guides/with-nextjs',
+        'guides/with-react',
+        'guides/with-svelte',
+        'guides/self-hosting',
+      ],
     },
     {
       type: 'category',
