@@ -40,7 +40,7 @@ const { data, error } = await supabase
 .from('players')
 .select() // or .select('*')
 .or('team_id.eq.CHN,team_id.is.null')
-.or('age.gt.35,age.is.null) // additional filters imply "AND"
+.or('age.gt.35,age.is.null') // additional filters imply "AND"
 .not('team_id', 'eq', 'STL')
 ```
 
@@ -48,7 +48,7 @@ Select all columns from a single table with a complex where clause: AND OR AND
 
 ```sql
 select * from players
-where ((team_id = 'CHN' and age > 35) or (team_id <> 'CHN and age is not null))
+where ((team_id = 'CHN' and age > 35) or (team_id <> 'CHN' and age is not null))
 ```
 
 ```js
