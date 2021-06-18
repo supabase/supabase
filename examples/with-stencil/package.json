@@ -29,7 +29,7 @@
   "license": "MIT",
   "author": "Ademílson F. Tonato - @ftonato",
   "dependencies": {
-    "@supabase/supabase-js": "^1.3.3",
+    "@supabase/supabase-js": "^1.15.1",
     "puppeteer": "^5.2.1"
   },
   "keywords": [
