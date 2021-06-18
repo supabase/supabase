@@ -58,6 +58,19 @@ const { data, error } = await supabase
 .or('and(team_id.eq.CHN,age.gt.35),and(team_id.neq.CHN,.not.age.is.null)')
 ```
 
+Get a count of rows, but don't return any data.
+
+```sql
+select count(*) from players
+where team_id = 'NYM'
+```
+
+```js
+const { data, error } = await supabase
+.from('players')
+.select('*', { count: 'exact', head: true }) // exact, planned, or executed
+.eq('team_id', 'NYM')
+```
 
 ## Resources
 
