@@ -296,7 +296,7 @@ pages:
           any URL path on your website (the base domain must be the same as the domain in your Auth settings).
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signUp({
+          const { user, session, error } = await supabase.auth.signIn({
             provider: 'github'
           }, {
             redirectTo: 'https://example.com/welcome'
