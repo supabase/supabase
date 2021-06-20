@@ -4431,7 +4431,7 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 561,
+									"line": 565,
 									"character": 25
 								}
 							]
@@ -4563,7 +4563,7 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 566,
+									"line": 570,
 									"character": 30
 								}
 							]
@@ -4667,7 +4667,7 @@
 							"sources": [
 								{
 									"fileName": "GoTrueClient.ts",
-									"line": 577,
+									"line": 581,
 									"character": 32
 								}
 							]
