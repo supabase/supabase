@@ -1,0 +1,96 @@
+---
+id: auth-github
+title: "Setting up Github Auth"
+description: Add Github OAuth to your Supabase project
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Setting up Github logins for your application consists of 3 parts:
+
+* Create and configure a Github OAuth App on [Github](https://github.com)
+* Add your Github OAuth keys to your [Supabase Project](https://supabase.io)
+* Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+
+## Steps
+
+### Log into your [Github](https://github.com) Account
+
+Once logged into *"Github"*:
+
+Go to the [Github Developer Settings](https://github.com/settings/developers) page:
+
+- Click on your profile photo at the top right
+- Click Settings near the bottom of the menu
+- In the left sidebar, click "Developer settings" (near the bottom)
+- In the left sidebar, click "OAuth Apps"
+
+Register a new OAuth application
+
+- Click "Register a new application"
+  - (If you've created an app before, click "New OAuth App" here)
+- In "Application name", type the name of your app.
+- In "Homepage URL", type the full URL to your app's website.
+- In "Authorization callback URL", type the callback URL of your app.
+    - Your OAuth Redirect URI looks like this:
+      - `https://<project-ref>.supabase.co/auth/v1/callback`
+      - where `https://<project-ref>.supabase.co` is your Supabase Project API URL
+          - Go to your [Supasebase Project Dashboard](https://supabase.io)
+          - Click on the "Settings" icon at the bottom of the left sidebar
+          - Click on "API" in the list
+          - Under Config / URL you'll find your API URL, you can click "Copy" to copy it to the clipboard
+          - Now just add "/auth/v1/callback" to the end of that to get your full "OAuth Redirect URI"
+          - Enter this in the "Valid OAuth Redirect URIs" box
+          - Click "Save Changes" at the bottom right
+- Click "Register Application"
+
+Copy your new OAuth credentials
+
+- Copy and save your "Client ID"
+- Click "Generate a new client secret"
+- Copy and save your "Client secret"
+
+### Enter your Github Client ID and Client Secret into your Supabase Project
+
+- Go to your [Supasebase Project Dashboard](https://supabase.io)
+- In the left sidebar, click the "Authentication" icon (near the top)
+- Click "Settings" from the list to go to the "Authentication Settings" page
+- Enter the final (hosted) URL of your app under "Site URL" (this is important)
+- Under "External OAuth Providers" turn "Github Enabled" to ON
+- Enter your "Github Client ID" and "Github Client Secret" saved in the previous step
+- Click "Save"
+
+### Add login code to your client app
+
+The JavaScript client code is documented here: [Supabase OAuth Client Code](https://supabase.io/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'github'
+})
+```
+
+Add this function which you can call from a button, link, or UI element.
+
+```js
+function signInWithGithub() {
+  const { user, session, error } = await supabase.auth.signIn({
+    provider: 'github'
+  });
+}
+```
+
+To log out:
+
+```js
+function signout() {
+  const { error } = await supabase.auth.signOut();
+}
+```
+
+## Resources
+
+* [Supabase Account - Free Tier OK](https://supabase.io)
+* [Supabase JS Client](https://github.com/supabase/supabase-js)
+* [Github Developer Settings](https://github.com/settings/developers)
