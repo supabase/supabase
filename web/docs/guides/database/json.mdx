@@ -7,18 +7,12 @@ description: How to use JSON Data in PostgreSQL and the Supabase Javascript API.
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-## Description
+PostgreSQL supports [JSON functions and operators](https://www.postgresql.org/docs/12/functions-json.html) which gives flexiblity when storing data inside a database column.  
 
-How to use JSON Data in PostgreSQL and the Supabase Javascript API
+PostgreSQL supports two types of JSON columns: `JSON` and `JSONB`.  The recommended type is `JSONB`, so that's what we'll be using throughout this document.
 
-PostgreSQL supports [JSON functions and operators](https://www.postgresql.org/docs/12/functions-json.html) that can give you nearly unlimited flexiblity when storing data inside a database column.  In this document you'll learn how to:
 
-* create database columns that store JSON data
-* insert JSON data into a database
-* query JSON data stored in a database
-
-PostgreSQL supports two types of JSON columns: JSON and JSONB.  The recommended type is JSONB, so that's what we'll be using throughout this document.
-
+<!-- @TODO: I think we can explain this in our own words a bit more easily -->
 > The json data type stores an exact copy of the input text, which processing functions must reparse on each execution; while jsonb data is stored in a decomposed binary format that makes it slightly slower to input due to added conversion overhead, but significantly faster to process, since no reparsing is needed. jsonb also supports indexing, which can be a significant advantage.
 
 From: [PostgreSQL JSON types](https://www.postgresql.org/docs/12/datatype-json.html)
@@ -35,7 +29,8 @@ values={[
 ]}>
 <TabItem value="UI">
 
-- Table Editor
+```bash
+1. Go to the Table Editor
 - New Table
 - Create a new table named `game_log`
     - include primary key `id`, type `UUID`, default value `Automatically generate UUID`
@@ -48,6 +43,7 @@ values={[
         - game_date type DATE
         - home_team type TEXT
         - visiting_team type TEXT
+```
 
 </TabItem>
 <TabItem value="SQL">
@@ -77,6 +73,7 @@ values={[
 ]}>
 <TabItem value="UI">
 
+```bash
 - Table Editor
 - Select `game_log`
 - Insert Row
@@ -85,7 +82,6 @@ values={[
     - visiting_team: 'San Diego Padres'
     - game_data: [COPY AND PASTE THE JSON BLOCK]
 
-  ```js
   {
     "winning_pitcher": "Alzolay", 
     "losing_pitcher": "Johnson", 
@@ -97,9 +93,9 @@ values={[
       "visitors": [0,0,0,1,0,0,0,0,0], 
       "home": [0,0,0,1,2,0,3,0]}
   }
-  ```
-
+  
     - Save the new row
+```
 
 </TabItem>
 
@@ -223,10 +219,11 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-SELECT game_data -> 'winning_pitcher' AS winning_pitcher FROM game_log;
+select game_data -> 'winning_pitcher' AS winning_pitcher 
+from game_log;
 ```
 
-Resuls:
+Results:
 
 | winning_pitcher |
 | --------------- |
@@ -267,12 +264,12 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-SELECT 
+select 
   visiting_team, 
   game_data -> 'final_score' -> 'visitors' -> 'runs' as visitors_runs,
   home_team, 
   game_data -> 'final_score' -> 'home' -> 'runs' as home_runs
-FROM game_log;
+from game_log;
 ```
 
 Results:
