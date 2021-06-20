@@ -96,6 +96,51 @@ module.exports = {
       ],
     },
   ],
+  guides: [
+    {
+      type: 'category',
+      label: 'Guides',
+      items: ['guides'],
+      collapsed: false,
+    },
+    {
+      type: 'category',
+      label: 'Database',
+      collapsed: false,
+      items: [
+        'guides/database/arrays', 
+        'guides/database/json', 
+        'guides/database/password-reset',
+        'guides/database/sql-to-api',
+        // {
+        //   type: 'category',
+        //   label: 'SQL Tutorial',
+        //   collapsed: false,
+        //   items: ['guides/database/arrays'],
+        // },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Auth',
+      collapsed: false,
+      items: [
+        'guides/auth/auth-apple', 
+        'guides/auth/auth-bitbucket',
+        'guides/auth/auth-facebook', 
+        'guides/auth/auth-github', 
+        'guides/auth/auth-gitlab',
+        'guides/auth/auth-google', 
+        'guides/auth/auth-twitter',
+      ],
+    },
+    // {
+    //   type: 'category',
+    //   label: 'Storage',
+    //   collapsed: false,
+    //   items: ['guides/storage/storage-sample'],
+    // },
+  ],
   resources: [
     { type: 'category', label: 'Resources', items: ['resources'], collapsed: false },
     // { type: 'category', label: 'Resources', collapsed: false },
