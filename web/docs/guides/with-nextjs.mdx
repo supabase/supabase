@@ -251,10 +251,10 @@ export default function Auth() {
               e.preventDefault()
               handleLogin(email)
             }}
-            className={'button block'}
+            className="button block"
             disabled={loading}
           >
-            {loading ? <span>Loading</span> : <span>Send magic link</span>}
+            <span>{loading ? 'Loading' : 'Send magic link'}</span>
           </button>
         </div>
       </div>
