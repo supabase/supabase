@@ -7,11 +7,8 @@ description: How to use arrays in PostgreSQL and the Supabase API.
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-## Description
-
-How to use arrays in PostgreSQL and the Supabase API
-
-PostgreSQL supports flexible [array types](https://www.postgresql.org/docs/12/arrays.html).  You can use arrays in your PostgreSQL tables in the Supabase dashboard and in the Javascript API.
+PostgreSQL supports flexible [array types](https://www.postgresql.org/docs/12/arrays.html).  
+These arrays are also supported in the Supabase dashboard and in the Javascript API.
 
 ## Steps
 
@@ -28,14 +25,16 @@ values={[
 
 <TabItem value="UI">
 
-- Table Editor
-- New Table
-- Create a new table named `arraytest` and save the table
+```bash
+1. Got the Table Editor
+2. Create a New Table
+3. Create a new table named `arraytest` and save the table
     - New Column
         - Name the new column `textarray`
         - Make it type `text`
         - Check the box labelled `Define as array`
         - Save the new column
+```
 
 </TabItem>
 
@@ -65,13 +64,14 @@ values={[
 
 <TabItem value="UI">
 
+```bash
 - Table Editor
 - Select `arraytest`
 - Insert Row
     - In the `textarray` field input, paste:
     - `["Harry", "Larry", "Moe"]`
     - Save the new row
-
+```
 
 </TabItem>
 
@@ -111,8 +111,10 @@ values={[
 
 <TabItem value="UI">
 
+```bash
 - Table Editor
 - Select `arraytest`
+```
 
 Your first array data!
 
