@@ -113,12 +113,12 @@ module.exports = {
         'guides/database/json', 
         'guides/database/password-reset',
         'guides/database/sql-to-api',
-        {
-          type: 'category',
-          label: 'SQL Tutorial',
-          collapsed: false,
-          items: ['guides/database/arrays'],
-        },
+        // {
+        //   type: 'category',
+        //   label: 'SQL Tutorial',
+        //   collapsed: false,
+        //   items: ['guides/database/arrays'],
+        // },
       ],
     },
     {
