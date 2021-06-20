@@ -587,8 +587,8 @@ pages:
           ```js
           const { data, error } = await supabase
             .from('users')
-            .csv()
             .select()
+            .csv()
           ```
 
   insert():
