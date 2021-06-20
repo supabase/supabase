@@ -253,7 +253,7 @@ pages:
             - uses: actions/setup-node@v2.1.5
               with:
                 node-version: 14
-            - run: npm run update-database-types
+            - run: npm run update-types
             - name: check for file changes
               id: git_status
               run: |
@@ -557,8 +557,8 @@ pages:
           ```js
           const { data, error } = await supabase
             .from('users')
-            .csv()
             .select()
+            .csv()
           ```
 
   insert():

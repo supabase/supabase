@@ -224,6 +224,7 @@
 html,
 body {
   font-smoothing: antialiased;
+  scroll-behavior: smooth;
   text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
@@ -511,6 +512,10 @@ a.card:hover {
 .menu > .menu__list > .menu__list-item > .menu__link {
   margin-bottom: 4px;
   color: gray;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 /* Disable click events for large screens  */
@@ -1320,18 +1325,23 @@ h4.method-list-item-label {
 h4.method-list-item-label .method-list-item-label-name {
   font-family: var(--ifm-font-family-monospace);
   font-size: 0.8rem;
+  padding: var(--ifm-code-padding-vertical) 0;
 }
 h4.method-list-item-label .method-list-item-label-badge {
   font-family: var(--ifm-font-family-monospace);
   font-size: 0.8rem;
   padding: 0 5px;
   font-weight: 300;
+  padding: var(--ifm-code-padding-vertical) var(--ifm-code-padding-horizontal);
 }
 h4.method-list-item-label .method-list-item-validation {
   font-family: var(--ifm-font-family-monospace);
   font-size: 0.8rem;
   padding: 0 5px;
   font-weight: 300;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .method-list-group .method-list-group {
