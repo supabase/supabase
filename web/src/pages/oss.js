@@ -1,8 +1,7 @@
 import React from 'react'
 import Layout from '@theme/Layout'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
-import sponsorThisMonth from '../data/sponsors.json'
-import sponsorsPreviousMonth from '../data/sponsorsPreviousMonth.json'
+import sponsors from '../data/sponsors.json'
 import maintainers from '../data/maintainers.json'
 import GithubCard from '../components/GithubCard'
 import { repos } from '../data/github'
@@ -12,16 +11,7 @@ export default function Oss() {
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
 
-  // Hacky solution to get sponsors for the past 1 month
-  let oneMonthAgo = new Date()
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
-  const sponsors = sponsorThisMonth
-    .concat(sponsorsPreviousMonth)
-    .filter((x) => {
-      let paid = x.transactions.some((t) => t.transaction_date > oneMonthAgo.toISOString())
-      return paid
-    })
-    .sort((a, b) => a.sponsor_handle.localeCompare(b.sponsor_handle))
+  
 
   const maintainerTags = maintainers
     .reduce((acc, x) => acc.concat(x.tags), []) // get all tags
@@ -32,56 +22,32 @@ export default function Oss() {
     {
       tier_name: '$5,000 a month',
       heading: 'Enterprise: $5,000 per month',
-      transactions: sponsors.filter(
-        (x) =>
-          x.transactions[0]?.tier_name == '$5,000 a month' &&
-          x.transactions[0]?.status != 'processor_declined'
-      ),
+      transactions: sponsors.filter((x) => (x.tier == '$5,000 a month')),
     },
     {
       tier_name: '$2,500 a month',
       heading: 'Agency: $2,500 per month',
-      transactions: sponsors.filter(
-        (x) =>
-          x.transactions[0]?.tier_name == '$2,500 a month' &&
-          x.transactions[0]?.status != 'processor_declined'
-      ),
+      transactions: sponsors.filter((x) => (x.tier == '$2,500 a month')),
     },
     {
       tier_name: '$1,000 a month',
       heading: 'Startup: $1,000 per month',
-      transactions: sponsors.filter(
-        (x) =>
-          x.transactions[0]?.tier_name == '$1,000 a month' &&
-          x.transactions[0]?.status != 'processor_declined'
-      ),
+      transactions: sponsors.filter((x) => (x.tier == '$1,000 a month')),
     },
     {
       tier_name: '$49 a month',
       heading: 'Evangelist: $49 per month',
-      transactions: sponsors.filter(
-        (x) =>
-          x.transactions[0]?.tier_name == '$49 a month' &&
-          x.transactions[0]?.status != 'processor_declined'
-      ),
+      transactions: sponsors.filter((x) => (x.tier == '$49 a month')),
     },
     {
       tier_name: '$19 a month',
       heading: 'Supporter: $19 per month',
-      transactions: sponsors.filter(
-        (x) =>
-          x.transactions[0]?.tier_name == '$19 a month' &&
-          x.transactions[0]?.status != 'processor_declined'
-      ),
+      transactions: sponsors.filter((x) => (x.tier == '$19 a month')),
     },
     {
       tier_name: '$5 a month',
       heading: 'Contributor: $5 per month',
-      transactions: sponsors.filter(
-        (x) =>
-          x.transactions[0]?.tier_name == '$5 a month' &&
-          x.transactions[0]?.status != 'processor_declined'
-      ),
+      transactions: sponsors.filter((x) => (x.tier == '$5 a month')),
     },
   ]
 
@@ -93,7 +59,7 @@ export default function Oss() {
             <div className="col">
               <h2 className="with-underline">Open source</h2>
               <p className="">
-                Supabase is an opensource company, supporting existing open source tools and
+                Supabase is an open source company, supporting existing open source tools and
                 communities wherever possible.
               </p>
             </div>
@@ -112,14 +78,14 @@ export default function Oss() {
                   <h4 className="">{t.heading}</h4>
                   <div className="row is-multiline">
                     {t.transactions.map((x) => (
-                      <div className="col col--3" key={x.sponsor_handle}>
-                        <a className="avatar" href={`https://github.com/${x.sponsor_handle}`}>
+                      <div className="col col--3" key={x.sponsor}>
+                        <a className="avatar" href={`https://github.com/${x.sponsor}`}>
                           <img
                             className="avatar__photo avatar__photo--sm"
-                            src={`https://github.com/${x.sponsor_handle}.png`}
+                            src={`https://github.com/${x.sponsor}.png`}
                           />
                           <div className="avatar__intro">
-                            <h5 className="avatar__name">{x.sponsor_handle}</h5>
+                            <h5 className="avatar__name">{x.sponsor}</h5>
                           </div>
                         </a>
                       </div>

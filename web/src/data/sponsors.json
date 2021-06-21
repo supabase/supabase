@@ -1,641 +1,182 @@
 [
   {
-    "sponsor_handle": "sleepypikachu",
-    "sponsor_profile_name": "Elliot",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-05-27T17:06:42.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$19 a month",
+    "sponsor": "dshukertjr"
   },
   {
-    "sponsor_handle": "prashantpawar",
-    "sponsor_profile_name": "Prashant Singh Pawar",
-    "sponsor_public_email": "prashantpawar@gmail.com",
-    "sponsorship_started_on": "2020-05-27T18:58:54.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "calendee"
   },
   {
-    "sponsor_handle": "sebastianbachmann",
-    "sponsor_profile_name": "Sebastian Bachmann",
-    "sponsor_public_email": "github@sebastianbachmann.de",
-    "sponsorship_started_on": "2020-05-27T19:27:21.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1IK68eEQsq43iHhXqVHfPLUP",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-13T02:13:16.000+08:00"
-      },
-      {
-        "transaction_id": "ch_1IJD2JEQsq43iHhXR6DSwLW3",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-10T15:23:01.000+08:00"
-      }
-    ]
+    "tier": "$5 a month",
+    "sponsor": "kylewelsby"
   },
   {
-    "sponsor_handle": "arnaudbonzom",
-    "sponsor_profile_name": "Arnaud Bonzom",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-05-27T20:38:34.000+08:00",
-    "is_public": false,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "ricdex"
   },
   {
-    "sponsor_handle": "reverie",
-    "sponsor_profile_name": "Andrew Badr",
-    "sponsor_public_email": "andrewbadr.etc+github@gmail.com",
-    "sponsorship_started_on": "2020-05-27T23:07:56.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "lexifdev"
   },
   {
-    "sponsor_handle": "saphp",
-    "sponsor_profile_name": "Saleh Almatrafi",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-05-28T12:57:15.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "tacowaco"
   },
   {
-    "sponsor_handle": "Cmarenburg",
-    "sponsor_profile_name": "Colin Arenburg",
-    "sponsor_public_email": "cmarenburg2@gmail.com",
-    "sponsorship_started_on": "2020-06-01T18:23:00.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "kachar"
   },
   {
-    "sponsor_handle": "Aaron-A",
-    "sponsor_profile_name": "Aaron",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-06-01T19:58:42.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1IIHw9EQsq43iHhXWinCozGk",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-08T02:24:54.000+08:00"
-      }
-    ]
+    "tier": "$19 a month",
+    "sponsor": "tpberntsen"
   },
   {
-    "sponsor_handle": "gabrielpires",
-    "sponsor_profile_name": "Gabriel Pires",
-    "sponsor_public_email": "eu@gabrielpires.com.br",
-    "sponsorship_started_on": "2020-06-06T18:20:23.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "AndersGerner"
   },
   {
-    "sponsor_handle": "Julianwan",
-    "sponsor_profile_name": "Julian Wan",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-06-16T03:30:05.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "2WG586875J4914044",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-16T02:31:05.000+08:00"
-      }
-    ]
+    "tier": "$5 a month",
+    "sponsor": "stopyellingatme"
   },
   {
-    "sponsor_handle": "affluent-bilby-classifieds",
-    "sponsor_profile_name": null,
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-06-22T19:09:58.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "danalloway"
   },
   {
-    "sponsor_handle": "KoreyPeters",
-    "sponsor_profile_name": "Korey Peters",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-07-03T05:23:58.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1IGTluEQsq43iHhXghflEAXV",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-03T02:38:50.000+08:00"
-      }
-    ]
+    "tier": "$19 a month",
+    "sponsor": "bookofdom"
   },
   {
-    "sponsor_handle": "patrickxchong",
-    "sponsor_profile_name": "Patrick Chong",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-07-05T22:59:43.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "juzhiyuan"
   },
   {
-    "sponsor_handle": "gregdenson",
-    "sponsor_profile_name": null,
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-07-18T01:44:44.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$19 a month",
+    "sponsor": "Alileus"
   },
   {
-    "sponsor_handle": "StephaneP",
-    "sponsor_profile_name": "Stephane Leandre Paul",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-08-07T21:43:49.000+08:00",
-    "is_public": true,
-    "is_yearly": true,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "gregaltuna"
   },
   {
-    "sponsor_handle": "thorwebdev",
-    "sponsor_profile_name": "Thor 雷神 Schaeff",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-08-08T02:08:34.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$19 a month",
+    "sponsor": "mkiisoft"
   },
   {
-    "sponsor_handle": "briannekimmel",
-    "sponsor_profile_name": null,
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-08-11T01:25:23.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "emschwartz"
   },
   {
-    "sponsor_handle": "Idered",
-    "sponsor_profile_name": "Kasper Mikiewicz",
-    "sponsor_public_email": "iam@kasper.io",
-    "sponsorship_started_on": "2020-08-19T04:03:03.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "ctwhome"
   },
   {
-    "sponsor_handle": "singareddynm",
-    "sponsor_profile_name": null,
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-08-25T14:55:22.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "alienzz"
   },
   {
-    "sponsor_handle": "zlwaterfield",
-    "sponsor_profile_name": "Zach Waterfield",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-08-28T22:39:16.000+08:00",
-    "is_public": true,
-    "is_yearly": true,
-    "transactions": []
+    "tier": "$19 a month",
+    "sponsor": "dsernst"
   },
   {
-    "sponsor_handle": "tpberntsen",
-    "sponsor_profile_name": "Thomas Peter Berntsen",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-10-16T16:05:31.000+08:00",
-    "is_public": true,
-    "is_yearly": true,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "zlwaterfield"
   },
   {
-    "sponsor_handle": "harrisi",
-    "sponsor_profile_name": "Ian Harris",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-10-21T12:04:49.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "Aaron-A"
   },
   {
-    "sponsor_handle": "CodeByCorey",
-    "sponsor_profile_name": "Corey O'Donnell",
-    "sponsor_public_email": "me@coreyodonnell.com",
-    "sponsorship_started_on": "2020-11-18T04:32:48.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$49 a month",
+    "sponsor": "tmm"
   },
   {
-    "sponsor_handle": "deanpress",
-    "sponsor_profile_name": "Dean van Dugteren",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-11-19T02:12:34.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "gabrielmip"
   },
   {
-    "sponsor_handle": "kopi-cloud",
-    "sponsor_profile_name": null,
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-11-26T12:51:03.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "zoutiyx"
   },
   {
-    "sponsor_handle": "jvieirar",
-    "sponsor_profile_name": "Juan Vieira",
-    "sponsor_public_email": "jmvieirar@gmail.com",
-    "sponsorship_started_on": "2020-12-01T13:22:27.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "adammoyle"
   },
   {
-    "sponsor_handle": "tmm",
-    "sponsor_profile_name": "Tom Meagher",
-    "sponsor_public_email": "tom@meagher.co",
-    "sponsorship_started_on": "2020-12-04T13:40:45.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "EvonuX"
   },
   {
-    "sponsor_handle": "gregaltuna",
-    "sponsor_profile_name": "Greg Altuna",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-12-05T01:50:46.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1IHCMoEQsq43iHhXx3yIDfwx",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-05T02:15:55.000+08:00"
-      }
-    ]
+    "tier": "$5 a month",
+    "sponsor": "KoreyPeters"
   },
   {
-    "sponsor_handle": "lIIIIIIIIIIIIIIIIIIIII",
-    "sponsor_profile_name": null,
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-12-06T07:48:00.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "74U75508XD131542P",
-        "tier_name": "$19 a month",
-        "tier_monthly_amount": "$19.00",
-        "processed_amount": "$19.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-06T02:16:23.000+08:00"
-      }
-    ]
+    "tier": "$19 a month",
+    "sponsor": "fefurst"
   },
   {
-    "sponsor_handle": "peachp",
-    "sponsor_profile_name": "Waldemar",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-12-07T00:07:37.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1IHvGHEQsq43iHhXu6LzNJEV",
-        "tier_name": "$19 a month",
-        "tier_monthly_amount": "$19.00",
-        "processed_amount": "$19.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-07T02:12:11.000+08:00"
-      }
-    ]
+    "tier": "$5 a month",
+    "sponsor": "sebastianbachmann"
   },
   {
-    "sponsor_handle": "guido4000",
-    "sponsor_profile_name": "Guido",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-12-08T04:17:27.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "jvieirar"
   },
   {
-    "sponsor_handle": "calendee",
-    "sponsor_profile_name": "Justin Noel",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-12-09T03:46:00.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1IHZSCEQsq43iHhXGEY4toH6",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-06T02:55:00.000+08:00"
-      }
-    ]
+    "tier": "$5 a month",
+    "sponsor": "CmplxStack"
   },
   {
-    "sponsor_handle": "lexifdev",
-    "sponsor_profile_name": "sl kim",
-    "sponsor_public_email": "sl@lxf.kr",
-    "sponsorship_started_on": "2020-12-14T23:06:43.000+08:00",
-    "is_public": true,
-    "is_yearly": true,
-    "transactions": []
+    "tier": "$19 a month",
+    "sponsor": "Kunstderfug"
   },
   {
-    "sponsor_handle": "tacowaco",
-    "sponsor_profile_name": null,
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-12-16T16:17:12.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "ConorEB"
   },
   {
-    "sponsor_handle": "dshukertjr",
-    "sponsor_profile_name": "Tyler",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2020-12-29T10:50:15.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$19 a month",
+    "sponsor": "hype08"
   },
   {
-    "sponsor_handle": "killshot13",
-    "sponsor_profile_name": "Michael R.",
-    "sponsor_public_email": "dmreh@outlook.com",
-    "sponsorship_started_on": "2021-01-01T15:06:41.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "jwanner83"
   },
   {
-    "sponsor_handle": "georgedalai",
-    "sponsor_profile_name": null,
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2021-01-03T18:13:16.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "83M10465R1047023R",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-04T03:00:20.000+08:00"
-      }
-    ]
+    "tier": "$5 a month",
+    "sponsor": "affluent-bilby-classifieds"
   },
   {
-    "sponsor_handle": "emschwartz",
-    "sponsor_profile_name": "Evan Schwartz",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2021-01-03T23:44:19.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "8JY63239BU234533F",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-05T02:54:30.000+08:00"
-      }
-    ]
+    "tier": "$5 a month",
+    "sponsor": "Lucostus"
   },
   {
-    "sponsor_handle": "ricdex",
-    "sponsor_profile_name": "Ricardo Avila",
-    "sponsor_public_email": "ricdex@gmail.com",
-    "sponsorship_started_on": "2021-01-05T04:28:01.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1IHCYPEQsq43iHhX6OliBTTA",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-05T02:27:58.000+08:00"
-      }
-    ]
+    "tier": "$19 a month",
+    "sponsor": "peachp"
   },
   {
-    "sponsor_handle": "danalloway",
-    "sponsor_profile_name": "Dan Alloway",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2021-01-05T11:49:11.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "7XC149329V6287225",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-05T02:10:56.000+08:00"
-      }
-    ]
+    "tier": "$5 a month",
+    "sponsor": "killshot13"
   },
   {
-    "sponsor_handle": "gohappylabs",
-    "sponsor_profile_name": "goHappy Labs",
-    "sponsor_public_email": "info@gohappyapp.com",
-    "sponsorship_started_on": "2021-01-05T11:49:49.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$19 a month",
+    "sponsor": "lIIIIIIIIIIIIIIIIIIIII"
   },
   {
-    "sponsor_handle": "stopyellingatme",
-    "sponsor_profile_name": "Taylor King",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2021-01-13T23:47:20.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1IKSijEQsq43iHhXfwEiwjtu",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-14T02:20:01.000+08:00"
-      }
-    ]
+    "tier": "$5 a month",
+    "sponsor": "hugodemelo"
   },
   {
-    "sponsor_handle": "jwanner83",
-    "sponsor_profile_name": "Jonas Wanner",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2021-01-19T19:33:04.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "ch_1IHCc7EQsq43iHhXGEyyKbak",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$5.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-05T02:31:43.000+08:00"
-      }
-    ]
+    "tier": "$5 a month",
+    "sponsor": "georgedalai"
   },
   {
-    "sponsor_handle": "EvonuX",
-    "sponsor_profile_name": "Djordje Stevanovic",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2021-01-23T06:16:44.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
+    "tier": "$5 a month",
+    "sponsor": "gregdenson"
   },
   {
-    "sponsor_handle": "elijificent",
-    "sponsor_profile_name": null,
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2021-01-27T16:49:23.000+08:00",
-    "is_public": false,
-    "is_yearly": false,
-    "transactions": []
-  },
-  {
-    "sponsor_handle": "hype08",
-    "sponsor_profile_name": "Henry",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2021-01-30T16:46:31.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": []
-  },
-  {
-    "sponsor_handle": "bookofdom",
-    "sponsor_profile_name": "Dominic Luciano",
-    "sponsor_public_email": "dom.luciano@ascentfactory.com",
-    "sponsorship_started_on": "2021-02-05T03:55:01.000+08:00",
-    "is_public": true,
-    "is_yearly": true,
-    "transactions": [
-      {
-        "transaction_id": "ch_1IHDuuEQsq43iHhXNwitNnUb",
-        "tier_name": "$19 a month",
-        "tier_monthly_amount": "$19.00",
-        "processed_amount": "$96.82",
-        "is_prorated": true,
-        "status": "settled",
-        "transaction_date": "2021-02-05T03:55:15.000+08:00"
-      }
-    ]
-  },
-  {
-    "sponsor_handle": "dsernst",
-    "sponsor_profile_name": "David Ernst",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2021-02-10T03:32:47.000+08:00",
-    "is_public": true,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "71992373LA592170D",
-        "tier_name": "$19 a month",
-        "tier_monthly_amount": "$19.00",
-        "processed_amount": "$19.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-10T03:32:58.000+08:00"
-      }
-    ]
-  },
-  {
-    "sponsor_handle": "gabrielmip",
-    "sponsor_profile_name": "Gabriel Pedrosa",
-    "sponsor_public_email": "gabrielgmps@gmail.com",
-    "sponsorship_started_on": "2021-02-15T08:49:36.000+08:00",
-    "is_public": true,
-    "is_yearly": true,
-    "transactions": [
-      {
-        "transaction_id": "04F81079FC483611D",
-        "tier_name": "$5 a month",
-        "tier_monthly_amount": "$5.00",
-        "processed_amount": "$60.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-15T08:49:46.000+08:00"
-      }
-    ]
-  },
-  {
-    "sponsor_handle": "Brotakuu",
-    "sponsor_profile_name": "Brotaku",
-    "sponsor_public_email": null,
-    "sponsorship_started_on": "2021-02-16T05:21:43.000+08:00",
-    "is_public": false,
-    "is_yearly": false,
-    "transactions": [
-      {
-        "transaction_id": "6PU95874S0445412S",
-        "tier_name": "$19 a month",
-        "tier_monthly_amount": "$19.00",
-        "processed_amount": "$19.00",
-        "is_prorated": false,
-        "status": "settled",
-        "transaction_date": "2021-02-16T05:21:54.000+08:00"
-      }
-    ]
+    "tier": "$5 a month",
+    "sponsor": "i-infra"
   }
 ]
