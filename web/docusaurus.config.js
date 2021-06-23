@@ -73,12 +73,12 @@ module.exports = {
           activeBaseRegex: '(^/docs$)|(/docs/faq)',
           position: 'left',
         },
-        // {
-        //   label: 'Guides',
-        //   to: '/docs/guides',
-        //   activeBaseRegex: '(/docs/guides)',
-        //   position: 'left',
-        // },
+        {
+          label: 'Guides',
+          to: '/docs/guides',
+          activeBaseRegex: '(/docs/guides)',
+          position: 'left',
+        },
         {
           label: 'Reference',
           to: '/docs/reference/javascript/supabase-client',
