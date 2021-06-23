@@ -23,46 +23,46 @@ First, you'll need a Developer Account at [https://developers.facebook.com](http
 
 Once logged into *"Facebook for Developers"*:
 
-- Click on "My Apps" at the top right.
-- Click "Create App" near the top right.
-- Select your app type and click "Continue".
-- Fill in your app information, then click "Create App".
-- This should bring you to the screen: "Add Products to Your App". (Alternatively you can click on "Add Product" in the left sidebar to get to this screen.)
+- Click on `My Apps` at the top right.
+- Click `Create App` near the top right.
+- Select your app type and click `Continue`.
+- Fill in your app information, then click `Create App`.
+- This should bring you to the screen: `Add Products to Your App`. (Alternatively you can click on `Add Product` in the left sidebar to get to this screen.)
 
 ### Set up FaceBook Login for your Facebook App
 
-From the "Add Products to your App" screen:
+From the `Add Products to your App` screen:
 
-- Click "Setup" under "Facebook Login"
-- Skip the Quickstart screen, instead, in the left sidebar, click "Settings" under "Facebook Login"
-- Enter your callback URI under "Valid OAuth Redirect URIs" on the "Facebook Login Settings" page
+- Click `Setup` under `Facebook Login`
+- Skip the Quickstart screen, instead, in the left sidebar, click `Settings` under `Facebook Login`
+- Enter your callback URI under `Valid OAuth Redirect URIs` on the `Facebook Login Settings` page
     - Your OAuth Redirect URI looks like this:
       - `https://<project-ref>.supabase.co/auth/v1/callback`
       - where `https://<project-ref>.supabase.co` is your Supabase Project API URL
           - Go to your [Supasebase Project Dashboard](https://supabase.io)
-          - Click on the "Settings" icon at the bottom of the left sidebar
-          - Click on "API" in the list
-          - Under Config / URL you'll find your API URL, you can click "Copy" to copy it to the clipboard
-          - Now just add "/auth/v1/callback" to the end of that to get your full "OAuth Redirect URI"
-          - Enter this in the "Valid OAuth Redirect URIs" box
-          - Click "Save Changes" at the bottom right
+          - Click on the `Settings` icon at the bottom of the left sidebar
+          - Click on `API` in the list
+          - Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard
+          - Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`
+          - Enter this in the `Valid OAuth Redirect URIs` box
+          - Click `Save Changes` at the bottom right
 
 ### Copy your Facebook App ID and Secret
 
-- Click "Settings / Basic" in the left sidebar
-- Copy your App ID from the top of the "Basic Settings" page 
-- Under "App Secret" click "Show" then copy your secret 
+- Click `Settings / Basic` in the left sidebar
+- Copy your App ID from the top of the `Basic Settings` page 
+- Under `App Secret` click `Show` then copy your secret 
 - Make sure all required fields are completed on this screen.
 
 ### Enter your Facebook App ID and Secret into your Supabase Project
 
 - Go to your [Supasebase Project Dashboard](https://supabase.io)
-- In the left sidebar, click the "Authentication" icon (near the top)
-- Click "Settings" from the list to go to the "Authentication Settings" page
-- Enter the final (hosted) URL of your app under "Site URL" (this is important)
-- Under "External OAuth Providers" turn "Facebook Enabled" to ON
-- Enter your "Facebook client ID" and "Facebook secret" saved in the previous step
-- Click "Save"
+- In the left sidebar, click the `Authentication` icon (near the top)
+- Click `Settings` from the list to go to the `Authentication Settings` page
+- Enter the final (hosted) URL of your app under `Site URL` (this is important)
+- Under `External OAuth Providers` turn `Facebook Enabled` to ON
+- Enter your `Facebook client ID` and `Facebook secret` saved in the previous step
+- Click `Save`
 
 ### Add login code to your client app
 
