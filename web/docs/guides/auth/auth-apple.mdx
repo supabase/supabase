@@ -48,7 +48,7 @@ This will serve as the `cliend_id` when you make API calls to authenticate the u
 - Fill out your information:
     - App description.
     - Bundle ID (you can't use the same Bundle ID from the previous step, but you can just add something to the beginning, such "app." to make it app.com.acme.roadrunner").
-    - SAVE THIS ID -- this ID will become your "client_id" later.
+    - SAVE THIS ID -- this ID will become your `client_id` later.
     - Click `Continue` at the top right.
     - Click `Register` at the top right.
 
@@ -60,14 +60,14 @@ This will serve as the `cliend_id` when you make API calls to authenticate the u
 - Make sure your newly created Bundle ID is selected under `Primary App ID`
 - Add your domain to the `Domains and Subdomains` box (do not add `https://`, just add the domain).
 - In the `Return URLs` box, type the callback URL of your app.
-    - Your "Return URL" (OAuth Redirect URI) looks like this:
+    - Your `Return URL` (OAuth Redirect URI) looks like this:
       - `https://<project-ref>.supabase.co/auth/v1/callback`
       - where `https://<project-ref>.supabase.co` is your Supabase Project API URL.
           - Go to your [Supasebase Project Dashboard](https://supabase.io).
           - Click on the `Settings` icon at the bottom of the left sidebar.
           - Click on `API` in the list.
           - Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
-          - Now just add `/auth/v1/callback` to the end of that to get your full "OAuth Redirect URI".
+          - Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
           - Enter this in the `Return URLs` box.
           - Click `Next` at the bottom right.
 - Click `Done` at the bottom.
@@ -76,7 +76,7 @@ This will serve as the `cliend_id` when you make API calls to authenticate the u
 
 ### Download your secret key 
 
-Now you'll need to download a "secret key" file from Apple that will be used to generate your `client_secret`.
+Now you'll need to download a `secret key` file from Apple that will be used to generate your `client_secret`.
 
 - Go to `Certificates, Identifiers & Profiles`.
 - Click on `Keys` at the left.
@@ -94,7 +94,7 @@ Now you'll need to download a "secret key" file from Apple that will be used to 
 
 ### Generate a `client_secret`
 
-The "secret key" you downloaded is used to create the `client_secret` string you'll need to authenticate your users.
+The `secret key` you downloaded is used to create the `client_secret` string you'll need to authenticate your users.
 
 According to the [Apple Docs](https://developer.apple.com/documentation/signinwithapplerestapi/generate_and_validate_tokens) it needs to be a JWT 
 token encrypted using the Elliptic Curve Digital Signature Algorithm (ECDSA) with the P-256 curve and the SHA-256 hash algorithm.
@@ -139,15 +139,15 @@ puts token
 ```
 
 1. Edit the `secret_gen.rb` file:
-    - `key_file` = "Path to the private key you downloaded from Apple". It should look like this: "AuthKey_XXXXXXXXXX.p8".
+    - `key_file` = "Path to the private key you downloaded from Apple". It should look like this: `AuthKey_XXXXXXXXXX.p8`.
     - `team_id` = "Your Team ID". This is found at the top right of the Apple Developer site (next to your name).
-    - `client_id` = "The Service ID of the service you created". This is the "Services ID" you created in the above step "Obtain a Services ID".
+    - `client_id` = "The Service ID of the service you created". This is the `Services ID` you created in the above step `Obtain a Services ID`.
         - If you've lost this ID, you can find it in the Apple Developer Site:
             - Go to `Certificates, Identifiers & Profiles`.
             - Click `Identifiers` at the left.
             - At the top right drop-down, select `Services IDs`.
             - Find your Identifier in the list (i.e. app.com.acme.roadrunner).
-    - `key_id` = "The Key ID of the private key". This can be found in the name of your downloaded secret file (For a file named "AuthKey_XXXXXXXXXX.p8" your key_id is "XXXXXXXXXX").
+    - `key_id` = "The Key ID of the private key". This can be found in the name of your downloaded secret file (For a file named `AuthKey_XXXXXXXXXX.p8` your key_id is `XXXXXXXXXX`).
         - If you've lost this ID, you can find it in the Apple Developer Site:
             - Go to `Certificates, Identifiers & Profiles`.
             - Click `Keys` at the left.
