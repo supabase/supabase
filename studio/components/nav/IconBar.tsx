@@ -1,14 +1,14 @@
-import { IconMail } from '@supabase/ui'
+import { IconColumns, IconGrid } from '@supabase/ui'
 import Link from 'next/link'
 
 const ROUTES = [
-  { key: 'ICON', label: 'Supabase', icon: <IconMail />, link: '/' },
-  { key: 'TABLE', label: 'Table Editor', icon: <IconMail />, link: '/editor' },
-  { key: 'AUTH', label: 'Authentication', icon: <IconMail />, link: '/auth' },
-  { key: 'STORAGE', label: 'Storage', icon: <IconMail />, link: '/storage' },
-  { key: 'SQL', label: 'SQL', icon: <IconMail />, link: '/storage' },
-  { key: 'API', label: 'API', icon: <IconMail />, link: '/storage' },
-  { key: 'DATABASE', label: 'Database', icon: <IconMail />, link: '/storage' },
+  { key: 'ICON', label: 'Supabase', icon: <IconGrid />, link: '/' },
+  { key: 'TABLE', label: 'Table Editor', icon: <IconGrid />, link: '/editor' },
+  //   { key: 'AUTH', label: 'Authentication', icon: <IconMail />, link: '/auth' },
+  //   { key: 'STORAGE', label: 'Storage', icon: <IconMail />, link: '/storage' },
+  //   { key: 'SQL', label: 'SQL', icon: <IconMail />, link: '/storage' },
+  { key: 'API', label: 'API', icon: <IconColumns />, link: '/api' },
+  //   { key: 'DATABASE', label: 'Database', icon: <IconMail />, link: '/storage' },
 ]
 
 /**
