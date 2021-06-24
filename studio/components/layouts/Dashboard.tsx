@@ -1,6 +1,7 @@
+import { ReactElement } from "react"
 import IconBar from "../nav/IconBar"
 
-export default function DashboardLayout ({ children }) {
+export default function DashboardLayout ({ children }: { children: ReactElement}) {
   return (
     <div className="flex">
       <div className="w-14 h-screen bg-sidebar-light dark:bg-sidebar-dark border-r dark:border-dark">

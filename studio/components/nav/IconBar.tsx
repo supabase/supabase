@@ -1,12 +1,16 @@
 import { IconColumns, IconGrid } from '@supabase/ui'
 import Link from 'next/link'
+import { ReactElement } from 'react'
 
-const ROUTES = [
+type Route = {
+    key: string
+    label: string
+    icon: ReactElement
+    link: string
+}
+
+const ROUTES: Route[] = [
   { key: 'ICON', label: 'Supabase', icon: <IconGrid />, link: '/' },
-  { key: 'TABLE', label: 'Table Editor', icon: <IconGrid />, link: '/editor' },
-  //   { key: 'AUTH', label: 'Authentication', icon: <IconMail />, link: '/auth' },
-  //   { key: 'STORAGE', label: 'Storage', icon: <IconMail />, link: '/storage' },
-  //   { key: 'SQL', label: 'SQL', icon: <IconMail />, link: '/storage' },
   { key: 'API', label: 'API', icon: <IconColumns />, link: '/api' },
   //   { key: 'DATABASE', label: 'Database', icon: <IconMail />, link: '/storage' },
 ]
@@ -19,7 +23,7 @@ export default function IconBar({}) {
     /**
      * Renders all the icons
      */
-  const renderNav = (routes) => {
+  const renderNav = (routes: Route[]) => {
     return routes.map((x) => (
       <li key={x.key}>
         <Link href={x.link}>
