@@ -250,6 +250,10 @@ body {
   display: inline-block;
 }
 
+h4, h5, h6 {
+  font-weight: bold !important;
+}
+
 .button {
   font-family: var(--custom-font-base);
 }
