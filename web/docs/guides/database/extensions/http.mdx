@@ -86,7 +86,20 @@ Get the current ip address of the PostgreSQL server:
 SELECT content::json->>'origin' as ip FROM http_get('http://httpbin.org/ip');
 ```
 
+Get information on a food product:
 
+```sql
+SELECT content::json as product FROM http_get('https://world.openfoodfacts.org/api/v0/product/9300650018860.json');
+```
+
+Post data to an API endpoint:
+
+```sql
+SELECT status, content::JSON->'form' as form_result
+  FROM http_post('http://httpbin.org/post',
+                 'myvar=myval&foo=bar&special=' || urlencode('my special string & things?'),
+                 'application/x-www-form-urlencoded');
+```
 
 
 ## Resources 
