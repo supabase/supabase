@@ -64,8 +64,24 @@ To disable an extension you can call `drop extension`.
 
 </Tabs>
 
+## Creating `PLV8` functions
 
-### Creating a `PLV8` function
+Functions written in `PLV8` (Javascript V8) are written just like any other PostgreSQL functions, only
+with the `LANGUAGE` identifier set to `plv8`.
+
+```sql
+CREATE OR REPLACE FUNCTION function_name(parameter1 text, parameter2 integer) RETURNS TEXT AS $$
+    // V8 Javascript
+    // code
+    // here
+    return 'return value';
+$$ LANGUAGE plv8;
+```
+
+
+## Examples
+
+### Scalar Functions
 
 A simple Scalar Function.
 

@@ -62,7 +62,7 @@ To disable an extension you can call `drop extension`.
 
 </Tabs>
 
-### `HTTP` functions
+## `HTTP` functions
 
 While the main `HTTP` function is simply `http(http_request)`, there are 5 wrapper functions for specific functionality:
 
@@ -72,8 +72,9 @@ While the main `HTTP` function is simply `http(http_request)`, there are 5 wrapp
 - `http_delete()`
 - `http_head()` 
 
-### Using the `HTTP` extension
+## Examples
 
+### `HTTP GET`
 Get a bunch of information about the current time (in JSON format):
 
 ```sql
@@ -91,6 +92,8 @@ Get information on a food product:
 ```sql
 SELECT content::json as product FROM http_get('https://world.openfoodfacts.org/api/v0/product/9300650018860.json');
 ```
+
+### `HTTP POST`
 
 Post data to an API endpoint:
 
