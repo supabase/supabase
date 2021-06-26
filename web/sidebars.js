@@ -118,7 +118,7 @@ module.exports = {
           type: 'category',
           label: 'Extensions',
           collapsed: false,
-          items: ['guides/database/extensions', 'guides/database/extensions/pgtap'],
+          items: ['guides/database/extensions', 'guides/database/extensions/pgtap', 'guides/database/extensions/plv8'],
         },
       ],
     },
