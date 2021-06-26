@@ -123,6 +123,7 @@ module.exports = {
             'guides/database/extensions/pgtap',
             'guides/database/extensions/plv8',
             'guides/database/extensions/http',
+            'guides/database/extensions/uuid-ossp',
           ],
         },
       ],

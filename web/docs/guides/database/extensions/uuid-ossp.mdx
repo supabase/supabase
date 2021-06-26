@@ -1,0 +1,100 @@
+---
+id: uuid-ossp
+title: "UUID-OSSP: Unique Identifiers"
+description: A UUID generator for PostgreSQL.
+---
+
+import ExtensionsComponent from '../../../../src/components/Extensions'
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+`UUID-OSSP` is an extension for PostgreSQL that creates the ability to generate `Universally Unique Identifers`, also known as (`UUIDs`).
+
+## Overview
+
+A universally unique identifier (`UUID`) is a 128-bit label used for information in computer systems. -- [Wikipedia](https://en.wikipedia.org/wiki/Universally_unique_identifier)
+`UUID-OSSP` enables the following functions used to generate `UUIDs`:
+- `uuid_generate_v1()`
+- `uuid_generate_v4()`
+
+## Usage
+
+
+### Enabling `UUID-OSSP`
+
+
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'SQL', value: 'SQL'},
+]}>
+<TabItem value="UI">
+
+```bash
+1. Go to the Database page
+2. Click on "Extensions" in the sidebar 
+3. Find the extension you would like to enable/disable 
+4. Click the toggle.
+```
+
+
+
+</TabItem>
+<TabItem value="SQL">
+
+```sql 
+
+-- Example: enable the "uuid-ossp" extension 
+create extenstion "uuid-ossp";
+
+-- Example: disable the "uuid-ossp" extension 
+drop extenstion "uuid-ossp";
+
+```
+
+Even though the SQL code is `create extension`, this is the equivelent of "enabling the extension". 
+To disable an extension you can call `drop extension`.
+
+</TabItem>
+
+</Tabs>
+
+### `UUID` functions
+
+
+To generate the UUID values based on the combination of computer’s MAC address, current timestamp, and a random value, you use the uuid_generate_v1() function:
+
+```uuid_generate_v1()```
+
+To generate a UUID value solely based on random numbers, use the uuid_generate_v4():
+
+```uuid_generate_v4()```
+
+### `UUID` Usage
+
+Basic usage in a select statement:
+
+```sql
+SELECT uuid_generate_v1();
+SELECT uuid_generate_v4();
+```
+
+Automatically create a unique, random ID in a table:
+
+```sql
+CREATE TABLE contacts (
+    contact_id uuid DEFAULT uuid_generate_v4(),
+    first_name VARCHAR NOT NULL,
+    last_name VARCHAR NOT NULL,
+    email VARCHAR NOT NULL,
+    phone VARCHAR,
+    PRIMARY KEY (contact_id)
+);
+```
+
+
+## Resources 
+
+- [The Basics Of PostgreSQL `UUID` Data Type](https://www.postgresqltutorial.com/postgresql-uuid/).
