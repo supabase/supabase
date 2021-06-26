@@ -1,0 +1,106 @@
+---
+id: plv8
+title: "PLV8: Javascript Language"
+description: Javascript language for PostgreSQL.
+---
+
+import ExtensionsComponent from '../../../../src/components/Extensions'
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+`PLV8` is a trusted Javascript language extension for PostgreSQL. It can be used for database functions, triggers, etc.
+
+## Overview
+
+The `PLV8` extension allows you to write PostgreSQL functions using the [V8 Jasvascript engine](https://v8.dev).
+It has its own runtime environment that can be customized with a runtime startup procedure (`set plv8.start_proc`)
+and execution timeout period (`set plv8.execution_timeout`).  It can execute multiple types of function calls inside of PostgreSQL
+including `Scalar Function Calls`, `Set-returning Function Calls`, `Trigger Function Calls`, and more.
+
+
+
+
+## Usage
+
+
+### Enabling `PLV8`
+
+
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'SQL', value: 'SQL'},
+]}>
+<TabItem value="UI">
+
+```bash
+1. Go to the Database page
+2. Click on "Extensions" in the sidebar 
+3. Find the extension you would like to enable/disable 
+4. Click the toggle.
+```
+
+
+
+</TabItem>
+<TabItem value="SQL">
+
+```sql 
+
+-- Example: enable the "plv8" extension 
+create extenstion plv8;
+
+-- Example: disable the "plv8" extension 
+drop extenstion plv8;
+
+```
+
+Even though the SQL code is `create extension`, this is the equivelent of "enabling the extension". 
+To disable an extension you can call `drop extension`.
+
+</TabItem>
+
+</Tabs>
+
+
+### Creating a `PLV8` function
+
+A simple Scalar Function.
+
+```sql
+CREATE OR REPLACE FUNCTION HelloWorld(name text) RETURNS TEXT AS $$
+    let output = `Hello from PLV8, ${name}!`;
+    output += ' The time is now ' + new Date();
+    return output;
+$$ LANGUAGE plv8;
+```
+
+To test it:
+
+```sql
+SELECT HelloWorld('Harold');
+```
+
+A simple Scalar Function to convert a string to proper case:
+
+```sql
+CREATE OR REPLACE FUNCTION ProperCase(str text) RETURNS TEXT AS $$
+    return str.toLowerCase().replace(/^(.)|\s(.)/g, 
+            function($1) { return $1.toUpperCase(); });
+$$ LANGUAGE plv8;
+```
+
+To test it:
+
+```sql
+SELECT ProperCase('this is my title with all the words capitalized');
+```
+
+
+
+## Resources 
+
+- Official [`PLV8` documentation](https://plv8.github.io/).
+- [PLV8 Github Repository](https://github.com/plv8/plv8).

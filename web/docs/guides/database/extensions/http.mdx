@@ -1,0 +1,94 @@
+---
+id: http
+title: "HTTP: HTTP Client"
+description: An HTTP Client for PostgreSQL Functions.
+---
+
+import ExtensionsComponent from '../../../../src/components/Extensions'
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+`HTTP` is a HTTP Client extension for PostgreSQL. It can be used to make calls to HTTP REST API endpoints from inside your PostgreSQL functions.
+
+## Overview
+
+The `HTTP` extension allows you to make HTTP calls from inside your PostgreSQL functions, returning data back from API endpoints.
+A successful call to a web URL from the `HTTP` extension returns a record with the following fields: `status`, `content_type`, `headers`, and `content`.
+
+
+
+
+## Usage
+
+
+### Enabling `PLV8`
+
+
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'SQL', value: 'SQL'},
+]}>
+<TabItem value="UI">
+
+```bash
+1. Go to the Database page
+2. Click on "Extensions" in the sidebar 
+3. Find the extension you would like to enable/disable 
+4. Click the toggle.
+```
+
+
+
+</TabItem>
+<TabItem value="SQL">
+
+```sql 
+
+-- Example: enable the "http" extension 
+create extenstion http;
+
+-- Example: disable the "http" extension 
+drop extenstion http;
+
+```
+
+Even though the SQL code is `create extension`, this is the equivelent of "enabling the extension". 
+To disable an extension you can call `drop extension`.
+
+</TabItem>
+
+</Tabs>
+
+### `HTTP` functions
+
+While the main `HTTP` function is simply `http(http_request)`, there are 5 wrapper functions for specific functionality:
+
+- `http_get()`
+- `http_post()`
+- `http_put()`
+- `http_delete()`
+- `http_head()` 
+
+### Using the `HTTP` extension
+
+Get a bunch of information about the current time (in JSON format):
+
+```sql
+SELECT content FROM http_get('http://worldtimeapi.org/api/ip');
+```
+
+Get the current ip address of the PostgreSQL server:
+
+```sql
+SELECT content::json->>'origin' as ip FROM http_get('http://httpbin.org/ip');
+```
+
+
+
+
+## Resources 
+
+- Official [`HTTP` Github Repository](https://github.com/pramsey/pgsql-http).
