@@ -117,7 +117,7 @@ pages:
       ```
 
       Find the source code on [GitHub](https://github.com/supabase/supabase-js).  
-      
+
       ## Python
 
       ```bash
@@ -125,7 +125,6 @@ pages:
       ```
 
       Find the source code on [GitHub](https://github.com/supabase/supabase-py).
-      
 
   Initializing:
     $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.constructor'
@@ -996,7 +995,10 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .upload('public/avatar1.png', avatarFile)
+            .upload('public/avatar1.png', avatarFile, {
+              cacheControl: 3600,
+              upsert: false
+            })
           ```
 
   storage.from.update():
@@ -1015,7 +1017,10 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .update('public/avatar1.png', avatarFile)
+            .update('public/avatar1.png', avatarFile, {
+              cacheControl: 3600,
+              upsert: false
+            })
           ```
 
   storage.from.move():
