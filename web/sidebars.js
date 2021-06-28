@@ -110,6 +110,7 @@ module.exports = {
       label: 'Database',
       collapsed: false,
       items: [
+        'guides/database/full-text-search',
         'guides/database/arrays',
         'guides/database/json',
         'guides/database/password-reset',
