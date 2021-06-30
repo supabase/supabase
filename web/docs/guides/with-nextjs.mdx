@@ -274,7 +274,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../utils/supabaseClient'
 
 export default function Account({ session }) {
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [username, setUsername] = useState(null)
   const [website, setWebsite] = useState(null)
   const [avatar_url, setAvatarUrl] = useState(null)
