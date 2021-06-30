@@ -9,12 +9,12 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 
-Postgres has built-in functions to handle `Full Text Search` queries. This allows is very similar to a "search engine" within Postgres.
+Postgres has built-in functions to handle `Full Text Search` queries. This is like a "search engine" within Postgres.
 
 
 ## Preparation
 
-For this guide we'll use the following data:
+For this guide we'll use the following example data:
 
 
 <Tabs
@@ -105,7 +105,7 @@ where to_tsvector(name) @@ to_tsquery('Harry');
 
 ## Basic Full Text Queries
 
-### Search a single column for a single word
+### Search a single column
 
 To find all `books` where the `description` contain the word `big`:
 
@@ -138,7 +138,7 @@ where
 </TabItem>
 </Tabs>
 
-### Search multiple columns for a single word
+### Search multiple columns
 
 To find all `books` where `description` or `title` contain the word `little`:
 
