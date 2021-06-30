@@ -9,12 +9,12 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 
-`PostgreSQL` has built-in functions to handle flexible and performant `Full Text Search` queries.
+Postgres has built-in functions to handle `Full Text Search` queries. This allows is very similar to a "search engine" within Postgres.
 
 
-## Overview: The Data
+## Preparation
 
-Let's query the following data from the following table using `Full Text Search` functions:
+For this guide we'll use the following data:
 
 
 <Tabs
@@ -27,19 +27,20 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-CREATE TABLE IF NOT EXISTS books (
-  id SERIAL PRIMARY KEY,
-  title TEXT,
-  author TEXT,
-  description TEXT
+create table books (
+  id serial primary key,
+  title text,
+  author text,
+  description text
 );
-INSERT INTO books (title, author, description) VALUES 
-('The Poky Little Puppy','Janette Sebring Lowrey','Puppy is slower than other, bigger animals.'),
-('The Tale of Peter Rabbit','Beatrix Potter','Rabbit eats some vegetables.'),
-('Tootle','Gertrude Crampton','Little toy train has big dreams.'),
-('Green Eggs and Ham','Dr. Seuss','Sam has changing food preferences and eats unusally colored food.'),
-('Harry Potter and the Goblet of Fire','J.K. Rowling','Fourth year of school starts, big drama ensues.');
-SELECT * FROM books;
+
+insert into books (title, author, description) 
+values 
+  ('The Poky Little Puppy','Janette Sebring Lowrey','Puppy is slower than other, bigger animals.'),
+  ('The Tale of Peter Rabbit','Beatrix Potter','Rabbit eats some vegetables.'),
+  ('Tootle','Gertrude Crampton','Little toy train has big dreams.'),
+  ('Green Eggs and Ham','Dr. Seuss','Sam has changing food preferences and eats unusally colored food.'),
+  ('Harry Potter and the Goblet of Fire','J.K. Rowling','Fourth year of school starts, big drama ensues.');
 ```
 
 </TabItem>
@@ -57,12 +58,50 @@ SELECT * FROM books;
 
 </Tabs>
 
-## Full Text Search Functions
+## Usage
 
-`PostgreSQL` uses the following functions to perform `full text search` queries:
+The functions we'll cover in this guide are:
 
-- `to_tsvector()`
-- `to_tsquery()`
+### `to_tsvector()`
+
+Converts your data into searchable "tokens". `to_tsvector()` stands for "to text search vector". For example:
+
+```sql
+select to_tsvector("green eggs and ham")
+
+-- Returns 'egg':2 'green':1 'ham':4
+``` 
+
+Collectively these tokens are called a "document" which Postgres can use for comparisons.
+
+### `to_tsquery()`
+
+Converts a query string into "tokens" to match match . `to_tsquery()` stands for "to text search query".
+
+This conversion step is important because we will want to "fuzzy match" on keywords. 
+For example if a user searches for "eggs", and a column has the value "egg", we probably still want to return a match.
+
+
+### Match: `@@`
+
+The `@@` symbol is the "match" symbol for Full Text Search. It returns any matches between a `to_tsvector` result and a `to_tsquery` result.
+
+Take the following example:
+
+```sql
+select * 
+from books 
+where name = 'Harry';
+```
+
+The equality symbol above (`=`) is very "strict" on what it matches. In a full text search context, we might want to find all "Harry Potter" books and so we can rewrite the 
+example above:
+
+```sql
+select * 
+from books 
+where to_tsvector(name) @@ to_tsquery('Harry');
+```
 
 ## Basic Full Text Queries
 
@@ -79,9 +118,13 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-SELECT * FROM books
-WHERE to_tsvector(description) 
-@@ to_tsquery('big');
+select 
+  * 
+from 
+  books
+where 
+  to_tsvector(description) 
+  @@ to_tsquery('big');
 ```
 
 </TabItem>
@@ -108,9 +151,13 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-SELECT * FROM books
-WHERE to_tsvector(description || ' ' || title) -- concat columns, but be sure to include a space to separate them!
-@@ to_tsquery('little');
+select 
+  * 
+from 
+  books
+where 
+  to_tsvector(description || ' ' || title) -- concat columns, but be sure to include a space to separate them!
+  @@ to_tsquery('little');
 ```
 
 </TabItem>
@@ -124,9 +171,9 @@ WHERE to_tsvector(description || ' ' || title) -- concat columns, but be sure to
 </TabItem>
 </Tabs>
 
-### Search multiple columns for multiple words (`AND`: contains both words)
+### Match all search words
 
-To find all `books` where (`description` or `title`) contain the word (`little` and `dream`):
+To find all `books` where `description` or `title` contain BOTH of the words `little` and `dream`, we can  use the `&` symbol:
 
 <Tabs
 defaultValue="SQL"
@@ -137,9 +184,13 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-SELECT * FROM books
-WHERE to_tsvector(description || ' ' || title)
-@@ to_tsquery('little & dream'); -- use & for AND in the search query
+select 
+  * 
+from 
+  books
+where 
+  to_tsvector(description || ' ' || title)
+  @@ to_tsquery('little & dream'); -- use & for AND in the search query
 ```
 
 </TabItem>
@@ -152,11 +203,11 @@ WHERE to_tsvector(description || ' ' || title)
 </TabItem>
 </Tabs>
 
-Notice how searching for `dream` includes results with the word `dreams` (or `dreaming`, `dreamed`, etc.)
+Notice how searching for `dream` includes results with the word `dreams` (or `dreaming`, `dreamed`, etc).
 
-### Search multiple columns for multiple words (`OR`: contains any of the search words)
+### Match any search words
 
-To find all `books` where (`description` or `title`) contain the word (`little` or `dream`):
+To find all `books` where `description` or `title` contain ANY of the words `little` or `dream`, use the `|` symbol:
 
 <Tabs
 defaultValue="SQL"
@@ -167,9 +218,13 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-SELECT * FROM books
-WHERE to_tsvector(description || ' ' || title) 
-@@ to_tsquery('little | dream'); -- use | for AND in the search query
+select 
+  * 
+from 
+  books
+where 
+  to_tsvector(description || ' ' || title) 
+  @@ to_tsquery('little | dream'); -- use | for OR in the search query
 ```
 
 </TabItem>
@@ -183,39 +238,18 @@ WHERE to_tsvector(description || ' ' || title)
 </TabItem>
 </Tabs>
 
-## Creating Indexes to Increase Performance
+## Creating Indexes
 
-Now that we have `Full Text Search` working, let's create an `index` that will speed things up and allow this to scale to millions of records and users.
+Now that we have Full Text Search working, let's create an `index`. This will allow Postgres to "build" the documents pre-emptively so that they 
+don't need to be created at the time we execute the query. This will make our queries much faster.
 
-### Add a column to hold the tsvector (full text search) data
-<Tabs
-defaultValue="SQL"
-values={[
-  {label: 'SQL', value: 'SQL'},
-  {label: 'Data', value: 'Data'},
-]}>
-<TabItem value="SQL">
+### Searchable columns
 
-```sql
-ALTER TABLE books ADD COLUMN fts tsvector; -- we'll call our new column "fts" (full text search)
-SELECT id, fts FROM books;
-```
+Let's create a new column `fts` inside the `books` table to store the searchable index of the `title` and `description` columns. 
 
-</TabItem>
-<TabItem value="Data">
-
-| id | fts |
-| -- | --- |
-| 1  | null |
-| 2  | null |
-| 3  | null |
-| 4  | null |
-| 5  | null |
-
-</TabItem>
-</Tabs>
-
-### Populate the `fts` column with data using `to_tsvector()`
+We can use a special feature of Postgres called 
+[Generated Columns](https://www.postgresql.org/docs/current/ddl-generated-columns.html) 
+to ensure that the index is updated any time the values in the `title` and `description` columns change.
 
 <Tabs
 defaultValue="SQL"
@@ -226,15 +260,18 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-UPDATE books SET fts = (to_tsvector(description || ' ' || title));
--- the `fts` column will now always (and only) allow us to search 'description' and 'title'
-SELECT id, fts FROM books;
+alter table 
+  books 
+add column 
+  fts tsvector generated always as to_tsvector(description || ' ' || title);
+
+
+select id, fts 
+from books;
 ```
 
 </TabItem>
 <TabItem value="Data">
-
-(The data stored in the `fts` column is interesting, but we'll never interact with it directly.)
 
 | id | fts                                                                                                             |
 | -- | --------------------------------------------------------------------------------------------------------------- |
@@ -247,7 +284,7 @@ SELECT id, fts FROM books;
 </TabItem>
 </Tabs>
 
-### Searching Using the New Index
+### Searching using the new column
 
 Now that we've created and populated our index, we can search it using the same techniques as before:
 
@@ -261,9 +298,12 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-SELECT * FROM books
-WHERE fts -- now we just search the fts column instead of calling to_tsvector()
-@@ to_tsquery('little & dream');
+select 
+  * 
+from 
+  books
+where 
+  fts @@ to_tsquery('little & dream');
 ```
 
 </TabItem>
@@ -276,37 +316,50 @@ WHERE fts -- now we just search the fts column instead of calling to_tsvector()
 </TabItem>
 </Tabs>
 
-### Keeping the Index Up-to-Date
+## Query Operators
 
-It's important that whenever your data changes, you update your index (recalculate your `fts` field).
-If we add a new `book` to the table, or if we change the `title` or `description` field for any record, we need to calculate/recalculate the `fts` column.
-
-There are two ways to do this:
-
-1.  **Manually** add this to your database code that does any inserts or updates to the table.
-2.  Create a **trigger** on your table to handle this chore automatically.
-
-
-## Bonus Query Operators
-
-Visit [PostgreSQL: Text Search Functions and Operators](https://www.postgresql.org/docs/12/functions-textsearch.html)
+Visit [PostgreSQL: Text Search Functions and Operators](https://www.postgresql.org/docs/current/functions-textsearch.html)
 to learn about additional query operators you can use to do more advanced `full text queries`, such as:
 
-Find the `exact phrase`: `big dreams`:
+### Proximity: `<->`
 
-```@@ to_tsquery('big <-> dreams')```
+The proximity symbol is useful for searching for terms that are a certain "distance" apart.
+For example, to find the phrase `big dreams`, where the a match for "big" is followed immediately by a match for "dreams":
 
-`Proximity`: find `year` and `school` within 2 words of each other:
+```sql
+select 
+  *
+from 
+  books
+where 
+  to_tsvector(description) @@ to_tsquery('big <-> dreams');
+```
 
-```@@ to_tsquery('year <2> school')```
+We can also use the `<->` to find words within a certain distance of eachother. For example to find `year` and `school` within 2 words of each other:
 
-`Negate` a query term (find records that have the word `big` but `not little`):
+```sql
+select 
+  *
+from 
+  books
+where 
+  to_tsvector(description) @@ to_tsquery('year <2> school');
+```
 
-```@@ to_tsquery('big & !little');```
+### Negation: `!`
 
-`Mix and Match` query terms:
+The negation symbol can be used to find phrases which _don't_ contain a search term.
+For example, to find records that have the word `big` but not `little`:
 
-```@@ to_tsquery('(food & eat) | (eat & vegetable) & !school');```
+```sql
+select 
+  *
+from 
+  books
+where 
+  to_tsvector(description) @@ to_tsquery('big & !little');
+```
+
 
 ## Resources
 
