@@ -9,7 +9,8 @@ Even though Supabase provides an `auth.users` table, it can be helpful to create
 
 ## Creating user tables
 
-When you create user tables, it's helpful to reference the `auth.users` table in the primary key. This ensures data integrity.
+When you create tables to store user data, it's helpful to reference the `auth.users` table in the primary key. This ensures data integrity.
+
 For example, a `public.profiles` table which is accessible via the API might look something like this:
 
 ```sql
@@ -62,20 +63,20 @@ The nice thing about this pattern? We can now query this table via the API and w
 
 ```js
 // This will return nothing while the user is logged out
-const { data: profile, error } = supabase
+const { data } = await supabase
   .from('profiles')
   .select('id, username, avatar_url, website')
 
 // After the user is logged in, this will only return 
 // the logged-in user's data - in this case a single row
 const { error } = await supabase.auth.signIn({ email })
-const { data: profile, error } = supabase
+const { data: profile } = await supabase
   .from('profiles')
   .select('id, username, avatar_url, website')
 ```
 
 ## Bypassing Row Level Security 
 
-If you need to fetch a full list of user profiles, we supply a `service_key` which you can use with your API and Client Libraries. 
+If you need to fetch a full list of user profiles, we supply a `service_key` which you can use with your API and Client Libraries to bypass Row Level Security. 
 
 Make sure you _NEVER_ expose this publicly. But it can be used on the server-side to fetch all of the profiles.
