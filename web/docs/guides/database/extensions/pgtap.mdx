@@ -12,7 +12,7 @@ import TabItem from '@theme/TabItem';
 
 ## Overview
 
-Before showing you how to write tests, let's cover some basic concepts:
+Let's cover some basic concepts:
 
 - Unit tests: allow you to test small parts of a system (like a database table!).
 - TAP: stands for [Test Anything Protocol](http://testanything.org/). It is an framework which aims to simplify the error reporting during testing. 
@@ -22,9 +22,7 @@ Before showing you how to write tests, let's cover some basic concepts:
 ## Usage
 
 
-### Enabling pgTAP
-
-
+### Enabling
 
 <Tabs
 defaultValue="UI"
@@ -34,10 +32,10 @@ values={[
 ]}>
 <TabItem value="UI">
 
-```bash
-1. Go to the Database page
-2. Click on "Extensions" in the sidebar 
-3. Find the extension you would like to enable/disable 
+```sh
+1. Go to the Database page.
+2. Click on "Extensions" in the sidebar.
+3. Search for "pgtap".
 4. Click the toggle.
 ```
 
@@ -54,14 +52,14 @@ values={[
 ```sql 
 
 -- Example: enable the "pgtap" extension 
-create extenstion pgtap;
+create extension pgtap;
 
 -- Example: disable the "pgtap" extension 
-drop extenstion pgtap;
+drop extension pgtap;
 
 ```
 
-Even though the SQL code is `create extension`, this is the equivelent of "enabling the extension". 
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
 To disable an extension you can call `drop extension`.
 
 </TabItem>
