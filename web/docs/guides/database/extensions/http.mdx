@@ -1,6 +1,6 @@
 ---
 id: http
-title: "HTTP: HTTP Client"
+title: "http: RESTful Client"
 description: An HTTP Client for PostgreSQL Functions.
 ---
 
@@ -8,22 +8,26 @@ import ExtensionsComponent from '../../../../src/components/Extensions'
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-`HTTP` is a HTTP Client extension for PostgreSQL. It can be used to make calls to HTTP REST API endpoints from inside your PostgreSQL functions.
+The `http` extension allows you to call RESTful endpoints within Postgres.
 
 ## Overview
 
-The `HTTP` extension allows you to make HTTP calls from inside your PostgreSQL functions, returning data back from API endpoints.
-A successful call to a web URL from the `HTTP` extension returns a record with the following fields: `status`, `content_type`, `headers`, and `content`.
+Let's cover some basic concepts:
 
+- REST: stands for REpresentational State Transfer. It's simploy a way to request data from external services.
+- RESTful APIs are servers which accept HTTP "calls". The calls are typically:
+  - `GET` − Read only access to a resource.
+  - `POST` − Creates a new resource.
+  - `DELETE` − Removes a resource.
+  - `PUT` − Updates an existing resource or creates a new resource.
 
+You can use the `http` extension to make these network requests from Postgres.
 
 
 ## Usage
 
 
-### Enabling `PLV8`
-
-
+### Enabling
 
 <Tabs
 defaultValue="UI"
@@ -34,9 +38,9 @@ values={[
 <TabItem value="UI">
 
 ```bash
-1. Go to the Database page
-2. Click on "Extensions" in the sidebar 
-3. Find the extension you would like to enable/disable 
+1. Go to the Database page.
+2. Click on "Extensions" in the sidebar.
+3. Search for "http".
 4. Click the toggle.
 ```
 
@@ -55,16 +59,16 @@ drop extenstion http;
 
 ```
 
-Even though the SQL code is `create extension`, this is the equivelent of "enabling the extension". 
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
 To disable an extension you can call `drop extension`.
 
 </TabItem>
 
 </Tabs>
 
-## `HTTP` functions
+### Available functions
 
-While the main `HTTP` function is simply `http(http_request)`, there are 5 wrapper functions for specific functionality:
+While the main usage is simply `http('http_request')`, there are 5 wrapper functions for specific functionality:
 
 - `http_get()`
 - `http_post()`
@@ -72,39 +76,37 @@ While the main `HTTP` function is simply `http(http_request)`, there are 5 wrapp
 - `http_delete()`
 - `http_head()` 
 
+### Returned values 
+
+A successful call to a web URL from the `http` extension returns a record with the following fields: 
+
+- `status`: integer
+- `content_type`: character varying
+- `headers`: http_header[]
+- `content`: character varying. Typically you would want to cast this to `jsonb` using the format `content::jsonb`
+
 ## Examples
 
-### `HTTP GET`
-Get a bunch of information about the current time (in JSON format):
+### Simple `GET` example
 
 ```sql
-SELECT content FROM http_get('http://worldtimeapi.org/api/ip');
+select "status", "content"::jsonb
+from http_get('https://jsonplaceholder.typicode.com/todos/1');
 ```
 
-Get the current ip address of the PostgreSQL server:
+
+### Simple `POST` example
 
 ```sql
-SELECT content::json->>'origin' as ip FROM http_get('http://httpbin.org/ip');
-```
-
-Get information on a food product:
-
-```sql
-SELECT content::json as product FROM http_get('https://world.openfoodfacts.org/api/v0/product/9300650018860.json');
-```
-
-### `HTTP POST`
-
-Post data to an API endpoint:
-
-```sql
-SELECT status, content::JSON->'form' as form_result
-  FROM http_post('http://httpbin.org/post',
-                 'myvar=myval&foo=bar&special=' || urlencode('my special string & things?'),
-                 'application/x-www-form-urlencoded');
+select "status", "content"::jsonb
+from http_post(
+  'https://jsonplaceholder.typicode.com/posts',
+  '{ "title": "foo", "body": "bar", "userId": 1 }',
+  'application/json'
+);
 ```
 
 
 ## Resources 
 
-- Official [`HTTP` Github Repository](https://github.com/pramsey/pgsql-http).
+- Official [`http` Github Repository](https://github.com/pramsey/pgsql-http).
