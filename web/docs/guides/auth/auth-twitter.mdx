@@ -7,6 +7,10 @@ description: Add Twitter OAuth to your Supabase project
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+To enable Twitter Auth for your project, you need to set up a Twitter OAuth application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
 Setting up Twitter logins for your application consists of 3 parts:
 
 * Create and configure a Twitter Project and App on the [Twitter Developer Dashboard](https://developer.twitter.com/en/portal/dashboard).
@@ -14,6 +18,18 @@ Setting up Twitter logins for your application consists of 3 parts:
 * Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Steps
+
+### Find your callback URL
+
+In the next step you require a callback URL, which looks like this: 
+
+`https://<project-ref>.supabase.co/auth/v1/callback`
+
+- Go to your [Supasebase Project Dashboard](https://supabase.io).
+- Click on the `Settings` icon at the bottom of the left sidebar.
+- Click on `API` in the list.
+- Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
+- Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
 
 ### Create a Twitter OAuth app
 
@@ -31,15 +47,6 @@ Setting up Twitter logins for your application consists of 3 parts:
 - Turn `Enable 3-legged OAuth` ON.
 - Turn `Request email address from users` ON.
 - Enter your `Callback URL`.
-    - Your `Callback URL` or `OAuth Redirect URI` looks like this:
-      - `https://<project-ref>.supabase.co/auth/v1/callback`.
-      - where `https://<project-ref>.supabase.co` is your Supabase Project API URL.
-          - Go to your [Supasebase Project Dashboard](https://supabase.io).
-          - Click on the `Settings` icon at the bottom of the left sidebar.
-          - Click on `API` in the list.
-          - Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
-          - Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
-          - Enter this in the `Callback URL` box.
 - Enter your `Website URL`.
 - Enter your `Terms of service URL`.
 - Enter your `Privacy policy URL`.
