@@ -111,10 +111,10 @@ module.exports = {
       collapsed: false,
       items: [
         'guides/database/full-text-search',
-        'guides/database/arrays',
-        'guides/database/json',
-        'guides/database/password-reset',
-        'guides/database/sql-to-api',
+        // 'guides/database/arrays',
+        // 'guides/database/json',
+        // 'guides/database/managing-passwords',
+        // 'guides/database/sql-to-api',
         {
           type: 'category',
           label: 'Extensions',
