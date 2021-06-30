@@ -37,7 +37,7 @@ values={[
 ]}>
 <TabItem value="UI">
 
-```bash
+```sh
 1. Go to the Database page.
 2. Click on "Extensions" in the sidebar.
 3. Search for "http".
@@ -92,20 +92,24 @@ A successful call to a web URL from the `http` extension returns a record with t
 ### Simple `GET` example
 
 ```sql
-select "status", "content"::jsonb
-from http_get('https://jsonplaceholder.typicode.com/todos/1');
+select 
+  "status", "content"::jsonb
+from 
+  http_get('https://jsonplaceholder.typicode.com/todos/1');
 ```
 
 
 ### Simple `POST` example
 
 ```sql
-select "status", "content"::jsonb
-from http_post(
-  'https://jsonplaceholder.typicode.com/posts',
-  '{ "title": "foo", "body": "bar", "userId": 1 }',
-  'application/json'
-);
+select 
+  "status", "content"::jsonb
+from 
+  http_post(
+    'https://jsonplaceholder.typicode.com/posts',
+    '{ "title": "foo", "body": "bar", "userId": 1 }',
+    'application/json'
+  );
 ```
 
 
