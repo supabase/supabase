@@ -41,23 +41,25 @@ values={[
 ```sql 
 
 -- Example: enable the "uuid-ossp" extension 
-create extension "uuid-ossp";
+create extension "uuid-ossp" with schema extensions;
 
 -- Example: disable the "uuid-ossp" extension 
-drop extension "uuid-ossp";
+drop extension if exists "uuid-ossp";
 
 ```
 
 Even though the SQL code is `create extension`, this is the equivelent of "enabling the extension". 
 To disable an extension you can call `drop extension`.
 
+It's good practise to create the extension within a separate schema (like `extensions`) to keep your database clean.
+
 </TabItem>
 
 </Tabs>
 
-## Available functions
+### The `uuid` type 
 
-There are two functions available:
+Once the extension is enabled, you now have access to a `uuid` type.
 
 ### `uuid_generate_v1()`
 

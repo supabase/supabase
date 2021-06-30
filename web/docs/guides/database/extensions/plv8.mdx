@@ -46,15 +46,17 @@ values={[
 ```sql 
 
 -- Example: enable the "plv8" extension 
-create extension plv8;
+create extension plv8 with schema extensions;
 
 -- Example: disable the "plv8" extension 
-drop extension plv8;
+drop extension if exists plv8;
 
 ```
 
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
 To disable an extension you can call `drop extension`.
+
+It's good practise to create the extension within a separate schema (like `extensions`) to keep your database clean.
 
 </TabItem>
 

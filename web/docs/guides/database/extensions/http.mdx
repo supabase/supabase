@@ -52,15 +52,17 @@ values={[
 ```sql 
 
 -- Example: enable the "http" extension 
-create extenstion http;
+create extenstion http with schema extensions;
 
 -- Example: disable the "http" extension 
-drop extenstion http;
+drop extenstion if exists http;
 
 ```
 
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
 To disable an extension you can call `drop extension`.
+
+It's good practise to create the extension within a separate schema (like `extensions`) to keep your database clean.
 
 </TabItem>
 

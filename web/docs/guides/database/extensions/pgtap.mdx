@@ -52,15 +52,17 @@ values={[
 ```sql 
 
 -- Enable the "pgtap" extension 
-create extension pgtap;
+create extension pgtap with schema extensions;
 
 -- Disable the "pgtap" extension 
-drop extension pgtap;
+drop extension if exists pgtap;
 
 ```
 
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
 To disable an extension you can call `drop extension`.
+
+It's good practise to create the extension within a separate schema (like `extensions`) to keep your database clean.
 
 </TabItem>
 
