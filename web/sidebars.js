@@ -134,13 +134,21 @@ module.exports = {
       label: 'Auth',
       collapsed: false,
       items: [
-        'guides/auth/auth-apple',
-        'guides/auth/auth-bitbucket',
-        'guides/auth/auth-facebook',
-        'guides/auth/auth-github',
-        'guides/auth/auth-gitlab',
-        'guides/auth/auth-google',
-        'guides/auth/auth-twitter',
+        'guides/auth/managing-user-data',
+        {
+          type: 'category',
+          label: 'OAuth Providers',
+          collapsed: false,
+          items: [
+            'guides/auth/auth-apple',
+            'guides/auth/auth-bitbucket',
+            'guides/auth/auth-facebook',
+            'guides/auth/auth-github',
+            'guides/auth/auth-gitlab',
+            'guides/auth/auth-google',
+            'guides/auth/auth-twitter',
+          ],
+        },
       ],
     },
     // {
