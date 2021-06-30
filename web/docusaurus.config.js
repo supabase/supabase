@@ -70,13 +70,13 @@ module.exports = {
         {
           label: 'Overview',
           to: '/docs',
-          activeBaseRegex: '(^/docs$)|(/docs/faq)',
+          activeBaseRegex: '(^/docs$)|(/docs/faq)|(^/docs/guides/examples)',
           position: 'left',
         },
         {
           label: 'Guides',
           to: '/docs/guides',
-          activeBaseRegex: '(/docs/guides)',
+          activeBaseRegex: '(^/docs/guides/database/|^/docs/guides/auth/)',
           position: 'left',
         },
         {
