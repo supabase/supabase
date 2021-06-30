@@ -46,7 +46,7 @@ values={[
 ```sql 
 
 -- Example: enable the "plv8" extension 
-create extension plv8 with schema extensions;
+create extension plv8;
 
 -- Example: disable the "plv8" extension 
 drop extension if exists plv8;
@@ -56,7 +56,7 @@ drop extension if exists plv8;
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
 To disable an extension you can call `drop extension`.
 
-It's good practise to create the extension within a separate schema (like `extensions`) to keep your database clean.
+Procedural languages are automatically installed within `pg_catalog`, so you don't need to specify a schema.
 
 </TabItem>
 
@@ -99,28 +99,38 @@ returns text as $$
 $$ language plv8;
 ```
 
+### Executing SQL 
+
+You can execute SQL within `plv8` code using the [`plv8.execute` function](https://plv8.github.io/#plv8-execute).
+
+```sql
+create or replace function update_user(id bigint, first_name text) 
+returns smallint as $$
+
+    var num_affected = plv8.execute(
+        'udpate profiles set first_name = $1 where id = $2', 
+        [id, first_name]
+    );
+
+    return num_affected;
+$$ language plv8;
+```
+
 ### Set-returning Functions
 
 A [set-returning function](https://plv8.github.io/#set-returning-function-calls) is anything that returns a full set of results - for example, rows in a table.
 
 ```sql
-create or replace function get_rows() 
-returns text as $$
+create or replace function get_messages() 
+returns setof messages as $$
 
-    -- @TODO
+    var json_result = plv8.execute(
+        'select * from messages'
+    );
 
+    return json_result;
 $$ language plv8;
 ```
-
-
-## Configuration
-
-@TODO: break this down: 
-
-
-> It has its own runtime environment that can be customized with a runtime startup procedure (`set plv8.start_proc`)
-and execution timeout period (`set plv8.execution_timeout`).  It can execute multiple types of function calls inside of PostgreSQL
-including `Scalar Function Calls`, `Set-returning Function Calls`, `Trigger Function Calls`, and more.
 
 
 ## Resources 

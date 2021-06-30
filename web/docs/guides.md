@@ -7,9 +7,16 @@ hide_title: true
 
 ## Guides
 
-<!-- @TODO: improve -->
-Supabase is a suite of integrated tools. These guides will help you build your product using the Supabase stack.
+### Database
 
+These guides help you unleash the power of PostgreSQL, the world's most advanced open source database.
+
+### Auth
+
+Authenticating users isn't the most exciting job for most developers, so Supabase makes it quick and simple, while maintaining security and performance.
+
+
+<!-- 
 <a className="card" href="/docs/guides/database" style={{marginBottom: 10}}>
 <div className="card__body">
 <h3>Database</h3>
@@ -22,4 +29,4 @@ Supabase is a suite of integrated tools. These guides will help you build your p
 <h3>Auth</h3>
 <p>Authenticating users isn't the most exciting job for most developers, so Supabase makes it quick and simple, while maintaining security and performance.</p>
 </div>
-</a>
+</a> -->
