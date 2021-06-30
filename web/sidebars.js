@@ -80,7 +80,7 @@ module.exports = {
     },
     {
       type: 'category',
-      label: 'Guides',
+      label: 'Tutorials',
       collapsed: false,
       items: [
         'guides/examples',
@@ -121,7 +121,7 @@ module.exports = {
           collapsed: false,
           items: [
             'guides/database/extensions',
-            'guides/database/extensions/pgtap',
+            // 'guides/database/extensions/pgtap',
             'guides/database/extensions/plv8',
             'guides/database/extensions/http',
             'guides/database/extensions/uuid-ossp',
