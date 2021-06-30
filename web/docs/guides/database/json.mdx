@@ -22,23 +22,11 @@ From: [PostgreSQL JSON types](https://www.postgresql.org/docs/12/datatype-json.h
 ### Create a table with a JSON column.  
 
 <Tabs
-defaultValue="Data"
+defaultValue="SQL"
 values={[
-  {label: 'Data', value: 'Data'},
   {label: 'SQL', value: 'SQL'},
   {label: 'UI', value: 'UI'},
 ]}>
-<TabItem value="Data">
-
-| id | title                               | author                 | metadata                                                                                                      |
-| -- | ----------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------- |
-| 1  | The Poky Little Puppy               | Janette Sebring Lowrey | {"ages":[3,6],"price":5.95,"description":"Puppy is slower than other, bigger animals."}                       |
-| 2  | The Tale of Peter Rabbit            | Beatrix Potter         | {"ages":[2,5],"price":4.49,"description":"Rabbit eats some vegetables."}                                      |
-| 3  | Tootle                              | Gertrude Crampton      | {"ages":[2,5],"price":3.99,"description":"Little toy train has big dreams."}                                  |
-| 4  | Green Eggs and Ham                  | Dr. Seuss              | {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusally colored food."} |
-| 5  | Harry Potter and the Goblet of Fire | J.K. Rowling           | {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}                |
-
-</TabItem>
 <TabItem value="SQL">
 
 ```sql
@@ -79,11 +67,11 @@ CREATE TABLE books (
 ### Insert data into the table.
 
 <Tabs
-defaultValue="UI"
+defaultValue="Data"
 values={[
   {label: 'Data', value: 'Data'},
-  {label: 'UI', value: 'UI'},
   {label: 'SQL', value: 'SQL'},
+  {label: 'UI', value: 'UI'},
   {label: 'JS', value: 'JavaScript'},
 ]}>
 <TabItem value="Data">
@@ -95,6 +83,28 @@ values={[
 | 3  | Tootle                              | Gertrude Crampton      | {"ages":[2,5],"price":3.99,"description":"Little toy train has big dreams."}                                  |
 | 4  | Green Eggs and Ham                  | Dr. Seuss              | {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusally colored food."} |
 | 5  | Harry Potter and the Goblet of Fire | J.K. Rowling           | {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}                |
+
+</TabItem>
+<TabItem value="SQL">
+
+```sql
+insert into books (title, author, metadata) values 
+('The Poky Little Puppy',
+ 'Janette Sebring Lowrey',
+ '{"description":"Puppy is slower than other, bigger animals.","price":5.95,"ages":[3,6]}'),
+('The Tale of Peter Rabbit',
+ 'Beatrix Potter',
+ '{"description":"Rabbit eats some vegetables.","price":4.49,"ages":[2,5]}'),
+('Tootle',
+ 'Gertrude Crampton',
+ '{"description":"Little toy train has big dreams.","price":3.99,"ages":[2,5]}'),
+('Green Eggs and Ham',
+ 'Dr. Seuss',
+ '{"description":"Sam has changing food preferences and eats unusally colored food.","price":7.49,"ages":[4,8]}'),
+('Harry Potter and the Goblet of Fire',
+ 'J.K. Rowling',
+ '{"description":"Fourth year of school starts, big drama ensues.","price":24.95,"ages":[10,99]}');
+```
 
 </TabItem>
 <TabItem value="UI">
@@ -127,29 +137,6 @@ values={[
     - `author`: 'J.K. Rowling'
     - `metadata`: {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}
     - click `Save`
-```
-
-</TabItem>
-
-<TabItem value="SQL">
-
-```sql
-insert into books (title, author, metadata) values 
-('The Poky Little Puppy',
- 'Janette Sebring Lowrey',
- '{"description":"Puppy is slower than other, bigger animals.","price":5.95,"ages":[3,6]}'),
-('The Tale of Peter Rabbit',
- 'Beatrix Potter',
- '{"description":"Rabbit eats some vegetables.","price":4.49,"ages":[2,5]}'),
-('Tootle',
- 'Gertrude Crampton',
- '{"description":"Little toy train has big dreams.","price":3.99,"ages":[2,5]}'),
-('Green Eggs and Ham',
- 'Dr. Seuss',
- '{"description":"Sam has changing food preferences and eats unusally colored food.","price":7.49,"ages":[4,8]}'),
-('Harry Potter and the Goblet of Fire',
- 'J.K. Rowling',
- '{"description":"Fourth year of school starts, big drama ensues.","price":24.95,"ages":[10,99]}');
 ```
 
 </TabItem>
@@ -190,28 +177,15 @@ const { data, error } = await supabase
 </TabItem>
 </Tabs>
 
-
-
 ### View the data.
 
 <Tabs
 defaultValue="SQL"
 values={[
-  {label: 'Data', value: 'Data'},
   {label: 'SQL', value: 'SQL'},
   {label: 'JS', value: 'JavaScript'},
+  {label: 'Data', value: 'Data'},
 ]}>
-<TabItem value="Data">
-
-| id | title                               | author                 | metadata                                                                                                      |
-| -- | ----------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------- |
-| 1  | The Poky Little Puppy               | Janette Sebring Lowrey | {"ages":[3,6],"price":5.95,"description":"Puppy is slower than other, bigger animals."}                       |
-| 2  | The Tale of Peter Rabbit            | Beatrix Potter         | {"ages":[2,5],"price":4.49,"description":"Rabbit eats some vegetables."}                                      |
-| 3  | Tootle                              | Gertrude Crampton      | {"ages":[2,5],"price":3.99,"description":"Little toy train has big dreams."}                                  |
-| 4  | Green Eggs and Ham                  | Dr. Seuss              | {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusally colored food."} |
-| 5  | Harry Potter and the Goblet of Fire | J.K. Rowling           | {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}                |
-
-</TabItem>
 <TabItem value="SQL">
 
 ```sql
@@ -227,6 +201,17 @@ const { data, error } = await supabase
 .select('*');
 console.log(JSON.stringify(data, null, 2));
 ```
+
+</TabItem>
+<TabItem value="Data">
+
+| id | title                               | author                 | metadata                                                                                                      |
+| -- | ----------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------- |
+| 1  | The Poky Little Puppy               | Janette Sebring Lowrey | {"ages":[3,6],"price":5.95,"description":"Puppy is slower than other, bigger animals."}                       |
+| 2  | The Tale of Peter Rabbit            | Beatrix Potter         | {"ages":[2,5],"price":4.49,"description":"Rabbit eats some vegetables."}                                      |
+| 3  | Tootle                              | Gertrude Crampton      | {"ages":[2,5],"price":3.99,"description":"Little toy train has big dreams."}                                  |
+| 4  | Green Eggs and Ham                  | Dr. Seuss              | {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusally colored food."} |
+| 5  | Harry Potter and the Goblet of Fire | J.K. Rowling           | {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}                |
 
 </TabItem>
 </Tabs>
