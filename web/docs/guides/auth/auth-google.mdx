@@ -7,6 +7,10 @@ description: Add Google OAuth to your Supabase project
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+To enable Google Auth for your project, you need to set up a Google OAuth application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
 Setting up Google logins for your application consists of 3 parts:
 
 * Create and configure a Google Project on the [Google Cloud Platform Console](https://console.cloud.google.com/home/dashboard)
@@ -32,40 +36,44 @@ First, you'll need an Account at [Google Cloud Platform](https://console.cloud.g
 
 From your project's dashboard screen:
 
-- In the search bar at the top labelled `Search products and resources` type `OAuth`
-- Click on `OAuth consent screen` from the list of results
-- On the `OAuth consent screen` page select `External`
-- Click `Create`
+- In the search bar at the top labelled `Search products and resources` type `OAuth`.
+- Click on `OAuth consent screen` from the list of results.
+- On the `OAuth consent screen` page select `External`.
+- Click `Create`.
 
-Edit your app information
+### Edit your app information
 
-- On the `Edit app registration` page fill out your app information
-- Click `Save and continue` at the bottom
+- On the `Edit app registration` page fill out your app information.
+- Click `Save and continue` at the bottom.
 
-Create your credentials
+### Find your callback URL
+
+In the next step you require a callback URL, which looks like this: 
+
+`https://<project-ref>.supabase.co/auth/v1/callback`
+
+- Go to your [Supasebase Project Dashboard](https://supabase.io).
+- Click on the `Settings` icon at the bottom of the left sidebar.
+- Click on `API` in the list.
+- Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
+- Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
+
+### Create your credentials
 
 - Click `Credentials` at the left to go to the `Credentials` page
 - Click `Create Credentials` near the top then select `OAuth client ID`
 - On the `Create OAuth client ID` page, select your application type.  If you're not sure, choose `Web application`.
-- Fill in your app name
-- At the bottom, under `Authorised redirect URIs` click `Add URI`
-- Enter your callback URI under `Authorised redirect URIs` at the bottom
-    - Your OAuth Redirect URI looks like this:
-      - `https://<project-ref>.supabase.co/auth/v1/callback`
-      - where `https://<project-ref>.supabase.co` is your Supabase Project API URL
-          - Go to your [Supasebase Project Dashboard](https://supabase.io)
-          - Click on the `Settings` icon at the bottom of the left sidebar
-          - Click on `API` in the list
-          - Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard
-          - Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`
-          - Enter this in the `Valid OAuth Redirect URIs` box
-          - Click `Save Changes` at the bottom right
-- Click `Create`
+- Fill in your app name.
+- At the bottom, under `Authorised redirect URIs` click `Add URI`.
+- Enter your callback URI under `Authorised redirect URIs` at the bottom.
+- Enter your callback URI in the `Valid OAuth Redirect URIs` box.
+- Click `Save Changes` at the bottom right.
+- Click `Create`.
 
 Copy your new OAuth credentials
 
-- A box will appear called `OAuth client created`
-- Copy and save the values under `Your Client ID` and `Your Client Secret`
+- A box will appear called `OAuth client created`.
+- Copy and save the values under `Your Client ID` and `Your Client Secret`.
 
 
 ### Enter your Google credentials into your Supabase Project

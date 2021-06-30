@@ -7,6 +7,10 @@ description: Add GitHub OAuth to your Supabase project
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+To enable GitHub Auth for your project, you need to set up a GitHub OAuth application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
 Setting up GitHub logins for your application consists of 3 parts:
 
 * Create and configure a GitHub OAuth App on [GitHub](https://github.com)
@@ -24,30 +28,33 @@ Go to the [GitHub Developer Settings](https://github.com/settings/developers) pa
 - In the left sidebar, click `Developer settings` (near the bottom)
 - In the left sidebar, click `OAuth Apps`
 
-Register a new OAuth application
+### Find your callback URL
 
-- Click `Register a new application`
-  - (If you've created an app before, click `New OAuth App` here)
+In the next step you require a callback URL, which looks like this: 
+
+`https://<project-ref>.supabase.co/auth/v1/callback`
+
+- Go to your [Supasebase Project Dashboard](https://supabase.io).
+- Click on the `Settings` icon at the bottom of the left sidebar.
+- Click on `API` in the list.
+- Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
+- Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
+
+### Register a new OAuth application
+
+- Click `Register a new application`. If you've created an app before, click `New OAuth App` here.
 - In `Application name`, type the name of your app.
 - In `Homepage URL`, type the full URL to your app's website.
 - In `Authorization callback URL`, type the callback URL of your app.
-    - Your OAuth Redirect URI looks like this:
-      - `https://<project-ref>.supabase.co/auth/v1/callback`
-      - where `https://<project-ref>.supabase.co` is your Supabase Project API URL
-          - Go to your [Supasebase Project Dashboard](https://supabase.io)
-          - Click on the `Settings` icon at the bottom of the left sidebar
-          - Click on `API` in the list
-          - Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard
-          - Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`
-          - Enter this in the `Valid OAuth Redirect URIs` box
-          - Click `Save Changes` at the bottom right
-- Click `Register Application`
+- Enter the URL in the `Valid OAuth Redirect URIs` box.
+- Click `Save Changes` at the bottom right.
+- Click `Register Application`.
 
 Copy your new OAuth credentials
 
-- Copy and save your `Client ID`
-- Click `Generate a new client secret`
-- Copy and save your `Client secret`
+- Copy and save your `Client ID`.
+- Click `Generate a new client secret`.
+- Copy and save your `Client secret`.
 
 ### Enter your GitHub credentials into your Supabase Project
 
