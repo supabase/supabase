@@ -19,21 +19,31 @@ Setting up Twitter logins for your application consists of 3 parts:
 
 ## Steps
 
+### Access your Twitter Developer account
+
+- Go to [developer.twitter.com](https://developer.twitter.com).
+- Click on `Sign in` at the top right to log in.
+
+![Twitter Developer Portal.](/img/guides/twitter-portal.png)
+
 ### Find your callback URL
 
 In the next step you require a callback URL, which looks like this: 
 
 `https://<project-ref>.supabase.co/auth/v1/callback`
 
-- Go to your [Supasebase Project Dashboard](https://supabase.io).
+- Go to your [Supabase Project Dashboard](https://supabase.io).
 - Click on the `Settings` icon at the bottom of the left sidebar.
 - Click on `API` in the list.
 - Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
 - Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
 
+<video width="99%" muted playsInline controls="true">
+<source src="/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+</video>
+
 ### Create a Twitter OAuth app
 
-- Log into the *Twitter Developer Dashboard*.
 - Click `+ Create Project`.
   - Enter your project name, click `Next`.
   - Select your use case, click `Next`.
@@ -54,7 +64,7 @@ In the next step you require a callback URL, which looks like this:
 
 ### Enter your Twitter credentials into your Supabase Project
 
-- Go to your [Supasebase Project Dashboard](https://supabase.io).
+- Go to your [Supabase Project Dashboard](https://supabase.io).
 - In the left sidebar, click the `Authentication` icon (near the top).
 - Click `Settings` from the list to go to the `Authentication Settings` page.
 - Enter the final (hosted) URL of your app under `Site URL` (this is important).

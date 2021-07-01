@@ -19,9 +19,12 @@ Setting up Google logins for your application consists of 3 parts:
 
 ## Steps
 
-### Create a Google Cloud Platform Account
+### Access your Google Cloud Platform account
 
-First, you'll need an Account at [Google Cloud Platform](https://console.cloud.google.com/home/dashboard).
+- Go to [cloud.google.com](https://cloud.google.com).
+- Click on `Sign in` at the top right to log in.
+
+![Google Developer Portal.](/img/guides/google-portal.png)
 
 ### Create a Google Cloud Platform Project
 
@@ -52,11 +55,15 @@ In the next step you require a callback URL, which looks like this:
 
 `https://<project-ref>.supabase.co/auth/v1/callback`
 
-- Go to your [Supasebase Project Dashboard](https://supabase.io).
+- Go to your [Supabase Project Dashboard](https://supabase.io).
 - Click on the `Settings` icon at the bottom of the left sidebar.
 - Click on `API` in the list.
 - Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
 - Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
+
+<video width="99%" muted playsInline controls="true">
+<source src="/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+</video>
 
 ### Create your credentials
 
@@ -78,7 +85,7 @@ Copy your new OAuth credentials
 
 ### Enter your Google credentials into your Supabase Project
 
-- Go to your [Supasebase Project Dashboard](https://supabase.io)
+- Go to your [Supabase Project Dashboard](https://supabase.io)
 - In the left sidebar, click the `Authentication` icon (near the top)
 - Click `Settings` from the list to go to the `Authentication Settings` page
 - Enter the final (hosted) URL of your app under `Site URL` (this is important)
