@@ -19,9 +19,12 @@ Setting up Facebook logins for your application consists of 3 parts:
 
 ## Steps
 
-### Create a Facebook Developer Account
+### Access your Facebook Developer account
 
-First, you'll need a Developer Account at [developers.facebook.com](https://developers.facebook.com).
+- Go to [developers.facebook.com](https://developers.facebook.com).
+- Click on `Log In` at the top right to log in.
+
+![Facebook Developer Portal.](/img/guides/facebook-portal.png)
 
 ### Create a Facebook App
 
@@ -38,11 +41,15 @@ In the next step you require a callback URI, which looks like this:
 
 `https://<project-ref>.supabase.co/auth/v1/callback`
 
-- Go to your [Supasebase Project Dashboard](https://supabase.io).
+- Go to your [Supabase Project Dashboard](https://supabase.io).
 - Click on the `Settings` icon at the bottom of the left sidebar.
 - Click on `API` in the list.
 - Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
 - Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
+
+<video width="99%" muted playsInline controls="true">
+<source src="/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+</video>
 
 ### Set up FaceBook Login for your Facebook App
 
@@ -63,7 +70,7 @@ From the `Add Products to your App` screen:
 
 ### Enter your Facebook App ID and Secret into your Supabase Project
 
-- Go to your [Supasebase Project Dashboard](https://supabase.io)
+- Go to your [Supabase Project Dashboard](https://supabase.io)
 - In the left sidebar, click the `Authentication` icon (near the top)
 - Click `Settings` from the list to go to the `Authentication Settings` page
 - Enter the final (hosted) URL of your app under `Site URL` (this is important)
