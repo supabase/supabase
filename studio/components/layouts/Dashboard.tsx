@@ -37,7 +37,22 @@ export default function DashboardLayout({
           'dark:bg-sidebar-linkbar-dark dark:border-dark ', // Dark mode
         ].join(' ')}
       >
-        <Title level={3 } className="border-b p-4">{menu.title}</Title>
+        <Title level={3} className="border-b p-4">
+          {menu.title}
+        </Title>
+        {menu.categories?.map((category) => (
+          <div key={category.label}>
+            <Title level={5} className="">
+              {category.label}
+            </Title>
+
+            {category.links.map((link) => (
+              <div key={link.label}>
+                <a href={link.href}>{link.label}</a>
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
     )
   }
