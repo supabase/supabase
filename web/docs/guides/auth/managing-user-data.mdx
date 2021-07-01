@@ -5,25 +5,22 @@ description: Securing your user data with Row Level Security.
 ---
 
 For security purposes, the `auth` schema is not exposed on the auto-generated API. 
-Even though Supabase provides an `auth.users` table, it can be helpful to create tables in the `public` schema for storing user data.
+
+Even though Supabase provides an `auth.users` table, it can be helpful to create tables in the `public` schema for storing user data that you want to access via the API.
 
 ## Creating user tables
 
 When you create tables to store user data, it's helpful to reference the `auth.users` table in the primary key. This ensures data integrity.
 
-For example, a `public.profiles` table which is accessible via the API might look something like this:
+For example, a `public.profiles` table might look like this:
 
 ```sql
 create table public.profiles (
   id uuid references auth.users not null,
-  updated_at timestamp with time zone,
-  username text unique,
-  avatar_url text,
-  website text,
+  first_name text,
+  last_name text,
 
-  primary key (id),
-  unique(username),
-  constraint username_length check (char_length(username) >= 3)
+  primary key (id)
 );
 
 alter table public.profiles enable row level security;
@@ -33,7 +30,7 @@ alter table public.profiles enable row level security;
 ## Public access
 
 Since Row Level Security is enabled, this table is accessible via the API but no data will be returned unless we set up some Policies. 
-If we wanted the data to be _readable_ by everyone but only allow logged-in user to update their own data, the Policies would look like this:
+If we wanted the data to be _readable_ by everyone but only allow logged-in users to update their own data, the Policies would look like this:
 
 ```sql
 create policy "Public profiles are viewable by everyone."
@@ -51,7 +48,7 @@ create policy "Users can update own profile."
 
 ## Private access
 
-If we didn't want this data to be publicly accessible, and instead it should only be _readable_ by the user who owns the data, we just need to change the `for select` query above.
+If the data should only be _readable_ by the user who owns the data, we just need to change the `for select` query above.
 
 ```sql
 create policy "Profiles are viewable by users who created them."
