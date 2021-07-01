@@ -38,8 +38,6 @@ values={[
 4. Click the toggle.
 ```
 
-
-
 </TabItem>
 <TabItem value="SQL">
 
@@ -59,7 +57,6 @@ To disable an extension you can call `drop extension`.
 Procedural languages are automatically installed within `pg_catalog`, so you don't need to specify a schema.
 
 </TabItem>
-
 </Tabs>
 
 ### Creating `plv8` functions
@@ -78,10 +75,32 @@ $$ language plv8;
 
 You can call `plv8` functions like any other Postgres function: 
 
+
+
+<Tabs
+defaultValue="SQL"
+values={[
+  {label: 'SQL', value: 'SQL'},
+  {label: 'Javascript', value: 'JS'},
+]}>
+<TabItem value="SQL">
+
+
 ```sql
 select function_name();
 ```
 
+</TabItem>
+<TabItem value="JS">
+
+```js 
+
+const { data, error } = supabase.rpc('function_name')
+
+```
+
+</TabItem>
+</Tabs>
 
 ## Examples
 
