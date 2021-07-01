@@ -70,15 +70,15 @@ module.exports = {
         {
           label: 'Overview',
           to: '/docs',
-          activeBaseRegex: '(^/docs$)|(/docs/faq)',
+          activeBaseRegex: '(^/docs$)|(/docs/faq)|(^/docs/guides/examples)',
           position: 'left',
         },
-        // {
-        //   label: 'Guides',
-        //   to: '/docs/guides',
-        //   activeBaseRegex: '(/docs/guides)',
-        //   position: 'left',
-        // },
+        {
+          label: 'Guides',
+          to: '/docs/guides',
+          activeBaseRegex: '(^/docs/guides/database/|^/docs/guides/auth/)|(/docs/guides$)',
+          position: 'left',
+        },
         {
           label: 'Reference',
           to: '/docs/reference/javascript/supabase-client',
