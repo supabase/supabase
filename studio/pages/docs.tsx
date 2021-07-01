@@ -13,7 +13,7 @@ export default function Home() {
         </Head>
 
         <main className={styles.main}>
-          <h1 className={styles.title}>API</h1>
+          <h1 className={styles.title}>API Docs</h1>
         </main>
       </div>
     </DashboardLayout>
