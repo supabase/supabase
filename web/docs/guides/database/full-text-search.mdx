@@ -88,20 +88,63 @@ The `@@` symbol is the "match" symbol for Full Text Search. It returns any match
 
 Take the following example:
 
+<Tabs
+defaultValue="SQL"
+values={[
+  {label: 'SQL', value: 'SQL'},
+  {label: 'Javascript', value: 'JS'},
+]}>
+<TabItem value="SQL">
+
 ```sql
 select * 
 from books 
 where name = 'Harry';
 ```
 
+</TabItem>
+<TabItem value="JS">
+
+```js
+const { data, error } = supabase
+  .from('books')
+  .select()
+  .eq('name', 'Harry')
+```
+
+</TabItem>
+</Tabs>
+
+
 The equality symbol above (`=`) is very "strict" on what it matches. In a full text search context, we might want to find all "Harry Potter" books and so we can rewrite the 
 example above:
+
+<Tabs
+defaultValue="SQL"
+values={[
+  {label: 'SQL', value: 'SQL'},
+  {label: 'Javascript', value: 'JS'},
+]}>
+<TabItem value="SQL">
 
 ```sql
 select * 
 from books 
 where to_tsvector(name) @@ to_tsquery('Harry');
 ```
+
+</TabItem>
+<TabItem value="JS">
+
+```js
+const { data, error } = supabase
+  .from('books')
+  .select()
+  .textSearch('name', `'Harry'`)
+```
+
+</TabItem>
+</Tabs>
 
 ## Basic Full Text Queries
 
@@ -113,6 +156,7 @@ To find all `books` where the `description` contain the word `big`:
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
+  {label: 'Javascript', value: 'JS'},
   {label: 'Data', value: 'Data'},
 ]}>
 <TabItem value="SQL">
@@ -125,6 +169,16 @@ from
 where 
   to_tsvector(description) 
   @@ to_tsquery('big');
+```
+
+</TabItem>
+<TabItem value="JS">
+
+```js
+const { data, error } = supabase
+  .from('books')
+  .select()
+  .textSearch('description', `'big'`)
 ```
 
 </TabItem>
@@ -173,12 +227,13 @@ where
 
 ### Match all search words
 
-To find all `books` where `description` or `title` contain BOTH of the words `little` and `dream`, we can  use the `&` symbol:
+To find all `books` where `description` contains BOTH of the words `little` and `big`, we can  use the `&` symbol:
 
 <Tabs
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
+  {label: 'Javascript', value: 'JS'},
   {label: 'Data', value: 'Data'},
 ]}>
 <TabItem value="SQL">
@@ -189,8 +244,18 @@ select
 from 
   books
 where 
-  to_tsvector(description || ' ' || title)
-  @@ to_tsquery('little & dream'); -- use & for AND in the search query
+  to_tsvector(description)
+  @@ to_tsquery('little & big'); -- use & for AND in the search query
+```
+
+</TabItem>
+<TabItem value="JS">
+
+```js
+const { data, error } = supabase
+  .from('books')
+  .select()
+  .textSearch('description', `'little' & 'big'`)
 ```
 
 </TabItem>
@@ -203,16 +268,15 @@ where
 </TabItem>
 </Tabs>
 
-Notice how searching for `dream` includes results with the word `dreams` (or `dreaming`, `dreamed`, etc).
-
 ### Match any search words
 
-To find all `books` where `description` or `title` contain ANY of the words `little` or `dream`, use the `|` symbol:
+To find all `books` where `description` contain ANY of the words `little` or `big`, use the `|` symbol:
 
 <Tabs
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
+  {label: 'Javascript', value: 'JS'},
   {label: 'Data', value: 'Data'},
 ]}>
 <TabItem value="SQL">
@@ -223,8 +287,18 @@ select
 from 
   books
 where 
-  to_tsvector(description || ' ' || title) 
-  @@ to_tsquery('little | dream'); -- use | for OR in the search query
+  to_tsvector(description) 
+  @@ to_tsquery('little | big'); -- use | for OR in the search query
+```
+
+</TabItem>
+<TabItem value="JS">
+
+```js
+const { data, error } = supabase
+  .from('books')
+  .select()
+  .textSearch('description', `'little' | 'big'`)
 ```
 
 </TabItem>
@@ -237,6 +311,8 @@ where
 
 </TabItem>
 </Tabs>
+
+Notice how searching for `big` includes results with the word `bigger` (or `biggest`, etc).
 
 ## Creating Indexes
 
@@ -284,15 +360,15 @@ from books;
 </TabItem>
 </Tabs>
 
-### Searching using the new column
+### Search using the new column
 
 Now that we've created and populated our index, we can search it using the same techniques as before:
-
 
 <Tabs
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
+  {label: 'Javascript', value: 'JS'},
   {label: 'Data', value: 'Data'},
 ]}>
 <TabItem value="SQL">
@@ -303,7 +379,17 @@ select
 from 
   books
 where 
-  fts @@ to_tsquery('little & dream');
+  fts @@ to_tsquery('little & big');
+```
+
+</TabItem>
+<TabItem value="JS">
+
+```js
+const { data, error } = supabase
+  .from('books')
+  .select()
+  .textSearch('fts', `'little' & 'big'`)
 ```
 
 </TabItem>
@@ -326,16 +412,47 @@ to learn about additional query operators you can use to do more advanced `full 
 The proximity symbol is useful for searching for terms that are a certain "distance" apart.
 For example, to find the phrase `big dreams`, where the a match for "big" is followed immediately by a match for "dreams":
 
+
+<Tabs
+defaultValue="SQL"
+values={[
+  {label: 'SQL', value: 'SQL'},
+  {label: 'Javascript', value: 'JS'},
+]}>
+<TabItem value="SQL">
+
 ```sql
 select 
   *
 from 
   books
 where 
-  to_tsvector(description) @@ to_tsquery('big <-> dreams');
+  to_tsvector(description) @@ to_tsquery('little <-> big');
 ```
 
+</TabItem>
+<TabItem value="JS">
+
+```js
+const { data, error } = supabase
+  .from('books')
+  .select()
+  .textSearch('description', `'little' <-> 'big'`)
+```
+
+</TabItem>
+</Tabs>
+
+
 We can also use the `<->` to find words within a certain distance of eachother. For example to find `year` and `school` within 2 words of each other:
+
+<Tabs
+defaultValue="SQL"
+values={[
+  {label: 'SQL', value: 'SQL'},
+  {label: 'Javascript', value: 'JS'},
+]}>
+<TabItem value="SQL">
 
 ```sql
 select 
@@ -346,10 +463,32 @@ where
   to_tsvector(description) @@ to_tsquery('year <2> school');
 ```
 
+</TabItem>
+<TabItem value="JS">
+
+```js
+const { data, error } = supabase
+  .from('books')
+  .select()
+  .textSearch('description', `'year' <2> 'school'`)
+```
+
+</TabItem>
+</Tabs>
+
+
 ### Negation: `!`
 
 The negation symbol can be used to find phrases which _don't_ contain a search term.
 For example, to find records that have the word `big` but not `little`:
+
+<Tabs
+defaultValue="SQL"
+values={[
+  {label: 'SQL', value: 'SQL'},
+  {label: 'Javascript', value: 'JS'},
+]}>
+<TabItem value="SQL">
 
 ```sql
 select 
@@ -359,6 +498,19 @@ from
 where 
   to_tsvector(description) @@ to_tsquery('big & !little');
 ```
+
+</TabItem>
+<TabItem value="JS">
+
+```js
+const { data, error } = supabase
+  .from('books')
+  .select()
+  .textSearch('description', `'big' & !'little'`)
+```
+
+</TabItem>
+</Tabs>
 
 
 ## Resources
