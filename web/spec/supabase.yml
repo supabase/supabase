@@ -116,7 +116,15 @@ pages:
       npm install @supabase/supabase-js
       ```
 
-      Find the source code on [GitHub](https://github.com/supabase/supabase-js).
+      Find the source code on [GitHub](https://github.com/supabase/supabase-js).  
+
+      ## Python
+
+      ```bash
+      pip install supabase-py
+      ```
+
+      Find the source code on [GitHub](https://github.com/supabase/supabase-py).
 
   Initializing:
     $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.constructor'
@@ -290,39 +298,10 @@ pages:
             password: 'example-password',
           })
           ```
-      - name: Sign up with redirect.
-        description: |
-          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
-          any URL path on your website (the base domain must be the same as the domain in your Auth settings).
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signUp({
-            provider: 'github'
-          }, {
-            redirectTo: 'https://example.com/welcome'
-          })
-          ```
       - name: Sign up with third-party providers.
+        hideCodeBlock: true
         description: |
           You can sign up with OAuth providers using the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers) method.
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            provider: 'github'
-          })
-          ```
-      - name: Sign up with scopes.
-        description: |
-          You can provide additional scopes to OAuth providers using the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-with-scopes) method.
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            provider: 'github'
-          }, {
-            scopes: 'repo gist notifications'
-          })
-          const oAuthToken = session.provider_token // use to access provider API
-          ```
 
   auth.signIn():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signIn'
@@ -587,8 +566,8 @@ pages:
           ```js
           const { data, error } = await supabase
             .from('users')
-            .csv()
             .select()
+            .csv()
           ```
 
   insert():
@@ -1016,7 +995,10 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .upload('public/avatar1.png', avatarFile)
+            .upload('public/avatar1.png', avatarFile, {
+              cacheControl: 3600,
+              upsert: false
+            })
           ```
 
   storage.from.update():
@@ -1035,7 +1017,10 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .update('public/avatar1.png', avatarFile)
+            .update('public/avatar1.png', avatarFile, {
+              cacheControl: 3600,
+              upsert: false
+            })
           ```
 
   storage.from.move():
