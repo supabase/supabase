@@ -142,6 +142,7 @@ module.exports = {
           items: [
             'guides/auth/auth-apple',
             'guides/auth/auth-bitbucket',
+            'guides/auth/auth-discord',
             'guides/auth/auth-facebook',
             'guides/auth/auth-github',
             'guides/auth/auth-gitlab',
