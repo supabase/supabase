@@ -25,7 +25,7 @@ with the usual `CREATE ROLE`, `ALTER ROLE`, and `DROP ROLE` statements.
 So, how do we grant them the `CREATEROLE` privilege and, at the same time, protect our own roles? In this blog post, 
 we explain how we managed to do this by using PostgreSQL Hooks in our [SupaUtils](https://github.com/supabase/supautils) extension.
 
-### Reserved Roles
+## Reserved Roles
 
 PostgreSQL has a list of [predefined roles](https://www.postgresql.org/docs/14/predefined-roles.html) — all prefixed 
 with "pg\_" — that cannot be dropped or altered. Attempting to do so will throw an error mentioning that the role is "reserved".
@@ -66,7 +66,7 @@ show shared_preload_libraries;
 `rdsutils` can be seen there. Naturally this lead us into thinking we can achieve the same logic with an extension 
 of our own, and thus the SupaUtils idea was born.
 
-### Extending PostgreSQL with Hooks
+## Extending PostgreSQL with Hooks
 
 PostgreSQL hooks allow us to extend internal functionality. Hooks can modify behavior at different places, 
 including when running SQL statements.
@@ -79,7 +79,7 @@ if the password fails the password requirements.
 
 For `SupaUtils`, we're particularly interested in the `ProcessUtility_hook`, which allows us to hook into **utility statements:** every statement except `select`, `insert`, `delete` or `update`. They include `alter role` and `drop role`, which are the statements we want to hook on.
 
-### Hooks are global function pointers
+## Hooks are global function pointers
 
 To use hooks, we can override functions pointers that are global. On the Postgres codebase, the `ProcessUtility_hook` is basically used[^1] like this:
 
@@ -104,7 +104,7 @@ else
 
 As you can see, `ProcessUtility_hook` is `NULL` by default, so our extension should set it for the hook to run. Also, the `standard_ProcessUtility` function is the one that actually does the job of creating or modifying the roles (among other things) so our hook should also call it.
 
-### Loading and running the hook
+## Loading and running the hook
 
 Each extension set in `shared_preload_libraries` will get its `_PG_init` function called. This function will allow us to set our hook onto `ProcessUtility_hook`.
 
@@ -141,7 +141,7 @@ our_hook(PARAMS_OMITTED_FOR_BREVITY)
 }
 ```
 
-### Setting up the SupaUtils extension
+## Setting up the SupaUtils extension
 
 We can use the concepts above to build our extension.
 
@@ -200,7 +200,7 @@ static char* look_for_reserved_role(Node *utility_stmt, List *reserved_role_list
 
 Up next we'll define each one of these function declarations.
 
-### Initializing the extension
+## Initializing the extension
 
 Let's now `_PG_init` our extension. Besides setting the hook here, we want to define our reserved roles as a configuration parameter, that way they can be modified by editing the `postgresql.conf` file. For this, we can use the `DefineCustomStringVariable` function, which inserts the parameter into Postgres "Grand Unified Configuration"(GUC) system.
 
@@ -229,7 +229,7 @@ _PG_init(void)
 }
 ```
 
-### Running the SupaUtils hook
+## Running the SupaUtils hook
 
 Now that our hook is set, we'll define what it will do. As specified in the [ProcessUtility_hook_type](https://github.com/postgres/postgres/blob/f807e3410fdfc29ced6590c7c2afa76637e001ad/src/include/tcop/utility.h#L71-L75), the hook's first parameter is a `PlannedStmt`, this represents the planned statement — the output from the Postgres planner. This is a step before the statement is executed.
 
@@ -294,7 +294,7 @@ supautils_hook(
 
 ```
 
-### Looking for the reserved role
+## Looking for the reserved role
 
 Lastly, we'll define how we look for the reserved role.
 
@@ -373,7 +373,7 @@ look_for_reserved_role(Node *utility_stmt, List *reserved_role_list)
 }
 ```
 
-### Testing the extension
+## Testing the extension
 
 Now that the code is finished, we can test the extension. Since we already have a `Makefile`, the extension can be installed by doing `make && make install`. Then, in postgresql.conf:
 
@@ -397,7 +397,7 @@ ERROR:  "supabase_auth_admin" is a reserved role, it cannot be modified
 -- Success!!
 ```
 
-### Wrapping up
+## Wrapping up
 
 As you can see, PostgreSQL Hooks allow us to intercept SQL statements. There are many types of hooks, you can see unofficial documentation for these at [AmatanHead/psql-hooks](https://github.com/AmatanHead/psql-hooks).
 
