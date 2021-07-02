@@ -79,7 +79,7 @@ if the password fails the password requirements.
 
 For `SupaUtils`, we're particularly interested in the `ProcessUtility_hook`, which allows us to hook into **utility statements:** every statement except `select`, `insert`, `delete` or `update`. They include `alter role` and `drop role`, which are the statements we want to hook on.
 
-## Hooks are global function pointers
+### Hooks are global function pointers
 
 To use hooks, we can override functions pointers that are global. On the Postgres codebase, the `ProcessUtility_hook` is basically used[^1] like this:
 
@@ -104,7 +104,7 @@ else
 
 As you can see, `ProcessUtility_hook` is `NULL` by default, so our extension should set it for the hook to run. Also, the `standard_ProcessUtility` function is the one that actually does the job of creating or modifying the roles (among other things) so our hook should also call it.
 
-## Loading and running the hook
+### Loading and running the hook
 
 Each extension set in `shared_preload_libraries` will get its `_PG_init` function called. This function will allow us to set our hook onto `ProcessUtility_hook`.
 
