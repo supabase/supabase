@@ -5643,6 +5643,10 @@
 																	{
 																		"type": "stringLiteral",
 																		"value": "apple"
+																	},
+																	{
+																		"type": "stringLiteral",
+																		"value": "discord"
 																	}
 																]
 															}
@@ -11127,6 +11131,10 @@
 							{
 								"type": "stringLiteral",
 								"value": "apple"
+							},
+							{
+								"type": "stringLiteral",
+								"value": "discord"
 							}
 						]
 					}
