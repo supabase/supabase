@@ -3018,6 +3018,10 @@
 																	{
 																		"type": "stringLiteral",
 																		"value": "apple"
+																	},
+																	{
+																		"type": "stringLiteral",
+																		"value": "discord"
 																	}
 																]
 															}
