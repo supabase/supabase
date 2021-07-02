@@ -16,7 +16,13 @@ This is a boilerplate for creating a WebApp using [Stencil](https://github.com/i
 To start using this boilerplate, clone this repo to a new directory:
 
 ```sh
-git clone https://github.com/ftonato/stencil-supabase.git
+git clone git@github.com:supabase/supabase.git
+```
+
+access the repository:
+
+```sh
+cd supabase/examples/with-stencil
 ```
 
 and run:
@@ -29,11 +35,7 @@ npm install
 
 Setup Supabase configuration
 
-Please setup _Supabase_ configuration in the file
-
-```
-src -> config -> config.ts
-```
+Please setup _Supabase_ configuration in the file `src/config/config.ts`:
 
 ```js
 const supabaseConfig = {
@@ -74,7 +76,7 @@ You can check the details of the [structure of our project through this file](./
 
 ## Contributing 👏
 
-- [Pull requests](https://github.com/ftonato/stencil-supabase/pulls) and 🌟 stars are always welcome.
+- [Pull requests](https://github.com/supabase/supabase/pulls) and 🌟 stars are always welcome.
 
 ## License
 

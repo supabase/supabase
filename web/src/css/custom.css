@@ -250,6 +250,10 @@ body {
   display: inline-block;
 }
 
+h4, h5, h6 {
+  font-weight: bold !important;
+}
+
 .button {
   font-family: var(--custom-font-base);
 }
@@ -485,7 +489,7 @@ a.card:hover {
 .menu > ul.menu__list li > a {
   padding-left: 0;
   padding-right: 0;
-  color: var(--custom-content-color);
+  /* color: var(--custom-content-color); */
 }
 .menu .menu__list-item-hidden {
   display: none;
@@ -642,11 +646,13 @@ div[class^='sidebar_'] .menu {
 }
 div[class^='sidebar_'] .menu .menu__link {
   padding-right: var(--ifm-menu-link-padding-horizontal);
+  color: var(--custom-color-content);
 }
 div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) {
   border-radius: 0;
   border-right: 2px solid var(--ifm-color-primary);
   padding-right: calc(var(--ifm-menu-link-padding-horizontal) - 2px);
+  color: var(--ifm-color-primary);
 }
 div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) .badge {
   background: var(--ifm-color-primary);
@@ -1278,6 +1284,8 @@ html[data-theme='dark'] .navbar-item-twitter:before {
 /* New CSS */
 
 code {
+  padding-top: 2px;
+  padding-bottom: 2px;
   border: 1px solid var(--ifm-hr-border-color);
 }
 

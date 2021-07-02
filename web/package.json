@@ -41,6 +41,7 @@
     "axios": "^0.21.1",
     "babel-plugin-css-modules-transform": "^1.6.2",
     "clsx": "^1.1.1",
+    "dotenv": "^10.0.0",
     "js-yaml": "^3.14.0",
     "minimist": "^1.2.5",
     "ts-node": "^9.0.0",
