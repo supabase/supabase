@@ -61,5 +61,12 @@
     "position": "Engineering",
     "username": "fracek",
     "author_image_url": "https://github.com/fracek.png"
+  },
+  "steve_chavez": {
+    "author": "Steve Chavez",
+    "author_url": "https://github.com/steve-chavez",
+    "position": "Engineering",
+    "username": "steve-chavez",
+    "author_image_url": "https://github.com/steve-chavez.png"
   }
 }
