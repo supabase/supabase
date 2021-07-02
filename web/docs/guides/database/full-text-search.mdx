@@ -427,7 +427,7 @@ select
 from 
   books
 where 
-  to_tsvector(description) @@ to_tsquery('little <-> big');
+  to_tsvector(description) @@ to_tsquery('big <-> dreams');
 ```
 
 </TabItem>
@@ -437,7 +437,7 @@ where
 const { data, error } = supabase
   .from('books')
   .select()
-  .textSearch('description', `'little' <-> 'big'`)
+  .textSearch('description', `'big' <-> 'dreams'`)
 ```
 
 </TabItem>
