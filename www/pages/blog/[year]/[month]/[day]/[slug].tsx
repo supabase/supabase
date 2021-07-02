@@ -78,7 +78,7 @@ export async function getStaticProps({ params }: any) {
         slug: `${params.year}/${params.month}/${params.day}/${params.slug}`,
         content: mdxSource,
         ...data,
-        toc: toc(content, { maxdepth: 2 }),
+        toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
       },
     },
   }
