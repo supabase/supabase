@@ -1,4 +1,4 @@
-import DashboardLayout from '../components/layouts/Dashboard'
+import DashboardLayout from '../components/layouts/DashboardLayout'
 import { fetchOpenApiSpec } from '../lib/api'
 
 export default function Home() {

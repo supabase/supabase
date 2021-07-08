@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import Image from 'next/image'
-import DashboardLayout from '../components/layouts/Dashboard'
+import DashboardLayout from '../components/layouts/DashboardLayout'
 import styles from '../styles/Home.module.css'
 import { Button } from '@supabase/ui'
 
