@@ -1,12 +1,15 @@
 import DashboardLayout from '../components/layouts/DashboardLayout'
+import Loading from '../components/utils/Loading'
+import Error from '../components/utils/Error'
 import { fetchOpenApiSpec } from '../lib/api'
 
 export default function Home() {
-  const { data, error } = fetchOpenApiSpec()
-
-  if (!data) return <div>loading...</div>
-
-  const { definitions } = data
+  const { data, isLoading, error } = fetchOpenApiSpec()
+  
+  if (isLoading) return <Loading />
+  if (error) return <Error />
+    
+  const definitions = data!.definitions || {}
   const tableNames = Object.keys(definitions)
 
   const buildSidebar = (tableNames: string[]) => {
@@ -19,10 +22,13 @@ export default function Home() {
   }
 
   return (
-    <DashboardLayout title="API Docs" menu={{ title: 'API', categories: buildSidebar(tableNames) }}>
-      <>
-        <h1>API Docs</h1>
-      </>
+    <DashboardLayout
+      title="API Docs"
+      sidebar={{ title: 'API', categories: buildSidebar(tableNames) }}
+    >
+        <>
+          <h1>API Docs</h1>
+        </>
     </DashboardLayout>
   )
 }

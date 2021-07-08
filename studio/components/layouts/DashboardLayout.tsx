@@ -1,17 +1,18 @@
-import { ReactElement } from 'react'
-import { Typography } from '@supabase/ui'
+import Link from 'next/link'
 import IconBar from '../nav/IconBar'
 import Head from 'next/head'
+import { ReactElement } from 'react'
+import { Divider, Menu, Typography } from '@supabase/ui'
 
-type MenuBar = {
+type Sidebar = {
   title: string
-  categories?: MenuBarItems[]
+  categories?: SidebarItems[]
 }
-type MenuBarItems = {
+type SidebarItems = {
   label: string
-  links: MenuBarLinks[]
+  links: SidebarLinks[]
 }
-type MenuBarLinks = {
+type SidebarLinks = {
   label: string
   href: string
 }
@@ -19,44 +20,12 @@ type MenuBarLinks = {
 export default function DashboardLayout({
   children,
   title,
-  menu,
+  sidebar,
 }: {
   children: ReactElement
   title?: string
-  menu?: MenuBar
+  sidebar?: Sidebar
 }) {
-  // Render the side menu
-  const renderMenu = (menu: MenuBar) => {
-    const { Title } = Typography
-
-    return (
-      <div
-        className={[
-          'w-64 h-screen overflow-autohide-scrollbar border-r ', // layout
-          'bg-sidebar-linkbar-light', // Light mode
-          'dark:bg-sidebar-linkbar-dark dark:border-dark ', // Dark mode
-        ].join(' ')}
-      >
-        <Title level={3} className="border-b p-4">
-          {menu.title}
-        </Title>
-        {menu.categories?.map((category) => (
-          <div key={category.label}>
-            <Title level={5} className="">
-              {category.label}
-            </Title>
-
-            {category.links.map((link) => (
-              <div key={link.label}>
-                <a href={link.href}>{link.label}</a>
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-    )
-  }
-
   return (
     <>
       <Head>
@@ -68,9 +37,42 @@ export default function DashboardLayout({
         <div className="w-14 h-screen bg-sidebar-light dark:bg-sidebar-dark border-r dark:border-dark">
           <IconBar />
         </div>
-        {menu && renderMenu(menu)}
+        {sidebar && <SidebarMenu sidebar={sidebar} />}
         <main className="flex-1">{children}</main>
       </div>
     </>
+  )
+}
+
+const SidebarMenu = ({ sidebar }: { sidebar: Sidebar }) => {
+  return (
+    <div
+      className={[
+        'w-64 h-screen overflow-autohide-scrollbar border-r ', // Layout
+        'bg-sidebar-linkbar-light', // Light mode
+        'dark:bg-sidebar-linkbar-dark dark:border-dark ', // Dark mode
+      ].join(' ')}
+    >
+      <Typography.Title level={3} className="border-b p-4">
+        {sidebar.title}
+      </Typography.Title>
+
+      <Menu>
+        {sidebar.categories?.map((category) => (
+          <div key={category.label}>
+            <Menu.Group title={category.label} />
+
+            {category.links.map((link) => (
+              <Link href={link.href} key={link.href}>
+                <a>
+                  <Menu.Item>{link.label}</Menu.Item>
+                </a>
+              </Link>
+            ))}
+            <Divider />
+          </div>
+        ))}
+      </Menu>
+    </div>
   )
 }
