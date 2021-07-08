@@ -7,15 +7,20 @@ description: There are various ways to connect to your Postgres database.
 Supabase provides two options for connection to your Postgres database:
 
 - Direct connections.
-- Connection pooling , using PgBouncer.
-
+- Connection pooling, using PgBouncer.
 
 ## Direct connection vs Connection Pooling
 
-Some details here, and when you should choose which.
+A "direct connection" is one where a connection is made to the database server using Postgres' native connection implementation. 
+Supabase's connection pool [PgBouncer](https://www.pgbouncer.org/) to manage connections to the database server.
 
-![Connection pooling](/img/guides/connection-pool.png)
+Why would you use a connection pool? Primarily because the way that Postgres handles connections isn't very scalable for a large number of _temporary_ connections. 
+You can use these simple questions to determine which connection method to use:
+
+- Are you connecting to a database an _maintaining_ a connection? If yes, use a direct connection.
+- Are you connecting to your database and then _disconnecting_ immediately (like in a serverless environment)? If yes, use a connection pool.
 
 ## Connection strings 
 
 Link to reference docs.
+
