@@ -38,7 +38,7 @@ Go to the Authentication Settings page (the user icon). Enter the flutter app re
 
 ![authentication settings page](https://user-images.githubusercontent.com/689843/124574731-f735c180-de74-11eb-8f50-2d34161261dd.png)
 
-### 4. Run the flutter application
+### 5. Run the flutter application
 
 - Go to `lib/utils/constants.dart` file
 - Update `SUPABASE_URL` and `SUPABASE_ANNON_KEY` with your URL and Key
