@@ -1,0 +1,25 @@
+import AuthLayout from '../../components/layouts/AuthLayout'
+import Loading from '../../components/utils/Loading'
+import Error from '../../components/utils/Error'
+import { fetchOpenApiSpec } from '../../lib/api'
+import { Button, IconPlus, IconSearch, Input } from '@supabase/ui'
+
+export default function Home() {
+  const { isLoading, error } = fetchOpenApiSpec()
+
+  if (isLoading) return <Loading />
+  if (error) return <Error />
+
+  return (
+    <AuthLayout title="Users">
+      <div className="border-b my-8 ">
+        <div className="flex">
+          <div>
+            <Input type="text" placeholder="Filter tables" icon={<IconSearch />} />
+          </div>
+          <div>{/* Add table when table components will be supported by Supabase UI */}</div>
+        </div>
+      </div>
+    </AuthLayout>
+  )
+}

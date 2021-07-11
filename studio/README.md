@@ -15,6 +15,21 @@ Warning: this is a work in progress. You can watch the development here:
 
 ### Built with
 
-- Next.js
-- Tailwind
-- Supabase UI 
+- [Next.js](https://nextjs.org/)
+- [Tailwind](https://tailwindcss.com/)
+- [Supabase UI](https://ui.supabase.io/)
+
+
+### Run locally
+
+```bash
+# Add your API URL and KEY as environment variables
+# You can find you API params at app.supabase.io > project > settings > API
+
+NEXT_PUBLIC_SUPABASE_URL=URL
+NEXT_PUBLIC_SUAPBASE_ANON_KEY=API_KEY
+
+cd studio
+npm i
+npm run dev
+```

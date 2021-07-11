@@ -9,10 +9,10 @@
   },
   "dependencies": {
     "@supabase/ui": "^0.27.3",
-    "next": "11.0.1",
+    "next": "^11.0.1",
     "openapi-types": "^9.1.0",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "swr": "^0.5.6"
   },
   "devDependencies": {
