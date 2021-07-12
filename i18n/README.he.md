@@ -50,7 +50,6 @@ Supabase הוא שילוב של כלי קוד פתוח. אנו בונים את �
 Supabase היא [תשתית ענן](https://app.supabase.io)
 . את\ה יכול\ה להירשם ולהתחיל להשתמש ב- Supabase מבלי להתקין שום דבר. אנו עדיין עובדים על לייצר את חוויית הפיתוח המקומית - בזה אנחנו מתמקדים, יחד עם יציבות המערכת.
 
-
 ![Architecture](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [פוסטגרס (PostgreSQL)](https://www.postgresql.org/) זהו מסד נתונים רלציוני עם למעלה מ -30 שנות פיתוח פעיל שזכתה למוניטין של אמינות, עמידות וביצועים.
@@ -70,7 +69,7 @@ Supabase היא [תשתית ענן](https://app.supabase.io)
   - `realtime-{lang}`: ספריה צד לקוח לעבודה מול [Realtime](https://github.com/supabase/realtime)
   - `gotrue-{lang}`: ספריה צד לקוח לעבודה מול [GoTrue](https://github.com/netlify/gotrue)
 
-| Repo                  | תמיכה רשמית                                         | תמיכת הקהילה                                                                                                                                                                                                                                                                                                                            |
+| Repo                  | תמיכה רשמית                                      | תמיכת הקהילה                                                                                                                                                                                                                                                                                                                         |
 | --------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` \| [`Ruby`](https://github.com/supabase/supabase-rb) \| `Go`                                                                                             |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) \| [`Ruby`](https://github.com/supabase/postgrest-rb) \| [`Go`](https://github.com/supabase/postgrest-go) |
