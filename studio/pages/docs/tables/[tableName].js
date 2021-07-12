@@ -23,12 +23,6 @@ export default function Home() {
           <Typography.Title level={1}>
             <code>{tableName}</code>
           </Typography.Title>
-          <input
-            className="border-2 w-full"
-            type="text"
-            placeholder={table.description}
-            value={table.description}
-          />
           <div>
             {table.fields.map((field) => (
               <Field
@@ -36,7 +30,7 @@ export default function Home() {
                 type={field.type}
                 format={field.format}
                 description={field.description}
-                required={table.required.includes(field.name)}
+                required={field.required}
               />
             ))}
           </div>
