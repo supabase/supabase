@@ -4,6 +4,7 @@ Supabase is 100% remote.
 
 Angelico de los Reyes
 Ant Wilson
+Beng Eu
 Bobbie Soedirgo
 Chris Copplestone
 Div Arora
