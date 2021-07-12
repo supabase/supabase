@@ -4,6 +4,7 @@ Supabase is 100% remote.
 
 Angelico de los Reyes
 Ant Wilson
+Beng Eu
 Bobbie Soedirgo
 Chris Copplestone
 Div Arora
@@ -13,6 +14,7 @@ Hieu Pham
 Inian P
 Jonny Summers-Muir
 Joshen Lim
+Kang Ming Tay
 Paul Copplestone
 Rory Wilding
 Shakeel-Abbas Hussein

@@ -36,7 +36,7 @@ And click to create a new set of credentials, select OAuth client ID as the opti
 
 ![Create new oauth client id credentials](/img/auth-5-5.png)
 
-Now choose Web Application (assuming you're creating a web app) and in the Authorized redirect URI section you need to add: `https://<your-ref>/supabase.co/auth/v1/callback`. You can find your Supabase URL in Settings > API inside the Supabase dashboard.
+Now choose Web Application (assuming you're creating a web app) and in the Authorized redirect URI section you need to add: `https://<your-ref>.supabase.co/auth/v1/callback`. You can find your Supabase URL in Settings > API inside the Supabase dashboard.
 
 ![Add your redirect URI](/img/auth-5-6.png)
 
