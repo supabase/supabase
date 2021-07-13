@@ -1,7 +1,7 @@
 import DocsLayout from '../../../components/layouts/DocsLayout'
 import Loading from '../../../components/utils/Loading'
 import Error from '../../../components/utils/Error'
-import { fetchOpenApiSpec } from '../../../lib/api'
+import { fetchOpenApiSpec } from '../../../lib/openApi'
 import { useRouter } from 'next/router'
 import { Typography } from '@supabase/ui'
 
