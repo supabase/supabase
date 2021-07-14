@@ -1,0 +1,40 @@
+---
+id: direct-connections
+title: "Direct Connections"
+description: Connecting to your Supabase database.
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Every Supabase project provides a full Postgres database. You can connect to the database using any tool which supports Postgres.
+
+## Finding your connection string
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'}
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "Settings" section.
+2. Click "Database".
+3. Find your Connection Info and Connection String.
+```
+
+<video width="99%" muted playsInline controls="true">
+  <source src="/videos/postgres-connection.mp4" type="video/mp4" muted playsInline />
+</video>
+
+</TabItem>
+</Tabs>
+
+## Resources 
+
+- [Direct Connections](/docs/guides/database/connecting/direct-connections).
+- [Connection Pooling](/docs/guides/database/connecting/connection-pooling).
+- [Connection Strings (Reference Docs)](/docs/reference/postgres/connection-strings).
+
+
