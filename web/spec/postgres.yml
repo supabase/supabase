@@ -284,21 +284,41 @@ pages:
 
   Connection strings:
     description: |
-      @TODO.
+      There are various ways to connect to your database, depending on the configuration of your Postgres instance and the tool which you are connecting with.
+
     notes: |
-      - Official Documentation: [postgresql.org/docs/current/libpq-connect.html](https://www.postgresql.org/docs/current/libpq-connect.html).
+      - [Official Documentation](https://www.postgresql.org/docs/current/libpq-connect.html).
+      - Avoid using special characters usernames and passwords. If you use special characters in a connection URL, you'll need to URL encode any special characters.
 
     examples:
-      - name: TODO
+      - name: Basic connection string
+        description: |
+          If you're using a default setup, your postgres connection string will likely be in the format: 
+          
+          `postgres://{user}:{password}@{host}:{port}/{database_name}`
+
         isSpotlight: true
         sql: |
-          ```sh
-          postgresql://
-          postgresql://localhost
-          postgresql://localhost:5433
-          postgresql://localhost/mydb
-          postgresql://user@localhost
-          postgresql://user:secret@localhost
-          postgresql://other@localhost/otherdb?connect_timeout=10&application_name=myapp
-          postgresql://host1:123,host2:456/somedb?target_session_attrs=any&application_name=myapp
+          ```bash
+          postgres://postgres:postgres@localhost:5432/postgres
+          # or 
+          postgresql://postgres:postgres@localhost:5432/postgres
+          ```
+      - name: JDBC
+        description: See full [documentation](http://jdbc.postgresql.org/documentation/head/connect.html).
+        sql: |
+          ```bash
+          jdbc:postgresql://{host}:{port}/{database_name}
+          ```
+      - name: ADO.NET
+        description: See full [documentation](http://npgsql.projects.postgresql.org/docs/manual/UserManual.html).
+        sql: |
+          ```bash
+          Server=host;Port=5432;User Id=username;Password=secret;Database=database_name;
+          ```
+      - name: PHP
+        description: See full [documentation](http://php.net/manual/en/book.pgsql.php).
+        sql: |
+          ```bash
+          host=hostname port=5432 dbname=databasename user=username password=secret
           ```
