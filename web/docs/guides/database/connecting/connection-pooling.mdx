@@ -1,31 +1,20 @@
 ---
 id: connection-pooling
-title: "Connection pooling"
-description: There are various ways to connect to your Postgres database.
+title: "Connection Pooling"
+description: Connecting to your Supabase database using PgBouncer.
 ---
 
 Connection pools are useful for managing a large number of _temporary_ connections. 
 
-
 ## How connection pooling works
 
-Typically when a client connects to a PostgreSQL database, the client opens and manages their own database connection. 
+A "connection pool" is a system (external to Postgres) which manage connections, rather than PostgreSQL's native system. Supabase uses [PgBouncer](https://www.pgbouncer.org/) for connection pooling.
 
-With a connection pool, connections are already open and available for use. When a client makes a request, they use an existing connection from the pool. 
-When the client transaction or session is completed the connection is simply returned to the pool and is free to be used by another client or application.
+When a client makes a request, PgBouncer "allocates" and available connection to the client.
+When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
+
 
 ![Connection pooling](/img/guides/connection-pool.png)
-
-## Handling temporary connections
-
-In a traditional architecture, middleware servers (e.g. APIs) manage a small number of connection to a Postgres database. 
-Essentially, the middleware server is a connection pool.
-
-In a Serverless environment, there is no middleware server to maintain a connection, so they create a new connection for each concurrent request. 
-Since Serverless functions are typically used for bursty workloads, this can end up opening a lot of connections to the database and overwhelm your Postgres server.
-
-Connection pools mitigate this. Connections are maintained by the pool and recycled across users and applications. 
-Whenever a new connection is required it is taken from a pool of open and available connections instead of initializing an entirely new one. This eliminates the need to spawn a new process.
 
 
 ## Pool modes
@@ -35,19 +24,47 @@ Pool Mode determines how PgBouncer handles a connection.
 ### Session
 
 When a new client connects, a connection is assigned to the client until it disconnects. Afterward, the connection is returned back to the pool. 
+
 All PostgreSQL features can be used with this option.
 
 ### Transaction
 
-This is the suggested option for serverless functions. With this, the connection is only assigned to the client for the duration of a transaction. Once done, the connection is returned to the pool. 
-Two consecutive transactions from the same client could be done over two, different connections. Some session-based PostgreSQL features such as prepared statements are not available with this option. 
-A more comprehensive list of incompatible features can be found here.
+This is the suggested option for serverless functions. A connection is only assigned to the client for the duration of a transaction. Two consecutive transactions from the same client 
+could be executed over two different connections. 
+
+Some session-based PostgreSQL features such as prepared statements are not available with this option. 
+A comprehensive list of incompatible features can be found [here](https://www.pgbouncer.org/features.html).
 
 ### Statement
 
-This is the most granular option. Connections are returned to the pool after every statement. Transactions with multiple statements are not allowed. This is best used when AUTOCOMMIT is in use.
+This is the most granular option. Connections are returned to the pool after every statement. Transactions with multiple statements are not allowed. This is best used when `AUTOCOMMIT` is in use.
 
-### Finding your connection string
+## Finding your connection string
 
-- How to find it on the dashboard.
-- Link to the reference docs on Connection strings
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'}
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "Database" section.
+2. Click "Connection Pooling".
+3. Find your Connection Info and Connection String.
+```
+
+<video width="99%" muted playsInline controls="true">
+  <source src="/videos/pgbouncer-connection.mp4" type="video/mp4" muted playsInline />
+</video>
+
+</TabItem>
+</Tabs>
+
+
+
+## Resources 
+
+- [Direct Connections](/docs/guides/database/connecting/direct-connections).
+- [Connection Pooling](/docs/guides/database/connecting/connection-pooling).
+- [Connection Strings (Reference Docs)](/docs/reference/postgres/connection-strings).
