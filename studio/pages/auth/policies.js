@@ -48,28 +48,34 @@ export default function Home() {
 
 const TableCard = ({ table }) => {
   return (
-    <div className="border-b  my-8 mx-8">
-      <div className="flex ">
-        <div className="flex-1 ">
+    <div className="border-b my-8 mx-8">
+      <div className="flex">
+        <div className="flex-auto">
           <Card
             title={
-              <div className="flex space-between">
-                {table?.name}
-                {table?.isRLSEnabled ? (
-                  <Badge color="green">RLS Enabled</Badge>
-                ) : (
-                  <Badge color="yellow">RLS Disabled</Badge>
-                )}
+              <div className="flex space-x-2">
+                <div>{table?.name}</div>
+                <div>
+                  {table?.isRLSEnabled ? (
+                    <Badge color="green">RLS Enabled</Badge>
+                  ) : (
+                    <Badge color="yellow">RLS Disabled</Badge>
+                  )}
+                </div>
               </div>
             }
             titleExtra={
-              <div className="flex space-between">
-                {table?.isRLSEnabled ? (
-                  <Button type="text">Disable RLS</Button>
-                ) : (
-                  <Button type="text">Enable RLS</Button>
-                )}
-                <Button type="outline">New Policy</Button>
+              <div className="flex space-x-2">
+                <div>
+                  {table?.isRLSEnabled ? (
+                    <Button type="text">Disable RLS</Button>
+                  ) : (
+                    <Button type="text">Enable RLS</Button>
+                  )}
+                </div>
+                <div>
+                  <Button type="outline">New Policy</Button>
+                </div>
               </div>
             }
           >
