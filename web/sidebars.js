@@ -127,6 +127,16 @@ module.exports = {
             'guides/database/extensions/uuid-ossp',
           ],
         },
+        {
+          type: 'category',
+          label: 'Connecting to Postgres',
+          collapsed: false,
+          items: [
+            'guides/database/connecting/connecting-to-postgres',
+            'guides/database/connecting/direct-connections',
+            'guides/database/connecting/connection-pooling',
+          ],
+        },
       ],
     },
     {
