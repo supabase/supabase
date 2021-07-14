@@ -21,6 +21,7 @@ info:
       - name: 'About'
         items:
           - index
+          - Connection Strings
       - name: 'Managing Tables'
         items:
           - Schemas
@@ -282,7 +283,7 @@ pages:
           where name ilike '%york%';
           ```
 
-  Connection strings:
+  Connection Strings:
     description: |
       There are various ways to connect to your database, depending on the configuration of your Postgres instance and the tool which you are connecting with.
 
