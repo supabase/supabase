@@ -1,5 +1,5 @@
 version: "3.7"
-serives:
+services:
     traefik:
         container_name: traefik
         image: traefik
