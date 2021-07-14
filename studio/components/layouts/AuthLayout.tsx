@@ -21,6 +21,7 @@ export default function AuthLayout({ title, children }: { title: string; childre
             links: [
               { label: 'Users', href: '/auth/users' },
               { label: 'Policies', href: '/auth/policies' },
+              { label: 'Templates', href: '/auth/templates' },
             ],
           },
           {
