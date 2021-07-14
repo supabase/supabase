@@ -27,10 +27,10 @@ export default function Home() {
   ]
   return (
     <AuthLayout title="Users">
-      <div className="border-b my-8 ">
+      <div className="border-b my-8 mx-4 ">
         <div className="flex justify-between">
           <div>
-            <Input type="text" placeholder="Filter tables" icon={<IconSearch />} />
+            <Input className="mb-2" type="text" placeholder="Filter tables" icon={<IconSearch />} />
           </div>
           <div>
             <Button type="outline">What is RLS</Button>
@@ -48,9 +48,9 @@ export default function Home() {
 
 const TableCard = ({ table }) => {
   return (
-    <div className="border-b my-8">
-      <div className="flex">
-        <div className="flex-1">
+    <div className="border-b  my-8 mx-8">
+      <div className="flex ">
+        <div className="flex-1 ">
           <Card
             title={
               <div className="flex space-between">
