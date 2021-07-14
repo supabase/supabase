@@ -1,5 +1,5 @@
 import AuthLayout from '../../components/layouts/AuthLayout'
-import { Card, Button, Badge, IconSearch, Input } from '@supabase/ui'
+import { Card, Button, Badge, IconSearch, Input, Divider } from '@supabase/ui'
 
 export default function Home() {
   let mockTables = [
@@ -73,9 +73,12 @@ const TableCard = ({ table }) => {
               </div>
             }
           >
-            {table?.policies?.map((policy) => {
+            {table?.policies?.map((policy, index) => {
               return Object.keys(policy).length !== 0 ? (
-                <Card.Meta title={policy?.name} description={policy?.expression} />
+                <div>
+                  <Card.Meta title={policy?.name} description={policy?.expression} />
+                  {index + 1 !== table?.policies.length ? <Divider className="my-4" /> : null}
+                </div>
               ) : (
                 <Card.Meta description="No policies created yet" />
               )
