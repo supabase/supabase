@@ -1,15 +1,30 @@
 import AuthLayout from '../../components/layouts/AuthLayout'
-import Loading from '../../components/utils/Loading'
-import Error from '../../components/utils/Error'
-import { fetchOpenApiSpec } from '../../lib/openApi'
 import { Card, Button, Badge, IconSearch, Input } from '@supabase/ui'
 
 export default function Home() {
-  const { tables, isLoading, error } = fetchOpenApiSpec()
-
-  if (isLoading) return <Loading />
-  if (error) return <Error />
-
+  let mockTables = [
+    {
+      name: 'first_table',
+      isRLSEnabled: true,
+      policies: [{ name: 'Enable access to all users', expression: 'true' }],
+    },
+    {
+      name: 'second_table',
+      isRLSEnabled: false,
+      policies: [{}],
+    },
+    {
+      name: 'third_table',
+      isRLSEnabled: true,
+      policies: [
+        { name: 'Enable access to all users', expression: 'true' },
+        {
+          name: 'Enable insert for authenticated users only',
+          expression: "(role() = 'authenticated'::text)",
+        },
+      ],
+    },
+  ]
   return (
     <AuthLayout title="Users">
       <div className="border-b my-8 ">
@@ -23,7 +38,7 @@ export default function Home() {
         </div>
       </div>
       <div>
-        {tables?.map((table) => {
+        {mockTables?.map((table) => {
           return <TableCard table={table} />
         })}
       </div>
@@ -32,8 +47,6 @@ export default function Home() {
 }
 
 const TableCard = ({ table }) => {
-  console.log(table)
-  let is_enabled = true
   return (
     <div className="border-b my-8">
       <div className="flex">
@@ -42,17 +55,31 @@ const TableCard = ({ table }) => {
             title={
               <div className="flex space-between">
                 {table?.name}
-                {<Badge color="green">RLS Enabled</Badge>}
+                {table?.isRLSEnabled ? (
+                  <Badge color="green">RLS Enabled</Badge>
+                ) : (
+                  <Badge color="yellow">RLS Disabled</Badge>
+                )}
               </div>
             }
             titleExtra={
               <div className="flex space-between">
-                <Button type="text">Disable RLS</Button>
+                {table?.isRLSEnabled ? (
+                  <Button type="text">Disable RLS</Button>
+                ) : (
+                  <Button type="text">Enable RLS</Button>
+                )}
                 <Button type="outline">New Policy</Button>
               </div>
             }
           >
-            <Card.Meta title="Enable access to all users" description="True" />
+            {table?.policies?.map((policy) => {
+              return Object.keys(policy).length !== 0 ? (
+                <Card.Meta title={policy?.name} description={policy?.expression} />
+              ) : (
+                <Card.Meta description="No policies created yet" />
+              )
+            })}
           </Card>
         </div>
       </div>
