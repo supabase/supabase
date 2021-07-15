@@ -1,9 +1,13 @@
-import { Typography } from '@supabase/ui'
+import { Image } from '@supabase/ui'
 
 export default function EmptyPageState({}: {}) {
   return (
     <>
-      <Typography.Text>Loading...</Typography.Text>
+      <div className="flex h-screen">
+        <div className="m-auto">
+          <Image source="/supabase-logo.svg" alt="Supabase Logo" className="animate-spin" />
+        </div>
+      </div>
     </>
   )
 }
