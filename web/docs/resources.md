@@ -22,4 +22,4 @@ A collection of resources for you to explore and learn.
 - Support: beta@supabase.io
 - GitHub: https://github.com/supabase/supabase
 - Discussions & Forums: https://github.com/supabase/supabase/discussions
-- Twitter: https://twitter.com/supabase_io
+- Twitter: https://twitter.com/supabase

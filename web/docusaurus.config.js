@@ -63,7 +63,7 @@ module.exports = {
           position: 'right',
         },
         {
-          href: 'https://twitter.com/supabase_io',
+          href: 'https://twitter.com/supabase',
           className: 'navbar-item-twitter',
           position: 'right',
         },
@@ -159,7 +159,7 @@ module.exports = {
             },
             {
               label: 'Twitter',
-              href: 'https://twitter.com/supabase_io',
+              href: 'https://twitter.com/supabase',
             },
             {
               label: 'DevTo',
