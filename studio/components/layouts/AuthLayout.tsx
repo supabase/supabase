@@ -1,15 +1,7 @@
 import DashboardLayout from '../../components/layouts/DashboardLayout'
-import Loading from '../../components/utils/Loading'
-import Error from '../../components/utils/Error'
-import { fetchOpenApiSpec } from '../../lib/api'
 import { ReactElement } from 'react'
 
 export default function AuthLayout({ title, children }: { title: string; children: ReactElement }) {
-  const { isLoading, error } = fetchOpenApiSpec()
-
-  if (isLoading) return <Loading />
-  if (error) return <Error />
-
   return (
     <DashboardLayout
       title={title || 'Authentication'}
