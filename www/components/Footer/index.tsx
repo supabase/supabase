@@ -32,7 +32,7 @@ const Footer = (props: Props) => {
             />
             <div className="flex space-x-6">
               <a
-                href="https://twitter.com/supabase_io"
+                href="https://twitter.com/supabase"
                 className="text-gray-300 hover:text-gray-400"
               >
                 <span className="sr-only">Twitter</span>
