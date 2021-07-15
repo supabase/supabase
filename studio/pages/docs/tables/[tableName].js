@@ -18,24 +18,30 @@ export default function Home() {
 
   return (
     <DocsLayout title={`API: ${tableName}`}>
-      <div className="flex h-screen">
-        <div className="flex-1">
-          <Typography.Title level={1}>
-            <code>{tableName}</code>
-          </Typography.Title>
-          <div>
-            {table.fields.map((field) => (
-              <Field
-                name={field.name}
-                type={field.type}
-                format={field.format}
-                description={field.description}
-                required={field.required}
-              />
-            ))}
+      <div className="h-screen">
+        <Typography.Title level={1}>
+          <code>{tableName}</code>
+        </Typography.Title>
+        <Typography.Title level={2}>Fields</Typography.Title>
+
+        {table.fields.map((field) => (
+          <div className="">
+            <div className="flex">
+              <div className="flex-1">
+                <Field
+                  name={field.name}
+                  type={field.type}
+                  format={field.format}
+                  description={field.description}
+                  required={field.required}
+                />
+              </div>
+              <div className="flex-1 border-l bg-gray-50">
+                <Typography.Text code>{selectSnippet(tableName, field.name)}</Typography.Text>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="flex-1 border-l bg-gray-50">JavaScript | Bash</div>
+        ))}
       </div>
     </DocsLayout>
   )
@@ -72,3 +78,11 @@ const Field = ({ name, type, required, description, format }) => {
     </div>
   )
 }
+
+
+
+const selectSnippet = (tableName, columns) => `
+let { data: channels, error } = await supabase
+  .from('${tableName}')
+  .select('${columns}')
+`
