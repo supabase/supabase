@@ -61,8 +61,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           ],
         }}
         twitter={{
-          handle: '@supabase_io',
-          site: '@supabase_io',
+          handle: '@supabase',
+          site: '@supabase',
           cardType: 'summary_large_image',
         }}
       />
