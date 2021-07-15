@@ -1,4 +1,4 @@
-import { IconColumns, IconUserMinus, IconUserPlus, IconUsers, IconZap } from '@supabase/ui'
+import { IconColumns, IconTerminal, IconUsers, IconZap } from '@supabase/ui'
 import Link from 'next/link'
 import { ReactElement } from 'react'
 
@@ -17,7 +17,13 @@ type Route = {
  */
 const ROUTES: Route[] = [
   { key: 'ICON', label: 'Supabase', icon: <IconZap size={20} strokeWidth={3} />, link: '/' },
-  { key: 'AUTH', label: 'Authentication', icon: <IconUsers size={20} strokeWidth={3} />, link: '/auth' },
+  {
+    key: 'AUTH',
+    label: 'Authentication',
+    icon: <IconUsers size={20} strokeWidth={3} />,
+    link: '/auth',
+  },
+  { key: 'SQL', label: 'SQL', icon: <IconTerminal size={20} strokeWidth={3} />, link: '/sql' },
   { key: 'API', label: 'API', icon: <IconColumns size={20} strokeWidth={3} />, link: '/docs' },
 ]
 
@@ -27,7 +33,6 @@ const ROUTES: Route[] = [
 export default function IconBar({}) {
   // Renders all the icons
   const renderNav = (routes: Route[]) => {
-
     return routes.map((x) => (
       <li key={x.key}>
         <Link href={x.link}>

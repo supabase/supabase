@@ -1,52 +1,47 @@
 import AuthLayout from '../../components/layouts/AuthLayout'
 import { Card, Button, Badge, IconSearch, Input, Divider } from '@supabase/ui'
+import { useEffect, useState } from 'react'
+import { observer } from 'mobx-react-lite'
+import { useMetaStore } from 'store/postgres/MetaStore'
 
-export default function Home() {
-  let mockTables = [
-    {
-      name: 'first_table',
-      isRLSEnabled: true,
-      policies: [{ name: 'Enable access to all users', expression: 'true' }],
-    },
-    {
-      name: 'second_table',
-      isRLSEnabled: false,
-      policies: [{}],
-    },
-    {
-      name: 'third_table',
-      isRLSEnabled: true,
-      policies: [
-        { name: 'Enable access to all users', expression: 'true' },
-        {
-          name: 'Enable insert for authenticated users only',
-          expression: "(role() = 'authenticated'::text)",
-        },
-      ],
-    },
-  ]
+function Policies() {
+  const meta = useMetaStore()
+  const [filter, setFilter] = useState('')
+  const { tables } = meta
+
+  useEffect(() => {
+    tables.load()
+  }, [])
+
   return (
     <AuthLayout title="Users">
       <div className="border-b my-8 mx-4 ">
         <div className="flex justify-between">
           <div>
-            <Input className="mb-2" type="text" placeholder="Filter tables" icon={<IconSearch />} />
-          </div>
-          <div>
-            <Button type="outline">What is RLS</Button>
+            <Input
+              className="mb-2"
+              type="text"
+              placeholder="Filter tables"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              icon={<IconSearch />}
+            />
           </div>
         </div>
       </div>
       <div>
-        {mockTables?.map((table) => {
-          return <TableCard table={table} />
-        })}
+        {tables
+          .list((table) => table.name.indexOf(filter) >= 0)
+          .map((table) => {
+            return <TableCard table={table} />
+          })}
       </div>
     </AuthLayout>
   )
 }
+export default observer(Policies)
 
-const TableCard = ({ table }) => {
+const TableCard = observer(({ table }) => {
   return (
     <div className="border-b my-8 mx-8">
       <div className="flex">
@@ -54,9 +49,9 @@ const TableCard = ({ table }) => {
           <Card
             title={
               <div className="flex space-x-2">
-                <div>{table?.name}</div>
+                <div>{table.name}</div>
                 <div>
-                  {table?.isRLSEnabled ? (
+                  {table.rls_enabled ? (
                     <Badge color="green">RLS Enabled</Badge>
                   ) : (
                     <Badge color="yellow">RLS Disabled</Badge>
@@ -67,7 +62,7 @@ const TableCard = ({ table }) => {
             titleExtra={
               <div className="flex space-x-2">
                 <div>
-                  {table?.isRLSEnabled ? (
+                  {table.rls_enabled ? (
                     <Button type="text">Disable RLS</Button>
                   ) : (
                     <Button type="text">Enable RLS</Button>
@@ -78,20 +73,9 @@ const TableCard = ({ table }) => {
                 </div>
               </div>
             }
-          >
-            {table?.policies?.map((policy, index) => {
-              return Object.keys(policy).length !== 0 ? (
-                <div>
-                  <Card.Meta title={policy?.name} description={policy?.expression} />
-                  {index + 1 !== table?.policies.length ? <Divider className="my-4" /> : null}
-                </div>
-              ) : (
-                <Card.Meta description="No policies created yet" />
-              )
-            })}
-          </Card>
+          ></Card>
         </div>
       </div>
     </div>
   )
-}
+})
