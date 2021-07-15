@@ -1,6 +1,6 @@
 ---
 id: auth-twitch
-title: "Setting up Twich Auth"
+title: "Setting up Twitch Auth"
 description: Add Twitch OAuth to your Supabase project
 ---
 
@@ -51,6 +51,8 @@ In the next step you require a callback URL, which looks like this:
 
 ### Create a Twitch Application
 
+![Twitch Developer Console](/img/guides/twitch-console.png)
+
 - Click on `+ Register Your Application` at the top right.
 
 ![Register Application](/img/guides/twitch-register-your-application.png)
@@ -60,11 +62,13 @@ In the next step you require a callback URL, which looks like this:
 - Select a category for your app.
 - Check the Captcha box and click `Create`.
 
-![Twitch Applications List](/img/guides/twitch-applications-list.png)
 
 ### Retrieve your Twitch OAuth Client ID and Client Secret
 
 - Click `Manage` at the right of your application entry in the list.
+
+![Twitch Applications List](/img/guides/twitch-applications-list.png)
+
 - Copy your Client ID.
 - Click `New Secret` to create a new Client Secret.
 - Copy your Client Secret.
