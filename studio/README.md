@@ -22,6 +22,16 @@ Warning: this is a work in progress. You can watch the development here:
 
 ### Run locally
 
+Run Supabase
+
+```bash
+cd ..
+cd docker
+docker-compose up
+```
+
+Run this repo
+
 ```bash
 # Add your API URL and KEY as environment variables
 # You can find you API params at app.supabase.io > project > settings > API
