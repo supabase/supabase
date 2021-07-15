@@ -85,7 +85,7 @@ docker-compose up
 Make sure you update the default [passwords and secrets](https://github.com/supabase/supabase/blob/master/docker/.env) 
 before running in Production.
 After you have regenerated the JWT secret, you will need to encode a new `anon` and `service_role` API key and update 
-them [here](https://github.com/supabase/supabase/blob/9131e670f2679b9305a67f54c15bdab17b2cfd5a/docker/dockerfiles/kong/kong.yml#L42). For example, using [jsonwebtoken.io](https://www.jsonwebtoken.io/).
+them [here](https://github.com/supabase/supabase/blob/b1e99d2ce1f63ba728230fb53a6de444f60bce1f/docker/dockerfiles/kong/kong.yml#L42). For example, using [jsonwebtoken.io](https://www.jsonwebtoken.io/).
 
 The data you will need to encode includes:
 
