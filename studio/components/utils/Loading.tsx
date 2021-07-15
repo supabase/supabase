@@ -5,7 +5,7 @@ export default function EmptyPageState({}: {}) {
     <>
       <div className="flex h-screen">
         <div className="m-auto">
-          <Image source="/supabase-logo.svg" alt="Supabase Logo" className="animate-spin" />
+          <Image source="/supabase-logo.svg" alt="Supabase Logo" className="" />
         </div>
       </div>
     </>

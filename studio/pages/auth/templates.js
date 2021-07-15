@@ -1,8 +1,8 @@
 import AuthLayout from '../../components/layouts/AuthLayout'
-import { Card, Button, Badge, IconSearch, Input, Divider, Typography } from '@supabase/ui'
+import { Card, Button, Input, Typography } from '@supabase/ui'
 
-export default function Home() {
-  let templates = [
+export default function Templates() {
+  const mock_templates = [
     {
       title: 'Confirm Signup',
       subject: 'Confirm Your Signup',
@@ -27,15 +27,15 @@ export default function Home() {
   return (
     <AuthLayout title="Users">
       <div>
-        {templates.map((tamplate) => {
-          return <TemplateCard tamplate={tamplate} />
+        {mock_templates.map((template) => {
+          return <TemplateCard tamplate={template} />
         })}
       </div>
     </AuthLayout>
   )
 }
 
-const TemplateCard = ({ tamplate: template }) => {
+const TemplateCard = ({ template: template }) => {
   return (
     <div className="border-b my-8 mx-8">
       <div className="flex">
