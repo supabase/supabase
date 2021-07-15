@@ -814,7 +814,7 @@ const FundingPartners = () => (
           <p>
             Follow us on{' '}
             <a
-              href="https://twitter.com/supabase_io"
+              href="https://twitter.com/supabase"
               target="_blank"
               className="text-brand-700 hover:text-brand-800"
             >
