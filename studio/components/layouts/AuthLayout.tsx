@@ -1,7 +1,7 @@
 import DashboardLayout from '../../components/layouts/DashboardLayout'
 import Loading from '../../components/utils/Loading'
 import Error from '../../components/utils/Error'
-import { fetchOpenApiSpec } from '../../lib/openApi'
+import { fetchOpenApiSpec } from '../../lib/api'
 import { ReactElement } from 'react'
 
 export default function AuthLayout({ title, children }: { title: string; children: ReactElement }) {

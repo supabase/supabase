@@ -1,7 +1,7 @@
 import AuthLayout from '../../components/layouts/AuthLayout'
 import Loading from '../../components/utils/Loading'
 import Error from '../../components/utils/Error'
-import { fetchOpenApiSpec } from '../../lib/openApi'
+import { fetchOpenApiSpec } from '../../lib/api'
 import { Button, IconPlus, IconSearch, Input } from '@supabase/ui'
 
 export default function Home() {
