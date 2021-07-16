@@ -291,6 +291,22 @@ pages:
 
   api.updateUser:
     $ref: '"GoTrueApi".GoTrueApi.updateUser'
+    notes: |
+      Updating the `email` field will cause a "Confirm Email Change" email to be sent to the new address.
+
+      When the user clicks the Confirm link in the Confirm Change email they will be forwarded to:
+
+      `<SITE_URL>?email_change_token=x&type=email_change&redirect_to=y`
+
+      Your app must detect the `email_change_token` in the search params.
+
+      You should then use the `email_change_token` in the url to update the user's email as follows:
+
+      ```js
+      const { error, data } = await supabase.auth.update({
+        email_change_token: emailChangeToken,
+      });
+      ```
     examples:
       - name: Update user info that Gotrue holds (also used for setting new passwords)
         js: |
