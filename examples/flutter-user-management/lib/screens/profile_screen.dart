@@ -1,15 +1,15 @@
-import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:supabase_demo/components/auth_required_state.dart';
-import 'package:supabase_demo/utils/helpers.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:supabase/supabase.dart';
 import 'package:flutter/material.dart';
-import 'package:gotrue/gotrue.dart';
-import 'package:path/path.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '/components/auth_required_state.dart';
+import '/utils/helpers.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -36,94 +36,121 @@ class _ProfileScreenState extends AuthRequiredState<ProfileScreen> {
   String avatarUrl = '';
 
   @override
-  void initState() {
-    super.initState();
-
-    final _user = Supabase().client.auth.user();
+  void onAuthenticated(Session session) {
+    final _user = session.user;
     if (_user != null) {
       setState(() {
         _appBarTitle = 'Welcome ${_user.email}';
         user = _user;
       });
-      loadProfile(_user.id);
+      _loadProfile(_user.id);
     }
   }
 
-  Future<bool> loadProfile(String userId) async {
-    final response = await Supabase()
-        .client
-        .from('profiles')
-        .select('username, website, avatar_url')
-        .eq('id', userId)
-        .single()
-        .execute();
-    if (response.error == null && response.data != null) {
-      setState(() {
-        username = response.data['username'] as String? ?? '';
-        website = response.data['website'] as String? ?? '';
-        avatarUrl = response.data['avatar_url'] as String? ?? '';
-        loadingProfile = false;
-      });
-    } else {
-      setState(() {
-        loadingProfile = false;
-      });
-    }
-    return true;
-  }
-
-  final picker = ImagePicker();
-
-  Future updateAvatar(BuildContext context) async {
-    final pickedFile = await _picker.getImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      final file = File(pickedFile.path);
-      final fileExt = extension(file.path);
-      final fileName = '${randomString(15)}$fileExt';
-
+  Future _loadProfile(String userId) async {
+    try {
       final response = await Supabase()
+          .client
+          .from('profiles')
+          .select('username, website, avatar_url')
+          .eq('id', userId)
+          .maybeSingle()
+          .execute();
+      if (response.error != null) {
+        throw "Load profile failed: ${response.error!.message}";
+      }
+
+      setState(() {
+        username = response.data?['username'] as String? ?? '';
+        website = response.data?['website'] as String? ?? '';
+        avatarUrl = response.data?['avatar_url'] as String? ?? '';
+      });
+    } catch (e) {
+      showMessage(e.toString());
+    } finally {
+      setState(() {
+        loadingProfile = false;
+      });
+    }
+  }
+
+  Future _onSignOutPress(BuildContext context) async {
+    await Supabase().client.auth.signOut();
+    Navigator.pushNamedAndRemoveUntil(context, '/signIn', (route) => false);
+  }
+
+  Future _updateAvatar(BuildContext context) async {
+    try {
+      final pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxHeight: 600,
+        maxWidth: 600,
+      );
+      if (pickedFile == null) {
+        return;
+      }
+
+      final size = await pickedFile.length();
+      if (size > 1000000) {
+        throw "The file is too large. Allowed maximum size is 1 MB.";
+      }
+
+      final bytes = await pickedFile.readAsBytes();
+      final List<int> listBytes = List.from(bytes);
+      final file = BinaryFile(
+        bytes: listBytes,
+        mime: 'image/jpeg',
+      );
+      final fileName = '${randomString(15)}.jpg';
+
+      final uploadRes = await Supabase()
           .client
           .storage
           .from('avatars')
-          .upload(fileName, file);
-      if (response.error == null) {
-        setState(() {
-          avatarUrl = fileName;
-        });
-        _onUpdateProfilePress(context);
-      } else {
-        print(response.error!.message);
+          .uploadBinary(fileName, file);
+      if (uploadRes.error != null) {
+        throw uploadRes.error!.message;
       }
+
+      final res = await Supabase().client.from('profiles').upsert({
+        'id': user!.id,
+        'avatar_url': fileName,
+      }).execute();
+      if (res.error != null) {
+        throw res.error!.message;
+      }
+
+      setState(() {
+        avatarUrl = fileName;
+      });
+      showMessage("Avatar updated!");
+    } catch (e) {
+      showMessage(e.toString());
     }
   }
 
-  Future<bool> _onSignOutPress(BuildContext context) async {
-    await Supabase().client.auth.signOut();
-    Navigator.pushNamedAndRemoveUntil(context, '/signIn', (route) => false);
-    return true;
-  }
+  Future _onUpdateProfilePress(BuildContext context) async {
+    try {
+      FocusScope.of(context).unfocus();
 
-  Future<bool> _onUpdateProfilePress(BuildContext context) async {
-    FocusScope.of(context).unfocus();
+      final updates = {
+        'id': user?.id,
+        'username': username,
+        'website': website,
+        'updated_at': DateTime.now().toString(),
+      };
 
-    final updates = {
-      'id': user?.id,
-      'username': username,
-      'website': website,
-      'avatar_url': avatarUrl,
-      'updated_at': DateTime.now().toString(),
-    };
+      final response =
+          await Supabase().client.from('profiles').upsert(updates).execute();
+      if (response.error != null) {
+        throw "Update profile failed: ${response.error!.message}";
+      }
 
-    final response =
-        await Supabase().client.from('profiles').upsert(updates).execute();
-    if (response.error != null) {
-      showMessage("Update profile failed: ${response.error!.message}");
-      _updateProfileBtnController.reset();
-      return false;
-    } else {
-      _updateProfileBtnController.reset();
       showMessage("Profile updated!");
-      return true;
+    } catch (e) {
+      showMessage(e.toString());
+    } finally {
+      _updateProfileBtnController.reset();
     }
   }
 
@@ -134,76 +161,81 @@ class _ProfileScreenState extends AuthRequiredState<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Text(_appBarTitle),
-      ),
-      body: loadingProfile
-          ? SizedBox(
-              height: MediaQuery.of(context).size.height / 1.3,
-              child: const Center(
-                child: CircularProgressIndicator(),
+    if (loadingProfile) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(_appBarTitle),
+        ),
+        body: SizedBox(
+          height: MediaQuery.of(context).size.height / 1.3,
+          child: const Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    } else {
+      return Scaffold(
+        key: scaffoldKey,
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          title: Text(_appBarTitle),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            children: <Widget>[
+              AvatarContainer(
+                url: avatarUrl,
+                onUpdatePressed: () => _updateAvatar(context),
+                key: Key(avatarUrl),
               ),
-            )
-          : Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: <Widget>[
-                  AvatarContainer(
-                    url: avatarUrl,
-                    onUpdatePressed: () => updateAvatar(context),
-                    key: Key(avatarUrl),
-                  ),
-                  TextFormField(
-                    onChanged: (value) => setState(() {
-                      username = value;
-                    }),
-                    initialValue: username,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'Username',
-                      hintText: '',
-                    ),
-                  ),
-                  TextFormField(
-                    onChanged: (value) => setState(() {
-                      website = value;
-                    }),
-                    initialValue: website,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'Website',
-                      hintText: '',
-                    ),
-                  ),
-                  const SizedBox(height: 35.0),
-                  RoundedLoadingButton(
-                    color: Colors.green,
-                    controller: _updateProfileBtnController,
-                    onPressed: () {
-                      _onUpdateProfilePress(context);
-                    },
-                    child: const Text('Update profile',
-                        style: TextStyle(fontSize: 20, color: Colors.white)),
-                  ),
-                  const SizedBox(height: 35.0),
-                  RoundedLoadingButton(
-                    color: Colors.red,
-                    controller: _signOutBtnController,
-                    onPressed: () {
-                      _onSignOutPress(context);
-                    },
-                    child: const Text(
-                      'Sign out',
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    ),
-                  ),
-                ],
+              TextFormField(
+                onChanged: (value) => setState(() {
+                  username = value;
+                }),
+                initialValue: username,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  labelText: 'Username',
+                  hintText: '',
+                ),
               ),
-            ),
-    );
+              TextFormField(
+                onChanged: (value) => setState(() {
+                  website = value;
+                }),
+                initialValue: website,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  labelText: 'Website',
+                  hintText: '',
+                ),
+              ),
+              const SizedBox(height: 35.0),
+              RoundedLoadingButton(
+                color: Colors.green,
+                controller: _updateProfileBtnController,
+                onPressed: () {
+                  _onUpdateProfilePress(context);
+                },
+                child: const Text('Update profile',
+                    style: TextStyle(fontSize: 20, color: Colors.white)),
+              ),
+              const SizedBox(height: 35.0),
+              RoundedLoadingButton(
+                color: Colors.red,
+                controller: _signOutBtnController,
+                onPressed: () {
+                  _onSignOutPress(context);
+                },
+                child: const Text('Sign out',
+                    style: TextStyle(fontSize: 20, color: Colors.white)),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 }
 
@@ -221,7 +253,7 @@ class AvatarContainer extends StatefulWidget {
 class _AvatarContainerState extends State<AvatarContainer> {
   _AvatarContainerState();
 
-  bool loadingImage = true;
+  bool loadingImage = false;
   Uint8List? image;
 
   @override
@@ -280,9 +312,12 @@ class _AvatarContainerState extends State<AvatarContainer> {
             alignment: Alignment.bottomRight,
             child: IconButton(
               icon: const CircleAvatar(
-                radius: 18,
+                radius: 25,
                 backgroundColor: Colors.white70,
-                child: Icon(CupertinoIcons.camera),
+                child: Icon(
+                  CupertinoIcons.camera,
+                  size: 18,
+                ),
               ),
               onPressed: () => widget.onUpdatePressed(),
             ),

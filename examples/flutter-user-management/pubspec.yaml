@@ -1,7 +1,5 @@
 name: supabase_demo
 description: Supabase flutter user management. users can sign up with a magic link and then update their account with public profile information, including a profile image.
-homepage: "https://supabase.io"
-repository: "https://github.com/supabase/supabase"
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -26,11 +24,10 @@ dependencies:
   cupertino_icons: ^1.0.3
   flutter:
     sdk: flutter
-  image_picker: ^0.8.0+3
-  path: ^1.8.0
+  image_picker: ^0.8.2
   rounded_loading_button: ^2.0.5
-  supabase: ^0.0.1-dev.27
-  supabase_flutter: ^0.0.1-dev.2
+  supabase: ^0.0.2
+  supabase_flutter: ^0.0.1
 
 dev_dependencies:
   flutter_launcher_icons: ^0.9.0
