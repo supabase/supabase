@@ -57,6 +57,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.15.0"
+  cross_file:
+    dependency: transitive
+    description:
+      name: cross_file
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.1+4"
   crypto:
     dependency: transitive
     description:
@@ -91,7 +98,7 @@ packages:
       name: file
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.1.1"
+    version: "6.1.2"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -127,7 +134,7 @@ packages:
       name: gotrue
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.6"
+    version: "0.0.7"
   http:
     dependency: transitive
     description:
@@ -155,21 +162,21 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.0+3"
+    version: "0.8.2"
   image_picker_for_web:
     dependency: transitive
     description:
       name: image_picker_for_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.1.0"
   image_picker_platform_interface:
     dependency: transitive
     description:
       name: image_picker_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.0"
+    version: "2.2.0"
   js:
     dependency: transitive
     description:
@@ -213,7 +220,7 @@ packages:
     source: hosted
     version: "1.0.0"
   path:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: path
       url: "https://pub.dartlang.org"
@@ -246,7 +253,7 @@ packages:
       name: pedantic
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.11.0"
+    version: "1.11.1"
   petitparser:
     dependency: transitive
     description:
@@ -267,14 +274,14 @@ packages:
       name: plugin_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.0.1"
   postgrest:
     dependency: transitive
     description:
       name: postgrest
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.3"
+    version: "0.1.4"
   process:
     dependency: transitive
     description:
@@ -370,7 +377,7 @@ packages:
       name: storage_client
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1-dev.3"
+    version: "0.0.2"
   stream_channel:
     dependency: transitive
     description:
@@ -391,14 +398,14 @@ packages:
       name: supabase
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1-dev.27"
+    version: "0.0.2"
   supabase_flutter:
     dependency: "direct main"
     description:
       name: supabase_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1-dev.2"
+    version: "0.0.1"
   term_glyph:
     dependency: transitive
     description:
@@ -454,7 +461,7 @@ packages:
       name: url_launcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.0.6"
+    version: "6.0.9"
   url_launcher_linux:
     dependency: transitive
     description:
@@ -475,7 +482,7 @@ packages:
       name: url_launcher_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.3"
+    version: "2.0.4"
   url_launcher_web:
     dependency: transitive
     description:
@@ -510,7 +517,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.5"
+    version: "2.2.5"
   xdg_directories:
     dependency: transitive
     description:

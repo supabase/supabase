@@ -1,4 +1,4 @@
-package io.supabase.demoapp
+package io.supabase.supabase_demo
 
 import io.flutter.embedding.android.FlutterActivity
 

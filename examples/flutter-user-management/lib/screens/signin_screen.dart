@@ -1,10 +1,10 @@
-import 'package:supabase_demo/components/auth_state.dart';
-import 'package:supabase_demo/utils/helpers.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_demo/utils/constants.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:supabase/supabase.dart' as supabase;
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '/components/auth_state.dart';
+import '/utils/helpers.dart';
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -25,7 +25,7 @@ class _SignInState extends AuthState<SignInScreen> {
     showMessage(message);
   }
 
-  Future<bool> _onMagicLinkPress(BuildContext context) async {
+  Future _onMagicLinkPress(BuildContext context) async {
     final form = formKey.currentState;
 
     if (form != null && form.validate()) {
@@ -47,7 +47,6 @@ class _SignInState extends AuthState<SignInScreen> {
     } else {
       _magicLinkController.reset();
     }
-    return true;
   }
 
   void showMessage(String message) {
