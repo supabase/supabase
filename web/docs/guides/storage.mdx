@@ -47,6 +47,7 @@ values={[
   {label: 'UI', value: 'UI'},
   {label: 'SQL', value: 'SQL'},
   {label: 'JavaScript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="UI">
 
@@ -83,6 +84,21 @@ const { data, error } = await supabase.storage.createBucket('avatars')
 [Reference.](/docs/reference/javascript/storage-createbucket)
 
 </TabItem>
+<TabItem value="DART">
+
+```dart
+void main() async {
+  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+  
+  final storageResponse = await client
+      .storage
+      .createBucket('avatars');
+}
+```
+
+[Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
+
+</TabItem>
 </Tabs>
 
 ### Upload a file
@@ -94,6 +110,7 @@ defaultValue="UI"
 values={[
   {label: 'UI', value: 'UI'},
   {label: 'JavaScript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="UI">
 
@@ -121,6 +138,23 @@ const { data, error } = await supabase.storage
 [Reference.](/docs/reference/javascript/storage-from-upload)
 
 </TabItem>
+<TabItem value="DART">
+
+```dart
+void main() async {
+  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+  
+  // Create file `example.txt` and upload it in `public` bucket
+  final file = File('example.txt');
+  file.writeAsStringSync('File content');
+  final storageResponse = await client
+      .storage
+      .from('public')
+      .upload('example.txt', file);
+}
+```
+
+</TabItem>
 </Tabs>
 
 ### Download a file
@@ -132,6 +166,7 @@ defaultValue="UI"
 values={[
   {label: 'UI', value: 'UI'},
   {label: 'JavaScript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="UI">
 
@@ -156,6 +191,20 @@ const { data, error } = await supabase.storage.from('avatars').download('public/
 ```
 
 [Reference.](/docs/reference/javascript/storage-from-download)
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+void main() async {
+  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+  
+  final storageResponse = await client
+      .storage
+      .from('public')
+      .download('example.txt');
+}
+```
 
 </TabItem>
 </Tabs>
