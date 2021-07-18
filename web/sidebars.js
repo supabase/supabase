@@ -88,6 +88,7 @@ module.exports = {
         'guides/with-react',
         'guides/with-svelte',
         'guides/with-vue-3',
+        'guides/with-angular',
         'guides/self-hosting',
       ],
     },
