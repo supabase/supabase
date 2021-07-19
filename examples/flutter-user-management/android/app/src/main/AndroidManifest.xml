@@ -2,7 +2,9 @@
     package="io.supabase.supabase_demo">
    <application
         android:label="Supabase Demo"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/launcher_icon"
+        android:allowBackup="false"
+        android:fullBackupContent="false">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

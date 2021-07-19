@@ -17,7 +17,7 @@ class _WebHomeScreenState extends AuthState<WebHomeScreen>
   void initState() {
     super.initState();
 
-    final uriParameters = Supabase().parseUriParameters(Uri.base);
+    final uriParameters = Supabase.instance.parseUriParameters(Uri.base);
     if (uriParameters.containsKey('access_token') &&
         uriParameters.containsKey('refresh_token') &&
         uriParameters.containsKey('expires_in')) {
@@ -28,7 +28,7 @@ class _WebHomeScreenState extends AuthState<WebHomeScreen>
   }
 
   Future onSignIn() async {
-    final hasAccessToken = await Supabase().hasAccessToken;
+    final hasAccessToken = await Supabase.instance.hasAccessToken;
     final String route = hasAccessToken ? '/profile' : '/signIn';
 
     stopAuthObserver();
