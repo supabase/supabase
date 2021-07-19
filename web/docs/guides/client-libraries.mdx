@@ -56,7 +56,7 @@ user = supabase.auth.sign_up(
 ```dart
 import 'package:supabase/supabase.dart';
 
-main() {
+void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
   // Sign up user with email and password
@@ -113,7 +113,7 @@ user = supabase.auth.sign_in(
 ```dart
 import 'package:supabase/supabase.dart';
 
-main() {
+void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
   // Sign up user with email and password
@@ -167,7 +167,7 @@ user = supabase.auth.sign_in(
 ```dart
 import 'package:supabase/supabase.dart';
 
-main() {
+void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
   // Sign up user with email and password
@@ -215,13 +215,11 @@ const { user, error } = await supabase.auth.signIn({
 ```dart
 import 'package:supabase/supabase.dart';
 
-main() {
+void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
-  // Sign up user with email and password
   final response = await client
       .auth
-      // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
       .signIn(provider: Provider.github);
 }
 ```
@@ -269,7 +267,7 @@ const { data, error } = await supabase
 ```dart
 import 'package:supabase/supabase.dart';
 
-main() {
+void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
   // Sign up user with email and password
@@ -319,7 +317,7 @@ const { data, error } = await supabase
 ```dart
 import 'package:supabase/supabase.dart';
 
-main() {
+void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
   // Sign up user with email and password
@@ -373,15 +371,15 @@ const { data, error } = await supabase
 ```dart
 import 'package:supabase/supabase.dart';
 
-main() {
+void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
   // Sign up user with email and password
   final response = await client
       .from('cities')
       .insert([
-        { name: 'The Shire', country_id: 554 },
-        { name: 'Rohan', country_id: 555 },
+        { 'name': 'The Shire', 'country_id': 554 },
+        { 'name': 'Rohan', 'country_id': 555 },
        ])
       .execute();
 }
@@ -429,7 +427,7 @@ const mySubscription = supabase
 ```dart
 import 'package:supabase/supabase.dart';
 
-main() {
+void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
   // Sign up user with email and password
@@ -477,12 +475,12 @@ const mySubscription = supabase
 
 </TabItem>
   
-  <TabItem value="dart">
+<TabItem value="dart">
 
 ```dart
 import 'package:supabase/supabase.dart';
 
-main() {
+void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
   // Sign up user with email and password
