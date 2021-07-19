@@ -32,12 +32,12 @@ class _SignInState extends AuthState<SignInScreen> {
       form.save();
       FocusScope.of(context).unfocus();
 
-      final response = await Supabase().client.auth.signIn(
-            email: _email,
-            options: supabase.AuthOptions(
-              redirectTo: authRedirectUri,
-            ),
-          );
+      final response = await Supabase.instance.client.auth.signIn(
+        email: _email,
+        options: supabase.AuthOptions(
+          redirectTo: authRedirectUri,
+        ),
+      );
       if (response.error != null) {
         showMessage(response.error!.message);
         _magicLinkController.reset();

@@ -66,6 +66,10 @@ flutter_plugin_android_lifecycle
 2.12
 file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_plugin_android_lifecycle-2.0.2/
 file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_plugin_android_lifecycle-2.0.2/lib/
+flutter_secure_storage
+2.12
+file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_secure_storage-4.2.0/
+file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_secure_storage-4.2.0/lib/
 gotrue
 2.12
 file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/gotrue-0.0.7/
@@ -220,8 +224,8 @@ file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org
 file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/supabase-0.0.2/lib/
 supabase_flutter
 2.12
-file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/supabase_flutter-0.0.1/
-file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/supabase_flutter-0.0.1/lib/
+file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/supabase_flutter-0.0.3/
+file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/supabase_flutter-0.0.3/lib/
 term_glyph
 2.12
 file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/term_glyph-1.2.0/

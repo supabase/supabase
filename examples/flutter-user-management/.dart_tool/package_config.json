@@ -104,6 +104,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "flutter_secure_storage",
+      "rootUri": "file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_secure_storage-4.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "flutter_test",
       "rootUri": "file:///Users/phamhieu/Documents/sdks/flutter/packages/flutter_test",
       "packageUri": "lib/",
@@ -351,7 +357,7 @@
     },
     {
       "name": "supabase_flutter",
-      "rootUri": "file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/supabase_flutter-0.0.1",
+      "rootUri": "file:///Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/supabase_flutter-0.0.3",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -476,7 +482,7 @@
       "languageVersion": "2.12"
     }
   ],
-  "generated": "2021-07-16T09:20:27.634174Z",
+  "generated": "2021-07-19T01:13:21.414488Z",
   "generator": "pub",
   "generatorVersion": "2.13.4"
 }

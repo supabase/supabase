@@ -49,8 +49,7 @@ class _ProfileScreenState extends AuthRequiredState<ProfileScreen> {
 
   Future _loadProfile(String userId) async {
     try {
-      final response = await Supabase()
-          .client
+      final response = await Supabase.instance.client
           .from('profiles')
           .select('username, website, avatar_url')
           .eq('id', userId)
@@ -75,7 +74,7 @@ class _ProfileScreenState extends AuthRequiredState<ProfileScreen> {
   }
 
   Future _onSignOutPress(BuildContext context) async {
-    await Supabase().client.auth.signOut();
+    await Supabase.instance.client.auth.signOut();
     Navigator.pushNamedAndRemoveUntil(context, '/signIn', (route) => false);
   }
 
@@ -103,16 +102,14 @@ class _ProfileScreenState extends AuthRequiredState<ProfileScreen> {
       );
       final fileName = '${randomString(15)}.jpg';
 
-      final uploadRes = await Supabase()
-          .client
-          .storage
+      final uploadRes = await Supabase.instance.client.storage
           .from('avatars')
           .uploadBinary(fileName, file);
       if (uploadRes.error != null) {
         throw uploadRes.error!.message;
       }
 
-      final res = await Supabase().client.from('profiles').upsert({
+      final res = await Supabase.instance.client.from('profiles').upsert({
         'id': user!.id,
         'avatar_url': fileName,
       }).execute();
@@ -140,8 +137,10 @@ class _ProfileScreenState extends AuthRequiredState<ProfileScreen> {
         'updated_at': DateTime.now().toString(),
       };
 
-      final response =
-          await Supabase().client.from('profiles').upsert(updates).execute();
+      final response = await Supabase.instance.client
+          .from('profiles')
+          .upsert(updates)
+          .execute();
       if (response.error != null) {
         throw "Update profile failed: ${response.error!.message}";
       }
@@ -271,7 +270,7 @@ class _AvatarContainerState extends State<AvatarContainer> {
     });
 
     final response =
-        await Supabase().client.storage.from('avatars').download(path);
+        await Supabase.instance.client.storage.from('avatars').download(path);
     if (response.error == null) {
       setState(() {
         image = response.data;

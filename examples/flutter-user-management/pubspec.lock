@@ -118,6 +118,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
+  flutter_secure_storage:
+    dependency: "direct main"
+    description:
+      name: flutter_secure_storage
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.2.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -405,7 +412,7 @@ packages:
       name: supabase_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1"
+    version: "0.0.3"
   term_glyph:
     dependency: transitive
     description:
