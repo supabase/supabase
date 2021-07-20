@@ -34,6 +34,7 @@ class _ProfileScreenState extends AuthRequiredState<ProfileScreen> {
   String username = '';
   String website = '';
   String avatarUrl = '';
+  String avatarKey = '';
 
   @override
   void onAuthenticated(Session session) {
@@ -51,7 +52,7 @@ class _ProfileScreenState extends AuthRequiredState<ProfileScreen> {
     try {
       final response = await Supabase.instance.client
           .from('profiles')
-          .select('username, website, avatar_url')
+          .select('username, website, avatar_url, updated_at')
           .eq('id', userId)
           .maybeSingle()
           .execute();
@@ -60,9 +61,12 @@ class _ProfileScreenState extends AuthRequiredState<ProfileScreen> {
       }
 
       setState(() {
+        print(response.data);
         username = response.data?['username'] as String? ?? '';
         website = response.data?['website'] as String? ?? '';
         avatarUrl = response.data?['avatar_url'] as String? ?? '';
+        final updatedAt = response.data?['updated_at'] as String? ?? '';
+        avatarKey = '$avatarUrl-$updatedAt';
       });
     } catch (e) {
       showMessage(e.toString());
@@ -95,23 +99,21 @@ class _ProfileScreenState extends AuthRequiredState<ProfileScreen> {
       }
 
       final bytes = await pickedFile.readAsBytes();
-      final List<int> listBytes = List.from(bytes);
-      final file = BinaryFile(
-        bytes: listBytes,
-        mime: 'image/jpeg',
-      );
-      final fileName = '${randomString(15)}.jpg';
-
+      final fileName = avatarUrl == '' ? '${randomString(15)}.jpg' : avatarUrl;
+      const fileOptions = FileOptions(upsert: true);
       final uploadRes = await Supabase.instance.client.storage
           .from('avatars')
-          .uploadBinary(fileName, file);
+          .uploadBinary(fileName, bytes, fileOptions: fileOptions);
+
       if (uploadRes.error != null) {
         throw uploadRes.error!.message;
       }
 
+      final updatedAt = DateTime.now().toString();
       final res = await Supabase.instance.client.from('profiles').upsert({
         'id': user!.id,
         'avatar_url': fileName,
+        'updated_at': updatedAt,
       }).execute();
       if (res.error != null) {
         throw res.error!.message;
@@ -119,6 +121,7 @@ class _ProfileScreenState extends AuthRequiredState<ProfileScreen> {
 
       setState(() {
         avatarUrl = fileName;
+        avatarKey = '$fileName-$updatedAt';
       });
       showMessage("Avatar updated!");
     } catch (e) {
@@ -186,7 +189,7 @@ class _ProfileScreenState extends AuthRequiredState<ProfileScreen> {
               AvatarContainer(
                 url: avatarUrl,
                 onUpdatePressed: () => _updateAvatar(context),
-                key: Key(avatarUrl),
+                key: Key(avatarKey),
               ),
               TextFormField(
                 onChanged: (value) => setState(() {
