@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+const dartClient = require('./sidebar_spec_dart')
 const goTrueClient = require('./sidebar_spec_gotrue')
 const postgrestClient = require('./sidebar_spec_postgrest')
 const realtimeClient = require('./sidebar_spec_realtime')
@@ -43,6 +44,12 @@ module.exports = {
       label: 'Javascript',
       collapsed: false,
       items: supabaseClient.docs,
+    },
+    {
+      type: 'category',
+      label: 'Dart',
+      collapsed: false,
+      items: dartClient.docs,
     },
     {
       type: 'category',
