@@ -2199,12 +2199,14 @@
 					"name": "Options",
 					"kind": 4194304,
 					"kindString": "Type alias",
-					"flags": {},
+					"flags": {
+						"isExported": true
+					},
 					"sources": [
 						{
 							"fileName": "RealtimeClient.ts",
 							"line": 14,
-							"character": 12
+							"character": 19
 						}
 					],
 					"type": {
@@ -2214,7 +2216,9 @@
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
-							"flags": {},
+							"flags": {
+								"isExported": true
+							},
 							"children": [
 								{
 									"id": 309,
@@ -2222,6 +2226,7 @@
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {
+										"isExported": true,
 										"isOptional": true
 									},
 									"sources": [
@@ -2242,6 +2247,7 @@
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {
+										"isExported": true,
 										"isOptional": true
 									},
 									"sources": [
@@ -2262,6 +2268,7 @@
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {
+										"isExported": true,
 										"isOptional": true
 									},
 									"sources": [
@@ -2285,21 +2292,27 @@
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
-													"flags": {},
+													"flags": {
+														"isExported": true
+													},
 													"indexSignature": [
 														{
 															"id": 313,
 															"name": "__index",
 															"kind": 8192,
 															"kindString": "Index signature",
-															"flags": {},
+															"flags": {
+																"isExported": true
+															},
 															"parameters": [
 																{
 																	"id": 314,
 																	"name": "key",
 																	"kind": 32768,
 																	"kindString": "Parameter",
-																	"flags": {},
+																	"flags": {
+																		"isExported": true
+																	},
 																	"type": {
 																		"type": "intrinsic",
 																		"name": "string"
@@ -2323,6 +2336,7 @@
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {
+										"isExported": true,
 										"isOptional": true
 									},
 									"sources": [
@@ -2352,6 +2366,7 @@
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {
+										"isExported": true,
 										"isOptional": true
 									},
 									"sources": [
@@ -2372,6 +2387,7 @@
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {
+										"isExported": true,
 										"isOptional": true
 									},
 									"sources": [
@@ -2401,6 +2417,7 @@
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {
+										"isExported": true,
 										"isOptional": true
 									},
 									"sources": [
@@ -2424,21 +2441,27 @@
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
-													"flags": {},
+													"flags": {
+														"isExported": true
+													},
 													"indexSignature": [
 														{
 															"id": 317,
 															"name": "__index",
 															"kind": 8192,
 															"kindString": "Index signature",
-															"flags": {},
+															"flags": {
+																"isExported": true
+															},
 															"parameters": [
 																{
 																	"id": 318,
 																	"name": "key",
 																	"kind": 32768,
 																	"kindString": "Parameter",
-																	"flags": {},
+																	"flags": {
+																		"isExported": true
+																	},
 																	"type": {
 																		"type": "intrinsic",
 																		"name": "string"
@@ -2462,6 +2485,7 @@
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {
+										"isExported": true,
 										"isOptional": true
 									},
 									"sources": [
@@ -2482,6 +2506,7 @@
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {
+										"isExported": true,
 										"isOptional": true
 									},
 									"sources": [
@@ -2511,6 +2536,7 @@
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {
+										"isExported": true,
 										"isOptional": true
 									},
 									"sources": [
@@ -2548,7 +2574,7 @@
 								{
 									"fileName": "RealtimeClient.ts",
 									"line": 14,
-									"character": 14
+									"character": 21
 								}
 							]
 						}
