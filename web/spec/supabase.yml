@@ -926,7 +926,7 @@ pages:
           ```js
           const { data, error } = await supabase
             .storage
-            .createBucket('avatars')
+            .createBucket('avatars', { public: false })
           ```
 
   storage.emptyBucket():
@@ -1056,7 +1056,7 @@ pages:
           const { signedURL, error } = await supabase
             .storage
             .from('avatars')
-            .createSignedUrl('avatar1.png', 60)
+            .createSignedUrl('folder/avatar1.png', 60)
           ```
 
   storage.from.getPublicUrl():
@@ -1074,7 +1074,7 @@ pages:
           const { publicURL, error } = supabase
             .storage
             .from('public-bucket')
-            .getPublicUrl('avatar1.png')
+            .getPublicUrl('folder/avatar1.png')
           ```
 
   storage.from.download():
@@ -1092,7 +1092,7 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .download('avatar1.png')
+            .download('folder/avatar1.png')
           ```
 
   storage.from.remove():
@@ -1110,7 +1110,7 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .remove(['avatar1.png'])
+            .remove(['folder/avatar1.png'])
           ```
 
   storage.from.list():
@@ -1128,7 +1128,11 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .list()
+            .list('folder', {
+              limit: 100,
+              offset: 0,
+              sortBy: { column: 'name', order: 'asc' },
+            })
           ```
 
   Using Modifiers:
