@@ -71,6 +71,18 @@ services:
       # Disable JWT Auth locally. The JWT_SECRET will be ignored.
       SECURE_CHANNELS: 'false'
       JWT_SECRET: ${JWT_SECRET}
+  meta:
+    container_name: supabase-meta
+    image: supabase/postgres-meta:latest
+    environment:
+      PG_META_DB_HOST: db
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: postgres
+      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      PG_META_DB_PORT: ${POSTGRES_PORT}
+      PG_META_PORT: ${META_PORT}
+    ports:
+      - ${META_PORT}:${META_PORT}
   db:
     container_name: supabase-db
     build:
