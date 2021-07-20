@@ -41,7 +41,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:latest
+    image: postgrest/postgrest:nightly-2021-03-05-19-03-d3a8b5f
     ports:
       - ${REST_PORT}:3000
     depends_on:
@@ -49,9 +49,10 @@ services:
     restart: always
     environment:
       PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres
-      PGRST_DB_SCHEMA: public
+      PGRST_DB_SCHEMA: public, storage
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
+
   realtime:
     container_name: supabase-realtime
     image: supabase/realtime:latest
@@ -71,6 +72,30 @@ services:
       # Disable JWT Auth locally. The JWT_SECRET will be ignored.
       SECURE_CHANNELS: 'false'
       JWT_SECRET: ${JWT_SECRET}
+
+  storage:
+    image: supabase/storage-api:v0.8.3
+    ports:
+      - '5000:5000'
+    depends_on:
+    - db
+    - rest
+    restart: on-failure
+    environment:
+        ANON_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoxNjkwNDQzMTM1LCJhdWQiOiIiLCJzdWIiOiIiLCJSb2xlIjoiYW5vbiIsImp0aSI6ImQ1N2ZkMjFlLTNkYjQtNDk3YS1hNGViLTI4ZDY3Yzg2NjEwMiJ9.YySz_BoYxYco0b2aP3iBMt-dVUqC6RpnQiSb4Zt-L-o
+        SERVICE_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoxNjkwNDQzMTM1LCJhdWQiOiIiLCJyb2xlIjoic2VydmljZV9yb2xlIiwianRpIjoiOTk4MzJiYmItNDdhNS00NzJhLTgxMDQtYzY4ZGVjZDQyZDVlIn0._DToQdxDcSLsp3tPpacsxswv0p1KRti0QOTmnbfs5JY
+        PROJECT_REF: bjwdssmqcnupljrqypxz # can be any random string
+        POSTGREST_URL: http://rest:3000
+        PGRST_JWT_SECRET: ${JWT_SECRET}
+        DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres
+        PGOPTIONS: "-c search_path=storage"
+        FILE_SIZE_LIMIT: 52428800
+        REGION: us-east-1 # region where your bucket is located
+        GLOBAL_S3_BUCKET: supa-storage-testing  # name of s3 bucket where you want to store objects
+        # AWS_ACCESS_KEY_ID: replace-with-your-aws-key
+        # AWS_SECRET_ACCESS_KEY: replace-with-your-aws-secret
+        STORAGE_BACKEND: file
+        FILE_STORAGE_BACKEND_PATH: /var/data/storage
   db:
     container_name: supabase-db
     build:

@@ -39,6 +39,16 @@ services:
     -   name: key-auth
         config:
             hide_credentials: true
+-   name: storage-v1
+    _comment: 'Storage: /storage/v1/* -> http://storage-api:5000/*'
+    url: http://storage:5000/
+    routes:
+    -   name: storage-v1-all
+        strip_path: true
+        paths:
+        - /storage/v1/
+    plugins:
+    -   name: cors
 consumers:
 -   username: 'anon-key'
     keyauth_credentials:
