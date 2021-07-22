@@ -8,7 +8,6 @@
     "swizzle": "docusaurus swizzle",
     "traction": "node traction.js",
     "gen:all": "npm run gen:supabase && npm run gen:gotrue && npm run gen:postgrest && npm run gen:realtime && npm run gen:postgres && npm run gen:cli",
-    "gen:dart": "ts-node ReferenceGenerator.ts -o docs/reference/dart spec/dart.yml",
     "gen:gotrue": "ts-node ReferenceGenerator.ts -o docs/gotrue/client spec/gotrue.yml",
     "gen:postgrest": "ts-node ReferenceGenerator.ts -o docs/postgrest/client spec/postgrest.yml",
     "gen:realtime": "ts-node ReferenceGenerator.ts -o docs/realtime/client spec/realtime.yml",
