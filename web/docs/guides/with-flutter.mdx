@@ -13,34 +13,14 @@ This example provides the steps to build a simple user management app (from scra
 
 - Supabase [Database](/docs/guides/database): a Postgres database for storing your user data.
 - Supabase [Auth](/docs/guides/auth): users can sign in with magic links (no passwords, only email).
-- Supabase [Storage](/docs/guides/storage): users can upload a photo.
+<!-- - Supabase [Storage](/docs/guides/storage): users can upload a photo. -->
 - [Row Level Security](/docs/guides/auth#row-level-security): data is protected so that individuals can only access their own data.
 - Instant [APIs](/docs/guides/api): APIs will be automatically generated when you create your database tables.
 
 By the end of this guide you'll have an app which allows users to login and update some basic profile details:
 
-![Supabase User Management example](/img/user-management-demo.png)
+<img height="500px" src="/img/supabase-flutter-demo.png" alt="Supabase User Management example" />
 
-<!-- ## Video demo 
-
-Coming soon.
-
-Use the annotated timeline to step through this tutorial.
-
-## Instant deploy
-
-Want to deploy a completed version of this example without following the guide? 
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Freact-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-react-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management)
-
-Clicking this button the application will:
-
-- Launch and prepare the Postgres database in Supabase.
-- Launch the app in Vercel.
-- Fork the example into your own GitHub account.
-- Prepare the deployed application with all the necessary environment variables.
-
-If you want to do it yourself, let's get started: -->
 
 ## Project set up
 
@@ -179,7 +159,7 @@ Then let's install the only additional dependency: [supabase-flutter](https://gi
 Open the app and copy and paste the following inside `pubspec.yaml` under `dependencies`.
 
 ```yaml
-supabase_flutter: ^0.0.3
+supabase_flutter: ^0.0.4
 ```
 
 Run `flutter pub get` to install the dependencies. 
@@ -199,7 +179,7 @@ Now that we have the dependencies installed let's setup deep links so users who 
 
 That is it on Supabase's end and the rest are platform specific settings:
 
-For Android:
+For Android, add an intent-filter to enable deep linking:
 ```xml title="android/app/src/main/AndroidManifest.xml"
 <manifest ...>
   <!-- ... other tags -->
@@ -223,7 +203,7 @@ For Android:
 </manifest>
 ```
 
-For iOS:
+For iOS add CFBundleURLTypes to enable deep linking:
 ```xml title="ios/Runner/Info.plist"
 <!-- ... other tags -->
 <plist>
@@ -248,7 +228,10 @@ For iOS:
 ```
 
 For web:
+
 There are no additional configurations. 
+
+### main function
 
 Now that we have deep links ready let's initialize the Supabase client inside our `main` function with the API credentials that you copied [earlier](#get-the-api-keys).
 These variables will be exposed on the app, and that's completely fine since we have 
@@ -298,7 +281,7 @@ class AuthState<T extends StatefulWidget> extends SupabaseAuthState<T> {
 }
 ```
 
-Let's also create a constant file to to make our lives easier. 
+Let's also create a constant file to make it easier to use Supabase client.
 
 ```dart title="lib/utils/constants.dart"
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -342,10 +325,11 @@ class _SplashPageState extends AuthState<SplashPage> {
 
 Let's create a Flutter widget to manage logins and sign ups.
 We'll use Magic Links, so users can sign in with their email without using passwords.
+This page will also inherit `AuthState` as it will handle user login. 
 
 ```dart title="lib/pages/login_page.dart"
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_flutter_guide/components/auth_state.dart';
 import 'package:supabase/supabase.dart';
 import 'package:supabase_flutter_guide/utils/constants.dart';
@@ -368,7 +352,9 @@ class _LoginPageState extends AuthState<LoginPage> {
     final response = await supabase.auth.signIn(
         email: _emailController.text,
         options: AuthOptions(
-            redirectTo: 'io.supabase.flutterquickstart://login-callback/'));
+            redirectTo: kIsWeb
+                ? null
+                : 'io.supabase.flutterquickstart://login-callback/'));
     if (response.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(response.error!.message),
@@ -424,12 +410,11 @@ class _LoginPageState extends AuthState<LoginPage> {
 ### Set up Account page
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
-
 Let's create a new component for that called `account_page.dart`.
+Note that this page will also inherit `AuthState` as it will handle user sign out. 
 
 ```dart title="lib/pages/account_page.dart"
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_flutter_guide/components/auth_state.dart';
 import 'package:supabase_flutter_guide/utils/constants.dart';
 
@@ -599,16 +584,22 @@ class MyApp extends StatelessWidget {
 }
 ```
 
-Once that's done, run this in a terminal window:
+Once that's done, run this in a terminal window to launch on Android or iOS:
 
 ```bash
 flutter run
 ```
 
+Or for web, run the following command to launch it on `localhost:3000`
+
+```bash
+flutter run -d web-server --web-hostname localhost --web-port 3000
+```
+
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
 
-![Supabase User demo](/img/supabase-react-demo.png)
+<img height="500px" src="/img/supabase-flutter-demo.png" alt="Supabase User Management example" />
 
 ## Next steps
 
