@@ -89,6 +89,7 @@ module.exports = {
         'guides/with-svelte',
         'guides/with-vue-3',
         'guides/with-angular',
+        'guides/with-flutter',
         'guides/self-hosting',
       ],
     },
