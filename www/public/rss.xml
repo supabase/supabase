@@ -5,9 +5,17 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 01 Jul 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Wed, 21 Jul 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.io/blog/2021/07/22/supabase-launch-week-sql</guid>
+  <title>Supabase Launch Week II: The SQL</title>
+  <link>https://supabase.io/blog/2021/07/22/supabase-launch-week-sql</link>
+  <description>Five days of Supabase. Again.</description>
+  <pubDate>Wed, 21 Jul 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.io/blog/2021/07/01/roles-postgres-hooks</guid>
   <title>Protecting reserved roles with PostgreSQL Hooks</title>
