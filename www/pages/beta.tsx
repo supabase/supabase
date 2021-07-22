@@ -118,7 +118,7 @@ const Hero = () => {
             Today, we're moving to <span className="text-brand-700">Beta</span>
           </p>
           <time itemProp="datePublished" dateTime="2020-12-03" className="opacity-50 text-sm">
-            Published December 12th, 2020
+            Published December 3rd, 2020
           </time>
         </div>
       </div>
