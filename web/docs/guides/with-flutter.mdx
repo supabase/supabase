@@ -231,7 +231,7 @@ For web:
 
 There are no additional configurations. 
 
-### main function
+### Main function
 
 Now that we have deep links ready let's initialize the Supabase client inside our `main` function with the API credentials that you copied [earlier](#get-the-api-keys).
 These variables will be exposed on the app, and that's completely fine since we have 
@@ -289,10 +289,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 final supabase = Supabase.instance.client;
 ```
 
-### SEt up Splash Screen
+### Set up Splash Screen
 
 Let's create a splash screen that will be shown to users right after they open the app.
-This splash screen inherits `AuthState` to redirect users to the appropreate pages depending on their authentication state. 
+This splash screen inherits `AuthState` to redirect users to the appropriate pages depending on their authentication state. 
 
 ```dart title="lib/pages/splash_page.dart"
 import 'package:flutter/material.dart';
