@@ -155,7 +155,11 @@ function Database() {
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
               <Typography.Text>
                 <p className="mb-4">
-                  <IconShuffle />
+                  <Space>
+                    <ProductIcon icon={Solutions['database'].icon} />
+                    <IconX />
+                    <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
+                  </Space>
                 </p>
               </Typography.Text>
               <Typography.Title level={4}>Realtime enabled</Typography.Title>
