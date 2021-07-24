@@ -1,12 +1,28 @@
 [
   {
     "type": "Announcement",
-    "title": "Beta launch",
-    "description": "We're excited to announce we have moved from Alpha to Beta",
+    "title": "Launch Week II: The SQL",
+    "description": "We're launching a product every day for one week in July.",
     "imgUrl": "images/case-study-monitoro.jpg",
     "logoUrl": "images/logos/monitoro.png",
     "organization": "Monitoro",
-    "url": "/beta",
+    "url": "/blog/2021/07/22/supabase-launch-week-sql",
+    "postMeta": {
+      "name": "Paul Copplestone",
+      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
+      "publishDate": "Mar 16, 2020",
+      "readLength": 6
+    },
+    "ctaText": "View case study"
+  },
+  {
+    "type": "Announcement",
+    "title": "Supabase Storage",
+    "description": "Supabase launches Storage leveraging Postgres.",
+    "imgUrl": "images/case-study-monitoro.jpg",
+    "logoUrl": "images/logos/monitoro.png",
+    "organization": "Monitoro",
+    "url": "/blog/2021/03/30/supabase-storage",
     "postMeta": {
       "name": "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",

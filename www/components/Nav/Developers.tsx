@@ -66,7 +66,7 @@ const Developers = () => {
       <div className="col-span-6">
         <div className="m-3 mx-6">
           <Typography.Text type="secondary">Latest announcements</Typography.Text>
-          <ul className="mt-6 space-y-16">
+          <ul className="mt-6 space-y-3 pb-6">
             {AnnouncementsData.map((caseStudy: any, idx: number) => (
               <li className="flow-root" key={`flyout_case_${idx}`}>
                 <a
