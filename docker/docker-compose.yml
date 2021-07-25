@@ -24,7 +24,7 @@ services:
       GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
       GOTRUE_DB_DRIVER: postgres
       DB_NAMESPACE: auth
-      API_EXTERNAL_URL: localhost
+      API_EXTERNAL_URL: http://localhost:8000
       GOTRUE_API_HOST: 0.0.0.0
       PORT: ${AUTH_PORT}
 
@@ -32,9 +32,13 @@ services:
       GOTRUE_SMTP_PORT: ${SMTP_PORT}
       GOTRUE_SMTP_USER: ${SMTP_USER}
       GOTRUE_SMTP_PASS: ${SMTP_PASS}
+      GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
 
       GOTRUE_DISABLE_SIGNUP: 'false'
-      GOTRUE_SITE_URL: localhost
+      GOTRUE_SITE_URL: http://localhost:8000
+      GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
+      MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+      MAILER_URLPATHS_RECOVERY: /auth/v1/verify
       GOTRUE_MAILER_AUTOCONFIRM: 'true'
       GOTRUE_LOG_LEVEL: DEBUG
       GOTRUE_OPERATOR_TOKEN: ${OPERATOR_TOKEN}
