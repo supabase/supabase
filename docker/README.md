@@ -1,14 +1,12 @@
 # Supabase Docker
 
-You can run Supabase on your local machine or a server using `docker-compose`.
-For a more secure setup to use on a server (e.g. using HTTPS), have a look at the *supabase-traefik* setup.
-
+Run Supabase locally.
 ## Configuration
 
-Add your passwords to the .env file.
-For better customization and security, please make sure you read the [self-hosting guide](https://supabase.io/docs/guides/self-hosting#running-supabase).
+Add your passwords to the `.env` file.
+For better customization and security, please read the [self-hosting guide](https://supabase.io/docs/guides/self-hosting#running-supabase).
 
-## Run via docker-compose
+## Run via `docker-compose`
 
 - Starting all services: `docker-compose up`
 - Stopping all services: `docker-compose down`
@@ -30,4 +28,5 @@ Accessing the services directly:
   - GoTrue: http://localhost:8000/auth/v1/?apikey=<anon-apikey-from-kong.yml>
   - PostgREST: http://localhost:8000/rest/v1/?apikey=<anon-apikey-from-kong.yml>
   - Realtime: http://localhost:8000/realtime/v1/?apikey=<anon-apikey-from-kong.yml>
+  - Storage: http://localhost:8000/storage/v1/?apikey=<anon-apikey-from-kong.yml>
 - Postgres: http://localhost:5432
