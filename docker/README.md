@@ -23,7 +23,7 @@ For better customization and security, please read the [self-hosting guide](http
 - Postgres: http://localhost:5432
 
 
-#### With Javascript
+### With Javascript
 
 ```js
 import { createClient } from '@supabase/supabase-js'
@@ -34,7 +34,7 @@ const SUPABASE_KEY = '<anon-apikey-from-kong.yml>'
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 ```
 
-#### Full example 
+### Quickstart example
 
 Once you have started all the services, you can use any of the examples in the `/examples` folder. For example:
 
