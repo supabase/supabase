@@ -93,6 +93,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">
 
@@ -113,6 +114,17 @@ const { data, error } = supabase
 ```
 
 </TabItem>
+  
+<TabItem value="DART">
+
+```dart
+final result = client
+  .from('books')
+  .select()
+  .eq('name', 'Harry');
+```
+
+</TabItem>
 </Tabs>
 
 
@@ -124,6 +136,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">
 
@@ -144,6 +157,16 @@ const { data, error } = supabase
 ```
 
 </TabItem>
+<TabItem value="DART">
+
+```dart
+final result = client
+  .from('books')
+  .select()
+  .textSearch('name', "'Harry'");
+```
+
+</TabItem>
 </Tabs>
 
 ## Basic Full Text Queries
@@ -157,6 +180,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
 <TabItem value="SQL">
@@ -179,6 +203,16 @@ const { data, error } = supabase
   .from('books')
   .select()
   .textSearch('description', `'big'`)
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final result = client
+  .from('books')
+  .select()
+  .textSearch('description', "'big'");
 ```
 
 </TabItem>
@@ -234,6 +268,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
 <TabItem value="SQL">
@@ -259,6 +294,16 @@ const { data, error } = supabase
 ```
 
 </TabItem>
+<TabItem value="DART">
+
+```dart
+final result = client
+  .from('books')
+  .select()
+  .textSearch('description', "'little' & 'big'");
+```
+
+</TabItem>
 <TabItem value="Data">
 
 | id | title  | author            | description                      |
@@ -277,6 +322,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
 <TabItem value="SQL">
@@ -299,6 +345,16 @@ const { data, error } = supabase
   .from('books')
   .select()
   .textSearch('description', `'little' | 'big'`)
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final result = client
+  .from('books')
+  .select()
+  .textSearch('description', "'little' | 'big'");
 ```
 
 </TabItem>
@@ -369,6 +425,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
 <TabItem value="SQL">
@@ -390,6 +447,16 @@ const { data, error } = supabase
   .from('books')
   .select()
   .textSearch('fts', `'little' & 'big'`)
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final result = client
+  .from('books')
+  .select()
+  .textSearch('fts', "'little' & 'big'");
 ```
 
 </TabItem>
@@ -418,6 +485,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">
 
@@ -441,6 +509,16 @@ const { data, error } = supabase
 ```
 
 </TabItem>
+<TabItem value="DART">
+
+```dart
+final result = client
+  .from('books')
+  .select()
+  .textSearch('description', "'big' <-> 'dreams'");
+```
+
+</TabItem>
 </Tabs>
 
 
@@ -451,6 +529,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">
 
@@ -474,6 +553,16 @@ const { data, error } = supabase
 ```
 
 </TabItem>
+<TabItem value="DART">
+
+```dart
+final result = client
+  .from('books')
+  .select()
+  .textSearch('description', "'year' <2> 'school'");
+```
+
+</TabItem>
 </Tabs>
 
 
@@ -487,6 +576,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">
 
@@ -507,6 +597,16 @@ const { data, error } = supabase
   .from('books')
   .select()
   .textSearch('description', `'big' & !'little'`)
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final result = client
+  .from('books')
+  .select()
+  .textSearch('description', "'big' & !'little'");
 ```
 
 </TabItem>
