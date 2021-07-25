@@ -5,7 +5,7 @@ description: How to use configure and deploy Supabase.
 ---
 
 Supabase is a [Hosted Platform](https://app.supabase.io), so you don't _have_ to deploy it yourself. 
-However, if you _want_ to configure and deploy it yourself, this is also possible.
+However, if you want to configure and deploy it yourself, that's also possible.
 
 ## Before you begin
 
@@ -13,7 +13,7 @@ If you are about to step through this Guide, please record your steps! You can h
 missing details and fixing errors.
 
 The self-hosted version of Supabase does not include a UI yet. 
-We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) 
+We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) and with a [WIP PR here](https://github.com/supabase/supabase/pull/2281) 
 ([more context](https://github.com/supabase/supabase/discussions/1001#discussioncomment-558696)).
 
 In the meantime, here are some suggested tools for interacting with your Postgres Database:
@@ -54,40 +54,21 @@ git clone https://github.com/supabase/supabase
 cd supabase/docker
 ```
 
-### Option 3: Using a shallow clone
-
-If you use Git version >2.25, you can use a shallow clone to download this folder to your local machine:
-
-```bash
-# 1. Copy an empty repo
-git clone --no-checkout https://github.com/supabase/supabase
-
-# 2. Move into the empty repo
-cd supabase
-
-# 3. Initialize sparse-checkout
-git sparse-checkout init --cone
-
-# 4. Checkout the folder
-git sparse-checkout set docker
-```
 
 ## Running Supabase
 
-Now that you have the Docker set up on your local machine, you can start it here by running 
+### (Optional) Update secrets 
 
-```bash
-docker-compose up
-```
+If you are deploying to production, you should update the default [passwords and secrets](https://github.com/supabase/supabase/blob/master/docker/.env).
 
-**Important** 
+### (Optional) Update API keys 
 
-Make sure you update the default [passwords and secrets](https://github.com/supabase/supabase/blob/master/docker/.env) 
-before running in Production.
-After you have regenerated the JWT secret, you will need to encode a new `anon` and `service_role` API key and update 
-them [here](https://github.com/supabase/supabase/blob/b1e99d2ce1f63ba728230fb53a6de444f60bce1f/docker/dockerfiles/kong/kong.yml#L42). For example, using [jsonwebtoken.io](https://www.jsonwebtoken.io/).
+If you are deploying to production, you should encode a new `anon` and `service_role` API key and update 
+them [here](https://github.com/supabase/supabase/blob/b1e99d2ce1f63ba728230fb53a6de444f60bce1f/docker/dockerfiles/kong/kong.yml#L42). 
 
-The data you will need to encode includes:
+
+After you have regenerated the JWT secret in the step above, use a JWT generator (for example, using [jsonwebtoken.io](https://www.jsonwebtoken.io/)) to regenerate the API Keys using the payloads below:
+
 
 ```bash
 # anon Payload:
@@ -111,6 +92,14 @@ The data you will need to encode includes:
 ```
  
 
+### Run the Docker set up
+
+Now that you have the Docker set up on your local machine, you can start it here by running 
+
+```bash
+docker-compose up
+```
+
 ## Configuring each service
 
 Supabase is made up of several services. We have prefilled the `docker-compose` file with all the configuration you need to get started. 
@@ -122,6 +111,7 @@ Here are a list of environment variables for each service:
 - [PostgREST](https://postgrest.org/en/v7.0.0/configuration.html)
 - [Realtime](https://github.com/supabase/realtime#server-set-up)
 - [GoTrue](https://github.com/supabase/gotrue)
+- [Storage](https://github.com/supabase/storage-api)
 - [Kong](https://docs.konghq.com/install/docker/)
 
 ### Configuring email 
@@ -149,7 +139,7 @@ See the following guides to deploy Docker Compose setup using your preferred too
 
 ## One-click deploys 
 
-For some individual tools, we also provide images and deployments into cloud marketplaces:
+For some tools we also provide images and deployments into cloud marketplaces:
 
 ### Postgres
 

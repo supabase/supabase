@@ -82,19 +82,19 @@ services:
     - rest
     restart: on-failure
     environment:
-        ANON_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoxNjkwNDQzMTM1LCJhdWQiOiIiLCJzdWIiOiIiLCJSb2xlIjoiYW5vbiIsImp0aSI6ImQ1N2ZkMjFlLTNkYjQtNDk3YS1hNGViLTI4ZDY3Yzg2NjEwMiJ9.YySz_BoYxYco0b2aP3iBMt-dVUqC6RpnQiSb4Zt-L-o
-        SERVICE_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoxNjkwNDQzMTM1LCJhdWQiOiIiLCJyb2xlIjoic2VydmljZV9yb2xlIiwianRpIjoiOTk4MzJiYmItNDdhNS00NzJhLTgxMDQtYzY4ZGVjZDQyZDVlIn0._DToQdxDcSLsp3tPpacsxswv0p1KRti0QOTmnbfs5JY
+        ANON_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoxNjIwNzQyMTM1LCJhdWQiOiIiLCJzdWIiOiIiLCJSb2xlIjoiYW5vbiIsImp0aSI6ImQ1N2ZkMjFlLTNkYjQtNDk3YS1hNGViLTI4ZDY3Yzg2NjEwMiJ9.Uc0w024BLhWjMAAdzMJfkMxaFa82N-6pBxAtEGzrXCQ
+        SERVICE_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoxNjIwNzQyMTU1LCJhdWQiOiIiLCJzdWIiOiIiLCJSb2xlIjoic2VydmljZV9yb2xlIiwianRpIjoiOTk4MzJiYmItNDdhNS00NzJhLTgxMDQtYzY4ZGVjZDQyZDVlIn0.zQXx74dQyhpkcqZOMxsx961DPsDz4-nWxTLrCAd-ioI
         PROJECT_REF: bjwdssmqcnupljrqypxz # can be any random string
         POSTGREST_URL: http://rest:3000
         PGRST_JWT_SECRET: ${JWT_SECRET}
         DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres
         PGOPTIONS: "-c search_path=storage"
         FILE_SIZE_LIMIT: 52428800
-        REGION: us-east-1 # region where your bucket is located
-        GLOBAL_S3_BUCKET: supa-storage-testing  # name of s3 bucket where you want to store objects
+        REGION: ${STORAGE_REGION} # region where your bucket is located
+        GLOBAL_S3_BUCKET: ${STORAGE_S3_BUCKET}  # name of s3 bucket where you want to store objects
         # AWS_ACCESS_KEY_ID: replace-with-your-aws-key
         # AWS_SECRET_ACCESS_KEY: replace-with-your-aws-secret
-        STORAGE_BACKEND: file
+        STORAGE_BACKEND: ${STORAGE_BACKEND}
         FILE_STORAGE_BACKEND_PATH: /var/data/storage
   db:
     container_name: supabase-db
