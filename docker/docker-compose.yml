@@ -75,7 +75,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
 
   storage:
-    image: supabase/storage-api:v0.8.3
+    image: supabase/storage-api:v0.9.1
     ports:
       - '5000:5000'
     depends_on:
