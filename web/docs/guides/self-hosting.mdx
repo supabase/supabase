@@ -5,18 +5,15 @@ description: How to use configure and deploy Supabase.
 ---
 
 Supabase is a [Hosted Platform](https://app.supabase.io), so you don't _have_ to deploy it yourself. 
-However, if you _want_ to configure and deploy it yourself, this is also possible.
+However, if you want to configure and deploy it yourself, that's also possible.
 
 ## Before you begin
 
-If you are about to step through this Guide, please record your steps! You can help us improve by adding 
-missing details and fixing errors.
-
 The self-hosted version of Supabase does not include a UI yet. 
-We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) 
-([more context](https://github.com/supabase/supabase/discussions/1001#discussioncomment-558696)).
+We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) and with a [WIP PR here](https://github.com/supabase/supabase/pull/2281). 
+[[more context](https://github.com/supabase/supabase/discussions/1001#discussioncomment-558696)]
 
-In the meantime, here are some suggested tools for interacting with your Postgres Database:
+In the meantime, here are some suggestions for working with your Postgres Database:
 
 - `pgadmin`: https://www.pgadmin.org 
 - `dbeaver`: https://dbeaver.com 
@@ -54,25 +51,7 @@ git clone https://github.com/supabase/supabase
 cd supabase/docker
 ```
 
-### Option 3: Using a shallow clone
-
-If you use Git version >2.25, you can use a shallow clone to download this folder to your local machine:
-
-```bash
-# 1. Copy an empty repo
-git clone --no-checkout https://github.com/supabase/supabase
-
-# 2. Move into the empty repo
-cd supabase
-
-# 3. Initialize sparse-checkout
-git sparse-checkout init --cone
-
-# 4. Checkout the folder
-git sparse-checkout set docker
-```
-
-## Running Supabase
+## Running Locally
 
 Now that you have the Docker set up on your local machine, you can start it here by running 
 
@@ -80,14 +59,38 @@ Now that you have the Docker set up on your local machine, you can start it here
 docker-compose up
 ```
 
-**Important** 
+## Deploying
 
-Make sure you update the default [passwords and secrets](https://github.com/supabase/supabase/blob/master/docker/.env) 
-before running in Production.
-After you have regenerated the JWT secret, you will need to encode a new `anon` and `service_role` API key and update 
-them [here](https://github.com/supabase/supabase/blob/b1e99d2ce1f63ba728230fb53a6de444f60bce1f/docker/dockerfiles/kong/kong.yml#L42). For example, using [jsonwebtoken.io](https://www.jsonwebtoken.io/).
+### Configuring each service
 
-The data you will need to encode includes:
+Supabase is made up of several services. We have prefilled the `docker-compose` file with all the configuration you need to get started. 
+If you would like to change any of the configuration, you can update the env variables in the `docker-compose` file.
+
+Here are a list of environment variables for each service:
+
+- [Postgres](https://hub.docker.com/_/postgres/)
+- [PostgREST](https://postgrest.org/en/v7.0.0/configuration.html)
+- [Realtime](https://github.com/supabase/realtime#server-set-up)
+- [GoTrue](https://github.com/supabase/gotrue)
+- [Storage](https://github.com/supabase/storage-api)
+- [Kong](https://docs.konghq.com/install/docker/)
+
+### Update secrets 
+
+If you are deploying to production, you should update the default [passwords and secrets](https://github.com/supabase/supabase/blob/master/docker/.env).
+
+### Update API keys 
+
+All config for the API Gateway is stored in the `kong` directory. Inside `kong.yml` you'll find the routing for all services, the routing rules, 
+and down the bottom you'll find the JWTs capable of accessing services that require API Key access.
+
+See the full docs [here](https://docs.konghq.com/hub/kong-inc/key-auth/).
+
+If you are deploying to production, you should encode a new `anon` and `service_role` API key and update 
+them [here](https://github.com/supabase/supabase/blob/b1e99d2ce1f63ba728230fb53a6de444f60bce1f/docker/dockerfiles/kong/kong.yml#L42). 
+
+After you have regenerated the JWT secret in the step above, use a JWT generator (for example, using [jsonwebtoken.io](https://www.jsonwebtoken.io/)) to regenerate the API Keys using the payloads below:
+
 
 ```bash
 # anon Payload:
@@ -109,35 +112,14 @@ The data you will need to encode includes:
  "role": "service_role"
 }
 ```
- 
-
-## Configuring each service
-
-Supabase is made up of several services. We have prefilled the `docker-compose` file with all the configuration you need to get started. 
-If you would like to change any of the configuration, you can update the env variables in the `docker-compose` file.
-
-Here are a list of environment variables for each service:
-
-- [Postgres](https://hub.docker.com/_/postgres/)
-- [PostgREST](https://postgrest.org/en/v7.0.0/configuration.html)
-- [Realtime](https://github.com/supabase/realtime#server-set-up)
-- [GoTrue](https://github.com/supabase/gotrue)
-- [Kong](https://docs.konghq.com/install/docker/)
 
 ### Configuring email 
 
 GoTrue requires an SMTP server to send emails for all authentication actions. 
 You will need to provide the following [settings](https://github.com/supabase/gotrue#e-mail) inside the `.env` file [here](https://github.com/supabase/supabase/blob/027e7f7b97bbe7365db4f7f46abe480e05841006/docker/.env#L8).
 
-### API Keys 
 
-All config for the API Gateway is stored in the `kong` directory. Inside `kong.yml` you'll find the routing for all services, the routing rules, 
-and down the bottom you'll find the JWTs capable of accessing services that require API Key access.
-
-See the full docs [here](https://docs.konghq.com/hub/kong-inc/key-auth/).
-
-
-## Deploying
+### Deploying
 
 See the following guides to deploy Docker Compose setup using your preferred tool and platform: 
 
@@ -149,7 +131,7 @@ See the following guides to deploy Docker Compose setup using your preferred too
 
 ## One-click deploys 
 
-For some individual tools, we also provide images and deployments into cloud marketplaces:
+For some tools we also provide images and deployments into cloud marketplaces:
 
 ### Postgres
 
