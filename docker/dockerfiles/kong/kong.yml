@@ -79,7 +79,7 @@ services:
 consumers:
 -   username: 'anon-key'
     keyauth_credentials:
-    -   key: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoxNjIwNzQyMTM1LCJhdWQiOiIiLCJzdWIiOiIiLCJSb2xlIjoiYW5vbiIsImp0aSI6ImQ1N2ZkMjFlLTNkYjQtNDk3YS1hNGViLTI4ZDY3Yzg2NjEwMiJ9.Uc0w024BLhWjMAAdzMJfkMxaFa82N-6pBxAtEGzrXCQ
+    -   key: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYyNzIwNzUzMiwiZXhwIjoxNjkwMjc5NTMyLCJhdWQiOiIiLCJzdWIiOiIiLCJyb2xlIjoiYW5vbiJ9.05CInfNa3-mSWJbTcUhhjCGfSF8tWNO94-TE2ez5AfY
 -   username: 'service-key'
     keyauth_credentials:
-    -   key: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoxNjIwNzQyMTU1LCJhdWQiOiIiLCJzdWIiOiIiLCJSb2xlIjoic2VydmljZV9yb2xlIiwianRpIjoiOTk4MzJiYmItNDdhNS00NzJhLTgxMDQtYzY4ZGVjZDQyZDVlIn0.zQXx74dQyhpkcqZOMxsx961DPsDz4-nWxTLrCAd-ioI
+    -   key: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYyNzIwNzUzMiwiZXhwIjoxNjkwMjc5NTMyLCJhdWQiOiIiLCJzdWIiOiIiLCJyb2xlIjoiYW5vbiJ9.05CInfNa3-mSWJbTcUhhjCGfSF8tWNO94-TE2ez5AfY
