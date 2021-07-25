@@ -17,6 +17,7 @@ services:
       - ${AUTH_PORT}
     depends_on:
       - db
+    restart: always
     environment:
       GOTRUE_JWT_SECRET: ${JWT_SECRET}
       GOTRUE_JWT_EXP: 3600
@@ -74,13 +75,13 @@ services:
       JWT_SECRET: ${JWT_SECRET}
 
   storage:
-    image: supabase/storage-api:v0.8.3
+    image: supabase/storage-api:v0.9.1
     ports:
       - '5000:5000'
     depends_on:
     - db
     - rest
-    restart: on-failure
+    restart: always
     environment:
         ANON_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoxNjkwNDQzMTM1LCJhdWQiOiIiLCJzdWIiOiIiLCJSb2xlIjoiYW5vbiIsImp0aSI6ImQ1N2ZkMjFlLTNkYjQtNDk3YS1hNGViLTI4ZDY3Yzg2NjEwMiJ9.YySz_BoYxYco0b2aP3iBMt-dVUqC6RpnQiSb4Zt-L-o
         SERVICE_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoxNjkwNDQzMTM1LCJhdWQiOiIiLCJyb2xlIjoic2VydmljZV9yb2xlIiwianRpIjoiOTk4MzJiYmItNDdhNS00NzJhLTgxMDQtYzY4ZGVjZDQyZDVlIn0._DToQdxDcSLsp3tPpacsxswv0p1KRti0QOTmnbfs5JY
