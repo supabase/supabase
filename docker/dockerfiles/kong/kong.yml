@@ -1,18 +1,9 @@
 _format_version: "1.1"
 services:
--   name: auth-v1
-    _comment: 'GoTrue: /auth/v1/* -> http://auth:9999/*'
-    url: http://auth:9999/
-    routes:
-    -   name: auth-v1-all
-        strip_path: true
-        paths:
-        - /auth/v1/
-    plugins:
-    -   name: cors
-    -   name: key-auth
-        config:
-            hide_credentials: true
+- {name: auth-v1-open, url: 'http://localhost:9999/verify', routes: [{name: auth-v1-open, strip_path: true, paths: [/auth/v1/verify]}], plugins: [{name: cors}]}
+- {name: auth-v1-open-callback, url: 'http://localhost:9999/callback', routes: [{name: auth-v1-open-callback, strip_path: true, paths: [/auth/v1/callback]}], plugins: [{name: cors}]}
+- {name: auth-v1-open-authorize, url: 'http://localhost:9999/authorize', routes: [{name: auth-v1-open-authorize, strip_path: true, paths: [/auth/v1/authorize]}], plugins: [{name: cors}]}
+- {name: auth-v1, url: 'http://localhost:9999/', routes: [{name: auth-v1, strip_path: true, paths: [/auth/v1/]}], plugins: [{name: cors}, {name: key-auth, config: {hide_credentials: false}}]}
 -   name: rest-v1
     _comment: 'PostgREST: /rest/v1/* -> http://rest:3000/*'
     url: http://rest:3000/
