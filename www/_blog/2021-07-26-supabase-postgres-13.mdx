@@ -50,13 +50,13 @@ Below is a comparison between the ARM versions of Supabase Postgres `0.15.0` and
 and follow the PostgreSQL configuration [here](https://www.percona.com/blog/2021/01/22/postgresql-on-arm-based-aws-ec2-instances-is-it-any-good/). 
 The following configuration of `pgbench` was used.
 
-```sql
+```bash
 pgbench -i -s 150
 ```
 
 Running the benchmark with 2, 4, 8, 16, 64, and 128 clients:
 
-```sql
+```bash
 pgbench -P 5 -c {num_clients} -j {num_clients} -T 300 -M prepared postgres
 ```
 
