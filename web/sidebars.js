@@ -97,7 +97,13 @@ module.exports = {
       type: 'category',
       label: 'See Also',
       collapsed: false,
-      items: ['handbook/contributing', 'company/terms', 'company/privacy', 'company/aup'],
+      items: [
+        'handbook/contributing',
+        'handbook/supasquad',
+        'company/terms',
+        'company/privacy',
+        'company/aup',
+      ],
     },
   ],
   guides: [
