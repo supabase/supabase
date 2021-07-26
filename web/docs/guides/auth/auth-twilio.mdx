@@ -8,6 +8,8 @@ import ExtensionsComponent from '../../../../web/src/components/Extensions'
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+## Overview
+
 In this guide we'll show you how to authenticate your users with SMS based OTP (One-Time Password) tokens.
 
 There are two reasons to use Supabase SMS OTP tokens:
@@ -24,7 +26,9 @@ What you'll need:
 - A Supabase project (create one here: https://app.supabase.io)
 - A mobile phone capable of receiving SMS
 
-## Finding your Twilio credentials
+## Steps
+
+### Finding your Twilio credentials
 
 Start by logging into your Twilio account and starting a new project: https://www.twilio.com/console/projects/create
 
@@ -65,7 +69,7 @@ Note: for "Twilio Message Service SID" you can use the Sender Phone Number gener
 Now the backend should be setup, we can proceed to adding our clientside code!
 
 
-## Using OTP with password based logins
+### Using OTP with password based logins
 
 In this use scenario we'll be using the user's mobile phone number as an alternative to an email address when signing up along with a password. You may want to think hard about the permanency of this however. It is not uncommon for mobile phone numbers to be recycled by phone networks when users cancel their phone contracts or move countries, therefore granting access to the user's account to whomever takes over the phone number in the future. Soon we'll add multi-factor auth, which will mitigate this risk, but for now you may want to give some thought to allowing your users to recover their account by some other means in an emergency.
 
@@ -184,7 +188,7 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/token?grant_type=
 </TabItem>
 </Tabs>
 
-## Using OTP as a passwordless sign-in mechanism
+### Using OTP as a passwordless sign-in mechanism
 
 In this scenario you are granting your user's the ability to login to their account without needing to set a password on their account, all they have to do to log in is verify their mobile each time using the OTP.
 
@@ -265,3 +269,9 @@ and the response should also be the same as above:
 ```
 
 The user does not have a password therefore will need to sign in via this method each time they want to access your service.
+
+## Resources
+
+- [Twilio Signup](https://www.twilio.com/try-twilio)
+- [Supabase Dashboard](https://app.supabase.io)
+- [Supabase Row Level Security](https://supabase.io/docs/guides/auth#row-level-security)
