@@ -4,6 +4,10 @@ title: SMS OTP with Twilio
 description: How to set up and use Mobile OTP with Twilio and Supabase.
 ---
 
+import ExtensionsComponent from '../../../../web/src/components/Extensions'
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 In this guide we'll show you how to authenticate your users with SMS based OTP (One-Time Password) tokens.
 
 There are two reasons to use Supabase SMS OTP tokens:
@@ -67,6 +71,14 @@ In this use scenario we'll be using the user's mobile phone number as an alterna
 
 Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
 
+<Tabs
+defaultValue="JS"
+values={[
+  {label: 'Javascript', value: 'JS'},
+  {label: 'HTTP', value: 'HTTP'},
+]}>
+<TabItem value="JS">
+
 ```js
 let { user, error } = await supabase.auth.signUp({
   phone: '+13334445555',
@@ -74,9 +86,33 @@ let { user, error } = await supabase.auth.signUp({
 })
 ```
 
+</TabItem>
+<TabItem value="HTTP">
+
+```bash
+curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/signup' \
+-H "apikey: SUPABASE_KEY" \
+-H "Content-Type: application/json" \
+-d '{
+  "phone": "+13334445555",
+  "password": "some-password"
+}'
+```
+
+</TabItem>
+</Tabs>
+
 The user will now receive an SMS with a 6-digit pin that you will need to receive from them within 60-seconds before they can login to their account.
 
 You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOTP`:
+
+<Tabs
+defaultValue="JS"
+values={[
+  {label: 'Javascript', value: 'JS'},
+  {label: 'HTTP', value: 'HTTP'},
+]}>
+<TabItem value="JS">
 
 ```js
 let { session, error } = await supabase.auth.verifyOTP({
@@ -84,6 +120,23 @@ let { session, error } = await supabase.auth.verifyOTP({
   token: '123456'
 })
 ```
+
+</TabItem>
+<TabItem value="HTTP">
+
+```bash
+curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
+-H "apikey: SUPABASE_KEY" \
+-H "Content-Type: application/json" \
+-d '{
+  "type": "sms",
+  "phone": "+13334445555",
+  "token": "123456"
+}'
+```
+
+</TabItem>
+</Tabs>
 
 If successful the user will now be logged in and you should receive a valid session like:
 
@@ -100,6 +153,14 @@ The access token can be sent in the Authorization header as a Bearer token for a
 
 Also now that the mobile has been verified, the user can use the number and password to sign in without needing to verify their number each time:
 
+<Tabs
+defaultValue="JS"
+values={[
+  {label: 'Javascript', value: 'JS'},
+  {label: 'HTTP', value: 'HTTP'},
+]}>
+<TabItem value="JS">
+
 ```js
 let { user, error } = await supabase.auth.signIn({
   phone: '+13334445555',
@@ -107,11 +168,35 @@ let { user, error } = await supabase.auth.signIn({
 })
 ```
 
+</TabItem>
+<TabItem value="HTTP">
+
+```bash
+curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/token?grant_type=password' \
+-H "apikey: SUPABASE_KEY" \
+-H "Content-Type: application/json" \
+-d '{
+  "phone": "+13334445555",
+  "password": "some-password"
+}'
+```
+
+</TabItem>
+</Tabs>
+
 ## Using OTP as a passwordless sign-in mechanism
 
 In this scenario you are granting your user's the ability to login to their account without needing to set a password on their account, all they have to do to log in is verify their mobile each time using the OTP.
 
 In javascript we can use the `signIn` method with a single parameter: `phone`
+
+<Tabs
+defaultValue="JS"
+values={[
+  {label: 'Javascript', value: 'JS'},
+  {label: 'HTTP', value: 'HTTP'},
+]}>
+<TabItem value="JS">
 
 ```js
 let { user, error } = await supabase.auth.signIn({
@@ -119,7 +204,30 @@ let { user, error } = await supabase.auth.signIn({
 })
 ```
 
+</TabItem>
+<TabItem value="HTTP">
+
+```bash
+curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/otp' \
+-H "apikey: SUPABASE_KEY" \
+-H "Content-Type: application/json" \
+-d '{
+  "phone": "+13334445555"
+}'
+```
+
+</TabItem>
+</Tabs>
+
 the second step is the same as the previous section, you need to collect the 6-digit pin from the user and pass it along with their phone number to the verify method:
+
+<Tabs
+defaultValue="JS"
+values={[
+  {label: 'Javascript', value: 'JS'},
+  {label: 'HTTP', value: 'HTTP'},
+]}>
+<TabItem value="JS">
 
 ```js
 let { session, error } = await supabase.auth.verifyOTP({
@@ -127,6 +235,23 @@ let { session, error } = await supabase.auth.verifyOTP({
   token: '123456'
 })
 ```
+
+</TabItem>
+<TabItem value="HTTP">
+
+```bash
+curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
+-H "apikey: SUPABASE_KEY" \
+-H "Content-Type: application/json" \
+-d '{
+  "type": "sms",
+  "phone": "+13334445555",
+  "token": "123456"
+}'
+```
+
+</TabItem>
+</Tabs>
 
 and the response should also be the same as above:
 
