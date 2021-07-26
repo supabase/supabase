@@ -14,4 +14,126 @@ toc_depth: 2
 ---
 
 
-TBD
+Did you know that Supabase has been one of the fastest growing startups [on GitHub](https://github.com/supabase/supabase) for four consecutive quarters? [^1] 
+
+![Supabase Star grown](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/66ba60ed-8afd-4571-bbbf-893221941946/Untitled.png)
+
+This simply be possible without some amazing open source tools, and since we're shipping a few upgrades this week we feel it's only fair 
+to shine a spotlight on some of the tools and community efforts that make Supabase possible. 
+
+## PostgreSQL version 13.3
+
+![Postgres version 13 released](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/9c581252-6e87-4ab4-a6cd-66bfe3eec6d0/supabase-postgres-13.png)
+
+PostgreSQL is not only a huge part of Supabase, it's also a huge inspiration - the speed that they ship, their community organization, 
+and their absolute dedication towards reliability. PostgreSQL 13.3 was released in June and from today, every new Supabase project will 
+be on PostgreSQL version 13.3.
+
+### Giving back
+
+Supabase makes it easy to get started with Postgres, but we think you should try it even if you don't want to use Supabase. Here's a 
+few ways that we want to give back to the PostgreSQL community:
+
+- Supabase was the first company to put Postgres in the [Digital Ocean Marketplace](https://marketplace.digitalocean.com/apps/supabase-postgres). 
+Since then it's been installed over 1000 times (not by us!).
+- We provide the same image in the [AWS marketplace](https://aws.amazon.com/marketplace/pp/prodview-lk2pfa5nafecg).
+- We're packaging the Marketplace version, along with "Bundles" [link to the blog post]
+- We're developing a few extensions: `[supautils](https://github.com/supabase/supautils)` and `[pg_net](https://github.com/supabase/pg_net)`
+
+### Get involved
+
+- Follow the official [PostgreSQL Twitter](https://twitter.com/PostgreSQL) account.
+- Join the official [mailing lists](https://www.postgresql.org/community/).
+
+[https://www.notion.so/supabase/13-3-0-0b7fb1ea8f414506b61dd07577861875](https://www.notion.so/13-3-0-0b7fb1ea8f414506b61dd07577861875)
+
+## PostgREST version 8.0
+
+![PostgREST version 8.0 released](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/7136a514-55ab-428c-b8da-638a6cba1e5f/supabase-postgrest.png)
+
+This new PostgREST stable version comes with the improvements we've made to make it truly enterprise-grade. Due to our commitment with OSS, 
+all of our improvements are upstreamed, so you can fully use them on your own self-hosted projects.
+
+### Highlights
+
+**Improved Performance**: Supabase high throughput requirements made this PostgREST version be able to handle up to 50% more throughput on 
+GET requests according to our benchmarks. We converted all of its SELECT queries to use prepared statements and reduced its logging 
+verbosity to make this possible.
+
+**Reduced downtime**: we need PostgREST to be more "set it and forget it", so reloading its schema cache is now zero downtime.
+
+**Dynamic Configuration**: we've made it easier to handle PostgREST configuration at scale(we manage hundreds of PostgREST instances). 
+This new version includes the ability to use an in-database configuration that is reloadable through a NOTIFY command.
+
+**Less admin burden**: PostgREST used to require the `pg_listen` utility to reload its schema cache. This is no longer needed. 
+The schema cache is reloadable with a simple NOTIFY command.
+
+**Better diagnostic information**: in the rare cases where PostgREST fails, we want to find the exact root cause quickly. 
+For this we've improved its logging by adding logging levels and timestamps to its server errors.
+
+**Simpler OpenAPI**: showing a complete OpenAPI output used to require a highly-privileged `anon` role. With the new `openapi-mode`, 
+this is no longer needed and `anon` can be kept with minimal privileges.
+
+The community has also made more enhancements and many bug fixes for the new version, see the 
+[v8.0 CHANGELOG](https://github.com/PostgREST/postgrest/releases/tag/v8.0.0) for the full list.
+
+### Get Started
+
+Want to get started with PostgREST? The Supabase community has built a number of client libraries to make it simpler to use:
+
+- Javascript: [postgrest-js](https://github.com/supabase/postgrest-js)
+- Rust: [postgrest-rs](https://github.com/supabase/postgrest-rs)
+- Go: [postgrest-go](https://github.com/supabase/postgrest-go)
+- Python: [postgrest-py](https://github.com/supabase/postgrest-py)
+- Dart: [postgrest-dart](https://github.com/supabase/postgrest-dart)
+- C#: [postgrest-csharp](https://github.com/supabase/postgrest-csharp)
+- Swift: [postgrest-swift](https://github.com/supabase/postgrest-swift)
+- Ruby: [postgrest-rb](https://github.com/supabase/postgrest-rb)
+- Kotlin: [postgrest-kt](https://github.com/supabase/postgrest-kt)
+
+### Get involved
+
+- Help with [PostgREST development](https://github.com/PostgREST/postgrest/blob/main/.github/CONTRIBUTING.md).
+- Help with [PostgREST docs translations](https://github.com/PostgREST/postgrest-docs/issues/393).
+- Follow the official [PostgREST Twitter](https://twitter.com/postgrest_org) account.
+
+## Supabase Flutter/Dart (Beta release)
+
+![Supabase Flutter Beta release](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/c876d071-d4f1-434f-9dec-493ba5988e07/supabase-flutter.png)
+
+While the Supabase team have been busy with the Javascript libraries, the community have been beavering away with Dart. They've even 
+[built fully-functional apps](https://www.producthunt.com/posts/spot-2d300f54-7a0a-4dbf-aee2-4a75311217cc) using Supabase Auth and Storage. 
+
+Today the Community are releasing both the the Flutter and Dart libraries in Beta. 
+
+### Get started
+
+- Check out the [Flutter Quickstart Guide](https://supabase.io/docs/guides/with-flutter)
+- Check out the code:
+    - Supabase Flutter: [GitHub](https://github.com/supabase/supabase-flutter/) | [Release](https://pub.dev/packages/supabase_flutter)
+    - Supabase Dart: [GitHub](https://github.com/supabase/supabase-dart/) | [Release](https://pub.dev/packages/supabase)
+
+### Get involved
+
+- Help [write](https://supabase.io/docs/handbook/supasquad#author) the Flutter Docs.
+- Help [maintain](https://supabase.io/docs/handbook/supasquad#maintainer) the [Flutter](https://github.com/supabase/supabase-flutter/) 
+and [Dart](https://github.com/supabase/supabase-dart/) libraries.
+
+## Supabase Discord
+
+![Supabase Discord](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/406cbb95-1152-4b77-9377-e1304c956000/supabase-discord.png)
+
+OK, OK, we get it - GitHub [Discussions](https://github.com/supabase/supabase/discussions) aren't enough for y'all. While we've been trying 
+to keep the conversation contained to our GitHub, the community has been creating [subreddits](https://www.reddit.com/r/Supabase/), 
+StackOverflow [tags](https://stackoverflow.com/questions/tagged/supabase), and GitHub [topics](https://github.com/topics/supabase). 
+
+A few weeks ago one of the community decided to create a Community-led Discord, and so the team figured we might as well join the fun.
+
+We'll still be using Discussions for debugging, but if you're looking for a Supabase Social, Discord is where to find it.
+
+### Get involved
+
+Join the Supabase Community Discord: [https://discord.gg/AYybku5cUz](https://discord.gg/AYybku5cUz), say hi, and start building.
+
+[^1]: GitHub Growth: 207% in [Q3](https://runacap.com/ross-index/q3-2020/) 2020; 1,373% in [Q4](https://runacap.com/ross-index/q4-2020/) 2020; 
+462% in [Q1](https://runacap.com/ross-index/q1-2021/) 2021; 1,653% in [Q2](https://runacap.com/ross-index/q2-2021/) 2021.
