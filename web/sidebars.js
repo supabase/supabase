@@ -147,6 +147,7 @@ module.exports = {
       collapsed: false,
       items: [
         'guides/auth/managing-user-data',
+        'guides/auth/auth-twilio',
         {
           type: 'category',
           label: 'OAuth Providers',
