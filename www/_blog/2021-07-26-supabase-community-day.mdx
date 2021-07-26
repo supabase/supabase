@@ -35,7 +35,7 @@ few ways we make it easy to use PostgreSQL without Supabase:
 Since then it's been installed over 1000 times (not by us!).
 - We provide a Postgres image in the [AWS marketplace](https://aws.amazon.com/marketplace/pp/prodview-lk2pfa5nafecg).
 - We're packaging the Marketplace version, [along with "Bundles"](/blog/2021/07/26/supabase-postgres-13#postgresql-bundles)
-- We're developing a few extensions: `[supautils](https://github.com/supabase/supautils)`, `[pg_net](https://github.com/supabase/pg_net)`, and a couple more soon to be announced.
+- We're developing a few extensions: [supautils](https://github.com/supabase/supautils), [pg_net](https://github.com/supabase/pg_net), and a couple more soon to be announced.
 
 ### Get involved
 
@@ -55,7 +55,7 @@ all of our improvements are upstreamed, so you can fully use them on your own se
 GET requests, according to our benchmarks. We converted all SELECT queries to use prepared statements and reduced logging 
 verbosity to make this possible.
 
-**Reduced downtime**: we need PostgREST to be more "set it and forget it", so reloading schema cache is now zero downtime.
+**Reduced downtime**: we need PostgREST to be more "set it and forget it", so reloading schema cache now has zero downtime.
 
 **Dynamic Configuration**: we've made it easier to handle PostgREST configuration at scale (we manage thousands of PostgREST instances). 
 This new version includes the ability to use an in-database configuration that is reloadable through a `NOTIFY` command.
