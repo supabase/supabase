@@ -133,6 +133,10 @@ module.exports = {
           title: 'Resources',
           items: [
             {
+              label: 'Brand Assets',
+              to: 'https://supabase.io/brand-assets',
+            },
+            {
               label: 'Docs',
               to: '/docs',
             },
