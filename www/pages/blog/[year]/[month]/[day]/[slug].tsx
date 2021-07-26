@@ -173,7 +173,7 @@ function BlogPostPage(props: any) {
         }}
       />
       <DefaultLayout>
-        <div className="bg-white dark:bg-dark-800 overflow-hidden py-12">
+        <div className="bg-white dark:bg-dark-800 overflow-hidden mb-12">
           <div className="container px-8 sm:px-16 xl:px-20 lg:mt-16 mx-auto">
             <div className="max-w-6xl mx-auto">
               <div className="lg:py-12 grid grid-cols-12 lg:gap-16">
