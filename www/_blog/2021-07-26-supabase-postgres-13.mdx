@@ -60,7 +60,7 @@ Running the benchmark with 2, 4, 8, 16, 64, and 128 clients:
 pgbench -P 5 -c {num_clients} -j {num_clients} -T 300 -M prepared postgres
 ```
 
-![PostgreSQL 13.3 performance](/new/images/blog/pg13/postgres-13-performance)
+![PostgreSQL 13.3 performance](/new/images/blog/pg13/postgres-13-performance.png)
 
 ## Ubuntu 20.04
 
@@ -77,7 +77,7 @@ expect Supabase Postgres 14 to quickly follow.
 
 ### `pgRouting`
 
-An extension of PostGIS, `[pgRouting](https://pgrouting.org/)` provides geospatial routing functionality.
+An extension of PostGIS, [`pgRouting`](https://pgrouting.org/) provides geospatial routing functionality.
 
 More information can be found [here](https://docs.pgrouting.org/latest/en/index.html).
 
@@ -99,11 +99,11 @@ database servers based on evolving traffic patterns.
 
 Last but not the least, we're diversifying the images of Supabase Postgres available in the AWS and Digital Ocean Marketplaces. 
 
-Instead of a single option, you we will soon offer four unique configurations of Supabase Postgres. Each bundle offers functionality for 
+Instead of a single option, we'll soon offer four configurations of PostgreSQL. Each bundle offers functionality for 
 common use-cases. For example, if you're using Postgres with Serverless functions, you might want to run the PgBouncer bundle. If you want an 
 HTTP API with your Postgres offering you might want to run the PostgREST bundle.
 
-| Name                                | PostgreSQL | PgBouncer | PostgREST |
+| `Name`                                | `PostgreSQL` | `PgBouncer` | `PostgREST` |
 |-------------------------------------|------------|-----------|-----------|
 | Supabase Postgres                   | ✅          |           |           |
 | Supabase Postgres: PgBouncer Bundle | ✅          | ✅         |           |
@@ -112,6 +112,6 @@ HTTP API with your Postgres offering you might want to run the PostgREST bundle.
 
 Each offering will be available for both the `x86` and `arm` architectures.
 
-## Try PostgreSQL 13 today
+## Try PostgreSQL 13
 
 Try the new features of PostgreSQL 13.3 today by creating a [new project](https://app.supabase.io/) on Supabase.
