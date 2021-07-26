@@ -63,7 +63,7 @@ module.exports = {
           position: 'right',
         },
         {
-          href: 'https://twitter.com/supabase_io',
+          href: 'https://twitter.com/supabase',
           className: 'navbar-item-twitter',
           position: 'right',
         },
@@ -102,6 +102,7 @@ module.exports = {
     },
     prism: {
       defaultLanguage: 'js',
+      additionalLanguages: ['dart'],
       plugins: ['line-numbers', 'show-language'],
       theme: require('@kiwicopple/prism-react-renderer/themes/vsDark'),
       darkTheme: require('@kiwicopple/prism-react-renderer/themes/vsDark'),
@@ -159,7 +160,7 @@ module.exports = {
             },
             {
               label: 'Twitter',
-              href: 'https://twitter.com/supabase_io',
+              href: 'https://twitter.com/supabase',
             },
             {
               label: 'DevTo',

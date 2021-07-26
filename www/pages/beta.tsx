@@ -117,6 +117,9 @@ const Hero = () => {
           <p className="text-2xl">
             Today, we're moving to <span className="text-brand-700">Beta</span>
           </p>
+          <time itemProp="datePublished" dateTime="2020-12-03" className="opacity-50 text-sm">
+            Published December 3rd, 2020
+          </time>
         </div>
       </div>
     </div>
@@ -814,7 +817,7 @@ const FundingPartners = () => (
           <p>
             Follow us on{' '}
             <a
-              href="https://twitter.com/supabase_io"
+              href="https://twitter.com/supabase"
               target="_blank"
               className="text-brand-700 hover:text-brand-800"
             >

@@ -1,0 +1,70 @@
+---
+id: connection-pooling
+title: "Connection Pooling"
+description: Connecting to your Supabase database using PgBouncer.
+---
+
+Connection pools are useful for managing a large number of _temporary_ connections. 
+
+## How connection pooling works
+
+A "connection pool" is a system (external to Postgres) which manage connections, rather than PostgreSQL's native system. Supabase uses [PgBouncer](https://www.pgbouncer.org/) for connection pooling.
+
+When a client makes a request, PgBouncer "allocates" and available connection to the client.
+When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
+
+
+![Connection pooling](/img/guides/connection-pool.png)
+
+
+## Pool modes
+
+Pool Mode determines how PgBouncer handles a connection.
+
+### Session
+
+When a new client connects, a connection is assigned to the client until it disconnects. Afterward, the connection is returned back to the pool. 
+
+All PostgreSQL features can be used with this option.
+
+### Transaction
+
+This is the suggested option for serverless functions. A connection is only assigned to the client for the duration of a transaction. Two consecutive transactions from the same client 
+could be executed over two different connections. 
+
+Some session-based PostgreSQL features such as prepared statements are not available with this option. 
+A comprehensive list of incompatible features can be found [here](https://www.pgbouncer.org/features.html).
+
+### Statement
+
+This is the most granular option. Connections are returned to the pool after every statement. Transactions with multiple statements are not allowed. This is best used when `AUTOCOMMIT` is in use.
+
+## Finding your connection string
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'}
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "Database" section.
+2. Click "Connection Pooling".
+3. Find your Connection Info and Connection String.
+```
+
+<video width="99%" muted playsInline controls="true">
+  <source src="/videos/pgbouncer-connection.mp4" type="video/mp4" muted playsInline />
+</video>
+
+</TabItem>
+</Tabs>
+
+
+
+## Resources 
+
+- [Direct Connections](/docs/guides/database/connecting/direct-connections).
+- [Connection Pooling](/docs/guides/database/connecting/connection-pooling).
+- [Connection Strings (Reference Docs)](/docs/reference/postgres/connection-strings).

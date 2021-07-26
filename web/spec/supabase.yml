@@ -926,7 +926,7 @@ pages:
           ```js
           const { data, error } = await supabase
             .storage
-            .createBucket('avatars')
+            .createBucket('avatars', { public: false })
           ```
 
   storage.emptyBucket():
@@ -986,6 +986,7 @@ pages:
       - Policy permissions required:
         - `buckets` permissions: none 
         - `objects` permissions: `insert`
+      - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - name: Upload file
         isSpotlight: true
@@ -1000,6 +1001,18 @@ pages:
               upsert: false
             })
           ```
+      - name: Upload file using `ArrayBuffer` from base64 file data
+        js: |
+          ```js
+          import {decode} from 'base64-arraybuffer'
+
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .upload('public/avatar1.png', decode('base64FileData'), {
+              contentType: 'image/png'
+            })
+          ```
 
   storage.from.update():
     title: 'from.update()'
@@ -1008,6 +1021,7 @@ pages:
       - Policy permissions required:
         - `buckets` permissions: none 
         - `objects` permissions: `update` and `select`
+      - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - name: Update file
         isSpotlight: true
@@ -1020,6 +1034,18 @@ pages:
             .update('public/avatar1.png', avatarFile, {
               cacheControl: 3600,
               upsert: false
+            })
+          ```
+      - name: Update file using `ArrayBuffer` from base64 file data
+        js: |
+          ```js
+          import {decode} from 'base64-arraybuffer'
+
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .update('public/avatar1.png', decode('base64FileData'), {
+              contentType: 'image/png'
             })
           ```
 
@@ -1056,7 +1082,7 @@ pages:
           const { signedURL, error } = await supabase
             .storage
             .from('avatars')
-            .createSignedUrl('avatar1.png', 60)
+            .createSignedUrl('folder/avatar1.png', 60)
           ```
 
   storage.from.getPublicUrl():
@@ -1074,7 +1100,7 @@ pages:
           const { publicURL, error } = supabase
             .storage
             .from('public-bucket')
-            .getPublicUrl('avatar1.png')
+            .getPublicUrl('folder/avatar1.png')
           ```
 
   storage.from.download():
@@ -1092,7 +1118,7 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .download('avatar1.png')
+            .download('folder/avatar1.png')
           ```
 
   storage.from.remove():
@@ -1110,7 +1136,7 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .remove(['avatar1.png'])
+            .remove(['folder/avatar1.png'])
           ```
 
   storage.from.list():
@@ -1128,7 +1154,11 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .list()
+            .list('folder', {
+              limit: 100,
+              offset: 0,
+              sortBy: { column: 'name', order: 'asc' },
+            })
           ```
 
   Using Modifiers:

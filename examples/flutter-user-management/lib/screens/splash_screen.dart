@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:supabase_demo/components/auth_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '/components/auth_state.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
