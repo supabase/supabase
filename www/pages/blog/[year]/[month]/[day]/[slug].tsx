@@ -196,7 +196,21 @@ function BlogPostPage(props: any) {
                     </Typography.Text>
                   </Space>
                   <Typography.Title>{props.blog.title}</Typography.Title>
-                  {author && <Avatar author={author} />}
+                  {author && (
+                    <div className="mt-6 mb-8 lg:mb-0">
+                      <Space size={4}>
+                        {author.author_image_url && (
+                          <img src={author.author_image_url} className="rounded-full w-10" />
+                        )}
+                        <Space direction="vertical" size={0}>
+                          <Typography.Text>{author.author}</Typography.Text>
+                          <Typography.Text type="secondary" small>
+                            {author.position}
+                          </Typography.Text>
+                        </Space>
+                      </Space>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
