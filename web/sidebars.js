@@ -147,10 +147,9 @@ module.exports = {
       collapsed: false,
       items: [
         'guides/auth/managing-user-data',
-        'guides/auth/auth-twilio',
         {
           type: 'category',
-          label: 'OAuth Providers',
+          label: 'External Providers',
           collapsed: false,
           items: [
             'guides/auth/auth-apple',
@@ -161,6 +160,7 @@ module.exports = {
             'guides/auth/auth-gitlab',
             'guides/auth/auth-google',
             'guides/auth/auth-twitter',
+            'guides/auth/auth-twilio',
           ],
         },
       ],
