@@ -55,7 +55,7 @@ all of our improvements are upstreamed, so you can fully use them on your own se
 GET requests, according to our benchmarks. We converted all SELECT queries to use prepared statements and reduced logging 
 verbosity to make this possible.
 
-**Reduced downtime**: we need PostgREST to be more "set it and forget it", so reloading schema cache is now zero downtime.
+**Reduced downtime**: we need PostgREST to be more "set it and forget it", so reloading schema cache now has zero downtime.
 
 **Dynamic Configuration**: we've made it easier to handle PostgREST configuration at scale (we manage thousands of PostgREST instances). 
 This new version includes the ability to use an in-database configuration that is reloadable through a `NOTIFY` command.
