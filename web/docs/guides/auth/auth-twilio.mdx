@@ -63,7 +63,80 @@ Now the backend should be setup, we can proceed to adding our clientside code!
 
 ## Using OTP with password based logins
 
-In this use case we'll be using the user's mobile phone number as an alternative to an email address. You may want to think hard about the permanency of this however. It is not uncommon for mobile phone numbers  
+In this use scenario we'll be using the user's mobile phone number as an alternative to an email address when signing up along with a password. You may want to think hard about the permanency of this however. It is not uncommon for mobile phone numbers to be recycled by phone networks when users cancel their phone contracts or move countries, therefore granting access to the user's account to whomever takes over the phone number in the future. Soon we'll add multi-factor auth, which will mitigate this risk, but for now you may want to give some thought to allowing your users to recover their account by some other means in an emergency.
+
+Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
+
+```js
+let { user, error } = await supabase.auth.signUp({
+  phone: '+13334445555',
+  password: 'some-password'
+})
+```
+
+The user will now receive an SMS with a 6-digit pin that you will need to receive from them within 60-seconds before they can login to their account.
+
+You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOTP`:
+
+```js
+let { session, error } = await supabase.auth.verifyOTP({
+  phone: '+13334445555',
+  token: '123456'
+})
+```
+
+If successful the user will now be logged in and you should receive a valid session like:
+
+```json
+{
+  access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNjI3MjkxNTc3LCJzdWIiOiJmYTA2NTQ1Zi1kYmI1LTQxY2EtYjk1NC1kOGUyOTg4YzcxOTEiLCJlbWFpbCI6IiIsInBob25lIjoiNjU4NzUyMjAyOSIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6InBob25lIn0sInVzZXJfbWV0YWRhdGEiOnt9LCJyb2xlIjoiYXV0aGVudGljYXRlZCJ9.1BqRi0NbS_yr1f6hnr4q3s1ylMR3c1vkiJ4e_N55dhM',
+  token_type: 'bearer',
+  expires_in: 3600,
+  refresh_token: 'LSp8LglPPvf0DxGMSj-vaQ'
+}
+```
+
+The access token can be sent in the Authorization header as a Bearer token for any CRUD operations on supabase-js. See our guide on [Row Level Security](https://supabase.io/docs/guides/auth#row-level-security) for more info on restricting access on a user basis.
+
+Also now that the mobile has been verified, the user can use the number and password to sign in without needing to verify their number each time:
+
+```js
+let { user, error } = await supabase.auth.signIn({
+  phone: '+13334445555',
+  password: 'some-password'
+})
+```
 
 ## Using OTP as a passwordless sign-in mechanism
 
+In this scenario you are granting your user's the ability to login to their account without needing to set a password on their account, all they have to do to log in is verify their mobile each time using the OTP.
+
+In javascript we can use the `signIn` method with a single parameter: `phone`
+
+```js
+let { user, error } = await supabase.auth.signIn({
+  phone: '+13334445555'
+})
+```
+
+the second step is the same as the previous section, you need to collect the 6-digit pin from the user and pass it along with their phone number to the verify method:
+
+```js
+let { session, error } = await supabase.auth.verifyOTP({
+  phone: '+13334445555',
+  token: '123456'
+})
+```
+
+and the response should also be the same as above:
+
+```json
+{
+  access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNjI3MjkxNTc3LCJzdWIiOiJmYTA2NTQ1Zi1kYmI1LTQxY2EtYjk1NC1kOGUyOTg4YzcxOTEiLCJlbWFpbCI6IiIsInBob25lIjoiNjU4NzUyMjAyOSIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6InBob25lIn0sInVzZXJfbWV0YWRhdGEiOnt9LCJyb2xlIjoiYXV0aGVudGljYXRlZCJ9.1BqRi0NbS_yr1f6hnr4q3s1ylMR3c1vkiJ4e_N55dhM',
+  token_type: 'bearer',
+  expires_in: 3600,
+  refresh_token: 'LSp8LglPPvf0DxGMSj-vaQ'
+}
+```
+
+The user does not have a password therefore will need to sign in via this method each time they want to access your service.
