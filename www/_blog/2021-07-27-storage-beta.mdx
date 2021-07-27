@@ -101,8 +101,10 @@ With this change in place, the client library supports uploading `ArrayBuffer`, 
 
 The storage explorer in our Dashboard feels like using a file explorer in your operating system. There were a lot of challenges to make it feel intuitive and robust, since S3 is a not a traditional filesystem. For example, S3 doesn't support a move operation natively - you need to copy the object to the new location and delete the original object. S3 also doesn't have a concept of directory, which means there is no API call to rename a directory. But to make the storage explorer feel like a native file explorer, we implemented these features.
 
+Context menus on folders
 ![Context menu 1](/new/images/blog/launch-week-sql-day-2/context-menu-1.png)
 
+Context menus on files
 ![Context menu 2](/new/images/blog/launch-week-sql-day-2/context-menu-2.png)
 
 ### The case of the disappearing folders
