@@ -22,7 +22,7 @@ const Annoucement = () => {
         <span>{a.text}</span>
         <a
           href={a.link.url}
-          className="inline-flex items-center px-2 py-1 space-x-1 text-xs transition-colors bg-indigo-900 rounded text-white dark:hover:text-indigo-100 hover:text-indigo-800 hover:bg-opacity-90"
+          className="inline-flex items-center px-2 py-1 space-x-1 text-xs transition-colors bg-indigo-900 rounded text-white dark:hover:text-indigo-100 hover:text-indigo-100 hover:bg-opacity-90"
         >
           {a.link.text} <IconArrowRight size="tiny" />
         </a>
