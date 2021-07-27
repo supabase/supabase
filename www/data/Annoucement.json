@@ -1,8 +1,8 @@
 {
-  "show": false,
-  "text": "We have released the April recap!",
+  "show": true,
+  "text": "We're now on Discord!",
   "link": {
-    "url": "https://supabase.io/blog/2021/05/03/supabase-beta-april-2021",
-    "text": "Read more"
+    "url": "http://discord.supabase.com",
+    "text": "Join"
   }
 }
