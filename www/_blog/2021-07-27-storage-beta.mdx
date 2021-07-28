@@ -99,7 +99,7 @@ With this change in place, the client library supports uploading `ArrayBuffer`, 
 
 ## Context menus
 
-The storage explorer in our Dashboard feels like using a file explorer in your operating system. There were a lot of challenges to make it feel intuitive and robust, since S3 is a not a traditional filesystem. For example, S3 doesn't support a move operation natively - you need to copy the object to the new location and delete the original object. S3 also doesn't have a concept of directory, which means there is no API call to rename a directory. But to make the storage explorer feel like a native file explorer, we implemented these features.
+The storage explorer in our Dashboard feels like using a file explorer in your operating system. There were a lot of challenges to make it feel intuitive and robust, since S3 is not a traditional filesystem. For example, S3 doesn't support a move operation natively - you need to copy the object to the new location and delete the original object. S3 also doesn't have a concept of directory, which means there is no API call to rename a directory. But to make the storage explorer feel like a native file explorer, we implemented these features.
 
 Context menus on folders
 ![Context menu 1](/new/images/blog/launch-week-sql-day-2/context-menu-1.png)
@@ -111,7 +111,7 @@ Context menus on files
 
 As we already mentioned, S3 doesn't really have a concept of directories. So if a user uploads an object with path `dir/subdir/avatar.png`, the dir and subdir are automatically "created" and there is no explicit API call to create them.
 
-This leads to an issue where if a user creates an empty directory and refreshes the page, the directory disappears since it is not persisted to S3. To simulate a normal filesystem (where empty directories are not garbage collected), we upload an empty file when the user creates a directory on the dashboard. The dashboard hides this placeholder file and the placeholder is deleted when the user uploads an object in the directory - voila, no more disappearing directores!
+This leads to an issue where if a user creates an empty directory and refreshes the page, the directory disappears since it is not persisted to S3. To simulate a normal filesystem (where empty directories are not garbage collected), we upload an empty file when the user creates a directory on the dashboard. The dashboard hides this placeholder file and the placeholder is deleted when the user uploads an object in the directory - voila, no more disappearing directories!
 
 ## Performance improvements for large buckets
 
