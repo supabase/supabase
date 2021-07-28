@@ -166,6 +166,7 @@ module.exports = {
             'guides/auth/auth-gitlab',
             'guides/auth/auth-google',
             'guides/auth/auth-twitter',
+            'guides/auth/auth-twitch',
           ],
         },
       ],
