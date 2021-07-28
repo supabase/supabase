@@ -68,5 +68,12 @@
     "position": "Engineering & PostgREST maintainer",
     "username": "steve-chavez",
     "author_image_url": "https://github.com/steve-chavez.png"
+  },
+  "kangmingtay": {
+    "author": "Kang Ming Tay",
+    "author_url": "https://github.com/kangmingtay",
+    "position": "Engineering",
+    "username": "kangmingtay",
+    "author_image_url": "https://github.com/kangmingtay.png"
   }
 }
