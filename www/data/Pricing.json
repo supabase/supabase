@@ -29,12 +29,12 @@
         }
       },
       {
-        "title": "Optimised database instances",
+        "title": "Optimzed database instances",
         "tooltip": "Why? Unique workload requirements, heavy reads and writes, compliance",
         "tiers": {
           "free": false,
           "pro": false,
-          "enterprise": true
+          "enterprise": "Starting from $50/month"
         }
       },
       {
