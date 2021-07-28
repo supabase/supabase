@@ -128,7 +128,7 @@ returns smallint as $$
 
     var num_affected = plv8.execute(
         'udpate profiles set first_name = $1 where id = $2', 
-        [id, first_name]
+        [first_name, id]
     );
 
     return num_affected;
