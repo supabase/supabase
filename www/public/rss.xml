@@ -5,9 +5,41 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sun, 25 Jul 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 26 Jul 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.io/blog/2021/07/27/storage-beta</guid>
+  <title>Supabase Storage now in Beta</title>
+  <link>https://supabase.io/blog/2021/07/27/storage-beta</link>
+  <description>Supabase Storage moves into Beta.</description>
+  <pubDate>Mon, 26 Jul 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/07/27/spot-flutter-with-postgres</guid>
+  <title>Spot: a video sharing app built with Flutter</title>
+  <link>https://supabase.io/blog/2021/07/27/spot-flutter-with-postgres</link>
+  <description>Spot is a geolocation-based video-sharing app with some social networking features.</description>
+  <pubDate>Mon, 26 Jul 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/07/26/supabase-postgres-13</guid>
+  <title>Supabase is now on Postgres 13.3</title>
+  <link>https://supabase.io/blog/2021/07/26/supabase-postgres-13</link>
+  <description>From today, new Supabase projects will be on a version of Supabase Postgres that runs on Postgres 13.3.</description>
+  <pubDate>Sun, 25 Jul 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/07/26/supabase-community-day</guid>
+  <title>Supabase Community Day</title>
+  <link>https://supabase.io/blog/2021/07/26/supabase-community-day</link>
+  <description>Community Day</description>
+  <pubDate>Sun, 25 Jul 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.io/blog/2021/07/26/epsilon3-self-hosting</guid>
   <title>Epsilon3 Self-Host Supabase To Revolutionize Space Operations </title>

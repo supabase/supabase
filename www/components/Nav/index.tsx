@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Button, Badge, IconGitHub } from '@supabase/ui'
+import { Button, Badge, IconStar } from '@supabase/ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -241,8 +241,8 @@ const Nav = (props: Props) => {
               </div>
               <div className="hidden lg:flex items-center sm:space-x-3">
                 <a href="https://github.com/supabase/supabase" target="_blank">
-                  <Button type="default" icon={<IconGitHub />}>
-                    GitHub
+                  <Button type="default" icon={<IconStar />}>
+                    Star us on GitHub
                   </Button>
                 </a>
                 <a href="https://app.supabase.io/api/login">
