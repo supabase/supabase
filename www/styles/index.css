@@ -201,8 +201,14 @@ table .thead--plans th {
   z-index: 5;
 }
 
-/* th {
+/* 
+th {
   border-right: 5px solid red;
   background: white;
   background-clip: padding-box;
-} */
+}
+*/
+
+.sbui-typography-container thead {
+  @apply text-gray-500 dark:text-gray-200;
+}
