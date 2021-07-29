@@ -15,27 +15,28 @@ date: '2021-07-29'
 toc_depth: 3
 ---
 
-Supabase offers a supercharged Postgres instance, along with a set of complementary services that make it easy to build mobile or web applications.
+Supabase offers a supercharged Postgres instance, along with a set of complementary services, making it easy to build mobile and web applications.
 Today, we're exposing a full set of metrics in your projects, so that you can build better (and faster) products for your users.
 
 ## Reports page
 
-We have added a new "Reports" section. You can view up to one month of data including API requests across all of Supabase's core pillars,
-Database, Auth and Storage, and also a couple of instance health metrics. We've included CPU usage and Memory usage for now,
+We have added a new "Reports" section to the Dashboard. You can view up to one month of data including
+API requests across all of Supabase's core pillars,
+Database, Auth and Storage. We've included a few instance health metrics, CPU usage and Memory usage for now,
 with a lot more on the way.
 
 ![Supabase reports screen](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-and-metrics-reports-screen.jpg)
 
-The charts are built with [Recharts](https://recharts.org/en-US), an MIT-licensed React chart library chosen for it's ease of use.
-We'll add customizable charts in the future, so we'd love to hear any libraries you'd like to see in Supabase in the future.
+All charts are built with [Recharts](https://recharts.org/en-US), an MIT-licensed React chart library chosen for it's ease of use.
+We'll add customizable charts in the future, so we'd love to hear which libraries you'd like to see in Supabase.
 
-Currently it's one configurable report per project, accessible and editable by all team members. In the next few weeks,
+Currently we support one configurable report per project, accessible and editable by all team members. In the next few weeks,
 we'll expand to unlimited reports per project, with longer date range options, new layout configurations, report templates,
 stacked charts and private/public visibility across your project's members.
 
-## New Project Home page
+## New project home page
 
-Every project now has a new home screen with a weekly overview of important metrics, and included usage bars for Database storage,
+Every project now has a new home screen with a weekly overview of important metrics. We've included usage bars for Database storage,
 number of Auth users, and Storage space.
 
 And we're just getting warmed up. Over the next few months you'll see more project information, notifications, and highlights so
@@ -43,9 +44,11 @@ that you can monitor your project health at a glance.
 
 ![Supabase new dashboard app homescreen](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-and-metrics-homepage.jpg)
 
-## Observability and Usage Metrics
+## Observability metrics
 
-tbd
+Backend as a Service? infrastructure as a Service? We don't care about the label, but we do care about giving developers the relevant
+observability metrics. Supabase gives you a full Postgres cluster for every project, and now we give you the tools to diagnose and manage
+important infrastructure anomolies.
 
 ![Supabase observability metrics](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-and-metrics-observability-screen.jpg)
 
@@ -95,27 +98,26 @@ A small subset of the metrics collected get aggregated to a centralized Victoria
 
 ![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/b7978a8a-a60a-488a-9789-4e9bf23fd445/prometheus.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/b7978a8a-a60a-488a-9789-4e9bf23fd445/prometheus.png)
 
-### Available Sources and Metrics
+### Available sources and metrics
 
 To start with, we're focusing on metrics a few of the most pertinent metrics:
 
-- The `[pg_stat_statements](https://www.postgresql.org/docs/13/pgstatstatements.html)` extension now comes enabled out of the box.
-- Our new dashboards now expose:
-  - Database metrics: CPU and RAM usage
-  - API Requests: Ingress, Egress, `GET`, `POST`, `PATCH`, `PUT`, `OPTIONS`, and all requests.
-  - Storage Requests: Ingress, Egress, `GET`, `POST`, `PATCH`, `PUT`, `OPTIONS`, and all requests.
-  - Auth Requests: Ingress, Egress, `GET`, `POST`, `PATCH`, `PUT`, `OPTIONS`, and all requests.
-- Coming soon:
-  - Number of active connections to your database.
-  - Various detailed stats from `pg_stat_statements`, `pg_stat_bgwriter`, `pg_stat_database`, `pg_stat_database_conflicts`.
-  - System level metrics like CPU, memory and disk utilization.
+- Database metrics: CPU and RAM usage
+- API Requests: Ingress, Egress, `GET`, `POST`, `PATCH`, `PUT`, `OPTIONS`, and all requests.
+- Storage Requests: Ingress, Egress, `GET`, `POST`, `PATCH`, `PUT`, `OPTIONS`, and all requests.
+- Auth Requests: Ingress, Egress, `GET`, `POST`, `PATCH`, `PUT`, `OPTIONS`, and all requests.
 
 ## What's next?
 
 Where to begin?
 
 - Multiple reports per project: we've started with just one report per projects, but in the next few weeks we'll allow you to create as many as you want.
-- More metrics: we're just getting started (especially database related statustics using `pg_stat_statements` and connection info).
+- More metrics: we're just getting started.
+  - Number of active connections to your database.
+  - Various detailed stats from `pg_stat_statements`, `pg_stat_bgwriter`, `pg_stat_database`, `pg_stat_database_conflicts`.
+  - System level metrics like CPU, memory and disk utilization.
 - Granularity: project statistics will come down to hourly.
 - Longer time periods: view historical data going back several months.
 - Interactive widgets: view-only reports are fine, but we wouldn't be a Postgres company if we didn't allow you to write your own SQL queries.
+
+Any other metrics you want to see in your projects? Reach out on our [Discord channel](https://discord.supabase.com/) and give Supabase a try by [creating a project](https://app.supabase.io/).
