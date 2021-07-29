@@ -195,6 +195,7 @@ const Nav = (props: Props) => {
               <div className="flex items-center">
                 <div className="flex-shrink-0 flex items-center">
                   <Link href="/" as="/">
+                    <a>
                     <img
                       className="block h-6 w-auto"
                       src={
@@ -204,6 +205,7 @@ const Nav = (props: Props) => {
                       }
                       alt="Logo"
                     />
+                    </a>
                   </Link>
                 </div>
                 <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-4">
