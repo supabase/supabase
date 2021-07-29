@@ -155,7 +155,7 @@ module.exports = {
         'guides/auth/managing-user-data',
         {
           type: 'category',
-          label: 'OAuth Providers',
+          label: 'External Providers',
           collapsed: false,
           items: [
             'guides/auth/auth-apple',
@@ -166,6 +166,8 @@ module.exports = {
             'guides/auth/auth-gitlab',
             'guides/auth/auth-google',
             'guides/auth/auth-twitter',
+            'guides/auth/auth-twitch',
+            'guides/auth/auth-twilio',
           ],
         },
       ],
