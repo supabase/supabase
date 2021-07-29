@@ -5,14 +5,22 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 27 Jul 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Wed, 28 Jul 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.io/blog/2021/07/29/supabase-reports-and-metrics</guid>
+  <title>Supabase Reports and Metrics</title>
+  <link>https://supabase.io/blog/2021/07/29/supabase-reports-and-metrics</link>
+  <description>We're exposing a full set of metrics in your projects, so that you can build better (and faster) products for your users.</description>
+  <pubDate>Wed, 28 Jul 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.io/blog/2021/07/28/supabase-auth-passwordless-sms-login</guid>
   <title>Supabase Auth v2: Phone Auth now available</title>
   <link>https://supabase.io/blog/2021/07/28/supabase-auth-passwordless-sms-login</link>
-  <description>Learn how Mobbin migrated 200,000 users from Firebase for a better authentication experience.</description>
+  <description>Phone Auth is available today on all new and existing Supabase projects.</description>
   <pubDate>Tue, 27 Jul 2021 16:00:00 GMT</pubDate>
 </item>
 
