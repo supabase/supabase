@@ -20,9 +20,9 @@ Today, we're exposing a full set of metrics in your projects, so that you can bu
 
 ## Reports page
 
-We have added a new "Reports" section to the Dashboard. You can view up to one month of data including
-API requests across all of Supabase's core pillars,
-Database, Auth and Storage. We've included a few instance health metrics, CPU usage and Memory usage for now,
+We've added a new "Reports" section to the Dashboard. You can view one month of data, including
+API requests across all of Supabase's core pillars:
+Database, Auth and Storage. We've included a two instance health metrics, CPU usage and Memory usage,
 with a lot more on the way.
 
 ![Supabase reports screen](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-and-metrics-reports-screen.jpg)
@@ -30,17 +30,17 @@ with a lot more on the way.
 All charts are built with [Recharts](https://recharts.org/en-US), an MIT-licensed React chart library chosen for it's ease of use.
 We'll add customizable charts in the future, so we'd love to hear which libraries you'd like to see in Supabase.
 
-Currently we support one configurable report per project, accessible and editable by all team members. In the next few weeks,
-we'll expand to unlimited reports per project, with longer date range options, new layout configurations, report templates,
+We support one configurable report per project, accessible and editable by all team members. In the next few weeks,
+we'll expand to unlimited reports, with longer date range options, new layout configurations, report templates,
 stacked charts and private/public visibility across your project's members.
 
 ## New project home page
 
-Every project now has a new home screen with a weekly overview of important metrics. We've included usage bars for Database storage,
+Every project has a new home page with a weekly overview of important metrics. We've included usage bars for Database storage,
 number of Auth users, and Storage space.
 
-And we're just getting warmed up. Over the next few months you'll see more project information, notifications, and highlights so
-that you can monitor your project health at a glance.
+And we're just getting warmed up. Over the next few months you'll see more project information, notifications, and highlights to
+monitor your project health at a glance.
 
 ![Supabase new dashboard app homescreen](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-and-metrics-homepage.jpg)
 
@@ -49,6 +49,8 @@ that you can monitor your project health at a glance.
 Backend as a Service? infrastructure as a Service? We don't care about the label, but we do care about giving developers the relevant
 observability metrics. Supabase gives you a full Postgres cluster for every project, and now we give you the tools to diagnose and manage
 important infrastructure anomolies.
+
+All databases are now launched with `pg_stat_statements` enabled, so you can expect some useful query statistics in the future too.
 
 ![Supabase observability metrics](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-and-metrics-observability-screen.jpg)
 
@@ -65,7 +67,7 @@ and to get ahead of possible issues before they become showstoppers.
 At Supabase, each project is provisioned with a Postgres cluster, and a suite of associated services that add, ahem,
 supa-powers to the database.
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/062496de-4c4b-407c-b4b6-b6abd9ef6160/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/062496de-4c4b-407c-b4b6-b6abd9ef6160/Untitled.png)
+![Supabase architecture](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-infra.png)
 
 Our users get liberal access to each of these services - you can use PostgREST for a RESTful API,
 Realtime to listen to changes in your Postgres instance, or even just open a raw connection to the database.
@@ -96,7 +98,7 @@ We run [Prometheus](https://prometheus.io/) out of inertia, soon to be [Victoria
 The monitoring instances scrape data from a number of exporters that are bundled into each of our projects.
 A small subset of the metrics collected get aggregated to a centralized VictoriaMetrics instance for easier cohort analysis.
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/b7978a8a-a60a-488a-9789-4e9bf23fd445/prometheus.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/b7978a8a-a60a-488a-9789-4e9bf23fd445/prometheus.png)
+![Supabase Prometheus](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/prometheus.png)
 
 ### Available sources and metrics
 
