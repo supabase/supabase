@@ -75,5 +75,12 @@
     "position": "Engineering",
     "username": "kangmingtay",
     "author_image_url": "https://github.com/kangmingtay.png"
+  },
+  "div_arora": {
+    "author": "Div Arora",
+    "author_url": "https://github.com/darora",
+    "position": "Engineering",
+    "username": "darora",
+    "author_image_url": "https://github.com/darora.png"
   }
 }
