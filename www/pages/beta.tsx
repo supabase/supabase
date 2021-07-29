@@ -996,7 +996,9 @@ const Beta = () => {
         <div className="sticky inset-0 z-50">
           <div className="shadow-lg py-5 px-5 xl:px-20 bg-dark-800 flex items-center justify-between">
             <Link href="/">
+              <a>
               <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
+              </a>
             </Link>
             <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)} />
           </div>
