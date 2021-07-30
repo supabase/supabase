@@ -69,7 +69,7 @@ const SidebarMenu = ({ sidebar }: { sidebar: Sidebar }) => {
           </div>
         )}
         {sidebar.categories?.map((category) => (
-          <div key={category.label}>
+          <div key={category.label} className="mt-8">
             <Menu.Group title={category.label} />
 
             {category.links.map((link) => (
@@ -79,7 +79,8 @@ const SidebarMenu = ({ sidebar }: { sidebar: Sidebar }) => {
                 </a>
               </Link>
             ))}
-            <Divider />
+
+            <Divider className="my-4" />
           </div>
         ))}
       </Menu>

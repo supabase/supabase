@@ -53,20 +53,20 @@ const ROUTES: Route[] = [
     key: 'Database',
     label: 'Database',
     icon: <IconDatabase size={20} strokeWidth={2} />,
-    link: '/sql',
+    link: '/database',
   },
   {
     key: 'Reports',
     label: 'Reports',
     icon: <IconBarChart size={20} strokeWidth={2} />,
-    link: '/docs',
+    link: '/reports',
   },
   { key: 'API', label: 'API', icon: <IconFileText size={20} strokeWidth={2} />, link: '/docs' },
   {
     key: 'Settings',
     label: 'Settings',
     icon: <IconSettings size={20} strokeWidth={2} />,
-    link: '/docs',
+    link: '/settings',
   },
 ]
 
