@@ -41,14 +41,6 @@
 </item>
 
 <item>
-  <guid>https://supabase.io/blog/2021/07/29/supabase-hackathon-august-2021</guid>
-  <title>Supabase Hackathon</title>
-  <link>https://supabase.io/blog/2021/07/29/supabase-hackathon-august-2021</link>
-  <description>Hackathon hype.</description>
-  <pubDate>Wed, 28 Jul 2021 16:00:00 GMT</pubDate>
-</item>
-
-<item>
   <guid>https://supabase.io/blog/2021/07/28/supabase-auth-passwordless-sms-login</guid>
   <title>Supabase Auth v2: Phone Auth now available</title>
   <link>https://supabase.io/blog/2021/07/28/supabase-auth-passwordless-sms-login</link>
