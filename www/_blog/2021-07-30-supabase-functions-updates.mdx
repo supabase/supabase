@@ -114,7 +114,7 @@ type UpdatePayload = {
 	old_record: TableRecord<T>
 }
 type DeletePayload = {
-	type: 'UPDATE'
+	type: 'DELETE'
 	table: string
 	schema: string
 	record: null
@@ -240,7 +240,7 @@ Of course, the sync version waits until each request is completed to return the 
 
 This is only the beginning! First we'll thoroughly test it and make an stable release, then we expect to add support for
 
-- the remaining HTTP methods (`DELETE` / `PUT` / `PATCH`)
+- the remaining HTTP methods (`PUT` / `PATCH`)
 - synchronous HTTP
 - additional protocols e.g. SMTP, FTP
 - more throughput (using epoll)
