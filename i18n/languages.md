@@ -32,4 +32,4 @@
 - [Traditional Chinese / 繁体中文](/i18n/README.zh-tw.md)
 - [Turkish / Türkçe](/i18n/README.tr.md)
 - [Ukrainian / Українська](/i18n/README.uk.md)
-- [Vietnamese / Tiếng Việt](/i18n/README.vi-VN.md)
+- [Vietnamese / Tiếng Việt](/i18n/README.vi-vn.md)
