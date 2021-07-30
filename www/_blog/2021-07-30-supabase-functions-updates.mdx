@@ -28,9 +28,9 @@ Let's cover the features we're launching today before the item that every one is
 
 Postgres has built-in support for [SQL functions](https://www.postgresql.org/docs/current/sql-createfunction.html). Today we're making it even easier for developers to build PostgreSQL Functions by releasing a native Functions editor. Soon we'll release some handy templates!
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/1561db71-06d4-4849-9ee7-2d03ed939d45/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/1561db71-06d4-4849-9ee7-2d03ed939d45/Untitled.png)
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/330cfef6-d3cd-4228-9edf-fbd311414877/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/330cfef6-d3cd-4228-9edf-fbd311414877/Untitled.png)
+![Postgres Functions](/new/images/blog/functions-updates/postgres-functions.png)
+
 
 You can call PostgreSQL Functions with `supabase-js` using your project API [[Docs](https://supabase.io/docs/reference/javascript/rpc)]:
 
@@ -47,7 +47,7 @@ const { data, error } = await supabase
 
 While triggers are a staple of Database Administrators, they can be a bit complex and hard to use. We plan to change that with a simple interface for building and managing PostgreSQL triggers.
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/14b3bc3d-ccd6-4a9a-a514-25717e69cf2b/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/14b3bc3d-ccd6-4a9a-a514-25717e69cf2b/Untitled.png)
+![Postgres Triggers](/new/images/blog/functions-updates/postgres-triggers.png)
 
 ## Supabase Functions
 
@@ -74,7 +74,7 @@ To meet these goals, we're releasing Supabase Functions in stages:
 
 Today we're releasing Functions Hooks in `ALPHA`. The `ALPHA` tag means that it is NOT stable, but it's available for testing and feedback. The API will change, so do not use it for anything critical. You have been warned. 
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/4a4cbd30-2aa5-4866-aa09-c18c7ac0e074/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/4a4cbd30-2aa5-4866-aa09-c18c7ac0e074/Untitled.png)
+![Supabase Function Hooks](/new/images/blog/functions-updates/supabase-function-hooks.png)
 
 Hooks? Triggers? Firestore has the concept of [Function Triggers](https://firebase.google.com/docs/functions/firestore-events), which are very cool. 
 Supabase Hooks are the same concept, just with a different name. 
@@ -83,6 +83,8 @@ Postgres already has the concept of [Triggers](https://www.postgresql.org/docs/c
 ### Hook Events
 
 Function Hooks allow you to "listen" to any change in your tables to trigger an asynchronous Function. You can hook into a few different events:`INSERT`, `UPDATE`, and `DELETE`. All events are fired **after** a database row is changed. Keen eyes will be able to spot the similarity to Postgres triggers, and that's because Function Hooks are just a convenience wrapper around triggers.
+
+![Hook Events](/new/images/blog/functions-updates/hook-events.png)
 
 ### Hook Targets
 
