@@ -110,7 +110,7 @@ type UpdatePayload = {
 	type: 'UPDATE'
 	table: string 
 	schema: string
-	record: TableRecord
+	record: TableRecord<T>
 	old_record: TableRecord<T>
 }
 type DeletePayload = {
