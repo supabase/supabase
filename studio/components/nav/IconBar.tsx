@@ -1,4 +1,16 @@
-import { IconColumns, IconTerminal, IconUsers, IconZap } from '@supabase/ui'
+import {
+  IconColumns,
+  IconTerminal,
+  IconUsers,
+  IconZap,
+  IconHome,
+  IconFile,
+  IconArchive,
+  IconDatabase,
+  IconBarChart,
+  IconFileText,
+  IconSettings,
+} from '@supabase/ui'
 import Link from 'next/link'
 import { ReactElement } from 'react'
 
@@ -16,15 +28,46 @@ type Route = {
  * Full list of Sidebar Routes
  */
 const ROUTES: Route[] = [
-  { key: 'ICON', label: 'Supabase', icon: <IconZap size={20} strokeWidth={3} />, link: '/' },
+  { key: 'ICON', label: 'Supabase', icon: <IconZap size={20} strokeWidth={2} />, link: '/' },
+  { key: 'HOME', label: 'Home', icon: <IconHome size={20} strokeWidth={2} />, link: '/' },
+  {
+    key: 'Tables',
+    label: 'Table Editor',
+    icon: <IconColumns size={20} strokeWidth={2} />,
+    link: '/editor',
+  }, //TODO: Find proper table editor icon
   {
     key: 'AUTH',
     label: 'Authentication',
-    icon: <IconUsers size={20} strokeWidth={3} />,
+    icon: <IconUsers size={20} strokeWidth={2} />,
     link: '/auth',
   },
-  { key: 'SQL', label: 'SQL', icon: <IconTerminal size={20} strokeWidth={3} />, link: '/sql' },
-  { key: 'API', label: 'API', icon: <IconColumns size={20} strokeWidth={3} />, link: '/docs' },
+  {
+    key: 'Storage',
+    label: 'Storage',
+    icon: <IconArchive size={20} strokeWidth={2} />,
+    link: '/storage',
+  },
+  { key: 'SQL', label: 'SQL', icon: <IconTerminal size={20} strokeWidth={2} />, link: '/sql' },
+  {
+    key: 'Database',
+    label: 'Database',
+    icon: <IconDatabase size={20} strokeWidth={2} />,
+    link: '/sql',
+  },
+  {
+    key: 'Reports',
+    label: 'Reports',
+    icon: <IconBarChart size={20} strokeWidth={2} />,
+    link: '/docs',
+  },
+  { key: 'API', label: 'API', icon: <IconFileText size={20} strokeWidth={2} />, link: '/docs' },
+  {
+    key: 'Settings',
+    label: 'Settings',
+    icon: <IconSettings size={20} strokeWidth={2} />,
+    link: '/docs',
+  },
 ]
 
 /**
@@ -39,7 +82,7 @@ export default function IconBar({}) {
           <a
             className={[
               'flex items-center justify-center mx-2 mt-2 h-10 w-10 rounded', // Layout
-              'bg-gray-200 text-gray-600 hover:bg-gray-200', // Light mode
+              'text-gray-600 hover:bg-gray-200', // Light mode
               'dark:text-gray-400 dark:hover:bg-bg-alt-dark dark:hover:text-white', // Dark mode
             ].join(' ')}
           >
