@@ -22,7 +22,7 @@ By the end of this guide you'll have an app which allows users to login and upda
 <img height="500px" src="/img/supabase-flutter-demo.png" alt="Supabase User Management example" />
 
 ### Github
-Whenever you get stuck at any point, take a look at [this repo](https://github.com/dshukertjr/flutter_supabase_quickstart).
+Whenever you get stuck at any point, take a look at [this repo](https://github.com/supasquad/supabase-flutter-quickstart).
 
 ## Project set up
 
@@ -161,7 +161,7 @@ Then let's install the only additional dependency: [supabase-flutter](https://gi
 Open the app and copy and paste the following inside `pubspec.yaml` under `dependencies`.
 
 ```yaml
-supabase_flutter: ^0.0.4
+supabase_flutter: ^0.0.6
 ```
 
 Run `flutter pub get` to install the dependencies. 
@@ -279,6 +279,26 @@ class AuthState<T extends StatefulWidget> extends SupabaseAuthState<T> {
   @override
   void onErrorAuthenticating(String message) {
     print('Error authenticating $message');
+  }
+}
+```
+
+### Set up AuthRequiredState
+
+We might want to show certain pages to the users only if they are signed in. 
+For that we can create a handy `AuthRequiredState` class that we can inherit from for pages where the users need to be authenticated. 
+`AuthRequiredState` will inherit `SupabaseAuthRequiredState` which is provided by `supabase_flutter` package. 
+
+```dart title="lib/components/auth_required_state.dart"
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class AuthRequiredState<T extends StatefulWidget>
+    extends SupabaseAuthRequiredState<T> {
+  @override
+  void onUnauthenticated() {
+    /// Users will be sent back to the LoginPage if they sign out.
+    Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
   }
 }
 ```
@@ -412,13 +432,14 @@ class _LoginPageState extends AuthState<LoginPage> {
 ### Set up Account page
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
-Let's create a new component for that called `account_page.dart`.
-Note that this page will also inherit `AuthState` as it will handle user sign out. 
+Let's create a new widget called `account_page.dart` for that.
+Note that this page will inherit `AuthRequiredState` as user needs to be authenticated to view this page.
 
 ```dart title="lib/pages/account_page.dart"
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter_guide/components/auth_state.dart';
+import 'package:supabase_flutter_guide/components/auth_required_state.dart';
 import 'package:supabase_flutter_guide/utils/constants.dart';
+import 'package:supabase/supabase.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({Key? key}) : super(key: key);
@@ -427,20 +448,19 @@ class AccountPage extends StatefulWidget {
   _AccountPageState createState() => _AccountPageState();
 }
 
-class _AccountPageState extends AuthState<AccountPage> {
+class _AccountPageState extends AuthRequiredState<AccountPage> {
   late final _usernameController = TextEditingController();
   late final _websiteController = TextEditingController();
   var _loading = false;
 
-  Future<void> _getProfile() async {
+  Future<void> _getProfile(String userId) async {
     setState(() {
       _loading = true;
     });
-    final user = supabase.auth.user()!;
     final response = await supabase
         .from('profiles')
         .select()
-        .eq('id', user.id)
+        .eq('id', userId)
         .single()
         .execute();
     if (response.error != null && response.status != 406) {
@@ -496,9 +516,16 @@ class _AccountPageState extends AuthState<AccountPage> {
   }
 
   @override
-  void initState() {
-    _getProfile();
-    super.initState();
+  void onAuthenticated(Session session) {
+    final user = session.user;
+    if (user != null) {
+      _getProfile(user.id);
+    }
+  }
+
+  @override
+  void onUnauthenticated() {
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   @override
@@ -536,7 +563,6 @@ class _AccountPageState extends AuthState<AccountPage> {
   }
 }
 ```
-
 
 
 ### Launch!
