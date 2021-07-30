@@ -5,7 +5,7 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 28 Jul 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 29 Jul 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
 <item>
@@ -13,7 +13,15 @@
   <title>Supabase Swag Store</title>
   <link>https://supabase.io/blog/2021/07/30/supabase-swag-store</link>
   <description>Today we are officially launching the Supabase Swag Store.</description>
-  <pubDate>Wed, 28 Jul 2021 16:00:00 GMT</pubDate>
+  <pubDate>Thu, 29 Jul 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/07/30/supabase-functions-updates</guid>
+  <title>Supabase Functions Updates</title>
+  <link>https://supabase.io/blog/2021/07/30/supabase-functions-updates</link>
+  <description>The question on everyone's mind - are we launching Supabase Functions? Well, it's complicated.</description>
+  <pubDate>Thu, 29 Jul 2021 16:00:00 GMT</pubDate>
 </item>
 
 <item>
@@ -21,6 +29,14 @@
   <title>Supabase Reports and Metrics</title>
   <link>https://supabase.io/blog/2021/07/29/supabase-reports-and-metrics</link>
   <description>We're exposing a full set of metrics in your projects, so that you can build better (and faster) products for your users.</description>
+  <pubDate>Wed, 28 Jul 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/07/29/supabase-hackathon-august-2021</guid>
+  <title>Supabase Hackathon</title>
+  <link>https://supabase.io/blog/2021/07/29/supabase-hackathon-august-2021</link>
+  <description>Hackathon hype.</description>
   <pubDate>Wed, 28 Jul 2021 16:00:00 GMT</pubDate>
 </item>
 
