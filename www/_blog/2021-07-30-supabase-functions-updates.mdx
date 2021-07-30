@@ -74,8 +74,6 @@ To meet these goals, we're releasing Supabase Functions in stages:
 
 Today we're releasing Functions Hooks in `ALPHA`. The `ALPHA` tag means that it is NOT stable, but it's available for testing and feedback. The API will change, so do not use it for anything critical. You have been warned. 
 
-![Supabase Function Hooks](/new/images/blog/functions-updates/supabase-function-hooks.png)
-
 Hooks? Triggers? Firestore has the concept of [Function Triggers](https://firebase.google.com/docs/functions/firestore-events), which are very cool. 
 Supabase Hooks are the same concept, just with a different name. 
 Postgres already has the concept of [Triggers](https://www.postgresql.org/docs/current/triggers.html), and we thought this would be less confusing[^1]. 
@@ -87,6 +85,8 @@ Function Hooks allow you to "listen" to any change in your tables to trigger an 
 ![Hook Events](/new/images/blog/functions-updates/hook-events.png)
 
 ### Hook Targets
+
+![Supabase Function Hooks](/new/images/blog/functions-updates/supabase-function-hooks.png)
 
 Supabase will support several different targets.
 
