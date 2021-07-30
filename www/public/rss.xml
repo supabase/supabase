@@ -17,6 +17,14 @@
 </item>
 
 <item>
+  <guid>https://supabase.io/blog/2021/07/30/supabase-functions-updates</guid>
+  <title>Supabase Functions Updates</title>
+  <link>https://supabase.io/blog/2021/07/30/supabase-functions-updates</link>
+  <description>The question on everyone's mind - are we launching Supabase Functions? Well, it's complicated.</description>
+  <pubDate>Thu, 29 Jul 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
   <guid>https://supabase.io/blog/2021/07/30/1-the-supabase-hackathon</guid>
   <title>The Supabase Hackathon</title>
   <link>https://supabase.io/blog/2021/07/30/1-the-supabase-hackathon</link>
@@ -29,6 +37,14 @@
   <title>Supabase Reports and Metrics</title>
   <link>https://supabase.io/blog/2021/07/29/supabase-reports-and-metrics</link>
   <description>We're exposing a full set of metrics in your projects, so that you can build better (and faster) products for your users.</description>
+  <pubDate>Wed, 28 Jul 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/07/29/supabase-hackathon-august-2021</guid>
+  <title>Supabase Hackathon</title>
+  <link>https://supabase.io/blog/2021/07/29/supabase-hackathon-august-2021</link>
+  <description>Hackathon hype.</description>
   <pubDate>Wed, 28 Jul 2021 16:00:00 GMT</pubDate>
 </item>
 
