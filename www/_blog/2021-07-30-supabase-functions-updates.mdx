@@ -20,7 +20,7 @@ The question on everyone's mind - are we launching Supabase Functions? Well, it'
 Today we're announcing *part* of Functions - Supabase Hooks - in Alpha, for all **new** projects.
 
 We're also releasing support for Postgres Functions and Triggers in our Dashboard, and some timelines for the rest of Supabase Functions.
-Let's cover the features we're launching today before the item that every one is waiting for: Supabase Functions.
+Let's cover the features we're launching today before the item that everyone is waiting for: Supabase Functions.
 
 ## PostgreSQL Functions
 
@@ -66,7 +66,7 @@ To meet these goals, we're releasing Supabase Functions in stages:
 
 - *Stage 1:* Give developers the ability to trigger external HTTP functions - today, using Function Hooks.
 - *Stage 2:* Give developers the ability to trigger their own Serverless functions on AWS and GCP - Q4 2021.
-- *Stage 3:* Release our own Serverless Functions (Supabase Functions) - Q4 for Early Preview customer.
+- *Stage 3:* Release our own Serverless Functions (Supabase Functions) - Q4 for Early Preview customers.
 
 ![Supabase Functions timeline](/new/images/blog/functions-updates/functions-timeline.png)
 
@@ -96,7 +96,7 @@ Supabase will support several different targets.
 
 ### Hook Payload
 
-If the target is a Serverless functions or an HTTP `POST` request, the payload is automatically generated from the underlying table data. The format matches Supabase [Realtime](https://supabase.io/docs/reference/javascript/subscribe), except in this case you don't a client to "listen" to the changes. This provides yet another mechanism for responding to database changes.  
+If the target is a Serverless function or an HTTP `POST` request, the payload is automatically generated from the underlying table data. The format matches Supabase [Realtime](https://supabase.io/docs/reference/javascript/subscribe), except in this case you don't a client to "listen" to the changes. This provides yet another mechanism for responding to database changes.  
 
 ```ts hideCopy
 type InsertPayload = {
@@ -234,11 +234,11 @@ from
 Time: 1.562 ms
 ```
 
-Of course, the sync version waits until each request is completed to return the result, taking around 3.5 seconds for 10 requests; while the async version returns almost immediately in 1.5 milliseconds. This is really important for Supabase hooks, which runs requests for every event fired from a SQL trigger - potentially thousands of requests per second.
+Of course, the sync version waits until each request is completed to return the result, taking around 3.5 seconds for 10 requests; while the async version returns almost immediately in 1.5 milliseconds. This is really important for Supabase hooks, which run requests for every event fired from a SQL trigger - potentially thousands of requests per second.
 
 ### Future/Roadmap
 
-This is only the beginning! First we'll thoroughly test it and make an stable release, then we expect to add support for
+This is only the beginning! First we'll thoroughly test it and make a stable release, then we expect to add support for
 
 - the remaining HTTP methods (`PUT` / `PATCH`)
 - synchronous HTTP
