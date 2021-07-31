@@ -34,7 +34,7 @@ Public Buckets have been one of our most requested features. We launched without
 
 To enable this feature safely, buckets are made private by default, with an extremely prominent warning in the dashboard when you choose to make them public.
 
-You can make objects public in S3 via multiple mechanisms (e.g. tags, or prefixes). While this allows for flexibility, it makes it hard to discover publicly exposed objects. To prevent any confusion, we decided that buckets must be public in their entirety. This public visibility straightforward - if it's in a public bucket, it's public!
+You can make objects public in S3 via multiple mechanisms (e.g. tags, or prefixes). While this allows for flexibility, it makes it hard to discover publicly exposed objects. To prevent any confusion, we decided that buckets must be public in their entirety. This public visibility is straightforward - if it's in a public bucket, it's public!
 
 Objects in public buckets can be accessed via a URL without any Authorization tokens or headers. This makes them perfect for hosting assets for your web or mobile application.
 
@@ -115,7 +115,7 @@ This leads to an issue where if a user creates an empty directory and refreshes 
 
 ## Performance improvements for large buckets
 
-We significantly improved rendering for a large number of items in the Dashboard. We use a virtualization library to render the objects in view and actively discard DOM elements which are not currently rendered from memory. This makes scrolling through thousands of items buttery smooth.
+We significantly improved rendering for a large number of items in the Dashboard. We use a virtualization library to render the objects in view and actively discard DOM elements that are not currently rendered from memory. This makes scrolling through thousands of items buttery smooth.
 
 Here is a demo testing rendering the heaviest object known to mankind - the `node_modules` folder!
 
