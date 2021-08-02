@@ -10,7 +10,7 @@
 
 - [x] Cơ sở dữ liệu Postgres tự chủ
 - [x] Cập nhật dữ liệu thời gian thực
-- [x] Xác thực và ủy quyền
+- [x] Xác thực và phân quyền
 - [x] Tự động tạo API
 - [x] Bảng điều khiển
 - [x] Kho lưu trữ
@@ -29,12 +29,12 @@
 
 ## Trạng thái
 
-- [x] Alpha: Chúng tôi đang thử nghiệm Supabase với một nhóm khách hàng kín
-- [x] Alpha công khai: Bất kỳ ai cũng có thể đăng ký tại [app.supabase.io](https://app.supabase.io). Nhưng hãy bình tĩnh với chúng tôi, sẽ có một vài khúc mắc nhỏ.
-- [x] Beta công khai: Đủ ổn định cho hầu hết các trường hợp sử dụng không phải trong môi trường doanh nghiệp
-- [ ] Công khai: Sẵn sàng cho môi trường production doanh nghiệp
+- [x] Alpha: Chúng tôi đang thử nghiệm Supabase với một nhóm người dùng kín
+- [x] Public Alpha: Bất kỳ ai cũng có thể đăng ký tại [app.supabase.io](https://app.supabase.io). Nhưng hãy bình tĩnh với chúng tôi, sẽ có một vài lỗi nhỏ.
+- [x] Public Beta: Đủ ổn định cho hầu hết các trường hợp sử dụng không phải trong môi trường doanh nghiệp (production)
+- [ ] Public: Sẵn sàng cho môi trường doanh nghiệp (production)
 
-Chúng tôi hiện đang ở giai đoạn Beta công khai. Xem "releases" của repo này để nhận thông báo về các bản cập nhật lớn.
+Chúng tôi hiện đang ở giai đoạn Public Beta. Xem mục "releases" của repo này để nhận thông báo về các bản cập nhật lớn.
 
 <kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Xem repo này"/></kbd>
 
@@ -58,16 +58,16 @@ Supabase là một [nền tảng được lưu trữ] (https://app.supabase.io).
 - [GoTrue] (https://github.com/netlify/gotrue) là một API dựa trên SWT để quản lý người dùng và phát hành mã thông báo SWT.
 - [Kong] (https://github.com/Kong/kong) là một cổng API gốc đám mây.
 
-#### Thư viện khách hàng
+#### Thư viện hỗ trợ
 
-Các thư viện khách hàng của chúng tôi là các mô-đun. Mỗi thư viện con là một triển khai độc lập cho một hệ thống bên ngoài. Đây là một trong những cách chúng tôi hỗ trợ các công cụ hiện có.
+Các thư viện hỗ trợ của chúng tôi là các mô-đun. Mỗi thư viện con là một triển khai độc lập cho một hệ thống bên ngoài. Đây là một trong những cách mà chúng tôi hỗ trợ các công cụ hiện có.
 
-- **`supabase-{lang}`**: Kết hợp các thư viện và thêm các phần "phong phú".
-  - `postgrest-{lang}`: Thư viện khách hàng để làm việc với [PostgREST](https://github.com/postgrest/postgrest)
-  - `realtime-{lang}`: Thư viện khách hàng để làm việc với [Realtime](https://github.com/supabase/realtime)
-  - `gotrue-{lang}`: Thư viện khách hàng để làm việc với [GoTrue](https://github.com/netlify/gotrue)
+- **`supabase-{lang}`**: Kết hợp các thư viện và thêm một số tính năng.
+  - `postgrest-{lang}`: Thư viện hỗ trợ để làm việc với [PostgREST](https://github.com/postgrest/postgrest)
+  - `realtime-{lang}`: Thư viện hỗ trợ để làm việc với [Realtime](https://github.com/supabase/realtime)
+  - `gotrue-{lang}`: Thư viện hỗ trợ để làm việc với [GoTrue](https://github.com/netlify/gotrue)
 
-| Kho lưu trữ                  | Chính thức                                         | Cộng đồng                                                                                                                                                                                                                                                                                                                            |
+| Kho lưu trữ           | Chính thức                                       | Cộng đồng                                                                                                                                                                                                                                                                                                                            |
 | --------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` \| [`Ruby`](https://github.com/supabase/supabase-rb) \| `Go`                                                                                             |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) \| [`Ruby`](https://github.com/supabase/postgrest-rb) \| [`Go`](https://github.com/supabase/postgrest-go) |
