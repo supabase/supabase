@@ -42,11 +42,11 @@ Chúng tôi hiện đang ở giai đoạn Public Beta. Xem mục "releases" củ
 
 ## Cách Supabase hoạt động
 
-Supabase là sự kết hợp của các công cụ mã nguồn mở. Chúng tôi đang xây dựng các tính năng của Firebase bằng cách sử dụng các sản phẩm mã nguồn mở, cấp doanh nghiệp. Nếu các công cụ và cộng đồng tồn tại, với MIT, Apache 2 hoặc giấy phép mở tương đương, chúng tôi sẽ sử dụng và hỗ trợ công cụ đó. Nếu công cụ không tồn tại, chúng tôi tự xây dựng và mở mã nguồn của nó. Supabase không phải là phiên bản 1 đổi 1 của Firebase. Mục đích của chúng tôi là cung cấp cho các nhà phát triển trải nghiệm giống như Firebase bằng cách sử dụng các công cụ nguồn mở.
+Supabase là sự kết hợp của các công cụ mã nguồn mở. Các tính năng của Supabase được xây dựng dựa trên các sản phẩm đạt chuẩn doanh nghiệp và mã nguồn mở. Nếu các công cụ và cộng đồng hỗ trợ công cụ đó tồn tại, cùng với giấy phép MIT, Apache 2 hoặc giấy phép mở tương đương, chúng tôi sẽ sử dụng và hỗ trợ công cụ đó. Nếu công cụ không tồn tại, chúng tôi sẽ tự xây dựng và mở mã nguồn của nó. Supabase không phải là phiên bản 1 : 1 của Firebase. Mục đích của chúng tôi là cung cấp cho các nhà phát triển trải nghiệm tuyệt vời giống như sử dụng Firebase bằng cách sử dụng các công cụ nguồn mở.
 
 **Kiến trúc hiện tại**
 
-Supabase là một [nền tảng được lưu trữ] (https://app.supabase.io). Bạn có thể đăng ký và bắt đầu sử dụng Supabase mà không cần cài đặt bất kỳ thứ gì. Chúng tôi vẫn đang tạo ra trải nghiệm phát triển "local" - đây hiện là trọng tâm cốt lõi của chúng tôi, cùng với sự ổn định của nền tảng.
+Supabase là một [nền tảng lưu trữ cơ sở dữ liệu] (https://app.supabase.io). Bạn có thể đăng ký và bắt đầu sử dụng Supabase mà không cần cài đặt bất kỳ thứ gì. Chúng tôi vẫn đang tạo ra trải nghiệm phát triển "local" - đây hiện là trọng tâm cốt lõi của chúng tôi, cùng với sự ổn định của nền tảng.
 
 ![Kiến trúc](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
