@@ -151,6 +151,15 @@ pages:
           const options = { }
           const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
           ```
+      - name: With additional parameters - access non-public schemas
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const options = {schema: "otherschema"}
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
+          ```
+          Note: each client connection can only access a single schema, so the code above can access the `otherschema` schema but cannot access the `public` schema.
 
   Generating Types:
     description: |
