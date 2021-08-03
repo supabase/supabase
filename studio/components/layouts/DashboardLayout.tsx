@@ -70,6 +70,7 @@ const SidebarMenu = ({ sidebar }: { sidebar: Sidebar }) => {
             <Button
               icon={<IconPlus />}
               shadow={true}
+              textAlign="left"
               block
               type="text"
               onClick={sidebar.button?.action}
@@ -81,7 +82,13 @@ const SidebarMenu = ({ sidebar }: { sidebar: Sidebar }) => {
 
         {sidebar.searchable && (
           <div>
-            <Input className="mb-8" type="search" placeholder="Search" icon={<IconSearch />} />
+            <Input
+              borderless
+              className="mb-8"
+              type="search"
+              placeholder="Search"
+              icon={<IconSearch />}
+            />
           </div>
         )}
         {sidebar.categories?.map((category) => (
