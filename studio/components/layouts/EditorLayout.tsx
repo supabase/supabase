@@ -2,7 +2,7 @@ import DashboardLayout from '../../components/layouts/DashboardLayout'
 import Loading from '../../components/utils/Loading'
 import Error from '../../components/utils/Error'
 import { fetchOpenApiSpec } from '../../lib/api'
-import { ReactElement } from 'react'
+import { MouseEventHandler, ReactElement } from 'react'
 import { Button, IconPlus } from '@supabase/ui'
 
 export default function EditorLayout({
@@ -28,12 +28,11 @@ export default function EditorLayout({
     ]
   }
 
-  const buildSidebarAction = () => {
-    return (
-      <Button icon={<IconPlus />} shadow={true} block type="text">
-        New table
-      </Button>
-    )
+  const buildSidebarButton = () => {
+    return {
+      label: 'New table',
+      action: (_e: any) => {},
+    }
   }
 
   return (
@@ -43,7 +42,7 @@ export default function EditorLayout({
         title: 'Tables',
         categories: buildSidebar(tableNames),
         searchable: true,
-        action: buildSidebarAction(),
+        button: buildSidebarButton(),
       }}
     >
       {children}

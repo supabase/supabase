@@ -31,12 +31,11 @@ export default function StorageLayout({
     ]
   }
 
-  const buildSidebarAction = () => {
-    return (
-      <Button icon={<IconPlus />} shadow={true} block type="text">
-        New Bucket
-      </Button>
-    )
+  const buildSidebarButton = () => {
+    return {
+      label: 'New bucket',
+      action: (_e: any) => {},
+    }
   }
 
   return (
@@ -46,7 +45,7 @@ export default function StorageLayout({
         title: 'Storage',
         categories: buildSidebar(bucketNames),
         searchable: true,
-        action: buildSidebarAction(),
+        button: buildSidebarButton(),
       }}
     >
       {children}

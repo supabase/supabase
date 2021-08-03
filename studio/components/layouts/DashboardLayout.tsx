@@ -2,14 +2,13 @@ import Link from 'next/link'
 import IconBar from '../nav/IconBar'
 import Head from 'next/head'
 import { ReactElement } from 'react'
-import { Divider, Menu, Typography, Input, IconSearch, IconPlus } from '@supabase/ui'
-import { useRouter } from 'next/router'
+import { Divider, Menu, Typography, Input, IconSearch, Button, IconPlus } from '@supabase/ui'
 
 type Sidebar = {
   title: string
   searchable?: boolean
   categories?: SidebarItems[]
-  action?: ReactElement
+  button?: SidebarButton
 }
 type SidebarItems = {
   label: string
@@ -18,6 +17,11 @@ type SidebarItems = {
 type SidebarLinks = {
   label: string
   href: string
+}
+
+type SidebarButton = {
+  label: string
+  action: (e: any) => void
 }
 
 export default function DashboardLayout({
@@ -61,7 +65,19 @@ const SidebarMenu = ({ sidebar }: { sidebar: Sidebar }) => {
       </Typography.Title>
 
       <Menu className="px-4">
-        {sidebar.action && <div className="mt-8">{sidebar.action}</div>}
+        {sidebar.button && (
+          <div className="mt-8">
+            <Button
+              icon={<IconPlus />}
+              shadow={true}
+              block
+              type="text"
+              onClick={sidebar.button?.action}
+            >
+              {sidebar.button.label}
+            </Button>
+          </div>
+        )}
 
         {sidebar.searchable && (
           <div>
