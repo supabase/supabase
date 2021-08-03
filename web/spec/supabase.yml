@@ -161,6 +161,7 @@ pages:
           ```
           Note: each client connection can only access a single schema, so the code above can access the `otherschema` schema but cannot access the `public` schema.
 
+          TODO:  Descibe how to whitelist the schema from the Supabase dashboard, which is required to obtain access to the schema from the client.
   Generating Types:
     description: |
       Supabase will soon release native type generators that dump your database types for various languages. For now, we support TypeScript through a third-party tool.
