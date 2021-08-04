@@ -5,9 +5,17 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 29 Jul 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Tue, 03 Aug 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.io/blog/2021/08/04/supabase-beta-july-2021</guid>
+  <title>Supabase Beta July 2021</title>
+  <link>https://supabase.io/blog/2021/08/04/supabase-beta-july-2021</link>
+  <description>Discord Logins, Vercel Integration, Full text search, and OAuth guides.</description>
+  <pubDate>Tue, 03 Aug 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.io/blog/2021/07/30/supabase-swag-store</guid>
   <title>Supabase Swag Store</title>
