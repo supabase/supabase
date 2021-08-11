@@ -319,7 +319,6 @@ pages:
           ```js
           const { data, error } = await postgrest
             .rpc('hello_world')
-          }
           ```
         py: |
           ```py
@@ -336,21 +335,18 @@ pages:
           ```py
           # Not yet implemented
           ```
-      - name: Bulk call
+      - name: Bulk processing
+        description: You can process large payloads at once using [array parameters](https://postgrest.org/en/stable/api.html#calling-functions-with-array-parameters).
         js: |
           ```js
           const { data, error } = await postgrest
-            .rpc('echo_city', [
-              { name: 'The Shire' },
-              { name: 'Mordor' }
-            ])
-          }
+            .rpc('echo_cities', { names: ['The Shire', 'Mordor'] })
           ```
         py: |
           ```py
           # Not yet implemented
           ```
-      - name: With filters.
+      - name: With filters
         description: |
           Stored procedures that return tables can also be combined with 
           `modifiers` and 
