@@ -94,7 +94,7 @@ services:
         PGRST_JWT_SECRET: ${JWT_SECRET}
         DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres
         PGOPTIONS: "-c search_path=storage"
-        FILE_SIZE_LIMIT: 52428800
+        FILE_SIZE_LIMIT: ${FILE_SIZE_LIMIT}
         REGION: ${STORAGE_REGION} # region where your bucket is located
         GLOBAL_S3_BUCKET: ${STORAGE_S3_BUCKET}  # name of s3 bucket where you want to store objects
         # AWS_ACCESS_KEY_ID: replace-with-your-aws-key
