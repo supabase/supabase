@@ -732,16 +732,14 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_city', { name: 'The Shire' })
           ```
-      - name: Bulk call
+      - name: Bulk processing
+        description: You can process large payloads at once using [array parameters](https://postgrest.org/en/stable/api.html#calling-functions-with-array-parameters).
         js: |
           ```js
-          const { data, error } = await supabase
-            .rpc('echo_city', [
-              { name: 'The Shire' },
-              { name: 'Mordor' }
-            ])
+          const { data, error } = await postgrest
+            .rpc('echo_cities', { names: ['The Shire', 'Mordor'] })
           ```
-      - name: With filters.
+      - name: With filters
         description: |
           Stored procedures that return tables can also be combined with 
           [Modifiers](/docs/reference/javascript/using-modifiers) and 
