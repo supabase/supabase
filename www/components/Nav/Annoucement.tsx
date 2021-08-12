@@ -17,14 +17,16 @@ const a: A = data
 const Annoucement = () => {
   if (!a.show) return null
   return (
-    <div className="bg-indigo-400 dark:bg-indigo-400">
-      <div className="flex items-center justify-center py-2 mx-auto space-x-2 text-white lg:container lg:px-16 xl:px-20 text-sm md:text-base">
-        <span>{a.text}</span>
+    <div className="bg-[#5865F2]">
+      <div className="flex items-center justify-center py-2 mx-auto space-x-2 text-sm lg:container lg:px-16 xl:px-20 md:text-base">
+        <span className="text-white">{a.text}</span>
         <a
           href={a.link.url}
-          className="inline-flex items-center px-2 py-1 space-x-1 text-xs transition-colors bg-indigo-900 rounded text-white dark:hover:text-indigo-100 hover:text-indigo-100 hover:bg-opacity-90"
+          target="_blank"
+          className="inline-flex items-center px-2 py-1 space-x-1 text-xs transition-colors rounded-lg text-[#5865F2] bg-white border border-transparent dark:hover:border-white dark:hover:bg-[#5865F2]"
         >
-          {a.link.text} <IconArrowRight size="tiny" />
+          <span>{a.link.text}</span>
+          <IconArrowRight size="tiny" />
         </a>
       </div>
     </div>
