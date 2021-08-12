@@ -10,10 +10,18 @@
       
 <item>
   <guid>https://supabase.io/blog/2021/08/09/hackathon-winners</guid>
-  <title>Hackathon Winners</title>
+  <title>Open Source Hackathon Winners</title>
   <link>https://supabase.io/blog/2021/08/09/hackathon-winners</link>
   <description>Let the medal ceremony begin for the best projects submitted during the Supabase Hackathon.</description>
   <pubDate>Sun, 08 Aug 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/08/04/supabase-beta-july-2021</guid>
+  <title>Supabase Beta July 2021</title>
+  <link>https://supabase.io/blog/2021/08/04/supabase-beta-july-2021</link>
+  <description>Discord Logins, Vercel Integration, Full text search, and OAuth guides.</description>
+  <pubDate>Tue, 03 Aug 2021 16:00:00 GMT</pubDate>
 </item>
 
 <item>
