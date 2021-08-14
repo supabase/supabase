@@ -4,8 +4,9 @@ import Error from '../../../components/utils/Error'
 import { fetchOpenApiSpec } from '../../../lib/api'
 import { useRouter } from 'next/router'
 import { Typography } from '@supabase/ui'
+import { FC, ReactElement } from 'react'
 
-export default function Home() {
+export default function TableDocs() {
   const router = useRouter()
   const { data, tables, isLoading, error } = fetchOpenApiSpec()
   const { tableName } = router.query
@@ -13,8 +14,6 @@ export default function Home() {
 
   if (isLoading) return <Loading />
   if (error) return <Error />
-
-  console.log(table)
 
   return (
     <DocsLayout title={`API: ${tableName}`}>
@@ -24,20 +23,22 @@ export default function Home() {
         </Typography.Title>
         <Typography.Title level={2}>Fields</Typography.Title>
 
-        {table.fields.map((field) => (
+        {table!.fields.map((field) => (
           <div className="">
             <div className="flex">
               <div className="flex-1">
                 <Field
                   name={field.name}
-                  type={field.type}
-                  format={field.format}
+                  type={String(field.type)}
+                  format={String(field.format)}
                   description={field.description}
-                  required={field.required}
+                  required={Boolean(field.required)}
                 />
               </div>
               <div className="flex-1 border-l bg-gray-50">
-                <Typography.Text code>{selectSnippet(tableName, field.name)}</Typography.Text>
+                <Typography.Text code>
+                  {selectSnippet(String(tableName), field.name)}
+                </Typography.Text>
               </div>
             </div>
           </div>
@@ -47,7 +48,15 @@ export default function Home() {
   )
 }
 
-const Field = ({ name, type, required, description, format }) => {
+type FieldProps = {
+  name: string
+  type: string
+  required: boolean
+  description?: string
+  format: string
+}
+
+const Field: FC<FieldProps> = ({ name, type, required, description, format }): ReactElement => {
   return (
     <div className="border-b my-8">
       <div className="flex">
@@ -79,10 +88,9 @@ const Field = ({ name, type, required, description, format }) => {
   )
 }
 
-
-
-const selectSnippet = (tableName, columns) => `
+const selectSnippet = (tableName: string, columns: string): string => `
 let { data: channels, error } = await supabase
   .from('${tableName}')
   .select('${columns}')
 `
+

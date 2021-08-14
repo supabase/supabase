@@ -1,7 +1,7 @@
-import EditorLayout from '../../../components/layouts/EditorLayout.tsx'
+import EditorLayout from '../../../components/layouts/EditorLayout'
 import { SupabaseGrid } from '@supabase/grid'
 import { useRouter } from 'next/router'
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../../lib/constants.ts'
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../../lib/constants'
 
 export default function TableEditor() {
   const router = useRouter()
@@ -11,7 +11,7 @@ export default function TableEditor() {
     <EditorLayout title={`Editor: ${tableName}`}>
       <div className="h-screen">
         <SupabaseGrid
-          table={tableName}
+          table={String(tableName)}
           clientProps={{
             supabaseUrl: SUPABASE_URL,
             supabaseKey: SUPABASE_ANON_KEY,

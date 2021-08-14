@@ -1,5 +1,5 @@
 import AuthLayout from '../../components/layouts/AuthLayout'
-import { Card, Button, Badge, IconSearch, Input, Divider } from '@supabase/ui'
+import { Card, Button, Badge, IconSearch, Input } from '@supabase/ui'
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useMetaStore } from 'store/postgres/MetaStore'
@@ -15,27 +15,29 @@ function Policies() {
 
   return (
     <AuthLayout title="Users">
-      <div className="border-b my-8 mx-4 ">
-        <div className="flex justify-between">
-          <div>
-            <Input
-              className="mb-2"
-              type="text"
-              placeholder="Filter tables"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              icon={<IconSearch />}
-            />
+      <>
+        <div className="border-b my-8 mx-4 ">
+          <div className="flex justify-between">
+            <div>
+              <Input
+                className="mb-2"
+                type="text"
+                placeholder="Filter tables"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                icon={<IconSearch />}
+              />
+            </div>
           </div>
         </div>
-      </div>
-      <div>
-        {tables
-          .list((table) => table.name.indexOf(filter) >= 0)
-          .map((table) => {
-            return <TableCard table={table} />
-          })}
-      </div>
+        <div>
+          {tables
+            .list((table) => table.name.indexOf(filter) >= 0)
+            .map((table) => {
+              return <TableCard table={table} />
+            })}
+        </div>
+      </>
     </AuthLayout>
   )
 }
