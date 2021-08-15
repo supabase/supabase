@@ -38,27 +38,27 @@ info:
           - upsert()
           - delete()
           - rpc()
-      # - name: 'Realtime'
-      #   items:
-      #     - subscribe()
-      #     - removeSubscription()
-      #     - getSubscriptions()
-      # - name: 'Storage'
-      #   items:
-      #     - storage.createBucket()
-      #     - storage.getBucket()
-      #     - storage.listBuckets()
-      #     - storage.updateBucket()
-      #     - storage.deleteBucket()
-      #     - storage.emptyBucket()
-      #     - storage.from.upload()
-      #     - storage.from.download()
-      #     - storage.from.list()
-      #     - storage.from.update()
-      #     - storage.from.move()
-      #     - storage.from.remove()
-      #     - storage.from.createSignedUrl()
-      #     - storage.from.getPublicUrl()
+      - name: 'Realtime'
+        items:
+          - subscribe()
+          - removeSubscription()
+          - getSubscriptions()
+      - name: 'Storage'
+        items:
+          - storage.createBucket()
+          - storage.getBucket()
+          - storage.listBuckets()
+          - storage.updateBucket()
+          - storage.deleteBucket()
+          - storage.emptyBucket()
+          - storage.from.upload()
+          - storage.from.download()
+          - storage.from.list()
+          - storage.from.update()
+          - storage.from.move()
+          - storage.from.remove()
+          - storage.from.createSignedUrl()
+          - storage.from.getPublicUrl()
       # - name: 'Modifiers'
       #   items:
       #     - Using Modifiers
@@ -606,4 +606,362 @@ pages:
           final res = await supabase
             .rpc('hello_world')
             .execute(count: CountOption.exact);
+          ```
+
+  subscribe():
+    title: 'on().subscribe()'
+    notes: |
+      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
+      - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
+    examples:
+      - name: Listen to all database changes
+        isSpotlight: true
+        dart: |
+          ```dart
+          final mySubscription = supabase
+            .from('countries')
+            .on(SupabaseEventTypes.all, (payload) {
+              // Handle realtime payload
+            })
+            .subscribe();
+          ```
+      - name: Listening to a specific table
+        dart: |
+          ```dart
+          final mySubscription = supabase
+            .from('countries')
+            .on(SupabaseEventTypes.all, (payload) {
+              // Handle realtime payload
+            })
+            .subscribe();
+          ```
+      - name: Listening to inserts
+        dart: |
+          ```dart
+          final mySubscription = supabase
+            .from('countries')
+            .on(SupabaseEventTypes.insert, (payload) {
+              // Handle realtime payload
+            })
+            .subscribe();
+          ```
+      - name: Listening to updates
+        description: |
+          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can 
+          enable full replication for the table you are listening too: 
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
+        dart: |
+          ```dart
+          final mySubscription = supabase
+            .from('countries')
+            .on(SupabaseEventTypes.update, (payload) {
+              // Handle realtime payload
+            })
+            .subscribe();
+          ```
+      - name: Listening to deletes
+        description: |
+          By default, Supabase does not send deleted records. If you want to receive the deleted record you can 
+          enable full replication for the table you are listening too: 
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
+        dart: |
+          ```dart
+          final mySubscription = supabase
+            .from('countries')
+            .on(SupabaseEventTypes.delete, (payload) {
+              // Handle realtime payload
+            })
+            .subscribe();
+          ```
+      - name: Listening to multiple events
+        description: You can chain listeners if you want to listen to multiple events for each table.
+        dart: |
+          ```dart
+          final mySubscription = supabase
+            .from('countries')
+            .on(SupabaseEventTypes.insert, handleInsert)
+            .on(SupabaseEventTypes.delete, handleDelete)
+            .subscribe();
+          ```
+      - name: Listening to row level changes
+        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        dart: |
+          ```dart
+          final mySubscription = supabase
+            .from('countries:id=eq.200')
+            .on(SupabaseEventTypes.update, handleRecordUpdated)
+            .subscribe();
+          ```
+
+  removeSubscription():
+    title: 'removeSubscription()'
+    notes: |
+      - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
+    examples:
+      - name: Remove a subscription
+        isSpotlight: true
+        dart: |
+          ```dart
+          supabase.removeSubscription(mySubscription);
+          ```
+
+  getSubscriptions():
+    title: 'getSubscriptions()'
+    examples:
+      - name: Get all subscriptions
+        isSpotlight: true
+        dart: |
+          ```dart
+          final subscriptions = supabase.getSubscriptions();
+          ```
+  storage.listBuckets():
+    title: 'listBuckets()'
+    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.listBuckets'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `select` 
+        - `objects` permissions: none
+    examples:
+      - name: List buckets
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .storage
+            .listBuckets()
+          ```
+
+  storage.getBucket():
+    title: 'getBucket()'
+    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.getBucket'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `select` 
+        - `objects` permissions: none
+    examples:
+      - name: Get bucket
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .storage
+            .getBucket('avatars')
+          ```
+
+  storage.createBucket():
+    title: 'createBucket()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `insert` 
+        - `objects` permissions: none
+    examples:
+      - name: Create bucket
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .storage
+            .createBucket('avatars');
+          ```
+
+  storage.emptyBucket():
+    title: 'emptyBucket()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `select` 
+        - `objects` permissions: `select` and `delete`
+    examples:
+      - name: Empty bucket
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .storage
+            .emptyBucket('avatars');
+          ```
+  storage.updateBucket():
+    title: 'updateBucket()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `update`
+        - `objects` permissions: none
+    examples:
+      - name: Update bucket
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .storage
+            .updateBucket('avatars', { public: false });
+          ```
+
+  storage.deleteBucket():
+    title: 'deleteBucket()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `select` and `delete`
+        - `objects` permissions: none
+    examples:
+      - name: Delete bucket
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .storage
+            .deleteBucket('avatars');
+          ```
+
+  storage.from.upload():
+    title: 'from.upload()'
+    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.upload'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none 
+        - `objects` permissions: `insert`
+    examples:
+      - name: Upload file
+        isSpotlight: true
+        dart: |
+          ```dart
+          final avatarFile = File('path/to/file');
+          final res = await supabase
+            .storage
+            .from('avatars')
+            .upload('public/avatar1.png', avatarFile, fileOptions: FileOptions(
+              cacheControl: '3600',
+              upsert: false
+            ));
+          ```
+
+  storage.from.update():
+    title: 'from.update()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none 
+        - `objects` permissions: `update` and `select`
+    examples:
+      - name: Update file
+        isSpotlight: true
+        dart: |
+          ```dart
+          final avatarFile = File('path/to/file');
+          final res = await supabase
+            .storage
+            .from('avatars')
+            .update('public/avatar1.png', avatarFile, fileOptions: FileOptions(
+              cacheControl: '3600',
+              upsert: false
+            ));
+          ```
+
+  storage.from.move():
+    title: 'from.move()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none 
+        - `objects` permissions: `update` and `select`
+    examples:
+      - name: Move file
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .storage
+            .from('avatars')
+            .move('public/avatar1.png', 'private/avatar2.png');
+          ```
+
+  storage.from.createSignedUrl():
+    title: 'from.createSignedUrl()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none 
+        - `objects` permissions: `select`
+    examples:
+      - name: Create Signed URL
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUrl('avatar1.png', 60);
+
+          final signedURL = res.data;
+          ```
+
+  storage.from.getPublicUrl():
+    title: 'from.getPublicUrl()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none 
+        - `objects` permissions: none
+    examples:
+      - name: Returns the URL for an asset in a public bucket
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = supabase
+            .storage
+            .from('public-bucket')
+            .getPublicUrl('avatar1.png');
+
+          final publicURL = res.data;
+          ```
+
+  storage.from.download():
+    title: 'from.download()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none 
+        - `objects` permissions: `select`
+    examples:
+      - name: Download file
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .storage
+            .from('avatars')
+            .download('avatar1.png');
+          ```
+
+  storage.from.remove():
+    title: 'from.remove()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none 
+        - `objects` permissions: `delete` and `select`
+    examples:
+      - name: Delete file
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .storage
+            .from('avatars')
+            .remove(['avatar1.png']);
+          ```
+
+  storage.from.list():
+    title: 'from.list()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none 
+        - `objects` permissions: `select`
+    examples:
+      - name: List files in a bucket
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .storage
+            .from('avatars')
+            .list();
           ```
