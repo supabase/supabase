@@ -17,40 +17,332 @@ info:
     sidebar:
       - name: 'About'
         items:
-          - index
           - Installing
           - Initializing
-
+      - name: 'Auth'
+        items:
+          - auth.signUp()
+          - auth.signIn()
+          - auth.signOut()
+          - auth.session()
+          - auth.user()
+          - auth.update()
+          - auth.onAuthStateChange()
+          - Reset Password (Email)
+          - Delete User
+      # - name: 'Data'
+      #   items:
+      #     - select()
+      #     - insert()
+      #     - update()
+      #     - upsert()
+      #     - delete()
+      #     - rpc()
+      # - name: 'Realtime'
+      #   items:
+      #     - subscribe()
+      #     - removeSubscription()
+      #     - getSubscriptions()
+      # - name: 'Storage'
+      #   items:
+      #     - storage.createBucket()
+      #     - storage.getBucket()
+      #     - storage.listBuckets()
+      #     - storage.updateBucket()
+      #     - storage.deleteBucket()
+      #     - storage.emptyBucket()
+      #     - storage.from.upload()
+      #     - storage.from.download()
+      #     - storage.from.list()
+      #     - storage.from.update()
+      #     - storage.from.move()
+      #     - storage.from.remove()
+      #     - storage.from.createSignedUrl()
+      #     - storage.from.getPublicUrl()
+      # - name: 'Modifiers'
+      #   items:
+      #     - Using Modifiers
+      #     - limit()
+      #     - order()
+      #     - range()
+      #     - single()
+      # - name: 'Filters'
+      #   items:
+      #     - Using Filters
+      #     - .filter()
+      #     - .or()
+      #     - .not()
+      #     - .match()
+      #     - .eq()
+      #     - .neq()
+      #     - .gt()
+      #     - .gte()
+      #     - .lt()
+      #     - .lte()
+      #     - .like()
+      #     - .ilike()
+      #     - .is()
+      #     - .in()
+      #     - .contains()
+      #     - .containedBy()
+      #     - .rangeLt()
+      #     - .rangeGt()
+      #     - .rangeGte()
+      #     - .rangeLte()
+      #     - .rangeAdjacent()
+      #     - .overlaps()
+      #     - .textSearch()
 pages:
   Installing:
     description: |
+
+      ## Dart
+
       Dart libraries are built and suppported by the community. 
 
       ```bash
-      # TODO
+      dart pub add supabase
       ```
 
       Find the source code on [GitHub](https://github.com/supabase/supabase-dart).
 
       ## Flutter 
 
-      TODO: Some notes about flutter
+      For Flutter project, you can use [supabase-flutter](https://github.com/supabase/supabase-flutter).
+
+      ```bash
+      flutter pub add supabase_flutter
+      ```
+
+      `supabase-flutter` plugin uses `supabase` plugin internally, and it adds some Flutter specific functionality such as handling deeplinks comoing back from magic link vefications.
+      If you are creating a Flutter application, you should use `supabase-flutter` instead of `supabase-dart`. 
+
+      Basic syntax of `supabase-flutter` are the same as `supabase` except initialization.
 
   Initializing:
     description: |
-      You can initialize a new Supabase client using the `createClient()` method.
+      ## Dart
+      You can initialize a new Supabase client using the `SupabaseClient()` method.
 
       The Supabase client is your entrypoint to the rest of the Supabase functionality
       and is the easiest way to interact with everything we offer within the Supabase ecosystem.
 
+
+      ## Flutter
+
+      For `supabase-flutter`, you will be using the static `initialize()` method on `Supabase` class.
+
     examples:
-      - name: example()
+      - name: Dart SupabaseClient()
         dart: |
           ```dart
-          TODO
+          final supabase = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
           ```
-      - name: example()
+      - name: Flutter initialize()
         dart: |
           ```dart
-          TODO
+          Future<void> main() async {
+            await Supabase.initialize(url: 'https://xyzcompany.supabase.co', anonKey: 'public-anon-key');
+            runApp(MyApp());
+          }
+          ```
+
+  auth.signUp():
+    notes: |
+      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
+      - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
+      - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
+      - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
+    examples:
+      - name: Sign up.
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase.auth.signUp('example@email.com',　'example-password');
+
+          final user = res.data?.user;
+          final session = res.data?session;
+          final error = res.error;
+          ```
+      - name: Sign up with third-party providers.
+        hideCodeBlock: true
+        description: |
+          You can sign up with OAuth providers using the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers) method.
+
+  auth.signIn():
+    notes: |
+      - A user can sign up either via email or OAuth.
+      - If you provide `email` without a `password`, the user will be sent a magic link.
+      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
+      - Specifying a `provider` will open the browser to the relevant login page.
+    examples:
+      - name: Sign in with email.
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase.auth.signIn(email: 'example@email.com', password: 'example-password');
+
+          final user = res.data?user;
+          final session = res.data?.session;
+          final error = res.error;
+          ```
+      - name: Sign in with magic link.
+        description: If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
+        dart: |
+          ```dart
+          final res = await supabase.auth.signIn(email: 'example@email.com');
+
+          final user = res.data?user;
+          final session = res.data?.session;
+          final error = res.error;
+          ```
+      - name: Sign in using third-party providers.
+        description: |
+          Supabase supports OAuth logins.
+        dart: |
+          ```dart
+          final res = await supabase.auth.signIn(provider: Provider.github);
+
+          final user = res.data?user;
+          final session = res.data?.session;
+          final error = res.error;
+          ```
+      - name: Sign in with redirect.
+        description: |
+          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
+          any URL path on your website (the base domain must be the same as the domain in your Auth settings).
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            provider: 'github'
+          }, {
+            redirectTo: 'https://example.com/welcome'
+          })
+          ```
+      - name: Sign in with scopes.
+        description: |
+          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
+          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            provider: 'github'
+          }, {
+            scopes: 'repo gist notifications'
+          })
+          const oAuthToken = session.provider_token // use to access provider API
+          ```
+      - name: Sign in using a refresh token (e.g. in React Native).
+        description: |
+          If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
+        js: |
+          ```js
+          // An example using Expo's `AuthSession`
+          const redirectUri = AuthSession.makeRedirectUri({ useProxy: false });
+          const provider = 'google';
+
+          AuthSession.startAsync({
+            authUrl: `https://MYSUPABASEAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
+            returnUrl: redirectUri,
+          }).then(async (response: any) => {
+            if (!response) return;
+            const { user, session, error } = await supabase.auth.signIn({
+              refreshToken: response.params?.refresh_token,
+            });
+          });
+          ```
+
+  auth.signOut():
+    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signOut'
+    examples:
+      - name: Sign out
+        isSpotlight: true
+        js: |
+          ```js
+          const { error } = await supabase.auth.signOut()
+          ```
+
+  auth.session():
+    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.session'
+    examples:
+      - name: Get the session data
+        isSpotlight: true
+        js: |
+          ```js
+          const session = supabase.auth.session()
+          ```
+
+  auth.user():
+    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.user'
+    examples:
+      - name: Get the logged in user
+        isSpotlight: true
+        js: |
+          ```js
+          const user = supabase.auth.user()
+          ```
+
+  auth.update():
+    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.update'
+    notes: |
+      It's generally better to store user data in a table inside your public schema (i.e. `public.users`). 
+      Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
+    examples:
+      - name: Update a user's metadata.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.update({ 
+            data: { hello: 'world' } 
+          })
+          ```
+
+  auth.onAuthStateChange():
+    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.onAuthStateChange'
+    examples:
+      - name: Listen to auth changes
+        isSpotlight: true
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            console.log(event, session)
+          })
+          ```
+
+  Reset Password (Email):
+    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.resetPasswordForEmail'
+    notes: |
+      Sends a reset request to an email address.
+
+      When the user clicks the reset link in the email they will be forwarded to:
+
+      `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`
+
+      Your app must detect `type=recovery` in the fragment and display a password reset form to the user.
+
+      You should then use the access_token in the url and new password to update the user as follows:
+
+      ```js
+      const { error, data } = await supabase.auth.api
+            .updateUser(access_token, { password : new_password })
+      ```
+    examples:
+      - name: Reset password
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = supabase.auth.api.resetPasswordForEmail('user@email.com')
+          ```
+
+  Delete User:
+    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.deleteUser'
+    examples:
+      - name: Remove a user completely.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.api.deleteUser(
+            '715ed5db-f090-4b8c-a067-640ecee36aa0',
+            'YOUR_SERVICE_ROLE_KEY'
+          )
           ```
