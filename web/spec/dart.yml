@@ -66,32 +66,32 @@ info:
           - order()
           - range()
           - single()
-      # - name: 'Filters'
-      #   items:
-      #     - Using Filters
-      #     - .filter()
-      #     - .or()
-      #     - .not()
-      #     - .match()
-      #     - .eq()
-      #     - .neq()
-      #     - .gt()
-      #     - .gte()
-      #     - .lt()
-      #     - .lte()
-      #     - .like()
-      #     - .ilike()
-      #     - .is()
-      #     - .in()
-      #     - .contains()
-      #     - .containedBy()
-      #     - .rangeLt()
-      #     - .rangeGt()
-      #     - .rangeGte()
-      #     - .rangeLte()
-      #     - .rangeAdjacent()
-      #     - .overlaps()
-      #     - .textSearch()
+      - name: 'Filters'
+        items:
+          - Using Filters
+          - .filter()
+          - .or()
+          - .not()
+          - .match()
+          - .eq()
+          - .neq()
+          - .gt()
+          - .gte()
+          - .lt()
+          - .lte()
+          - .like()
+          - .ilike()
+          - .is()
+          - .in()
+          - .contains()
+          - .containedBy()
+          - .rangeLt()
+          - .rangeGt()
+          - .rangeGte()
+          - .rangeLte()
+          - .rangeAdjacent()
+          - .overlaps()
+          - .textSearch()
 pages:
   Installing:
     description: |
@@ -1031,7 +1031,6 @@ pages:
           ```
 
   single():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.single'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1041,5 +1040,1004 @@ pages:
             .from('cities')
             .select('name, country_id')
             .single()
+            .execute();
+          ```
+
+  Using Filters:
+    description: |
+      Filters can be used on `select()`, `update()`, and `delete()` queries. 
+
+      If a Stored Procedure returns a table response, you can also apply filters.
+
+      ### Applying Filters
+
+      You must apply your filters to the end of your query. For example:
+
+      ```dart
+      final res = await supabase
+        .from('cities')
+        .select('name, country_id')
+        .eq('name', 'The Shire')    // Correct
+        .execute();
+
+      final res = await supabase
+        .from('cities')
+        .eq('name', 'The Shire')    // Incorrect
+        .select('name, country_id')
+        .execute();
+      ```
+
+      ### Chaining
+
+      Filters can be chained together to produce advanced queries. For example:
+
+      ```dart
+      final res = await supabase
+        .from('cities')
+        .select('name, country_id')
+        .gte('population', 1000)
+        .lt('population', 10000)
+        .execute();
+      ```
+
+  .filter():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .filter('name', 'eq', 'Paris')
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .filter('name', 'eq', 'Paris')
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .delete()
+            .filter('name', 'eq', 'Paris')
+            .execute();
+          ```
+      # TODO Not available at the moment, so would have to fix the bug on postgrest-dart first
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_cities')
+      #       .filter('name', 'eq', 'Paris')
+      #     ```
+      - name: Filter embedded resources
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, countries ( name )')
+            .filter('countries.name', 'eq', 'France')
+            .execute();
+          ```
+
+  .or():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .or('id.eq.20,id.eq.30')
+            .execute();
+          ```
+      - name: Use `or` with `and`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
+            .execute();
+          ```
+      # TODO Not available at the moment, so would have to fix the bug on postgrest-dart first
+      # - name: Use `or` on foreign tables
+      #   isSpotlight: true
+      #   dart: |
+      #     ```dart
+      #     final res = await supabase
+      #       .from('countries')
+      #       .select('id, cities(*)')
+      #       .or('name.eq.Wellington,name.eq.Paris', { foreignTable: "cities" })
+      #     ```
+
+  .not():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .not('name', 'eq', 'Paris')
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .not('name', 'eq', 'Paris')
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .delete()
+            .not('name', 'eq', 'Paris')
+            .execute();
+          ```
+      # TODO Not available in dart yes, so first fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_cities)
+      #       .not('name', 'eq', 'Paris')
+      #     ```
+
+  .match():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .match({'name': 'Beijing', 'country_id': 156})
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .match({'name': 'Beijing', 'country_id': 156})
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .delete()
+            .match({'name': 'Beijing', 'country_id': 156})
+            .execute();
+          ```
+      # TODO Not available in postgrest-dart yet, so first fix the bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_cities')
+      #       .match({name: 'Beijing', country_id: 156})
+      #     ```
+
+  .eq():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .eq('name', 'The shire')
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .eq('name', 'San Francisco')
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .delete()
+            .eq('name', 'Mordor')
+            .execute();
+          ```
+      # TODO Fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_cities')
+      #       .eq('name', 'San Francisco')
+      #     ```
+
+  .neq():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .neq('name', 'The shire')
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .neq('name', 'San Francisco')
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .delete()
+            .neq('name', 'Mordor')
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_cities')
+      #       .neq('name', 'Lagos')
+      #     ```
+
+  .gt():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .gt('country_id', 250)
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .gt('country_id', 250)
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .delete()
+            .gt('country_id', 250)
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_cities')
+      #       .gt('country_id', 250)
+      #     ```
+
+  .gte():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .gte('country_id', 250)
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .gte('country_id', 250)
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .delete()
+            .gte('country_id', 250)
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_cities')
+      #       .gte('country_id', 250)
+      #     ```
+
+  .lt():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .lt('country_id', 250)
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .lt('country_id', 250)
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .delete()
+            .lt('country_id', 250)
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_cities')
+      #       .lt('country_id', 250)
+      #       .execute();
+      #     ```
+
+  .lte():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lte'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .lte('country_id', 250)
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .lte('country_id', 250)
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .delete()
+            .lte('country_id', 250)
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_cities')
+      #       .lte('country_id', 250)
+      #       .execute();
+      #     ```
+
+  .like():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.like'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .like('name', '%la%')
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .like('name', '%la%')
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .delete()
+            .like('name', '%la%')
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_cities')
+      #       .like('name', '%la%')
+      #       .execute();
+      #     ```
+
+  .ilike():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .ilike('name', '%la%')
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .ilike('name', '%la%')
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .delete()
+            .ilike('name', '%la%')
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_cities')
+      #       .ilike('name', '%la%')
+      #       .execute();
+      #     ```
+
+  # TODO Not available in dart yet, so uncomment when added
+  # .is():
+  #   examples:
+  #     - name: With `select()`
+  #       isSpotlight: true
+  #       dart: |
+  #         ```dart
+  #         final res = await supabase
+  #           .from('cities')
+  #           .select('name, country_id')
+  #           .is('name', null)
+  #           .execute();
+  #         ```
+  #     - name: With `update()`
+  #       dart: |
+  #         ```dart
+  #         final res = await supabase
+  #           .from('cities')
+  #           .update({ name: 'Mordor' })
+  #           .is('name', null)
+  #           .execute();
+  #         ```
+  #     - name: With `delete()`
+  #       dart: |
+  #         ```dart
+  #         final res = await supabase
+  #           .from('cities')
+  #           .delete()
+  #           .is('name', null)
+  #           .execute();
+  #         ```
+  # TODO fix bug on postgrest-dart
+  # - name: With `rpc()`
+  #   dart: |
+  #     ```dart
+  #     // Only valid if the Stored Procedure returns a table type.
+  #     final res = await supabase
+  #       .rpc('echo_all_cities')
+  #       .is('name', null)
+  #       .execute();
+  #     ```
+
+  # .in():
+  #   examples:
+  #     - name: With `select()`
+  #       isSpotlight: true
+  #       dart: |
+  #         ```dart
+  #         final res = await supabase
+  #           .from('cities')
+  #           .select('name, country_id')
+  #           .in('name', ['Rio de Janeiro', 'San Francisco'])
+  #           .execute();
+  #         ```
+  #     - name: With `update()`
+  #       dart: |
+  #         ```dart
+  #         final res = await supabase
+  #           .from('cities')
+  #           .update({ name: 'Mordor' })
+  #           .in('name', ['Rio de Janeiro', 'San Francisco'])
+  #           .execute();
+  #         ```
+  #     - name: With `delete()`
+  #       dart: |
+  #         ```dart
+  #         final res = await supabase
+  #           .from('cities')
+  #           .delete()
+  #           .in('name', ['Rio de Janeiro', 'San Francisco'])
+  #           .execute();
+  #         ```
+  # TODO fix bug on postgrest-dart
+  # - name: With `rpc()`
+  #   dart: |
+  #     ```dart
+  #     // Only valid if the Stored Procedure returns a table type.
+  #     final res = await supabase
+  #       .rpc('echo_all_cities')
+  #       .in('name', ['Rio de Janeiro', 'San Francisco'])
+  #       .execute();
+  #     ```
+
+  .contains():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .contains('main_exports', ['oil'])
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .contains('main_exports', ['oil'])
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .delete()
+            .contains('main_exports', ['oil'])
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_countries')
+      #       .contains('main_exports', ['oil'])
+      #       .execute();
+      #     ```
+
+  .containedBy():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .containedBy('main_exports', ['cars', 'food', 'machine'])
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .containedBy('main_exports', ['orks', 'surveillance', 'evil'])
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .delete()
+            .containedBy('main_exports', ['cars', 'food', 'machine'])
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_countries')
+      #       .containedBy('main_exports', ['cars', 'food', 'machine'])
+      #       .execute();
+      #     ```
+
+  .rangeLt():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeLt('population_range_millions', '[150, 250]')
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .rangeLt('population_range_millions', '[150, 250]')
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .delete()
+            .rangeLt('population_range_millions', '[150, 250]')
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_countries')
+      #       .rangeLt('population_range_millions', [150, 250])
+      #       .execute();
+      #     ```
+
+  .rangeGt():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeGt('population_range_millions', '[150, 250]')
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .rangeGt('population_range_millions', '[150, 250]')
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .delete()
+            .rangeGt('population_range_millions', '[150, 250]')
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_countries')
+      #       .rangeGt('population_range_millions', [150, 250])
+      #       .execute();
+      #     ```
+
+  .rangeGte():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeGte('population_range_millions', '[150, 250]')
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .rangeGte('population_range_millions', '[150, 250]')
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .delete()
+            .rangeGte('population_range_millions', '[150, 250]')
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_countries')
+      #       .rangeGte('population_range_millions', [150, 250])
+      #       .execute();
+      #     ```
+
+  .rangeLte():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxr'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeLte('population_range_millions', '[150, 250]')
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .rangeLte('population_range_millions', '[150, 250]')
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .delete()
+            .rangeLte('population_range_millions', '[150, 250]')
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_countries')
+      #       .rangeLte('population_range_millions', [150, 250])
+      #       .execute();
+      #     ```
+
+  .rangeAdjacent():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeAdjacent('population_range_millions', '[70, 185]')
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .rangeAdjacent('population_range_millions', '[70, 185]')
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .delete()
+            .rangeAdjacent('population_range_millions', '[70, 185]')
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_countries')
+      #       .rangeAdjacent('population_range_millions', [70, 185])
+      #       .execute();
+      #     ```
+
+  .overlaps():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .overlaps('main_exports', ['computers', 'minerals'])
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .overlaps('main_exports', ['computers', 'minerals'])
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('countries')
+            .delete()
+            .overlaps('main_exports', ['computers', 'minerals'])
+            .execute();
+          ```
+      # TODO fix bug on postgrest-dart
+      # - name: With `rpc()`
+      #   dart: |
+      #     ```dart
+      #     // Only valid if the Stored Procedure returns a table type.
+      #     final res = await supabase
+      #       .rpc('echo_all_countries')
+      #       .overlaps('main_exports', ['computers', 'minerals'])
+      #       .execute();
+      #     ```
+
+  .textSearch():
+    examples:
+      - name: Text search
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', "'fat' & 'cat'", 
+              config: 'english' 
+            )
+            .execute();
+          ```
+      - name: Basic normalization
+        description: Uses PostgreSQL's `plainto_tsquery` function.
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', "'fat' & 'cat'",  
+              type: TextSearchType.plain,
+              config: 'english' 
+            )
+            .execute();
+          ```
+      - name: Full normalization
+        description: Uses PostgreSQL's `phraseto_tsquery` function.
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', "'fat' & 'cat'",  
+              type: TextSearchType.phrase,
+              config: 'english' 
+            )
+            .execute();
+          ```
+      - name: Full normalization
+        description: |
+          Uses PostgreSQL's `websearch_to_tsquery` function. 
+          This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used 
+          with advanced operators.
+
+          - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
+          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+          - `OR`: the word “or” will be converted to the | operator.
+          - `-`: a dash will be converted to the ! operator.
+
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', "'fat or cat'",  
+              type: TextSearchType.websearch,
+              config: 'english'
+            )
             .execute();
           ```
