@@ -23,13 +23,13 @@ info:
         items:
           - auth.signUp()
           - auth.signIn()
+          - auth.signInWithProvider()
           - auth.signOut()
           - auth.session()
           - auth.user()
           - auth.update()
           - auth.onAuthStateChange()
           - Reset Password (Email)
-          - Delete User
       # - name: 'Data'
       #   items:
       #     - select()
@@ -117,7 +117,7 @@ pages:
       `supabase-flutter` plugin uses `supabase` plugin internally, and it adds some Flutter specific functionality such as handling deeplinks comoing back from magic link vefications.
       If you are creating a Flutter application, you should use `supabase-flutter` instead of `supabase-dart`. 
 
-      Basic syntax of `supabase-flutter` are the same as `supabase` except initialization.
+      For the most part `supabase-flutter` are share the same API `supabase` with few exceptions such as initialization or OAuth sign in.
 
   Initializing:
     description: |
@@ -140,7 +140,7 @@ pages:
           ```
       - name: Flutter initialize()
         dart: |
-          ```dart
+          ```dart title="main.dart"
           Future<void> main() async {
             await Supabase.initialize(url: 'https://xyzcompany.supabase.co', anonKey: 'public-anon-key');
             runApp(MyApp());
@@ -161,20 +161,20 @@ pages:
           final res = await supabase.auth.signUp('example@email.com',　'example-password');
 
           final user = res.data?.user;
-          final session = res.data?session;
           final error = res.error;
           ```
       - name: Sign up with third-party providers.
         hideCodeBlock: true
         description: |
-          You can sign up with OAuth providers using the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers) method.
+          If you are using Flutter, you can sign up with OAuth providers using the [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider) method available on `supabase-flutter`.
 
   auth.signIn():
     notes: |
-      - A user can sign up either via email or OAuth.
+      - A user can sign up via email, phone number.
       - If you provide `email` without a `password`, the user will be sent a magic link.
       - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
-      - Specifying a `provider` will open the browser to the relevant login page.
+      - Similary, if you provide `phone` without a `password`, the user will be sent a one time password. 
+      - If you are looking to sign users in with OAuth in Flutter apps, go to [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider).
     examples:
       - name: Sign in with email.
         isSpotlight: true
@@ -182,44 +182,58 @@ pages:
           ```dart
           final res = await supabase.auth.signIn(email: 'example@email.com', password: 'example-password');
 
-          final user = res.data?user;
-          final session = res.data?.session;
+          final user = res.data?.user;
           final error = res.error;
           ```
       - name: Sign in with magic link.
-        description: If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
+        description: If email is provided, but no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
         dart: |
           ```dart
           final res = await supabase.auth.signIn(email: 'example@email.com');
 
-          final user = res.data?user;
-          final session = res.data?.session;
           final error = res.error;
           ```
-      - name: Sign in using third-party providers.
+      - name: Get OAuth sign in URL.
         description: |
-          Supabase supports OAuth logins.
+          Passing provider parameter to `signIn()` will return a URL to sign your user in via OAuth. 
+          If you are looking to sign in a user via OAuth on Flutter app, go to [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider).
         dart: |
           ```dart
           final res = await supabase.auth.signIn(provider: Provider.github);
 
-          final user = res.data?user;
-          final session = res.data?.session;
+          final url = res.data?.url;
           final error = res.error;
           ```
-      - name: Sign in with redirect.
-        description: |
-          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
-          any URL path on your website (the base domain must be the same as the domain in your Auth settings).
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            provider: 'github'
-          }, {
-            redirectTo: 'https://example.com/welcome'
-          })
+  auth.signInWithProvider():
+    notes: |
+      - `auth.signInWithProvider()` is only available on `supabase-flutter`
+      - It will open the browser to the relevant login page.
+    examples:
+      - name: Sign in with provider.
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase.auth.signInWithProvider(Provider.github);
+
+          final error = res.error;
           ```
-      - name: Sign in with scopes.
+      - name: With `redirectTo`
+        description: |
+          Specify the redirect link to bring back the user via deeplink.
+          Note that `redirectTo` should be null for Flutter Web.
+        dart: |
+          ```dart
+          final res = await supabase.auth.signInWithProvider(
+            Provider.github,
+            options: AuthOptions(
+                redirectTo: kIsWeb
+                    ? null
+                    : 'io.supabase.flutter://reset-callback/'),
+          );
+
+          final error = res.error;
+          ```
+      - name: With scopes
         description: |
           If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
@@ -232,85 +246,64 @@ pages:
           })
           const oAuthToken = session.provider_token // use to access provider API
           ```
-      - name: Sign in using a refresh token (e.g. in React Native).
-        description: |
-          If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
-        js: |
-          ```js
-          // An example using Expo's `AuthSession`
-          const redirectUri = AuthSession.makeRedirectUri({ useProxy: false });
-          const provider = 'google';
-
-          AuthSession.startAsync({
-            authUrl: `https://MYSUPABASEAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
-            returnUrl: redirectUri,
-          }).then(async (response: any) => {
-            if (!response) return;
-            const { user, session, error } = await supabase.auth.signIn({
-              refreshToken: response.params?.refresh_token,
-            });
-          });
-          ```
-
   auth.signOut():
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signOut'
     examples:
       - name: Sign out
         isSpotlight: true
-        js: |
-          ```js
-          const { error } = await supabase.auth.signOut()
+        dart: |
+          ```dart
+          final res = await supabase.auth.signOut();
+
+          final error = res.error;
           ```
 
   auth.session():
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.session'
     examples:
       - name: Get the session data
         isSpotlight: true
-        js: |
-          ```js
-          const session = supabase.auth.session()
+        dart: |
+          ```dart
+          final session = supabase.auth.session();
           ```
 
   auth.user():
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.user'
     examples:
       - name: Get the logged in user
         isSpotlight: true
-        js: |
-          ```js
-          const user = supabase.auth.user()
+        dart: |
+          ```dart
+          final user = supabase.auth.user();
           ```
 
   auth.update():
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.update'
     notes: |
       It's generally better to store user data in a table inside your public schema (i.e. `public.users`). 
       Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
     examples:
       - name: Update a user's metadata.
         isSpotlight: true
-        js: |
-          ```js
-          const { user, error } = await supabase.auth.update({ 
-            data: { hello: 'world' } 
-          })
+        dart: |
+          ```dart
+          final res = await supabase.auth.update(
+            UserAttributes(data: {'hello': 'world'})
+          );
+
+          final error = res.error;
           ```
 
   auth.onAuthStateChange():
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.onAuthStateChange'
     examples:
       - name: Listen to auth changes
         isSpotlight: true
-        js: |
-          ```js
-          supabase.auth.onAuthStateChange((event, session) => {
-            console.log(event, session)
-          })
+        dart: |
+          ```dart
+          final subscription = supabase.auth.onAuthStateChange((event, session) {
+            print(session?.user?.id);
+            // handle auth state change
+          });
           ```
 
   Reset Password (Email):
-    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.resetPasswordForEmail'
     notes: |
       Sends a reset request to an email address.
 
@@ -322,27 +315,32 @@ pages:
 
       You should then use the access_token in the url and new password to update the user as follows:
 
-      ```js
-      const { error, data } = await supabase.auth.api
-            .updateUser(access_token, { password : new_password })
+      ```dart
+      final res = await supabase.auth.api.updateUser(
+        accessToken,
+        UserAttributes(password: 'NEW_PASSWORD'),
+      );
       ```
     examples:
       - name: Reset password
         isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = supabase.auth.api.resetPasswordForEmail('user@email.com')
-          ```
+        dart: |
+          ```dart
+          final res = await supabase.auth.api.resetPasswordForEmail('user@example.com');
 
-  Delete User:
-    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.deleteUser'
-    examples:
-      - name: Remove a user completely.
+          final error = res.error;
+          ```
+      - name: Reset password for Flutter
         isSpotlight: true
-        js: |
-          ```js
-          const { user, error } = await supabase.auth.api.deleteUser(
-            '715ed5db-f090-4b8c-a067-640ecee36aa0',
-            'YOUR_SERVICE_ROLE_KEY'
-          )
+        dart: |
+          You can pass `redirectTo` to open the app via deeplink when user opens the password reset email. 
+          ```dart
+          final res = await supabase.auth.api.resetPasswordForEmail(
+            'user@example.com',
+            options: AuthOptions(redirectTo: kIsWeb
+                ? null
+                : 'io.supabase.flutter://reset-callback/'),
+          );
+
+          final error = res.error;
           ```
