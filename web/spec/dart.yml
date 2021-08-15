@@ -43,6 +43,9 @@ info:
           - subscribe()
           - removeSubscription()
           - getSubscriptions()
+      # - name: 'Stream'
+      #   items:
+      #     - stream()
       - name: 'Storage'
         items:
           - storage.createBucket()
@@ -81,8 +84,8 @@ info:
           - .lte()
           - .like()
           - .ilike()
-          - .is()
-          - .in()
+          # - .is()
+          # - .in()
           - .contains()
           - .containedBy()
           - .rangeLt()
@@ -148,6 +151,8 @@ pages:
           ```
 
   auth.signUp():
+    description: |
+      Creates a new user.
     notes: |
       - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
       - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
@@ -348,9 +353,8 @@ pages:
     title: 'Fetch data: select()'
     notes: |
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
-      TODO change the followinng links to dart
-      - `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
-      - `select()` can be combined with [Filters](/docs/reference/javascript/using-filters)
+      - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
+      - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
     examples:
       - name: Getting your data
         isSpotlight: true
