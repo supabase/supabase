@@ -43,9 +43,9 @@ info:
           - subscribe()
           - removeSubscription()
           - getSubscriptions()
-      # - name: 'Stream'
-      #   items:
-      #     - stream()
+      - name: 'Stream'
+        items:
+          - stream()
       - name: 'Storage'
         items:
           - storage.createBucket()
@@ -724,6 +724,53 @@ pages:
           ```dart
           final subscriptions = supabase.getSubscriptions();
           ```
+
+  stream():
+    title: 'stream()'
+    notes: |
+      - `stream()` will emit the initial data as well as any further change on the database as `Stream` of `List<Map<String, dynamic>>` by combining Postgrest and Realtime.
+      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
+    examples:
+      - name: Listening to a specific table
+        isSpotlight: true
+        dart: |
+          ```dart
+          supabase
+            .from('countries')
+            .stream()
+            .execute();
+          ```
+      - name: Listening to a specific rows within a table
+        description: |
+          You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+          This syntax is the as how you can filter data in Realtime
+        dart: |
+          ```dart
+          supabase
+            .from('countries:id=eq.120')
+            .stream()
+            .execute();
+          ```
+      - name: With `order()`
+        dart: |
+          ```dart
+          supabase
+            .from('countries')
+            .stream()
+            .order('name', ascending: false)
+            .execute();
+          ```
+      - name: With `limit()`
+        dart: |
+          ```dart
+          supabase
+            .from('countries')
+            .stream()
+            .order('name', ascending: false)
+            .limit(10)
+            .execute();
+          ```
+
   storage.listBuckets():
     title: 'listBuckets()'
     $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.listBuckets'
