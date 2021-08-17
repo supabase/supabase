@@ -11,7 +11,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Introduction',
-      items: ['about'],
+      items: ['handbook'],
       collapsed: false,
     },
     {
@@ -21,9 +21,6 @@ module.exports = {
       items: [
         'handbook/contributing',
         'handbook/supasquad',
-        'company/terms',
-        'company/privacy',
-        'company/aup',
       ],
     },
   ],
