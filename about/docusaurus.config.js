@@ -76,7 +76,7 @@ module.exports = {
         {
           label: 'Handbook',
           to: '/handbook',
-          activeBaseRegex: '(^/docs$)|(/docs/faq)|(^/docs/guides/examples)',
+          activeBaseRegex: '/handbook',
           position: 'left',
         },
       ],
@@ -112,7 +112,7 @@ module.exports = {
           items: [
             {
               label: 'Handbook',
-              href: '/docs',
+              href: '/handbook',
             },
           ],
         },
@@ -132,13 +132,13 @@ module.exports = {
               href: 'https://dev.to/supabase',
             },
             {
+              label: "Discord",
+              href: "https://discord.supabase.com"
+            },
+            {
               label: 'RSS',
               href: 'https://supabase.io/rss.xml',
             },
-            // {
-            //   label: "Discord",
-            //   href: "https://discordapp.com/invite/docusaurus"
-            // }
           ],
         },
         {
@@ -165,7 +165,7 @@ module.exports = {
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
-        blog: false
+        blog: false,
       },
     ],
   ],

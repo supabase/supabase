@@ -28,7 +28,7 @@ export default function Home() {
                       'button hero--button button--md button--secondary button--outline responsive-button',
                       styles.button
                     )}
-                    to={useBaseUrl('docs')}
+                    to={useBaseUrl('/handbook')}
                     style={{ marginLeft: 0, marginTop: 10 }}
                   >
                     Learn More
@@ -38,7 +38,7 @@ export default function Home() {
                       'button hero--button button--md button--primary responsive-button',
                       styles.button
                     )}
-                    to={'/docs/careers'}
+                    to={'/careers'}
                     style={{ marginTop: 10 }}
                   >
                     Join the team →
