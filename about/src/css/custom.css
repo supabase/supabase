@@ -2,21 +2,7 @@
   Font import 
 */
 
-@font-face {
-  font-family: 'custom-font';
-  src: url(/fonts/custom/CustomFont-Book.woff2) format('woff2'),
-    url(/fonts/custom/CustomFont-Book.woff) format('woff');
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'custom-font';
-  src: url(/fonts/custom/CustomFont-Medium.woff2) format('woff2'),
-    url(/fonts/custom/CustomFont-Medium.woff) format('woff');
-  font-weight: 500;
-  font-style: normal;
-}
+@import url('https://rsms.me/inter/inter.css');
 
 /* mono font */
 
@@ -47,7 +33,7 @@
   /* 
     Customisation here for both Light and Dark themes
   */
-  --custom-font-base: 'custom-font', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto',
+  --custom-font-base: 'Inter', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto',
     'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica',
     'Arial', sans-serif;
   --custom-font-code: 'office code pro', Menlo, monospace;
@@ -119,7 +105,7 @@
   --ifm-font-family-monospace: var(--custom-font-code);
   --ifm-heading-font-family: var(--custom-font-base);
   --ifm-font-size-base: var(--custom-font-size-base);
-  --ifm-heading-font-weight: 400;
+  --ifm-heading-font-weight: 500;
   --ifm-font-weight-bold: 500;
 
   /* Globals */

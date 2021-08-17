@@ -21,9 +21,6 @@ module.exports = {
       items: [
         'handbook/contributing',
         'handbook/supasquad',
-        'company/terms',
-        'company/privacy',
-        'company/aup',
       ],
     },
   ],
