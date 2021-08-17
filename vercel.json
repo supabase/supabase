@@ -218,7 +218,11 @@
     { "source": "/docs/pricing", "destination": "/pricing" },
 
     { "source": "/docs/careers", "destination": "https://about.supabase.com/careers" },
-    { "source": "/docs/careers/:match*", "destination": "https://about.supabase.com/careers//:match*" }
+    { "source": "/docs/careers/:match*", "destination": "https://about.supabase.com/careers//:match*" },
+
+    { "source": "/docs/resources", "destination": "/docs/guides" }
+
+
   ],
   "trailingSlash": false
 }

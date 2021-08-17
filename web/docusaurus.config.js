@@ -85,12 +85,6 @@ module.exports = {
           activeBasePath: '/docs/reference/',
           position: 'left',
         },
-        {
-          label: 'Resources',
-          to: '/docs/resources',
-          activeBaseRegex: 'docs/(resources|learn|gotrue|postgrest|realtime)',
-          position: 'left',
-        },
         { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
       ],
     },
