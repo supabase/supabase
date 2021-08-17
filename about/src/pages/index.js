@@ -20,7 +20,7 @@ export default function Home() {
               <div className="col col--5">
                 <h2 className="hero__title">{siteConfig.tagline}</h2>
                 <p className="hero__subtitle">
-                  Supabase adds realtime and restful APIs to Postgres without a single line of code.
+                  Supabase is the open source Firebase alternative.
                 </p>
                 <div>
                   <Link
@@ -38,10 +38,10 @@ export default function Home() {
                       'button hero--button button--md button--primary responsive-button',
                       styles.button
                     )}
-                    to={'https://app.supabase.io'}
+                    to={'/docs/careers'}
                     style={{ marginTop: 10 }}
                   >
-                    Beta sign up →
+                    Join the team →
                   </Link>
                 </div>
               </div>

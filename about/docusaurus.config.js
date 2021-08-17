@@ -6,7 +6,7 @@
  */
 module.exports = {
   title: 'Supabase',
-  tagline: 'The open source Firebase alternative.',
+  tagline: 'Build in a weekend. Scale to millions.',
   url: 'https://supabase.io',
   baseUrl: '/',
   favicon: '/favicon.ico',
@@ -108,11 +108,11 @@ module.exports = {
           ],
         },
         {
-          title: 'Resources',
+          title: 'Team',
           items: [
             {
-              label: 'Brand Assets',
-              to: 'https://supabase.io/brand-assets',
+              label: 'Handbook',
+              href: '/docs',
             },
           ],
         },
@@ -142,11 +142,11 @@ module.exports = {
           ],
         },
         {
-          title: 'Beta',
+          title: 'Resources',
           items: [
             {
-              label: 'Join our beta',
-              href: 'https://app.supabase.io',
+              label: 'Brand Assets',
+              to: 'https://supabase.io/brand-assets',
             },
           ],
         },
