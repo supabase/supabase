@@ -68,15 +68,15 @@ module.exports = {
           position: 'right',
         },
         {
-          label: 'Overview',
-          to: '/docs',
-          activeBaseRegex: '(^/docs$)|(/docs/faq)|(^/docs/guides/examples)',
+          label: 'Careers',
+          to: '/careers',
+          activeBasePath: '/careers',
           position: 'left',
         },
         {
-          label: 'Jobs',
-          to: '/docs/careers',
-          activeBasePath: '/docs/careers',
+          label: 'Handbook',
+          to: '/handbook',
+          activeBaseRegex: '(^/docs$)|(/docs/faq)|(^/docs/guides/examples)',
           position: 'left',
         },
       ],
@@ -160,92 +160,87 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/supabase/supabase/edit/master/web',
+          routeBasePath: '/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
-        blog: {
-          feedOptions: {
-            type: 'all',
-            copyright: `Copyright © ${new Date().getFullYear()} Supabase, Inc.`,
-          },
-        },
+        blog: false
       },
     ],
   ],
   scripts: [{ src: '/scripts/telemetry.js' }],
-  // plugins: [
-  //   // [
-  //   //   '@docusaurus/plugin-content-docs',
-  //   //   {
-  //   //     id: 'supabase-client', // for first plugin-content-docs with "resources/" path
-  //   //     // homePageId: "doc2",
-  //   //     path: './ref/supabase', // Path to data on filesystem, relative to site dir.
-  //   //     routeBasePath: 'ref/supabase', // URL Route.
-  //   //     include: ['**/*.md', '**/*.mdx'],
-  //   //     sidebarPath: require.resolve('./sidebar_spec_supabase.js'),
-  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
-  //   //   },
-  //   // ],
-  //   // [
-  //   //   '@docusaurus/plugin-content-docs',
-  //   //   {
-  //   //     id: 'postgrest-client', // for first plugin-content-docs with "resources/" path
-  //   //     // homePageId: "doc2",
-  //   //     path: './ref/postgrest', // Path to data on filesystem, relative to site dir.
-  //   //     routeBasePath: 'ref/postgrest', // URL Route.
-  //   //     include: ['**/*.md', '**/*.mdx'],
-  //   //     sidebarPath: require.resolve('./sidebar_spec_postgrest.js'),
-  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
-  //   //   },
-  //   // ],
-  //   // [
-  //   //   '@docusaurus/plugin-content-docs',
-  //   //   {
-  //   //     id: 'gotrue-client', // for first plugin-content-docs with "resources/" path
-  //   //     // homePageId: "doc2",
-  //   //     path: './ref/gotrue', // Path to data on filesystem, relative to site dir.
-  //   //     routeBasePath: 'ref/gotrue', // URL Route.
-  //   //     include: ['**/*.md', '**/*.mdx'],
-  //   //     sidebarPath: require.resolve('./sidebar_spec_gotrue.js'),
-  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
-  //   //   },
-  //   // ],
-  //   // [
-  //   //   '@docusaurus/plugin-content-docs',
-  //   //   {
-  //   //     id: 'realtime-client', // for first plugin-content-docs with "resources/" path
-  //   //     // homePageId: "doc2",
-  //   //     path: './ref/realtime', // Path to data on filesystem, relative to site dir.
-  //   //     routeBasePath: 'ref/realtime', // URL Route.
-  //   //     include: ['**/*.md', '**/*.mdx'],
-  //   //     sidebarPath: require.resolve('./sidebar_spec_realtime.js'),
-  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
-  //   //   },
-  //   // ],
-  //   // [
-  //   //   '@docusaurus/plugin-content-docs',
-  //   //   {
-  //   //     id: 'realtime-server', // for first plugin-content-docs with "resources/" path
-  //   //     path: './tools/realtime', // Path to data on filesystem, relative to site dir.
-  //   //     routeBasePath: 'docs/realtime', // URL Route.
-  //   //     include: ['**/*.md', '**/*.mdx'],
-  //   //     sidebarPath: require.resolve('./sidebar_realtime_server.js'),
-  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
-  //   //   },
-  //   // ],
-  //   // [
-  //   //   '@docusaurus/plugin-content-docs',
-  //   //   {
-  //   //     id: 'postgrest', // for first plugin-content-docs with "resources/" path
-  //   //     // homePageId: "doc2",
-  //   //     path: './ref/postgrest', // Path to data on filesystem, relative to site dir.
-  //   //     routeBasePath: 'ref/postgrest', // URL Route.
-  //   //     include: ['**/*.md', '**/*.mdx'],
-  //   //     sidebarPath: require.resolve('./sidebar_spec_postgrest.js'),
-  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
-  //   //   },
-  //   // ],
-  // ],
+  plugins: [
+    // [
+    //   '@docusaurus/plugin-content-docs',
+    //   {
+    //     id: 'supabase-client', // for first plugin-content-docs with "resources/" path
+    //     // homePageId: "doc2",
+    //     path: './ref/supabase', // Path to data on filesystem, relative to site dir.
+    //     routeBasePath: 'ref/supabase', // URL Route.
+    //     include: ['**/*.md', '**/*.mdx'],
+    //     sidebarPath: require.resolve('./sidebar_spec_supabase.js'),
+    //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
+    //   },
+    // ],
+    // [
+    //   '@docusaurus/plugin-content-docs',
+    //   {
+    //     id: 'postgrest-client', // for first plugin-content-docs with "resources/" path
+    //     // homePageId: "doc2",
+    //     path: './ref/postgrest', // Path to data on filesystem, relative to site dir.
+    //     routeBasePath: 'ref/postgrest', // URL Route.
+    //     include: ['**/*.md', '**/*.mdx'],
+    //     sidebarPath: require.resolve('./sidebar_spec_postgrest.js'),
+    //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
+    //   },
+    // ],
+    // [
+    //   '@docusaurus/plugin-content-docs',
+    //   {
+    //     id: 'gotrue-client', // for first plugin-content-docs with "resources/" path
+    //     // homePageId: "doc2",
+    //     path: './ref/gotrue', // Path to data on filesystem, relative to site dir.
+    //     routeBasePath: 'ref/gotrue', // URL Route.
+    //     include: ['**/*.md', '**/*.mdx'],
+    //     sidebarPath: require.resolve('./sidebar_spec_gotrue.js'),
+    //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
+    //   },
+    // ],
+    // [
+    //   '@docusaurus/plugin-content-docs',
+    //   {
+    //     id: 'realtime-client', // for first plugin-content-docs with "resources/" path
+    //     // homePageId: "doc2",
+    //     path: './ref/realtime', // Path to data on filesystem, relative to site dir.
+    //     routeBasePath: 'ref/realtime', // URL Route.
+    //     include: ['**/*.md', '**/*.mdx'],
+    //     sidebarPath: require.resolve('./sidebar_spec_realtime.js'),
+    //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
+    //   },
+    // ],
+    // [
+    //   '@docusaurus/plugin-content-docs',
+    //   {
+    //     id: 'realtime-server', // for first plugin-content-docs with "resources/" path
+    //     path: './tools/realtime', // Path to data on filesystem, relative to site dir.
+    //     routeBasePath: 'docs/realtime', // URL Route.
+    //     include: ['**/*.md', '**/*.mdx'],
+    //     sidebarPath: require.resolve('./sidebar_realtime_server.js'),
+    //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
+    //   },
+    // ],
+    // [
+    //   '@docusaurus/plugin-content-docs',
+    //   {
+    //     id: 'postgrest', // for first plugin-content-docs with "resources/" path
+    //     // homePageId: "doc2",
+    //     path: './ref/postgrest', // Path to data on filesystem, relative to site dir.
+    //     routeBasePath: 'ref/postgrest', // URL Route.
+    //     include: ['**/*.md', '**/*.mdx'],
+    //     sidebarPath: require.resolve('./sidebar_spec_postgrest.js'),
+    //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
+    //   },
+    // ],
+  ],
 }

@@ -11,7 +11,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Introduction',
-      items: ['about'],
+      items: ['handbook'],
       collapsed: false,
     },
     {
