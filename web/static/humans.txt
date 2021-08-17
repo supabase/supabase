@@ -26,7 +26,7 @@ ____________
 
 JOBS
 
-If you are interested in working with us check out the open roles here: https://supabase.io/docs/careers
+If you are interested in working with us check out the open roles here: https://about.supabase.com/careers
 
 ___________
 
