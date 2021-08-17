@@ -7,9 +7,7 @@ description: Creating and using Postgres tables.
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-In PostgreSQL, data is stored in "tables".
-
-Tables are made of "columns" and "rows", similar to a spreadsheet. For example:
+In PostgreSQL, data is stored in "tables". Tables are made of "columns" and "rows", similar to a spreadsheet. For example:
 
 | `id`    | `name` | `description` |
 | ----  | ---- | ----------- |
@@ -23,15 +21,17 @@ This table has 3 "columns": `id`, `name`, and `description`, and 5 "rows" of dat
 
 ## Designing tables
 
-Before you can store the data you need to "design" the table.
-This is different from NoSQL databases where you can immediately put any data in your database. 
+Before you can store data you need to "design" and create your tables.
 
-There is a big benefit however: data integrity. PostgreSQL will guarantee that each table fits the rules that you specify. 
-As you scale, this will become incredibly important.
+This is different from NoSQL databases where you can immediately put any data in your database. 
+There is a big benefit to this approach: data integrity. PostgreSQL guarantees that your data fits the rules that you specify. 
+As you scale, this becomes incredibly important.
 
 ## Creating Tables
 
-Supabase gives you several options for creating tables. You can use the Table Editor or create them directly using SQL.
+Supabase gives you several options for creating tables. You can use the Table Editor or create them directly using SQL. 
+We provide a SQL editor within the Dashboard, or you can [connect](/docs/guides/database/connecting/connecting-to-postgres) to your database 
+and run the SQL queries yourself.
 
 <Tabs
 defaultValue="UI"
