@@ -84,8 +84,8 @@ info:
           - .lte()
           - .like()
           - .ilike()
-          # - .is()
-          # - .in()
+          - .is_()
+          - .in_()
           - .contains()
           - .containedBy()
           - .rangeLt()
@@ -1619,37 +1619,36 @@ pages:
       #       .execute();
       #     ```
 
-  # TODO Not available in dart yet, so uncomment when added
-  # .is():
-  #   examples:
-  #     - name: With `select()`
-  #       isSpotlight: true
-  #       dart: |
-  #         ```dart
-  #         final res = await supabase
-  #           .from('cities')
-  #           .select('name, country_id')
-  #           .is('name', null)
-  #           .execute();
-  #         ```
-  #     - name: With `update()`
-  #       dart: |
-  #         ```dart
-  #         final res = await supabase
-  #           .from('cities')
-  #           .update({ name: 'Mordor' })
-  #           .is('name', null)
-  #           .execute();
-  #         ```
-  #     - name: With `delete()`
-  #       dart: |
-  #         ```dart
-  #         final res = await supabase
-  #           .from('cities')
-  #           .delete()
-  #           .is('name', null)
-  #           .execute();
-  #         ```
+  .is_():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .is_('name', null)
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .is_('name', null)
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .delete()
+            .is_('name', null)
+            .execute();
+          ```
   # TODO fix bug on postgrest-dart
   # - name: With `rpc()`
   #   dart: |
@@ -1661,36 +1660,36 @@ pages:
   #       .execute();
   #     ```
 
-  # .in():
-  #   examples:
-  #     - name: With `select()`
-  #       isSpotlight: true
-  #       dart: |
-  #         ```dart
-  #         final res = await supabase
-  #           .from('cities')
-  #           .select('name, country_id')
-  #           .in('name', ['Rio de Janeiro', 'San Francisco'])
-  #           .execute();
-  #         ```
-  #     - name: With `update()`
-  #       dart: |
-  #         ```dart
-  #         final res = await supabase
-  #           .from('cities')
-  #           .update({ name: 'Mordor' })
-  #           .in('name', ['Rio de Janeiro', 'San Francisco'])
-  #           .execute();
-  #         ```
-  #     - name: With `delete()`
-  #       dart: |
-  #         ```dart
-  #         final res = await supabase
-  #           .from('cities')
-  #           .delete()
-  #           .in('name', ['Rio de Janeiro', 'San Francisco'])
-  #           .execute();
-  #         ```
+  .in_():
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .in_('name', ['Rio de Janeiro', 'San Francisco'])
+            .execute();
+          ```
+      - name: With `update()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .in_('name', ['Rio de Janeiro', 'San Francisco'])
+            .execute();
+          ```
+      - name: With `delete()`
+        dart: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .delete()
+            .in_('name', ['Rio de Janeiro', 'San Francisco'])
+            .execute();
+          ```
   # TODO fix bug on postgrest-dart
   # - name: With `rpc()`
   #   dart: |
