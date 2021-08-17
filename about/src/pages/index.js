@@ -52,7 +52,7 @@ export default function Home() {
           </div>
         </header>
 
-        <section
+        {/* <section
           style={{
             padding: 30,
           }}
@@ -74,7 +74,7 @@ export default function Home() {
               Backed by Y Combinator
             </p>
           </div>
-        </section>
+        </section> */}
 
       </main>
     </Layout>
