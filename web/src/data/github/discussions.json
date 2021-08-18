@@ -1,0 +1,200 @@
+{
+  "data": {
+    "repository": {
+      "discussions": {
+        "nodes": [
+          {
+            "id": "MDEwOkRpc2N1c3Npb24zNTI0ODA3",
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/7221389?u=cd8e279f95d479997ba55e106c44b96fdc7f979e&v=4",
+              "url": "https://github.com/mazipan",
+              "login": "mazipan"
+            },
+            "body": "I have application here: https://ksana.in/auth/sign-in that suddenly can not use any auth method from Supabase.\r\n\r\n![Screen Shot 2021-08-17 at 17 18 57](https://user-images.githubusercontent.com/7221389/129708977-2f1af5ee-f73c-41f8-977e-a3b6cc7a193f.png)\r\n\r\nFor example, the Google Login will redirect to:\r\n\r\n```\r\nhttps://oirhwazlkofldqlyoamp.supabase.co/auth/v1/authorize?provider=google&redirect_to=https://ksana.in/callback\r\n``` \r\n\r\nI can ping the domain\r\n\r\n![Screen Shot 2021-08-17 at 17 21 20](https://user-images.githubusercontent.com/7221389/129709330-3757f11e-8b73-46b1-8f02-1ffea090e630.png)\r\n\r\nIs there any changes I missing from Supabase side? I already update the version to the latest version, but still no luck. \r\n\r\nLooking the report, it happen from 16 Aug 2021. All request suddenly gone\r\n\r\n![Screen Shot 2021-08-17 at 17 25 43](https://user-images.githubusercontent.com/7221389/129710024-19a12314-882e-4530-b0c0-2a11d58e39a5.png)\r\n",
+            "title": "My Auth Suddenly Not Working",
+            "answer": {
+              "author": {
+                "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
+                "login": "inian"
+              },
+              "body": "Hi @mazipan, I was able to sign into your application just now. If this continues to happen, please raise a ticket at beta@supabase.io. Thanks!",
+              "createdAt": "2021-08-18T03:03:20Z"
+            },
+            "createdAt": "2021-08-17T10:22:39Z"
+          },
+          {
+            "id": "MDEwOkRpc2N1c3Npb24zNTI1NzEz",
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/89100093?v=4",
+              "url": "https://github.com/tmt-devq",
+              "login": "tmt-devq"
+            },
+            "body": "Hi,\r\n\r\nI've added an 'updated_at' column to a table and created a trigger to update to the current timestamp via the moddatetime extension whenever a new record gets inserted or an update is made. How can I prevent users from passing through a value when they post an update? I've tried it with a function and trigger like the below (just silently resetting the value but I will raise an exception here rather), but I am still able to insert a new record and specify an 'updated_at' value through the rest call?\r\n\r\n```\r\ncreate function tester() returns trigger language plpgsql as $$\r\nbegin\r\n  new.updated_at = old.updated_at;\r\n  return new;\r\nend $$;\r\n\r\nCREATE TRIGGER a_test_trigger BEFORE UPDATE ON items \r\nFOR EACH ROW EXECUTE PROCEDURE tester();\r\n```\r\n\r\nThank you",
+            "title": "Immutable column value",
+            "answer": {
+              "author": {
+                "avatarUrl": "https://avatars.githubusercontent.com/u/31685197?u=8aff941b133b7627af28427a656602f4749b735e&v=4",
+                "login": "soedirgo"
+              },
+              "body": "If the `tester` function is `IMMUTABLE`, you can use [generated columns](https://www.postgresql.org/docs/current/ddl-generated-columns.html) instead of triggers:\r\n```sql\r\nALTER TABLE items ADD updated_at timestamptz GENERATED ALWAYS AS (tester()) STORED;\r\n```\r\n\r\nOtherwise you can use an `AFTER` trigger on inserts and updates so that it overwrites the specified `updated_at`.",
+              "createdAt": "2021-08-18T04:57:36Z"
+            },
+            "createdAt": "2021-08-17T18:32:14Z"
+          },
+          {
+            "id": "MDEwOkRpc2N1c3Npb24zNTAyMzY2",
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/66746171?v=4",
+              "url": "https://github.com/nyxongod",
+              "login": "nyxongod"
+            },
+            "body": "I have been trying to connect to database using your string connection of course used password for database during creation, but I can't connect --> instead this error I get --> Error: P1001: Can't reach database server at.\r\n\r\nCommand to connect --> prisma db push \r\n\r\nAny advice ?\r\n\r\nRegards",
+            "title": "Connection Problem to database",
+            "answer": {
+              "author": {
+                "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
+                "login": "inian"
+              },
+              "body": "Hi @nyxongod, if you are still facing this issue, reach out to support@supabase.io with the api url and we will take a look. thanks!",
+              "createdAt": "2021-08-18T03:58:22Z"
+            },
+            "createdAt": "2021-08-04T11:45:00Z"
+          },
+          {
+            "id": "MDEwOkRpc2N1c3Npb24zNDkwODE4",
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/46375818?u=8ec8ab4135c6dc831157cff6c36ad2350a857578&v=4",
+              "url": "https://github.com/nithinpachday",
+              "login": "nithinpachday"
+            },
+            "body": "Hi,\r\nI am trying to create google/Facebook authentication to my application. right now I am using the superbase rest API endpoint for authentication. How to integrate social media login using default endpoints?  ",
+            "title": "Social Media Login using Rest API",
+            "answer": {
+              "author": {
+                "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
+                "login": "inian"
+              },
+              "body": "Hi @nithinpachday, we have guides for different OAuth providers in our website. This is the one for Facebook - https://supabase.io/docs/guides/auth/auth-facebook and a video explaining it here - https://www.youtube.com/watch?v=EbV746pWDas\r\n\r\nLet me know if there is something thats not clear in these guides and we will improve it.",
+              "createdAt": "2021-08-02T06:03:22Z"
+            },
+            "createdAt": "2021-07-30T13:57:10Z"
+          },
+          {
+            "id": "MDEwOkRpc2N1c3Npb24zNTAyNTQy",
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/24230875?u=d109b720a4b62995e34e0e60e0d7a9f7ac1ace0b&v=4",
+              "url": "https://github.com/chrisLoPresti",
+              "login": "chrisLoPresti"
+            },
+            "body": "Hey it appears im missing default tables such as users, migrations, etc. Or are these no longer provided? \r\n\r\nthanks in advance for your help!",
+            "title": "Missing default tables",
+            "answer": {
+              "author": {
+                "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
+                "login": "inian"
+              },
+              "body": "Hi, internal tables are hidden in the dashboard by default. You can still access them by connecting to your database directly. We will add an option to toggle internal tables in the dashboard at some point. ",
+              "createdAt": "2021-08-18T03:56:13Z"
+            },
+            "createdAt": "2021-08-04T13:44:33Z"
+          },
+          {
+            "id": "MDEwOkRpc2N1c3Npb24zNTAyMzU3",
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/29046316?u=bbbdd413a429b1775ade01b044d51908379859b2&v=4",
+              "url": "https://github.com/dostuffthatmatters",
+              "login": "dostuffthatmatters"
+            },
+            "body": "I am trying to allow certain users to insert stuff into a table. Since I do not want to share the project secret this should be based on email/password credentials.\r\n\r\nThe sign-in works fine and the `supabase.auth.user()` object immediately before the request is correct. The code I am using:\r\n\r\nhttps://github.com/dostuffthatmatters/esm-air-quality-rt-plot-data/blob/4b923384854a85e2d6f317183f1f882455933199/run.py#L43-L61\r\n\r\nI have tried any combination of RLS rules but comparisons with `role() = 'authenticated'` or `email() = '...'` always result in a blocked request. Has anyone here used Python and RLS before?",
+            "title": "Row Level Security blocks all requests",
+            "answer": null,
+            "createdAt": "2021-08-04T11:38:30Z"
+          },
+          {
+            "id": "MDEwOkRpc2N1c3Npb24zNzQ3Mw==",
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/369825?u=26fdceebce232b0b9f062345775664103e18a4ad&v=4",
+              "url": "https://github.com/skoshy",
+              "login": "skoshy"
+            },
+            "body": "Hi, I'm trying to set up a trigger to automatically copy new users from `auth` to my public `users` table. I've drafted up the below, but I get a database error every time I try to signup a new user (`\"Database error saving new user\"`). Any ideas on what could be the issue?\r\n\r\n```sql\r\nCREATE OR REPLACE FUNCTION auth.signup_copy_to_users_table()\r\nRETURNS TRIGGER LANGUAGE plpgsql AS $function$\r\n  BEGIN\r\n    INSERT INTO public.users(id)\r\n    VALUES(NEW.id);\r\n  \r\n    RETURN NEW;\r\n  END;\r\n$function$;\r\n\r\nDROP TRIGGER IF EXISTS signup_copy on auth.users;\r\nCREATE TRIGGER signup_copy\r\nAFTER INSERT OR UPDATE ON auth.users\r\nFOR EACH ROW EXECUTE PROCEDURE signup_copy_to_users_table();\r\n```\r\n\r\nIn general it'd be useful to be able to keep the auth/public users tables in sync with the `id` and `email` fields at least.",
+            "title": "Sign-up database trigger to insert into public users table",
+            "answer": {
+              "author": {
+                "avatarUrl": "https://avatars.githubusercontent.com/u/10214025?u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4",
+                "login": "kiwicopple"
+              },
+              "body": "I suspect it's permissions - the trigger is probably getting called by the `anon` user. You can try to add `security definer` to the function, which will use the same permissions as the user who created the function.\r\n\r\nHere is a snippet that should work:\r\n\r\n```sql\r\n\r\n/**\r\n* This trigger automatically creates a user entry when a new user signs up via Supabase Auth.\r\n*/ \r\ncreate function public.handle_new_user() \r\nreturns trigger as $$\r\nbegin\r\n  insert into public.users (id)\r\n  values (new.id);\r\n  return new;\r\nend;\r\n$$ language plpgsql security definer;\r\ncreate trigger on_auth_user_created\r\n  after insert on auth.users\r\n  for each row execute procedure public.handle_new_user();\r\n```",
+              "createdAt": "2020-11-25T12:06:48Z"
+            },
+            "createdAt": "2020-11-24T20:10:58Z"
+          },
+          {
+            "id": "MDEwOkRpc2N1c3Npb24zNTE3MDgw",
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/39565159?v=4",
+              "url": "https://github.com/Criepstar",
+              "login": "Criepstar"
+            },
+            "body": "Hello would it be possible to have custom fonts via CSS in the Email templates of Supabase?",
+            "title": "Custom font/ CSS in Email Template for authentication",
+            "answer": {
+              "author": {
+                "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
+                "login": "inian"
+              },
+              "body": "Hi @Criepstar, we will bring in a more powerful template editor at a later date, but for now you can get the confirmation URLs from the gotrue server directly. With this, you can use a third party tool to generate HTML emails and embed the confirmation URLs in the templates programatically - [docs](https://supabase.io/blog/2021/07/28/supabase-auth-passwordless-sms-login#generate-confirmation-links)",
+              "createdAt": "2021-08-18T03:30:32Z"
+            },
+            "createdAt": "2021-08-13T18:41:10Z"
+          },
+          {
+            "id": "MDEwOkRpc2N1c3Npb24zNTEzMTAw",
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/9329005?u=45801d27fe4bdadd63566c7324ddae511607da05&v=4",
+              "url": "https://github.com/donPuerto",
+              "login": "donPuerto"
+            },
+            "body": "I know there so many ways of doing this, but i want to know the best pattern in supabase?\r\n\r\nthanks",
+            "title": "How to implement soft delete",
+            "answer": {
+              "author": {
+                "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
+                "login": "inian"
+              },
+              "body": "Hi @donPuerto, I personally prefer having a status column as a postgres enum type and setting it to \"DELETED\" for soft deletes.",
+              "createdAt": "2021-08-18T03:24:34Z"
+            },
+            "createdAt": "2021-08-11T14:08:41Z"
+          },
+          {
+            "id": "MDEwOkRpc2N1c3Npb24zNTE3ODM2",
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/5142194?u=df68f5eb68c33ba3e0a7ce85401341108f452c1e&v=4",
+              "url": "https://github.com/Danieltech99",
+              "login": "Danieltech99"
+            },
+            "body": "Is it possible to download a folder from the Storage Dashboard Page?\r\n\r\nThis is an important feature for many use cases. Or equivalently being able to download all storage items for backup purposes or offline data science processing.",
+            "title": "Download storage folder from Supabase Dashboard",
+            "answer": {
+              "author": {
+                "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
+                "login": "inian"
+              },
+              "body": "We are tracking the feature here @Danieltech99 https://github.com/supabase/storage-api/issues/27",
+              "createdAt": "2021-08-18T03:22:27Z"
+            },
+            "createdAt": "2021-08-14T03:24:07Z"
+          }
+        ],
+        "totalCount": 1099,
+        "pageInfo": {
+          "startCursor": "Y3Vyc29yOnYyOpK5MjAyMS0wOC0xOFQxNDowMTo0MCswODowMM4ANcjH",
+          "endCursor": "Y3Vyc29yOnYyOpK5MjAyMS0wOC0xOFQxMToyMjoyNyswODowMM4ANa2M",
+          "hasNextPage": true,
+          "hasPreviousPage": false
+        }
+      }
+    }
+  }
+}

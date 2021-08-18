@@ -86,6 +86,12 @@ module.exports = {
           activeBasePath: '/docs/reference/',
           position: 'left',
         },
+        {
+          label: 'FAQs',
+          to: '/docs/faqs',
+          activeBasePath: '/docs/faqs',
+          position: 'left',
+        },
         { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
       ],
     },
