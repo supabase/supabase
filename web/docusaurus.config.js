@@ -76,19 +76,14 @@ module.exports = {
         {
           label: 'Guides',
           to: '/docs/guides',
-          activeBaseRegex: '(^/docs/guides/database/|^/docs/guides/auth/)|(/docs/guides$)',
+          activeBaseRegex:
+            '(^/docs/guides/database/|^/docs/guides/auth/)|(/docs/guides$)|docs/(resources|learn)',
           position: 'left',
         },
         {
           label: 'Reference',
           to: '/docs/reference/javascript/supabase-client',
           activeBasePath: '/docs/reference/',
-          position: 'left',
-        },
-        {
-          label: 'Resources',
-          to: '/docs/resources',
-          activeBaseRegex: 'docs/(resources|learn|gotrue|postgrest|realtime)',
           position: 'left',
         },
         { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
