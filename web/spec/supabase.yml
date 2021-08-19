@@ -718,17 +718,20 @@ pages:
           ```
 
   rpc():
-    title: 'Stored Procedures: rpc()'
+    title: 'Remote Functions: rpc()'
     description: |
-      You can call stored procedures as a "Remote Procedure Call".
+      You can call Remote Functions as a "Remote Procedure Call".
 
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
-      It's especially useful when the logic rarely changes - like password resets and updates.
+      It's especially useful when the logic rarely changes - like password resets and updates. 
+      
+      At this time only Postgres functions are supported, stored procedures are not supported directly by the Supabase client.  
+      
     $ref: '@supabase/postgrest-js."PostgrestClient".PostgrestClient.rpc'
     examples:
-      - name: Call a stored procedure
+      - name: Call a Remote Function
         isSpotlight: true
-        description: This is an example invoking a stored procedure.
+        description: This is an example invoking a remote function.
         js: |
           ```js
           const { data, error } = await supabase
@@ -749,7 +752,7 @@ pages:
           ```
       - name: With filters
         description: |
-          Stored procedures that return tables can also be combined with 
+          Remote function that return tables can also be combined with 
           [Modifiers](/docs/reference/javascript/using-modifiers) and 
           [Filters](/docs/reference/javascript/using-filters).
         js: |
@@ -1171,7 +1174,7 @@ pages:
     description: |
       Modifiers can be used on `select()` queries. 
 
-      If a Stored Procedure returns a table response, you can also apply modifiers to the `rpc()` function.
+      If a remote function returns a table response, you can also apply modifiers to the `rpc()` function.
 
   limit():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.limit'
@@ -1247,7 +1250,7 @@ pages:
     description: |
       Filters can be used on `select()`, `update()`, and `delete()` queries. 
 
-      If a Stored Procedure returns a table response, you can also apply filters.
+      If a remote function returns a table response, you can also apply filters.
 
       ### Applying Filters
 
@@ -1308,7 +1311,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .filter('name', 'eq', 'Paris')
@@ -1384,7 +1387,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities)
             .not('name', 'eq', 'Paris')
@@ -1421,7 +1424,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .match({name: 'Beijing', country_id: 156})
@@ -1458,7 +1461,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .eq('name', 'San Francisco')
@@ -1495,7 +1498,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .neq('name', 'Lagos')
@@ -1532,7 +1535,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .gt('country_id', 250)
@@ -1569,7 +1572,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .gte('country_id', 250)
@@ -1606,7 +1609,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .lt('country_id', 250)
@@ -1643,7 +1646,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .lte('country_id', 250)
@@ -1680,7 +1683,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .like('name', '%la%')
@@ -1717,7 +1720,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .ilike('name', '%la%')
@@ -1754,7 +1757,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .is('name', null)
@@ -1791,7 +1794,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .in('name', ['Rio de Janeiro', 'San Francisco'])
@@ -1828,7 +1831,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .contains('main_exports', ['oil'])
@@ -1865,7 +1868,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .containedBy('main_exports', ['cars', 'food', 'machine'])
@@ -1902,7 +1905,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .rangeLt('population_range_millions', [150, 250])
@@ -1939,7 +1942,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .rangeGt('population_range_millions', [150, 250])
@@ -1976,7 +1979,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .rangeGte('population_range_millions', [150, 250])
@@ -2013,7 +2016,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .rangeLte('population_range_millions', [150, 250])
@@ -2050,7 +2053,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .rangeAdjacent('population_range_millions', [70, 185])
@@ -2087,7 +2090,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the remote function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .overlaps('main_exports', ['computers', 'minerals'])
