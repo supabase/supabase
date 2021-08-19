@@ -1386,7 +1386,7 @@ pages:
           ```js
           // Only valid if the Stored Procedure returns a table type.
           const { data, error } = await supabase
-            .rpc('echo_all_cities)
+            .rpc('echo_all_cities')
             .not('name', 'eq', 'Paris')
           ```
 
