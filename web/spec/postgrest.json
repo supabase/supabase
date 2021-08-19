@@ -474,7 +474,7 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "Perform a stored procedure call."
+										"shortText": "Perform a function call."
 									},
 									"typeParameter": [
 										{
@@ -4264,7 +4264,7 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "Retrieves only one row from the result. Result must be one row (e.g. using\n`limit`), otherwise this will result in an error.\n\nWithout using `.single()`, results are returned as an array of rows, even if there is only one.  When using `.single()` results are returned as an object without an enclosing array."
+										"shortText": "Retrieves only one row from the result. Result must be one row (e.g. using\n`limit`), otherwise this will result in an error."
 									},
 									"type": {
 										"type": "reference",
@@ -7891,7 +7891,7 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "Perform a stored procedure call."
+										"shortText": "Perform a function call."
 									},
 									"parameters": [
 										{
