@@ -81,7 +81,7 @@ const { user, session, error } = await supabase.auth.signIn({
 Add this function which you can call from a button, link, or UI element.
 
 ```js
-function signInWithBitbucket() {
+async function signInWithBitbucket() {
   const { user, session, error } = await supabase.auth.signIn({
     provider: 'bitbucket'
   });
@@ -91,7 +91,7 @@ function signInWithBitbucket() {
 To log out:
 
 ```js
-function signout() {
+async function signout() {
   const { error } = await supabase.auth.signOut();
 }
 ```
