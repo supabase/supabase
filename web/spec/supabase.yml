@@ -238,8 +238,7 @@ pages:
       };
       ```
 
-      ### Update types automatically with GitHub 
-      s
+      ### Update types automatically with GitHub Actions
 
       One way to keep your type definitions in sync with your database is to set up a GitHub action that runs on a schedule.
 
