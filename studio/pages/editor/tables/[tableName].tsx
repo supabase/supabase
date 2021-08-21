@@ -12,6 +12,7 @@ export default function TableEditor() {
       <div className="h-screen">
         <SupabaseGrid
           table={String(tableName)}
+          editable={true /* clientProps must have SERVICE_KEY not ANON_KEY */}
           clientProps={{
             supabaseUrl: SUPABASE_URL,
             supabaseKey: SUPABASE_SERVICE_KEY,
