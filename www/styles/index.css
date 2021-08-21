@@ -197,7 +197,7 @@ table .thead--plans th {
   /* @apply py-4; */
   position: sticky;
   border-collapse: separate;
-  top: 76px;
+  top: 0;
   z-index: 5;
 }
 
