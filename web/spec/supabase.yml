@@ -245,7 +245,7 @@ pages:
       Add a script to your package.json to generate the types:
 
       ```
-      "update-types": "npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/supabase.ts"
+      "update-types": "npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/database/index.ts"
       ```
 
       In your repo, create the file `.github/workflows/update-types.yml`. Add the following snippet into this file to define the action. If there is a change to your definitions, this script will commit the change to your repo.
