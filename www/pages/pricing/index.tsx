@@ -402,7 +402,7 @@ export default function IndexPage() {
             <Typography.Title level={4}>28 July 2021</Typography.Title>
             <Typography className="w-full">
               <p>
-                Clarified pricing on the "Optimzed database instances" to include the starting price
+                Clarified pricing on the "Optimized database instances" to include the starting price
                 of $50/month.
               </p>
             </Typography>
