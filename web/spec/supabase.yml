@@ -1003,7 +1003,7 @@ pages:
             .storage
             .from('avatars')
             .upload('public/avatar1.png', avatarFile, {
-              cacheControl: 3600,
+              cacheControl: '3600',
               upsert: false
             })
           ```
@@ -1038,7 +1038,7 @@ pages:
             .storage
             .from('avatars')
             .update('public/avatar1.png', avatarFile, {
-              cacheControl: 3600,
+              cacheControl: '3600',
               upsert: false
             })
           ```
