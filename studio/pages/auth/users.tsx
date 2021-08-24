@@ -2,7 +2,6 @@ import AuthLayout from '../../components/layouts/AuthLayout'
 import { Button, IconPlus, IconSearch, Input } from '@supabase/ui'
 
 export default function Users() {
-
   return (
     <AuthLayout title="Users">
       <div className="border-b my-8 mx-4">
