@@ -12,7 +12,6 @@
     "@supabase/postgres-meta": "^0.24.3",
     "@supabase/ui": "^0.33.1",
     "axios": "^0.21.1",
-    "cuid": "^2.1.8",
     "mobx": "^6.3.2",
     "mobx-react-lite": "^3.2.0",
     "next": "11.0.1",

@@ -3,7 +3,6 @@ import DashboardLayout from '../components/layouts/DashboardLayout'
 import ClientLibrary from 'components/utils/ClientLibrary'
 import ExampleProject from 'components/utils/ExampleProject'
 import exampleProjects from '../lib/example-projects.json'
-import cuid from 'cuid'
 
 export default function Home() {
   return (
@@ -36,7 +35,7 @@ export default function Home() {
         <div className="mx-6 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {exampleProjects.map((p) => (
             <ExampleProject
-              key={cuid()}
+              key={p.url}
               framework={p.framework}
               title={p.title}
               description={p.description}
