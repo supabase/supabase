@@ -174,6 +174,8 @@ pages:
           If you are using Flutter, you can sign up with OAuth providers using the [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider) method available on `supabase-flutter`.
 
   auth.signIn():
+    description: |
+      Log in an existing user, or login via a third-party provider.
     notes: |
       - A user can sign up via email, phone number.
       - If you provide `email` without a `password`, the user will be sent a magic link.
@@ -210,6 +212,8 @@ pages:
           final error = res.error;
           ```
   auth.signInWithProvider():
+    description: |
+      Signs the user in using thrid party OAuth providers.
     notes: |
       - `auth.signInWithProvider()` is only available on `supabase-flutter`
       - It will open the browser to the relevant login page.
@@ -252,6 +256,8 @@ pages:
           const oAuthToken = session.provider_token // use to access provider API
           ```
   auth.signOut():
+    description: |
+      Signs out the current user, if there is a logged in user.
     examples:
       - name: Sign out
         isSpotlight: true
@@ -263,6 +269,8 @@ pages:
           ```
 
   auth.session():
+    description: |
+      Returns the session data, if there is an active session.
     examples:
       - name: Get the session data
         isSpotlight: true
@@ -272,6 +280,8 @@ pages:
           ```
 
   auth.user():
+    description: |
+      Returns the user data, if there is a logged in user.
     examples:
       - name: Get the logged in user
         isSpotlight: true
@@ -281,6 +291,8 @@ pages:
           ```
 
   auth.update():
+    description: |
+      Updates user data, if there is a logged in user.
     notes: |
       It's generally better to store user data in a table inside your public schema (i.e. `public.users`). 
       Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
@@ -297,6 +309,8 @@ pages:
           ```
 
   auth.onAuthStateChange():
+    description: |
+      Receive a notification every time an auth event happens.
     examples:
       - name: Listen to auth changes
         isSpotlight: true
@@ -309,6 +323,8 @@ pages:
           ```
 
   Reset Password (Email):
+    description: |
+      Sends a reset request to an email address.
     notes: |
       Sends a reset request to an email address.
 
@@ -350,6 +366,8 @@ pages:
           final error = res.error;
           ```
   select():
+    description: |
+      Performs vertical filtering with SELECT.
     title: 'Fetch data: select()'
     notes: |
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
@@ -454,6 +472,8 @@ pages:
           ```
 
   insert():
+    description: |
+      Performs an INSERT into the table.
     title: 'Create data: insert()'
     notes: |
       - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
@@ -482,6 +502,8 @@ pages:
           ```
 
   update():
+    description: |
+      Performs an UPDATE on the table.
     title: 'Modify data: update()'
     notes: |
       TODO update the link to dart
@@ -518,6 +540,8 @@ pages:
           ```
 
   upsert():
+    description: |
+      Performs an UPSERT into the table.
     title: 'Upsert data: upsert()'
     notes: |
       - Primary keys should to be included in the data payload in order for an update to work correctly. 
@@ -561,6 +585,8 @@ pages:
           ```
 
   delete():
+    description: |
+      Performs a DELETE on the table.
     title: 'Delete data: delete()'
     notes: |
       TODO update link to dart
@@ -613,6 +639,8 @@ pages:
           ```
 
   subscribe():
+    description: |
+      Subscribe to realtime changes in your databse.
     title: 'on().subscribe()'
     notes: |
       - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
@@ -704,6 +732,8 @@ pages:
           ```
 
   removeSubscription():
+    description: |
+      Removes an active subscription and returns the number of open connections.
     title: 'removeSubscription()'
     notes: |
       - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
@@ -716,6 +746,8 @@ pages:
           ```
 
   getSubscriptions():
+    description: |
+      Returns an array of all your subscriptions.
     title: 'getSubscriptions()'
     examples:
       - name: Get all subscriptions
@@ -726,6 +758,8 @@ pages:
           ```
 
   stream():
+    description: |
+      Notifies of data at the queried table.
     title: 'stream()'
     notes: |
       - `stream()` will emit the initial data as well as any further change on the database as `Stream` of `List<Map<String, dynamic>>` by combining Postgrest and Realtime.
@@ -772,6 +806,8 @@ pages:
           ```
 
   storage.listBuckets():
+    description: |
+      Retrieves the details of all Storage buckets within an existing product.
     title: 'listBuckets()'
     $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.listBuckets'
     notes: |
@@ -789,6 +825,8 @@ pages:
           ```
 
   storage.getBucket():
+    description: |
+      Retrieves the details of an existing Storage bucket.
     title: 'getBucket()'
     $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.getBucket'
     notes: |
@@ -806,6 +844,8 @@ pages:
           ```
 
   storage.createBucket():
+    description: |
+      Creates a new Storage bucket
     title: 'createBucket()'
     notes: |
       - Policy permissions required:
@@ -822,6 +862,8 @@ pages:
           ```
 
   storage.emptyBucket():
+    description: |
+      Removes all objects inside a single bucket.
     title: 'emptyBucket()'
     notes: |
       - Policy permissions required:
@@ -837,6 +879,8 @@ pages:
             .emptyBucket('avatars');
           ```
   storage.updateBucket():
+    description: |
+      Updates a new Storage bucket
     title: 'updateBucket()'
     notes: |
       - Policy permissions required:
@@ -853,6 +897,8 @@ pages:
           ```
 
   storage.deleteBucket():
+    description: |
+      Deletes an existing bucket. A bucket can't be deleted with existing objects inside it. You must first `empty()` the bucket.
     title: 'deleteBucket()'
     notes: |
       - Policy permissions required:
@@ -869,6 +915,8 @@ pages:
           ```
 
   storage.from.upload():
+    description: |
+      Uploads a file to an existing bucket.
     title: 'from.upload()'
     $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.upload'
     notes: |
@@ -891,6 +939,8 @@ pages:
           ```
 
   storage.from.update():
+    description: |
+      Replaces an existing file at the specified path with a new one.
     title: 'from.update()'
     notes: |
       - Policy permissions required:
@@ -912,6 +962,8 @@ pages:
           ```
 
   storage.from.move():
+    description: |
+      Moves an existing file, optionally renaming it at the same time.
     title: 'from.move()'
     notes: |
       - Policy permissions required:
@@ -929,6 +981,8 @@ pages:
           ```
 
   storage.from.createSignedUrl():
+    description: |
+      Create signed url to download file without requiring permissions. This URL can be valid for a set number of seconds.
     title: 'from.createSignedUrl()'
     notes: |
       - Policy permissions required:
@@ -948,6 +1002,8 @@ pages:
           ```
 
   storage.from.getPublicUrl():
+    description: |
+      Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
       - Policy permissions required:
@@ -967,6 +1023,8 @@ pages:
           ```
 
   storage.from.download():
+    description: |
+      Downloads a file.
     title: 'from.download()'
     notes: |
       - Policy permissions required:
@@ -984,6 +1042,8 @@ pages:
           ```
 
   storage.from.remove():
+    description: |
+      Deletes files within the same bucket
     title: 'from.remove()'
     notes: |
       - Policy permissions required:
@@ -1001,6 +1061,8 @@ pages:
           ```
 
   storage.from.list():
+    description: |
+      Lists all the files within a bucket.
     title: 'from.list()'
     notes: |
       - Policy permissions required:
@@ -1023,6 +1085,8 @@ pages:
       If a Stored Procedure returns a table response, you can also apply modifiers to the `rpc()` function.
 
   limit():
+    description: |
+      Limits the result with the specified count.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1046,6 +1110,8 @@ pages:
           ```
 
   order():
+    description: |
+      Orders the result with the specified column.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1069,6 +1135,8 @@ pages:
           ```
 
   range():
+    description: |
+      Limits the result to rows within the specified range, inclusive.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1082,6 +1150,8 @@ pages:
           ```
 
   single():
+    description: |
+      Retrieves only one row from the result. Result must be one row (e.g. using limit), otherwise this will result in an error.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1132,6 +1202,8 @@ pages:
       ```
 
   .filter():
+    description: |
+      Finds all rows whose `column` satisfies the filter.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1181,6 +1253,8 @@ pages:
           ```
 
   .or():
+    description: |
+      Finds all rows satisfying at least one of the filters.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1214,6 +1288,8 @@ pages:
       #     ```
 
   .not():
+    description: |
+      Finds all rows which doesn't satisfy the filter.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1254,6 +1330,8 @@ pages:
       #     ```
 
   .match():
+    description: |
+      Finds all rows whose columns match the specified `query` object.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1294,6 +1372,8 @@ pages:
       #     ```
 
   .eq():
+    description: |
+      Finds all rows whose value on the stated `column` exactly matches the specified `value`.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1334,6 +1414,8 @@ pages:
       #     ```
 
   .neq():
+    description: |
+      Finds all rows whose value on the stated `column` doesn't match the specified `value`.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1374,6 +1456,8 @@ pages:
       #     ```
 
   .gt():
+    description: |
+      Finds all rows whose value on the stated `column` is greater than the specified `value`.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1414,6 +1498,8 @@ pages:
       #     ```
 
   .gte():
+    description: |
+      Finds all rows whose value on the stated `column` is greater than or equal to the specified `value`.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1454,6 +1540,8 @@ pages:
       #     ```
 
   .lt():
+    description: |
+      Finds all rows whose value on the stated `column` is less than the specified `value`.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1495,6 +1583,8 @@ pages:
       #     ```
 
   .lte():
+    description: |
+      Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lte'
     examples:
       - name: With `select()`
@@ -1537,6 +1627,8 @@ pages:
       #     ```
 
   .like():
+    description: |
+      Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.like'
     examples:
       - name: With `select()`
@@ -1579,6 +1671,8 @@ pages:
       #     ```
 
   .ilike():
+    description: |
+      Finds all rows whose value in the stated `column` matches the supplied `pattern` (case insensitive).
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1620,6 +1714,8 @@ pages:
       #     ```
 
   .is_():
+    description: |
+      A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1661,6 +1757,8 @@ pages:
   #     ```
 
   .in_():
+    description: |
+      Finds all rows whose value on the stated `column` is found on the specified `values`.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2031,6 +2129,8 @@ pages:
       #     ```
 
   .textSearch():
+    description: |
+      Finds all rows whose tsvector value on the stated `column` matches to_tsquery(query).
     examples:
       - name: Text search
         dart: |
