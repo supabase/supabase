@@ -6,7 +6,7 @@
 	"originalName": "",
 	"children": [
 		{
-			"id": 196,
+			"id": 200,
 			"name": "\"RealtimeClient\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -16,7 +16,7 @@
 			"originalName": "/home/runner/work/realtime-js/realtime-js/src/RealtimeClient.ts",
 			"children": [
 				{
-					"id": 197,
+					"id": 201,
 					"name": "RealtimeClient",
 					"kind": 128,
 					"kindString": "Class",
@@ -25,7 +25,7 @@
 					},
 					"children": [
 						{
-							"id": 228,
+							"id": 232,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -37,7 +37,7 @@
 							},
 							"signatures": [
 								{
-									"id": 229,
+									"id": 233,
 									"name": "new RealtimeClient",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -49,7 +49,7 @@
 									},
 									"parameters": [
 										{
-											"id": 230,
+											"id": 234,
 											"name": "endPoint",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -65,7 +65,7 @@
 											}
 										},
 										{
-											"id": 231,
+											"id": 235,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -75,14 +75,14 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 303,
+												"id": 307,
 												"name": "Options"
 											}
 										}
 									],
 									"type": {
 										"type": "reference",
-										"id": 197,
+										"id": 201,
 										"name": "RealtimeClient"
 									}
 								}
@@ -90,13 +90,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 65,
+									"line": 66,
 									"character": 3
 								}
 							]
 						},
 						{
-							"id": 198,
+							"id": 202,
 							"name": "channels",
 							"kind": 1024,
 							"kindString": "Property",
@@ -106,7 +106,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 36,
+									"line": 37,
 									"character": 10
 								}
 							],
@@ -114,14 +114,14 @@
 								"type": "array",
 								"elementType": {
 									"type": "reference",
-									"id": 93,
+									"id": 97,
 									"name": "RealtimeSubscription"
 								}
 							},
 							"defaultValue": "[]"
 						},
 						{
-							"id": 220,
+							"id": 224,
 							"name": "conn",
 							"kind": 1024,
 							"kindString": "Property",
@@ -131,7 +131,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 52,
+									"line": 53,
 									"character": 6
 								}
 							],
@@ -151,8 +151,28 @@
 							"defaultValue": "null"
 						},
 						{
-							"id": 218,
+							"id": 222,
 							"name": "decode",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "RealtimeClient.ts",
+									"line": 51,
+									"character": 8
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "Function"
+							}
+						},
+						{
+							"id": 221,
+							"name": "encode",
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {
@@ -171,27 +191,7 @@
 							}
 						},
 						{
-							"id": 217,
-							"name": "encode",
-							"kind": 1024,
-							"kindString": "Property",
-							"flags": {
-								"isExported": true
-							},
-							"sources": [
-								{
-									"fileName": "RealtimeClient.ts",
-									"line": 49,
-									"character": 8
-								}
-							],
-							"type": {
-								"type": "reference",
-								"name": "Function"
-							}
-						},
-						{
-							"id": 199,
+							"id": 203,
 							"name": "endPoint",
 							"kind": 1024,
 							"kindString": "Property",
@@ -201,7 +201,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 37,
+									"line": 38,
 									"character": 10
 								}
 							],
@@ -212,7 +212,7 @@
 							"defaultValue": "\"\""
 						},
 						{
-							"id": 200,
+							"id": 204,
 							"name": "headers",
 							"kind": 1024,
 							"kindString": "Property",
@@ -223,178 +223,8 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 38,
-									"character": 9
-								}
-							],
-							"type": {
-								"type": "union",
-								"types": [
-									{
-										"type": "intrinsic",
-										"name": "undefined"
-									},
-									{
-										"type": "reflection",
-										"declaration": {
-											"id": 201,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {
-												"isExported": true
-											},
-											"indexSignature": [
-												{
-													"id": 202,
-													"name": "__index",
-													"kind": 8192,
-													"kindString": "Index signature",
-													"flags": {
-														"isExported": true
-													},
-													"parameters": [
-														{
-															"id": 203,
-															"name": "key",
-															"kind": 32768,
-															"kindString": "Parameter",
-															"flags": {
-																"isExported": true
-															},
-															"type": {
-																"type": "intrinsic",
-																"name": "string"
-															}
-														}
-													],
-													"type": {
-														"type": "intrinsic",
-														"name": "string"
-													}
-												}
-											]
-										}
-									}
-								]
-							}
-						},
-						{
-							"id": 210,
-							"name": "heartbeatIntervalMs",
-							"kind": 1024,
-							"kindString": "Property",
-							"flags": {
-								"isExported": true
-							},
-							"sources": [
-								{
-									"fileName": "RealtimeClient.ts",
-									"line": 42,
-									"character": 21
-								}
-							],
-							"type": {
-								"type": "intrinsic",
-								"name": "number"
-							},
-							"defaultValue": "30000"
-						},
-						{
-							"id": 212,
-							"name": "heartbeatTimer",
-							"kind": 1024,
-							"kindString": "Property",
-							"flags": {
-								"isExported": true
-							},
-							"sources": [
-								{
-									"fileName": "RealtimeClient.ts",
-									"line": 44,
-									"character": 16
-								}
-							],
-							"type": {
-								"type": "union",
-								"types": [
-									{
-										"type": "reference",
-										"typeArguments": [
-											{
-												"type": "query",
-												"queryType": {
-													"type": "reference",
-													"name": "setInterval"
-												}
-											}
-										],
-										"name": "ReturnType"
-									},
-									{
-										"type": "intrinsic",
-										"name": "undefined"
-									}
-								]
-							},
-							"defaultValue": "undefined"
-						},
-						{
-							"id": 216,
-							"name": "logger",
-							"kind": 1024,
-							"kindString": "Property",
-							"flags": {
-								"isExported": true
-							},
-							"sources": [
-								{
-									"fileName": "RealtimeClient.ts",
-									"line": 48,
-									"character": 8
-								}
-							],
-							"type": {
-								"type": "reference",
-								"name": "Function"
-							},
-							"defaultValue": "noop"
-						},
-						{
-							"id": 211,
-							"name": "longpollerTimeout",
-							"kind": 1024,
-							"kindString": "Property",
-							"flags": {
-								"isExported": true
-							},
-							"sources": [
-								{
-									"fileName": "RealtimeClient.ts",
-									"line": 43,
-									"character": 19
-								}
-							],
-							"type": {
-								"type": "intrinsic",
-								"name": "number"
-							},
-							"defaultValue": "20000"
-						},
-						{
-							"id": 204,
-							"name": "params",
-							"kind": 1024,
-							"kindString": "Property",
-							"flags": {
-								"isExported": true,
-								"isOptional": true
-							},
-							"sources": [
-								{
-									"fileName": "RealtimeClient.ts",
 									"line": 39,
-									"character": 8
+									"character": 9
 								}
 							],
 							"type": {
@@ -447,11 +277,33 @@
 										}
 									}
 								]
-							}
+							},
+							"defaultValue": "DEFAULT_HEADERS"
 						},
 						{
-							"id": 213,
-							"name": "pendingHeartbeatRef",
+							"id": 214,
+							"name": "heartbeatIntervalMs",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "RealtimeClient.ts",
+									"line": 43,
+									"character": 21
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "number"
+							},
+							"defaultValue": "30000"
+						},
+						{
+							"id": 216,
+							"name": "heartbeatTimer",
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {
@@ -461,6 +313,155 @@
 								{
 									"fileName": "RealtimeClient.ts",
 									"line": 45,
+									"character": 16
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "query",
+												"queryType": {
+													"type": "reference",
+													"name": "setInterval"
+												}
+											}
+										],
+										"name": "ReturnType"
+									},
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									}
+								]
+							},
+							"defaultValue": "undefined"
+						},
+						{
+							"id": 220,
+							"name": "logger",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "RealtimeClient.ts",
+									"line": 49,
+									"character": 8
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "Function"
+							},
+							"defaultValue": "noop"
+						},
+						{
+							"id": 215,
+							"name": "longpollerTimeout",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "RealtimeClient.ts",
+									"line": 44,
+									"character": 19
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "number"
+							},
+							"defaultValue": "20000"
+						},
+						{
+							"id": 208,
+							"name": "params",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "RealtimeClient.ts",
+									"line": 40,
+									"character": 8
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "reflection",
+										"declaration": {
+											"id": 209,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {
+												"isExported": true
+											},
+											"indexSignature": [
+												{
+													"id": 210,
+													"name": "__index",
+													"kind": 8192,
+													"kindString": "Index signature",
+													"flags": {
+														"isExported": true
+													},
+													"parameters": [
+														{
+															"id": 211,
+															"name": "key",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isExported": true
+															},
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											]
+										}
+									}
+								]
+							}
+						},
+						{
+							"id": 217,
+							"name": "pendingHeartbeatRef",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "RealtimeClient.ts",
+									"line": 46,
 									"character": 21
 								}
 							],
@@ -480,7 +481,7 @@
 							"defaultValue": "null"
 						},
 						{
-							"id": 219,
+							"id": 223,
 							"name": "reconnectAfterMs",
 							"kind": 1024,
 							"kindString": "Property",
@@ -490,7 +491,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 51,
+									"line": 52,
 									"character": 18
 								}
 							],
@@ -500,7 +501,7 @@
 							}
 						},
 						{
-							"id": 215,
+							"id": 219,
 							"name": "reconnectTimer",
 							"kind": 1024,
 							"kindString": "Property",
@@ -510,18 +511,18 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 47,
+									"line": 48,
 									"character": 16
 								}
 							],
 							"type": {
 								"type": "reference",
-								"id": 25,
+								"id": 29,
 								"name": "Timer"
 							}
 						},
 						{
-							"id": 214,
+							"id": 218,
 							"name": "ref",
 							"kind": 1024,
 							"kindString": "Property",
@@ -531,7 +532,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 46,
+									"line": 47,
 									"character": 5
 								}
 							],
@@ -542,32 +543,8 @@
 							"defaultValue": "0"
 						},
 						{
-							"id": 221,
+							"id": 225,
 							"name": "sendBuffer",
-							"kind": 1024,
-							"kindString": "Property",
-							"flags": {
-								"isExported": true
-							},
-							"sources": [
-								{
-									"fileName": "RealtimeClient.ts",
-									"line": 53,
-									"character": 12
-								}
-							],
-							"type": {
-								"type": "array",
-								"elementType": {
-									"type": "reference",
-									"name": "Function"
-								}
-							},
-							"defaultValue": "[]"
-						},
-						{
-							"id": 222,
-							"name": "serializer",
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {
@@ -581,14 +558,38 @@
 								}
 							],
 							"type": {
+								"type": "array",
+								"elementType": {
+									"type": "reference",
+									"name": "Function"
+								}
+							},
+							"defaultValue": "[]"
+						},
+						{
+							"id": 226,
+							"name": "serializer",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "RealtimeClient.ts",
+									"line": 55,
+									"character": 12
+								}
+							],
+							"type": {
 								"type": "reference",
-								"id": 172,
+								"id": 176,
 								"name": "Serializer"
 							},
 							"defaultValue": "new Serializer()"
 						},
 						{
-							"id": 208,
+							"id": 212,
 							"name": "timeout",
 							"kind": 1024,
 							"kindString": "Property",
@@ -598,7 +599,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 40,
+									"line": 41,
 									"character": 9
 								}
 							],
@@ -609,7 +610,7 @@
 							"defaultValue": "DEFAULT_TIMEOUT"
 						},
 						{
-							"id": 209,
+							"id": 213,
 							"name": "transport",
 							"kind": 1024,
 							"kindString": "Property",
@@ -619,7 +620,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 41,
+									"line": 42,
 									"character": 11
 								}
 							],
@@ -630,7 +631,7 @@
 							"defaultValue": "WebSocket"
 						},
 						{
-							"id": 290,
+							"id": 294,
 							"name": "_appendParams",
 							"kind": 2048,
 							"kindString": "Method",
@@ -640,7 +641,7 @@
 							},
 							"signatures": [
 								{
-									"id": 291,
+									"id": 295,
 									"name": "_appendParams",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -649,7 +650,7 @@
 									},
 									"parameters": [
 										{
-											"id": 292,
+											"id": 296,
 											"name": "url",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -662,7 +663,7 @@
 											}
 										},
 										{
-											"id": 293,
+											"id": 297,
 											"name": "params",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -672,7 +673,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 294,
+													"id": 298,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -681,7 +682,7 @@
 													},
 													"indexSignature": [
 														{
-															"id": 295,
+															"id": 299,
 															"name": "__index",
 															"kind": 8192,
 															"kindString": "Index signature",
@@ -690,7 +691,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 296,
+																	"id": 300,
 																	"name": "key",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -712,7 +713,7 @@
 													"sources": [
 														{
 															"fileName": "RealtimeClient.ts",
-															"line": 347,
+															"line": 348,
 															"character": 44
 														}
 													]
@@ -729,13 +730,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 347,
+									"line": 348,
 									"character": 23
 								}
 							]
 						},
 						{
-							"id": 297,
+							"id": 301,
 							"name": "_flushSendBuffer",
 							"kind": 2048,
 							"kindString": "Method",
@@ -745,7 +746,7 @@
 							},
 							"signatures": [
 								{
-									"id": 298,
+									"id": 302,
 									"name": "_flushSendBuffer",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -761,13 +762,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 357,
+									"line": 358,
 									"character": 26
 								}
 							]
 						},
 						{
-							"id": 282,
+							"id": 286,
 							"name": "_onConnClose",
 							"kind": 2048,
 							"kindString": "Method",
@@ -777,7 +778,7 @@
 							},
 							"signatures": [
 								{
-									"id": 283,
+									"id": 287,
 									"name": "_onConnClose",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -786,7 +787,7 @@
 									},
 									"parameters": [
 										{
-											"id": 284,
+											"id": 288,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -808,13 +809,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 327,
+									"line": 328,
 									"character": 22
 								}
 							]
 						},
 						{
-							"id": 285,
+							"id": 289,
 							"name": "_onConnError",
 							"kind": 2048,
 							"kindString": "Method",
@@ -824,7 +825,7 @@
 							},
 							"signatures": [
 								{
-									"id": 286,
+									"id": 290,
 									"name": "_onConnError",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -833,7 +834,7 @@
 									},
 									"parameters": [
 										{
-											"id": 287,
+											"id": 291,
 											"name": "error",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -855,13 +856,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 335,
+									"line": 336,
 									"character": 22
 								}
 							]
 						},
 						{
-							"id": 280,
+							"id": 284,
 							"name": "_onConnOpen",
 							"kind": 2048,
 							"kindString": "Method",
@@ -871,7 +872,7 @@
 							},
 							"signatures": [
 								{
-									"id": 281,
+									"id": 285,
 									"name": "_onConnOpen",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -887,13 +888,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 319,
+									"line": 320,
 									"character": 21
 								}
 							]
 						},
 						{
-							"id": 299,
+							"id": 303,
 							"name": "_resetHeartbeat",
 							"kind": 2048,
 							"kindString": "Method",
@@ -903,7 +904,7 @@
 							},
 							"signatures": [
 								{
-									"id": 300,
+									"id": 304,
 									"name": "_resetHeartbeat",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -919,13 +920,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 364,
+									"line": 365,
 									"character": 25
 								}
 							]
 						},
 						{
-							"id": 301,
+							"id": 305,
 							"name": "_sendHeartbeat",
 							"kind": 2048,
 							"kindString": "Method",
@@ -935,7 +936,7 @@
 							},
 							"signatures": [
 								{
-									"id": 302,
+									"id": 306,
 									"name": "_sendHeartbeat",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -951,13 +952,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 373,
+									"line": 374,
 									"character": 24
 								}
 							]
 						},
 						{
-							"id": 288,
+							"id": 292,
 							"name": "_triggerChanError",
 							"kind": 2048,
 							"kindString": "Method",
@@ -967,7 +968,7 @@
 							},
 							"signatures": [
 								{
-									"id": 289,
+									"id": 293,
 									"name": "_triggerChanError",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -983,13 +984,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 341,
+									"line": 342,
 									"character": 27
 								}
 							]
 						},
 						{
-							"id": 265,
+							"id": 269,
 							"name": "channel",
 							"kind": 2048,
 							"kindString": "Method",
@@ -998,7 +999,7 @@
 							},
 							"signatures": [
 								{
-									"id": 266,
+									"id": 270,
 									"name": "channel",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1007,7 +1008,7 @@
 									},
 									"parameters": [
 										{
-											"id": 267,
+											"id": 271,
 											"name": "topic",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1020,7 +1021,7 @@
 											}
 										},
 										{
-											"id": 268,
+											"id": 272,
 											"name": "chanParams",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1030,7 +1031,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 269,
+													"id": 273,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -1044,7 +1045,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 93,
+										"id": 97,
 										"name": "RealtimeSubscription"
 									}
 								}
@@ -1052,13 +1053,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 249,
+									"line": 250,
 									"character": 9
 								}
 							]
 						},
 						{
-							"id": 232,
+							"id": 236,
 							"name": "connect",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1067,7 +1068,7 @@
 							},
 							"signatures": [
 								{
-									"id": 233,
+									"id": 237,
 									"name": "connect",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1086,13 +1087,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 117,
+									"line": 118,
 									"character": 9
 								}
 							]
 						},
 						{
-							"id": 258,
+							"id": 262,
 							"name": "connectionState",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1101,7 +1102,7 @@
 							},
 							"signatures": [
 								{
-									"id": 259,
+									"id": 263,
 									"name": "connectionState",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1137,13 +1138,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 218,
+									"line": 219,
 									"character": 17
 								}
 							]
 						},
 						{
-							"id": 234,
+							"id": 238,
 							"name": "disconnect",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1152,7 +1153,7 @@
 							},
 							"signatures": [
 								{
-									"id": 235,
+									"id": 239,
 									"name": "disconnect",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1164,7 +1165,7 @@
 									},
 									"parameters": [
 										{
-											"id": 236,
+											"id": 240,
 											"name": "code",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1190,7 +1191,7 @@
 											}
 										},
 										{
-											"id": 237,
+											"id": 241,
 											"name": "reason",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1222,7 +1223,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 238,
+													"id": 242,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -1231,7 +1232,7 @@
 													},
 													"children": [
 														{
-															"id": 240,
+															"id": 244,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1241,7 +1242,7 @@
 															"sources": [
 																{
 																	"fileName": "RealtimeClient.ts",
-																	"line": 142,
+																	"line": 143,
 																	"character": 40
 																}
 															],
@@ -1251,7 +1252,7 @@
 															}
 														},
 														{
-															"id": 239,
+															"id": 243,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1261,7 +1262,7 @@
 															"sources": [
 																{
 																	"fileName": "RealtimeClient.ts",
-																	"line": 142,
+																	"line": 143,
 																	"character": 20
 																}
 															],
@@ -1285,15 +1286,15 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																240,
-																239
+																244,
+																243
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "RealtimeClient.ts",
-															"line": 142,
+															"line": 143,
 															"character": 13
 														}
 													]
@@ -1307,13 +1308,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 139,
+									"line": 140,
 									"character": 12
 								}
 							]
 						},
 						{
-							"id": 276,
+							"id": 280,
 							"name": "endPointURL",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1322,7 +1323,7 @@
 							},
 							"signatures": [
 								{
-									"id": 277,
+									"id": 281,
 									"name": "endPointURL",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1341,13 +1342,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 298,
+									"line": 299,
 									"character": 13
 								}
 							]
 						},
 						{
-							"id": 260,
+							"id": 264,
 							"name": "isConnected",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1356,7 +1357,7 @@
 							},
 							"signatures": [
 								{
-									"id": 261,
+									"id": 265,
 									"name": "isConnected",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1375,13 +1376,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 234,
+									"line": 235,
 									"character": 13
 								}
 							]
 						},
 						{
-							"id": 241,
+							"id": 245,
 							"name": "log",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1390,7 +1391,7 @@
 							},
 							"signatures": [
 								{
-									"id": 242,
+									"id": 246,
 									"name": "log",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1402,7 +1403,7 @@
 									},
 									"parameters": [
 										{
-											"id": 243,
+											"id": 247,
 											"name": "kind",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1415,7 +1416,7 @@
 											}
 										},
 										{
-											"id": 244,
+											"id": 248,
 											"name": "msg",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1428,7 +1429,7 @@
 											}
 										},
 										{
-											"id": 245,
+											"id": 249,
 											"name": "data",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1451,13 +1452,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 167,
+									"line": 168,
 									"character": 5
 								}
 							]
 						},
 						{
-							"id": 278,
+							"id": 282,
 							"name": "makeRef",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1466,7 +1467,7 @@
 							},
 							"signatures": [
 								{
-									"id": 279,
+									"id": 283,
 									"name": "makeRef",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1485,13 +1486,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 308,
+									"line": 309,
 									"character": 9
 								}
 							]
 						},
 						{
-							"id": 249,
+							"id": 253,
 							"name": "onClose",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1500,7 +1501,7 @@
 							},
 							"signatures": [
 								{
-									"id": 250,
+									"id": 254,
 									"name": "onClose",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1518,7 +1519,7 @@
 									},
 									"parameters": [
 										{
-											"id": 251,
+											"id": 255,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1543,13 +1544,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 189,
+									"line": 190,
 									"character": 9
 								}
 							]
 						},
 						{
-							"id": 273,
+							"id": 277,
 							"name": "onConnMessage",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1558,7 +1559,7 @@
 							},
 							"signatures": [
 								{
-									"id": 274,
+									"id": 278,
 									"name": "onConnMessage",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1567,7 +1568,7 @@
 									},
 									"parameters": [
 										{
-											"id": 275,
+											"id": 279,
 											"name": "rawMessage",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1589,13 +1590,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 270,
+									"line": 271,
 									"character": 15
 								}
 							]
 						},
 						{
-							"id": 252,
+							"id": 256,
 							"name": "onError",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1604,7 +1605,7 @@
 							},
 							"signatures": [
 								{
-									"id": 253,
+									"id": 257,
 									"name": "onError",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1622,7 +1623,7 @@
 									},
 									"parameters": [
 										{
-											"id": 254,
+											"id": 258,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1647,13 +1648,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 200,
+									"line": 201,
 									"character": 9
 								}
 							]
 						},
 						{
-							"id": 255,
+							"id": 259,
 							"name": "onMessage",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1662,7 +1663,7 @@
 							},
 							"signatures": [
 								{
-									"id": 256,
+									"id": 260,
 									"name": "onMessage",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1680,7 +1681,7 @@
 									},
 									"parameters": [
 										{
-											"id": 257,
+											"id": 261,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1705,13 +1706,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 211,
+									"line": 212,
 									"character": 11
 								}
 							]
 						},
 						{
-							"id": 246,
+							"id": 250,
 							"name": "onOpen",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1720,7 +1721,7 @@
 							},
 							"signatures": [
 								{
-									"id": 247,
+									"id": 251,
 									"name": "onOpen",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1738,7 +1739,7 @@
 									},
 									"parameters": [
 										{
-											"id": 248,
+											"id": 252,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1763,13 +1764,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 178,
+									"line": 179,
 									"character": 8
 								}
 							]
 						},
 						{
-							"id": 270,
+							"id": 274,
 							"name": "push",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1778,7 +1779,7 @@
 							},
 							"signatures": [
 								{
-									"id": 271,
+									"id": 275,
 									"name": "push",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1787,7 +1788,7 @@
 									},
 									"parameters": [
 										{
-											"id": 272,
+											"id": 276,
 											"name": "data",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1796,7 +1797,7 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 321,
+												"id": 325,
 												"name": "Message"
 											}
 										}
@@ -1810,13 +1811,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 255,
+									"line": 256,
 									"character": 6
 								}
 							]
 						},
 						{
-							"id": 262,
+							"id": 266,
 							"name": "remove",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1825,7 +1826,7 @@
 							},
 							"signatures": [
 								{
-									"id": 263,
+									"id": 267,
 									"name": "remove",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1837,7 +1838,7 @@
 									},
 									"parameters": [
 										{
-											"id": 264,
+											"id": 268,
 											"name": "channel",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1849,7 +1850,7 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 93,
+												"id": 97,
 												"name": "RealtimeSubscription"
 											}
 										}
@@ -1863,13 +1864,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 243,
+									"line": 244,
 									"character": 8
 								}
 							]
 						},
 						{
-							"id": 223,
+							"id": 227,
 							"name": "stateChangeCallbacks",
 							"kind": 2097152,
 							"kindString": "Object literal",
@@ -1878,32 +1879,8 @@
 							},
 							"children": [
 								{
-									"id": 225,
+									"id": 229,
 									"name": "close",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isExported": true
-									},
-									"sources": [
-										{
-											"fileName": "RealtimeClient.ts",
-											"line": 62,
-											"character": 9
-										}
-									],
-									"type": {
-										"type": "array",
-										"elementType": {
-											"type": "intrinsic",
-											"name": "never"
-										}
-									},
-									"defaultValue": "[]"
-								},
-								{
-									"id": 226,
-									"name": "error",
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {
@@ -1926,8 +1903,8 @@
 									"defaultValue": "[]"
 								},
 								{
-									"id": 227,
-									"name": "message",
+									"id": 230,
+									"name": "error",
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {
@@ -1937,6 +1914,30 @@
 										{
 											"fileName": "RealtimeClient.ts",
 											"line": 64,
+											"character": 9
+										}
+									],
+									"type": {
+										"type": "array",
+										"elementType": {
+											"type": "intrinsic",
+											"name": "never"
+										}
+									},
+									"defaultValue": "[]"
+								},
+								{
+									"id": 231,
+									"name": "message",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isExported": true
+									},
+									"sources": [
+										{
+											"fileName": "RealtimeClient.ts",
+											"line": 65,
 											"character": 11
 										}
 									],
@@ -1950,7 +1951,7 @@
 									"defaultValue": "[]"
 								},
 								{
-									"id": 224,
+									"id": 228,
 									"name": "open",
 									"kind": 32,
 									"kindString": "Variable",
@@ -1960,7 +1961,7 @@
 									"sources": [
 										{
 											"fileName": "RealtimeClient.ts",
-											"line": 61,
+											"line": 62,
 											"character": 8
 										}
 									],
@@ -1979,17 +1980,17 @@
 									"title": "Variables",
 									"kind": 32,
 									"children": [
-										225,
-										226,
-										227,
-										224
+										229,
+										230,
+										231,
+										228
 									]
 								}
 							],
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 55,
+									"line": 56,
 									"character": 22
 								}
 							],
@@ -2004,81 +2005,81 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								228
+								232
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								198,
-								220,
-								218,
-								217,
-								199,
-								200,
-								210,
-								212,
-								216,
-								211,
-								204,
-								213,
-								219,
-								215,
-								214,
-								221,
+								202,
+								224,
 								222,
+								221,
+								203,
+								204,
+								214,
+								216,
+								220,
+								215,
 								208,
-								209
+								217,
+								223,
+								219,
+								218,
+								225,
+								226,
+								212,
+								213
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								290,
-								297,
-								282,
-								285,
-								280,
-								299,
+								294,
 								301,
-								288,
-								265,
-								232,
-								258,
-								234,
-								276,
-								260,
-								241,
-								278,
-								249,
-								273,
-								252,
-								255,
-								246,
-								270,
-								262
+								286,
+								289,
+								284,
+								303,
+								305,
+								292,
+								269,
+								236,
+								262,
+								238,
+								280,
+								264,
+								245,
+								282,
+								253,
+								277,
+								256,
+								259,
+								250,
+								274,
+								266
 							]
 						},
 						{
 							"title": "Object literals",
 							"kind": 2097152,
 							"children": [
-								223
+								227
 							]
 						}
 					],
 					"sources": [
 						{
 							"fileName": "RealtimeClient.ts",
-							"line": 35,
+							"line": 36,
 							"character": 35
 						}
 					]
 				},
 				{
-					"id": 321,
+					"id": 325,
 					"name": "Message",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -2086,22 +2087,76 @@
 					"sources": [
 						{
 							"fileName": "RealtimeClient.ts",
-							"line": 26,
+							"line": 27,
 							"character": 12
 						}
 					],
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 322,
+							"id": 326,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 324,
+									"id": 328,
 									"name": "event",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "RealtimeClient.ts",
+											"line": 29,
+											"character": 7
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 329,
+									"name": "payload",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "RealtimeClient.ts",
+											"line": 30,
+											"character": 9
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "any"
+									}
+								},
+								{
+									"id": 330,
+									"name": "ref",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "RealtimeClient.ts",
+											"line": 31,
+											"character": 5
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 327,
+									"name": "topic",
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {},
@@ -2116,60 +2171,6 @@
 										"type": "intrinsic",
 										"name": "string"
 									}
-								},
-								{
-									"id": 325,
-									"name": "payload",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {},
-									"sources": [
-										{
-											"fileName": "RealtimeClient.ts",
-											"line": 29,
-											"character": 9
-										}
-									],
-									"type": {
-										"type": "intrinsic",
-										"name": "any"
-									}
-								},
-								{
-									"id": 326,
-									"name": "ref",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {},
-									"sources": [
-										{
-											"fileName": "RealtimeClient.ts",
-											"line": 30,
-											"character": 5
-										}
-									],
-									"type": {
-										"type": "intrinsic",
-										"name": "string"
-									}
-								},
-								{
-									"id": 323,
-									"name": "topic",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {},
-									"sources": [
-										{
-											"fileName": "RealtimeClient.ts",
-											"line": 27,
-											"character": 7
-										}
-									],
-									"type": {
-										"type": "intrinsic",
-										"name": "string"
-									}
 								}
 							],
 							"groups": [
@@ -2177,17 +2178,17 @@
 									"title": "Variables",
 									"kind": 32,
 									"children": [
-										324,
-										325,
-										326,
-										323
+										328,
+										329,
+										330,
+										327
 									]
 								}
 							],
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 26,
+									"line": 27,
 									"character": 14
 								}
 							]
@@ -2195,7 +2196,7 @@
 					}
 				},
 				{
-					"id": 303,
+					"id": 307,
 					"name": "Options",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -2205,14 +2206,14 @@
 					"sources": [
 						{
 							"fileName": "RealtimeClient.ts",
-							"line": 14,
+							"line": 15,
 							"character": 19
 						}
 					],
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 304,
+							"id": 308,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
@@ -2221,8 +2222,29 @@
 							},
 							"children": [
 								{
-									"id": 311,
+									"id": 315,
 									"name": "decode",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "RealtimeClient.ts",
+											"line": 22,
+											"character": 8
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "Function"
+									}
+								},
+								{
+									"id": 314,
+									"name": "encode",
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {
@@ -2242,28 +2264,7 @@
 									}
 								},
 								{
-									"id": 310,
-									"name": "encode",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isExported": true,
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "RealtimeClient.ts",
-											"line": 20,
-											"character": 8
-										}
-									],
-									"type": {
-										"type": "reference",
-										"name": "Function"
-									}
-								},
-								{
-									"id": 313,
+									"id": 317,
 									"name": "headers",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2274,157 +2275,8 @@
 									"sources": [
 										{
 											"fileName": "RealtimeClient.ts",
-											"line": 23,
-											"character": 9
-										}
-									],
-									"type": {
-										"type": "union",
-										"types": [
-											{
-												"type": "intrinsic",
-												"name": "undefined"
-											},
-											{
-												"type": "reflection",
-												"declaration": {
-													"id": 314,
-													"name": "__type",
-													"kind": 65536,
-													"kindString": "Type literal",
-													"flags": {
-														"isExported": true
-													},
-													"indexSignature": [
-														{
-															"id": 315,
-															"name": "__index",
-															"kind": 8192,
-															"kindString": "Index signature",
-															"flags": {
-																"isExported": true
-															},
-															"parameters": [
-																{
-																	"id": 316,
-																	"name": "key",
-																	"kind": 32768,
-																	"kindString": "Parameter",
-																	"flags": {
-																		"isExported": true
-																	},
-																	"type": {
-																		"type": "intrinsic",
-																		"name": "string"
-																	}
-																}
-															],
-															"type": {
-																"type": "intrinsic",
-																"name": "string"
-															}
-														}
-													]
-												}
-											}
-										]
-									}
-								},
-								{
-									"id": 307,
-									"name": "heartbeatIntervalMs",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isExported": true,
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "RealtimeClient.ts",
-											"line": 17,
-											"character": 21
-										}
-									],
-									"type": {
-										"type": "union",
-										"types": [
-											{
-												"type": "intrinsic",
-												"name": "undefined"
-											},
-											{
-												"type": "intrinsic",
-												"name": "number"
-											}
-										]
-									}
-								},
-								{
-									"id": 309,
-									"name": "logger",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isExported": true,
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "RealtimeClient.ts",
-											"line": 19,
-											"character": 8
-										}
-									],
-									"type": {
-										"type": "reference",
-										"name": "Function"
-									}
-								},
-								{
-									"id": 308,
-									"name": "longpollerTimeout",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isExported": true,
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "RealtimeClient.ts",
-											"line": 18,
-											"character": 19
-										}
-									],
-									"type": {
-										"type": "union",
-										"types": [
-											{
-												"type": "intrinsic",
-												"name": "undefined"
-											},
-											{
-												"type": "intrinsic",
-												"name": "number"
-											}
-										]
-									}
-								},
-								{
-									"id": 317,
-									"name": "params",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isExported": true,
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "RealtimeClient.ts",
 											"line": 24,
-											"character": 8
+											"character": 9
 										}
 									],
 									"type": {
@@ -2480,7 +2332,156 @@
 									}
 								},
 								{
+									"id": 311,
+									"name": "heartbeatIntervalMs",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "RealtimeClient.ts",
+											"line": 18,
+											"character": 21
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "undefined"
+											},
+											{
+												"type": "intrinsic",
+												"name": "number"
+											}
+										]
+									}
+								},
+								{
+									"id": 313,
+									"name": "logger",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "RealtimeClient.ts",
+											"line": 20,
+											"character": 8
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "Function"
+									}
+								},
+								{
 									"id": 312,
+									"name": "longpollerTimeout",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "RealtimeClient.ts",
+											"line": 19,
+											"character": 19
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "undefined"
+											},
+											{
+												"type": "intrinsic",
+												"name": "number"
+											}
+										]
+									}
+								},
+								{
+									"id": 321,
+									"name": "params",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "RealtimeClient.ts",
+											"line": 25,
+											"character": 8
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "undefined"
+											},
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 322,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"indexSignature": [
+														{
+															"id": 323,
+															"name": "__index",
+															"kind": 8192,
+															"kindString": "Index signature",
+															"flags": {
+																"isExported": true
+															},
+															"parameters": [
+																{
+																	"id": 324,
+																	"name": "key",
+																	"kind": 32768,
+																	"kindString": "Parameter",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													]
+												}
+											}
+										]
+									}
+								},
+								{
+									"id": 316,
 									"name": "reconnectAfterMs",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2491,7 +2492,7 @@
 									"sources": [
 										{
 											"fileName": "RealtimeClient.ts",
-											"line": 22,
+											"line": 23,
 											"character": 18
 										}
 									],
@@ -2501,7 +2502,7 @@
 									}
 								},
 								{
-									"id": 306,
+									"id": 310,
 									"name": "timeout",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2512,7 +2513,7 @@
 									"sources": [
 										{
 											"fileName": "RealtimeClient.ts",
-											"line": 16,
+											"line": 17,
 											"character": 9
 										}
 									],
@@ -2531,7 +2532,7 @@
 									}
 								},
 								{
-									"id": 305,
+									"id": 309,
 									"name": "transport",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2542,7 +2543,7 @@
 									"sources": [
 										{
 											"fileName": "RealtimeClient.ts",
-											"line": 15,
+											"line": 16,
 											"character": 11
 										}
 									],
@@ -2557,23 +2558,23 @@
 									"title": "Variables",
 									"kind": 32,
 									"children": [
-										311,
-										310,
-										313,
-										307,
-										309,
-										308,
+										315,
+										314,
 										317,
+										311,
+										313,
 										312,
-										306,
-										305
+										321,
+										316,
+										310,
+										309
 									]
 								}
 							],
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 14,
+									"line": 15,
 									"character": 21
 								}
 							]
@@ -2581,7 +2582,7 @@
 					}
 				},
 				{
-					"id": 327,
+					"id": 331,
 					"name": "noop",
 					"kind": 64,
 					"kindString": "Function",
@@ -2590,7 +2591,7 @@
 					},
 					"signatures": [
 						{
-							"id": 328,
+							"id": 332,
 							"name": "noop",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -2604,7 +2605,7 @@
 					"sources": [
 						{
 							"fileName": "RealtimeClient.ts",
-							"line": 33,
+							"line": 34,
 							"character": 10
 						}
 					]
@@ -2615,22 +2616,22 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						197
+						201
 					]
 				},
 				{
 					"title": "Type aliases",
 					"kind": 4194304,
 					"children": [
-						321,
-						303
+						325,
+						307
 					]
 				},
 				{
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						327
+						331
 					]
 				}
 			],
@@ -2643,7 +2644,7 @@
 			]
 		},
 		{
-			"id": 92,
+			"id": 96,
 			"name": "\"RealtimeSubscription\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -2653,7 +2654,7 @@
 			"originalName": "/home/runner/work/realtime-js/realtime-js/src/RealtimeSubscription.ts",
 			"children": [
 				{
-					"id": 93,
+					"id": 97,
 					"name": "RealtimeSubscription",
 					"kind": 128,
 					"kindString": "Class",
@@ -2662,7 +2663,7 @@
 					},
 					"children": [
 						{
-							"id": 101,
+							"id": 105,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -2671,7 +2672,7 @@
 							},
 							"signatures": [
 								{
-									"id": 105,
+									"id": 109,
 									"name": "new RealtimeSubscription",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -2680,7 +2681,7 @@
 									},
 									"parameters": [
 										{
-											"id": 106,
+											"id": 110,
 											"name": "topic",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2693,7 +2694,7 @@
 											}
 										},
 										{
-											"id": 107,
+											"id": 111,
 											"name": "params",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2707,7 +2708,7 @@
 											"defaultValue": "{}"
 										},
 										{
-											"id": 108,
+											"id": 112,
 											"name": "socket",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2716,14 +2717,14 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 197,
+												"id": 201,
 												"name": "RealtimeClient"
 											}
 										}
 									],
 									"type": {
 										"type": "reference",
-										"id": 93,
+										"id": 97,
 										"name": "RealtimeSubscription"
 									}
 								}
@@ -2737,7 +2738,7 @@
 							]
 						},
 						{
-							"id": 94,
+							"id": 98,
 							"name": "bindings",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2761,7 +2762,7 @@
 							"defaultValue": "[]"
 						},
 						{
-							"id": 98,
+							"id": 102,
 							"name": "joinPush",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2777,12 +2778,12 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 39,
+								"id": 43,
 								"name": "Push"
 							}
 						},
 						{
-							"id": 97,
+							"id": 101,
 							"name": "joinedOnce",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2803,7 +2804,7 @@
 							"defaultValue": "false"
 						},
 						{
-							"id": 103,
+							"id": 107,
 							"name": "params",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2825,7 +2826,7 @@
 							}
 						},
 						{
-							"id": 100,
+							"id": 104,
 							"name": "pushBuffer",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2843,14 +2844,14 @@
 								"type": "array",
 								"elementType": {
 									"type": "reference",
-									"id": 39,
+									"id": 43,
 									"name": "Push"
 								}
 							},
 							"defaultValue": "[]"
 						},
 						{
-							"id": 99,
+							"id": 103,
 							"name": "rejoinTimer",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2866,12 +2867,12 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 25,
+								"id": 29,
 								"name": "Timer"
 							}
 						},
 						{
-							"id": 104,
+							"id": 108,
 							"name": "socket",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2889,12 +2890,12 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 197,
+								"id": 201,
 								"name": "RealtimeClient"
 							}
 						},
 						{
-							"id": 96,
+							"id": 100,
 							"name": "state",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2910,13 +2911,13 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 7,
+								"id": 9,
 								"name": "CHANNEL_STATES"
 							},
 							"defaultValue": "CHANNEL_STATES.closed"
 						},
 						{
-							"id": 95,
+							"id": 99,
 							"name": "timeout",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2936,7 +2937,7 @@
 							}
 						},
 						{
-							"id": 102,
+							"id": 106,
 							"name": "topic",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2958,7 +2959,7 @@
 							}
 						},
 						{
-							"id": 127,
+							"id": 131,
 							"name": "canPush",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2967,7 +2968,7 @@
 							},
 							"signatures": [
 								{
-									"id": 128,
+									"id": 132,
 									"name": "canPush",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2989,7 +2990,7 @@
 							]
 						},
 						{
-							"id": 161,
+							"id": 165,
 							"name": "isClosed",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2998,7 +2999,7 @@
 							},
 							"signatures": [
 								{
-									"id": 162,
+									"id": 166,
 									"name": "isClosed",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3020,7 +3021,7 @@
 							]
 						},
 						{
-							"id": 163,
+							"id": 167,
 							"name": "isErrored",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3029,7 +3030,7 @@
 							},
 							"signatures": [
 								{
-									"id": 164,
+									"id": 168,
 									"name": "isErrored",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3051,7 +3052,7 @@
 							]
 						},
 						{
-							"id": 165,
+							"id": 169,
 							"name": "isJoined",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3060,7 +3061,7 @@
 							},
 							"signatures": [
 								{
-									"id": 166,
+									"id": 170,
 									"name": "isJoined",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3082,7 +3083,7 @@
 							]
 						},
 						{
-							"id": 167,
+							"id": 171,
 							"name": "isJoining",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3091,7 +3092,7 @@
 							},
 							"signatures": [
 								{
-									"id": 168,
+									"id": 172,
 									"name": "isJoining",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3113,7 +3114,7 @@
 							]
 						},
 						{
-							"id": 169,
+							"id": 173,
 							"name": "isLeaving",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3122,7 +3123,7 @@
 							},
 							"signatures": [
 								{
-									"id": 170,
+									"id": 174,
 									"name": "isLeaving",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3144,7 +3145,7 @@
 							]
 						},
 						{
-							"id": 142,
+							"id": 146,
 							"name": "isMember",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3153,7 +3154,7 @@
 							},
 							"signatures": [
 								{
-									"id": 143,
+									"id": 147,
 									"name": "isMember",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3162,7 +3163,7 @@
 									},
 									"parameters": [
 										{
-											"id": 144,
+											"id": 148,
 											"name": "topic",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3190,7 +3191,7 @@
 							]
 						},
 						{
-							"id": 145,
+							"id": 149,
 							"name": "joinRef",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3199,7 +3200,7 @@
 							},
 							"signatures": [
 								{
-									"id": 146,
+									"id": 150,
 									"name": "joinRef",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3221,7 +3222,7 @@
 							]
 						},
 						{
-							"id": 124,
+							"id": 128,
 							"name": "off",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3230,7 +3231,7 @@
 							},
 							"signatures": [
 								{
-									"id": 125,
+									"id": 129,
 									"name": "off",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3239,7 +3240,7 @@
 									},
 									"parameters": [
 										{
-											"id": 126,
+											"id": 130,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3267,7 +3268,7 @@
 							]
 						},
 						{
-							"id": 120,
+							"id": 124,
 							"name": "on",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3276,7 +3277,7 @@
 							},
 							"signatures": [
 								{
-									"id": 121,
+									"id": 125,
 									"name": "on",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3285,7 +3286,7 @@
 									},
 									"parameters": [
 										{
-											"id": 122,
+											"id": 126,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3298,7 +3299,7 @@
 											}
 										},
 										{
-											"id": 123,
+											"id": 127,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3326,7 +3327,7 @@
 							]
 						},
 						{
-							"id": 114,
+							"id": 118,
 							"name": "onClose",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3335,7 +3336,7 @@
 							},
 							"signatures": [
 								{
-									"id": 115,
+									"id": 119,
 									"name": "onClose",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3344,7 +3345,7 @@
 									},
 									"parameters": [
 										{
-											"id": 116,
+											"id": 120,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3372,7 +3373,7 @@
 							]
 						},
 						{
-							"id": 117,
+							"id": 121,
 							"name": "onError",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3381,7 +3382,7 @@
 							},
 							"signatures": [
 								{
-									"id": 118,
+									"id": 122,
 									"name": "onError",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3390,7 +3391,7 @@
 									},
 									"parameters": [
 										{
-											"id": 119,
+											"id": 123,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3418,7 +3419,7 @@
 							]
 						},
 						{
-							"id": 137,
+							"id": 141,
 							"name": "onMessage",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3427,7 +3428,7 @@
 							},
 							"signatures": [
 								{
-									"id": 138,
+									"id": 142,
 									"name": "onMessage",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3440,7 +3441,7 @@
 									},
 									"parameters": [
 										{
-											"id": 139,
+											"id": 143,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3453,7 +3454,7 @@
 											}
 										},
 										{
-											"id": 140,
+											"id": 144,
 											"name": "payload",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3466,7 +3467,7 @@
 											}
 										},
 										{
-											"id": 141,
+											"id": 145,
 											"name": "ref",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3504,7 +3505,7 @@
 							]
 						},
 						{
-							"id": 129,
+							"id": 133,
 							"name": "push",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3513,7 +3514,7 @@
 							},
 							"signatures": [
 								{
-									"id": 130,
+									"id": 134,
 									"name": "push",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3522,7 +3523,7 @@
 									},
 									"parameters": [
 										{
-											"id": 131,
+											"id": 135,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3531,12 +3532,12 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 13,
+												"id": 15,
 												"name": "CHANNEL_EVENTS"
 											}
 										},
 										{
-											"id": 132,
+											"id": 136,
 											"name": "payload",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3549,7 +3550,7 @@
 											}
 										},
 										{
-											"id": 133,
+											"id": 137,
 											"name": "timeout",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3565,7 +3566,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 39,
+										"id": 43,
 										"name": "Push"
 									}
 								}
@@ -3579,7 +3580,7 @@
 							]
 						},
 						{
-							"id": 150,
+							"id": 154,
 							"name": "rejoin",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3588,7 +3589,7 @@
 							},
 							"signatures": [
 								{
-									"id": 151,
+									"id": 155,
 									"name": "rejoin",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3597,7 +3598,7 @@
 									},
 									"parameters": [
 										{
-											"id": 152,
+											"id": 156,
 											"name": "timeout",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3626,7 +3627,7 @@
 							]
 						},
 						{
-							"id": 109,
+							"id": 113,
 							"name": "rejoinUntilConnected",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3635,7 +3636,7 @@
 							},
 							"signatures": [
 								{
-									"id": 110,
+									"id": 114,
 									"name": "rejoinUntilConnected",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3657,7 +3658,7 @@
 							]
 						},
 						{
-							"id": 158,
+							"id": 162,
 							"name": "replyEventName",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3666,7 +3667,7 @@
 							},
 							"signatures": [
 								{
-									"id": 159,
+									"id": 163,
 									"name": "replyEventName",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3675,7 +3676,7 @@
 									},
 									"parameters": [
 										{
-											"id": 160,
+											"id": 164,
 											"name": "ref",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3703,7 +3704,7 @@
 							]
 						},
 						{
-							"id": 147,
+							"id": 151,
 							"name": "sendJoin",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3712,7 +3713,7 @@
 							},
 							"signatures": [
 								{
-									"id": 148,
+									"id": 152,
 									"name": "sendJoin",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3721,7 +3722,7 @@
 									},
 									"parameters": [
 										{
-											"id": 149,
+											"id": 153,
 											"name": "timeout",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3749,7 +3750,7 @@
 							]
 						},
 						{
-							"id": 111,
+							"id": 115,
 							"name": "subscribe",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3758,7 +3759,7 @@
 							},
 							"signatures": [
 								{
-									"id": 112,
+									"id": 116,
 									"name": "subscribe",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3767,7 +3768,7 @@
 									},
 									"parameters": [
 										{
-											"id": 113,
+											"id": 117,
 											"name": "timeout",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3783,7 +3784,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 39,
+										"id": 43,
 										"name": "Push"
 									}
 								}
@@ -3797,7 +3798,7 @@
 							]
 						},
 						{
-							"id": 153,
+							"id": 157,
 							"name": "trigger",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3806,7 +3807,7 @@
 							},
 							"signatures": [
 								{
-									"id": 154,
+									"id": 158,
 									"name": "trigger",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3815,7 +3816,7 @@
 									},
 									"parameters": [
 										{
-											"id": 155,
+											"id": 159,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3828,7 +3829,7 @@
 											}
 										},
 										{
-											"id": 156,
+											"id": 160,
 											"name": "payload",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3842,7 +3843,7 @@
 											}
 										},
 										{
-											"id": 157,
+											"id": 161,
 											"name": "ref",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3880,7 +3881,7 @@
 							]
 						},
 						{
-							"id": 134,
+							"id": 138,
 							"name": "unsubscribe",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3889,7 +3890,7 @@
 							},
 							"signatures": [
 								{
-									"id": 135,
+									"id": 139,
 									"name": "unsubscribe",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3902,7 +3903,7 @@
 									},
 									"parameters": [
 										{
-											"id": 136,
+											"id": 140,
 											"name": "timeout",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3918,7 +3919,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 39,
+										"id": 43,
 										"name": "Push"
 									}
 								}
@@ -3937,50 +3938,50 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								101
+								105
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								94,
 								98,
-								97,
+								102,
+								101,
+								107,
+								104,
 								103,
+								108,
 								100,
 								99,
-								104,
-								96,
-								95,
-								102
+								106
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								127,
-								161,
-								163,
+								131,
 								165,
 								167,
 								169,
-								142,
-								145,
+								171,
+								173,
+								146,
+								149,
+								128,
 								124,
-								120,
-								114,
-								117,
-								137,
-								129,
-								150,
-								109,
-								158,
-								147,
-								111,
-								153,
-								134
+								118,
+								121,
+								141,
+								133,
+								154,
+								113,
+								162,
+								151,
+								115,
+								157,
+								138
 							]
 						}
 					],
@@ -3998,7 +3999,7 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						93
+						97
 					]
 				}
 			],
@@ -4011,7 +4012,7 @@
 			]
 		},
 		{
-			"id": 415,
+			"id": 419,
 			"name": "\"index\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -4028,7 +4029,7 @@
 			]
 		},
 		{
-			"id": 1,
+			"id": 3,
 			"name": "\"lib/constants\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -4038,7 +4039,7 @@
 			"originalName": "/home/runner/work/realtime-js/realtime-js/src/lib/constants.ts",
 			"children": [
 				{
-					"id": 13,
+					"id": 15,
 					"name": "CHANNEL_EVENTS",
 					"kind": 4,
 					"kindString": "Enumeration",
@@ -4047,59 +4048,8 @@
 					},
 					"children": [
 						{
-							"id": 14,
-							"name": "close",
-							"kind": 16,
-							"kindString": "Enumeration member",
-							"flags": {
-								"isExported": true
-							},
-							"sources": [
-								{
-									"fileName": "lib/constants.ts",
-									"line": 23,
-									"character": 7
-								}
-							],
-							"defaultValue": "\"phx_close\""
-						},
-						{
-							"id": 15,
-							"name": "error",
-							"kind": 16,
-							"kindString": "Enumeration member",
-							"flags": {
-								"isExported": true
-							},
-							"sources": [
-								{
-									"fileName": "lib/constants.ts",
-									"line": 24,
-									"character": 7
-								}
-							],
-							"defaultValue": "\"phx_error\""
-						},
-						{
 							"id": 16,
-							"name": "join",
-							"kind": 16,
-							"kindString": "Enumeration member",
-							"flags": {
-								"isExported": true
-							},
-							"sources": [
-								{
-									"fileName": "lib/constants.ts",
-									"line": 25,
-									"character": 6
-								}
-							],
-							"defaultValue": "\"phx_join\""
-						},
-						{
-							"id": 18,
-							"name": "leave",
+							"name": "close",
 							"kind": 16,
 							"kindString": "Enumeration member",
 							"flags": {
@@ -4112,10 +4062,61 @@
 									"character": 7
 								}
 							],
-							"defaultValue": "\"phx_leave\""
+							"defaultValue": "\"phx_close\""
 						},
 						{
 							"id": 17,
+							"name": "error",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/constants.ts",
+									"line": 28,
+									"character": 7
+								}
+							],
+							"defaultValue": "\"phx_error\""
+						},
+						{
+							"id": 18,
+							"name": "join",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/constants.ts",
+									"line": 29,
+									"character": 6
+								}
+							],
+							"defaultValue": "\"phx_join\""
+						},
+						{
+							"id": 20,
+							"name": "leave",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/constants.ts",
+									"line": 31,
+									"character": 7
+								}
+							],
+							"defaultValue": "\"phx_leave\""
+						},
+						{
+							"id": 19,
 							"name": "reply",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -4125,7 +4126,7 @@
 							"sources": [
 								{
 									"fileName": "lib/constants.ts",
-									"line": 26,
+									"line": 30,
 									"character": 7
 								}
 							],
@@ -4137,25 +4138,141 @@
 							"title": "Enumeration members",
 							"kind": 16,
 							"children": [
-								14,
-								15,
 								16,
+								17,
 								18,
-								17
+								20,
+								19
 							]
 						}
 					],
 					"sources": [
 						{
 							"fileName": "lib/constants.ts",
-							"line": 22,
+							"line": 26,
 							"character": 26
 						}
 					]
 				},
 				{
-					"id": 7,
+					"id": 9,
 					"name": "CHANNEL_STATES",
+					"kind": 4,
+					"kindString": "Enumeration",
+					"flags": {
+						"isExported": true
+					},
+					"children": [
+						{
+							"id": 10,
+							"name": "closed",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/constants.ts",
+									"line": 19,
+									"character": 8
+								}
+							],
+							"defaultValue": "\"closed\""
+						},
+						{
+							"id": 11,
+							"name": "errored",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/constants.ts",
+									"line": 20,
+									"character": 9
+								}
+							],
+							"defaultValue": "\"errored\""
+						},
+						{
+							"id": 12,
+							"name": "joined",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/constants.ts",
+									"line": 21,
+									"character": 8
+								}
+							],
+							"defaultValue": "\"joined\""
+						},
+						{
+							"id": 13,
+							"name": "joining",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/constants.ts",
+									"line": 22,
+									"character": 9
+								}
+							],
+							"defaultValue": "\"joining\""
+						},
+						{
+							"id": 14,
+							"name": "leaving",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/constants.ts",
+									"line": 23,
+									"character": 9
+								}
+							],
+							"defaultValue": "\"leaving\""
+						}
+					],
+					"groups": [
+						{
+							"title": "Enumeration members",
+							"kind": 16,
+							"children": [
+								10,
+								11,
+								12,
+								13,
+								14
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/constants.ts",
+							"line": 18,
+							"character": 26
+						}
+					]
+				},
+				{
+					"id": 4,
+					"name": "SOCKET_STATES",
 					"kind": 4,
 					"kindString": "Enumeration",
 					"flags": {
@@ -4177,126 +4294,10 @@
 									"character": 8
 								}
 							],
-							"defaultValue": "\"closed\""
-						},
-						{
-							"id": 9,
-							"name": "errored",
-							"kind": 16,
-							"kindString": "Enumeration member",
-							"flags": {
-								"isExported": true
-							},
-							"sources": [
-								{
-									"fileName": "lib/constants.ts",
-									"line": 16,
-									"character": 9
-								}
-							],
-							"defaultValue": "\"errored\""
-						},
-						{
-							"id": 10,
-							"name": "joined",
-							"kind": 16,
-							"kindString": "Enumeration member",
-							"flags": {
-								"isExported": true
-							},
-							"sources": [
-								{
-									"fileName": "lib/constants.ts",
-									"line": 17,
-									"character": 8
-								}
-							],
-							"defaultValue": "\"joined\""
-						},
-						{
-							"id": 11,
-							"name": "joining",
-							"kind": 16,
-							"kindString": "Enumeration member",
-							"flags": {
-								"isExported": true
-							},
-							"sources": [
-								{
-									"fileName": "lib/constants.ts",
-									"line": 18,
-									"character": 9
-								}
-							],
-							"defaultValue": "\"joining\""
-						},
-						{
-							"id": 12,
-							"name": "leaving",
-							"kind": 16,
-							"kindString": "Enumeration member",
-							"flags": {
-								"isExported": true
-							},
-							"sources": [
-								{
-									"fileName": "lib/constants.ts",
-									"line": 19,
-									"character": 9
-								}
-							],
-							"defaultValue": "\"leaving\""
-						}
-					],
-					"groups": [
-						{
-							"title": "Enumeration members",
-							"kind": 16,
-							"children": [
-								8,
-								9,
-								10,
-								11,
-								12
-							]
-						}
-					],
-					"sources": [
-						{
-							"fileName": "lib/constants.ts",
-							"line": 14,
-							"character": 26
-						}
-					]
-				},
-				{
-					"id": 2,
-					"name": "SOCKET_STATES",
-					"kind": 4,
-					"kindString": "Enumeration",
-					"flags": {
-						"isExported": true
-					},
-					"children": [
-						{
-							"id": 6,
-							"name": "closed",
-							"kind": 16,
-							"kindString": "Enumeration member",
-							"flags": {
-								"isExported": true
-							},
-							"sources": [
-								{
-									"fileName": "lib/constants.ts",
-									"line": 11,
-									"character": 8
-								}
-							],
 							"defaultValue": "3"
 						},
 						{
-							"id": 5,
+							"id": 7,
 							"name": "closing",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -4306,14 +4307,14 @@
 							"sources": [
 								{
 									"fileName": "lib/constants.ts",
-									"line": 10,
+									"line": 14,
 									"character": 9
 								}
 							],
 							"defaultValue": "2"
 						},
 						{
-							"id": 3,
+							"id": 5,
 							"name": "connecting",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -4323,14 +4324,14 @@
 							"sources": [
 								{
 									"fileName": "lib/constants.ts",
-									"line": 8,
+									"line": 12,
 									"character": 12
 								}
 							],
 							"defaultValue": "0"
 						},
 						{
-							"id": 4,
+							"id": 6,
 							"name": "open",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -4340,7 +4341,7 @@
 							"sources": [
 								{
 									"fileName": "lib/constants.ts",
-									"line": 9,
+									"line": 13,
 									"character": 6
 								}
 							],
@@ -4352,23 +4353,23 @@
 							"title": "Enumeration members",
 							"kind": 16,
 							"children": [
-								6,
+								8,
+								7,
 								5,
-								3,
-								4
+								6
 							]
 						}
 					],
 					"sources": [
 						{
 							"fileName": "lib/constants.ts",
-							"line": 7,
+							"line": 11,
 							"character": 25
 						}
 					]
 				},
 				{
-					"id": 19,
+					"id": 21,
 					"name": "TRANSPORTS",
 					"kind": 4,
 					"kindString": "Enumeration",
@@ -4377,7 +4378,7 @@
 					},
 					"children": [
 						{
-							"id": 20,
+							"id": 22,
 							"name": "websocket",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -4387,7 +4388,7 @@
 							"sources": [
 								{
 									"fileName": "lib/constants.ts",
-									"line": 31,
+									"line": 35,
 									"character": 11
 								}
 							],
@@ -4399,20 +4400,20 @@
 							"title": "Enumeration members",
 							"kind": 16,
 							"children": [
-								20
+								22
 							]
 						}
 					],
 					"sources": [
 						{
 							"fileName": "lib/constants.ts",
-							"line": 30,
+							"line": 34,
 							"character": 22
 						}
 					]
 				},
 				{
-					"id": 22,
+					"id": 26,
 					"name": "DEFAULT_TIMEOUT",
 					"kind": 32,
 					"kindString": "Variable",
@@ -4423,7 +4424,7 @@
 					"sources": [
 						{
 							"fileName": "lib/constants.ts",
-							"line": 3,
+							"line": 7,
 							"character": 28
 						}
 					],
@@ -4434,7 +4435,7 @@
 					"defaultValue": "10000"
 				},
 				{
-					"id": 21,
+					"id": 25,
 					"name": "VSN",
 					"kind": 32,
 					"kindString": "Variable",
@@ -4445,7 +4446,7 @@
 					"sources": [
 						{
 							"fileName": "lib/constants.ts",
-							"line": 1,
+							"line": 5,
 							"character": 16
 						}
 					],
@@ -4456,7 +4457,7 @@
 					"defaultValue": "\"1.0.0\""
 				},
 				{
-					"id": 23,
+					"id": 27,
 					"name": "WS_CLOSE_NORMAL",
 					"kind": 32,
 					"kindString": "Variable",
@@ -4467,7 +4468,7 @@
 					"sources": [
 						{
 							"fileName": "lib/constants.ts",
-							"line": 5,
+							"line": 9,
 							"character": 28
 						}
 					],
@@ -4476,6 +4477,59 @@
 						"name": "1000"
 					},
 					"defaultValue": "1000"
+				},
+				{
+					"id": 23,
+					"name": "DEFAULT_HEADERS",
+					"kind": 2097152,
+					"kindString": "Object literal",
+					"flags": {
+						"isExported": true,
+						"isConst": true
+					},
+					"children": [
+						{
+							"id": 24,
+							"name": "X-Client-Info",
+							"kind": 32,
+							"kindString": "Variable",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/constants.ts",
+									"line": 3,
+									"character": 48
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							},
+							"defaultValue": "`realtime-js/${version}`"
+						}
+					],
+					"groups": [
+						{
+							"title": "Variables",
+							"kind": 32,
+							"children": [
+								24
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/constants.ts",
+							"line": 3,
+							"character": 28
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "object"
+					}
 				}
 			],
 			"groups": [
@@ -4483,18 +4537,25 @@
 					"title": "Enumerations",
 					"kind": 4,
 					"children": [
-						13,
-						7,
-						2,
-						19
+						15,
+						9,
+						4,
+						21
 					]
 				},
 				{
 					"title": "Variables",
 					"kind": 32,
 					"children": [
-						22,
-						21,
+						26,
+						25,
+						27
+					]
+				},
+				{
+					"title": "Object literals",
+					"kind": 2097152,
+					"children": [
 						23
 					]
 				}
@@ -4508,7 +4569,7 @@
 			]
 		},
 		{
-			"id": 38,
+			"id": 42,
 			"name": "\"lib/push\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -4518,7 +4579,7 @@
 			"originalName": "/home/runner/work/realtime-js/realtime-js/src/lib/push.ts",
 			"children": [
 				{
-					"id": 39,
+					"id": 43,
 					"name": "Push",
 					"kind": 128,
 					"kindString": "Class",
@@ -4527,7 +4588,7 @@
 					},
 					"children": [
 						{
-							"id": 52,
+							"id": 56,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -4539,7 +4600,7 @@
 							},
 							"signatures": [
 								{
-									"id": 57,
+									"id": 61,
 									"name": "new Push",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -4551,7 +4612,7 @@
 									},
 									"parameters": [
 										{
-											"id": 58,
+											"id": 62,
 											"name": "channel",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4563,12 +4624,12 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 93,
+												"id": 97,
 												"name": "RealtimeSubscription"
 											}
 										},
 										{
-											"id": 59,
+											"id": 63,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4584,7 +4645,7 @@
 											}
 										},
 										{
-											"id": 60,
+											"id": 64,
 											"name": "payload",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4601,7 +4662,7 @@
 											"defaultValue": "{}"
 										},
 										{
-											"id": 61,
+											"id": 65,
 											"name": "timeout",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4620,7 +4681,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 39,
+										"id": 43,
 										"name": "Push"
 									}
 								}
@@ -4634,7 +4695,7 @@
 							]
 						},
 						{
-							"id": 53,
+							"id": 57,
 							"name": "channel",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4655,12 +4716,12 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 93,
+								"id": 97,
 								"name": "RealtimeSubscription"
 							}
 						},
 						{
-							"id": 54,
+							"id": 58,
 							"name": "event",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4685,7 +4746,7 @@
 							}
 						},
 						{
-							"id": 55,
+							"id": 59,
 							"name": "payload",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4710,7 +4771,7 @@
 							}
 						},
 						{
-							"id": 47,
+							"id": 51,
 							"name": "recHooks",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4729,7 +4790,7 @@
 								"elementType": {
 									"type": "reflection",
 									"declaration": {
-										"id": 48,
+										"id": 52,
 										"name": "__type",
 										"kind": 65536,
 										"kindString": "Type literal",
@@ -4738,7 +4799,7 @@
 										},
 										"children": [
 											{
-												"id": 50,
+												"id": 54,
 												"name": "callback",
 												"kind": 32,
 												"kindString": "Variable",
@@ -4758,7 +4819,7 @@
 												}
 											},
 											{
-												"id": 49,
+												"id": 53,
 												"name": "status",
 												"kind": 32,
 												"kindString": "Variable",
@@ -4783,8 +4844,8 @@
 												"title": "Variables",
 												"kind": 32,
 												"children": [
-													50,
-													49
+													54,
+													53
 												]
 											}
 										],
@@ -4801,7 +4862,7 @@
 							"defaultValue": "[]"
 						},
 						{
-							"id": 43,
+							"id": 47,
 							"name": "receivedResp",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4821,7 +4882,7 @@
 									{
 										"type": "reflection",
 										"declaration": {
-											"id": 44,
+											"id": 48,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -4830,7 +4891,7 @@
 											},
 											"children": [
 												{
-													"id": 46,
+													"id": 50,
 													"name": "response",
 													"kind": 32,
 													"kindString": "Variable",
@@ -4850,7 +4911,7 @@
 													}
 												},
 												{
-													"id": 45,
+													"id": 49,
 													"name": "status",
 													"kind": 32,
 													"kindString": "Variable",
@@ -4875,8 +4936,8 @@
 													"title": "Variables",
 													"kind": 32,
 													"children": [
-														46,
-														45
+														50,
+														49
 													]
 												}
 											],
@@ -4898,7 +4959,7 @@
 							"defaultValue": "null"
 						},
 						{
-							"id": 42,
+							"id": 46,
 							"name": "ref",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4919,7 +4980,7 @@
 							"defaultValue": "\"\""
 						},
 						{
-							"id": 51,
+							"id": 55,
 							"name": "refEvent",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4949,7 +5010,7 @@
 							"defaultValue": "null"
 						},
 						{
-							"id": 40,
+							"id": 44,
 							"name": "sent",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4970,7 +5031,7 @@
 							"defaultValue": "false"
 						},
 						{
-							"id": 56,
+							"id": 60,
 							"name": "timeout",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4995,7 +5056,7 @@
 							}
 						},
 						{
-							"id": 41,
+							"id": 45,
 							"name": "timeoutTimer",
 							"kind": 1024,
 							"kindString": "Property",
@@ -5025,7 +5086,7 @@
 							"defaultValue": "undefined"
 						},
 						{
-							"id": 79,
+							"id": 83,
 							"name": "_cancelRefEvent",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5035,7 +5096,7 @@
 							},
 							"signatures": [
 								{
-									"id": 80,
+									"id": 84,
 									"name": "_cancelRefEvent",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5057,7 +5118,7 @@
 							]
 						},
 						{
-							"id": 81,
+							"id": 85,
 							"name": "_cancelTimeout",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5067,7 +5128,7 @@
 							},
 							"signatures": [
 								{
-									"id": 82,
+									"id": 86,
 									"name": "_cancelTimeout",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5089,7 +5150,7 @@
 							]
 						},
 						{
-							"id": 89,
+							"id": 93,
 							"name": "_hasReceived",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5099,7 +5160,7 @@
 							},
 							"signatures": [
 								{
-									"id": 90,
+									"id": 94,
 									"name": "_hasReceived",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5108,7 +5169,7 @@
 									},
 									"parameters": [
 										{
-											"id": 91,
+											"id": 95,
 											"name": "status",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5149,7 +5210,7 @@
 							]
 						},
 						{
-							"id": 83,
+							"id": 87,
 							"name": "_matchReceive",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5159,7 +5220,7 @@
 							},
 							"signatures": [
 								{
-									"id": 84,
+									"id": 88,
 									"name": "_matchReceive",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5168,7 +5229,7 @@
 									},
 									"parameters": [
 										{
-											"id": 85,
+											"id": 89,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5179,7 +5240,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 86,
+													"id": 90,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -5188,7 +5249,7 @@
 													},
 													"children": [
 														{
-															"id": 88,
+															"id": 92,
 															"name": "response",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5208,7 +5269,7 @@
 															}
 														},
 														{
-															"id": 87,
+															"id": 91,
 															"name": "status",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5233,8 +5294,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																88,
-																87
+																92,
+																91
 															]
 														}
 													],
@@ -5264,7 +5325,7 @@
 							]
 						},
 						{
-							"id": 77,
+							"id": 81,
 							"name": "destroy",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5273,7 +5334,7 @@
 							},
 							"signatures": [
 								{
-									"id": 78,
+									"id": 82,
 									"name": "destroy",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5295,7 +5356,7 @@
 							]
 						},
 						{
-							"id": 67,
+							"id": 71,
 							"name": "receive",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5304,7 +5365,7 @@
 							},
 							"signatures": [
 								{
-									"id": 68,
+									"id": 72,
 									"name": "receive",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5313,7 +5374,7 @@
 									},
 									"parameters": [
 										{
-											"id": 69,
+											"id": 73,
 											"name": "status",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5326,7 +5387,7 @@
 											}
 										},
 										{
-											"id": 70,
+											"id": 74,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5354,7 +5415,7 @@
 							]
 						},
 						{
-							"id": 62,
+							"id": 66,
 							"name": "resend",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5363,7 +5424,7 @@
 							},
 							"signatures": [
 								{
-									"id": 63,
+									"id": 67,
 									"name": "resend",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5372,7 +5433,7 @@
 									},
 									"parameters": [
 										{
-											"id": 64,
+											"id": 68,
 											"name": "timeout",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5400,7 +5461,7 @@
 							]
 						},
 						{
-							"id": 65,
+							"id": 69,
 							"name": "send",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5409,7 +5470,7 @@
 							},
 							"signatures": [
 								{
-									"id": 66,
+									"id": 70,
 									"name": "send",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5431,7 +5492,7 @@
 							]
 						},
 						{
-							"id": 71,
+							"id": 75,
 							"name": "startTimeout",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5440,7 +5501,7 @@
 							},
 							"signatures": [
 								{
-									"id": 72,
+									"id": 76,
 									"name": "startTimeout",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5462,7 +5523,7 @@
 							]
 						},
 						{
-							"id": 73,
+							"id": 77,
 							"name": "trigger",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5471,7 +5532,7 @@
 							},
 							"signatures": [
 								{
-									"id": 74,
+									"id": 78,
 									"name": "trigger",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5480,7 +5541,7 @@
 									},
 									"parameters": [
 										{
-											"id": 75,
+											"id": 79,
 											"name": "status",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5493,7 +5554,7 @@
 											}
 										},
 										{
-											"id": 76,
+											"id": 80,
 											"name": "response",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5526,39 +5587,39 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								52
+								56
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								53,
-								54,
-								55,
-								47,
-								43,
-								42,
+								57,
+								58,
+								59,
 								51,
-								40,
-								56,
-								41
+								47,
+								46,
+								55,
+								44,
+								60,
+								45
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								79,
-								81,
-								89,
 								83,
-								77,
-								67,
-								62,
-								65,
+								85,
+								93,
+								87,
+								81,
 								71,
-								73
+								66,
+								69,
+								75,
+								77
 							]
 						}
 					],
@@ -5576,7 +5637,7 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						39
+						43
 					]
 				}
 			],
@@ -5589,7 +5650,7 @@
 			]
 		},
 		{
-			"id": 171,
+			"id": 175,
 			"name": "\"lib/serializer\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -5599,7 +5660,7 @@
 			"originalName": "/home/runner/work/realtime-js/realtime-js/src/lib/serializer.ts",
 			"children": [
 				{
-					"id": 172,
+					"id": 176,
 					"name": "Serializer",
 					"kind": 128,
 					"kindString": "Class",
@@ -5608,7 +5669,7 @@
 					},
 					"children": [
 						{
-							"id": 173,
+							"id": 177,
 							"name": "HEADER_LENGTH",
 							"kind": 1024,
 							"kindString": "Property",
@@ -5629,7 +5690,7 @@
 							"defaultValue": "1"
 						},
 						{
-							"id": 178,
+							"id": 182,
 							"name": "_binaryDecode",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5639,7 +5700,7 @@
 							},
 							"signatures": [
 								{
-									"id": 179,
+									"id": 183,
 									"name": "_binaryDecode",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5648,7 +5709,7 @@
 									},
 									"parameters": [
 										{
-											"id": 180,
+											"id": 184,
 											"name": "buffer",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5664,7 +5725,7 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 181,
+											"id": 185,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -5673,7 +5734,7 @@
 											},
 											"children": [
 												{
-													"id": 184,
+													"id": 188,
 													"name": "event",
 													"kind": 32,
 													"kindString": "Variable",
@@ -5693,7 +5754,7 @@
 													}
 												},
 												{
-													"id": 185,
+													"id": 189,
 													"name": "payload",
 													"kind": 32,
 													"kindString": "Variable",
@@ -5713,7 +5774,7 @@
 													}
 												},
 												{
-													"id": 182,
+													"id": 186,
 													"name": "ref",
 													"kind": 32,
 													"kindString": "Variable",
@@ -5733,7 +5794,7 @@
 													}
 												},
 												{
-													"id": 183,
+													"id": 187,
 													"name": "topic",
 													"kind": 32,
 													"kindString": "Variable",
@@ -5758,10 +5819,10 @@
 													"title": "Variables",
 													"kind": 32,
 													"children": [
-														184,
-														185,
-														182,
-														183
+														188,
+														189,
+														186,
+														187
 													]
 												}
 											]
@@ -5778,7 +5839,7 @@
 							]
 						},
 						{
-							"id": 186,
+							"id": 190,
 							"name": "_decodeBroadcast",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5788,7 +5849,7 @@
 							},
 							"signatures": [
 								{
-									"id": 187,
+									"id": 191,
 									"name": "_decodeBroadcast",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5797,7 +5858,7 @@
 									},
 									"parameters": [
 										{
-											"id": 188,
+											"id": 192,
 											"name": "buffer",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5810,7 +5871,7 @@
 											}
 										},
 										{
-											"id": 189,
+											"id": 193,
 											"name": "view",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5823,7 +5884,7 @@
 											}
 										},
 										{
-											"id": 190,
+											"id": 194,
 											"name": "decoder",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5839,7 +5900,7 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 191,
+											"id": 195,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -5848,7 +5909,7 @@
 											},
 											"children": [
 												{
-													"id": 194,
+													"id": 198,
 													"name": "event",
 													"kind": 32,
 													"kindString": "Variable",
@@ -5868,7 +5929,7 @@
 													}
 												},
 												{
-													"id": 195,
+													"id": 199,
 													"name": "payload",
 													"kind": 32,
 													"kindString": "Variable",
@@ -5888,7 +5949,7 @@
 													}
 												},
 												{
-													"id": 192,
+													"id": 196,
 													"name": "ref",
 													"kind": 32,
 													"kindString": "Variable",
@@ -5908,7 +5969,7 @@
 													}
 												},
 												{
-													"id": 193,
+													"id": 197,
 													"name": "topic",
 													"kind": 32,
 													"kindString": "Variable",
@@ -5933,10 +5994,10 @@
 													"title": "Variables",
 													"kind": 32,
 													"children": [
-														194,
-														195,
-														192,
-														193
+														198,
+														199,
+														196,
+														197
 													]
 												}
 											],
@@ -5960,7 +6021,7 @@
 							]
 						},
 						{
-							"id": 174,
+							"id": 178,
 							"name": "decode",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5969,7 +6030,7 @@
 							},
 							"signatures": [
 								{
-									"id": 175,
+									"id": 179,
 									"name": "decode",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5978,7 +6039,7 @@
 									},
 									"parameters": [
 										{
-											"id": 176,
+											"id": 180,
 											"name": "rawPayload",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6000,7 +6061,7 @@
 											}
 										},
 										{
-											"id": 177,
+											"id": 181,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6033,16 +6094,16 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								173
+								177
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								178,
-								186,
-								174
+								182,
+								190,
+								178
 							]
 						}
 					],
@@ -6060,7 +6121,7 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						172
+						176
 					]
 				}
 			],
@@ -6073,7 +6134,7 @@
 			]
 		},
 		{
-			"id": 24,
+			"id": 28,
 			"name": "\"lib/timer\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -6083,7 +6144,7 @@
 			"originalName": "/home/runner/work/realtime-js/realtime-js/src/lib/timer.ts",
 			"children": [
 				{
-					"id": 25,
+					"id": 29,
 					"name": "Timer",
 					"kind": 128,
 					"kindString": "Class",
@@ -6101,7 +6162,7 @@
 					},
 					"children": [
 						{
-							"id": 28,
+							"id": 32,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -6110,7 +6171,7 @@
 							},
 							"signatures": [
 								{
-									"id": 31,
+									"id": 35,
 									"name": "new Timer",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -6119,7 +6180,7 @@
 									},
 									"parameters": [
 										{
-											"id": 32,
+											"id": 36,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6132,7 +6193,7 @@
 											}
 										},
 										{
-											"id": 33,
+											"id": 37,
 											"name": "timerCalc",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6147,7 +6208,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 25,
+										"id": 29,
 										"name": "Timer"
 									}
 								}
@@ -6161,7 +6222,7 @@
 							]
 						},
 						{
-							"id": 29,
+							"id": 33,
 							"name": "callback",
 							"kind": 1024,
 							"kindString": "Property",
@@ -6183,7 +6244,7 @@
 							}
 						},
 						{
-							"id": 26,
+							"id": 30,
 							"name": "timer",
 							"kind": 1024,
 							"kindString": "Property",
@@ -6213,7 +6274,7 @@
 							"defaultValue": "undefined"
 						},
 						{
-							"id": 30,
+							"id": 34,
 							"name": "timerCalc",
 							"kind": 1024,
 							"kindString": "Property",
@@ -6235,7 +6296,7 @@
 							}
 						},
 						{
-							"id": 27,
+							"id": 31,
 							"name": "tries",
 							"kind": 1024,
 							"kindString": "Property",
@@ -6256,7 +6317,7 @@
 							"defaultValue": "0"
 						},
 						{
-							"id": 34,
+							"id": 38,
 							"name": "reset",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6265,7 +6326,7 @@
 							},
 							"signatures": [
 								{
-									"id": 35,
+									"id": 39,
 									"name": "reset",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6287,7 +6348,7 @@
 							]
 						},
 						{
-							"id": 36,
+							"id": 40,
 							"name": "scheduleTimeout",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6296,7 +6357,7 @@
 							},
 							"signatures": [
 								{
-									"id": 37,
+									"id": 41,
 									"name": "scheduleTimeout",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6323,25 +6384,25 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								28
+								32
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								29,
-								26,
+								33,
 								30,
-								27
+								34,
+								31
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								34,
-								36
+								38,
+								40
 							]
 						}
 					],
@@ -6359,7 +6420,7 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						25
+						29
 					]
 				}
 			],
@@ -6372,7 +6433,7 @@
 			]
 		},
 		{
-			"id": 329,
+			"id": 333,
 			"name": "\"lib/transformers\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -6382,7 +6443,7 @@
 			"originalName": "/home/runner/work/realtime-js/realtime-js/src/lib/transformers.ts",
 			"children": [
 				{
-					"id": 330,
+					"id": 334,
 					"name": "PostgresTypes",
 					"kind": 4,
 					"kindString": "Enumeration",
@@ -6394,7 +6455,7 @@
 					},
 					"children": [
 						{
-							"id": 331,
+							"id": 335,
 							"name": "abstime",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6411,7 +6472,7 @@
 							"defaultValue": "\"abstime\""
 						},
 						{
-							"id": 332,
+							"id": 336,
 							"name": "bool",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6428,7 +6489,7 @@
 							"defaultValue": "\"bool\""
 						},
 						{
-							"id": 333,
+							"id": 337,
 							"name": "date",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6445,7 +6506,7 @@
 							"defaultValue": "\"date\""
 						},
 						{
-							"id": 334,
+							"id": 338,
 							"name": "daterange",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6462,7 +6523,7 @@
 							"defaultValue": "\"daterange\""
 						},
 						{
-							"id": 335,
+							"id": 339,
 							"name": "float4",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6479,7 +6540,7 @@
 							"defaultValue": "\"float4\""
 						},
 						{
-							"id": 336,
+							"id": 340,
 							"name": "float8",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6496,7 +6557,7 @@
 							"defaultValue": "\"float8\""
 						},
 						{
-							"id": 337,
+							"id": 341,
 							"name": "int2",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6513,7 +6574,7 @@
 							"defaultValue": "\"int2\""
 						},
 						{
-							"id": 338,
+							"id": 342,
 							"name": "int4",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6530,7 +6591,7 @@
 							"defaultValue": "\"int4\""
 						},
 						{
-							"id": 339,
+							"id": 343,
 							"name": "int4range",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6547,7 +6608,7 @@
 							"defaultValue": "\"int4range\""
 						},
 						{
-							"id": 340,
+							"id": 344,
 							"name": "int8",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6564,7 +6625,7 @@
 							"defaultValue": "\"int8\""
 						},
 						{
-							"id": 341,
+							"id": 345,
 							"name": "int8range",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6581,7 +6642,7 @@
 							"defaultValue": "\"int8range\""
 						},
 						{
-							"id": 342,
+							"id": 346,
 							"name": "json",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6598,7 +6659,7 @@
 							"defaultValue": "\"json\""
 						},
 						{
-							"id": 343,
+							"id": 347,
 							"name": "jsonb",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6615,7 +6676,7 @@
 							"defaultValue": "\"jsonb\""
 						},
 						{
-							"id": 344,
+							"id": 348,
 							"name": "money",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6632,7 +6693,7 @@
 							"defaultValue": "\"money\""
 						},
 						{
-							"id": 345,
+							"id": 349,
 							"name": "numeric",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6649,7 +6710,7 @@
 							"defaultValue": "\"numeric\""
 						},
 						{
-							"id": 346,
+							"id": 350,
 							"name": "oid",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6666,7 +6727,7 @@
 							"defaultValue": "\"oid\""
 						},
 						{
-							"id": 347,
+							"id": 351,
 							"name": "reltime",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6683,7 +6744,7 @@
 							"defaultValue": "\"reltime\""
 						},
 						{
-							"id": 348,
+							"id": 352,
 							"name": "time",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6700,7 +6761,7 @@
 							"defaultValue": "\"time\""
 						},
 						{
-							"id": 349,
+							"id": 353,
 							"name": "timestamp",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6717,7 +6778,7 @@
 							"defaultValue": "\"timestamp\""
 						},
 						{
-							"id": 350,
+							"id": 354,
 							"name": "timestamptz",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6734,7 +6795,7 @@
 							"defaultValue": "\"timestamptz\""
 						},
 						{
-							"id": 351,
+							"id": 355,
 							"name": "timetz",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6751,7 +6812,7 @@
 							"defaultValue": "\"timetz\""
 						},
 						{
-							"id": 352,
+							"id": 356,
 							"name": "tsrange",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6768,7 +6829,7 @@
 							"defaultValue": "\"tsrange\""
 						},
 						{
-							"id": 353,
+							"id": 357,
 							"name": "tstzrange",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6790,10 +6851,6 @@
 							"title": "Enumeration members",
 							"kind": 16,
 							"children": [
-								331,
-								332,
-								333,
-								334,
 								335,
 								336,
 								337,
@@ -6812,7 +6869,11 @@
 								350,
 								351,
 								352,
-								353
+								353,
+								354,
+								355,
+								356,
+								357
 							]
 						}
 					],
@@ -6825,7 +6886,7 @@
 					]
 				},
 				{
-					"id": 354,
+					"id": 358,
 					"name": "Column",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -6840,14 +6901,14 @@
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 355,
+							"id": 359,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 356,
+									"id": 360,
 									"name": "flags",
 									"kind": 32,
 									"kindString": "Variable",
@@ -6868,7 +6929,7 @@
 									}
 								},
 								{
-									"id": 357,
+									"id": 361,
 									"name": "name",
 									"kind": 32,
 									"kindString": "Variable",
@@ -6886,7 +6947,7 @@
 									}
 								},
 								{
-									"id": 358,
+									"id": 362,
 									"name": "type",
 									"kind": 32,
 									"kindString": "Variable",
@@ -6904,7 +6965,7 @@
 									}
 								},
 								{
-									"id": 359,
+									"id": 363,
 									"name": "type_modifier",
 									"kind": 32,
 									"kindString": "Variable",
@@ -6927,10 +6988,10 @@
 									"title": "Variables",
 									"kind": 32,
 									"children": [
-										356,
-										357,
-										358,
-										359
+										360,
+										361,
+										362,
+										363
 									]
 								}
 							],
@@ -6945,7 +7006,7 @@
 					}
 				},
 				{
-					"id": 360,
+					"id": 364,
 					"name": "Records",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -6960,21 +7021,21 @@
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 361,
+							"id": 365,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"indexSignature": [
 								{
-									"id": 362,
+									"id": 366,
 									"name": "__index",
 									"kind": 8192,
 									"kindString": "Index signature",
 									"flags": {},
 									"parameters": [
 										{
-											"id": 363,
+											"id": 367,
 											"name": "key",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7002,7 +7063,7 @@
 					}
 				},
 				{
-					"id": 380,
+					"id": 384,
 					"name": "convertCell",
 					"kind": 64,
 					"kindString": "Function",
@@ -7029,7 +7090,7 @@
 					},
 					"signatures": [
 						{
-							"id": 381,
+							"id": 385,
 							"name": "convertCell",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7055,7 +7116,7 @@
 							},
 							"parameters": [
 								{
-									"id": 382,
+									"id": 386,
 									"name": "type",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7071,7 +7132,7 @@
 									}
 								},
 								{
-									"id": 383,
+									"id": 387,
 									"name": "stringValue",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7102,7 +7163,7 @@
 					]
 				},
 				{
-					"id": 364,
+					"id": 368,
 					"name": "convertChangeData",
 					"kind": 64,
 					"kindString": "Function",
@@ -7121,7 +7182,7 @@
 					},
 					"signatures": [
 						{
-							"id": 365,
+							"id": 369,
 							"name": "convertChangeData",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7139,7 +7200,7 @@
 							},
 							"parameters": [
 								{
-									"id": 366,
+									"id": 370,
 									"name": "columns",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7150,13 +7211,13 @@
 										"type": "array",
 										"elementType": {
 											"type": "reference",
-											"id": 354,
+											"id": 358,
 											"name": "Column"
 										}
 									}
 								},
 								{
-									"id": 367,
+									"id": 371,
 									"name": "records",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7166,12 +7227,12 @@
 									"comment": {},
 									"type": {
 										"type": "reference",
-										"id": 360,
+										"id": 364,
 										"name": "Records"
 									}
 								},
 								{
-									"id": 368,
+									"id": 372,
 									"name": "options",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7184,7 +7245,7 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 369,
+											"id": 373,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -7193,7 +7254,7 @@
 											},
 											"children": [
 												{
-													"id": 370,
+													"id": 374,
 													"name": "skipTypes",
 													"kind": 32,
 													"kindString": "Variable",
@@ -7222,7 +7283,7 @@
 													"title": "Variables",
 													"kind": 32,
 													"children": [
-														370
+														374
 													]
 												}
 											],
@@ -7241,7 +7302,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 371,
+									"id": 375,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -7250,7 +7311,7 @@
 									},
 									"indexSignature": [
 										{
-											"id": 372,
+											"id": 376,
 											"name": "__index",
 											"kind": 8192,
 											"kindString": "Index signature",
@@ -7259,7 +7320,7 @@
 											},
 											"parameters": [
 												{
-													"id": 373,
+													"id": 377,
 													"name": "key",
 													"kind": 32768,
 													"kindString": "Parameter",
@@ -7291,7 +7352,7 @@
 					]
 				},
 				{
-					"id": 374,
+					"id": 378,
 					"name": "convertColumn",
 					"kind": 64,
 					"kindString": "Function",
@@ -7315,7 +7376,7 @@
 					},
 					"signatures": [
 						{
-							"id": 375,
+							"id": 379,
 							"name": "convertColumn",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7338,7 +7399,7 @@
 							},
 							"parameters": [
 								{
-									"id": 376,
+									"id": 380,
 									"name": "columnName",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7354,7 +7415,7 @@
 									}
 								},
 								{
-									"id": 377,
+									"id": 381,
 									"name": "columns",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7365,13 +7426,13 @@
 										"type": "array",
 										"elementType": {
 											"type": "reference",
-											"id": 354,
+											"id": 358,
 											"name": "Column"
 										}
 									}
 								},
 								{
-									"id": 378,
+									"id": 382,
 									"name": "records",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7383,12 +7444,12 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 360,
+										"id": 364,
 										"name": "Records"
 									}
 								},
 								{
-									"id": 379,
+									"id": 383,
 									"name": "skipTypes",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7422,7 +7483,7 @@
 					]
 				},
 				{
-					"id": 384,
+					"id": 388,
 					"name": "noop",
 					"kind": 64,
 					"kindString": "Function",
@@ -7431,14 +7492,14 @@
 					},
 					"signatures": [
 						{
-							"id": 385,
+							"id": 389,
 							"name": "noop",
 							"kind": 4096,
 							"kindString": "Call signature",
 							"flags": {},
 							"parameters": [
 								{
-									"id": 386,
+									"id": 390,
 									"name": "stringValue",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7464,7 +7525,7 @@
 					]
 				},
 				{
-					"id": 408,
+					"id": 412,
 					"name": "toArray",
 					"kind": 64,
 					"kindString": "Function",
@@ -7487,7 +7548,7 @@
 					},
 					"signatures": [
 						{
-							"id": 409,
+							"id": 413,
 							"name": "toArray",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7509,7 +7570,7 @@
 							},
 							"parameters": [
 								{
-									"id": 410,
+									"id": 414,
 									"name": "stringValue",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7522,7 +7583,7 @@
 									}
 								},
 								{
-									"id": 411,
+									"id": 415,
 									"name": "type",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7553,7 +7614,7 @@
 					]
 				},
 				{
-					"id": 387,
+					"id": 391,
 					"name": "toBoolean",
 					"kind": 64,
 					"kindString": "Function",
@@ -7563,7 +7624,7 @@
 					},
 					"signatures": [
 						{
-							"id": 388,
+							"id": 392,
 							"name": "toBoolean",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7572,7 +7633,7 @@
 							},
 							"parameters": [
 								{
-									"id": 389,
+									"id": 393,
 									"name": "stringValue",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7613,7 +7674,7 @@
 					]
 				},
 				{
-					"id": 390,
+					"id": 394,
 					"name": "toDate",
 					"kind": 64,
 					"kindString": "Function",
@@ -7623,7 +7684,7 @@
 					},
 					"signatures": [
 						{
-							"id": 391,
+							"id": 395,
 							"name": "toDate",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7632,7 +7693,7 @@
 							},
 							"parameters": [
 								{
-									"id": 392,
+									"id": 396,
 									"name": "stringValue",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7660,7 +7721,7 @@
 					]
 				},
 				{
-					"id": 393,
+					"id": 397,
 					"name": "toDateRange",
 					"kind": 64,
 					"kindString": "Function",
@@ -7670,7 +7731,7 @@
 					},
 					"signatures": [
 						{
-							"id": 394,
+							"id": 398,
 							"name": "toDateRange",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7679,7 +7740,7 @@
 							},
 							"parameters": [
 								{
-									"id": 395,
+									"id": 399,
 									"name": "stringValue",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7710,7 +7771,7 @@
 					]
 				},
 				{
-					"id": 396,
+					"id": 400,
 					"name": "toFloat",
 					"kind": 64,
 					"kindString": "Function",
@@ -7720,7 +7781,7 @@
 					},
 					"signatures": [
 						{
-							"id": 397,
+							"id": 401,
 							"name": "toFloat",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7729,7 +7790,7 @@
 							},
 							"parameters": [
 								{
-									"id": 398,
+									"id": 402,
 									"name": "stringValue",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7757,7 +7818,7 @@
 					]
 				},
 				{
-					"id": 399,
+					"id": 403,
 					"name": "toInt",
 					"kind": 64,
 					"kindString": "Function",
@@ -7767,7 +7828,7 @@
 					},
 					"signatures": [
 						{
-							"id": 400,
+							"id": 404,
 							"name": "toInt",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7776,7 +7837,7 @@
 							},
 							"parameters": [
 								{
-									"id": 401,
+									"id": 405,
 									"name": "stringValue",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7804,7 +7865,7 @@
 					]
 				},
 				{
-					"id": 402,
+					"id": 406,
 					"name": "toIntRange",
 					"kind": 64,
 					"kindString": "Function",
@@ -7814,7 +7875,7 @@
 					},
 					"signatures": [
 						{
-							"id": 403,
+							"id": 407,
 							"name": "toIntRange",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7823,7 +7884,7 @@
 							},
 							"parameters": [
 								{
-									"id": 404,
+									"id": 408,
 									"name": "stringValue",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7854,7 +7915,7 @@
 					]
 				},
 				{
-					"id": 405,
+					"id": 409,
 					"name": "toJson",
 					"kind": 64,
 					"kindString": "Function",
@@ -7864,7 +7925,7 @@
 					},
 					"signatures": [
 						{
-							"id": 406,
+							"id": 410,
 							"name": "toJson",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7873,7 +7934,7 @@
 							},
 							"parameters": [
 								{
-									"id": 407,
+									"id": 411,
 									"name": "stringValue",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7901,7 +7962,7 @@
 					]
 				},
 				{
-					"id": 412,
+					"id": 416,
 					"name": "toTimestampString",
 					"kind": 64,
 					"kindString": "Function",
@@ -7920,7 +7981,7 @@
 					},
 					"signatures": [
 						{
-							"id": 413,
+							"id": 417,
 							"name": "toTimestampString",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7938,7 +7999,7 @@
 							},
 							"parameters": [
 								{
-									"id": 414,
+									"id": 418,
 									"name": "stringValue",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7971,40 +8032,90 @@
 					"title": "Enumerations",
 					"kind": 4,
 					"children": [
-						330
+						334
 					]
 				},
 				{
 					"title": "Type aliases",
 					"kind": 4194304,
 					"children": [
-						354,
-						360
+						358,
+						364
 					]
 				},
 				{
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						380,
-						364,
-						374,
 						384,
-						408,
-						387,
-						390,
-						393,
-						396,
-						399,
-						402,
-						405,
-						412
+						368,
+						378,
+						388,
+						412,
+						391,
+						394,
+						397,
+						400,
+						403,
+						406,
+						409,
+						416
 					]
 				}
 			],
 			"sources": [
 				{
 					"fileName": "lib/transformers.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 1,
+			"name": "\"lib/version\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/realtime-js/realtime-js/src/lib/version.ts",
+			"children": [
+				{
+					"id": 2,
+					"name": "version",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {
+						"isExported": true,
+						"isConst": true
+					},
+					"sources": [
+						{
+							"fileName": "lib/version.ts",
+							"line": 2,
+							"character": 20
+						}
+					],
+					"type": {
+						"type": "stringLiteral",
+						"value": "0.0.0"
+					},
+					"defaultValue": "\"0.0.0\""
+				}
+			],
+			"groups": [
+				{
+					"title": "Variables",
+					"kind": 32,
+					"children": [
+						2
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "lib/version.ts",
 					"line": 1,
 					"character": 0
 				}
@@ -8016,14 +8127,15 @@
 			"title": "Modules",
 			"kind": 1,
 			"children": [
-				196,
-				92,
-				415,
-				1,
-				38,
-				171,
-				24,
-				329
+				200,
+				96,
+				419,
+				3,
+				42,
+				175,
+				28,
+				333,
+				1
 			]
 		}
 	]
