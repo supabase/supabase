@@ -17,7 +17,6 @@ export default function SettingsLayout({
           { label: 'Database', href: '/settings/database' },
           { label: 'API', href: '/settings/api' },
           { label: 'Auth Settings', href: '/auth/settings' },
-          { label: 'Billing & Usage', href: '/settings/billing' },
         ],
       },
     ]
