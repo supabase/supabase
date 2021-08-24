@@ -14,13 +14,13 @@
   {
     "name": "Local emulator",
     "description": "Develop locally and push to production when you're ready",
-    "badge": "Q1 2021",
-    "url": "https://supabasesubscribe.vercel.app/subscription/localEmulator"
+    "badge": "",
+    "url": "https://supabase.io/docs/guides/self-hosting"
   },
   {
     "name": "Supabase CLI",
     "description": "Manage Supabase projects from your local machine",
-    "badge": "Q2 2021",
-    "url": "https://supabasesubscribe.vercel.app/subscription/commandLine"
+    "badge": "",
+    "url": "https://github.com/supabase/cli"
   }
 ]

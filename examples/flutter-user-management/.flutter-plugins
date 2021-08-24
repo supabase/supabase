@@ -1,0 +1,19 @@
+# This is a generated file; do not edit or check into version control.
+flutter_plugin_android_lifecycle=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_plugin_android_lifecycle-2.0.2/
+flutter_secure_storage=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_secure_storage-4.2.0/
+image_picker=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/image_picker-0.8.2/
+image_picker_for_web=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/image_picker_for_web-2.1.0/
+path_provider_linux=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_linux-2.0.0/
+path_provider_windows=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_windows-2.0.1/
+shared_preferences=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences-2.0.6/
+shared_preferences_linux=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_linux-2.0.0/
+shared_preferences_macos=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_macos-2.0.0/
+shared_preferences_web=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_web-2.0.0/
+shared_preferences_windows=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_windows-2.0.0/
+uni_links=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/uni_links-0.5.1/
+uni_links_web=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/uni_links_web-0.1.0/
+url_launcher=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher-6.0.9/
+url_launcher_linux=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher_linux-2.0.0/
+url_launcher_macos=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher_macos-2.0.0/
+url_launcher_web=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher_web-2.0.1/
+url_launcher_windows=/Users/phamhieu/Documents/sdks/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher_windows-2.0.0/

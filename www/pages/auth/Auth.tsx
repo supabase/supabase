@@ -39,7 +39,7 @@ function AuthPage() {
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNTIxNDE1MywiZXhwIjoxOTMwNzkwMTUzfQ.OQEbAaTfgDdLCCht251P2JRD3QDnui6nsU8N-tZA_Mc'
   )
 
-  const meta_title = 'Auth | Built-in user mangement'
+  const meta_title = 'Auth | Built-in user management'
   const meta_description =
     'Authentication that you can afford that is built in to your supabase project.'
 
@@ -118,20 +118,15 @@ function AuthPage() {
                   </div>
                   <img src={`${basePath}/images/product/auth/gitlab-icon.svg`} width={21} />
                   <img src={`${basePath}/images/product/auth/bitbucket-icon.svg`} width={21} />
+                  <img src={`${basePath}/images/product/auth/twitter-icon.svg`} width={21} />
                 </Space>
               </p>
               <Typography.Title level={4}>All the social providers</Typography.Title>
               <Typography.Text>
-                <p className="text-base lg:text-lg">
-                  Enable social logins with the click of a button. Google, Facebook, Github, Azure,
-                  Gitlab and Bitbucket.
+                <p className="text-base">
+                  Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
+                  Gitlab, Twitter, Discord, and Bitbucket.
                 </p>
-                <Space>
-                  <img src={`${basePath}/images/product/auth/twitter-icon.svg`} width={21} />
-                  <p className="m-0">
-                    <span className="text-gray-800 dark:text-white">Twitter</span> coming soon
-                  </p>
-                </Space>
               </Typography.Text>
             </div>
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
@@ -142,10 +137,10 @@ function AuthPage() {
               </Typography.Text>
               <Typography.Title level={4}>Fully integrated</Typography.Title>
               <Typography.Text>
-                <p className="text-base lg:text-lg">
-                  Incredibly simple Auth, without a single external authentication service.
+                <p className="text-base">
+                  Incredibly simple Auth, without a single external authentication service. Built-in
+                  Authentication, Authorization, and User Management.
                 </p>
-                <p>Built-in Authentication, Authorization, and User Management.</p>
               </Typography.Text>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
@@ -156,11 +151,10 @@ function AuthPage() {
               </Typography.Text>
               <Typography.Title level={4}>Own your data</Typography.Title>
               <Typography.Text>
-                <p className="text-base lg:text-lg">
+                <p className="text-base">
                   User data stored in your Supabase database so you never have to worry about 3rd
-                  party privacy issues.
+                  party privacy issues. Host your data in 8 different locations.
                 </p>
-                <p>Host your data in 8 different regions.</p>
               </Typography.Text>
             </div>
           </div>

@@ -6,51 +6,19 @@ import maintainers from '../data/maintainers.json'
 import GithubCard from '../components/GithubCard'
 import { repos } from '../data/github'
 
+import Sponsors from '../components/Sponsors'
+
 export default function Oss() {
   const [activePill, setActivePill] = React.useState('All')
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
-
-  
 
   const maintainerTags = maintainers
     .reduce((acc, x) => acc.concat(x.tags), []) // get all tags
     .filter((v, i, a) => a.indexOf(v) === i) // remove duplicates
     .sort((a, b) => a.localeCompare(b)) // alphabetical
   const maintainerPills = ['All'].concat(maintainerTags)
-  const tiers = [
-    {
-      tier_name: '$5,000 a month',
-      heading: 'Enterprise: $5,000 per month',
-      transactions: sponsors.filter((x) => (x.tier == '$5,000 a month')),
-    },
-    {
-      tier_name: '$2,500 a month',
-      heading: 'Agency: $2,500 per month',
-      transactions: sponsors.filter((x) => (x.tier == '$2,500 a month')),
-    },
-    {
-      tier_name: '$1,000 a month',
-      heading: 'Startup: $1,000 per month',
-      transactions: sponsors.filter((x) => (x.tier == '$1,000 a month')),
-    },
-    {
-      tier_name: '$49 a month',
-      heading: 'Evangelist: $49 per month',
-      transactions: sponsors.filter((x) => (x.tier == '$49 a month')),
-    },
-    {
-      tier_name: '$19 a month',
-      heading: 'Supporter: $19 per month',
-      transactions: sponsors.filter((x) => (x.tier == '$19 a month')),
-    },
-    {
-      tier_name: '$5 a month',
-      heading: 'Contributor: $5 per month',
-      transactions: sponsors.filter((x) => (x.tier == '$5 a month')),
-    },
-  ]
-
+  
   return (
     <Layout title={`${siteConfig.title}`} description={siteConfig.tagline}>
       <section className={'section-lg'}>
@@ -71,30 +39,7 @@ export default function Oss() {
       <section className={'section-lg'}>
         <div className="container">
           <h2 className="with-underline">Sponsors</h2>
-          {tiers.map(
-            (t) =>
-              !!t.transactions.length && (
-                <>
-                  <h4 className="">{t.heading}</h4>
-                  <div className="row is-multiline">
-                    {t.transactions.map((x) => (
-                      <div className="col col--3" key={x.sponsor}>
-                        <a className="avatar" href={`https://github.com/${x.sponsor}`}>
-                          <img
-                            className="avatar__photo avatar__photo--sm"
-                            src={`https://github.com/${x.sponsor}.png`}
-                          />
-                          <div className="avatar__intro">
-                            <h5 className="avatar__name">{x.sponsor}</h5>
-                          </div>
-                        </a>
-                      </div>
-                    ))}
-                  </div>
-                  <br />
-                </>
-              )
-          )}
+          <Sponsors />
         </div>
       </section>
 
@@ -162,39 +107,4 @@ export default function Oss() {
       </section>
     </Layout>
   )
-}
-
-function ContributorCard({ title, description, href, stars, handle }) {
-  return (
-    <a className={'card'} href={href} style={{ height: '100%' }}>
-      <div className="card__body">
-        <h4 style={styles.h4} style={{ margin: 0 }}>
-          {title.toUpperCase()}
-        </h4>
-        <small>{description}</small>
-      </div>
-      <hr style={styles.hr} />
-      <div style={styles.cardBase}>
-        <div>@{handle}</div>
-        <div>{stars} ★</div>
-      </div>
-    </a>
-  )
-}
-
-const styles = {
-  hr: {
-    margin: '15px 0 10px 0',
-  },
-  h3: {
-    margin: 0,
-    textTransform: 'capitalize',
-  },
-  cardBase: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: '0 15px 10px 15px',
-    fontSize: '0.8em',
-  },
 }

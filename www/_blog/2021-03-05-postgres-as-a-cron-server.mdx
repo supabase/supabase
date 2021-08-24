@@ -53,6 +53,16 @@ If you're using Supabase you can also enable it in the Dashboard.
 
 ![This image shows that pg_cron is enabled in the Supabase Dashboard](/new/images/blog/supabase-extensions.png)
 
+#### Granting access to the extension
+
+If you're planning to use a `non-superuser` role to schedule jobs, ensure that they are granted access to the `cron` schema and its underlying objects beforehand.
+```sql
+grant usage on schema cron to {{DB user}};
+grant all privileges on all tables in schema cron to {{DB user}};
+```
+
+Failure to do so would result in jobs by these roles to not run at all.
+
 ### Postgres + webhooks
 
 The Supabase customer wanted to call external endpoints every day. How would we do this? Another extension of course. This time we're going to use [pgsql-http](https://github.com/pramsey/pgsql-http) by [@pramsey](https://github.com/pramsey). Using the same technique, we can enable the extension (if it exists in your cloud provider).

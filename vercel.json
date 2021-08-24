@@ -215,7 +215,14 @@
     { "source": "/docs/client/wfts", "destination": "/docs/reference/javascript/textSearch" },
     { "source": "/blog/page/:number", "destination": "/blog" },
     { "source": "/blog/tags", "destination": "/blog" },
-    { "source": "/docs/pricing", "destination": "/pricing" }
+    { "source": "/docs/pricing", "destination": "/pricing" },
+
+    { "source": "/docs/careers", "destination": "https://about.supabase.com/careers" },
+    { "source": "/docs/careers/:match*", "destination": "https://about.supabase.com/careers//:match*" },
+
+    { "source": "/docs/resources", "destination": "/docs/guides" }
+
+
   ],
   "trailingSlash": false
 }

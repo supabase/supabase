@@ -25,11 +25,12 @@ For full documentation, visit [supabase.io/docs](https://supabase.io/docs)
 - [Community Forum](https://github.com/supabase/supabase/discussions). Best for: help with building, discussion about database best practices.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Best for: bugs and errors you encounter using Supabase.
 - [Email Support](https://supabase.io/docs/support#business-support). Best for: problems with your database or infrastructure.
+- [Discord](https://discord.supabase.com). Best for: sharing you applications and hanging out with the community.
 
 ## Status
 
 - [x] Alpha: We are testing Supabase with a closed set of customers
-- [x] Public Alpha: Anyone can sign up over at [app.supabase.io](https://app.supabase.io). But go easy on us, there are a few kinks.
+- [x] Public Alpha: Anyone can sign up over at [app.supabase.io](https://app.supabase.io). But go easy on us, there are a few kinks
 - [x] Public Beta: Stable enough for most non-enterprise use-cases
 - [ ] Public: Production-ready
 
@@ -45,7 +46,8 @@ Supabase is a combination of open source tools. We’re building the features of
 
 **Current architecture**
 
-Supabase is a [hosted platform](https://app.supabase.io). You can sign up and start using Supabase without installing anything. We are still creating the local development experience - this is now our core focus, along with platform stability.
+Supabase is a [hosted platform](https://app.supabase.io). You can sign up and start using Supabase without installing anything. 
+You can also [self-host](https://supabase.io/docs/guides/self-hosting) and [develop locally](https://supabase.io/docs/guides/local-development).
 
 ![Architecture](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
@@ -79,12 +81,14 @@ Our client library is modular. Each sub-library is a standalone implementation f
 ## Translations
 
 - [Arabic | العربية](/i18n/README.ar.md)
+- [Albanian / Shqip](/i18n/README.sq.md)
 - [Danish / Dansk](/i18n/README.da.md)
 - [Dutch / Nederlands](/i18n/README.nl.md)
 - [English](https://github.com/supabase/supabase)
 - [French / Français](/i18n/README.fr.md)
 - [German / Deutsch](/i18n/README.de.md)
 - [Greek / Ελληνικά](/i18n/README.gr.md)
+- [Hebrew / עברית](/i18n/README.he.md)
 - [Hindi / हिंदी](/i18n/README.hi.md)
 - [Nepali / नेपाली](/i18n/README.ne.md)
 - [Indonesian / Bahasa Indonesia](/i18n/README.id.md)
@@ -98,6 +102,7 @@ Our client library is modular. Each sub-library is a standalone implementation f
 - [Portuguese (Brazilian) / Português Brasileiro](/i18n/README.pt-br.md)
 - [Romanian / Română](/i18n/README.ro.md)
 - [Russian / Pусский](/i18n/README.ru.md)
+- [Sinhala / සිංහල](/i18n/README.si.md)
 - [Spanish / Español](/i18n/README.es.md)
 - [Simplified Chinese / 简体中文](/i18n/README.zh-cn.md)
 - [Swedish / Svenska](/i18n/README.sv.md)
@@ -105,6 +110,7 @@ Our client library is modular. Each sub-library is a standalone implementation f
 - [Traditional Chinese / 繁体中文](/i18n/README.zh-tw.md)
 - [Turkish / Türkçe](/i18n/README.tr.md)
 - [Ukrainian / Українська](/i18n/README.uk.md)
+- [Vietnamese / Tiếng Việt](/i18n/README.vi-vn.md)
 - [List of translations](/i18n/languages.md) <!--- Keep only this -->
 
 ---

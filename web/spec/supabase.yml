@@ -111,13 +111,21 @@ pages:
       Other languages are built by the community and supported by Supabase.
 
       ## JavaScript
-
+      
+      Via NPM
       ```bash
       npm install @supabase/supabase-js
       ```
-
+      
       Find the source code on [GitHub](https://github.com/supabase/supabase-js).  
       
+      Or via CDN
+      ```js
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+      //or
+      <script src="https://unpkg.com/@supabase/supabase-js"></script>
+      ```
+
       ## Python
 
       ```bash
@@ -125,7 +133,6 @@ pages:
       ```
 
       Find the source code on [GitHub](https://github.com/supabase/supabase-py).
-      
 
   Initializing:
     $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.constructor'
@@ -541,7 +548,7 @@ pages:
           ```js
           const { data, error, count } = await supabase
             .from('cities')
-            .select('name', { count: 'exact' }) // if you don't want to return any rows, you can use { count: 'exact', head: true }
+            .select('name', {}, { count: 'exact' }) // if you don't want to return any rows, you can use { count: 'exact', head: true }
           ```
       - name: Querying JSON data
         description: |
@@ -733,16 +740,14 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_city', { name: 'The Shire' })
           ```
-      - name: Bulk call
+      - name: Bulk processing
+        description: You can process large payloads at once using [array parameters](https://postgrest.org/en/stable/api.html#calling-functions-with-array-parameters).
         js: |
           ```js
-          const { data, error } = await supabase
-            .rpc('echo_city', [
-              { name: 'The Shire' },
-              { name: 'Mordor' }
-            ])
+          const { data, error } = await postgrest
+            .rpc('echo_cities', { names: ['The Shire', 'Mordor'] })
           ```
-      - name: With filters.
+      - name: With filters
         description: |
           Stored procedures that return tables can also be combined with 
           [Modifiers](/docs/reference/javascript/using-modifiers) and 
@@ -760,7 +765,7 @@ pages:
         js: |
           ```js
           const { data, error, count } = await supabase
-            .rpc('hello_world', { count: 'exact' })
+            .rpc('hello_world', {}, { count: 'exact' })
           ```
 
   subscribe():
@@ -927,7 +932,7 @@ pages:
           ```js
           const { data, error } = await supabase
             .storage
-            .createBucket('avatars')
+            .createBucket('avatars', { public: false })
           ```
 
   storage.emptyBucket():
@@ -987,6 +992,7 @@ pages:
       - Policy permissions required:
         - `buckets` permissions: none 
         - `objects` permissions: `insert`
+      - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - name: Upload file
         isSpotlight: true
@@ -996,7 +1002,22 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .upload('public/avatar1.png', avatarFile)
+            .upload('public/avatar1.png', avatarFile, {
+              cacheControl: 3600,
+              upsert: false
+            })
+          ```
+      - name: Upload file using `ArrayBuffer` from base64 file data
+        js: |
+          ```js
+          import {decode} from 'base64-arraybuffer'
+
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .upload('public/avatar1.png', decode('base64FileData'), {
+              contentType: 'image/png'
+            })
           ```
 
   storage.from.update():
@@ -1006,6 +1027,7 @@ pages:
       - Policy permissions required:
         - `buckets` permissions: none 
         - `objects` permissions: `update` and `select`
+      - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - name: Update file
         isSpotlight: true
@@ -1015,7 +1037,22 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .update('public/avatar1.png', avatarFile)
+            .update('public/avatar1.png', avatarFile, {
+              cacheControl: 3600,
+              upsert: false
+            })
+          ```
+      - name: Update file using `ArrayBuffer` from base64 file data
+        js: |
+          ```js
+          import {decode} from 'base64-arraybuffer'
+
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .update('public/avatar1.png', decode('base64FileData'), {
+              contentType: 'image/png'
+            })
           ```
 
   storage.from.move():
@@ -1051,7 +1088,7 @@ pages:
           const { signedURL, error } = await supabase
             .storage
             .from('avatars')
-            .createSignedUrl('avatar1.png', 60)
+            .createSignedUrl('folder/avatar1.png', 60)
           ```
 
   storage.from.getPublicUrl():
@@ -1069,7 +1106,7 @@ pages:
           const { publicURL, error } = supabase
             .storage
             .from('public-bucket')
-            .getPublicUrl('avatar1.png')
+            .getPublicUrl('folder/avatar1.png')
           ```
 
   storage.from.download():
@@ -1087,7 +1124,7 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .download('avatar1.png')
+            .download('folder/avatar1.png')
           ```
 
   storage.from.remove():
@@ -1105,7 +1142,7 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .remove(['avatar1.png'])
+            .remove(['folder/avatar1.png'])
           ```
 
   storage.from.list():
@@ -1123,7 +1160,11 @@ pages:
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .list()
+            .list('folder', {
+              limit: 100,
+              offset: 0,
+              sortBy: { column: 'name', order: 'asc' },
+            })
           ```
 
   Using Modifiers:

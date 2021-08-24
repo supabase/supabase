@@ -393,6 +393,27 @@ export default function IndexPage() {
           </div>
         </div>
       </div>
+
+      <div className="bg-gray-50 dark:bg-gray-800 border-t dark:border-gray-600">
+        <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
+          <Typography.Title level={2}>Changelog</Typography.Title>
+
+          <div className="mt-4">
+            <Typography.Title level={4}>28 July 2021</Typography.Title>
+            <Typography className="w-full">
+              <p>
+                Clarified pricing on the "Optimzed database instances" to include the starting price
+                of $50/month.
+              </p>
+            </Typography>
+          </div>
+          <div className="mt-4">
+            <Typography.Title level={4}>29 March 2021</Typography.Title>
+            <Typography>Released our Beta pricing.</Typography>
+          </div>
+        </div>
+      </div>
+
       <CTABanner />
     </DefaultLayout>
   )

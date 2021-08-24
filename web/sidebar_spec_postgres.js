@@ -3,7 +3,7 @@ module.exports = {
     {
       type: 'category',
       label: 'About',
-      items: ['reference/postgres/index'],
+      items: ['reference/postgres/index', 'reference/postgres/connection-strings'],
       collapsed: true,
     },
     {

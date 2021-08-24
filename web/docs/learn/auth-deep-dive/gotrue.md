@@ -18,7 +18,7 @@ Gotrue is an auth API server written in Go by the Netlify team, find the Supabas
 
 When you deploy a new Supabase project, we deploy a new instance of this server alongside your database, and also inject your database with the required `auth` schema.
 
-It makes it super easy to, for example, send magic link emails which your user's can use to login:
+It makes it super easy to, for example, send magic link emails which your users can use to login:
 
 ```bash
 # replace <project-ref> with your own project reference

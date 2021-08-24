@@ -72,6 +72,15 @@ function ExampleCard(props: any) {
                 </a>
               </Link>
             )}
+            {!props.demo_url && (
+              <Link href={props.repo_url} as={props.repo_url}>
+                <a target="_blank">
+                  <Button size="tiny" type="default" iconRight={<IconArrowUpRight />}>
+                    View Code
+                  </Button>
+                </a>
+              </Link>
+            )}
           </Space>
         </div>
       </div>

@@ -25,6 +25,7 @@ Para ver la documentación completa, visita [supabase.io/docs](https://supabase.
 - [Foro de la comunidad](https://github.com/supabase/supabase/discussions). Mejor para: ayuda construyendo, discusiones acerca de las mejores practicas de base de datos.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Mejor para: bugs y errores que te puedes encontrar utilizando Supabase.
 - [Soporte por e-mail](https://supabase.io/docs/support#business-support). Mejor para: problemas con la base de datos o infraestructura.
+- [Discord](https://discord.supabase.com). Mejor para: compartir tus aplicaciones y pasar el rato con la comunidad.
 
 ## Estatus
 

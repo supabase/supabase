@@ -5,38 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const goTrueClient = require('./sidebar_spec_gotrue')
-const postgrestClient = require('./sidebar_spec_postgrest')
-const realtimeClient = require('./sidebar_spec_realtime')
 const supabaseClient = require('./sidebar_spec_supabase')
 const supabaseCli = require('./sidebar_spec_cli')
 const postgres = require('./sidebar_spec_postgres')
 
 module.exports = {
-  goTrueClient: [
-    {
-      type: 'category',
-      label: 'Javascript',
-      collapsed: false,
-      items: goTrueClient.docs,
-    },
-  ],
-  postgrestClient: [
-    {
-      type: 'category',
-      label: 'Javascript',
-      collapsed: false,
-      items: postgrestClient.docs,
-    },
-  ],
-  realtimeClient: [
-    {
-      type: 'category',
-      label: 'Javascript',
-      collapsed: false,
-      items: realtimeClient.docs,
-    },
-  ],
   supabaseClient: [
     {
       type: 'category',
@@ -80,9 +53,18 @@ module.exports = {
     },
     {
       type: 'category',
-      label: 'Guides',
+      label: 'Tutorials',
       collapsed: false,
-      items: ['guides/examples', 'guides/with-nextjs', 'guides/with-react', 'guides/with-svelte', 'guides/with-vue-3' ,'guides/self-hosting'],
+      items: [
+        'guides/examples',
+        'guides/with-angular',
+        'guides/with-flutter',
+        'guides/with-nextjs',
+        'guides/with-react',
+        'guides/with-svelte',
+        'guides/with-vue-3',
+        'guides/self-hosting',
+      ],
     },
     {
       type: 'category',
@@ -90,6 +72,7 @@ module.exports = {
       collapsed: false,
       items: [
         'handbook/contributing',
+        'handbook/supasquad',
         'company/terms',
         'company/privacy',
         'company/aup',
@@ -108,16 +91,34 @@ module.exports = {
       label: 'Database',
       collapsed: false,
       items: [
-        'guides/database/arrays', 
-        'guides/database/json', 
-        'guides/database/password-reset',
-        'guides/database/sql-to-api',
-        // {
-        //   type: 'category',
-        //   label: 'SQL Tutorial',
-        //   collapsed: false,
-        //   items: ['guides/database/arrays'],
-        // },
+        'guides/database/tables',
+        'guides/database/full-text-search',
+        {
+          type: 'category',
+          label: 'Connecting to Postgres',
+          collapsed: true,
+          items: [
+            'guides/database/connecting/connecting-to-postgres',
+            'guides/database/connecting/direct-connections',
+            'guides/database/connecting/connection-pooling',
+          ],
+        },
+        // 'guides/database/arrays',
+        // 'guides/database/json',
+        // 'guides/database/managing-passwords',
+        // 'guides/database/sql-to-api',
+        {
+          type: 'category',
+          label: 'Extensions',
+          collapsed: true,
+          items: [
+            'guides/database/extensions',
+            // 'guides/database/extensions/pgtap',
+            'guides/database/extensions/plv8',
+            'guides/database/extensions/http',
+            'guides/database/extensions/uuid-ossp',
+          ],
+        },
       ],
     },
     {
@@ -125,34 +126,28 @@ module.exports = {
       label: 'Auth',
       collapsed: false,
       items: [
-        'guides/auth/auth-apple', 
-        'guides/auth/auth-bitbucket',
-        'guides/auth/auth-facebook', 
-        'guides/auth/auth-github', 
-        'guides/auth/auth-gitlab',
-        'guides/auth/auth-google', 
-        'guides/auth/auth-twitter',
-      ],
-    },
-    // {
-    //   type: 'category',
-    //   label: 'Storage',
-    //   collapsed: false,
-    //   items: ['guides/storage/storage-sample'],
-    // },
-  ],
-  resources: [
-    { type: 'category', label: 'Resources', items: ['resources'], collapsed: false },
-    // { type: 'category', label: 'Resources', collapsed: false },
-    {
-      type: 'category',
-      label: 'Learn',
-      collapsed: false,
-      items: [
+        'guides/auth/managing-user-data',
         {
           type: 'category',
-          label: 'Auth Deep Dive',
-          collapsed: false,
+          label: 'External Providers',
+          collapsed: true,
+          items: [
+            'guides/auth/auth-apple',
+            'guides/auth/auth-bitbucket',
+            'guides/auth/auth-discord',
+            'guides/auth/auth-facebook',
+            'guides/auth/auth-github',
+            'guides/auth/auth-gitlab',
+            'guides/auth/auth-google',
+            'guides/auth/auth-twitter',
+            'guides/auth/auth-twitch',
+            'guides/auth/auth-twilio',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Deep Dive',
+          collapsed: true,
           items: [
             'learn/auth-deep-dive/auth-deep-dive-jwts',
             'learn/auth-deep-dive/auth-row-level-security',
@@ -163,55 +158,13 @@ module.exports = {
         },
       ],
     },
-    {
-      type: 'category',
-      label: 'Tools',
-      collapsed: false,
-      items: [
-        'gotrue/server/about',
-        'gotrue/client/index',
-        'postgrest/server/about',
-        'postgrest/client/index',
-        'realtime/server/about',
-        'realtime/client/index',
-      ],
-    },
+    // {
+    //   type: 'category',
+    //   label: 'Storage',
+    //   collapsed: false,
+    //   items: ['guides/storage/storage-sample'],
+    // },
   ],
-  // realtimeServer: [
-  //   {
-  //     type: 'category',
-  //     label: 'Realtime',
-  //     collapsed: false,
-  //     items: ['realtime/server/about'],
-  //   },
-  //   {
-  //     type: 'category',
-  //     label: 'Self hosting',
-  //     collapsed: false,
-  //     items: [
-  //       'realtime/server/docker',
-  //       'realtime/server/aws',
-  //       'realtime/server/digitalocean',
-  //       'realtime/server/source',
-  //     ],
-  //   },
-  // ],
-  // realtimeClient: [
-  //   {
-  //     type: 'category',
-  //     label: 'Realtime',
-  //     collapsed: false,
-  //     items: ['realtime/client/about'],
-  //   },
-  // ],
-  // postgrestServer: [
-  //   {
-  //     type: 'category',
-  //     label: 'PostgREST',
-  //     collapsed: false,
-  //     items: ['postgrest/server/about'],
-  //   },
-  // ],
   postgresServer: [
     {
       type: 'category',
