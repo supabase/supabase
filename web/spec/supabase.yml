@@ -40,7 +40,7 @@ info:
           - auth.onAuthStateChange()
           - Reset Password (Email)
           - Delete User
-      - name: 'Data'
+      - name: 'Database'
         items:
           - select()
           - insert()
@@ -48,8 +48,6 @@ info:
           - upsert()
           - delete()
           - rpc()
-      - name: 'Realtime'
-        items:
           - subscribe()
           - removeSubscription()
           - getSubscriptions()

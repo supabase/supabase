@@ -33,27 +33,32 @@ module.exports = {
   docs: [
     {
       type: 'category',
-      label: 'Introduction',
-      items: ['about', 'faq'],
-      collapsed: false,
-    },
-    {
-      type: 'category',
-      label: 'Getting Started',
-      collapsed: false,
+      label: 'Overview',
       items: [
-        'guides/platform',
+        'about',
+        'architecture',
         'guides/database',
         'guides/auth',
         'guides/storage',
         'guides/api',
-        'guides/client-libraries',
-        'guides/local-development',
       ],
+      collapsed: false,
     },
+    // {
+    //   type: 'category',
+    //   label: 'Getting Started',
+    //   collapsed: false,
+    //   items: [
+    //     'guides/database',
+    //     'guides/auth',
+    //     'guides/storage',
+    //     'guides/api',
+    //     'guides/client-libraries',
+    //   ],
+    // },
     {
       type: 'category',
-      label: 'Tutorials',
+      label: 'Getting Started',
       collapsed: false,
       items: [
         'guides/examples',
@@ -63,7 +68,6 @@ module.exports = {
         'guides/with-react',
         'guides/with-svelte',
         'guides/with-vue-3',
-        'guides/self-hosting',
       ],
     },
     {
@@ -71,6 +75,7 @@ module.exports = {
       label: 'See Also',
       collapsed: false,
       items: [
+        'faq',
         'handbook/contributing',
         'handbook/supasquad',
         'company/terms',
@@ -83,7 +88,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Guides',
-      items: ['guides'],
+      items: ['guides', 'guides/platform', 'guides/local-development', 'guides/self-hosting'],
       collapsed: false,
     },
     {
