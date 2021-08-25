@@ -21,13 +21,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Realtime',
-      items: ['reference/dart/subscribe', 'reference/dart/removesubscription', 'reference/dart/getsubscriptions'],
-      collapsed: true,
-    },
-    {
-      type: 'category',
-      label: 'Stream',
-      items: ['reference/dart/stream'],
+      items: ['reference/dart/subscribe', 'reference/dart/removesubscription', 'reference/dart/getsubscriptions', 'reference/dart/stream'],
       collapsed: true,
     },
     {
