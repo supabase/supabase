@@ -87,9 +87,9 @@ module.exports = {
           position: 'left',
         },
         {
-          label: 'FAQs',
-          to: '/docs/faqs',
-          activeBasePath: '/docs/faqs',
+          label: 'Discussions',
+          to: '/discussions',
+          activeBasePath: '/discussions',
           position: 'left',
         },
         { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
@@ -216,16 +216,16 @@ module.exports = {
         /**
          * Required for any multi-instance plugin
          */
-        id: 'faq',
+        id: 'discussions',
         /**
          * URL route for the blog section of your site.
          * *DO NOT* include a trailing slash.
          */
-        routeBasePath: 'faq',
+        routeBasePath: 'discussions',
         /**
          * Path to data on filesystem relative to site dir.
          */
-        path: './faq',
+        path: './discussions',
       },
     ],
     //   // [
