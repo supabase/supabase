@@ -53,7 +53,6 @@ module.exports = {
     //     'guides/auth',
     //     'guides/storage',
     //     'guides/api',
-    //     'guides/client-libraries',
     //   ],
     // },
     {
