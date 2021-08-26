@@ -37,6 +37,18 @@ const query = `
     }
 }
 `
+const postTemplate = ({ title, author, avatarUrl, authorUrl, body }) => `---
+title: ${title}
+author: ${author}
+tags: [Question]
+author_image_url: ${avatarUrl}
+author_url: ${authorUrl}
+-- image: https://i.imgur.com/mErPwqL.png
+hide_table_of_contents: false
+---
+
+${body}
+`
 
 async function fetchDiscussions() {
   const { repository } = await graphql(query, {
@@ -46,6 +58,38 @@ async function fetchDiscussions() {
   })
   return repository
 }
+
+function formatDate(date) {
+  var d = new Date(date),
+    month = '' + (d.getMonth() + 1),
+    day = '' + d.getDate(),
+    year = d.getFullYear()
+
+  if (month.length < 2) month = '0' + month
+  if (day.length < 2) day = '0' + day
+
+  return [year, month, day].join('-')
+}
+
+function slugify(str) {
+  str = str.replace(/^\s+|\s+$/g, '') // trim
+  str = str.toLowerCase()
+
+  // remove accents, swap ñ for n, etc
+  var from = 'àáäâèéëêìíïîòóöôùúüûñç·/_,:;'
+  var to = 'aaaaeeeeiiiioooouuuunc------'
+  for (var i = 0, l = from.length; i < l; i++) {
+    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i))
+  }
+
+  str = str
+    .replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+    .replace(/-+/g, '-') // collapse dashes
+
+  return str
+}
+
 
 // type Discussion = { id: string; author: string; body: string; title: string; createdAt: string; answer: string }
 
@@ -60,26 +104,14 @@ async function main() {
   discussions.nodes.map(async (discussion) => {
     const { id, author, body, title, createdAt, answer } = discussion
 
-    // console.log('author', author)
-
-//     ---
-// title: Welcome Docusaurus v2
-// author: Joel Marcey
-// author_title: Co-creator of Docusaurus 1
-// author_url: https://github.com/JoelMarcey
-// author_image_url: https://avatars3.githubusercontent.com/u/13352?s=400&amp;v=4
-// tags: [hello, docusaurus-v2]
-// description: This is my first post on Docusaurus 2.
-// image: https://i.imgur.com/mErPwqL.png
-// hide_table_of_contents: false
-// ---
-    const post = `---
-title: ${title}
-author: ${author.login}
-author_image_url: ${author.avatarUrl}
----
-    `
-    const fileName = `${id}.md`
+    const post = postTemplate({
+      title,
+      author: author.login,
+      authorUrl: author.url,
+      avatarUrl: author.avatarUrl,
+      body,
+    })
+    const fileName = `${formatDate(createdAt)}-${slugify(title)}.md`
     await writeToDisk(`./discussions/${fileName}`, post)
   })
 }
