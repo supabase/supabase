@@ -2,19 +2,12 @@
 id: architecture
 title: Architecture
 description: 'Supabase design and architecture'
+# hide_table_of_contents: true
 ---
 
 
-Supabase is open source. Wherever possible, we use and support existing tools in the ecosystem rather than developing from scratch. 
+Supabase is open source. Wherever possible, we use and support existing tools rather than developing from scratch. 
 We choose open source tools which are scalable and we make them simple to use.
-
-Supabase is not a 1-to-1 mapping of Firebase. While we are building many of the features that Firebase offers, we are not going about it the same way.
-
-Our technological choices are quite different to Firebase. Everything we use is open source. Wherever possible, we use and support existing tools in the ecosystem, rather than developing from scratch.
-
-Most notably, we use Postgres rather than a NoSQL store. This was a deliberate choice. We believe that no other database on the market offers the scalability and functionality required to legitimately compete with Firebase.
-
-At its core, Supabase is a suite of open source tools, stitched together to build a seamless developer experience:
 
 ![Supabase Architecture](/img/supabase-architecture.png)
 
@@ -24,3 +17,10 @@ At its core, Supabase is a suite of open source tools, stitched together to buil
 - [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries etc.
 - [GoTrue](https://github.com/netlify/gotrue) is an SWT-based API for managing users and issuing SWT tokens.
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
+
+Supabase is not a 1-to-1 mapping of Firebase. While we are building many of the features that Firebase offers, we are not going about it the same way.
+
+Our technological choices are quite different to Firebase. Everything we use is open source. Wherever possible, we use and support existing tools in the ecosystem, rather than developing from scratch.
+
+Most notably, we use Postgres rather than a NoSQL store. This was a deliberate choice. We believe that no other database on the market offers the scalability and functionality required to legitimately compete with Firebase.
+
