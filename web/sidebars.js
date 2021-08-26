@@ -41,6 +41,7 @@ module.exports = {
         'guides/auth',
         'guides/storage',
         'guides/api',
+        'guides/examples',
       ],
       collapsed: false,
     },
@@ -57,10 +58,9 @@ module.exports = {
     // },
     {
       type: 'category',
-      label: 'Getting Started',
+      label: 'Tutorials',
       collapsed: false,
       items: [
-        'guides/examples',
         'guides/with-angular',
         'guides/with-flutter',
         'guides/with-nextjs',
