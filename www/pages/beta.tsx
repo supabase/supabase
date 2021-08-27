@@ -915,11 +915,11 @@ const WhatsNext = () => (
           <p className="mb-10">
             We depend on your feedback to continually improve Supabase. Email us at{' '}
             <a
-              href="mailto:beta@supabase.io"
+              href="mailto:support@supabase.io"
               target="_blank"
               className="text-brand-700 hover:text-brand-800"
             >
-              beta@supabase.io
+              support@supabase.io
             </a>{' '}
             or join the{' '}
             <a

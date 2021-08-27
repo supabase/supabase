@@ -12,10 +12,10 @@ For help and questions about best practices, we have a discussion forum set up o
 
 ## Business Support
 
-We offer email based support for business users. You can email us at beta@supabase.io.
+We offer email based support for business users. You can email us at support@supabase.io.
 
 If you need SLAs, guaranteed response times, or other enterprise level services, please contact us at this email address.
 
 ## Slack Support
 
-If you are building with Supabase and you would like to set up a shared Slack channel (via [Slack Connect](https://slack.com/connect)), please reach out to us at beta@supabase.io.
+If you are building with Supabase and you would like to set up a shared Slack channel (via [Slack Connect](https://slack.com/connect)), please reach out to us at support@supabase.io.
