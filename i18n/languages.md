@@ -11,6 +11,7 @@
 - [Gujarati / ગુજરાતી](/i18n/README.gu.md)
 - [Hebrew / עברית](/i18n/README.he.md)
 - [Hindi / हिंदी](/i18n/README.hi.md)
+- [Hungarian / Magyar](/i18n/README.hu.md)
 - [Nepali / नेपाली](/i18n/README.ne.md)
 - [Indonesian / Bahasa Indonesia](/i18n/README.id.md)
 - [Italiano / Italian](/i18n/README.it.md)
