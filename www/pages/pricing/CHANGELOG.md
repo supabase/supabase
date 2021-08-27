@@ -4,7 +4,7 @@
 
 Changes "Dedicated support" to "Designated support".
 
-- Dedicated = one individual solely focused on an account. 
+- Dedicated = one individual solely focused on an account.
 - Designated = individual who may be helping across various accounts, but still a single point of contact. May be dedicated or non-dedicated.
 
 ### 28 July 2021
