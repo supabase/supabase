@@ -1,28 +1,24 @@
 .PostPreview {
   display: block;
   border-width: 2px !important;
+  width: 100%;
+}
+.PostPreview:hover {
+  background-color: var(--custom-background-color-diff);
 }
 
 .PostPreviewBody {
   display: flex;
   flex-direction: column;
-  min-height: 140px !important;
 }
 .PostPreviewHeading {
+  flex-grow: 1;
+  display: flex;
+}
+.PostPreviewHeading h3 {
   flex-grow: 1;
 }
 .PreviewDate {
   flex-grow: 1;
-}
-.PreviewArrow {
-  width: 25px;
-  height: 25px;
-  padding: 2px;
-}
-
-.PostPreview:hover .PreviewArrow {
-  margin-right: -5px;
-}
-.PostPreview:hover svg {
-  fill: var(--custom-primary);
+  font-size: 0.8rem;
 }
