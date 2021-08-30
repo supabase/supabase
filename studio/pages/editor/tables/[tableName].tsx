@@ -1,7 +1,7 @@
 import EditorLayout from '../../../components/layouts/EditorLayout'
 import { SupabaseGrid, SupabaseGridRef } from '@supabase/grid'
 import { useRouter } from 'next/router'
-import { SUPABASE_URL, SUPABASE_SERVICE_KEY } from '../../../lib/constants'
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../../lib/constants'
 import { useRef } from 'react'
 
 export default function TableEditor() {
@@ -16,13 +16,12 @@ export default function TableEditor() {
           ref={gridRef}
           table={String(tableName)}
           editable
-          schema="auth"
           gridProps={{
             height: '100%',
           }}
           clientProps={{
             supabaseUrl: SUPABASE_URL,
-            supabaseKey: SUPABASE_SERVICE_KEY,
+            supabaseKey: SUPABASE_ANON_KEY,
           }}
           onError={(error) => {
             console.log('ERROR: ', error)
