@@ -396,7 +396,8 @@ alter table
   books 
 add column 
   fts tsvector generated always as to_tsvector(description || ' ' || title);
-
+  
+create index books_fts on books (fts); -- generate the index
 
 select id, fts 
 from books;
