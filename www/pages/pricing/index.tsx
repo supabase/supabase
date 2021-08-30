@@ -299,7 +299,7 @@ export default function IndexPage() {
                       </p>
                       <p className="mt-4 mb-16 ">
                         <Typography.Text>
-                          Dedicated support team, account manager and technical specialist.
+                          Designated support team, account manager and technical specialist.
                         </Typography.Text>
                       </p>
                       <Link href="https://app.supabase.io" as="https://app.supabase.io">
