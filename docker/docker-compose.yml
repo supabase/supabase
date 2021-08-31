@@ -46,7 +46,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:nightly-2021-03-05-19-03-d3a8b5f
+    image: postgrest/postgrest:latest
     ports:
       - ${REST_PORT}:3000
     depends_on:
