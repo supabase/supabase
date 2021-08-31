@@ -158,6 +158,12 @@ module.exports = {
         },
       ],
     },
+    {
+      type: 'category',
+      label: 'Integrations',
+      collapsed: false,
+      items: ['guides/integrations/prisma'],
+    },
     // {
     //   type: 'category',
     //   label: 'Storage',
