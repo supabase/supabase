@@ -15,7 +15,7 @@ This guide explains how to quickly connect the Postgres database provided by Sup
 ## Step 1: Get the connection string from Supabase project settings
 
 Go to the settings page from the sidebar and navigate to the **Database** tab. You’ll find the database’s connection string with a placeholder for the password you provided when you created the project.
-![Getting the connection string](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/zntcsh3ic91gf1gy8j73.png)
+![Getting the connection string](/img/guides/integrations/prisma/zntcsh3ic91gf1gy8j73.png)
 
 ## Step 2: Testing the connection
 
@@ -114,14 +114,14 @@ This will create a `prisma/migrations` folder inside your `prisma` directory and
 
 > Note: if you want to skip the process of creating a migration history, you can use the [`db push`](https://www.prisma.io/docs/concepts/components/prisma-migrate/db-push) command instead of `migrate dev`.
 > If you go to your Supabase project, in the table editor, you should see that two tables have been created, a `Post` and a `User` table.
-> ![tables created in the UI](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/7y4qq4wwvfrheti6r09u.png)
+> ![tables created in the UI](/img/guides/integrations/prisma/7y4qq4wwvfrheti6r09u.png)
 > That’s it! You have now successfully connected a Prisma project to a PostgreSQL database hosted on Supabase and ran your first migration.
 
 ## Connection pooling with Supabase
 
 If you’re working in a serverless environment (for example Node.js functions hosted on AWS Lambda, Vercel or Netlify Functions), you need to set up [connection pooling](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#serverless-environments-faas) using a tool like [PgBouncer](https://www.pgbouncer.org/). That’s because every function invocation may result in a [new connection to the database](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#the-serverless-challenge). Supabase [support connection management using PgBouncer](https://supabase.io/blog/2021/04/02/supabase-pgbouncer#what-is-connection-pooling) and are enabled by default.
 Go to the **Database** page from the sidebar in the Supabase dashboard and navigate to **connection pool** settings
-![Connection pool settings](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/w0oowg8vq435ob5c3gf0.png)
+![Connection pool settings](/img/guides/integrations/prisma/w0oowg8vq435ob5c3gf0.png)
 When running migrations you need to use the non pooled connection URL (like the one we used in **step 4**). However, when deploying your app, you’ll use the pooled connection URL. and add the `?pgbouncer=true` flag to the PostgreSQL connection URL. The URL might look as follows:
 
 ```env
