@@ -42,7 +42,7 @@ services:
       GOTRUE_MAILER_AUTOCONFIRM: 'true'
       GOTRUE_LOG_LEVEL: DEBUG
       GOTRUE_OPERATOR_TOKEN: ${OPERATOR_TOKEN}
-      DATABASE_URL: 'postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres?sslmode=disable'
+      DATABASE_URL: 'postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres?sslmode=disable&search_path=auth'
 
   rest:
     container_name: supabase-rest
