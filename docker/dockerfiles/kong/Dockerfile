@@ -1,6 +1,6 @@
 FROM kong:2.1
 
-COPY kong.yml /var/lib/kong/kong.yml  
+COPY --chown=kong:nogroup kong.yml /var/lib/kong/kong.yml  
 
 # Build time defaults
 ARG build_KONG_DATABASE=off 

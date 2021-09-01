@@ -123,6 +123,7 @@ module.exports = {
             'guides/database/extensions/uuid-ossp',
           ],
         },
+        'guides/database/resource-management',
       ],
     },
     {
