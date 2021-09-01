@@ -26,3 +26,5 @@ alter default privileges in schema public grant all on sequences to postgres, an
 
 alter role anon set statement_timeout = '3s';
 alter role authenticated set statement_timeout = '8s';
+
+ALTER ROLE postgres SET search_path = "$user", public, auth, extensions;
