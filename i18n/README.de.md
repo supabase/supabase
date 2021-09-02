@@ -29,11 +29,11 @@ Um die gesamte Dokumentation einzusehen, schaue auf [supabase.io/docs](https://s
 ## Status
 
 - [x] Alpha: Wir testen Supabase mit einer eingeschränkten Anzahl an Kunden.
-- [x] Public Alpha: Jeder kann sich bei [app.supabase.io](https://app.supabase.io) anmelden.Aber sei gnädig, der Feinschliff fehlt noch.
+- [x] Public Alpha: Jeder kann sich bei [app.supabase.io](https://app.supabase.io) anmelden. Aber sei gnädig, der Feinschliff fehlt noch.
 - [x] Public Beta: Stabil genug für die meisten Use-Cases außerhalb des Enterprise-Bereiches.
 - [ ] Public: Bereit für Produktion
 
-Aktuell befinden wir uns in der Public Beta. Beobachte "Releases" in diesem Repository um über größere Neuigkeiten benachrichtigt zu werden.
+Aktuell befinden wir uns in der öffentlichen Beta. Beobachte "Releases" in diesem Repository um über größere Neuigkeiten benachrichtigt zu werden.
 
 <kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watche dieses Repo"/></kbd>
 
@@ -41,13 +41,13 @@ Aktuell befinden wir uns in der Public Beta. Beobachte "Releases" in diesem Repo
 
 ## So funktionierts
 
-Supabase ist eine Kombination von Open-Source Tools. Wir bauen die Features von Firebase mithilfe von enterprise-tauglichen Open-Source Tools. Alle Tools und Communities mit MIT/Apache 2 oder ähnlicher Lizenz werden von uns genutzt und unterstützt. Wenn es ein Tool nicht gibt, bauen wir es selbst als Open-Source Tool nach. Supabase ist keine 1:1 Kopie von Firebase. Unser Ziel ist es den Entwicklern, mit Open-Source Tools, eine Firebase-ähnliche Developer Experience zu geben.
+Supabase ist eine Kombination von Open-Source Tools. Wir bauen die Features von Firebase mithilfe von enterprise-tauglichen Open-Source Tools. Alle Tools und Communities mit MIT/Apache 2 oder ähnlicher Lizenz werden von uns genutzt und unterstützt. Wenn es ein Tool nicht gibt, bauen wir es selbst als Open-Source Tool nach. Supabase ist keine 1:1 Kopie von Firebase. Unser Ziel ist es den Entwicklern, mit Open-Source Tools, eine Firebase-ähnliche Entwicklererfahrung zu bieten.
 
 **Aktuelle Architektur**
 
 Supabase ist eine [gehostete Plattform](https://app.supabase.io).
 Du kannst dich bei Supabase anmelden und sofort loslegen, ohne etwas zu installieren.
-Wir sind noch dabei, die lokalen Entwicklungsmöglichkeiten zu verbessern - darauf liegt aktuell unser größter Fokus, neben der Stabilität der Plattform.
+Du kannst Supabase auch selbst hosten und lokal entwickeln.
 
 ![Architektur](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
