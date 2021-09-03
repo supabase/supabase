@@ -62,6 +62,15 @@
           "pro": "Never",
           "enterprise": "Never"
         }
+      },
+      {
+        "title": "Transfer limits",
+        "tooltip": "Good news, only download operations are counted towards the limit",
+        "tiers": {
+          "free": "Up to 2GB",
+          "pro": "Up to 50GB",
+          "enterprise": "$0.09 per GB"
+        },
       }
     ]
   },
