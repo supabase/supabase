@@ -107,7 +107,7 @@ where name = 'Harry';
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .eq('name', 'Harry')
@@ -150,7 +150,7 @@ where to_tsvector(name) @@ to_tsquery('Harry');
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('name', `'Harry'`)
@@ -199,7 +199,7 @@ where
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('description', `'big'`)
@@ -287,7 +287,7 @@ where
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('description', `'little' & 'big'`)
@@ -341,7 +341,7 @@ where
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('description', `'little' | 'big'`)
@@ -444,7 +444,7 @@ where
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('fts', `'little' & 'big'`)
@@ -503,7 +503,7 @@ where
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('description', `'big' <-> 'dreams'`)
@@ -547,7 +547,7 @@ where
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('description', `'year' <2> 'school'`)
@@ -594,7 +594,7 @@ where
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('description', `'big' & !'little'`)
