@@ -7,7 +7,7 @@
 
 const supabaseClient = require('./sidebar_spec_supabase')
 const supabaseCli = require('./sidebar_spec_cli')
-const postgres = require('./sidebar_spec_postgres')
+// const postgres = require('./sidebar_spec_postgres')
 
 module.exports = {
   supabaseClient: [
@@ -17,12 +17,12 @@ module.exports = {
       collapsed: false,
       items: supabaseClient.docs,
     },
-    {
-      type: 'category',
-      label: 'Postgres',
-      collapsed: false,
-      items: postgres.docs,
-    },
+    // {
+    //   type: 'category',
+    //   label: 'Postgres',
+    //   collapsed: false,
+    //   items: postgres.docs,
+    // },
     {
       type: 'category',
       label: 'CLI',
