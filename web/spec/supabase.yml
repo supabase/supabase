@@ -23,7 +23,7 @@ info:
   docs:
     path: reference/javascript/
     sidebar:
-      - name: 'About'
+      - name: 'Getting Started'
         items:
           - index
           - Installing
@@ -40,7 +40,7 @@ info:
           - auth.onAuthStateChange()
           - Reset Password (Email)
           - Delete User
-      - name: 'Data'
+      - name: 'Database'
         items:
           - select()
           - insert()

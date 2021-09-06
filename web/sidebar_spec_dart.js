@@ -2,7 +2,7 @@ module.exports = {
   docs: [
     {
       type: 'category',
-      label: 'About',
+      label: 'Getting Started',
       items: ['reference/dart/installing', 'reference/dart/initializing'],
       collapsed: true,
     },
@@ -14,7 +14,7 @@ module.exports = {
     },
     {
       type: 'category',
-      label: 'Data',
+      label: 'Database',
       items: ['reference/dart/select', 'reference/dart/insert', 'reference/dart/update', 'reference/dart/upsert', 'reference/dart/delete', 'reference/dart/rpc'],
       collapsed: true,
     },
