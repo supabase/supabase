@@ -92,7 +92,7 @@ On the expiration or termination of the Agreement, the receiving Party shall pro
 
 ## 7. Personal Information.
 
-Customer will ensure that its Customer Data, and its use of such Customer Data, complies with this Agremeent and any applicable law. Customer is responsible for properly configuring and using the Services and taking its own steps to maintain appropriate security, protection, and backup of Customer Data. Customer may not store or process protected health information (as defined in HIPAA) using the Services unless Customer signs a Business Associate Agreement with Supabase. Customer may not store any payment cardholder information using the Services without Supabase's prior written approval.
+Customer will ensure that its Customer Data, and its use of such Customer Data, complies with this Agreement and any applicable law. Customer is responsible for properly configuring and using the Services and taking its own steps to maintain appropriate security, protection, and backup of Customer Data. Customer may not store or process protected health information (as defined in HIPAA) using the Services unless Customer signs a Business Associate Agreement with Supabase. Customer may not store any payment cardholder information using the Services without Supabase's prior written approval.
 
 ## 8. Intellectual Property Ownership; Feedback.
 

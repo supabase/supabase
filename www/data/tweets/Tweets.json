@@ -1,21 +1,9 @@
 [
   {
-    "text": "Been playing with @supabase_io and so far I'm liking it. I ❤️ you get full access to the database. It's very quick to get up and running, seems a nice fit for prototypes or smaller apps",
-    "url": "https://twitter.com/mattegreer/status/1341765395133415425",
-    "handle": "mattegreer",
-    "img_url": "/images/twitter-profiles/IgXniSVk_400x400.jpg"
-  },
-  {
-    "text": "Reply enjoying building on @supabase_io for a project with @lasnindrek - allows incredible development speed when bashing together an MVP",
-    "url": "https://twitter.com/geordidearns/status/1344433863804788737",
-    "handle": "geordidearns",
-    "img_url": "/images/twitter-profiles/vppimY3M_400x400.jpg"
-  },
-  {
-    "text": "OKAY OKAY FINE I'LL LOOK AT SUPABASE PROPERLY",
-    "url": "https://twitter.com/benbarbersmith/status/1369758528764776453",
-    "handle": "benbarbersmith",
-    "img_url": "/images/twitter-profiles/Jqle_tE6_400x400.jpg"
+    "text": "DB/Backend: @supabase_io Reason: Takes care of Auth, DB hosting, API. Open source, easy to eject into something else. I love SQL. Cloud IDE is incredible for productivity.",
+    "url": "https://twitter.com/JessetheSibley/status/1369678185508593673",
+    "handle": "JessetheSibley",
+    "img_url": "/images/twitter-profiles/aNx9O0lH_400x400.jpg"
   },
   {
     "text": "Been trying out this new stack. Loving it so far. Next.js (Frontend) + Stitches.js (Styling) + Radix (Primitives & Icons) + Supabase (Backend) + Vercel (Deployment) 😍 Thank you @vercel @Modulz @supabase_io for this amazing DX.",
@@ -24,22 +12,40 @@
     "img_url": "/images/twitter-profiles/mZAIoZM1_400x400.jpg"
   },
   {
-    "text": "DB/Backend: @supabase_io Reason: Takes care of Auth, DB hosting, API. Open source, easy to eject into something else. I love SQL. Cloud IDE is incredible for productivity.",
-    "url": "https://twitter.com/JessetheSibley/status/1369678185508593673",
-    "handle": "JessetheSibley",
-    "img_url": "/images/twitter-profiles/aNx9O0lH_400x400.jpg"
+    "text": "OKAY OKAY FINE I'LL LOOK AT SUPABASE PROPERLY",
+    "url": "https://twitter.com/benbarbersmith/status/1369758528764776453",
+    "handle": "benbarbersmith",
+    "img_url": "/images/twitter-profiles/Jqle_tE6_400x400.jpg"
   },
   {
-    "text": "Looking for a Firebase alternative? Consider using the open-source @supabase_io. It's as simple as Firebase but I found the dashboard UX more intuitive and hey it's OSS! It's in beta so you can use it for free rn.",
-    "url": "https://twitter.com/mneelansh15/status/1368171468153118721",
-    "handle": "mneelansh15",
-    "img_url": "/images/twitter-profiles/6XKH3Rm6_400x400.jpg"
+    "text": "@supabase_io is amazing, super easy to get up and running quickly + they have multiple examples with various frameworks (chat app, auth, etc)",
+    "url": "https://twitter.com/ssw1ss/status/1366515168260337671",
+    "handle": "ssw1ss",
+    "img_url": "/images/twitter-profiles/4mD0C5Wk_400x400.jpg"
+  },
+  {
+    "text": "Been playing with @supabase_io and so far I'm liking it. I ❤️ you get full access to the database. It's very quick to get up and running, seems a nice fit for prototypes or smaller apps",
+    "url": "https://twitter.com/mattegreer/status/1341765395133415425",
+    "handle": "mattegreer",
+    "img_url": "/images/twitter-profiles/IgXniSVk_400x400.jpg"
+  },
+  {
+    "text": "Using @supabase_io with SWR by @vercel is something else 🔥",
+    "url": "https://twitter.com/eunjae_lee/status/1369788285317419009",
+    "handle": "eunjae_lee",
+    "img_url": "/images/twitter-profiles/eGjSYbQd_400x400.jpg"
   },
   {
     "text": "big props to the @supabase_io team - open source is a two way street and they’re super responsive & community oriented",
     "url": "https://twitter.com/_mateomorris/status/1369661833557196800",
     "handle": "_mateomorris",
     "img_url": "/images/twitter-profiles/1FyEWRE8_400x400.jpg"
+  },
+  {
+    "text": "Enjoying building on @supabase_io for a project with @lasnindrek - allows incredible development speed when bashing together an MVP",
+    "url": "https://twitter.com/geordidearns/status/1344433863804788737",
+    "handle": "geordidearns",
+    "img_url": "/images/twitter-profiles/vppimY3M_400x400.jpg"
   },
   {
     "text": "Been actively working on Quill. It's been rapid, thanks to @supabase_io and @tailwindui",
@@ -54,12 +60,6 @@
     "img_url": "/images/twitter-profiles/ext7ggBo_400x400.jpg"
   },
   {
-    "text": "Using @supabase_io with SWR by @vercel is something else Fire",
-    "url": "https://twitter.com/eunjae_lee/status/1369788285317419009",
-    "handle": "eunjae_lee",
-    "img_url": "/images/twitter-profiles/eGjSYbQd_400x400.jpg"
-  },
-  {
     "text": "Another month, another impressive @supabase_io release. It’s rare to see a startup ship in public so consistently.",
     "url": "https://twitter.com/yuris/status/1366770633401491456",
     "handle": "yuris",
@@ -70,12 +70,6 @@
     "url": "https://twitter.com/swyx/status/1366685025047994373",
     "handle": "swyx",
     "img_url": "/images/twitter-profiles/qhvO9V6x_400x400.jpg"
-  },
-  {
-    "text": "@supabase_io is amazing, super easy to get up and running quickly + they have multiple examples with various frameworks (chat app, auth, etc)",
-    "url": "https://twitter.com/ssw1ss/status/1366515168260337671",
-    "handle": "ssw1ss",
-    "img_url": "/images/twitter-profiles/4mD0C5Wk_400x400.jpg"
   },
   {
     "text": "This weekend I made a personal record 🥇 on the less time spent creating an application with social login / permissions, database, cdn, infinite scaling, git push to deploy and for free. Thanks to @supabase_io and @vercel",
@@ -106,6 +100,12 @@
     "url": "https://twitter.com/prakis/status/1365201855849009155",
     "handle": "prakis",
     "img_url": "/images/twitter-profiles/eRvqp-t0_400x400.jpg"
+  },
+  {
+    "text": "Looking for a Firebase alternative? Consider using the open-source @supabase_io. It's as simple as Firebase but I found the dashboard UX more intuitive and hey it's OSS! It's in beta so you can use it for free rn.",
+    "url": "https://twitter.com/mneelansh15/status/1368171468153118721",
+    "handle": "mneelansh15",
+    "img_url": "/images/twitter-profiles/6XKH3Rm6_400x400.jpg"
   },
   {
     "text": "Me using @supabase_io for the first time right now 🤯",

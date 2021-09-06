@@ -1,6 +1,6 @@
 ---
 id: auth-google
-title: "Setting up Google Auth"
+title: "OAuth with Google"
 description: Add Google OAuth to your Supabase project
 ---
 
@@ -106,7 +106,7 @@ const { user, session, error } = await supabase.auth.signIn({
 Add this function which you can call from a button, link, or UI element.
 
 ```js
-function signInWithGoogle() {
+async function signInWithGoogle() {
   const { user, session, error } = await supabase.auth.signIn({
     provider: 'google'
   });
@@ -116,7 +116,7 @@ function signInWithGoogle() {
 To log out:
 
 ```js
-function signout() {
+async function signout() {
   const { error } = await supabase.auth.signOut();
 }
 ```

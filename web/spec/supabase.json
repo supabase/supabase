@@ -6,7 +6,7 @@
 	"originalName": "",
 	"children": [
 		{
-			"id": 266,
+			"id": 264,
 			"name": "\"SupabaseClient\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -16,7 +16,7 @@
 			"originalName": "/home/runner/work/supabase-js/supabase-js/src/SupabaseClient.ts",
 			"children": [
 				{
-					"id": 267,
+					"id": 265,
 					"name": "SupabaseClient",
 					"kind": 128,
 					"kindString": "Class",
@@ -29,7 +29,7 @@
 					},
 					"children": [
 						{
-							"id": 275,
+							"id": 273,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -41,7 +41,7 @@
 							},
 							"signatures": [
 								{
-									"id": 278,
+									"id": 276,
 									"name": "new SupabaseClient",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -53,7 +53,7 @@
 									},
 									"parameters": [
 										{
-											"id": 279,
+											"id": 277,
 											"name": "supabaseUrl",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -69,7 +69,7 @@
 											}
 										},
 										{
-											"id": 280,
+											"id": 278,
 											"name": "supabaseKey",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -85,7 +85,7 @@
 											}
 										},
 										{
-											"id": 281,
+											"id": 279,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -102,7 +102,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 267,
+										"id": 265,
 										"name": "SupabaseClient"
 									}
 								}
@@ -116,7 +116,7 @@
 							]
 						},
 						{
-							"id": 268,
+							"id": 266,
 							"name": "auth",
 							"kind": 1024,
 							"kindString": "Property",
@@ -140,7 +140,7 @@
 							}
 						},
 						{
-							"id": 272,
+							"id": 270,
 							"name": "authUrl",
 							"kind": 1024,
 							"kindString": "Property",
@@ -161,7 +161,7 @@
 							}
 						},
 						{
-							"id": 274,
+							"id": 272,
 							"name": "realtime",
 							"kind": 1024,
 							"kindString": "Property",
@@ -182,7 +182,7 @@
 							}
 						},
 						{
-							"id": 271,
+							"id": 269,
 							"name": "realtimeUrl",
 							"kind": 1024,
 							"kindString": "Property",
@@ -203,7 +203,7 @@
 							}
 						},
 						{
-							"id": 270,
+							"id": 268,
 							"name": "restUrl",
 							"kind": 1024,
 							"kindString": "Property",
@@ -224,7 +224,7 @@
 							}
 						},
 						{
-							"id": 269,
+							"id": 267,
 							"name": "schema",
 							"kind": 1024,
 							"kindString": "Property",
@@ -245,7 +245,7 @@
 							}
 						},
 						{
-							"id": 273,
+							"id": 271,
 							"name": "storageUrl",
 							"kind": 1024,
 							"kindString": "Property",
@@ -266,7 +266,7 @@
 							}
 						},
 						{
-							"id": 277,
+							"id": 275,
 							"name": "supabaseKey",
 							"kind": 1024,
 							"kindString": "Property",
@@ -291,7 +291,7 @@
 							}
 						},
 						{
-							"id": 276,
+							"id": 274,
 							"name": "supabaseUrl",
 							"kind": 1024,
 							"kindString": "Property",
@@ -316,7 +316,7 @@
 							}
 						},
 						{
-							"id": 282,
+							"id": 280,
 							"name": "storage",
 							"kind": 262144,
 							"kindString": "Accessor",
@@ -328,7 +328,7 @@
 							},
 							"getSignature": [
 								{
-									"id": 283,
+									"id": 281,
 									"name": "__get",
 									"kind": 524288,
 									"kindString": "Get signature",
@@ -353,7 +353,7 @@
 							]
 						},
 						{
-							"id": 326,
+							"id": 320,
 							"name": "_closeChannel",
 							"kind": 2048,
 							"kindString": "Method",
@@ -363,7 +363,7 @@
 							},
 							"signatures": [
 								{
-									"id": 327,
+									"id": 321,
 									"name": "_closeChannel",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -372,7 +372,7 @@
 									},
 									"parameters": [
 										{
-											"id": 328,
+											"id": 322,
 											"name": "subscription",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -400,13 +400,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 188,
+									"line": 186,
 									"character": 23
 								}
 							]
 						},
 						{
-							"id": 299,
+							"id": 297,
 							"name": "_closeSubscription",
 							"kind": 2048,
 							"kindString": "Method",
@@ -416,7 +416,7 @@
 							},
 							"signatures": [
 								{
-									"id": 300,
+									"id": 298,
 									"name": "_closeSubscription",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -425,7 +425,7 @@
 									},
 									"parameters": [
 										{
-											"id": 301,
+											"id": 299,
 											"name": "subscription",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -459,7 +459,7 @@
 							]
 						},
 						{
-							"id": 321,
+							"id": 315,
 							"name": "_getAuthHeaders",
 							"kind": 2048,
 							"kindString": "Method",
@@ -469,7 +469,7 @@
 							},
 							"signatures": [
 								{
-									"id": 322,
+									"id": 316,
 									"name": "_getAuthHeaders",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -479,7 +479,7 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 323,
+											"id": 317,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -488,7 +488,7 @@
 											},
 											"indexSignature": [
 												{
-													"id": 324,
+													"id": 318,
 													"name": "__index",
 													"kind": 8192,
 													"kindString": "Index signature",
@@ -497,7 +497,7 @@
 													},
 													"parameters": [
 														{
-															"id": 325,
+															"id": 319,
 															"name": "key",
 															"kind": 32768,
 															"kindString": "Parameter",
@@ -519,7 +519,7 @@
 											"sources": [
 												{
 													"fileName": "src/SupabaseClient.ts",
-													"line": 180,
+													"line": 178,
 													"character": 28
 												}
 											]
@@ -530,13 +530,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 180,
+									"line": 178,
 									"character": 25
 								}
 							]
 						},
 						{
-							"id": 319,
+							"id": 313,
 							"name": "_initPostgRESTClient",
 							"kind": 2048,
 							"kindString": "Method",
@@ -546,7 +546,7 @@
 							},
 							"signatures": [
 								{
-									"id": 320,
+									"id": 314,
 									"name": "_initPostgRESTClient",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -562,13 +562,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 173,
+									"line": 171,
 									"character": 30
 								}
 							]
 						},
 						{
-							"id": 316,
+							"id": 310,
 							"name": "_initRealtimeClient",
 							"kind": 2048,
 							"kindString": "Method",
@@ -578,7 +578,7 @@
 							},
 							"signatures": [
 								{
-									"id": 317,
+									"id": 311,
 									"name": "_initRealtimeClient",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -587,7 +587,7 @@
 									},
 									"parameters": [
 										{
-											"id": 318,
+											"id": 312,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -610,13 +610,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 166,
+									"line": 164,
 									"character": 29
 								}
 							]
 						},
 						{
-							"id": 304,
+							"id": 302,
 							"name": "_initSupabaseAuthClient",
 							"kind": 2048,
 							"kindString": "Method",
@@ -626,7 +626,7 @@
 							},
 							"signatures": [
 								{
-									"id": 305,
+									"id": 303,
 									"name": "_initSupabaseAuthClient",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -635,7 +635,7 @@
 									},
 									"parameters": [
 										{
-											"id": 306,
+											"id": 304,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -646,7 +646,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 307,
+													"id": 305,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -655,7 +655,7 @@
 													},
 													"children": [
 														{
-															"id": 308,
+															"id": 306,
 															"name": "autoRefreshToken",
 															"kind": 32,
 															"kindString": "Variable",
@@ -688,7 +688,7 @@
 															}
 														},
 														{
-															"id": 310,
+															"id": 308,
 															"name": "detectSessionInUrl",
 															"kind": 32,
 															"kindString": "Variable",
@@ -721,74 +721,7 @@
 															}
 														},
 														{
-															"id": 312,
-															"name": "headers",
-															"kind": 32,
-															"kindString": "Variable",
-															"flags": {
-																"isExported": true
-															},
-															"sources": [
-																{
-																	"fileName": "src/SupabaseClient.ts",
-																	"line": 150,
-																	"character": 11
-																}
-															],
-															"type": {
-																"type": "union",
-																"types": [
-																	{
-																		"type": "intrinsic",
-																		"name": "undefined"
-																	},
-																	{
-																		"type": "reflection",
-																		"declaration": {
-																			"id": 313,
-																			"name": "__type",
-																			"kind": 65536,
-																			"kindString": "Type literal",
-																			"flags": {
-																				"isExported": true
-																			},
-																			"indexSignature": [
-																				{
-																					"id": 314,
-																					"name": "__index",
-																					"kind": 8192,
-																					"kindString": "Index signature",
-																					"flags": {
-																						"isExported": true
-																					},
-																					"parameters": [
-																						{
-																							"id": 315,
-																							"name": "key",
-																							"kind": 32768,
-																							"kindString": "Parameter",
-																							"flags": {
-																								"isExported": true
-																							},
-																							"type": {
-																								"type": "intrinsic",
-																								"name": "string"
-																							}
-																						}
-																					],
-																					"type": {
-																						"type": "intrinsic",
-																						"name": "string"
-																					}
-																				}
-																			]
-																		}
-																	}
-																]
-															}
-														},
-														{
-															"id": 311,
+															"id": 309,
 															"name": "localStorage",
 															"kind": 32,
 															"kindString": "Variable",
@@ -817,7 +750,7 @@
 															}
 														},
 														{
-															"id": 309,
+															"id": 307,
 															"name": "persistSession",
 															"kind": 32,
 															"kindString": "Variable",
@@ -855,11 +788,10 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
+																306,
 																308,
-																310,
-																312,
-																311,
-																309
+																309,
+																307
 															]
 														}
 													],
@@ -890,7 +822,7 @@
 							]
 						},
 						{
-							"id": 284,
+							"id": 282,
 							"name": "from",
 							"kind": 2048,
 							"kindString": "Method",
@@ -899,7 +831,7 @@
 							},
 							"signatures": [
 								{
-									"id": 285,
+									"id": 283,
 									"name": "from",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -911,7 +843,7 @@
 									},
 									"typeParameter": [
 										{
-											"id": 286,
+											"id": 284,
 											"name": "T",
 											"kind": 131072,
 											"kindString": "Type parameter",
@@ -922,7 +854,7 @@
 									],
 									"parameters": [
 										{
-											"id": 287,
+											"id": 285,
 											"name": "table",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -940,7 +872,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 176,
+										"id": 174,
 										"typeArguments": [
 											{
 												"type": "typeParameter",
@@ -964,7 +896,7 @@
 							]
 						},
 						{
-							"id": 302,
+							"id": 300,
 							"name": "getSubscriptions",
 							"kind": 2048,
 							"kindString": "Method",
@@ -973,7 +905,7 @@
 							},
 							"signatures": [
 								{
-									"id": 303,
+									"id": 301,
 									"name": "getSubscriptions",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1001,7 +933,7 @@
 							]
 						},
 						{
-							"id": 296,
+							"id": 294,
 							"name": "removeSubscription",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1010,7 +942,7 @@
 							},
 							"signatures": [
 								{
-									"id": 297,
+									"id": 295,
 									"name": "removeSubscription",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1022,7 +954,7 @@
 									},
 									"parameters": [
 										{
-											"id": 298,
+											"id": 296,
 											"name": "subscription",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1059,7 +991,7 @@
 							]
 						},
 						{
-							"id": 288,
+							"id": 286,
 							"name": "rpc",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1068,7 +1000,7 @@
 							},
 							"signatures": [
 								{
-									"id": 289,
+									"id": 287,
 									"name": "rpc",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1080,7 +1012,7 @@
 									},
 									"typeParameter": [
 										{
-											"id": 290,
+											"id": 288,
 											"name": "T",
 											"kind": 131072,
 											"kindString": "Type parameter",
@@ -1091,7 +1023,7 @@
 									],
 									"parameters": [
 										{
-											"id": 291,
+											"id": 289,
 											"name": "fn",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1107,7 +1039,7 @@
 											}
 										},
 										{
-											"id": 292,
+											"id": 290,
 											"name": "params",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1133,7 +1065,7 @@
 											}
 										},
 										{
-											"id": 293,
+											"id": 291,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1144,7 +1076,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 294,
+													"id": 292,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -1153,7 +1085,7 @@
 													},
 													"children": [
 														{
-															"id": 295,
+															"id": 293,
 															"name": "count",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1199,7 +1131,7 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																295
+																293
 															]
 														}
 													],
@@ -1241,45 +1173,45 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								275
+								273
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								268,
-								272,
-								274,
-								271,
+								266,
 								270,
+								272,
 								269,
-								273,
-								277,
-								276
+								268,
+								267,
+								271,
+								275,
+								274
 							]
 						},
 						{
 							"title": "Accessors",
 							"kind": 262144,
 							"children": [
-								282
+								280
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								326,
-								299,
-								321,
-								319,
-								316,
-								304,
-								284,
+								320,
+								297,
+								315,
+								313,
+								310,
 								302,
-								296,
-								288
+								282,
+								300,
+								294,
+								286
 							]
 						}
 					],
@@ -1292,7 +1224,7 @@
 					]
 				},
 				{
-					"id": 329,
+					"id": 323,
 					"name": "DEFAULT_OPTIONS",
 					"kind": 2097152,
 					"kindString": "Object literal",
@@ -1301,7 +1233,7 @@
 					},
 					"children": [
 						{
-							"id": 331,
+							"id": 325,
 							"name": "autoRefreshToken",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1320,7 +1252,7 @@
 							"defaultValue": "true"
 						},
 						{
-							"id": 333,
+							"id": 327,
 							"name": "detectSessionInUrl",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1339,7 +1271,7 @@
 							"defaultValue": "true"
 						},
 						{
-							"id": 335,
+							"id": 329,
 							"name": "headers",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1354,7 +1286,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 336,
+									"id": 330,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -1394,7 +1326,7 @@
 							"defaultValue": "DEFAULT_HEADERS"
 						},
 						{
-							"id": 334,
+							"id": 328,
 							"name": "localStorage",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1413,7 +1345,7 @@
 							"defaultValue": "globalThis.localStorage"
 						},
 						{
-							"id": 332,
+							"id": 326,
 							"name": "persistSession",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1432,7 +1364,7 @@
 							"defaultValue": "true"
 						},
 						{
-							"id": 330,
+							"id": 324,
 							"name": "schema",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1456,12 +1388,12 @@
 							"title": "Variables",
 							"kind": 32,
 							"children": [
-								331,
-								333,
-								335,
-								334,
-								332,
-								330
+								325,
+								327,
+								329,
+								328,
+								326,
+								324
 							]
 						}
 					],
@@ -1483,14 +1415,14 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						267
+						265
 					]
 				},
 				{
 					"title": "Object literals",
 					"kind": 2097152,
 					"children": [
-						329
+						323
 					]
 				}
 			],
@@ -1503,7 +1435,7 @@
 			]
 		},
 		{
-			"id": 338,
+			"id": 331,
 			"name": "\"index\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -1513,7 +1445,7 @@
 			"originalName": "/home/runner/work/supabase-js/supabase-js/src/index.ts",
 			"children": [
 				{
-					"id": 339,
+					"id": 332,
 					"name": "createClient",
 					"kind": 64,
 					"kindString": "Function",
@@ -1526,7 +1458,7 @@
 					},
 					"signatures": [
 						{
-							"id": 340,
+							"id": 333,
 							"name": "createClient",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -1538,7 +1470,7 @@
 							},
 							"parameters": [
 								{
-									"id": 341,
+									"id": 334,
 									"name": "supabaseUrl",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1551,7 +1483,7 @@
 									}
 								},
 								{
-									"id": 342,
+									"id": 335,
 									"name": "supabaseKey",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1564,7 +1496,7 @@
 									}
 								},
 								{
-									"id": 343,
+									"id": 336,
 									"name": "options",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1581,7 +1513,7 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 267,
+								"id": 265,
 								"name": "SupabaseClient"
 							}
 						}
@@ -1600,7 +1532,7 @@
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						339
+						332
 					]
 				}
 			],
@@ -2193,7 +2125,7 @@
 							}
 						},
 						{
-							"id": 127,
+							"id": 125,
 							"name": "getSessionFromUrl",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2202,7 +2134,7 @@
 							},
 							"signatures": [
 								{
-									"id": 128,
+									"id": 126,
 									"name": "getSessionFromUrl",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2214,7 +2146,7 @@
 									},
 									"parameters": [
 										{
-											"id": 129,
+											"id": 127,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2232,7 +2164,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 130,
+															"id": 128,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -2241,7 +2173,7 @@
 															},
 															"children": [
 																{
-																	"id": 131,
+																	"id": 129,
 																	"name": "storeSession",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -2283,7 +2215,7 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		131
+																		129
 																	]
 																}
 															]
@@ -2299,7 +2231,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 132,
+													"id": 130,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2308,7 +2240,7 @@
 													},
 													"children": [
 														{
-															"id": 133,
+															"id": 131,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2337,7 +2269,7 @@
 															}
 														},
 														{
-															"id": 134,
+															"id": 132,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2371,8 +2303,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																133,
-																134
+																131,
+																132
 															]
 														}
 													],
@@ -2390,7 +2322,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 127,
+										"id": 125,
 										"name": "GoTrueClient.getSessionFromUrl"
 									}
 								}
@@ -2404,12 +2336,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 127,
+								"id": 125,
 								"name": "GoTrueClient.getSessionFromUrl"
 							}
 						},
 						{
-							"id": 139,
+							"id": 137,
 							"name": "onAuthStateChange",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2418,7 +2350,7 @@
 							},
 							"signatures": [
 								{
-									"id": 140,
+									"id": 138,
 									"name": "onAuthStateChange",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2431,7 +2363,7 @@
 									},
 									"parameters": [
 										{
-											"id": 141,
+											"id": 139,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2441,7 +2373,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 142,
+													"id": 140,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2450,7 +2382,7 @@
 													},
 													"signatures": [
 														{
-															"id": 143,
+															"id": 141,
 															"name": "__call",
 															"kind": 4096,
 															"kindString": "Call signature",
@@ -2459,7 +2391,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 144,
+																	"id": 142,
 																	"name": "event",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -2472,7 +2404,7 @@
 																	}
 																},
 																{
-																	"id": 145,
+																	"id": 143,
 																	"name": "session",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -2514,7 +2446,7 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 146,
+											"id": 144,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -2523,7 +2455,7 @@
 											},
 											"children": [
 												{
-													"id": 147,
+													"id": 145,
 													"name": "data",
 													"kind": 32,
 													"kindString": "Variable",
@@ -2552,7 +2484,7 @@
 													}
 												},
 												{
-													"id": 148,
+													"id": 146,
 													"name": "error",
 													"kind": 32,
 													"kindString": "Variable",
@@ -2586,8 +2518,8 @@
 													"title": "Variables",
 													"kind": 32,
 													"children": [
-														147,
-														148
+														145,
+														146
 													]
 												}
 											],
@@ -2602,7 +2534,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 139,
+										"id": 137,
 										"name": "GoTrueClient.onAuthStateChange"
 									}
 								}
@@ -2616,12 +2548,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 139,
+								"id": 137,
 								"name": "GoTrueClient.onAuthStateChange"
 							}
 						},
 						{
-							"id": 105,
+							"id": 103,
 							"name": "refreshSession",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2630,7 +2562,7 @@
 							},
 							"signatures": [
 								{
-									"id": 106,
+									"id": 104,
 									"name": "refreshSession",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2646,7 +2578,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 107,
+													"id": 105,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2655,7 +2587,7 @@
 													},
 													"children": [
 														{
-															"id": 108,
+															"id": 106,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2684,7 +2616,7 @@
 															}
 														},
 														{
-															"id": 110,
+															"id": 108,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2713,7 +2645,7 @@
 															}
 														},
 														{
-															"id": 109,
+															"id": 107,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2747,9 +2679,9 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
+																106,
 																108,
-																110,
-																109
+																107
 															]
 														}
 													],
@@ -2767,7 +2699,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 105,
+										"id": 103,
 										"name": "GoTrueClient.refreshSession"
 									}
 								}
@@ -2781,12 +2713,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 105,
+								"id": 103,
 								"name": "GoTrueClient.refreshSession"
 							}
 						},
 						{
-							"id": 103,
+							"id": 101,
 							"name": "session",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2795,7 +2727,7 @@
 							},
 							"signatures": [
 								{
-									"id": 104,
+									"id": 102,
 									"name": "session",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2820,7 +2752,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 103,
+										"id": 101,
 										"name": "GoTrueClient.session"
 									}
 								}
@@ -2834,12 +2766,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 103,
+								"id": 101,
 								"name": "GoTrueClient.session"
 							}
 						},
 						{
-							"id": 124,
+							"id": 122,
 							"name": "setAuth",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2848,7 +2780,7 @@
 							},
 							"signatures": [
 								{
-									"id": 125,
+									"id": 123,
 									"name": "setAuth",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2860,7 +2792,7 @@
 									},
 									"parameters": [
 										{
-											"id": 126,
+											"id": 124,
 											"name": "access_token",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2882,7 +2814,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 124,
+										"id": 122,
 										"name": "GoTrueClient.setAuth"
 									}
 								}
@@ -2896,12 +2828,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 124,
+								"id": 122,
 								"name": "GoTrueClient.setAuth"
 							}
 						},
 						{
-							"id": 118,
+							"id": 116,
 							"name": "setSession",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2910,7 +2842,7 @@
 							},
 							"signatures": [
 								{
-									"id": 119,
+									"id": 117,
 									"name": "setSession",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2922,7 +2854,7 @@
 									},
 									"parameters": [
 										{
-											"id": 120,
+											"id": 118,
 											"name": "refresh_token",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2944,7 +2876,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 121,
+													"id": 119,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2953,7 +2885,7 @@
 													},
 													"children": [
 														{
-															"id": 123,
+															"id": 121,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2982,7 +2914,7 @@
 															}
 														},
 														{
-															"id": 122,
+															"id": 120,
 															"name": "session",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3016,8 +2948,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																123,
-																122
+																121,
+																120
 															]
 														}
 													],
@@ -3035,7 +2967,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 118,
+										"id": 116,
 										"name": "GoTrueClient.setSession"
 									}
 								}
@@ -3049,12 +2981,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 118,
+								"id": 116,
 								"name": "GoTrueClient.setSession"
 							}
 						},
 						{
-							"id": 67,
+							"id": 65,
 							"name": "signIn",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3063,7 +2995,7 @@
 							},
 							"signatures": [
 								{
-									"id": 68,
+									"id": 66,
 									"name": "signIn",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3075,7 +3007,7 @@
 									},
 									"parameters": [
 										{
-											"id": 69,
+											"id": 67,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3086,7 +3018,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 70,
+													"id": 68,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3095,7 +3027,7 @@
 													},
 													"children": [
 														{
-															"id": 71,
+															"id": 69,
 															"name": "email",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3127,7 +3059,7 @@
 															}
 														},
 														{
-															"id": 73,
+															"id": 71,
 															"name": "password",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3159,7 +3091,7 @@
 															}
 														},
 														{
-															"id": 72,
+															"id": 70,
 															"name": "phone",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3171,6 +3103,35 @@
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
 																	"line": 68,
 																	"character": 25
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														},
+														{
+															"id": 73,
+															"name": "provider",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"line": 68,
+																	"character": 59
 																}
 															],
 															"type": {
@@ -3256,7 +3217,7 @@
 															}
 														},
 														{
-															"id": 74,
+															"id": 72,
 															"name": "refreshToken",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3293,11 +3254,11 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
+																69,
 																71,
+																70,
 																73,
-																72,
-																75,
-																74
+																72
 															]
 														}
 													],
@@ -3312,7 +3273,7 @@
 											}
 										},
 										{
-											"id": 76,
+											"id": 74,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3330,7 +3291,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 77,
+															"id": 75,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -3339,7 +3300,7 @@
 															},
 															"children": [
 																{
-																	"id": 78,
+																	"id": 76,
 																	"name": "redirectTo",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -3369,7 +3330,7 @@
 																	}
 																},
 																{
-																	"id": 79,
+																	"id": 77,
 																	"name": "scopes",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -3404,8 +3365,8 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		78,
-																		79
+																		76,
+																		77
 																	]
 																}
 															]
@@ -3421,7 +3382,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 80,
+													"id": 78,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3430,7 +3391,7 @@
 													},
 													"children": [
 														{
-															"id": 86,
+															"id": 84,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3459,7 +3420,7 @@
 															}
 														},
 														{
-															"id": 85,
+															"id": 83,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3488,7 +3449,7 @@
 															}
 														},
 														{
-															"id": 83,
+															"id": 81,
 															"name": "provider",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3509,7 +3470,7 @@
 															}
 														},
 														{
-															"id": 81,
+															"id": 79,
 															"name": "session",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3538,7 +3499,7 @@
 															}
 														},
 														{
-															"id": 84,
+															"id": 82,
 															"name": "url",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3568,7 +3529,7 @@
 															}
 														},
 														{
-															"id": 82,
+															"id": 80,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3602,12 +3563,12 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																86,
-																85,
+																84,
 																83,
 																81,
-																84,
-																82
+																79,
+																82,
+																80
 															]
 														}
 													],
@@ -3625,7 +3586,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 67,
+										"id": 65,
 										"name": "GoTrueClient.signIn"
 									}
 								}
@@ -3639,12 +3600,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 67,
+								"id": 65,
 								"name": "GoTrueClient.signIn"
 							}
 						},
 						{
-							"id": 135,
+							"id": 133,
 							"name": "signOut",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3653,7 +3614,7 @@
 							},
 							"signatures": [
 								{
-									"id": 136,
+									"id": 134,
 									"name": "signOut",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3670,7 +3631,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 137,
+													"id": 135,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3679,7 +3640,7 @@
 													},
 													"children": [
 														{
-															"id": 138,
+															"id": 136,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3713,7 +3674,7 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																138
+																136
 															]
 														}
 													],
@@ -3731,7 +3692,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 135,
+										"id": 133,
 										"name": "GoTrueClient.signOut"
 									}
 								}
@@ -3745,7 +3706,7 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 135,
+								"id": 133,
 								"name": "GoTrueClient.signOut"
 							}
 						},
@@ -3855,7 +3816,7 @@
 															}
 														},
 														{
-															"id": 58,
+															"id": 56,
 															"name": "phone",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3892,9 +3853,9 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																56,
-																57,
-																58
+																54,
+																55,
+																56
 															]
 														}
 													],
@@ -3909,7 +3870,7 @@
 											}
 										},
 										{
-											"id": 59,
+											"id": 57,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3927,7 +3888,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 60,
+															"id": 58,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -3936,7 +3897,7 @@
 															},
 															"children": [
 																{
-																	"id": 61,
+																	"id": 59,
 																	"name": "redirectTo",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -3971,7 +3932,7 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		61
+																		59
 																	]
 																}
 															]
@@ -3987,7 +3948,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 62,
+													"id": 60,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3996,7 +3957,7 @@
 													},
 													"children": [
 														{
-															"id": 66,
+															"id": 64,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4029,7 +3990,7 @@
 															}
 														},
 														{
-															"id": 65,
+															"id": 63,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4058,7 +4019,7 @@
 															}
 														},
 														{
-															"id": 64,
+															"id": 62,
 															"name": "session",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4087,7 +4048,7 @@
 															}
 														},
 														{
-															"id": 63,
+															"id": 61,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4121,10 +4082,10 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																66,
-																65,
 																64,
-																63
+																63,
+																62,
+																61
 															]
 														}
 													],
@@ -4161,7 +4122,7 @@
 							}
 						},
 						{
-							"id": 111,
+							"id": 109,
 							"name": "update",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4170,7 +4131,7 @@
 							},
 							"signatures": [
 								{
-									"id": 112,
+									"id": 110,
 									"name": "update",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4182,7 +4143,7 @@
 									},
 									"parameters": [
 										{
-											"id": 113,
+											"id": 111,
 											"name": "attributes",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4201,7 +4162,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 114,
+													"id": 112,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -4210,7 +4171,7 @@
 													},
 													"children": [
 														{
-															"id": 115,
+															"id": 113,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4229,6 +4190,10 @@
 																"types": [
 																	{
 																		"type": "reference",
+																		"name": "Session"
+																	},
+																	{
+																		"type": "reference",
 																		"name": "User"
 																	},
 																	{
@@ -4239,7 +4204,7 @@
 															}
 														},
 														{
-															"id": 117,
+															"id": 115,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4268,7 +4233,7 @@
 															}
 														},
 														{
-															"id": 116,
+															"id": 114,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4302,9 +4267,9 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
+																113,
 																115,
-																117,
-																116
+																114
 															]
 														}
 													],
@@ -4322,7 +4287,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 111,
+										"id": 109,
 										"name": "GoTrueClient.update"
 									}
 								}
@@ -4336,12 +4301,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 111,
+								"id": 109,
 								"name": "GoTrueClient.update"
 							}
 						},
 						{
-							"id": 101,
+							"id": 99,
 							"name": "user",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4350,7 +4315,7 @@
 							},
 							"signatures": [
 								{
-									"id": 102,
+									"id": 100,
 									"name": "user",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4376,7 +4341,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 101,
+										"id": 99,
 										"name": "GoTrueClient.user"
 									}
 								}
@@ -4390,12 +4355,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 101,
+								"id": 99,
 								"name": "GoTrueClient.user"
 							}
 						},
 						{
-							"id": 87,
+							"id": 85,
 							"name": "verifyOTP",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4404,7 +4369,7 @@
 							},
 							"signatures": [
 								{
-									"id": 88,
+									"id": 86,
 									"name": "verifyOTP",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4416,7 +4381,7 @@
 									},
 									"parameters": [
 										{
-											"id": 89,
+											"id": 87,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4427,7 +4392,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 90,
+													"id": 88,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -4436,7 +4401,7 @@
 													},
 													"children": [
 														{
-															"id": 91,
+															"id": 89,
 															"name": "phone",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4459,7 +4424,7 @@
 															}
 														},
 														{
-															"id": 92,
+															"id": 90,
 															"name": "token",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4487,8 +4452,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																91,
-																92
+																89,
+																90
 															]
 														}
 													],
@@ -4503,7 +4468,7 @@
 											}
 										},
 										{
-											"id": 93,
+											"id": 91,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4521,7 +4486,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 94,
+															"id": 92,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -4530,7 +4495,7 @@
 															},
 															"children": [
 																{
-																	"id": 95,
+																	"id": 93,
 																	"name": "redirectTo",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -4565,7 +4530,7 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		95
+																		93
 																	]
 																}
 															]
@@ -4581,7 +4546,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 96,
+													"id": 94,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -4590,7 +4555,7 @@
 													},
 													"children": [
 														{
-															"id": 100,
+															"id": 98,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4623,7 +4588,7 @@
 															}
 														},
 														{
-															"id": 99,
+															"id": 97,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4652,7 +4617,7 @@
 															}
 														},
 														{
-															"id": 98,
+															"id": 96,
 															"name": "session",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4681,7 +4646,7 @@
 															}
 														},
 														{
-															"id": 97,
+															"id": 95,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4715,10 +4680,10 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																100,
-																99,
 																98,
-																97
+																97,
+																96,
+																95
 															]
 														}
 													],
@@ -4736,7 +4701,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 87,
+										"id": 85,
 										"name": "GoTrueClient.verifyOTP"
 									}
 								}
@@ -4750,7 +4715,7 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 87,
+								"id": 85,
 								"name": "GoTrueClient.verifyOTP"
 							}
 						}
@@ -4781,18 +4746,18 @@
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								127,
-								139,
-								105,
+								125,
+								137,
 								103,
-								124,
-								118,
-								67,
-								135,
-								52,
-								111,
 								101,
-								87
+								122,
+								116,
+								65,
+								133,
+								50,
+								109,
+								99,
+								85
 							]
 						}
 					],
@@ -4829,7 +4794,7 @@
 			]
 		},
 		{
-			"id": 175,
+			"id": 173,
 			"name": "\"lib/SupabaseQueryBuilder\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -4839,7 +4804,7 @@
 			"originalName": "/home/runner/work/supabase-js/supabase-js/src/lib/SupabaseQueryBuilder.ts",
 			"children": [
 				{
-					"id": 176,
+					"id": 174,
 					"name": "SupabaseQueryBuilder",
 					"kind": 128,
 					"kindString": "Class",
@@ -4848,7 +4813,7 @@
 					},
 					"typeParameter": [
 						{
-							"id": 177,
+							"id": 175,
 							"name": "T",
 							"kind": 131072,
 							"kindString": "Type parameter",
@@ -4859,7 +4824,7 @@
 					],
 					"children": [
 						{
-							"id": 180,
+							"id": 178,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -4868,7 +4833,7 @@
 							},
 							"signatures": [
 								{
-									"id": 181,
+									"id": 179,
 									"name": "new SupabaseQueryBuilder",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -4877,7 +4842,7 @@
 									},
 									"parameters": [
 										{
-											"id": 182,
+											"id": 180,
 											"name": "url",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4890,7 +4855,7 @@
 											}
 										},
 										{
-											"id": 183,
+											"id": 181,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4901,7 +4866,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 184,
+													"id": 182,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -4910,7 +4875,7 @@
 													},
 													"children": [
 														{
-															"id": 185,
+															"id": 183,
 															"name": "headers",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4927,7 +4892,7 @@
 															"type": {
 																"type": "reflection",
 																"declaration": {
-																	"id": 186,
+																	"id": 184,
 																	"name": "__type",
 																	"kind": 65536,
 																	"kindString": "Type literal",
@@ -4936,7 +4901,7 @@
 																	},
 																	"indexSignature": [
 																		{
-																			"id": 187,
+																			"id": 185,
 																			"name": "__index",
 																			"kind": 8192,
 																			"kindString": "Index signature",
@@ -4945,7 +4910,7 @@
 																			},
 																			"parameters": [
 																				{
-																					"id": 188,
+																					"id": 186,
 																					"name": "key",
 																					"kind": 32768,
 																					"kindString": "Parameter",
@@ -4968,7 +4933,7 @@
 															}
 														},
 														{
-															"id": 190,
+															"id": 188,
 															"name": "realtime",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4988,7 +4953,7 @@
 															}
 														},
 														{
-															"id": 189,
+															"id": 187,
 															"name": "schema",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5008,7 +4973,7 @@
 															}
 														},
 														{
-															"id": 191,
+															"id": 189,
 															"name": "table",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5033,10 +4998,10 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																185,
-																190,
-																189,
-																191
+																183,
+																188,
+																187,
+																189
 															]
 														}
 													],
@@ -5053,7 +5018,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 176,
+										"id": 174,
 										"name": "SupabaseQueryBuilder"
 									},
 									"overwrites": {
@@ -5075,7 +5040,7 @@
 							}
 						},
 						{
-							"id": 179,
+							"id": 177,
 							"name": "_realtime",
 							"kind": 1024,
 							"kindString": "Property",
@@ -5096,7 +5061,7 @@
 							}
 						},
 						{
-							"id": 178,
+							"id": 176,
 							"name": "_subscription",
 							"kind": 1024,
 							"kindString": "Property",
@@ -5113,12 +5078,12 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 150,
+								"id": 148,
 								"name": "SupabaseRealtimeClient"
 							}
 						},
 						{
-							"id": 250,
+							"id": 248,
 							"name": "body",
 							"kind": 1024,
 							"kindString": "Property",
@@ -5164,12 +5129,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 250,
+								"id": 248,
 								"name": "PostgrestBuilder.body"
 							}
 						},
 						{
-							"id": 245,
+							"id": 243,
 							"name": "headers",
 							"kind": 1024,
 							"kindString": "Property",
@@ -5187,7 +5152,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 246,
+									"id": 244,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -5196,7 +5161,7 @@
 									},
 									"indexSignature": [
 										{
-											"id": 247,
+											"id": 245,
 											"name": "__index",
 											"kind": 8192,
 											"kindString": "Index signature",
@@ -5205,7 +5170,7 @@
 											},
 											"parameters": [
 												{
-													"id": 248,
+													"id": 246,
 													"name": "key",
 													"kind": 32768,
 													"kindString": "Parameter",
@@ -5235,12 +5200,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 245,
+								"id": 243,
 								"name": "PostgrestBuilder.headers"
 							}
 						},
 						{
-							"id": 243,
+							"id": 241,
 							"name": "method",
 							"kind": 1024,
 							"kindString": "Property",
@@ -5282,12 +5247,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 243,
+								"id": 241,
 								"name": "PostgrestBuilder.method"
 							}
 						},
 						{
-							"id": 249,
+							"id": 247,
 							"name": "schema",
 							"kind": 1024,
 							"kindString": "Property",
@@ -5318,12 +5283,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 249,
+								"id": 247,
 								"name": "PostgrestBuilder.schema"
 							}
 						},
 						{
-							"id": 251,
+							"id": 249,
 							"name": "shouldThrowOnError",
 							"kind": 1024,
 							"kindString": "Property",
@@ -5358,12 +5323,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 251,
+								"id": 249,
 								"name": "PostgrestBuilder.shouldThrowOnError"
 							}
 						},
 						{
-							"id": 244,
+							"id": 242,
 							"name": "url",
 							"kind": 1024,
 							"kindString": "Property",
@@ -5384,12 +5349,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 244,
+								"id": 242,
 								"name": "PostgrestBuilder.url"
 							}
 						},
 						{
-							"id": 237,
+							"id": 235,
 							"name": "delete",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5398,7 +5363,7 @@
 							},
 							"signatures": [
 								{
-									"id": 238,
+									"id": 236,
 									"name": "delete",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5410,7 +5375,7 @@
 									},
 									"parameters": [
 										{
-											"id": 239,
+											"id": 237,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5422,7 +5387,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 240,
+													"id": 238,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -5431,7 +5396,7 @@
 													},
 													"children": [
 														{
-															"id": 242,
+															"id": 240,
 															"name": "count",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5475,7 +5440,7 @@
 															}
 														},
 														{
-															"id": 241,
+															"id": 239,
 															"name": "returning",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5516,8 +5481,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																242,
-																241
+																240,
+																239
 															]
 														}
 													],
@@ -5544,7 +5509,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 237,
+										"id": 235,
 										"name": "PostgrestQueryBuilder.delete"
 									}
 								}
@@ -5558,12 +5523,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 237,
+								"id": 235,
 								"name": "PostgrestQueryBuilder.delete"
 							}
 						},
 						{
-							"id": 206,
+							"id": 204,
 							"name": "insert",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5572,7 +5537,7 @@
 							},
 							"signatures": [
 								{
-									"id": 207,
+									"id": 205,
 									"name": "insert",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5584,7 +5549,7 @@
 									},
 									"parameters": [
 										{
-											"id": 208,
+											"id": 206,
 											"name": "values",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5624,7 +5589,7 @@
 											}
 										},
 										{
-											"id": 209,
+											"id": 207,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5642,7 +5607,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 210,
+															"id": 208,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -5651,7 +5616,7 @@
 															},
 															"children": [
 																{
-																	"id": 212,
+																	"id": 210,
 																	"name": "count",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -5689,7 +5654,7 @@
 																	}
 																},
 																{
-																	"id": 211,
+																	"id": 209,
 																	"name": "returning",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -5724,8 +5689,8 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		212,
-																		211
+																		210,
+																		209
 																	]
 																}
 															]
@@ -5747,12 +5712,12 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 206,
+										"id": 204,
 										"name": "PostgrestQueryBuilder.insert"
 									}
 								},
 								{
-									"id": 213,
+									"id": 211,
 									"name": "insert",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5769,7 +5734,7 @@
 									},
 									"parameters": [
 										{
-											"id": 214,
+											"id": 212,
 											"name": "values",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5806,7 +5771,7 @@
 											}
 										},
 										{
-											"id": 215,
+											"id": 213,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5824,7 +5789,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 216,
+															"id": 214,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -5833,7 +5798,7 @@
 															},
 															"children": [
 																{
-																	"id": 220,
+																	"id": 218,
 																	"name": "count",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -5871,7 +5836,7 @@
 																	}
 																},
 																{
-																	"id": 218,
+																	"id": 216,
 																	"name": "onConflict",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -5901,7 +5866,7 @@
 																	}
 																},
 																{
-																	"id": 219,
+																	"id": 217,
 																	"name": "returning",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -5931,7 +5896,7 @@
 																	}
 																},
 																{
-																	"id": 217,
+																	"id": 215,
 																	"name": "upsert",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -5970,10 +5935,10 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		220,
 																		218,
-																		219,
-																		217
+																		216,
+																		217,
+																		215
 																	]
 																}
 															]
@@ -5995,7 +5960,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 206,
+										"id": 204,
 										"name": "PostgrestQueryBuilder.insert"
 									}
 								}
@@ -6014,12 +5979,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 206,
+								"id": 204,
 								"name": "PostgrestQueryBuilder.insert"
 							}
 						},
 						{
-							"id": 192,
+							"id": 190,
 							"name": "on",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6028,7 +5993,7 @@
 							},
 							"signatures": [
 								{
-									"id": 193,
+									"id": 191,
 									"name": "on",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6040,7 +6005,7 @@
 									},
 									"parameters": [
 										{
-											"id": 194,
+											"id": 192,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6057,7 +6022,7 @@
 											}
 										},
 										{
-											"id": 195,
+											"id": 193,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6070,7 +6035,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 196,
+													"id": 194,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -6079,7 +6044,7 @@
 													},
 													"signatures": [
 														{
-															"id": 197,
+															"id": 195,
 															"name": "__call",
 															"kind": 4096,
 															"kindString": "Call signature",
@@ -6088,7 +6053,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 198,
+																	"id": 196,
 																	"name": "payload",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -6127,7 +6092,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 150,
+										"id": 148,
 										"name": "SupabaseRealtimeClient"
 									}
 								}
@@ -6141,7 +6106,7 @@
 							]
 						},
 						{
-							"id": 199,
+							"id": 197,
 							"name": "select",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6150,7 +6115,7 @@
 							},
 							"signatures": [
 								{
-									"id": 200,
+									"id": 198,
 									"name": "select",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6162,7 +6127,7 @@
 									},
 									"parameters": [
 										{
-											"id": 201,
+											"id": 199,
 											"name": "columns",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6188,7 +6153,7 @@
 											}
 										},
 										{
-											"id": 202,
+											"id": 200,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6200,7 +6165,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 203,
+													"id": 201,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -6209,7 +6174,7 @@
 													},
 													"children": [
 														{
-															"id": 205,
+															"id": 203,
 															"name": "count",
 															"kind": 32,
 															"kindString": "Variable",
@@ -6253,7 +6218,7 @@
 															}
 														},
 														{
-															"id": 204,
+															"id": 202,
 															"name": "head",
 															"kind": 32,
 															"kindString": "Variable",
@@ -6294,8 +6259,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																205,
-																204
+																203,
+																202
 															]
 														}
 													],
@@ -6322,7 +6287,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 199,
+										"id": 197,
 										"name": "PostgrestQueryBuilder.select"
 									}
 								}
@@ -6336,12 +6301,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 199,
+								"id": 197,
 								"name": "PostgrestQueryBuilder.select"
 							}
 						},
 						{
-							"id": 254,
+							"id": 252,
 							"name": "then",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6350,7 +6315,7 @@
 							},
 							"signatures": [
 								{
-									"id": 255,
+									"id": 253,
 									"name": "then",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6359,7 +6324,7 @@
 									},
 									"typeParameter": [
 										{
-											"id": 256,
+											"id": 254,
 											"name": "TResult1",
 											"kind": 131072,
 											"kindString": "Type parameter",
@@ -6368,7 +6333,7 @@
 											}
 										},
 										{
-											"id": 257,
+											"id": 255,
 											"name": "TResult2",
 											"kind": 131072,
 											"kindString": "Type parameter",
@@ -6379,7 +6344,7 @@
 									],
 									"parameters": [
 										{
-											"id": 258,
+											"id": 256,
 											"name": "onfulfilled",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6393,7 +6358,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 259,
+															"id": 257,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -6402,7 +6367,7 @@
 															},
 															"signatures": [
 																{
-																	"id": 260,
+																	"id": 258,
 																	"name": "__call",
 																	"kind": 4096,
 																	"kindString": "Call signature",
@@ -6411,7 +6376,7 @@
 																	},
 																	"parameters": [
 																		{
-																			"id": 261,
+																			"id": 259,
 																			"name": "value",
 																			"kind": 32768,
 																			"kindString": "Parameter",
@@ -6492,7 +6457,7 @@
 											}
 										},
 										{
-											"id": 262,
+											"id": 260,
 											"name": "onrejected",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6506,7 +6471,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 263,
+															"id": 261,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -6515,7 +6480,7 @@
 															},
 															"signatures": [
 																{
-																	"id": 264,
+																	"id": 262,
 																	"name": "__call",
 																	"kind": 4096,
 																	"kindString": "Call signature",
@@ -6524,7 +6489,7 @@
 																	},
 																	"parameters": [
 																		{
-																			"id": 265,
+																			"id": 263,
 																			"name": "reason",
 																			"kind": 32768,
 																			"kindString": "Parameter",
@@ -6622,7 +6587,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 254,
+										"id": 252,
 										"name": "PostgrestBuilder.then"
 									}
 								}
@@ -6636,12 +6601,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 254,
+								"id": 252,
 								"name": "PostgrestBuilder.then"
 							}
 						},
 						{
-							"id": 252,
+							"id": 250,
 							"name": "throwOnError",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6650,7 +6615,7 @@
 							},
 							"signatures": [
 								{
-									"id": 253,
+									"id": 251,
 									"name": "throwOnError",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6673,7 +6638,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 252,
+										"id": 250,
 										"name": "PostgrestBuilder.throwOnError"
 									}
 								}
@@ -6687,12 +6652,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 252,
+								"id": 250,
 								"name": "PostgrestBuilder.throwOnError"
 							}
 						},
 						{
-							"id": 230,
+							"id": 228,
 							"name": "update",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6701,7 +6666,7 @@
 							},
 							"signatures": [
 								{
-									"id": 231,
+									"id": 229,
 									"name": "update",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6713,7 +6678,7 @@
 									},
 									"parameters": [
 										{
-											"id": 232,
+											"id": 230,
 											"name": "values",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6735,7 +6700,7 @@
 											}
 										},
 										{
-											"id": 233,
+											"id": 231,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6747,7 +6712,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 234,
+													"id": 232,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -6756,7 +6721,7 @@
 													},
 													"children": [
 														{
-															"id": 236,
+															"id": 234,
 															"name": "count",
 															"kind": 32,
 															"kindString": "Variable",
@@ -6800,7 +6765,7 @@
 															}
 														},
 														{
-															"id": 235,
+															"id": 233,
 															"name": "returning",
 															"kind": 32,
 															"kindString": "Variable",
@@ -6841,8 +6806,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																236,
-																235
+																234,
+																233
 															]
 														}
 													],
@@ -6869,7 +6834,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 230,
+										"id": 228,
 										"name": "PostgrestQueryBuilder.update"
 									}
 								}
@@ -6883,12 +6848,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 230,
+								"id": 228,
 								"name": "PostgrestQueryBuilder.update"
 							}
 						},
 						{
-							"id": 221,
+							"id": 219,
 							"name": "upsert",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6897,7 +6862,7 @@
 							},
 							"signatures": [
 								{
-									"id": 222,
+									"id": 220,
 									"name": "upsert",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6909,7 +6874,7 @@
 									},
 									"parameters": [
 										{
-											"id": 223,
+											"id": 221,
 											"name": "values",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6949,7 +6914,7 @@
 											}
 										},
 										{
-											"id": 224,
+											"id": 222,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6961,7 +6926,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 225,
+													"id": 223,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -6970,7 +6935,7 @@
 													},
 													"children": [
 														{
-															"id": 228,
+															"id": 226,
 															"name": "count",
 															"kind": 32,
 															"kindString": "Variable",
@@ -7014,7 +6979,7 @@
 															}
 														},
 														{
-															"id": 229,
+															"id": 227,
 															"name": "ignoreDuplicates",
 															"kind": 32,
 															"kindString": "Variable",
@@ -7050,7 +7015,7 @@
 															}
 														},
 														{
-															"id": 226,
+															"id": 224,
 															"name": "onConflict",
 															"kind": 32,
 															"kindString": "Variable",
@@ -7082,7 +7047,7 @@
 															}
 														},
 														{
-															"id": 227,
+															"id": 225,
 															"name": "returning",
 															"kind": 32,
 															"kindString": "Variable",
@@ -7123,10 +7088,10 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																228,
-																229,
 																226,
-																227
+																227,
+																224,
+																225
 															]
 														}
 													],
@@ -7153,7 +7118,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 221,
+										"id": 219,
 										"name": "PostgrestQueryBuilder.upsert"
 									}
 								}
@@ -7167,7 +7132,7 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 221,
+								"id": 219,
 								"name": "PostgrestQueryBuilder.upsert"
 							}
 						}
@@ -7177,35 +7142,35 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								180
+								178
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								179,
-								178,
-								250,
-								245,
+								177,
+								176,
+								248,
 								243,
+								241,
+								247,
 								249,
-								251,
-								244
+								242
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								237,
-								206,
-								192,
-								199,
-								254,
+								235,
+								204,
+								190,
+								197,
 								252,
-								230,
-								221
+								250,
+								228,
+								219
 							]
 						}
 					],
@@ -7253,7 +7218,7 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						176
+						174
 					]
 				}
 			],
@@ -7266,7 +7231,7 @@
 			]
 		},
 		{
-			"id": 149,
+			"id": 147,
 			"name": "\"lib/SupabaseRealtimeClient\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -7276,7 +7241,7 @@
 			"originalName": "/home/runner/work/supabase-js/supabase-js/src/lib/SupabaseRealtimeClient.ts",
 			"children": [
 				{
-					"id": 150,
+					"id": 148,
 					"name": "SupabaseRealtimeClient",
 					"kind": 128,
 					"kindString": "Class",
@@ -7285,7 +7250,7 @@
 					},
 					"children": [
 						{
-							"id": 152,
+							"id": 150,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -7294,7 +7259,7 @@
 							},
 							"signatures": [
 								{
-									"id": 153,
+									"id": 151,
 									"name": "new SupabaseRealtimeClient",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -7303,7 +7268,7 @@
 									},
 									"parameters": [
 										{
-											"id": 154,
+											"id": 152,
 											"name": "socket",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7316,7 +7281,7 @@
 											}
 										},
 										{
-											"id": 155,
+											"id": 153,
 											"name": "schema",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7329,7 +7294,7 @@
 											}
 										},
 										{
-											"id": 156,
+											"id": 154,
 											"name": "tableName",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7344,7 +7309,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 150,
+										"id": 148,
 										"name": "SupabaseRealtimeClient"
 									}
 								}
@@ -7358,7 +7323,7 @@
 							]
 						},
 						{
-							"id": 151,
+							"id": 149,
 							"name": "subscription",
 							"kind": 1024,
 							"kindString": "Property",
@@ -7378,7 +7343,7 @@
 							}
 						},
 						{
-							"id": 157,
+							"id": 155,
 							"name": "getPayloadRecords",
 							"kind": 2048,
 							"kindString": "Method",
@@ -7388,7 +7353,7 @@
 							},
 							"signatures": [
 								{
-									"id": 158,
+									"id": 156,
 									"name": "getPayloadRecords",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -7397,7 +7362,7 @@
 									},
 									"parameters": [
 										{
-											"id": 159,
+											"id": 157,
 											"name": "payload",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7413,7 +7378,7 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 160,
+											"id": 158,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -7422,7 +7387,7 @@
 											},
 											"children": [
 												{
-													"id": 161,
+													"id": 159,
 													"name": "new",
 													"kind": 32,
 													"kindString": "Variable",
@@ -7439,7 +7404,7 @@
 													"type": {
 														"type": "reflection",
 														"declaration": {
-															"id": 162,
+															"id": 160,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -7450,7 +7415,7 @@
 													}
 												},
 												{
-													"id": 163,
+													"id": 161,
 													"name": "old",
 													"kind": 32,
 													"kindString": "Variable",
@@ -7467,7 +7432,7 @@
 													"type": {
 														"type": "reflection",
 														"declaration": {
-															"id": 164,
+															"id": 162,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -7483,8 +7448,8 @@
 													"title": "Variables",
 													"kind": 32,
 													"children": [
-														161,
-														163
+														159,
+														161
 													]
 												}
 											]
@@ -7501,7 +7466,7 @@
 							]
 						},
 						{
-							"id": 165,
+							"id": 163,
 							"name": "on",
 							"kind": 2048,
 							"kindString": "Method",
@@ -7510,7 +7475,7 @@
 							},
 							"signatures": [
 								{
-									"id": 166,
+									"id": 164,
 									"name": "on",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -7522,7 +7487,7 @@
 									},
 									"parameters": [
 										{
-											"id": 167,
+											"id": 165,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7539,7 +7504,7 @@
 											}
 										},
 										{
-											"id": 168,
+											"id": 166,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7552,7 +7517,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 169,
+													"id": 167,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -7561,7 +7526,7 @@
 													},
 													"signatures": [
 														{
-															"id": 170,
+															"id": 168,
 															"name": "__call",
 															"kind": 4096,
 															"kindString": "Call signature",
@@ -7570,7 +7535,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 171,
+																	"id": 169,
 																	"name": "payload",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -7622,7 +7587,7 @@
 							]
 						},
 						{
-							"id": 172,
+							"id": 170,
 							"name": "subscribe",
 							"kind": 2048,
 							"kindString": "Method",
@@ -7631,7 +7596,7 @@
 							},
 							"signatures": [
 								{
-									"id": 173,
+									"id": 171,
 									"name": "subscribe",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -7643,7 +7608,7 @@
 									},
 									"parameters": [
 										{
-											"id": 174,
+											"id": 172,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7677,23 +7642,23 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								152
+								150
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								151
+								149
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								157,
-								165,
-								172
+								155,
+								163,
+								170
 							]
 						}
 					],
@@ -7711,7 +7676,7 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						150
+						148
 					]
 				}
 			],
@@ -7805,7 +7770,7 @@
 			]
 		},
 		{
-			"id": 344,
+			"id": 337,
 			"name": "\"lib/helpers\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -7815,7 +7780,7 @@
 			"originalName": "/home/runner/work/supabase-js/supabase-js/src/lib/helpers.ts",
 			"children": [
 				{
-					"id": 345,
+					"id": 338,
 					"name": "uuid",
 					"kind": 64,
 					"kindString": "Function",
@@ -7824,7 +7789,7 @@
 					},
 					"signatures": [
 						{
-							"id": 346,
+							"id": 339,
 							"name": "uuid",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7851,7 +7816,7 @@
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						345
+						338
 					]
 				}
 			],
@@ -8502,15 +8467,14 @@
 			"title": "Modules",
 			"kind": 1,
 			"children": [
-				266,
-				338,
-				29,
-				175,
-				149,
-				3,
-				344,
-				6,
-				1
+				264,
+				331,
+				27,
+				173,
+				147,
+				1,
+				337,
+				4
 			]
 		}
 	]

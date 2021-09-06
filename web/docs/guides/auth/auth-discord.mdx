@@ -1,6 +1,6 @@
 ---
 id: auth-discord
-title: "Setting up Discord Auth"
+title: "OAuth with Discord"
 description: Add Discord OAuth to your Supabase project
 ---
 
@@ -81,7 +81,7 @@ const { user, session, error } = await supabase.auth.signIn({
 Add this function which you can call from a button, link, or UI element.
 
 ```js
-function signInWithDiscord() {
+async function signInWithDiscord() {
   const { user, session, error } = await supabase.auth.signIn({
     provider: 'discord'
   });
@@ -91,7 +91,7 @@ function signInWithDiscord() {
 To log out:
 
 ```js
-function signout() {
+async function signout() {
   const { error } = await supabase.auth.signOut();
 }
 ```

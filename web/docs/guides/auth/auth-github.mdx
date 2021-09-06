@@ -1,6 +1,6 @@
 ---
 id: auth-github
-title: "Setting up GitHub Auth"
+title: "OAuth with GitHub"
 description: Add GitHub OAuth to your Supabase project
 ---
 
@@ -90,7 +90,7 @@ const { user, session, error } = await supabase.auth.signIn({
 Add this function which you can call from a button, link, or UI element.
 
 ```js
-function signInWithGithub() {
+async function signInWithGithub() {
   const { user, session, error } = await supabase.auth.signIn({
     provider: 'github'
   });
@@ -100,7 +100,7 @@ function signInWithGithub() {
 To log out:
 
 ```js
-function signout() {
+async function signout() {
   const { error } = await supabase.auth.signOut();
 }
 ```

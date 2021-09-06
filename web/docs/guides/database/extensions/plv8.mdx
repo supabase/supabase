@@ -13,7 +13,7 @@ The `plv8` extension allows you use Javascript within Postgres.
 ## Overview
 
 While Postgres natively runs SQL, it can also run other "procedural languages". 
-`plv8` allows you to run Javascript code - specifically any code that runs on the [V8 Jasvascript engine](https://v8.dev).
+`plv8` allows you to run Javascript code - specifically any code that runs on the [V8 Javascript engine](https://v8.dev).
 
 It can be used for database functions, triggers, queries and more.
 
@@ -127,8 +127,8 @@ create or replace function update_user(id bigint, first_name text)
 returns smallint as $$
 
     var num_affected = plv8.execute(
-        'udpate profiles set first_name = $1 where id = $2', 
-        [id, first_name]
+        'update profiles set first_name = $1 where id = $2', 
+        [first_name, id]
     );
 
     return num_affected;

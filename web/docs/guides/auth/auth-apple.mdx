@@ -1,6 +1,6 @@
 ---
 id: auth-apple
-title: "Setting up Apple Auth"
+title: "OAuth with Apple"
 description: Add Apple OAuth to your Supabase project
 ---
 
@@ -45,7 +45,7 @@ Apple OAuth consists of six broad steps:
 
 ### Obtain a Services ID
 
-This will serve as the `cliend_id` when you make API calls to authenticate the user.
+This will serve as the `client_id` when you make API calls to authenticate the user.
 
 - Go to `Certificates, Identifiers & Profiles`.
 - Click on `Identifiers` at the left.
@@ -190,7 +190,7 @@ const { user, session, error } = await supabase.auth.signIn({
 Add a function which you can call from a button, link, or UI element.
 
 ```js
-function signInWithApple() {
+async function signInWithApple() {
   const { user, session, error } = await supabase.auth.signIn({
     provider: 'apple'
   });
@@ -200,7 +200,7 @@ function signInWithApple() {
 To log out:
 
 ```js
-function signout() {
+async function signout() {
   const { error } = await supabase.auth.signOut();
 }
 ```

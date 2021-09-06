@@ -117,6 +117,9 @@ const Hero = () => {
           <p className="text-2xl">
             Today, we're moving to <span className="text-brand-700">Beta</span>
           </p>
+          <time itemProp="datePublished" dateTime="2020-12-03" className="opacity-50 text-sm">
+            Published December 3rd, 2020
+          </time>
         </div>
       </div>
     </div>
@@ -912,11 +915,11 @@ const WhatsNext = () => (
           <p className="mb-10">
             We depend on your feedback to continually improve Supabase. Email us at{' '}
             <a
-              href="mailto:beta@supabase.io"
+              href="mailto:support@supabase.io"
               target="_blank"
               className="text-brand-700 hover:text-brand-800"
             >
-              beta@supabase.io
+              support@supabase.io
             </a>{' '}
             or join the{' '}
             <a
@@ -992,9 +995,11 @@ const Beta = () => {
       <Container>
         <div className="sticky inset-0 z-50">
           <div className="shadow-lg py-5 px-5 xl:px-20 bg-dark-800 flex items-center justify-between">
-            <a href="/">
-              <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
-            </a>
+            <Link href="/">
+              <a>
+                <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
+              </a>
+            </Link>
             <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)} />
           </div>
           <FlyOut

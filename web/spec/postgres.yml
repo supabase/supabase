@@ -107,7 +107,7 @@ pages:
           ```sql
           create table table_name (
             column_1 data_type,
-            column_2 data_type
+            column_2 data_type,
             -- Constraints:
             primary key (column_1, column_2)
           );

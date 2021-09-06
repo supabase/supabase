@@ -14,7 +14,7 @@ export default function Quote(props: Props) {
     <figure className="border border-gray-100 dark:border-gray-600 p-8">
       <Space direction="vertical" size={5}>
         <blockquote className="border-none mb-4" style={{ margin: 0, padding: 0 }}>
-          "{children}"
+          {children}
         </blockquote>
         <Space size={4} className="align-center">
           <img

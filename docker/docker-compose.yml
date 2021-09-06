@@ -17,13 +17,14 @@ services:
       - ${AUTH_PORT}
     depends_on:
       - db
+    restart: always
     environment:
       GOTRUE_JWT_SECRET: ${JWT_SECRET}
       GOTRUE_JWT_EXP: 3600
       GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
       GOTRUE_DB_DRIVER: postgres
       DB_NAMESPACE: auth
-      API_EXTERNAL_URL: localhost
+      API_EXTERNAL_URL: http://localhost:8000
       GOTRUE_API_HOST: 0.0.0.0
       PORT: ${AUTH_PORT}
 
@@ -31,13 +32,17 @@ services:
       GOTRUE_SMTP_PORT: ${SMTP_PORT}
       GOTRUE_SMTP_USER: ${SMTP_USER}
       GOTRUE_SMTP_PASS: ${SMTP_PASS}
+      GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
 
       GOTRUE_DISABLE_SIGNUP: 'false'
-      GOTRUE_SITE_URL: localhost
+      GOTRUE_SITE_URL: http://localhost:8000
+      GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
       GOTRUE_MAILER_AUTOCONFIRM: 'true'
       GOTRUE_LOG_LEVEL: DEBUG
       GOTRUE_OPERATOR_TOKEN: ${OPERATOR_TOKEN}
-      DATABASE_URL: 'postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres?sslmode=disable'
+      DATABASE_URL: 'postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres?sslmode=disable&search_path=auth'
 
   rest:
     container_name: supabase-rest
@@ -49,9 +54,10 @@ services:
     restart: always
     environment:
       PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres
-      PGRST_DB_SCHEMA: public
+      PGRST_DB_SCHEMA: public, storage
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
+
   realtime:
     container_name: supabase-realtime
     image: supabase/realtime:latest
@@ -71,6 +77,30 @@ services:
       # Disable JWT Auth locally. The JWT_SECRET will be ignored.
       SECURE_CHANNELS: 'false'
       JWT_SECRET: ${JWT_SECRET}
+
+  storage:
+    image: supabase/storage-api:v0.9.1
+    ports:
+      - '5000:5000'
+    depends_on:
+    - db
+    - rest
+    restart: always
+    environment:
+        ANON_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYyNzIwODU0MCwiZXhwIjoxOTc0MzYzNzQwLCJhdWQiOiIiLCJzdWIiOiIiLCJyb2xlIjoiYW5vbiJ9.sUHErUOiKZ3nHQIxy-7jND6B80Uzf9G4NtMLmL6HXPQ
+        SERVICE_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYyNzIwNzUzMiwiZXhwIjoxNjkwMjc5NTMyLCJhdWQiOiIiLCJzdWIiOiIiLCJyb2xlIjoic2VydmljZV9yb2xlIn0.hfdXFZV5PdvUdo2xK0vStb1i97GJukSkRqfwd4YIh2M
+        PROJECT_REF: bjwdssmqcnupljrqypxz # can be any random string
+        POSTGREST_URL: http://rest:3000
+        PGRST_JWT_SECRET: ${JWT_SECRET}
+        DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres
+        PGOPTIONS: "-c search_path=storage"
+        FILE_SIZE_LIMIT: ${FILE_SIZE_LIMIT}
+        REGION: ${STORAGE_REGION} # region where your bucket is located
+        GLOBAL_S3_BUCKET: ${STORAGE_S3_BUCKET}  # name of s3 bucket where you want to store objects
+        # AWS_ACCESS_KEY_ID: replace-with-your-aws-key
+        # AWS_SECRET_ACCESS_KEY: replace-with-your-aws-secret
+        STORAGE_BACKEND: ${STORAGE_BACKEND}
+        FILE_STORAGE_BACKEND_PATH: /var/data/storage
   db:
     container_name: supabase-db
     build:

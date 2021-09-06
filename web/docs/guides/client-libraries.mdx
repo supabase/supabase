@@ -116,7 +116,7 @@ import 'package:supabase/supabase.dart';
 void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
-  // Sign up user with email and password
+  // Sign in user with email and password
   final response = await client
       .auth
       .signIn(email: 'example@email.com', password: 'example-password');
@@ -170,7 +170,7 @@ import 'package:supabase/supabase.dart';
 void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
-  // Sign up user with email and password
+  // Sign in user with email and magic link
   final response = await client
       .auth
       .signIn(email: 'example@email.com');
@@ -256,7 +256,14 @@ const { data, error } = await supabase
 <TabItem value="py">
 
 ```py
-# Not yet implemented
+import os
+from supabase_py import create_client, Client
+
+url: str = os.environ.get("SUPABASE_TEST_URL")
+key: str = os.environ.get("SUPABASE_TEST_KEY")
+supabase: Client = create_client(url, key)
+
+data = supabase.from_('countries').select('name').execute()
 ```
 
 
@@ -270,7 +277,7 @@ import 'package:supabase/supabase.dart';
 void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
-  // Sign up user with email and password
+  // Query tables and fetch related data in one round-trip, using select()
   final response = await client
       .from('countries')
       .select('name')
@@ -320,7 +327,7 @@ import 'package:supabase/supabase.dart';
 void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
-  // Sign up user with email and password
+  // When fetching data, use advanced filtering to only extract data, that you need.
   final response = await client
       .from('cities')
       .select('name,country_id')
@@ -374,7 +381,7 @@ import 'package:supabase/supabase.dart';
 void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
-  // Sign up user with email and password
+  // Create data easily, using insert()
   final response = await client
       .from('cities')
       .insert([
@@ -430,11 +437,11 @@ import 'package:supabase/supabase.dart';
 void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
-  // Sign up user with email and password
+  // Listen to realtime database changes, using subscribe()
   final response = await client
       .from('countries')
       .on(SupabaseEventTypes.all, (payload) {
-        print('Something happenned: ${payload.eventType}');
+        print('Something happened: ${payload.eventType}');
       })
       .subscribe((String event, {String? errorMsg}) {
         print('event: $event error: $errorMsg');
@@ -483,11 +490,11 @@ import 'package:supabase/supabase.dart';
 void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
 
-  // Sign up user with email and password
+  // You can even listen to Row Level changes
   final response = await client
       .from('countries:id.eq.200')
       .on(SupabaseEventTypes.update, (payload) {
-        print('Something happenned: ${payload.eventType}');
+        print('Something happened: ${payload.eventType}');
       })
       .subscribe((String event, {String? errorMsg}) {
         print('event: $event error: $errorMsg');
