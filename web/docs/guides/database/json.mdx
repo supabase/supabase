@@ -1,21 +1,18 @@
 ---
 id: json
-title: "Working With JSON Data"
-description: How to use JSON Data in PostgreSQL and the Supabase Javascript API.
+title: "JSON"
+description: Using the JSON data type in PostgreSQL.
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-PostgreSQL supports [JSON functions and operators](https://www.postgresql.org/docs/12/functions-json.html) which gives flexiblity when storing data inside a database column.  
+PostgreSQL supports [JSON functions and operators](https://www.postgresql.org/docs/current/functions-json.html) which gives flexiblity when storing data inside a database column.  
 
-PostgreSQL supports two types of JSON columns: `JSON` and `JSONB`.  The recommended type is `JSONB`, so that's what we'll be using throughout this document.
+PostgreSQL supports two types of JSON columns: `JSON` and `JSONB`.  
 
-The `JSON` format stores data exactly as you enter it, so every time that data is used PostgreSQL has to reparse it in order to use it.
-
-When you use the `JSONB` format, the data is parsed when it's put into the database so it's faster when querying and also it can be indexed, a big advantage!
-
-From: [PostgreSQL JSON types](https://www.postgresql.org/docs/12/datatype-json.html)
+The recommended type is `JSONB` for almost all cases.
+When you use the `JSONB` format, the data is parsed when it's put into the database so it's faster when querying and also it can be indexed.
 
 ## Steps
 
