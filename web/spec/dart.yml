@@ -15,7 +15,7 @@ info:
   docs:
     path: reference/dart/
     sidebar:
-      - name: 'About'
+      - name: 'Getting Started'
         items:
           - Installing
           - Initializing
@@ -30,7 +30,7 @@ info:
           - auth.update()
           - auth.onAuthStateChange()
           - Reset Password (Email)
-      - name: 'Data'
+      - name: 'Database'
         items:
           - select()
           - insert()
