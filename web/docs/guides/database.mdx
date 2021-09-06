@@ -47,15 +47,14 @@ Supabase comes with a SQL Editor. You can also save your favorite queries to run
 
 ### Additional features
 
-- Supabase extends Postgres with realtime functionality using our [Realtime Server](/docs/realtime/server/about).
+- Supabase extends Postgres with realtime functionality using our [Realtime Server](https://github.com/supabase/realtime).
 - Every project is a full Postgres database, with `postgres` level access.
-- Managed backups - Supabase handles all your database backups.
+- Managed backups - Supabase handles all your database backups.[^backups]
 - Data imports - import directly from a CSV or excel spreadsheet.
 
-## Extensions
+[^backups] Database backups do _NOT_ include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup will not restore objects that have been deleted since then.
 
-
-### Enable and disable extensions
+### Extensions
 
 To expand the functionality of your Postgres database, you can use extensions.
 You can enable Postgres extensions with the click of a button within the Supabase dashboard.
@@ -64,13 +63,7 @@ You can enable Postgres extensions with the click of a button within the Supabas
 <source src="/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
 </video>
 
-
-### Full list of extensions
-
-Supabase is pre-configured with over 50 extensions. You can also install your own SQL extensions directly into the database through our SQL editor.
-
-<ExtensionsComponent />
-
+[Learn more](/docs/guides/database/extensions) about all the extensions provided on Supabase.
 
 ## Tips
 

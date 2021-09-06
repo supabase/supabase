@@ -76,7 +76,8 @@ module.exports = {
         {
           label: 'Guides',
           to: '/docs/guides',
-          activeBaseRegex: '(^/docs/guides/database/|^/docs/guides/auth/)|(/docs/guides$)',
+          activeBaseRegex:
+            '(^/docs/guides/database/|^/docs/guides/auth/)|(/docs/guides$)|docs/(resources|learn)',
           position: 'left',
         },
         {
@@ -85,23 +86,12 @@ module.exports = {
           activeBasePath: '/docs/reference/',
           position: 'left',
         },
-        {
-          label: 'Resources',
-          to: '/docs/resources',
-          activeBaseRegex: 'docs/(resources|learn|gotrue|postgrest|realtime)',
-          position: 'left',
-        },
-        {
-          label: 'Jobs',
-          to: '/docs/careers',
-          activeBasePath: '/docs/careers',
-          position: 'left',
-        },
         { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
       ],
     },
     prism: {
       defaultLanguage: 'js',
+      additionalLanguages: ['dart'],
       plugins: ['line-numbers', 'show-language'],
       theme: require('@kiwicopple/prism-react-renderer/themes/vsDark'),
       darkTheme: require('@kiwicopple/prism-react-renderer/themes/vsDark'),
@@ -132,6 +122,10 @@ module.exports = {
         {
           title: 'Resources',
           items: [
+            {
+              label: 'Brand Assets',
+              to: 'https://supabase.io/brand-assets',
+            },
             {
               label: 'Docs',
               to: '/docs',
@@ -219,7 +213,7 @@ module.exports = {
   //   //     routeBasePath: 'ref/supabase', // URL Route.
   //   //     include: ['**/*.md', '**/*.mdx'],
   //   //     sidebarPath: require.resolve('./sidebar_spec_supabase.js'),
-  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
   //   //   },
   //   // ],
   //   // [
@@ -231,7 +225,7 @@ module.exports = {
   //   //     routeBasePath: 'ref/postgrest', // URL Route.
   //   //     include: ['**/*.md', '**/*.mdx'],
   //   //     sidebarPath: require.resolve('./sidebar_spec_postgrest.js'),
-  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
   //   //   },
   //   // ],
   //   // [
@@ -243,7 +237,7 @@ module.exports = {
   //   //     routeBasePath: 'ref/gotrue', // URL Route.
   //   //     include: ['**/*.md', '**/*.mdx'],
   //   //     sidebarPath: require.resolve('./sidebar_spec_gotrue.js'),
-  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
   //   //   },
   //   // ],
   //   // [
@@ -255,7 +249,7 @@ module.exports = {
   //   //     routeBasePath: 'ref/realtime', // URL Route.
   //   //     include: ['**/*.md', '**/*.mdx'],
   //   //     sidebarPath: require.resolve('./sidebar_spec_realtime.js'),
-  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
   //   //   },
   //   // ],
   //   // [
@@ -266,7 +260,7 @@ module.exports = {
   //   //     routeBasePath: 'docs/realtime', // URL Route.
   //   //     include: ['**/*.md', '**/*.mdx'],
   //   //     sidebarPath: require.resolve('./sidebar_realtime_server.js'),
-  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
   //   //   },
   //   // ],
   //   // [
@@ -278,7 +272,7 @@ module.exports = {
   //   //     routeBasePath: 'ref/postgrest', // URL Route.
   //   //     include: ['**/*.md', '**/*.mdx'],
   //   //     sidebarPath: require.resolve('./sidebar_spec_postgrest.js'),
-  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
   //   //   },
   //   // ],
   // ],
