@@ -7,7 +7,14 @@ description: Creating and using Postgres tables.
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-In PostgreSQL, data is stored in "tables". Tables are made of "columns" and "rows", similar to a spreadsheet. For example:
+
+In Postgres, data is stored in "tables". 
+Tables are similar to excel spreadsheets. They contain columns & rows of data. There are a few key differences from a spreadsheet however:
+
+- Every column is a strict type of data. When you set up a column, you must define the "data type".
+- Tables can be "joined" together. For example you can have a `users` table, which is joined to a `teams` table (because users belong to teams).
+
+For example, this table has 3 "columns" (`id`, `name`, `description`) and 4 "rows" of data:
 
 | `id`    | `name` | `description` |
 | ----  | ---- | ----------- |
@@ -15,23 +22,14 @@ In PostgreSQL, data is stored in "tables". Tables are made of "columns" and "row
 |    2 | Monsters, Inc. | In order to power the city, monsters have to scare children so that they scream. However, the children are toxic to monsters. |
 |    3 | Finding Nemo | After his son is captured in the Great Barrier Reef and taken to Sydney, a timid clownfish sets out on a journey to bring him home. |
 |    4 | WALL-E | In the distant future, a small waste-collecting robot inadvertently embarks on a space journey that will ultimately decide the fate of mankind. |
-|    5 | Up | 78-year-old Carl Fredricksen travels to Paradise Falls in his house equipped with balloons, inadvertently taking a young stowaway. |
 
-This table has 3 "columns": `id`, `name`, and `description`, and 5 "rows" of data.
-
-## Designing tables
-
-Before you can store data you need to "design" and create your tables.
-
-This is different from NoSQL databases where you can immediately put any data in your database. 
-There is a big benefit to this approach: data integrity. PostgreSQL guarantees that your data fits the rules that you specify. 
-As you scale, this becomes incredibly important.
 
 ## Creating Tables
 
-Supabase gives you several options for creating tables. You can use the Table Editor or create them directly using SQL. 
+Supabase provides several options for creating tables. You can use the Table Editor or create them directly using SQL. 
 We provide a SQL editor within the Dashboard, or you can [connect](/docs/guides/database/connecting/connecting-to-postgres) to your database 
 and run the SQL queries yourself.
+
 
 <Tabs
 defaultValue="UI"
@@ -70,10 +68,21 @@ create table todos (
 </TabItem>
 </Tabs>
 
-## Data types
+
+### Tips
+
+- It is best practice to use lowercase and underscores when naming tables. For example: `table_name`, not `Table Name`.
+- Tables belong to `schemas`. If you don't explicitly pass the schema, Postgres will assume that you want to create the table in the `public` schema.
+
+
+### Data types
 
 Every column is a predefined type. PostgreSQL provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions) 
 if the default types don't fit your needs.
+
+<details>
+<summary>Show/Hide default data types</summary>
+  
 
 | `Name`                                        | `Aliases`              | `Description`                                                       |
 | ------------------------------------------- | -------------------- | ----------------------------------------------------------------- |
@@ -120,3 +129,7 @@ if the default types don't fit your needs.
 | txid\_snapshot                              |                      | user-level transaction ID snapshot (deprecated; see pg\_snapshot) |
 | uuid                                        |                      | universally unique identifier                                     |
 | xml                                         |                      | XML data                                                          |
+
+
+</details>
+

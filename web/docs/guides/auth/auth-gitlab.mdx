@@ -77,7 +77,7 @@ const { user, session, error } = await supabase.auth.signIn({
 Add this function which you can call from a button, link, or UI element.
 
 ```js
-function signInWithGitLab() {
+async function signInWithGitLab() {
   const { user, session, error } = await supabase.auth.signIn({
     provider: 'gitlab'
   });
@@ -87,7 +87,7 @@ function signInWithGitLab() {
 To log out:
 
 ```js
-function signout() {
+async function signout() {
   const { error } = await supabase.auth.signOut();
 }
 ```
