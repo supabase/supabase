@@ -220,7 +220,16 @@
     { "source": "/docs/careers", "destination": "https://about.supabase.com/careers" },
     { "source": "/docs/careers/:match*", "destination": "https://about.supabase.com/careers//:match*" },
 
-    { "source": "/docs/resources", "destination": "/docs/guides" }
+    { "source": "/docs/resources", "destination": "/docs/guides" },
+
+    { "source": "/docs/reference/postgres/getting-started", "destination": "/docs/guides/database/introduction" },
+    { "source": "/reference/postgres/connection-strings", "destination": "/docs/guides/database/connecting/connecting-to-postgres" },
+    { "source": "/docs/reference/postgres/schemas", "destination": "/docs/guides/database/tables" },
+    { "source": "/docs/reference/postgres/tables", "destination": "/docs/guides/database/tables" },
+    { "source": "/docs/guides/database/resource-management", "destination": "/docs/guides/database/timeouts" },
+    { "source": "/docs/reference/postgres/database-passwords", "destination": "/docs/guides/database/managing-passwords" },
+    { "source": "/docs/reference/postgres/changing-timezones", "destination": "/docs/guides/database/managing-timezones" },
+    { "source": "/docs/reference/postgres/publications", "destination": "/docs/guides/database/replication" }
 
 
   ],
