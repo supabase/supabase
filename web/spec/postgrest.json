@@ -6,7 +6,7 @@
 	"originalName": "",
 	"children": [
 		{
-			"id": 443,
+			"id": 448,
 			"name": "\"PostgrestClient\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -16,7 +16,7 @@
 			"originalName": "/home/runner/work/postgrest-js/postgrest-js/src/PostgrestClient.ts",
 			"children": [
 				{
-					"id": 444,
+					"id": 449,
 					"name": "PostgrestClient",
 					"kind": 128,
 					"kindString": "Class",
@@ -25,7 +25,7 @@
 					},
 					"children": [
 						{
-							"id": 451,
+							"id": 456,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -37,7 +37,7 @@
 							},
 							"signatures": [
 								{
-									"id": 452,
+									"id": 457,
 									"name": "new PostgrestClient",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -49,7 +49,7 @@
 									},
 									"parameters": [
 										{
-											"id": 453,
+											"id": 458,
 											"name": "url",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -65,7 +65,7 @@
 											}
 										},
 										{
-											"id": 454,
+											"id": 459,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -76,7 +76,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 455,
+													"id": 460,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -85,7 +85,7 @@
 													},
 													"children": [
 														{
-															"id": 456,
+															"id": 461,
 															"name": "headers",
 															"kind": 32,
 															"kindString": "Variable",
@@ -98,14 +98,14 @@
 															"sources": [
 																{
 																	"fileName": "PostgrestClient.ts",
-																	"line": 19,
+																	"line": 20,
 																	"character": 13
 																}
 															],
 															"type": {
 																"type": "reflection",
 																"declaration": {
-																	"id": 457,
+																	"id": 462,
 																	"name": "__type",
 																	"kind": 65536,
 																	"kindString": "Type literal",
@@ -114,7 +114,7 @@
 																	},
 																	"indexSignature": [
 																		{
-																			"id": 458,
+																			"id": 463,
 																			"name": "__index",
 																			"kind": 8192,
 																			"kindString": "Index signature",
@@ -123,7 +123,7 @@
 																			},
 																			"parameters": [
 																				{
-																					"id": 459,
+																					"id": 464,
 																					"name": "key",
 																					"kind": 32768,
 																					"kindString": "Parameter",
@@ -146,7 +146,7 @@
 															}
 														},
 														{
-															"id": 460,
+															"id": 465,
 															"name": "schema",
 															"kind": 32,
 															"kindString": "Variable",
@@ -159,7 +159,7 @@
 															"sources": [
 																{
 																	"fileName": "PostgrestClient.ts",
-																	"line": 19,
+																	"line": 20,
 																	"character": 26
 																}
 															],
@@ -183,15 +183,15 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																456,
-																460
+																461,
+																465
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "PostgrestClient.ts",
-															"line": 18,
+															"line": 19,
 															"character": 16
 														}
 													]
@@ -202,7 +202,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 444,
+										"id": 449,
 										"name": "PostgrestClient"
 									}
 								}
@@ -210,13 +210,13 @@
 							"sources": [
 								{
 									"fileName": "PostgrestClient.ts",
-									"line": 8,
+									"line": 9,
 									"character": 17
 								}
 							]
 						},
 						{
-							"id": 446,
+							"id": 451,
 							"name": "headers",
 							"kind": 1024,
 							"kindString": "Property",
@@ -226,14 +226,14 @@
 							"sources": [
 								{
 									"fileName": "PostgrestClient.ts",
-									"line": 7,
+									"line": 8,
 									"character": 9
 								}
 							],
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 447,
+									"id": 452,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -242,7 +242,7 @@
 									},
 									"indexSignature": [
 										{
-											"id": 448,
+											"id": 453,
 											"name": "__index",
 											"kind": 8192,
 											"kindString": "Index signature",
@@ -251,7 +251,7 @@
 											},
 											"parameters": [
 												{
-													"id": 449,
+													"id": 454,
 													"name": "key",
 													"kind": 32768,
 													"kindString": "Parameter",
@@ -273,7 +273,7 @@
 									"sources": [
 										{
 											"fileName": "PostgrestClient.ts",
-											"line": 7,
+											"line": 8,
 											"character": 10
 										}
 									]
@@ -281,7 +281,7 @@
 							}
 						},
 						{
-							"id": 450,
+							"id": 455,
 							"name": "schema",
 							"kind": 1024,
 							"kindString": "Property",
@@ -292,7 +292,7 @@
 							"sources": [
 								{
 									"fileName": "PostgrestClient.ts",
-									"line": 8,
+									"line": 9,
 									"character": 8
 								}
 							],
@@ -311,7 +311,7 @@
 							}
 						},
 						{
-							"id": 445,
+							"id": 450,
 							"name": "url",
 							"kind": 1024,
 							"kindString": "Property",
@@ -321,7 +321,7 @@
 							"sources": [
 								{
 									"fileName": "PostgrestClient.ts",
-									"line": 6,
+									"line": 7,
 									"character": 5
 								}
 							],
@@ -331,7 +331,7 @@
 							}
 						},
 						{
-							"id": 461,
+							"id": 466,
 							"name": "auth",
 							"kind": 2048,
 							"kindString": "Method",
@@ -340,7 +340,7 @@
 							},
 							"signatures": [
 								{
-									"id": 462,
+									"id": 467,
 									"name": "auth",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -352,7 +352,7 @@
 									},
 									"parameters": [
 										{
-											"id": 463,
+											"id": 468,
 											"name": "token",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -377,13 +377,13 @@
 							"sources": [
 								{
 									"fileName": "PostgrestClient.ts",
-									"line": 31,
+									"line": 32,
 									"character": 6
 								}
 							]
 						},
 						{
-							"id": 464,
+							"id": 469,
 							"name": "from",
 							"kind": 2048,
 							"kindString": "Method",
@@ -392,7 +392,7 @@
 							},
 							"signatures": [
 								{
-									"id": 465,
+									"id": 470,
 									"name": "from",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -404,7 +404,7 @@
 									},
 									"typeParameter": [
 										{
-											"id": 466,
+											"id": 471,
 											"name": "T",
 											"kind": 131072,
 											"kindString": "Type parameter",
@@ -415,7 +415,7 @@
 									],
 									"parameters": [
 										{
-											"id": 467,
+											"id": 472,
 											"name": "table",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -451,13 +451,13 @@
 							"sources": [
 								{
 									"fileName": "PostgrestClient.ts",
-									"line": 41,
+									"line": 42,
 									"character": 6
 								}
 							]
 						},
 						{
-							"id": 468,
+							"id": 473,
 							"name": "rpc",
 							"kind": 2048,
 							"kindString": "Method",
@@ -466,7 +466,7 @@
 							},
 							"signatures": [
 								{
-									"id": 469,
+									"id": 474,
 									"name": "rpc",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -478,7 +478,7 @@
 									},
 									"typeParameter": [
 										{
-											"id": 470,
+											"id": 475,
 											"name": "T",
 											"kind": 131072,
 											"kindString": "Type parameter",
@@ -489,7 +489,7 @@
 									],
 									"parameters": [
 										{
-											"id": 471,
+											"id": 476,
 											"name": "fn",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -505,7 +505,7 @@
 											}
 										},
 										{
-											"id": 472,
+											"id": 477,
 											"name": "params",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -531,7 +531,7 @@
 											}
 										},
 										{
-											"id": 473,
+											"id": 478,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -542,7 +542,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 474,
+													"id": 479,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -551,7 +551,7 @@
 													},
 													"children": [
 														{
-															"id": 475,
+															"id": 480,
 															"name": "count",
 															"kind": 32,
 															"kindString": "Variable",
@@ -564,7 +564,7 @@
 															"sources": [
 																{
 																	"fileName": "PostgrestClient.ts",
-																	"line": 57,
+																	"line": 58,
 																	"character": 11
 																}
 															],
@@ -597,14 +597,14 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																475
+																480
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "PostgrestClient.ts",
-															"line": 55,
+															"line": 56,
 															"character": 20
 														}
 													]
@@ -633,7 +633,7 @@
 							"sources": [
 								{
 									"fileName": "PostgrestClient.ts",
-									"line": 53,
+									"line": 54,
 									"character": 5
 								}
 							]
@@ -644,32 +644,32 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								451
+								456
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								446,
-								450,
-								445
+								451,
+								455,
+								450
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								461,
-								464,
-								468
+								466,
+								469,
+								473
 							]
 						}
 					],
 					"sources": [
 						{
 							"fileName": "PostgrestClient.ts",
-							"line": 5,
+							"line": 6,
 							"character": 36
 						}
 					]
@@ -680,7 +680,7 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						444
+						449
 					]
 				}
 			],
@@ -693,7 +693,7 @@
 			]
 		},
 		{
-			"id": 476,
+			"id": 481,
 			"name": "\"index\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -9923,6 +9923,87 @@
 			]
 		},
 		{
+			"id": 445,
+			"name": "\"lib/constants\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/postgrest-js/postgrest-js/src/lib/constants.ts",
+			"children": [
+				{
+					"id": 446,
+					"name": "DEFAULT_HEADERS",
+					"kind": 2097152,
+					"kindString": "Object literal",
+					"flags": {
+						"isExported": true,
+						"isConst": true
+					},
+					"children": [
+						{
+							"id": 447,
+							"name": "X-Client-Info",
+							"kind": 32,
+							"kindString": "Variable",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/constants.ts",
+									"line": 2,
+									"character": 48
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							},
+							"defaultValue": "`postgrest-js/${version}`"
+						}
+					],
+					"groups": [
+						{
+							"title": "Variables",
+							"kind": 32,
+							"children": [
+								447
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/constants.ts",
+							"line": 2,
+							"character": 28
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "object"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Object literals",
+					"kind": 2097152,
+					"children": [
+						446
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "lib/constants.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
 			"id": 1,
 			"name": "\"lib/types\"",
 			"kind": 1,
@@ -11531,6 +11612,56 @@
 					"character": 0
 				}
 			]
+		},
+		{
+			"id": 443,
+			"name": "\"lib/version\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/postgrest-js/postgrest-js/src/lib/version.ts",
+			"children": [
+				{
+					"id": 444,
+					"name": "version",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {
+						"isExported": true,
+						"isConst": true
+					},
+					"sources": [
+						{
+							"fileName": "lib/version.ts",
+							"line": 2,
+							"character": 20
+						}
+					],
+					"type": {
+						"type": "stringLiteral",
+						"value": "0.0.0-automated"
+					},
+					"defaultValue": "\"0.0.0-automated\""
+				}
+			],
+			"groups": [
+				{
+					"title": "Variables",
+					"kind": 32,
+					"children": [
+						444
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "lib/version.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
 		}
 	],
 	"groups": [
@@ -11538,13 +11669,15 @@
 			"title": "Modules",
 			"kind": 1,
 			"children": [
-				443,
-				476,
+				448,
+				481,
 				126,
 				321,
 				401,
 				67,
-				1
+				445,
+				1,
+				443
 			]
 		}
 	]

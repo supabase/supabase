@@ -7,7 +7,7 @@
 
 const supabaseClient = require('./sidebar_spec_supabase')
 const supabaseCli = require('./sidebar_spec_cli')
-const postgres = require('./sidebar_spec_postgres')
+const dart = require('./sidebar_spec_dart')
 
 module.exports = {
   supabaseClient: [
@@ -17,11 +17,17 @@ module.exports = {
       collapsed: false,
       items: supabaseClient.docs,
     },
+    // {
+    //   type: 'category',
+    //   label: 'Postgres',
+    //   collapsed: false,
+    //   items: postgres.docs,
+    // },
     {
       type: 'category',
-      label: 'Postgres',
+      label: 'Dart',
       collapsed: false,
-      items: postgres.docs,
+      items: dart.docs,
     },
     {
       type: 'category',
@@ -84,21 +90,11 @@ module.exports = {
       label: 'Database',
       collapsed: false,
       items: [
+        'guides/database/introduction',
         'guides/database/tables',
         'guides/database/full-text-search',
-        {
-          type: 'category',
-          label: 'Connecting to Postgres',
-          collapsed: true,
-          items: [
-            'guides/database/connecting/connecting-to-postgres',
-            'guides/database/connecting/direct-connections',
-            'guides/database/connecting/connection-pooling',
-          ],
-        },
-        // 'guides/database/arrays',
         // 'guides/database/json',
-        // 'guides/database/managing-passwords',
+        // 'guides/database/arrays',
         // 'guides/database/sql-to-api',
         {
           type: 'category',
@@ -112,7 +108,27 @@ module.exports = {
             'guides/database/extensions/uuid-ossp',
           ],
         },
-        'guides/database/resource-management',
+        {
+          type: 'category',
+          label: 'Connecting to Postgres',
+          collapsed: true,
+          items: [
+            'guides/database/connecting/connecting-to-postgres',
+            'guides/database/connecting/direct-connections',
+            'guides/database/connecting/connection-pooling',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Configuration',
+          collapsed: true,
+          items: [
+            'guides/database/timeouts',
+            'guides/database/replication',
+            'guides/database/managing-passwords',
+            'guides/database/managing-timezones',
+          ],
+        },
       ],
     },
     {

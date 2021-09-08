@@ -30,14 +30,6 @@ info:
       #   items:
       #     - Creating columns
           # - Column types
-      - name: 'Replication'
-        items:
-          - Publications
-      - name: 'Database Configuration'
-        items:
-          # - Database Users
-          - Database Passwords
-          - Changing Timezones
 
 pages:
   Schemas:
@@ -156,72 +148,6 @@ pages:
   #         alter table new_table
   #         add new_column text;
   #         ```
-
-  Publications:
-    description: |
-      Publications are a way of grouping changes generated from a table or a group of tables. 
-      These changes can then be sent to other systems (usually another Postgres database).
-
-    examples:
-      - name: Create a Publication
-        description: |
-          This publication will contain all changes to all tables.
-        sql: |
-          ```sql
-          create publication publication_name 
-          for all tables;
-          ```
-      - name: Create a Publication which listens to individual tables
-        sql: |
-          ```sql
-          create publication publication_name 
-          for table table_one, table_two;
-          ```
-      - name: Add tables to an existing publication
-        sql: |
-          ```sql
-          alter publication publication_name 
-          add table table_name;
-          ```
-      - name: Listens to inserts only
-        sql: |
-          ```sql
-          create publication publication_name 
-          for all tables
-          with (publish = 'insert');
-          ```
-      - name: Listens to updates only
-        sql: |
-          ```sql
-          create publication publication_name 
-          for all tables
-          with (publish = 'update');
-          ```
-      - name: Listens to deletions only
-        sql: |
-          ```sql
-          create publication publication_name 
-          for all tables
-          with (publish = 'delete');
-          ```
-      - name: Remove a Publication
-        sql: |
-          ```sql
-          drop publication if exists publication_name;
-          ```
-      - name: Recreate a Publication
-        description: |
-          If you are planning to re-create a publication, it's best to do it in a transaction to ensure the operation succeeds.
-        sql: |
-          ```sql
-          begin; 
-            -- remove the realtime publication
-            drop publication if exists publication_name; 
-
-            -- re-create the publication but don't enable it for any tables
-            create publication publication_name;  
-          commit;
-          ```
           
   Database Users:
     description: |
@@ -233,93 +159,4 @@ pages:
           ```sql
           create user new_user
           with password 'hello';
-          ```
-  Database Passwords:
-    description: |
-      Manage the passwords of your database users using any super user.
-
-    examples:
-      - name: Password reset
-        sql: |
-          ```sql
-          alter user postgres 
-          with password 'new_password';
-          ```
-  Changing Timezones:
-    description: |
-      Data types.
-    notes: |
-      - View a full list of timezones on [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
-
-    examples:
-      - name: Change timezone
-        isSpotlight: true
-        sql: |
-          ```sql
-          alter database postgres 
-          set timezone to 'America/New_York';
-          ```
-      - name: Full list of timezones
-        description: |
-          Get a full list of timezones supported by your database. This will return the following columns:
-
-          - `name`: Time zone name
-          - `abbrev`: Time zone abbreviation
-          - `utc_offset`: Offset from UTC (positive means east of Greenwich)
-          - `is_dst`: True if currently observing daylight savings
-
-        sql: |
-          ```sql
-          select name, abbrev, utc_offset, is_dst
-          from pg_timezone_names() 
-          order by name;
-          ```
-      - name: Search for a specific timezone
-        description: Use `ilike` (case insensitive search) to find specific timezones.
-        sql: |
-          ```sql
-          select * 
-          from pg_timezone_names() 
-          where name ilike '%york%';
-          ```
-
-  Connection Strings:
-    description: |
-      There are various ways to connect to your database, depending on the configuration of your Postgres instance and the tool which you are connecting with.
-
-    notes: |
-      - [Official Documentation](https://www.postgresql.org/docs/current/libpq-connect.html).
-      - Avoid using special characters usernames and passwords. If you use special characters in a connection URL, you'll need to URL encode any special characters.
-
-    examples:
-      - name: Basic connection string
-        description: |
-          If you're using a default setup, your postgres connection string will likely be in the format: 
-          
-          `postgres://{user}:{password}@{host}:{port}/{database_name}`
-
-        isSpotlight: true
-        sql: |
-          ```bash
-          postgres://postgres:postgres@localhost:5432/postgres
-          # or 
-          postgresql://postgres:postgres@localhost:5432/postgres
-          ```
-      - name: JDBC
-        description: See full [documentation](http://jdbc.postgresql.org/documentation/head/connect.html).
-        sql: |
-          ```bash
-          jdbc:postgresql://{host}:{port}/{database_name}
-          ```
-      - name: ADO.NET
-        description: See full [documentation](http://npgsql.projects.postgresql.org/docs/manual/UserManual.html).
-        sql: |
-          ```bash
-          Server=host;Port=5432;User Id=username;Password=secret;Database=database_name;
-          ```
-      - name: PHP
-        description: See full [documentation](http://php.net/manual/en/book.pgsql.php).
-        sql: |
-          ```bash
-          host=hostname port=5432 dbname=databasename user=username password=secret
           ```
