@@ -27,6 +27,15 @@ const authProviders = [
     selfHosted: true,
   },
   {
+    name: 'Azure',
+    // logo: '/img/libraries/dart-icon.svg',
+    href: '/docs/guides/auth/auth-apple',
+    official: false,
+    supporter: 'TBD',
+    platform: false,
+    selfHosted: true,
+  },
+  {
     name: 'Bitbucket',
     // logo: '/img/libraries/dart-icon.svg',
     href: '/docs/guides/auth/auth-bitbucket',
@@ -81,6 +90,15 @@ const authProviders = [
     selfHosted: true,
   },
   {
+    name: 'MessageBird',
+    // logo: '/img/libraries/dart-icon.svg',
+    href: '/docs/guides/auth/auth-twilio',
+    official: false,
+    supporter: 'Messagebird',
+    platform: false,
+    selfHosted: true,
+  },
+  {
     name: 'Twitter',
     // logo: '/img/libraries/dart-icon.svg',
     href: '/docs/guides/auth/auth-twitter',
@@ -105,15 +123,6 @@ const authProviders = [
     official: true,
     supporter: 'Supabase',
     platform: true,
-    selfHosted: true,
-  },
-  {
-    name: 'MessageBird',
-    // logo: '/img/libraries/dart-icon.svg',
-    href: '/docs/guides/auth/auth-twilio',
-    official: false,
-    supporter: 'Messagebird',
-    platform: false,
     selfHosted: true,
   },
 ]

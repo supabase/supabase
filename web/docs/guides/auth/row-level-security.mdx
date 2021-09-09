@@ -4,19 +4,26 @@ title: Row Level Security
 description: Secure your data using Postgres Row Level Security.
 ---
 
+When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html). 
+
+[Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) are PostgreSQL's rule engine. They are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs.
 
 <iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/Ow_Uzedfohk" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
 
-## Policies Are Like `WHERE` Clauses
 
-Policies are easy to understand once you get the hang of them. You can just think of them as adding a `WHERE` clause to every query. For example if you had a policy like this:
+## Policies
+
+Policies are easy to understand once you get the hang of them. Each policy is attached to a table, and the policy is executed
+every time a table is accessed.
+You can just think of them as adding a `WHERE` clause to every query. For example a policy like this ...
 
 ```sql
-create policy "Individuals can view their own todos." on todos for
-    select using (auth.uid() = user_id);
+create policy "Individuals can view their own todos." 
+    on todos for select 
+    using ( auth.uid() = user_id );
 ```
 
-It would translate to this whenever a user tries to select from the todos table:
+.. would translate to this whenever a user tries to select from the todos table:
 
 ```sql
 select *
@@ -24,20 +31,26 @@ from todos
 where auth.uid() = todos.user_id; -- Policy is implicitly added.
 ```
 
-## How It Works
+## Helper Functions 
 
-1. A user signs up. Supabase creates a new user in the `auth.users` table.
-2. Supabase returns a new JWT, which contains the user's `UUID`.
-3. Every request to your database also sends the JWT.
-4. Postgres inspects the JWT to determine the user making the request.
-5. The user's UID can be used in policies to restrict access to rows. 
+Supabase provides you with a few easy functions that you can use with your policies.
 
-Supabase provides a special function in Postgres, `auth.uid()`, which extracts the user's UID from the JWT. This is especially useful when creating policies.
 
-## Policy Examples
+### `auth.uid()` 
 
-Here are some examples to show you the power of PostgreSQL's RLS. Each policy is attached to a table, and the policy is executed
-every time a table is accessed.
+Returns the ID of the user making the request.
+
+### `auth.role()`
+
+Returns the role of the user making the request. In most cases this is either `authenticated` or `anon`.
+
+### `auth.email()`
+
+Retuns the email of the user making the request.
+
+## Examples
+
+Here are some examples to show you the power of PostgreSQL's RLS. 
 
 ### Allow read access 
 
@@ -250,6 +263,33 @@ using (
 
 
 ## Tips
+
+### Disable realtime for private tables
+
+Our realtime server doesn't provide per-user security. Until we build a more robust auth system for WebSockets, you can disable realtime functionality for any private tables. To do this, you can manage the underlying Postgres replication publication:
+
+```sql
+/**
+ * REALTIME SUBSCRIPTIONS
+ * Only allow realtime listening on public tables.
+ */
+
+begin;
+  -- remove the realtime publication
+  drop publication if exists supabase_realtime;
+
+  -- re-create the publication but don't enable it for any tables
+  create publication supabase_realtime;
+commit;
+
+-- add a table to the publication
+alter publication supabase_realtime add table products;
+
+-- add other tables to the publication
+alter publication supabase_realtime add table posts;
+```
+
+We're in the process of building enhanced realtime security.
 
 ### You don't have to use policies 
 
