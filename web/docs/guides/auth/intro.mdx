@@ -1,7 +1,9 @@
 ---
 id: intro
 title: Supabase Auth
+sidebar_label: Introduction
 description: Use Supabase to Authenticate and Authorize your users.
+# hide_table_of_contents: true
 ---
 
 import Link from '@docusaurus/Link'
@@ -9,7 +11,21 @@ import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 import providers from '@site/src/data/authProviders'
 
-<div class="container" style={{}}>
+Supabase Auth is designed to work with Postgres. There are two parts to every Auth system:
+
+- Authentication: should this person be allowed in? If yes, who are they?
+- Authorization: once they are in, what are they allowed to do?
+
+## Authentication
+
+You can authenticate your users in several ways:
+
+- Email & password.
+- Magic links (one-click logins).
+- Social providers.
+- Phone logins.
+
+<div class="container" style={{ padding: 0 }}>
   <div class="row is-multiline">
     {providers.map((x) => (
       <div key={x.name} class="col col--4">
@@ -44,3 +60,8 @@ import providers from '@site/src/data/authProviders'
     ))}
   </div>
 </div>
+
+
+## Authorization
+
+- TBD
