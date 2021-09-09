@@ -1,0 +1,46 @@
+---
+id: intro
+title: Supabase Auth
+description: Use Supabase to Authenticate and Authorize your users.
+---
+
+import Link from '@docusaurus/Link'
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+import providers from '@site/src/data/authProviders'
+
+<div class="container" style={{}}>
+  <div class="row is-multiline">
+    {providers.map((x) => (
+      <div key={x.name} class="col col--4">
+        <Link class="card" to={x.href}>
+          <div class="card__body">
+            <div class="" style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
+              {x.logo && <img src={x.logo} alt={x.name} width="20" />}
+              <p>{x.name}</p>
+              <p>
+                {x.official ? <span class={`badge badge--official`}>
+                  Official
+                </span>: 
+                <span class={`badge badge--unofficial`}>
+                  Unofficial
+                </span>
+                }
+              </p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <div class="code-block" style={{ width: '100%',  display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem' }}>
+                <span>Platform:</span>
+                <span>{x.platform.toString()}</span>
+              </div>
+              <div class="code-block" style={{ width: '100%',  display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem' }}>
+                <span>Hosted:</span>
+                <span>{x.selfHosted.toString()}</span>
+              </div>
+            </div>
+          </div>
+        </Link>
+      </div>
+    ))}
+  </div>
+</div>
