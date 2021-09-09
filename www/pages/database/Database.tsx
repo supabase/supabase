@@ -155,7 +155,11 @@ function Database() {
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
               <Typography.Text>
                 <p className="mb-4">
-                  <IconShuffle />
+                  <Space>
+                    <ProductIcon icon={Solutions['database'].icon} />
+                    <IconX />
+                    <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
+                  </Space>
                 </p>
               </Typography.Text>
               <Typography.Title level={4}>Realtime enabled</Typography.Title>
@@ -223,7 +227,7 @@ function Database() {
                       handle="@Elsolo244"
                       img_url={`${basePath}/images/twitter-profiles/v6citnk33y2wpeyzrq05_400x400.jpeg`}
                       quote="Where has
-                @supabase_io
+                @supabase
                 been all my life? 😍"
                     />,
                   ]}
@@ -238,7 +242,7 @@ function Database() {
                     <TweetCard
                       handle="@jim_bisenius"
                       img_url={`${basePath}/images/twitter-profiles/rLgwUZSB_400x400.jpg`}
-                      quote="@MongoDB or @MySQL?!?! Please, let me introduce you to @supabase_io and the wonderful world of @PostgreSQL before it's too late!!"
+                      quote="@MongoDB or @MySQL?!?! Please, let me introduce you to @supabase and the wonderful world of @PostgreSQL before it's too late!!"
                     />,
                   ]}
                 />

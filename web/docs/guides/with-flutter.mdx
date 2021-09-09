@@ -1,0 +1,638 @@
+---
+id: with-flutter
+title: 'Quickstart: Flutter'
+description: Learn how to use Supabase in your Flutter App.
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+## Intro
+
+This example provides the steps to build a simple user management app (from scratch!) using Supabase and Flutter. It includes:
+
+- Supabase [Database](/docs/guides/database): a Postgres database for storing your user data.
+- Supabase [Auth](/docs/guides/auth): users can sign in with magic links (no passwords, only email).
+<!-- - Supabase [Storage](/docs/guides/storage): users can upload a photo. -->
+- [Row Level Security](/docs/guides/auth#row-level-security): data is protected so that individuals can only access their own data.
+- Instant [APIs](/docs/guides/api): APIs will be automatically generated when you create your database tables.
+
+By the end of this guide you'll have an app which allows users to login and update some basic profile details:
+
+<img height="500px" src="/img/supabase-flutter-demo.png" alt="Supabase User Management example" />
+
+### Github
+
+Whenever you get stuck at any point, take a look at [this repo](https://github.com/supasquad/supabase-flutter-quickstart).
+
+## Project set up
+
+Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase
+and then creating a "schema" inside the database.
+
+### Create a project
+
+1. Go to [app.supabase.io](https://app.supabase.io).
+1. Click on "New Project".
+1. Enter your project details.
+1. Wait for the new database to launch.
+
+### Set up the database schema
+
+Now we are going to set up the database schema. We can use the "User Management Starter" quickstart in the SQL Editor,
+or you can just copy/paste the SQL from below and run it yourself.
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'SQL', value: 'SQL'},
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "SQL" section.
+2. Click "User Management Starter".
+3. Click "Run".
+```
+
+<video width="99%" muted playsInline controls="true">
+  <source src="/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
+</video>
+
+</TabItem>
+<TabItem value="SQL">
+
+```sql
+-- Create a table for public "profiles"
+create table profiles (
+  id uuid references auth.users not null,
+  updated_at timestamp with time zone,
+  username text unique,
+  avatar_url text,
+  website text,
+
+  primary key (id),
+  unique(username),
+  constraint username_length check (char_length(username) >= 3)
+);
+
+alter table profiles enable row level security;
+
+create policy "Public profiles are viewable by everyone."
+  on profiles for select
+  using ( true );
+
+create policy "Users can insert their own profile."
+  on profiles for insert
+  with check ( auth.uid() = id );
+
+create policy "Users can update own profile."
+  on profiles for update
+  using ( auth.uid() = id );
+
+-- Set up Realtime!
+begin;
+  drop publication if exists supabase_realtime;
+  create publication supabase_realtime;
+commit;
+alter publication supabase_realtime add table profiles;
+
+-- Set up Storage!
+insert into storage.buckets (id, name)
+values ('avatars', 'avatars');
+
+create policy "Avatar images are publicly accessible."
+  on storage.objects for select
+  using ( bucket_id = 'avatars' );
+
+create policy "Anyone can upload an avatar."
+  on storage.objects for insert
+  with check ( bucket_id = 'avatars' );
+
+```
+
+</TabItem>
+</Tabs>
+
+### Get the API Keys
+
+Now that you've created some database tables, you are ready to insert data using the auto-generated API.
+We just need to get the URL and `anon` key from the API settings.
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'}
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "Settings" section.
+2. Click "API" in the sidebar.
+3. Find your API URL in this page.
+4. Find your "anon" key on this page.
+```
+
+<video width="99%" muted playsInline controls="true">
+  <source src="/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+</video>
+
+</TabItem>
+</Tabs>
+
+## Building the App
+
+Let's start building the Flutter app from scratch.
+
+### Initialize a Flutter app
+
+We can use [`flutter create`](https://flutter.dev/docs/get-started/test-drive) to initialize
+an app called `supabase_quickstart`:
+
+```bash
+flutter create supabase_quickstart
+```
+
+Then let's install the only additional dependency: [supabase-flutter](https://github.com/supabase/supabase-flutter)
+
+Open the app and copy and paste the following inside `pubspec.yaml` under `dependencies`.
+
+```yaml
+supabase_flutter: ^0.1.0
+```
+
+Run `flutter pub get` to install the dependencies.
+
+### Setup deep links
+
+Now that we have the dependencies installed let's setup deep links so users who have logged in via magic link or OAuth can come back to the app.
+
+```sh
+1. Go to the "Authentication" section.
+2. Click "Settings" in the sidebar.
+3. Type `io.supabase.flutterquickstart://login-callback/` in the Additional Redirect URLs input field.
+4. Hit save.
+```
+
+![Supabase console deep link setting](/img/deeplink-setting.png)
+
+That is it on Supabase's end and the rest are platform specific settings:
+
+For Android, add an intent-filter to enable deep linking:
+
+```xml title="android/app/src/main/AndroidManifest.xml"
+<manifest ...>
+  <!-- ... other tags -->
+  <application ...>
+    <activity ...>
+      <!-- ... other tags -->
+
+      <!-- Add this intent-filter for Deep Links -->
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
+        <data
+          android:scheme="io.supabase.flutterquickstart"
+          android:host="login-callback" />
+      </intent-filter>
+
+    </activity>
+  </application>
+</manifest>
+```
+
+For iOS add CFBundleURLTypes to enable deep linking:
+
+```xml title="ios/Runner/Info.plist"
+<!-- ... other tags -->
+<plist>
+<dict>
+  <!-- ... other tags -->
+
+  <!-- Add this array for Deep Links -->
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleTypeRole</key>
+      <string>Editor</string>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>io.supabase.flutterquickstart</string>
+      </array>
+    </dict>
+  </array>
+  <!-- ... other tags -->
+</dict>
+</plist>
+```
+
+For web:
+
+There are no additional configurations.
+
+### Main function
+
+Now that we have deep links ready let's initialize the Supabase client inside our `main` function with the API credentials that you copied [earlier](#get-the-api-keys).
+These variables will be exposed on the app, and that's completely fine since we have
+[Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
+
+```dart title="lib/main.dart"
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: '[YOUR_SUPABASE_URL]',
+    anonKey: '[YOUR_SUPABASE_ANON_KEY]',
+  );
+  runApp(MyApp());
+}
+```
+
+### Set up AuthState
+
+In order to handle deep links for Android and iOS, let's create a class that will do just that.
+`supabase_flutter` plugin comes with `SupabaseAuthState` class where we can inherit from to react to various deep link events.
+
+```dart title="lib/components/auth_state.dart"
+import 'package:flutter/material.dart';
+import 'package:supabase/supabase.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class AuthState<T extends StatefulWidget> extends SupabaseAuthState<T> {
+  @override
+  void onUnauthenticated() {
+    if (mounted) {
+      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+    }
+  }
+
+  @override
+  void onAuthenticated(Session session) {
+    if (mounted) {
+      Navigator.of(context).pushNamedAndRemoveUntil('/account', (route) => false);
+    }
+  }
+
+  @override
+  void onPasswordRecovery(Session session) {}
+
+  @override
+  void onErrorAuthenticating(String message) {
+    print('Error authenticating $message');
+  }
+}
+```
+
+### Set up AuthRequiredState
+
+We might want to show certain pages to the users only if they are signed in.
+For that we can create a handy `AuthRequiredState` class that we can inherit from for pages where the users need to be authenticated.
+`AuthRequiredState` will inherit `SupabaseAuthRequiredState` which is provided by `supabase_flutter` package.
+
+```dart title="lib/components/auth_required_state.dart"
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class AuthRequiredState<T extends StatefulWidget>
+    extends SupabaseAuthRequiredState<T> {
+  @override
+  void onUnauthenticated() {
+    /// Users will be sent back to the LoginPage if they sign out.
+    Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+  }
+}
+```
+
+Let's also create a constant file to make it easier to use Supabase client.
+
+```dart title="lib/utils/constants.dart"
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+final supabase = Supabase.instance.client;
+```
+
+### Set up Splash Screen
+
+Let's create a splash screen that will be shown to users right after they open the app.
+This splash screen inherits `AuthState` to redirect users to the appropriate pages depending on their authentication state.
+
+```dart title="lib/pages/splash_page.dart"
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter_guide/components/auth_state.dart';
+
+class SplashPage extends StatefulWidget {
+  const SplashPage({Key? key}) : super(key: key);
+
+  @override
+  _SplashPageState createState() => _SplashPageState();
+}
+
+class _SplashPageState extends AuthState<SplashPage> {
+  @override
+  void initState() {
+    recoverSupabaseSession();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(child: CircularProgressIndicator()),
+    );
+  }
+}
+```
+
+### Set up a Login page
+
+Let's create a Flutter widget to manage logins and sign ups.
+We'll use Magic Links, so users can sign in with their email without using passwords.
+This page will also inherit `AuthState` as it will handle user login.
+
+```dart title="lib/pages/login_page.dart"
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter_guide/components/auth_state.dart';
+import 'package:supabase/supabase.dart';
+import 'package:supabase_flutter_guide/utils/constants.dart';
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends AuthState<LoginPage> {
+  bool _isLoading = false;
+  late final TextEditingController _emailController;
+
+  Future<void> _signIn() async {
+    setState(() {
+      _isLoading = true;
+    });
+    final response = await supabase.auth.signIn(
+        email: _emailController.text,
+        options: AuthOptions(
+            redirectTo: kIsWeb
+                ? null
+                : 'io.supabase.flutterquickstart://login-callback/'));
+    if (response.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(response.error!.message),
+        backgroundColor: Colors.red,
+      ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Check your email for login link!')));
+    }
+    setState(() {
+      _emailController.clear();
+      _isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    _emailController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Sign In')),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+        children: [
+          const Text('Sign in via the magic link with your email below'),
+          const SizedBox(height: 18),
+          TextFormField(
+            controller: _emailController,
+            decoration: const InputDecoration(labelText: 'Email'),
+          ),
+          const SizedBox(height: 18),
+          ElevatedButton(
+            onPressed: _isLoading ? null : _signIn,
+            child: Text(_isLoading ? 'Loading' : 'Send Magic Link'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+### Set up Account page
+
+After a user is signed in we can allow them to edit their profile details and manage their account.
+Let's create a new widget called `account_page.dart` for that.
+Note that this page will inherit `AuthRequiredState` as user needs to be authenticated to view this page.
+
+```dart title="lib/pages/account_page.dart"
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter_guide/components/auth_required_state.dart';
+import 'package:supabase_flutter_guide/utils/constants.dart';
+import 'package:supabase/supabase.dart';
+
+class AccountPage extends StatefulWidget {
+  const AccountPage({Key? key}) : super(key: key);
+
+  @override
+  _AccountPageState createState() => _AccountPageState();
+}
+
+class _AccountPageState extends AuthRequiredState<AccountPage> {
+  late final _usernameController = TextEditingController();
+  late final _websiteController = TextEditingController();
+  var _loading = false;
+
+  Future<void> _getProfile(String userId) async {
+    setState(() {
+      _loading = true;
+    });
+    final response = await supabase
+        .from('profiles')
+        .select()
+        .eq('id', userId)
+        .single()
+        .execute();
+    if (response.error != null && response.status != 406) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(response.error!.message)));
+    }
+    if (response.data != null) {
+      _usernameController.text = response.data!['username'] as String;
+      _websiteController.text = response.data!['website'] as String;
+    }
+    setState(() {
+      _loading = false;
+    });
+  }
+
+  Future<void> _updateProfile() async {
+    setState(() {
+      _loading = true;
+    });
+    final userName = _usernameController.text;
+    final website = _websiteController.text;
+    final user = supabase.auth.currentUser;
+    final updates = {
+      'id': user!.id,
+      'username': userName,
+      'website': website,
+      'updated_at': DateTime.now().toIso8601String(),
+    };
+    final response = await supabase.from('profiles').upsert(updates).execute();
+    if (response.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(response.error!.message),
+        backgroundColor: Colors.red,
+      ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Successfully updated profile!')));
+    }
+    setState(() {
+      _loading = false;
+    });
+  }
+
+  Future<void> _signOut() async {
+    final response = await supabase.auth.signOut();
+    if (response.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(response.error!.message),
+        backgroundColor: Colors.red,
+      ));
+    }
+    Navigator.of(context).pushReplacementNamed('/login');
+  }
+
+  @override
+  void onAuthenticated(Session session) {
+    final user = session.user;
+    if (user != null) {
+      _getProfile(user.id);
+    }
+  }
+
+  @override
+  void onUnauthenticated() {
+    Navigator.of(context).pushReplacementNamed('/login');
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _websiteController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Profile')),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+        children: [
+          TextFormField(
+            controller: _usernameController,
+            decoration: const InputDecoration(labelText: 'User Name'),
+          ),
+          const SizedBox(height: 18),
+          TextFormField(
+            controller: _websiteController,
+            decoration: const InputDecoration(labelText: 'Website'),
+          ),
+          const SizedBox(height: 18),
+          ElevatedButton(
+              onPressed: _updateProfile,
+              child: Text(_loading ? 'Saving...' : 'Update')),
+          const SizedBox(height: 18),
+          ElevatedButton(onPressed: _signOut, child: const Text('Sign Out')),
+        ],
+      ),
+    );
+  }
+}
+```
+
+### Launch!
+
+Now that we have all the components in place, let's update `lib/main.dart`:
+
+```dart title="lib/main.dart"
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter_guide/pages/account_page.dart';
+import 'package:supabase_flutter_guide/pages/login_page.dart';
+import 'package:supabase_flutter_guide/pages/splash_page.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: '[YOUR_SUPABASE_URL]',
+    anonKey: '[YOUR_SUPABASE_ANON_KEY]',
+  );
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Supabase Flutter',
+      theme: ThemeData.dark().copyWith(
+        primaryColor: Colors.green,
+        accentColor: Colors.green,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            onPrimary: Colors.white,
+            primary: Colors.green,
+          ),
+        ),
+      ),
+      initialRoute: '/',
+      routes: <String, WidgetBuilder>{
+        '/': (_) => const SplashPage(),
+        '/login': (_) => const LoginPage(),
+        '/account': (_) => const AccountPage(),
+      },
+    );
+  }
+}
+```
+
+Once that's done, run this in a terminal window to launch on Android or iOS:
+
+```bash
+flutter run
+```
+
+Or for web, run the following command to launch it on `localhost:3000`
+
+```bash
+flutter run -d web-server --web-hostname localhost --web-port 3000
+```
+
+And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
+
+<img height="500px" src="/img/supabase-flutter-demo.png" alt="Supabase User Management example" />
+
+## Next steps
+
+At this stage you have a fully functional application!
+
+- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
+- Sign in: [app.supabase.io](https://app.supabase.io)

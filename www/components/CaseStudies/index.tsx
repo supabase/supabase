@@ -41,7 +41,7 @@ const CaseStudies = () => {
           </a>
         ))}
       </div>
-      <Benchmark />
+      {/* <Benchmark /> */}
     </SectionContainer>
   )
 }

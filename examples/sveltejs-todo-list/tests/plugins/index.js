@@ -12,14 +12,11 @@
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 
-
-
 /**
  * @type {Cypress.PluginConfig}
  */
 module.exports = (on, config) => {
-  
   // @bahmutov/cy-rollup is already a dependency of cypress-svelte-unit-test
-  const filePreprocessor = require('@bahmutov/cy-rollup');
-  on('file:preprocessor', filePreprocessor());
-};
+  const filePreprocessor = require('@bahmutov/cy-rollup')
+  on('file:preprocessor', filePreprocessor())
+}

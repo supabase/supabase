@@ -1,0 +1,180 @@
+---
+title: Supabase Beta April 2021
+description: Supabase "gardening" - stability, security, and community support.
+author: paul_copplestone
+author_url: https://github.com/kiwicopple
+author_image_url: https://github.com/kiwicopple.png
+authorURL: https://github.com/kiwicopple
+image: april-2021/release-apr-2021.jpg
+thumb: april-2021/release-apr-2021.jpg
+tags:
+  - release-notes
+date: '2021-05-05'
+---
+
+This month was a "gardening" month for Supabase. The team focused on stability, security, and community support. 
+Check out what we were working on below, as well as some incredible Community contributions.
+
+### Quick demo
+
+Watch a full demo:
+
+<iframe
+  className="w-full video-with-border"
+  width="640"
+  height="385"
+  src="https://www.youtube-nocookie.com/embed/uWJmUTCFdak"
+  frameBorder="1"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+## Light Mode
+
+We're a developer tool, which means that Dark Mode is [extremely popular](https://twitter.com/supabase/status/1388131942919376904).
+
+![This poll on twitter shows that 78.5% of our developer base use Dark Mode for the IDE](/new/images/blog/april-2021/twitter-darkmode.png)
+
+While Dark mode is great, for some people it's not an option. Dark Mode is difficult to use for developers with astigmatisms, 
+or even just working in brightly-lit environments.
+
+So today we're shipping Light Mode. Access it in the settings of your [Dashboard](https://app.supabase.io).
+
+<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
+  <source src="/new/images/blog/april-2021/light-mode.mp4" type="video/mp4" muted playsInline />
+</video>
+
+
+## Translations
+
+With the help of the community, we [started internationalizing](https://github.com/supabase/supabase/issues/1341) our main repository:
+
+- [Arabic | العربية](https://github.com/supabase/supabase/blob/master/i18n/README.ar.md)
+- [Chinese / 中文](https://github.com/supabase/supabase/blob/master/i18n/README.cn.md)
+- [Dutch / Nederlands](https://github.com/supabase/supabase/blob/master/i18n/README.nl.md)
+- [English](https://github.com/supabase/supabase)
+- [French / Français](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
+- [German / Deutsch](https://github.com/supabase/supabase/blob/master/i18n/README.de.md)
+- [Hindi / हिंदी](https://github.com/supabase/supabase/blob/master/i18n/README.hi.md)
+- [Nepali / नेपाली](https://github.com/supabase/supabase/blob/master/i18n/README.ne.md)
+- [Italiano / Italian](https://github.com/supabase/supabase/blob/master/i18n/README.it.md)
+- [Japanese / 日本語](https://github.com/supabase/supabase/blob/master/i18n/README.jp.md)
+- [Norwegian (Bokmål) / Norsk (Bokmål)](https://github.com/supabase/supabase/blob/master/i18n/README.nb-no.md)
+- [Polish / Polski](https://github.com/supabase/supabase/blob/master/i18n/README.pl.md)
+- [Portuguese / Portuguese](https://github.com/supabase/supabase/blob/master/i18n/README.pt.md)
+- [Portuguese (Brazilian) / Português Brasileiro](https://github.com/supabase/supabase/blob/master/i18n/README.pt-br.md)
+- [Russian / Pусский](https://github.com/supabase/supabase/blob/master/i18n/README.ru.md)
+- [Spanish / Español](https://github.com/supabase/supabase/blob/master/i18n/README.es.md)
+- [Traditional Chinese / 正體中文](https://github.com/supabase/supabase/blob/master/i18n/README.zh-tw.md)
+- [Turkish / Türkçe](https://github.com/supabase/supabase/blob/master/i18n/README.tr.md)
+- [Ukrainian / Українська](https://github.com/supabase/supabase/blob/master/i18n/README.uk.md)
+
+![Map of the world](/new/images/blog/april-2021/map.png)
+
+## OpenAPI spec for Storage
+
+We released [Storage Api docs](https://supabase.github.io/storage-api) built using OpenAPI (swagger). 
+
+![Storage API documentation](/new/images/blog/april-2021/storage-openapi.png)
+
+## Stripe Sync Engine (Experimental)
+
+We [open-sourced a server](https://github.com/supabase/stripe-sync-engine) which keeps any Postgres database in sync with Stripe. 
+This is experimental only. We're evaluating other tools such as [Singer](https://www.singer.io/tap/stripe/postgresql/), 
+which provide a more general solution (but are less "realtime"), and we're opening it up here to gather feedback.
+
+![Stripe sync engine](/new/images/blog/april-2021/stripe-sync-engine.jpg)
+
+## Community spotlight: Threaded comments
+
+One of the most powerful Postgres features is "recursive CTEs" which can be used for nested items (comments, pages, friend-graphs). [@lawrencecchen](https://twitter.com/lawrencecchen) has built a full [Threaded Comments demo](https://github.com/lawrencecchen/threaded-comments) which you can [Deploy with a single click](https://github.com/lawrencecchen/threaded-comments#instant-deploy). Want to add comments to your blog with [Full Text Search](https://supabase.io/docs/reference/javascript/textsearch)? Just use Postgres.
+
+<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
+  <source src="/new/images/blog/april-2021/threaded-small.mp4" type="video/mp4" muted playsInline />
+</video>
+
+## Community spotlight: SupaScript
+
+It looks like [@burggraf2](https://twitter.com/burggraf2) got tired of waiting for us to ship Functions, and decided to 
+build a whole JS ecosystem within his Supabase database. If you want to write PG functions in JS, import remote libraries 
+from the web, and console log to your browser, check out this [SupaScript repo](https://github.com/burggraf/SupaScript).
+
+```js
+// After installing: 
+// https://github.com/burggraf/SupaScript#installation
+
+/**
+ * Get all users who logged in this week.
+ * Use in the database:  select * from users_this_week();
+ * Use in the browser:   supabase.rpc('users_this_week');
+ */ 
+create or replace function users_this_week()
+returns json as $$
+  const moment = require('https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.js', false);
+  
+  const lastWeek = moment().subtract(7, 'days');
+  const query = 'select * from auth.users where created_at > $1'
+  const users = sql(query, lastWeek);
+
+  return users; 
+$$ language plv8;
+```
+
+## Community spotlight: Fireship
+
+Fireship reviewed Supabase last week, and despite being a (self-proclaimed) Firebase fan-boy, the review was very impartial.  
+
+<iframe
+  className="w-full video-with-border"
+  width="640"
+  height="385"
+  src="https://www.youtube-nocookie.com/embed/WiwfiVdfRIc"
+  frameBorder="1"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+
+## Community
+
+- Watch [@everConfusedGuy](https://twitter.com/everConfusedGuy)'s talk at DevX conf - Building Supabase Storage: [YouTube video](https://www.youtube.com/watch?v=YsUYOsq_o7g)
+- DuckDuckAbdaal by [@Nutlope](https://twitter.com/Nutlope) - a personalized search engine: [Twitter](https://twitter.com/Nutlope/status/1389082406477463557)
+- Supabase in 6 minutes by [Georges Duverger](https://www.youtube.com/channel/UCNERPJ-vs61KEsD_dRNWFIw): [YouTube video](https://www.youtube.com/watch?v=c8DNV9yl0mg)
+- Build a SaaS Platform with Stripe by [@__dijonmusters:](https://twitter.com/_dijonmusters) [DEV blog](https://dev.to/dijonmusters/series/12346)
+- Supabase & Sveltekit by Svelte Mastery: [YouTube video](https://www.youtube.com/watch?v=j4AV2Liojk0)
+- Firebase vs. Supabase - Draftbit Office Hours: [YouTube Livestream](https://www.youtube.com/watch?v=9Yg6i_zCuiM)
+
+
+**Supabase Github Star Growth**
+
+- Our [main GitHub repo](https://github.com/supabase/supabase) grew 60% (by stars) and we saw a flood of new contributors. 
+- Our [UI Library](https://github.com/supabase/ui) grew 175%
+- Our [Realtime Server](https://github.com/supabase/realtime) grew 39% after landing on the [front page of Hacker News](https://news.ycombinator.com/item?id=26968449).
+
+![Stars from github](/new/images/blog/april-2021/stars-all.png)
+
+<small>
+  Source: <a href="https://repository.surf/supabase">repository.surf/supabase</a>
+</small>
+
+If you want to keep up to date, make sure you [subscribe to our YouTube channel](https://www.youtube.com/channel/UCNTVzV1InxHV-YR0fSajqPQ) or [follow us on Twitter](https://twitter.com/supabase).
+
+## Coming Next
+
+You might have noticed our Dashboard slowly changing (improving), as we migrate the components out to our [open source UI Library](https://github.com/supabase/ui). This progression is an important step towards offering a UI for [Local Development](https://supabase.io/docs/guides/local-development) and [Self Hosting](https://supabase.io/docs/guides/self-hosting).
+
+We're also working on our [Workflows engine](https://supabase.io/blog/2021/04/02/supabase-workflows). This is quite a large task, but we're making progress and aiming to ship sometime in July.
+
+## One more thing
+
+[We started hiring](https://supabase.io/docs/careers).
+
+![screenshot of our hiring page](/new/images/blog/april-2021/hiring.png)
+
+### Get started
+
+- Start using Supabase today: [app.supabase.io](https://app.supabase.io/)
+- Make sure to [star us on GitHub](https://github.com/supabase/supabase)
+- Follow us [on Twitter](https://twitter.com/supabase)
+- Subscribe to our [YouTube channel](https://www.youtube.com/channel/UCNTVzV1InxHV-YR0fSajqPQ)
+- Become a [sponsor](https://github.com/sponsors/supabase)

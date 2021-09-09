@@ -25,8 +25,8 @@
   src: url('/fonts/office-code-pro/OfficeCodePro-Regular.eot');
   src: url('/fonts/office-code-pro/OfficeCodePro-Regular.woff2') format('woff2'),
     url('/fonts/office-code-pro/OfficeCodePro-Regular.woff') format('woff'),
-    url('/fonts/office-code-pro/OfficeCodePro-Regular.ttf') format('truetype');
-  /*url('/fonts/office-code-pro/OfficeCodePro-Regular.svg#SourceCodePro-Regular') format('svg');*/
+    url('/fonts/office-code-pro/OfficeCodePro-Regular.ttf') format('truetype'),
+    url('/fonts/office-code-pro/OfficeCodePro-Regular.otf') format('otf');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -224,6 +224,7 @@
 html,
 body {
   font-smoothing: antialiased;
+  scroll-behavior: smooth;
   text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
@@ -247,6 +248,12 @@ body {
 }
 :root[data-theme='dark'] .navbar__logo.logo--dark {
   display: inline-block;
+}
+
+h4,
+h5,
+h6 {
+  font-weight: bold !important;
 }
 
 .button {
@@ -484,6 +491,7 @@ a.card:hover {
 .menu > ul.menu__list li > a {
   padding-left: 0;
   padding-right: 0;
+  /* color: var(--custom-content-color); */
 }
 .menu .menu__list-item-hidden {
   display: none;
@@ -510,6 +518,10 @@ a.card:hover {
 .menu > .menu__list > .menu__list-item > .menu__link {
   margin-bottom: 4px;
   color: gray;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 /* Disable click events for large screens  */
@@ -636,11 +648,13 @@ div[class^='sidebar_'] .menu {
 }
 div[class^='sidebar_'] .menu .menu__link {
   padding-right: var(--ifm-menu-link-padding-horizontal);
+  color: var(--custom-color-content);
 }
 div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) {
   border-radius: 0;
   border-right: 2px solid var(--ifm-color-primary);
   padding-right: calc(var(--ifm-menu-link-padding-horizontal) - 2px);
+  color: var(--ifm-color-primary);
 }
 div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) .badge {
   background: var(--ifm-color-primary);
@@ -697,6 +711,12 @@ div[class*=' codeBlockContent'],
   font-weight: bold;
   /* text-transform: uppercase; */
   border-bottom: 1px solid #444;
+}
+div[class^='codeBlockTitle'],
+div[class*=' codeBlockTitle'] {
+  color: #ccc !important;
+  font-size: 0.8rem !important;
+  border-color: #444;
 }
 .repsonse-header {
   border-radius: 0 0 4px 4px;
@@ -971,9 +991,6 @@ html[data-theme='dark'] .DocSearch {
   border-radius: 6px !important;
   background: var(--custom-background-color-diff) !important;
   font-family: var(--ifm-font-family-base);
-}
-.DocSearch-Button svg {
-  display: none;
 }
 .DocSearch-Button-Placeholder {
   font-family: var(--ifm-font-family-base);
@@ -1269,6 +1286,8 @@ html[data-theme='dark'] .navbar-item-twitter:before {
 /* New CSS */
 
 code {
+  padding-top: 2px;
+  padding-bottom: 2px;
   border: 1px solid var(--ifm-hr-border-color);
 }
 
@@ -1316,18 +1335,23 @@ h4.method-list-item-label {
 h4.method-list-item-label .method-list-item-label-name {
   font-family: var(--ifm-font-family-monospace);
   font-size: 0.8rem;
+  padding: var(--ifm-code-padding-vertical) 0;
 }
 h4.method-list-item-label .method-list-item-label-badge {
   font-family: var(--ifm-font-family-monospace);
   font-size: 0.8rem;
   padding: 0 5px;
   font-weight: 300;
+  padding: var(--ifm-code-padding-vertical) var(--ifm-code-padding-horizontal);
 }
 h4.method-list-item-label .method-list-item-validation {
   font-family: var(--ifm-font-family-monospace);
   font-size: 0.8rem;
   padding: 0 5px;
   font-weight: 300;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .method-list-group .method-list-group {

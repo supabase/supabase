@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "https://www-internal.supabase.io/new" },
+    { "source": "/beta", "destination": "https://www-internal.supabase.io/new/beta" }
+  ],
+  "trailingSlash": false
+}

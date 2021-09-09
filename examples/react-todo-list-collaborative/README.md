@@ -13,7 +13,7 @@ production unless you're ok with all your tasks being publicly available
 
 ## Required env vars
 
-Make a `.env` in this folder with the following, 
+Make a `.env` in this folder with the following,
 you can get these values from your project dashboard at [app.supabase.io](app.supabase.io):
 
 ```bash

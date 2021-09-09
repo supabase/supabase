@@ -58,7 +58,7 @@ const { data, error } = await supabase
 const { data, error } = await supabase
   .storage
   .from('avatars')
-  .move('pubic/space-cat.png', 'private/space-cat.png')
+  .move('public/space-cat.png', 'private/space-cat.png')
 
 
 

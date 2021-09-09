@@ -40,7 +40,7 @@ export default defineComponent({
     const task = ref('')
 
     /**
-     * Wrapper function adding a new todo for additional client side error handling.
+     * Wrapper function adding a new todo for additional client-side error handling.
      */
     async function insertTask() {
       // Guard for short task descriptions which will fail db policy.
@@ -54,13 +54,18 @@ export default defineComponent({
         return
       }
       try {
+        // Try and write the data to the database.
         const todo = await addTodo({ user_id: userSession.value.user.id, task: task.value })
-        // If there was no response, dont do anything.
+
+        // If there was no response, don't do anything.
         if (!todo) {
           return
         }
-        // Otherwise push the response into allTodos.
+        // Otherwise, push the response into allTodos.
         allTodos.value.push(todo)
+
+        // Reset input field.
+        task.value = ''
       } catch (err) {
         console.error('Unknown error when adding todo', err)
       }

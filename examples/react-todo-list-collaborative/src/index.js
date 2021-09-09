@@ -43,7 +43,10 @@ const Home = (props) => {
             <a href="https://dev.to/awalias/howto-build-collaborative-realtime-task-lists-in-react-4k52">
               Tutorial
             </a>{' '}
-            | <a href="https://github.com/supabase/supabase/tree/master/examples/react-todo-list">Github</a>
+            |{' '}
+            <a href="https://github.com/supabase/supabase/tree/master/examples/react-todo-list">
+              Github
+            </a>
           </h3>
           <a href="https://dev.to/awalias/howto-build-collaborative-realtime-task-lists-in-react-4k52">
             <img

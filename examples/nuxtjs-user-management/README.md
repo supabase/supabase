@@ -1,7 +1,6 @@
 # Supabase Nuxt.js User Management
 
-
-This is a WIP! 
+This is a WIP!
 
 ## Build Setup
 

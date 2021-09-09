@@ -18,7 +18,7 @@ Gotrue is an auth API server written in Go by the Netlify team, find the Supabas
 
 When you deploy a new Supabase project, we deploy a new instance of this server alongside your database, and also inject your database with the required `auth` schema.
 
-It makes it super easy to, for example, send magic link emails which your user's can use to login:
+It makes it super easy to, for example, send magic link emails which your users can use to login:
 
 ```bash
 # replace <project-ref> with your own project reference
@@ -26,8 +26,8 @@ It makes it super easy to, for example, send magic link emails which your user's
 curl -X POST 'https://<project-ref>.supabase.co/auth/v1/magiclink' \
 -H "apikey: SUPABASE_KEY" \
 -H "Content-Type: application/json" \
--d '{ 
-  "email": "someone@email.com" 
+-d '{
+  "email": "someone@email.com"
 }'
 ```
 
@@ -45,7 +45,7 @@ You'll have to make sure your google app is verified of course in order to reque
 
 [Gotrue-js](https://github.com/supabase/gotrue-js) (and also [gotrue-csharp](https://github.com/supabase/gotrue-csharp), [gotrue-py](https://github.com/j0/gotrue-py), [gotrue-kt](https://github.com/supabase/gotrue-kt), and [gotrue-dart](https://github.com/supabase/gotrue-dart)) are all wrappers around the gotrue API endpoints, and make for easier session management inside your client.
 
-But all the functionality of gotrue-js is also available in supabase-js, which uses gotrue-js internall when you do things like:
+But all the functionality of gotrue-js is also available in supabase-js, which uses gotrue-js internally when you do things like:
 
 ```jsx
 const { user, session, error } = await supabase.auth.signIn({

@@ -5,18 +5,17 @@ description: How to use configure and deploy Supabase.
 ---
 
 Supabase is a [Hosted Platform](https://app.supabase.io), so you don't _have_ to deploy it yourself. 
-However, if you _want_ to configure and deploy it yourself, this is also possible.
+However, if you want to configure and deploy it yourself, that's also possible.
+
+![Supabase Architecture](/img/supabase-architecture.png)
 
 ## Before you begin
 
-If you are about to step through this Guide, please record your steps! You can help us improve by adding 
-missing details and fixing errors.
-
 The self-hosted version of Supabase does not include a UI yet. 
-We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) 
-([more context](https://github.com/supabase/supabase/discussions/1001#discussioncomment-558696)).
+We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) and with a [WIP PR here](https://github.com/supabase/supabase/pull/2281). 
+[[more context](https://github.com/supabase/supabase/discussions/1001#discussioncomment-558696)]
 
-In the meantime, here are some suggested tools for interacting with your Postgres Database:
+In the meantime, here are some suggestions for working with your Postgres Database:
 
 - `pgadmin`: https://www.pgadmin.org 
 - `dbeaver`: https://dbeaver.com 
@@ -28,23 +27,7 @@ In the meantime, here are some suggested tools for interacting with your Postgre
 
 We provide a Docker Compose directory which is includes all of the tools required for building on top of Supabase. 
 
-You can download the Docker files in various ways:
-
-### Option 1: Using our CLI 
-
-Make sure the CLI is installed:
-
-```bash
-npm install -g supabase
-```
-
-Then run in any folder to create a `docker` folder with a `docker-compose.yml`:
-
-```bash
-supabase eject
-```
-
-### Option 2: Clone our repo
+Download the Docker files:
 
 ```bash
 # 1. Copy an empty repo
@@ -54,25 +37,7 @@ git clone https://github.com/supabase/supabase
 cd supabase/docker
 ```
 
-### Option 3: Using a shallow clone
-
-If you use Git version >2.25, you can use a shallow clone to download this folder to your local machine:
-
-```bash
-# 1. Copy an empty repo
-git clone --no-checkout https://github.com/supabase/supabase
-
-# 2. Move into the empty repo
-cd supabase
-
-# 3. Initialize sparse-checkout
-git sparse-checkout init --cone
-
-# 4. Checkout the folder
-git sparse-checkout set docker
-```
-
-## Running Supabase
+## Running Locally
 
 Now that you have the Docker set up on your local machine, you can start it here by running 
 
@@ -80,25 +45,9 @@ Now that you have the Docker set up on your local machine, you can start it here
 docker-compose up
 ```
 
-**Important** 
+## Deploying
 
-Make sure you update the default passwords and secrets before running in Production:
-
-- Postgres 
-  - [POSTGRES_PASSWORD](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L80)
-- Realtime 
-  - [DB_PASSWORD](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L60)
-  - [JWT_SECRET](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L66)
-- PostgREST 
-  - [PGRST_DB_URI](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L44)
-  - [PGRST_JWT_SECRET](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L47)
-- GoTrue 
-  - [DATABASE_URL](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L32)
-  - [GOTRUE_OPERATOR_TOKEN](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L31)
-  - [GOTRUE_JWT_SECRET](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L19)
-  - [GOTRUE_JWT_SECRET](https://github.com/supabase/supabase/blob/3efd909fe86dd3540195b85054b611f3aa1d0de6/docker/docker-compose.yml#L19)
-
-## Configuring each service
+### Configuring each service
 
 Supabase is made up of several services. We have prefilled the `docker-compose` file with all the configuration you need to get started. 
 If you would like to change any of the configuration, you can update the env variables in the `docker-compose` file.
@@ -109,27 +58,54 @@ Here are a list of environment variables for each service:
 - [PostgREST](https://postgrest.org/en/v7.0.0/configuration.html)
 - [Realtime](https://github.com/supabase/realtime#server-set-up)
 - [GoTrue](https://github.com/supabase/gotrue)
+- [Storage](https://github.com/supabase/storage-api)
 - [Kong](https://docs.konghq.com/install/docker/)
 
-### Configuring email 
+### Update secrets 
 
-GoTrue requires an SMTP server to send emails for all authentication actions. 
-You will need to provide the following [settings](https://github.com/supabase/gotrue#e-mail) inside the `docker-compose.yml` under `services.auth.environment`:
+If you are deploying to production, you should update the default [passwords and secrets](https://github.com/supabase/supabase/blob/master/docker/.env).
 
-- `GOTRUE_SMTP_HOST` - The mail server hostname to send emails through.
-- `GOTRUE_SMTP_PORT` - The port number to connect to the mail server on.
-- `GOTRUE_SMTP_USER` - If the mail server requires authentication, the username to use.
-- `GOTRUE_SMTP_PASS` - If the mail server requires authentication, the password to use.
-
-### API Keys 
+### Update API keys 
 
 All config for the API Gateway is stored in the `kong` directory. Inside `kong.yml` you'll find the routing for all services, the routing rules, 
 and down the bottom you'll find the JWTs capable of accessing services that require API Key access.
 
 See the full docs [here](https://docs.konghq.com/hub/kong-inc/key-auth/).
 
+If you are deploying to production, you should encode a new `anon` and `service_role` API key and update 
+them [here](https://github.com/supabase/supabase/blob/b1e99d2ce1f63ba728230fb53a6de444f60bce1f/docker/dockerfiles/kong/kong.yml#L42). 
 
-## Deploying
+After you have regenerated the JWT secret in the step above, use a JWT generator (for example, using [jsonwebtoken.io](https://www.jsonwebtoken.io/)) to regenerate the API Keys using the payloads below:
+
+
+```bash
+# anon Payload:
+{
+ "iss": "supabase",
+ "iat": 1603968834,
+ "exp": 2550653634,
+ "aud": "",
+ "sub": "",
+ "role": "anon"
+}
+# service_role Payload:
+{
+ "iss": "supabase",
+ "iat": 1603968834,
+ "exp": 2550653634,
+ "aud": "",
+ "sub": "",
+ "role": "service_role"
+}
+```
+
+### Configuring email 
+
+GoTrue requires an SMTP server to send emails for all authentication actions. 
+You will need to provide the following [settings](https://github.com/supabase/gotrue#e-mail) inside the `.env` file [here](https://github.com/supabase/supabase/blob/027e7f7b97bbe7365db4f7f46abe480e05841006/docker/.env#L8).
+
+
+### Deploying
 
 See the following guides to deploy Docker Compose setup using your preferred tool and platform: 
 
@@ -139,9 +115,116 @@ See the following guides to deploy Docker Compose setup using your preferred too
 - [AWS Fargate](https://aws.amazon.com/blogs/containers/deploy-applications-on-amazon-ecs-using-docker-compose/)
 - [Using Kompose for Kubernetes](https://kubernetes.io/docs/tasks/configure-pod-container/translate-compose-kubernetes/)
 
+
+### Example environment variable configuration
+
+The default environment variable configuration for most services should be sufficient. The default GoTrue config may not support all the settings you require to get up and running.
+
+For brevity, here is an example of what the environment variables for the auth / GoTrue container might look like once the service is deployed:
+
+```sh
+GOTRUE_OPERATOR_TOKEN=your-super-secret-operator-token
+GOTRUE_JWT_DEFAULT_GROUP_NAME=authenticated
+
+# Make sure this JWT secret matches what was configured during setup
+GOTRUE_JWT_SECRET=your-super-secret-jwt-token-with-at-least-32-characters-long
+
+# How long should JWT tokens be valid for?
+GOTRUE_JWT_EXP=3600
+
+# Since Supabase is based on Postgres, you shouldn't need to change this
+GOTRUE_DB_DRIVER=postgres
+
+# What schema should requests be routed to?
+# There should be no reason to change this
+DB_NAMESPACE=auth
+
+# Where is our auth/GoTrue located
+# You shouldn't need to change these unless the ports are mapped differently
+GOTRUE_API_HOST=0.0.0.0
+PORT=9999
+
+# Email settings
+# You must set these if you want to be able to send emails
+GOTRUE_SMTP_HOST=smtp.your-email-host.com
+GOTRUE_SMTP_PORT=465
+GOTRUE_SMTP_USER=your-smtp-user
+GOTRUE_SMTP_PASS=your-smtp-password
+
+# Should users be required to confirm their email address before they can log in?
+# If set to false, users won't have to confirm their registration
+# If set to true, users will have to click the link in their email to confirm
+GOTRUE_MAILER_AUTOCONFIRM=false
+
+# What is the 'from' address that emails are sent from?
+GOTRUE_SMTP_ADMIN_EMAIL=noreply@example.com
+
+# Remove this if you don't want debug logs
+GOTRUE_LOG_LEVEL=debug
+
+# The connection string for your database
+# `@db` says we're looking for the container called 'db' on our docker network
+DATABASE_URL=postgres://postgres:your-super-secret-and-long-postgres-password@db:5432/postgres
+
+# Email templates
+# Invite user - provide a URL to a HTML or Text template
+GOTRUE_MAILER_TEMPLATES_INVITE=https://example.com/path/to/your/invite/template.html
+
+# Confirm registration - provide a URL to a HTML or Text template
+GOTRUE_MAILER_TEMPLATES_CONFIRMATION=https://example.com/path/to/your/confirmation/template.html
+
+# Password recovery - provide a URL to a HTML or Text template
+GOTRUE_MAILER_TEMPLATES_RECOVERY=https://example.com/path/to/your/password_reset/template.HTML
+
+# Magic link - provide a URL to a HTML or Text template
+GOTRUE_MAILER_TEMPLATES_MAGIC_LINK=https://example.com/path/to/your/magic_link/template.html
+
+# GoTrue URLs
+# These are appended after the API_EXTERNAL_URL
+# You shouldn't need to change these
+GOTRUE_MAILER_URLPATHS_CONFIRMATION=/auth/v1/verify
+GOTRUE_MAILER_URLPATHS_INVITE=/auth/v1/verify
+GOTRUE_MAILER_URLPATHS_CONFIRMATION=/auth/v1/verify
+GOTRUE_MAILER_URLPATHS_RECOVERY=/auth/v1/verify
+
+# Site URLs
+# This is where the user will be redirected to after clicking a link in an email and after oAuth
+GOTRUE_SITE_URL=https://example.com/redirect_to_here
+GOTRUE_URI_ALLOW_LIST=https://example.com/redirect_to_here
+
+# This is the URL where your supabase stack is accessible
+# i.e. this is the endpoint URL you would pass into a `createClient()` call in the supabase-js library
+API_EXTERNAL_URL=https://database.example.com/
+
+# Set this to true if you want to prevent signing up with email and password
+GOTRUE_DISABLE_SIGNUP=true
+
+# oAuth
+# If you are not using oAuth to login (e.g. Login with Facebook), you can ignore the below
+# If you want to disable oAuth for a specific provider, set the `GOTRUE_EXTERNAL_<provider>_ENABLED` to false
+# Github oAuth
+GOTRUE_EXTERNAL_GITHUB_CLIENT_ID=your_github_client_id
+GOTRUE_EXTERNAL_GITHUB_SECRET=your_github_client_secret
+GOTRUE_EXTERNAL_GITHUB_ENABLED=true
+
+# Google oAuth
+GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOTRUE_EXTERNAL_GOOGLE_SECRET=your-google-secret
+GOTRUE_EXTERNAL_GOOGLE_ENABLED=true
+
+# Facebook oAuth
+GOTRUE_EXTERNAL_FACEBOOK_CLIENT_ID=your-facebook-client-id
+GOTRUE_EXTERNAL_FACEBOOK_SECRET=your-facebook-app-secret
+GOTRUE_EXTERNAL_FACEBOOK_ENABLED=true
+
+# Add other oAuth provider details below
+```
+
+More details can be found in the 'Configuring each service section' above.
+
 ## One-click deploys 
 
-For some individual tools, we also provide images and deployments into cloud marketplaces:
+For some tools we also provide images and deployments into cloud marketplaces:
 
 ### Postgres
 
@@ -154,7 +237,7 @@ For some individual tools, we also provide images and deployments into cloud mar
 
 - AWS [one click deploy](https://aws.amazon.com/marketplace/pp/B089N4FH7N?qid=1617156168590&sr=0-2)
 - Digital Ocean [one click deploy](https://marketplace.digitalocean.com/apps/supabase-realtime)
-- Docker [image](https://hub.docker.com/r/supabase/postgres)
+- Docker [image](https://hub.docker.com/r/supabase/realtime)
 
 ## Next steps
 

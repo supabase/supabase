@@ -87,9 +87,21 @@ export default function IndexPage() {
               </Link>
             </div>
 
-            <PricingTableRowMobile category={pricing.database} tier={'free'} icon={Solutions['database'].icon}/>
-            <PricingTableRowMobile category={pricing.auth} tier={'free'} icon={Solutions['authentication'].icon}/>
-            <PricingTableRowMobile category={pricing.storage} tier={'free'} icon={Solutions['storage'].icon}/>
+            <PricingTableRowMobile
+              category={pricing.database}
+              tier={'free'}
+              icon={Solutions['database'].icon}
+            />
+            <PricingTableRowMobile
+              category={pricing.auth}
+              tier={'free'}
+              icon={Solutions['authentication'].icon}
+            />
+            <PricingTableRowMobile
+              category={pricing.storage}
+              tier={'free'}
+              icon={Solutions['storage'].icon}
+            />
             <PricingTableRowMobile category={pricing.dashboard} tier={'free'} />
             <PricingTableRowMobile category={pricing.support} tier={'free'} />
 
@@ -112,9 +124,21 @@ export default function IndexPage() {
               </Link>
             </div>
 
-            <PricingTableRowMobile category={pricing.database} tier={'pro'} icon={Solutions['database'].icon}/>
-            <PricingTableRowMobile category={pricing.auth} tier={'pro'} icon={Solutions['authentication'].icon}/>
-            <PricingTableRowMobile category={pricing.storage} tier={'pro'} icon={Solutions['storage'].icon}/>
+            <PricingTableRowMobile
+              category={pricing.database}
+              tier={'pro'}
+              icon={Solutions['database'].icon}
+            />
+            <PricingTableRowMobile
+              category={pricing.auth}
+              tier={'pro'}
+              icon={Solutions['authentication'].icon}
+            />
+            <PricingTableRowMobile
+              category={pricing.storage}
+              tier={'pro'}
+              icon={Solutions['storage'].icon}
+            />
             <PricingTableRowMobile category={pricing.dashboard} tier={'pro'} />
             <PricingTableRowMobile category={pricing.support} tier={'pro'} />
 
@@ -128,7 +152,7 @@ export default function IndexPage() {
                 <Typography.Text type="secondary">/project /month plus usage costs</Typography.Text>
               </p>
               <p className="my-4 text-sm text-gray-500">
-                Dedicated support team, account manager and technical specialist.
+                Designated support team, account manager and technical specialist.
               </p>
               <Link href="https://app.supabase.io" as="https://app.supabase.io">
                 <a>
@@ -139,9 +163,21 @@ export default function IndexPage() {
               </Link>
             </div>
 
-            <PricingTableRowMobile category={pricing.database} tier={'enterprise'} icon={Solutions['database'].icon}/>
-            <PricingTableRowMobile category={pricing.auth} tier={'enterprise'} icon={Solutions['authentication'].icon}/>
-            <PricingTableRowMobile category={pricing.storage} tier={'enterprise'} icon={Solutions['storage'].icon}/>
+            <PricingTableRowMobile
+              category={pricing.database}
+              tier={'enterprise'}
+              icon={Solutions['database'].icon}
+            />
+            <PricingTableRowMobile
+              category={pricing.auth}
+              tier={'enterprise'}
+              icon={Solutions['authentication'].icon}
+            />
+            <PricingTableRowMobile
+              category={pricing.storage}
+              tier={'enterprise'}
+              icon={Solutions['storage'].icon}
+            />
             <PricingTableRowMobile category={pricing.dashboard} tier={'enterprise'} />
             <PricingTableRowMobile category={pricing.support} tier={'enterprise'} />
           </div>
@@ -256,14 +292,14 @@ export default function IndexPage() {
                   <td className="h-full py-8 px-6 align-top">
                     <div className="relative h-full table">
                       <p>
-                      <span className="text-4xl font-normal text-gray-900 dark:text-white">
+                        <span className="text-4xl font-normal text-gray-900 dark:text-white">
                           $25
                         </span>
                         <Typography.Text> /project /month plus usage costs</Typography.Text>
                       </p>
                       <p className="mt-4 mb-16 ">
                         <Typography.Text>
-                          Dedicated support team, account manager and technical specialist.
+                          Designated support team, account manager and technical specialist.
                         </Typography.Text>
                       </p>
                       <Link href="https://app.supabase.io" as="https://app.supabase.io">
@@ -277,9 +313,18 @@ export default function IndexPage() {
                   </td>
                 </tr>
 
-                <PricingTableRowDesktop category={pricing.database} icon={Solutions['database'].icon}/>
-                <PricingTableRowDesktop category={pricing.auth} icon={Solutions['authentication'].icon}/>
-                <PricingTableRowDesktop category={pricing.storage} icon={Solutions['storage'].icon}/>
+                <PricingTableRowDesktop
+                  category={pricing.database}
+                  icon={Solutions['database'].icon}
+                />
+                <PricingTableRowDesktop
+                  category={pricing.auth}
+                  icon={Solutions['authentication'].icon}
+                />
+                <PricingTableRowDesktop
+                  category={pricing.storage}
+                  icon={Solutions['storage'].icon}
+                />
                 <PricingTableRowDesktop category={pricing.dashboard} />
                 <PricingTableRowDesktop category={pricing.support} />
               </tbody>
@@ -348,7 +393,8 @@ export default function IndexPage() {
           </div>
         </div>
       </div>
-      <CTABanner/>
+
+      <CTABanner />
     </DefaultLayout>
   )
 }

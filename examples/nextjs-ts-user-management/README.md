@@ -7,7 +7,7 @@ This demonstrates how to use:
 - User signups using Supabase [Auth](https://supabase.io/auth).
 - User avatar images using Supabase [Storage](https://supabase.io/storage).
 - Public profiles restricted with [Policies](https://supabase.io/docs/guides/auth#policies).
-- Frontend using [Next.js]([nextjs.org/](https://nextjs.org/)).
+- Frontend using [Next.js](<[nextjs.org/](https://nextjs.org/)>).
 
 ## Technologies used
 
@@ -64,7 +64,7 @@ Run the application: `npm run dev`. Open your browser to `https://localhost:3000
 
 This project uses very high-level Authorization using Postgres' Role Level Security.
 When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
-When a user logs in, they are issued a JWT with the role `authenticated` and thier UUID.
+When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.
 
 This is a trimmed-down schema, with the policies:

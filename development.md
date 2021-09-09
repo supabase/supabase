@@ -4,6 +4,8 @@ This is a mono repo of two different websites. Our docs are built with docusauru
 
 The beta website has a `basePath` of `new` and using `vercel.json`. This is to distinguish between http requests between both the websites. Any request with path starting with `/new/` will be routed to the beta website.
 
+Install the [Vercel CLI](https://vercel.com/cli).
+
 To run this locally, run the following commands. This will start the website at http://localhost:8080/ and requests will be automatically proxied (via vercel rewrites) to the docs website (running at http://localhost:3005/) and the beta website (running at http://localhost:3000)
 
 ```
@@ -12,10 +14,14 @@ make dev
 
 # tab 2
 cd www
+npm install
 npm run dev
 
 # tab 3
-cd web
+cd web/spec
+make
+npm install
+npm run gen:supabase
 npm run start
 ```
 

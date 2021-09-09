@@ -1,12 +1,12 @@
-import { useContext, useEffect, useState } from "react";
-import { AppContext } from "lib/constants";
-import { supabase } from "lib/api";
-import dynamic from "next/dynamic";
-import styles from "styles/Map.module.css";
-import SignIn from "components/SignIn";
-import PageLayout from "components/PageLayout";
+import { useContext, useEffect, useState } from 'react'
+import { AppContext } from 'lib/constants'
+import { supabase } from 'lib/api'
+import dynamic from 'next/dynamic'
+import styles from 'styles/Map.module.css'
+import SignIn from 'components/SignIn'
+import PageLayout from 'components/PageLayout'
 
-const MapInput = dynamic(() => import("components/MapInput"), { ssr: false });
+const MapInput = dynamic(() => import('components/MapInput'), { ssr: false })
 
 function randomPosition() {
   var array = [
@@ -30,25 +30,25 @@ function randomPosition() {
       lat: 1.35454,
       lng: 103.69746,
     },
-  ];
-  return array[Math.floor(Math.random() * array.length)];
+  ]
+  return array[Math.floor(Math.random() * array.length)]
 }
-const center = randomPosition();
-const zoomLevel = 14;
+const center = randomPosition()
+const zoomLevel = 14
 
 export default function Page() {
-  const { session } = useContext(AppContext);
-  const [userRole, setRole] = useState(null);
-  const [username, setUsername] = useState(null);
+  const { session } = useContext(AppContext)
+  const [userRole, setRole] = useState(null)
+  const [username, setUsername] = useState(null)
 
   useEffect(() => {
-    setRole(session?.user?.user_metadata?.role);
-    setUsername(session?.user?.user_metadata?.username);
-  }, [session]);
+    setRole(session?.user?.user_metadata?.role)
+    setUsername(session?.user?.user_metadata?.username)
+  }, [session])
 
   async function onSignOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) console.log("Error logging out:", error.message);
+    const { error } = await supabase.auth.signOut()
+    if (error) console.log('Error logging out:', error.message)
   }
 
   return (
@@ -63,17 +63,11 @@ export default function Page() {
         {!session && <SignIn />}
         {session && (
           <div className={styles.card}>
-            {userRole?.toUpperCase() == "DRIVER" && (
-              <MapInput
-                clientRef={session.user?.id}
-                center={center}
-                zoom={zoomLevel}
-              />
+            {userRole?.toUpperCase() == 'DRIVER' && (
+              <MapInput clientRef={session.user?.id} center={center} zoom={zoomLevel} />
             )}
-            {userRole?.toUpperCase() == "MANAGER" && (
-              <p className={styles.error}>
-                Sorry, You need to sign in as driver
-              </p>
+            {userRole?.toUpperCase() == 'MANAGER' && (
+              <p className={styles.error}>Sorry, You need to sign in as driver</p>
             )}
             <div className={styles.profile_container}>
               Signed in as {username} [{userRole}]<br />
@@ -85,5 +79,5 @@ export default function Page() {
         )}
       </div>
     </PageLayout>
-  );
+  )
 }

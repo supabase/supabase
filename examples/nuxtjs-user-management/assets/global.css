@@ -151,7 +151,7 @@ button.primary,
   left: 0;
   right: 0;
   display: flex;
-  flex-flow: row; 
+  flex-flow: row;
   border-top: var(--custom-border);
 }
 .footer div {
