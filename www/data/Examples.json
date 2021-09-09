@@ -54,8 +54,8 @@
   {
     "type": "example",
     "products": ["database", "auth"],
-    "title": "NextJS example",
-    "description": "NextJS example using Supabase Auth",
+    "title": "NestJS example",
+    "description": "NestJS example using Supabase Auth",
     "author": "hiro1107",
     "author_url": "https://github.com/hiro1107",
     "author_img": "https://avatars.githubusercontent.com/u/1423067",
@@ -107,7 +107,7 @@
     "type": "example",
     "products": ["database"],
     "title": "NextJS todo list app",
-    "description": "React Native todo List example with Expo",
+    "description": "NextJS todo list example",
     "author": "supabase",
     "author_url": "https://github.com/supabase",
     "author_img": "https://avatars.githubusercontent.com/u/54469796",
@@ -152,6 +152,19 @@
     "author_img": "https://avatars.githubusercontent.com/u/54469796",
     "repo_name": "vue3-ts-todo-list",
     "repo_url": "https://github.com/supabase/supabase/tree/master/examples/vue3-ts-todo-list",
+    "vercel_deploy_url": "",
+    "demo_url": ""
+  },
+  {
+    "type": "example",
+    "products": ["database"],
+    "title": "Angular todo list app",
+    "description": "Angular todo List example",
+    "author": "geromegrignon",
+    "author_url": "https://github.com/geromegrignon",
+    "author_img": "https://avatars.githubusercontent.com/u/32737308",
+    "repo_name": "angular-todo-list",
+    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/angular-todo-list",
     "vercel_deploy_url": "",
     "demo_url": ""
   }

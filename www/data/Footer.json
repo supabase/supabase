@@ -29,7 +29,11 @@
     "links": [
       {
         "text": "Support",
-        "url": "/docs/support"
+        "url": "/support"
+      },
+      {
+        "text": "Brand Assets / Logos",
+        "url": "/brand-assets"
       },
       {
         "text": "Case Studies",
@@ -72,6 +76,10 @@
       {
         "text": "Open Source",
         "url": "/oss"
+      },
+      {
+        "text": "Careers",
+        "url": "https://about.supabase.com/careers"
       },
       {
         "text": "Humans.txt",

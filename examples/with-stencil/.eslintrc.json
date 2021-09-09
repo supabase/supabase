@@ -2,9 +2,7 @@
   "parserOptions": {
     "project": "./tsconfig.json"
   },
-  "extends": [
-    "plugin:@stencil/recommended"
-  ],
+  "extends": ["plugin:@stencil/recommended"],
   "rules": {
     "@stencil/async-methods": "error",
     "@stencil/ban-prefix": ["error", ["stencil", "stnl", "st"]],

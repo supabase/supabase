@@ -29,12 +29,12 @@
         }
       },
       {
-        "title": "Optimised database instances",
+        "title": "Optimized database instances",
         "tooltip": "Why? Unique workload requirements, heavy reads and writes, compliance",
         "tiers": {
           "free": false,
           "pro": false,
-          "enterprise": true
+          "enterprise": "Starting from $50/month"
         }
       },
       {
@@ -42,7 +42,7 @@
         "tiers": {
           "free": "Up to 500 MB",
           "pro": "Up to 8 GB",
-          "enterprise": "0.125 per GB"
+          "enterprise": "$0.125 per GB"
         }
       },
       {
@@ -61,6 +61,15 @@
           "free": "Paused after 1 week inactivity",
           "pro": "Never",
           "enterprise": "Never"
+        }
+      },
+      {
+        "title": "Transfer limits",
+        "tooltip": "Good news, only download operations are counted towards the limit",
+        "tiers": {
+          "free": "Up to 2GB",
+          "pro": "Up to 50GB",
+          "enterprise": "$0.09 per GB"
         }
       }
     ]
@@ -137,7 +146,7 @@
         "tiers": {
           "free": "Up to 2 GB",
           "pro": "Up to 200 GB",
-          "enterprise": "$0.07 per GB"
+          "enterprise": "$0.09 per GB"
         }
       },
       {
@@ -201,7 +210,7 @@
         }
       },
       {
-        "title": "Dedicated support",
+        "title": "Designated support",
         "tiers": {
           "free": false,
           "pro": false,

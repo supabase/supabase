@@ -1,4 +1,4 @@
-type params = { name: string; description:string; tabs: string }
+type params = { name: string; description: string; tabs: string }
 
 const Example = ({ name, description = '', tabs = '' }: params) =>
   `

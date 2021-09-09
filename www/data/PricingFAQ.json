@@ -53,7 +53,7 @@
   },
   {
     "question": "I read that you are giving credits to users who sign up during beta, do I get those?",
-    "answer": "If you sign up before the end of launch week we will issue credits for the Pro tier. You can claim them by getting in touch via <support@supabase.io>[](mailto:support@supabase.io)."
+    "answer": "If you signed up before the 4th of April 2021 we will issue credits for the Pro tier. You can claim them by getting in touch via <support@supabase.io>[](mailto:support@supabase.io)."
   },
   {
     "question": "What if I want to cancel my monthly subscription?",
@@ -105,7 +105,7 @@
   },
   {
     "question": "What is the largest sized file I can deploy to storage?",
-    "answer": "A big cat like a Lion or Siberian tiger, also Ligers are fine. If you are uploading via the dashboard there is a 50MB limit."
+    "answer": "A big cat like a Lion or Siberian tiger, also Ligers are fine. If you are using the hosted platform there is a 50MB limit."
   },
   {
     "question": "Are there any limits for data egress?",

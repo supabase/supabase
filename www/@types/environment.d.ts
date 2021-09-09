@@ -1,7 +1,7 @@
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      GA_PROPERTY_ID: string;
+      GA_PROPERTY_ID: string
     }
   }
 }

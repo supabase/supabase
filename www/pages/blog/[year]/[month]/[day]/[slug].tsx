@@ -78,7 +78,7 @@ export async function getStaticProps({ params }: any) {
         slug: `${params.year}/${params.month}/${params.day}/${params.slug}`,
         content: mdxSource,
         ...data,
-        toc: toc(content, { maxdepth: 2 }),
+        toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
       },
     },
   }
@@ -122,7 +122,11 @@ function BlogPostPage(props: any) {
       <div>
         <Space>
           {props.blog.tags.map((tag: string) => {
-            return <Badge key={`categroy-badge-${tag}`}>{tag}</Badge>
+            return (
+              <a href={`/blog/tags/${tag}`}>
+                <Badge key={`categroy-badge-`}>{tag}</Badge>
+              </a>
+            )
           })}
         </Space>
       </div>
@@ -162,14 +166,14 @@ function BlogPostPage(props: any) {
           images: [
             {
               url: `https://supabase.io${basePath}/images/blog/${
-                props.blog.thumb ? props.blog.thumb : props.blog.image
+                props.blog.image ? props.blog.image : props.blog.thumb
               }`,
             },
           ],
         }}
       />
       <DefaultLayout>
-        <div className="bg-white dark:bg-dark-800 overflow-hidden py-12">
+        <div className="bg-white dark:bg-dark-800 overflow-hidden mb-12">
           <div className="container px-8 sm:px-16 xl:px-20 lg:mt-16 mx-auto">
             <div className="max-w-6xl mx-auto">
               <div className="lg:py-12 grid grid-cols-12 lg:gap-16">
@@ -228,7 +232,7 @@ function BlogPostPage(props: any) {
                 </article>
               </div>
               <div className="col-span-12 lg:col-span-4">
-                <Space direction="vertical" size={8}>
+                <Space direction="vertical" size={8} className="lg:mb-16 lg:top-16 lg:sticky">
                   <div className="hidden lg:block">{toc}</div>
                   <div>
                     <Typography.Title className="mb-4" level={5}>

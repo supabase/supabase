@@ -17,6 +17,7 @@ import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
+import Link from 'next/link'
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import CTABanner from '~/components/CTABanner'
@@ -28,13 +29,13 @@ import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
 
-function AuthPage() {
+function StoragePage() {
   // base path for images
   const { basePath } = useRouter()
 
   const meta_title = 'Storage | Store any digital content'
   const meta_description =
-    'An open source Object store service with unlimited scalability, for any file type.'
+    'An open source Object store with unlimited scalability, for any file type.'
 
   return (
     <>
@@ -63,7 +64,7 @@ function AuthPage() {
             </span>,
           ]}
           subheader={[
-            'An open source Object store service with unlimited scalability, for any file type.',
+            'An open source Object store with unlimited scalability, for any file type.',
             'With custom policies and permissions that are familiar and easy to implement.',
           ]}
           image={[
@@ -115,8 +116,14 @@ function AuthPage() {
             </div>
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
               <Typography.Text>
-                <p className="mb-4">
-                  <IconBarChart />
+                <p>
+                  <Space>
+                    <ProductIcon
+                      icon={
+                        'M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'
+                      }
+                    />
+                  </Space>
                 </p>
               </Typography.Text>
               <Typography.Title level={4}>Lightning fast</Typography.Title>
@@ -132,8 +139,14 @@ function AuthPage() {
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
               <Typography.Text>
-                <p className="mb-4">
-                  <IconCheckSquare />
+                <p>
+                  <Space>
+                    <ProductIcon
+                      icon={
+                        'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'
+                      }
+                    />
+                  </Space>
                 </p>
               </Typography.Text>
               <Typography.Title level={4}>Dependable</Typography.Title>
@@ -200,11 +213,11 @@ function AuthPage() {
               </p>,
             ]}
             footer={[
-              <div className="grid grid-cols-12 gap-8 lg:gap-0 xl:gap-16 mt-8">
+              <div className="grid grid-cols-12 gap-8 lg:gap-0 xl:gap-16 my-8">
                 <div className="col-span-6 lg:col-span-12 lg:mb-8 xl:mb-0 xl:col-span-4">
                   <FeatureColumn
                     icon={<IconWifi />}
-                    title="CDN integration"
+                    title="CDN"
                     text="Serve from the edge to reduce latency."
                   />
                   <Badge color="blue">Coming soon</Badge>
@@ -212,7 +225,7 @@ function AuthPage() {
                 <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
                     icon={<IconShuffle />}
-                    title="Auto transformation & optimization"
+                    title="Transformations"
                     text="Resize and compress your media before you serve it."
                   />
                   <Badge color="blue">Coming soon</Badge>
@@ -242,7 +255,7 @@ function AuthPage() {
                         with Supabase Auth
                       </Typography.Title>
                       <Typography.Text>
-                        <p className="text-lg">
+                        <p className="">
                           Using Postgres Row Level Security to create Object access rules.
                         </p>
                         <p>
@@ -251,14 +264,21 @@ function AuthPage() {
                           write policies.
                         </p>
                       </Typography.Text>
-                      <Button
-                        size="small"
-                        type="default"
-                        className="mt-4"
-                        icon={<IconArrowUpRight />}
+                      <Link
+                        href="https://supabase.io/docs/reference/javascript/storage-createbucket"
+                        as="https://supabase.io/docs/reference/javascript/storage-createbucket"
                       >
-                        Explore documentation
-                      </Button>
+                        <a>
+                          <Button
+                            size="small"
+                            type="default"
+                            className="mt-4"
+                            icon={<IconArrowUpRight />}
+                          >
+                            Explore documentation
+                          </Button>
+                        </a>
+                      </Link>
                     </div>
                     <div className="col-span-12 lg:col-span-6 lg:col-start-7">
                       <SplitCodeBlockCarousel
@@ -278,4 +298,4 @@ function AuthPage() {
   )
 }
 
-export default AuthPage
+export default StoragePage

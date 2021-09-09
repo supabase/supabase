@@ -34,8 +34,8 @@ http://localhost:3000/#access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQ
 Let's break this up so that it's easier to read:
 
 ```jsx
-// the base url - whatever you set in the Auth Settings in app.supabase.io dashboard 
-http://localhost:3000/ 
+// the base url - whatever you set in the Auth Settings in app.supabase.io dashboard
+http://localhost:3000/
 
 // note we use the '#' (fragment) instead of '?' query param
 // the access token is a JWT issued to the user
@@ -98,7 +98,7 @@ create table my_scores (
 ALTER TABLE my_scores ENABLE ROW LEVEL SECURITY;
 
 insert into my_scores(name, score, user_id)
-values 
+values
   ('Paul', 100, '5a4365e7-7c7d-4eaf-a8ee-9ec9432917ca'),
   ('Paul', 200, '5a4365e7-7c7d-4eaf-a8ee-9ec9432917ca'),
   ('Leto', 50,  '9ec94326-2e2d-2ea2-22e3-3a535a4365e7');
@@ -118,10 +118,7 @@ CREATE POLICY user_update_own_scores ON my_scores
 Now, assuming you have an active session in your javascript/supabase-js environment you can do:
 
 ```jsx
-supabase
-  .from('my_scores')
-  .select('*')
-  .then(console.log)
+supabase.from('my_scores').select('*').then(console.log)
 ```
 
 and you should only receive scores belonging to the current logged in user. Alternatively you can use Bash like:
@@ -139,6 +136,10 @@ There are some more notes here on how to structure your schema to best integrate
 Once you get the hang of polices you can start to get a little bit fancy. Let's say I work at Blizzard and I only want Blizzard staff members to be able to update people's high scores, I can write something like:
 
 ```sql
+create or replace function auth.email() returns text as $$
+  select nullif(current_setting('request.jwt.claim.email', true), '')::text;
+$$ language sql;
+
 create policy "Only Blizzard staff can update leaderboard"
   on my_scores
   for update using (
@@ -151,7 +152,6 @@ Supabase comes with three built-in helper functions: `auth.email()`, `auth.uid()
 See the full PostgreSQL policy docs here: [https://www.postgresql.org/docs/12/sql-createpolicy.html](https://www.postgresql.org/docs/12/sql-createpolicy.html)
 
 You can get as creative as you like with these policies.
-
 
 ### Resources
 

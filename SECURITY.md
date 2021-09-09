@@ -2,24 +2,33 @@
 
 ## Supported Versions
 
-
 | Version | Supported          |
 | ------- | ------------------ |
-| All   | :white_check_mark: |
+| All     | :white_check_mark: |
 
 ## Reporting a Vulnerability
 
 Contact: security@supabase.io
 Canonical: https://supabase.io/.well-known/security.txt
 
-
 At Supabase, we consider the security of our systems a top priority. But no matter how much effort we put into system security, there can still be vulnerabilities present.
 
 If you discover a vulnerability, we would like to know about it so we can take steps to address it as quickly as possible. We would like to ask you to help us better protect our clients and our systems.
 
+Out of scope vulnerabilities:
+
+- Clickjacking on pages with no sensitive actions.
+- Unauthenticated/logout/login CSRF.
+- Attacks requiring MITM or physical access to a user's device.
+- Any activity that could lead to the disruption of our service (DoS).
+- Content spoofing and text injection issues without showing an attack vector/without being able to modify HTML/CSS.
+- Email spoofing
+- Lack of Secure or HTTP only flag on non-sensitive cookies
+- Deadlinks
+
 Please do the following:
 
-- E-mail your findings to security@supabase.io. 
+- E-mail your findings to security@supabase.io.
 - Do not take advantage of the vulnerability or problem you have discovered, for example by downloading more data than necessary to demonstrate the vulnerability or deleting or modifying other people's data,
 - Do not reveal the problem to others until it has been resolved,
 - Do not use attacks on physical security, social engineering, distributed denial of service, spam or applications of third parties, and

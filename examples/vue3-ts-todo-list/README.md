@@ -85,23 +85,26 @@ create policy "Individuals can delete their own todos." on todos for
 
 Supabase is open source, we'd love for you to follow along and get involved at https://github.com/supabase/supabase
 
+## Local development
 
-## Local development 
 ```
 npm install
 ```
 
 ### Compiles and hot-reloads for development
+
 ```
 npm run serve
 ```
 
 ### Compiles and minifies for production
+
 ```
 npm run build
 ```
 
 ### Lints and fixes files
+
 ```
 npm run lint
 ```

@@ -85,8 +85,8 @@ Adds a prefix to all table names.
 Migrations are not applied automatically, so you will need to run them after
 you've built gotrue.
 
-* If built locally: `./gotrue migrate`
-* Using Docker: `docker run --rm gotrue gotrue migrate`
+- If built locally: `./gotrue migrate`
+- Using Docker: `docker run --rm gotrue gotrue migrate`
 
 ### Logging
 
@@ -251,7 +251,9 @@ Default Content (if template is unavailable):
 ```html
 <h2>You have been invited</h2>
 
-<p>You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:</p>
+<p>
+  You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:
+</p>
 <p><a href="{{ .ConfirmationURL }}">Accept the invite</a></p>
 ```
 
@@ -317,283 +319,383 @@ GoTrue exposes the following endpoints:
 
 ### **GET /settings**
 
-  Returns the publicly available settings for this gotrue instance.
+Returns the publicly available settings for this gotrue instance.
 
-  ```json
-  {
-    "external": {
-      "bitbucket": true,
-      "github": true,
-      "gitlab": true,
-      "google": true
-    },
-    "disable_signup": false,
-    "autoconfirm": false
-  }
-  ```
+```json
+{
+  "external": {
+    "bitbucket": true,
+    "github": true,
+    "gitlab": true,
+    "google": true
+  },
+  "disable_signup": false,
+  "autoconfirm": false
+}
+```
 
 ### **POST /signup**
 
-  Register a new user with an email and password.
+Register a new user with an email and password.
 
-  ```json
-  {
-    "email": "email@example.com",
-    "password": "secret"
-  }
-  ```
+```json
+{
+  "email": "email@example.com",
+  "password": "secret"
+}
+```
 
-  Returns:
+Returns:
 
-  ```json
-  {
-    "id": "11111111-2222-3333-4444-5555555555555",
-    "email": "email@example.com",
-    "confirmation_sent_at": "2016-05-15T20:49:40.882805774-07:00",
-    "created_at": "2016-05-15T19:53:12.368652374-07:00",
-    "updated_at": "2016-05-15T19:53:12.368652374-07:00"
-  }
-  ```
+```json
+{
+  "id": "11111111-2222-3333-4444-5555555555555",
+  "email": "email@example.com",
+  "confirmation_sent_at": "2016-05-15T20:49:40.882805774-07:00",
+  "created_at": "2016-05-15T19:53:12.368652374-07:00",
+  "updated_at": "2016-05-15T19:53:12.368652374-07:00"
+}
+```
 
 ### **POST /invite**
 
-  Invites a new user with an email.
-  This endpoint requires the `service_role` or `supabase_admin` JWT set as an Auth Bearer header:
+Invites a new user with an email.
+This endpoint requires the `service_role` or `supabase_admin` JWT set as an Auth Bearer header:
 
-  e.g.
-  ```json
-  headers: {
-    "Authorization" : "Bearer eyJhbGciOiJI...M3A90LCkxxtX9oNP9KZO"
-  }
-  ```
+e.g.
 
-  ```json
-  {
-    "email": "email@example.com"
-  }
-  ```
+```json
+headers: {
+  "Authorization" : "Bearer eyJhbGciOiJI...M3A90LCkxxtX9oNP9KZO"
+}
+```
 
-  Returns:
+```json
+{
+  "email": "email@example.com"
+}
+```
 
-  ```json
-  {
-    "id": "11111111-2222-3333-4444-5555555555555",
-    "email": "email@example.com",
-    "confirmation_sent_at": "2016-05-15T20:49:40.882805774-07:00",
-    "created_at": "2016-05-15T19:53:12.368652374-07:00",
-    "updated_at": "2016-05-15T19:53:12.368652374-07:00",
-    "invited_at": "2016-05-15T19:53:12.368652374-07:00"
-  }
-  ```
+Returns:
+
+```json
+{
+  "id": "11111111-2222-3333-4444-5555555555555",
+  "email": "email@example.com",
+  "confirmation_sent_at": "2016-05-15T20:49:40.882805774-07:00",
+  "created_at": "2016-05-15T19:53:12.368652374-07:00",
+  "updated_at": "2016-05-15T19:53:12.368652374-07:00",
+  "invited_at": "2016-05-15T19:53:12.368652374-07:00"
+}
+```
 
 ### **POST /verify**
 
-  Verify a registration or a password recovery. Type can be `signup` or `recovery` or `invite`
-  and the `token` is a token returned from either `/signup` or `/recover`.
+Verify a registration or a password recovery. Type can be `signup` or `recovery` or `invite`
+and the `token` is a token returned from either `/signup` or `/recover`.
 
-  ```json
-  {
-    "type": "signup",
-    "token": "confirmation-code-delivered-in-email"
-  }
-  ```
-  
-  `password` is required for signup verification if no existing password exists.
+```json
+{
+  "type": "signup",
+  "token": "confirmation-code-delivered-in-email"
+}
+```
 
-  Returns:
+`password` is required for signup verification if no existing password exists.
 
-  ```json
-  {
-    "access_token": "jwt-token-representing-the-user",
-    "token_type": "bearer",
-    "expires_in": 3600,
-    "refresh_token": "a-refresh-token",
-    "type": "signup | recovery | invite"
-  }
-  ```
+Returns:
+
+```json
+{
+  "access_token": "jwt-token-representing-the-user",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "refresh_token": "a-refresh-token",
+  "type": "signup | recovery | invite"
+}
+```
 
 ### **GET /verify**
 
-  Verify a registration or a password recovery. Type can be `signup` or `recovery` or `magiclink` or `invite`
-  and the `token` is a token returned from either `/signup` or `/recover` or `/magiclink`.
+Verify a registration or a password recovery. Type can be `signup` or `recovery` or `magiclink` or `invite`
+and the `token` is a token returned from either `/signup` or `/recover` or `/magiclink`.
 
-  query params:
-  ```json
-  {
-    "type": "signup",
-    "token": "confirmation-code-delivered-in-email",
-  }
-  ```
+query params:
 
-  User will be logged in and redirected to:
+```json
+{
+  "type": "signup",
+  "token": "confirmation-code-delivered-in-email"
+}
+```
 
-  ```json
-  SITE_URL/#access_token=jwt-token-representing-the-user&token_type=bearer&expires_in=3600&refresh_token=a-refresh-token&type=invite
-  ```
+User will be logged in and redirected to:
 
-  Your app should detect the query params in the fragment and use them to set the session (supabase-js does this automatically)
+```json
+SITE_URL/#access_token=jwt-token-representing-the-user&token_type=bearer&expires_in=3600&refresh_token=a-refresh-token&type=invite
+```
 
-  You can use the `type` param to redirect the user to a password set form in the case of `invite` or `recovery`,
-  or show an account confirmed/welcome message in the case of `signup`, or direct them to some additional onboarding flow
+Your app should detect the query params in the fragment and use them to set the session (supabase-js does this automatically)
+
+You can use the `type` param to redirect the user to a password set form in the case of `invite` or `recovery`,
+or show an account confirmed/welcome message in the case of `signup`, or direct them to some additional onboarding flow
 
 ### **POST /magiclink**
 
-  Magic Link. Will deliver a link (e.g. `/verify?type=magiclink&token=fgtyuf68ddqdaDd`) to the user based on
-  email address which they can use to redeem an access_token.
-  
-  By default Magic Links can only be sent once every 60 seconds
+Magic Link. Will deliver a link (e.g. `/verify?type=magiclink&token=fgtyuf68ddqdaDd`) to the user based on
+email address which they can use to redeem an access_token.
 
-  ```json
-  {
-    "email": "email@example.com"
-  }
-  ```
+By default Magic Links can only be sent once every 60 seconds
 
-  Returns:
+```json
+{
+  "email": "email@example.com"
+}
+```
 
-  ```json
-  {}
-  ```
-  
-  when clicked the magic link will redirect the user to `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=magiclink` (see `/verify` above)
+Returns:
+
+```json
+{}
+```
+
+when clicked the magic link will redirect the user to `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=magiclink` (see `/verify` above)
 
 ### **POST /recover**
 
-  Password recovery. Will deliver a password recovery mail to the user based on
-  email address.
-  
-  By default recovery links can only be sent once every 60 seconds
+Password recovery. Will deliver a password recovery mail to the user based on
+email address.
 
-  ```json
-  {
-    "email": "email@example.com"
-  }
-  ```
+By default recovery links can only be sent once every 60 seconds
 
-  Returns:
+```json
+{
+  "email": "email@example.com"
+}
+```
 
-  ```json
-  {}
-  ```
+Returns:
+
+```json
+{}
+```
 
 ### **POST /token**
 
-  This is an OAuth2 endpoint that currently implements
-  the password and refresh_token grant types
+This is an OAuth2 endpoint that currently implements
+the password and refresh_token grant types
 
-  query params:
-  ```
-  ?grant_type=password
-  ```
+query params:
 
-  body:
-  ```json
-  {
-    "email": "name@domain.com",
-    "password": "somepassword",
-  }
-  ```
+```
+?grant_type=password
+```
 
-  or
+body:
 
-  query params:
-  ```
-  grant_type=refresh_token
-  ```
+```json
+{
+  "email": "name@domain.com",
+  "password": "somepassword"
+}
+```
 
-  body:
-  ```json
-  {
-    "refresh_token": "a-refresh-token"
-  }
-  ```
+or
 
-  Once you have an access token, you can access the methods requiring authentication
-  by settings the `Authorization: Bearer YOUR_ACCESS_TOKEN_HERE` header.
+query params:
 
-  Returns:
+```
+grant_type=refresh_token
+```
 
-  ```json
-  {
-    "access_token": "jwt-token-representing-the-user",
-    "token_type": "bearer",
-    "expires_in": 3600,
-    "refresh_token": "a-refresh-token"
-  }
-  ```
+body:
+
+```json
+{
+  "refresh_token": "a-refresh-token"
+}
+```
+
+Once you have an access token, you can access the methods requiring authentication
+by settings the `Authorization: Bearer YOUR_ACCESS_TOKEN_HERE` header.
+
+Returns:
+
+```json
+{
+  "access_token": "jwt-token-representing-the-user",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "refresh_token": "a-refresh-token"
+}
+```
 
 ### **GET /user**
 
-  Get the JSON object for the logged in user (requires authentication)
+Get the JSON object for the logged in user (requires authentication)
 
-  Returns:
+Returns:
 
-  ```json
-  {
-    "id": "11111111-2222-3333-4444-5555555555555",
-    "email": "email@example.com",
-    "confirmation_sent_at": "2016-05-15T20:49:40.882805774-07:00",
-    "created_at": "2016-05-15T19:53:12.368652374-07:00",
-    "updated_at": "2016-05-15T19:53:12.368652374-07:00"
-  }
-  ```
+```json
+{
+  "id": "11111111-2222-3333-4444-5555555555555",
+  "email": "email@example.com",
+  "confirmation_sent_at": "2016-05-15T20:49:40.882805774-07:00",
+  "created_at": "2016-05-15T19:53:12.368652374-07:00",
+  "updated_at": "2016-05-15T19:53:12.368652374-07:00"
+}
+```
 
 ### **PUT /user**
 
-  Update a user (Requires authentication). Apart from changing email/password, this
-  method can be used to set custom user data.
+Update a user (Requires authentication). Apart from changing email/password, this
+method can be used to set custom user data.
 
-  ```json
-  {
-    "email": "new-email@example.com",
-    "password": "new-password",
-    "data": {
-      "key": "value",
-      "number": 10,
-      "admin": false
-    }
+```json
+{
+  "email": "new-email@example.com",
+  "password": "new-password",
+  "data": {
+    "key": "value",
+    "number": 10,
+    "admin": false
   }
-  ```
+}
+```
 
-  Returns:
+Returns:
 
-  ```json
-  {
-    "id": "11111111-2222-3333-4444-5555555555555",
-    "email": "email@example.com",
-    "confirmation_sent_at": "2016-05-15T20:49:40.882805774-07:00",
-    "created_at": "2016-05-15T19:53:12.368652374-07:00",
-    "updated_at": "2016-05-15T19:53:12.368652374-07:00"
+```json
+{
+  "id": "11111111-2222-3333-4444-5555555555555",
+  "email": "email@example.com",
+  "confirmation_sent_at": "2016-05-15T20:49:40.882805774-07:00",
+  "created_at": "2016-05-15T19:53:12.368652374-07:00",
+  "updated_at": "2016-05-15T19:53:12.368652374-07:00"
+}
+```
+
+### **POST /admin/users**
+
+Creates a new user. Requires your `service_role` API key and thus should only be
+used in secure server-side environments.
+
+```json
+{
+  "email": "new-email@example.com",
+  "password": "new-password",
+  "data": {
+    "key": "value",
+    "number": 10,
+    "admin": false
   }
-  ```
+}
+```
+
+Returns:
+
+```json
+{
+  "id": "11111111-2222-3333-4444-5555555555555",
+  "aud": "authenticated",
+  "role": "authenticated",
+  "email": "email@example.com",
+  "app_metadata": {
+    "provider": "email"
+  },
+  "user_metadata": null,
+  "created_at": "2016-05-15T19:53:12.368652374-07:00",
+  "updated_at": "2016-05-15T19:53:12.368652374-07:00"
+}
+```
+
+### **GET /admin/users/{user_id}**
+
+Gets a user. Requires your `service_role` API key and thus should only be used
+in secure server-side environments.
+
+Returns:
+
+```json
+{
+  "id": "11111111-2222-3333-4444-5555555555555",
+  "aud": "authenticated",
+  "role": "authenticated",
+  "email": "email@example.com",
+  "app_metadata": {
+    "provider": "email"
+  },
+  "user_metadata": {},
+  "created_at": "2016-05-15T19:53:12.368652374-07:00",
+  "updated_at": "2016-05-15T19:53:12.368652374-07:00"
+}
+```
+
+
+### **PUT /admin/users/{user_id}**
+
+Updates a user. Requires your `service_role` API key and thus should only be
+used in secure server-side environments.
+
+```json
+{
+  "email": "email@example.com",
+  "password": "updated-password",
+  "data": {
+    "key": "updated-value",
+    "number": 10,
+    "admin": false
+  }
+}
+```
+
+Returns:
+
+```json
+{
+  "id": "11111111-2222-3333-4444-5555555555555",
+  "aud": "authenticated",
+  "role": "authenticated",
+  "email": "email@example.com",
+  "app_metadata": {
+    "provider": "email"
+  },
+  "user_metadata": {},
+  "created_at": "2016-05-15T19:53:12.368652374-07:00",
+  "updated_at": "2016-05-15T19:53:12.368652374-07:00"
+}
+```
+
+### **DELETE /admin/users/{user_id}**
+
+Deletes a user. Requires your `service_role` API key and thus should only be
+used in secure server-side environments.
 
 ### **POST /logout**
 
-  Logout a user (Requires authentication).
+Logout a user (Requires authentication).
 
-  This will revoke all refresh tokens for the user. Remember that the JWT tokens
-  will still be valid for stateless auth until they expires.
-
+This will revoke all refresh tokens for the user. Remember that the JWT tokens
+will still be valid for stateless auth until they expires.
 
 ### **GET /authorize**
 
-  Get access_token from external oauth provider
+Get access_token from external oauth provider
 
-  query params:
-  ```
-  provider=google | bitbucket | github | gitlab
-  ```
- 
-  Redirects to provider and then to `/callback`
-  
+query params:
+
+```
+provider=google | bitbucket | github | gitlab
+```
+
+Redirects to provider and then to `/callback`
+
 ### **GET /callback**
 
-  External provider should redirect to here
- 
-  Redirects to `<GOTRUE_SITE_URL>#access_token=<access_token>&refresh_token=<refresh_token>&expires_in=3600&provider=<provider_name>`
-  
-  
+External provider should redirect to here
+
+Redirects to `<GOTRUE_SITE_URL>#access_token=<access_token>&refresh_token=<refresh_token>&expires_in=3600&provider=<provider_name>`
+
 ## Pre-built
 
 - [Docker](https://hub.docker.com/repository/docker/supabase/gotrue)
-

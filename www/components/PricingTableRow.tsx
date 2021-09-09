@@ -52,10 +52,10 @@ export const PricingTableRowDesktop = (props: any) => {
           scope="colgroup"
         >
           <Space size={4}>
-            {props.icon && (
-              <ProductIcon icon={props.icon}/>
-            )}
-            <Typography.Title className="m-0" level={4}>{category.title}</Typography.Title>
+            {props.icon && <ProductIcon icon={props.icon} />}
+            <Typography.Title className="m-0" level={4}>
+              {category.title}
+            </Typography.Title>
           </Space>
         </th>
         <td className="pricing-table__product-row bg-gray-50 dark:bg-dark-700 py-5 px-6"></td>
@@ -111,10 +111,10 @@ export const PricingTableRowMobile = (props: any) => {
       <table className="mt-8 w-full">
         <caption className="bg-gray-50 dark:bg-dark-900 border-t border-gray-200 dark:border-gray-600 py-3 px-4 text-sm font-medium text-gray-900 dark:text-white text-left">
           <Space size={4}>
-            {category.icon ? (
-              <ProductIcon icon={props.icon}/>
-            ) : null}
-            <Typography.Title className="m-0" level={4}>{category.title}</Typography.Title>
+            {category.icon ? <ProductIcon icon={props.icon} /> : null}
+            <Typography.Title className="m-0" level={4}>
+              {category.title}
+            </Typography.Title>
           </Space>
         </caption>
         <thead>

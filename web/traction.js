@@ -81,11 +81,14 @@ const main = async () => {
     })
   }
 
-  fs.writeFile('./src/data/stars/stargazers.json', JSON.stringify(data, null, 2), 'utf8', function (
-    err
-  ) {
-    if (err) throw err
-    console.log('stargazers.json saved.')
-  })
+  fs.writeFile(
+    './src/data/stars/stargazers.json',
+    JSON.stringify(data, null, 2),
+    'utf8',
+    function (err) {
+      if (err) throw err
+      console.log('stargazers.json saved.')
+    }
+  )
 }
 main()

@@ -1,0 +1,28 @@
+name: Check Code with Prettier
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+
+  format:
+  
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repo
+      uses: actions/checkout@v2
+    - name: Run prettier
+      run: |-
+        npx prettier --write 'examples/**/*.{js,jsx,ts,tsx,css,md,json}' 
+        npx prettier --write 'i18n/**/*.{js,jsx,ts,tsx,css,md,json}'
+        npx prettier --write 'www/**/*.{js,jsx,ts,tsx,css,md,json}'
+        
+    - name: Commit changes
+      uses: stefanzweifel/git-auto-commit-action@v2.3.0
+      with:
+        commit_message: Apply Prettier changes
+        branch: master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

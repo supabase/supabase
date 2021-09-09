@@ -7,4 +7,4 @@ module.exports = {
 }
 `.trim()
 
-export default Sidebar 
+export default Sidebar
