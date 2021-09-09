@@ -416,8 +416,9 @@ article header {
   }
 }
 
-.menu--responsive {
+nav.menu {
   border-right: 1px solid var(--custom-border-color);
+  padding: 0;
 }
 
 .navbar__toggle svg {
