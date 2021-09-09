@@ -6,12 +6,12 @@
 
 # Supabase
 
-A [Supabase](https://supabase.io) egy nyílt forráskódú Firebase alternatíva. A Firebase funkcióit építjük vállalati szintű nyílt forráskódú eszközökkel. 
+A [Supabase](https://supabase.io) egy nyílt forráskódú Firebase alternatíva. A Firebase funkcióit építjük vállalati szintű nyílt forráskódú eszközökkel.
 
 - [x] Hosztolt Postgres Adatbázis
 - [x] Valós idejű feliratkozások
 - [x] Hitelesítés és engedélyezés
-- [x] Automatikusan generált  API-ok
+- [x] Automatikusan generált API-ok
 - [x] Kezelőfelület
 - [x] Tárhely
 - [ ] Funkciók (hamarosan)
@@ -68,7 +68,7 @@ A Kliens könyvtáraink modulárisak. Mindegyik alkönyvtár egy kivitelezés eg
   - `realtime-{lang}`: Kliens könyvtár [Realtime](https://github.com/supabase/realtime) használatához
   - `gotrue-{lang}`: Kliens könyvtár [GoTrue](https://github.com/netlify/gotrue) használatához
 
-| Repo                  | Hivatalos                                         | Közösség                                                                                                                                                                                                                                                                                                                            |
+| Repo                  | Hivatalos                                        | Közösség                                                                                                                                                                                                                                                                                                                             |
 | --------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` \| [`Ruby`](https://github.com/supabase/supabase-rb) \| `Go`                                                                                             |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) \| [`Ruby`](https://github.com/supabase/postgrest-rb) \| [`Go`](https://github.com/supabase/postgrest-go) |
