@@ -416,6 +416,10 @@ article header {
   }
 }
 
+.menu--responsive {
+  border-right: 1px solid var(--custom-border-color);
+}
+
 .navbar__toggle svg {
   width: 21px;
 }
@@ -630,7 +634,7 @@ main[class^='docMainContainer_'] div.container div.row div.col.col--3 {
 
 div[class^='docSidebarContainer_'] {
   border-right-color: var(--ifm-sidebar-border-color);
-  max-width: 250px;
+  /* max-width: 250px; */
   min-width: 250px;
 }
 
@@ -709,7 +713,6 @@ div[class*=' codeBlockContent'],
   border-radius: 4px 4px 0 0;
   font-size: 0.8rem;
   font-weight: bold;
-  /* text-transform: uppercase; */
   border-bottom: 1px solid #444;
 }
 div[class^='codeBlockTitle'],
