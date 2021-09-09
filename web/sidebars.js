@@ -137,10 +137,9 @@ module.exports = {
       collapsed: false,
       items: [
         'guides/auth/intro',
-        'guides/auth/managing-user-data',
         {
           type: 'category',
-          label: 'External Providers',
+          label: 'Authentication',
           collapsed: true,
           items: [
             'guides/auth/auth-apple',
@@ -154,6 +153,12 @@ module.exports = {
             'guides/auth/auth-twitch',
             'guides/auth/auth-twilio',
           ],
+        },
+        {
+          type: 'category',
+          label: 'Authorization',
+          collapsed: true,
+          items: ['guides/auth/row-level-security', 'guides/auth/managing-user-data'],
         },
         {
           type: 'category',
