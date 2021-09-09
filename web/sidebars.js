@@ -136,6 +136,7 @@ module.exports = {
       label: 'Auth',
       collapsed: false,
       items: [
+        'guides/auth/intro',
         'guides/auth/managing-user-data',
         {
           type: 'category',
