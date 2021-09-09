@@ -9,6 +9,15 @@ const authProviders = [
     selfHosted: true,
   },
   {
+    name: 'Magic Links',
+    // logo: '/img/libraries/dart-icon.svg',
+    href: '/docs/guides/auth/auth-apple',
+    official: true,
+    supporter: 'Supabase',
+    platform: true,
+    selfHosted: true,
+  },
+  {
     name: 'Apple',
     // logo: '/img/libraries/dart-icon.svg',
     href: '/docs/guides/auth/auth-apple',
@@ -99,7 +108,7 @@ const authProviders = [
     selfHosted: true,
   },
   {
-    name: 'Messagebird',
+    name: 'MessageBird',
     // logo: '/img/libraries/dart-icon.svg',
     href: '/docs/guides/auth/auth-twilio',
     official: false,
