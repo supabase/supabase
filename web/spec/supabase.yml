@@ -676,7 +676,7 @@ pages:
             .upsert({ id: 3, message: 'foo', username: 'supabot' })
           ```
       - name: Bulk Upsert your data
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data, error } = await supabase
