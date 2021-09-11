@@ -372,6 +372,13 @@ const { data, error } = await supabase
 data = supabase.table('cities').insert({'name': 'Gotham', 'country_id': 556 }).execute()
 # assert if insert resonse is a success
 assert data.get("status_code") in (200, 201)
+
+# bulk insert 
+data = supabase.table('cities').insert([
+{'name': 'Gotham', 'country_id': 556 },
+{'name': 'The Shire', 'country_id': 557 }
+).execute()
+
 ```
 
 
