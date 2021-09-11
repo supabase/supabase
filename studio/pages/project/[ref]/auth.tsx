@@ -1,4 +1,4 @@
-import AuthLayout from '../components/layouts/AuthLayout'
+import AuthLayout from 'components/layouts/AuthLayout'
 
 export default function Home() {
   return (

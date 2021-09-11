@@ -1,18 +1,19 @@
-import { useState } from 'react'
-import SqlLayout from '../components/layouts/SqlLayout'
+import { useState, useContext } from 'react'
+import SqlLayout from 'components/layouts/SqlLayout'
 import { Button, Typography } from '@supabase/ui'
-import { useMetaStore } from '../store/postgres/MetaStore'
+import { observer } from 'mobx-react-lite'
+import { DataStoreContext, UiStoreContext } from 'store/StoreContext'
 
-export default function Sql() {
+const Sql = observer(() => {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState(null)
   const [error, setError] = useState(null)
-  const meta = useMetaStore()
+  const { database } = useContext(DataStoreContext) // See the Timer definition above.
 
   async function runQuery(q: string) {
     setResults(null)
     setError(null)
-    const { data, error } = await meta.query(q)
+    const { data, error } = await database.query(q)
     if (error) {
       console.error('Error:', error)
       setError(error)
@@ -36,4 +37,6 @@ export default function Sql() {
       </>
     </SqlLayout>
   )
-}
+})
+
+export default Sql

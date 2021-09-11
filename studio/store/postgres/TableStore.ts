@@ -1,4 +1,4 @@
-import MetaStore from './MetaStore'
+import MetaStore from './PostgresStore'
 import PostgresMetaInterface from './MetaInterface'
 
 export default class TableStore extends PostgresMetaInterface {

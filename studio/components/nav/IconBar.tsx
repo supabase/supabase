@@ -29,45 +29,49 @@ type Route = {
  */
 const ROUTES: Route[] = [
   { key: 'ICON', label: 'Supabase', icon: <IconZap size={20} strokeWidth={2} />, link: '/' },
-  { key: 'HOME', label: 'Home', icon: <IconHome size={20} strokeWidth={2} />, link: '/' },
+  {
+    key: 'HOME',
+    label: 'Home',
+    icon: <IconHome size={20} strokeWidth={2} />,
+    link: '/project/default/',
+  },
   {
     key: 'Tables',
     label: 'Table Editor',
     icon: <IconColumns size={20} strokeWidth={2} />,
-    link: '/editor',
+    link: '/project/default/editor',
   }, //TODO: Find proper table editor icon
+  // {
+  //   key: 'AUTH',
+  //   label: 'Authentication',
+  //   icon: <IconUsers size={20} strokeWidth={2} />,
+  //   link: '/project/default/auth',
+  // },
+  // {
+  //   key: 'Storage',
+  //   label: 'Storage',
+  //   icon: <IconArchive size={20} strokeWidth={2} />,
+  //   link: '/project/default/storage',
+  // },
   {
-    key: 'AUTH',
-    label: 'Authentication',
-    icon: <IconUsers size={20} strokeWidth={2} />,
-    link: '/auth',
+    key: 'SQL',
+    label: 'SQL',
+    icon: <IconTerminal size={20} strokeWidth={2} />,
+    link: '/project/default/sql',
   },
-  {
-    key: 'Storage',
-    label: 'Storage',
-    icon: <IconArchive size={20} strokeWidth={2} />,
-    link: '/storage',
-  },
-  { key: 'SQL', label: 'SQL', icon: <IconTerminal size={20} strokeWidth={2} />, link: '/sql' },
-  {
-    key: 'Database',
-    label: 'Database',
-    icon: <IconDatabase size={20} strokeWidth={2} />,
-    link: '/database',
-  },
-  {
-    key: 'Reports',
-    label: 'Reports',
-    icon: <IconBarChart size={20} strokeWidth={2} />,
-    link: '/reports',
-  },
-  { key: 'API', label: 'API', icon: <IconFileText size={20} strokeWidth={2} />, link: '/docs' },
-  {
-    key: 'Settings',
-    label: 'Settings',
-    icon: <IconSettings size={20} strokeWidth={2} />,
-    link: '/settings',
-  },
+  // {
+  //   key: 'Database',
+  //   label: 'Database',
+  //   icon: <IconDatabase size={20} strokeWidth={2} />,
+  //   link: '/project/default/database',
+  // },
+  // {
+  //   key: 'Reports',
+  //   label: 'Reports',
+  //   icon: <IconBarChart size={20} strokeWidth={2} />,
+  //   link: '/project/default/reports',
+  // },
+  // { key: 'API', label: 'API', icon: <IconFileText size={20} strokeWidth={2} />, link: '/project/default/docs' },
 ]
 
 /**

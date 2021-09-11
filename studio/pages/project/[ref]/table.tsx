@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import DashboardLayout from '../components/layouts/DashboardLayout'
+import DashboardLayout from 'components/layouts/DashboardLayout'
 
 export default function Home() {
   return (
