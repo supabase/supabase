@@ -675,6 +675,17 @@ pages:
             .from('messages')
             .upsert({ id: 3, message: 'foo', username: 'supabot' })
           ```
+      - name: Bulk Upsert your data
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('messages')
+            .upsert([
+            { id: 3, message: 'foo', username: 'supabot' },
+            { id: 4, message: 'bar', username: 'supabot' }
+            ])
+          ```
       - name: Upserting into tables with constraints
         description: |
           Running the following will cause supabase to upsert data into the `users` table. 
