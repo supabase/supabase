@@ -279,10 +279,7 @@ class AuthState<T extends StatefulWidget> extends SupabaseAuthState<T> {
 
   @override
   void onErrorAuthenticating(String message) {
-    context.showSnackBar(
-      message: message,
-      backgroundColor: Colors.red,
-    );
+    context.showErrorSnackBar(message: message);
   }
 }
 ```
@@ -404,9 +401,10 @@ class _LoginPageState extends AuthState<LoginPage> {
       context.showErrorSnackBar(message: error.message);
     } else {
       context.showSnackBar(message: 'Check your email for login link!');
-    }
-    setState(() {
       _emailController.clear();
+    }
+
+    setState(() {
       _isLoading = false;
     });
   }
@@ -472,6 +470,7 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
   final _websiteController = TextEditingController();
   var _loading = false;
 
+  /// Called once a user id is received within `onAuthenticated()`
   Future<void> _getProfile(String userId) async {
     setState(() {
       _loading = true;
@@ -496,6 +495,7 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
     });
   }
 
+  /// Called when user taps `Update` button
   Future<void> _updateProfile() async {
     setState(() {
       _loading = true;
@@ -674,7 +674,6 @@ We can start by creating a new component:
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter_guide/utils/constants.dart';
-import 'package:universal_io/io.dart';
 
 class Avatar extends StatefulWidget {
   const Avatar({
@@ -733,12 +732,12 @@ class _AvatarState extends State<Avatar> {
     }
     setState(() => _isLoading = true);
 
-    final file = File(imageFile.path);
-    final fileExt = file.path.split('.').last;
+    final bytes = await imageFile.readAsBytes();
+    final fileExt = imageFile.path.split('.').last;
     final fileName = '${DateTime.now().toIso8601String()}.$fileExt';
     final filePath = fileName;
     final response =
-        await supabase.storage.from('avatars').upload(filePath, file);
+        await supabase.storage.from('avatars').uploadBinary(filePath, bytes);
 
     setState(() => _isLoading = false);
 
@@ -780,6 +779,7 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
   String? _avatarUrl;
   var _loading = false;
 
+  /// Called once a user id is received within `onAuthenticated()`
   Future<void> _getProfile(String userId) async {
     setState(() {
       _loading = true;
@@ -805,6 +805,7 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
     });
   }
 
+  /// Called when user taps `Update` button
   Future<void> _updateProfile() async {
     setState(() {
       _loading = true;
@@ -839,6 +840,22 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
     Navigator.of(context).pushReplacementNamed('/login');
   }
 
+  /// Called when image has been uploaded to Supabase storage from within Avatar widget
+  Future<void> _onUpload(String imageUrl) async {
+    final response = await supabase.from('profiles').upsert({
+      'id': _userId,
+      'avatar_url': imageUrl,
+    }).execute();
+    final error = response.error;
+    if (error != null) {
+      context.showErrorSnackBar(message: error.message);
+    }
+    setState(() {
+      _avatarUrl = imageUrl;
+    });
+    context.showSnackBar(message: 'Updated your profile image!');
+  }
+
   @override
   void onAuthenticated(Session session) {
     final user = session.user;
@@ -869,20 +886,7 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
         children: [
           Avatar(
             imageUrl: _avatarUrl,
-            onUpload: (imageUrl) async {
-              final response = await supabase.from('profiles').upsert({
-                'id': _userId,
-                'avatar_url': imageUrl,
-              }).execute();
-              final error = response.error;
-              if (error != null) {
-                context.showErrorSnackBar(message: error.message);
-              }
-              setState(() {
-                _avatarUrl = imageUrl;
-              });
-              context.showSnackBar(message: 'Updated your profile image!');
-            },
+            onUpload: _onUpload,
           ),
           const SizedBox(height: 18),
           TextFormField(
