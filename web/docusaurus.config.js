@@ -55,16 +55,6 @@ module.exports = {
       },
       items: [
         {
-          href: 'https://github.com/supabase/supabase',
-          className: 'navbar-item-github',
-          position: 'right',
-        },
-        {
-          href: 'https://twitter.com/supabase',
-          className: 'navbar-item-twitter',
-          position: 'right',
-        },
-        {
           label: 'Overview',
           to: '/docs',
           activeBaseRegex: '(^/docs$)|(/docs/faq)|(^/docs/guides/examples)',
@@ -84,6 +74,16 @@ module.exports = {
           position: 'left',
         },
         { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
+        {
+          href: 'https://github.com/supabase/supabase',
+          className: 'navbar-item-github',
+          position: 'right',
+        },
+        {
+          href: 'https://twitter.com/supabase',
+          className: 'navbar-item-twitter',
+          position: 'right',
+        },
       ],
     },
     prism: {
