@@ -377,42 +377,12 @@ article header {
 /* Sidebar */
 
 .navbar__logo {
-  max-width: 196px;
+  max-width: 200px;
 }
 
 @media (max-width: 750px) {
-  .DocSearch-Button-Key,
-  .DocSearch-Button-KeySeparator,
-  .DocSearch-Button-Placeholder {
-    display: block !important;
-    font-size: 0.8rem !important;
-    margin-top: 0 !important;
-  }
-
   .navbar__logo {
-    max-width: 128px;
-  }
-}
-
-@media (max-width: 360px) {
-  .DocSearch {
-    display: none !important;
-  }
-}
-
-@media (max-width: 750px) {
-  .navbar-sidebar__items {
-    padding-left: 1rem;
-    /* margin-right: 6rem !important; */
-  }
-}
-
-@media (max-width: 997px) {
-  .menu--responsive {
-    padding-right: 2rem !important;
-  }
-  .menu__link--active.active {
-    border: none !important;
+    max-width: 150px;
   }
 }
 
@@ -446,8 +416,8 @@ nav.menu {
 .navbar-sidebar__items .menu .menu__link.menu__link--sublist::after {
   display: none;
 }
-.navbar-sidebar__items .menu .menu__list-item .menu__list-item a.menu__link {
-  margin-left: 30px;
+.menu__list-item svg, .navbar__link svg {
+  display: none;
 }
 
 @media screen and (max-width: 996px) {
@@ -1022,12 +992,6 @@ html[data-theme='dark'] .DocSearch {
   /* font-weight: 400; */
 }
 
-.navbar-item-github {
-  display: flex !important;
-  align-items: center;
-  justify-items: center;
-  justify-content: end;
-}
 
 @media screen and (max-width: 580px) {
   .navbar__items .navbar-item-github {
@@ -1057,12 +1021,6 @@ html[data-theme='dark'] .navbar-item-github:before {
   background-position: center;
 }
 
-.navbar-item-twitter {
-  display: flex !important;
-  align-items: center;
-  justify-items: center;
-  justify-content: end;
-}
 
 @media screen and (max-width: 580px) {
   .navbar__items .navbar-item-twitter {
