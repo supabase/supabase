@@ -256,7 +256,7 @@ In order to handle deep links for Android and iOS, let's create a class that wil
 import 'package:flutter/material.dart';
 import 'package:supabase/supabase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:supabase_flutter_guide/utils/constants.dart';
+import 'package:supabase_quickstart/utils/constants.dart';
 
 class AuthState<T extends StatefulWidget> extends SupabaseAuthState<T> {
   @override
@@ -337,7 +337,7 @@ This splash screen inherits `AuthState` to redirect users to the appropriate pag
 
 ```dart title="lib/pages/splash_page.dart"
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter_guide/components/auth_state.dart';
+import 'package:supabase_quickstart/components/auth_state.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
@@ -372,8 +372,8 @@ This page will also inherit `AuthState` as it will handle user login.
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase/supabase.dart';
-import 'package:supabase_flutter_guide/components/auth_state.dart';
-import 'package:supabase_flutter_guide/utils/constants.dart';
+import 'package:supabase_quickstart/components/auth_state.dart';
+import 'package:supabase_quickstart/utils/constants.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -455,8 +455,8 @@ Note that this page will inherit `AuthRequiredState` as user needs to be authent
 ```dart title="lib/pages/account_page.dart"
 import 'package:flutter/material.dart';
 import 'package:supabase/supabase.dart';
-import 'package:supabase_flutter_guide/components/auth_required_state.dart';
-import 'package:supabase_flutter_guide/utils/constants.dart';
+import 'package:supabase_quickstart/components/auth_required_state.dart';
+import 'package:supabase_quickstart/utils/constants.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({Key? key}) : super(key: key);
@@ -586,9 +586,9 @@ Now that we have all the components in place, let's update `lib/main.dart`:
 ```dart title="lib/main.dart"
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:supabase_flutter_guide/pages/account_page.dart';
-import 'package:supabase_flutter_guide/pages/login_page.dart';
-import 'package:supabase_flutter_guide/pages/splash_page.dart';
+import 'package:supabase_quickstart/pages/account_page.dart';
+import 'package:supabase_quickstart/pages/login_page.dart';
+import 'package:supabase_quickstart/pages/splash_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -671,7 +671,7 @@ We can start by creating a new component:
 ```dart title="lib/components/avatar.dart"
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter_guide/utils/constants.dart';
+import 'package:supabase_quickstart/utils/constants.dart';
 
 class Avatar extends StatefulWidget {
   const Avatar({
@@ -759,9 +759,9 @@ And then we can add the widget to the Account page as well as some logic to upda
 ```dart title="lib/pages/account_page.dart"
 import 'package:flutter/material.dart';
 import 'package:supabase/supabase.dart';
-import 'package:supabase_flutter_guide/components/auth_required_state.dart';
-import 'package:supabase_flutter_guide/components/avatar.dart';
-import 'package:supabase_flutter_guide/utils/constants.dart';
+import 'package:supabase_quickstart/components/auth_required_state.dart';
+import 'package:supabase_quickstart/components/avatar.dart';
+import 'package:supabase_quickstart/utils/constants.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({Key? key}) : super(key: key);
