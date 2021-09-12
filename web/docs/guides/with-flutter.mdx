@@ -150,7 +150,7 @@ an app called `supabase_quickstart`:
 flutter create supabase_quickstart
 ```
 
-Then let's install the only additional dependency: [`supabase_flutter1](https://github.com/supabase/supabase-flutter)
+Then let's install the only additional dependency: [`supabase_flutter`](https://github.com/supabase/supabase-flutter)
 
 Run the following command to get the newest version of `supabase_flutter` to your project. 
 
@@ -650,18 +650,16 @@ photos and videos.
 
 ### Adding image uploading feature to Account page
 
-We will use [`image_picker`](https://pub.dev/packages/image_picker) plugin to select image form the device. 
-We will also use [`universal_io`](https://pub.dev/packages/universal_io) plugin to support choosing files on web, iOS and Android platforms. 
+We will use [`image_picker`](https://pub.dev/packages/image_picker) plugin to select an image form the device.
 
-Run the following commands to install both plugins. 
+Run the following command to install it.
 
 ```bash
 flutter pub add image_picker
-flutter pub add universal_io
 ```
 
 Using [`image_picker`]((https://pub.dev/packages/image_picker)) requires some additional preparation depending on the platform. 
-Follow the instruction on [`image_picker`](https://pub.dev/packages/image_picker)'s description on how to set it up for the platform you are using. 
+Follow the instruction on README.md of [`image_picker`](https://pub.dev/packages/image_picker) on how to set it up for the platform you are using. 
 
 Once you are done with all of the above, it is time to dive into coding.
 
@@ -756,9 +754,9 @@ class _AvatarState extends State<Avatar> {
 
 ### Add the new widget
 
-And then we can add the widget to the Account page as well as some logic to update the `avatar_url` whenever the user uploads a new avatar:
+And then we can add the widget to the Account page as well as some logic to update the `avatar_url` whenever the user uploads a new avatar.
 
-```dart title="lib/components/avatar.dart"
+```dart title="lib/pages/account_page.dart"
 import 'package:flutter/material.dart';
 import 'package:supabase/supabase.dart';
 import 'package:supabase_flutter_guide/components/auth_required_state.dart';
@@ -910,6 +908,8 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
   }
 }
 ```
+
+Congratulations, that is it! You have now built a fully functional user management app using Flutter and Supabase!
 
 ## Next steps
 
