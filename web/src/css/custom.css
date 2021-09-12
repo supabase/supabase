@@ -657,35 +657,6 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   cursor: pointer;
 }
 
-div[class^='codeBlockContent'],
-div[class*=' codeBlockContent'],
-.prism-code {
-  background-color: var(--ifm-code-background-dark) !important;
-}
-.code-with-header {
-  border-radius: 4px;
-  overflow: hidden;
-}
-.prism-code {
-  padding: 0 !important;
-  margin-bottom: 0;
-  background-color: var(--ifm-code-background-dark);
-}
-.code-with-header pre {
-  border-radius: 0 0 4px 4px;
-}
-.code-with-header.code-with-response {
-  border-radius: 0;
-}
-.code-header {
-  background: var(--ifm-code-background-dark);
-  color: #ccc;
-  padding: 5px 15px;
-  border-radius: 4px 4px 0 0;
-  font-size: 0.8rem;
-  font-weight: bold;
-  border-bottom: 1px solid #444;
-}
 div[class^='codeBlockTitle'],
 div[class*=' codeBlockTitle'] {
   color: #ccc !important;
@@ -897,7 +868,6 @@ a.hash-link {
 
 .prism-code {
   background-color: none;
-  white-space: normal;
   word-break: break-word;
   font-size: 0.8rem;
   outline: none !important;
@@ -1251,24 +1221,6 @@ code {
   padding-top: 2px;
   padding-bottom: 2px;
   border: 1px solid var(--ifm-hr-border-color);
-}
-
-.tabs {
-  margin: 0;
-  font-size: 0.7rem;
-  background-color: var(--ifm-code-background-dark);
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  border-bottom: 1px solid var(--custom-border-color);
-}
-.tabs li {
-  padding: 8px;
-  border-radius: 0;
-  border-width: 0px;
-  color: var(--ifm-color-gray-500);
-}
-.tabs li.tabs__item--active {
-  color: var(--custom-primary);
 }
 div[role='tabpanel'],
 div[role='tabpanel'] div {
