@@ -377,7 +377,7 @@ assert data.get("status_code") in (200, 201)
 data = supabase.table('cities').insert([
 {'name': 'Gotham', 'country_id': 556 },
 {'name': 'The Shire', 'country_id': 557 }
-).execute()
+]).execute()
 
 ```
 
