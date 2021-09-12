@@ -263,7 +263,7 @@ url: str = os.environ.get("SUPABASE_TEST_URL")
 key: str = os.environ.get("SUPABASE_TEST_KEY")
 supabase: Client = create_client(url, key)
 
-data = supabase.from_('countries').select('name').execute()
+data = supabase.table('countries').select('name').execute()
 ```
 
 
@@ -377,7 +377,7 @@ assert data.get("status_code") in (200, 201)
 data = supabase.table('cities').insert([
 {'name': 'Gotham', 'country_id': 556 },
 {'name': 'The Shire', 'country_id': 557 }
-).execute()
+]).execute()
 
 ```
 
