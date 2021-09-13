@@ -26,7 +26,9 @@ const Footer = (props: Props) => {
             <img
               className="w-40"
               src={
-                darkMode ? `${basePath}/images/logo-dark.png` : `${basePath}/images/logo-light.png`
+                darkMode
+                  ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
+                  : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
               }
               alt="Supabase"
             />
