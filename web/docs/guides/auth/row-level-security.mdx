@@ -307,26 +307,3 @@ Tip: Make sure to enable RLS for all your tables, so that your tables are inacce
 
 Supabase provides special "Service" keys, which can be used to bypass all RLS. 
 These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.
-
-### Disable realtime for private tables
-
-Our realtime server doesn't provide per-user security. Until we build a more robust auth system for WebSockets, you can disable realtime functionality for any private tables. To do this, you can manage the underlying Postgres replication publication:
-
-```sql
-/**
- * REALTIME SUBSCRIPTIONS
- * Only allow realtime listening on public tables.
- */
-begin; 
-  -- remove the realtime publication
-  drop publication if exists supabase_realtime; 
-  -- re-create the publication but don't enable it for any tables
-  create publication supabase_realtime;  
-commit;
--- add a table to the publication
-alter publication supabase_realtime add table products;
--- add other tables to the publication
-alter publication supabase_realtime add table posts;
-```
-
-We're in the process of building enhanced realtime security.
