@@ -92,6 +92,10 @@ alter publication supabase_realtime add table products;
 alter publication supabase_realtime add table posts;
 ```
 
+| SECURITY WARNING |
+| - |
+| Please check [Disable realtime for private tables](https://supabase.io/docs/guides/auth#disable-realtime-for-private-tables) for the current state of Realtime security. |
+
 By default only "new" values are sent, but if you want to receive the old record (previous values) whenever you `update` or `delete` a record, 
 you can update the replica identity of your tables, setting it to `full`:
 
