@@ -45,17 +45,6 @@ module.exports = {
       ],
       collapsed: false,
     },
-    // {
-    //   type: 'category',
-    //   label: 'Getting Started',
-    //   collapsed: false,
-    //   items: [
-    //     'guides/database',
-    //     'guides/auth',
-    //     'guides/storage',
-    //     'guides/api',
-    //   ],
-    // },
     {
       type: 'category',
       label: 'Tutorials',
