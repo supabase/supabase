@@ -548,7 +548,7 @@ pages:
           ```js
           const { data, error, count } = await supabase
             .from('cities')
-            .select('name', {}, { count: 'exact' }) // if you don't want to return any rows, you can use { count: 'exact', head: true }
+            .select('name', { count: 'exact' }) // if you don't want to return any rows, you can use { count: 'exact', head: true }
           ```
       - name: Querying JSON data
         description: |
