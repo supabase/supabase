@@ -1,5 +1,4 @@
 import React, { useEffect, useState, createContext, useContext } from 'react'
-import { SupabaseClient, Session, User } from '@supabase/supabase-js'
 
 const UserContext = createContext({ user: null, session: null })
 

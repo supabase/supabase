@@ -167,7 +167,7 @@ Now that you understand what JWTs are and where they're used in Supabase, you ca
 
 ### Resources
 
-- JWT debugger: https://jwt.io/​
+- JWT debugger: https://jwt.io/
 
 ### Next steps
 

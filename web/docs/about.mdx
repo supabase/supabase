@@ -1,0 +1,137 @@
+---
+id: about
+title: Introduction
+description: 'What is Supabase?'
+slug: /
+hide_table_of_contents: true
+---
+
+import Link from '@docusaurus/Link'
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+const frameworks = [
+  {
+    name: 'Angular',
+    logo: '/img/libraries/angular-icon.svg',
+    href: '/docs/guides/with-angular',
+  },
+  {
+    name: 'Expo',
+    logo: '/img/libraries/expo-icon.svg',
+    href: 'https://github.com/supabase/supabase/tree/master/examples/expo-todo-list',
+  },
+  { name: 'Flutter', logo: '/img/libraries/dart-icon.svg', href: '/docs/guides/with-flutter' },
+  {
+    name: 'Javascript',
+    logo: '/img/libraries/javascript-icon.svg',
+    href: 'https://github.com/supabase/supabase/tree/master/examples/javascript-auth',
+  },
+  { name: 'Next.js', logo: '/img/libraries/nextjs-icon.svg', href: '/docs/guides/with-nextjs' },
+  { name: 'React', logo: '/img/libraries/react-icon.svg', href: '/docs/guides/with-react' },
+  { name: 'Svelte', logo: '/img/libraries/svelte-icon.svg', href: '/docs/guides/with-svelte' },
+  { name: 'Vue', logo: '/img/libraries/vuejs-icon.svg', href: '/docs/guides/with-vue-3' },
+]
+
+Supabase is an open source Firebase alternative.
+
+It provides all the backend services you need to build a product. You can use it completely, or just the services you require:
+
+<div class="container" style={{ padding: 0 }}>
+  <div class="row is-multiline">
+    {/* Database */}
+    <div class="col col--6">
+      <Link class="card" to="/docs/guides/database" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>Database</h4>
+          <p>A dedicated, scalable Postgres database.</p>
+        </div>
+      </Link>
+    </div>
+    {/* Auth */}
+    <div class="col col--6">
+      <Link class="card" to="/docs/guides/auth" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>Auth</h4>
+          <p>User management with Row Level Security.</p>
+        </div>
+      </Link>
+    </div>
+    {/* Auth */}
+    <div class="col col--6">
+      <Link class="card" to="/docs/guides/storage" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>File Storage</h4>
+          <p>Store, organize, and serve large files.</p>
+        </div>
+      </Link>
+    </div>
+    {/* API */}
+    <div class="col col--6">
+      <Link class="card" to="/docs/guides/api" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>Auto-generated APIs</h4>
+          <p>Instantly APIs for your database.</p>
+        </div>
+      </Link>
+    </div>
+  </div>
+</div>
+
+## Getting started
+
+Visit [app.supabase.io](https://app.supabase.io) to get started with the hosted platform or visit the [self-hosting](/docs/guides/self-hosting) docs to learn how to host Supabase yourself.
+
+Supabase is just Postgres, which makes it compatible with a large number of tools and frameworks.
+
+<div class="container" style={{}}>
+  <div class="row is-multiline">
+    {frameworks.map((x) => (
+      <div key={x.name} class="col col--3">
+        <Link class="card" to={x.href}>
+          <div class="card__body" style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
+            {x.logo && (
+              <img src={x.logo} alt={x.name} width="20" style={{ display: 'block', maxHeight: 20 }} />
+            )}
+            <p>{x.name}</p>
+          </div>
+        </Link>
+      </div>
+    ))}
+  </div>
+</div>
+
+## How to use these docs
+
+The documentation is divided into 3 sections.
+
+<div class="container" style={{ padding: 0 }}>
+  <div class="row is-multiline">
+    {/* Overview */}
+    <div class="col col--4">
+      <Link class="card" to="/docs/architecture" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>Overview</h4>
+          <p>A summary of the tools and how to get started.</p>
+        </div>
+      </Link>
+    </div>
+    {/* Auth */}
+    <div class="col col--4">
+      <Link class="card" to="/docs/guides" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>Guides</h4>
+          <p>In-depth explanations for each tool.</p>
+        </div>
+      </Link>
+    </div>
+    {/* Ref */}
+    <div class="col col--4">
+      <Link class="card" to="/docs/reference/javascript/supabase-client" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>Reference Docs</h4>
+          <p>Technical documentation for Client Libraries and Systems.</p>
+        </div>
+      </Link>
+    </div>
+  </div>
+</div>

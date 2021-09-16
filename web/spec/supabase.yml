@@ -12,8 +12,8 @@ info:
     |-----------------------|--------------------------------------------------|------------------|
     | **`supabase-{lang}`** <br /> Combines libraries and adds enrichments.    | [`JavaScript`](https://github.com/supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp), [`Python`](https://github.com/supabase/supabase-py), `Rust`, [`Dart`](https://github.com/supabase/supabase-dart) |
     | `postgrest-{lang}` <br /> Client library to work with [PostgREST](https://github.com/postgrest/postgrest) | [`JavaScript`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp), [`Python`](https://github.com/supabase/postgrest-py), [`Rust`](https://github.com/supabase/postgrest-rs), [`Kotlin`](https://github.com/supabase/postgrest-kt), [`Dart`](https://github.com/supabase/postgrest-dart) |
-    | `realtime-{lang}` <br /> Client library to work with [Realtime](https://github.com/supabase/realtime) | [`JavaScript`](https://github.com/supabase/realtime-js) | `C#`, `Python`, `Rust`, [`Dart`](https://github.com/supabase/realtime-dart) |
-    | `gotrue-{lang}` <br /> Client library to work with [GoTrue](https://github.com/netlify/gotrue)   | [`JavaScript`](https://github.com/supabase/gotrue-js) | `C#`, `Python`, `Rust`, [`Kotlin`](https://github.com/supabase/gotrue-kt), [`Dart`](https://github.com/supabase/gotrue-dart) |
+    | `realtime-{lang}` <br /> Client library to work with [Realtime](https://github.com/supabase/realtime) | [`JavaScript`](https://github.com/supabase/realtime-js) | [`C#`](https://github.com/supabase/realtime-csharp), [`Python`](https://github.com/supabase-community/realtime-py), `Rust`, [`Dart`](https://github.com/supabase/realtime-dart) |
+    | `gotrue-{lang}` <br /> Client library to work with [GoTrue](https://github.com/netlify/gotrue)   | [`JavaScript`](https://github.com/supabase/gotrue-js) | [`C#`](https://github.com/supabase/gotrue-csharp), [`Python`](https://github.com/supabase-community/gotrue-py), `Rust`, [`Kotlin`](https://github.com/supabase/gotrue-kt), [`Dart`](https://github.com/supabase/gotrue-dart) |
 
   definition: spec/combined.json
   libraries:
@@ -23,7 +23,7 @@ info:
   docs:
     path: reference/javascript/
     sidebar:
-      - name: 'About'
+      - name: 'Getting Started'
         items:
           - index
           - Installing
@@ -40,7 +40,7 @@ info:
           - auth.onAuthStateChange()
           - Reset Password (Email)
           - Delete User
-      - name: 'Data'
+      - name: 'Database'
         items:
           - select()
           - insert()
@@ -245,7 +245,7 @@ pages:
       Add a script to your package.json to generate the types:
 
       ```
-      "update-types": "npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/supabase.ts"
+      "update-types": "npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/database/index.ts"
       ```
 
       In your repo, create the file `.github/workflows/update-types.yml`. Add the following snippet into this file to define the action. If there is a change to your definitions, this script will commit the change to your repo.
@@ -675,6 +675,17 @@ pages:
             .from('messages')
             .upsert({ id: 3, message: 'foo', username: 'supabot' })
           ```
+      - name: Bulk Upsert your data
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('messages')
+            .upsert([
+            { id: 3, message: 'foo', username: 'supabot' },
+            { id: 4, message: 'bar', username: 'supabot' }
+            ])
+          ```
       - name: Upserting into tables with constraints
         description: |
           Running the following will cause supabase to upsert data into the `users` table. 
@@ -705,7 +716,12 @@ pages:
     title: 'Delete data: delete()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.delete'
     notes: |
-      - `delete()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
+      - `delete()` should always be combined with [filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
+      - If you use `delete()` with filters and you have
+        [RLS](/docs/learn/auth-deep-dive/auth-row-level-security) enabled, only
+        rows visible through `SELECT` policies are deleted. Note that by default
+        no rows are visible, so you need at least one `SELECT`/`ALL` policy that
+        makes the rows visible.
     examples:
       - name: Delete records
         isSpotlight: true
@@ -718,17 +734,17 @@ pages:
           ```
 
   rpc():
-    title: 'Stored Procedures: rpc()'
+    title: 'Postgres functions: rpc()'
     description: |
-      You can call stored procedures as a "Remote Procedure Call".
+      You can call Postgres functions as a "Remote Procedure Call".
 
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
     $ref: '@supabase/postgrest-js."PostgrestClient".PostgrestClient.rpc'
     examples:
-      - name: Call a stored procedure
+      - name: Call a Postgres function
         isSpotlight: true
-        description: This is an example invoking a stored procedure.
+        description: This is an example invoking a Postgres function.
         js: |
           ```js
           const { data, error } = await supabase
@@ -749,7 +765,7 @@ pages:
           ```
       - name: With filters
         description: |
-          Stored procedures that return tables can also be combined with 
+          Postgres functions that return tables can also be combined with
           [Modifiers](/docs/reference/javascript/using-modifiers) and 
           [Filters](/docs/reference/javascript/using-filters).
         js: |
@@ -765,7 +781,7 @@ pages:
         js: |
           ```js
           const { data, error, count } = await supabase
-            .rpc('hello_world', { count: 'exact' })
+            .rpc('hello_world', {}, { count: 'exact' })
           ```
 
   subscribe():
@@ -1003,7 +1019,7 @@ pages:
             .storage
             .from('avatars')
             .upload('public/avatar1.png', avatarFile, {
-              cacheControl: 3600,
+              cacheControl: '3600',
               upsert: false
             })
           ```
@@ -1038,7 +1054,7 @@ pages:
             .storage
             .from('avatars')
             .update('public/avatar1.png', avatarFile, {
-              cacheControl: 3600,
+              cacheControl: '3600',
               upsert: false
             })
           ```
@@ -1171,7 +1187,7 @@ pages:
     description: |
       Modifiers can be used on `select()` queries. 
 
-      If a Stored Procedure returns a table response, you can also apply modifiers to the `rpc()` function.
+      If a Postgres function returns a table response, you can also apply modifiers to the `rpc()` function.
 
   limit():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.limit'
@@ -1247,7 +1263,7 @@ pages:
     description: |
       Filters can be used on `select()`, `update()`, and `delete()` queries. 
 
-      If a Stored Procedure returns a table response, you can also apply filters.
+      If a Postgres function returns a table response, you can also apply filters.
 
       ### Applying Filters
 
@@ -1308,7 +1324,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .filter('name', 'eq', 'Paris')
@@ -1384,9 +1400,9 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
-            .rpc('echo_all_cities)
+            .rpc('echo_all_cities')
             .not('name', 'eq', 'Paris')
           ```
 
@@ -1421,7 +1437,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .match({name: 'Beijing', country_id: 156})
@@ -1458,7 +1474,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .eq('name', 'San Francisco')
@@ -1495,7 +1511,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .neq('name', 'Lagos')
@@ -1532,7 +1548,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .gt('country_id', 250)
@@ -1569,7 +1585,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .gte('country_id', 250)
@@ -1606,7 +1622,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .lt('country_id', 250)
@@ -1643,7 +1659,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .lte('country_id', 250)
@@ -1680,7 +1696,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .like('name', '%la%')
@@ -1717,7 +1733,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .ilike('name', '%la%')
@@ -1754,7 +1770,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .is('name', null)
@@ -1791,7 +1807,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_cities')
             .in('name', ['Rio de Janeiro', 'San Francisco'])
@@ -1828,7 +1844,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .contains('main_exports', ['oil'])
@@ -1865,7 +1881,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .containedBy('main_exports', ['cars', 'food', 'machine'])
@@ -1902,7 +1918,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .rangeLt('population_range_millions', [150, 250])
@@ -1939,7 +1955,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .rangeGt('population_range_millions', [150, 250])
@@ -1976,7 +1992,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .rangeGte('population_range_millions', [150, 250])
@@ -2013,7 +2029,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .rangeLte('population_range_millions', [150, 250])
@@ -2050,7 +2066,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .rangeAdjacent('population_range_millions', [70, 185])
@@ -2087,7 +2103,7 @@ pages:
       - name: With `rpc()`
         js: |
           ```js
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
             .overlaps('main_exports', ['computers', 'minerals'])

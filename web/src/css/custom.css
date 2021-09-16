@@ -1,5 +1,5 @@
-/* 
-  Font import 
+/*
+  Font import
 */
 
 @font-face {
@@ -44,7 +44,7 @@
 :root[data-theme='dark'] {
   /* See theme-specific "--custom" vars below  */
 
-  /* 
+  /*
     Customisation here for both Light and Dark themes
   */
   --custom-font-base: 'custom-font', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto',
@@ -85,7 +85,7 @@
   --custom-shadow-tl: 0 12px 28px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   --custom-shadow-xl: 0 30px 60px 0 rgba(0, 0, 0, 0.1);
 
-  /* 
+  /*
     Infirma overrides with customisation
   */
   /* Colors */
@@ -250,7 +250,9 @@ body {
   display: inline-block;
 }
 
-h4, h5, h6 {
+h4,
+h5,
+h6 {
   font-weight: bold !important;
 }
 
@@ -375,43 +377,18 @@ article header {
 /* Sidebar */
 
 .navbar__logo {
-  max-width: 196px;
+  max-width: 200px;
 }
 
 @media (max-width: 750px) {
-  .DocSearch-Button-Key,
-  .DocSearch-Button-KeySeparator,
-  .DocSearch-Button-Placeholder {
-    display: block !important;
-    font-size: 0.8rem !important;
-    margin-top: 0 !important;
-  }
-
   .navbar__logo {
-    max-width: 128px;
+    max-width: 150px;
   }
 }
 
-@media (max-width: 360px) {
-  .DocSearch {
-    display: none !important;
-  }
-}
-
-@media (max-width: 750px) {
-  .navbar-sidebar__items {
-    padding-left: 1rem;
-    /* margin-right: 6rem !important; */
-  }
-}
-
-@media (max-width: 997px) {
-  .menu--responsive {
-    padding-right: 2rem !important;
-  }
-  .menu__link--active.active {
-    border: none !important;
-  }
+nav.menu {
+  border-right: 1px solid var(--custom-border-color);
+  padding: 0;
 }
 
 .navbar__toggle svg {
@@ -439,8 +416,8 @@ article header {
 .navbar-sidebar__items .menu .menu__link.menu__link--sublist::after {
   display: none;
 }
-.navbar-sidebar__items .menu .menu__list-item .menu__list-item a.menu__link {
-  margin-left: 30px;
+.menu__list-item svg, .navbar__link svg {
+  display: none;
 }
 
 @media screen and (max-width: 996px) {
@@ -554,8 +531,8 @@ a.card:hover {
   line-height: calc(var(--ifm-spacing-vertical) * 1);
 }
 
-/* 
-  Link chevrons 
+/*
+  Link chevrons
 */
 .menu .menu__link.menu__link--sublist::after {
   background-image: url('data:image/svg+xml;utf8,<svg alt="Arrow" xmlns="http://www.w3.org/2000/svg"  viewBox="-6 -6 38 38"><path fill="inherit" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg>');
@@ -628,7 +605,7 @@ main[class^='docMainContainer_'] div.container div.row div.col.col--3 {
 
 div[class^='docSidebarContainer_'] {
   border-right-color: var(--ifm-sidebar-border-color);
-  max-width: 250px;
+  /* max-width: 250px; */
   min-width: 250px;
 }
 
@@ -680,36 +657,6 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   cursor: pointer;
 }
 
-div[class^='codeBlockContent'],
-div[class*=' codeBlockContent'],
-.prism-code {
-  background-color: var(--ifm-code-background-dark) !important;
-}
-.code-with-header {
-  border-radius: 4px;
-  overflow: hidden;
-}
-.prism-code {
-  padding: 0 !important;
-  margin-bottom: 0;
-  background-color: var(--ifm-code-background-dark);
-}
-.code-with-header pre {
-  border-radius: 0 0 4px 4px;
-}
-.code-with-header.code-with-response {
-  border-radius: 0;
-}
-.code-header {
-  background: var(--ifm-code-background-dark);
-  color: #ccc;
-  padding: 5px 15px;
-  border-radius: 4px 4px 0 0;
-  font-size: 0.8rem;
-  font-weight: bold;
-  /* text-transform: uppercase; */
-  border-bottom: 1px solid #444;
-}
 div[class^='codeBlockTitle'],
 div[class*=' codeBlockTitle'] {
   color: #ccc !important;
@@ -921,7 +868,6 @@ a.hash-link {
 
 .prism-code {
   background-color: none;
-  white-space: normal;
   word-break: break-word;
   font-size: 0.8rem;
   outline: none !important;
@@ -1016,12 +962,6 @@ html[data-theme='dark'] .DocSearch {
   /* font-weight: 400; */
 }
 
-.navbar-item-github {
-  display: flex !important;
-  align-items: center;
-  justify-items: center;
-  justify-content: end;
-}
 
 @media screen and (max-width: 580px) {
   .navbar__items .navbar-item-github {
@@ -1051,12 +991,6 @@ html[data-theme='dark'] .navbar-item-github:before {
   background-position: center;
 }
 
-.navbar-item-twitter {
-  display: flex !important;
-  align-items: center;
-  justify-items: center;
-  justify-content: end;
-}
 
 @media screen and (max-width: 580px) {
   .navbar__items .navbar-item-twitter {
@@ -1287,24 +1221,6 @@ code {
   padding-top: 2px;
   padding-bottom: 2px;
   border: 1px solid var(--ifm-hr-border-color);
-}
-
-.tabs {
-  margin: 0;
-  font-size: 0.7rem;
-  background-color: var(--ifm-code-background-dark);
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  border-bottom: 1px solid var(--custom-border-color);
-}
-.tabs li {
-  padding: 8px;
-  border-radius: 0;
-  border-width: 0px;
-  color: var(--ifm-color-gray-500);
-}
-.tabs li.tabs__item--active {
-  color: var(--custom-primary);
 }
 div[role='tabpanel'],
 div[role='tabpanel'] div {

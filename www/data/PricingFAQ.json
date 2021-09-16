@@ -21,7 +21,7 @@
   },
   {
     "question": "What are soft limits? ",
-    "answer": "Soft limits mean if you cross your usage tier we will let you know and give you a grace period without charging you for exceeding your limits. We will email you to discuss moving up a tier and you will not be charged until you agree to move up a tier. If you do not respond, or do want to move up a tier and continue to exceed your limits then we may have to limit your projects consumption."
+    "answer": "Soft limits mean if you cross your usage tier we will let you know and give you a grace period without charging you for exceeding your limits. We will email you to discuss moving up a tier and you will not be charged until you agree to move up a tier. If you do not respond, or do not want to move up a tier and continue to exceed your limits then we may have to limit your projects' consumption."
   },
   {
     "question": "How do I know which tier I need before I even finish building my project?",
@@ -53,7 +53,7 @@
   },
   {
     "question": "I read that you are giving credits to users who sign up during beta, do I get those?",
-    "answer": "If you sign up before the end of launch week we will issue credits for the Pro tier. You can claim them by getting in touch via <support@supabase.io>[](mailto:support@supabase.io)."
+    "answer": "If you signed up before the 4th of April 2021 we will issue credits for the Pro tier. You can claim them by getting in touch via <support@supabase.io>[](mailto:support@supabase.io)."
   },
   {
     "question": "What if I want to cancel my monthly subscription?",

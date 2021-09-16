@@ -13,8 +13,6 @@ module.exports = {
   organizationName: 'supabase', // Usually your GitHub org/user name.
   projectName: 'supabase', // Usually your repo name.
   themeConfig: {
-    forceDarkMode: true,
-    darkMode: true,
     colorMode: {
       // "light" | "dark"
       defaultMode: 'dark',
@@ -40,7 +38,6 @@ module.exports = {
         },
       },
     },
-    sidebarCollapsible: true,
     algolia: {
       apiKey: '766d56f13dd1e82f43253559b7c86636',
       indexName: 'supabase',
@@ -58,6 +55,26 @@ module.exports = {
       },
       items: [
         {
+          label: 'Overview',
+          to: '/docs',
+          activeBaseRegex: '(^/docs$)|(/docs/faq)|(^/docs/guides/examples)',
+          position: 'left',
+        },
+        {
+          label: 'Guides',
+          to: '/docs/guides',
+          activeBaseRegex:
+            '(^/docs/guides/database/|^/docs/guides/auth/)|(/docs/guides$)|docs/(resources|learn)',
+          position: 'left',
+        },
+        {
+          label: 'Reference',
+          to: '/docs/reference/javascript/supabase-client',
+          activeBasePath: '/docs/reference/',
+          position: 'left',
+        },
+        { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
+        {
           href: 'https://github.com/supabase/supabase',
           className: 'navbar-item-github',
           position: 'right',
@@ -67,37 +84,6 @@ module.exports = {
           className: 'navbar-item-twitter',
           position: 'right',
         },
-        {
-          label: 'Overview',
-          to: '/docs',
-          activeBaseRegex: '(^/docs$)|(/docs/faq)|(^/docs/guides/examples)',
-          position: 'left',
-        },
-        {
-          label: 'Guides',
-          to: '/docs/guides',
-          activeBaseRegex: '(^/docs/guides/database/|^/docs/guides/auth/)|(/docs/guides$)',
-          position: 'left',
-        },
-        {
-          label: 'Reference',
-          to: '/docs/reference/javascript/supabase-client',
-          activeBasePath: '/docs/reference/',
-          position: 'left',
-        },
-        {
-          label: 'Resources',
-          to: '/docs/resources',
-          activeBaseRegex: 'docs/(resources|learn|gotrue|postgrest|realtime)',
-          position: 'left',
-        },
-        {
-          label: 'Jobs',
-          to: '/docs/careers',
-          activeBasePath: '/docs/careers',
-          position: 'left',
-        },
-        { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
       ],
     },
     prism: {
@@ -198,6 +184,7 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
+          sidebarCollapsible: true,
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/supabase/supabase/edit/master/web',
         },

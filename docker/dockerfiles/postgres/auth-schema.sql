@@ -88,6 +88,5 @@ $$ language sql stable;
 GRANT ALL PRIVILEGES ON SCHEMA auth TO postgres;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA auth TO postgres;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA auth TO postgres;
-ALTER ROLE postgres SET search_path = "$user", auth, public;
 
 GRANT USAGE ON SCHEMA auth TO anon, authenticated, service_role;
