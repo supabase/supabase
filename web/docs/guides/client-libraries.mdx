@@ -434,7 +434,7 @@ void main() async {
   final response = await client
       .from('countries')
       .on(SupabaseEventTypes.all, (payload) {
-        print('Something happenned: ${payload.eventType}');
+        print('Something happened: ${payload.eventType}');
       })
       .subscribe((String event, {String? errorMsg}) {
         print('event: $event error: $errorMsg');
@@ -487,7 +487,7 @@ void main() async {
   final response = await client
       .from('countries:id.eq.200')
       .on(SupabaseEventTypes.update, (payload) {
-        print('Something happenned: ${payload.eventType}');
+        print('Something happened: ${payload.eventType}');
       })
       .subscribe((String event, {String? errorMsg}) {
         print('event: $event error: $errorMsg');

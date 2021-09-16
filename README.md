@@ -109,6 +109,7 @@ Our client library is modular. Each sub-library is a standalone implementation f
 - [Traditional Chinese / 繁体中文](/i18n/README.zh-tw.md)
 - [Turkish / Türkçe](/i18n/README.tr.md)
 - [Ukrainian / Українська](/i18n/README.uk.md)
+- [Vietnamese / Tiếng Việt](/i18n/README.vi-vn.md)
 - [List of translations](/i18n/languages.md) <!--- Keep only this -->
 
 ---

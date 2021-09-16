@@ -22,12 +22,12 @@ Today, we're exposing a full set of metrics in your projects, so that you can bu
 
 We've added a new "Reports" section to the Dashboard. You can view one month of data, including
 API requests across all of Supabase's core pillars:
-Database, Auth and Storage. We've included a two instance health metrics, CPU usage and Memory usage,
+Database, Auth and Storage. We've included two instance health metrics, CPU usage and Memory usage,
 with a lot more on the way.
 
 ![Supabase reports screen](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-and-metrics-reports-screen.jpg)
 
-All charts are built with [Recharts](https://recharts.org/en-US), an MIT-licensed React chart library chosen for it's ease of use.
+All charts are built with [Recharts](https://recharts.org/en-US), an MIT-licensed React chart library chosen for its ease of use.
 We'll add customizable charts in the future, so we'd love to hear which libraries you'd like to see in Supabase.
 
 We support one configurable report per project, accessible and editable by all team members. In the next few weeks,
@@ -46,9 +46,9 @@ monitor your project health at a glance.
 
 ## Observability metrics
 
-Backend as a Service? infrastructure as a Service? We don't care about the label, but we do care about giving developers the relevant
+Backend as a Service? Infrastructure as a Service? We don't care about the label, but we do care about giving developers the relevant
 observability metrics. Supabase gives you a full Postgres cluster for every project, and now we give you the tools to diagnose and manage
-important infrastructure anomolies.
+important infrastructure anomalies.
 
 All databases are now launched with `pg_stat_statements` enabled, so you can expect some useful query statistics in the future too.
 
@@ -83,12 +83,12 @@ As such, we're also working on exposing as much data as possible to them.
 ### Gathering relevant metrics
 
 Given the setup described above, there are two major categories of metrics that we care about.
-There's metrics pertinent to the services mentioned ("Project Metrics") that get spun up for each project
-(e.g. the number of active connections to the db), and there's metrics for the underlying infrastructure
+There are metrics pertinent to the services mentioned ("Project Metrics") that get spun up for each project
+(e.g. the number of active connections to the db), and there are metrics for the underlying infrastructure
 (e.g. system health). Most of the time, our users shouldn't have to care about the latter,
 though the nature of leaky abstractions dictates that sometimes they become relevant to Project Metrics as well.
 
-In order to build a comprehensive view of the project's health, each services needs to be instrumented along with their
+In order to build a comprehensive view of the project's health, each service needs to be instrumented along with its
 underlying infrastructure. We're looking at hundreds of thousands of targets at our current scale
 (likely approaching millions in the near future) each of them presenting hundreds of metrics of interest (every minute!).
 
@@ -96,7 +96,7 @@ To buy ourselves some headroom, we built a federated approach: we run instances 
 geographical region we operate in. This provides a natural dimension for sharding, while reducing the latency for everyone.
 We run [Prometheus](https://prometheus.io/) out of inertia, soon to be [VictoriaMetrics](https://victoriametrics.com/).
 The monitoring instances scrape data from a number of exporters that are bundled into each of our projects.
-A small subset of the metrics collected get aggregated to a centralized VictoriaMetrics instance for easier cohort analysis.
+A small subset of the metrics collected gets aggregated to a centralized VictoriaMetrics instance for easier cohort analysis.
 
 ![Supabase Prometheus](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/prometheus.png)
 
@@ -113,7 +113,7 @@ To start with, we're focusing on metrics a few of the most pertinent metrics:
 
 Where to begin?
 
-- Multiple reports per project: we've started with just one report per projects, but in the next few weeks we'll allow you to create as many as you want.
+- Multiple reports per project: we've started with just one report per project, but in the next few weeks we'll allow you to create as many as you want.
 - More metrics: we're just getting started.
   - Number of active connections to your database.
   - Various detailed stats from `pg_stat_statements`, `pg_stat_bgwriter`, `pg_stat_database`, `pg_stat_database_conflicts`.

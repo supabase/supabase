@@ -107,7 +107,7 @@
     "type": "example",
     "products": ["database"],
     "title": "NextJS todo list app",
-    "description": "React Native todo List example with Expo",
+    "description": "NextJS todo list example",
     "author": "supabase",
     "author_url": "https://github.com/supabase",
     "author_img": "https://avatars.githubusercontent.com/u/54469796",

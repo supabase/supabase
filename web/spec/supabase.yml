@@ -111,12 +111,20 @@ pages:
       Other languages are built by the community and supported by Supabase.
 
       ## JavaScript
-
+      
+      Via NPM
       ```bash
       npm install @supabase/supabase-js
       ```
-
+      
       Find the source code on [GitHub](https://github.com/supabase/supabase-js).  
+      
+      Or via CDN
+      ```js
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+      //or
+      <script src="https://unpkg.com/@supabase/supabase-js"></script>
+      ```
 
       ## Python
 
@@ -732,16 +740,14 @@ pages:
           const { data, error } = await supabase
             .rpc('echo_city', { name: 'The Shire' })
           ```
-      - name: Bulk call
+      - name: Bulk processing
+        description: You can process large payloads at once using [array parameters](https://postgrest.org/en/stable/api.html#calling-functions-with-array-parameters).
         js: |
           ```js
-          const { data, error } = await supabase
-            .rpc('echo_city', [
-              { name: 'The Shire' },
-              { name: 'Mordor' }
-            ])
+          const { data, error } = await postgrest
+            .rpc('echo_cities', { names: ['The Shire', 'Mordor'] })
           ```
-      - name: With filters.
+      - name: With filters
         description: |
           Stored procedures that return tables can also be combined with 
           [Modifiers](/docs/reference/javascript/using-modifiers) and 
