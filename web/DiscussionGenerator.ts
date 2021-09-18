@@ -1,5 +1,9 @@
 import { graphql } from '@octokit/graphql'
 import { writeToDisk } from './spec/gen/lib/helpers'
+const dayjs = require('dayjs')
+const relativeTime = require('dayjs/plugin/relativeTime')
+dayjs.extend(relativeTime)
+
 const fs = require('fs')
 
 const discussions = require('./src/data/github/discussions')
@@ -78,6 +82,13 @@ hide_table_of_contents: false
 ---
 
 ${body}
+
+---
+### Suggested answer
+__${answer.author.login}__ \`${dayjs(answer.createdAt).fromNow()}\`
+
+${answer.body}
+
 `
 
 async function fetchDiscussions() {
@@ -134,18 +145,22 @@ async function main() {
     const { id, author, body, title, createdAt, answer, category, upvoteCount, comments } =
       discussion
 
-    const post = postTemplate({
-      title,
-      author: author.login,
-      authorUrl: author.url,
-      avatarUrl: author.avatarUrl,
-      body,
-      category: category.name,
-      answer,
-      upvoteCount,
-      comments,
-    })
+    const voidTags = /(\<[img|hr|br|area|base|col|embed|param|source].*[^\>])(\>)/g
+
+    let terminatedBody = body.replace(voidTags, '$1/$2')
+
     if (answer) {
+      const post = postTemplate({
+        title,
+        author: author.login,
+        authorUrl: author.url,
+        avatarUrl: author.avatarUrl,
+        body: terminatedBody,
+        category: category.name,
+        answer,
+        upvoteCount,
+        comments,
+      })
       const fileName = `${formatDate(createdAt)}-${slugify(title)}.md`
       await writeToDisk(`./discussions/${fileName}`, post)
     }
