@@ -26,6 +26,22 @@ const query = `
             }
             createdAt
             }
+            category {
+              name
+            }
+            comments {
+              totalCount
+              nodes {
+                author {
+                  avatarUrl
+                  url
+                  login
+                }
+                body
+                createdAt
+              }
+            }
+            upvoteCount
             totalCount
             pageInfo {
             startCursor
@@ -37,12 +53,28 @@ const query = `
     }
 }
 `
-const postTemplate = ({ title, author, avatarUrl, authorUrl, body }) => `---
+const postTemplate = ({
+  title,
+  author,
+  avatarUrl,
+  authorUrl,
+  body,
+  category,
+  answer,
+  answered,
+  upvoteCount,
+  comments,
+}) => `---
 title: ${title}
 author: ${author}
 tags: [Question]
 author_image_url: ${avatarUrl}
 author_url: ${authorUrl}
+answer: ${answer}
+answered: ${answered}
+category: ${category}
+upvoteCount: ${upvoteCount}
+commentCount: ${comments ? comments.totalCount : 0}
 -- image: https://i.imgur.com/mErPwqL.png
 hide_table_of_contents: false
 ---
@@ -90,7 +122,6 @@ function slugify(str) {
   return str
 }
 
-
 // type Discussion = { id: string; author: string; body: string; title: string; createdAt: string; answer: string }
 
 async function main() {
@@ -102,7 +133,8 @@ async function main() {
 
   // 3. Transform the discussions into "blog" posts
   discussions.nodes.map(async (discussion) => {
-    const { id, author, body, title, createdAt, answer } = discussion
+    const { id, author, body, title, createdAt, answer, category, upvoteCount, comments } =
+      discussion
 
     const post = postTemplate({
       title,
@@ -110,6 +142,11 @@ async function main() {
       authorUrl: author.url,
       avatarUrl: author.avatarUrl,
       body,
+      category: category.name,
+      answered: !!answer,
+      answer,
+      upvoteCount,
+      comments,
     })
     const fileName = `${formatDate(createdAt)}-${slugify(title)}.md`
     await writeToDisk(`./discussions/${fileName}`, post)

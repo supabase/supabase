@@ -15,21 +15,17 @@ import type { Props } from '@theme/BlogListPage'
 import Link from '@docusaurus/Link'
 import styles from './styles.module.css'
 import clsx from 'clsx'
-
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-]
+import cuid from 'cuid'
+import {
+  ArrowUpIcon,
+  ZapIcon,
+  CheckCircleIcon,
+  CheckCircleFillIcon,
+  CommentIcon,
+} from '@primer/octicons-react'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayjs.extend(relativeTime)
 
 function BlogListPage(props: Props): JSX.Element {
   const { metadata, items } = props
@@ -45,42 +41,74 @@ function BlogListPage(props: Props): JSX.Element {
       <div className="BlogListPage container margin-vert--lg">
         <div className="row">
           <main className="col col--10 col--offset-1">
-              {items.map(({ content: BlogPostContent }) => {
-                const { date, permalink, tags, readingTime } = BlogPostContent.metadata
-                const match = date.substring(0, 10).split('-')
-                const year = match[0]
-                const month = MONTHS[parseInt(match[1], 10) - 1]
-                const day = parseInt(match[2], 10)
-                return (
-                  <div className="row">
-                    <Link
-                      className={clsx('', styles.PostPreview)}
-                      to={BlogPostContent.metadata.permalink}
-                      key={BlogPostContent.metadata.permalink}
-                    >
-                      <div className={clsx('card__body', styles.PostPreviewBody)}>
-                        <div className={styles.PostPreviewHeading}>
-                          <h3>{BlogPostContent.frontMatter.title}</h3>
-                          <div className="avatar">
-                            <img
-                              className="avatar__photo avatar__photo--sm"
-                              src={BlogPostContent.frontMatter.author_image_url}
-                            />
-                          </div>
-                        </div>
+            {items.map(({ content: BlogPostContent }) => {
+              const { date, permalink, tags, readingTime } = BlogPostContent.metadata
+              const {
+                frontMatter: {
+                  title,
+                  author_image_url,
+                  author,
+                  category,
+                  answered,
+                  commentCount,
+                  upvoteCount,
+                },
+              } = BlogPostContent
 
+              const categoryIcon = {
+                General: '⚡',
+                Ideas: '💡',
+                'Jobs Board': '📋',
+                'Q&A': '❓',
+                'Show and tell': '🙌',
+              }
+
+              return (
+                <div className="row" key={cuid()}>
+                  <Link
+                    className={clsx('', 'row row--no-gutters', styles.PostPreview)}
+                    to={permalink}
+                  >
+                    <div className="row card__body">
+                      <div className="col col--1 padding-vert--md padding-horiz-md">
+                        <button className="button button--sm button--outline button--secondary padding-horiz--sm">
+                          <ArrowUpIcon className="margin-right--sm" />
+                          {upvoteCount}
+                        </button>
+                      </div>
+                      <div className="col col--1">
+                        <button className="button padding-horiz--md padding-vert--md margin-right--none">
+                          {categoryIcon[category]}
+                        </button>
+                      </div>
+                      <div className="col col--8 margin-right--none padding-horiz--none">
+                        <div>
+                          <h3>{title}</h3>
+                        </div>
                         <div className="row row--no-gutters">
-                          <div className={styles.PreviewDate}>
-                            <time dateTime={date} className={styles.blogPostDate}>
-                              {month} {day}, {year}{' '}
-                            </time>
-                          </div>
+                          {`${author} asked ${dayjs(date).fromNow()} in ${category} • ${
+                            answered ? 'Answered' : 'Unanswered'
+                          }`}
                         </div>
                       </div>
-                    </Link>
-                  </div>
-                )
-              })}
+                      <div className="col col--1 avatar">
+                        <img className="avatar__photo avatar__photo--sm" src={author_image_url} />
+                      </div>
+                      <div className="col col--1">
+                        {category == 'Ideas' ? (
+                          <CommentIcon />
+                        ) : answered ? (
+                          <CheckCircleFillIcon />
+                        ) : (
+                          <CheckCircleIcon />
+                        )}
+                        <span className="margin-left--sm">{`${commentCount}`}</span>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              )
+            })}
             <div style={{ paddingLeft: 12 }}>
               <BlogListPaginator metadata={metadata} />
             </div>
