@@ -61,7 +61,6 @@ const postTemplate = ({
   body,
   category,
   answer,
-  answered,
   upvoteCount,
   comments,
 }) => `---
@@ -71,7 +70,6 @@ tags: [Question]
 author_image_url: ${avatarUrl}
 author_url: ${authorUrl}
 answer: ${answer}
-answered: ${answered}
 category: ${category}
 upvoteCount: ${upvoteCount}
 commentCount: ${comments ? comments.totalCount : 0}
@@ -143,13 +141,14 @@ async function main() {
       avatarUrl: author.avatarUrl,
       body,
       category: category.name,
-      answered: !!answer,
       answer,
       upvoteCount,
       comments,
     })
-    const fileName = `${formatDate(createdAt)}-${slugify(title)}.md`
-    await writeToDisk(`./discussions/${fileName}`, post)
+    if (answer) {
+      const fileName = `${formatDate(createdAt)}-${slugify(title)}.md`
+      await writeToDisk(`./discussions/${fileName}`, post)
+    }
   })
 }
 

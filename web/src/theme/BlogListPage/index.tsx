@@ -86,9 +86,7 @@ function BlogListPage(props: Props): JSX.Element {
                           <h3>{title}</h3>
                         </div>
                         <div className="row row--no-gutters">
-                          {`${author} asked ${dayjs(date).fromNow()} in ${category} • ${
-                            answered ? 'Answered' : 'Unanswered'
-                          }`}
+                          {`${author} asked ${dayjs(date).fromNow()} in ${category} • Answered`}
                         </div>
                       </div>
                       <div className="col col--1 avatar">
