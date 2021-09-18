@@ -16,13 +16,7 @@ import Link from '@docusaurus/Link'
 import styles from './styles.module.css'
 import clsx from 'clsx'
 import cuid from 'cuid'
-import {
-  ArrowUpIcon,
-  ZapIcon,
-  CheckCircleIcon,
-  CheckCircleFillIcon,
-  CommentIcon,
-} from '@primer/octicons-react'
+import { ArrowUpIcon, CheckCircleFillIcon, CommentIcon } from '@primer/octicons-react'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime)
@@ -93,13 +87,7 @@ function BlogListPage(props: Props): JSX.Element {
                         <img className="avatar__photo avatar__photo--sm" src={author_image_url} />
                       </div>
                       <div className="col col--1">
-                        {category == 'Ideas' ? (
-                          <CommentIcon />
-                        ) : answered ? (
-                          <CheckCircleFillIcon />
-                        ) : (
-                          <CheckCircleIcon />
-                        )}
+                        {category == 'Ideas' ? <CommentIcon /> : <CheckCircleFillIcon />}
                         <span className="margin-left--sm">{`${commentCount}`}</span>
                       </div>
                     </div>
