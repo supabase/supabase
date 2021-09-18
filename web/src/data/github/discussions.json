@@ -1,187 +1,714 @@
 {
   "nodes": [
     {
-      "id": "MDEwOkRpc2N1c3Npb24zNTI0ODA3",
+      "id": "D_kwDODMpXOc4ANpxO",
       "author": {
-        "avatarUrl": "https://avatars.githubusercontent.com/u/7221389?u=cd8e279f95d479997ba55e106c44b96fdc7f979e&v=4",
-        "url": "https://github.com/mazipan",
-        "login": "mazipan"
+        "avatarUrl": "https://avatars.githubusercontent.com/u/55960058?v=4",
+        "url": "https://github.com/budoteam",
+        "login": "budoteam"
       },
-      "body": "I have application here: https://ksana.in/auth/sign-in that suddenly can not use any auth method from Supabase.\r\n\r\n![Screen Shot 2021-08-17 at 17 18 57](https://user-images.githubusercontent.com/7221389/129708977-2f1af5ee-f73c-41f8-977e-a3b6cc7a193f.png)\r\n\r\nFor example, the Google Login will redirect to:\r\n\r\n```\r\nhttps://oirhwazlkofldqlyoamp.supabase.co/auth/v1/authorize?provider=google&redirect_to=https://ksana.in/callback\r\n``` \r\n\r\nI can ping the domain\r\n\r\n![Screen Shot 2021-08-17 at 17 21 20](https://user-images.githubusercontent.com/7221389/129709330-3757f11e-8b73-46b1-8f02-1ffea090e630.png)\r\n\r\nIs there any changes I missing from Supabase side? I already update the version to the latest version, but still no luck. \r\n\r\nLooking the report, it happen from 16 Aug 2021. All request suddenly gone\r\n\r\n![Screen Shot 2021-08-17 at 17 25 43](https://user-images.githubusercontent.com/7221389/129710024-19a12314-882e-4530-b0c0-2a11d58e39a5.png)\r\n",
-      "title": "My Auth Suddenly Not Working",
+      "body": "I am currently developing a management tool for my sports school. Among other things, it will be used to plan courses.\r\n\r\nNow I need the possibility to create multiple relations between two tables.\r\n\r\nFor example, I have a user table and one for the courses. In the courses the trainers are listed (can be several / linkd to the user table) as well as the participants (also from the user table). A separate trainer table is not an option, because they can also be participants in other lessons. Is there a possibility?",
+      "title": "Multiple relations between two tables?",
       "answer": {
         "author": {
-          "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
-          "login": "inian"
+          "avatarUrl": "https://avatars.githubusercontent.com/u/18113850?u=d27502ff73c45f1f38b8c7ed002238a8d466f2f8&v=4",
+          "login": "dshukertjr"
         },
-        "body": "Hi @mazipan, I was able to sign into your application just now. If this continues to happen, please raise a ticket at beta@supabase.io. Thanks!",
-        "createdAt": "2021-08-18T03:03:20Z"
+        "body": "Hi @budoteam!\r\n\r\nYou could simply create two relational table like this:\r\n\r\n```sql\r\ncreate table if not exists public.users (\r\n  id uuid references auth.users on delete cascade not null primary key,\r\n  name varchar(18) not null unique\r\n);\r\n\r\ncreate table if not exists public.courses (\r\n  id uuid not null primary key DEFAULT uuid_generate_v4 (),\r\n  title varchar(18) not null\r\n);\r\n\r\ncreate type participant_type AS ENUM ('trainer', 'participant');\r\n\r\ncreate table if not exists public.participants (\r\n  user_id uuid references public.users not null,\r\n  course_id uuid references public.courses not null,\r\n  type participant_type not null,\r\n  primary key (user_id, course_id)\r\n);\r\n```\r\n\r\nYou have a `participants` table that holds whoever is participating in certain course. A participant can either be a `trainer` or a `partifipant` in na given course. The same user can be the other role in different courses. ",
+        "createdAt": "2021-09-17T12:52:42Z"
       },
-      "createdAt": "2021-08-17T10:22:39Z"
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 1,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/18113850?u=d27502ff73c45f1f38b8c7ed002238a8d466f2f8&v=4",
+              "url": "https://github.com/dshukertjr",
+              "login": "dshukertjr"
+            },
+            "body": "Hi @budoteam!\r\n\r\nYou could simply create two relational table like this:\r\n\r\n```sql\r\ncreate table if not exists public.users (\r\n  id uuid references auth.users on delete cascade not null primary key,\r\n  name varchar(18) not null unique\r\n);\r\n\r\ncreate table if not exists public.courses (\r\n  id uuid not null primary key DEFAULT uuid_generate_v4 (),\r\n  title varchar(18) not null\r\n);\r\n\r\ncreate type participant_type AS ENUM ('trainer', 'participant');\r\n\r\ncreate table if not exists public.participants (\r\n  user_id uuid references public.users not null,\r\n  course_id uuid references public.courses not null,\r\n  type participant_type not null,\r\n  primary key (user_id, course_id)\r\n);\r\n```\r\n\r\nYou have a `participants` table that holds whoever is participating in certain course. A participant can either be a `trainer` or a `partifipant` in na given course. The same user can be the other role in different courses. ",
+            "createdAt": "2021-09-17T12:52:42Z"
+          }
+        ]
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-17T09:42:54Z"
     },
     {
-      "id": "MDEwOkRpc2N1c3Npb24zNTI1NzEz",
+      "id": "D_kwDODMpXOc4ANqJq",
       "author": {
-        "avatarUrl": "https://avatars.githubusercontent.com/u/89100093?v=4",
-        "url": "https://github.com/tmt-devq",
-        "login": "tmt-devq"
+        "avatarUrl": "https://avatars.githubusercontent.com/u/14294592?u=2a478daff4a3ebfd6603a664c5ddb37e7faaac8f&v=4",
+        "url": "https://github.com/krasinedev",
+        "login": "krasinedev"
       },
-      "body": "Hi,\r\n\r\nI've added an 'updated_at' column to a table and created a trigger to update to the current timestamp via the moddatetime extension whenever a new record gets inserted or an update is made. How can I prevent users from passing through a value when they post an update? I've tried it with a function and trigger like the below (just silently resetting the value but I will raise an exception here rather), but I am still able to insert a new record and specify an 'updated_at' value through the rest call?\r\n\r\n```\r\ncreate function tester() returns trigger language plpgsql as $$\r\nbegin\r\n  new.updated_at = old.updated_at;\r\n  return new;\r\nend $$;\r\n\r\nCREATE TRIGGER a_test_trigger BEFORE UPDATE ON items \r\nFOR EACH ROW EXECUTE PROCEDURE tester();\r\n```\r\n\r\nThank you",
-      "title": "Immutable column value",
-      "answer": {
-        "author": {
-          "avatarUrl": "https://avatars.githubusercontent.com/u/31685197?u=8aff941b133b7627af28427a656602f4749b735e&v=4",
-          "login": "soedirgo"
-        },
-        "body": "If the `tester` function is `IMMUTABLE`, you can use [generated columns](https://www.postgresql.org/docs/current/ddl-generated-columns.html) instead of triggers:\r\n```sql\r\nALTER TABLE items ADD updated_at timestamptz GENERATED ALWAYS AS (tester()) STORED;\r\n```\r\n\r\nOtherwise you can use an `AFTER` trigger on inserts and updates so that it overwrites the specified `updated_at`.",
-        "createdAt": "2021-08-18T04:57:36Z"
-      },
-      "createdAt": "2021-08-17T18:32:14Z"
-    },
-    {
-      "id": "MDEwOkRpc2N1c3Npb24zNTAyMzY2",
-      "author": {
-        "avatarUrl": "https://avatars.githubusercontent.com/u/66746171?v=4",
-        "url": "https://github.com/nyxongod",
-        "login": "nyxongod"
-      },
-      "body": "I have been trying to connect to database using your string connection of course used password for database during creation, but I can't connect --> instead this error I get --> Error: P1001: Can't reach database server at.\r\n\r\nCommand to connect --> prisma db push \r\n\r\nAny advice ?\r\n\r\nRegards",
-      "title": "Connection Problem to database",
-      "answer": {
-        "author": {
-          "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
-          "login": "inian"
-        },
-        "body": "Hi @nyxongod, if you are still facing this issue, reach out to support@supabase.io with the api url and we will take a look. thanks!",
-        "createdAt": "2021-08-18T03:58:22Z"
-      },
-      "createdAt": "2021-08-04T11:45:00Z"
-    },
-    {
-      "id": "MDEwOkRpc2N1c3Npb24zNDkwODE4",
-      "author": {
-        "avatarUrl": "https://avatars.githubusercontent.com/u/46375818?u=8ec8ab4135c6dc831157cff6c36ad2350a857578&v=4",
-        "url": "https://github.com/nithinpachday",
-        "login": "nithinpachday"
-      },
-      "body": "Hi,\r\nI am trying to create google/Facebook authentication to my application. right now I am using the superbase rest API endpoint for authentication. How to integrate social media login using default endpoints?  ",
-      "title": "Social Media Login using Rest API",
-      "answer": {
-        "author": {
-          "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
-          "login": "inian"
-        },
-        "body": "Hi @nithinpachday, we have guides for different OAuth providers in our website. This is the one for Facebook - https://supabase.io/docs/guides/auth/auth-facebook and a video explaining it here - https://www.youtube.com/watch?v=EbV746pWDas\r\n\r\nLet me know if there is something thats not clear in these guides and we will improve it.",
-        "createdAt": "2021-08-02T06:03:22Z"
-      },
-      "createdAt": "2021-07-30T13:57:10Z"
-    },
-    {
-      "id": "MDEwOkRpc2N1c3Npb24zNTAyNTQy",
-      "author": {
-        "avatarUrl": "https://avatars.githubusercontent.com/u/24230875?u=d109b720a4b62995e34e0e60e0d7a9f7ac1ace0b&v=4",
-        "url": "https://github.com/chrisLoPresti",
-        "login": "chrisLoPresti"
-      },
-      "body": "Hey it appears im missing default tables such as users, migrations, etc. Or are these no longer provided? \r\n\r\nthanks in advance for your help!",
-      "title": "Missing default tables",
-      "answer": {
-        "author": {
-          "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
-          "login": "inian"
-        },
-        "body": "Hi, internal tables are hidden in the dashboard by default. You can still access them by connecting to your database directly. We will add an option to toggle internal tables in the dashboard at some point. ",
-        "createdAt": "2021-08-18T03:56:13Z"
-      },
-      "createdAt": "2021-08-04T13:44:33Z"
-    },
-    {
-      "id": "MDEwOkRpc2N1c3Npb24zNTAyMzU3",
-      "author": {
-        "avatarUrl": "https://avatars.githubusercontent.com/u/29046316?u=bbbdd413a429b1775ade01b044d51908379859b2&v=4",
-        "url": "https://github.com/dostuffthatmatters",
-        "login": "dostuffthatmatters"
-      },
-      "body": "I am trying to allow certain users to insert stuff into a table. Since I do not want to share the project secret this should be based on email/password credentials.\r\n\r\nThe sign-in works fine and the `supabase.auth.user()` object immediately before the request is correct. The code I am using:\r\n\r\nhttps://github.com/dostuffthatmatters/esm-air-quality-rt-plot-data/blob/4b923384854a85e2d6f317183f1f882455933199/run.py#L43-L61\r\n\r\nI have tried any combination of RLS rules but comparisons with `role() = 'authenticated'` or `email() = '...'` always result in a blocked request. Has anyone here used Python and RLS before?",
-      "title": "Row Level Security blocks all requests",
+      "body": "Is there/will there be a way to define a storage \"quota\" per user? The use case is allowing people to upload files through the storage api, but limiting the maximum amount of data they can store as an individual.",
+      "title": "Storage quota per individual user",
       "answer": null,
-      "createdAt": "2021-08-04T11:38:30Z"
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 0,
+        "nodes": []
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-18T11:50:48Z"
     },
     {
-      "id": "MDEwOkRpc2N1c3Npb24zNzQ3Mw==",
+      "id": "D_kwDODMpXOc4ANqIF",
       "author": {
-        "avatarUrl": "https://avatars.githubusercontent.com/u/369825?u=26fdceebce232b0b9f062345775664103e18a4ad&v=4",
-        "url": "https://github.com/skoshy",
-        "login": "skoshy"
+        "avatarUrl": "https://avatars.githubusercontent.com/u/59526869?v=4",
+        "url": "https://github.com/roker15",
+        "login": "roker15"
       },
-      "body": "Hi, I'm trying to set up a trigger to automatically copy new users from `auth` to my public `users` table. I've drafted up the below, but I get a database error every time I try to signup a new user (`\"Database error saving new user\"`). Any ideas on what could be the issue?\r\n\r\n```sql\r\nCREATE OR REPLACE FUNCTION auth.signup_copy_to_users_table()\r\nRETURNS TRIGGER LANGUAGE plpgsql AS $function$\r\n  BEGIN\r\n    INSERT INTO public.users(id)\r\n    VALUES(NEW.id);\r\n  \r\n    RETURN NEW;\r\n  END;\r\n$function$;\r\n\r\nDROP TRIGGER IF EXISTS signup_copy on auth.users;\r\nCREATE TRIGGER signup_copy\r\nAFTER INSERT OR UPDATE ON auth.users\r\nFOR EACH ROW EXECUTE PROCEDURE signup_copy_to_users_table();\r\n```\r\n\r\nIn general it'd be useful to be able to keep the auth/public users tables in sync with the `id` and `email` fields at least.",
-      "title": "Sign-up database trigger to insert into public users table",
+      "body": "When user login in firebase, we can determine if user is first time or not. we do something like \r\n`task.getResult().getAdditionalUserInfo().isNewUser()`\r\nDo we have similar functanility in supabase so that we can perform some initical operation like profile update, assigning roles etc...",
+      "title": "Can i detect if user is new or not in supabase similar to firebase?",
+      "answer": null,
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 0,
+        "nodes": []
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-18T09:23:14Z"
+    },
+    {
+      "id": "D_kwDODMpXOc4ANpD3",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/59526869?v=4",
+        "url": "https://github.com/roker15",
+        "login": "roker15"
+      },
+      "body": "I have multiple tables related by foreign keys reffering to tables `ID`, each table ID is of type `int8`\r\nWhen i tried to do\r\n```js\r\nconst { data, error } = await supabase\r\n  .from<Post>(\"posts\")\r\n  .insert([{ \"post\": content, subheading_id: { id: 1 } }]\r\n  \r\n``` \r\n\r\nI am getting following response \r\n\r\n```\r\n{\"hint\":null,\"message\":\"invalid input syntax for type bigint: \\\"{\\\"id\\\":1}\\\"\",\"code\":\"22P02\",\"details\":null}\r\n```",
+      "title": "Can not insert foreign key into database? \"message\":\"invalid input syntax for type bigint",
+      "answer": null,
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 2,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/8291514?u=2960d72247d0460343d4fd9acbbf02c6abf1dd51&v=4",
+              "url": "https://github.com/MildTomato",
+              "login": "MildTomato"
+            },
+            "body": "It looks like your 'subheading_id' column is a bigint (int8) type, but you're trying to update it like its a json column.\r\nIf you change it to what is below, you might find it will probably run.\r\n\r\n```js\r\nconst { data, error } = await supabase.from<Post>(\"posts\").insert([{ \"post\": content, subheading_id: 1 }])\r\n```\r\n\r\nIt might help if you can explain in more detail what you're trying to do, and then maybe me or someone else here can advise ",
+            "createdAt": "2021-09-16T08:34:22Z"
+          },
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/458736?u=7bc13764a2f8dd974acc7ca284850390a6f914e0&v=4",
+              "url": "https://github.com/awalias",
+              "login": "awalias"
+            },
+            "body": "hey @roker15 supabase-js works differently than a java ORM for mysql - inserting a nested object will not automatically be unpacked and stored in a foreign table\r\n\r\nas the error (`\"invalid input syntax for type bigint: \\\"{\\\"id\\\":1}\\\"\"`) suggests, supabase-js is expecting that you just pass the bigint value itself rather than an entire json object\r\n\r\nso you'll probably want to insert the Subheading row initially, and then follow it up by inserting the Past row with a reference to the subheading",
+            "createdAt": "2021-09-16T12:42:26Z"
+          }
+        ]
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-16T07:49:11Z"
+    },
+    {
+      "id": "D_kwDODMpXOc4ANppu",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/10214230?u=35e6961929c10a1bf676dbe72d668c97a83e6e06&v=4",
+        "url": "https://github.com/Phamiliarize",
+        "login": "Phamiliarize"
+      },
+      "body": "I want to only allow creation when a user has less than a certain amount of items.\r\n\r\nI've created a custom function here to return a boolean based on this.\r\n\r\n```sql\r\ncreate function can_make_item(auth_user uuid)\r\nreturns boolean\r\nlanguage plpgsql\r\nas\r\n$$\r\ndeclare\r\n   retval boolean;\r\nbegin\r\n   select CAST((count(*) < 4) as boolean)\r\n   into retval\r\n   from items\r\n   where items.owner_id = auth_user;\r\n   return retval;\r\nend;\r\n$$;\r\n```\r\n\r\nWhen dropping this into the following policy, however, it doesn't work and seems to always be true. It looks something like this\r\n\r\n```sql\r\n((role() = 'authenticated'::text) AND (can_make_board(uid()) = true))\r\n```\r\n\r\nI don't know why but policy auto changes `auth.uid()` to just `uid()`. I thought it might be because uid does not exist and it returns nothing therefore our count would always be less than 4. When running the function in a query with a string provided ID and not the uid() function this seems to be the case, so I added a check to make sure the user is also authenticated so that if they have a UID, and it has no items, then they should be clear.\r\n\r\nThe issue is, people can still unlimitedly make objects.\r\n\r\n\r\nAm I doing something wrong? is this functionality just not supported?\r\n\r\nIf it is supported I think these functions can be a marvelous way to helping implement some business logic.\r\n\r\n",
+      "title": "Policies & Functions Don't work",
+      "answer": null,
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 1,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/5532241?u=19b8f763228c042ab14453bf35360de7fd06c47d&v=4",
+              "url": "https://github.com/w3b6x9",
+              "login": "w3b6x9"
+            },
+            "body": "@Phamiliarize can you please share the entire policy you created?",
+            "createdAt": "2021-09-17T19:43:17Z"
+          }
+        ]
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-17T03:02:18Z"
+    },
+    {
+      "id": "D_kwDODMpXOc4ANqDk",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/59526869?v=4",
+        "url": "https://github.com/roker15",
+        "login": "roker15"
+      },
+      "body": "Here is the previsous [discussion](https://github.com/supabase/supabase/discussions/458)  , answer has been marked accepted but whosoever is asked is not satisfied and answer is still pending since 8 -jan. so i have to ask this again\r\n``\r\nHow to save user to public schema and update role while signing up? folloing is not working and user is undefined.\r\n```\r\nconst { user, error } = await supabase.auth.signIn({ email });\r\n      console.log(console.log(user)) //user is undefined here\r\nconst { data } = await supabase.from<Profile>(\"profiles\").upsert({id:user?.id,role:role });\r\n```",
+      "title": "How to save user to public schema and update role while signing up?",
+      "answer": null,
+      "category": {
+        "name": "General"
+      },
+      "comments": {
+        "totalCount": 0,
+        "nodes": []
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-18T01:30:19Z"
+    },
+    {
+      "id": "MDEwOkRpc2N1c3Npb24xMTU1Nzg3",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/36083550?u=55ec896530ada25dac87c548d4f04a3b60f79bf2&v=4",
+        "url": "https://github.com/mountiny",
+        "login": "mountiny"
+      },
+      "body": "Hi! I am working on one simple app using your great Stripe, Next.js Starter. I am now stuck with one problem. \r\n\r\nFor my app, I need two roles for the users I create, let's say a business and buyer roles. I have different pages on frontend to create buyer user account and to create a business user account. \r\n\r\nHowever, I struggle to find a way how to create these in database as the call will create generic user and the confirmation email takes the user back to my website with no way for me to distinguish, whether it was business or buyer user. Even if I would use localStorage, I can't assume the user will click the confirmation link in email on the same device or use the same browser for it.\r\n\r\nDo  you have any idea or tips how to achieve this workflow? \r\n\r\nThank you very much!",
+      "title": "Roles for Users",
       "answer": {
         "author": {
           "avatarUrl": "https://avatars.githubusercontent.com/u/10214025?u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4",
           "login": "kiwicopple"
         },
-        "body": "I suspect it's permissions - the trigger is probably getting called by the `anon` user. You can try to add `security definer` to the function, which will use the same permissions as the user who created the function.\r\n\r\nHere is a snippet that should work:\r\n\r\n```sql\r\n\r\n/**\r\n* This trigger automatically creates a user entry when a new user signs up via Supabase Auth.\r\n*/ \r\ncreate function public.handle_new_user() \r\nreturns trigger as $$\r\nbegin\r\n  insert into public.users (id)\r\n  values (new.id);\r\n  return new;\r\nend;\r\n$$ language plpgsql security definer;\r\ncreate trigger on_auth_user_created\r\n  after insert on auth.users\r\n  for each row execute procedure public.handle_new_user();\r\n```",
-        "createdAt": "2020-11-25T12:06:48Z"
+        "body": "Are you saving the user to the public schema too ? https://supabase.io/docs/guides/auth#create-a-publicusers-table\r\n\r\nIf you are then you can probably do this in your signup function. Something like this\r\n\r\n```js\r\nconst signUpUser = async (email, password, role) => {\r\n\r\n  const { user, error } = await supabase\r\n    .auth\r\n    .signUp({ email, password})\r\n    \r\n  const { data, error } = await supabase\r\n    .from('user')\r\n    .update({ role })\r\n    .eq('id', user.id) \r\n}\r\n```\r\n\r\nHope that helps!\r\n",
+        "createdAt": "2021-01-02T11:53:44Z"
       },
-      "createdAt": "2020-11-24T20:10:58Z"
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 1,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/10214025?u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4",
+              "url": "https://github.com/kiwicopple",
+              "login": "kiwicopple"
+            },
+            "body": "Are you saving the user to the public schema too ? https://supabase.io/docs/guides/auth#create-a-publicusers-table\r\n\r\nIf you are then you can probably do this in your signup function. Something like this\r\n\r\n```js\r\nconst signUpUser = async (email, password, role) => {\r\n\r\n  const { user, error } = await supabase\r\n    .auth\r\n    .signUp({ email, password})\r\n    \r\n  const { data, error } = await supabase\r\n    .from('user')\r\n    .update({ role })\r\n    .eq('id', user.id) \r\n}\r\n```\r\n\r\nHope that helps!\r\n",
+            "createdAt": "2021-01-02T11:53:44Z"
+          }
+        ]
+      },
+      "upvoteCount": 1,
+      "createdAt": "2020-12-30T17:35:17Z"
     },
     {
-      "id": "MDEwOkRpc2N1c3Npb24zNTE3MDgw",
+      "id": "D_kwDODMpXOc4ANoz9",
       "author": {
-        "avatarUrl": "https://avatars.githubusercontent.com/u/39565159?v=4",
-        "url": "https://github.com/Criepstar",
-        "login": "Criepstar"
+        "avatarUrl": "https://avatars.githubusercontent.com/u/16518948?u=e70b396d1dc50cb82533e1e9540818c96de057fe&v=4",
+        "url": "https://github.com/CaseyG5",
+        "login": "CaseyG5"
       },
-      "body": "Hello would it be possible to have custom fonts via CSS in the Email templates of Supabase?",
-      "title": "Custom font/ CSS in Email Template for authentication",
+      "body": "1. `Error: supabaseUrl is required.`\r\n2. `Error: supabaseKey is required.`\r\n\r\nSupabaseClient.ts:\r\n`   51 | this.storageUrl = `${supabaseUrl}/storage/v1`;`\r\n`> 52 | this.schema = settings.schema;`\r\n\r\nThese two errors I'm getting in my React project (one at a time, not both together) are rather frustrating since my supabaseUrl and supabaseKey are, and have always been, provided to the `createClient()` function or `SupabaseClient()` constructor.  For the first error, Supabase complains about line 51 in it's own file.  For the second, line 52 is a problem.\r\n\r\nI updated `@supabase/supabase-js` from version 1.22.5 to 1.22.6 and the URL error disappeared temporarily but then I switched to using my Service key instead of my Anon key and now the KEY error has taken its place.  Is this a Supabase bug that is plaguing anyone else?  Thanks for any tips you might have.\r\n\r\nCasey",
+      "title": "supabaseUrl or supabaseKey required",
+      "answer": null,
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 2,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/18113850?u=d27502ff73c45f1f38b8c7ed002238a8d466f2f8&v=4",
+              "url": "https://github.com/dshukertjr",
+              "login": "dshukertjr"
+            },
+            "body": "Hi @CaseyG5!\r\n\r\nI am sorry that you are having some trouble. I just upgraded one of my Next.js project to use both v1.22.5 and v1.22.6 of `supabase-js`, and was not able to reproduce this issue with both annon key and service key. Do you know if this issue happened on earlier versions of `supabase-js`?\r\n\r\nCould you share your code where you are calling `createClient()`?",
+            "createdAt": "2021-09-15T22:20:44Z"
+          },
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/8291514?u=2960d72247d0460343d4fd9acbbf02c6abf1dd51&v=4",
+              "url": "https://github.com/MildTomato",
+              "login": "MildTomato"
+            },
+            "body": "Is it possible there’s a trailing slash in the URL?",
+            "createdAt": "2021-09-17T06:36:36Z"
+          }
+        ]
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-15T16:13:13Z"
+    },
+    {
+      "id": "D_kwDODMpXOc4ANpaz",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/38829404?u=205777e46c675f088ecad68aee2005eace313de1&v=4",
+        "url": "https://github.com/zgramming",
+        "login": "zgramming"
+      },
+      "body": "Hello, I wonder how the upsert function works, especially `bulk upsert` (I integrated **Supabase** with **Flutter** ).\r\n\r\nIn [this](https://supabase.io/docs/reference/javascript/upsert#bulk-upsert-your-data) documentation, is clear how we can upsert multiple data, which in essence we have to enter primary key to the list object. Let me explain my case : \r\n\r\n<table>\r\n        <thead>\r\n            <tr>\r\n                <th>id</th>\r\n                <th>id_user (FK & Not Null)</th>\r\n                <th>id_pairing (FK & Not Null)</th>\r\n                <th>is_archived (Nullable)</th>\r\n            </tr>\r\n        </thead>\r\n        <tbody>\r\n            <tr>\r\n                <td>1</td>\r\n                <td>1</td>\r\n                <td>2</td>\r\n                <td>false</td>\r\n            </tr>\r\n            <tr>\r\n                <td>2</td>\r\n                <td>1</td>\r\n                <td>3</td>\r\n                <td>false</td>\r\n            </tr>\r\n            <tr>\r\n                <td>3</td>\r\n                <td>1</td>\r\n                <td>4</td>\r\n                <td>false</td>\r\n            </tr>\r\n            <tr>\r\n                <td>4</td>\r\n                <td>1</td>\r\n                <td>5</td>\r\n                <td>false</td>\r\n            </tr>\r\n        </tbody>\r\n    </table>\r\n\r\nIn above, i got data in database then i want `bulk upsert` column **is_archived** to TRUE. Then i create `List<Map<String,dynamic>>` by including the primary key and value what i want to update.\r\n```\r\nfinal data = [\r\n{id: 1, is_archived: true}, \r\n{id: 2, is_archived: true}, \r\n{id: 3, is_archived: true},\r\n{id: 4, is_archived: true}\r\n]\r\n```\r\n\r\nThen i create query to `bulk upsert` like this : \r\n\r\n```\r\nfinal result = await _supabase.from(Constant.tableInbox).upsert(data).execute();\r\n```\r\n\r\nBut i got error when perform the query. \r\n<img src=\"https://user-images.githubusercontent.com/38829404/133627297-834d6047-a352-4165-a32d-90bd7c6e6ff7.jpeg\" heigh=\"500\" width=\"300\">\r\n\r\n\r\nIn documentation it's not giving any information about not null column, in my perception it's good to go when we already including **primary key** into List Object and ignore about constraint or not null column. \r\n\r\nOr my perception is wrong ? Can you give explain about my case ? \r\n\r\nThank's",
+      "title": "Bulk Upsert with not null column",
+      "answer": {
+        "author": {
+          "avatarUrl": "https://avatars.githubusercontent.com/u/1829294?u=8ad4fe0b6485e806601d2c2128fa37f536205034&v=4",
+          "login": "steve-chavez"
+        },
+        "body": "Hey @zgramming,\r\n\r\n> In above, i got data in database then i want bulk upsert column is_archived to TRUE. Then i create List<Map<String,dynamic>> by including the primary key and value what i want to update.\r\n\r\nFor this case, wouldn't be better to do an update since the rows already exist? Like so:\r\n\r\n```dart\r\nfinal result = await _supabase.from(Constant.tableInbox).update({'is_archived': true).in('id', [1,2,3,4]).execute();\r\n```",
+        "createdAt": "2021-09-16T20:42:25Z"
+      },
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 1,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/1829294?u=8ad4fe0b6485e806601d2c2128fa37f536205034&v=4",
+              "url": "https://github.com/steve-chavez",
+              "login": "steve-chavez"
+            },
+            "body": "Hey @zgramming,\r\n\r\n> In above, i got data in database then i want bulk upsert column is_archived to TRUE. Then i create List<Map<String,dynamic>> by including the primary key and value what i want to update.\r\n\r\nFor this case, wouldn't be better to do an update since the rows already exist? Like so:\r\n\r\n```dart\r\nfinal result = await _supabase.from(Constant.tableInbox).update({'is_archived': true).in('id', [1,2,3,4]).execute();\r\n```",
+            "createdAt": "2021-09-16T20:42:25Z"
+          }
+        ]
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-16T14:12:01Z"
+    },
+    {
+      "id": "D_kwDODMpXOc4ANo-_",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/11864025?u=aaf0a27a9e98b054fa9e72ffbe4e172bf46d6e8c&v=4",
+        "url": "https://github.com/fergusmeiklejohn",
+        "login": "fergusmeiklejohn"
+      },
+      "body": "I'm developing an app with lots of user interactions so many of the tables require a `user_id` column as a foreign key referencing `auth.users.id`.\r\n\r\neg I've got a comments thread, I've created 1000 fake comments, each comment must have a user_id which must reference a user id in `auth.users.id`.\r\n\r\nQuestion 1: how do we generate ~1000 fake `auth.users`? What columns in `auth.users` must be populated?\r\n\r\nQuestion 2: do all of the public tables need to reference the `auth.users` table? I've got a `public.users` table, which must reference `auth.users` but would I have the same level of data integrity if I referenced the `public.users.user_id` from all other pubic tables and only reference the `auth.users` table from the `public.users` table?  Seems to be me that it would be the same (and would be easier to manage in development) but I don't know..",
+      "title": "Question about setting up fake users for dev",
+      "answer": {
+        "author": {
+          "avatarUrl": "https://avatars.githubusercontent.com/u/28647601?u=6affdd8462b37219bab90e93e91d6800feeaaea9&v=4",
+          "login": "kangmingtay"
+        },
+        "body": "Hey @fergusmeiklejohn,\r\n\r\n> how do we generate ~1000 fake auth.users? What columns in auth.users must be populated?\r\n\r\nYou can just do a bulk insert on the auth.users table and populate the `id` field with a randomly generated uuid since that's the primary key in the auth.users table, the `email` and the `email_confirmed_at` fields. If you want to add more user specific data for testing, you can always connect to postgres and take a look at the constraints on each table in the auth schema to figure out which fields should be populated.\r\n\r\n> ...would I have the same level of data integrity if I referenced the public.users.user_id from all other pubic tables and only reference the auth.users table from the public.users table?\r\n\r\nYes, if you create a 1-1 relationship between the public.users and the auth.users on user_id, there shouldn't be issues with data integrity. In fact, I would recommend that you do that because the auth.users schema is maintained by Supabase and we make regular updates to it. If you directly modify the auth schema, it might result in breaking changes on your project when we roll out new auth updates. \r\n",
+        "createdAt": "2021-09-17T04:09:11Z"
+      },
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 1,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/28647601?u=6affdd8462b37219bab90e93e91d6800feeaaea9&v=4",
+              "url": "https://github.com/kangmingtay",
+              "login": "kangmingtay"
+            },
+            "body": "Hey @fergusmeiklejohn,\r\n\r\n> how do we generate ~1000 fake auth.users? What columns in auth.users must be populated?\r\n\r\nYou can just do a bulk insert on the auth.users table and populate the `id` field with a randomly generated uuid since that's the primary key in the auth.users table, the `email` and the `email_confirmed_at` fields. If you want to add more user specific data for testing, you can always connect to postgres and take a look at the constraints on each table in the auth schema to figure out which fields should be populated.\r\n\r\n> ...would I have the same level of data integrity if I referenced the public.users.user_id from all other pubic tables and only reference the auth.users table from the public.users table?\r\n\r\nYes, if you create a 1-1 relationship between the public.users and the auth.users on user_id, there shouldn't be issues with data integrity. In fact, I would recommend that you do that because the auth.users schema is maintained by Supabase and we make regular updates to it. If you directly modify the auth schema, it might result in breaking changes on your project when we roll out new auth updates. \r\n",
+            "createdAt": "2021-09-17T04:09:11Z"
+          }
+        ]
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-16T03:03:32Z"
+    },
+    {
+      "id": "D_kwDODMpXOc4ANpuL",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/59526869?v=4",
+        "url": "https://github.com/roker15",
+        "login": "roker15"
+      },
+      "body": "Is it safe to handle user roles (authorization) from public schema user table or from authentication & authorization mechanism provided by postgres.",
+      "title": "Is it safe to handle user roles (authorization) from public schema table or from authentication & authorization mechanism provided by postgres?",
+      "answer": {
+        "author": {
+          "avatarUrl": "https://avatars.githubusercontent.com/u/458736?u=7bc13764a2f8dd974acc7ca284850390a6f914e0&v=4",
+          "login": "awalias"
+        },
+        "body": "hey @roker15 thanks for you question\r\n\r\nas this is related to [my response](https://github.com/supabase/supabase/discussions/3232#discussioncomment-1343550) to one of your [previous questions](https://github.com/supabase/supabase/discussions/3232) it would be most useful to add this as a comment response to that thread in order to better help future users find answers, and to avoid spamming the main discussion board",
+        "createdAt": "2021-09-17T09:26:25Z"
+      },
+      "category": {
+        "name": "General"
+      },
+      "comments": {
+        "totalCount": 1,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/458736?u=7bc13764a2f8dd974acc7ca284850390a6f914e0&v=4",
+              "url": "https://github.com/awalias",
+              "login": "awalias"
+            },
+            "body": "hey @roker15 thanks for you question\r\n\r\nas this is related to [my response](https://github.com/supabase/supabase/discussions/3232#discussioncomment-1343550) to one of your [previous questions](https://github.com/supabase/supabase/discussions/3232) it would be most useful to add this as a comment response to that thread in order to better help future users find answers, and to avoid spamming the main discussion board",
+            "createdAt": "2021-09-17T09:26:25Z"
+          }
+        ]
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-17T07:37:39Z"
+    },
+    {
+      "id": "MDEwOkRpc2N1c3Npb24zNTY4NjM1",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/62440911?u=d39228c1a78f53cfc76eb7bfcdf7ed40c0a7bfd2&v=4",
+        "url": "https://github.com/Prashant4900",
+        "login": "Prashant4900"
+      },
+      "body": "how should we sync our Django users with supabase users so each user we created in Django is stored in supabase users?\r\nbecause in general if we created a new user in Django it's rather than user supabase users it's created our own new table ( users ) database. so how should we avoid this?",
+      "title": "Syncs Django user model with Supabase users.",
+      "answer": null,
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 1,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/28647601?u=6affdd8462b37219bab90e93e91d6800feeaaea9&v=4",
+              "url": "https://github.com/kangmingtay",
+              "login": "kangmingtay"
+            },
+            "body": "Hey @Prashant4900, \r\n\r\n> in general if we created a new user in Django it's rather than user supabase users it's created our own new table ( users ) database.\r\n\r\nCould you elaborate more on this point?\r\n\r\nGenerally, I would recommend to first switch django's password hashing algorithm to use `bcrypt` instead of the default `PBKDF2`. If you're looking to migrate your django users over to supabase auth, you'll need to compare the schema difference between your users table in django and the `auth.users` table in Supabase and map the appropriate fields accordingly.    ",
+            "createdAt": "2021-09-17T04:18:00Z"
+          }
+        ]
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-13T09:53:06Z"
+    },
+    {
+      "id": "D_kwDODMpXOc4ANo6T",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/1075218?v=4",
+        "url": "https://github.com/sanketch",
+        "login": "sanketch"
+      },
+      "body": "Hey! Is there a way to modify the JWT somehow before it is returned to the user? We want to use CubeJS's multi-tenancy feature, and in order to do that we need to pass in the CubeJS's security context in the token. \r\n\r\nOne solution is to send over the supabase token to a backend service that then creates another token with CubeJS. This token is then stored in client local storage. But trying to see if there is an approach where we can modify it before the auth token is sent from supabase to save another trip. Any thoughts?\r\n\r\nhttps://cube.dev/docs/security",
+      "title": "Modifying the JWT before it is sent from supabase",
+      "answer": {
+        "author": {
+          "avatarUrl": "https://avatars.githubusercontent.com/u/28647601?u=6affdd8462b37219bab90e93e91d6800feeaaea9&v=4",
+          "login": "kangmingtay"
+        },
+        "body": "Hey @sanketch, we expose the `JWT_SECRET` on the dashboard under the \"Settings\" -> \"API\" page. You can use that `JWT_SECRET` to sign it after updating the JWT payload. However, do note that this should be done on the backend / server-side instead of on the client because the `JWT_SECRET` should not be exposed.",
+        "createdAt": "2021-09-17T04:12:59Z"
+      },
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 1,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/28647601?u=6affdd8462b37219bab90e93e91d6800feeaaea9&v=4",
+              "url": "https://github.com/kangmingtay",
+              "login": "kangmingtay"
+            },
+            "body": "Hey @sanketch, we expose the `JWT_SECRET` on the dashboard under the \"Settings\" -> \"API\" page. You can use that `JWT_SECRET` to sign it after updating the JWT payload. However, do note that this should be done on the backend / server-side instead of on the client because the `JWT_SECRET` should not be exposed.",
+            "createdAt": "2021-09-17T04:12:59Z"
+          }
+        ]
+      },
+      "upvoteCount": 2,
+      "createdAt": "2021-09-15T21:33:25Z"
+    },
+    {
+      "id": "D_kwDODMpXOc4ANnve",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/38829404?u=205777e46c675f088ecad68aee2005eace313de1&v=4",
+        "url": "https://github.com/zgramming",
+        "login": "zgramming"
+      },
+      "body": "I'm confused whether this should be a separate question or not, but I have 2 questions regarding Realtime Database, and i integrated **Supabase** with **Flutter**\r\n\r\nIn this [docs](https://supabase.io/docs/reference/javascript/subscribe) about Realtime Database, it is very clear that we can listen for any changes in our table by defining table and action what we want listen (Insert,Update,Delete). And even better, we can listen [to row level change](https://supabase.io/docs/reference/javascript/subscribe#listening-to-row-level-changes).\r\n\r\nBut i have some special cases which have not been explained in the documentation, let me explain this.\r\n\r\n\r\n## Table Profile\r\n<table>\r\n<thead>\r\n<tr>\r\n<th>id</th>\r\n<th>id_user</th>\r\n<th>name</th>\r\n<th>email</th>\r\n<th>picture_profile</th>\r\n</tr>\r\n</thead>\r\n<tbody>\r\n<tr>\r\n<td>1</td>\r\n<td>55c0aa7c-d479-41b9-b06a-470c13f35bc1</td>\r\n<td>Zeffry Reynando</td>\r\n<td>zeffry.reynando@gmail.com</td>\r\n<td>https://example.com/image.png</td>\r\n</tr>\r\n<tr>\r\n<td>2</td>\r\n<td>58a3eebf-98c1-46e3-8603-08c266676f43</td>\r\n<td>Icha</td>\r\n<td>icha@gmail.com</td>\r\n<td>https://example.com/image2.png</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n\r\n## Table Inbox\r\n<table>\r\n<thead>\r\n<tr>\r\n<th>id</th>\r\n<th>inbox_channel</th>\r\n<th>id_user</th>\r\n<th>id_sender</th>\r\n<th>message</th>\r\n<th>message_date</th>\r\n</tr>\r\n</thead>\r\n<tbody>\r\n<tr>\r\n<td>1</td>\r\n<td>1_2</td>\r\n<td>1</td>\r\n<td>1</td>\r\n<td>Halo ?</td>\r\n<td>111122223333</td>\r\n</tr>\r\n<tr>\r\n<td>2</td>\r\n<td>1_2</td>\r\n<td>2</td>\r\n<td>1</td>\r\n<td>Halo ?</td>\r\n<td>111122223333</td>\r\n</tr>\r\n\r\n</tbody>\r\n</table>\r\n\r\n> I have made an example table above, to make it easier to explain what I mean.\r\n\r\n# 1. Custom return onSubscribe\r\n\r\n```\r\nconst mySubscription = supabase\r\n  .from('inbox')\r\n  .on('*', payload => {\r\n    console.log('Change received!', payload)\r\n  })\r\n  .subscribe()\r\n```\r\n\r\nWhen there is a change in the our table (UPDATE,INSERT,DELETE), `onSubscribe` give us return **object**. If we use the example table above, when table **inbox** there is data change `onSubscribe` will give us : \r\n\r\n```\r\n{\r\n \"id\": \"2\",\r\n \"inbox_channel\" : \"1_2\",\r\n \"id_user\" : \"1\",\r\n \"id_sender\" : \"2\",\r\n \"message\" : \"halooo\",\r\n \"message_date\" : 1112223333\r\n}\r\n```\r\nIs possible we can custom return callback like this  ? : \r\n\r\n```\r\n \"id\": \"2\",\r\n \"inbox_channel\" : \"1_2\",\r\n /// It from profile table\r\n \"user\" : {\r\n        \"id\" : \"1\",\r\n        \"id_user\" : \"55c0aa7c-d479-41b9-b06a-470c13f35bc1\",\r\n        \"name\" : \"zeffry\",\r\n        \"email\" : \"zeffry.reynando@gmail.com\",\r\n        \"picture_profile\" : \"https://example.com/image1.png\",\r\n }\r\n \r\n \"sender\" : {\r\n        \"id\" : \"2\",\r\n        \"id_user\" : \"58a3eebf-98c1-46e3-8603-08c266676f43\",\r\n        \"name\" : \"icha\",\r\n        \"email\" : \"icha@gmail.com\",\r\n        \"picture_profile\" : \"https://example.com/image2.png\",\r\n }\r\n \"message\" : \"halooo\",\r\n \"message_date\" : 1112223333\r\n}\r\n```\r\nIf we use standar select, it's can be achieve using [JOIN](https://supabase.io/docs/reference/javascript/select#query-foreign-tables).\r\n\r\n```\r\nsupabase.from(\"inbox\")\r\n        .select(\"*, user:id_user(*), sender:id_sender(*)\")\r\n        .eq('id_user', idUser)\r\n        .execute();\r\n```\r\n\r\nBut i don't know implement it when using `onSubscribe`.\r\n\r\n\r\n\r\n# 2. Multiple Where clause onSubscribe\r\n\r\nAs I explained above, we can listen to changes down [to row level change](https://supabase.io/docs/reference/javascript/subscribe#listening-to-row-level-changes). In documentation, as far as I understand it is only described using 1 filter. \r\n\r\n```\r\nconst mySubscription = supabase\r\n  .from('countries:id=eq.200')\r\n  .on('UPDATE', handleRecordUpdated)\r\n  .subscribe()\r\n```\r\n\r\nIt's possible use multiple where clause on `onSubscribe` ?  something like this\r\n\r\n```\r\nconst mySubscription = supabase\r\n  .from('countries:id=eq.200, countries:id_user=eq.100')\r\n  .on('UPDATE', handleRecordUpdated)\r\n  .subscribe()\r\n```\r\n\r\nThank's.",
+      "title": "Is possible custom return Database Realtime onSubscribe & multiple where clause on it ?",
+      "answer": {
+        "author": {
+          "avatarUrl": "https://avatars.githubusercontent.com/u/38829404?u=205777e46c675f088ecad68aee2005eace313de1&v=4",
+          "login": "zgramming"
+        },
+        "body": "Hi @dshukertjr ! thank's for your response. \r\n\r\n> Also, if you are using Flutter, it might be easier to listen to realtime data using stream() method! Let me know what you think of it!\r\n\r\nYes, because my project using flutter and Supabase package support to using [stream](https://pub.dev/packages/supabase/example) in pub.dev, i already implement like this : \r\n\r\n```\r\nfinal boxProfile = Hive.box<ProfileHiveModel>(Constant.hiveKeyBoxProfile);\r\nfinal listen = Constant.supabase\r\n      .from(\"inbox:id_user=eq.${user?.id}\")\r\n      .stream()\r\n      .order('inbox_last_message_date')\r\n      .execute()\r\n      .listen((events) async {\r\n    if (events.isNotEmpty) {\r\n      ProfileModel? sender;\r\n\r\n      /// Check if sender exists in Hive Box\r\n      /// if exists, we used it from local database\r\n      /// otherwise call API\r\n      for (final event in events) {\r\n        if (boxProfile.containsKey(event['id_sender'])) {\r\n          final getProfile = boxProfile.get(event['id_sender']);\r\n          sender = const ProfileHiveModel().convertToProfileModel(getProfile);\r\n        } else {\r\n          sender = await SupabaseQuery.instance.getUserById(event['id_sender'] as int);\r\n          boxProfile.put(sender.id, const ProfileHiveModel().convertFromProfileModel(sender));\r\n        }\r\n\r\n        final inbox = InboxModel.fromJson(event).copyWith(sender: sender);\r\n        ref.read(InboxProvider.provider.notifier).upsertInbox(inbox);\r\n      }\r\n    }\r\n  });\r\n```\r\nA little explain about above code, i listen to table **inbox** where id_user equal to user login id, so i only receive return from stream where have any changes on table **inbox** equal to id_user. Then i check if sender exists in my local database **(Hive in my case)**, if sender exists in the local then i using from local, otherwise i call API to supabase to get user by id. \r\n\r\nIt's works what i expected, but i notice return from stream is `List<Map<String,dynamic>>` . The problem about this (IMO), if only single row changes in **Inbox**, it will return all data on **inbox** equal to id_user i have defined before. Let me explain this with table : \r\n\r\n<table>\r\n    <thead>\r\n        <tr>\r\n            <th>id</th>\r\n            <th>inbox_channel</th>\r\n            <th>id_user</th>\r\n            <th>id_sender</th>\r\n            <th>message</th>\r\n            <th>message_date</th>\r\n            <th>X</th>\r\n        </tr>\r\n    </thead>\r\n    <tbody>\r\n        <tr>\r\n            <td>1</td>\r\n            <td>1_2</td>\r\n            <td>1</td>\r\n            <td>2</td>\r\n            <td>Hello Zeffry I icha</td>\r\n            <td>123456</td>\r\n            <td>Only this row have changes on table</td>\r\n        </tr>\r\n        <tr>\r\n            <td>2</td>\r\n            <td>1_3</td>\r\n            <td>1</td>\r\n            <td>3</td>\r\n            <td>Hello Zeffry I riri</td>\r\n            <td>123456</td>\r\n        </tr>\r\n        <tr>\r\n            <td>1</td>\r\n            <td>1_4</td>\r\n            <td>1</td>\r\n            <td>4</td>\r\n            <td>Hello Zeffry I budi</td>\r\n            <td>123456</td>\r\n        </tr>\r\n        <tr>\r\n            <td>1</td>\r\n            <td>1_5</td>\r\n            <td>1</td>\r\n            <td>5</td>\r\n            <td>Hello Zeffry I joko</td>\r\n            <td>123456</td>\r\n        </tr>\r\n    </tbody>\r\n</table>\r\n\r\nAs I described above, if only **id 1** have changes  in **inbox**, then stream will return all data on **inbox** equal id_user. So stream will return like this : \r\n\r\n## return from stream\r\n```\r\n[{\"id\":1,\"inbox_channel\":\"1_2\",\"id_user\":\"1\",\"id_sender\":\"2\",\"message\":\"hello zeffry i icha\",\"message_date\":\"11112222333\"},{\"id\":2,\"inbox_channel\":\"1_3\",\"id_user\":\"1\",\"id_sender\":\"3\",\"message\":\"hello zeffry i riri\",\"message_date\":\"11112222333\"},{\"id\":1,\"inbox_channel\":\"1_4\",\"id_user\":\"1\",\"id_sender\":\"4\",\"message\":\"hello zeffry i budi\",\"message_date\":\"11112222333\"},{\"id\":1,\"inbox_channel\":\"1_5\",\"id_user\":\"1\",\"id_sender\":\"5\",\"message\":\"hello zeffry i joko\",\"message_date\":\"11112222333\"}]\r\n```\r\n\r\nIf we using **onSubscribe**, it will return single data only changes on **inbox** and we have ability to detect is **Delete/Insert/Update** type.\r\n\r\n## return from onSubscribe(only data changes return)\r\n\r\n```\r\n{\"id\":1,\"inbox_channel\":\"1_2\",\"id_user\":\"1\",\"id_sender\":\"2\",\"message\":\"hello zeffry i icha\",\"message_date\":\"11112222333\"}\r\n```\r\n\r\nThe problem i think use **stream** rather than **onSubscribe** is if my **inbox** have large data example 1000 rows with id_user == 1, then if only 1 row changes in **inbox**, stream will return 1000 rows. \r\nSo i ask about best practice to handle this scenario, it's okay if stream will return all data although is only 1 row changes in **inbox** or any recommendation ?\r\n\r\n\r\n> You would achieve this by creating multiple listeners:\r\n\r\nFor second question, i think your advice it's not suitable for me. Because you create **2 subscribe**, but i need only **1 subscribe** with multiple where clause. \r\n\r\nIf i follow your advice, it will create **2 subscribe** then if subscribe detect changes on table it will multiple return.\r\n\r\nSo **onSubscribe** can't execute multiple where clause like my example above ? \r\n\r\n```\r\nconst mySubscription = supabase\r\n  .from('countries:id=eq.200, countries:id_user=eq.100')\r\n  .on('UPDATE', handleRecordUpdated)\r\n  .subscribe()\r\n```",
+        "createdAt": "2021-09-15T02:13:45Z"
+      },
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 2,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/18113850?u=d27502ff73c45f1f38b8c7ed002238a8d466f2f8&v=4",
+              "url": "https://github.com/dshukertjr",
+              "login": "dshukertjr"
+            },
+            "body": "Hi @zgramming!\r\n\r\n>1. Custom return onSubscribe\r\n\r\nThis is not possible currently due to the limitation of realtime. What I would do in your case is setup a listener on `inbox` like you have, and also create a variable to store profile data of different users. Whenever you get a new message in the `inbox`, you can search within the profile variable to see if you already have that profile in memory. If not, you can go get it with standard `select()` query. Supabase is really fast, so this should still feel relatively realtime.\r\n\r\nWould this be a viable solution in your case?\r\n\r\nAlso, if you are using Flutter, it might be easier to listen to realtime data using [`stream()`](https://supabase.io/docs/reference/dart/stream) method! Let me know what you think of it!\r\n\r\n>2. Multiple Where clause onSubscribe\r\n\r\nYou would achieve this by creating multiple listeners:\r\n\r\n```typescript\r\nconst mySubscription = supabase\r\n  .from('countries:id=eq.200')\r\n  .on('UPDATE', handleRecordUpdated)\r\n  .subscribe()\r\n  \r\n  const anotherSubscription = supabase\r\n  .from('countries:id=eq.300')\r\n  .on('UPDATE', handleRecordUpdated)\r\n  .subscribe()\r\n```",
+            "createdAt": "2021-09-14T22:15:46Z"
+          },
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/38829404?u=205777e46c675f088ecad68aee2005eace313de1&v=4",
+              "url": "https://github.com/zgramming",
+              "login": "zgramming"
+            },
+            "body": "Hi @dshukertjr ! thank's for your response. \r\n\r\n> Also, if you are using Flutter, it might be easier to listen to realtime data using stream() method! Let me know what you think of it!\r\n\r\nYes, because my project using flutter and Supabase package support to using [stream](https://pub.dev/packages/supabase/example) in pub.dev, i already implement like this : \r\n\r\n```\r\nfinal boxProfile = Hive.box<ProfileHiveModel>(Constant.hiveKeyBoxProfile);\r\nfinal listen = Constant.supabase\r\n      .from(\"inbox:id_user=eq.${user?.id}\")\r\n      .stream()\r\n      .order('inbox_last_message_date')\r\n      .execute()\r\n      .listen((events) async {\r\n    if (events.isNotEmpty) {\r\n      ProfileModel? sender;\r\n\r\n      /// Check if sender exists in Hive Box\r\n      /// if exists, we used it from local database\r\n      /// otherwise call API\r\n      for (final event in events) {\r\n        if (boxProfile.containsKey(event['id_sender'])) {\r\n          final getProfile = boxProfile.get(event['id_sender']);\r\n          sender = const ProfileHiveModel().convertToProfileModel(getProfile);\r\n        } else {\r\n          sender = await SupabaseQuery.instance.getUserById(event['id_sender'] as int);\r\n          boxProfile.put(sender.id, const ProfileHiveModel().convertFromProfileModel(sender));\r\n        }\r\n\r\n        final inbox = InboxModel.fromJson(event).copyWith(sender: sender);\r\n        ref.read(InboxProvider.provider.notifier).upsertInbox(inbox);\r\n      }\r\n    }\r\n  });\r\n```\r\nA little explain about above code, i listen to table **inbox** where id_user equal to user login id, so i only receive return from stream where have any changes on table **inbox** equal to id_user. Then i check if sender exists in my local database **(Hive in my case)**, if sender exists in the local then i using from local, otherwise i call API to supabase to get user by id. \r\n\r\nIt's works what i expected, but i notice return from stream is `List<Map<String,dynamic>>` . The problem about this (IMO), if only single row changes in **Inbox**, it will return all data on **inbox** equal to id_user i have defined before. Let me explain this with table : \r\n\r\n<table>\r\n    <thead>\r\n        <tr>\r\n            <th>id</th>\r\n            <th>inbox_channel</th>\r\n            <th>id_user</th>\r\n            <th>id_sender</th>\r\n            <th>message</th>\r\n            <th>message_date</th>\r\n            <th>X</th>\r\n        </tr>\r\n    </thead>\r\n    <tbody>\r\n        <tr>\r\n            <td>1</td>\r\n            <td>1_2</td>\r\n            <td>1</td>\r\n            <td>2</td>\r\n            <td>Hello Zeffry I icha</td>\r\n            <td>123456</td>\r\n            <td>Only this row have changes on table</td>\r\n        </tr>\r\n        <tr>\r\n            <td>2</td>\r\n            <td>1_3</td>\r\n            <td>1</td>\r\n            <td>3</td>\r\n            <td>Hello Zeffry I riri</td>\r\n            <td>123456</td>\r\n        </tr>\r\n        <tr>\r\n            <td>1</td>\r\n            <td>1_4</td>\r\n            <td>1</td>\r\n            <td>4</td>\r\n            <td>Hello Zeffry I budi</td>\r\n            <td>123456</td>\r\n        </tr>\r\n        <tr>\r\n            <td>1</td>\r\n            <td>1_5</td>\r\n            <td>1</td>\r\n            <td>5</td>\r\n            <td>Hello Zeffry I joko</td>\r\n            <td>123456</td>\r\n        </tr>\r\n    </tbody>\r\n</table>\r\n\r\nAs I described above, if only **id 1** have changes  in **inbox**, then stream will return all data on **inbox** equal id_user. So stream will return like this : \r\n\r\n## return from stream\r\n```\r\n[{\"id\":1,\"inbox_channel\":\"1_2\",\"id_user\":\"1\",\"id_sender\":\"2\",\"message\":\"hello zeffry i icha\",\"message_date\":\"11112222333\"},{\"id\":2,\"inbox_channel\":\"1_3\",\"id_user\":\"1\",\"id_sender\":\"3\",\"message\":\"hello zeffry i riri\",\"message_date\":\"11112222333\"},{\"id\":1,\"inbox_channel\":\"1_4\",\"id_user\":\"1\",\"id_sender\":\"4\",\"message\":\"hello zeffry i budi\",\"message_date\":\"11112222333\"},{\"id\":1,\"inbox_channel\":\"1_5\",\"id_user\":\"1\",\"id_sender\":\"5\",\"message\":\"hello zeffry i joko\",\"message_date\":\"11112222333\"}]\r\n```\r\n\r\nIf we using **onSubscribe**, it will return single data only changes on **inbox** and we have ability to detect is **Delete/Insert/Update** type.\r\n\r\n## return from onSubscribe(only data changes return)\r\n\r\n```\r\n{\"id\":1,\"inbox_channel\":\"1_2\",\"id_user\":\"1\",\"id_sender\":\"2\",\"message\":\"hello zeffry i icha\",\"message_date\":\"11112222333\"}\r\n```\r\n\r\nThe problem i think use **stream** rather than **onSubscribe** is if my **inbox** have large data example 1000 rows with id_user == 1, then if only 1 row changes in **inbox**, stream will return 1000 rows. \r\nSo i ask about best practice to handle this scenario, it's okay if stream will return all data although is only 1 row changes in **inbox** or any recommendation ?\r\n\r\n\r\n> You would achieve this by creating multiple listeners:\r\n\r\nFor second question, i think your advice it's not suitable for me. Because you create **2 subscribe**, but i need only **1 subscribe** with multiple where clause. \r\n\r\nIf i follow your advice, it will create **2 subscribe** then if subscribe detect changes on table it will multiple return.\r\n\r\nSo **onSubscribe** can't execute multiple where clause like my example above ? \r\n\r\n```\r\nconst mySubscription = supabase\r\n  .from('countries:id=eq.200, countries:id_user=eq.100')\r\n  .on('UPDATE', handleRecordUpdated)\r\n  .subscribe()\r\n```",
+            "createdAt": "2021-09-15T02:13:45Z"
+          }
+        ]
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-14T05:28:12Z"
+    },
+    {
+      "id": "D_kwDODMpXOc4ANoZA",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/694225?v=4",
+        "url": "https://github.com/grschafer",
+        "login": "grschafer"
+      },
+      "body": "I'm currently hosting and using PostgREST on its own and I'm thinking about moving to Supabase. I'm trying to figure out how to fit the following workflow into Supabase:\r\n\r\n> I'd like to provide a long-lived API token (JWT) for each user of my webapp. Users would use this token in their own CLI tools and scripts to auth access to my API. So, the token would be similar in usage to e.g. Stripe API tokens or AWS credentials or the Supabase `service_role` token. Given that the token would be long-lived, I want to let the user revoke it and mint a new one on a user-settings page in my webapp.\r\n\r\nThe [suggested way to do this with PostgREST](https://postgrest.org/en/v8.0/tutorials/tut1.html#bonus-topic-immediate-revocation) is to add a `pre-request` function that can verify the token (e.g. require a \"revocation id\" custom claim in the JWT, which gets looked up in the database to see if the token has been revoked or not). Using the `pre-request` approach came up in a recent discussion about rotating the `service_role` key (https://github.com/supabase/supabase/discussions/2265#discussioncomment-1230872). Is adding the `pre-request` config option to the Supabase Admin UI on the roadmap? Should a feature-request issue be created for it?\r\n\r\nI suppose an alternative approach might be to add a policy to every table which calls a verify-token function which raises an exception if the JWT is revoked. This feels non-DRY and a bit error-prone though, and I'm not sure how much it might impact performance (maybe it's not too bad if the verify-token function is [marked as stable](https://www.postgresql.org/docs/current/xfunc-volatility.html)?). I'm curious if anyone else here has considered how to handle this situation and found a nicer solution that I'm missing, or if waiting for `pre-request` in Supabase is the best case.\r\n\r\nThanks!",
+      "title": "How to provide a long-lived, revocable API token to users?",
+      "answer": {
+        "author": {
+          "avatarUrl": "https://avatars.githubusercontent.com/u/1829294?u=8ad4fe0b6485e806601d2c2128fa37f536205034&v=4",
+          "login": "steve-chavez"
+        },
+        "body": "> Should a feature-request issue be created for it?\r\n\r\nYeah, I think this is your best bet.\r\n\r\n> I suppose an alternative approach might be to add a policy to every table which calls a verify-token function which raises an exception if the JWT is revoked. This feels non-DRY and a bit error-prone though, and I'm not sure how much it might impact performance\r\n\r\nHm, that might work but it looks much more complicated than the pre-request approach - you'd need to repeat the condition for every policy(which in turn, will be applied for every query, impacting perf).",
+        "createdAt": "2021-09-16T23:43:16Z"
+      },
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 2,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/1829294?u=8ad4fe0b6485e806601d2c2128fa37f536205034&v=4",
+              "url": "https://github.com/steve-chavez",
+              "login": "steve-chavez"
+            },
+            "body": "> Should a feature-request issue be created for it?\r\n\r\nYeah, I think this is your best bet.\r\n\r\n> I suppose an alternative approach might be to add a policy to every table which calls a verify-token function which raises an exception if the JWT is revoked. This feels non-DRY and a bit error-prone though, and I'm not sure how much it might impact performance\r\n\r\nHm, that might work but it looks much more complicated than the pre-request approach - you'd need to repeat the condition for every policy(which in turn, will be applied for every query, impacting perf).",
+            "createdAt": "2021-09-16T23:43:16Z"
+          },
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/694225?v=4",
+              "url": "https://github.com/grschafer",
+              "login": "grschafer"
+            },
+            "body": "Thanks for the response! I've opened an issue for that here: https://github.com/supabase/supabase/issues/3233\r\n\r\nHopefully this fits in with existing work to expose PostgREST's `db-schema` config (https://github.com/supabase/supabase/discussions/1222), so it's not too big of an ask!",
+            "createdAt": "2021-09-17T01:32:00Z"
+          }
+        ]
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-14T23:13:15Z"
+    },
+    {
+      "id": "MDEwOkRpc2N1c3Npb24xNzM2NTA2",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/61484145?u=e20364fd3facedce2762d88ce2b9d0ec3d930881&v=4",
+        "url": "https://github.com/pearlslugs",
+        "login": "pearlslugs"
+      },
+      "body": "I keep having my connection closed while trying to add a large amount of columns, is there any work around for this?",
+      "title": "Inserting large amount of data",
+      "answer": {
+        "author": {
+          "avatarUrl": "https://avatars.githubusercontent.com/u/1829294?u=8ad4fe0b6485e806601d2c2128fa37f536205034&v=4",
+          "login": "steve-chavez"
+        },
+        "body": "**Edit**: `supabase-js/postgrest-js` now use the `columns` query parameter by default, no need to go to through the REST API for this.\r\n\r\n@pearlslugs How are you adding the large amount of columns?\r\n\r\nYou could try inserting the big payload through the REST API. There's a special [columns query parameter](https://postgrest.org/en/v7.0.0/api.html#specifying-columns) that can help with large bulk inserts.\r\n\r\nThere are curl snippets in `https://app.supabase.io/project/<your_project_id>/api/default?resource=<your_table>`(click the API icon and then the Bash tab to go here).",
+        "createdAt": "2021-01-12T20:26:24Z"
+      },
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 2,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/1829294?u=8ad4fe0b6485e806601d2c2128fa37f536205034&v=4",
+              "url": "https://github.com/steve-chavez",
+              "login": "steve-chavez"
+            },
+            "body": "**Edit**: `supabase-js/postgrest-js` now use the `columns` query parameter by default, no need to go to through the REST API for this.\r\n\r\n@pearlslugs How are you adding the large amount of columns?\r\n\r\nYou could try inserting the big payload through the REST API. There's a special [columns query parameter](https://postgrest.org/en/v7.0.0/api.html#specifying-columns) that can help with large bulk inserts.\r\n\r\nThere are curl snippets in `https://app.supabase.io/project/<your_project_id>/api/default?resource=<your_table>`(click the API icon and then the Bash tab to go here).",
+            "createdAt": "2021-01-12T20:26:24Z"
+          },
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/5748289?u=1ec8adaac4995dfc06b4b5af48bfbbcff503770f&v=4",
+              "url": "https://github.com/thorwebdev",
+              "login": "thorwebdev"
+            },
+            "body": "Appending some more ideas that might be useful:\r\n\r\nYou might want to consider using the rpc function from the supabase-js client library to handle bulk processing as well (https://supabase.io/docs/reference/javascript/rpc#bulk-processing).\r\n\r\nOutside of the client library, if you're looking to optimise the performance of bulk inserts on the database level, you can consider using a prepared INSERT statement and execute it as many times as you want (reduces the query planning time). You can also refer to this document on the Postgres site that explains how you can go around inserting large amounts of data into your db. (https://www.postgresql.org/docs/current/populate.html)",
+            "createdAt": "2021-09-16T10:42:47Z"
+          }
+        ]
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-01-12T18:54:16Z"
+    },
+    {
+      "id": "MDEwOkRpc2N1c3Npb24zNDgxNTI5",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/33632126?u=2aef8e3b9487aa6b1cca92ddef7513a4dca67ad7&v=4",
+        "url": "https://github.com/richiemcilroy",
+        "login": "richiemcilroy"
+      },
+      "body": "I went to add a LinkedIn sign in button yesterday and realised that it's not an auth option - can this be added? Or is this something that I could potentially create myself and submit as a pull request?",
+      "title": "LinkedIn Auth",
+      "answer": null,
+      "category": {
+        "name": "Ideas"
+      },
+      "comments": {
+        "totalCount": 2,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
+              "url": "https://github.com/inian",
+              "login": "inian"
+            },
+            "body": "This is not on the roadmap yet @richiemcilroy, but Pull requests welcome :) For example, [this](https://github.com/supabase/gotrue/pull/135) is how the Twitch provider was implemented which should be a good starting point",
+            "createdAt": "2021-07-28T03:17:38Z"
+          },
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/7243879?u=ffcab6516136e7fb15edb6c3173ebfaa95b1d310&v=4",
+              "url": "https://github.com/FlorianBouron",
+              "login": "FlorianBouron"
+            },
+            "body": "> I went to add a LinkedIn sign in button yesterday and realised that it's not an auth option - can this be added? Or is this something that I could potentially create myself and submit as a pull request?\n\nDid you start any PR about this?\nI am interested in it as well.",
+            "createdAt": "2021-09-16T10:48:50Z"
+          }
+        ]
+      },
+      "upvoteCount": 2,
+      "createdAt": "2021-07-27T15:35:23Z"
+    },
+    {
+      "id": "D_kwDODMpXOc4ANpgR",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/59526869?v=4",
+        "url": "https://github.com/roker15",
+        "login": "roker15"
+      },
+      "body": "I have three user role **author, editor and publishe**r .. how to do this in supabase. earlier disucssion did not help me. auth.user has role **authenticated** only.",
+      "title": "I have three user role author, editor and publisher .. how to do this in supabase. earlier disucssion did not help me.",
+      "answer": {
+        "author": {
+          "avatarUrl": "https://avatars.githubusercontent.com/u/458736?u=7bc13764a2f8dd974acc7ca284850390a6f914e0&v=4",
+          "login": "awalias"
+        },
+        "body": "hey @roker15 thanks for the question but please refrain from spamming the discussion board, if useful you can refer to the answers on your previous question here: https://github.com/supabase/supabase/discussions/3129\r\n\r\nyou can implement this at the schema level as per the example linked, but our API gateway does not yet currently support custom \"postgres level roles\", this is being worked on and should be available in the coming months",
+        "createdAt": "2021-09-16T17:31:58Z"
+      },
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 1,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/458736?u=7bc13764a2f8dd974acc7ca284850390a6f914e0&v=4",
+              "url": "https://github.com/awalias",
+              "login": "awalias"
+            },
+            "body": "hey @roker15 thanks for the question but please refrain from spamming the discussion board, if useful you can refer to the answers on your previous question here: https://github.com/supabase/supabase/discussions/3129\r\n\r\nyou can implement this at the schema level as per the example linked, but our API gateway does not yet currently support custom \"postgres level roles\", this is being worked on and should be available in the coming months",
+            "createdAt": "2021-09-16T17:31:58Z"
+          }
+        ]
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-16T17:23:31Z"
+    },
+    {
+      "id": "MDEwOkRpc2N1c3Npb24zNTY1MDYy",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/59526869?v=4",
+        "url": "https://github.com/roker15",
+        "login": "roker15"
+      },
+      "body": "I see something like this \r\n`const { data, error } = useSWR(`/api/user/${id}`, fetcher)`\r\nThen what will be the `fetcher` in case of super base?\r\n\r\nI tried following but did not worked \r\n```\r\n\r\nconst fetcher = async () =>  await supabase.from(\"papers\").select(\"*\");\r\n\r\n const { data } = useSWR(\"/api/article\", fetcher);\r\n```",
+      "title": "How to use Supabase with SWR?",
+      "answer": null,
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 2,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/5748289?u=1ec8adaac4995dfc06b4b5af48bfbbcff503770f&v=4",
+              "url": "https://github.com/thorwebdev",
+              "login": "thorwebdev"
+            },
+            "body": "I haven't looked into it, but you might find https://github.com/EdgarBarrantes/supabase-utils useful.",
+            "createdAt": "2021-09-14T03:44:51Z"
+          },
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/8291514?u=2960d72247d0460343d4fd9acbbf02c6abf1dd51&v=4",
+              "url": "https://github.com/MildTomato",
+              "login": "MildTomato"
+            },
+            "body": "it looks like a rather odd way of using SWR - it looks like you may have gotten that url \"api/user/${id}\" from the [SWR docs](https://swr.vercel.app/docs/getting-started#make-it-reusable), but it looks like you just want to run supabase-js in client.\r\n\r\nI think if you really wanted to use SWR here, it might look a bit like this.\r\n(not tested this though).\r\n\r\n```js\r\nconst fetcher = async (table) =>  await supabase.from(table).select(\"*\");\r\n\r\nfunction App () {\r\n  const { data, error } = useSWR('papers', fetcher)\r\n \r\n  if (!data) return \"loading\"\r\n  // ...\r\n}\r\n```\r\n\r\nIt think this is rather obtuse though, since if you are just getting the data client side, then you can just use supabase-js and drop SWR and it will behave pretty much the same.\r\n",
+            "createdAt": "2021-09-15T07:45:27Z"
+          }
+        ]
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-10T10:27:18Z"
+    },
+    {
+      "id": "MDEwOkRpc2N1c3Npb24zNDQ3ODQ1",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/63981639?u=0d13b5f15c463560f812096925b9db7adc27d0a0&v=4",
+        "url": "https://github.com/Vinzent03",
+        "login": "Vinzent03"
+      },
+      "body": "I am **really** new to sql in general and want to use python in my functions, because I need to use postgis. It's not listed in the extensions list and enabling via \r\n\r\n`CREATE EXTENSION plpythonu3` throws the following error: \r\n\r\n`could not open extension control file \"/usr/share/postgresql/12/extension/plpythonu3.control\": No such file or directory`",
+      "title": "Add plpythonu3 extension",
       "answer": {
         "author": {
           "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
           "login": "inian"
         },
-        "body": "Hi @Criepstar, we will bring in a more powerful template editor at a later date, but for now you can get the confirmation URLs from the gotrue server directly. With this, you can use a third party tool to generate HTML emails and embed the confirmation URLs in the templates programatically - [docs](https://supabase.io/blog/2021/07/28/supabase-auth-passwordless-sms-login#generate-confirmation-links)",
-        "createdAt": "2021-08-18T03:30:32Z"
+        "body": "Hi @Vinzent03, we are not planning to offer [untrusted extensions](https://www.postgresql.org/docs/9.1/plpython.html) in Supabase in the near future. It is hard to limit the functionality of these untrusted extensions and a malicious user can make the platform unsafe for everyone. ",
+        "createdAt": "2021-07-07T16:01:18Z"
       },
-      "createdAt": "2021-08-13T18:41:10Z"
-    },
-    {
-      "id": "MDEwOkRpc2N1c3Npb24zNTEzMTAw",
-      "author": {
-        "avatarUrl": "https://avatars.githubusercontent.com/u/9329005?u=45801d27fe4bdadd63566c7324ddae511607da05&v=4",
-        "url": "https://github.com/donPuerto",
-        "login": "donPuerto"
+      "category": {
+        "name": "Q&A"
       },
-      "body": "I know there so many ways of doing this, but i want to know the best pattern in supabase?\r\n\r\nthanks",
-      "title": "How to implement soft delete",
-      "answer": {
-        "author": {
-          "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
-          "login": "inian"
-        },
-        "body": "Hi @donPuerto, I personally prefer having a status column as a postgres enum type and setting it to \"DELETED\" for soft deletes.",
-        "createdAt": "2021-08-18T03:24:34Z"
+      "comments": {
+        "totalCount": 1,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
+              "url": "https://github.com/inian",
+              "login": "inian"
+            },
+            "body": "Hi @Vinzent03, we are not planning to offer [untrusted extensions](https://www.postgresql.org/docs/9.1/plpython.html) in Supabase in the near future. It is hard to limit the functionality of these untrusted extensions and a malicious user can make the platform unsafe for everyone. ",
+            "createdAt": "2021-07-07T16:01:18Z"
+          }
+        ]
       },
-      "createdAt": "2021-08-11T14:08:41Z"
-    },
-    {
-      "id": "MDEwOkRpc2N1c3Npb24zNTE3ODM2",
-      "author": {
-        "avatarUrl": "https://avatars.githubusercontent.com/u/5142194?u=df68f5eb68c33ba3e0a7ce85401341108f452c1e&v=4",
-        "url": "https://github.com/Danieltech99",
-        "login": "Danieltech99"
-      },
-      "body": "Is it possible to download a folder from the Storage Dashboard Page?\r\n\r\nThis is an important feature for many use cases. Or equivalently being able to download all storage items for backup purposes or offline data science processing.",
-      "title": "Download storage folder from Supabase Dashboard",
-      "answer": {
-        "author": {
-          "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
-          "login": "inian"
-        },
-        "body": "We are tracking the feature here @Danieltech99 https://github.com/supabase/storage-api/issues/27",
-        "createdAt": "2021-08-18T03:22:27Z"
-      },
-      "createdAt": "2021-08-14T03:24:07Z"
+      "upvoteCount": 1,
+      "createdAt": "2021-07-06T12:36:02Z"
     }
   ],
   "totalCount": 1099,
