@@ -5,7 +5,6 @@ tags: [Question]
 author_image_url: https://avatars.githubusercontent.com/u/36083550?u=55ec896530ada25dac87c548d4f04a3b60f79bf2&v=4
 author_url: https://github.com/mountiny
 answer: [object Object]
-answered: true
 category: Q&A
 upvoteCount: 1
 commentCount: 1
@@ -22,3 +21,29 @@ However, I struggle to find a way how to create these in database as the call wi
 Do  you have any idea or tips how to achieve this workflow? 
 
 Thank you very much!
+
+---
+### Suggested answer
+__kiwicopple__ `9 months ago`
+
+Are you saving the user to the public schema too ? https://supabase.io/docs/guides/auth#create-a-publicusers-table
+
+If you are then you can probably do this in your signup function. Something like this
+
+```js
+const signUpUser = async (email, password, role) => {
+
+  const { user, error } = await supabase
+    .auth
+    .signUp({ email, password})
+    
+  const { data, error } = await supabase
+    .from('user')
+    .update({ role })
+    .eq('id', user.id) 
+}
+```
+
+Hope that helps!
+
+

@@ -5,7 +5,6 @@ tags: [Question]
 author_image_url: https://avatars.githubusercontent.com/u/694225?v=4
 author_url: https://github.com/grschafer
 answer: [object Object]
-answered: true
 category: Q&A
 upvoteCount: 1
 commentCount: 2
@@ -22,3 +21,16 @@ The [suggested way to do this with PostgREST](https://postgrest.org/en/v8.0/tuto
 I suppose an alternative approach might be to add a policy to every table which calls a verify-token function which raises an exception if the JWT is revoked. This feels non-DRY and a bit error-prone though, and I'm not sure how much it might impact performance (maybe it's not too bad if the verify-token function is [marked as stable](https://www.postgresql.org/docs/current/xfunc-volatility.html)?). I'm curious if anyone else here has considered how to handle this situation and found a nicer solution that I'm missing, or if waiting for `pre-request` in Supabase is the best case.
 
 Thanks!
+
+---
+### Suggested answer
+__steve-chavez__ `2 days ago`
+
+> Should a feature-request issue be created for it?
+
+Yeah, I think this is your best bet.
+
+> I suppose an alternative approach might be to add a policy to every table which calls a verify-token function which raises an exception if the JWT is revoked. This feels non-DRY and a bit error-prone though, and I'm not sure how much it might impact performance
+
+Hm, that might work but it looks much more complicated than the pre-request approach - you'd need to repeat the condition for every policy(which in turn, will be applied for every query, impacting perf).
+

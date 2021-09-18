@@ -1,6 +1,65 @@
 {
   "nodes": [
     {
+      "id": "D_kwDODMpXOc4ANqPP",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/249592?u=15486d0d573222512a70584f3606c7e65b89cfe2&v=4",
+        "url": "https://github.com/harshamv",
+        "login": "harshamv"
+      },
+      "body": "I am getting this error when I try to integrate it with Prisma ORM\r\n\r\n```\r\nError occurred during query execution:\r\nConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(Error { kind: Db, cause: Some(DbError { severity: \"ERROR\", parsed_severity: Some(Error), code: SqlState(\"08P01\"), message: \"bind message supplies 1 parameters, but prepared statement \\\"s1\\\" requires 2\", detail: None, hint: None, position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some(\"postgres.c\"), line: Some(1697), routine: Some(\"exec_bind_message\") }) }) })\r\n```\r\n\r\nAny help on how to solve this?",
+      "title": "Prisma - bind message supplies 1 parameters, but prepared statement \\\"s1\\\" requires 2",
+      "answer": null,
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 0,
+        "nodes": []
+      },
+      "upvoteCount": 1,
+      "createdAt": "2021-09-18T17:33:26Z"
+    },
+    {
+      "id": "MDEwOkRpc2N1c3Npb24zNDc1Nzcy",
+      "author": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/13342175?u=ffdbe3b0b889f7227ad42df2313a1df0842c841f&v=4",
+        "url": "https://github.com/willi-nuechterlein",
+        "login": "willi-nuechterlein"
+      },
+      "body": "Hi,\r\n\r\nI'm trying to build a private table (the table should not be accessible through supabase UI).\r\nTo achieve this, I created a new schema and added the table to that schema. Like so:\r\n```sql\r\ncreate schema private;\r\ngrant usage on schema private to anon, authenticated;\r\ncreate table private.todos_private \r\n...\r\n```\r\n\r\nI also added the  `private` schema to \"Extra search path\" in `settings/api`\r\n\r\nMy problem: \r\nWhen I try to add a todo, I get the error \r\n`relation \"public.todos_private\" does not exist`\r\n\r\nWhy is the app trying to access the public schema, and how can I access the custom `private` schema through the API?\r\n\r\n(P.S. I'm using the supabase `react-todo-list` example)",
+      "title": "Access custom schema through API",
+      "answer": null,
+      "category": {
+        "name": "Q&A"
+      },
+      "comments": {
+        "totalCount": 2,
+        "nodes": [
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/18113850?u=d27502ff73c45f1f38b8c7ed002238a8d466f2f8&v=4",
+              "url": "https://github.com/dshukertjr",
+              "login": "dshukertjr"
+            },
+            "body": "I don't have an answer, but I am getting close 😅\r\n\r\nIn TypeScript, `createClient` function has options argument where you can set the schema to use like this:\r\n\r\n```typescript\r\n  const supabase = createClient('supabaseUrl', 'annonKey', { schema: 'private' })\r\n  const { data, error } = await supabase.from('posts').select()\r\n```\r\n\r\nI thought this was the answer, but when I ran this, I got an error saying `The schema must be one of the following: public, storage`. I have added `private` schema as my search path as well. ",
+            "createdAt": "2021-07-31T12:54:28Z"
+          },
+          {
+            "author": {
+              "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
+              "url": "https://github.com/inian",
+              "login": "inian"
+            },
+            "body": "Hi, everyone this is not supported yet. we need to expose the `db-schema` parameter in the dashboard to allow configuring the schemas postgrest should connect to https://postgrest.org/en/v7.0.0/configuration.html\r\n\r\nCreated an issue internally to track this",
+            "createdAt": "2021-08-03T02:22:35Z"
+          }
+        ]
+      },
+      "upvoteCount": 2,
+      "createdAt": "2021-07-24T18:17:08Z"
+    },
+    {
       "id": "D_kwDODMpXOc4ANpxO",
       "author": {
         "avatarUrl": "https://avatars.githubusercontent.com/u/55960058?v=4",
@@ -633,82 +692,6 @@
       },
       "upvoteCount": 1,
       "createdAt": "2021-09-16T17:23:31Z"
-    },
-    {
-      "id": "MDEwOkRpc2N1c3Npb24zNTY1MDYy",
-      "author": {
-        "avatarUrl": "https://avatars.githubusercontent.com/u/59526869?v=4",
-        "url": "https://github.com/roker15",
-        "login": "roker15"
-      },
-      "body": "I see something like this \r\n`const { data, error } = useSWR(`/api/user/${id}`, fetcher)`\r\nThen what will be the `fetcher` in case of super base?\r\n\r\nI tried following but did not worked \r\n```\r\n\r\nconst fetcher = async () =>  await supabase.from(\"papers\").select(\"*\");\r\n\r\n const { data } = useSWR(\"/api/article\", fetcher);\r\n```",
-      "title": "How to use Supabase with SWR?",
-      "answer": null,
-      "category": {
-        "name": "Q&A"
-      },
-      "comments": {
-        "totalCount": 2,
-        "nodes": [
-          {
-            "author": {
-              "avatarUrl": "https://avatars.githubusercontent.com/u/5748289?u=1ec8adaac4995dfc06b4b5af48bfbbcff503770f&v=4",
-              "url": "https://github.com/thorwebdev",
-              "login": "thorwebdev"
-            },
-            "body": "I haven't looked into it, but you might find https://github.com/EdgarBarrantes/supabase-utils useful.",
-            "createdAt": "2021-09-14T03:44:51Z"
-          },
-          {
-            "author": {
-              "avatarUrl": "https://avatars.githubusercontent.com/u/8291514?u=2960d72247d0460343d4fd9acbbf02c6abf1dd51&v=4",
-              "url": "https://github.com/MildTomato",
-              "login": "MildTomato"
-            },
-            "body": "it looks like a rather odd way of using SWR - it looks like you may have gotten that url \"api/user/${id}\" from the [SWR docs](https://swr.vercel.app/docs/getting-started#make-it-reusable), but it looks like you just want to run supabase-js in client.\r\n\r\nI think if you really wanted to use SWR here, it might look a bit like this.\r\n(not tested this though).\r\n\r\n```js\r\nconst fetcher = async (table) =>  await supabase.from(table).select(\"*\");\r\n\r\nfunction App () {\r\n  const { data, error } = useSWR('papers', fetcher)\r\n \r\n  if (!data) return \"loading\"\r\n  // ...\r\n}\r\n```\r\n\r\nIt think this is rather obtuse though, since if you are just getting the data client side, then you can just use supabase-js and drop SWR and it will behave pretty much the same.\r\n",
-            "createdAt": "2021-09-15T07:45:27Z"
-          }
-        ]
-      },
-      "upvoteCount": 1,
-      "createdAt": "2021-09-10T10:27:18Z"
-    },
-    {
-      "id": "MDEwOkRpc2N1c3Npb24zNDQ3ODQ1",
-      "author": {
-        "avatarUrl": "https://avatars.githubusercontent.com/u/63981639?u=0d13b5f15c463560f812096925b9db7adc27d0a0&v=4",
-        "url": "https://github.com/Vinzent03",
-        "login": "Vinzent03"
-      },
-      "body": "I am **really** new to sql in general and want to use python in my functions, because I need to use postgis. It's not listed in the extensions list and enabling via \r\n\r\n`CREATE EXTENSION plpythonu3` throws the following error: \r\n\r\n`could not open extension control file \"/usr/share/postgresql/12/extension/plpythonu3.control\": No such file or directory`",
-      "title": "Add plpythonu3 extension",
-      "answer": {
-        "author": {
-          "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
-          "login": "inian"
-        },
-        "body": "Hi @Vinzent03, we are not planning to offer [untrusted extensions](https://www.postgresql.org/docs/9.1/plpython.html) in Supabase in the near future. It is hard to limit the functionality of these untrusted extensions and a malicious user can make the platform unsafe for everyone. ",
-        "createdAt": "2021-07-07T16:01:18Z"
-      },
-      "category": {
-        "name": "Q&A"
-      },
-      "comments": {
-        "totalCount": 1,
-        "nodes": [
-          {
-            "author": {
-              "avatarUrl": "https://avatars.githubusercontent.com/u/2155545?u=2ff9d14b413a4a45c3d45f7335198e11f357d1d1&v=4",
-              "url": "https://github.com/inian",
-              "login": "inian"
-            },
-            "body": "Hi @Vinzent03, we are not planning to offer [untrusted extensions](https://www.postgresql.org/docs/9.1/plpython.html) in Supabase in the near future. It is hard to limit the functionality of these untrusted extensions and a malicious user can make the platform unsafe for everyone. ",
-            "createdAt": "2021-07-07T16:01:18Z"
-          }
-        ]
-      },
-      "upvoteCount": 1,
-      "createdAt": "2021-07-06T12:36:02Z"
     }
   ],
   "totalCount": 1099,

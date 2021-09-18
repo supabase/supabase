@@ -5,7 +5,6 @@ tags: [Question]
 author_image_url: https://avatars.githubusercontent.com/u/1075218?v=4
 author_url: https://github.com/sanketch
 answer: [object Object]
-answered: true
 category: Q&A
 upvoteCount: 2
 commentCount: 1
@@ -18,3 +17,10 @@ Hey! Is there a way to modify the JWT somehow before it is returned to the user?
 One solution is to send over the supabase token to a backend service that then creates another token with CubeJS. This token is then stored in client local storage. But trying to see if there is an approach where we can modify it before the auth token is sent from supabase to save another trip. Any thoughts?
 
 https://cube.dev/docs/security
+
+---
+### Suggested answer
+__kangmingtay__ `2 days ago`
+
+Hey @sanketch, we expose the `JWT_SECRET` on the dashboard under the "Settings" -> "API" page. You can use that `JWT_SECRET` to sign it after updating the JWT payload. However, do note that this should be done on the backend / server-side instead of on the client because the `JWT_SECRET` should not be exposed.
+
