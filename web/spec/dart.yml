@@ -115,10 +115,10 @@ pages:
       flutter pub add supabase_flutter
       ```
 
-      `supabase-flutter` plugin uses `supabase` plugin internally, and it adds some Flutter specific functionality such as handling deeplinks comoing back from magic link vefications.
+      `supabase-flutter` plugin uses `supabase` plugin internally, and it adds some Flutter specific functionality such as handling deeplinks coming back from magic link verifications.
       If you are creating a Flutter application, you should use `supabase-flutter` instead of `supabase-dart`. 
 
-      For the most part `supabase-flutter` are share the same API `supabase` with few exceptions such as initialization or OAuth sign in.
+      For the most part `supabase-flutter` shares the same API as `supabase` with few exceptions such as initialization or OAuth sign in.
 
   Initializing:
     description: |
