@@ -257,16 +257,16 @@ alter table members
   enable row level security
 
 -- 3.  Create security definer function
-create or replace function get_teams_for_user(user_id uuid)
-returns setof bigint 
+create or replace function get_teams_for_authenticated_user()
+returns setof bigint
 language sql
-security definer 
+security definer
 set search_path = public
 stable
 as $$
     select team_id
     from members
-    where user_id = $1
+    where user_id = auth.uid()
 $$;
 
 -- 4. Create Policy
@@ -274,7 +274,7 @@ create policy "Team members can update team members if they belong to the team."
   on members
   for all using (
     team_id in (
-      select get_teams_for_user(auth.uid())
+      select get_teams_for_authenticated_user()
     )
   );
 
