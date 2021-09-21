@@ -109,16 +109,16 @@ pages:
 
       ## Flutter 
 
-      For Flutter project, you can use [supabase-flutter](https://github.com/supabase/supabase-flutter).
+      For Flutter project, you can use [supabase_flutter](https://github.com/supabase/supabase-flutter).
 
       ```bash
       flutter pub add supabase_flutter
       ```
 
-      `supabase-flutter` plugin uses `supabase` plugin internally, and it adds some Flutter specific functionality such as handling deeplinks coming back from magic link verifications.
-      If you are creating a Flutter application, you should use `supabase-flutter` instead of `supabase-dart`. 
+      `supabase_flutter` plugin uses `supabase` plugin internally, and it adds some Flutter specific functionality such as handling deeplinks coming back from magic link verifications.
+      If you are creating a Flutter application, we recommend using `supabase_flutter` instead of `supabase`. 
 
-      For the most part `supabase-flutter` shares the same API as `supabase` with few exceptions such as initialization or OAuth sign in.
+      For the most part `supabase_flutter` shares the same API as `supabase` with few exceptions such as initialization or OAuth sign in.
 
   Initializing:
     description: |
@@ -131,7 +131,7 @@ pages:
 
       ## Flutter
 
-      For `supabase-flutter`, you will be using the static `initialize()` method on `Supabase` class.
+      For `supabase_flutter`, you will be using the static `initialize()` method on `Supabase` class.
 
     examples:
       - name: Dart SupabaseClient()
@@ -169,7 +169,7 @@ pages:
       - name: Sign up with third-party providers.
         hideCodeBlock: true
         description: |
-          If you are using Flutter, you can sign up with OAuth providers using the [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider) method available on `supabase-flutter`.
+          If you are using Flutter, you can sign up with OAuth providers using the [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider) method available on `supabase_flutter`.
 
   auth.signIn():
     description: |
@@ -213,7 +213,7 @@ pages:
     description: |
       Signs the user in using thrid party OAuth providers.
     notes: |
-      - `auth.signInWithProvider()` is only available on `supabase-flutter`
+      - `auth.signInWithProvider()` is only available on `supabase_flutter`
       - It will open the browser to the relevant login page.
     examples:
       - name: Sign in with provider.
