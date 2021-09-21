@@ -258,11 +258,15 @@ alter table members
 
 -- 3.  Create security definer function
 create or replace function get_teams_for_user(user_id uuid)
-returns setof bigint as $$
+returns setof bigint 
+language sql
+security definer 
+SET search_path = public
+as $$
     select team_id
     from members
     where user_id = $1
-$$ stable language sql security definer;
+$$;
 
 -- 4. Create Policy
 create policy "Team members can update team members if they belong to the team."
