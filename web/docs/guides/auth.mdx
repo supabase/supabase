@@ -261,7 +261,8 @@ create or replace function get_teams_for_user(user_id uuid)
 returns setof bigint 
 language sql
 security definer 
-SET search_path = public
+set search_path = public
+stable
 as $$
     select team_id
     from members
