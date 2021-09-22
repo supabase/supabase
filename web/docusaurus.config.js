@@ -38,7 +38,6 @@ module.exports = {
         },
       },
     },
-    sidebarCollapsible: true,
     algolia: {
       apiKey: '766d56f13dd1e82f43253559b7c86636',
       indexName: 'supabase',
@@ -55,16 +54,6 @@ module.exports = {
         srcDark: '/supabase-dark.svg',
       },
       items: [
-        {
-          href: 'https://github.com/supabase/supabase',
-          className: 'navbar-item-github',
-          position: 'right',
-        },
-        {
-          href: 'https://twitter.com/supabase',
-          className: 'navbar-item-twitter',
-          position: 'right',
-        },
         {
           label: 'Overview',
           to: '/docs',
@@ -85,6 +74,16 @@ module.exports = {
           position: 'left',
         },
         { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
+        {
+          href: 'https://github.com/supabase/supabase',
+          className: 'navbar-item-github',
+          position: 'right',
+        },
+        {
+          href: 'https://twitter.com/supabase',
+          className: 'navbar-item-twitter',
+          position: 'right',
+        },
       ],
     },
     prism: {
@@ -185,6 +184,7 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
+          sidebarCollapsible: true,
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/supabase/supabase/edit/master/web',
         },
