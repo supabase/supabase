@@ -786,6 +786,7 @@ pages:
           ```js
           const { data, error } = await supabase
             .rpc('echo_all_cities')
+            .select('name, population')
             .eq('name', 'The Shire')
           ```
       - name: With count option
