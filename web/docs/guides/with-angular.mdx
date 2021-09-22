@@ -53,76 +53,75 @@ Now we are going to set up the database schema. We can use the "User Management 
 or you can just copy/paste the SQL from below and run it yourself.
 
 <Tabs
-  defaultValue="UI"
-  values={[
-    {label: 'UI', value: 'UI'},
-    {label: 'SQL', value: 'SQL'},
-  ]}>
-  <TabItem value="UI">
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'SQL', value: 'SQL'},
+]}>
+<TabItem value="UI">
 
-    ```sh
-    1. Go to the "SQL" section.
-    2. Click "User Management Starter".
-    4. Click "Run".
-    ```
+```sh
+1. Go to the "SQL" section.
+2. Click "User Management Starter".
+4. Click "Run".
+```
 
 <video width="99%" muted playsInline controls="true">
     <source src="/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
 </video>
 
-  </TabItem>
-  <TabItem value="SQL">
+</TabItem>
+<TabItem value="SQL">
 
-    ```sql
-    -- Create a table for public "profiles"
-    create table profiles (
-    id uuid references auth.users not null,
-    updated_at timestamp with time zone,
-    username text unique,
-    avatar_url text,
-    website text,
+```sql
+-- Create a table for public "profiles"
+create table profiles (
+  id uuid references auth.users not null,
+  updated_at timestamp with time zone,
+  username text unique,
+  avatar_url text,
+  website text,
 
-    primary key (id),
-    unique(username),
-    constraint username_length check (char_length(username) >= 3)
-    );
+  primary key (id),
+  unique(username),
+  constraint username_length check (char_length(username) >= 3)
+);
 
-    alter table profiles enable row level security;
+alter table profiles enable row level security;
 
-    create policy "Public profiles are viewable by everyone."
-    on profiles for select
-    using ( true );
+create policy "Public profiles are viewable by everyone."
+  on profiles for select
+  using ( true );
 
-    create policy "Users can insert their own profile."
-    on profiles for insert
-    with check ( auth.uid() = id );
+create policy "Users can insert their own profile."
+  on profiles for insert
+  with check ( auth.uid() = id );
 
-    create policy "Users can update own profile."
-    on profiles for update
-    using ( auth.uid() = id );
+create policy "Users can update own profile."
+  on profiles for update
+  using ( auth.uid() = id );
 
-    -- Set up Realtime!
-    begin;
-    drop publication if exists supabase_realtime;
-    create publication supabase_realtime;
-    commit;
-    alter publication supabase_realtime add table profiles;
+-- Set up Realtime!
+begin;
+  drop publication if exists supabase_realtime;
+  create publication supabase_realtime;
+commit;
+alter publication supabase_realtime add table profiles;
 
-    -- Set up Storage!
-    insert into storage.buckets (id, name)
-    values ('avatars', 'avatars');
+-- Set up Storage!
+insert into storage.buckets (id, name)
+values ('avatars', 'avatars');
 
-    create policy "Avatar images are publicly accessible."
-    on storage.objects for select
-    using ( bucket_id = 'avatars' );
+create policy "Avatar images are publicly accessible."
+  on storage.objects for select
+  using ( bucket_id = 'avatars' );
 
-    create policy "Anyone can upload an avatar."
-    on storage.objects for insert
-    with check ( bucket_id = 'avatars' );
+create policy "Anyone can upload an avatar."
+  on storage.objects for insert
+  with check ( bucket_id = 'avatars' );
+```
 
-    ```
-
-  </TabItem>
+</TabItem>
 </Tabs>
 
 
@@ -132,24 +131,24 @@ Now that you've created some database tables, you are ready to insert data using
 We just need to get the URL and `anon` key from the API settings.
 
 <Tabs
-  defaultValue="UI"
-  values={[
-    {label: 'UI', value: 'UI'}
-  ]}>
-  <TabItem value="UI">
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'}
+]}>
+<TabItem value="UI">
 
-    ```sh
-    1. Go to the "Settings" section.
-    2. Click "API" in the sidebar.
-    3. Find your API URL in this page.
-    4. Find your "anon" and "service_role" keys on this page.
-    ```
+```sh
+1. Go to the "Settings" section.
+2. Click "API" in the sidebar.
+3. Find your API URL in this page.
+4. Find your "anon" and "service_role" keys on this page.
+```
 
 <video width="99%" muted playsInline controls="true">
     <source src="/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
 </video>
 
-  </TabItem>
+</TabItem>
 </Tabs>
 
 ## Building the App

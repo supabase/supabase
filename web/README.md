@@ -3,6 +3,7 @@
 ### Contributing to the specs
 
 - `cd /web/spec/`
+- run `npm install`
 - run `make` which will pull the latest TSDoc with your updates
 - add your comments to `supabase.yml` | `dart.yml` | `postgrest.yml` | `gotrue.yml` | `realtime.yml`
 - run `npm run gen:supabase` inside the `/spec` folder which will generate the Docusaurus pages

@@ -61,6 +61,17 @@ Here are a list of environment variables for each service:
 - [Storage](https://github.com/supabase/storage-api)
 - [Kong](https://docs.konghq.com/install/docker/)
 
+### Configure persistent storage
+
+The default docker-compose file does not use volumes, as it is also used for local development where transiency is desirable. For non-dev self-hosted setups, you'll likely want to provision [storage volumes](https://docs.docker.com/storage/volumes/)[^storage-options] for the stateful services:
+
+- Postgres: the data dir for PG12 is located at `/var/lib/postgresql/12`
+- Storage: the default data dir is `/var/data/storage`
+
+For the Storage service, you can also choose to configure it to use an s3 bucket instead.
+
+[^storage-options]: Other deployment platforms will usually provide an alternative mechanism for persistent disk storage, e.g. [Persistent Volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) in Kubernetes
+
 ### Update secrets 
 
 If you are deploying to production, you should update the default [passwords and secrets](https://github.com/supabase/supabase/blob/master/docker/.env).

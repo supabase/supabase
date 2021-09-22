@@ -12,8 +12,8 @@ info:
     |-----------------------|--------------------------------------------------|------------------|
     | **`supabase-{lang}`** <br /> Combines libraries and adds enrichments.    | [`JavaScript`](https://github.com/supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp), [`Python`](https://github.com/supabase/supabase-py), `Rust`, [`Dart`](https://github.com/supabase/supabase-dart) |
     | `postgrest-{lang}` <br /> Client library to work with [PostgREST](https://github.com/postgrest/postgrest) | [`JavaScript`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp), [`Python`](https://github.com/supabase/postgrest-py), [`Rust`](https://github.com/supabase/postgrest-rs), [`Kotlin`](https://github.com/supabase/postgrest-kt), [`Dart`](https://github.com/supabase/postgrest-dart) |
-    | `realtime-{lang}` <br /> Client library to work with [Realtime](https://github.com/supabase/realtime) | [`JavaScript`](https://github.com/supabase/realtime-js) | `C#`, `Python`, `Rust`, [`Dart`](https://github.com/supabase/realtime-dart) |
-    | `gotrue-{lang}` <br /> Client library to work with [GoTrue](https://github.com/netlify/gotrue)   | [`JavaScript`](https://github.com/supabase/gotrue-js) | `C#`, `Python`, `Rust`, [`Kotlin`](https://github.com/supabase/gotrue-kt), [`Dart`](https://github.com/supabase/gotrue-dart) |
+    | `realtime-{lang}` <br /> Client library to work with [Realtime](https://github.com/supabase/realtime) | [`JavaScript`](https://github.com/supabase/realtime-js) | [`C#`](https://github.com/supabase/realtime-csharp), [`Python`](https://github.com/supabase-community/realtime-py), `Rust`, [`Dart`](https://github.com/supabase/realtime-dart) |
+    | `gotrue-{lang}` <br /> Client library to work with [GoTrue](https://github.com/netlify/gotrue)   | [`JavaScript`](https://github.com/supabase/gotrue-js) | [`C#`](https://github.com/supabase/gotrue-csharp), [`Python`](https://github.com/supabase-community/gotrue-py), `Rust`, [`Kotlin`](https://github.com/supabase/gotrue-kt), [`Dart`](https://github.com/supabase/gotrue-dart) |
 
   definition: spec/combined.json
   libraries:
@@ -423,9 +423,23 @@ pages:
   auth.update():
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.update'
     notes: |
-      It's generally better to store user data in a table inside your public schema (i.e. `public.users`). 
+      User email: email updates will send an email to both the user's current and new email with a confirmation link.
+      
+      User metadata: It's generally better to store user data in a table inside your public schema (i.e. `public.users`). 
       Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
     examples:
+      - name: Update email for authenticated user.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.update({email: 'new@email.com'})
+          ```
+      - name: Update password for authenticated user.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.update({password: 'new password'})
+          ```
       - name: Update a user's metadata.
         isSpotlight: true
         js: |
@@ -548,7 +562,7 @@ pages:
           ```js
           const { data, error, count } = await supabase
             .from('cities')
-            .select('name', {}, { count: 'exact' }) // if you don't want to return any rows, you can use { count: 'exact', head: true }
+            .select('name', { count: 'exact' }) // if you don't want to return any rows, you can use { count: 'exact', head: true }
           ```
       - name: Querying JSON data
         description: |
@@ -675,6 +689,17 @@ pages:
             .from('messages')
             .upsert({ id: 3, message: 'foo', username: 'supabot' })
           ```
+      - name: Bulk Upsert your data
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('messages')
+            .upsert([
+            { id: 3, message: 'foo', username: 'supabot' },
+            { id: 4, message: 'bar', username: 'supabot' }
+            ])
+          ```
       - name: Upserting into tables with constraints
         description: |
           Running the following will cause supabase to upsert data into the `users` table. 
@@ -761,6 +786,7 @@ pages:
           ```js
           const { data, error } = await supabase
             .rpc('echo_all_cities')
+            .select('name, population')
             .eq('name', 'The Shire')
           ```
       - name: With count option
