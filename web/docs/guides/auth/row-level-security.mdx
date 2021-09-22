@@ -52,7 +52,7 @@ Retuns the email of the user making the request.
 
 Here are some examples to show you the power of PostgreSQL's RLS. 
 
-### Allow read access 
+### Allow read access
 
 ```sql
 -- 1. Create table
@@ -62,11 +62,11 @@ create table profiles (
 );
 
 -- 2. Enable RLS
-alter table profiles 
+alter table profiles
   enable row level security;
 
 -- 3. Create Policy
-create policy "Public profiles are viewable by everyone." 
+create policy "Public profiles are viewable by everyone."
   on profiles for select using (
     true
   );
@@ -74,10 +74,9 @@ create policy "Public profiles are viewable by everyone."
 
 1. Creates a table called `profiles` in the public schema (default schema).
 2. Enables Row Level Security.
-3. Creates a policy which allows all `select` queries to run. 
+3. Creates a policy which allows all `select` queries to run.
 
-
-### Restrict updates 
+### Restrict updates
 
 ```sql
 -- 1. Create table
@@ -87,11 +86,11 @@ create table profiles (
 );
 
 -- 2. Enable RLS
-alter table profiles 
+alter table profiles
   enable row level security;
 
 -- 3. Create Policy
-create policy "Users can update their own profiles." 
+create policy "Users can update their own profiles."
   on profiles for update using (
     auth.uid() = id
   );
@@ -100,7 +99,6 @@ create policy "Users can update their own profiles."
 1. Creates a table called `profiles` in the public schema (default schema).
 2. Enables RLS.
 3. Creates a policy which allows logged in users to update their own data.
-
 
 ### Policies with joins
 
@@ -119,16 +117,16 @@ create table members (
 );
 
 -- 3. Enable RLS
-alter table teams 
+alter table teams
   enable row level security;
 
 -- 4. Create Policy
 create policy "Team members can update team details if they belong to the team."
   on teams
   for update using (
-    auth.uid() in ( 
-      select user_id from members 
-      where team_id = id 
+    auth.uid() in (
+      select user_id from members
+      where team_id = id
     )
   );
 ```
@@ -141,31 +139,37 @@ Policies can also make use of `security definer functions`. This is useful in a 
 -- 1. Follow example for 'Policies with joins' above
 
 -- 2.  Enable RLS
-alter table members 
+alter table members
   enable row level security
 
 -- 3.  Create security definer function
-create or replace function get_teams_for_user(user_id uuid)
-returns setof bigint as $$
-    select team_id 
-    from members 
-    where user_id = $1
-$$ stable language sql security definer;
+create or replace function get_teams_for_authenticated_user()
+returns setof bigint
+language sql
+security definer
+set search_path = public
+stable
+as $$
+    select team_id
+    from members
+    where user_id = auth.uid()
+$$;
 
 -- 4. Create Policy
 create policy "Team members can update team members if they belong to the team."
   on members
   for all using (
     team_id in (
-      select get_teams_for_user(auth.uid())
+      select get_teams_for_authenticated_user()
     )
   );
+
 ```
 
 ### Verifying email domains
 
-Postgres has a function `right(string, n)` that returns the rightmost n characters of a string. 
-You could use this to match staff member's email domains. 
+Postgres has a function `right(string, n)` that returns the rightmost n characters of a string.
+You could use this to match staff member's email domains.
 
 ```sql
 -- 1. Create table
@@ -175,7 +179,7 @@ create table leaderboard (
 );
 
 -- 2. Enable RLS
-alter table leaderboard 
+alter table leaderboard
   enable row level security;
 
 -- 3. Create Policy
@@ -188,8 +192,8 @@ create policy "Only Blizzard staff can update leaderboard"
 
 ### Time to live for rows
 
-Policies can also be used to implement TTL or time to live feature that you see in Instagram stories or Snapchat. 
-In the following example, rows of `stories` table are available only if they have been created within the last 24 hours. 
+Policies can also be used to implement TTL or time to live feature that you see in Instagram stories or Snapchat.
+In the following example, rows of `stories` table are available only if they have been created within the last 24 hours.
 
 ```sql
 -- 1. Create table
@@ -200,7 +204,7 @@ create table if not exists stories (
 );
 
 -- 2. Enable RLS
-alter table stories 
+alter table stories
   enable row level security;
 
 -- 3. Create Policy
@@ -208,31 +212,31 @@ create policy "Stories are live for a day"
   on stories
   for select using (
     created_at > (current_timestamp - interval '1 day')
-  ); 
+  );
 ```
 
 ### Advanced policies
 
 Use the full power of SQL to build extremely advanced rules.
 
-In this example, we will create a `posts` and `comments` tables and then create a policy that depends on another policy. 
+In this example, we will create a `posts` and `comments` tables and then create a policy that depends on another policy.
 (In this case, the comments policy depends on the posts policy.)
 
 ```sql
 create table posts (
-  id            serial    primary key, 
-  creator_id    uuid      not null     references auth.users(id), 
-  title         text      not null, 
-  body          text      not null, 
-  publish_date  date      not null     default now(), 
+  id            serial    primary key,
+  creator_id    uuid      not null     references auth.users(id),
+  title         text      not null,
+  body          text      not null,
+  publish_date  date      not null     default now(),
   audience      uuid[]    null -- many to many table omitted for brevity
 );
 
 create table comments (
-  id            serial    primary key, 
-  post_id       int       not null     references posts(id)  on delete cascade, 
-  user_id       uuid      not null     references auth.users(id), 
-  body          text      not null, 
+  id            serial    primary key,
+  post_id       int       not null     references posts(id)  on delete cascade,
+  user_id       uuid      not null     references auth.users(id),
+  body          text      not null,
   comment_date  date      not null     default now()
 );
 
