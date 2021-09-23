@@ -9,53 +9,54 @@ const fs = require('fs')
 const discussions = require('./src/data/github/discussions')
 const query = `
 {
-    repository(owner: "supabase", name: "supabase") {
-        discussions(first: 10) {
-            nodes {
-            id
+ repository(owner: "supabase", name: "supabase") {
+    discussions(first: 20) {
+      nodes {
+        id
+        author {
+          avatarUrl
+          url
+          login
+        }
+        body
+        title
+        answer {
+          author {
+            avatarUrl
+            login
+            url
+          }
+          body
+          url
+          createdAt
+        }
+        createdAt
+        category {
+          name
+        }
+        comments(first: 10) {
+          totalCount
+          nodes {
             author {
-                avatarUrl
-                url
-                login
+              avatarUrl
+              url
+              login
             }
             body
-            title
-            answer {
-                author {
-                avatarUrl
-                login
-                }
-                body
-                createdAt
-            }
             createdAt
-            category {
-              name
-            }
-            comments {
-              totalCount
-              nodes {
-                author {
-                  avatarUrl
-                  url
-                  login
-                }
-                body
-                createdAt
-              }
-            }
-            upvoteCount 
-            }
-            
-            totalCount
-            pageInfo {
-            startCursor
-            endCursor
-            hasNextPage
-            hasPreviousPage
-            }
+          }
         }
+        upvoteCount
+      }
+      totalCount
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
     }
+  }
 }
 `
 const postTemplate = ({
