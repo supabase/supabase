@@ -21,7 +21,7 @@
   },
   {
     "question": "What are soft limits? ",
-    "answer": "Soft limits mean if you cross your usage tier we will let you know and give you a grace period without charging you for exceeding your limits. We will email you to discuss moving up a tier and you will not be charged until you agree to move up a tier. If you do not respond, or do want to move up a tier and continue to exceed your limits then we may have to limit your projects consumption."
+    "answer": "Soft limits mean if you cross your usage tier we will let you know and give you a grace period without charging you for exceeding your limits. We will email you to discuss moving up a tier and you will not be charged until you agree to move up a tier. If you do not respond, or do not want to move up a tier and continue to exceed your limits then we may have to limit your projects' consumption."
   },
   {
     "question": "How do I know which tier I need before I even finish building my project?",

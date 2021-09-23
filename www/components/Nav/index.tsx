@@ -200,8 +200,8 @@ const Nav = (props: Props) => {
                         className="block h-6 w-auto"
                         src={
                           darkMode
-                            ? `${basePath}/images/logo-dark.png`
-                            : `${basePath}/images/logo-light.png`
+                            ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
+                            : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
                         }
                         alt="Logo"
                       />

@@ -98,7 +98,7 @@ const { user, session, error } = await supabase.auth.signIn({
 Add this function which you can call from a button, link, or UI element.
 
 ```js
-function signInWithFacebook() {
+async function signInWithFacebook() {
   const { user, session, error } = await supabase.auth.signIn({
     provider: 'facebook'
   });
@@ -108,7 +108,7 @@ function signInWithFacebook() {
 To log out:
 
 ```js
-function signout() {
+async function signout() {
   const { error } = await supabase.auth.signOut();
 }
 ```
