@@ -70,23 +70,29 @@ function BlogListPage(props: Props): JSX.Element {
                     to={permalink}
                   >
                     <div className="row card__body">
-                      <div className="col col--1 padding-vert--md padding-horiz-md">
-                        <button className="button button--sm button--outline button--secondary padding-horiz--sm">
+                      <div className={clsx(styles.Centered, 'col col--1')}>
+                        <button className={clsx('button', styles.UpVoteButton)}>
                           <ArrowUpIcon className="margin-right--sm" />
                           {upvoteCount}
                         </button>
                       </div>
-                      <div className="col col--1">
-                        <button className="button padding-horiz--md padding-vert--md margin-right--none">
-                          {categoryIcon[category]}
-                        </button>
+                      <div className={clsx(styles.Centered, 'col col--1')}>
+                        <div className={clsx(styles.CategoryIcon)}>
+                          <span>{categoryIcon[category]}</span>
+                        </div>
                       </div>
                       <div className="col col--8 margin-right--none padding-horiz--none">
                         <div>
                           <h3>{title}</h3>
                         </div>
                         <div className="row row--no-gutters">
-                          {`${author} asked ${dayjs(date).fromNow()} in ${category} • Answered`}
+                          <span style={{ color: 'darkgray' }}>{`${author} asked ${dayjs(
+                            date
+                          ).fromNow()} in ${category}`}</span>{' '}
+                          <span className="margin-horiz--sm" style={{ fontSize: '0.8em' }}>
+                            •
+                          </span>{' '}
+                          Answered
                         </div>
                       </div>
                       <div className="col col--1 avatar">

@@ -22,3 +22,38 @@
   flex-grow: 1;
   font-size: 0.8rem;
 }
+
+.UpVoteButton {
+  width: 54px;
+  height: 30px;
+  display: flex;
+  flex-direction: row;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+  align-items: center;
+  border-radius: 2em;
+  border: 0.5px solid #444;
+  padding: 8px;
+  color: #bbb;
+}
+.UpVoteButton:hover {
+  color: #efefef;
+  border-color: #efefef;
+}
+.Centered {
+  display: flex;
+  align-items: center;
+}
+.CategoryIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.4em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #333;
+  font-size: 1.2em;
+  margin-left: auto;
+  margin-right: auto;
+}
