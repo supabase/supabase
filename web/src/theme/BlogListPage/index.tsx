@@ -35,6 +35,12 @@ function BlogListPage(props: Props): JSX.Element {
       <div className="BlogListPage container margin-vert--lg">
         <div className="row">
           <main className="col col--10 col--offset-1">
+            <div
+              className="margin-bottom--md"
+              style={{ display: 'flex', justifyContent: 'flex-end' }}
+            >
+              <Link to="https://github.com/supabase/supabase/discussions/new">New Discussion</Link>
+            </div>
             {items.map(({ content: BlogPostContent }) => {
               const { date, permalink, tags, readingTime } = BlogPostContent.metadata
               const {
