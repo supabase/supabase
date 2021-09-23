@@ -36,7 +36,7 @@ function BlogListPage(props: Props): JSX.Element {
         <div className="row">
           <main className="col col--10 col--offset-1">
             <div
-              className="margin-bottom--md"
+              className={clsx(styles.NewDiscussionButton, 'margin-bottom--md')}
               style={{ display: 'flex', justifyContent: 'flex-end' }}
             >
               <Link to="https://github.com/supabase/supabase/discussions/new">New Discussion</Link>

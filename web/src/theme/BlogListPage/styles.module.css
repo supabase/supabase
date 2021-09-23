@@ -5,6 +5,8 @@
 }
 .PostPreview:hover {
   background-color: var(--custom-background-color-diff);
+  border: 0.5px solid #3ecf8e;
+  border-radius: 0.8em;
 }
 
 .PostPreviewBody {
@@ -56,4 +58,15 @@
   font-size: 1.2em;
   margin-left: auto;
   margin-right: auto;
+}
+.NewDiscussionButton a {
+  background-color: var(--custom-background-color-diff);
+  display: flex;
+  justify-content: flex-end;
+  padding: 1.2em;
+  border-radius: 0.5em;
+  border: 1px solid transparent;
+}
+.NewDiscussionButton a:hover {
+  border: 1px solid #3ecf8e;
 }
