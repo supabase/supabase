@@ -29,7 +29,6 @@ const query = `
                 createdAt
             }
             createdAt
-            }
             category {
               name
             }
@@ -45,7 +44,9 @@ const query = `
                 createdAt
               }
             }
-            upvoteCount
+            upvoteCount 
+            }
+            
             totalCount
             pageInfo {
             startCursor
@@ -145,9 +146,9 @@ async function main() {
     const { id, author, body, title, createdAt, answer, category, upvoteCount, comments } =
       discussion
 
-    const voidTags = /(\<[img|hr|br|area|base|col|embed|param|source].*[^\>])(\>)/g
+    const voidTags = /(\<(img|hr|br|area|base|col|embed|param|source).*)(\>)/g
 
-    let terminatedBody = body.replace(voidTags, '$1/$2')
+    let terminatedBody = body.replace(voidTags, '$1/$3')
 
     if (answer) {
       const post = postTemplate({
