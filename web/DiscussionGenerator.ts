@@ -74,7 +74,6 @@ author: ${author}
 tags: [Question]
 author_image_url: ${avatarUrl}
 author_url: ${authorUrl}
-answer: ${answer}
 category: ${category}
 upvoteCount: ${upvoteCount}
 commentCount: ${comments ? comments.totalCount : 0}
@@ -85,11 +84,30 @@ hide_table_of_contents: false
 ${body}
 
 ---
-### Suggested answer
-__${answer.author.login}__ \`${dayjs(answer.createdAt).fromNow()}\`
 
-${answer.body}
+<a href="${answer.url}" className="margin-bottom--md">Open on GitHub</a>
 
+<details open style={{borderWidth: 1, borderColor: '#3ecf8e', backgroundColor: 'transparent'}}>
+  <summary>
+    <h2>Suggested Answer</h2>
+  </summary>
+  <div className="avatar">
+  <a href="${answer.author.url}" style={{display: 'flex'}} className="margin-vert--md">
+  <span className="col--1 avatar ">
+    <img className="avatar__photo avatar__photo--sm" src="${answer.author.avatarUrl}"/>
+  </span>
+  <span style={{display: 'flex'}}>
+    <span className="margin-horiz--sm">${answer.author.login}</span>
+    <span style={{ color: '#8b949e' }}>${dayjs(answer.createdAt).fromNow()}</span>
+  </span>
+  </a>
+  </div>
+  ${answer.body}
+  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+    <p>⬆️  <span className="margin-left--sm">${upvoteCount}</span></p>
+    <p>${answer.replies?.totalCount || 0} replies</p>
+  </div>
+</details> 
 `
 
 async function fetchDiscussions() {
