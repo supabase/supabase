@@ -118,10 +118,11 @@ const { data, error } = await supabase
 <TabItem value="DART">
 
 ```dart
-final result = client
+final result = await client
   .from('books')
   .select()
-  .eq('name', 'Harry');
+  .eq('name', 'Harry')
+  .execute();
 ```
 
 </TabItem>
@@ -160,10 +161,11 @@ const { data, error } = await supabase
 <TabItem value="DART">
 
 ```dart
-final result = client
+final result = await client
   .from('books')
   .select()
-  .textSearch('name', "'Harry'");
+  .textSearch('name', "'Harry'")
+  .execute();
 ```
 
 </TabItem>
@@ -209,10 +211,11 @@ const { data, error } = await supabase
 <TabItem value="DART">
 
 ```dart
-final result = client
+final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'big'");
+  .textSearch('description', "'big'")
+  .execute();
 ```
 
 </TabItem>
@@ -297,10 +300,11 @@ const { data, error } = await supabase
 <TabItem value="DART">
 
 ```dart
-final result = client
+final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'little' & 'big'");
+  .textSearch('description', "'little' & 'big'")
+  .execute();
 ```
 
 </TabItem>
@@ -351,10 +355,11 @@ const { data, error } = await supabase
 <TabItem value="DART">
 
 ```dart
-final result = client
+final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'little' | 'big'");
+  .textSearch('description', "'little' | 'big'")
+  .execute();
 ```
 
 </TabItem>
@@ -454,10 +459,11 @@ const { data, error } = await supabase
 <TabItem value="DART">
 
 ```dart
-final result = client
+final result = await client
   .from('books')
   .select()
-  .textSearch('fts', "'little' & 'big'");
+  .textSearch('fts', "'little' & 'big'")
+  .execute();
 ```
 
 </TabItem>
@@ -513,10 +519,11 @@ const { data, error } = await supabase
 <TabItem value="DART">
 
 ```dart
-final result = client
+final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'big' <-> 'dreams'");
+  .textSearch('description', "'big' <-> 'dreams'")
+  .execute();
 ```
 
 </TabItem>
@@ -557,10 +564,11 @@ const { data, error } = await supabase
 <TabItem value="DART">
 
 ```dart
-final result = client
+final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'year' <2> 'school'");
+  .textSearch('description', "'year' <2> 'school'")
+  .execute();
 ```
 
 </TabItem>
@@ -604,10 +612,11 @@ const { data, error } = await supabase
 <TabItem value="DART">
 
 ```dart
-final result = client
+final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'big' & !'little'");
+  .textSearch('description', "'big' & !'little'")
+  .execute();
 ```
 
 </TabItem>
