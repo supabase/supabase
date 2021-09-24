@@ -96,7 +96,6 @@ info:
 pages:
   Installing:
     description: |
-
       ## Dart
 
       Dart libraries are built and suppported by the community. 
@@ -1230,15 +1229,14 @@ pages:
             .filter('name', 'eq', 'Paris')
             .execute();
           ```
-      # TODO Not available at the moment, so would have to fix the bug on postgrest-dart first
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_cities')
-      #       .filter('name', 'eq', 'Paris')
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_cities')
+            .filter('name', 'eq', 'Paris')
+          ```
       - name: Filter embedded resources
         dart: |
           ```dart
@@ -1316,15 +1314,15 @@ pages:
             .not('name', 'eq', 'Paris')
             .execute();
           ```
-      # TODO Not available in dart yes, so first fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_cities)
-      #       .not('name', 'eq', 'Paris')
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_cities)
+            .not('name', 'eq', 'Paris')
+            .execute();
+          ```
 
   .match():
     description: |
@@ -1358,15 +1356,15 @@ pages:
             .match({'name': 'Beijing', 'country_id': 156})
             .execute();
           ```
-      # TODO Not available in postgrest-dart yet, so first fix the bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_cities')
-      #       .match({name: 'Beijing', country_id: 156})
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_cities')
+            .match({'name': 'Beijing', 'country_id': 156})
+            .execute();
+          ```
 
   .eq():
     description: |
@@ -1400,15 +1398,15 @@ pages:
             .eq('name', 'Mordor')
             .execute();
           ```
-      # TODO Fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_cities')
-      #       .eq('name', 'San Francisco')
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_cities')
+            .eq('name', 'San Francisco')
+            .execute();
+          ```
 
   .neq():
     description: |
@@ -1442,15 +1440,15 @@ pages:
             .neq('name', 'Mordor')
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_cities')
-      #       .neq('name', 'Lagos')
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_cities')
+            .neq('name', 'Lagos')
+            .execute();
+          ```
 
   .gt():
     description: |
@@ -1484,15 +1482,15 @@ pages:
             .gt('country_id', 250)
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_cities')
-      #       .gt('country_id', 250)
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_cities')
+            .gt('country_id', 250)
+            .execute();
+          ```
 
   .gte():
     description: |
@@ -1526,15 +1524,15 @@ pages:
             .gte('country_id', 250)
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_cities')
-      #       .gte('country_id', 250)
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_cities')
+            .gte('country_id', 250)
+            .execute();
+          ```
 
   .lt():
     description: |
@@ -1568,16 +1566,15 @@ pages:
             .lt('country_id', 250)
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_cities')
-      #       .lt('country_id', 250)
-      #       .execute();
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_cities')
+            .lt('country_id', 250)
+            .execute();
+          ```
 
   .lte():
     description: |
@@ -1612,16 +1609,15 @@ pages:
             .lte('country_id', 250)
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_cities')
-      #       .lte('country_id', 250)
-      #       .execute();
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_cities')
+            .lte('country_id', 250)
+            .execute();
+          ```
 
   .like():
     description: |
@@ -1656,16 +1652,15 @@ pages:
             .like('name', '%la%')
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_cities')
-      #       .like('name', '%la%')
-      #       .execute();
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_cities')
+            .like('name', '%la%')
+            .execute();
+          ```
 
   .ilike():
     description: |
@@ -1699,16 +1694,15 @@ pages:
             .ilike('name', '%la%')
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_cities')
-      #       .ilike('name', '%la%')
-      #       .execute();
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_cities')
+            .ilike('name', '%la%')
+            .execute();
+          ```
 
   .is_():
     description: |
@@ -1742,16 +1736,15 @@ pages:
             .is_('name', null)
             .execute();
           ```
-  # TODO fix bug on postgrest-dart
-  # - name: With `rpc()`
-  #   dart: |
-  #     ```dart
-  #     // Only valid if the Stored Procedure returns a table type.
-  #     final res = await supabase
-  #       .rpc('echo_all_cities')
-  #       .is('name', null)
-  #       .execute();
-  #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_cities')
+            .is_('name', null)
+            .execute();
+          ```
 
   .in_():
     description: |
@@ -1785,16 +1778,15 @@ pages:
             .in_('name', ['Rio de Janeiro', 'San Francisco'])
             .execute();
           ```
-  # TODO fix bug on postgrest-dart
-  # - name: With `rpc()`
-  #   dart: |
-  #     ```dart
-  #     // Only valid if the Stored Procedure returns a table type.
-  #     final res = await supabase
-  #       .rpc('echo_all_cities')
-  #       .in('name', ['Rio de Janeiro', 'San Francisco'])
-  #       .execute();
-  #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_cities')
+            .in_('name', ['Rio de Janeiro', 'San Francisco'])
+            .execute();
+          ```
 
   .contains():
     examples:
@@ -1826,16 +1818,15 @@ pages:
             .contains('main_exports', ['oil'])
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_countries')
-      #       .contains('main_exports', ['oil'])
-      #       .execute();
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_countries')
+            .contains('main_exports', ['oil'])
+            .execute();
+          ```
 
   .containedBy():
     examples:
@@ -1867,16 +1858,15 @@ pages:
             .containedBy('main_exports', ['cars', 'food', 'machine'])
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_countries')
-      #       .containedBy('main_exports', ['cars', 'food', 'machine'])
-      #       .execute();
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_countries')
+            .containedBy('main_exports', ['cars', 'food', 'machine'])
+            .execute();
+          ```
 
   .rangeLt():
     examples:
@@ -1908,16 +1898,15 @@ pages:
             .rangeLt('population_range_millions', '[150, 250]')
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_countries')
-      #       .rangeLt('population_range_millions', [150, 250])
-      #       .execute();
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_countries')
+            .rangeLt('population_range_millions', '[150, 250]')
+            .execute();
+          ```
 
   .rangeGt():
     examples:
@@ -1949,16 +1938,15 @@ pages:
             .rangeGt('population_range_millions', '[150, 250]')
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_countries')
-      #       .rangeGt('population_range_millions', [150, 250])
-      #       .execute();
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_countries')
+            .rangeGt('population_range_millions', '[150, 250]')
+            .execute();
+          ```
 
   .rangeGte():
     examples:
@@ -1990,16 +1978,15 @@ pages:
             .rangeGte('population_range_millions', '[150, 250]')
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_countries')
-      #       .rangeGte('population_range_millions', [150, 250])
-      #       .execute();
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_countries')
+            .rangeGte('population_range_millions', '[150, 250]')
+            .execute();
+          ```
 
   .rangeLte():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxr'
@@ -2032,16 +2019,15 @@ pages:
             .rangeLte('population_range_millions', '[150, 250]')
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_countries')
-      #       .rangeLte('population_range_millions', [150, 250])
-      #       .execute();
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_countries')
+            .rangeLte('population_range_millions', [150, 250])
+            .execute();
+          ```
 
   .rangeAdjacent():
     examples:
@@ -2073,16 +2059,15 @@ pages:
             .rangeAdjacent('population_range_millions', '[70, 185]')
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_countries')
-      #       .rangeAdjacent('population_range_millions', [70, 185])
-      #       .execute();
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_countries')
+            .rangeAdjacent('population_range_millions', '[70, 185]')
+            .execute();
+          ```
 
   .overlaps():
     examples:
@@ -2114,16 +2099,15 @@ pages:
             .overlaps('main_exports', ['computers', 'minerals'])
             .execute();
           ```
-      # TODO fix bug on postgrest-dart
-      # - name: With `rpc()`
-      #   dart: |
-      #     ```dart
-      #     // Only valid if the Stored Procedure returns a table type.
-      #     final res = await supabase
-      #       .rpc('echo_all_countries')
-      #       .overlaps('main_exports', ['computers', 'minerals'])
-      #       .execute();
-      #     ```
+      - name: With `rpc()`
+        dart: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final res = await supabase
+            .rpc('echo_all_countries')
+            .overlaps('main_exports', ['computers', 'minerals'])
+            .execute();
+          ```
 
   .textSearch():
     description: |
