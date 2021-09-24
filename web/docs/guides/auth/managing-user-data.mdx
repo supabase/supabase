@@ -77,3 +77,34 @@ const { data: profile } = await supabase
 If you need to fetch a full list of user profiles, we supply a `service_key` which you can use with your API and Client Libraries to bypass Row Level Security. 
 
 Make sure you _NEVER_ expose this publicly. But it can be used on the server-side to fetch all of the profiles.
+
+
+## Advanced techniques
+
+### Using triggers
+
+If you want to add a row to your `public.users` table every time a user signs up, you can use triggers. 
+If the trigger fails however, it could block the user sign ups - so make sure that the code is well-tested.
+
+For example:
+
+```sql
+-- inserts a row into public.users
+create function public.handle_new_user() 
+returns trigger 
+language plpgsql 
+security definer 
+search_path = public
+as $$
+begin
+  insert into public.users (id)
+  values (new.id);
+  return new;
+end;
+$$;
+
+-- trigger the function every time a user is created
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+```
