@@ -97,7 +97,7 @@
       {
         "title": "Custom SMTP server",
         "tiers": {
-          "free": false,
+          "free": true,
           "pro": true,
           "enterprise": true
         }

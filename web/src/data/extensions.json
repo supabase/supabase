@@ -133,13 +133,6 @@
     "comment": "data type for storing sets of (key, value) pairs"
   },
   {
-    "name": "hstore_plpython3u",
-    "schema": null,
-    "default_version": "1.0",
-    "installed_version": null,
-    "comment": "transform between hstore and plpython3u"
-  },
-  {
     "name": "http",
     "schema": "extensions",
     "default_version": "1.3",
@@ -175,13 +168,6 @@
     "comment": "data types for international product numbering standards"
   },
   {
-    "name": "jsonb_plpython3u",
-    "schema": null,
-    "default_version": "1.0",
-    "installed_version": null,
-    "comment": "transform between jsonb and plpython3u"
-  },
-  {
     "name": "lo",
     "schema": null,
     "default_version": "1.1",
@@ -194,13 +180,6 @@
     "default_version": "1.1",
     "installed_version": null,
     "comment": "data type for hierarchical tree-like structures"
-  },
-  {
-    "name": "ltree_plpython3u",
-    "schema": null,
-    "default_version": "1.0",
-    "installed_version": null,
-    "comment": "transform between ltree and plpython3u"
   },
   {
     "name": "moddatetime",
@@ -341,13 +320,6 @@
     "default_version": "1.11",
     "installed_version": null,
     "comment": "extended check for plpgsql functions"
-  },
-  {
-    "name": "plpython3u",
-    "schema": null,
-    "default_version": "1.0",
-    "installed_version": null,
-    "comment": "PL/Python3U untrusted procedural language"
   },
   {
     "name": "plv8",
