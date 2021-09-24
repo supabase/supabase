@@ -21,6 +21,7 @@
     "swr": "^0.5.6"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.172",
     "@types/react": "17.0.11",
     "autoprefixer": "^10.2.6",
     "postcss": "^8.3.5",

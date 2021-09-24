@@ -95,7 +95,7 @@ const { user, session, error } = await supabase.auth.signIn({
 Add this function which you can call from a button, link, or UI element.
 
 ```js
-function signInWithTwitch() {
+async function signInWithTwitch() {
   const { user, session, error } = await supabase.auth.signIn({
     provider: 'twitch',
   })
@@ -105,7 +105,7 @@ function signInWithTwitch() {
 To log out:
 
 ```js
-function signout() {
+async function signout() {
   const { error } = await supabase.auth.signOut()
 }
 ```

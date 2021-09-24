@@ -183,7 +183,7 @@ const Index = ({}: Props) => {
                     rounded rounded-t-none"
                   >
                     <Space className="">
-                      <a href="mailto:beta@supabase.io">
+                      <a href="mailto:support@supabase.io">
                         <Button size="medium" type="default" iconRight={<IconMail />}>
                           Email Support
                         </Button>

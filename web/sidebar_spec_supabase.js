@@ -2,7 +2,7 @@ module.exports = {
   docs: [
     {
       type: 'category',
-      label: 'About',
+      label: 'Getting Started',
       items: ['reference/javascript/index', 'reference/javascript/installing', 'reference/javascript/initializing', 'reference/javascript/generating-types'],
       collapsed: true,
     },
@@ -14,7 +14,7 @@ module.exports = {
     },
     {
       type: 'category',
-      label: 'Data',
+      label: 'Database',
       items: ['reference/javascript/select', 'reference/javascript/insert', 'reference/javascript/update', 'reference/javascript/upsert', 'reference/javascript/delete', 'reference/javascript/rpc'],
       collapsed: true,
     },

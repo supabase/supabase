@@ -190,7 +190,7 @@ const { user, session, error } = await supabase.auth.signIn({
 Add a function which you can call from a button, link, or UI element.
 
 ```js
-function signInWithApple() {
+async function signInWithApple() {
   const { user, session, error } = await supabase.auth.signIn({
     provider: 'apple'
   });
@@ -200,7 +200,7 @@ function signInWithApple() {
 To log out:
 
 ```js
-function signout() {
+async function signout() {
   const { error } = await supabase.auth.signOut();
 }
 ```
