@@ -1707,6 +1707,8 @@ pages:
   .is_():
     description: |
       A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
+
+      `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1749,6 +1751,8 @@ pages:
   .in_():
     description: |
       Finds all rows whose value on the stated `column` is found on the specified `values`.
+
+      `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
     examples:
       - name: With `select()`
         isSpotlight: true
