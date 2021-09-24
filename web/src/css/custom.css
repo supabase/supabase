@@ -61,6 +61,8 @@
   --custom-primary-light: #65d9a5;
   --custom-primary-lighter: #9fe7c7;
   --custom-primary-lightest: #c5f1dd;
+  --custom-primary-rgba: RGBA(36, 180, 126, 1);
+  --custom-primary-rgb: 36, 180, 126;
   --custom-background-color: #1f1f1f;
   --custom-background-color-highlight: #fff;
   --custom-background-color-diff: #f5f6f7;
@@ -1296,4 +1298,36 @@ h4.method-list-item-label .method-list-item-validation {
   border-radius: 5px;
   overflow: hidden;
   border: 2px solid var(--custom-border-color);
+}
+
+.badge--official {
+  border-radius: 3px;
+  font-size: 0.6rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  border-color: var(--custom-primary);
+  background-color: rgba(var(--custom-primary-rgb), 0.8);
+}
+.badge--unofficial {
+  border-radius: 3px;
+  font-size: 0.6rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--custom-content-color-lightest);
+  background: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+:root[data-theme='dark'] .badge--official {
+  background-color: rgba(var(--custom-primary-rgb), 0.5);
+}
+:root[data-theme='dark'] .badge--unofficial {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+}
+.code-block {
+  border-radius: 3px;
+  font-family: 'office code pro';
+  border: 1px solid var(--custom-border-color);
+  padding: 2px 6px;
 }
