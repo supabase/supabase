@@ -186,7 +186,7 @@ export default function IndexPage() {
           <div className="hidden lg:block">
             <table className="w-full h-px table-fixed">
               <caption className="sr-only">Pricing plan comparison</caption>
-              <thead className="thead--plans">
+              <thead className="thead--plans sticky z-10 top-[62px]">
                 <tr>
                   <th
                     className="relative bg-white dark:bg-gray-800  pb-4 px-6 text-sm font-medium text-gray-900 dark:text-white text-left"
