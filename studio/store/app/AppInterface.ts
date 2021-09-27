@@ -64,7 +64,7 @@ export default class PostgresMetaInterface<T> {
   }
 
   get isLoading() {
-    return this.state === this.STATES.ERROR
+    return this.state === this.STATES.LOADING
   }
 
   get count() {
