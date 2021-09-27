@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { annoucement } from '~/data/Annoucement'
+import annoucement from '~/data/Annoucement.json'
 
 const Annoucement = () => {
   if (!annoucement.show) return null
