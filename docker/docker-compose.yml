@@ -1,118 +1,115 @@
-version: '3.6'
 services:
   kong:
     container_name: supabase-kong
-    build:
-      context: ./dockerfiles/kong
-    environment:
-      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
-      KONG_PLUGINS: request-transformer,cors,key-auth,http-log
+    image: kong:2.1
+    restart: unless-stopped
     ports:
-      - ${KONG_PORT}:8000/tcp
-      - ${KONG_PORT_TLS}:8443/tcp
+      - ${KONG_HTTP_PORT}:8000/tcp
+      - ${KONG_HTTPS_PORT}:8443/tcp
+    volumes:
+      - ./volumes/kong.yml:/var/lib/kong/kong.yml
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+      # https://github.com/supabase/cli/issues/14
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:latest
-    ports:
-      - ${AUTH_PORT}
+    image: supabase/gotrue:v2.1.8
     depends_on:
       - db
-    restart: always
+    restart: unless-stopped
     environment:
-      GOTRUE_JWT_SECRET: ${JWT_SECRET}
-      GOTRUE_JWT_EXP: 3600
-      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
-      GOTRUE_DB_DRIVER: postgres
-      DB_NAMESPACE: auth
-      API_EXTERNAL_URL: http://localhost:8000
       GOTRUE_API_HOST: 0.0.0.0
-      PORT: ${AUTH_PORT}
+      GOTRUE_API_PORT: 9999
 
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?sslmode=disable&search_path=auth
+
+      GOTRUE_SITE_URL: ${SITE_URL}
+      GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
+      GOTRUE_DISABLE_SIGNUP: ${DISABLE_SIGNUP}
+
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      GOTRUE_JWT_EXP: ${JWT_EXPIRY}
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
+      GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM}
+      GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
       GOTRUE_SMTP_HOST: ${SMTP_HOST}
       GOTRUE_SMTP_PORT: ${SMTP_PORT}
       GOTRUE_SMTP_USER: ${SMTP_USER}
       GOTRUE_SMTP_PASS: ${SMTP_PASS}
-      GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
-
-      GOTRUE_DISABLE_SIGNUP: 'false'
-      GOTRUE_SITE_URL: http://localhost:8000
+      GOTRUE_SMTP_SENDER_NAME: ${SMTP_SENDER_NAME}
       GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
       GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
       GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
-      GOTRUE_MAILER_AUTOCONFIRM: 'true'
-      GOTRUE_LOG_LEVEL: DEBUG
-      GOTRUE_OPERATOR_TOKEN: ${OPERATOR_TOKEN}
-      DATABASE_URL: 'postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres?sslmode=disable&search_path=auth'
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/v1/verify
 
+      GOTRUE_EXTERNAL_PHONE_ENABLED: ${ENABLE_PHONE_SIGNUP}
+      GOTRUE_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:latest
-    ports:
-      - ${REST_PORT}:3000
+    image: postgrest/postgrest:v8.0.0
     depends_on:
       - db
-    restart: always
+    restart: unless-stopped
     environment:
-      PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres
+      PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
       PGRST_DB_SCHEMA: public, storage
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
-
   realtime:
     container_name: supabase-realtime
-    image: supabase/realtime:latest
-    ports:
-      - ${REALTIME_PORT}
+    image: supabase/realtime:v0.15.0
     depends_on:
       - db
-    restart: on-failure
+    restart: unless-stopped
     environment:
       DB_HOST: db
+      DB_PORT: 5432
       DB_NAME: postgres
       DB_USER: postgres
       DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_PORT: ${POSTGRES_PORT}
-      PORT: ${REALTIME_PORT}
-      HOSTNAME: localhost
-      # Disable JWT Auth locally. The JWT_SECRET will be ignored.
-      SECURE_CHANNELS: 'false'
+      SLOT_NAME: supabase_realtime
+      PORT: 4000
+      SECURE_CHANNELS: "true"
       JWT_SECRET: ${JWT_SECRET}
-
   storage:
-    image: supabase/storage-api:v0.9.1
-    ports:
-      - '5000:5000'
+    container_name: supabase-storage
+    image: supabase/storage-api:v0.9.3
     depends_on:
-    - db
-    - rest
-    restart: always
+      - db
+      - rest
+    restart: unless-stopped
+    volumes:
+      - ./volumes/storage:/var/lib/storage
     environment:
-        ANON_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYyNzIwODU0MCwiZXhwIjoxOTc0MzYzNzQwLCJhdWQiOiIiLCJzdWIiOiIiLCJyb2xlIjoiYW5vbiJ9.sUHErUOiKZ3nHQIxy-7jND6B80Uzf9G4NtMLmL6HXPQ
-        SERVICE_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYyNzIwNzUzMiwiZXhwIjoxNjkwMjc5NTMyLCJhdWQiOiIiLCJzdWIiOiIiLCJyb2xlIjoic2VydmljZV9yb2xlIn0.hfdXFZV5PdvUdo2xK0vStb1i97GJukSkRqfwd4YIh2M
-        PROJECT_REF: bjwdssmqcnupljrqypxz # can be any random string
-        POSTGREST_URL: http://rest:3000
-        PGRST_JWT_SECRET: ${JWT_SECRET}
-        DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/postgres
-        PGOPTIONS: "-c search_path=storage"
-        FILE_SIZE_LIMIT: ${FILE_SIZE_LIMIT}
-        REGION: ${STORAGE_REGION} # region where your bucket is located
-        GLOBAL_S3_BUCKET: ${STORAGE_S3_BUCKET}  # name of s3 bucket where you want to store objects
-        # AWS_ACCESS_KEY_ID: replace-with-your-aws-key
-        # AWS_SECRET_ACCESS_KEY: replace-with-your-aws-secret
-        STORAGE_BACKEND: ${STORAGE_BACKEND}
-        FILE_STORAGE_BACKEND_PATH: /var/data/storage
+      ANON_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYyNzIwODU0MCwiZXhwIjoxOTc0MzYzNzQwfQ.zcaQfHd3VA7XgJmdGfmV86OLVJT9s2MTmSy-e69BpUY
+      SERVICE_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaWF0IjoxNjI3MjA4NTQwLCJleHAiOjE5NzQzNjM3NDB9.pkT3PNpO4DtO45Ac5HK_TKCx8sGLgNtV__pr_ZrRSAU
+      POSTGREST_URL: http://rest:3000
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
+      PGOPTIONS: -c search_path=storage
+      FILE_SIZE_LIMIT: 52428800
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      # TODO: https://github.com/supabase/storage-api/commit/a836fc9666c2434d89ca4b31402f74772d50fb6d
+      PROJECT_REF: stub
+      # TODO: https://github.com/supabase/storage-api/issues/55
+      REGION: stub
+      GLOBAL_S3_BUCKET: stub
   db:
     container_name: supabase-db
-    build:
-      context: ./dockerfiles/postgres
+    image: supabase/postgres:13.3.0
+    restart: unless-stopped
     ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
-    command:
-      - postgres
-      - -c
-      - wal_level=logical
+      - ${POSTGRES_PORT}:5432
+    volumes:
+      - ./volumes/db/data:/var/lib/postgresql/data
+      - ./volumes/db/init:/docker-entrypoint-initdb.d
     environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_PORT: ${POSTGRES_PORT}
+    command: postgres -c wal_level=logical
