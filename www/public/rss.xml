@@ -5,9 +5,17 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 09 Sep 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 27 Sep 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.io/blog/2021/09/28/supabase-hacktoberfest-hackathon-2021</guid>
+  <title>Supabase Hacktoberfest Hackathon 2021</title>
+  <link>https://supabase.io/blog/2021/09/28/supabase-hacktoberfest-hackathon-2021</link>
+  <description>We're running another Supabase Hackathon during Hacktoberfest!</description>
+  <pubDate>Mon, 27 Sep 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.io/blog/2021/09/10/supabase-beta-august-2021</guid>
   <title>Supabase Beta August 2021</title>
