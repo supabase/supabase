@@ -335,6 +335,13 @@ const Nav = (props: Props) => {
                   >
                     GitHub
                   </a>
+                  <a
+                    href="/blog"
+                    target="_blank"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                  >
+                    Blog
+                  </a>
                 </div>
                 <div className="p-3">
                   <p className="mb-6 text-sm text-gray-400">Products available:</p>
