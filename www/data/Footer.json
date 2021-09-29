@@ -21,6 +21,10 @@
       {
         "text": "Pricing",
         "url": "/pricing"
+      },
+      {
+        "text": "Beta",
+        "url": "/beta"
       }
     ]
   },
