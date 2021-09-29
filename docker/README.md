@@ -1,48 +1,75 @@
 # Supabase Docker
 
-Run Supabase locally.
-## Configuration
+This is a minimal Docker Compose setup for self-hosting Supabase.
 
-Add your passwords to the `.env` file.
-For better customization and security, please read the [self-hosting guide](https://supabase.io/docs/guides/self-hosting#running-supabase).
+## Getting started
 
-## Run via `docker-compose`
+You need the following installed in your system:
 
-- Starting all services: `docker-compose up`
-- Stopping all services: `docker-compose down`
+- Docker
+- Git
+- docker-compose
 
-## Usage
+Then checkout this directory:
 
-### Accessing the services directly
-
-- Kong: http://localhost:8000
-  - GoTrue: http://localhost:8000/auth/v1/?apikey=<anon-apikey-from-kong.yml>
-  - PostgREST: http://localhost:8000/rest/v1/?apikey=<anon-apikey-from-kong.yml>
-  - Realtime: http://localhost:8000/realtime/v1/?apikey=<anon-apikey-from-kong.yml>
-  - Storage: http://localhost:8000/storage/v1/?apikey=<anon-apikey-from-kong.yml>
-- Postgres: http://localhost:5432
-
-
-### With Javascript
-
-```js
-import { createClient } from '@supabase/supabase-js'
-
-const SUPABASE_URL = 'http://localhost:8000'
-const SUPABASE_KEY = '<anon-apikey-from-kong.yml>'
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+```sh
+git clone --depth 1 https://github.com/supabase/supabase
+cd supabase/docker
 ```
 
-### Quickstart example
+Copy `.env.example` to `.env`:
 
-Once you have started all the services, you can use any of the examples in the `/examples` folder. For example:
+```sh
+cp .env.example .env
+```
 
-- Add some SMTP credentials in `env`
-- Run `docker-compose up` 
-- Move to the Auth+Storage example: `cd ../examples/nextjs-ts-user-management`
-- update `.env.local` 
-  - `NEXT_PUBLIC_SUPABASE_URL=http://localhost:8000`
-  - `NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-apikey-from-kong.yml>`
-- `npm install`
-- `npm run dev`
+Populate `.env`. In particular, these environment variables are required:
+
+- `POSTGRES_PASSWORD`: you will access your database using the `postgres` role and the password you set here
+- `JWT_SECRET`: this is used by PostgREST and GoTrue, among others
+- `SITE_URL`: the base URL of your site
+- `SMTP_*`: mail server credentials
+
+Then take your `JWT_SECRET` and generate JWTs for use as API keys. You will need two keys with payloads:
+
+```json
+{
+  "role": "anon"
+}
+```
+
+```json
+{
+  "role": "service_role"
+}
+```
+
+Replace `ANON_KEY` & `SERVICE_KEY` in `docker-compose.yml` and the `anon` & `service_role` keys in `volumes/kong.yml` with these keys.
+
+With that, you can now start the setup:
+
+```sh
+docker-compose up
+```
+
+Your database will be persisted in `volumes/db/data`, and your storage objects in `volumes/storage`. Now you can try out the examples in `supabase/examples` to verify if it works correctly!
+
+## Advanced configuration
+
+To keep the setup simple, we made some choices that may not be optimal for your needs, e.g.:
+
+- the database is in the same machine as the servers
+- the storage uses the filesystem backend instead of S3
+
+If you want to deploy this to production and this minimal setup has outgrown your needs, you should operate the components with your own deployment strategy. You can configure each of the components using the resources here:
+
+- [Postgres](https://hub.docker.com/_/postgres/)
+- [PostgREST](https://postgrest.org/en/stable/configuration.html)
+- [Realtime](https://github.com/supabase/realtime#server-set-up)
+- [GoTrue](https://github.com/supabase/gotrue)
+- [Storage](https://github.com/supabase/storage-api)
+- [Kong](https://docs.konghq.com/install/docker/)
+
+## Migrating to newer versions
+
+Supabase keeps evolving, and this setup will get updated over time. However, at the moment we don't have a migration strategy to move your data to a newer setup. We hope to address this as the platform matures.
