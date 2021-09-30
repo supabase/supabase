@@ -109,13 +109,13 @@ module.exports = {
       }),
     },
   },
-  variants: {
-    extend: {
-      inset: ['group-hover'],
-      stroke: ['dark'],
-      height: ['hover'],
-    },
-  },
+  // variants: {
+  //   extend: {
+  //     inset: ['group-hover'],
+  //     stroke: ['dark'],
+  //     height: ['hover'],
+  //   },
+  // },
   plugins: [],
   corePlugins: {
     preflight: true,
