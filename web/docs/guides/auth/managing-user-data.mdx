@@ -94,7 +94,7 @@ create function public.handle_new_user()
 returns trigger 
 language plpgsql 
 security definer 
-search_path = public
+set search_path = public
 as $$
 begin
   insert into public.users (id)
