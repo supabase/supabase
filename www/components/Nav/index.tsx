@@ -220,16 +220,6 @@ const Nav = (props: Props) => {
                     active={openDevelopers}
                   />
                   <a
-                    href="/beta"
-                    className={`
-                    inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                    text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
-                    dark:text-dark-100 dark:hover:border-dark-100
-                  `}
-                  >
-                    Beta
-                  </a>
-                  <a
                     href="/pricing"
                     className={`
                     inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
