@@ -83,7 +83,7 @@ Make sure you _NEVER_ expose this publicly. But it can be used on the server-sid
 
 ### Using triggers
 
-If you want to add a row to your `public.users` table every time a user signs up, you can use triggers. 
+If you want to add a row to your `public.profiles` table every time a user signs up, you can use triggers. 
 If the trigger fails however, it could block the user sign ups - so make sure that the code is well-tested.
 
 For example:
@@ -93,11 +93,10 @@ For example:
 create function public.handle_new_user() 
 returns trigger 
 language plpgsql 
-security definer 
-set search_path = public
+security definer set search_path = public
 as $$
 begin
-  insert into public.users (id)
+  insert into public.profiles (id)
   values (new.id);
   return new;
 end;
