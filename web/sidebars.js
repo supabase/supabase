@@ -35,12 +35,6 @@ module.exports = {
       collapsed: false,
       items: supabaseCli.docs,
     },
-    {
-      type: 'category',
-      label: 'Configuration',
-      collapsed: false,
-      items: ['reference/config/postgres', 'reference/config/gotrue'],
-    },
   ],
   docs: [
     {
