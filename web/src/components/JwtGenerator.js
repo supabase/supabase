@@ -36,7 +36,6 @@ export default function JwtGenerator({}) {
   }
 
   const generate = () => {
-    // const signedJWT = KJUR.jws.JWS.sign(token, jwtSecret, { algorithm: 'RS256' })
     const signedJWT = KJUR.jws.JWS.sign(null, JWT_HEADER, token, jwtSecret)
     setSignedToken(signedJWT)
   }
@@ -44,14 +43,7 @@ export default function JwtGenerator({}) {
   return (
     <div>
       <div style={styles.inputContainer}>
-        <label>Supabase Key</label>
-        <select onChange={handleKeySelection} style={styles.input}>
-          <option value="anon">ANON_KEY</option>
-          <option value="service">SERVICE_KEY</option>
-        </select>
-      </div>
-      <div style={styles.inputContainer}>
-        <label>JWT Secret</label>
+        <label>JWT Secret:</label>
         <input
           type="text"
           style={styles.input}
@@ -61,7 +53,14 @@ export default function JwtGenerator({}) {
         />
       </div>
       <div style={styles.inputContainer}>
-        <label>JWT Token</label>
+        <label>Preconfigured Payload:</label>
+        <select onChange={handleKeySelection} style={styles.input}>
+          <option value="anon">ANON_KEY</option>
+          <option value="service">SERVICE_KEY</option>
+        </select>
+      </div>
+      <div style={styles.inputContainer}>
+        <label>Payload:</label>
         <textarea
           type="text"
           style={styles.input}
@@ -72,7 +71,7 @@ export default function JwtGenerator({}) {
         />
       </div>
       <button className="button button--primary" onClick={generate}>
-        Generate
+        Generate JWT:
       </button>
       {signedToken && (
         <div style={{ marginTop: 20 }}>
