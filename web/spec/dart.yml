@@ -210,7 +210,7 @@ pages:
           ```
   auth.signInWithProvider():
     description: |
-      Signs the user in using thrid party OAuth providers.
+      Signs the user in using third party OAuth providers.
     notes: |
       - `auth.signInWithProvider()` is only available on `supabase_flutter`
       - It will open the browser to the relevant login page.
