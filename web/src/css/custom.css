@@ -601,23 +601,8 @@ div[class^='docItemContainer_'] {
   }
 }
 
-main[class^='docMainContainer_'] div.container div.row div.col.col--3 {
-  padding-left: 0;
-}
-
 div[class^='docSidebarContainer_'] {
   border-right-color: var(--ifm-sidebar-border-color);
-  /* max-width: 250px; */
-  min-width: 250px;
-}
-
-div[class^='sidebar_'] {
-  font-size: 0.85rem;
-}
-div[class^='sidebar_'] .menu {
-  background: var(--ifm-sidebar-background);
-  margin-right: calc(var(--ifm-spacing-horizontal) * -1);
-  padding-bottom: var(--ifm-spacing-vertical);
 }
 
 div[class^='sidebar_'] .menu {
