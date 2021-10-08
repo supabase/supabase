@@ -111,7 +111,6 @@ A special role for the API (PostgREST). It has very limited access, and is used 
 
 For "authenticated access". This is the role which the API (PostgREST) will use when a user _is_ logged in.
 
-
 ##### `service_role`
 
 For elevated access. This role is used by the API (PostgREST) to bypass Row Level Security.
@@ -119,7 +118,6 @@ For elevated access. This role is used by the API (PostgREST) to bypass Row Leve
 ##### `supabase_auth_admin`
 
 Used by the Auth middleware to connect to the database and run migration. Access is scoped to the `auth` schema.
-
 
 ##### `supabase_storage_admin`
 
@@ -133,7 +131,6 @@ For running commands via the Supabase UI.
 
 Supabase Administrative role for maintaining your database. 
 
-
 ## API Keys 
 
 The API Gateway (Kong) uses JWT to authenticate access through to the database. The JWT should correspond to a relevant Postgres Role, 
@@ -142,6 +139,20 @@ and Supabase is designed to work with 2 roles: an `ANON_KEY` for unauthenticated
 Use this tool to generate keys:
 
 <JwtGenerator />
+
+## Managing your secrets 
+
+Many components inside Supabase use secure secrets and password. These are listed in the self-hosting
+[env file](https://github.com/supabase/supabase/blob/master/docker/.env.example), but we strongly recommend using a 
+secrets manager when deploying to production. Plain text files like dotenv lead to accidental costly leaks. 
+
+Some suggested systems include:
+
+- [Doppler](https://www.doppler.com/)
+- [Key Vault](https://docs.microsoft.com/en-us/azure/key-vault/general/overview) by Azure
+- [Secrets Manager](https://aws.amazon.com/secrets-manager/) by AWS
+- [Secrets Manager](https://cloud.google.com/secret-manager) by GCP
+- [Vault](https://www.hashicorp.com/products/vault) by Hashicorp
 
 ## Migrating and Upgrading
 
