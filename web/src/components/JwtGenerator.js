@@ -71,7 +71,7 @@ export default function JwtGenerator({}) {
         />
       </div>
       <button className="button button--primary" onClick={generate}>
-        Generate JWT:
+        Generate JWT
       </button>
       {signedToken && (
         <div style={{ marginTop: 20 }}>
