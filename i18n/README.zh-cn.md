@@ -29,7 +29,7 @@
 ## 状态
 
 - [x] Alpha：我们正在与一组封闭的客户测试 Supabase
-- [x] Public Alpha：任何人都可以在 [app.supabase.io]（https://app.supabase.io）上注册。只是务必手下留情，还有一些纠结的地方。
+- [x] Public Alpha：任何人都可以在 [app.supabase.io](https://app.supabase.io)上注册。只是务必手下留情，还有一些纠结的地方。
 - [x] Public Beta：足够稳定，适合大多数非企业使用场景
 - [ ] Public：生产就绪
 
