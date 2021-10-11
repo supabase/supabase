@@ -17,6 +17,7 @@
 - [Italiano / Italian](/i18n/README.it.md)
 - [Japanese / 日本語](/i18n/README.jp.md)
 - [Korean / 한국어](/i18n/README.ko.md)
+- [Malay / Bahasa Malaysia](/i18n/README.ms.md)
 - [Nepali / नेपाली](/i18n/README.ne.md)
 - [Norwegian (Bokmål) / Norsk (Bokmål)](/i18n/README.nb-no.md)
 - [Persian / فارسی](/i18n/README.fa.md)
