@@ -184,7 +184,7 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
-          sidebarCollapsible: true,
+          // sidebarCollapsible: true,
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/supabase/supabase/edit/master/web',
         },

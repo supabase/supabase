@@ -82,7 +82,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Guides',
-      items: ['guides', 'guides/platform', 'guides/local-development', 'guides/self-hosting'],
+      items: ['guides', 'guides/local-development'],
       collapsed: false,
     },
     {
@@ -180,6 +180,12 @@ module.exports = {
     //   collapsed: false,
     //   items: ['guides/storage/storage-sample'],
     // },
+    {
+      type: 'category',
+      label: 'Self Hosting',
+      collapsed: false,
+      items: ['guides/hosting/overview', 'guides/hosting/platform', 'guides/hosting/docker'],
+    },
   ],
   postgresServer: [
     {
