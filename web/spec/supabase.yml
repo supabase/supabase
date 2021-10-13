@@ -255,7 +255,7 @@ pages:
 
       on:
         schedule:
-          # sets the action to run daily. You can modify this to run the action more or less freqently
+          # sets the action to run daily. You can modify this to run the action more or less frequently
           - cron: '0 0 * * *'
 
       jobs:
@@ -429,6 +429,7 @@ pages:
       Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
     examples:
       - name: Update email for authenticated user.
+        description: Sends a "Confirm Email Change" email to the new email address.
         isSpotlight: true
         js: |
           ```js
