@@ -7,7 +7,7 @@
 
 const supabaseClient = require('./sidebar_spec_supabase')
 const supabaseCli = require('./sidebar_spec_cli')
-const postgres = require('./sidebar_spec_postgres')
+const dart = require('./sidebar_spec_dart')
 
 module.exports = {
   supabaseClient: [
@@ -17,11 +17,17 @@ module.exports = {
       collapsed: false,
       items: supabaseClient.docs,
     },
+    // {
+    //   type: 'category',
+    //   label: 'Postgres',
+    //   collapsed: false,
+    //   items: postgres.docs,
+    // },
     {
       type: 'category',
-      label: 'Postgres',
+      label: 'Dart',
       collapsed: false,
-      items: postgres.docs,
+      items: dart.docs,
     },
     {
       type: 'category',
@@ -33,37 +39,29 @@ module.exports = {
   docs: [
     {
       type: 'category',
-      label: 'Introduction',
-      items: ['about', 'faq'],
-      collapsed: false,
-    },
-    {
-      type: 'category',
-      label: 'Getting Started',
-      collapsed: false,
+      label: 'Overview',
       items: [
-        'guides/platform',
+        'about',
+        'architecture',
         'guides/database',
         'guides/auth',
         'guides/storage',
         'guides/api',
-        'guides/client-libraries',
-        'guides/local-development',
+        'guides/examples',
       ],
+      collapsed: false,
     },
     {
       type: 'category',
       label: 'Tutorials',
       collapsed: false,
       items: [
-        'guides/examples',
         'guides/with-angular',
         'guides/with-flutter',
         'guides/with-nextjs',
         'guides/with-react',
         'guides/with-svelte',
         'guides/with-vue-3',
-        'guides/self-hosting',
       ],
     },
     {
@@ -71,6 +69,7 @@ module.exports = {
       label: 'See Also',
       collapsed: false,
       items: [
+        'faq',
         'handbook/contributing',
         'handbook/supasquad',
         'company/terms',
@@ -83,7 +82,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Guides',
-      items: ['guides'],
+      items: ['guides', 'guides/local-development'],
       collapsed: false,
     },
     {
@@ -91,21 +90,11 @@ module.exports = {
       label: 'Database',
       collapsed: false,
       items: [
+        'guides/database/introduction',
         'guides/database/tables',
         'guides/database/full-text-search',
-        {
-          type: 'category',
-          label: 'Connecting to Postgres',
-          collapsed: true,
-          items: [
-            'guides/database/connecting/connecting-to-postgres',
-            'guides/database/connecting/direct-connections',
-            'guides/database/connecting/connection-pooling',
-          ],
-        },
-        // 'guides/database/arrays',
         // 'guides/database/json',
-        // 'guides/database/managing-passwords',
+        // 'guides/database/arrays',
         // 'guides/database/sql-to-api',
         {
           type: 'category',
@@ -119,6 +108,27 @@ module.exports = {
             'guides/database/extensions/uuid-ossp',
           ],
         },
+        {
+          type: 'category',
+          label: 'Connecting to Postgres',
+          collapsed: true,
+          items: [
+            'guides/database/connecting/connecting-to-postgres',
+            'guides/database/connecting/direct-connections',
+            'guides/database/connecting/connection-pooling',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Configuration',
+          collapsed: true,
+          items: [
+            'guides/database/timeouts',
+            'guides/database/replication',
+            'guides/database/managing-passwords',
+            'guides/database/managing-timezones',
+          ],
+        },
       ],
     },
     {
@@ -126,10 +136,10 @@ module.exports = {
       label: 'Auth',
       collapsed: false,
       items: [
-        'guides/auth/managing-user-data',
+        'guides/auth/intro',
         {
           type: 'category',
-          label: 'External Providers',
+          label: 'Authentication',
           collapsed: true,
           items: [
             'guides/auth/auth-apple',
@@ -143,6 +153,12 @@ module.exports = {
             'guides/auth/auth-twitch',
             'guides/auth/auth-twilio',
           ],
+        },
+        {
+          type: 'category',
+          label: 'Authorization',
+          collapsed: true,
+          items: ['guides/auth/row-level-security', 'guides/auth/managing-user-data'],
         },
         {
           type: 'category',
@@ -170,6 +186,12 @@ module.exports = {
     //   collapsed: false,
     //   items: ['guides/storage/storage-sample'],
     // },
+    {
+      type: 'category',
+      label: 'Self Hosting',
+      collapsed: false,
+      items: ['guides/hosting/overview', 'guides/hosting/platform', 'guides/hosting/docker'],
+    },
   ],
   postgresServer: [
     {

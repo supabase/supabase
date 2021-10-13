@@ -54,10 +54,7 @@ Supabase comes with a SQL Editor. You can also save your favorite queries to run
 
 [^backups] Database backups do _NOT_ include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup will not restore objects that have been deleted since then.
 
-## Extensions
-
-
-### Enable and disable extensions
+### Extensions
 
 To expand the functionality of your Postgres database, you can use extensions.
 You can enable Postgres extensions with the click of a button within the Supabase dashboard.
@@ -66,13 +63,7 @@ You can enable Postgres extensions with the click of a button within the Supabas
 <source src="/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
 </video>
 
-
-### Full list of extensions
-
-Supabase is pre-configured with over 50 extensions. You can also install your own SQL extensions directly into the database through our SQL editor.
-
-<ExtensionsComponent />
-
+[Learn more](/docs/guides/database/extensions) about all the extensions provided on Supabase.
 
 ## Tips
 
@@ -81,7 +72,7 @@ Supabase is pre-configured with over 50 extensions. You can also install your ow
 Supabase provides a realtime engine on top of Postgres, so that you can listen to changes as they happen. 
 Our realtime engine uses the built-in replication functionality of Postgres. 
 You can manage the realtime system, simply by 
-[updating](/docs/reference/postgres/publications) the `supabase_realtime` publication.
+[updating](/docs/guides/database/replication) the `supabase_realtime` publication.
 
 For example to enable realtime only for individual tables:
 
@@ -100,6 +91,10 @@ alter publication supabase_realtime add table products;
 -- add other tables to the publication
 alter publication supabase_realtime add table posts;
 ```
+
+| SECURITY WARNING |
+| - |
+| Please check [Disable realtime for private tables](https://supabase.io/docs/guides/auth#disable-realtime-for-private-tables) for the current state of Realtime security. |
 
 By default only "new" values are sent, but if you want to receive the old record (previous values) whenever you `update` or `delete` a record, 
 you can update the replica identity of your tables, setting it to `full`:
@@ -184,7 +179,7 @@ alter user postgres
 with password 'new_password';
 ```
 
-Read more in [Database Configuration](/docs/reference/postgres/database-passwords).
+Read more in [Database Configuration](/docs/guides/database/managing-passwords).
 
 ### Changing the timezone of your server.
 
@@ -197,7 +192,7 @@ For example:
 alter database postgres set timezone to 'America/New_York';
 ```
 
-Read more in [Database Configuration](/docs/reference/postgres/changing-timezones).
+Read more in [Database Configuration](/docs/guides/database/managing-timezones).
 
 ## Next steps
 

@@ -5,23 +5,39 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sun, 08 Aug 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 27 Sep 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.io/blog/2021/09/28/supabase-hacktoberfest-hackathon-2021</guid>
+  <title>Supabase Hacktoberfest Hackathon 2021</title>
+  <link>https://supabase.io/blog/2021/09/28/supabase-hacktoberfest-hackathon-2021</link>
+  <description>We're running another Supabase Hackathon during Hacktoberfest!</description>
+  <pubDate>Mon, 27 Sep 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/09/10/supabase-beta-august-2021</guid>
+  <title>Supabase Beta August 2021</title>
+  <link>https://supabase.io/blog/2021/09/10/supabase-beta-august-2021</link>
+  <description>Fundraising, Realtime Security, custom SMS templates, and deployments in South Korea.</description>
+  <pubDate>Thu, 09 Sep 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.io/blog/2021/08/12/supabase-beta-july-2021</guid>
+  <title>Supabase Beta July 2021</title>
+  <link>https://supabase.io/blog/2021/08/12/supabase-beta-july-2021</link>
+  <description>Discord Logins, Vercel Integration, Full text search, and OAuth guides.</description>
+  <pubDate>Wed, 11 Aug 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.io/blog/2021/08/09/hackathon-winners</guid>
   <title>Open Source Hackathon Winners</title>
   <link>https://supabase.io/blog/2021/08/09/hackathon-winners</link>
   <description>Let the medal ceremony begin for the best projects submitted during the Supabase Hackathon.</description>
   <pubDate>Sun, 08 Aug 2021 16:00:00 GMT</pubDate>
-</item>
-
-<item>
-  <guid>https://supabase.io/blog/2021/08/04/supabase-beta-july-2021</guid>
-  <title>Supabase Beta July 2021</title>
-  <link>https://supabase.io/blog/2021/08/04/supabase-beta-july-2021</link>
-  <description>Discord Logins, Vercel Integration, Full text search, and OAuth guides.</description>
-  <pubDate>Tue, 03 Aug 2021 16:00:00 GMT</pubDate>
 </item>
 
 <item>

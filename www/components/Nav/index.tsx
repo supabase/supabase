@@ -200,8 +200,8 @@ const Nav = (props: Props) => {
                         className="block h-6 w-auto"
                         src={
                           darkMode
-                            ? `${basePath}/images/logo-dark.png`
-                            : `${basePath}/images/logo-light.png`
+                            ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
+                            : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
                         }
                         alt="Logo"
                       />
@@ -220,16 +220,6 @@ const Nav = (props: Props) => {
                     active={openDevelopers}
                   />
                   <a
-                    href="/beta"
-                    className={`
-                    inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                    text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
-                    dark:text-dark-100 dark:hover:border-dark-100
-                  `}
-                  >
-                    Beta
-                  </a>
-                  <a
                     href="/pricing"
                     className={`
                     inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
@@ -238,6 +228,16 @@ const Nav = (props: Props) => {
                   `}
                   >
                     Pricing
+                  </a>
+                  <a
+                    href="/blog"
+                    className={`
+                    inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
+                    text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
+                    dark:text-dark-100 dark:hover:border-dark-100
+                  `}
+                  >
+                    Blog
                   </a>
                 </div>
               </div>
@@ -334,6 +334,13 @@ const Nav = (props: Props) => {
                     className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
                   >
                     GitHub
+                  </a>
+                  <a
+                    href="/blog"
+                    target="_blank"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                  >
+                    Blog
                   </a>
                 </div>
                 <div className="p-3">
