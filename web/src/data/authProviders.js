@@ -29,7 +29,7 @@ const authProviders = [
   {
     name: 'Azure',
     // logo: '/img/libraries/dart-icon.svg',
-    href: '/docs/guides/auth/auth-apple',
+    href: 'https://github.com/supabase/gotrue/pull/54#issuecomment-757043573',
     official: false,
     supporter: 'TBD',
     platform: false,
