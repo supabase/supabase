@@ -67,7 +67,7 @@ services:
         config:
           hide_credentials: false
   - name: storage-v1
-    _comment: "Storage: /storage/v1/* -> http://storage-api:5000/*"
+    _comment: "Storage: /storage/v1/* -> http://storage:5000/*"
     url: http://storage:5000/
     routes:
       - name: storage-v1-all
@@ -76,6 +76,19 @@ services:
           - /storage/v1/
     plugins:
       - name: cors
+  - name: pg-meta
+    _comment: "pg-meta: /pg/* -> http://pg-meta:8080/*"
+    url: http://pg-meta:8080/
+    routes:
+      - name: pg-meta-all
+        strip_path: true
+        paths:
+          - /pg/
+    plugins:
+      - name: cors
+      - name: key-auth
+        config:
+          hide_credentials: true
 consumers:
   - username: anon
     keyauth_credentials:
