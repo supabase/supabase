@@ -21,6 +21,12 @@ By the end of this guide you'll have an app which allows users to login and upda
 
 ![Supabase User Management example](/img/user-management-demo.png)
 
+> Note: For RedwoodJS apps, port will be 8910
+
+### Github
+
+Whenever you get stuck at any point, take a look at [this repo](https://github.com/dthyresson/redwoodjs-supabase-quickstart).
+
 <!-- ## Video demo
 
 Coming soon.
@@ -224,7 +230,7 @@ When prompted:
 
 > Overwrite existing /api/src/lib/auth.[jt]s?
 
-Say, **yes** and it will setup the Supabase client in your app and also provide hooks used with Supabase authnetication.
+Say, **yes** and it will setup the Supabase client in your app and also provide hooks used with Supabase authentication.
 
 ```bash
 ✔ Generating auth lib...
@@ -554,7 +560,7 @@ const Account = () => {
 export default Account
 ```
 
-> Note: You see the use of `useAuth()` several times in the quickstart. Redwood's `useAuth` hook provides conventient ways to access
+> Note: You'll see the use of `useAuth()` several times in the quickstart. Redwood's `useAuth` hook provides conventient ways to access
 > logIn, logOut, currentUser and access the the `supabase` authenticate client. We'll use it to get an instance
 > of the supabase client to interact with your API.
 
@@ -595,7 +601,7 @@ yarn rw dev
 
 And then open the browser to [localhost:8910](http://localhost:8910) and you should see the completed app.
 
-![Supabase RedwoodJS](/img/supabase-react-demo.png)
+![Supabase RedwoodJS](/img/supabase-redwoodjs-demo.png)
 
 ## Bonus: Profile photos
 
