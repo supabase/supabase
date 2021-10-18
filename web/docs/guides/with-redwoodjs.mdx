@@ -21,7 +21,9 @@ By the end of this guide you'll have an app which allows users to login and upda
 
 ![Supabase User Management example](/img/user-management-demo.png)
 
-> Note: For RedwoodJS apps, port will be 8910
+:::note
+Note: For RedwoodJS apps, port will be 8910
+:::
 
 ### Github
 
@@ -55,27 +57,31 @@ A Redwood application is split into two parts: a frontend and a backend. This is
 The frontend project is called **web** and the backend project is called **api**. For clarity, we will refer to these in prose as **"sides"**, i.e. the "web side" and the "api side".
 They are separate projects because code on the web side will end up running in the user's browser while code on the api side will run on a server somewhere.
 
-> Important: When this guide refers to "API", that means the Supabase API and when it refers to "api side", that means the RedwoodJS api side.
+:::note
+Important: When this guide refers to "API", that means the Supabase API and when it refers to "api side", that means the RedwoodJS api side.
+:::
 
-The **api side** is an implementation of a GraphQL API. Your business logic is organized into "services" that represent their own internal API and can be called both from external GraphQL requests and other internal services.
-Redwood can automatically connect your internal services with Apollo, reducing the amount of boilerplate you have to write.
-Your services can interact with a database via Prisma's ORM, and Prisma's migration tooling provides first-class migrations that take the pain out of evolving your database schema.
+The **api side** is an implementation of a GraphQL API. The business logic is organized into "services" that represent their own internal API and can be called both from external GraphQL requests and other internal services.
 
 The **web side** is built with React. Redwood's router makes it simple to map URL paths to React "Page" components (and automatically code-split your app on each route).
 Pages may contain a "Layout" component to wrap content. They also contain "Cells" and regular React components.
 Cells allow you to declaratively manage the lifecycle of a component that fetches and displays data.
 
-> FYI: For the sake of consistency with the other framework Quickstart examples, we'll build a RedwoodJS a little differently than normal.
-> We **_won't use_** use Prisma to connect to the Supabase Postgres database or [Prisma migrations](https://redwoodjs.com/docs/cli-commands#prisma-migrate) as one typically might in a Redwood app.
-> Instead, we'll rely on the Supabase client to do some of the work on the **web** side and use the client again on the **api** side to do data fetching as well.
+:::note
+FYI: For the sake of consistency with the other framework Quickstart examples, we'll build a RedwoodJS a little differently than normal.
+We **_won't use_** use Prisma to connect to the Supabase Postgres database or [Prisma migrations](https://redwoodjs.com/docs/cli-commands#prisma-migrate) as one typically might in a Redwood app.
+Instead, we'll rely on the Supabase client to do some of the work on the **web** side and use the client again on the **api** side to do data fetching as well.
+:::
 
 ## Project set up
 
 Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase
 and then creating a "schema" inside the database.
 
-> Note: When setting up Supabase, you'll interact with your project dashboard. However, most of the RedwoodJS setup steps will interact with the [Redwood CLI](https://redwoodjs.com/docs/cli-commands) to generate routes, pages, components and more.
-> So be sure to have a terminal at the ready and in your project directory.
+:::note
+Note: When setting up Supabase, you'll interact with your project dashboard. However, most of the RedwoodJS setup steps will interact with the [Redwood CLI](https://redwoodjs.com/docs/cli-commands) to generate routes, pages, components and more.
+So be sure to have a terminal at the ready and in your project directory.
+:::
 
 ### Create a project
 
@@ -192,7 +198,9 @@ values={[
 
 Let's start building the RedwoodJS app from scratch.
 
-> **Note:** RedwoodJS requires Node.js (=14.x) and Yarn (>=1.15).
+:::note
+**Note:** RedwoodJS requires Node.js (=14.x) and Yarn (>=1.15).
+:::
 
 Make sure you have installed yarn since RedwoodJS relies on it to [manage its packages in workspaces](https://classic.yarnpkg.com/lang/en/docs/workspaces/) for its `web` and `api` "sides".
 
@@ -228,7 +236,9 @@ yarn redwood setup auth supabase
 
 When prompted:
 
-> Overwrite existing /api/src/lib/auth.[jt]s?
+:::note
+Overwrite existing /api/src/lib/auth.[jt]s?
+:::
 
 Say, **yes** and it will setup the Supabase client in your app and also provide hooks used with Supabase authentication.
 
@@ -309,7 +319,9 @@ Let's test our setup at the moment by starting up the app:
 yarn rw dev
 ```
 
-> Note: You can also use the alias `rw` for `redwood`, as in `yarn rw` to run Redwood CLI commands
+:::note
+Note: You can also use the alias `rw` for `redwood`, as in `yarn rw` to run Redwood CLI commands
+:::
 
 You should see a "Welcome to RedwoodJS" page and a message abiout not having any pages yet.
 
@@ -326,7 +338,9 @@ yarn rw generate page home /
 ✔ Generating types ...
 ```
 
-> Note: the slash `/` is important here as it creates a root level route.
+:::note
+Note: the slash `/` is important here as it creates a root level route.
+:::
 
 You can stop the `dev` server if you want; to see your changes, just be sure to run`yarn rw dev` again.
 
@@ -560,9 +574,11 @@ const Account = () => {
 export default Account
 ```
 
-> Note: You'll see the use of `useAuth()` several times in the quickstart. Redwood's `useAuth` hook provides conventient ways to access
-> logIn, logOut, currentUser and access the the `supabase` authenticate client. We'll use it to get an instance
-> of the supabase client to interact with your API.
+:::note
+Note: You'll see the use of `useAuth()` several times in the quickstart. Redwood's `useAuth` hook provides conventient ways to access
+logIn, logOut, currentUser and access the the `supabase` authenticate client. We'll use it to get an instance
+of the supabase client to interact with your API.
+:::
 
 ### Update Home Page
 
