@@ -93,6 +93,7 @@ module.exports = {
       items: [
         'guides/database/introduction',
         'guides/database/tables',
+        'guides/database/functions',
         'guides/database/full-text-search',
         // 'guides/database/json',
         // 'guides/database/arrays',
