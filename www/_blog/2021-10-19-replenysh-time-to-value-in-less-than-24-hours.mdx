@@ -21,9 +21,9 @@ Learn how Replenysh uses Supabase to power the circular economy, redefining how 
 
 ## Material recovery offers brands a new way to connect to their customers
 
-At the end of a linear economy, product life cycle items typically end up in landfills or the ocean. Every year, 8 million metric tons of plastics enter our ocean. This is on top of the estimated 150 million metric tons that currently circulate our marine environments. In the USA alone, every year, 139 million tons of waste is sent to landfills. 
+At the end of a linear economy, products usually end up in landfills or the ocean. Every year, 8 million metric tons of plastics enter our ocean. This is on top of the estimated 150 million metric tons that currently circulate our marine environments. In the USA alone, every year, 139 million tons of waste is sent to landfills. 
 
-The problem is our current waste and recycling infrastructure can't support that demand. With less than 10% of material actually getting recycled, the vast majority just ends up in a landfill or as pollution in our skies.
+The problem is our current waste and recycling infrastructure can't support that demand. With less than 10% of material actually getting recycled, the vast majority just ends up in a landfill or as pollution.
 
 Replenysh is building a solution to this problem by creating entirely new infrastructure to help brands get their materials back. They're building an ecosystem of tools to enable any community in the world to do the right thing.
 
@@ -37,13 +37,13 @@ Brands are adopting Replenysh to demonstrate their commitment to making a positi
 
 Historically the team created their own backend infrastructure, setting up APIs and Authentication to run their own OTP system with Twilio and passwords. Postgres is essential to their requirements because Replenysh use Row Level Security for authorization. Before adopting Supabase, the team used a Haskell server with a different Postgres instance deployed on Heroku. 
 
-The team decided to do a large refactor of their codebase and began investigating alternative hosting options.
+The team decided to do a large refactor of their codebase and began investigating alternative hosting options to help speed up development time and reduce maintenance.
 
 Firebase seemed appealing due to its ability to get started quickly, but the team didn't want to migrate away from a relational database. Specifically, Postgres and RLS fit their requirements.
 
 When the team discovered Supabase on Hacker News they felt excitement. Supabase has a reputation for a smooth developer experience, providing Postgres and Row Level Security as a core feature. 
 
-As a bonus, Supabase provided more than just a database, reducing DevOps overhead. After reading the [Supabase Auth documentation](https://supabase.io/docs/guides/auth) the team determined they can have the functionality they need, like SMS OTP. When they saw [Mobbin are using Supabase at scale](https://supabase.io/blog/2021/07/28/mobbin-supabase-200000-users), they decided to migrate to Supabase.
+As a bonus, Supabase provided more than just a database, reducing their DevOps overhead. After reading the [Supabase Auth documentation](https://supabase.io/docs/guides/auth) the team determined they can have the functionality they need, like SMS OTP. When they saw [Mobbin are using Supabase at scale](https://supabase.io/blog/2021/07/28/mobbin-supabase-200000-users), they decided to migrate to Supabase.
 
 ## Globally recognised brands need quality at scale
 
@@ -52,7 +52,7 @@ Less than a day after beginning development with Supabase, the team completed th
 ![Replenysh-Mobile-App](/new/images/blog/replenysh/Replenysh-Mobile-App.png)
 
 
-Replenysh clients include brands with global recognition and millions of customers. With their reputation at stake, major brands have a high-quality threshold. If a worldwide brand asks its customers to adopt a technology, the user experience must be high quality and reliable. Their customers' primary interaction point is mobile-first. This means a robust and smooth mobile Auth experience is non-negotiable. After switching to Supabase, when they demo, clients are instantly impressed with just how easy it is for users to log in with an SMS OTP and start participating in the circular economy. As a result, some of the largest retailers and beverage companies have recently joined Replenysh and the circular economy.
+Replenysh clients include brands with global recognition and millions of customers. With their reputation at stake, major brands have a high-quality threshold. If a global brand asks its customers to adopt a technology, the user experience must be high quality and reliable. Their customers' primary interaction point is mobile-first. This means a robust and smooth mobile Auth experience is non-negotiable. After switching to Supabase, when they demo, clients are instantly impressed with just how easy it is for users to log in with an SMS OTP and start participating in the circular economy. As a result, some of the world's largest retailers and beverage companies have recently joined Replenysh and the circular economy.
 
 ![Replenysh-large-screen-view](/new/images/blog/replenysh/Replenysh-large-screen-view.png)
 
@@ -76,4 +76,4 @@ Replenysh clients include brands with global recognition and millions of custome
 
 ## Supabase help's Replenysh continue to scale
 
-Supabase turbo-charged Replynish's development time with a seamless end-user mobile login experience. They are ready to help major brands engage with their users through participation in the circular economy. With Supabase, the team knows they have a slick auth experience, reduced DevOps overhead, and can continue to scale with Postgres. You can test out the Supabase developer experience today by starting a new project on the free tier!
+Supabase turbo-charged Replynish's development time with a seamless end-user mobile login experience. They are ready to help major brands engage with their users through participation in the circular economy. With Supabase, the team knows they have a slick auth experience, reduced DevOps overhead, and can continue to scale with Postgres. You can test out the Supabase developer experience today by [starting a new project on the free tier!.](https://app.supabase.io/api/login)
