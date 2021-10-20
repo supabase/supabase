@@ -91,8 +91,8 @@ const Community = () => {
             </Card>
           </a>
         ))}
-       {selected &&  <div key={`detail_${selected.title}`}>{selected.detail()}</div>}
       </div>
+      {selected && <div key={`detail_${selected.title}`}>{selected.detail()}</div>}
     </SectionContainer>
   )
 }

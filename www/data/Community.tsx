@@ -1,4 +1,5 @@
 import { Card, Space, Typography } from '@supabase/ui'
+import DeveloperSignups from 'data/DeveloperSignups'
 
 type CommunityItem = {
   title: string
@@ -13,8 +14,12 @@ const data: CommunityItem[] = [
     stat: '40,000',
     statLabel: 'Devs',
     detail: () => (
-      <div>
-        <Typography.Text>All the awesome logos we have for developers</Typography.Text>
+      <div className="mt-5 max-w-lg mx-auto grid gap-0 sm:grid-cols-3 lg:grid-cols-4 lg:max-w-none text-center border border-dashed rounded-lg overflow-hidden ">
+        {DeveloperSignups.map((signup) => (
+          <div className="col-span-1 flex justify-center py-8 px-8 border border-dashed">
+            <img key={signup.title} className="max-h-12" src={signup.img} alt={signup.title} />
+          </div>
+        ))}
       </div>
     ),
   },
