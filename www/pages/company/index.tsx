@@ -12,6 +12,7 @@ import CTABanner from 'components/CTABanner/index'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import PressData from 'data/Press'
 import CommunityData from 'data/Community'
+import InvestorData from 'data/Investors'
 import { Card, Space, Typography } from '@supabase/ui'
 
 type Props = {}
@@ -57,9 +58,9 @@ const Team = () => {
 }
 
 const Community = () => {
-    const [selectedTitle, setSelectedTitle] = useState('Developers')
+  const [selectedTitle, setSelectedTitle] = useState('Developers')
 
-    const selected = CommunityData.find((x) => x.title == selectedTitle)
+  const selected = CommunityData.find((x) => x.title == selectedTitle)
   return (
     <SectionContainer>
       <div>
@@ -109,7 +110,11 @@ const Investors = () => {
         />
       </div>
       <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
-        <Typography.Text>Show all</Typography.Text>
+        {InvestorData.map((x) => (
+          <div key={x.name}>
+            <Typography.Text>{x.name}</Typography.Text>
+          </div>
+        ))}
       </div>
     </SectionContainer>
   )
