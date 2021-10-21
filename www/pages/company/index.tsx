@@ -13,6 +13,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import PressData from 'data/Press'
 import CommunityData from 'data/Community'
 import InvestorData from 'data/Investors'
+import TeamData from 'data/Team'
 import { Card, Space, Typography } from '@supabase/ui'
 
 type Props = {}
@@ -52,6 +53,15 @@ const Team = () => {
       </div>
       <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
         <Typography.Text>Team members, flags?, link to careers</Typography.Text>
+      </div>
+      <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
+        {TeamData.map((x) => (
+          <div key={x.name}>
+            {x.img && <img src={x.img} alt={x.name} />}
+            <Typography.Text>{x.name}</Typography.Text>
+            <Typography.Text>{x.department}</Typography.Text>
+          </div>
+        ))}
       </div>
     </SectionContainer>
   )
