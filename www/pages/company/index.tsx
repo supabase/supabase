@@ -109,7 +109,7 @@ const Investors = () => {
           title={'Investors'}
           //   title_alt={' with no extra effort'}
           //   subtitle={' with no extra effort'}
-          paragraph={`Join one of the world's fastest growing communities.`}
+          paragraph={`We've raised over $36 million in funding.`}
         />
       </div>
       <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
