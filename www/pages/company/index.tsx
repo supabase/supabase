@@ -55,7 +55,7 @@ const Team = () => {
         <Typography.Text>Team members, flags?, link to careers</Typography.Text>
       </div>
       <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
-        {TeamData.map((x) => (
+        {TeamData.filter((x) => x.active).map((x) => (
           <div key={x.name}>
             {x.img && <img src={x.img} alt={x.name} />}
             <Typography.Text>{x.name}</Typography.Text>
@@ -83,15 +83,12 @@ const Community = () => {
       </div>
       <div className="mt-5 max-w-lg mx-auto grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:max-w-none">
         {CommunityData.map((x) => (
-          <a
-            key={x.title}
-            onClick={() => setSelectedTitle(x.title)}
-          >
+          <a key={x.title} onClick={() => setSelectedTitle(x.title)}>
             <Card
               key={`comm_${x.title}`}
               hoverable
               className="cursor-pointer"
-              style={ selectedTitle == x.title ? { border: `2px solid green` } : {}}
+              style={selectedTitle == x.title ? { border: `2px solid green` } : {}}
             >
               <Space className="justify-between h-40" direction="vertical">
                 <div>
@@ -125,7 +122,7 @@ const Investors = () => {
       <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
         {InvestorData.map((x) => (
           <div key={x.name}>
-             {x.img && <img src={x.img} alt={x.name} />}
+            {x.img && <img src={x.img} alt={x.name} />}
             <Typography.Text>{x.name}</Typography.Text>
             <Typography.Text>{x.title}</Typography.Text>
           </div>
