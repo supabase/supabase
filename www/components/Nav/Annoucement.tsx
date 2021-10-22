@@ -1,35 +1,18 @@
 import React from 'react'
-import { IconArrowRight } from '@supabase/ui'
 
-import data from '~/data/Annoucement.json'
-
-type A = {
-  show: boolean
-  text: string
-  link: {
-    text: string
-    url: string
-  }
-}
-
-const a: A = data
+import annoucement from '~/data/Annoucement.json'
 
 const Annoucement = () => {
-  if (!a.show) return null
+  if (!annoucement.show) return null
   return (
-    <div className="bg-[#5865F2]">
-      <div className="flex items-center justify-center py-2 mx-auto space-x-2 text-sm lg:container lg:px-16 xl:px-20 md:text-base">
-        <span className="text-white">{a.text}</span>
-        <a
-          href={a.link.url}
-          target="_blank"
-          className="inline-flex items-center px-2 py-1 space-x-1 text-xs transition-colors rounded-lg text-[#5865F2] bg-white border border-transparent dark:hover:border-white dark:hover:bg-[#5865F2]"
-        >
-          <span>{a.link.text}</span>
-          <IconArrowRight size="tiny" />
-        </a>
+    <a href={annoucement.link} target="_blank">
+      {/* <div className="bg-dark-700 text-white hover:bg-dark-600 dark:bg-white dark:text-dark-600 dark:hover:bg-dark-200 transition-colors"> */}
+      <div className="bg-[#5865F2] text-white">
+        <div className="flex items-center justify-center p-2 mx-auto space-x-2 text-sm lg:container lg:px-16 xl:px-20">
+          {annoucement.text}
+        </div>
       </div>
-    </div>
+    </a>
   )
 }
 

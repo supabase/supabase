@@ -34,7 +34,7 @@ Para ver la documentación completa, visita [supabase.io/docs](https://supabase.
 - [x] Beta pública: Suficientemente estable para la mayoría de los casos no empresariales.
 - [ ] Público: Listo para producción.
 
-Actualmente estamos en la fase de beta pública. Puedes suscribirte a los "releases" de este repositorio para mantenerte notificado de actualizaciones mayores.
+Actualmente estamos en la fase de beta pública. Puedes suscribirte a las _releases_ de este repositorio para mantenerte notificado de actualizaciones mayores.
 
 <kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Seguir este repositorio"/></kbd>
 
@@ -42,16 +42,16 @@ Actualmente estamos en la fase de beta pública. Puedes suscribirte a los "relea
 
 ## Cómo funciona
 
-Supabase es una combinación de herramientas de código abierto. Estamos construyendo las funcionalidades de Firebase utilizando soluciones de código abierto de nivel empresarial. Si las herramientas y comunidades existen con una licencia abierta MIT, Apache 2 o equivalente, usaremos y apoyaremos tal herramienta. Si la herramienta no existe, la desarrollaremos y la lanzaremos como herramienta de código abierto nosotros mismos. Supabase no es un mapeo 1-1 de Firebase. Nuestro objetivo es dar a los desarrolladores una experiencia parecida a la de Firebase utilizando herramientas de código abierto.
+Supabase es una combinación de herramientas de código abierto. Estamos construyendo las funcionalidades de Firebase utilizando soluciones de código abierto de nivel empresarial. Si las herramientas y comunidades existen con una licencia abierta MIT, Apache 2 o equivalente, usaremos y apoyaremos tal herramienta. Si la herramienta no existe, la desarrollaremos y la lanzaremos como herramienta de código abierto nosotros mismos. Supabase no es un mapeo _1 a 1_ de Firebase. Nuestro objetivo es dar a los desarrolladores una experiencia parecida a la de Firebase utilizando herramientas de código abierto.
 
 **Arquitectura actual**
 
-Supabase es una [plataforma alojada](https://app.supabase.io). Te puedes registrar y comenzar a utilizar Supabase sin instalar nada. Aún estamos creando la experiencia de desarrollo local - actualmente es en lo que nos estamos enfocando, junto con la estabilidad de la plataforma.
+Supabase es una [plataforma alojada](https://app.supabase.io). Te puedes registrar y comenzar a utilizar Supabase sin instalar nada. También puedes tener un [_host_ propio](https://supabase.io/docs/guides/self-hosting) y [desarrollar en local](https://supabase.io/docs/guides/local-development).
 
 ![Arquitectura](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) es un sistema de base de datos objeto-relacional con más de 30 años de desarrollo activo que se ha ganado su fuerte reputación por ser confiable, robusto y de alto rendimiento.
-- [Tiempo Real](https://github.com/supabase/realtime) es un server construido en Elixir que permite escuchar a los _inserts_, _updates_ y _deletes_ de PostgreSQL utilizando websockets. Supabase escucha a la funcionalidad de replicación integrada de PostgreSQL, convierte el bite de replicación en un JSON, despues transmite el JSON a través de websockets.
+- [Tiempo Real](https://github.com/supabase/realtime) es un server construido en Elixir que permite escuchar a los _inserts_, _updates_ y _deletes_ de PostgreSQL utilizando WebSockets. Supabase escucha a la funcionalidad de replicación integrada de PostgreSQL, convierte el byte de replicación en un JSON y después transmite el JSON a través de WebSockets.
 - [PostgREST](http://postgrest.org/) es un servidor web que convierte la base de datos PostgreSQL directamente en una API RESTful.
 - [Almacenamiento](https://github.com/supabase/storage-api) proporciona una interfaz RESTful para manipular los archivos alojados en S3, utilizando Postgres para manejar los permisos.
 - [postgres-meta](https://github.com/supabase/postgres-meta) es una API RESTful para manejar Postgres, permite obtener información de tablas, agregar roles, ejecutar consultas, etc.
@@ -67,7 +67,7 @@ Nuestra librería de cliente es modular. Cada sub-librería es una implementaci�
   - `realtime-{lang}`: Librería de cliente para trabajar con [Realtime](https://github.com/supabase/realtime)
   - `gotrue-{lang}`: Librería de cliente para trabajar con [GoTrue](https://github.com/netlify/gotrue)
 
-| Repo                  | Oficial                                          | Comunidad                                                                                                                                                                                                                  |
+| Repositorio           | Oficial                                          | Comunidad                                                                                                                                                                                                                  |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
@@ -85,4 +85,4 @@ Nuestra librería de cliente es modular. Cada sub-librería es una implementaci�
 
 ## Patrocinadores
 
-[![Nuevo Patrocinador](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
+[![Nuevo patrocinador](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
