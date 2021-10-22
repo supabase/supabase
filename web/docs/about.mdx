@@ -10,10 +10,11 @@ import Link from '@docusaurus/Link'
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 const frameworks = [
-  { 
-    name: 'Angular', 
-    logo: '/img/libraries/angular-icon.svg', 
-    href: '/docs/guides/with-angular' },
+  {
+    name: 'Angular',
+    logo: '/img/libraries/angular-icon.svg',
+    href: '/docs/guides/with-angular',
+  },
   {
     name: 'Expo',
     logo: '/img/libraries/expo-icon.svg',
@@ -33,7 +34,7 @@ const frameworks = [
 
 Supabase is an open source Firebase alternative.
 
-It's provides all the backend services you need to build a product. You can use it completely, or just the services you require:
+It provides all the backend services you need to build a product. You can use it completely, or just the services you require:
 
 <div class="container" style={{ padding: 0 }}>
   <div class="row is-multiline">
@@ -69,7 +70,7 @@ It's provides all the backend services you need to build a product. You can use 
       <Link class="card" to="/docs/guides/api" style={{ height: '100%' }}>
         <div class="card__body">
           <h4>Auto-generated APIs</h4>
-          <p>Instantly APIs for your database.</p>
+          <p>Instantly generate APIs for your database.</p>
         </div>
       </Link>
     </div>
@@ -78,7 +79,7 @@ It's provides all the backend services you need to build a product. You can use 
 
 ## Getting started
 
-Visit [app.supabase.io](https://app.supabase.io) to get started with the hosted platform or visit the [self-hosting](/docs/guides/self-hosting) docs to learn how to host Supabase yourself.
+Visit [app.supabase.io](https://app.supabase.io) to get started with the hosted platform or visit the [self-hosting](/docs/guides/hosting/overview) docs to learn how to host Supabase yourself.
 
 Supabase is just Postgres, which makes it compatible with a large number of tools and frameworks.
 
@@ -87,8 +88,10 @@ Supabase is just Postgres, which makes it compatible with a large number of tool
     {frameworks.map((x) => (
       <div key={x.name} class="col col--3">
         <Link class="card" to={x.href}>
-          <div class="card__body" style={{ display: 'flex', gap: 20 }}>
-            {x.logo && <img src={x.logo} alt={x.name} width="20"/>}
+          <div class="card__body" style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
+            {x.logo && (
+              <img src={x.logo} alt={x.name} width="20" style={{ display: 'block', maxHeight: 20 }} />
+            )}
             <p>{x.name}</p>
           </div>
         </Link>

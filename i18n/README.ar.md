@@ -1,4 +1,4 @@
-<div style="direction: rtl;">
+<div style="direction: rtl;" dir="rtl">
 
 <p align="center">
   <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>

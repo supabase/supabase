@@ -1,0 +1,3 @@
+volumes/db/data
+volumes/storage
+.env

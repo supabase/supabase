@@ -70,6 +70,7 @@ module.exports = {
       collapsed: false,
       items: [
         'faq',
+        'going-into-prod',
         'handbook/contributing',
         'handbook/supasquad',
         'company/terms',
@@ -82,7 +83,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Guides',
-      items: ['guides', 'guides/platform', 'guides/local-development', 'guides/self-hosting'],
+      items: ['guides', 'guides/local-development'],
       collapsed: false,
     },
     {
@@ -136,10 +137,10 @@ module.exports = {
       label: 'Auth',
       collapsed: false,
       items: [
-        'guides/auth/managing-user-data',
+        'guides/auth/intro',
         {
           type: 'category',
-          label: 'External Providers',
+          label: 'Authentication',
           collapsed: true,
           items: [
             'guides/auth/auth-apple',
@@ -153,6 +154,12 @@ module.exports = {
             'guides/auth/auth-twitch',
             'guides/auth/auth-twilio',
           ],
+        },
+        {
+          type: 'category',
+          label: 'Authorization',
+          collapsed: true,
+          items: ['guides/auth/row-level-security', 'guides/auth/managing-user-data'],
         },
         {
           type: 'category',
@@ -174,6 +181,12 @@ module.exports = {
     //   collapsed: false,
     //   items: ['guides/storage/storage-sample'],
     // },
+    {
+      type: 'category',
+      label: 'Self Hosting',
+      collapsed: false,
+      items: ['guides/hosting/overview', 'guides/hosting/platform', 'guides/hosting/docker'],
+    },
   ],
   postgresServer: [
     {
