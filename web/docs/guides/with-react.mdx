@@ -440,8 +440,8 @@ export default function Avatar({ url, size, onUpload }) {
   const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
-    if (url) downloadImage(url)
-  }, [url])
+    if (avatarUrl) downloadImage(avatarUrl)
+  }, [avatarUrl])
 
   async function downloadImage(path) {
     try {
