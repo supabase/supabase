@@ -229,7 +229,10 @@
     { "source": "/docs/guides/database/resource-management", "destination": "/docs/guides/database/timeouts" },
     { "source": "/docs/reference/postgres/database-passwords", "destination": "/docs/guides/database/managing-passwords" },
     { "source": "/docs/reference/postgres/changing-timezones", "destination": "/docs/guides/database/managing-timezones" },
-    { "source": "/docs/reference/postgres/publications", "destination": "/docs/guides/database/replication" }
+    { "source": "/docs/reference/postgres/publications", "destination": "/docs/guides/database/replication" },
+
+    { "source": "/docs/guides/platform", "destination": "/docs/guides/hosting/platform" },
+    { "source": "/docs/guides/self-hosting", "destination": "/docs/guides/hosting/overview" }
 
 
   ],

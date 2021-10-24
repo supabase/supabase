@@ -8,6 +8,7 @@ Ant Wilson
 Beng Eu
 Bobbie Soedirgo
 Chris Copplestone
+David Thyresson
 Div Arora
 Erkin
 Francesco Ceccon
@@ -27,6 +28,8 @@ Stanislav M
 Steve Chavez
 Wen Bo Xie
 Mark Burggraf
+Thor Schaeff
+Gurjeet Singh https://gurjeet.singh.im
 
 ____________
 

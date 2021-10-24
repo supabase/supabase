@@ -212,3 +212,7 @@ th {
 .sbui-typography-container thead {
   @apply text-gray-500 dark:text-gray-200;
 }
+
+.sbui-typography a {
+  @apply break-words;
+}

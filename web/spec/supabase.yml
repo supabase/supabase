@@ -79,7 +79,6 @@ info:
       - name: 'Filters'
         items:
           - Using Filters
-          - .filter()
           - .or()
           - .not()
           - .match()
@@ -102,6 +101,7 @@ info:
           - .rangeAdjacent()
           - .overlaps()
           - .textSearch()
+          - .filter()
 
 pages:
   Installing:
@@ -255,7 +255,7 @@ pages:
 
       on:
         schedule:
-          # sets the action to run daily. You can modify this to run the action more or less freqently
+          # sets the action to run daily. You can modify this to run the action more or less frequently
           - cron: '0 0 * * *'
 
       jobs:
@@ -429,6 +429,7 @@ pages:
       Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
     examples:
       - name: Update email for authenticated user.
+        description: Sends a "Confirm Email Change" email to the new email address.
         isSpotlight: true
         js: |
           ```js
@@ -590,6 +591,32 @@ pages:
             .from('users')
             .select()
             .csv()
+          ```
+      - name: Aborting requests in-flight
+        description: |
+          You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests. Note that `status` and `statusText` doesn't mean anything for aborted requests, since the request wasn't actually fulfilled.
+        js: |
+          ```js
+          const ac = new AbortController()
+          supabase
+            .from('very_big_table')
+            .select()
+            .abortSignal(ac.signal)
+            .then(console.log)
+          ac.abort()
+          // {
+          //   error: {
+          //     message: 'FetchError: The user aborted a request.',
+          //     details: '',
+          //     hint: '',
+          //     code: ''
+          //   },
+          //   data: null,
+          //   body: null,
+          //   count: null,
+          //   status: 400,
+          //   statusText: 'Bad Request'
+          // }
           ```
 
   insert():
@@ -1307,51 +1334,6 @@ pages:
         .gte('population', 1000)
         .lt('population', 10000)
       ```
-
-  .filter():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.filter'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .filter('name', 'eq', 'Paris')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .filter('name', 'eq', 'Paris')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .filter('name', 'eq', 'Paris')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .filter('name', 'eq', 'Paris')
-          ```
-      - name: Filter embedded resources
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, countries ( name )')
-            .filter('countries.name', 'eq', 'France')
-          ```
 
   .or():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.or'
@@ -2181,4 +2163,51 @@ pages:
               type: 'websearch',
               config: 'english'
             })
+          ```
+
+  .filter():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.filter'
+    notes: |
+      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter values, so it should only be used as an escape hatch in case other filters don't work.
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: Filter embedded resources
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, countries ( name )')
+            .filter('countries.name', 'in', '("France","Japan")')
           ```

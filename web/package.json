@@ -22,6 +22,7 @@
     "@primer/octicons-react": "^15.1.0",
     "cuid": "^2.1.8",
     "dayjs": "^1.10.7",
+    "jsrsasign": "^10.4.1",
     "mermaid": "^8.6.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
