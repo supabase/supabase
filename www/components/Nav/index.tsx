@@ -12,13 +12,16 @@ import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
 import Announcement from '~/components/Nav/Announcement'
 
+import DarkModeToggle from '../DarkModeToggle'
+
 type Props = {
   darkMode: boolean
+  updateTheme: Function
 }
 
 const Nav = (props: Props) => {
   const { basePath } = useRouter()
-  const { darkMode } = props
+  const { darkMode, updateTheme } = props
   const [open, setOpen] = useState(false)
 
   const [openProduct, setOpenProduct] = useState(false)
@@ -242,6 +245,7 @@ const Nav = (props: Props) => {
                 </div>
               </div>
               <div className="hidden lg:flex items-center sm:space-x-3">
+                <DarkModeToggle darkMode={darkMode} updateTheme={updateTheme} />
                 <a href="https://github.com/supabase/supabase" target="_blank">
                   <Button type="default" icon={<IconStar />}>
                     Star us on GitHub
