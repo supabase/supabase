@@ -199,9 +199,8 @@ const Community = () => {
           `}
           >
             <img
-              // style={{ maxWidth: '48px' }}
               className={`max-h-4 ${x.invertImgDarkMode ? ' dark:filter dark:invert' : ''}`}
-              alt={`logo`}
+              alt={`${x.title} logo`}
               src={`${basePath}/images/company/community/${x.img}`}
             />
             <div>
