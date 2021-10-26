@@ -47,7 +47,7 @@ const data: TeamMember[] = [
   {
     name: 'Joshen Lim',
     github: 'https://github.com/joshenlim',
-    department: 'Engineering',
+    department: 'Engineering, Design',
     img: 'https://github.com/joshenlim.png',
     twitter: 'https://twitter.com/joshenlimek',
     active: true,
