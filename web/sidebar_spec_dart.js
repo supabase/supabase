@@ -39,7 +39,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Filters',
-      items: ['reference/dart/using-filters', 'reference/dart/filter', 'reference/dart/or', 'reference/dart/not', 'reference/dart/match', 'reference/dart/eq', 'reference/dart/neq', 'reference/dart/gt', 'reference/dart/gte', 'reference/dart/lt', 'reference/dart/lte', 'reference/dart/like', 'reference/dart/ilike', 'reference/dart/is_', 'reference/dart/in_', 'reference/dart/contains', 'reference/dart/containedby', 'reference/dart/rangelt', 'reference/dart/rangegt', 'reference/dart/rangegte', 'reference/dart/rangelte', 'reference/dart/rangeadjacent', 'reference/dart/overlaps', 'reference/dart/textsearch'],
+      items: ['reference/dart/using-filters', 'reference/dart/or', 'reference/dart/not', 'reference/dart/match', 'reference/dart/eq', 'reference/dart/neq', 'reference/dart/gt', 'reference/dart/gte', 'reference/dart/lt', 'reference/dart/lte', 'reference/dart/like', 'reference/dart/ilike', 'reference/dart/is_', 'reference/dart/in_', 'reference/dart/contains', 'reference/dart/containedby', 'reference/dart/rangelt', 'reference/dart/rangegt', 'reference/dart/rangegte', 'reference/dart/rangelte', 'reference/dart/rangeadjacent', 'reference/dart/overlaps', 'reference/dart/textsearch', 'reference/dart/filter'],
       collapsed: true,
     }
   ],
