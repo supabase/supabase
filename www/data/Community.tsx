@@ -5,6 +5,7 @@ type CommunityItem = {
   title: string
   stat: string
   statLabel: string
+  img: string
   detail: any // some component to show when selected
 }
 
@@ -12,11 +13,15 @@ const data: CommunityItem[] = [
   {
     title: 'Developers',
     stat: '40,000+',
-    statLabel: 'Devs',
+    statLabel: 'Registered developers',
+    img: 'supabase.png',
     detail: () => (
       <div className="mt-5 max-w-lg mx-auto grid gap-0 sm:grid-cols-3 lg:grid-cols-4 lg:max-w-none text-center border border-dashed rounded-lg overflow-hidden ">
         {DeveloperSignups.map((signup) => (
-          <div key={signup.title} className="col-span-1 flex justify-center py-8 px-8 border border-dashed">
+          <div
+            key={signup.title}
+            className="col-span-1 flex justify-center py-8 px-8 border border-dashed"
+          >
             <img key={signup.title} className="max-h-12" src={signup.img} alt={signup.title} />
           </div>
         ))}
@@ -26,7 +31,8 @@ const data: CommunityItem[] = [
   {
     title: 'GitHub',
     stat: '20,000+',
-    statLabel: 'STARS',
+    statLabel: 'Github stars',
+    img: 'github.png',
     detail: () => (
       <div>
         <Typography.Text>Some growth chart?</Typography.Text>
@@ -37,6 +43,7 @@ const data: CommunityItem[] = [
     title: 'Twitter',
     stat: '17,000+',
     statLabel: 'Followers',
+    img: 'twitter.png',
     detail: () => (
       <div>
         <Typography.Text>Some twitter callouts</Typography.Text>
@@ -47,6 +54,7 @@ const data: CommunityItem[] = [
     title: 'Discord',
     stat: '4,000+',
     statLabel: 'SuperTroopers',
+    img: 'discord.png',
     detail: () => (
       <div>
         <Typography.Text>Something great</Typography.Text>

@@ -5,16 +5,20 @@ type TeamMember = {
   name: string
   img: string
   department: string
-  github: string
   active: boolean
+
+  github?: string
+  twitter?: string
+  linkedin?: string
 }
 
 const data: TeamMember[] = [
   {
-    name: 'Rory Wilding',
-    github: 'https://github.com/roryw10',
-    img: 'https://github.com/roryw10.png',
-    department: 'Growth',
+    name: 'Paul Copplestone',
+    github: 'https://github.com/kiwicopple',
+    img: 'https://github.com/kiwicopple.png',
+    department: 'Cofounder',
+    twitter: 'https://twitter.com/kiwicopple',
     active: true,
   },
   {
@@ -22,13 +26,7 @@ const data: TeamMember[] = [
     github: 'https://github.com/awalias',
     img: 'https://github.com/awalias.png',
     department: 'Cofounder',
-    active: true,
-  },
-  {
-    name: 'Paul Copplestone',
-    github: 'https://github.com/kiwicopple',
-    img: 'https://github.com/kiwicopple.png',
-    department: 'Cofounder',
+    twitter: 'https://twitter.com/antwilson',
     active: true,
   },
   {
@@ -39,10 +37,42 @@ const data: TeamMember[] = [
     active: true,
   },
   {
-    name: 'Thor Schaeff',
-    github: 'https://github.com/thorwebdev',
-    img: 'https://github.com/thorwebdev.png',
-    department: 'DevRel',
+    name: 'Hieu Pham',
+    github: 'https://github.com/phamhieu',
+    department: 'Engineering',
+    img: 'https://github.com/phamhieu.png',
+    twitter: 'https://twitter.com/phamhieu_',
+    active: true,
+  },
+  {
+    name: 'Joshen Lim',
+    github: 'https://github.com/joshenlim',
+    department: 'Engineering',
+    img: 'https://github.com/joshenlim.png',
+    twitter: 'https://twitter.com/joshenlimek',
+    active: true,
+  },
+  {
+    name: 'Steve Chavez',
+    github: 'https://github.com/steve-chavez',
+    department: 'Engineering & PostgREST maintainer',
+    img: 'https://github.com/steve-chavez.png',
+    twitter: 'https://twitter.com/_steve_chavez',
+    active: true,
+  },
+  {
+    name: 'Chris Copplestone',
+    github: '',
+    department: 'Engineering',
+    img: 'https://ca.slack-edge.com/TS93YE5NV-U0131589GCX-8ceb0013e47a-512',
+    active: true,
+  },
+  {
+    name: 'Rory Wilding',
+    github: 'https://github.com/roryw10',
+    img: 'https://github.com/roryw10.png',
+    department: 'Growth',
+    twitter: 'https://twitter.com/Rorstro',
     active: true,
   },
   {
@@ -50,6 +80,7 @@ const data: TeamMember[] = [
     github: 'https://github.com/inian',
     img: 'https://github.com/inian.png',
     department: 'Engineering',
+    twitter: 'https://twitter.com/everConfusedGuy',
     active: true,
   },
   {
@@ -60,24 +91,18 @@ const data: TeamMember[] = [
     active: true,
   },
   {
-    name: 'Francesco Ceccon',
-    github: 'https://github.com/fracek',
-    department: 'Engineering',
-    img: 'https://github.com/fracek.png',
-    active: false,
-  },
-  {
-    name: 'Steve Chavez',
-    github: 'https://github.com/steve-chavez',
-    department: 'Engineering & PostgREST maintainer',
-    img: 'https://github.com/steve-chavez.png',
+    name: 'Jonathan Summers-Muir',
+    github: 'https://github.com/mildtomato',
+    department: 'Design, Engineering',
+    img: 'https://github.com/mildtomato.png',
+    twitter: 'https://twitter.com/JSummersMuir',
     active: true,
   },
   {
-    name: 'Kang Ming Tay',
-    github: 'https://github.com/kangmingtay',
+    name: 'Wen Bo Xi',
+    github: 'https://github.com/w3b6x9',
     department: 'Engineering',
-    img: 'https://github.com/kangmingtay.png',
+    img: 'https://github.com/w3b6x9.png',
     active: true,
   },
   {
@@ -85,6 +110,97 @@ const data: TeamMember[] = [
     github: 'https://github.com/darora',
     department: 'Engineering',
     img: 'https://github.com/darora.png',
+    active: true,
+  },
+  {
+    name: 'Thor Schaeff',
+    github: 'https://github.com/thorwebdev',
+    img: 'https://github.com/thorwebdev.png',
+    department: 'DevRel',
+    twitter: 'https://twitter.com/thorwebdev',
+    active: true,
+  },
+  {
+    name: 'Mark Burggra',
+    github: 'https://github.com/burggraf',
+    department: 'Engineering',
+    img: 'https://github.com/burggraf.png',
+    active: true,
+  },
+  {
+    name: 'Kang Ming Tay',
+    github: 'https://github.com/kangmingtay',
+    department: 'Engineering',
+    img: 'https://github.com/kangmingtay.png',
+    twitter: 'https://twitter.com/kangmingtay',
+    active: true,
+  },
+  {
+    name: 'Amy Que',
+    github: '',
+    department: 'Marketing',
+    img: 'https://ca.slack-edge.com/TS93YE5NV-U023L5A1ER0-613a55cd13b7-512',
+    twitter: 'https://twitter.com/QuekAmy',
+    active: true,
+  },
+  {
+    name: 'Stanislav Muzhy',
+    github: 'https://github.com/abc3',
+    department: 'Engineering',
+    img: 'https://github.com/abc3.png',
+    twitter: 'https://twitter.com/abc3erl',
+    active: true,
+  },
+  {
+    name: 'Leo Tanad',
+    github: 'https://github.com/ltanady',
+    department: 'Engineering',
+    img: 'https://github.com/ltanady.png',
+    active: true,
+  },
+  {
+    name: 'Oliver Ric',
+    github: 'https://github.com/olirice',
+    department: 'Engineering',
+    img: 'https://github.com/olirice.png',
+    active: true,
+  },
+  {
+    name: 'Beng Eu',
+    github: 'https://github.com/thebengeu',
+    department: 'Engineering',
+    img: 'https://github.com/thebengeu.png',
+    twitter: 'https://twitter.com/thebengeu',
+    active: true,
+  },
+  {
+    name: 'Gurjeet Sing',
+    github: 'https://github.com/gurjeet',
+    department: 'Engineering',
+    img: 'https://github.com/gurjeet.png',
+    active: true,
+  },
+  {
+    name: 'Laura Copplestone',
+    github: 'https://github.com/??',
+    department: '',
+    img: 'https://ca.slack-edge.com/TS93YE5NV-U0267HUR09J-35f4554b6def-512',
+    active: true,
+  },
+  {
+    name: 'Jon Meyer',
+    github: 'https://github.com/dijonmusters',
+    department: 'Engineering',
+    img: 'https://github.com/dijonmusters.png',
+    twitter: 'https://twitter.com/_dijonmusters',
+    active: true,
+  },
+  {
+    name: 'Chase Granberry',
+    github: 'https://github.com/chasers',
+    department: 'Engineering',
+    img: 'https://github.com/chasers.png',
+    twitter: 'https://twitter.com/chasers',
     active: true,
   },
 ]

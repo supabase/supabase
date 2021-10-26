@@ -1,5 +1,3 @@
-
-
 type Investor = {
   name: string
   round: 'SEED' | 'A'
@@ -182,13 +180,6 @@ const data: Investor[] = [
     name: 'Jason Warner',
     round: 'SEED',
     title: 'GitHub CTO',
-    img: '',
-    lead: false,
-  },
-  {
-    name: 'Shawn Wang',
-    round: 'SEED',
-    title: 'Temporal DevRel',
     img: '',
     lead: false,
   },
