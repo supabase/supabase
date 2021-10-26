@@ -4012,7 +4012,7 @@
 			]
 		},
 		{
-			"id": 419,
+			"id": 407,
 			"name": "\"index\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -6745,7 +6745,7 @@
 						},
 						{
 							"id": 352,
-							"name": "time",
+							"name": "text",
 							"kind": 16,
 							"kindString": "Enumeration member",
 							"flags": {
@@ -6758,11 +6758,11 @@
 									"character": 6
 								}
 							],
-							"defaultValue": "\"time\""
+							"defaultValue": "\"text\""
 						},
 						{
 							"id": 353,
-							"name": "timestamp",
+							"name": "time",
 							"kind": 16,
 							"kindString": "Enumeration member",
 							"flags": {
@@ -6772,14 +6772,14 @@
 								{
 									"fileName": "lib/transformers.ts",
 									"line": 27,
-									"character": 11
+									"character": 6
 								}
 							],
-							"defaultValue": "\"timestamp\""
+							"defaultValue": "\"time\""
 						},
 						{
 							"id": 354,
-							"name": "timestamptz",
+							"name": "timestamp",
 							"kind": 16,
 							"kindString": "Enumeration member",
 							"flags": {
@@ -6789,14 +6789,14 @@
 								{
 									"fileName": "lib/transformers.ts",
 									"line": 28,
-									"character": 13
+									"character": 11
 								}
 							],
-							"defaultValue": "\"timestamptz\""
+							"defaultValue": "\"timestamp\""
 						},
 						{
 							"id": 355,
-							"name": "timetz",
+							"name": "timestamptz",
 							"kind": 16,
 							"kindString": "Enumeration member",
 							"flags": {
@@ -6806,14 +6806,14 @@
 								{
 									"fileName": "lib/transformers.ts",
 									"line": 29,
-									"character": 8
+									"character": 13
 								}
 							],
-							"defaultValue": "\"timetz\""
+							"defaultValue": "\"timestamptz\""
 						},
 						{
 							"id": 356,
-							"name": "tsrange",
+							"name": "timetz",
 							"kind": 16,
 							"kindString": "Enumeration member",
 							"flags": {
@@ -6823,14 +6823,14 @@
 								{
 									"fileName": "lib/transformers.ts",
 									"line": 30,
-									"character": 9
+									"character": 8
 								}
 							],
-							"defaultValue": "\"tsrange\""
+							"defaultValue": "\"timetz\""
 						},
 						{
 							"id": 357,
-							"name": "tstzrange",
+							"name": "tsrange",
 							"kind": 16,
 							"kindString": "Enumeration member",
 							"flags": {
@@ -6840,6 +6840,23 @@
 								{
 									"fileName": "lib/transformers.ts",
 									"line": 31,
+									"character": 9
+								}
+							],
+							"defaultValue": "\"tsrange\""
+						},
+						{
+							"id": 358,
+							"name": "tstzrange",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "lib/transformers.ts",
+									"line": 32,
 									"character": 11
 								}
 							],
@@ -6873,7 +6890,8 @@
 								354,
 								355,
 								356,
-								357
+								357,
+								358
 							]
 						}
 					],
@@ -6886,156 +6904,207 @@
 					]
 				},
 				{
-					"id": 358,
-					"name": "Column",
+					"id": 365,
+					"name": "BaseValue",
 					"kind": 4194304,
 					"kindString": "Type alias",
 					"flags": {},
 					"sources": [
 						{
 							"fileName": "lib/transformers.ts",
-							"line": 34,
+							"line": 42,
+							"character": 14
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "null"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							},
+							{
+								"type": "intrinsic",
+								"name": "number"
+							},
+							{
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						]
+					}
+				},
+				{
+					"id": 359,
+					"name": "Columns",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "lib/transformers.ts",
+							"line": 35,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "array",
+						"elementType": {
+							"type": "reflection",
+							"declaration": {
+								"id": 360,
+								"name": "__type",
+								"kind": 65536,
+								"kindString": "Type literal",
+								"flags": {},
+								"children": [
+									{
+										"id": 363,
+										"name": "flags",
+										"kind": 32,
+										"kindString": "Variable",
+										"flags": {
+											"isOptional": true
+										},
+										"sources": [
+											{
+												"fileName": "lib/transformers.ts",
+												"line": 38,
+												"character": 7
+											}
+										],
+										"type": {
+											"type": "array",
+											"elementType": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									},
+									{
+										"id": 361,
+										"name": "name",
+										"kind": 32,
+										"kindString": "Variable",
+										"flags": {},
+										"sources": [
+											{
+												"fileName": "lib/transformers.ts",
+												"line": 36,
+												"character": 6
+											}
+										],
+										"type": {
+											"type": "intrinsic",
+											"name": "string"
+										}
+									},
+									{
+										"id": 362,
+										"name": "type",
+										"kind": 32,
+										"kindString": "Variable",
+										"flags": {},
+										"sources": [
+											{
+												"fileName": "lib/transformers.ts",
+												"line": 37,
+												"character": 6
+											}
+										],
+										"type": {
+											"type": "intrinsic",
+											"name": "string"
+										}
+									},
+									{
+										"id": 364,
+										"name": "type_modifier",
+										"kind": 32,
+										"kindString": "Variable",
+										"flags": {
+											"isOptional": true
+										},
+										"sources": [
+											{
+												"fileName": "lib/transformers.ts",
+												"line": 39,
+												"character": 15
+											}
+										],
+										"type": {
+											"type": "union",
+											"types": [
+												{
+													"type": "intrinsic",
+													"name": "undefined"
+												},
+												{
+													"type": "intrinsic",
+													"name": "number"
+												}
+											]
+										}
+									}
+								],
+								"groups": [
+									{
+										"title": "Variables",
+										"kind": 32,
+										"children": [
+											363,
+											361,
+											362,
+											364
+										]
+									}
+								],
+								"sources": [
+									{
+										"fileName": "lib/transformers.ts",
+										"line": 35,
+										"character": 14
+									}
+								]
+							}
+						}
+					}
+				},
+				{
+					"id": 367,
+					"name": "Record",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "lib/transformers.ts",
+							"line": 45,
 							"character": 11
 						}
 					],
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 359,
-							"name": "__type",
-							"kind": 65536,
-							"kindString": "Type literal",
-							"flags": {},
-							"children": [
-								{
-									"id": 360,
-									"name": "flags",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {},
-									"sources": [
-										{
-											"fileName": "lib/transformers.ts",
-											"line": 35,
-											"character": 7
-										}
-									],
-									"type": {
-										"type": "array",
-										"elementType": {
-											"type": "intrinsic",
-											"name": "string"
-										}
-									}
-								},
-								{
-									"id": 361,
-									"name": "name",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {},
-									"sources": [
-										{
-											"fileName": "lib/transformers.ts",
-											"line": 36,
-											"character": 6
-										}
-									],
-									"type": {
-										"type": "intrinsic",
-										"name": "string"
-									}
-								},
-								{
-									"id": 362,
-									"name": "type",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {},
-									"sources": [
-										{
-											"fileName": "lib/transformers.ts",
-											"line": 37,
-											"character": 6
-										}
-									],
-									"type": {
-										"type": "intrinsic",
-										"name": "string"
-									}
-								},
-								{
-									"id": 363,
-									"name": "type_modifier",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {},
-									"sources": [
-										{
-											"fileName": "lib/transformers.ts",
-											"line": 38,
-											"character": 15
-										}
-									],
-									"type": {
-										"type": "intrinsic",
-										"name": "number"
-									}
-								}
-							],
-							"groups": [
-								{
-									"title": "Variables",
-									"kind": 32,
-									"children": [
-										360,
-										361,
-										362,
-										363
-									]
-								}
-							],
-							"sources": [
-								{
-									"fileName": "lib/transformers.ts",
-									"line": 34,
-									"character": 13
-								}
-							]
-						}
-					}
-				},
-				{
-					"id": 364,
-					"name": "Records",
-					"kind": 4194304,
-					"kindString": "Type alias",
-					"flags": {},
-					"sources": [
-						{
-							"fileName": "lib/transformers.ts",
-							"line": 41,
-							"character": 12
-						}
-					],
-					"type": {
-						"type": "reflection",
-						"declaration": {
-							"id": 365,
+							"id": 368,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"indexSignature": [
 								{
-									"id": 366,
+									"id": 369,
 									"name": "__index",
 									"kind": 8192,
 									"kindString": "Index signature",
 									"flags": {},
 									"parameters": [
 										{
-											"id": 367,
+											"id": 370,
 											"name": "key",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7047,19 +7116,52 @@
 										}
 									],
 									"type": {
-										"type": "intrinsic",
-										"name": "string"
+										"type": "reference",
+										"id": 366,
+										"name": "RecordValue"
 									}
 								}
 							],
 							"sources": [
 								{
 									"fileName": "lib/transformers.ts",
-									"line": 41,
-									"character": 14
+									"line": 45,
+									"character": 13
 								}
 							]
 						}
+					}
+				},
+				{
+					"id": 366,
+					"name": "RecordValue",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "lib/transformers.ts",
+							"line": 43,
+							"character": 16
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "reference",
+								"id": 365,
+								"name": "BaseValue"
+							},
+							{
+								"type": "array",
+								"elementType": {
+									"type": "reference",
+									"id": 365,
+									"name": "BaseValue"
+								}
+							}
+						]
 					}
 				},
 				{
@@ -7133,37 +7235,36 @@
 								},
 								{
 									"id": 387,
-									"name": "stringValue",
+									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {
 										"isExported": true
 									},
-									"comment": {
-										"shortText": "The cell value\n"
-									},
 									"type": {
-										"type": "intrinsic",
-										"name": "string"
+										"type": "reference",
+										"id": 366,
+										"name": "RecordValue"
 									}
 								}
 							],
 							"type": {
-								"type": "intrinsic",
-								"name": "any"
+								"type": "reference",
+								"id": 366,
+								"name": "RecordValue"
 							}
 						}
 					],
 					"sources": [
 						{
 							"fileName": "lib/transformers.ts",
-							"line": 112,
+							"line": 118,
 							"character": 24
 						}
 					]
 				},
 				{
-					"id": 368,
+					"id": 371,
 					"name": "convertChangeData",
 					"kind": 64,
 					"kindString": "Function",
@@ -7182,7 +7283,7 @@
 					},
 					"signatures": [
 						{
-							"id": 369,
+							"id": 372,
 							"name": "convertChangeData",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7200,7 +7301,7 @@
 							},
 							"parameters": [
 								{
-									"id": 370,
+									"id": 373,
 									"name": "columns",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7208,17 +7309,14 @@
 										"isExported": true
 									},
 									"type": {
-										"type": "array",
-										"elementType": {
-											"type": "reference",
-											"id": 358,
-											"name": "Column"
-										}
+										"type": "reference",
+										"id": 359,
+										"name": "Columns"
 									}
 								},
 								{
-									"id": 371,
-									"name": "records",
+									"id": 374,
+									"name": "record",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {
@@ -7227,12 +7325,12 @@
 									"comment": {},
 									"type": {
 										"type": "reference",
-										"id": 364,
-										"name": "Records"
+										"id": 367,
+										"name": "Record"
 									}
 								},
 								{
-									"id": 372,
+									"id": 375,
 									"name": "options",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7245,7 +7343,7 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 373,
+											"id": 376,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -7254,7 +7352,7 @@
 											},
 											"children": [
 												{
-													"id": 374,
+													"id": 377,
 													"name": "skipTypes",
 													"kind": 32,
 													"kindString": "Variable",
@@ -7265,7 +7363,7 @@
 													"sources": [
 														{
 															"fileName": "lib/transformers.ts",
-															"line": 60,
+															"line": 64,
 															"character": 22
 														}
 													],
@@ -7283,14 +7381,14 @@
 													"title": "Variables",
 													"kind": 32,
 													"children": [
-														374
+														377
 													]
 												}
 											],
 											"sources": [
 												{
 													"fileName": "lib/transformers.ts",
-													"line": 60,
+													"line": 64,
 													"character": 10
 												}
 											]
@@ -7300,53 +7398,16 @@
 								}
 							],
 							"type": {
-								"type": "reflection",
-								"declaration": {
-									"id": 375,
-									"name": "__type",
-									"kind": 65536,
-									"kindString": "Type literal",
-									"flags": {
-										"isExported": true
-									},
-									"indexSignature": [
-										{
-											"id": 376,
-											"name": "__index",
-											"kind": 8192,
-											"kindString": "Index signature",
-											"flags": {
-												"isExported": true
-											},
-											"parameters": [
-												{
-													"id": 377,
-													"name": "key",
-													"kind": 32768,
-													"kindString": "Parameter",
-													"flags": {
-														"isExported": true
-													},
-													"type": {
-														"type": "intrinsic",
-														"name": "string"
-													}
-												}
-											],
-											"type": {
-												"type": "intrinsic",
-												"name": "any"
-											}
-										}
-									]
-								}
+								"type": "reference",
+								"id": 367,
+								"name": "Record"
 							}
 						}
 					],
 					"sources": [
 						{
 							"fileName": "lib/transformers.ts",
-							"line": 57,
+							"line": 61,
 							"character": 30
 						}
 					]
@@ -7423,17 +7484,14 @@
 										"isExported": true
 									},
 									"type": {
-										"type": "array",
-										"elementType": {
-											"type": "reference",
-											"id": 358,
-											"name": "Column"
-										}
+										"type": "reference",
+										"id": 359,
+										"name": "Columns"
 									}
 								},
 								{
 									"id": 382,
-									"name": "records",
+									"name": "record",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {
@@ -7444,8 +7502,8 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 364,
-										"name": "Records"
+										"id": 367,
+										"name": "Record"
 									}
 								},
 								{
@@ -7469,15 +7527,16 @@
 								}
 							],
 							"type": {
-								"type": "intrinsic",
-								"name": "any"
+								"type": "reference",
+								"id": 366,
+								"name": "RecordValue"
 							}
 						}
 					],
 					"sources": [
 						{
 							"fileName": "lib/transformers.ts",
-							"line": 85,
+							"line": 88,
 							"character": 26
 						}
 					]
@@ -7500,32 +7559,34 @@
 							"parameters": [
 								{
 									"id": 390,
-									"name": "stringValue",
+									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
-										"type": "intrinsic",
-										"name": "string"
+										"type": "reference",
+										"id": 366,
+										"name": "RecordValue"
 									}
 								}
 							],
 							"type": {
-								"type": "intrinsic",
-								"name": "string"
+								"type": "reference",
+								"id": 366,
+								"name": "RecordValue"
 							}
 						}
 					],
 					"sources": [
 						{
 							"fileName": "lib/transformers.ts",
-							"line": 183,
+							"line": 162,
 							"character": 10
 						}
 					]
 				},
 				{
-					"id": 412,
+					"id": 400,
 					"name": "toArray",
 					"kind": 64,
 					"kindString": "Function",
@@ -7538,17 +7599,21 @@
 						"tags": [
 							{
 								"tag": "example",
-								"text": "toArray('{1,2,3,4}', 'int4')\n//=> [1,2,3,4]"
+								"text": "toArray('{}', 'int4')\n//=> []"
 							},
 							{
 								"tag": "example",
-								"text": "toArray('{}', 'int4')\n//=> []\n"
+								"text": "toArray('{\"[2021-01-01,2021-12-31)\",\"(2021-01-01,2021-12-32]\"}', 'daterange')\n//=> ['[2021-01-01,2021-12-31)', '(2021-01-01,2021-12-32]']"
+							},
+							{
+								"tag": "example",
+								"text": "toArray([1,2,3,4], 'int4')\n//=> [1,2,3,4]\n"
 							}
 						]
 					},
 					"signatures": [
 						{
-							"id": 413,
+							"id": 401,
 							"name": "toArray",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7560,30 +7625,35 @@
 								"tags": [
 									{
 										"tag": "example",
-										"text": "toArray('{1,2,3,4}', 'int4')\n//=> [1,2,3,4]"
+										"text": "toArray('{}', 'int4')\n//=> []"
 									},
 									{
 										"tag": "example",
-										"text": "toArray('{}', 'int4')\n//=> []\n"
+										"text": "toArray('{\"[2021-01-01,2021-12-31)\",\"(2021-01-01,2021-12-32]\"}', 'daterange')\n//=> ['[2021-01-01,2021-12-31)', '(2021-01-01,2021-12-32]']"
+									},
+									{
+										"tag": "example",
+										"text": "toArray([1,2,3,4], 'int4')\n//=> [1,2,3,4]\n"
 									}
 								]
 							},
 							"parameters": [
 								{
-									"id": 414,
-									"name": "stringValue",
+									"id": 402,
+									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {
 										"isExported": true
 									},
 									"type": {
-										"type": "intrinsic",
-										"name": "string"
+										"type": "reference",
+										"id": 366,
+										"name": "RecordValue"
 									}
 								},
 								{
-									"id": 415,
+									"id": 403,
 									"name": "type",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7597,18 +7667,16 @@
 								}
 							],
 							"type": {
-								"type": "array",
-								"elementType": {
-									"type": "intrinsic",
-									"name": "any"
-								}
+								"type": "reference",
+								"id": 366,
+								"name": "RecordValue"
 							}
 						}
 					],
 					"sources": [
 						{
 							"fileName": "lib/transformers.ts",
-							"line": 225,
+							"line": 206,
 							"character": 20
 						}
 					]
@@ -7634,288 +7702,36 @@
 							"parameters": [
 								{
 									"id": 393,
-									"name": "stringValue",
+									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {
 										"isExported": true
 									},
 									"type": {
-										"type": "intrinsic",
-										"name": "string"
-									}
-								}
-							],
-							"type": {
-								"type": "union",
-								"types": [
-									{
-										"type": "intrinsic",
-										"name": "null"
-									},
-									{
-										"type": "intrinsic",
-										"name": "false"
-									},
-									{
-										"type": "intrinsic",
-										"name": "true"
-									}
-								]
-							}
-						}
-					],
-					"sources": [
-						{
-							"fileName": "lib/transformers.ts",
-							"line": 186,
-							"character": 22
-						}
-					]
-				},
-				{
-					"id": 394,
-					"name": "toDate",
-					"kind": 64,
-					"kindString": "Function",
-					"flags": {
-						"isExported": true,
-						"isConst": true
-					},
-					"signatures": [
-						{
-							"id": 395,
-							"name": "toDate",
-							"kind": 4096,
-							"kindString": "Call signature",
-							"flags": {
-								"isExported": true
-							},
-							"parameters": [
-								{
-									"id": 396,
-									"name": "stringValue",
-									"kind": 32768,
-									"kindString": "Parameter",
-									"flags": {
-										"isExported": true
-									},
-									"type": {
-										"type": "intrinsic",
-										"name": "string"
+										"type": "reference",
+										"id": 366,
+										"name": "RecordValue"
 									}
 								}
 							],
 							"type": {
 								"type": "reference",
-								"name": "Date"
+								"id": 366,
+								"name": "RecordValue"
 							}
 						}
 					],
 					"sources": [
 						{
 							"fileName": "lib/transformers.ts",
-							"line": 196,
-							"character": 19
+							"line": 165,
+							"character": 22
 						}
 					]
 				},
 				{
 					"id": 397,
-					"name": "toDateRange",
-					"kind": 64,
-					"kindString": "Function",
-					"flags": {
-						"isExported": true,
-						"isConst": true
-					},
-					"signatures": [
-						{
-							"id": 398,
-							"name": "toDateRange",
-							"kind": 4096,
-							"kindString": "Call signature",
-							"flags": {
-								"isExported": true
-							},
-							"parameters": [
-								{
-									"id": 399,
-									"name": "stringValue",
-									"kind": 32768,
-									"kindString": "Parameter",
-									"flags": {
-										"isExported": true
-									},
-									"type": {
-										"type": "intrinsic",
-										"name": "string"
-									}
-								}
-							],
-							"type": {
-								"type": "array",
-								"elementType": {
-									"type": "reference",
-									"name": "Date"
-								}
-							}
-						}
-					],
-					"sources": [
-						{
-							"fileName": "lib/transformers.ts",
-							"line": 199,
-							"character": 24
-						}
-					]
-				},
-				{
-					"id": 400,
-					"name": "toFloat",
-					"kind": 64,
-					"kindString": "Function",
-					"flags": {
-						"isExported": true,
-						"isConst": true
-					},
-					"signatures": [
-						{
-							"id": 401,
-							"name": "toFloat",
-							"kind": 4096,
-							"kindString": "Call signature",
-							"flags": {
-								"isExported": true
-							},
-							"parameters": [
-								{
-									"id": 402,
-									"name": "stringValue",
-									"kind": 32768,
-									"kindString": "Parameter",
-									"flags": {
-										"isExported": true
-									},
-									"type": {
-										"type": "intrinsic",
-										"name": "string"
-									}
-								}
-							],
-							"type": {
-								"type": "intrinsic",
-								"name": "number"
-							}
-						}
-					],
-					"sources": [
-						{
-							"fileName": "lib/transformers.ts",
-							"line": 203,
-							"character": 20
-						}
-					]
-				},
-				{
-					"id": 403,
-					"name": "toInt",
-					"kind": 64,
-					"kindString": "Function",
-					"flags": {
-						"isExported": true,
-						"isConst": true
-					},
-					"signatures": [
-						{
-							"id": 404,
-							"name": "toInt",
-							"kind": 4096,
-							"kindString": "Call signature",
-							"flags": {
-								"isExported": true
-							},
-							"parameters": [
-								{
-									"id": 405,
-									"name": "stringValue",
-									"kind": 32768,
-									"kindString": "Parameter",
-									"flags": {
-										"isExported": true
-									},
-									"type": {
-										"type": "intrinsic",
-										"name": "string"
-									}
-								}
-							],
-							"type": {
-								"type": "intrinsic",
-								"name": "number"
-							}
-						}
-					],
-					"sources": [
-						{
-							"fileName": "lib/transformers.ts",
-							"line": 206,
-							"character": 18
-						}
-					]
-				},
-				{
-					"id": 406,
-					"name": "toIntRange",
-					"kind": 64,
-					"kindString": "Function",
-					"flags": {
-						"isExported": true,
-						"isConst": true
-					},
-					"signatures": [
-						{
-							"id": 407,
-							"name": "toIntRange",
-							"kind": 4096,
-							"kindString": "Call signature",
-							"flags": {
-								"isExported": true
-							},
-							"parameters": [
-								{
-									"id": 408,
-									"name": "stringValue",
-									"kind": 32768,
-									"kindString": "Parameter",
-									"flags": {
-										"isExported": true
-									},
-									"type": {
-										"type": "intrinsic",
-										"name": "string"
-									}
-								}
-							],
-							"type": {
-								"type": "array",
-								"elementType": {
-									"type": "intrinsic",
-									"name": "number"
-								}
-							}
-						}
-					],
-					"sources": [
-						{
-							"fileName": "lib/transformers.ts",
-							"line": 209,
-							"character": 23
-						}
-					]
-				},
-				{
-					"id": 409,
 					"name": "toJson",
 					"kind": 64,
 					"kindString": "Function",
@@ -7925,7 +7741,7 @@
 					},
 					"signatures": [
 						{
-							"id": 410,
+							"id": 398,
 							"name": "toJson",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7934,35 +7750,86 @@
 							},
 							"parameters": [
 								{
-									"id": 411,
-									"name": "stringValue",
+									"id": 399,
+									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {
 										"isExported": true
 									},
 									"type": {
-										"type": "intrinsic",
-										"name": "string"
+										"type": "reference",
+										"id": 366,
+										"name": "RecordValue"
 									}
 								}
 							],
 							"type": {
-								"type": "intrinsic",
-								"name": "any"
+								"type": "reference",
+								"id": 366,
+								"name": "RecordValue"
 							}
 						}
 					],
 					"sources": [
 						{
 							"fileName": "lib/transformers.ts",
-							"line": 213,
+							"line": 184,
 							"character": 19
 						}
 					]
 				},
 				{
-					"id": 416,
+					"id": 394,
+					"name": "toNumber",
+					"kind": 64,
+					"kindString": "Function",
+					"flags": {
+						"isExported": true,
+						"isConst": true
+					},
+					"signatures": [
+						{
+							"id": 395,
+							"name": "toNumber",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 396,
+									"name": "value",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 366,
+										"name": "RecordValue"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 366,
+								"name": "RecordValue"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "lib/transformers.ts",
+							"line": 175,
+							"character": 21
+						}
+					]
+				},
+				{
+					"id": 404,
 					"name": "toTimestampString",
 					"kind": 64,
 					"kindString": "Function",
@@ -7981,7 +7848,7 @@
 					},
 					"signatures": [
 						{
-							"id": 417,
+							"id": 405,
 							"name": "toTimestampString",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7999,29 +7866,31 @@
 							},
 							"parameters": [
 								{
-									"id": 418,
-									"name": "stringValue",
+									"id": 406,
+									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {
 										"isExported": true
 									},
 									"type": {
-										"type": "intrinsic",
-										"name": "string"
+										"type": "reference",
+										"id": 366,
+										"name": "RecordValue"
 									}
 								}
 							],
 							"type": {
-								"type": "intrinsic",
-								"name": "string"
+								"type": "reference",
+								"id": 366,
+								"name": "RecordValue"
 							}
 						}
 					],
 					"sources": [
 						{
 							"fileName": "lib/transformers.ts",
-							"line": 246,
+							"line": 241,
 							"character": 30
 						}
 					]
@@ -8039,8 +7908,10 @@
 					"title": "Type aliases",
 					"kind": 4194304,
 					"children": [
-						358,
-						364
+						365,
+						359,
+						367,
+						366
 					]
 				},
 				{
@@ -8048,18 +7919,14 @@
 					"kind": 64,
 					"children": [
 						384,
-						368,
+						371,
 						378,
 						388,
-						412,
-						391,
-						394,
-						397,
 						400,
-						403,
-						406,
-						409,
-						416
+						391,
+						397,
+						394,
+						404
 					]
 				}
 			],
@@ -8129,7 +7996,7 @@
 			"children": [
 				200,
 				96,
-				419,
+				407,
 				3,
 				42,
 				175,
