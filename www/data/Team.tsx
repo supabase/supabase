@@ -121,7 +121,7 @@ const data: TeamMember[] = [
     active: true,
   },
   {
-    name: 'Mark Burggra',
+    name: 'Mark Burggraf',
     github: 'https://github.com/burggraf',
     department: 'Engineering',
     img: 'https://github.com/burggraf.png',
@@ -193,14 +193,6 @@ const data: TeamMember[] = [
     department: 'Engineering',
     img: 'https://github.com/dijonmusters.png',
     twitter: 'https://twitter.com/_dijonmusters',
-    active: true,
-  },
-  {
-    name: 'Chase Granberry',
-    github: 'https://github.com/chasers',
-    department: 'Engineering',
-    img: 'https://github.com/chasers.png',
-    twitter: 'https://twitter.com/chasers',
     active: true,
   },
 ]
