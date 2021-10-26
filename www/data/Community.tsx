@@ -7,6 +7,7 @@ type CommunityItem = {
   statLabel: string
   img: string
   detail: any // some component to show when selected
+  invertImgDarkMode?: boolean
 }
 
 const data: CommunityItem[] = [
@@ -33,6 +34,7 @@ const data: CommunityItem[] = [
     stat: '20,000+',
     statLabel: 'Github stars',
     img: 'github.png',
+    invertImgDarkMode: true,
     detail: () => (
       <div>
         <Typography.Text>Some growth chart?</Typography.Text>

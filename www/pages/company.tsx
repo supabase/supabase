@@ -194,15 +194,13 @@ const Community = () => {
             key={x.title}
             className={`
               space-y-4 
-              ${i !== CommunityData.length - 1 ? 'md:border-r' : ''}
-              ${i === 1 ? 'md:border-0 lg:border-r' : ''}
+              ${i !== CommunityData.length - 1 ? 'dark:border-r-dark md:border-r' : ''}
+              ${i === 1 ? 'md:border-0 dark:border-r-dark lg:border-r ' : ''}
           `}
           >
             <img
               // style={{ maxWidth: '48px' }}
-              className="max-h-4
-              
-              "
+              className={`max-h-4 ${x.invertImgDarkMode ? ' dark:filter dark:invert' : ''}`}
               alt={`logo`}
               src={`${basePath}/images/company/community/${x.img}`}
             />
