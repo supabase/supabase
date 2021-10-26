@@ -472,7 +472,6 @@ pages:
           }
           ```
       - name: With Express.
-        description: This is most useful on server-side functions where you cannot log the user in, but have access to the user's access token.
         isSpotlight: true
         js: |
           ```js
