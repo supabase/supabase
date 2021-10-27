@@ -88,10 +88,6 @@ const data: Companies[] = [
     name: 'santander',
     image: 'santander.png',
   },
-  // {
-  //   name: 'sap',
-  //   image: 'sap.png',
-  // },
   {
     name: 'shopify',
     image: 'shopify.png',

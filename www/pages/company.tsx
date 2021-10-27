@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useRouter } from 'next/router'
 
 import Container from 'components/Container'
@@ -13,6 +12,9 @@ import CommunityData from 'data/Community'
 import CompaniesData from 'data/Companies'
 import InvestorData from 'data/Investors'
 import TeamData from 'data/Team'
+
+import Image from 'next/image'
+// import profilePic from '../public/me.png'
 
 import {
   Button,
@@ -35,7 +37,7 @@ const Index = ({}: Props) => {
           <Header />
           <Team />
           <Community />
-          <Companies />
+          {/* <Companies /> */}
           <Investors />
           <Press />
 
@@ -88,7 +90,7 @@ const Team = () => {
   }
 
   return (
-    <SectionContainer>
+    <SectionContainer className="pt-0 lg:pt-0">
       <div>
         <SectionHeader
           title="A truly remote team"
@@ -103,14 +105,16 @@ const Team = () => {
                 value an autonomous work culture that’s driven on building great products.
               </p>
 
-              <Button
-                type="link"
-                size="large"
-                iconRight={<IconChevronRight />}
-                style={{ padding: 0, background: 'none' }}
-              >
-                Join the team
-              </Button>
+              <a href="https://about.supabase.com/careers">
+                <Button
+                  type="link"
+                  size="large"
+                  iconRight={<IconChevronRight />}
+                  style={{ padding: 0, background: 'none' }}
+                >
+                  Join the team
+                </Button>
+              </a>
             </>
           }
         />
@@ -118,15 +122,17 @@ const Team = () => {
       <div className="mt-5 max-w-lg lg:max-w-none">
         <Typography.Text type="secondary">The team is sorted in order of hiring</Typography.Text>
       </div>
-      <div className="mt-5 grid md:gap-8 grid-cols-2 lg:grid-cols-3 w-full">
+      <div className="mt-5 grid md:gap-8 grid-cols-2 lg:grid-cols-4 w-full">
         {TeamData.filter((x) => x.active).map((x) => (
           <div key={x.name}>
             <div className="flex flex-col lg:flex-row space-y-3 lg:space-y-0 lg:space-x-4">
               <div>
-                <img
+                <Image
                   src={x.img}
-                  className="relative rounded-full bg-white border dark:border-dark w-16 h-16 shadow-md"
                   alt={x.name}
+                  width={48}
+                  height={48}
+                  className="rounded-md shadow-md object-contain"
                 />
               </div>
               <div className="flex flex-col justify-center space-y-2">
@@ -171,46 +177,92 @@ const Community = () => {
   const { basePath } = useRouter()
 
   return (
-    <SectionContainer className="lg:pt-0">
-      <div>
-        <SectionHeader
-          title={'Community'}
-          paragraph={
-            <>
-              <p>Join one of the world's fastest growing open source communities.</p>
-              <p>
-                We are a global company that’s distributed across the globe and all time zones. We
-                value an autonomous work culture that’s driven on building great products.
-              </p>
+    <SectionContainer className="pt-0 lg:pt-0">
+      <SectionHeader
+        title={'Community'}
+        paragraph={
+          <>
+            <p>Join one of the world's fastest growing open source communities.</p>
+            <p>
+              We are a global company that’s distributed across the globe and all time zones. We
+              value an autonomous work culture that’s driven on building great products.
+            </p>
 
-              <p>Let's build together</p>
-            </>
-          }
-        />
-      </div>
-      <div className="gap-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 max-w-5xl">
-        {CommunityData.map((x, i) => (
-          <div
-            key={x.title}
-            className={`
+            <p>Let's build together</p>
+          </>
+        }
+      />
+      <div className="space-y-16">
+        <div className="relative gap-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 max-w-5xl">
+          {CommunityData.map((x, i) => (
+            <div
+              key={x.title}
+              className={`
               space-y-4 
               ${i !== CommunityData.length - 1 ? 'dark:border-r-dark md:border-r' : ''}
               ${i === 1 ? 'md:border-0 dark:border-r-dark lg:border-r ' : ''}
           `}
-          >
-            <img
-              className={`max-h-4 ${x.invertImgDarkMode ? ' dark:filter dark:invert' : ''}`}
-              alt={`${x.title} logo`}
-              src={`${basePath}/images/company/community/${x.img}`}
-            />
-            <div>
-              <Typography.Title level={1} className="mb-0">
-                {x.stat}
-              </Typography.Title>
-              <Typography.Text type="secondary">{x.statLabel}</Typography.Text>
+            >
+              <div
+                className={`relative h-7 w-7 ${
+                  x.invertImgDarkMode ? ' dark:filter dark:invert' : ''
+                }`}
+              >
+                <Image
+                  layout="fill"
+                  alt={`${x.title} logo`}
+                  src={`${basePath}/images/company/community/${x.img}`}
+                  objectFit="scale-down"
+                  objectPosition="center"
+                  className="
+                      bg-no-repeat
+                  "
+                />
+              </div>
+              <div>
+                <Typography.Title level={1} className="mb-0">
+                  {x.stat}
+                </Typography.Title>
+                <Typography.Text type="secondary">{x.statLabel}</Typography.Text>
+              </div>
             </div>
+          ))}
+        </div>
+        <div className="space-y-8">
+          <div className="max-w-3xl">
+            <Typography.Title level={3}>Developer sign ups</Typography.Title>
+            <Typography.Text type="secondary">
+              <p className="text-xl">
+                Some of the best developers from the top companies in the world are already using
+                Supabase in some capacity. This is just a small selection of those companies we're
+                thrilled to already be experimenting with Supabase.
+              </p>
+            </Typography.Text>
           </div>
-        ))}
+          <div className="grid grid-cols-3 gap-0.5 md:grid-cols-6 lg:grid-cols-8">
+            {CompaniesData.map((x) => {
+              return (
+                <div className="col-span-1 flex items-center justify-center bg-gray-50 dark:bg-gray-700 p-8">
+                  <div className="relative overflow-auto w-full h-8 p-8">
+                    <Image
+                      layout="fill"
+                      src={`${basePath}/images/company/companies-using-supabase/${x.image}`}
+                      alt={x.name}
+                      objectFit="scale-down"
+                      objectPosition="center"
+                      className="
+                      bg-no-repeat
+                    filter 
+                    contrast-0
+                    opacity-50
+                  "
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
       </div>
     </SectionContainer>
   )
@@ -218,7 +270,7 @@ const Community = () => {
 
 const Investors = () => {
   return (
-    <SectionContainer>
+    <SectionContainer className="pt-0 lg:pt-0">
       <div>
         <SectionHeader
           title="Our investors"
@@ -234,18 +286,30 @@ const Investors = () => {
         />
       </div>
 
-      <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none mb-16">
+      <div className="mt-5 max-w-lg mx-auto grid gap-0.5 lg:grid-cols-3 lg:max-w-none mb-16">
         {InvestorData.filter((x) => x.lead === true).map((x) => (
           <div key={x.name}>
-            {/* <img src={x.img} alt={x.name} /> */}
             <div
               className="
               col-span-1 
               flex justify-center content-end items-center
-              bg-gray-50 dark:bg-gray-600 
+              bg-gray-50 dark:bg-gray-700 
               h-32"
             >
-              <img className="max-h-12" src={x.img} alt={x.name} />
+              <div className="relative overflow-auto w-full h-8 p-10">
+                <Image
+                  layout="fill"
+                  src={`${x.img}`}
+                  alt={x.name}
+                  objectFit="scale-down"
+                  objectPosition="center"
+                  className="
+                    filter 
+                    contrast-0
+                    opacity-50
+                  "
+                />
+              </div>
             </div>
           </div>
         ))}
@@ -316,7 +380,7 @@ const Companies = () => {
 
 const Press = () => {
   return (
-    <SectionContainer>
+    <SectionContainer className="pt-0 lg:pt-0">
       <div>
         <SectionHeader title={'Press'} />
       </div>

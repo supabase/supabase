@@ -14,6 +14,14 @@ type TeamMember = {
 
 const data: TeamMember[] = [
   {
+    name: 'Caryn Marooney',
+    img:
+      'https://res.cloudinary.com/crunchbase-production/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7,q_auto:eco,dpr_1/iqltjymln82pxxcwr6kq.png',
+    department: 'Board member',
+    twitter: 'https://twitter.com/carynm650',
+    active: true,
+  },
+  {
     name: 'Paul Copplestone',
     github: 'https://github.com/kiwicopple',
     img: 'https://github.com/kiwicopple.png',
@@ -136,7 +144,7 @@ const data: TeamMember[] = [
     active: true,
   },
   {
-    name: 'Amy Que',
+    name: 'Amy Quek',
     github: '',
     department: 'Marketing',
     img: 'https://ca.slack-edge.com/TS93YE5NV-U023L5A1ER0-613a55cd13b7-512',
@@ -190,7 +198,7 @@ const data: TeamMember[] = [
   {
     name: 'Jon Meyer',
     github: 'https://github.com/dijonmusters',
-    department: 'Engineering',
+    department: 'DevRel',
     img: 'https://github.com/dijonmusters.png',
     twitter: 'https://twitter.com/_dijonmusters',
     active: true,
