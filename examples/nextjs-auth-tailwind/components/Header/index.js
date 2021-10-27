@@ -29,7 +29,7 @@ export default function Header() {
                 <div className="flex-shrink-0 flex items-center text-white">
                   <img
                     className="h-8 w-auto"
-                    src="https://supabase.io/new/images/logo-dark.png"
+                    src="https://supabase.io/images/logo-dark.png"
                     alt="supabase"
                   />
                 </div>

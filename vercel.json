@@ -19,31 +19,6 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/new/_next/image:match*",
-      "destination": "https://www-internal.supabase.io/_next/image:match*"
-    },
-    { "source": "/new/:match*", "destination": "https://www-internal.supabase.io/new/:match*" },
-    { "source": "/", "destination": "https://www-internal.supabase.io/new" },
-    { "source": "/blog", "destination": "https://www-internal.supabase.io/new/blog" },
-    {
-      "source": "/blog/:match*",
-      "destination": "https://www-internal.supabase.io/new/blog/:match*"
-    },
-    { "source": "/rss", "destination": "https://www-internal.supabase.io/new/rss.xml" },
-    { "source": "/rss.xml", "destination": "https://www-internal.supabase.io/new/rss.xml" },
-    { "source": "/blog/rss.xml", "destination": "https://www-internal.supabase.io/new/rss.xml" },
-    { "source": "/blog/rss", "destination": "https://www-internal.supabase.io/new/rss.xml" },
-    { "source": "/beta", "destination": "https://www-internal.supabase.io/new/beta" },
-    { "source": "/pricing", "destination": "https://www-internal.supabase.io/new/pricing" },
-    { "source": "/database", "destination": "https://www-internal.supabase.io/new/database" },
-    { "source": "/auth", "destination": "https://www-internal.supabase.io/new/auth" },
-    { "source": "/storage", "destination": "https://www-internal.supabase.io/new/storage" },
-    { "source": "/support", "destination": "https://www-internal.supabase.io/new/support" },
-    {
-      "source": "/brand-assets",
-      "destination": "https://www-internal.supabase.io/new/brand-assets"
-    },
     { "source": "/:match*", "destination": "https://docs-rose.vercel.app/:match*" }
   ],
   "redirects": [
