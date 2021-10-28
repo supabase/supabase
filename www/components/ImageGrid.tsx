@@ -55,7 +55,7 @@ export default ({ images, smCols = 3, mdCols = 6, lgCols = 8 }: iImageGrid) => {
             <div className="relative overflow-auto w-full h-8 p-8">
               <Image
                 layout="fill"
-                src={`${basePath}${x.image}`}
+                src={`${x.image}`}
                 alt={x.alt}
                 objectFit="scale-down"
                 objectPosition="center"
