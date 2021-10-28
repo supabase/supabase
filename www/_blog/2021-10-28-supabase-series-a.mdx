@@ -19,24 +19,24 @@ bringing our total funding to $36M. How will we spend this? Read on to find out.
 From the outside, you can see that we're growing fast.
 To solidify some of the numbers with internal metrics:
 
-**Database Growth:** 
+### Database Growth
 
 As of September, we've launched over 50,000 databases. This is *only* on our hosted platform - it doesn't include our open source offering, 
 which has no telemetry. Active databases are growing 35% per month.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/a637013c-17c8-4aef-afc9-f6cc02ade3db/Untitled.png)
+![Supabase has launched more than 50000 databases](/new/images/blog/series-a/total-databases.png)
 
-**Developers:** 
+### Developers
 
-As of September, over 40,000 developers have signed up to Supabase, from some of the world's leading companies. 
+As of September, over 40,000 developers have signed up to Supabase from some of the world's leading companies. 
 Because of the versatility of Postgres, they're building everything from 
 [counter-fraud systems for Fintech](https://supabase.io/blog/2020/12/02/case-study-xendit) to 
 [digital platforms powering 200,000 users](https://supabase.io/blog/2021/07/28/mobbin-supabase-200000-users). 
 
 <ImageGrid
-  smCols={2}
+  smCols={3}
   mdCols={4}
-  lgCols={6}
+  lgCols={4}
   images={[
     {
       name: 'wells-fargo',
@@ -137,16 +137,14 @@ Because of the versatility of Postgres, they're building everything from
   ]}
 />
 
-**Community:**
+### Community
 
-We're one of GitHub's top 15 fastest growing open source startups for 
+Supabase has been in GitHub's top-15 fastest growing open source startups for 
 [five consecutive quarters](https://twitter.com/kiwicopple/status/1451104569266671619), 
 and our [Discord](https://discord.supabase.com) has grown to nearly 4000 members since launching just 3 months ago. 
 (And our growth is all organic.)
 
-[https://discord.supabase.com](https://discord.supabase.com/)
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/bd7eab29-902f-4309-a306-f5ebd9106400/Untitled.png)
+![Supabase Discord](/new/images/blog/series-a/discord-supabase-community.png)
 
 ## About the round
 
@@ -218,42 +216,43 @@ We plan to make Postgres the default database for every developer in the world. 
 User-facing applications usually require tools beyond just a database and frontend framework:
 
 - **APIs:** you don't want to give direct access to your database, right?
-- **Auth:** you need people to sign up, right?
+- **Auth:** when you want users to sign up.
 - **File Storage:** for large images and media.
 
 Supabase makes all of this easy. Beyond the database we offer [Auth](https://supabase.io/docs/guides/auth), 
 RESTful and Realtime [APIs](https://supabase.io/docs/guides/api), a [Storage](https://supabase.io/docs/guides/storage) 
 system for large files, and a bunch of other tools - all wrapped up into a simple-to-use Dashboard.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/3d9399ed-37c0-4fc1-9058-6d76360ab65c/Untitled.png)
+![Supabase Dashboard](/new/images/blog/series-a/dashboard.png)
 
 And this is where Supabase really differentiates itself: by doing less. All of these features build on top of PostgreSQL's 
-existing functionality, not 
+existing functionality. 
 
-- **Row Level Security:** user access to the data and files is managed with Postgres Policies
-- **Realtime data streams:** subscribe to database changes using the logical replication stream
+- **Row Level Security:** restrict user access to data and files using Postgres Policies.
+- **Realtime data streams:** subscribe to database changes using the logical replication stream.
 - **Function Hooks:** trigger external systems using Postgres triggers and our [async request extension](https://github.com/supabase/pg_net/).
-- **RESTful APIs:** driven by [PostgREST](https://postgrest.org), allow you to query your database [tables](https://supabase.io/docs/reference/javascript/select) and [functions](https://supabase.io/docs/reference/javascript/rpc).
+- **RESTful APIs:** query your database [tables](https://supabase.io/docs/reference/javascript/select) and [functions](https://supabase.io/docs/reference/javascript/rpc) over HTTP, using [PostgREST](https://postgrest.org).
 
 ### Phase 3: Cloud-native PostgreSQL
 
 PostgreSQL was created over 30 years ago, and it's one of the safest and most reliable databases in the world.
 
-But modern developers are becoming accustomed to cloud-native products that have several characteristics:
+But modern developers are becoming accustomed to cloud-native services with several characteristics:
 
-- Never having to worry about scaling.
+- Automatic scaling.
 - Low latency anywhere in the world.
-- Only charged for usage.
+- Billing based on usage.
 
 PostgreSQL is still catching up to the modern cloud environment in some areas. What does a Cloud-native PostgreSQL look like?
 
-- **Branching:** developers should be able to "fork" a database at any point. This is particularly important for Jamstack developers who run deployments for every Git branch
+- **Branching:** developers should be able to "fork" a database at any point. This is particularly important for Jamstack developers who run deployments for every Git branch.
 - **Scalable storage:** storage should grow and shrink without the user needing to provision more space themselves.
 - **Distributed:** An entire fleet of databases, distributed around the world, should feel like a single database (and even better if all nodes can accept read/write workloads).
 - **Ephemeral compute:** developers don't want to be charged for a database which isn't doing anything. Likewise - if they are running huge computation then the database should scale up seamlessly, and scale down to zero when it's unused.
 - **Snapshots and time-travel:** developers should be able to roll back to any point in time, or take a copy of their database with just a click of a button.
 
-We're taking a lot of inspiration from Amazon Aurora - the goal is to create an equivalent open source offering.
+This is the future of Supabase - a platform to power your transactional workloads: no matter how big or small; no matter the use-case. 
+We're building a cloud-native Postgres platform.
 
 ## Join us
 
@@ -262,7 +261,7 @@ We have a track record of hiring open source maintainers, PostgREST is maintaine
 We've recently added [another developer](https://www.postgresql.org/message-id/CABwTF4UZzYoHcaEGe2cESVn-e9dc3wzg%3Dmvx7Tz8qbKJ7p3UKA%40mail.gmail.com) 
 with the explicit goal of working within the PostgreSQL community.
 
-If you want to help us build the future of Cloud-native Postgres, join us: 
+If you want to help us build the future of cloud-native Postgres, join us: 
 [https://about.supabase.com/careers/postgres-experts](https://about.supabase.com/careers/postgres-experts)
 
 ## Get started
