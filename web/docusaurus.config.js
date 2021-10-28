@@ -7,11 +7,11 @@
 module.exports = {
   title: 'Supabase',
   tagline: 'The open source Firebase alternative.',
-  url: 'https://zones-docs.vercel.app/docs',
+  url: 'https://zones-docs.vercel.app',
   baseUrl: '/docs/',
   favicon: '/favicon.ico',
   organizationName: 'supabase', // Usually your GitHub org/user name.
-  projectName: 'supabase', // Usually your repo name.
+  projectName: 'Supabase Docs', // Usually your repo name.
   onBrokenLinks: 'ignore',
   themeConfig: {
     colorMode: {
