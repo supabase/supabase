@@ -38,7 +38,6 @@ const Index = ({}: Props) => {
         <Investors />
         <Press />
         <Team />
-
         <CTABanner />
       </Layout>
     </>
@@ -221,7 +220,7 @@ const Community = () => {
 const Investors = () => {
   return (
     <SectionContainer className="pt-0 lg:pt-0">
-      <div>
+      <div id="investors">
         <SectionHeader
           title="Our investors"
           paragraph={
