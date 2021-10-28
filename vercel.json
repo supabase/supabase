@@ -18,9 +18,6 @@
       ]
     }
   ],
-  "rewrites": [
-    { "source": "/:match*", "destination": "https://docs-rose.vercel.app/:match*" }
-  ],
   "redirects": [
     {
       "source": "/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders",
@@ -193,23 +190,42 @@
     { "source": "/docs/pricing", "destination": "/pricing" },
 
     { "source": "/docs/careers", "destination": "https://about.supabase.com/careers" },
-    { "source": "/docs/careers/:match*", "destination": "https://about.supabase.com/careers//:match*" },
+    {
+      "source": "/docs/careers/:match*",
+      "destination": "https://about.supabase.com/careers//:match*"
+    },
 
     { "source": "/docs/resources", "destination": "/docs/guides" },
 
-    { "source": "/docs/reference/postgres/getting-started", "destination": "/docs/guides/database/introduction" },
-    { "source": "/reference/postgres/connection-strings", "destination": "/docs/guides/database/connecting/connecting-to-postgres" },
+    {
+      "source": "/docs/reference/postgres/getting-started",
+      "destination": "/docs/guides/database/introduction"
+    },
+    {
+      "source": "/reference/postgres/connection-strings",
+      "destination": "/docs/guides/database/connecting/connecting-to-postgres"
+    },
     { "source": "/docs/reference/postgres/schemas", "destination": "/docs/guides/database/tables" },
     { "source": "/docs/reference/postgres/tables", "destination": "/docs/guides/database/tables" },
-    { "source": "/docs/guides/database/resource-management", "destination": "/docs/guides/database/timeouts" },
-    { "source": "/docs/reference/postgres/database-passwords", "destination": "/docs/guides/database/managing-passwords" },
-    { "source": "/docs/reference/postgres/changing-timezones", "destination": "/docs/guides/database/managing-timezones" },
-    { "source": "/docs/reference/postgres/publications", "destination": "/docs/guides/database/replication" },
+    {
+      "source": "/docs/guides/database/resource-management",
+      "destination": "/docs/guides/database/timeouts"
+    },
+    {
+      "source": "/docs/reference/postgres/database-passwords",
+      "destination": "/docs/guides/database/managing-passwords"
+    },
+    {
+      "source": "/docs/reference/postgres/changing-timezones",
+      "destination": "/docs/guides/database/managing-timezones"
+    },
+    {
+      "source": "/docs/reference/postgres/publications",
+      "destination": "/docs/guides/database/replication"
+    },
 
     { "source": "/docs/guides/platform", "destination": "/docs/guides/hosting/platform" },
     { "source": "/docs/guides/self-hosting", "destination": "/docs/guides/hosting/overview" }
-
-
   ],
   "trailingSlash": false
 }
