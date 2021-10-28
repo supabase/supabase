@@ -14,7 +14,6 @@ import InvestorData from 'data/Investors'
 import TeamData from 'data/Team'
 
 import Image from 'next/image'
-// import profilePic from '../public/me.png'
 
 import {
   Button,
@@ -35,7 +34,6 @@ const Index = ({}: Props) => {
       <Layout>
         <Header />
         <Community />
-        {/* <Companies /> */}
         <Investors />
         <Press />
         <Team />
@@ -245,7 +243,10 @@ const Investors = () => {
           paragraph={
             <>
               <Typography.Text>
-                <p className="text-lg">We've raised over $36 million in funding, backed by some of the world's leading investors.</p>
+                <p className="text-lg">
+                  We've raised over $36 million in funding, backed by some of the world's leading
+                  investors.
+                </p>
               </Typography.Text>
             </>
           }
@@ -262,7 +263,7 @@ const Investors = () => {
               bg-gray-50 dark:bg-gray-700 
               h-32"
             >
-              <div className="relative overflow-auto w-full h-8 p-10">
+              <div className="relative overflow-auto w-full h-8">
                 <Image
                   layout="fill"
                   src={`${x.img}`}
