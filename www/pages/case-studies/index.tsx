@@ -14,6 +14,7 @@ import { Typography, Badge, Space, Select } from '@supabase/ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 import BlogHeader from '~/components/Blog/BlogHeader'
+import ImageGrid from '~/components/ImageGrid'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts('_casestudies')
@@ -57,6 +58,8 @@ function Blog(props: any) {
     }
   })
 
+  console.log(caseStudyThumbs)
+
   return (
     <>
       <Head>
@@ -97,7 +100,9 @@ function Blog(props: any) {
                   </Space>
                 </div>
               </div>
-              <div className="mt-12 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none"></div>
+              <div className="mt-12 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none">
+                <ImageGrid images={caseStudyThumbs} />
+              </div>
             </div>
           </div>
         </div>
