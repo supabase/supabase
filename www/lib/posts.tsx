@@ -7,10 +7,10 @@ import { generateReadingTime } from './helpers'
 // based on YYYY-MM-DD format
 const FILENAME_SUBSTRING = 11
 
-//Finding directory named "blog" from the current working directory of Node.
-const postDirectory = path.join(process.cwd(), '_blog')
+export const getSortedPosts = (directory: string, limit?: number, tags?: any) => {
+  //Finding directory named "blog" from the current working directory of Node.
+  const postDirectory = path.join(process.cwd(), directory)
 
-export const getSortedPosts = (limit?: number, tags?: any) => {
   //Reads all the files in the post directory
   const fileNames = fs.readdirSync(postDirectory)
 
@@ -67,7 +67,10 @@ export const getSortedPosts = (limit?: number, tags?: any) => {
 }
 
 // Get Slugs
-export const getAllPostSlugs = () => {
+export const getAllPostSlugs = (directory: string) => {
+  //Finding directory named "blog" from the current working directory of Node.
+  const postDirectory = path.join(process.cwd(), directory)
+
   const fileNames = fs.readdirSync(postDirectory)
 
   return fileNames.map((filename) => {
@@ -81,15 +84,19 @@ export const getAllPostSlugs = () => {
 }
 
 // Get Post based on Slug
-export const getPostdata = async (slug: string) => {
+export const getPostdata = async (slug: string, directory: string) => {
+  //Finding directory named "blog" from the current working directory of Node.
+  const postDirectory = path.join(process.cwd(), directory)
+
   const fullPath = path.join(postDirectory, `${slug}.mdx`)
+
   const postContent = fs.readFileSync(fullPath, 'utf8')
 
   return postContent
 }
 
-export const getAllCategories = () => {
-  const posts = getSortedPosts()
+export const getAllCategories = (directory: string) => {
+  const posts = getSortedPosts(directory)
   let categories: any = []
 
   posts.map((post: any) => {
