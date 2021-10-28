@@ -17,7 +17,7 @@ import BlogHeader from '~/components/Blog/BlogHeader'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts('_blog')
-  const categories = getAllCategories()
+  const categories = getAllCategories('_blog')
   const rss = generateRss(allPostsData)
 
   // create a rss feed in public directory

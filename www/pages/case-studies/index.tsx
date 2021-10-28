@@ -16,8 +16,8 @@ import BlogListItem from '~/components/Blog/BlogListItem'
 import BlogHeader from '~/components/Blog/BlogHeader'
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPosts('_blog')
-  const categories = getAllCategories()
+  const allPostsData = getSortedPosts('_casestudies')
+  const categories = getAllCategories('_casestudies')
   const rss = generateRss(allPostsData)
 
   // create a rss feed in public directory
@@ -50,6 +50,13 @@ function Blog(props: any) {
     )
   }, [category])
 
+  const caseStudyThumbs = blogs.map((blog: PostTypes, idx: number) => {
+    return {
+      image: '/image/asds',
+      name: 'dsad ',
+    }
+  })
+
   return (
     <>
       <Head>
@@ -64,16 +71,6 @@ function Blog(props: any) {
       <DefaultLayout>
         <BlogHeader title="Case studies" />
         <div className="bg-gray-50 dark:bg-dark-800 overflow-hidden py-12">
-          <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
-            <div className="mx-auto max-w-7xl">
-              <Typography.Title level={2}>Latests posts</Typography.Title>
-              <div className="mt-5 max-w-lg mx-auto grid gap-16 lg:grid-cols-2 lg:max-w-none">
-                {props.blogs.slice(0, 2).map((blog: any, idx: any) => {
-                  return FeaturedThumb(blog)
-                })}
-              </div>
-            </div>
-          </div>
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-32">
             <div className="mx-auto max-w-7xl">
               <div className="grid grid-cols-12">
@@ -100,80 +97,12 @@ function Blog(props: any) {
                   </Space>
                 </div>
               </div>
-              <div className="mt-12 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none">
-                {/* <ul> */}
-                {blogs.map((blog: PostTypes, idx: number) => (
-                  <BlogListItem blog={blog} key={idx} />
-                ))}
-                {/* </ul> */}
-              </div>{' '}
+              <div className="mt-12 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none"></div>
             </div>
           </div>
         </div>
       </DefaultLayout>
     </>
-  )
-}
-
-function FeaturedThumb(blog: PostTypes) {
-  // @ts-ignore
-  const author = blog.author ? authors[blog.author] : authors['supabase']
-
-  return (
-    <div key={blog.slug} className="my-6 cursor-pointer">
-      <a href={`/blog/${blog.url}`}>
-        <a className="inline-block">
-          <img
-            className="h-96 w-full object-cover border dark:border-dark"
-            src={`/new/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
-          />
-          <Space direction="vertical" size={5} className="mt-4">
-            <div>
-              <Space className="mb-2">
-                <Typography.Text type="secondary">{blog.date}</Typography.Text>
-                <Typography.Text type="secondary">•</Typography.Text>
-                <Typography.Text type="secondary">{blog.readingTime}</Typography.Text>
-              </Space>
-
-              <Space direction="vertical" size={3}>
-                <Typography.Title level={3} className="">
-                  {blog.title}
-                </Typography.Title>
-
-                <Space className="block">
-                  {blog.tags &&
-                    blog.tags.map((tag: string) => (
-                      <a href={`/blog/tags/${tag}`}>
-                        <a>
-                          <Badge key={`${blog.slug}-${tag}-tag`} dot={false}>
-                            {tag}
-                          </Badge>
-                        </a>
-                      </a>
-                    ))}
-                </Space>
-              </Space>
-            </div>
-
-            {author && (
-              <div>
-                <Space size={4}>
-                  {author.author_image_url && (
-                    <img src={author.author_image_url} className="rounded-full w-10" />
-                  )}
-                  <Space direction="vertical" size={0}>
-                    <Typography.Text>{author.author}</Typography.Text>
-                    <Typography.Text type="secondary" small>
-                      {author.position}
-                    </Typography.Text>
-                  </Space>
-                </Space>
-              </div>
-            )}
-          </Space>
-        </a>
-      </a>
-    </div>
   )
 }
 
