@@ -17,8 +17,6 @@ interface iImageGrid {
 }
 
 export default ({ images, smCols = 3, mdCols = 6, lgCols = 8 }: iImageGrid) => {
-  const { basePath } = useRouter()
-
   const smBreakpoint = {
     3: 'grid-cols-3',
     4: 'grid-cols-4',
