@@ -50,12 +50,15 @@ export default Index
 const Header = () => {
   return (
     <>
-      <div className="p-16 py-20 text-center">
+      <div
+        className="
+          container 
+          mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24
+          text-center"
+      >
         <Typography.Title>
           Join one of the world's fastest growing open source communities.
         </Typography.Title>
-
-        <div className="mt-5 max-w-lg lg:max-w-none"></div>
       </div>
     </>
   )
@@ -84,7 +87,8 @@ const Team = () => {
             <Typography.Text>
               <p className="text-lg">
                 Supabase is fully remote, with a strong affinity for open source maintainers and
-                ex-Founders. Our engineering team is made up of developers from AWS, Google, Palantir, Stripe, and other YC companies.
+                ex-Founders. Our engineering team is made up of developers from AWS, Google,
+                Palantir, Stripe, and other YC companies.
               </p>
             </Typography.Text>
           </div>
