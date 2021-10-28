@@ -194,19 +194,17 @@ const Nav = (props: Props) => {
             <div className="flex-1 flex items-center justify-center sm:items-stretch lg:justify-between">
               <div className="flex items-center">
                 <div className="flex-shrink-0 flex items-center">
-                  <Link href="/" as="/">
-                    <a>
-                      <img
-                        className="block h-6 w-auto"
-                        src={
-                          darkMode
-                            ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
-                            : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
-                        }
-                        alt="Logo"
-                      />
-                    </a>
-                  </Link>
+                  <a href="/">
+                    <img
+                      className="block h-6 w-auto"
+                      src={
+                        darkMode
+                          ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
+                          : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
+                      }
+                      alt="Logo"
+                    />
+                  </a>
                 </div>
                 <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-4">
                   <FlyOutNavButton
