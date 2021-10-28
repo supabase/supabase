@@ -8,7 +8,7 @@ module.exports = {
   title: 'Supabase',
   tagline: 'The open source Firebase alternative.',
   url: 'https://supabase.io',
-  baseUrl: 'docs/',
+  baseUrl: '/docs/',
   favicon: '/favicon.ico',
   organizationName: 'supabase', // Usually your GitHub org/user name.
   projectName: 'supabase', // Usually your repo name.
