@@ -33,16 +33,14 @@ const Index = ({}: Props) => {
   return (
     <>
       <Layout>
-        <Container>
-          <Header />
-          <Team />
-          <Community />
-          {/* <Companies /> */}
-          <Investors />
-          <Press />
+        <Header />
+        <Community />
+        {/* <Companies /> */}
+        <Investors />
+        <Press />
+        <Team />
 
-          <CTABanner />
-        </Container>
+        <CTABanner />
       </Layout>
     </>
   )
@@ -53,24 +51,17 @@ export default Index
 const Header = () => {
   return (
     <>
-      <SectionContainer className="lg:pb-0">
-        <Typography.Title>We're building a company</Typography.Title>
-        <div className="max-w-4xl">
-          <Typography.Text type="secondary" className="">
-            <p className="text-2xl">
-              Software development around databases and backends is hard, and there aren’t adequate
-              tools to deal with it. We’re fixing that.
-            </p>
-            <p className="text-2xl">
-              We aim to eliminate the repetitive nature of app development, removing unnecessary
-              middleware and frustrating database maintenance.
-            </p>
-          </Typography.Text>
-        </div>
-        <div className="mt-5 max-w-lg lg:max-w-none">
-          {/* <Typography.Text type="secondary">The team is sorted in order of hiring</Typography.Text> */}
-        </div>
-      </SectionContainer>
+      <div className="p-16 py-20 text-center">
+        <Typography.Title>Build in a weekend. Scale to millions.</Typography.Title>
+
+        <Typography.Text className="text-2xl">
+          <p className="text-2xl max-w-2xl mx-auto">
+            Join one of the world's fastest growing open source communities. 
+          </p>
+        </Typography.Text>
+
+        <div className="mt-5 max-w-lg lg:max-w-none"></div>
+      </div>
     </>
   )
 }
@@ -93,17 +84,15 @@ const Team = () => {
     <SectionContainer className="pt-0 lg:pt-0">
       <div>
         <SectionHeader
-          title="A truly remote team"
+          title="Team"
           paragraph={
             <>
-              <p>
-                Supabase is fully remote, with a strong affinity for open source maintainers and
-                ex-Founders.
-              </p>
-              <p>
-                We are a global company that’s distributed across the globe and all time zones. We
-                value an autonomous work culture that’s driven on building great products.
-              </p>
+              <Typography.Text>
+                <p className="text-lg">
+                  Supabase is fully remote, with a strong affinity for open source maintainers and
+                  ex-Founders.
+                </p>
+              </Typography.Text>
 
               <a href="https://about.supabase.com/careers">
                 <Button
@@ -119,9 +108,6 @@ const Team = () => {
           }
         />
       </div>
-      <div className="mt-5 max-w-lg lg:max-w-none">
-        <Typography.Text type="secondary">The team is sorted in order of hiring</Typography.Text>
-      </div>
       <div className="mt-5 grid md:gap-8 grid-cols-2 lg:grid-cols-4 w-full">
         {TeamData.filter((x) => x.active).map((x) => (
           <div key={x.name}>
@@ -130,8 +116,8 @@ const Team = () => {
                 <Image
                   src={x.img}
                   alt={x.name}
-                  width={48}
-                  height={48}
+                  width={40}
+                  height={40}
                   className="rounded-md shadow-md object-contain"
                 />
               </div>
@@ -178,33 +164,32 @@ const Community = () => {
 
   return (
     <SectionContainer className="pt-0 lg:pt-0">
-      <SectionHeader
+      {/* <SectionHeader
         title={'Community'}
         paragraph={
           <>
-            <p>Join one of the world's fastest growing open source communities.</p>
-            <p>
-              We are a global company that’s distributed across the globe and all time zones. We
-              value an autonomous work culture that’s driven on building great products.
-            </p>
-
-            <p>Let's build together</p>
+            <Typography.Text>
+              <p className="text-lg">
+                Join one of the world's fastest growing open source communities. Let's build
+                together.
+              </p>
+            </Typography.Text>
           </>
         }
-      />
+      /> */}
       <div className="space-y-16">
-        <div className="relative gap-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 max-w-5xl">
+        <div className="relative gap-8 grid grid-cols-2 lg:grid-cols-4 max-w-5xl ">
           {CommunityData.map((x, i) => (
             <div
               key={x.title}
               className={`
-              space-y-4 
-              ${i !== CommunityData.length - 1 ? 'dark:border-r-dark md:border-r' : ''}
+              space-y-4 text-center lg:text-left
+              ${i !== CommunityData.length - 1 ? 'dark:border-r-dark lg:border-r' : ''}
               ${i === 1 ? 'md:border-0 dark:border-r-dark lg:border-r ' : ''}
           `}
             >
               <div
-                className={`relative h-7 w-7 ${
+                className={`relative h-7 w-7 mx-auto lg:mx-0 ${
                   x.invertImgDarkMode ? ' dark:filter dark:invert' : ''
                 }`}
               >
@@ -230,13 +215,8 @@ const Community = () => {
         </div>
         <div className="space-y-8">
           <div className="max-w-3xl">
-            <Typography.Title level={3}>Developer sign ups</Typography.Title>
-            <Typography.Text type="secondary">
-              <p className="text-xl">
-                Some of the best developers from the top companies in the world are already using
-                Supabase in some capacity. This is just a small selection of those companies we're
-                thrilled to already be experimenting with Supabase.
-              </p>
+            <Typography.Text>
+              With developer signups from the world's leading brands.
             </Typography.Text>
           </div>
           <div className="grid grid-cols-3 gap-0.5 md:grid-cols-6 lg:grid-cols-8">
@@ -276,11 +256,9 @@ const Investors = () => {
           title="Our investors"
           paragraph={
             <>
-              <p>We've raised over $36 million in funding.</p>
-              <p>
-                We've been lucky to have some incredible financial backers who share our company
-                values and goals.
-              </p>
+              <Typography.Text>
+                <p className="text-lg">We've raised over $36 million in funding, backed by some of the world's leading investors.</p>
+              </Typography.Text>
             </>
           }
         />
@@ -314,7 +292,7 @@ const Investors = () => {
           </div>
         ))}
       </div>
-      <Typography.Title level={3}>Financial angel investors</Typography.Title>
+      <Typography.Title level={3}>Individual investors</Typography.Title>
       <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-4 lg:max-w-none">
         {InvestorData.filter((x) => x.lead === false).map((x) => (
           <div key={x.name}>

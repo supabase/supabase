@@ -71,7 +71,7 @@ const data: TeamMember[] = [
   {
     name: 'Chris Copplestone',
     github: '',
-    department: 'Engineering',
+    department: 'Corp',
     img: 'https://ca.slack-edge.com/TS93YE5NV-U0131589GCX-8ceb0013e47a-512',
     active: true,
   },
@@ -191,7 +191,7 @@ const data: TeamMember[] = [
   {
     name: 'Laura Copplestone',
     github: 'https://github.com/??',
-    department: '',
+    department: 'Corp',
     img: 'https://ca.slack-edge.com/TS93YE5NV-U0267HUR09J-35f4554b6def-512',
     active: true,
   },
