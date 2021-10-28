@@ -14,7 +14,6 @@ import InvestorData from 'data/Investors'
 import TeamData from 'data/Team'
 
 import Image from 'next/image'
-// import profilePic from '../public/me.png'
 
 import {
   Button,
@@ -35,7 +34,6 @@ const Index = ({}: Props) => {
       <Layout>
         <Header />
         <Community />
-        {/* <Companies /> */}
         <Investors />
         <Press />
         <Team />
@@ -56,7 +54,7 @@ const Header = () => {
 
         <Typography.Text className="text-2xl">
           <p className="text-2xl max-w-2xl mx-auto">
-            Join one of the world's fastest growing open source communities. 
+            Join one of the world's fastest growing open source communities.
           </p>
         </Typography.Text>
 
@@ -257,7 +255,10 @@ const Investors = () => {
           paragraph={
             <>
               <Typography.Text>
-                <p className="text-lg">We've raised over $36 million in funding, backed by some of the world's leading investors.</p>
+                <p className="text-lg">
+                  We've raised over $36 million in funding, backed by some of the world's leading
+                  investors.
+                </p>
               </Typography.Text>
             </>
           }
@@ -274,7 +275,7 @@ const Investors = () => {
               bg-gray-50 dark:bg-gray-700 
               h-32"
             >
-              <div className="relative overflow-auto w-full h-8 p-10">
+              <div className="relative overflow-auto w-full h-8">
                 <Image
                   layout="fill"
                   src={`${x.img}`}
@@ -312,47 +313,6 @@ const Investors = () => {
         ))}
       </div>
     </SectionContainer>
-  )
-}
-
-const Companies = () => {
-  const { basePath } = useRouter()
-
-  return (
-    <div className="bg-white dark:bg-gray-700">
-      <SectionContainer>
-        <SectionHeader
-          title="Developer sign ups"
-          paragraph={
-            <>
-              <p>
-                Some of the best developers from the top companies in the world are already using
-                Supabase in some capacity. This is just a small selection of those companies we're
-                thrilled to already be experimenting with Supabase.
-              </p>
-            </>
-          }
-        />
-
-        <div className="mt-6 grid grid-cols-2 gap-0.5 md:grid-cols-6 lg:mt-8">
-          {CompaniesData.map((x) => {
-            return (
-              <div className="col-span-1 flex items-center justify-center py-8 px-8 bg-gray-50 dark:bg-gray-600">
-                <img
-                  style={{ maxWidth: '128px' }}
-                  className="max-h-12
-                    filter 
-                    contrast-0
-                  "
-                  alt={`${x.name} logo`}
-                  src={`${basePath}/images/company/companies-using-supabase/${x.image}`}
-                />
-              </div>
-            )
-          })}
-        </div>
-      </SectionContainer>
-    </div>
   )
 }
 
