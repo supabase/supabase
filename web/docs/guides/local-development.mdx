@@ -55,7 +55,7 @@ Once this is running, you will see an output that contains your local Supabase c
 ```txt
 Started local development setup.
 API URL: http://localhost:54321
-DB URL: postgresql://postgres:postgres@localhost:54322/postgres
+DB URL: postgresql://postgres:postgres@localhost:5432/postgres
 anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJ9.ZopqoUt20nEV9cklpv9e3yw3PVyZLmKs5qLD6nGL1SI
 service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIn0.M2d2z4SFn5C7HlJlaSLfrzuYim9nbY_XI40uWFN3hEE
 ```
@@ -73,7 +73,7 @@ values={[
 
 ```sh
 # Default URL:
-postgresql://postgres:postgres@localhost:54322/postgres
+postgresql://postgres:postgres@localhost:5432/postgres
 ```
 
 The local Postgres instance can be accessed through [`psql`](https://www.postgresql.org/docs/current/app-psql.html) 
@@ -82,7 +82,7 @@ or any other Postgres client, such as [pgadmin](https://www.pgadmin.org/).
 For example:
 
 ```bash
-psql 'postgresql://postgres:postgres@localhost:54322/postgres'
+psql 'postgresql://postgres:postgres@localhost:5432/postgres'
 ```
 
 </TabItem>
