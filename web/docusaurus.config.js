@@ -8,7 +8,7 @@ module.exports = {
   title: 'Supabase',
   tagline: 'The open source Firebase alternative.',
   url: 'https://zones-docs.vercel.app',
-  baseUrl: '/',
+  baseUrl: '/docs/',
   favicon: '/favicon.ico',
   organizationName: 'supabase', // Usually your GitHub org/user name.
   projectName: 'supabase', // Usually your repo name.
@@ -57,8 +57,8 @@ module.exports = {
       items: [
         {
           label: 'Overview',
-          to: '/docs',
-          activeBaseRegex: '(^/docs$)|(/docs/faq)|(^/docs/guides/examples)',
+          to: '/',
+          // activeBaseRegex: '(^/docs$)|(/docs/faq)|(^/docs/guides/examples)',
           position: 'left',
         },
         {
@@ -185,6 +185,8 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
+          // path: '',
+          routeBasePath: '/',
           // sidebarCollapsible: true,
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/supabase/supabase/edit/master/web',
@@ -192,12 +194,13 @@ module.exports = {
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
-        blog: {
-          feedOptions: {
-            type: 'all',
-            copyright: `Copyright © ${new Date().getFullYear()} Supabase, Inc.`,
-          },
-        },
+        blog: false,
+        // blog: {
+        //   feedOptions: {
+        //     type: 'all',
+        //     copyright: `Copyright © ${new Date().getFullYear()} Supabase, Inc.`,
+        //   },
+        // },
       },
     ],
   ],
