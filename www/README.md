@@ -4,8 +4,6 @@
 
 This is a single repository for two different websites. Our documents were created with docusaurus and are stored in the web folder. Our beta website can be found in the www folder. This is a standard Next.js website.
 
-The beta website has a `basePath` of `new` and is built with `vercel.json`. This is done to distinguish between HTTP requests from both websites. Any request with a path that begins with `/new/` will be routed to the beta website.
-
 Install the [Vercel CLI](https://vercel.com/cli).
 
 To execute this locally, run the following commands. This will launch the website at http://localhost:8080/, and requests will be automatically proxied (through vercel rewrites) to the docs website (running at http://localhost:3005/) and the beta website (running at http://localhost:3000).

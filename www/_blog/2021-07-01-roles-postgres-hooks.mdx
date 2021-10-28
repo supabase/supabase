@@ -12,22 +12,22 @@ tags:
 date: '2021-07-02'
 ---
 
-PostgreSQL manages permissions through roles. To create these roles, a database user needs the `CREATEROLE` privilege, 
+PostgreSQL manages permissions through roles. To create these roles, a database user needs the `CREATEROLE` privilege,
 which not only allows role creation but also _modification_ of any role (except superusers).
 
 At Supabase, we use dedicated roles for each of our customers' backend services. For instance, our [Storage API](https://supabase.io/storage) 
-uses the `supabase_storage_admin` role for connecting to the database. Giving the `CREATEROLE` privilege to our customers would allow them to 
+uses the `supabase_storage_admin` role for connecting to the database. Giving the `CREATEROLE` privilege to our customers would allow them to
 drop this role and take their own Storage API down.
 
-And yet, we want to give our customers the ability to manage roles the same as they do it in on-premises databases, 
+And yet, we want to give our customers the ability to manage roles the same as they do it in on-premises databases,
 with the usual `CREATE ROLE`, `ALTER ROLE`, and `DROP ROLE` statements.
 
-So, how do we grant them the `CREATEROLE` privilege and, at the same time, protect our own roles? In this blog post, 
+So, how do we grant them the `CREATEROLE` privilege and, at the same time, protect our own roles? In this blog post,
 we explain how we managed to do this by using PostgreSQL Hooks in our [SupaUtils](https://github.com/supabase/supautils) extension.
 
 ## Reserved Roles
 
-PostgreSQL has a list of [predefined roles](https://www.postgresql.org/docs/14/predefined-roles.html) — all prefixed 
+PostgreSQL has a list of [predefined roles](https://www.postgresql.org/docs/14/predefined-roles.html) — all prefixed
 with "pg\_" — that cannot be dropped or altered. Attempting to do so will throw an error mentioning that the role is "reserved".
 
 ```sql
@@ -52,7 +52,7 @@ LOCATION:  handle_rename, rdsutils.c:1534
 
 Again, the error mentions that the role is "reserved".
 
-Also note the `rdsutils.c` mention. That's not a stock Postgres source file. This means that the logic comes 
+Also note the `rdsutils.c` mention. That's not a stock Postgres source file. This means that the logic comes
 from an RDS extension. We can confirm this is the case by showing the preloaded libraries.
 
 ```sql
@@ -63,19 +63,19 @@ show shared_preload_libraries;
  rdsutils,pg_stat_statements
 ```
 
-`rdsutils` can be seen there. Naturally this lead us into thinking we can achieve the same logic with an extension 
+`rdsutils` can be seen there. Naturally this lead us into thinking we can achieve the same logic with an extension
 of our own, and thus the SupaUtils idea was born.
 
 ## Extending PostgreSQL with Hooks
 
-PostgreSQL hooks allow us to extend internal functionality. Hooks can modify behavior at different places, 
+PostgreSQL hooks allow us to extend internal functionality. Hooks can modify behavior at different places,
 including when running SQL statements.
 
-For example, if we wanted to enforce our own password restrictions whenever a user changes passwords, we could 
-use the `check_password_hook` to verify the password. We would write out our own Custom Logic, and raise an error 
+For example, if we wanted to enforce our own password restrictions whenever a user changes passwords, we could
+use the `check_password_hook` to verify the password. We would write out our own Custom Logic, and raise an error
 if the password fails the password requirements.
 
-![This is an images of the lifecycle of a Postgres Hook.](/new/images/blog/postgres-hooks/hooks-postgres-alter-role.png)
+![This is an images of the lifecycle of a Postgres Hook.](/images/blog/postgres-hooks/hooks-postgres-alter-role.png)
 
 For `SupaUtils`, we're particularly interested in the `ProcessUtility_hook`, which allows us to hook into **utility statements:** every statement except `select`, `insert`, `delete` or `update`. They include `alter role` and `drop role`, which are the statements we want to hook on.
 

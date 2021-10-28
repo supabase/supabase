@@ -1,7 +1,7 @@
 const withMDX = require('@next/mdx')()
 
 module.exports = withMDX({
-  basePath: '/new',
+  basePath: '',
   pageExtensions: ['js', 'jsx', 'tsx', 'md', 'mdx'],
   async rewrites() {
     return [
