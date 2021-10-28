@@ -7,7 +7,7 @@
 module.exports = {
   title: 'Supabase',
   tagline: 'The open source Firebase alternative.',
-  url: 'https://supabase.io',
+  url: 'https://zones-docs.vercel.app',
   baseUrl: '/',
   favicon: '/favicon.ico',
   organizationName: 'supabase', // Usually your GitHub org/user name.
