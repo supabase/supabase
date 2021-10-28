@@ -27,7 +27,7 @@ Note: For RedwoodJS apps, port will be 8910
 
 ### Github
 
-Whenever you get stuck at any point, take a look at [this repo](https://github.com/dthyresson/redwoodjs-supabase-quickstart).
+If you get stuck at any point, take a look at [this repo](https://github.com/dthyresson/redwoodjs-supabase-quickstart).
 
 <!-- ## Video demo
 
@@ -54,23 +54,23 @@ If you want to do it yourself, let's get started: -->
 
 A Redwood application is split into two parts: a frontend and a backend. This is represented as two node projects within a single monorepo.
 
-The frontend project is called **web** and the backend project is called **api**. For clarity, we will refer to these in prose as **"sides"**, i.e. the "web side" and the "api side".
-They are separate projects because code on the web side will end up running in the user's browser while code on the api side will run on a server somewhere.
+The frontend project is called **`web`** and the backend project is called **`api`**. For clarity, we will refer to these in prose as **"sides"**, i.e. the "web side" and the "api side".
+They are separate projects because code on the `web side` will end up running in the user's browser while code on the `api side` will run on a server somewhere.
 
 :::note
-Important: When this guide refers to "API", that means the Supabase API and when it refers to "api side", that means the RedwoodJS api side.
+Important: When this guide refers to "API", that means the Supabase API and when it refers to "api side", that means the RedwoodJS `api side`.
 :::
 
-The **api side** is an implementation of a GraphQL API. The business logic is organized into "services" that represent their own internal API and can be called both from external GraphQL requests and other internal services.
+The **`api side`** is an implementation of a GraphQL API. The business logic is organized into "services" that represent their own internal API and can be called both from external GraphQL requests and other internal services.
 
-The **web side** is built with React. Redwood's router makes it simple to map URL paths to React "Page" components (and automatically code-split your app on each route).
+The **`web side`** is built with React. Redwood's router makes it simple to map URL paths to React "Page" components (and automatically code-split your app on each route).
 Pages may contain a "Layout" component to wrap content. They also contain "Cells" and regular React components.
 Cells allow you to declaratively manage the lifecycle of a component that fetches and displays data.
 
 :::note
-FYI: For the sake of consistency with the other framework Quickstart examples, we'll build a RedwoodJS a little differently than normal.
+For the sake of consistency with the other framework Quickstart examples, we'll build a RedwoodJS a little differently than normal.
 We **_won't use_** use Prisma to connect to the Supabase Postgres database or [Prisma migrations](https://redwoodjs.com/docs/cli-commands#prisma-migrate) as one typically might in a Redwood app.
-Instead, we'll rely on the Supabase client to do some of the work on the **web** side and use the client again on the **api** side to do data fetching as well.
+Instead, we'll rely on the Supabase client to do some of the work on the **`web`** side and use the client again on the **`api`** side to do data fetching as well.
 :::
 
 ## Project set up
@@ -79,7 +79,7 @@ Before we start building we're going to set up our Database and API. This is as 
 and then creating a "schema" inside the database.
 
 :::note
-Note: When setting up Supabase, you'll interact with your project dashboard. However, most of the RedwoodJS setup steps will interact with the [Redwood CLI](https://redwoodjs.com/docs/cli-commands) to generate routes, pages, components and more.
+When setting up Supabase, you'll interact with your project dashboard. However, most of the RedwoodJS setup steps will interact with the [Redwood CLI](https://redwoodjs.com/docs/cli-commands) to generate routes, pages, components and more.
 So be sure to have a terminal at the ready and in your project directory.
 :::
 
@@ -264,7 +264,7 @@ SUPABASE_KEY=YOUR_SUPABASE_ANON_KEY
 SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
 ```
 
-And finally, you will also need to save **just** the web side environment variables to the `redwood.toml`.
+And finally, you will also need to save **just** the `web side` environment variables to the `redwood.toml`.
 
 ```bash title="redwood.toml"
 [web]
