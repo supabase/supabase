@@ -5,6 +5,7 @@ import Layout from '~/components/Layouts/Default'
 
 import SectionHeader from 'components/UI/SectionHeader'
 import CTABanner from 'components/CTABanner/index'
+import ImageGrid from 'components/ImageGrid'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import PressData from 'data/Press'
@@ -217,29 +218,8 @@ const Community = () => {
               With developer signups from the world's leading brands.
             </Typography.Text>
           </div>
-          <div className="grid grid-cols-3 gap-0.5 md:grid-cols-6 lg:grid-cols-8">
-            {CompaniesData.map((x) => {
-              return (
-                <div className="col-span-1 flex items-center justify-center bg-gray-50 dark:bg-gray-700 p-8">
-                  <div className="relative overflow-auto w-full h-8 p-8">
-                    <Image
-                      layout="fill"
-                      src={`${basePath}/images/company/companies-using-supabase/${x.image}`}
-                      alt={x.name}
-                      objectFit="scale-down"
-                      objectPosition="center"
-                      className="
-                      bg-no-repeat
-                    filter 
-                    contrast-0
-                    opacity-50
-                  "
-                    />
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+
+          <ImageGrid images={CompaniesData} />
         </div>
       </div>
     </SectionContainer>

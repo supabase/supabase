@@ -6,99 +6,99 @@ type Companies = {
 const data: Companies[] = [
   {
     name: 'wells-fargo',
-    image: 'wells-fargo.png',
+    image: '/images/company/companies-using-supabase/wells-fargo.png',
   },
   {
     name: 'under-armour',
-    image: 'under-armour.png',
+    image: '/images/company/companies-using-supabase/under-armour.png',
   },
   {
     name: 'audi-logo',
-    image: 'audi-logo.png',
+    image: '/images/company/companies-using-supabase/audi-logo.png',
   },
   {
     name: 'capitalone',
-    image: 'capitalone.png',
+    image: '/images/company/companies-using-supabase/capitalone.png',
   },
   {
     name: 'coinbase',
-    image: 'coinbase.png',
+    image: '/images/company/companies-using-supabase/coinbase.png',
   },
   {
     name: 'facebook',
-    image: 'facebook.png',
+    image: '/images/company/companies-using-supabase/facebook.png',
   },
   {
     name: 'github',
-    image: 'github.png',
+    image: '/images/company/companies-using-supabase/github.png',
   },
   {
     name: 'google',
-    image: 'google.png',
+    image: '/images/company/companies-using-supabase/google.png',
   },
   {
     name: 'gsk',
-    image: 'gsk.png',
+    image: '/images/company/companies-using-supabase/gsk.png',
   },
   {
     name: 'hewlett-packard',
-    image: 'hewlett-packard.png',
+    image: '/images/company/companies-using-supabase/hewlett-packard.png',
   },
   {
     name: 'hubspot',
-    image: 'hubspot.png',
+    image: '/images/company/companies-using-supabase/hubspot.png',
   },
   {
     name: 'ibm',
-    image: 'ibm.png',
+    image: '/images/company/companies-using-supabase/ibm.png',
   },
   {
     name: 'instagram',
-    image: 'instagram.png',
+    image: '/images/company/companies-using-supabase/instagram.png',
   },
   {
     name: 'linkedin',
-    image: 'linkedin.png',
+    image: '/images/company/companies-using-supabase/linkedin.png',
   },
   {
     name: 'microsoft',
-    image: 'microsoft.png',
+    image: '/images/company/companies-using-supabase/microsoft.png',
   },
   {
     name: 'netflix',
-    image: 'netflix.png',
+    image: '/images/company/companies-using-supabase/netflix.png',
   },
   {
     name: 'notion',
-    image: 'notion.png',
+    image: '/images/company/companies-using-supabase/notion.png',
   },
   {
     name: 'red-hat',
-    image: 'red-hat.png',
+    image: '/images/company/companies-using-supabase/red-hat.png',
   },
   {
     name: 'robinhood',
-    image: 'robinhood.png',
+    image: '/images/company/companies-using-supabase/robinhood.png',
   },
   {
     name: 'salesforce',
-    image: 'salesforce.png',
+    image: '/images/company/companies-using-supabase/salesforce.png',
   },
   {
     name: 'santander',
-    image: 'santander.png',
+    image: '/images/company/companies-using-supabase/santander.png',
   },
   {
     name: 'shopify',
-    image: 'shopify.png',
+    image: '/images/company/companies-using-supabase/shopify.png',
   },
   {
     name: 'squarespace',
-    image: 'squarespace.png',
+    image: '/images/company/companies-using-supabase/squarespace.png',
   },
   {
     name: 'twitter',
-    image: 'twitter.png',
+    image: '/images/company/companies-using-supabase/twitter.png',
   },
 ]
 
