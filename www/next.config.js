@@ -4,27 +4,29 @@ module.exports = withMDX({
   basePath: '',
   pageExtensions: ['js', 'jsx', 'tsx', 'md', 'mdx'],
   trailingSlash: false,
+
   async headers() {
     return [
-    {
-      source: '/(.*)',
-      headers: [
-        {
-          key: 'Strict-Transport-Security',
-          value: '',
-        },
-        {
-          key: 'X-Robots-Tag',
-          value: 'all',
-        },
-        {
-          key: 'X-Frame-Options',
-          value: 'DENY',
-        },
-      ],
-    },
-  ],
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value: '',
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'all',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+        ],
+      },
+    ]
   },
+
   async rewrites() {
     return [
       {
@@ -252,5 +254,5 @@ module.exports = withMDX({
       { source: '/docs/guides/platform', destination: '/docs/guides/hosting/platform' },
       { source: '/docs/guides/self-hosting', destination: '/docs/guides/hosting/overview' },
     ]
-  }
+  },
 })
