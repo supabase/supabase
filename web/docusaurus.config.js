@@ -186,22 +186,19 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
-          // path: '',
           routeBasePath: '/',
-          // sidebarCollapsible: true,
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/supabase/supabase/edit/master/web',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
-        // blog: false,
-        // blog: {
-        //   feedOptions: {
-        //     type: 'all',
-        //     copyright: `Copyright © ${new Date().getFullYear()} Supabase, Inc.`,
-        //   },
-        // },
+        blog: {
+          feedOptions: {
+            type: 'all',
+            copyright: `Copyright © ${new Date().getFullYear()} Supabase, Inc.`,
+          },
+        },
       },
     ],
   ],
