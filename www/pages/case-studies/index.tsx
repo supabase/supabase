@@ -22,7 +22,7 @@ export async function getStaticProps() {
 
   // create a rss feed in public directory
   // rss feed is added via <Head> component in render return
-  fs.writeFileSync('./public/rss.xml', rss)
+  fs.writeFileSync('./public/case-studies-rss.xml', rss)
 
   return {
     props: {
@@ -56,13 +56,13 @@ function Blog(props: any) {
         <link
           rel="alternate"
           type="application/rss+xml"
-          title="RSS feed for blog posts"
-          href={`${basePath}/rss.xml`}
+          title="RSS feed for case studies"
+          href={`${basePath}/case-studies-rss.xml`}
         />
       </Head>
-      <NextSeo title="Blog" description="Latest news from the Supabase team." />
+      <NextSeo title="Case studies" description="Latest customers using Supabase" />
       <DefaultLayout>
-        <BlogHeader title="Blog" />
+        <BlogHeader title="Case studies" />
         <div className="bg-gray-50 dark:bg-dark-800 overflow-hidden py-12">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
             <div className="mx-auto max-w-7xl">
@@ -124,7 +124,7 @@ function FeaturedThumb(blog: PostTypes) {
       <a href={`/blog/${blog.url}`}>
         <a className="inline-block">
           <img
-            className="h-96 w-full object-cover  border dark:border-dark-600"
+            className="h-96 w-full object-cover border dark:border-dark"
             src={`/new/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
           />
           <Space direction="vertical" size={5} className="mt-4">
