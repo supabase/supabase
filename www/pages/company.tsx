@@ -52,13 +52,9 @@ const Header = () => {
   return (
     <>
       <div className="p-16 py-20 text-center">
-        <Typography.Title>Build in a weekend. Scale to millions.</Typography.Title>
-
-        <Typography.Text className="text-2xl">
-          <p className="text-2xl max-w-2xl mx-auto">
-            Join one of the world's fastest growing open source communities. 
-          </p>
-        </Typography.Text>
+        <Typography.Title>
+          Join one of the world's fastest growing open source communities.
+        </Typography.Title>
 
         <div className="mt-5 max-w-lg lg:max-w-none"></div>
       </div>
@@ -81,34 +77,25 @@ const Team = () => {
   }
 
   return (
-    <SectionContainer className="pt-0 lg:pt-0">
-      <div>
-        <SectionHeader
-          title="Team"
-          paragraph={
-            <>
-              <Typography.Text>
-                <p className="text-lg">
-                  Supabase is fully remote, with a strong affinity for open source maintainers and
-                  ex-Founders.
-                </p>
-              </Typography.Text>
-
-              <a href="https://about.supabase.com/careers">
-                <Button
-                  type="link"
-                  size="large"
-                  iconRight={<IconChevronRight />}
-                  style={{ padding: 0, background: 'none' }}
-                >
-                  Join the team
-                </Button>
-              </a>
-            </>
-          }
-        />
-      </div>
-      <div className="mt-5 grid md:gap-8 grid-cols-2 lg:grid-cols-4 w-full">
+    <div className="border-t dark:border-gray-600">
+      <SectionContainer className="">
+        <SectionHeader title="Team" paragraph={<div className=""></div>} />
+        <div className="grid grid-cols-2 md:grid-cols-12">
+          <div className="col-span-8 ">
+            <Typography.Text>
+              <p className="text-lg">
+                Supabase is fully remote, with a strong affinity for open source maintainers and
+                ex-Founders. Our engineering team is made up of developers from AWS, Google, Palantir, Stripe, and other YC companies.
+              </p>
+            </Typography.Text>
+          </div>
+          <div className=" md:text-right pt-8 md:mt-0 col-span-4">
+            <a href="https://about.supabase.com/careers">
+              <Button size="medium">Join the team</Button>
+            </a>
+          </div>
+        </div>
+        {/* <div className="mt-5 grid md:gap-8 grid-cols-2 lg:grid-cols-4 w-full">
         {TeamData.filter((x) => x.active).map((x) => (
           <div key={x.name}>
             <div className="flex flex-col lg:flex-row space-y-3 lg:space-y-0 lg:space-x-4">
@@ -154,8 +141,9 @@ const Team = () => {
             </div>
           </div>
         ))}
-      </div>
-    </SectionContainer>
+      </div> */}
+      </SectionContainer>
+    </div>
   )
 }
 
@@ -293,7 +281,7 @@ const Investors = () => {
         ))}
       </div>
       <Typography.Title level={3}>Individual investors</Typography.Title>
-      <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-4 lg:max-w-none">
+      <div className="mt-5 mx-auto grid gap-5 grid-cols-2 lg:grid-cols-4 lg:max-w-none">
         {InvestorData.filter((x) => x.lead === false).map((x) => (
           <div key={x.name}>
             {x.img && <img src={x.img} alt={x.name} />}
@@ -315,54 +303,13 @@ const Investors = () => {
   )
 }
 
-const Companies = () => {
-  const { basePath } = useRouter()
-
-  return (
-    <div className="bg-white dark:bg-gray-700">
-      <SectionContainer>
-        <SectionHeader
-          title="Developer sign ups"
-          paragraph={
-            <>
-              <p>
-                Some of the best developers from the top companies in the world are already using
-                Supabase in some capacity. This is just a small selection of those companies we're
-                thrilled to already be experimenting with Supabase.
-              </p>
-            </>
-          }
-        />
-
-        <div className="mt-6 grid grid-cols-2 gap-0.5 md:grid-cols-6 lg:mt-8">
-          {CompaniesData.map((x) => {
-            return (
-              <div className="col-span-1 flex items-center justify-center py-8 px-8 bg-gray-50 dark:bg-gray-600">
-                <img
-                  style={{ maxWidth: '128px' }}
-                  className="max-h-12
-                    filter 
-                    contrast-0
-                  "
-                  alt={`${x.name} logo`}
-                  src={`${basePath}/images/company/companies-using-supabase/${x.image}`}
-                />
-              </div>
-            )
-          })}
-        </div>
-      </SectionContainer>
-    </div>
-  )
-}
-
 const Press = () => {
   return (
     <SectionContainer className="pt-0 lg:pt-0">
       <div>
         <SectionHeader title={'Press'} />
       </div>
-      <div className="mt-5 max-w-lg mx-auto grid gap-5 lg:grid-cols-2 lg:max-w-none">
+      <div className="mt-5 mx-auto grid gap-5 lg:grid-cols-2 lg:max-w-none">
         {PressData.filter((x) => x.type == 'article').map((x) => (
           <a href={x.href} key={x.href} target="_blank">
             <Card key={`press_${x.href}`} hoverable>
@@ -378,7 +325,7 @@ const Press = () => {
           </a>
         ))}
       </div>
-      <div className="mt-5 max-w-lg mx-auto grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:max-w-none">
+      <div className="mt-5 mx-auto grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:max-w-none">
         {PressData.filter((x) => x.type == 'podcast').map((x) => (
           <a href={x.href} key={x.href} target="_blank">
             <Card key={`press_${x.href}`} hoverable>
