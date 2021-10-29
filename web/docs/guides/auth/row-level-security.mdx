@@ -46,7 +46,7 @@ Returns the role of the user making the request. In most cases this is either `a
 
 ### `auth.email()`
 
-Retuns the email of the user making the request.
+Returns the email of the user making the request.
 
 ## Examples
 
@@ -144,7 +144,7 @@ alter table members
 
 -- 3.  Create security definer function
 create or replace function get_teams_for_authenticated_user()
-returns setof bigint
+returns set of bigint
 language sql
 security definer
 set search_path = public
