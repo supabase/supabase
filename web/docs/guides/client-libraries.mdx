@@ -370,7 +370,7 @@ const { data, error } = await supabase
 
 ```py
 data = supabase.table('cities').insert({'name': 'Gotham', 'country_id': 556 }).execute()
-# assert if insert resonse is a success
+# assert if insert response is a success
 assert data.get("status_code") in (200, 201)
 
 # bulk insert 
