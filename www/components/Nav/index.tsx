@@ -196,7 +196,7 @@ const Nav = (props: Props) => {
                 <div className="flex-shrink-0 flex items-center">
                   <a href="/">
                     <img
-                      className="block h-6 w-auto"
+                      className=""
                       src={
                         darkMode
                           ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
