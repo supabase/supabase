@@ -37,6 +37,7 @@ info:
           - auth.session()
           - auth.user()
           - auth.update()
+          - auth.setAuth()
           - auth.onAuthStateChange()
           - Reset Password (Email)
           - Delete User
@@ -448,6 +449,64 @@ pages:
           const { user, error } = await supabase.auth.update({ 
             data: { hello: 'world' } 
           })
+          ```
+
+  auth.setAuth():
+    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.setAuth'
+    examples:
+      - name: Basic example.
+        description: This is most useful on server-side functions where you cannot log the user in, but have access to the user's access token.
+        isSpotlight: true
+        js: |
+          ```js
+          function apiFunction(req, res) {
+            // Assuming the access token was sent as a header "X-Supabase-Auth"
+            const { access_token } = req.get('X-Supabase-Auth') 
+
+            // You can now use it within a Supabase Client 
+            const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
+            const { user, error } = supabase.auth.setAuth(access_token)
+
+            // This client will now send requests as this user
+            const { data } = await supabase.from('your_table').select()
+          }
+          ```
+      - name: With Express.
+        isSpotlight: true
+        js: |
+          ```js
+
+          /**
+          * Make a request from the client to your server function
+          */
+          async function makeApiRequest() {
+            const token = newClient.session()?.access_token
+
+            await fetch('https://example.com/withAuth', {
+               method: 'GET',
+               withCredentials: true,
+               credentials: 'include',
+               headers: {
+                'Content-Type': 'application/json'
+                'Authorization': bearer, // Your own auth
+                'X-Supabase-Auth': token, // Set the Supabase user
+               }
+            })
+          }
+
+          /**
+          * Use the Auth token in your server-side function.
+          */
+          async function apiFunction(req, res) {
+            const { access_token } = req.get('X-Supabase-Auth') 
+
+            // You can now use it within a Supabase Client 
+            const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
+            const { user, error } = supabase.auth.setAuth(access_token)
+
+            // This client will now send requests as this user
+            const { data } = await supabase.from('your_table').select()
+          }
           ```
 
   auth.onAuthStateChange():
