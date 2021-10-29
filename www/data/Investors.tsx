@@ -4,7 +4,8 @@ type Investor = {
   title: string
   img: string
   lead: boolean
-  twitter?: string
+  twitter?: string | null
+  linkedIn?: string | null
 }
 
 const data: Investor[] = [
@@ -14,6 +15,8 @@ const data: Investor[] = [
     title: 'Coatue Growth Fund',
     img: '/new/images/logos/coatue.png',
     lead: true,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Mozilla',
@@ -21,6 +24,8 @@ const data: Investor[] = [
     title: 'Mozilla',
     img: '/new/images/logos/mozilla--grey.png',
     lead: true,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Y Combinator',
@@ -28,6 +33,8 @@ const data: Investor[] = [
     title: 'CEO @ Vercel',
     img: '/new/images/logos/yc--grey.png',
     lead: true,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Tom Preston-Werner',
@@ -35,6 +42,8 @@ const data: Investor[] = [
     title: 'GitHub Cofounder',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Solomon Hykes',
@@ -42,6 +51,8 @@ const data: Investor[] = [
     title: 'Docker Cofounder',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Guillermo Rauch',
@@ -49,6 +60,8 @@ const data: Investor[] = [
     title: 'Vercel Founder',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Alex Solomon',
@@ -56,6 +69,8 @@ const data: Investor[] = [
     title: 'PagerDuty Cofounder',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Kurt Mackey',
@@ -63,6 +78,8 @@ const data: Investor[] = [
     title: 'Fly Founder',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Alana Anderson',
@@ -70,6 +87,8 @@ const data: Investor[] = [
     title: 'Base Case Capital',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Lee Robinson',
@@ -77,6 +96,8 @@ const data: Investor[] = [
     title: 'Vercel DevRel',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Kevin van Gundy',
@@ -84,13 +105,17 @@ const data: Investor[] = [
     title: 'Vercel CRO',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
-    name: 'Pedro Canahuati',
+    name: '1Password CTO, Ex-Facebook',
     round: 'A',
     title: 'Facebook',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Tyler McGinnis',
@@ -98,6 +123,8 @@ const data: Investor[] = [
     title: 'UI.dev Cofounder',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Piruze Sabuncu',
@@ -105,6 +132,8 @@ const data: Investor[] = [
     title: 'Stripe',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Astasia Myers',
@@ -112,6 +141,8 @@ const data: Investor[] = [
     title: 'Quiet Capital',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Anthony Guo',
@@ -119,6 +150,8 @@ const data: Investor[] = [
     title: 'Retool Cofounder',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Chris Nguyen',
@@ -126,6 +159,8 @@ const data: Investor[] = [
     title: 'LogDNA Founder',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Tod Sacerdoti',
@@ -133,6 +168,8 @@ const data: Investor[] = [
     title: 'Pipedream Founder',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Harold Giménez',
@@ -140,27 +177,8 @@ const data: Investor[] = [
     title: 'HashiCorp - VP Eng',
     img: '',
     lead: false,
-  },
-  {
-    name: 'Caryn Marooney',
-    round: 'A',
-    title: 'Coatue - Partner',
-    img: '',
-    lead: false,
-  },
-  {
-    name: 'David Cahn',
-    round: 'A',
-    title: 'Coatue - Partner',
-    img: '',
-    lead: false,
-  },
-  {
-    name: 'Thomas Laffont',
-    round: 'A',
-    title: 'Coatue - Cofounder',
-    img: '',
-    lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Mike Krieger',
@@ -168,13 +186,17 @@ const data: Investor[] = [
     title: 'Instagram Cofounder',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Cassidy Williams',
     round: 'SEED',
-    title: 'Netlify Cofounder',
+    title: 'Netlify DevRel',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Jason Warner',
@@ -182,6 +204,8 @@ const data: Investor[] = [
     title: 'GitHub CTO',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Shawn Wang',
@@ -189,6 +213,8 @@ const data: Investor[] = [
     title: 'Temporal DevRel',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Brian Douglas',
@@ -196,6 +222,8 @@ const data: Investor[] = [
     title: 'GitHub DevRel',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Thorsten Schaeff',
@@ -203,6 +231,8 @@ const data: Investor[] = [
     title: 'Stripe DevRel',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Justin Gage',
@@ -210,6 +240,8 @@ const data: Investor[] = [
     title: 'Retool DevRel',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
   {
     name: 'Zach Waterfield',
@@ -217,6 +249,8 @@ const data: Investor[] = [
     title: 'On Deck',
     img: '',
     lead: false,
+    twitter: null,
+    linkedIn: null,
   },
 ]
 
