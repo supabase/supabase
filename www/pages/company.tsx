@@ -266,22 +266,24 @@ const Investors = () => {
       </div>
       <Typography.Title level={3}>Individual investors</Typography.Title>
       <div className="mt-5 mx-auto grid gap-5 grid-cols-2 lg:grid-cols-4 lg:max-w-none">
-        {InvestorData.filter((x) => x.lead === false).map((x) => (
-          <div key={x.name}>
-            {x.img && <img src={x.img} alt={x.name} />}
+        {InvestorData.filter((x) => x.lead === false)
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((x) => (
+            <div key={x.name}>
+              {x.img && <img src={x.img} alt={x.name} />}
 
-            <div className="flex flex-col justify-center space-y-2">
-              <div>
-                <Typography.Title level={5} className="mb-0">
-                  {x.name}
-                </Typography.Title>
-                <Typography.Text type="secondary" className="mb-0">
-                  {x.title}
-                </Typography.Text>
+              <div className="flex flex-col justify-center space-y-2">
+                <div>
+                  <Typography.Title level={5} className="mb-0">
+                    {x.name}
+                  </Typography.Title>
+                  <Typography.Text type="secondary" className="mb-0">
+                    {x.title}
+                  </Typography.Text>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     </SectionContainer>
   )
