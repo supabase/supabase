@@ -145,15 +145,6 @@ const data: Investor[] = [
     linkedIn: null,
   },
   {
-    name: 'Anthony Guo',
-    round: 'A',
-    title: 'Retool Cofounder',
-    img: '',
-    lead: false,
-    twitter: null,
-    linkedIn: null,
-  },
-  {
     name: 'Chris Nguyen',
     round: 'A',
     title: 'LogDNA Founder',
