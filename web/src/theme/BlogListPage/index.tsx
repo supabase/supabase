@@ -83,7 +83,7 @@ function BlogListPage(props: Props): JSX.Element {
                       </div>
                       <div className="col col--8 margin-right--none padding-horiz--none">
                         <div>
-                          <h3>{title}</h3>
+                          <h3 className={clsx(styles.PostListItemTitle)}>{title}</h3>
                         </div>
                         <div className="row row--no-gutters">
                           <span style={{ color: 'darkgray' }}>{`${author} asked ${dayjs(

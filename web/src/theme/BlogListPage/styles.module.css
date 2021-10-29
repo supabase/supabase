@@ -70,3 +70,9 @@
 .NewDiscussionButton a:hover {
   border: 1px solid #3ecf8e;
 }
+h3.PostListItemTitle {
+  margin-bottom: 0em;
+}
+h3.PostListItemTitle:hover {
+  color: skyblue;
+}
