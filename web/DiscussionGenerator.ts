@@ -6,11 +6,13 @@ dayjs.extend(relativeTime)
 
 const fs = require('fs')
 
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN
+
 const discussions = require('./src/data/github/discussions')
 const query = `
 {
  repository(owner: "supabase", name: "supabase") {
-    discussions(first: 20) {
+    discussions(first: 50) {
       nodes {
         id
         author {
@@ -34,7 +36,7 @@ const query = `
         category {
           name
         }
-        comments(first: 10) {
+        comments(first: 20) {
           totalCount
           nodes {
             author {
@@ -112,12 +114,16 @@ ${body}
 `
 
 async function fetchDiscussions() {
-  const { repository } = await graphql(query, {
-    headers: {
-      authorization: `token secret123`,
-    },
-  })
-  return repository
+  try {
+    const { repository } = await graphql(query, {
+      headers: {
+        authorization: `token ${GITHUB_TOKEN}`,
+      },
+    })
+    return repository
+  } catch (err) {
+    console.error('error fetching discussions: ', err)
+  }
 }
 
 function formatDate(date) {
@@ -155,23 +161,26 @@ function slugify(str) {
 
 async function main() {
   // 1. Fetch the discussions
-  // const discussions = await fetchDiscussions()
+  const liveDiscussions = await fetchDiscussions()
 
   // 2. Save discussions to disk
   // @TODO
 
   // 3. Transform the discussions into "blog" posts
-  discussions.nodes.map(async (discussion) => {
+  const nodes = liveDiscussions ? liveDiscussions.discussions.nodes : discussions.nodes
+  nodes.map(async (discussion) => {
     const { id, author, body, title, createdAt, answer, category, upvoteCount, comments } =
       discussion
 
     const voidTags = /(\<(img|hr|br|area|base|col|embed|param|source).*)(\>)/g
 
     let terminatedBody = body.replace(voidTags, '$1/$3')
+    let escapedTitle = '"' + title.replace(/(["])/g, '\\"') + '"'
+    terminatedBody = terminatedBody.replace(/(`){3}([a-zA-Z]*)/g, '\n$1$2')
 
     if (answer) {
       const post = postTemplate({
-        title,
+        title: escapedTitle,
         author: author.login,
         authorUrl: author.url,
         avatarUrl: author.avatarUrl,
@@ -188,4 +197,6 @@ async function main() {
 }
 
 // Fire script
+main()
+main()
 main()
