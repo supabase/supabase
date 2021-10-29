@@ -71,6 +71,7 @@ module.exports = {
       collapsed: false,
       items: [
         'faq',
+        'going-into-prod',
         'handbook/contributing',
         'handbook/supasquad',
         'company/terms',

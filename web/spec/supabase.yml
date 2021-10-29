@@ -37,6 +37,7 @@ info:
           - auth.session()
           - auth.user()
           - auth.update()
+          - auth.setAuth()
           - auth.onAuthStateChange()
           - Reset Password (Email)
           - Delete User
@@ -79,7 +80,6 @@ info:
       - name: 'Filters'
         items:
           - Using Filters
-          - .filter()
           - .or()
           - .not()
           - .match()
@@ -102,6 +102,7 @@ info:
           - .rangeAdjacent()
           - .overlaps()
           - .textSearch()
+          - .filter()
 
 pages:
   Installing:
@@ -448,6 +449,64 @@ pages:
           const { user, error } = await supabase.auth.update({ 
             data: { hello: 'world' } 
           })
+          ```
+
+  auth.setAuth():
+    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.setAuth'
+    examples:
+      - name: Basic example.
+        description: This is most useful on server-side functions where you cannot log the user in, but have access to the user's access token.
+        isSpotlight: true
+        js: |
+          ```js
+          function apiFunction(req, res) {
+            // Assuming the access token was sent as a header "X-Supabase-Auth"
+            const { access_token } = req.get('X-Supabase-Auth') 
+
+            // You can now use it within a Supabase Client 
+            const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
+            const { user, error } = supabase.auth.setAuth(access_token)
+
+            // This client will now send requests as this user
+            const { data } = await supabase.from('your_table').select()
+          }
+          ```
+      - name: With Express.
+        isSpotlight: true
+        js: |
+          ```js
+
+          /**
+          * Make a request from the client to your server function
+          */
+          async function makeApiRequest() {
+            const token = newClient.session()?.access_token
+
+            await fetch('https://example.com/withAuth', {
+               method: 'GET',
+               withCredentials: true,
+               credentials: 'include',
+               headers: {
+                'Content-Type': 'application/json'
+                'Authorization': bearer, // Your own auth
+                'X-Supabase-Auth': token, // Set the Supabase user
+               }
+            })
+          }
+
+          /**
+          * Use the Auth token in your server-side function.
+          */
+          async function apiFunction(req, res) {
+            const { access_token } = req.get('X-Supabase-Auth') 
+
+            // You can now use it within a Supabase Client 
+            const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
+            const { user, error } = supabase.auth.setAuth(access_token)
+
+            // This client will now send requests as this user
+            const { data } = await supabase.from('your_table').select()
+          }
           ```
 
   auth.onAuthStateChange():
@@ -1335,51 +1394,6 @@ pages:
         .lt('population', 10000)
       ```
 
-  .filter():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.filter'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .filter('name', 'eq', 'Paris')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .filter('name', 'eq', 'Paris')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .filter('name', 'eq', 'Paris')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .filter('name', 'eq', 'Paris')
-          ```
-      - name: Filter embedded resources
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, countries ( name )')
-            .filter('countries.name', 'eq', 'France')
-          ```
-
   .or():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.or'
     examples:
@@ -2208,4 +2222,51 @@ pages:
               type: 'websearch',
               config: 'english'
             })
+          ```
+
+  .filter():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.filter'
+    notes: |
+      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter values, so it should only be used as an escape hatch in case other filters don't work.
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: Filter embedded resources
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, countries ( name )')
+            .filter('countries.name', 'in', '("France","Japan")')
           ```

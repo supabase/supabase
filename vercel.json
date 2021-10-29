@@ -40,6 +40,7 @@
     { "source": "/auth", "destination": "https://www-internal.supabase.io/new/auth" },
     { "source": "/storage", "destination": "https://www-internal.supabase.io/new/storage" },
     { "source": "/support", "destination": "https://www-internal.supabase.io/new/support" },
+    { "source": "/company", "destination": "https://www-internal.supabase.io/new/company" },
     {
       "source": "/brand-assets",
       "destination": "https://www-internal.supabase.io/new/brand-assets"
