@@ -86,6 +86,10 @@
         "url": "https://about.supabase.com/careers"
       },
       {
+        "text": "Company",
+        "url": "/company"
+      },
+      {
         "text": "Humans.txt",
         "url": "/humans.txt"
       },
