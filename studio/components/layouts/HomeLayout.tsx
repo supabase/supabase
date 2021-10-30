@@ -7,9 +7,9 @@ import Head from 'next/head'
 import SideBarMenu from 'components/nav/SideBar'
 
 export default function HomeLayout({ title, children }: { title: string; children: ReactElement }) {
-  const { isLoading, error } = fetchTableData()
-  if (isLoading) return <Loading />
-  if (error) return <Error />
+  // const { isLoading, error } = fetchTableData()
+  // if (isLoading) return <Loading />
+  // if (error) return <Error />
 
   const sampleOrgs = [
     { id: 'random-org-1', name: 'Sample Org 1' },
