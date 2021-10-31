@@ -637,7 +637,7 @@ pages:
 
   subscribe():
     description: |
-      Subscribe to realtime changes in your databse.
+      Subscribe to realtime changes in your database.
     title: 'on().subscribe()'
     notes: |
       - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
