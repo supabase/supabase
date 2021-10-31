@@ -144,7 +144,7 @@ alter table members
 
 -- 3.  Create security definer function
 create or replace function get_teams_for_authenticated_user()
-returns set of bigint
+returns setof bigint
 language sql
 security definer
 set search_path = public
