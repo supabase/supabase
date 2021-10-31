@@ -141,7 +141,7 @@ A [set-returning function](https://plv8.github.io/#set-returning-function-calls)
 
 ```sql
 create or replace function get_messages() 
-returns set of messages as $$
+returns setof messages as $$
 
     var json_result = plv8.execute(
         'select * from messages'
