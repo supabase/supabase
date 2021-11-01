@@ -21,8 +21,8 @@ Setting up Spotify logins for your application consists of 3 parts:
 
 ### Access your Spotify Developer account
 
-- Go to [developer.spotify.com](https://developer.spotify.com/).
-- Scroll down and click `Log in`.
+- Log into [Spotify](https://spotify.com)
+- Access the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
 
 ![Spotify Developer Portal.](/img/guides/spotify-portal.png)
 
@@ -44,7 +44,21 @@ The next step requires a callback URL, which looks like this:
 
 ### Create a Spotify OAuth app
 
-TBD
+- Log into [Spotify](https://spotify.com).
+- Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+- Click `Create an App`
+- Type your `App name`
+- Type your `App description`
+- Check the box to agree with the `Developer TOS and Branding Guidelines`
+- Click `Create`
+- Save your `Client ID`
+- Save your `Client Secret`
+- Click `Edit Settings`
+
+Under `Redirect URIs`:
+- Paste your Supabase Callback URL in the box
+- Click `Add`
+- Click `Save` at the bottom
 
 ### Enter your Spotify credentials into your Supabase Project
 
