@@ -40,7 +40,10 @@ info:
           - auth.setAuth()
           - auth.onAuthStateChange()
           - Reset Password (Email)
-          - Delete User
+      - name: 'Auth (Server Only)'
+        items:
+          - api.deleteUser()
+          - api.generateLink()
       - name: 'Database'
         items:
           - select()
@@ -560,10 +563,11 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = supabase.auth.api.resetPasswordForEmail('user@email.com')
+          const { data, error } = supabase.auth.api
+            .resetPasswordForEmail('user@email.com')
           ```
 
-  Delete User:
+  api.deleteUser():
     $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.deleteUser'
     examples:
       - name: Remove a user completely.
@@ -574,6 +578,19 @@ pages:
             '715ed5db-f090-4b8c-a067-640ecee36aa0',
             'YOUR_SERVICE_ROLE_KEY'
           )
+          ```
+
+  api.generateLink():
+    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.generateLink'
+    examples:
+      - name: Generate invite link.
+        isSpotlight: false
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.api.generateLink({
+            type: 'invite',
+            email: 'email@example.com'
+          })
           ```
 
   select():
