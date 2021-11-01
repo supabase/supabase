@@ -6,6 +6,7 @@ slug: /
 hide_table_of_contents: true
 ---
 
+import useBaseUrl from '@docusaurus/useBaseUrl'
 import Link from '@docusaurus/Link'
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
@@ -90,7 +91,12 @@ Supabase is just Postgres, which makes it compatible with a large number of tool
         <Link class="card" to={x.href}>
           <div class="card__body" style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
             {x.logo && (
-              <img src={x.logo} alt={x.name} width="20" style={{ display: 'block', maxHeight: 20 }} />
+              <img
+                src={useBaseUrl(x.logo)}
+                alt={x.name}
+                width="20"
+                style={{ display: 'block', maxHeight: 20 }}
+              />
             )}
             <p>{x.name}</p>
           </div>
