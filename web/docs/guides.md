@@ -15,8 +15,7 @@ These guides help you unleash the power of PostgreSQL, the world's most advanced
 
 Authenticating users isn't the most exciting job for most developers, so Supabase makes it quick and simple, while maintaining security and performance.
 
-
-<!-- 
+<!--
 <a className="card" href="/docs/guides/database" style={{marginBottom: 10}}>
 <div className="card__body">
 <h3>Database</h3>

@@ -71,7 +71,8 @@ Now that your application is now prepared, you can use Supabase anywhere in your
 ```jsx
 import { createClient } from '@supabase/supabase-js'
 const SUPABASE_URL = 'http://localhost:8000'
-const SUPABASE_ANON_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJyb2xlIjoiYW5vbiJ9.36fUebxgx1mcBo4s19v0SzqmzunP--hm_hep0uLX0ew'
+const SUPABASE_ANON_KEY =
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJyb2xlIjoiYW5vbiJ9.36fUebxgx1mcBo4s19v0SzqmzunP--hm_hep0uLX0ew'
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 ```
 
@@ -139,7 +140,7 @@ This is critical for Row Level Security to work with views. For policies to kick
 
 There was a problem in using the [pgAdmin Schema Diff](https://www.pgadmin.org/docs/pgadmin4/development/schema_diff.html) though, it's a GUI-only tool.
 
-![pgadmin diff](/new/images/blog/cli/pgadmin-diff.png)
+![pgadmin diff](/images/blog/cli/pgadmin-diff.png)
 
 So we did what we always strive to do - improve existing open source software. We created a CLI mode for the Schema Diff on [our repo](https://github.com/supabase/pgadmin4/blob/cli/web/cli.py). We've also released a [docker image](https://hub.docker.com/r/supabase/pgadmin-schema-diff) for a quick start.
 
