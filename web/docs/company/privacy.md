@@ -164,15 +164,15 @@ The criteria used to determine the period for which personal information about y
 4. **Legal Obligation.** Where we are processing personal information based on a legal obligation, we generally will retain the information for the period of time necessary to fulfill the legal obligation.
 5. **Legal Claim.** We may need to apply a "legal hold" that retains information beyond our typical retention period where we face threat of legal claim.  In that case, we will retain the information until the hold is removed, which typically means the claim or threat of claim has been resolved.
 
-In all cases, in addition to the purposes and legal bases, we consider the amount, nature and sensitivity of the personal information, as well as the potential risk of harm from unauthorised use or disclosure of your personal information.
+In all cases, in addition to the purposes and legal bases, we consider the amount, nature and sensitivity of the personal information, as well as the potential risk of harm from unauthorized use or disclosure of your personal information.
 
 ### 4. Recipients of Personal Information
 
 In addition to the recipients listed in Annexes 1 and 2, we may also share your personal information with the following (as required in accordance with the uses set out in Annexes 1 and 2):
 
 1. **Service providers and advisors**: we may share your personal information with third party vendors and other service providers that perform services for us or on our behalf, which may include providing professional services, such as legal and accounting services, mailing, email or chat services, fraud prevention, web hosting, or providing analytic services.
-2. **Affiliates**. Other companies owned by or under common ownership as Supabase, including our subsidiaries (i.e., any organisation we own or control) and our ultimate holding company (i.e., any organisation that owns or controls us) and any subsidiaries it owns. These companies will use your personal information in the same way as we can under these Privacy Disclosures.
-3. **Purchasers and third parties in connection with a business transaction**: your personal information may be disclosed to third parties in connection with a transaction, such as a merger, sale of assets or shares, reorganisation, financing, change of control or acquisition of all or a portion of our business.
+2. **Affiliates**. Other companies owned by or under common ownership as Supabase, including our subsidiaries (i.e., any organization we own or control) and our ultimate holding company (i.e., any organization that owns or controls us) and any subsidiaries it owns. These companies will use your personal information in the same way as we can under these Privacy Disclosures.
+3. **Purchasers and third parties in connection with a business transaction**: your personal information may be disclosed to third parties in connection with a transaction, such as a merger, sale of assets or shares, reorganization, financing, change of control or acquisition of all or a portion of our business.
 4. **Law enforcement, regulators and other parties for legal reasons**: we may share your personal information with third parties as required by law or if we reasonably believe that such action is necessary to (i) comply with the law and the reasonable requests of law enforcement; (ii) detect and investigate illegal activities and breaches of agreements, including our Terms; and/or (iii) exercise or protect the rights, property, or personal safety of Supabase, its users or others.
 
 ### 5. Marketing and Advertising
@@ -183,11 +183,11 @@ We will only send you marketing messages if you have given us your consent to do
 
 ### 6. Storing and transferring your personal information
 
-**Security**. We implement appropriate technical and organisational measures to protect your personal information against accidental or unlawful destruction, loss, change or damage. All personal information we collect will be stored by our cloud hosting provider on secure servers. We will never send you unsolicited emails or contact you by phone requesting credit or debit card information or national identification numbers.
+**Security**. We implement appropriate technical and organizational measures to protect your personal information against accidental or unlawful destruction, loss, change or damage. All personal information we collect will be stored by our cloud hosting provider on secure servers. We will never send you unsolicited emails or contact you by phone requesting credit or debit card information or national identification numbers.
 
 **International Transfers of your Personal Information**. The personal information we collect may be transferred to and stored in countries outside of the jurisdiction you are in where we and our third party service providers have operations. If you are located in the EEA, United Kingdom or Switzerland, your personal information may be processed outside of those regions, including in the United States.
 
-In the event of such a transfer, we ensure that: (i) the personal information is transferred to countries recognised as offering an equivalent level of protection; or (ii) the transfer is made pursuant to appropriate safeguards, such as standard data protection clauses adopted by the European Commission.
+In the event of such a transfer, we ensure that: (i) the personal information is transferred to countries recognized as offering an equivalent level of protection; or (ii) the transfer is made pursuant to appropriate safeguards, such as standard data protection clauses adopted by the European Commission.
 
 If you wish to enquire further about these safeguards used, please contact us using the details set out at the end of these Privacy Disclosures.
 
@@ -222,7 +222,7 @@ Due to the confidential nature of data processing we may ask you to provide proo
 
 Our European Services uses cookies and similar technologies such as pixels and Local Storage Objects (LSOs) like HTML5 (together "**_cookies_**") to distinguish you from other users of our European Services. This helps us to provide you with a good experience when you browse our European Services and also allows us to monitor and analyse how you use and interact with our European Services so that we can continue to improve our European Services.
 
-Cookies are pieces of code that allow for personalisation of our European Services experience by saving your information such as user ID and other preferences. A cookie is a small data file that we transfer to your computer's hard disk for record-keeping purposes.
+Cookies are pieces of code that allow for personalization of our European Services experience by saving your information such as user ID and other preferences. A cookie is a small data file that we transfer to your computer's hard disk for record-keeping purposes.
 
 We use the following types of cookies:
 

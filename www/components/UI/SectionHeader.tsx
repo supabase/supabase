@@ -17,9 +17,9 @@ const SectionHeader = (props: any) => {
         </div>
         <div className="col-span-12 lg:col-span-7">
           {props.paragraph && (
-            <p className="mt-3 mx-auto text-xl text-gray-400 dark:text-gray-300 sm:mt-4">
-              {props.paragraph}
-            </p>
+            <Typography.Text type="secondary">
+              <p className="mt-3 mx-auto text-xl sm:mt-4">{props.paragraph}</p>
+            </Typography.Text>
           )}
         </div>
       </div>

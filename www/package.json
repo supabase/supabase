@@ -49,11 +49,12 @@
     "@types/react-copy-to-clipboard": "^4.3.0",
     "@types/react-dom": "^16.9.8",
     "@types/react-syntax-highlighter": "^13.5.0",
+    "autoprefixer": "^10.3.7",
     "file-loader": "^6.2.0",
-    "postcss": "8",
+    "postcss": "^8.3.11",
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.2.1",
-    "tailwindcss": "^2.2.7"
+    "tailwindcss": "^2.2.17"
   },
   "license": "MIT"
 }

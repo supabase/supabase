@@ -307,6 +307,23 @@ pages:
             password: 'example-password',
           })
           ```
+      - name: Sign up with additional user meta data.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signUp(
+            {
+              email: 'example@email.com',
+              password: 'example-password',
+            },
+            {
+              data: { 
+                first_name: 'John', 
+                age: 27,
+              }
+            }
+          )
+          ```
       - name: Sign up with third-party providers.
         hideCodeBlock: true
         description: |

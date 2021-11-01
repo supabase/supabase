@@ -3,8 +3,11 @@ const withMDX = require('@next/mdx')()
 module.exports = withMDX({
   basePath: '',
   pageExtensions: ['js', 'jsx', 'tsx', 'md', 'mdx'],
-  trailingSlash: false,
 
+  trailingSlash: false,
+  images: {
+    domains: ['github.com', 'ca.slack-edge.com', 'res.cloudinary.com'],
+  },
   async headers() {
     return [
       {
@@ -26,7 +29,6 @@ module.exports = withMDX({
       },
     ]
   },
-
   async rewrites() {
     return [
       {
@@ -43,7 +45,6 @@ module.exports = withMDX({
       },
     ]
   },
-
   async redirects() {
     return [
       {
