@@ -180,7 +180,7 @@ These variables will be exposed on the browser, and that's completely fine since
 export const environment = {
   production: false,
   supabaseUrl: "YOUR_SUPABASE_URL",
-  supbaseKey: "YOUR_SUPABASE_KEY"
+  supabaseKey: "YOUR_SUPABASE_KEY"
 };
 ```
 
@@ -204,7 +204,7 @@ export class SupabaseService {
   private supabase: SupabaseClient;
 
   constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supbaseKey);
+    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
   }
 
   get user() {
