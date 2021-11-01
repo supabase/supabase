@@ -195,7 +195,7 @@ $$;
 
 #### Execute 
 
-Because this function returns a table set, we can also apply filters and selectors. For exaple, if we only wanted the `name` of the first planet:
+Because this function returns a table set, we can also apply filters and selectors. For example, if we only wanted the first planet:
 
 <Tabs
 defaultValue="SQL"
@@ -208,7 +208,7 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-select name
+select *
 from get_planets()
 where id = 1;
 ```
