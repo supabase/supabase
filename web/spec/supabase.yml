@@ -358,7 +358,7 @@ pages:
         description: Supabase supports OAuth logins.
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { provider, url, error } = await supabase.auth.signIn({
             // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
             provider: 'github'
           })
@@ -369,7 +369,7 @@ pages:
           any URL path on your website (the base domain must be the same as the domain in your Auth settings).
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { provider, url, error } = await supabase.auth.signIn({
             provider: 'github'
           }, {
             redirectTo: 'https://example.com/welcome'
@@ -381,7 +381,7 @@ pages:
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { provider, url, error } = await supabase.auth.signIn({
             provider: 'github'
           }, {
             scopes: 'repo gist notifications'

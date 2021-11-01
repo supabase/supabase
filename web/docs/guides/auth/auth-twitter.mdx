@@ -77,7 +77,7 @@ The next step requires a callback URL, which looks like this:
 The JavaScript client code is documented here: [Supabase OAuth Client Code](https://supabase.io/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers).
 
 ```js
-const { user, session, error } = await supabase.auth.signIn({
+const { provider, url, error } = await supabase.auth.signIn({
   provider: 'twitter'
 })
 ```
@@ -86,10 +86,18 @@ Add this function which you can call from a button, link, or UI element.
 
 ```js
 async function signInWithTwitter() {
-  const { user, session, error } = await supabase.auth.signIn({
+  const { provider, url, error } = await supabase.auth.signIn({
     provider: 'twitter'
   });
 }
+```
+
+Listen to auth changes:
+
+```js
+supabase.auth.onAuthStateChange((event, session) => {
+  console.log(event, session)
+})
 ```
 
 To log out:
