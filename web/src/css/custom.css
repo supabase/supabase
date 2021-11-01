@@ -1316,3 +1316,7 @@ h4.method-list-item-label .method-list-item-validation {
   border: 1px solid var(--custom-border-color);
   padding: 2px 6px;
 }
+
+details summary:hover {
+  cursor: pointer;
+}
