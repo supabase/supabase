@@ -21,6 +21,10 @@
       {
         "text": "Pricing",
         "url": "/pricing"
+      },
+      {
+        "text": "Beta",
+        "url": "/beta"
       }
     ]
   },
@@ -30,6 +34,10 @@
       {
         "text": "Support",
         "url": "/support"
+      },
+      {
+        "text": "Brand Assets / Logos",
+        "url": "/brand-assets"
       },
       {
         "text": "Case Studies",
@@ -72,6 +80,14 @@
       {
         "text": "Open Source",
         "url": "/oss"
+      },
+      {
+        "text": "Careers",
+        "url": "https://about.supabase.com/careers"
+      },
+      {
+        "text": "Company",
+        "url": "/company"
       },
       {
         "text": "Humans.txt",

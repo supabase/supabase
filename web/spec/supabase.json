@@ -6,7 +6,7 @@
 	"originalName": "",
 	"children": [
 		{
-			"id": 247,
+			"id": 291,
 			"name": "\"SupabaseClient\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -16,7 +16,7 @@
 			"originalName": "/home/runner/work/supabase-js/supabase-js/src/SupabaseClient.ts",
 			"children": [
 				{
-					"id": 248,
+					"id": 292,
 					"name": "SupabaseClient",
 					"kind": 128,
 					"kindString": "Class",
@@ -29,7 +29,7 @@
 					},
 					"children": [
 						{
-							"id": 256,
+							"id": 300,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -41,7 +41,7 @@
 							},
 							"signatures": [
 								{
-									"id": 259,
+									"id": 303,
 									"name": "new SupabaseClient",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -53,7 +53,7 @@
 									},
 									"parameters": [
 										{
-											"id": 260,
+											"id": 304,
 											"name": "supabaseUrl",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -69,7 +69,7 @@
 											}
 										},
 										{
-											"id": 261,
+											"id": 305,
 											"name": "supabaseKey",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -85,7 +85,7 @@
 											}
 										},
 										{
-											"id": 262,
+											"id": 306,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -95,14 +95,14 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 5,
+												"id": 36,
 												"name": "SupabaseClientOptions"
 											}
 										}
 									],
 									"type": {
 										"type": "reference",
-										"id": 248,
+										"id": 292,
 										"name": "SupabaseClient"
 									}
 								}
@@ -116,7 +116,7 @@
 							]
 						},
 						{
-							"id": 249,
+							"id": 293,
 							"name": "auth",
 							"kind": 1024,
 							"kindString": "Property",
@@ -135,12 +135,12 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 27,
+								"id": 59,
 								"name": "SupabaseAuthClient"
 							}
 						},
 						{
-							"id": 253,
+							"id": 297,
 							"name": "authUrl",
 							"kind": 1024,
 							"kindString": "Property",
@@ -161,7 +161,7 @@
 							}
 						},
 						{
-							"id": 255,
+							"id": 299,
 							"name": "realtime",
 							"kind": 1024,
 							"kindString": "Property",
@@ -182,7 +182,7 @@
 							}
 						},
 						{
-							"id": 252,
+							"id": 296,
 							"name": "realtimeUrl",
 							"kind": 1024,
 							"kindString": "Property",
@@ -203,7 +203,7 @@
 							}
 						},
 						{
-							"id": 251,
+							"id": 295,
 							"name": "restUrl",
 							"kind": 1024,
 							"kindString": "Property",
@@ -224,7 +224,7 @@
 							}
 						},
 						{
-							"id": 250,
+							"id": 294,
 							"name": "schema",
 							"kind": 1024,
 							"kindString": "Property",
@@ -245,7 +245,7 @@
 							}
 						},
 						{
-							"id": 254,
+							"id": 298,
 							"name": "storageUrl",
 							"kind": 1024,
 							"kindString": "Property",
@@ -266,7 +266,7 @@
 							}
 						},
 						{
-							"id": 258,
+							"id": 302,
 							"name": "supabaseKey",
 							"kind": 1024,
 							"kindString": "Property",
@@ -281,7 +281,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 48,
+									"line": 49,
 									"character": 25
 								}
 							],
@@ -291,7 +291,7 @@
 							}
 						},
 						{
-							"id": 257,
+							"id": 301,
 							"name": "supabaseUrl",
 							"kind": 1024,
 							"kindString": "Property",
@@ -306,7 +306,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 47,
+									"line": 48,
 									"character": 25
 								}
 							],
@@ -316,7 +316,7 @@
 							}
 						},
 						{
-							"id": 263,
+							"id": 307,
 							"name": "storage",
 							"kind": 262144,
 							"kindString": "Accessor",
@@ -328,7 +328,7 @@
 							},
 							"getSignature": [
 								{
-									"id": 264,
+									"id": 308,
 									"name": "__get",
 									"kind": 524288,
 									"kindString": "Get signature",
@@ -347,13 +347,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 73,
+									"line": 76,
 									"character": 13
 								}
 							]
 						},
 						{
-							"id": 299,
+							"id": 352,
 							"name": "_closeChannel",
 							"kind": 2048,
 							"kindString": "Method",
@@ -363,7 +363,7 @@
 							},
 							"signatures": [
 								{
-									"id": 300,
+									"id": 353,
 									"name": "_closeChannel",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -372,7 +372,7 @@
 									},
 									"parameters": [
 										{
-											"id": 301,
+											"id": 354,
 											"name": "subscription",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -400,13 +400,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 178,
+									"line": 194,
 									"character": 23
 								}
 							]
 						},
 						{
-							"id": 277,
+							"id": 325,
 							"name": "_closeSubscription",
 							"kind": 2048,
 							"kindString": "Method",
@@ -416,7 +416,7 @@
 							},
 							"signatures": [
 								{
-									"id": 278,
+									"id": 326,
 									"name": "_closeSubscription",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -425,7 +425,7 @@
 									},
 									"parameters": [
 										{
-											"id": 279,
+											"id": 327,
 											"name": "subscription",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -453,13 +453,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 125,
+									"line": 138,
 									"character": 34
 								}
 							]
 						},
 						{
-							"id": 294,
+							"id": 347,
 							"name": "_getAuthHeaders",
 							"kind": 2048,
 							"kindString": "Method",
@@ -469,7 +469,7 @@
 							},
 							"signatures": [
 								{
-									"id": 295,
+									"id": 348,
 									"name": "_getAuthHeaders",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -479,7 +479,7 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 296,
+											"id": 349,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -488,7 +488,7 @@
 											},
 											"indexSignature": [
 												{
-													"id": 297,
+													"id": 350,
 													"name": "__index",
 													"kind": 8192,
 													"kindString": "Index signature",
@@ -497,7 +497,7 @@
 													},
 													"parameters": [
 														{
-															"id": 298,
+															"id": 351,
 															"name": "key",
 															"kind": 32768,
 															"kindString": "Parameter",
@@ -519,7 +519,7 @@
 											"sources": [
 												{
 													"fileName": "src/SupabaseClient.ts",
-													"line": 170,
+													"line": 186,
 													"character": 28
 												}
 											]
@@ -530,13 +530,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 170,
+									"line": 186,
 									"character": 25
 								}
 							]
 						},
 						{
-							"id": 292,
+							"id": 345,
 							"name": "_initPostgRESTClient",
 							"kind": 2048,
 							"kindString": "Method",
@@ -546,7 +546,7 @@
 							},
 							"signatures": [
 								{
-									"id": 293,
+									"id": 346,
 									"name": "_initPostgRESTClient",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -562,13 +562,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 163,
+									"line": 179,
 									"character": 30
 								}
 							]
 						},
 						{
-							"id": 290,
+							"id": 342,
 							"name": "_initRealtimeClient",
 							"kind": 2048,
 							"kindString": "Method",
@@ -578,13 +578,29 @@
 							},
 							"signatures": [
 								{
-									"id": 291,
+									"id": 343,
 									"name": "_initRealtimeClient",
 									"kind": 4096,
 									"kindString": "Call signature",
 									"flags": {
 										"isExported": true
 									},
+									"parameters": [
+										{
+											"id": 344,
+											"name": "options",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "reference",
+												"name": "RealtimeClientOptions"
+											}
+										}
+									],
 									"type": {
 										"type": "reference",
 										"name": "RealtimeClient"
@@ -594,13 +610,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 157,
+									"line": 172,
 									"character": 29
 								}
 							]
 						},
 						{
-							"id": 282,
+							"id": 330,
 							"name": "_initSupabaseAuthClient",
 							"kind": 2048,
 							"kindString": "Method",
@@ -610,7 +626,7 @@
 							},
 							"signatures": [
 								{
-									"id": 283,
+									"id": 331,
 									"name": "_initSupabaseAuthClient",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -619,7 +635,7 @@
 									},
 									"parameters": [
 										{
-											"id": 284,
+											"id": 332,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -630,7 +646,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 285,
+													"id": 333,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -639,7 +655,7 @@
 													},
 													"children": [
 														{
-															"id": 286,
+															"id": 334,
 															"name": "autoRefreshToken",
 															"kind": 32,
 															"kindString": "Variable",
@@ -649,7 +665,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 139,
+																	"line": 152,
 																	"character": 20
 																}
 															],
@@ -672,7 +688,7 @@
 															}
 														},
 														{
-															"id": 288,
+															"id": 336,
 															"name": "detectSessionInUrl",
 															"kind": 32,
 															"kindString": "Variable",
@@ -682,7 +698,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 141,
+																	"line": 154,
 																	"character": 22
 																}
 															],
@@ -705,7 +721,74 @@
 															}
 														},
 														{
-															"id": 289,
+															"id": 338,
+															"name": "headers",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "src/SupabaseClient.ts",
+																	"line": 156,
+																	"character": 11
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "reflection",
+																		"declaration": {
+																			"id": 339,
+																			"name": "__type",
+																			"kind": 65536,
+																			"kindString": "Type literal",
+																			"flags": {
+																				"isExported": true
+																			},
+																			"indexSignature": [
+																				{
+																					"id": 340,
+																					"name": "__index",
+																					"kind": 8192,
+																					"kindString": "Index signature",
+																					"flags": {
+																						"isExported": true
+																					},
+																					"parameters": [
+																						{
+																							"id": 341,
+																							"name": "key",
+																							"kind": 32768,
+																							"kindString": "Parameter",
+																							"flags": {
+																								"isExported": true
+																							},
+																							"type": {
+																								"type": "intrinsic",
+																								"name": "string"
+																							}
+																						}
+																					],
+																					"type": {
+																						"type": "intrinsic",
+																						"name": "string"
+																					}
+																				}
+																			]
+																		}
+																	}
+																]
+															}
+														},
+														{
+															"id": 337,
 															"name": "localStorage",
 															"kind": 32,
 															"kindString": "Variable",
@@ -715,7 +798,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 142,
+																	"line": 155,
 																	"character": 16
 																}
 															],
@@ -728,13 +811,42 @@
 																	},
 																	{
 																		"type": "reference",
-																		"name": "Storage"
+																		"typeArguments": [
+																			{
+																				"type": "reference",
+																				"typeArguments": [
+																					{
+																						"type": "reference",
+																						"name": "Storage"
+																					},
+																					{
+																						"type": "union",
+																						"types": [
+																							{
+																								"type": "stringLiteral",
+																								"value": "getItem"
+																							},
+																							{
+																								"type": "stringLiteral",
+																								"value": "setItem"
+																							},
+																							{
+																								"type": "stringLiteral",
+																								"value": "removeItem"
+																							}
+																						]
+																					}
+																				],
+																				"name": "Pick"
+																			}
+																		],
+																		"name": "PromisifyMethods"
 																	}
 																]
 															}
 														},
 														{
-															"id": 287,
+															"id": 335,
 															"name": "persistSession",
 															"kind": 32,
 															"kindString": "Variable",
@@ -744,7 +856,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 140,
+																	"line": 153,
 																	"character": 18
 																}
 															],
@@ -772,17 +884,18 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																286,
-																288,
-																289,
-																287
+																334,
+																336,
+																338,
+																337,
+																335
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "src/SupabaseClient.ts",
-															"line": 138,
+															"line": 151,
 															"character": 34
 														}
 													]
@@ -792,7 +905,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 27,
+										"id": 59,
 										"name": "SupabaseAuthClient"
 									}
 								}
@@ -800,13 +913,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 138,
+									"line": 151,
 									"character": 33
 								}
 							]
 						},
 						{
-							"id": 265,
+							"id": 309,
 							"name": "from",
 							"kind": 2048,
 							"kindString": "Method",
@@ -815,7 +928,7 @@
 							},
 							"signatures": [
 								{
-									"id": 266,
+									"id": 310,
 									"name": "from",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -827,7 +940,7 @@
 									},
 									"typeParameter": [
 										{
-											"id": 267,
+											"id": 311,
 											"name": "T",
 											"kind": 131072,
 											"kindString": "Type parameter",
@@ -838,7 +951,7 @@
 									],
 									"parameters": [
 										{
-											"id": 268,
+											"id": 312,
 											"name": "table",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -856,7 +969,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 157,
+										"id": 200,
 										"typeArguments": [
 											{
 												"type": "typeParameter",
@@ -874,13 +987,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 82,
+									"line": 85,
 									"character": 6
 								}
 							]
 						},
 						{
-							"id": 280,
+							"id": 328,
 							"name": "getSubscriptions",
 							"kind": 2048,
 							"kindString": "Method",
@@ -889,7 +1002,7 @@
 							},
 							"signatures": [
 								{
-									"id": 281,
+									"id": 329,
 									"name": "getSubscriptions",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -911,13 +1024,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 134,
+									"line": 147,
 									"character": 18
 								}
 							]
 						},
 						{
-							"id": 274,
+							"id": 322,
 							"name": "removeSubscription",
 							"kind": 2048,
 							"kindString": "Method",
@@ -926,7 +1039,7 @@
 							},
 							"signatures": [
 								{
-									"id": 275,
+									"id": 323,
 									"name": "removeSubscription",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -938,7 +1051,7 @@
 									},
 									"parameters": [
 										{
-											"id": 276,
+											"id": 324,
 											"name": "subscription",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -969,13 +1082,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 108,
+									"line": 121,
 									"character": 20
 								}
 							]
 						},
 						{
-							"id": 269,
+							"id": 313,
 							"name": "rpc",
 							"kind": 2048,
 							"kindString": "Method",
@@ -984,7 +1097,7 @@
 							},
 							"signatures": [
 								{
-									"id": 270,
+									"id": 314,
 									"name": "rpc",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -992,11 +1105,11 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "Perform a stored procedure call."
+										"shortText": "Perform a function call."
 									},
 									"typeParameter": [
 										{
-											"id": 271,
+											"id": 315,
 											"name": "T",
 											"kind": 131072,
 											"kindString": "Type parameter",
@@ -1007,7 +1120,7 @@
 									],
 									"parameters": [
 										{
-											"id": 272,
+											"id": 316,
 											"name": "fn",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1023,7 +1136,7 @@
 											}
 										},
 										{
-											"id": 273,
+											"id": 317,
 											"name": "params",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1032,7 +1145,7 @@
 												"isOptional": true
 											},
 											"comment": {
-												"text": "The parameters to pass to the function call.\n"
+												"text": "The parameters to pass to the function call."
 											},
 											"type": {
 												"type": "union",
@@ -1047,6 +1160,113 @@
 													}
 												]
 											}
+										},
+										{
+											"id": 318,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__2",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 319,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 321,
+															"name": "count",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "Count algorithm to use to count rows in a table.\n\n"
+															},
+															"sources": [
+																{
+																	"fileName": "src/SupabaseClient.ts",
+																	"line": 109,
+																	"character": 11
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	},
+																	{
+																		"type": "stringLiteral",
+																		"value": "exact"
+																	},
+																	{
+																		"type": "stringLiteral",
+																		"value": "planned"
+																	},
+																	{
+																		"type": "stringLiteral",
+																		"value": "estimated"
+																	}
+																]
+															},
+															"defaultValue": "null"
+														},
+														{
+															"id": 320,
+															"name": "head",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "When set to true, no data will be returned."
+															},
+															"sources": [
+																{
+																	"fileName": "src/SupabaseClient.ts",
+																	"line": 108,
+																	"character": 10
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															},
+															"defaultValue": "false"
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																321,
+																320
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "src/SupabaseClient.ts",
+															"line": 106,
+															"character": 20
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
 										}
 									],
 									"type": {
@@ -1064,7 +1284,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 98,
+									"line": 104,
 									"character": 5
 								}
 							]
@@ -1075,45 +1295,45 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								256
+								300
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								249,
-								253,
-								255,
-								252,
-								251,
-								250,
-								254,
-								258,
-								257
+								293,
+								297,
+								299,
+								296,
+								295,
+								294,
+								298,
+								302,
+								301
 							]
 						},
 						{
 							"title": "Accessors",
 							"kind": 262144,
 							"children": [
-								263
+								307
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								299,
-								277,
-								294,
-								292,
-								290,
-								282,
-								265,
-								280,
-								274,
-								269
+								352,
+								325,
+								347,
+								345,
+								342,
+								330,
+								309,
+								328,
+								322,
+								313
 							]
 						}
 					],
@@ -1126,7 +1346,7 @@
 					]
 				},
 				{
-					"id": 302,
+					"id": 355,
 					"name": "DEFAULT_OPTIONS",
 					"kind": 2097152,
 					"kindString": "Object literal",
@@ -1135,7 +1355,7 @@
 					},
 					"children": [
 						{
-							"id": 304,
+							"id": 357,
 							"name": "autoRefreshToken",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1143,7 +1363,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 11,
+									"line": 12,
 									"character": 18
 								}
 							],
@@ -1154,7 +1374,7 @@
 							"defaultValue": "true"
 						},
 						{
-							"id": 306,
+							"id": 359,
 							"name": "detectSessionInUrl",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1162,7 +1382,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 13,
+									"line": 14,
 									"character": 20
 								}
 							],
@@ -1173,7 +1393,7 @@
 							"defaultValue": "true"
 						},
 						{
-							"id": 308,
+							"id": 360,
 							"name": "headers",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1188,36 +1408,47 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 309,
+									"id": 361,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
-									"flags": {}
+									"flags": {},
+									"children": [
+										{
+											"id": 362,
+											"name": "X-Client-Info",
+											"kind": 32,
+											"kindString": "Variable",
+											"flags": {},
+											"sources": [
+												{
+													"fileName": "src/lib/constants.ts",
+													"line": 3,
+													"character": 48
+												}
+											],
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											},
+											"defaultValue": "`supabase-js/${version}`"
+										}
+									],
+									"groups": [
+										{
+											"title": "Variables",
+											"kind": 32,
+											"children": [
+												362
+											]
+										}
+									]
 								}
 							},
 							"defaultValue": "DEFAULT_HEADERS"
 						},
 						{
-							"id": 307,
-							"name": "localStorage",
-							"kind": 32,
-							"kindString": "Variable",
-							"flags": {},
-							"sources": [
-								{
-									"fileName": "src/SupabaseClient.ts",
-									"line": 14,
-									"character": 14
-								}
-							],
-							"type": {
-								"type": "reference",
-								"name": "Storage"
-							},
-							"defaultValue": "globalThis.localStorage"
-						},
-						{
-							"id": 305,
+							"id": 358,
 							"name": "persistSession",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1225,7 +1456,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 12,
+									"line": 13,
 									"character": 16
 								}
 							],
@@ -1236,7 +1467,7 @@
 							"defaultValue": "true"
 						},
 						{
-							"id": 303,
+							"id": 356,
 							"name": "schema",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1244,7 +1475,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 10,
+									"line": 11,
 									"character": 8
 								}
 							],
@@ -1260,19 +1491,18 @@
 							"title": "Variables",
 							"kind": 32,
 							"children": [
-								304,
-								306,
-								308,
-								307,
-								305,
-								303
+								357,
+								359,
+								360,
+								358,
+								356
 							]
 						}
 					],
 					"sources": [
 						{
 							"fileName": "src/SupabaseClient.ts",
-							"line": 9,
+							"line": 10,
 							"character": 21
 						}
 					],
@@ -1287,14 +1517,14 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						248
+						292
 					]
 				},
 				{
 					"title": "Object literals",
 					"kind": 2097152,
 					"children": [
-						302
+						355
 					]
 				}
 			],
@@ -1307,7 +1537,7 @@
 			]
 		},
 		{
-			"id": 310,
+			"id": 363,
 			"name": "\"index\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -1317,7 +1547,7 @@
 			"originalName": "/home/runner/work/supabase-js/supabase-js/src/index.ts",
 			"children": [
 				{
-					"id": 311,
+					"id": 364,
 					"name": "createClient",
 					"kind": 64,
 					"kindString": "Function",
@@ -1330,7 +1560,7 @@
 					},
 					"signatures": [
 						{
-							"id": 312,
+							"id": 365,
 							"name": "createClient",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -1342,7 +1572,7 @@
 							},
 							"parameters": [
 								{
-									"id": 313,
+									"id": 366,
 									"name": "supabaseUrl",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1355,7 +1585,7 @@
 									}
 								},
 								{
-									"id": 314,
+									"id": 367,
 									"name": "supabaseKey",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1368,7 +1598,7 @@
 									}
 								},
 								{
-									"id": 315,
+									"id": 368,
 									"name": "options",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1378,14 +1608,14 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 5,
+										"id": 36,
 										"name": "SupabaseClientOptions"
 									}
 								}
 							],
 							"type": {
 								"type": "reference",
-								"id": 248,
+								"id": 292,
 								"name": "SupabaseClient"
 							}
 						}
@@ -1404,7 +1634,7 @@
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						311
+						364
 					]
 				}
 			],
@@ -1417,7 +1647,7 @@
 			]
 		},
 		{
-			"id": 26,
+			"id": 58,
 			"name": "\"lib/SupabaseAuthClient\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -1427,7 +1657,7 @@
 			"originalName": "/home/runner/work/supabase-js/supabase-js/src/lib/SupabaseAuthClient.ts",
 			"children": [
 				{
-					"id": 27,
+					"id": 59,
 					"name": "SupabaseAuthClient",
 					"kind": 128,
 					"kindString": "Class",
@@ -1436,7 +1666,7 @@
 					},
 					"children": [
 						{
-							"id": 28,
+							"id": 60,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -1445,7 +1675,7 @@
 							},
 							"signatures": [
 								{
-									"id": 29,
+									"id": 61,
 									"name": "new SupabaseAuthClient",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -1454,7 +1684,7 @@
 									},
 									"parameters": [
 										{
-											"id": 30,
+											"id": 62,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1462,266 +1692,15 @@
 												"isExported": true
 											},
 											"type": {
-												"type": "reflection",
-												"declaration": {
-													"id": 31,
-													"name": "__type",
-													"kind": 65536,
-													"kindString": "Type literal",
-													"flags": {
-														"isExported": true
-													},
-													"children": [
-														{
-															"id": 38,
-															"name": "autoRefreshToken",
-															"kind": 32,
-															"kindString": "Variable",
-															"flags": {
-																"isExported": true,
-																"isOptional": true
-															},
-															"sources": [
-																{
-																	"fileName": "src/lib/SupabaseAuthClient.ts",
-																	"line": 8,
-																	"character": 20
-																}
-															],
-															"type": {
-																"type": "union",
-																"types": [
-																	{
-																		"type": "intrinsic",
-																		"name": "undefined"
-																	},
-																	{
-																		"type": "intrinsic",
-																		"name": "false"
-																	},
-																	{
-																		"type": "intrinsic",
-																		"name": "true"
-																	}
-																]
-															}
-														},
-														{
-															"id": 37,
-															"name": "detectSessionInUrl",
-															"kind": 32,
-															"kindString": "Variable",
-															"flags": {
-																"isExported": true,
-																"isOptional": true
-															},
-															"sources": [
-																{
-																	"fileName": "src/lib/SupabaseAuthClient.ts",
-																	"line": 7,
-																	"character": 22
-																}
-															],
-															"type": {
-																"type": "union",
-																"types": [
-																	{
-																		"type": "intrinsic",
-																		"name": "undefined"
-																	},
-																	{
-																		"type": "intrinsic",
-																		"name": "false"
-																	},
-																	{
-																		"type": "intrinsic",
-																		"name": "true"
-																	}
-																]
-															}
-														},
-														{
-															"id": 33,
-															"name": "headers",
-															"kind": 32,
-															"kindString": "Variable",
-															"flags": {
-																"isExported": true,
-																"isOptional": true
-															},
-															"sources": [
-																{
-																	"fileName": "src/lib/SupabaseAuthClient.ts",
-																	"line": 6,
-																	"character": 11
-																}
-															],
-															"type": {
-																"type": "union",
-																"types": [
-																	{
-																		"type": "intrinsic",
-																		"name": "undefined"
-																	},
-																	{
-																		"type": "reflection",
-																		"declaration": {
-																			"id": 34,
-																			"name": "__type",
-																			"kind": 65536,
-																			"kindString": "Type literal",
-																			"flags": {
-																				"isExported": true
-																			},
-																			"indexSignature": [
-																				{
-																					"id": 35,
-																					"name": "__index",
-																					"kind": 8192,
-																					"kindString": "Index signature",
-																					"flags": {
-																						"isExported": true
-																					},
-																					"parameters": [
-																						{
-																							"id": 36,
-																							"name": "key",
-																							"kind": 32768,
-																							"kindString": "Parameter",
-																							"flags": {
-																								"isExported": true
-																							},
-																							"type": {
-																								"type": "intrinsic",
-																								"name": "string"
-																							}
-																						}
-																					],
-																					"type": {
-																						"type": "intrinsic",
-																						"name": "string"
-																					}
-																				}
-																			]
-																		}
-																	}
-																]
-															}
-														},
-														{
-															"id": 40,
-															"name": "localStorage",
-															"kind": 32,
-															"kindString": "Variable",
-															"flags": {
-																"isExported": true,
-																"isOptional": true
-															},
-															"sources": [
-																{
-																	"fileName": "src/lib/SupabaseAuthClient.ts",
-																	"line": 10,
-																	"character": 16
-																}
-															],
-															"type": {
-																"type": "reference",
-																"name": "Storage"
-															}
-														},
-														{
-															"id": 39,
-															"name": "persistSession",
-															"kind": 32,
-															"kindString": "Variable",
-															"flags": {
-																"isExported": true,
-																"isOptional": true
-															},
-															"sources": [
-																{
-																	"fileName": "src/lib/SupabaseAuthClient.ts",
-																	"line": 9,
-																	"character": 18
-																}
-															],
-															"type": {
-																"type": "union",
-																"types": [
-																	{
-																		"type": "intrinsic",
-																		"name": "undefined"
-																	},
-																	{
-																		"type": "intrinsic",
-																		"name": "false"
-																	},
-																	{
-																		"type": "intrinsic",
-																		"name": "true"
-																	}
-																]
-															}
-														},
-														{
-															"id": 32,
-															"name": "url",
-															"kind": 32,
-															"kindString": "Variable",
-															"flags": {
-																"isExported": true,
-																"isOptional": true
-															},
-															"sources": [
-																{
-																	"fileName": "src/lib/SupabaseAuthClient.ts",
-																	"line": 5,
-																	"character": 7
-																}
-															],
-															"type": {
-																"type": "union",
-																"types": [
-																	{
-																		"type": "intrinsic",
-																		"name": "undefined"
-																	},
-																	{
-																		"type": "intrinsic",
-																		"name": "string"
-																	}
-																]
-															}
-														}
-													],
-													"groups": [
-														{
-															"title": "Variables",
-															"kind": 32,
-															"children": [
-																38,
-																37,
-																33,
-																40,
-																39,
-																32
-															]
-														}
-													],
-													"sources": [
-														{
-															"fileName": "src/lib/SupabaseAuthClient.ts",
-															"line": 4,
-															"character": 22
-														}
-													]
-												}
+												"type": "reference",
+												"id": 13,
+												"name": "SupabaseAuthClientOptions"
 											}
 										}
 									],
 									"type": {
 										"type": "reference",
-										"id": 27,
+										"id": 59,
 										"name": "SupabaseAuthClient"
 									},
 									"overwrites": {
@@ -1733,7 +1712,7 @@
 							"sources": [
 								{
 									"fileName": "src/lib/SupabaseAuthClient.ts",
-									"line": 3,
+									"line": 4,
 									"character": 54
 								}
 							],
@@ -1743,7 +1722,7 @@
 							}
 						},
 						{
-							"id": 41,
+							"id": 63,
 							"name": "api",
 							"kind": 1024,
 							"kindString": "Property",
@@ -1756,7 +1735,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 8,
+									"line": 14,
 									"character": 7
 								}
 							],
@@ -1766,12 +1745,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 41,
+								"id": 63,
 								"name": "GoTrueClient.api"
 							}
 						},
 						{
-							"id": 44,
+							"id": 66,
 							"name": "autoRefreshToken",
 							"kind": 1024,
 							"kindString": "Property",
@@ -1782,7 +1761,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 17,
+									"line": 23,
 									"character": 30
 								}
 							],
@@ -1792,12 +1771,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 44,
+								"id": 66,
 								"name": "GoTrueClient.autoRefreshToken"
 							}
 						},
 						{
-							"id": 43,
+							"id": 65,
 							"name": "currentSession",
 							"kind": 1024,
 							"kindString": "Property",
@@ -1811,7 +1790,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 16,
+									"line": 22,
 									"character": 28
 								}
 							],
@@ -1830,12 +1809,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 43,
+								"id": 65,
 								"name": "GoTrueClient.currentSession"
 							}
 						},
 						{
-							"id": 42,
+							"id": 64,
 							"name": "currentUser",
 							"kind": 1024,
 							"kindString": "Property",
@@ -1849,7 +1828,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 12,
+									"line": 18,
 									"character": 25
 								}
 							],
@@ -1868,12 +1847,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 42,
+								"id": 64,
 								"name": "GoTrueClient.currentUser"
 							}
 						},
 						{
-							"id": 46,
+							"id": 68,
 							"name": "localStorage",
 							"kind": 1024,
 							"kindString": "Property",
@@ -1884,22 +1863,22 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 19,
+									"line": 25,
 									"character": 26
 								}
 							],
 							"type": {
 								"type": "reference",
-								"name": "Storage"
+								"name": "SupportedStorage"
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 46,
+								"id": 68,
 								"name": "GoTrueClient.localStorage"
 							}
 						},
 						{
-							"id": 45,
+							"id": 67,
 							"name": "persistSession",
 							"kind": 1024,
 							"kindString": "Property",
@@ -1910,7 +1889,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 18,
+									"line": 24,
 									"character": 28
 								}
 							],
@@ -1920,12 +1899,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 45,
+								"id": 67,
 								"name": "GoTrueClient.persistSession"
 							}
 						},
 						{
-							"id": 48,
+							"id": 70,
 							"name": "refreshTokenTimer",
 							"kind": 1024,
 							"kindString": "Property",
@@ -1937,7 +1916,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 21,
+									"line": 27,
 									"character": 31
 								}
 							],
@@ -1956,12 +1935,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 48,
+								"id": 70,
 								"name": "GoTrueClient.refreshTokenTimer"
 							}
 						},
 						{
-							"id": 47,
+							"id": 69,
 							"name": "stateChangeEmitters",
 							"kind": 1024,
 							"kindString": "Property",
@@ -1972,7 +1951,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 20,
+									"line": 26,
 									"character": 33
 								}
 							],
@@ -1992,12 +1971,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 47,
+								"id": 69,
 								"name": "GoTrueClient.stateChangeEmitters"
 							}
 						},
 						{
-							"id": 108,
+							"id": 147,
 							"name": "getSessionFromUrl",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2006,7 +1985,7 @@
 							},
 							"signatures": [
 								{
-									"id": 109,
+									"id": 148,
 									"name": "getSessionFromUrl",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2018,7 +1997,7 @@
 									},
 									"parameters": [
 										{
-											"id": 110,
+											"id": 149,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2036,7 +2015,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 111,
+															"id": 150,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -2045,7 +2024,7 @@
 															},
 															"children": [
 																{
-																	"id": 112,
+																	"id": 151,
 																	"name": "storeSession",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -2059,7 +2038,7 @@
 																	"sources": [
 																		{
 																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																			"line": 122,
+																			"line": 146,
 																			"character": 20
 																		}
 																	],
@@ -2087,7 +2066,7 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		112
+																		151
 																	]
 																}
 															]
@@ -2103,7 +2082,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 113,
+													"id": 152,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2112,7 +2091,7 @@
 													},
 													"children": [
 														{
-															"id": 114,
+															"id": 153,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2122,7 +2101,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 124,
+																	"line": 148,
 																	"character": 12
 																}
 															],
@@ -2141,7 +2120,7 @@
 															}
 														},
 														{
-															"id": 115,
+															"id": 154,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2151,7 +2130,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 125,
+																	"line": 149,
 																	"character": 13
 																}
 															],
@@ -2175,15 +2154,15 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																114,
-																115
+																153,
+																154
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-															"line": 123,
+															"line": 147,
 															"character": 16
 														}
 													]
@@ -2194,7 +2173,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 108,
+										"id": 147,
 										"name": "GoTrueClient.getSessionFromUrl"
 									}
 								}
@@ -2202,18 +2181,18 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 121,
+									"line": 145,
 									"character": 21
 								}
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 108,
+								"id": 147,
 								"name": "GoTrueClient.getSessionFromUrl"
 							}
 						},
 						{
-							"id": 120,
+							"id": 159,
 							"name": "onAuthStateChange",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2222,7 +2201,7 @@
 							},
 							"signatures": [
 								{
-									"id": 121,
+									"id": 160,
 									"name": "onAuthStateChange",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2235,7 +2214,7 @@
 									},
 									"parameters": [
 										{
-											"id": 122,
+											"id": 161,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2245,7 +2224,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 123,
+													"id": 162,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2254,7 +2233,7 @@
 													},
 													"signatures": [
 														{
-															"id": 124,
+															"id": 163,
 															"name": "__call",
 															"kind": 4096,
 															"kindString": "Call signature",
@@ -2263,7 +2242,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 125,
+																	"id": 164,
 																	"name": "event",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -2276,7 +2255,7 @@
 																	}
 																},
 																{
-																	"id": 126,
+																	"id": 165,
 																	"name": "session",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -2307,7 +2286,7 @@
 													"sources": [
 														{
 															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-															"line": 140,
+															"line": 164,
 															"character": 31
 														}
 													]
@@ -2318,7 +2297,7 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 127,
+											"id": 166,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -2327,7 +2306,7 @@
 											},
 											"children": [
 												{
-													"id": 128,
+													"id": 167,
 													"name": "data",
 													"kind": 32,
 													"kindString": "Variable",
@@ -2337,7 +2316,7 @@
 													"sources": [
 														{
 															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-															"line": 141,
+															"line": 165,
 															"character": 12
 														}
 													],
@@ -2356,7 +2335,7 @@
 													}
 												},
 												{
-													"id": 129,
+													"id": 168,
 													"name": "error",
 													"kind": 32,
 													"kindString": "Variable",
@@ -2366,7 +2345,7 @@
 													"sources": [
 														{
 															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-															"line": 142,
+															"line": 166,
 															"character": 13
 														}
 													],
@@ -2390,15 +2369,15 @@
 													"title": "Variables",
 													"kind": 32,
 													"children": [
-														128,
-														129
+														167,
+														168
 													]
 												}
 											],
 											"sources": [
 												{
 													"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-													"line": 140,
+													"line": 164,
 													"character": 91
 												}
 											]
@@ -2406,7 +2385,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 120,
+										"id": 159,
 										"name": "GoTrueClient.onAuthStateChange"
 									}
 								}
@@ -2414,18 +2393,18 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 140,
+									"line": 164,
 									"character": 21
 								}
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 120,
+								"id": 159,
 								"name": "GoTrueClient.onAuthStateChange"
 							}
 						},
 						{
-							"id": 86,
+							"id": 125,
 							"name": "refreshSession",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2434,7 +2413,7 @@
 							},
 							"signatures": [
 								{
-									"id": 87,
+									"id": 126,
 									"name": "refreshSession",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2450,7 +2429,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 88,
+													"id": 127,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2459,7 +2438,7 @@
 													},
 													"children": [
 														{
-															"id": 89,
+															"id": 128,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2469,7 +2448,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 92,
+																	"line": 116,
 																	"character": 12
 																}
 															],
@@ -2488,7 +2467,7 @@
 															}
 														},
 														{
-															"id": 91,
+															"id": 130,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2498,7 +2477,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 94,
+																	"line": 118,
 																	"character": 13
 																}
 															],
@@ -2517,7 +2496,7 @@
 															}
 														},
 														{
-															"id": 90,
+															"id": 129,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2527,7 +2506,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 93,
+																	"line": 117,
 																	"character": 12
 																}
 															],
@@ -2551,16 +2530,16 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																89,
-																91,
-																90
+																128,
+																130,
+																129
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-															"line": 91,
+															"line": 115,
 															"character": 30
 														}
 													]
@@ -2571,7 +2550,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 86,
+										"id": 125,
 										"name": "GoTrueClient.refreshSession"
 									}
 								}
@@ -2579,18 +2558,18 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 91,
+									"line": 115,
 									"character": 18
 								}
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 86,
+								"id": 125,
 								"name": "GoTrueClient.refreshSession"
 							}
 						},
 						{
-							"id": 84,
+							"id": 123,
 							"name": "session",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2599,7 +2578,7 @@
 							},
 							"signatures": [
 								{
-									"id": 85,
+									"id": 124,
 									"name": "session",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2624,7 +2603,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 84,
+										"id": 123,
 										"name": "GoTrueClient.session"
 									}
 								}
@@ -2632,18 +2611,18 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 87,
+									"line": 111,
 									"character": 11
 								}
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 84,
+								"id": 123,
 								"name": "GoTrueClient.session"
 							}
 						},
 						{
-							"id": 105,
+							"id": 144,
 							"name": "setAuth",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2652,7 +2631,7 @@
 							},
 							"signatures": [
 								{
-									"id": 106,
+									"id": 145,
 									"name": "setAuth",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2664,7 +2643,7 @@
 									},
 									"parameters": [
 										{
-											"id": 107,
+											"id": 146,
 											"name": "access_token",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2686,7 +2665,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 105,
+										"id": 144,
 										"name": "GoTrueClient.setAuth"
 									}
 								}
@@ -2694,18 +2673,18 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 116,
+									"line": 140,
 									"character": 11
 								}
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 105,
+								"id": 144,
 								"name": "GoTrueClient.setAuth"
 							}
 						},
 						{
-							"id": 99,
+							"id": 138,
 							"name": "setSession",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2714,7 +2693,7 @@
 							},
 							"signatures": [
 								{
-									"id": 100,
+									"id": 139,
 									"name": "setSession",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2726,7 +2705,7 @@
 									},
 									"parameters": [
 										{
-											"id": 101,
+											"id": 140,
 											"name": "refresh_token",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2748,7 +2727,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 102,
+													"id": 141,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2757,7 +2736,7 @@
 													},
 													"children": [
 														{
-															"id": 104,
+															"id": 143,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2767,7 +2746,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 110,
+																	"line": 134,
 																	"character": 13
 																}
 															],
@@ -2786,7 +2765,7 @@
 															}
 														},
 														{
-															"id": 103,
+															"id": 142,
 															"name": "session",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2796,7 +2775,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 109,
+																	"line": 133,
 																	"character": 15
 																}
 															],
@@ -2820,15 +2799,15 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																104,
-																103
+																143,
+																142
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-															"line": 108,
+															"line": 132,
 															"character": 47
 														}
 													]
@@ -2839,7 +2818,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 99,
+										"id": 138,
 										"name": "GoTrueClient.setSession"
 									}
 								}
@@ -2847,18 +2826,18 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 108,
+									"line": 132,
 									"character": 14
 								}
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 99,
+								"id": 138,
 								"name": "GoTrueClient.setSession"
 							}
 						},
 						{
-							"id": 63,
+							"id": 87,
 							"name": "signIn",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2867,7 +2846,7 @@
 							},
 							"signatures": [
 								{
-									"id": 64,
+									"id": 88,
 									"name": "signIn",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2879,7 +2858,7 @@
 									},
 									"parameters": [
 										{
-											"id": 65,
+											"id": 89,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2890,7 +2869,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 66,
+													"id": 90,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2899,7 +2878,7 @@
 													},
 													"children": [
 														{
-															"id": 67,
+															"id": 91,
 															"name": "email",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2912,7 +2891,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 67,
+																	"line": 77,
 																	"character": 18
 																}
 															],
@@ -2931,7 +2910,7 @@
 															}
 														},
 														{
-															"id": 68,
+															"id": 93,
 															"name": "password",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2944,8 +2923,8 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 67,
-																	"character": 28
+																	"line": 77,
+																	"character": 35
 																}
 															],
 															"type": {
@@ -2963,7 +2942,36 @@
 															}
 														},
 														{
-															"id": 70,
+															"id": 92,
+															"name": "phone",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"line": 77,
+																	"character": 25
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														},
+														{
+															"id": 95,
 															"name": "provider",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2976,8 +2984,8 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 67,
-																	"character": 52
+																	"line": 77,
+																	"character": 59
 																}
 															],
 															"type": {
@@ -3022,12 +3030,16 @@
 																	{
 																		"type": "stringLiteral",
 																		"value": "discord"
+																	},
+																	{
+																		"type": "stringLiteral",
+																		"value": "twitch"
 																	}
 																]
 															}
 														},
 														{
-															"id": 69,
+															"id": 94,
 															"name": "refreshToken",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3040,8 +3052,8 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 67,
-																	"character": 42
+																	"line": 77,
+																	"character": 49
 																}
 															],
 															"type": {
@@ -3064,17 +3076,18 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																67,
-																68,
-																70,
-																69
+																91,
+																93,
+																92,
+																95,
+																94
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-															"line": 67,
+															"line": 77,
 															"character": 11
 														}
 													]
@@ -3082,7 +3095,7 @@
 											}
 										},
 										{
-											"id": 71,
+											"id": 96,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3100,7 +3113,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 72,
+															"id": 97,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -3109,7 +3122,7 @@
 															},
 															"children": [
 																{
-																	"id": 73,
+																	"id": 98,
 																	"name": "redirectTo",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -3120,7 +3133,7 @@
 																	"sources": [
 																		{
 																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																			"line": 68,
+																			"line": 78,
 																			"character": 18
 																		}
 																	],
@@ -3139,7 +3152,7 @@
 																	}
 																},
 																{
-																	"id": 74,
+																	"id": 99,
 																	"name": "scopes",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -3150,7 +3163,7 @@
 																	"sources": [
 																		{
 																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																			"line": 69,
+																			"line": 79,
 																			"character": 14
 																		}
 																	],
@@ -3174,8 +3187,8 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		73,
-																		74
+																		98,
+																		99
 																	]
 																}
 															]
@@ -3191,7 +3204,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 75,
+													"id": 100,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3200,7 +3213,7 @@
 													},
 													"children": [
 														{
-															"id": 81,
+															"id": 106,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3210,7 +3223,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 76,
+																	"line": 86,
 																	"character": 12
 																}
 															],
@@ -3229,7 +3242,7 @@
 															}
 														},
 														{
-															"id": 80,
+															"id": 105,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3239,7 +3252,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 75,
+																	"line": 85,
 																	"character": 13
 																}
 															],
@@ -3258,7 +3271,7 @@
 															}
 														},
 														{
-															"id": 78,
+															"id": 103,
 															"name": "provider",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3269,7 +3282,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 73,
+																	"line": 83,
 																	"character": 16
 																}
 															],
@@ -3279,7 +3292,7 @@
 															}
 														},
 														{
-															"id": 76,
+															"id": 101,
 															"name": "session",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3289,7 +3302,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 71,
+																	"line": 81,
 																	"character": 15
 																}
 															],
@@ -3308,7 +3321,7 @@
 															}
 														},
 														{
-															"id": 79,
+															"id": 104,
 															"name": "url",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3319,7 +3332,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 74,
+																	"line": 84,
 																	"character": 11
 																}
 															],
@@ -3338,7 +3351,7 @@
 															}
 														},
 														{
-															"id": 77,
+															"id": 102,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3348,7 +3361,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 72,
+																	"line": 82,
 																	"character": 12
 																}
 															],
@@ -3372,19 +3385,19 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																81,
-																80,
-																78,
-																76,
-																79,
-																77
+																106,
+																105,
+																103,
+																101,
+																104,
+																102
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-															"line": 70,
+															"line": 80,
 															"character": 16
 														}
 													]
@@ -3395,7 +3408,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 63,
+										"id": 87,
 										"name": "GoTrueClient.signIn"
 									}
 								}
@@ -3403,18 +3416,18 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 67,
+									"line": 77,
 									"character": 10
 								}
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 63,
+								"id": 87,
 								"name": "GoTrueClient.signIn"
 							}
 						},
 						{
-							"id": 116,
+							"id": 155,
 							"name": "signOut",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3423,7 +3436,7 @@
 							},
 							"signatures": [
 								{
-									"id": 117,
+									"id": 156,
 									"name": "signOut",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3431,7 +3444,7 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "Inside a browser context, `signOut()` will remove extract the logged in user from the browser session\nand log them out - removing all items from localstorage and then trigger a \"SIGNED_OUT\" event.",
+										"shortText": "Inside a browser context, `signOut()` will remove the logged in user from the browser session\nand log them out - removing all items from localstorage and then trigger a \"SIGNED_OUT\" event.",
 										"text": "For server-side management, you can disable sessions by passing a JWT through to `auth.api.signOut(JWT: string)`\n"
 									},
 									"type": {
@@ -3440,7 +3453,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 118,
+													"id": 157,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3449,7 +3462,7 @@
 													},
 													"children": [
 														{
-															"id": 119,
+															"id": 158,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3459,7 +3472,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 134,
+																	"line": 158,
 																	"character": 13
 																}
 															],
@@ -3483,14 +3496,14 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																119
+																158
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-															"line": 133,
+															"line": 157,
 															"character": 23
 														}
 													]
@@ -3501,7 +3514,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 116,
+										"id": 155,
 										"name": "GoTrueClient.signOut"
 									}
 								}
@@ -3509,18 +3522,18 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 133,
+									"line": 157,
 									"character": 11
 								}
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 116,
+								"id": 155,
 								"name": "GoTrueClient.signOut"
 							}
 						},
 						{
-							"id": 49,
+							"id": 71,
 							"name": "signUp",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3529,7 +3542,7 @@
 							},
 							"signatures": [
 								{
-									"id": 50,
+									"id": 72,
 									"name": "signUp",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3541,7 +3554,7 @@
 									},
 									"parameters": [
 										{
-											"id": 51,
+											"id": 73,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3552,7 +3565,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 52,
+													"id": 74,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3561,7 +3574,7 @@
 													},
 													"children": [
 														{
-															"id": 53,
+															"id": 75,
 															"name": "email",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3574,7 +3587,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 49,
+																	"line": 58,
 																	"character": 18
 																}
 															],
@@ -3593,7 +3606,7 @@
 															}
 														},
 														{
-															"id": 54,
+															"id": 76,
 															"name": "password",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3606,8 +3619,40 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 49,
+																	"line": 58,
 																	"character": 28
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														},
+														{
+															"id": 77,
+															"name": "phone",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The user's phone number."
+															},
+															"sources": [
+																{
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"line": 58,
+																	"character": 35
 																}
 															],
 															"type": {
@@ -3630,15 +3675,16 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																53,
-																54
+																75,
+																76,
+																77
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-															"line": 49,
+															"line": 58,
 															"character": 11
 														}
 													]
@@ -3646,7 +3692,7 @@
 											}
 										},
 										{
-											"id": 55,
+											"id": 78,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3664,7 +3710,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 56,
+															"id": 79,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -3673,7 +3719,37 @@
 															},
 															"children": [
 																{
-																	"id": 57,
+																	"id": 81,
+																	"name": "data",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true,
+																		"isOptional": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																			"line": 60,
+																			"character": 12
+																		}
+																	],
+																	"type": {
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "intrinsic",
+																				"name": "undefined"
+																			},
+																			{
+																				"type": "intrinsic",
+																				"name": "object"
+																			}
+																		]
+																	}
+																},
+																{
+																	"id": 80,
 																	"name": "redirectTo",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -3684,7 +3760,7 @@
 																	"sources": [
 																		{
 																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																			"line": 50,
+																			"line": 59,
 																			"character": 18
 																		}
 																	],
@@ -3708,7 +3784,8 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		57
+																		81,
+																		80
 																	]
 																}
 															]
@@ -3724,7 +3801,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 58,
+													"id": 82,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3733,17 +3810,20 @@
 													},
 													"children": [
 														{
-															"id": 62,
+															"id": 86,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
 															"flags": {
 																"isExported": true
 															},
+															"comment": {
+																"text": "Optional user metadata.\n"
+															},
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 55,
+																	"line": 65,
 																	"character": 12
 																}
 															],
@@ -3766,7 +3846,7 @@
 															}
 														},
 														{
-															"id": 61,
+															"id": 85,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3776,7 +3856,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 54,
+																	"line": 64,
 																	"character": 13
 																}
 															],
@@ -3795,7 +3875,7 @@
 															}
 														},
 														{
-															"id": 60,
+															"id": 84,
 															"name": "session",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3805,7 +3885,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 53,
+																	"line": 63,
 																	"character": 15
 																}
 															],
@@ -3824,7 +3904,7 @@
 															}
 														},
 														{
-															"id": 59,
+															"id": 83,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3834,7 +3914,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 52,
+																	"line": 62,
 																	"character": 12
 																}
 															],
@@ -3858,17 +3938,17 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																62,
-																61,
-																60,
-																59
+																86,
+																85,
+																84,
+																83
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-															"line": 51,
+															"line": 61,
 															"character": 16
 														}
 													]
@@ -3879,7 +3959,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 49,
+										"id": 71,
 										"name": "GoTrueClient.signUp"
 									}
 								}
@@ -3887,18 +3967,18 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 49,
+									"line": 58,
 									"character": 10
 								}
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 49,
+								"id": 71,
 								"name": "GoTrueClient.signUp"
 							}
 						},
 						{
-							"id": 92,
+							"id": 131,
 							"name": "update",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3907,7 +3987,7 @@
 							},
 							"signatures": [
 								{
-									"id": 93,
+									"id": 132,
 									"name": "update",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3919,7 +3999,7 @@
 									},
 									"parameters": [
 										{
-											"id": 94,
+											"id": 133,
 											"name": "attributes",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3938,7 +4018,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 95,
+													"id": 134,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3947,7 +4027,7 @@
 													},
 													"children": [
 														{
-															"id": 96,
+															"id": 135,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3957,7 +4037,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 100,
+																	"line": 124,
 																	"character": 12
 																}
 															],
@@ -3976,7 +4056,7 @@
 															}
 														},
 														{
-															"id": 98,
+															"id": 137,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3986,7 +4066,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 102,
+																	"line": 126,
 																	"character": 13
 																}
 															],
@@ -4005,7 +4085,7 @@
 															}
 														},
 														{
-															"id": 97,
+															"id": 136,
 															"name": "user",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4015,7 +4095,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 101,
+																	"line": 125,
 																	"character": 12
 																}
 															],
@@ -4039,16 +4119,16 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																96,
-																98,
-																97
+																135,
+																137,
+																136
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-															"line": 99,
+															"line": 123,
 															"character": 48
 														}
 													]
@@ -4059,7 +4139,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 92,
+										"id": 131,
 										"name": "GoTrueClient.update"
 									}
 								}
@@ -4067,18 +4147,18 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 99,
+									"line": 123,
 									"character": 10
 								}
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 92,
+								"id": 131,
 								"name": "GoTrueClient.update"
 							}
 						},
 						{
-							"id": 82,
+							"id": 121,
 							"name": "user",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4087,7 +4167,7 @@
 							},
 							"signatures": [
 								{
-									"id": 83,
+									"id": 122,
 									"name": "user",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4113,7 +4193,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 82,
+										"id": 121,
 										"name": "GoTrueClient.user"
 									}
 								}
@@ -4121,14 +4201,374 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 83,
+									"line": 107,
 									"character": 8
 								}
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 82,
+								"id": 121,
 								"name": "GoTrueClient.user"
+							}
+						},
+						{
+							"id": 107,
+							"name": "verifyOTP",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 108,
+									"name": "verifyOTP",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Log in a user given a User supplied OTP received via mobile."
+									},
+									"parameters": [
+										{
+											"id": 109,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"originalName": "__0",
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 110,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 111,
+															"name": "phone",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The user's phone number."
+															},
+															"sources": [
+																{
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"line": 94,
+																	"character": 21
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 112,
+															"name": "token",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"comment": {
+																"text": "The user's password."
+															},
+															"sources": [
+																{
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"line": 94,
+																	"character": 28
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																111,
+																112
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+															"line": 94,
+															"character": 14
+														}
+													]
+												}
+											}
+										},
+										{
+											"id": 113,
+											"name": "options",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													},
+													{
+														"type": "reflection",
+														"declaration": {
+															"id": 114,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {
+																"isExported": true
+															},
+															"children": [
+																{
+																	"id": 115,
+																	"name": "redirectTo",
+																	"kind": 32,
+																	"kindString": "Variable",
+																	"flags": {
+																		"isExported": true,
+																		"isOptional": true
+																	},
+																	"sources": [
+																		{
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																			"line": 95,
+																			"character": 18
+																		}
+																	],
+																	"type": {
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "intrinsic",
+																				"name": "undefined"
+																			},
+																			{
+																				"type": "intrinsic",
+																				"name": "string"
+																			}
+																		]
+																	}
+																}
+															],
+															"groups": [
+																{
+																	"title": "Variables",
+																	"kind": 32,
+																	"children": [
+																		115
+																	]
+																}
+															]
+														}
+													}
+												]
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 116,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 120,
+															"name": "data",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"line": 100,
+																	"character": 12
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Session"
+																	},
+																	{
+																		"type": "reference",
+																		"name": "User"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 119,
+															"name": "error",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"line": 99,
+																	"character": 13
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Error"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 118,
+															"name": "session",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"line": 98,
+																	"character": 15
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Session"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 117,
+															"name": "user",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"line": 97,
+																	"character": 12
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "User"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																120,
+																119,
+																118,
+																117
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+															"line": 96,
+															"character": 16
+														}
+													]
+												}
+											}
+										],
+										"name": "Promise"
+									},
+									"inheritedFrom": {
+										"type": "reference",
+										"id": 107,
+										"name": "GoTrueClient.verifyOTP"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"line": 94,
+									"character": 13
+								}
+							],
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 107,
+								"name": "GoTrueClient.verifyOTP"
 							}
 						}
 					],
@@ -4137,45 +4577,46 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								28
+								60
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								41,
-								44,
-								43,
-								42,
-								46,
-								45,
-								48,
-								47
+								63,
+								66,
+								65,
+								64,
+								68,
+								67,
+								70,
+								69
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								108,
-								120,
-								86,
-								84,
-								105,
-								99,
-								63,
-								116,
-								49,
-								92,
-								82
+								147,
+								159,
+								125,
+								123,
+								144,
+								138,
+								87,
+								155,
+								71,
+								131,
+								121,
+								107
 							]
 						}
 					],
 					"sources": [
 						{
 							"fileName": "src/lib/SupabaseAuthClient.ts",
-							"line": 3,
+							"line": 4,
 							"character": 31
 						}
 					],
@@ -4192,7 +4633,7 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						27
+						59
 					]
 				}
 			],
@@ -4205,7 +4646,7 @@
 			]
 		},
 		{
-			"id": 156,
+			"id": 199,
 			"name": "\"lib/SupabaseQueryBuilder\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -4215,7 +4656,7 @@
 			"originalName": "/home/runner/work/supabase-js/supabase-js/src/lib/SupabaseQueryBuilder.ts",
 			"children": [
 				{
-					"id": 157,
+					"id": 200,
 					"name": "SupabaseQueryBuilder",
 					"kind": 128,
 					"kindString": "Class",
@@ -4224,7 +4665,7 @@
 					},
 					"typeParameter": [
 						{
-							"id": 158,
+							"id": 201,
 							"name": "T",
 							"kind": 131072,
 							"kindString": "Type parameter",
@@ -4235,7 +4676,7 @@
 					],
 					"children": [
 						{
-							"id": 161,
+							"id": 204,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -4244,7 +4685,7 @@
 							},
 							"signatures": [
 								{
-									"id": 162,
+									"id": 205,
 									"name": "new SupabaseQueryBuilder",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -4253,7 +4694,7 @@
 									},
 									"parameters": [
 										{
-											"id": 163,
+											"id": 206,
 											"name": "url",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4266,7 +4707,7 @@
 											}
 										},
 										{
-											"id": 164,
+											"id": 207,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4277,7 +4718,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 165,
+													"id": 208,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -4286,7 +4727,7 @@
 													},
 													"children": [
 														{
-															"id": 166,
+															"id": 209,
 															"name": "headers",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4303,7 +4744,7 @@
 															"type": {
 																"type": "reflection",
 																"declaration": {
-																	"id": 167,
+																	"id": 210,
 																	"name": "__type",
 																	"kind": 65536,
 																	"kindString": "Type literal",
@@ -4312,7 +4753,7 @@
 																	},
 																	"indexSignature": [
 																		{
-																			"id": 168,
+																			"id": 211,
 																			"name": "__index",
 																			"kind": 8192,
 																			"kindString": "Index signature",
@@ -4321,7 +4762,7 @@
 																			},
 																			"parameters": [
 																				{
-																					"id": 169,
+																					"id": 212,
 																					"name": "key",
 																					"kind": 32768,
 																					"kindString": "Parameter",
@@ -4344,7 +4785,7 @@
 															}
 														},
 														{
-															"id": 171,
+															"id": 214,
 															"name": "realtime",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4364,7 +4805,7 @@
 															}
 														},
 														{
-															"id": 170,
+															"id": 213,
 															"name": "schema",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4384,7 +4825,7 @@
 															}
 														},
 														{
-															"id": 172,
+															"id": 215,
 															"name": "table",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4409,10 +4850,10 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																166,
-																171,
-																170,
-																172
+																209,
+																214,
+																213,
+																215
 															]
 														}
 													],
@@ -4429,7 +4870,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 157,
+										"id": 200,
 										"name": "SupabaseQueryBuilder"
 									},
 									"overwrites": {
@@ -4451,7 +4892,7 @@
 							}
 						},
 						{
-							"id": 160,
+							"id": 203,
 							"name": "_realtime",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4472,7 +4913,7 @@
 							}
 						},
 						{
-							"id": 159,
+							"id": 202,
 							"name": "_subscription",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4489,12 +4930,12 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 131,
+								"id": 170,
 								"name": "SupabaseRealtimeClient"
 							}
 						},
 						{
-							"id": 231,
+							"id": 274,
 							"name": "body",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4540,12 +4981,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 231,
+								"id": 274,
 								"name": "PostgrestBuilder.body"
 							}
 						},
 						{
-							"id": 226,
+							"id": 269,
 							"name": "headers",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4563,7 +5004,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 227,
+									"id": 270,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -4572,7 +5013,7 @@
 									},
 									"indexSignature": [
 										{
-											"id": 228,
+											"id": 271,
 											"name": "__index",
 											"kind": 8192,
 											"kindString": "Index signature",
@@ -4581,7 +5022,7 @@
 											},
 											"parameters": [
 												{
-													"id": 229,
+													"id": 272,
 													"name": "key",
 													"kind": 32768,
 													"kindString": "Parameter",
@@ -4611,12 +5052,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 226,
+								"id": 269,
 								"name": "PostgrestBuilder.headers"
 							}
 						},
 						{
-							"id": 224,
+							"id": 267,
 							"name": "method",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4658,12 +5099,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 224,
+								"id": 267,
 								"name": "PostgrestBuilder.method"
 							}
 						},
 						{
-							"id": 230,
+							"id": 273,
 							"name": "schema",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4694,13 +5135,39 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 230,
+								"id": 273,
 								"name": "PostgrestBuilder.schema"
 							}
 						},
 						{
-							"id": 232,
+							"id": 275,
 							"name": "shouldThrowOnError",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+									"line": 49,
+									"character": 32
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 275,
+								"name": "PostgrestBuilder.shouldThrowOnError"
+							}
+						},
+						{
+							"id": 276,
+							"name": "signal",
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {
@@ -4711,35 +5178,22 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
-									"line": 49,
-									"character": 32
+									"line": 50,
+									"character": 20
 								}
 							],
 							"type": {
-								"type": "union",
-								"types": [
-									{
-										"type": "intrinsic",
-										"name": "undefined"
-									},
-									{
-										"type": "intrinsic",
-										"name": "false"
-									},
-									{
-										"type": "intrinsic",
-										"name": "true"
-									}
-								]
+								"type": "reference",
+								"name": "AbortSignal"
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 232,
-								"name": "PostgrestBuilder.shouldThrowOnError"
+								"id": 276,
+								"name": "PostgrestBuilder.signal"
 							}
 						},
 						{
-							"id": 225,
+							"id": 268,
 							"name": "url",
 							"kind": 1024,
 							"kindString": "Property",
@@ -4760,12 +5214,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 225,
+								"id": 268,
 								"name": "PostgrestBuilder.url"
 							}
 						},
 						{
-							"id": 218,
+							"id": 261,
 							"name": "delete",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4774,7 +5228,7 @@
 							},
 							"signatures": [
 								{
-									"id": 219,
+									"id": 262,
 									"name": "delete",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4786,7 +5240,7 @@
 									},
 									"parameters": [
 										{
-											"id": 220,
+											"id": 263,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4798,7 +5252,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 221,
+													"id": 264,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -4807,7 +5261,7 @@
 													},
 													"children": [
 														{
-															"id": 223,
+															"id": 266,
 															"name": "count",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4851,7 +5305,7 @@
 															}
 														},
 														{
-															"id": 222,
+															"id": 265,
 															"name": "returning",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4892,8 +5346,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																223,
-																222
+																266,
+																265
 															]
 														}
 													],
@@ -4920,7 +5374,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 218,
+										"id": 261,
 										"name": "PostgrestQueryBuilder.delete"
 									}
 								}
@@ -4934,12 +5388,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 218,
+								"id": 261,
 								"name": "PostgrestQueryBuilder.delete"
 							}
 						},
 						{
-							"id": 187,
+							"id": 230,
 							"name": "insert",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4948,7 +5402,7 @@
 							},
 							"signatures": [
 								{
-									"id": 188,
+									"id": 231,
 									"name": "insert",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4960,7 +5414,7 @@
 									},
 									"parameters": [
 										{
-											"id": 189,
+											"id": 232,
 											"name": "values",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5000,7 +5454,7 @@
 											}
 										},
 										{
-											"id": 190,
+											"id": 233,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5018,7 +5472,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 191,
+															"id": 234,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -5027,7 +5481,7 @@
 															},
 															"children": [
 																{
-																	"id": 193,
+																	"id": 236,
 																	"name": "count",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -5065,7 +5519,7 @@
 																	}
 																},
 																{
-																	"id": 192,
+																	"id": 235,
 																	"name": "returning",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -5100,8 +5554,8 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		193,
-																		192
+																		236,
+																		235
 																	]
 																}
 															]
@@ -5123,12 +5577,12 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 187,
+										"id": 230,
 										"name": "PostgrestQueryBuilder.insert"
 									}
 								},
 								{
-									"id": 194,
+									"id": 237,
 									"name": "insert",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5145,7 +5599,7 @@
 									},
 									"parameters": [
 										{
-											"id": 195,
+											"id": 238,
 											"name": "values",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5182,7 +5636,7 @@
 											}
 										},
 										{
-											"id": 196,
+											"id": 239,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5200,7 +5654,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 197,
+															"id": 240,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -5209,7 +5663,7 @@
 															},
 															"children": [
 																{
-																	"id": 201,
+																	"id": 244,
 																	"name": "count",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -5247,7 +5701,7 @@
 																	}
 																},
 																{
-																	"id": 199,
+																	"id": 242,
 																	"name": "onConflict",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -5277,7 +5731,7 @@
 																	}
 																},
 																{
-																	"id": 200,
+																	"id": 243,
 																	"name": "returning",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -5307,7 +5761,7 @@
 																	}
 																},
 																{
-																	"id": 198,
+																	"id": 241,
 																	"name": "upsert",
 																	"kind": 32,
 																	"kindString": "Variable",
@@ -5346,10 +5800,10 @@
 																	"title": "Variables",
 																	"kind": 32,
 																	"children": [
-																		201,
-																		199,
-																		200,
-																		198
+																		244,
+																		242,
+																		243,
+																		241
 																	]
 																}
 															]
@@ -5371,7 +5825,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 187,
+										"id": 230,
 										"name": "PostgrestQueryBuilder.insert"
 									}
 								}
@@ -5390,12 +5844,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 187,
+								"id": 230,
 								"name": "PostgrestQueryBuilder.insert"
 							}
 						},
 						{
-							"id": 173,
+							"id": 216,
 							"name": "on",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5404,7 +5858,7 @@
 							},
 							"signatures": [
 								{
-									"id": 174,
+									"id": 217,
 									"name": "on",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5412,11 +5866,11 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "Subscribe to realtime changes in your databse."
+										"shortText": "Subscribe to realtime changes in your database."
 									},
 									"parameters": [
 										{
-											"id": 175,
+											"id": 218,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5428,12 +5882,12 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 25,
+												"id": 57,
 												"name": "SupabaseEventTypes"
 											}
 										},
 										{
-											"id": 176,
+											"id": 219,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5446,7 +5900,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 177,
+													"id": 220,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -5455,7 +5909,7 @@
 													},
 													"signatures": [
 														{
-															"id": 178,
+															"id": 221,
 															"name": "__call",
 															"kind": 4096,
 															"kindString": "Call signature",
@@ -5464,7 +5918,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 179,
+																	"id": 222,
 																	"name": "payload",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -5473,7 +5927,7 @@
 																	},
 																	"type": {
 																		"type": "reference",
-																		"id": 16,
+																		"id": 48,
 																		"typeArguments": [
 																			{
 																				"type": "typeParameter",
@@ -5503,7 +5957,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 131,
+										"id": 170,
 										"name": "SupabaseRealtimeClient"
 									}
 								}
@@ -5517,7 +5971,7 @@
 							]
 						},
 						{
-							"id": 180,
+							"id": 223,
 							"name": "select",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5526,7 +5980,7 @@
 							},
 							"signatures": [
 								{
-									"id": 181,
+									"id": 224,
 									"name": "select",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5538,7 +5992,7 @@
 									},
 									"parameters": [
 										{
-											"id": 182,
+											"id": 225,
 											"name": "columns",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5564,7 +6018,7 @@
 											}
 										},
 										{
-											"id": 183,
+											"id": 226,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5576,7 +6030,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 184,
+													"id": 227,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -5585,7 +6039,7 @@
 													},
 													"children": [
 														{
-															"id": 186,
+															"id": 229,
 															"name": "count",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5629,7 +6083,7 @@
 															}
 														},
 														{
-															"id": 185,
+															"id": 228,
 															"name": "head",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5670,8 +6124,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																186,
-																185
+																229,
+																228
 															]
 														}
 													],
@@ -5698,7 +6152,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 180,
+										"id": 223,
 										"name": "PostgrestQueryBuilder.select"
 									}
 								}
@@ -5712,12 +6166,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 180,
+								"id": 223,
 								"name": "PostgrestQueryBuilder.select"
 							}
 						},
 						{
-							"id": 235,
+							"id": 279,
 							"name": "then",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5726,7 +6180,7 @@
 							},
 							"signatures": [
 								{
-									"id": 236,
+									"id": 280,
 									"name": "then",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5735,7 +6189,7 @@
 									},
 									"typeParameter": [
 										{
-											"id": 237,
+											"id": 281,
 											"name": "TResult1",
 											"kind": 131072,
 											"kindString": "Type parameter",
@@ -5744,7 +6198,7 @@
 											}
 										},
 										{
-											"id": 238,
+											"id": 282,
 											"name": "TResult2",
 											"kind": 131072,
 											"kindString": "Type parameter",
@@ -5755,7 +6209,7 @@
 									],
 									"parameters": [
 										{
-											"id": 239,
+											"id": 283,
 											"name": "onfulfilled",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5769,7 +6223,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 240,
+															"id": 284,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -5778,7 +6232,7 @@
 															},
 															"signatures": [
 																{
-																	"id": 241,
+																	"id": 285,
 																	"name": "__call",
 																	"kind": 4096,
 																	"kindString": "Call signature",
@@ -5787,7 +6241,7 @@
 																	},
 																	"parameters": [
 																		{
-																			"id": 242,
+																			"id": 286,
 																			"name": "value",
 																			"kind": 32768,
 																			"kindString": "Parameter",
@@ -5850,7 +6304,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
-																	"line": 58,
+																	"line": 59,
 																	"character": 75
 																}
 															]
@@ -5868,7 +6322,7 @@
 											}
 										},
 										{
-											"id": 243,
+											"id": 287,
 											"name": "onrejected",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5882,7 +6336,7 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 244,
+															"id": 288,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -5891,7 +6345,7 @@
 															},
 															"signatures": [
 																{
-																	"id": 245,
+																	"id": 289,
 																	"name": "__call",
 																	"kind": 4096,
 																	"kindString": "Call signature",
@@ -5900,7 +6354,7 @@
 																	},
 																	"parameters": [
 																		{
-																			"id": 246,
+																			"id": 290,
 																			"name": "reason",
 																			"kind": 32768,
 																			"kindString": "Parameter",
@@ -5945,7 +6399,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
-																	"line": 58,
+																	"line": 59,
 																	"character": 176
 																}
 															]
@@ -5998,7 +6452,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 235,
+										"id": 279,
 										"name": "PostgrestBuilder.then"
 									}
 								}
@@ -6006,18 +6460,18 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
-									"line": 58,
+									"line": 59,
 									"character": 8
 								}
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 235,
+								"id": 279,
 								"name": "PostgrestBuilder.then"
 							}
 						},
 						{
-							"id": 233,
+							"id": 277,
 							"name": "throwOnError",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6026,7 +6480,7 @@
 							},
 							"signatures": [
 								{
-									"id": 234,
+									"id": 278,
 									"name": "throwOnError",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6049,7 +6503,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 233,
+										"id": 277,
 										"name": "PostgrestBuilder.throwOnError"
 									}
 								}
@@ -6057,18 +6511,18 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
-									"line": 57,
+									"line": 58,
 									"character": 16
 								}
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 233,
+								"id": 277,
 								"name": "PostgrestBuilder.throwOnError"
 							}
 						},
 						{
-							"id": 211,
+							"id": 254,
 							"name": "update",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6077,7 +6531,7 @@
 							},
 							"signatures": [
 								{
-									"id": 212,
+									"id": 255,
 									"name": "update",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6089,7 +6543,7 @@
 									},
 									"parameters": [
 										{
-											"id": 213,
+											"id": 256,
 											"name": "values",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6111,7 +6565,7 @@
 											}
 										},
 										{
-											"id": 214,
+											"id": 257,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6123,7 +6577,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 215,
+													"id": 258,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -6132,7 +6586,7 @@
 													},
 													"children": [
 														{
-															"id": 217,
+															"id": 260,
 															"name": "count",
 															"kind": 32,
 															"kindString": "Variable",
@@ -6176,7 +6630,7 @@
 															}
 														},
 														{
-															"id": 216,
+															"id": 259,
 															"name": "returning",
 															"kind": 32,
 															"kindString": "Variable",
@@ -6217,8 +6671,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																217,
-																216
+																260,
+																259
 															]
 														}
 													],
@@ -6245,7 +6699,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 211,
+										"id": 254,
 										"name": "PostgrestQueryBuilder.update"
 									}
 								}
@@ -6259,12 +6713,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 211,
+								"id": 254,
 								"name": "PostgrestQueryBuilder.update"
 							}
 						},
 						{
-							"id": 202,
+							"id": 245,
 							"name": "upsert",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6273,7 +6727,7 @@
 							},
 							"signatures": [
 								{
-									"id": 203,
+									"id": 246,
 									"name": "upsert",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6285,7 +6739,7 @@
 									},
 									"parameters": [
 										{
-											"id": 204,
+											"id": 247,
 											"name": "values",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6325,7 +6779,7 @@
 											}
 										},
 										{
-											"id": 205,
+											"id": 248,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6337,7 +6791,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 206,
+													"id": 249,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -6346,7 +6800,7 @@
 													},
 													"children": [
 														{
-															"id": 209,
+															"id": 252,
 															"name": "count",
 															"kind": 32,
 															"kindString": "Variable",
@@ -6390,7 +6844,7 @@
 															}
 														},
 														{
-															"id": 210,
+															"id": 253,
 															"name": "ignoreDuplicates",
 															"kind": 32,
 															"kindString": "Variable",
@@ -6426,7 +6880,7 @@
 															}
 														},
 														{
-															"id": 207,
+															"id": 250,
 															"name": "onConflict",
 															"kind": 32,
 															"kindString": "Variable",
@@ -6458,7 +6912,7 @@
 															}
 														},
 														{
-															"id": 208,
+															"id": 251,
 															"name": "returning",
 															"kind": 32,
 															"kindString": "Variable",
@@ -6499,10 +6953,10 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																209,
-																210,
-																207,
-																208
+																252,
+																253,
+																250,
+																251
 															]
 														}
 													],
@@ -6529,7 +6983,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 202,
+										"id": 245,
 										"name": "PostgrestQueryBuilder.upsert"
 									}
 								}
@@ -6543,7 +6997,7 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 202,
+								"id": 245,
 								"name": "PostgrestQueryBuilder.upsert"
 							}
 						}
@@ -6553,35 +7007,36 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								161
+								204
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								160,
-								159,
-								231,
-								226,
-								224,
-								230,
-								232,
-								225
+								203,
+								202,
+								274,
+								269,
+								267,
+								273,
+								275,
+								276,
+								268
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								218,
-								187,
-								173,
-								180,
-								235,
-								233,
-								211,
-								202
+								261,
+								230,
+								216,
+								223,
+								279,
+								277,
+								254,
+								245
 							]
 						}
 					],
@@ -6629,7 +7084,7 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						157
+						200
 					]
 				}
 			],
@@ -6642,7 +7097,7 @@
 			]
 		},
 		{
-			"id": 130,
+			"id": 169,
 			"name": "\"lib/SupabaseRealtimeClient\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -6652,7 +7107,7 @@
 			"originalName": "/home/runner/work/supabase-js/supabase-js/src/lib/SupabaseRealtimeClient.ts",
 			"children": [
 				{
-					"id": 131,
+					"id": 170,
 					"name": "SupabaseRealtimeClient",
 					"kind": 128,
 					"kindString": "Class",
@@ -6661,7 +7116,7 @@
 					},
 					"children": [
 						{
-							"id": 133,
+							"id": 172,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -6670,7 +7125,7 @@
 							},
 							"signatures": [
 								{
-									"id": 134,
+									"id": 173,
 									"name": "new SupabaseRealtimeClient",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -6679,7 +7134,7 @@
 									},
 									"parameters": [
 										{
-											"id": 135,
+											"id": 174,
 											"name": "socket",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6692,7 +7147,65 @@
 											}
 										},
 										{
-											"id": 136,
+											"id": 175,
+											"name": "headers",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 176,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"indexSignature": [
+														{
+															"id": 177,
+															"name": "__index",
+															"kind": 8192,
+															"kindString": "Index signature",
+															"flags": {
+																"isExported": true
+															},
+															"parameters": [
+																{
+																	"id": 178,
+																	"name": "key",
+																	"kind": 32768,
+																	"kindString": "Parameter",
+																	"flags": {
+																		"isExported": true
+																	},
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"sources": [
+														{
+															"fileName": "src/lib/SupabaseRealtimeClient.ts",
+															"line": 9,
+															"character": 12
+														}
+													]
+												}
+											}
+										},
+										{
+											"id": 179,
 											"name": "schema",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6705,7 +7218,7 @@
 											}
 										},
 										{
-											"id": 137,
+											"id": 180,
 											"name": "tableName",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6720,7 +7233,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 131,
+										"id": 170,
 										"name": "SupabaseRealtimeClient"
 									}
 								}
@@ -6734,7 +7247,7 @@
 							]
 						},
 						{
-							"id": 132,
+							"id": 171,
 							"name": "subscription",
 							"kind": 1024,
 							"kindString": "Property",
@@ -6754,7 +7267,7 @@
 							}
 						},
 						{
-							"id": 138,
+							"id": 181,
 							"name": "getPayloadRecords",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6764,7 +7277,7 @@
 							},
 							"signatures": [
 								{
-									"id": 139,
+									"id": 182,
 									"name": "getPayloadRecords",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6773,7 +7286,7 @@
 									},
 									"parameters": [
 										{
-											"id": 140,
+											"id": 183,
 											"name": "payload",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6789,7 +7302,7 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 141,
+											"id": 184,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -6798,7 +7311,7 @@
 											},
 											"children": [
 												{
-													"id": 142,
+													"id": 185,
 													"name": "new",
 													"kind": 32,
 													"kindString": "Variable",
@@ -6808,14 +7321,14 @@
 													"sources": [
 														{
 															"fileName": "src/lib/SupabaseRealtimeClient.ts",
-															"line": 14,
+															"line": 26,
 															"character": 9
 														}
 													],
 													"type": {
 														"type": "reflection",
 														"declaration": {
-															"id": 143,
+															"id": 186,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -6826,7 +7339,7 @@
 													}
 												},
 												{
-													"id": 144,
+													"id": 187,
 													"name": "old",
 													"kind": 32,
 													"kindString": "Variable",
@@ -6836,14 +7349,14 @@
 													"sources": [
 														{
 															"fileName": "src/lib/SupabaseRealtimeClient.ts",
-															"line": 15,
+															"line": 27,
 															"character": 9
 														}
 													],
 													"type": {
 														"type": "reflection",
 														"declaration": {
-															"id": 145,
+															"id": 188,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
@@ -6859,8 +7372,8 @@
 													"title": "Variables",
 													"kind": 32,
 													"children": [
-														142,
-														144
+														185,
+														187
 													]
 												}
 											]
@@ -6871,13 +7384,13 @@
 							"sources": [
 								{
 									"fileName": "src/lib/SupabaseRealtimeClient.ts",
-									"line": 12,
+									"line": 24,
 									"character": 27
 								}
 							]
 						},
 						{
-							"id": 146,
+							"id": 189,
 							"name": "on",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6886,7 +7399,7 @@
 							},
 							"signatures": [
 								{
-									"id": 147,
+									"id": 190,
 									"name": "on",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6898,7 +7411,7 @@
 									},
 									"parameters": [
 										{
-											"id": 148,
+											"id": 191,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6910,12 +7423,12 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 25,
+												"id": 57,
 												"name": "SupabaseEventTypes"
 											}
 										},
 										{
-											"id": 149,
+											"id": 192,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6928,7 +7441,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 150,
+													"id": 193,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -6937,7 +7450,7 @@
 													},
 													"signatures": [
 														{
-															"id": 151,
+															"id": 194,
 															"name": "__call",
 															"kind": 4096,
 															"kindString": "Call signature",
@@ -6946,7 +7459,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 152,
+																	"id": 195,
 																	"name": "payload",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -6955,7 +7468,7 @@
 																	},
 																	"type": {
 																		"type": "reference",
-																		"id": 16,
+																		"id": 48,
 																		"typeArguments": [
 																			{
 																				"type": "intrinsic",
@@ -6975,7 +7488,7 @@
 													"sources": [
 														{
 															"fileName": "src/lib/SupabaseRealtimeClient.ts",
-															"line": 35,
+															"line": 47,
 															"character": 41
 														}
 													]
@@ -6992,13 +7505,13 @@
 							"sources": [
 								{
 									"fileName": "src/lib/SupabaseRealtimeClient.ts",
-									"line": 35,
+									"line": 47,
 									"character": 4
 								}
 							]
 						},
 						{
-							"id": 153,
+							"id": 196,
 							"name": "subscribe",
 							"kind": 2048,
 							"kindString": "Method",
@@ -7007,7 +7520,7 @@
 							},
 							"signatures": [
 								{
-									"id": 154,
+									"id": 197,
 									"name": "subscribe",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -7019,7 +7532,7 @@
 									},
 									"parameters": [
 										{
-											"id": 155,
+											"id": 198,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7042,7 +7555,7 @@
 							"sources": [
 								{
 									"fileName": "src/lib/SupabaseRealtimeClient.ts",
-									"line": 56,
+									"line": 68,
 									"character": 11
 								}
 							]
@@ -7053,23 +7566,23 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								133
+								172
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								132
+								171
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								138,
-								146,
-								153
+								181,
+								189,
+								196
 							]
 						}
 					],
@@ -7087,7 +7600,7 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						131
+						170
 					]
 				}
 			],
@@ -7100,7 +7613,7 @@
 			]
 		},
 		{
-			"id": 1,
+			"id": 3,
 			"name": "\"lib/constants\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -7110,14 +7623,46 @@
 			"originalName": "/home/runner/work/supabase-js/supabase-js/src/lib/constants.ts",
 			"children": [
 				{
-					"id": 2,
+					"id": 4,
 					"name": "DEFAULT_HEADERS",
-					"kind": 32,
-					"kindString": "Variable",
+					"kind": 2097152,
+					"kindString": "Object literal",
 					"flags": {
 						"isExported": true,
 						"isConst": true
 					},
+					"children": [
+						{
+							"id": 5,
+							"name": "X-Client-Info",
+							"kind": 32,
+							"kindString": "Variable",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "src/lib/constants.ts",
+									"line": 3,
+									"character": 48
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							},
+							"defaultValue": "`supabase-js/${version}`"
+						}
+					],
+					"groups": [
+						{
+							"title": "Variables",
+							"kind": 32,
+							"children": [
+								5
+							]
+						}
+					],
 					"sources": [
 						{
 							"fileName": "src/lib/constants.ts",
@@ -7126,25 +7671,17 @@
 						}
 					],
 					"type": {
-						"type": "reflection",
-						"declaration": {
-							"id": 3,
-							"name": "__type",
-							"kind": 65536,
-							"kindString": "Type literal",
-							"flags": {
-								"isExported": true
-							}
-						}
+						"type": "intrinsic",
+						"name": "object"
 					}
 				}
 			],
 			"groups": [
 				{
-					"title": "Variables",
-					"kind": 32,
+					"title": "Object literals",
+					"kind": 2097152,
 					"children": [
-						2
+						4
 					]
 				}
 			],
@@ -7157,7 +7694,7 @@
 			]
 		},
 		{
-			"id": 316,
+			"id": 6,
 			"name": "\"lib/helpers\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -7167,7 +7704,53 @@
 			"originalName": "/home/runner/work/supabase-js/supabase-js/src/lib/helpers.ts",
 			"children": [
 				{
-					"id": 317,
+					"id": 9,
+					"name": "stripTrailingSlash",
+					"kind": 64,
+					"kindString": "Function",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 10,
+							"name": "stripTrailingSlash",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 11,
+									"name": "url",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "src/lib/helpers.ts",
+							"line": 11,
+							"character": 34
+						}
+					]
+				},
+				{
+					"id": 7,
 					"name": "uuid",
 					"kind": 64,
 					"kindString": "Function",
@@ -7176,7 +7759,7 @@
 					},
 					"signatures": [
 						{
-							"id": 318,
+							"id": 8,
 							"name": "uuid",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7203,7 +7786,8 @@
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						317
+						9,
+						7
 					]
 				}
 			],
@@ -7216,7 +7800,7 @@
 			]
 		},
 		{
-			"id": 4,
+			"id": 12,
 			"name": "\"lib/types\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -7226,7 +7810,631 @@
 			"originalName": "/home/runner/work/supabase-js/supabase-js/src/lib/types.ts",
 			"children": [
 				{
-					"id": 5,
+					"id": 13,
+					"name": "SupabaseAuthClientOptions",
+					"kind": 256,
+					"kindString": "Interface",
+					"flags": {
+						"isExported": true
+					},
+					"children": [
+						{
+							"id": 31,
+							"name": "autoRefreshToken",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"line": 44,
+									"character": 24
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "false"
+									},
+									{
+										"type": "intrinsic",
+										"name": "true"
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 21,
+								"name": "__type.autoRefreshToken"
+							}
+						},
+						{
+							"id": 34,
+							"name": "cookieOptions",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"line": 47,
+									"character": 21
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "CookieOptions"
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 24,
+								"name": "__type.cookieOptions"
+							}
+						},
+						{
+							"id": 30,
+							"name": "detectSessionInUrl",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"line": 43,
+									"character": 26
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "false"
+									},
+									{
+										"type": "intrinsic",
+										"name": "true"
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 20,
+								"name": "__type.detectSessionInUrl"
+							}
+						},
+						{
+							"id": 26,
+							"name": "headers",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"line": 40,
+									"character": 15
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "reflection",
+										"declaration": {
+											"id": 27,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {
+												"isExported": true
+											},
+											"indexSignature": [
+												{
+													"id": 28,
+													"name": "__index",
+													"kind": 8192,
+													"kindString": "Index signature",
+													"flags": {
+														"isExported": true
+													},
+													"parameters": [
+														{
+															"id": 29,
+															"name": "key",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isExported": true
+															},
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											]
+										}
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 16,
+								"name": "__type.headers"
+							}
+						},
+						{
+							"id": 33,
+							"name": "localStorage",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"line": 46,
+									"character": 20
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "SupportedStorage"
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 23,
+								"name": "__type.localStorage"
+							}
+						},
+						{
+							"id": 32,
+							"name": "persistSession",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"line": 45,
+									"character": 22
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "false"
+									},
+									{
+										"type": "intrinsic",
+										"name": "true"
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 22,
+								"name": "__type.persistSession"
+							}
+						},
+						{
+							"id": 25,
+							"name": "url",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"line": 39,
+									"character": 11
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 15,
+								"name": "__type.url"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								31,
+								34,
+								30,
+								26,
+								33,
+								32,
+								25
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "src/lib/types.ts",
+							"line": 6,
+							"character": 42
+						}
+					],
+					"extendedTypes": [
+						{
+							"type": "reflection",
+							"declaration": {
+								"id": 14,
+								"name": "__type",
+								"kind": 65536,
+								"kindString": "Type literal",
+								"flags": {
+									"isExported": true
+								},
+								"children": [
+									{
+										"id": 21,
+										"name": "autoRefreshToken",
+										"kind": 32,
+										"kindString": "Variable",
+										"flags": {
+											"isExported": true,
+											"isOptional": true
+										},
+										"sources": [
+											{
+												"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+												"line": 44,
+												"character": 24
+											}
+										],
+										"type": {
+											"type": "union",
+											"types": [
+												{
+													"type": "intrinsic",
+													"name": "undefined"
+												},
+												{
+													"type": "intrinsic",
+													"name": "false"
+												},
+												{
+													"type": "intrinsic",
+													"name": "true"
+												}
+											]
+										}
+									},
+									{
+										"id": 24,
+										"name": "cookieOptions",
+										"kind": 32,
+										"kindString": "Variable",
+										"flags": {
+											"isExported": true,
+											"isOptional": true
+										},
+										"sources": [
+											{
+												"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+												"line": 47,
+												"character": 21
+											}
+										],
+										"type": {
+											"type": "reference",
+											"name": "CookieOptions"
+										}
+									},
+									{
+										"id": 20,
+										"name": "detectSessionInUrl",
+										"kind": 32,
+										"kindString": "Variable",
+										"flags": {
+											"isExported": true,
+											"isOptional": true
+										},
+										"sources": [
+											{
+												"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+												"line": 43,
+												"character": 26
+											}
+										],
+										"type": {
+											"type": "union",
+											"types": [
+												{
+													"type": "intrinsic",
+													"name": "undefined"
+												},
+												{
+													"type": "intrinsic",
+													"name": "false"
+												},
+												{
+													"type": "intrinsic",
+													"name": "true"
+												}
+											]
+										}
+									},
+									{
+										"id": 16,
+										"name": "headers",
+										"kind": 32,
+										"kindString": "Variable",
+										"flags": {
+											"isExported": true,
+											"isOptional": true
+										},
+										"sources": [
+											{
+												"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+												"line": 40,
+												"character": 15
+											}
+										],
+										"type": {
+											"type": "union",
+											"types": [
+												{
+													"type": "intrinsic",
+													"name": "undefined"
+												},
+												{
+													"type": "reflection",
+													"declaration": {
+														"id": 17,
+														"name": "__type",
+														"kind": 65536,
+														"kindString": "Type literal",
+														"flags": {
+															"isExported": true
+														},
+														"indexSignature": [
+															{
+																"id": 18,
+																"name": "__index",
+																"kind": 8192,
+																"kindString": "Index signature",
+																"flags": {
+																	"isExported": true
+																},
+																"parameters": [
+																	{
+																		"id": 19,
+																		"name": "key",
+																		"kind": 32768,
+																		"kindString": "Parameter",
+																		"flags": {
+																			"isExported": true
+																		},
+																		"type": {
+																			"type": "intrinsic",
+																			"name": "string"
+																		}
+																	}
+																],
+																"type": {
+																	"type": "intrinsic",
+																	"name": "string"
+																}
+															}
+														]
+													}
+												}
+											]
+										}
+									},
+									{
+										"id": 23,
+										"name": "localStorage",
+										"kind": 32,
+										"kindString": "Variable",
+										"flags": {
+											"isExported": true,
+											"isOptional": true
+										},
+										"sources": [
+											{
+												"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+												"line": 46,
+												"character": 20
+											}
+										],
+										"type": {
+											"type": "reference",
+											"name": "SupportedStorage"
+										}
+									},
+									{
+										"id": 22,
+										"name": "persistSession",
+										"kind": 32,
+										"kindString": "Variable",
+										"flags": {
+											"isExported": true,
+											"isOptional": true
+										},
+										"sources": [
+											{
+												"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+												"line": 45,
+												"character": 22
+											}
+										],
+										"type": {
+											"type": "union",
+											"types": [
+												{
+													"type": "intrinsic",
+													"name": "undefined"
+												},
+												{
+													"type": "intrinsic",
+													"name": "false"
+												},
+												{
+													"type": "intrinsic",
+													"name": "true"
+												}
+											]
+										}
+									},
+									{
+										"id": 15,
+										"name": "url",
+										"kind": 32,
+										"kindString": "Variable",
+										"flags": {
+											"isExported": true,
+											"isOptional": true
+										},
+										"sources": [
+											{
+												"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+												"line": 39,
+												"character": 11
+											}
+										],
+										"type": {
+											"type": "union",
+											"types": [
+												{
+													"type": "intrinsic",
+													"name": "undefined"
+												},
+												{
+													"type": "intrinsic",
+													"name": "string"
+												}
+											]
+										}
+									}
+								],
+								"groups": [
+									{
+										"title": "Variables",
+										"kind": 32,
+										"children": [
+											21,
+											24,
+											20,
+											16,
+											23,
+											22,
+											15
+										]
+									}
+								],
+								"sources": [
+									{
+										"fileName": "src/lib/types.ts",
+										"line": 6,
+										"character": 50
+									}
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": 35,
+					"name": "GoTrueClientOptions",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/lib/types.ts",
+							"line": 4,
+							"character": 24
+						}
+					],
+					"type": {
+						"type": "indexedAccess",
+						"indexType": {
+							"type": "unknown",
+							"name": "0"
+						},
+						"objectType": {
+							"type": "reference",
+							"typeArguments": [
+								{
+									"type": "query",
+									"queryType": {
+										"type": "reference",
+										"name": "GoTrueClient"
+									}
+								}
+							],
+							"name": "ConstructorParameters"
+						}
+					}
+				},
+				{
+					"id": 36,
 					"name": "SupabaseClientOptions",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -7236,14 +8444,14 @@
 					"sources": [
 						{
 							"fileName": "src/lib/types.ts",
-							"line": 1,
+							"line": 8,
 							"character": 33
 						}
 					],
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 6,
+							"id": 37,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
@@ -7252,7 +8460,7 @@
 							},
 							"children": [
 								{
-									"id": 12,
+									"id": 43,
 									"name": "autoRefreshToken",
 									"kind": 32,
 									"kindString": "Variable",
@@ -7266,7 +8474,7 @@
 									"sources": [
 										{
 											"fileName": "src/lib/types.ts",
-											"line": 13,
+											"line": 20,
 											"character": 18
 										}
 									],
@@ -7289,7 +8497,7 @@
 									}
 								},
 								{
-									"id": 14,
+									"id": 45,
 									"name": "detectSessionInUrl",
 									"kind": 32,
 									"kindString": "Variable",
@@ -7303,7 +8511,7 @@
 									"sources": [
 										{
 											"fileName": "src/lib/types.ts",
-											"line": 21,
+											"line": 28,
 											"character": 20
 										}
 									],
@@ -7326,7 +8534,7 @@
 									}
 								},
 								{
-									"id": 8,
+									"id": 39,
 									"name": "headers",
 									"kind": 32,
 									"kindString": "Variable",
@@ -7340,7 +8548,7 @@
 									"sources": [
 										{
 											"fileName": "src/lib/types.ts",
-											"line": 9,
+											"line": 16,
 											"character": 9
 										}
 									],
@@ -7354,7 +8562,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 9,
+													"id": 40,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -7363,7 +8571,7 @@
 													},
 													"indexSignature": [
 														{
-															"id": 10,
+															"id": 41,
 															"name": "__index",
 															"kind": 8192,
 															"kindString": "Index signature",
@@ -7372,7 +8580,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 11,
+																	"id": 42,
 																	"name": "key",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -7397,7 +8605,7 @@
 									}
 								},
 								{
-									"id": 15,
+									"id": 46,
 									"name": "localStorage",
 									"kind": 32,
 									"kindString": "Variable",
@@ -7411,17 +8619,24 @@
 									"sources": [
 										{
 											"fileName": "src/lib/types.ts",
-											"line": 25,
+											"line": 32,
 											"character": 14
 										}
 									],
 									"type": {
-										"type": "reference",
-										"name": "Storage"
+										"type": "indexedAccess",
+										"indexType": {
+											"type": "stringLiteral",
+											"value": "localStorage"
+										},
+										"objectType": {
+											"type": "reference",
+											"name": "SupabaseAuthClientOptions"
+										}
 									}
 								},
 								{
-									"id": 13,
+									"id": 44,
 									"name": "persistSession",
 									"kind": 32,
 									"kindString": "Variable",
@@ -7435,7 +8650,7 @@
 									"sources": [
 										{
 											"fileName": "src/lib/types.ts",
-											"line": 17,
+											"line": 24,
 											"character": 16
 										}
 									],
@@ -7458,7 +8673,31 @@
 									}
 								},
 								{
-									"id": 7,
+									"id": 47,
+									"name": "realtime",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"comment": {
+										"shortText": "Options passed to the realtime-js instance"
+									},
+									"sources": [
+										{
+											"fileName": "src/lib/types.ts",
+											"line": 37,
+											"character": 10
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "RealtimeClientOptions"
+									}
+								},
+								{
+									"id": 38,
 									"name": "schema",
 									"kind": 32,
 									"kindString": "Variable",
@@ -7472,7 +8711,7 @@
 									"sources": [
 										{
 											"fileName": "src/lib/types.ts",
-											"line": 5,
+											"line": 12,
 											"character": 8
 										}
 									],
@@ -7496,19 +8735,20 @@
 									"title": "Variables",
 									"kind": 32,
 									"children": [
-										12,
-										14,
-										8,
-										15,
-										13,
-										7
+										43,
+										45,
+										39,
+										46,
+										44,
+										47,
+										38
 									]
 								}
 							],
 							"sources": [
 								{
 									"fileName": "src/lib/types.ts",
-									"line": 1,
+									"line": 8,
 									"character": 35
 								}
 							]
@@ -7516,7 +8756,7 @@
 					}
 				},
 				{
-					"id": 25,
+					"id": 57,
 					"name": "SupabaseEventTypes",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -7526,7 +8766,7 @@
 					"sources": [
 						{
 							"fileName": "src/lib/types.ts",
-							"line": 39,
+							"line": 51,
 							"character": 30
 						}
 					],
@@ -7553,7 +8793,7 @@
 					}
 				},
 				{
-					"id": 16,
+					"id": 48,
 					"name": "SupabaseRealtimePayload",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -7562,7 +8802,7 @@
 					},
 					"typeParameter": [
 						{
-							"id": 17,
+							"id": 49,
 							"name": "T",
 							"kind": 131072,
 							"kindString": "Type parameter",
@@ -7574,14 +8814,14 @@
 					"sources": [
 						{
 							"fileName": "src/lib/types.ts",
-							"line": 28,
+							"line": 40,
 							"character": 35
 						}
 					],
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 18,
+							"id": 50,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
@@ -7590,7 +8830,7 @@
 							},
 							"children": [
 								{
-									"id": 19,
+									"id": 51,
 									"name": "commit_timestamp",
 									"kind": 32,
 									"kindString": "Variable",
@@ -7600,7 +8840,7 @@
 									"sources": [
 										{
 											"fileName": "src/lib/types.ts",
-											"line": 29,
+											"line": 41,
 											"character": 18
 										}
 									],
@@ -7610,7 +8850,7 @@
 									}
 								},
 								{
-									"id": 20,
+									"id": 52,
 									"name": "eventType",
 									"kind": 32,
 									"kindString": "Variable",
@@ -7620,7 +8860,7 @@
 									"sources": [
 										{
 											"fileName": "src/lib/types.ts",
-											"line": 30,
+											"line": 42,
 											"character": 11
 										}
 									],
@@ -7643,7 +8883,7 @@
 									}
 								},
 								{
-									"id": 23,
+									"id": 55,
 									"name": "new",
 									"kind": 32,
 									"kindString": "Variable",
@@ -7656,7 +8896,7 @@
 									"sources": [
 										{
 											"fileName": "src/lib/types.ts",
-											"line": 34,
+											"line": 46,
 											"character": 5
 										}
 									],
@@ -7666,7 +8906,7 @@
 									}
 								},
 								{
-									"id": 24,
+									"id": 56,
 									"name": "old",
 									"kind": 32,
 									"kindString": "Variable",
@@ -7679,7 +8919,7 @@
 									"sources": [
 										{
 											"fileName": "src/lib/types.ts",
-											"line": 36,
+											"line": 48,
 											"character": 5
 										}
 									],
@@ -7689,7 +8929,7 @@
 									}
 								},
 								{
-									"id": 21,
+									"id": 53,
 									"name": "schema",
 									"kind": 32,
 									"kindString": "Variable",
@@ -7699,7 +8939,7 @@
 									"sources": [
 										{
 											"fileName": "src/lib/types.ts",
-											"line": 31,
+											"line": 43,
 											"character": 8
 										}
 									],
@@ -7709,7 +8949,7 @@
 									}
 								},
 								{
-									"id": 22,
+									"id": 54,
 									"name": "table",
 									"kind": 32,
 									"kindString": "Variable",
@@ -7719,7 +8959,7 @@
 									"sources": [
 										{
 											"fileName": "src/lib/types.ts",
-											"line": 32,
+											"line": 44,
 											"character": 7
 										}
 									],
@@ -7734,19 +8974,19 @@
 									"title": "Variables",
 									"kind": 32,
 									"children": [
-										19,
-										20,
-										23,
-										24,
-										21,
-										22
+										51,
+										52,
+										55,
+										56,
+										53,
+										54
 									]
 								}
 							],
 							"sources": [
 								{
 									"fileName": "src/lib/types.ts",
-									"line": 28,
+									"line": 40,
 									"character": 40
 								}
 							]
@@ -7756,18 +8996,76 @@
 			],
 			"groups": [
 				{
+					"title": "Interfaces",
+					"kind": 256,
+					"children": [
+						13
+					]
+				},
+				{
 					"title": "Type aliases",
 					"kind": 4194304,
 					"children": [
-						5,
-						25,
-						16
+						35,
+						36,
+						57,
+						48
 					]
 				}
 			],
 			"sources": [
 				{
 					"fileName": "src/lib/types.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 1,
+			"name": "\"lib/version\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/supabase-js/supabase-js/src/lib/version.ts",
+			"children": [
+				{
+					"id": 2,
+					"name": "version",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {
+						"isExported": true,
+						"isConst": true
+					},
+					"sources": [
+						{
+							"fileName": "src/lib/version.ts",
+							"line": 2,
+							"character": 20
+						}
+					],
+					"type": {
+						"type": "stringLiteral",
+						"value": "0.0.0"
+					},
+					"defaultValue": "\"0.0.0\""
+				}
+			],
+			"groups": [
+				{
+					"title": "Variables",
+					"kind": 32,
+					"children": [
+						2
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "src/lib/version.ts",
 					"line": 1,
 					"character": 0
 				}
@@ -7779,14 +9077,15 @@
 			"title": "Modules",
 			"kind": 1,
 			"children": [
-				247,
-				310,
-				26,
-				156,
-				130,
-				1,
-				316,
-				4
+				291,
+				363,
+				58,
+				199,
+				169,
+				3,
+				6,
+				12,
+				1
 			]
 		}
 	]

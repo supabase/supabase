@@ -1,4 +1,4 @@
-<div style="direction: rtl;">
+<div style="direction: rtl;" dir="rtl">
 
 <p align="center">
   <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
@@ -24,7 +24,7 @@
 
 ## المجتمع والدعم
 
-- [مندى المجتمع](https://github.com/supabase/supabase/discussions). الأفضل لـ: المساعدة في البناء، والنقاس حول أفضل ممارسات قاعدة البيانات.
+- [مندى المجتمع](https://github.com/supabase/supabase/discussions). الأفضل لـ: المساعدة في البناء، والنقاش حول أفضل ممارسات قاعدة البيانات.
 - [مشاكل GitHub](https://github.com/supabase/supabase/issues). الأفضل لـ: المشاكل والأخطاء التي تواجهها عند استخدامك لـ(Supabase).
 - [دعم البريد الإلكتروني](https://supabase.io/docs/support#business-support). الأفضل لـ: مشاكل مع قاعدة بياناتك أو البنية التحتية.
 

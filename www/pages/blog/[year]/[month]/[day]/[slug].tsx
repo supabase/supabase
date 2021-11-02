@@ -1,4 +1,3 @@
-// file: pages/blog/[slug].js
 import { Badge, Card, Divider, IconFile, Space, Typography } from '@supabase/ui'
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
@@ -13,6 +12,7 @@ import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import Quote from '~/components/Quote'
+import ImageGrid from '~/components/ImageGrid'
 import { generateReadingTime } from '~/lib/helpers'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import blogStyles from './[slug].module.css'
@@ -25,6 +25,7 @@ const components = {
   code: (props: any) => {
     return <CodeBlock {...props} />
   },
+  ImageGrid,
 }
 
 // plugins for next-mdx-remote
@@ -166,14 +167,14 @@ function BlogPostPage(props: any) {
           images: [
             {
               url: `https://supabase.io${basePath}/images/blog/${
-                props.blog.thumb ? props.blog.thumb : props.blog.image
+                props.blog.image ? props.blog.image : props.blog.thumb
               }`,
             },
           ],
         }}
       />
       <DefaultLayout>
-        <div className="bg-white dark:bg-dark-800 overflow-hidden py-12">
+        <div className="bg-white dark:bg-dark-800 overflow-hidden mb-12">
           <div className="container px-8 sm:px-16 xl:px-20 lg:mt-16 mx-auto">
             <div className="max-w-6xl mx-auto">
               <div className="lg:py-12 grid grid-cols-12 lg:gap-16">

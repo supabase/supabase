@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Button, Badge } from '@supabase/ui'
+import { Button, Badge, IconStar } from '@supabase/ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -10,7 +10,7 @@ import SolutionsData from 'data/Solutions.json'
 
 import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
-import Annoucement from '~/components/Nav/Annoucement'
+import Announcement from '~/components/Nav/Announcement'
 
 type Props = {
   darkMode: boolean
@@ -185,7 +185,7 @@ const Nav = (props: Props) => {
 
   return (
     <>
-      <Annoucement />
+      <Announcement />
       <div className="sticky top-0 z-50">
         <nav className="bg-white dark:bg-gray-800 border-b dark:border-gray-600">
           {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
@@ -195,15 +195,17 @@ const Nav = (props: Props) => {
               <div className="flex items-center">
                 <div className="flex-shrink-0 flex items-center">
                   <Link href="/" as="/">
-                    <img
-                      className="block h-6 w-auto"
-                      src={
-                        darkMode
-                          ? `${basePath}/images/logo-dark.png`
-                          : `${basePath}/images/logo-light.png`
-                      }
-                      alt="Logo"
-                    />
+                    <a>
+                      <img
+                        className="block h-6 w-auto"
+                        src={
+                          darkMode
+                            ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
+                            : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
+                        }
+                        alt="Logo"
+                      />
+                    </a>
                   </Link>
                 </div>
                 <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-4">
@@ -218,16 +220,6 @@ const Nav = (props: Props) => {
                     active={openDevelopers}
                   />
                   <a
-                    href="/beta"
-                    className={`
-                    inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                    text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
-                    dark:text-dark-100 dark:hover:border-dark-100
-                  `}
-                  >
-                    Beta
-                  </a>
-                  <a
                     href="/pricing"
                     className={`
                     inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
@@ -237,20 +229,26 @@ const Nav = (props: Props) => {
                   >
                     Pricing
                   </a>
+                  <a
+                    href="/blog"
+                    className={`
+                    inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
+                    text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
+                    dark:text-dark-100 dark:hover:border-dark-100
+                  `}
+                  >
+                    Blog
+                  </a>
                 </div>
               </div>
-              <div className="hidden lg:flex items-center sm:space-x-4">
+              <div className="hidden lg:flex items-center sm:space-x-3">
+                <a href="https://github.com/supabase/supabase" target="_blank">
+                  <Button type="default" icon={<IconStar />}>
+                    Star us on GitHub
+                  </Button>
+                </a>
                 <a href="https://app.supabase.io/api/login">
                   <Button>Start your project</Button>
-                </a>
-                <a
-                  href="https://app.supabase.io/api/login"
-                  className={`
-                   items-center px-1 border-b-2 border-transparent text-sm font-medium
-                  text-gray-500 hover:text-gray-700 hidden lg:block dark:text-dark-100 dark:hover:text-white
-                `}
-                >
-                  Sign in
                 </a>
               </div>
             </div>
@@ -329,6 +327,20 @@ const Nav = (props: Props) => {
                     className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
                   >
                     Pricing
+                  </a>
+                  <a
+                    href="https://github.com/supabase/supabase"
+                    target="_blank"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                  >
+                    GitHub
+                  </a>
+                  <a
+                    href="/blog"
+                    target="_blank"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                  >
+                    Blog
                   </a>
                 </div>
                 <div className="p-3">

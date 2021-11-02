@@ -21,6 +21,7 @@ info:
       - name: 'About'
         items:
           - index
+          - Connection Strings
       - name: 'Managing Tables'
         items:
           - Schemas
@@ -29,14 +30,6 @@ info:
       #   items:
       #     - Creating columns
           # - Column types
-      - name: 'Replication'
-        items:
-          - Publications
-      - name: 'Database Configuration'
-        items:
-          # - Database Users
-          - Database Passwords
-          - Changing Timezones
 
 pages:
   Schemas:
@@ -106,7 +99,7 @@ pages:
           ```sql
           create table table_name (
             column_1 data_type,
-            column_2 data_type
+            column_2 data_type,
             -- Constraints:
             primary key (column_1, column_2)
           );
@@ -155,72 +148,6 @@ pages:
   #         alter table new_table
   #         add new_column text;
   #         ```
-
-  Publications:
-    description: |
-      Publications are a way of grouping changes generated from a table or a group of tables. 
-      These changes can then be sent to other systems (usually another Postgres database).
-
-    examples:
-      - name: Create a Publication
-        description: |
-          This publication will contain all changes to all tables.
-        sql: |
-          ```sql
-          create publication publication_name 
-          for all tables;
-          ```
-      - name: Create a Publication which listens to individual tables
-        sql: |
-          ```sql
-          create publication publication_name 
-          for table table_one, table_two;
-          ```
-      - name: Add tables to an existing publication
-        sql: |
-          ```sql
-          alter publication publication_name 
-          add table table_name;
-          ```
-      - name: Listens to inserts only
-        sql: |
-          ```sql
-          create publication publication_name 
-          for all tables
-          with (publish = 'insert');
-          ```
-      - name: Listens to updates only
-        sql: |
-          ```sql
-          create publication publication_name 
-          for all tables
-          with (publish = 'update');
-          ```
-      - name: Listens to deletions only
-        sql: |
-          ```sql
-          create publication publication_name 
-          for all tables
-          with (publish = 'delete');
-          ```
-      - name: Remove a Publication
-        sql: |
-          ```sql
-          drop publication if exists publication_name;
-          ```
-      - name: Recreate a Publication
-        description: |
-          If you are planning to re-create a publication, it's best to do it in a transaction to ensure the operation succeeds.
-        sql: |
-          ```sql
-          begin; 
-            -- remove the realtime publication
-            drop publication if exists publication_name; 
-
-            -- re-create the publication but don't enable it for any tables
-            create publication publication_name;  
-          commit;
-          ```
           
   Database Users:
     description: |
@@ -233,52 +160,3 @@ pages:
           create user new_user
           with password 'hello';
           ```
-  Database Passwords:
-    description: |
-      Manage the passwords of your database users using any super user.
-
-    examples:
-      - name: Password reset
-        sql: |
-          ```sql
-          alter user postgres 
-          with password 'new_password';
-          ```
-  Changing Timezones:
-    description: |
-      Data types.
-    notes: |
-      - View a full list of timezones on [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
-
-    examples:
-      - name: Change timezone
-        isSpotlight: true
-        sql: |
-          ```sql
-          alter database postgres 
-          set timezone to 'America/New_York';
-          ```
-      - name: Full list of timezones
-        description: |
-          Get a full list of timezones supported by your database. This will return the following columns:
-
-          - `name`: Time zone name
-          - `abbrev`: Time zone abbreviation
-          - `utc_offset`: Offset from UTC (positive means east of Greenwich)
-          - `is_dst`: True if currently observing daylight savings
-
-        sql: |
-          ```sql
-          select name, abbrev, utc_offset, is_dst
-          from pg_timezone_names() 
-          order by name;
-          ```
-      - name: Search for a specific timezone
-        description: Use `ilike` (case insensitive search) to find specific timezones.
-        sql: |
-          ```sql
-          select * 
-          from pg_timezone_names() 
-          where name ilike '%york%';
-          ```
-  

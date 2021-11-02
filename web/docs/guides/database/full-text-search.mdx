@@ -39,7 +39,7 @@ values
   ('The Poky Little Puppy','Janette Sebring Lowrey','Puppy is slower than other, bigger animals.'),
   ('The Tale of Peter Rabbit','Beatrix Potter','Rabbit eats some vegetables.'),
   ('Tootle','Gertrude Crampton','Little toy train has big dreams.'),
-  ('Green Eggs and Ham','Dr. Seuss','Sam has changing food preferences and eats unusally colored food.'),
+  ('Green Eggs and Ham','Dr. Seuss','Sam has changing food preferences and eats unusually colored food.'),
   ('Harry Potter and the Goblet of Fire','J.K. Rowling','Fourth year of school starts, big drama ensues.');
 ```
 
@@ -51,7 +51,7 @@ values
 |    1 | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
 |    2 | The Tale of Peter Rabbit  | Beatrix Potter | Rabbit eats some vegetables. |
 |    3 | Tootle | Gertrude Crampton | Little toy train has big dreams. |
-|    4 | Green Eggs and Ham | Dr. Seuss | Sam has changing food preferences and eats unusally colored food. |
+|    4 | Green Eggs and Ham | Dr. Seuss | Sam has changing food preferences and eats unusually colored food. |
 |    5 | Harry Potter and the Goblet of Fire | J.K. Rowling | Fourth year of school starts, big drama ensues.  |
 
 </TabItem>
@@ -93,6 +93,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">
 
@@ -106,10 +107,22 @@ where name = 'Harry';
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .eq('name', 'Harry')
+```
+
+</TabItem>
+  
+<TabItem value="DART">
+
+```dart
+final result = await client
+  .from('books')
+  .select()
+  .eq('name', 'Harry')
+  .execute();
 ```
 
 </TabItem>
@@ -124,6 +137,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">
 
@@ -137,10 +151,21 @@ where to_tsvector(name) @@ to_tsquery('Harry');
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('name', `'Harry'`)
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final result = await client
+  .from('books')
+  .select()
+  .textSearch('name', "'Harry'")
+  .execute();
 ```
 
 </TabItem>
@@ -157,6 +182,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
 <TabItem value="SQL">
@@ -175,10 +201,21 @@ where
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('description', `'big'`)
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final result = await client
+  .from('books')
+  .select()
+  .textSearch('description', "'big'")
+  .execute();
 ```
 
 </TabItem>
@@ -234,6 +271,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
 <TabItem value="SQL">
@@ -252,10 +290,21 @@ where
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('description', `'little' & 'big'`)
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final result = await client
+  .from('books')
+  .select()
+  .textSearch('description', "'little' & 'big'")
+  .execute();
 ```
 
 </TabItem>
@@ -277,6 +326,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
 <TabItem value="SQL">
@@ -295,10 +345,21 @@ where
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('description', `'little' | 'big'`)
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final result = await client
+  .from('books')
+  .select()
+  .textSearch('description', "'little' | 'big'")
+  .execute();
 ```
 
 </TabItem>
@@ -339,8 +400,9 @@ values={[
 alter table 
   books 
 add column 
-  fts tsvector generated always as to_tsvector(description || ' ' || title);
-
+  fts tsvector generated always as (to_tsvector('english', description || ' ' || title)) stored;
+  
+create index books_fts on books using gin (fts); -- generate the index
 
 select id, fts 
 from books;
@@ -369,6 +431,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
 <TabItem value="SQL">
@@ -386,10 +449,21 @@ where
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('fts', `'little' & 'big'`)
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final result = await client
+  .from('books')
+  .select()
+  .textSearch('fts', "'little' & 'big'")
+  .execute();
 ```
 
 </TabItem>
@@ -418,6 +492,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">
 
@@ -434,10 +509,21 @@ where
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('description', `'big' <-> 'dreams'`)
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final result = await client
+  .from('books')
+  .select()
+  .textSearch('description', "'big' <-> 'dreams'")
+  .execute();
 ```
 
 </TabItem>
@@ -451,6 +537,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">
 
@@ -467,10 +554,21 @@ where
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('description', `'year' <2> 'school'`)
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final result = await client
+  .from('books')
+  .select()
+  .textSearch('description', "'year' <2> 'school'")
+  .execute();
 ```
 
 </TabItem>
@@ -487,6 +585,7 @@ defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">
 
@@ -503,10 +602,21 @@ where
 <TabItem value="JS">
 
 ```js
-const { data, error } = supabase
+const { data, error } = await supabase
   .from('books')
   .select()
   .textSearch('description', `'big' & !'little'`)
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final result = await client
+  .from('books')
+  .select()
+  .textSearch('description', "'big' & !'little'")
+  .execute();
 ```
 
 </TabItem>

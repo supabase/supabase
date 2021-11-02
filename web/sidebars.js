@@ -5,38 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const goTrueClient = require('./sidebar_spec_gotrue')
-const postgrestClient = require('./sidebar_spec_postgrest')
-const realtimeClient = require('./sidebar_spec_realtime')
 const supabaseClient = require('./sidebar_spec_supabase')
 const supabaseCli = require('./sidebar_spec_cli')
-const postgres = require('./sidebar_spec_postgres')
+const dart = require('./sidebar_spec_dart')
 
 module.exports = {
-  goTrueClient: [
-    {
-      type: 'category',
-      label: 'Javascript',
-      collapsed: false,
-      items: goTrueClient.docs,
-    },
-  ],
-  postgrestClient: [
-    {
-      type: 'category',
-      label: 'Javascript',
-      collapsed: false,
-      items: postgrestClient.docs,
-    },
-  ],
-  realtimeClient: [
-    {
-      type: 'category',
-      label: 'Javascript',
-      collapsed: false,
-      items: realtimeClient.docs,
-    },
-  ],
   supabaseClient: [
     {
       type: 'category',
@@ -44,11 +17,17 @@ module.exports = {
       collapsed: false,
       items: supabaseClient.docs,
     },
+    // {
+    //   type: 'category',
+    //   label: 'Postgres',
+    //   collapsed: false,
+    //   items: postgres.docs,
+    // },
     {
       type: 'category',
-      label: 'Postgres',
+      label: 'Dart',
       collapsed: false,
-      items: postgres.docs,
+      items: dart.docs,
     },
     {
       type: 'category',
@@ -60,49 +39,52 @@ module.exports = {
   docs: [
     {
       type: 'category',
-      label: 'Introduction',
-      items: ['about', 'faq'],
-      collapsed: false,
-    },
-    {
-      type: 'category',
-      label: 'Getting Started',
-      collapsed: false,
+      label: 'Overview',
       items: [
-        'guides/platform',
+        'about',
+        'architecture',
         'guides/database',
         'guides/auth',
         'guides/storage',
         'guides/api',
-        'guides/client-libraries',
-        'guides/local-development',
+        'guides/examples',
       ],
+      collapsed: false,
     },
     {
       type: 'category',
       label: 'Tutorials',
       collapsed: false,
       items: [
-        'guides/examples',
+        'guides/with-angular',
+        'guides/with-flutter',
         'guides/with-nextjs',
         'guides/with-react',
+        'guides/with-redwoodjs',
         'guides/with-svelte',
         'guides/with-vue-3',
-        'guides/self-hosting',
       ],
     },
     {
       type: 'category',
       label: 'See Also',
       collapsed: false,
-      items: ['handbook/contributing', 'company/terms', 'company/privacy', 'company/aup'],
+      items: [
+        'faq',
+        'going-into-prod',
+        'handbook/contributing',
+        'handbook/supasquad',
+        'company/terms',
+        'company/privacy',
+        'company/aup',
+      ],
     },
   ],
   guides: [
     {
       type: 'category',
       label: 'Guides',
-      items: ['guides'],
+      items: ['guides', 'guides/local-development'],
       collapsed: false,
     },
     {
@@ -110,21 +92,43 @@ module.exports = {
       label: 'Database',
       collapsed: false,
       items: [
+        'guides/database/introduction',
+        'guides/database/tables',
         'guides/database/full-text-search',
-        // 'guides/database/arrays',
         // 'guides/database/json',
-        // 'guides/database/managing-passwords',
+        // 'guides/database/arrays',
         // 'guides/database/sql-to-api',
         {
           type: 'category',
           label: 'Extensions',
-          collapsed: false,
+          collapsed: true,
           items: [
             'guides/database/extensions',
             // 'guides/database/extensions/pgtap',
             'guides/database/extensions/plv8',
             'guides/database/extensions/http',
             'guides/database/extensions/uuid-ossp',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Connecting to Postgres',
+          collapsed: true,
+          items: [
+            'guides/database/connecting/connecting-to-postgres',
+            'guides/database/connecting/direct-connections',
+            'guides/database/connecting/connection-pooling',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Configuration',
+          collapsed: true,
+          items: [
+            'guides/database/timeouts',
+            'guides/database/replication',
+            'guides/database/managing-passwords',
+            'guides/database/managing-timezones',
           ],
         },
       ],
@@ -134,11 +138,11 @@ module.exports = {
       label: 'Auth',
       collapsed: false,
       items: [
-        'guides/auth/managing-user-data',
+        'guides/auth/intro',
         {
           type: 'category',
-          label: 'OAuth Providers',
-          collapsed: false,
+          label: 'Authentication',
+          collapsed: true,
           items: [
             'guides/auth/auth-apple',
             'guides/auth/auth-bitbucket',
@@ -149,29 +153,19 @@ module.exports = {
             'guides/auth/auth-google',
             'guides/auth/auth-twitter',
             'guides/auth/auth-twitch',
+            'guides/auth/auth-twilio',
           ],
         },
-      ],
-    },
-    // {
-    //   type: 'category',
-    //   label: 'Storage',
-    //   collapsed: false,
-    //   items: ['guides/storage/storage-sample'],
-    // },
-  ],
-  resources: [
-    { type: 'category', label: 'Resources', items: ['resources'], collapsed: false },
-    // { type: 'category', label: 'Resources', collapsed: false },
-    {
-      type: 'category',
-      label: 'Learn',
-      collapsed: false,
-      items: [
         {
           type: 'category',
-          label: 'Auth Deep Dive',
-          collapsed: false,
+          label: 'Authorization',
+          collapsed: true,
+          items: ['guides/auth/row-level-security', 'guides/auth/managing-user-data'],
+        },
+        {
+          type: 'category',
+          label: 'Deep Dive',
+          collapsed: true,
           items: [
             'learn/auth-deep-dive/auth-deep-dive-jwts',
             'learn/auth-deep-dive/auth-row-level-security',
@@ -182,55 +176,19 @@ module.exports = {
         },
       ],
     },
+    // {
+    //   type: 'category',
+    //   label: 'Storage',
+    //   collapsed: false,
+    //   items: ['guides/storage/storage-sample'],
+    // },
     {
       type: 'category',
-      label: 'Tools',
+      label: 'Self Hosting',
       collapsed: false,
-      items: [
-        'gotrue/server/about',
-        'gotrue/client/index',
-        'postgrest/server/about',
-        'postgrest/client/index',
-        'realtime/server/about',
-        'realtime/client/index',
-      ],
+      items: ['guides/hosting/overview', 'guides/hosting/platform', 'guides/hosting/docker'],
     },
   ],
-  // realtimeServer: [
-  //   {
-  //     type: 'category',
-  //     label: 'Realtime',
-  //     collapsed: false,
-  //     items: ['realtime/server/about'],
-  //   },
-  //   {
-  //     type: 'category',
-  //     label: 'Self hosting',
-  //     collapsed: false,
-  //     items: [
-  //       'realtime/server/docker',
-  //       'realtime/server/aws',
-  //       'realtime/server/digitalocean',
-  //       'realtime/server/source',
-  //     ],
-  //   },
-  // ],
-  // realtimeClient: [
-  //   {
-  //     type: 'category',
-  //     label: 'Realtime',
-  //     collapsed: false,
-  //     items: ['realtime/client/about'],
-  //   },
-  // ],
-  // postgrestServer: [
-  //   {
-  //     type: 'category',
-  //     label: 'PostgREST',
-  //     collapsed: false,
-  //     items: ['postgrest/server/about'],
-  //   },
-  // ],
   postgresServer: [
     {
       type: 'category',

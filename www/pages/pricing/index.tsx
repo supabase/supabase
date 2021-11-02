@@ -152,7 +152,7 @@ export default function IndexPage() {
                 <Typography.Text type="secondary">/project /month plus usage costs</Typography.Text>
               </p>
               <p className="my-4 text-sm text-gray-500">
-                Dedicated support team, account manager and technical specialist.
+                Designated support team, account manager and technical specialist.
               </p>
               <Link href="https://app.supabase.io" as="https://app.supabase.io">
                 <a>
@@ -186,7 +186,7 @@ export default function IndexPage() {
           <div className="hidden lg:block">
             <table className="w-full h-px table-fixed">
               <caption className="sr-only">Pricing plan comparison</caption>
-              <thead className="thead--plans">
+              <thead className="thead--plans sticky z-10 top-[62px]">
                 <tr>
                   <th
                     className="relative bg-white dark:bg-gray-800  pb-4 px-6 text-sm font-medium text-gray-900 dark:text-white text-left"
@@ -299,7 +299,7 @@ export default function IndexPage() {
                       </p>
                       <p className="mt-4 mb-16 ">
                         <Typography.Text>
-                          Dedicated support team, account manager and technical specialist.
+                          Designated support team, account manager and technical specialist.
                         </Typography.Text>
                       </p>
                       <Link href="https://app.supabase.io" as="https://app.supabase.io">
@@ -393,6 +393,7 @@ export default function IndexPage() {
           </div>
         </div>
       </div>
+
       <CTABanner />
     </DefaultLayout>
   )

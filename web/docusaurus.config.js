@@ -13,8 +13,6 @@ module.exports = {
   organizationName: 'supabase', // Usually your GitHub org/user name.
   projectName: 'supabase', // Usually your repo name.
   themeConfig: {
-    forceDarkMode: true,
-    darkMode: true,
     colorMode: {
       // "light" | "dark"
       defaultMode: 'dark',
@@ -40,7 +38,6 @@ module.exports = {
         },
       },
     },
-    sidebarCollapsible: true,
     algolia: {
       apiKey: '766d56f13dd1e82f43253559b7c86636',
       indexName: 'supabase',
@@ -58,16 +55,6 @@ module.exports = {
       },
       items: [
         {
-          href: 'https://github.com/supabase/supabase',
-          className: 'navbar-item-github',
-          position: 'right',
-        },
-        {
-          href: 'https://twitter.com/supabase_io',
-          className: 'navbar-item-twitter',
-          position: 'right',
-        },
-        {
           label: 'Overview',
           to: '/docs',
           activeBaseRegex: '(^/docs$)|(/docs/faq)|(^/docs/guides/examples)',
@@ -76,7 +63,8 @@ module.exports = {
         {
           label: 'Guides',
           to: '/docs/guides',
-          activeBaseRegex: '(^/docs/guides/database/|^/docs/guides/auth/)|(/docs/guides$)',
+          activeBaseRegex:
+            '(^/docs/guides/database/|^/docs/guides/auth/)|(/docs/guides$)|docs/(resources|learn)',
           position: 'left',
         },
         {
@@ -85,23 +73,22 @@ module.exports = {
           activeBasePath: '/docs/reference/',
           position: 'left',
         },
-        {
-          label: 'Resources',
-          to: '/docs/resources',
-          activeBaseRegex: 'docs/(resources|learn|gotrue|postgrest|realtime)',
-          position: 'left',
-        },
-        {
-          label: 'Jobs',
-          to: '/docs/careers',
-          activeBasePath: '/docs/careers',
-          position: 'left',
-        },
         { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
+        {
+          href: 'https://github.com/supabase/supabase',
+          className: 'navbar-item-github',
+          position: 'right',
+        },
+        {
+          href: 'https://twitter.com/supabase',
+          className: 'navbar-item-twitter',
+          position: 'right',
+        },
       ],
     },
     prism: {
       defaultLanguage: 'js',
+      additionalLanguages: ['dart'],
       plugins: ['line-numbers', 'show-language'],
       theme: require('@kiwicopple/prism-react-renderer/themes/vsDark'),
       darkTheme: require('@kiwicopple/prism-react-renderer/themes/vsDark'),
@@ -133,6 +120,10 @@ module.exports = {
           title: 'Resources',
           items: [
             {
+              label: 'Brand Assets',
+              to: 'https://supabase.io/brand-assets',
+            },
+            {
               label: 'Docs',
               to: '/docs',
             },
@@ -159,7 +150,7 @@ module.exports = {
             },
             {
               label: 'Twitter',
-              href: 'https://twitter.com/supabase_io',
+              href: 'https://twitter.com/supabase',
             },
             {
               label: 'DevTo',
@@ -193,6 +184,7 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
+          // sidebarCollapsible: true,
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/supabase/supabase/edit/master/web',
         },
@@ -219,7 +211,7 @@ module.exports = {
   //   //     routeBasePath: 'ref/supabase', // URL Route.
   //   //     include: ['**/*.md', '**/*.mdx'],
   //   //     sidebarPath: require.resolve('./sidebar_spec_supabase.js'),
-  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
   //   //   },
   //   // ],
   //   // [
@@ -231,7 +223,7 @@ module.exports = {
   //   //     routeBasePath: 'ref/postgrest', // URL Route.
   //   //     include: ['**/*.md', '**/*.mdx'],
   //   //     sidebarPath: require.resolve('./sidebar_spec_postgrest.js'),
-  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
   //   //   },
   //   // ],
   //   // [
@@ -243,7 +235,7 @@ module.exports = {
   //   //     routeBasePath: 'ref/gotrue', // URL Route.
   //   //     include: ['**/*.md', '**/*.mdx'],
   //   //     sidebarPath: require.resolve('./sidebar_spec_gotrue.js'),
-  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
   //   //   },
   //   // ],
   //   // [
@@ -255,7 +247,7 @@ module.exports = {
   //   //     routeBasePath: 'ref/realtime', // URL Route.
   //   //     include: ['**/*.md', '**/*.mdx'],
   //   //     sidebarPath: require.resolve('./sidebar_spec_realtime.js'),
-  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
   //   //   },
   //   // ],
   //   // [
@@ -266,7 +258,7 @@ module.exports = {
   //   //     routeBasePath: 'docs/realtime', // URL Route.
   //   //     include: ['**/*.md', '**/*.mdx'],
   //   //     sidebarPath: require.resolve('./sidebar_realtime_server.js'),
-  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
   //   //   },
   //   // ],
   //   // [
@@ -278,7 +270,7 @@ module.exports = {
   //   //     routeBasePath: 'ref/postgrest', // URL Route.
   //   //     include: ['**/*.md', '**/*.mdx'],
   //   //     sidebarPath: require.resolve('./sidebar_spec_postgrest.js'),
-  //   //     // disableVersioning: true, // if not set with vesions, throw: Identifier 'React' has already been declared
+  //   //     // disableVersioning: true, // if not set with versions, throw: Identifier 'React' has already been declared
   //   //   },
   //   // ],
   // ],
