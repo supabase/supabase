@@ -1,2 +1,7 @@
 /docs       https://supabase-docs.netlify.app/docs
 /blog       https://supabase-docs.netlify.app/blog
+
+# Temp fix for incorrect image urls for vercel integration - remove once updated on https://vercel.com/integrations/supabase
+/new/external-comms/vercel-integration/vercel-integration-supabase-dashboard-table-editor.jpg /external-comms/vercel-integration/vercel-integration-supabase-dashboard-table-editor.jpg
+/new/external-comms/vercel-integration/vercel-integration-supabase-auth-social-0auth.jpg /external-comms/vercel-integration/vercel-integration-supabase-auth-social-0auth.jpg
+/new/external-comms/vercel-integration/vercel-integration-supabase-dashboard-sql-editor.jpg /external-comms/vercel-integration/vercel-integration-supabase-dashboard-sql-editor.jpg
