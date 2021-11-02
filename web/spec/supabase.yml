@@ -165,12 +165,14 @@ pages:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          const options = {schema: "otherschema"}
+          const options = {schema: "other_schema"}
           const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
           ```
-          Note: each client connection can only access a single schema, so the code above can access the `otherschema` schema but cannot access the `public` schema.
 
-          TODO:  Descibe how to whitelist the schema from the Supabase dashboard, which is required to obtain access to the schema from the client.
+          By default the API server points to the `public` schema. You can enable others database schemas within the Dashboard. 
+          Go to `Settings > API > Schema` and add the schema which you want to expose to on the API.
+
+          Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
   Generating Types:
     description: |
       Supabase will soon release native type generators that dump your database types for various languages. For now, we support TypeScript through a third-party tool.
