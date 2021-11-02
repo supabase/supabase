@@ -583,7 +583,7 @@ pages:
   api.generateLink():
     $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.generateLink'
     examples:
-      - name: Generate invite link.
+      - name: Generate a confirmation / invite / recovery link.
         isSpotlight: false
         js: |
           ```js
