@@ -160,7 +160,19 @@ pages:
           const options = { }
           const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
           ```
+      - name: With additional parameters - access non-public schemas
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
 
+          const options = {schema: "other_schema"}
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
+          ```
+
+          By default the API server points to the `public` schema. You can enable others database schemas within the Dashboard. 
+          Go to `Settings > API > Schema` and add the schema which you want to expose to on the API.
+
+          Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
   Generating Types:
     description: |
       Supabase will soon release native type generators that dump your database types for various languages. For now, we support TypeScript through a third-party tool.
