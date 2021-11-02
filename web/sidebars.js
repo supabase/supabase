@@ -156,6 +156,7 @@ module.exports = {
             'guides/auth/auth-twitter',
             'guides/auth/auth-twitch',
             'guides/auth/auth-twilio',
+            'guides/auth/auth-messagebird',
           ],
         },
         {

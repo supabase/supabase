@@ -92,7 +92,7 @@ const authProviders = [
   {
     name: 'MessageBird',
     // logo: '/img/libraries/dart-icon.svg',
-    href: 'https://github.com/supabase/gotrue/pull/210',
+    href: '/docs/guides/auth/auth-messagebird',
     official: false,
     supporter: 'MessageBird',
     platform: true,
