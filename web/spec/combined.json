@@ -2142,7 +2142,7 @@
                                     "types": [
                                       {
                                         "type": "reference",
-                                        "name": "Error"
+                                        "name": "ApiError"
                                       },
                                       {
                                         "type": "intrinsic",
@@ -2357,7 +2357,7 @@
                                 "types": [
                                   {
                                     "type": "reference",
-                                    "name": "Error"
+                                    "name": "ApiError"
                                   },
                                   {
                                     "type": "intrinsic",
@@ -2489,7 +2489,7 @@
                                     "types": [
                                       {
                                         "type": "reference",
-                                        "name": "Error"
+                                        "name": "ApiError"
                                       },
                                       {
                                         "type": "intrinsic",
@@ -2758,7 +2758,7 @@
                                     "types": [
                                       {
                                         "type": "reference",
-                                        "name": "Error"
+                                        "name": "ApiError"
                                       },
                                       {
                                         "type": "intrinsic",
@@ -3037,6 +3037,14 @@
                                       {
                                         "type": "stringLiteral",
                                         "value": "twitch"
+                                      },
+                                      {
+                                        "type": "stringLiteral",
+                                        "value": "spotify"
+                                      },
+                                      {
+                                        "type": "stringLiteral",
+                                        "value": "slack"
                                       }
                                     ]
                                   }
@@ -3264,7 +3272,7 @@
                                     "types": [
                                       {
                                         "type": "reference",
-                                        "name": "Error"
+                                        "name": "ApiError"
                                       },
                                       {
                                         "type": "intrinsic",
@@ -3484,7 +3492,7 @@
                                     "types": [
                                       {
                                         "type": "reference",
-                                        "name": "Error"
+                                        "name": "ApiError"
                                       },
                                       {
                                         "type": "intrinsic",
@@ -3868,7 +3876,7 @@
                                     "types": [
                                       {
                                         "type": "reference",
-                                        "name": "Error"
+                                        "name": "ApiError"
                                       },
                                       {
                                         "type": "intrinsic",
@@ -4078,7 +4086,7 @@
                                     "types": [
                                       {
                                         "type": "reference",
-                                        "name": "Error"
+                                        "name": "ApiError"
                                       },
                                       {
                                         "type": "intrinsic",
@@ -4462,7 +4470,7 @@
                                     "types": [
                                       {
                                         "type": "reference",
-                                        "name": "Error"
+                                        "name": "ApiError"
                                       },
                                       {
                                         "type": "intrinsic",
@@ -5869,7 +5877,7 @@
                         "isExported": true
                       },
                       "comment": {
-                        "shortText": "Subscribe to realtime changes in your database."
+                        "shortText": "Subscribe to realtime changes in your databse."
                       },
                       "parameters": [
                         {
@@ -16352,6 +16360,14 @@
                                       {
                                         "type": "stringLiteral",
                                         "value": "twitch"
+                                      },
+                                      {
+                                        "type": "stringLiteral",
+                                        "value": "spotify"
+                                      },
+                                      {
+                                        "type": "stringLiteral",
+                                        "value": "slack"
                                       }
                                     ]
                                   }
@@ -20660,7 +20676,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 100,
+                      "line": 102,
                       "character": 8
                     }
                   ],
@@ -20690,7 +20706,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 98,
+                      "line": 100,
                       "character": 10
                     }
                   ],
@@ -20720,7 +20736,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 96,
+                      "line": 98,
                       "character": 6
                     }
                   ],
@@ -20750,7 +20766,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 101,
+                      "line": 103,
                       "character": 6
                     }
                   ],
@@ -20780,7 +20796,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 103,
+                      "line": 105,
                       "character": 10
                     }
                   ],
@@ -20815,7 +20831,7 @@
               "sources": [
                 {
                   "fileName": "lib/types.ts",
-                  "line": 94,
+                  "line": 96,
                   "character": 30
                 }
               ]
@@ -20840,7 +20856,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 22,
+                      "line": 24,
                       "character": 14
                     }
                   ],
@@ -20864,7 +20880,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 30,
+                      "line": 32,
                       "character": 12
                     }
                   ],
@@ -20897,7 +20913,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 26,
+                      "line": 28,
                       "character": 12
                     }
                   ],
@@ -20927,7 +20943,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 21,
+                      "line": 23,
                       "character": 16
                     }
                   ],
@@ -20957,7 +20973,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 31,
+                      "line": 33,
                       "character": 15
                     }
                   ],
@@ -20986,7 +21002,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 32,
+                      "line": 34,
                       "character": 12
                     }
                   ],
@@ -21006,7 +21022,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 33,
+                      "line": 35,
                       "character": 6
                     }
                   ],
@@ -21044,7 +21060,7 @@
               "sources": [
                 {
                   "fileName": "lib/types.ts",
-                  "line": 20,
+                  "line": 22,
                   "character": 24
                 }
               ]
@@ -21072,7 +21088,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 87,
+                      "line": 89,
                       "character": 10
                     }
                   ],
@@ -21143,7 +21159,7 @@
                       "sources": [
                         {
                           "fileName": "lib/types.ts",
-                          "line": 87,
+                          "line": 89,
                           "character": 11
                         }
                       ]
@@ -21164,7 +21180,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 83,
+                      "line": 85,
                       "character": 4
                     }
                   ],
@@ -21187,7 +21203,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 91,
+                      "line": 93,
                       "character": 13
                     }
                   ],
@@ -21219,7 +21235,7 @@
                       "sources": [
                         {
                           "fileName": "lib/types.ts",
-                          "line": 91,
+                          "line": 93,
                           "character": 14
                         }
                       ]
@@ -21241,7 +21257,7 @@
               "sources": [
                 {
                   "fileName": "lib/types.ts",
-                  "line": 79,
+                  "line": 81,
                   "character": 29
                 }
               ]
@@ -21267,7 +21283,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 47,
+                      "line": 49,
                       "character": 13
                     }
                   ],
@@ -21296,7 +21312,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 37,
+                      "line": 39,
                       "character": 14
                     }
                   ],
@@ -21353,7 +21369,7 @@
                           "sources": [
                             {
                               "fileName": "lib/types.ts",
-                              "line": 38,
+                              "line": 40,
                               "character": 12
                             }
                           ],
@@ -21384,7 +21400,7 @@
                       "sources": [
                         {
                           "fileName": "lib/types.ts",
-                          "line": 37,
+                          "line": 39,
                           "character": 15
                         }
                       ]
@@ -21402,7 +21418,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 44,
+                      "line": 46,
                       "character": 5
                     }
                   ],
@@ -21423,7 +21439,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 45,
+                      "line": 47,
                       "character": 22
                     }
                   ],
@@ -21453,7 +21469,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 51,
+                      "line": 53,
                       "character": 14
                     }
                   ],
@@ -21482,7 +21498,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 50,
+                      "line": 52,
                       "character": 12
                     }
                   ],
@@ -21503,7 +21519,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 48,
+                      "line": 50,
                       "character": 7
                     }
                   ],
@@ -21533,7 +21549,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 52,
+                      "line": 54,
                       "character": 20
                     }
                   ],
@@ -21562,7 +21578,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 36,
+                      "line": 38,
                       "character": 4
                     }
                   ],
@@ -21583,7 +21599,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 54,
+                      "line": 56,
                       "character": 17
                     }
                   ],
@@ -21613,7 +21629,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 49,
+                      "line": 51,
                       "character": 7
                     }
                   ],
@@ -21643,7 +21659,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 53,
+                      "line": 55,
                       "character": 20
                     }
                   ],
@@ -21673,7 +21689,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 46,
+                      "line": 48,
                       "character": 18
                     }
                   ],
@@ -21703,7 +21719,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 55,
+                      "line": 57,
                       "character": 6
                     }
                   ],
@@ -21733,7 +21749,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 56,
+                      "line": 58,
                       "character": 12
                     }
                   ],
@@ -21762,7 +21778,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 41,
+                      "line": 43,
                       "character": 15
                     }
                   ],
@@ -21809,7 +21825,7 @@
                       "sources": [
                         {
                           "fileName": "lib/types.ts",
-                          "line": 41,
+                          "line": 43,
                           "character": 16
                         }
                       ]
@@ -21844,7 +21860,7 @@
               "sources": [
                 {
                   "fileName": "lib/types.ts",
-                  "line": 35,
+                  "line": 37,
                   "character": 21
                 }
               ]
@@ -21873,7 +21889,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 76,
+                      "line": 78,
                       "character": 6
                     }
                   ],
@@ -21906,7 +21922,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 63,
+                      "line": 65,
                       "character": 7
                     }
                   ],
@@ -21939,7 +21955,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 71,
+                      "line": 73,
                       "character": 20
                     }
                   ],
@@ -21972,7 +21988,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 67,
+                      "line": 69,
                       "character": 10
                     }
                   ],
@@ -22006,7 +22022,7 @@
               "sources": [
                 {
                   "fileName": "lib/types.ts",
-                  "line": 59,
+                  "line": 61,
                   "character": 31
                 }
               ]
@@ -22032,7 +22048,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 107,
+                      "line": 109,
                       "character": 7
                     }
                   ],
@@ -22062,7 +22078,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 109,
+                      "line": 111,
                       "character": 10
                     }
                   ],
@@ -22092,7 +22108,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 108,
+                      "line": 110,
                       "character": 7
                     }
                   ],
@@ -22122,7 +22138,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 112,
+                      "line": 114,
                       "character": 10
                     }
                   ],
@@ -22144,7 +22160,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 110,
+                      "line": 112,
                       "character": 14
                     }
                   ],
@@ -22179,7 +22195,7 @@
               "sources": [
                 {
                   "fileName": "lib/types.ts",
-                  "line": 106,
+                  "line": 108,
                   "character": 32
                 }
               ]
@@ -22204,7 +22220,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 116,
+                      "line": 118,
                       "character": 7
                     }
                   ],
@@ -22224,7 +22240,7 @@
                   "sources": [
                     {
                       "fileName": "lib/types.ts",
-                      "line": 117,
+                      "line": 119,
                       "character": 7
                     }
                   ],
@@ -22247,7 +22263,7 @@
               "sources": [
                 {
                   "fileName": "lib/types.ts",
-                  "line": 115,
+                  "line": 117,
                   "character": 32
                 }
               ]
@@ -22263,7 +22279,7 @@
               "sources": [
                 {
                   "fileName": "lib/types.ts",
-                  "line": 13,
+                  "line": 15,
                   "character": 27
                 }
               ],
@@ -22350,6 +22366,14 @@
                   {
                     "type": "stringLiteral",
                     "value": "twitch"
+                  },
+                  {
+                    "type": "stringLiteral",
+                    "value": "spotify"
+                  },
+                  {
+                    "type": "stringLiteral",
+                    "value": "slack"
                   }
                 ]
               }
