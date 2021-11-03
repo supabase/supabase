@@ -43,6 +43,23 @@ module.exports = withMDX({
         source: '/docs/:path*',
         destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*`,
       },
+      // misc rewrites
+      {
+        source: '/humans.txt',
+        destination: `/docs/humans.txt`,
+      },
+      {
+        source: '/lawyers.txt',
+        destination: `/docs/lawyers.txt`,
+      },
+      {
+        source: '/.well-known/security.txt.txt',
+        destination: `/docs/.well-known/security.txt.txt`,
+      },
+      {
+        source: '/feed.xml',
+        destination: `/rss.xml`,
+      },
     ]
   },
   async redirects() {
