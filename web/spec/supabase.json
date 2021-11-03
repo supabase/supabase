@@ -2139,7 +2139,7 @@
 																"types": [
 																	{
 																		"type": "reference",
-																		"name": "Error"
+																		"name": "ApiError"
 																	},
 																	{
 																		"type": "intrinsic",
@@ -2354,7 +2354,7 @@
 														"types": [
 															{
 																"type": "reference",
-																"name": "Error"
+																"name": "ApiError"
 															},
 															{
 																"type": "intrinsic",
@@ -2486,7 +2486,7 @@
 																"types": [
 																	{
 																		"type": "reference",
-																		"name": "Error"
+																		"name": "ApiError"
 																	},
 																	{
 																		"type": "intrinsic",
@@ -2755,7 +2755,7 @@
 																"types": [
 																	{
 																		"type": "reference",
-																		"name": "Error"
+																		"name": "ApiError"
 																	},
 																	{
 																		"type": "intrinsic",
@@ -3034,6 +3034,14 @@
 																	{
 																		"type": "stringLiteral",
 																		"value": "twitch"
+																	},
+																	{
+																		"type": "stringLiteral",
+																		"value": "spotify"
+																	},
+																	{
+																		"type": "stringLiteral",
+																		"value": "slack"
 																	}
 																]
 															}
@@ -3261,7 +3269,7 @@
 																"types": [
 																	{
 																		"type": "reference",
-																		"name": "Error"
+																		"name": "ApiError"
 																	},
 																	{
 																		"type": "intrinsic",
@@ -3481,7 +3489,7 @@
 																"types": [
 																	{
 																		"type": "reference",
-																		"name": "Error"
+																		"name": "ApiError"
 																	},
 																	{
 																		"type": "intrinsic",
@@ -3865,7 +3873,7 @@
 																"types": [
 																	{
 																		"type": "reference",
-																		"name": "Error"
+																		"name": "ApiError"
 																	},
 																	{
 																		"type": "intrinsic",
@@ -4075,7 +4083,7 @@
 																"types": [
 																	{
 																		"type": "reference",
-																		"name": "Error"
+																		"name": "ApiError"
 																	},
 																	{
 																		"type": "intrinsic",
@@ -4459,7 +4467,7 @@
 																"types": [
 																	{
 																		"type": "reference",
-																		"name": "Error"
+																		"name": "ApiError"
 																	},
 																	{
 																		"type": "intrinsic",
@@ -5866,7 +5874,7 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "Subscribe to realtime changes in your database."
+										"shortText": "Subscribe to realtime changes in your databse."
 									},
 									"parameters": [
 										{
