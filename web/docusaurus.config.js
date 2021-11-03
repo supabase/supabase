@@ -139,7 +139,7 @@ module.exports = {
             },
             {
               label: 'System Status',
-              to: 'https://status.supabase.io/',
+              to: 'https://status.supabase.com/',
             },
           ],
         },
@@ -173,7 +173,7 @@ module.exports = {
           items: [
             {
               label: 'Join our beta',
-              href: 'https://app.supabase.io',
+              href: 'https://app.supabase.com',
             },
           ],
         },
