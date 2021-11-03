@@ -90,8 +90,6 @@ function BlogPostPage(props: any) {
   const author = props.blog.author ? authors[props.blog.author] : authors['supabase']
   const content = hydrate(props.blog.content, { components })
 
-  const { basePath } = useRouter()
-
   const NextCard = (props: any) => {
     const { post, label, className } = props
     return (
@@ -149,7 +147,7 @@ function BlogPostPage(props: any) {
         openGraph={{
           title: props.blog.title,
           description: props.blog.description,
-          url: `https://supabase.io/blog/${props.blog.slug}`,
+          url: `${process.env.NEXT_PUBLIC_URL}/blog/${props.blog.slug}`,
           type: 'article',
           article: {
             //
@@ -166,7 +164,7 @@ function BlogPostPage(props: any) {
           },
           images: [
             {
-              url: `https://supabase.io${basePath}/images/blog/${
+              url: `${process.env.NEXT_PUBLIC_URL}/images/blog/${
                 props.blog.image ? props.blog.image : props.blog.thumb
               }`,
             },

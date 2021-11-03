@@ -28,8 +28,8 @@ const Hero = () => {
                     </Typography.Text>
                     <Space>
                       <Link
-                        href="https://app.supabase.io/api/login"
-                        as="https://app.supabase.io/api/login"
+                        href={`${process.env.NEXT_PUBLIC_STUDIO_URL}/api/login`}
+                        as={`${process.env.NEXT_PUBLIC_STUDIO_URL}/api/login`}
                       >
                         <a>
                           <Button className="mt-10 py-3" size="medium">
@@ -37,7 +37,7 @@ const Hero = () => {
                           </Button>
                         </a>
                       </Link>
-                      <Link href="https://app.supabase.io/docs" as="https://supabase.io/docs">
+                      <Link href="/docs" as="/docs">
                         <a>
                           <Button
                             className="mt-10 py-3"

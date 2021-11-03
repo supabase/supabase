@@ -11,7 +11,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
 
   function telemetry() {
-    return post(`https://app.supabase.io/api/telemetry/page`, {
+    return post(`${process.env.NEXT_PUBLIC_STUDIO_URL}/api/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
     })
@@ -39,7 +39,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   }, [router.events])
 
   const site_title = `The Open Source Firebase Alternative | ${APP_NAME}`
-  const { basePath } = useRouter()
 
   return (
     <>
@@ -49,11 +48,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         description={DESCRIPTION}
         openGraph={{
           type: 'website',
-          url: 'https://supabase.io/',
+          url: process.env.NEXT_PUBLIC_URL,
           site_name: 'Supabase',
           images: [
             {
-              url: `https://supabase.io${basePath}/images/og/og-image.jpg`,
+              url: '/images/og/og-image.jpg',
               width: 800,
               height: 600,
               alt: 'Supabase Og Image',

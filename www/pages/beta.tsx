@@ -666,7 +666,7 @@ const BetaPricing = () => (
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
         <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
-          <p className="mb-10">For up to date pricing info see: https://supabase.io/pricing</p>
+          <p className="mb-10">For up to date pricing info see: https://supabase.com/pricing</p>
           <p className="mb-10">
             We're working closely with many open source projects, infrastructure providers, and of
             course our Alpha Users, to provide a predictable and sustainable pricing model.
@@ -716,7 +716,7 @@ const BetaPricing = () => (
           </ul>
           <p>
             The Supabase Base Tier is now called the Supabase Pro tier as per the{' '}
-            <a href="https://supabase.io/pricing" className="text-brand-700 hover:text-brand-800">
+            <a href="/pricing" className="text-brand-700 hover:text-brand-800">
               pricing page
             </a>
             .
@@ -972,7 +972,7 @@ const Beta = () => {
         openGraph={{
           title: site_title,
           description: DESCRIPTION,
-          url: `https://supabase.io/beta`,
+          url: `${process.env.NEXT_PUBLIC_URL}/beta`,
           type: 'article',
           article: {
             //
@@ -987,7 +987,7 @@ const Beta = () => {
           },
           images: [
             {
-              url: 'https://supabase.io/og/og-image.jpg',
+              url: `${process.env.NEXT_PUBLIC_URL}/og/og-image.jpg`,
             },
           ],
         }}

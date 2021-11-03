@@ -30,9 +30,6 @@ import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
 
 function StoragePage() {
-  // base path for images
-  const { basePath } = useRouter()
-
   const meta_title = 'Storage | Store any digital content'
   const meta_description =
     'An open source Object store with unlimited scalability, for any file type.'
@@ -45,10 +42,10 @@ function StoragePage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.io/storage`,
+          url: '/storage',
           images: [
             {
-              url: `https://supabase.io${basePath}/images/product/storage/storage-og.jpg`,
+              url: '/images/product/storage/storage-og.jpg',
             },
           ],
         }}
@@ -70,7 +67,7 @@ function StoragePage() {
           image={[
             <div className="w-full header--light block">
               <Image
-                src={`${basePath}/images/product/storage/header--light.png`}
+                src="/images/product/storage/header--light.png"
                 alt="storage header"
                 layout="responsive"
                 width="1386"
@@ -79,7 +76,7 @@ function StoragePage() {
             </div>,
             <div className="w-full header--dark mr-0 dark:block">
               <Image
-                src={`${basePath}/images/product/storage/header--dark.png`}
+                src="/images/product/storage/header--dark.png"
                 alt="storage header"
                 layout="responsive"
                 width="1386"
@@ -265,8 +262,8 @@ function StoragePage() {
                         </p>
                       </Typography.Text>
                       <Link
-                        href="https://supabase.io/docs/reference/javascript/storage-createbucket"
-                        as="https://supabase.io/docs/reference/javascript/storage-createbucket"
+                        href="/docs/reference/javascript/storage-createbucket"
+                        as="/docs/reference/javascript/storage-createbucket"
                       >
                         <a>
                           <Button

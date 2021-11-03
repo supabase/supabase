@@ -33,12 +33,6 @@ function AuthPage() {
   // base path for images
   const { basePath } = useRouter()
 
-  // supabase auth widget project details
-  const supabase = createClient(
-    'https://rsnibhkhsbfnncjmwnkj.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNTIxNDE1MywiZXhwIjoxOTMwNzkwMTUzfQ.OQEbAaTfgDdLCCht251P2JRD3QDnui6nsU8N-tZA_Mc'
-  )
-
   const meta_title = 'Auth | Built-in user management'
   const meta_description =
     'Authentication that you can afford that is built in to your supabase project.'
@@ -51,10 +45,10 @@ function AuthPage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.io/auth`,
+          url: '/auth',
           images: [
             {
-              url: `https://supabase.io${basePath}/images/product/auth/auth-og.jpg`,
+              url: '/images/product/auth/auth-og.jpg',
             },
           ],
         }}
@@ -76,7 +70,7 @@ function AuthPage() {
           image={[
             <div className="w-full header--light block">
               <Image
-                src={`${basePath}/images/product/auth/header--light.png`}
+                src="/images/product/auth/header--light.png"
                 alt="auth header"
                 layout="responsive"
                 width="1372"
@@ -85,7 +79,7 @@ function AuthPage() {
             </div>,
             <div className="w-full header--dark mr-0 dark:block">
               <Image
-                src={`${basePath}/images/product/auth/header--dark.png`}
+                src="/images/product/auth/header--dark.png"
                 alt="auth header"
                 layout="responsive"
                 width="1372"
@@ -93,7 +87,7 @@ function AuthPage() {
               />
             </div>,
           ]}
-          documentation_url={'https://supabase.io/docs/guides/auth'}
+          documentation_url={`${process.env.NEXT_PUBLIC_DOCS_URL}/docs/guides/auth`}
         />
 
         <SectionContainer>
@@ -101,8 +95,8 @@ function AuthPage() {
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
               <p className="mb-4">
                 <Space>
-                  <img src={`${basePath}/images/product/auth/google-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/facebook-icon.svg`} width={21} />
+                  <img src="/images/product/auth/google-icon.svg" width={21} />
+                  <img src="/images/product/auth/facebook-icon.svg" width={21} />
                   <div>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -116,9 +110,9 @@ function AuthPage() {
                       />
                     </svg>
                   </div>
-                  <img src={`${basePath}/images/product/auth/gitlab-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/bitbucket-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/twitter-icon.svg`} width={21} />
+                  <img src="/images/product/auth/gitlab-icon.svg" width={21} />
+                  <img src="/images/product/auth/bitbucket-icon.svg" width={21} />
+                  <img src="/images/product/auth/twitter-icon.svg" width={21} />
                 </Space>
               </p>
               <Typography.Title level={4}>All the social providers</Typography.Title>
@@ -197,7 +191,7 @@ function AuthPage() {
                 </div>
               </div>,
             ]}
-            documentation_link={'https://supabase.io/docs/guides/auth'}
+            documentation_link={`${process.env.NEXT_PUBLIC_DOCS_URL}/docs/guides/auth`}
           />
         </SectionContainer>
 
@@ -229,7 +223,7 @@ function AuthPage() {
                 </p>
                 <p>Policies can be written in SQL or using the dashboard online.</p>
               </Typography.Text>
-              <Link href="https://supabase.io/docs/guides/auth#policy-examples">
+              <Link href={`${process.env.NEXT_PUBLIC_DOCS_URL}/docs/guides/auth#policy-examples`}>
                 <a>
                   <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
                     Explore documentation
@@ -259,7 +253,7 @@ function AuthPage() {
                 <Typography.Text type="secondary">
                   <IconX />
                 </Typography.Text>
-                <img className="w-8" src={`${basePath}/images/product/auth/react-icon.svg`} />
+                <img className="w-8" src="/images/product/auth/react-icon.svg" />
               </Space>
 
               <Typography.Title level={2} className="mb-4">

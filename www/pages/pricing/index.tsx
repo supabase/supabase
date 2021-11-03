@@ -78,7 +78,7 @@ export default function IndexPage() {
               <p className="my-4 text-sm text-gray-500">
                 Perfect for hobby projects and experiments.
               </p>
-              <Link href="https://app.supabase.io" as="https://app.supabase.io">
+              <Link href="https://app.supabase.com" as="https://app.supabase.com">
                 <a>
                   <Button type="outline" size="medium" block>
                     Get started
@@ -115,7 +115,7 @@ export default function IndexPage() {
               <p className="my-4 text-sm text-gray-500">
                 Everything you need to scale your project into production.
               </p>
-              <Link href="https://app.supabase.io" as="https://app.supabase.io">
+              <Link href="https://app.supabase.com" as="https://app.supabase.com">
                 <a>
                   <Button type="outline" size="medium" block>
                     Get started
@@ -154,7 +154,7 @@ export default function IndexPage() {
               <p className="my-4 text-sm text-gray-500">
                 Designated support team, account manager and technical specialist.
               </p>
-              <Link href="https://app.supabase.io" as="https://app.supabase.io">
+              <Link href="https://app.supabase.com" as="https://app.supabase.com">
                 <a>
                   <Button type="outline" size="medium" block>
                     Get started
@@ -256,7 +256,7 @@ export default function IndexPage() {
                           Perfect for hobby projects and experiments.
                         </Typography.Text>
                       </p>
-                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                      <Link href="https://app.supabase.com" as="https://app.supabase.com">
                         <a>
                           <Button size="medium" type="outline" className="absolute bottom-0">
                             Get started
@@ -279,7 +279,7 @@ export default function IndexPage() {
                           Everything you need to scale your project into production.
                         </Typography.Text>
                       </p>
-                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                      <Link href="https://app.supabase.com" as="https://app.supabase.com">
                         <a>
                           <Button size="medium" type="outline" className="absolute bottom-0">
                             Get started
@@ -302,7 +302,7 @@ export default function IndexPage() {
                           Designated support team, account manager and technical specialist.
                         </Typography.Text>
                       </p>
-                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                      <Link href="https://app.supabase.com" as="https://app.supabase.com">
                         <a>
                           <Button size="medium" type="outline" className="absolute bottom-0">
                             Get started
@@ -335,7 +335,7 @@ export default function IndexPage() {
                   </th>
 
                   <td className="pt-5 px-6">
-                    <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                    <Link href="https://app.supabase.com" as="https://app.supabase.com">
                       <a>
                         <Button size="medium" type="outline" block>
                           Get started
@@ -345,7 +345,7 @@ export default function IndexPage() {
                   </td>
 
                   <td className="pt-5 px-6">
-                    <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                    <Link href="https://app.supabase.com" as="https://app.supabase.com">
                       <a>
                         <Button size="medium" type="outline" block>
                           Get started

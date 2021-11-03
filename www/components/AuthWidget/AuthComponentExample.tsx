@@ -70,7 +70,10 @@ function AuthComponentExample() {
                 <Space size={8} direction="vertical">
                   <div>
                     <Space size={3} direction="vertical">
-                      <img src="https://app.supabase.io/img/supabase-dark.svg" width="96" />
+                      <img
+                        src={`${process.env.NEXT_PUBLIC_STUDIO_URL}/img/supabase-dark.svg`}
+                        width="96"
+                      />
                       <Typography.Title level={3}>{'Acme Company'}</Typography.Title>
                     </Space>
                   </div>
