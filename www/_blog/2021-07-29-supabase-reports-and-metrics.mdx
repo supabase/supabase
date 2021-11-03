@@ -25,7 +25,7 @@ API requests across all of Supabase's core pillars:
 Database, Auth and Storage. We've included two instance health metrics, CPU usage and Memory usage,
 with a lot more on the way.
 
-![Supabase reports screen](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-and-metrics-reports-screen.jpg)
+![Supabase reports screen](/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-and-metrics-reports-screen.jpg)
 
 All charts are built with [Recharts](https://recharts.org/en-US), an MIT-licensed React chart library chosen for its ease of use.
 We'll add customizable charts in the future, so we'd love to hear which libraries you'd like to see in Supabase.
@@ -42,7 +42,7 @@ number of Auth users, and Storage space.
 And we're just getting warmed up. Over the next few months you'll see more project information, notifications, and highlights to
 monitor your project health at a glance.
 
-![Supabase new dashboard app homescreen](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-and-metrics-homepage.jpg)
+![Supabase new dashboard app homescreen](/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-and-metrics-homepage.jpg)
 
 ## Observability metrics
 
@@ -52,7 +52,7 @@ important infrastructure anomalies.
 
 All databases are now launched with `pg_stat_statements` enabled, so you can expect some useful query statistics in the future too.
 
-![Supabase observability metrics](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-and-metrics-observability-screen.jpg)
+![Supabase observability metrics](/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-and-metrics-observability-screen.jpg)
 
 ## Building a metrics pipeline
 
@@ -67,7 +67,7 @@ and to get ahead of possible issues before they become showstoppers.
 At Supabase, each project is provisioned with a Postgres cluster, and a suite of associated services that add, ahem,
 supa-powers to the database.
 
-![Supabase architecture](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-infra.png)
+![Supabase architecture](/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-infra.png)
 
 Our users get liberal access to each of these services - you can use PostgREST for a RESTful API,
 Realtime to listen to changes in your Postgres instance, or even just open a raw connection to the database.
@@ -98,7 +98,7 @@ We run [Prometheus](https://prometheus.io/) out of inertia, soon to be [Victoria
 The monitoring instances scrape data from a number of exporters that are bundled into each of our projects.
 A small subset of the metrics collected gets aggregated to a centralized VictoriaMetrics instance for easier cohort analysis.
 
-![Supabase Prometheus](/new/images/blog/launch-week-sql-day-4-reports-and-metrics/prometheus.png)
+![Supabase Prometheus](/images/blog/launch-week-sql-day-4-reports-and-metrics/prometheus.png)
 
 ### Available sources and metrics
 

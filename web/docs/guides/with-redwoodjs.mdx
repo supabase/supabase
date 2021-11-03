@@ -9,6 +9,17 @@ import TabItem from '@theme/TabItem'
 
 ## Intro
 
+For the sake of consistency with the other framework Quickstart examples, we'll build a RedwoodJS a little differently than normal.
+
+We **_won't use_** use Prisma to connect to the Supabase Postgres database or [Prisma migrations](https://redwoodjs.com/docs/cli-commands#prisma-migrate) as one typically might in a Redwood app.
+Instead, we'll rely on the Supabase client to do some of the work on the **web** side and use the client again on the **api** side to do data fetching as well.
+
+That means, you will want to refrain from running any `yarn rw prisma migrate` commands and also double check your build commands on deployment to ensure Prisma won't reset your database.
+
+:::note
+TLDR; Prisma currently doesn't support cross-schema foreign keys, so introspecting the schema fails due to how your Supabase `public` schema references the `auth.users`.
+:::
+
 This example provides the steps to build a simple user management app (from scratch!) using Supabase and [RedwoodJS](https://redwoodjs.com/docs/introduction). It includes:
 
 - Supabase [Database](/docs/guides/database): a Postgres database for storing your user data.
@@ -110,7 +121,7 @@ values={[
 ```
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
+  <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
@@ -168,6 +179,12 @@ create policy "Anyone can upload an avatar."
 </TabItem>
 </Tabs>
 
+#### Important Note about Prisma and Migrations
+
+:::note
+Because this Quick Start does not use Prisma to manage the database schema, seed it, or run mgrations, you **need** to take extra care when running some of the typical Redwood CLI commands.
+:::
+
 ### Get the API Keys
 
 Now that you've created some database tables, you are ready to insert data using the auto-generated API.
@@ -188,7 +205,7 @@ values={[
 ```
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
@@ -199,7 +216,7 @@ values={[
 Let's start building the RedwoodJS app from scratch.
 
 :::note
-**Note:** RedwoodJS requires Node.js (=14.x) and Yarn (>=1.15).
+RedwoodJS requires Node.js (>=14.x <=16.x) and Yarn (>=1.15).
 :::
 
 Make sure you have installed yarn since RedwoodJS relies on it to [manage its packages in workspaces](https://classic.yarnpkg.com/lang/en/docs/workspaces/) for its `web` and `api` "sides".
@@ -236,7 +253,6 @@ yarn redwood setup auth supabase
 
 When prompted:
 
-:::note
 Overwrite existing /api/src/lib/auth.[jt]s?
 :::
 
