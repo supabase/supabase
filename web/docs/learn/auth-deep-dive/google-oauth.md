@@ -87,4 +87,4 @@ For any support please get in touch at beta at supabase.io or for feature reques
 - Watch [Part Three: Policies](/docs/learn/auth-deep-dive/auth-policies)
 - Watch [Part Four: GoTrue](/docs/learn/auth-deep-dive/auth-gotrue)
 <!-- - Watch [Part Five: Google Oauth](/docs/learn/auth-deep-dive/auth-google-oauth) -->
-- Sign up for Supabase: [app.supabase.io](https://app.supabase.io)
+- Sign up for Supabase: [app.supabase.com](https://app.supabase.com)

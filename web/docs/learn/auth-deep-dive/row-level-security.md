@@ -126,4 +126,4 @@ In the next guide we will look at using Policies in combination with User Accoun
 - Watch [Part Three: Policies](/docs/learn/auth-deep-dive/auth-policies)
 - Watch [Part Four: GoTrue](/docs/learn/auth-deep-dive/auth-gotrue)
 - Watch [Part Five: Google Oauth](/docs/learn/auth-deep-dive/auth-google-oauth)
-- Sign up for Supabase: [app.supabase.io](https://app.supabase.io)
+- Sign up for Supabase: [app.supabase.com](https://app.supabase.com)
