@@ -10,40 +10,35 @@ Supabase is built on top of [Postgres](/docs/postgres/server/about), an extremel
 
 ## Features
 
-### Table View 
+### Table View
 
 You don't have to be a database expert to start using Supabase. Our table view makes Postgres as easy to use as a spreadsheet.
 
 ![Table View.](/img/table-view.png)
 
-
 ### Relationships
 
-Dig into the relationships within your data. 
-
+Dig into the relationships within your data.
 
 <video width="99%" loop="" muted="" playsInline="" controls="true">
-<source src="/videos/relational-drilldown-zoom.mp4" type="video/mp4" />
+  <source src="/videos/relational-drilldown-zoom.mp4" type="video/mp4" />
 </video>
-
 
 ### Clone tables
 
 You can duplicate your tables, just like you would inside a spreadsheet.
 
 <video width="99%" muted playsInline controls={true}>
-<source src="/videos/duplicate-tables.mp4" type="video/mp4" muted playsInline />
+  <source src="/videos/duplicate-tables.mp4" type="video/mp4" muted playsInline />
 </video>
-
 
 ### The SQL Editor
 
-Supabase comes with a SQL Editor. You can also save your favorite queries to run later! 
+Supabase comes with a SQL Editor. You can also save your favorite queries to run later!
 
 <video width="99%" muted playsInline controls={true}>
-<source src="/videos/favorites.mp4" type="video/mp4" muted playsInline />
+  <source src="/videos/favorites.mp4" type="video/mp4" muted playsInline />
 </video>
-
 
 ### Additional features
 
@@ -60,29 +55,29 @@ To expand the functionality of your Postgres database, you can use extensions.
 You can enable Postgres extensions with the click of a button within the Supabase dashboard.
 
 <video width="99%" muted playsInline controls={true}>
-<source src="/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
+  <source src="/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
 </video>
 
 [Learn more](/docs/guides/database/extensions) about all the extensions provided on Supabase.
 
 ## Tips
 
-### Realtime 
+### Realtime
 
-Supabase provides a realtime engine on top of Postgres, so that you can listen to changes as they happen. 
-Our realtime engine uses the built-in replication functionality of Postgres. 
-You can manage the realtime system, simply by 
+Supabase provides a realtime engine on top of Postgres, so that you can listen to changes as they happen.
+Our realtime engine uses the built-in replication functionality of Postgres.
+You can manage the realtime system, simply by
 [updating](/docs/guides/database/replication) the `supabase_realtime` publication.
 
 For example to enable realtime only for individual tables:
 
 ```sql
-begin; 
+begin;
   -- remove the realtime publication
-  drop publication if exists supabase_realtime; 
+  drop publication if exists supabase_realtime;
 
   -- re-create the publication but don't enable it for any tables
-  create publication supabase_realtime;  
+  create publication supabase_realtime;
 commit;
 
 -- add a table to the publication
@@ -92,11 +87,11 @@ alter publication supabase_realtime add table products;
 alter publication supabase_realtime add table posts;
 ```
 
-| SECURITY WARNING |
-| - |
-| Please check [Disable realtime for private tables](https://supabase.io/docs/guides/auth#disable-realtime-for-private-tables) for the current state of Realtime security. |
+| SECURITY WARNING                                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Please check [Disable realtime for private tables](https://supabase.com/docs/guides/auth#disable-realtime-for-private-tables) for the current state of Realtime security. |
 
-By default only "new" values are sent, but if you want to receive the old record (previous values) whenever you `update` or `delete` a record, 
+By default only "new" values are sent, but if you want to receive the old record (previous values) whenever you `update` or `delete` a record,
 you can update the replica identity of your tables, setting it to `full`:
 
 ```sql
@@ -125,7 +120,7 @@ pg_dump \
 > supabase_schema.sql
 ```
 
-This command creates a file on your computer called `supabase_schema.sql`. 
+This command creates a file on your computer called `supabase_schema.sql`.
 
 After creating a new Supabase project we can use it to restore the database structure:
 
@@ -136,14 +131,13 @@ psql \
 < supabase_schema.sql
 ```
 
-You may see some errors - the restore will attempt to drop any tables if they are present, 
+You may see some errors - the restore will attempt to drop any tables if they are present,
 and if they aren't present then an error will be displayed. These errors are informative only and nothing to worry about.
-
 
 #### (Optionally) Migrate the data
 
-We can migrate everything in our database, however we don't want to migrate 
-the data in our `storage` schema because the files exist outside of the database. 
+We can migrate everything in our database, however we don't want to migrate
+the data in our `storage` schema because the files exist outside of the database.
 For now, we can just get all the data inside the `public` and `auth` schemas:
 
 ```sh
@@ -156,7 +150,7 @@ pg_dump \
 > supabase_data.sql
 ```
 
-This command creates a file on your computer called `supabase_data.sql`.  We can use this file to restore the data in our new database:
+This command creates a file on your computer called `supabase_data.sql`. We can use this file to restore the data in our new database:
 
 ```sh
 psql \
@@ -164,7 +158,6 @@ psql \
 -U postgres \
 < supabase_data.sql
 ```
-
 
 ### Resetting your project password
 
@@ -175,7 +168,7 @@ If you forget your password, you can reset it from the Dashboard SQL editor:
 For example:
 
 ```sql
-alter user postgres 
+alter user postgres
 with password 'new_password';
 ```
 
@@ -198,4 +191,3 @@ Read more in [Database Configuration](/docs/guides/database/managing-timezones).
 
 - Read more about [Postgres](/docs/postgres/server/about)
 - Sign in: [app.supabase.io](https://app.supabase.io)
-

@@ -1,22 +1,22 @@
 ---
 id: json
-title: "JSON"
+title: 'JSON'
 description: Using the JSON data type in PostgreSQL.
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
-PostgreSQL supports [JSON functions and operators](https://www.postgresql.org/docs/current/functions-json.html) which gives flexibility when storing data inside a database column.  
+PostgreSQL supports [JSON functions and operators](https://www.postgresql.org/docs/current/functions-json.html) which gives flexibility when storing data inside a database column.
 
-PostgreSQL supports two types of JSON columns: `JSON` and `JSONB`.  
+PostgreSQL supports two types of JSON columns: `JSON` and `JSONB`.
 
 The recommended type is `JSONB` for almost all cases.
 When you use the `JSONB` format, the data is parsed when it's put into the database so it's faster when querying and also it can be indexed.
 
 ## Steps
 
-### Create a table with a JSON column.  
+### Create a table with a JSON column.
 
 <Tabs
 defaultValue="SQL"
@@ -81,21 +81,21 @@ values={[
 ]}>
 <TabItem value="Data">
 
-| id | title                               | author                 | metadata                                                                                                      |
-| -- | ----------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------- |
-| 1  | The Poky Little Puppy               | Janette Sebring Lowrey | {"ages":[3,6],"price":5.95,"description":"Puppy is slower than other, bigger animals."}                       |
-| 2  | The Tale of Peter Rabbit            | Beatrix Potter         | {"ages":[2,5],"price":4.49,"description":"Rabbit eats some vegetables."}                                      |
-| 3  | Tootle                              | Gertrude Crampton      | {"ages":[2,5],"price":3.99,"description":"Little toy train has big dreams."}                                  |
-| 4  | Green Eggs and Ham                  | Dr. Seuss              | {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusually colored food."} |
-| 5  | Harry Potter and the Goblet of Fire | J.K. Rowling           | {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}                |
+| id  | title                               | author                 | metadata                                                                                                       |
+| --- | ----------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
+| 1   | The Poky Little Puppy               | Janette Sebring Lowrey | {"ages":[3,6],"price":5.95,"description":"Puppy is slower than other, bigger animals."}                        |
+| 2   | The Tale of Peter Rabbit            | Beatrix Potter         | {"ages":[2,5],"price":4.49,"description":"Rabbit eats some vegetables."}                                       |
+| 3   | Tootle                              | Gertrude Crampton      | {"ages":[2,5],"price":3.99,"description":"Little toy train has big dreams."}                                   |
+| 4   | Green Eggs and Ham                  | Dr. Seuss              | {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusually colored food."} |
+| 5   | Harry Potter and the Goblet of Fire | J.K. Rowling           | {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}                 |
 
 </TabItem>
 <TabItem value="SQL">
 
 ```sql
-insert into books 
-  (title, author, metadata) 
-values 
+insert into books
+  (title, author, metadata)
+values
   (
     'The Poky Little Puppy',
     'Janette Sebring Lowrey',
@@ -160,35 +160,45 @@ values
 <TabItem value="JavaScript">
 
 ```js
-const { data, error } = await supabase
-.from('books')
-.insert([
-  { 
+const { data, error } = await supabase.from('books').insert([
+  {
     title: 'The Poky Little Puppy',
-    author: 'Janette Sebring Lowrey', 
-    metadata: {"description":"Puppy is slower than other, bigger animals.","price":5.95,"ages":[3,6]}
+    author: 'Janette Sebring Lowrey',
+    metadata: {
+      description: 'Puppy is slower than other, bigger animals.',
+      price: 5.95,
+      ages: [3, 6],
+    },
   },
-  { 
+  {
     title: 'The Tale of Peter Rabbit',
     author: 'Beatrix Potter',
-    metadata: {"description":"Rabbit eats some vegetables.","price":4.49,"ages":[2,5]}
+    metadata: { description: 'Rabbit eats some vegetables.', price: 4.49, ages: [2, 5] },
   },
-  { 
+  {
     title: 'Tootle',
-    author: 'Gertrude Crampton', 
-    metadata: {"description":"Little toy train has big dreams.","price":3.99,"ages":[2,5]}
+    author: 'Gertrude Crampton',
+    metadata: { description: 'Little toy train has big dreams.', price: 3.99, ages: [2, 5] },
   },
-  { 
-    title:'Green Eggs and Ham',
-    author:'Dr. Seuss', 
-    metadata: {"description":"Sam has changing food preferences and eats unusually colored food.","price":7.49,"ages":[4,8]}
+  {
+    title: 'Green Eggs and Ham',
+    author: 'Dr. Seuss',
+    metadata: {
+      description: 'Sam has changing food preferences and eats unusually colored food.',
+      price: 7.49,
+      ages: [4, 8],
+    },
   },
-  { 
-    title:'Harry Potter and the Goblet of Fire',
-    author:'J.K. Rowling', 
-    metadata: {"description":"Fourth year of school starts, big drama ensues.","price":24.95,"ages":[10,99]}
-  }
-]);  
+  {
+    title: 'Harry Potter and the Goblet of Fire',
+    author: 'J.K. Rowling',
+    metadata: {
+      description: 'Fourth year of school starts, big drama ensues.',
+      price: 24.95,
+      ages: [10, 99],
+    },
+  },
+])
 ```
 
 </TabItem>
@@ -206,7 +216,7 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-select * 
+select *
 from books;
 ```
 
@@ -214,26 +224,25 @@ from books;
 <TabItem value="JavaScript">
 
 ```js
-const { data, error } = await supabase
-.from('books')
-.select('*');
-console.log(JSON.stringify(data, null, 2));
+const { data, error } = await supabase.from('books').select('*')
+console.log(JSON.stringify(data, null, 2))
 ```
 
 </TabItem>
 <TabItem value="Data">
 
-| id | title                               | author                 | metadata                                                                                                      |
-| -- | ----------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------- |
-| 1  | The Poky Little Puppy               | Janette Sebring Lowrey | {"ages":[3,6],"price":5.95,"description":"Puppy is slower than other, bigger animals."}                       |
-| 2  | The Tale of Peter Rabbit            | Beatrix Potter         | {"ages":[2,5],"price":4.49,"description":"Rabbit eats some vegetables."}                                      |
-| 3  | Tootle                              | Gertrude Crampton      | {"ages":[2,5],"price":3.99,"description":"Little toy train has big dreams."}                                  |
-| 4  | Green Eggs and Ham                  | Dr. Seuss              | {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusually colored food."} |
-| 5  | Harry Potter and the Goblet of Fire | J.K. Rowling           | {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}                |
+| id  | title                               | author                 | metadata                                                                                                       |
+| --- | ----------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
+| 1   | The Poky Little Puppy               | Janette Sebring Lowrey | {"ages":[3,6],"price":5.95,"description":"Puppy is slower than other, bigger animals."}                        |
+| 2   | The Tale of Peter Rabbit            | Beatrix Potter         | {"ages":[2,5],"price":4.49,"description":"Rabbit eats some vegetables."}                                       |
+| 3   | Tootle                              | Gertrude Crampton      | {"ages":[2,5],"price":3.99,"description":"Little toy train has big dreams."}                                   |
+| 4   | Green Eggs and Ham                  | Dr. Seuss              | {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusually colored food."} |
+| 5   | Harry Potter and the Goblet of Fire | J.K. Rowling           | {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}                 |
 
 NOTICE: The data as it appears here will have the `JSONB` fields in a different order than when we inserted them.
 As we said earlier about the differences between the `JSON` and `JSONB` fields:
->When you use the `JSONB` format, the data is parsed when it's put into the database...
+
+> When you use the `JSONB` format, the data is parsed when it's put into the database...
 
 </TabItem>
 </Tabs>
@@ -252,13 +261,13 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-select 
-  title, 
+select
+  title,
   metadata -> 'description' AS description,
   metadata -> 'price' as price,
   metadata -> 'ages' -> 0 as low_age,
   metadata -> 'ages' -> 1 as high_age
-from 
+from
   books;
 ```
 
@@ -267,37 +276,37 @@ from
 
 ```js
 const { data, error } = await supabase
-.from('books')
-.select('title,description:metadata->description,price:metadata->price,low_age:metadata->ages->0,high_age:metadata->ages->1');
-console.log(JSON.stringify(data, null, 2));
+  .from('books')
+  .select(
+    'title,description:metadata->description,price:metadata->price,low_age:metadata->ages->0,high_age:metadata->ages->1'
+  )
+console.log(JSON.stringify(data, null, 2))
 ```
 
 </TabItem>
 <TabItem value="Results">
 
-| title                               | description                                                       | price | low_age | high_age |
-| ----------------------------------- | ----------------------------------------------------------------- | ----- | ------- | -------- |
-| The Poky Little Puppy               | Puppy is slower than other, bigger animals.                       | 5.95  | 3       | 6        |
-| The Tale of Peter Rabbit            | Rabbit eats some vegetables.                                      | 4.49  | 2       | 5        |
-| Tootle                              | Little toy train has big dreams.                                  | 3.99  | 2       | 5        |
+| title                               | description                                                        | price | low_age | high_age |
+| ----------------------------------- | ------------------------------------------------------------------ | ----- | ------- | -------- |
+| The Poky Little Puppy               | Puppy is slower than other, bigger animals.                        | 5.95  | 3       | 6        |
+| The Tale of Peter Rabbit            | Rabbit eats some vegetables.                                       | 4.49  | 2       | 5        |
+| Tootle                              | Little toy train has big dreams.                                   | 3.99  | 2       | 5        |
 | Green Eggs and Ham                  | Sam has changing food preferences and eats unusually colored food. | 7.49  | 4       | 8        |
-| Harry Potter and the Goblet of Fire | Fourth year of school starts, big drama ensues.                   | 24.95 | 10      | 99       |
+| Harry Potter and the Goblet of Fire | Fourth year of school starts, big drama ensues.                    | 24.95 | 10      | 99       |
 
 </TabItem>
 </Tabs>
 
-
-
-
 #### Data Types
-One last thing to note:  the -> operator returns JSONB data.  If you want TEXT/STRING data returned, you need to use the ->> operator.
+
+One last thing to note: the -> operator returns JSONB data. If you want TEXT/STRING data returned, you need to use the ->> operator.
 
 - metadata -> 'description' (this returns a JSON object)
 - metadata ->> 'description' (this returns STRING/TEXT data)
 
 ## Resources
 
-* [Supabase Account - Free Tier OK](https://supabase.io)
-* [Supabase JS Client](https://github.com/supabase/supabase-js)
-* [PostgreSQL: JSON Functions and Operators](https://www.postgresql.org/docs/12/functions-json.html)
-* [PostgreSQL JSON types](https://www.postgresql.org/docs/12/datatype-json.html)
+- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [PostgreSQL: JSON Functions and Operators](https://www.postgresql.org/docs/12/functions-json.html)
+- [PostgreSQL JSON types](https://www.postgresql.org/docs/12/datatype-json.html)
