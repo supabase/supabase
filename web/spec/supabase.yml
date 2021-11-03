@@ -44,6 +44,9 @@ info:
         items:
           - api.deleteUser()
           - api.generateLink()
+          - api.inviteUserByEmail()
+          - api.sendMobileOTP()
+          - api.resetPasswordForEmail()
       - name: 'Database'
         items:
           - select()
@@ -569,6 +572,9 @@ pages:
 
   api.deleteUser():
     $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.deleteUser'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should only be called on a server. Never expose your `service_role` key in the browser.
     examples:
       - name: Remove a user completely.
         isSpotlight: true
@@ -580,10 +586,58 @@ pages:
           )
           ```
 
+  api.inviteUserByEmail():
+    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.inviteUserByEmail'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should only be called on a server. Never expose your `service_role` key in the browser.
+    examples:
+      - name: Basic example.
+        isSpotlight: false
+        js: |
+          ```js
+          const { user, error } = await supabase.auth
+            .api
+            .inviteUserByEmail('email@example.com')
+          ```
+
+  api.sendMobileOTP():
+    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.sendMobileOTP'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should only be called on a server. Never expose your `service_role` key in the browser.
+    examples:
+      - name: Basic example.
+        isSpotlight: false
+        js: |
+          ```js
+          const { user, error } = await supabase.auth
+            .api
+            .sendMobileOTP('12345879')
+          ```
+
+  api.resetPasswordForEmail():
+    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.resetPasswordForEmail'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should only be called on a server. Never expose your `service_role` key in the browser.
+    examples:
+      - name: Basic example.
+        isSpotlight: false
+        js: |
+          ```js
+          const { user, error } = await supabase.auth
+            .api
+            .resetPasswordForEmail('email@example.com')
+          ```
+
   api.generateLink():
     $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.generateLink'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should only be called on a server. Never expose your `service_role` key in the browser.
     examples:
-      - name: Generate a confirmation / invite / recovery link.
+      - name: Generate invite link.
         isSpotlight: false
         js: |
           ```js
