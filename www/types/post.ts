@@ -16,6 +16,7 @@ type PostTypes = {
   readingTime: string
   url: string
   tags: []
+  logo?: string
 }
 
 export default PostTypes

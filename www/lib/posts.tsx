@@ -7,7 +7,9 @@ import { generateReadingTime } from './helpers'
 // based on YYYY-MM-DD format
 const FILENAME_SUBSTRING = 11
 
-export const getSortedPosts = (directory: string, limit?: number, tags?: any) => {
+type Directories = '_blog' | '_case-studies'
+
+export const getSortedPosts = (directory: Directories, limit?: number, tags?: any) => {
   //Finding directory named "blog" from the current working directory of Node.
   const postDirectory = path.join(process.cwd(), directory)
 
@@ -18,8 +20,11 @@ export const getSortedPosts = (directory: string, limit?: number, tags?: any) =>
 
   let allPostsData = fileNames.map((filename) => {
     const slug = filename.replace('.mdx', '')
+    // console.log('slug', slug)
 
     const fullPath = path.join(postDirectory, filename)
+    // console.log('fullPath', fullPath)
+
     //Extracts contents of the MDX file
     const fileContents = fs.readFileSync(fullPath, 'utf8')
     const { data, content } = matter(fileContents)
@@ -28,11 +33,17 @@ export const getSortedPosts = (directory: string, limit?: number, tags?: any) =>
     const formattedDate = new Date(data.date).toLocaleDateString('en-IN', options)
 
     const readingTime = generateReadingTime(content)
-    const dates = getDatesFromFileName(filename)
 
     // construct url to link to blog posts
     // based on datestamp in file name
-    const url = `${dates.year}/${dates.month}/${dates.day}/${slug.substring(FILENAME_SUBSTRING)}`
+    let url = ''
+    if (directory === '_blog') {
+      const dates = getDatesFromFileName(filename)
+      url = `${dates.year}/${dates.month}/${dates.day}/${slug.substring(FILENAME_SUBSTRING)}`
+    } else {
+      // console.log(slug.substring(FILENAME_SUBSTRING))
+      url = `/${directory.replace('_', '')}/${slug}`
+    }
 
     const frontmatter = {
       ...data,
@@ -67,20 +78,33 @@ export const getSortedPosts = (directory: string, limit?: number, tags?: any) =>
 }
 
 // Get Slugs
-export const getAllPostSlugs = (directory: string) => {
+export const getAllPostSlugs = (directory: Directories) => {
   //Finding directory named "blog" from the current working directory of Node.
   const postDirectory = path.join(process.cwd(), directory)
 
   const fileNames = fs.readdirSync(postDirectory)
 
-  return fileNames.map((filename) => {
+  const files = fileNames.map((filename) => {
+    const dates =
+      directory === '_blog'
+        ? getDatesFromFileName(filename)
+        : {
+            year: '2021',
+            month: '04',
+            day: '02',
+          }
+
     return {
       params: {
-        slug: filename.replace('.mdx', '').substring(FILENAME_SUBSTRING),
-        ...getDatesFromFileName(filename),
+        ...dates,
+        slug: filename
+          .replace('.mdx', '')
+          .substring(directory === '_blog' ? FILENAME_SUBSTRING : 0),
       },
     }
   })
+
+  return files
 }
 
 // Get Post based on Slug

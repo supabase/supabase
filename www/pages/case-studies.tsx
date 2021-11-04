@@ -17,8 +17,8 @@ import BlogHeader from '~/components/Blog/BlogHeader'
 import ImageGrid from '~/components/ImageGrid'
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPosts('_casestudies')
-  const categories = getAllCategories('_casestudies')
+  const allPostsData = getSortedPosts('_case-studies')
+  const categories = getAllCategories('_case-studies')
   const rss = generateRss(allPostsData)
 
   // create a rss feed in public directory
@@ -51,14 +51,17 @@ function Blog(props: any) {
     )
   }, [category])
 
+  console.log(blogs)
+
   const caseStudyThumbs = blogs.map((blog: PostTypes, idx: number) => {
     return {
-      image: '/image/asds',
-      name: 'dsad ',
+      image: blog.logo,
+      name: blog.title,
+      link: blog.url,
     }
   })
 
-  console.log(caseStudyThumbs)
+  // console.log('caseStudyThumbs', caseStudyThumbs)
 
   return (
     <>
@@ -72,36 +75,20 @@ function Blog(props: any) {
       </Head>
       <NextSeo title="Case studies" description="Latest customers using Supabase" />
       <DefaultLayout>
-        <BlogHeader title="Case studies" />
-        <div className="bg-gray-50 dark:bg-dark-800 overflow-hidden py-12">
+        <div className="bg-white dark:bg-dark-800 overflow-hidden">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-32">
             <div className="mx-auto max-w-7xl">
-              <div className="grid grid-cols-12">
-                <div className="col-span-12 lg:col-span-8">
-                  <Typography.Title level={2}>More posts from the team</Typography.Title>
-                </div>
-                <div className="col-span-12 lg:col-span-4 mt-4 lg:mt-0">
-                  <Space className="lg:justify-end" size={6}>
-                    <Typography.Text>Select a category</Typography.Text>
-                    <Select
-                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        setCategory(e.target.value)
-                      }
-                    >
-                      <Select.Option key={'all'} value={'all'}>
-                        Show all
-                      </Select.Option>
-                      {props.categories.map((categoryId: string) => (
-                        <Select.Option key={categoryId} value={categoryId}>
-                          {categoryId}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </Space>
-                </div>
+              <div className="max-w-3xl mx-auto text-center">
+                <Typography.Title level={1}>Case studies</Typography.Title>
+                <Typography.Text>
+                  <p className="text-xl">
+                    Learn how teams behind everyone’s favorite products use Radix to save time,
+                    boost quality, and set the bar for accessibility.
+                  </p>
+                </Typography.Text>
               </div>
               <div className="mt-12 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none">
-                <ImageGrid images={caseStudyThumbs} />
+                <ImageGrid images={caseStudyThumbs} lgCols={4} padding={6} className="h-32" />
               </div>
             </div>
           </div>
