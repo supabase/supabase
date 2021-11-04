@@ -44,6 +44,8 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: any) {
+  console.log('params', params)
+
   const filePath = `${params.year}-${params.month}-${params.day}-${params.slug}`
   const postContent = await getPostdata(filePath, '_blog')
   const { data, content } = matter(postContent)
