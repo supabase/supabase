@@ -8,10 +8,11 @@ module.exports = {
   title: 'Supabase',
   tagline: 'The open source Firebase alternative.',
   url: 'https://supabase.io',
-  baseUrl: '/',
+  baseUrl: '/docs/',
   favicon: '/favicon.ico',
   organizationName: 'supabase', // Usually your GitHub org/user name.
-  projectName: 'supabase', // Usually your repo name.
+  projectName: 'Supabase Docs', // Usually your repo name.
+  onBrokenLinks: 'ignore',
   themeConfig: {
     colorMode: {
       // "light" | "dark"
@@ -56,8 +57,9 @@ module.exports = {
       items: [
         {
           label: 'Overview',
-          to: '/docs',
-          activeBaseRegex: '(^/docs$)|(/docs/faq)|(^/docs/guides/examples)',
+          to: '/',
+          activeBaseRegex:
+            '.*.docs/$|^/docs/architecture|(^/docs/guides/(database|auth|storage|api|examples!))|(^/docs/guides/(examples|with-angular|with-flutter|with-nextjs|with-react|with-redwoodjs|with-svelte|with-vue-3)|^/docs/faq|^/docs/going-into-prod|^/docs/handbook|^/docs/company)',
           position: 'left',
         },
         {
@@ -160,10 +162,10 @@ module.exports = {
               label: 'RSS',
               href: 'https://supabase.io/rss.xml',
             },
-            // {
-            //   label: "Discord",
-            //   href: "https://discordapp.com/invite/docusaurus"
-            // }
+            {
+              label: 'Discord',
+              href: 'https://discord.supabase.com',
+            },
           ],
         },
         {
@@ -184,7 +186,7 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
-          // sidebarCollapsible: true,
+          routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/supabase/supabase/edit/master/web',
         },

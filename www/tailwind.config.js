@@ -3,6 +3,16 @@ module.exports = {
   darkMode: 'class', // 'media' or 'class'
   mode: 'jit',
   theme: {
+    borderColor: (theme) => ({
+      ...theme('colors'),
+      DEFAULT: '#f0f2f5',
+      dark: theme('colors.gray.600', 'currentColor'),
+    }),
+    divideColor: (theme) => ({
+      ...theme('colors'),
+      DEFAULT: '#f0f2f5',
+      dark: theme('colors.gray.600', 'currentColor'),
+    }),
     extend: {
       screens: {
         sm: '640px',

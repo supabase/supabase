@@ -1,30 +1,30 @@
-@tailwind base;
+@import 'tailwindcss/base';
 
 /* Write your own custom base styles here */
 
 /* Start purging... */
-@tailwind components;
+@import 'tailwindcss/components';
 /* Stop purging. */
 
 /* Write you own custom component styles here */
 
 /* Start purging... */
-@tailwind utilities;
+@import 'tailwindcss/utilities';
 /* Stop purging. */
 
 /* Your own custom utilities */
 
 @font-face {
   font-family: 'custom-font';
-  src: url(/new/fonts/custom/CustomFont-Book.woff2) format('woff2'),
-    url(/new/fonts/custom/CustomFont-Book.woff) format('woff');
+  src: url(/fonts/custom/CustomFont-Book.woff2) format('woff2'),
+    url(/fonts/custom/CustomFont-Book.woff) format('woff');
   font-weight: 400;
   font-style: normal;
 }
 @font-face {
   font-family: 'custom-font';
-  src: url(/new/fonts/custom/CustomFont-Medium.woff2) format('woff2'),
-    url(/new/fonts/custom/CustomFont-Medium.woff) format('woff');
+  src: url(/fonts/custom/CustomFont-Medium.woff2) format('woff2'),
+    url(/fonts/custom/CustomFont-Medium.woff) format('woff');
   font-weight: 500;
   font-style: normal;
 }

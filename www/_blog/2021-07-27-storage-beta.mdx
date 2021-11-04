@@ -21,7 +21,7 @@ Clients can use the `Content-Range` HTTP header to request specific parts of a f
 
 <video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
   <source
-    src="/new/videos/blog/launch-week-storage-2/nyan-cat.mp4"
+    src="/videos/blog/launch-week-storage-2/nyan-cat.mp4"
     type="video/mp4"
     muted
     playsInline
@@ -41,7 +41,7 @@ Objects in public buckets can be accessed via a URL without any Authorization to
 Public buckets still require [Auth Policies](https://supabase.io/docs/guides/storage#policy-examples) to upload and delete objects, allowing you to securely manage their contents.
 
 <video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
-  <source src="/new/images/blog/2021-june/public-buckets.mp4" type="video/mp4" muted playsInline />
+  <source src="/images/blog/2021-june/public-buckets.mp4" type="video/mp4" muted playsInline />
 </video>
 
 ## Directory uploads
@@ -50,7 +50,7 @@ You can now upload an entire directory to Supabase Storage and the directory str
 
 <video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
   <source
-    src="/new/videos/blog/launch-week-storage-2/directory-uploads.mp4"
+    src="/videos/blog/launch-week-storage-2/directory-uploads.mp4"
     type="video/mp4"
     muted
     playsInline
@@ -63,11 +63,11 @@ Postgres [Row Level Security](https://www.postgresql.org/docs/13/ddl-rowsecurity
 
 However, getting started with RLS can be daunting. To make it more approachable for beginners, we've included a set of pre-defined templates on our Dashboard, covering common use-cases.
 
-![Policy editor templates](/new/images/blog/launch-week-sql-day-2/policy-editor-1.png)
+![Policy editor templates](/images/blog/launch-week-sql-day-2/policy-editor-1.png)
 
 Once you've selected a template, you choose which operations to allow and the Dashboard determines which API functions can access the bucket. For example, a user with INSERT permissions will be able to call the `createObject`, `copyObject` and `getSignedObject` functions in the `supabase-js` library.
 
-![Policy editor permissions](/new/images/blog/launch-week-sql-day-2/policy-editor-2.png)
+![Policy editor permissions](/images/blog/launch-week-sql-day-2/policy-editor-2.png)
 
 After writing the policy definition (which can be any valid SQL expression), you get an opportunity to review the final policy before saving. We made sure that there is no magic going on behind the scenes: you can always see the underlying SQL definition of the policies. As you become more comfortable with Row Level Security, you can define these policies directly using our SQL editor.
 
@@ -87,13 +87,13 @@ However, `FormData` is only supported in the browser, making `supabase-js` incom
 
 At Supabase, we are [maniacal about performance](https://supabase.io/blog/2020/12/13/supabase-dashboard-performance). Keeping our client libraries lean is a key differentiator. Our entire client library (including the clients for postgrest, storage, realtime and auth) is just 15.8 kb. If you are just interested in using a single service like storage, you can use the `storage-js` library directly which is [even smaller](https://bundlephobia.com/package/@supabase/storage-js@1.4.0). This made including polyfills like Formdata a no-go.
 
-![Supabase JS bundle size](/new/images/blog/launch-week-sql-day-2/supabase-js-size.png)
+![Supabase JS bundle size](/images/blog/launch-week-sql-day-2/supabase-js-size.png)
 
 We also considered shipping separate bundles for Node.js and the browser. This would have avoided polyfills for APIs which are already supported in each browser. However, this comes with an increase in complexity to our build process, and users would need to choose which flavor of the library to use in different environments like React Native, Deno, etc. We want to make our libraries universal.
 
 Instead, we modified the storage server to accept Binary data directly. With this change, you can directly upload binary Data and even NodeJS streams to the storage API.
 
-![NodeJS Stream upload](/new/images/blog/launch-week-sql-day-2/stream-upload.png)
+![NodeJS Stream upload](/images/blog/launch-week-sql-day-2/stream-upload.png)
 
 With this change in place, the client library supports uploading `ArrayBuffer`, `ArrayBufferView`, `Blob`, `Buffer`, `File`, `FormData`, `NodeJS.ReadableStream`, `ReadableStream<Uint8Array>` - without any change to the bundle size! This should enable you to use storage from an even wider range of environments.
 
@@ -102,10 +102,10 @@ With this change in place, the client library supports uploading `ArrayBuffer`, 
 The storage explorer in our Dashboard feels like using a file explorer in your operating system. There were a lot of challenges to make it feel intuitive and robust, since S3 is not a traditional filesystem. For example, S3 doesn't support a move operation natively - you need to copy the object to the new location and delete the original object. S3 also doesn't have a concept of directory, which means there is no API call to rename a directory. But to make the storage explorer feel like a native file explorer, we implemented these features.
 
 Context menus on folders
-![Context menu 1](/new/images/blog/launch-week-sql-day-2/context-menu-1.png)
+![Context menu 1](/images/blog/launch-week-sql-day-2/context-menu-1.png)
 
 Context menus on files
-![Context menu 2](/new/images/blog/launch-week-sql-day-2/context-menu-2.png)
+![Context menu 2](/images/blog/launch-week-sql-day-2/context-menu-2.png)
 
 ### The case of the disappearing folders
 
@@ -121,7 +121,7 @@ Here is a demo testing rendering the heaviest object known to mankind - the `nod
 
 <video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
   <source
-    src="/new/videos/blog/launch-week-storage-2/large-buckets.mp4"
+    src="/videos/blog/launch-week-storage-2/large-buckets.mp4"
     type="video/mp4"
     muted
     playsInline
@@ -133,7 +133,7 @@ Here is a demo testing rendering the heaviest object known to mankind - the `nod
 Supabase Storage now supports `upsert`. Shoutout to [@ankitjena](https://github.com/ankitjena) for
 [this Pull Request](https://github.com/supabase/storage-api/pull/32).
 
-![Storage now supports upserts](/new/images/blog/2021-june/supabase-storage-upsert.png)
+![Storage now supports upserts](/images/blog/2021-june/supabase-storage-upsert.png)
 
 We also have automated API docs generated [here](https://supabase.github.io/storage-api/#/) if you want to use the Storage API directly.
 
