@@ -124,8 +124,8 @@ function FeaturedThumb(blog: PostTypes) {
       <a href={`/blog/${blog.url}`}>
         <a className="inline-block">
           <img
-            className="h-96 w-full object-cover  border dark:border-dark-600"
-            src={`/new/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
+            className="h-96 w-full object-cover border dark:border-dark"
+            src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
           />
           <Space direction="vertical" size={5} className="mt-4">
             <div>

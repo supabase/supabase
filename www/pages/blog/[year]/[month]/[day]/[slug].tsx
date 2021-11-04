@@ -1,4 +1,3 @@
-// file: pages/blog/[slug].js
 import { Badge, Card, Divider, IconFile, Space, Typography } from '@supabase/ui'
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
@@ -13,6 +12,7 @@ import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import Quote from '~/components/Quote'
+import ImageGrid from '~/components/ImageGrid'
 import { generateReadingTime } from '~/lib/helpers'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import blogStyles from './[slug].module.css'
@@ -25,6 +25,7 @@ const components = {
   code: (props: any) => {
     return <CodeBlock {...props} />
   },
+  ImageGrid,
 }
 
 // plugins for next-mdx-remote
@@ -221,7 +222,7 @@ function BlogPostPage(props: any) {
               <div className="col-span-12 lg:col-span-8">
                 {props.blog.thumb && (
                   <img
-                    src={'/new/images/blog/' + props.blog.thumb}
+                    src={'/images/blog/' + props.blog.thumb}
                     className="object-cover -mt-32 mb-8 border dark:border-gray-600"
                     style={{ maxHeight: '520px', width: '100%' }}
                   />

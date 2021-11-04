@@ -7,7 +7,7 @@ description: Using the JSON data type in PostgreSQL.
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-PostgreSQL supports [JSON functions and operators](https://www.postgresql.org/docs/current/functions-json.html) which gives flexiblity when storing data inside a database column.  
+PostgreSQL supports [JSON functions and operators](https://www.postgresql.org/docs/current/functions-json.html) which gives flexibility when storing data inside a database column.  
 
 PostgreSQL supports two types of JSON columns: `JSON` and `JSONB`.  
 
@@ -86,7 +86,7 @@ values={[
 | 1  | The Poky Little Puppy               | Janette Sebring Lowrey | {"ages":[3,6],"price":5.95,"description":"Puppy is slower than other, bigger animals."}                       |
 | 2  | The Tale of Peter Rabbit            | Beatrix Potter         | {"ages":[2,5],"price":4.49,"description":"Rabbit eats some vegetables."}                                      |
 | 3  | Tootle                              | Gertrude Crampton      | {"ages":[2,5],"price":3.99,"description":"Little toy train has big dreams."}                                  |
-| 4  | Green Eggs and Ham                  | Dr. Seuss              | {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusally colored food."} |
+| 4  | Green Eggs and Ham                  | Dr. Seuss              | {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusually colored food."} |
 | 5  | Harry Potter and the Goblet of Fire | J.K. Rowling           | {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}                |
 
 </TabItem>
@@ -114,7 +114,7 @@ values
   (
     'Green Eggs and Ham',
     'Dr. Seuss',
-    '{"description":"Sam has changing food preferences and eats unusally colored food.","price":7.49,"ages":[4,8]}'
+    '{"description":"Sam has changing food preferences and eats unusually colored food.","price":7.49,"ages":[4,8]}'
   ),
   (
     'Harry Potter and the Goblet of Fire',
@@ -147,7 +147,7 @@ values
 - click `+ Insert Row`
     - `title`: `Green Eggs and Ham`
     - `author`: 'Dr. Seuss'
-    - `metadata`: {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusally colored food."}
+    - `metadata`: {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusually colored food."}
     - click `Save`
 - click `+ Insert Row`
     - `title`: `Harry Potter and the Goblet of Fire`
@@ -181,7 +181,7 @@ const { data, error } = await supabase
   { 
     title:'Green Eggs and Ham',
     author:'Dr. Seuss', 
-    metadata: {"description":"Sam has changing food preferences and eats unusally colored food.","price":7.49,"ages":[4,8]}
+    metadata: {"description":"Sam has changing food preferences and eats unusually colored food.","price":7.49,"ages":[4,8]}
   },
   { 
     title:'Harry Potter and the Goblet of Fire',
@@ -228,7 +228,7 @@ console.log(JSON.stringify(data, null, 2));
 | 1  | The Poky Little Puppy               | Janette Sebring Lowrey | {"ages":[3,6],"price":5.95,"description":"Puppy is slower than other, bigger animals."}                       |
 | 2  | The Tale of Peter Rabbit            | Beatrix Potter         | {"ages":[2,5],"price":4.49,"description":"Rabbit eats some vegetables."}                                      |
 | 3  | Tootle                              | Gertrude Crampton      | {"ages":[2,5],"price":3.99,"description":"Little toy train has big dreams."}                                  |
-| 4  | Green Eggs and Ham                  | Dr. Seuss              | {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusally colored food."} |
+| 4  | Green Eggs and Ham                  | Dr. Seuss              | {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusually colored food."} |
 | 5  | Harry Potter and the Goblet of Fire | J.K. Rowling           | {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}                |
 
 NOTICE: The data as it appears here will have the `JSONB` fields in a different order than when we inserted them.
@@ -280,7 +280,7 @@ console.log(JSON.stringify(data, null, 2));
 | The Poky Little Puppy               | Puppy is slower than other, bigger animals.                       | 5.95  | 3       | 6        |
 | The Tale of Peter Rabbit            | Rabbit eats some vegetables.                                      | 4.49  | 2       | 5        |
 | Tootle                              | Little toy train has big dreams.                                  | 3.99  | 2       | 5        |
-| Green Eggs and Ham                  | Sam has changing food preferences and eats unusally colored food. | 7.49  | 4       | 8        |
+| Green Eggs and Ham                  | Sam has changing food preferences and eats unusually colored food. | 7.49  | 4       | 8        |
 | Harry Potter and the Goblet of Fire | Fourth year of school starts, big drama ensues.                   | 24.95 | 10      | 99       |
 
 </TabItem>

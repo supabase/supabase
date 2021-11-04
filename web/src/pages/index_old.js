@@ -1,3 +1,14 @@
+/*
+ *
+ * please note:
+ *
+ * This file was renamed from 'index' so the docs/about page
+ * can be properly served as the homepage
+ *
+ * @MildTomato
+ *
+ */
+
 import React, { useState } from 'react'
 import clsx from 'clsx'
 import Layout from '@theme/Layout'
