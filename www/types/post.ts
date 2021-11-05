@@ -14,6 +14,7 @@ type PostTypes = {
   thumb: string
   image: string
   readingTime: string
+  description: string
   url: string
   tags: []
   logo?: string
