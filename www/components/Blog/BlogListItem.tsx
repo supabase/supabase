@@ -2,6 +2,7 @@ import { Badge, Space, Typography } from '@supabase/ui'
 import authors from 'lib/authors.json'
 import Link from 'next/link'
 import React from 'react'
+import { capitalize } from '~/lib/helpers'
 import PostTypes from '~/types/post'
 
 interface Props {
@@ -11,62 +12,71 @@ interface Props {
 const BlogListItem = ({ blog }: Props) => {
   // @ts-ignore
   const author = blog.author ? authors[blog.author] : authors['supabase']
+
+  console.log('blog', blog)
   return (
-    <div key={blog.slug} className="pt-4 pb-12 border-b border-gray-100 dark:border-gray-600 mb-8">
-      <div className="mx-auto max-w-7xl cursor-pointer">
-        <a href={`/blog/${blog.url}`}>
-          <a className="inline-block">
-            <Space direction="vertical" size={5} className="">
+    <div key={blog.slug}>
+      <a href={`/blog/${blog.url}`}>
+        <div className="inline-block">
+          <div className="flex flex-col space-y-3">
+            <img
+              src={
+                !blog.thumb
+                  ? `https://images.unsplash.com/photo-1569982175971-d92b01cf8694?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1`
+                  : `/images/blog/${blog.thumb}`
+              }
+              style={{ minHeight: '220px', maxHeight: '220px', minWidth: '100%' }}
+              className="w-full object-cover border dark:border-dark rounded-sm shadow-sm"
+            />
+
+            <div>
+              <div className="space-x-3">
+                <Typography.Text type="secondary">{blog.date}</Typography.Text>
+                <Typography.Text type="secondary">•</Typography.Text>
+                <Typography.Text type="secondary">{blog.readingTime}</Typography.Text>
+              </div>
+              <Typography.Title level={4} className="m-0">
+                {blog.title}
+              </Typography.Title>
+            </div>
+
+            {/* {author && (
               <div>
-                <Space className="mb-2">
-                  <Typography.Text type="secondary">{blog.date}</Typography.Text>
-                  <Typography.Text type="secondary">•</Typography.Text>
-                  <Typography.Text type="secondary">{blog.readingTime}</Typography.Text>
-                </Space>
-
-                <Space direction="vertical" size={3}>
-                  <Typography.Title level={3} className="">
-                    {blog.title}
-                  </Typography.Title>
-
-                  <Space className="block">
-                    {blog.tags &&
-                      blog.tags.map((tag: string) => (
-                        <Link href={`/blog/tags/${tag}`} as={`/blog/tags/${tag}`}>
-                          <a>
-                            <Badge key={`${blog.slug}-${tag}-tag`} dot={false}>
-                              {tag}
-                            </Badge>
-                          </a>
-                        </Link>
-                      ))}
+                <Space size={4}>
+                  {author.author_image_url && (
+                    <img src={author.author_image_url} className="rounded-full w-8" />
+                  )}
+                  <Space direction="vertical" size={0}>
+                    <Typography.Text>{author.author}</Typography.Text>
+                    <Typography.Text type="secondary" small>
+                      {author.position}
+                    </Typography.Text>
                   </Space>
                 </Space>
               </div>
+            )} */}
+          </div>
+          <div className="flex space-x-3">
+            {blog.tags &&
+              blog.tags.map((tag: string) => (
+                <Link href={`/blog/tags/${tag}`} as={`/blog/tags/${tag}`}>
+                  <div className="transition-opacity opacity-50 hover:opacity-100">
+                    <Badge color="gray">{capitalize(tag.replace('-', ' '))}</Badge>
+                  </div>
+                </Link>
+              ))}
+          </div>
 
-              {author && (
-                <div>
-                  <Space size={4}>
-                    {author.author_image_url && (
-                      <img src={author.author_image_url} className="rounded-full w-10" />
-                    )}
-                    <Space direction="vertical" size={0}>
-                      <Typography.Text>{author.author}</Typography.Text>
-                      <Typography.Text type="secondary" small>
-                        {author.position}
-                      </Typography.Text>
-                    </Space>
-                  </Space>
-                </div>
-              )}
-              {/* <Typography>
+          <Typography.Text className="m-0" type="secondary">
+            {blog.description}
+          </Typography.Text>
+
+          {/* <Typography>
                 <ReactMarkdown>{blog.content.substring(0, 210) + '...'}</ReactMarkdown>
               </Typography>
               <Typography.Link>Read more</Typography.Link> */}
-            </Space>
-          </a>
-        </a>
-      </div>
+        </div>
+      </a>
     </div>
   )
 }

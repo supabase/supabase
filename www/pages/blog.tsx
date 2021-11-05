@@ -63,19 +63,20 @@ function Blog(props: any) {
       <NextSeo title="Blog" description="Latest news from the Supabase team." />
       <DefaultLayout>
         <BlogHeader title="Blog" />
-        <div className="bg-gray-50 dark:bg-dark-800 overflow-hidden py-12">
+
+        <div className="bg-white dark:bg-dark-800 overflow-hidden py-12">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
-            <div className="mx-auto max-w-7xl">
-              <Typography.Title level={2}>Latests posts</Typography.Title>
-              <div className="mt-5 max-w-lg mx-auto grid gap-16 lg:grid-cols-2 lg:max-w-none">
-                {props.blogs.slice(0, 2).map((blog: any, idx: any) => {
-                  return FeaturedThumb(blog)
-                })}
-              </div>
+            <div className="mx-auto ">
+              <Typography.Title level={3}>Latests post</Typography.Title>
+              {props.blogs.slice(0, 1).map((blog: any, idx: any) => {
+                return FeaturedThumb(blog)
+              })}
             </div>
           </div>
+        </div>
+        <div className="border-t dark:border-dark">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-32">
-            <div className="mx-auto max-w-7xl">
+            <div className="mx-auto ">
               <div className="grid grid-cols-12">
                 <div className="col-span-12 lg:col-span-8">
                   <Typography.Title level={2}>More posts from the team</Typography.Title>
@@ -100,10 +101,15 @@ function Blog(props: any) {
                   </Space>
                 </div>
               </div>
-              <div className="mt-12 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none">
+            </div>
+
+            <div className="">
+              <div className="grid grid-cols-12 mt-16 gap-16">
                 {/* <ul> */}
                 {blogs.map((blog: PostTypes, idx: number) => (
-                  <BlogListItem blog={blog} key={idx} />
+                  <div className="col-span-3 mb-16">
+                    <BlogListItem blog={blog} key={idx} />
+                  </div>
                 ))}
                 {/* </ul> */}
               </div>{' '}
@@ -120,14 +126,14 @@ function FeaturedThumb(blog: PostTypes) {
   const author = blog.author ? authors[blog.author] : authors['supabase']
 
   return (
-    <div key={blog.slug} className="my-6 cursor-pointer">
+    <div key={blog.slug} className="cursor-pointer w-full">
       <a href={`/blog/${blog.url}`}>
-        <a className="inline-block">
+        <a className="grid grid-cols-2 gap-16">
           <img
             className="h-96 w-full object-cover border dark:border-dark"
             src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
           />
-          <Space direction="vertical" size={5} className="mt-4">
+          <Space direction="vertical" size={5} className="">
             <div>
               <Space className="mb-2">
                 <Typography.Text type="secondary">{blog.date}</Typography.Text>
@@ -136,16 +142,19 @@ function FeaturedThumb(blog: PostTypes) {
               </Space>
 
               <Space direction="vertical" size={3}>
-                <Typography.Title level={3} className="">
+                <Typography.Title level={2} className="m-0">
                   {blog.title}
                 </Typography.Title>
+                <Typography.Text className="m-0" type="secondary">
+                  <span className="text-xl">{blog.description}</span>
+                </Typography.Text>
 
                 <Space className="block">
                   {blog.tags &&
                     blog.tags.map((tag: string) => (
                       <a href={`/blog/tags/${tag}`}>
                         <a>
-                          <Badge key={`${blog.slug}-${tag}-tag`} dot={false}>
+                          <Badge color="gray" key={`${blog.slug}-${tag}-tag`} dot={false}>
                             {tag}
                           </Badge>
                         </a>

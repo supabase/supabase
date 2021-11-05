@@ -169,6 +169,7 @@ function BlogPostPage(props: any) {
         >
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-2">
+              {/* Back button */}
               <Typography.Text type="secondary">
                 <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center">
                   <IconChevronLeft />
