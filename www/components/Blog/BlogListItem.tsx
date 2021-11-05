@@ -3,6 +3,8 @@ import authors from 'lib/authors.json'
 import Link from 'next/link'
 import React from 'react'
 import { capitalize } from '~/lib/helpers'
+
+import Image from 'next/image'
 import PostTypes from '~/types/post'
 
 interface Props {
@@ -19,15 +21,19 @@ const BlogListItem = ({ blog }: Props) => {
       <a href={`/blog/${blog.url}`}>
         <div className="inline-block">
           <div className="flex flex-col space-y-3">
-            <img
-              src={
-                !blog.thumb
-                  ? `https://images.unsplash.com/photo-1569982175971-d92b01cf8694?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1`
-                  : `/images/blog/${blog.thumb}`
-              }
-              style={{ minHeight: '220px', maxHeight: '220px', minWidth: '100%' }}
-              className="w-full object-cover border dark:border-dark rounded-sm shadow-sm"
-            />
+            <div
+              className={`relative overflow-auto w-full h-40 border dark:border-dark rounded-sm shadow-sm`}
+            >
+              <Image
+                layout="fill"
+                src={
+                  !blog.thumb
+                    ? `https://images.unsplash.com/photo-1569982175971-d92b01cf8694?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1`
+                    : `/images/blog/${blog.thumb}`
+                }
+                objectFit="cover"
+              />
+            </div>
 
             <div>
               <div className="space-x-3">
