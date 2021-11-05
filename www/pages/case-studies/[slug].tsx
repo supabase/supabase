@@ -8,6 +8,9 @@ import {
   Button,
   IconChevronRight,
   IconChevronLeft,
+  IconGlobe,
+  IconLink,
+  IconExternalLink,
 } from '@supabase/ui'
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
@@ -214,6 +217,10 @@ function BlogPostPage(props: any) {
                   <div className="flex flex-col space-y-2">
                     <Typography.Text type="secondary">About</Typography.Text>
                     <Typography.Text>{props.blog.about}</Typography.Text>
+                    <Typography.Text className="flex items-center space-x-1 transition-opacity cursor-pointer opacity-50 hover:opacity-100">
+                      <span>{props.blog.company_url}</span>
+                      <IconExternalLink size={14} />
+                    </Typography.Text>
                   </div>
                   {props.blog.misc.map((x: any) => {
                     return (
@@ -244,36 +251,6 @@ function BlogPostPage(props: any) {
                     <Button type="default" iconRight={<IconChevronRight />}>
                       Contact sales
                     </Button>
-                  </div>
-
-                  <div>
-                    <Typography.Title className="mb-4" level={5}>
-                      Related case stuides
-                    </Typography.Title>
-
-                    {props.relatedPosts.map((post: any) => (
-                      <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
-                        <div>
-                          <Typography.Text className="cursor-pointer">
-                            <Space>
-                              <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
-                              <span className="hover:text-gray-900 dark:hover:text-white">
-                                {post.title}
-                              </span>
-                            </Space>
-                          </Typography.Text>
-                          <Divider light className="mt-2" />
-                        </div>
-                      </Link>
-                    ))}
-
-                    <Link href={`/case-studies`} as={`/case-studies`}>
-                      <Typography.Text type="secondary">
-                        <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
-                          View all case studies
-                        </span>
-                      </Typography.Text>
-                    </Link>
                   </div>
                 </div>
               </div>
