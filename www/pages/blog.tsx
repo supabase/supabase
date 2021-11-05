@@ -75,7 +75,7 @@ function Blog(props: any) {
           </div>
         </div>
         <div className="border-t dark:border-dark">
-          <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-32">
+          <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
             <div className="mx-auto ">
               <div className="grid grid-cols-12">
                 <div className="col-span-12 lg:col-span-8">
