@@ -45,18 +45,6 @@ module.exports = withMDX({
       },
       // misc rewrites
       {
-        source: '/humans.txt',
-        destination: `/docs/humans.txt`,
-      },
-      {
-        source: '/lawyers.txt',
-        destination: `/docs/lawyers.txt`,
-      },
-      {
-        source: '/.well-known/security.txt.txt',
-        destination: `/docs/.well-known/security.txt.txt`,
-      },
-      {
         source: '/feed.xml',
         destination: `/rss.xml`,
       },
@@ -580,6 +568,26 @@ module.exports = withMDX({
         permanent: false,
         source: '/docs/guides/self-hosting',
         destination: '/docs/guides/hosting/overview',
+      },
+      {
+        permanent: false,
+        source: '/humans.txt',
+        destination: `/docs/humans.txt`,
+      },
+      {
+        permanent: false,
+        source: '/lawyers.txt',
+        destination: `/docs/lawyers.txt`,
+      },
+      {
+        permanent: false,
+        source: '/.well-known/security.txt.txt',
+        destination: `/docs/.well-known/security.txt.txt`,
+      },
+      {
+        permanent: false,
+        source: '/oss',
+        destination: `/docs/oss`,
       },
     ]
   },
