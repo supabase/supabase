@@ -16,7 +16,7 @@ export default function Profile() {
         <div style={{ maxWidth: '620px', margin: '96px auto' }}>
           <Card>
             <Space direction="vertical" size={6}>
-              <Typography.Text>Youre signed in</Typography.Text>
+              <Typography.Text>you're signed in</Typography.Text>
               <Typography.Text strong>Email: {user.email}</Typography.Text>
               <Typography.Text type="success">User data:</Typography.Text>
 
