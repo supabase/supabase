@@ -14,7 +14,7 @@ Note: you have to enable `DISABLE EMAIL CONFIRMATIONS` under your Supabase proje
 
 #### Database schema
 
-Go to [app.supabase.io](https://app.supabase.io/), create a new organisation and project if you haven't had one.  
+Go to [app.supabase.io](https://app.supabase.io/), create a new organization and project if you haven't had one.  
 Run this sql query to create required tables.
 
 ```sql
