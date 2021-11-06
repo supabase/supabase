@@ -57,6 +57,10 @@ module.exports = withMDX({
         destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
       },
       {
+        source: '/oss',
+        destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/oss`,
+      },
+      {
         source: '/feed.xml',
         destination: `/rss.xml`,
       },
