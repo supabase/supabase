@@ -46,15 +46,19 @@ module.exports = withMDX({
       // misc rewrites
       {
         source: '/humans.txt',
-        destination: `/docs/humans.txt`,
+        destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/humans.txt`,
       },
       {
         source: '/lawyers.txt',
-        destination: `/docs/lawyers.txt`,
+        destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/lawyers.txt`,
       },
       {
-        source: '/.well-known/security.txt.txt',
-        destination: `/docs/.well-known/security.txt.txt`,
+        source: '/.well-known/security.txt',
+        destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
+      },
+      {
+        source: '/oss',
+        destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/oss`,
       },
       {
         source: '/feed.xml',
