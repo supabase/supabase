@@ -53,8 +53,8 @@ module.exports = withMDX({
         destination: `/docs/lawyers.txt`,
       },
       {
-        source: '/.well-known/security.txt.txt',
-        destination: `/docs/.well-known/security.txt.txt`,
+        source: '/.well-known/security.txt',
+        destination: `/docs/.well-known/security.txt`,
       },
       {
         source: '/feed.xml',
