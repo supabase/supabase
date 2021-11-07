@@ -66,7 +66,7 @@ function AuthPage() {
           h1={[
             <span key={'authentication-h1'}>
               Open Source Auth
-              <br /> (without the integrations)
+              <br /> (with tons of integrations)
             </span>,
           ]}
           subheader={[

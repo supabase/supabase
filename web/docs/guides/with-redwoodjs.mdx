@@ -182,7 +182,7 @@ create policy "Anyone can upload an avatar."
 #### Important Note about Prisma and Migrations
 
 :::note
-Because this Quick Start does not use Prisma to manage the database schema, seed it, or run mgrations, you **need** to take extra care when running some of the typical Redwood CLI commands.
+Because this Quick Start does not use Prisma to manage the database schema, seed it, or run migrations, you **need** to take extra care when running some of the typical Redwood CLI commands.
 :::
 
 ### Get the API Keys
@@ -231,7 +231,7 @@ yarn create redwood-app supabase-redwoodjs
 cd supabase-redwoodjs
 ```
 
-While the app is insatlling, you should see:
+While the app is installing, you should see:
 
 ```bash
 ✔ Creating Redwood app
@@ -245,7 +245,7 @@ While the app is insatlling, you should see:
 Thanks for trying out Redwood!
 ```
 
-Then let's install the only additional dependency [supabase-js](https://github.com/supabase/supabase-js) by runnnig the `setup auth` command:
+Then let's install the only additional dependency [supabase-js](https://github.com/supabase/supabase-js) by running the `setup auth` command:
 
 ```bash
 yarn redwood setup auth supabase
@@ -339,7 +339,7 @@ yarn rw dev
 Note: You can also use the alias `rw` for `redwood`, as in `yarn rw` to run Redwood CLI commands
 :::
 
-You should see a "Welcome to RedwoodJS" page and a message abiout not having any pages yet.
+You should see a "Welcome to RedwoodJS" page and a message about not having any pages yet.
 
 So, let's create a "home" page:
 
@@ -591,14 +591,14 @@ export default Account
 ```
 
 :::note
-Note: You'll see the use of `useAuth()` several times in the quickstart. Redwood's `useAuth` hook provides conventient ways to access
+Note: You'll see the use of `useAuth()` several times in the quickstart. Redwood's `useAuth` hook provides convenient ways to access
 logIn, logOut, currentUser and access the the `supabase` authenticate client. We'll use it to get an instance
 of the supabase client to interact with your API.
 :::
 
 ### Update Home Page
 
-Now that we have all the components in place, let's update your`HomePage` page to use them:
+Now that we have all the components in place, let's update your `HomePage` page to use them:
 
 ```jsx title="web/src/pages/HomePage/HomePage.js"
 import { useAuth } from '@redwoodjs/auth'

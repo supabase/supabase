@@ -40,7 +40,7 @@ You can authenticate your users in several ways:
 <div class="container" style={{ padding: 0 }}>
   <div class="row is-multiline">
     {providers.map((x) => (
-      <div key={x.name} class="col col--4">
+      <div key={x.name} class="col col--6">
         <Link class="card" to={x.href}>
           <div class="card__body">
             <div class="" style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
@@ -62,7 +62,7 @@ You can authenticate your users in several ways:
                 <span>{x.platform.toString()}</span>
               </div>
               <div class="code-block" style={{ width: '100%',  display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem' }}>
-                <span>Hosted:</span>
+                <span>Self-Hosted:</span>
                 <span>{x.selfHosted.toString()}</span>
               </div>
             </div>
