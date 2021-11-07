@@ -15,7 +15,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Auth (Server Only)',
-      items: ['reference/javascript/api-deleteuser', 'reference/javascript/api-generatelink', 'reference/javascript/api-inviteuserbyemail', 'reference/javascript/api-sendmobileotp', 'reference/javascript/api-resetpasswordforemail'],
+      items: ['reference/javascript/auth-api-deleteuser', 'reference/javascript/auth-api-generatelink', 'reference/javascript/auth-api-inviteuserbyemail', 'reference/javascript/auth-api-sendmobileotp', 'reference/javascript/auth-api-resetpasswordforemail'],
       collapsed: true,
     },
     {

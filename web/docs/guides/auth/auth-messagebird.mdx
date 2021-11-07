@@ -1,7 +1,7 @@
 ---
 id: auth-messagebird
-title: Phone Auth with Messagebird
-description: How to set up and use Mobile OTP with Messagebird and Supabase.
+title: Phone Auth with MessageBird
+description: How to set up and use Mobile OTP with MessageBird and Supabase.
 ---
 
 import ExtensionsComponent from '../../../../web/src/components/Extensions'
@@ -19,21 +19,21 @@ There are two reasons to use Supabase SMS OTP tokens:
 
 We'll cover:
 
-- [Finding your Messagebird credentials](#finding-your-messagebird-credentials)
+- [Finding your MessageBird credentials](#finding-your-messagebird-credentials)
 - [Using OTP with password based logins](#using-otp-with-password-based-logins)
 - [Using OTP as a passwordless sign-in mechanism](#using-otp-as-a-passwordless-sign-in-mechanism)
 
 What you'll need:
 
-- A Messagebird account (sign up here: https://dashboard.messagebird.com/en/sign-up)
+- A MessageBird account (sign up here: https://dashboard.messagebird.com/en/sign-up)
 - A Supabase project (create one here: https://app.supabase.io)
 - A mobile phone capable of receiving SMS
 
 ## Steps
 
-### Finding your Messagebird credentials
+### Finding your MessageBird credentials
 
-Start by logging into your Messagebird account and verify the mobile number you'll be using to test with: https://dashboard.messagebird.com/en/getting-started/sms
+Start by logging into your MessageBird account and verify the mobile number you'll be using to test with: https://dashboard.messagebird.com/en/getting-started/sms
 
 This is the number that will be receiving the SMS OTPs.
 
@@ -49,7 +49,7 @@ For more information, you can refer to the messagebird article on choosing an or
 You will need the following values to get started:
 
 - Live API Key / Test API Key
-- Messagebird originator
+- MessageBird originator
 
 Now go to the Auth > Settings page in the Supabase dashboard (https://app.supabase.io/project/YOUR-PROJECT-REF/auth/settings).
 
@@ -63,7 +63,7 @@ Note: If you use the Test API Key, the OTP will not be delivered to the mobile n
 If the Live API Key is used instead, the OTP will be delivered and there will be a deduction in your free credits. 
 
 <!-- TODO: Add screenshot of UI -->
-Plug in Messagebird credentials
+Plug in MessageBird credentials
 
 Now the backend should be setup, we can proceed to adding our client-side code!
 
@@ -278,6 +278,6 @@ The user does not have a password therefore will need to sign in via this method
 
 ## Resources
 
-- [Messagebird Signup](https://dashboard.messagebird.com/en/sign-up)
+- [MessageBird Signup](https://dashboard.messagebird.com/en/sign-up)
 - [Supabase Dashboard](https://app.supabase.io)
 - [Supabase Row Level Security](https://supabase.io/docs/guides/auth#row-level-security)
