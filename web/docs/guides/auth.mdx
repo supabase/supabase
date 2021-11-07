@@ -39,7 +39,7 @@ We currently support the following OAuth providers:
 <div class="container" style={{}}>
   <div class="row is-multiline">
     {providers.map((x) => (
-      <div key={x.name} class="col col--3">
+      <div key={x.name} class="col col--4">
         <Link class="card" to={x.href}>
           <div class="card__body" style={{ display: 'flex', gap: 20 }}>
             {x.logo && <img src={x.logo} alt={x.name} width="20" />}
