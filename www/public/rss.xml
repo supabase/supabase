@@ -5,7 +5,7 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 18 Oct 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Wed, 27 Oct 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
 <item>
@@ -13,7 +13,7 @@
   <title>Supabase $30m Series A</title>
   <link>https://supabase.io/blog/2021/10/28/supabase-series-a</link>
   <description>Supabase just raised $30M, bringing our total funding to $36M.</description>
-  <pubDate>Mon, 29 Oct 2021 16:00:00 GMT</pubDate>
+  <pubDate>Wed, 27 Oct 2021 16:00:00 GMT</pubDate>
 </item>
 
 <item>
@@ -188,7 +188,7 @@
   <guid>https://supabase.io/blog/2021/06/02/supabase-beta-may-2021</guid>
   <title>Supabase Beta May 2021</title>
   <link>https://supabase.io/blog/2021/06/02/supabase-beta-may-2021</link>
-  <description>Apple & Twitter Logins, Supabase Grid, Go & Swift Libraries.</description>
+  <description>Apple &amp; Twitter Logins, Supabase Grid, Go &amp; Swift Libraries.</description>
   <pubDate>Tue, 01 Jun 2021 16:00:00 GMT</pubDate>
 </item>
 
