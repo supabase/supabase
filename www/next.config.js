@@ -585,6 +585,11 @@ module.exports = withMDX({
         source: '/docs/guides/self-hosting',
         destination: '/docs/guides/hosting/overview',
       },
+      {
+        permanent: true,
+        source: '/docs/reference/javascript/delete-user',
+        destination: '/docs/reference/javascript/auth-api-deleteuser',
+      },
     ]
   },
 })
