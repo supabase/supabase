@@ -43,6 +43,27 @@ module.exports = withMDX({
         source: '/docs/:path*',
         destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*`,
       },
+      // misc rewrites
+      {
+        source: '/humans.txt',
+        destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/humans.txt`,
+      },
+      {
+        source: '/lawyers.txt',
+        destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/lawyers.txt`,
+      },
+      {
+        source: '/.well-known/security.txt',
+        destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
+      },
+      {
+        source: '/oss',
+        destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/oss`,
+      },
+      {
+        source: '/feed.xml',
+        destination: `/rss.xml`,
+      },
     ]
   },
   async redirects() {
@@ -563,6 +584,11 @@ module.exports = withMDX({
         permanent: false,
         source: '/docs/guides/self-hosting',
         destination: '/docs/guides/hosting/overview',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/javascript/delete-user',
+        destination: '/docs/reference/javascript/auth-api-deleteuser',
       },
     ]
   },

@@ -19,7 +19,7 @@ This example provides the steps to build a simple user management app (from scra
 
 By the end of this guide you'll have an app which allows users to login and update some basic profile details:
 
-<img src="/img/supabase-flutter-demo.png" alt="Supabase User Management example" />
+![Supabase User Management example](/img/supabase-flutter-demo.png)
 
 ### Github
 
@@ -57,7 +57,7 @@ values={[
 ```
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
+  <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
@@ -131,7 +131,7 @@ values={[
 ```
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
@@ -299,7 +299,10 @@ class AuthRequiredState<T extends StatefulWidget>
   @override
   void onUnauthenticated() {
     /// Users will be sent back to the LoginPage if they sign out.
-    Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+    if (mounted) {
+      /// Users will be sent back to the LoginPage if they sign out.
+      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+    }
   }
 }
 ```
@@ -527,7 +530,6 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
     if (error != null) {
       context.showErrorSnackBar(message: error.message);
     }
-    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   @override
@@ -536,11 +538,6 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
     if (user != null) {
       _getProfile(user.id);
     }
-  }
-
-  @override
-  void onUnauthenticated() {
-    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   @override
@@ -640,7 +637,7 @@ flutter run -d web-server --web-hostname localhost --web-port 3000
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-<img src="/img/supabase-flutter-account-page.png" alt="Supabase User Management example" />
+![Supabase User Management example](/img/supabase-flutter-account-page.png)
 
 ## Bonus: Profile photos
 

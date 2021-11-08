@@ -10,7 +10,6 @@ import { APP_NAME, DESCRIPTION } from 'lib/constants'
 import { AlphaNumbers, IntroductionSegments, PerformanceComparisonData } from 'data/BetaPage'
 import { render } from 'react-dom'
 import Link from 'next/link'
-import { addBasePath } from 'next/dist/next-server/lib/router/router'
 
 import { NextSeo } from 'next-seo'
 import authors from 'lib/authors.json'
