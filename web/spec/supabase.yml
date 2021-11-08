@@ -177,14 +177,30 @@ pages:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          const options = { schema: 'other_schema' }
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
+          // Provide a custom schema. Defaults to "public".
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', { 
+            schema: 'other_schema' 
+          })
           ```
 
           By default the API server points to the `public` schema. You can enable others database schemas within the Dashboard. 
           Go to `Settings > API > Schema` and add the schema which you want to expose to on the API.
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
+      - name: Custom `fetch` implementation
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', { 
+            fetch: fetch 
+          })
+          ```
+
+          `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests, 
+          but an alternative `fetch` implementation can be provided as an option. 
+          This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
+
   Generating Types:
     description: |
       Supabase will soon release native type generators that dump your database types for various languages. For now, we support TypeScript through a third-party tool.
