@@ -15,7 +15,7 @@ date: '2021-07-02'
 PostgreSQL manages permissions through roles. To create these roles, a database user needs the `CREATEROLE` privilege,
 which not only allows role creation but also _modification_ of any role (except superusers).
 
-At Supabase, we use dedicated roles for each of our customers' backend services. For instance, our [Storage API](https://supabase.io/storage) 
+At Supabase, we use dedicated roles for each of our customers' backend services. For instance, our [Storage API](/storage) 
 uses the `supabase_storage_admin` role for connecting to the database. Giving the `CREATEROLE` privilege to our customers would allow them to
 drop this role and take their own Storage API down.
 
@@ -403,7 +403,7 @@ As you can see, PostgreSQL Hooks allow us to intercept SQL statements. There are
 
 The full SupaUtils code is in our [GitHub repository](https://github.com/supabase/supautils/).
 
-By the way, if you like working on PostgreSQL tooling and extensions: we are hiring [PostgreSQL experts](https://supabase.io/docs/careers/postgres-experts)!
+By the way, if you like working on PostgreSQL tooling and extensions: we are hiring [PostgreSQL experts](/docs/careers/postgres-experts)!
 
 [^1]: You can see the `ProcessUtility_hook` declaration [here](https://github.com/postgres/postgres/blob/11e9caff82bc7326e2bc9782937cb03875050cc4/src/backend/tcop/utility.c#L75-L76) and its usage [here](https://github.com/postgres/postgres/blob/11e9caff82bc7326e2bc9782937cb03875050cc4/src/backend/tcop/utility.c#L515-L527).
 [^2]: This is also done on [pg_stat_statements](https://github.com/postgres/postgres/blob/6991e774e0304f5ef488cf1ae4fa79578b6ae3d5/contrib/pg_stat_statements/pg_stat_statements.c#L1130-L1137) and [sepgsql](https://github.com/postgres/postgres/blob/6991e774e0304f5ef488cf1ae4fa79578b6ae3d5/contrib/sepgsql/hooks.c#L381-L388).

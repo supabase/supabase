@@ -6,7 +6,7 @@ export default [
     detail_text: 'Create a policy that allows public access to a table',
     badges_label: '',
     badges: [],
-    url: 'https://supabase.io/docs/guides/auth#allow-read-access',
+    url: '/docs/guides/auth#allow-read-access',
     code: `
 -- 1. Create table
 create table profiles (
@@ -31,7 +31,7 @@ using ( true );
       'Create a policy that only allows a user to update rows that match their unique ID',
     badges_label: '',
     badges: [],
-    url: 'https://supabase.io/docs/guides/auth#restrict-updates',
+    url: '/docs/guides/auth#restrict-updates',
     code: `
 -- 1. Create table
 create table profiles (
@@ -56,7 +56,7 @@ using ( auth.uid() = id );
       'Create a policy that allows for team members to update only rows which match their team ID.',
     badges_label: '',
     badges: [],
-    url: 'https://supabase.io/docs/guides/auth#policies-with-joins',
+    url: '/docs/guides/auth#policies-with-joins',
     code: `
 create table teams (
   id serial primary key,

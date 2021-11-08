@@ -93,7 +93,7 @@ function AuthPage() {
               />
             </div>,
           ]}
-          documentation_url={'https://supabase.io/docs/guides/auth'}
+          documentation_url={'/docs/guides/auth'}
         />
 
         <SectionContainer>
@@ -197,7 +197,7 @@ function AuthPage() {
                 </div>
               </div>,
             ]}
-            documentation_link={'https://supabase.io/docs/guides/auth'}
+            documentation_link={'/docs/guides/auth'}
           />
         </SectionContainer>
 
@@ -229,7 +229,7 @@ function AuthPage() {
                 </p>
                 <p>Policies can be written in SQL or using the dashboard online.</p>
               </Typography.Text>
-              <Link href="https://supabase.io/docs/guides/auth#policy-examples">
+              <Link href="/docs/guides/auth#policy-examples">
                 <a>
                   <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
                     Explore documentation

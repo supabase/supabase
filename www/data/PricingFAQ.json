@@ -49,7 +49,7 @@
   },
   {
     "question": "Are you going to change your pricing in the future?",
-    "answer": "Our pricing is in Beta. You can read more about our decisions in our blog on pricing [here](https://supabase.io/blog/2021/03/29/pricing). Pricing may change in the future, however as a team of developers we are committed to pricing being as developer friendly as possible."
+    "answer": "Our pricing is in Beta. You can read more about our decisions in our blog on pricing [here](/blog/2021/03/29/pricing). Pricing may change in the future, however as a team of developers we are committed to pricing being as developer friendly as possible."
   },
   {
     "question": "I read that you are giving credits to users who sign up during beta, do I get those?",
@@ -101,7 +101,7 @@
   },
   {
     "question": "Where can I find Privacy and Terms of Use information for Supabase?",
-    "answer": "You can check out our privacy policy here [here](https://supabase.io/docs/company/privacy) and terms of service [here](https://supabase.io/docs/company/terms)."
+    "answer": "You can check out our privacy policy here [here](/docs/company/privacy) and terms of service [here](/docs/company/terms)."
   },
   {
     "question": "What is the largest sized file I can deploy to storage?",

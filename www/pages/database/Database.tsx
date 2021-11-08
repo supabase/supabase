@@ -294,7 +294,7 @@ function Database() {
                 </div>
               </div>,
             ]}
-            documentation_link={'https://supabase.io/docs/guides/database'}
+            documentation_link={'/docs/guides/database'}
           />
         </SectionContainer>
 
@@ -329,8 +329,8 @@ function Database() {
                 text="We only show a few of the extensions supported by supabase here, but we preinstall many more that you can use right away."
               />
               <Link
-                href="https://supabase.io/docs/guides/database"
-                as="https://supabase.io/docs/guides/database"
+                href="/docs/guides/database"
+                as="/docs/guides/database"
               >
                 <a>
                   <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
