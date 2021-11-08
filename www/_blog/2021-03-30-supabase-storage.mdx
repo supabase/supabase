@@ -56,7 +56,7 @@ We focused on performance, security and interoperability with the rest of the Su
 
 ### **Integration with the Supabase ecosystem**
 
-Supabase is a [collection of open source tools](https://supabase.io/docs#how-it-works) which integrate very well with each other. We evaluated open source object storage servers like [Ceph](https://ceph.io/), [Swift](https://www.openstack.org/software/releases/ocata/components/swift), [Minio](https://min.io/) and [Zenko](https://github.com/scality/Zenko) but none of these tools were a good fit for our existing ecosystem.
+Supabase is a [collection of open source tools](/docs#how-it-works) which integrate very well with each other. We evaluated open source object storage servers like [Ceph](https://ceph.io/), [Swift](https://www.openstack.org/software/releases/ocata/components/swift), [Minio](https://min.io/) and [Zenko](https://github.com/scality/Zenko) but none of these tools were a good fit for our existing ecosystem.
 
 **Postgres Compatibility**
 
@@ -70,7 +70,7 @@ We are using managed services like [S3](https://aws.amazon.com/s3/), [Wasabi](ht
 
 **Integration with Supabase Auth**
 
-Existing tools do not play well with our authentication system. For example, Minio is bundled with its own [auth system](https://docs.min.io/docs/minio-admin-complete-guide.html#user) and there is no easy way to map Minio users to [Supabase users](https://supabase.io/docs/guides/auth).
+Existing tools do not play well with our authentication system. For example, Minio is bundled with its own [auth system](https://docs.min.io/docs/minio-admin-complete-guide.html#user) and there is no easy way to map Minio users to [Supabase users](/docs/guides/auth).
 
 In the end, we opted to build our own [Storage API server](https://github.com/supabase/storage-api).
 
@@ -113,7 +113,7 @@ on storage.objects for select using (
 
 We have created helper functions like `foldername()`, `filename()` and `extension()` in the storage schema to make Policies even simpler.
 
-This system integrates with our [User Management system](https://supabase.io/docs/guides/auth). Here is an example policy which gives access to a particular file to a Supabase user:
+This system integrates with our [User Management system](/docs/guides/auth). Here is an example policy which gives access to a particular file to a Supabase user:
 
 ```sql
 create policy crud_uid_file
@@ -146,7 +146,7 @@ We have intentionally kept the API surface for the storage backend very small, i
 
 ### Client libraries
 
-You may be itching to get started tinkering around with our new Supabase storage - we have an example app prepared for you right [here](https://github.com/supabase/supabase-js/tree/master/example/next-storage) which simulates a simple context of setting an avatar image for a user. This will help you to get a high level overview of how to use your project's storage with our client library. For greater detail, refer to our storage API documentation [here](https://supabase.io/docs/reference/javascript/storage-createbucket).
+You may be itching to get started tinkering around with our new Supabase storage - we have an example app prepared for you right [here](https://github.com/supabase/supabase-js/tree/master/example/next-storage) which simulates a simple context of setting an avatar image for a user. This will help you to get a high level overview of how to use your project's storage with our client library. For greater detail, refer to our storage API documentation [here](/docs/reference/javascript/storage-createbucket).
 
 ![Example app 1](/images/blog/storage/ph-7.png)
 
@@ -158,6 +158,6 @@ You may be itching to get started tinkering around with our new Supabase storage
 - We will integrate our storage service with a Content Delivery Network. With a CDN, objects are cached on a global network. This leads to faster access times for your users around the world.
 - We are working on transformations like resizing of images and automatic optimization of different media types. This makes it easy to embed Supabase objects directly in your websites and mobile applications without additional processing.
 - A better editor to make authoring policies easier and less error prone.
-- Reach out to us if you would like to help out with adding storage support in one of the [community maintained client libraries](https://supabase.io/docs/reference/javascript/supabase-client).
+- Reach out to us if you would like to help out with adding storage support in one of the [community maintained client libraries](/docs/reference/javascript/supabase-client).
 
 Take it for a spin on our [dashboard](http://app.supabase.io/) and let us know what you think!

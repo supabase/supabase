@@ -44,8 +44,8 @@ function GithubExamples() {
           </Typography.Text>
           <div className="flex space-y-1.5 flex-col lg:space-y-0 lg:space-x-1.5 lg:flex-row justify-center">
             <Link
-              href="https://supabase.io/docs/guides/examples#guides"
-              as="https://supabase.io/docs/guides/examples#guides"
+              href="/docs/guides/examples#guides"
+              as="/docs/guides/examples#guides"
             >
               <a>
                 <Button type="default" icon={<IconBookOpen />}>
@@ -54,8 +54,8 @@ function GithubExamples() {
               </a>
             </Link>
             <Link
-              href="https://supabase.io/docs/guides/examples"
-              as="https://supabase.io/docs/guides/examples"
+              href="/docs/guides/examples"
+              as="/docs/guides/examples"
             >
               <a>
                 <Button type="default">View all examples</Button>

@@ -127,7 +127,7 @@ module.exports = {
             },
             {
               label: 'Docs',
-              to: '/docs',
+              to: '/',
             },
             {
               label: 'Pricing',
@@ -135,7 +135,7 @@ module.exports = {
             },
             {
               label: 'Support',
-              to: '/docs/support',
+              to: '/support',
             },
             {
               label: 'System Status',
