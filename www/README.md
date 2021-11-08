@@ -2,35 +2,25 @@
 
 ## Overview
 
-This is a single repository for two different websites. Our documents were created with docusaurus and are stored in the web folder. Our beta website can be found in the www folder. This is a standard Next.js website.
-
-Install the [Vercel CLI](https://vercel.com/cli).
-
-You will need to run the marketing website and docs website seperately.
+Our documents were created with docusaurus and are stored in the web folder. Our website can be found in the www folder. This is a standard Next.js website.
 
 ```
-# tab 1
-make dev
 
-# tab 2
+# website
 cd www
 npm install
 npm run dev
 
-# tab 3
+# docs
 cd web/spec
 make
 npm install
 npm run gen:supabase
+cd ../
 npm run start
 ```
 
-In production, this setup is deployed as two different vercel websites (`docs` and `www`)
-
 ## Known issues
 
+- Referencing resources inside html/jsx inside a markdown file inside `/web` requires you to prepend `/docs/` to any urls. Anything that is not in html/jsx in markdown can just be treated as normal.
 - Referencing resources in nested folders may not work for `web` (eg `/web/static/folder/nestedfolder/asset`) may not work.
-- Possibly need to prepend all images/assets in docs site with baseUrl.
-
-<!-- // we need to check this -->
-<!-- - Don't use `Link` since that adds `/new` to the links. Use plain `a` tags when possible. -->
