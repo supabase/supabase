@@ -52,7 +52,7 @@ async function handleSignup(credentials: Credentials) {
 }
 
 /**
- * Handles signup via Third Pary Login.
+ * Handles signup via Third Party Login.
  * https://supabase.io/docs/guides/auth#third-party-logins
  */
 async function handleOAuthLogin(provider: Provider) {
@@ -92,7 +92,7 @@ async function handleUpdateUser(credentials: Credentials) {
 }
 
 /**
- * Handles logging a user out of a superbase session
+ * Handles logging a user out of a supabase session
  */
 async function handleLogout() {
   console.log('logging out')
