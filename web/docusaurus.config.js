@@ -102,7 +102,7 @@ module.exports = {
           items: [
             {
               label: 'Blog',
-              to: 'https://supabase.io/blog',
+              to: '/blog',
             },
             {
               label: 'Open source',
@@ -110,11 +110,11 @@ module.exports = {
             },
             {
               label: 'Humans.txt',
-              to: 'https://supabase.io/humans.txt',
+              to: '/humans.txt',
             },
             {
               label: 'Lawyers.txt',
-              to: 'https://supabase.io/lawyers.txt',
+              to: '/lawyers.txt',
             },
           ],
         },
@@ -123,7 +123,7 @@ module.exports = {
           items: [
             {
               label: 'Brand Assets',
-              to: 'https://supabase.io/brand-assets',
+              to: '/brand-assets',
             },
             {
               label: 'Docs',
@@ -131,7 +131,7 @@ module.exports = {
             },
             {
               label: 'Pricing',
-              to: 'https://supabase.io/pricing',
+              to: '/pricing',
             },
             {
               label: 'Support',
@@ -160,7 +160,7 @@ module.exports = {
             },
             {
               label: 'RSS',
-              href: 'https://supabase.io/rss.xml',
+              href: '/rss.xml',
             },
             {
               label: 'Discord',

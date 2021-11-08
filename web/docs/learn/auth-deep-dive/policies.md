@@ -21,7 +21,7 @@ We'll start with how user sessions work in Supabase, and later move onto writing
 Let's say we're signing a user up to our service for the first time. The typical way to do this is by invoking the following method in supabase-js:
 
 ```jsx
-// see full api reference here: https://supabase.io/docs/reference/javascript/auth-signup
+// see full api reference here: /docs/reference/javascript/auth-signup
 supabase.auth.signUp({ email, password })
 ```
 
@@ -80,7 +80,7 @@ For the curious, try heading to the SQL editor and querying:
 select * from auth.users;
 ```
 
-If supabase-js is loaded on your site (in this case http://localhost:3000) then it will automatically pluck the access_token out of the URL and initiate a session. You can check the [session()](https://supabase.io/docs/reference/javascript/auth-session) method to see if there is a valid session:
+If supabase-js is loaded on your site (in this case http://localhost:3000) then it will automatically pluck the access_token out of the URL and initiate a session. You can check the [session()](/docs/reference/javascript/auth-session) method to see if there is a valid session:
 
 ```jsx
 console.log(supabase.auth.session())
