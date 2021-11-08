@@ -21,8 +21,8 @@ const BuiltExamples = () => {
           </p>
           <Space className="justify-center">
             <Link
-              href="https://supabase.io/docs/guides/examples"
-              as="https://supabase.io/docs/guides/examples"
+              href="/docs/guides/examples"
+              as="/docs/guides/examples"
             >
               <a>
                 <Button type="default">View all examples</Button>
