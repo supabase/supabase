@@ -106,7 +106,7 @@ module.exports = {
             },
             {
               label: 'Open source',
-              to: 'https://supabase.io/oss',
+              to: '/oss',
             },
             {
               label: 'Humans.txt',
@@ -127,7 +127,7 @@ module.exports = {
             },
             {
               label: 'Docs',
-              to: 'https://supabase.io/docs',
+              to: '/',
             },
             {
               label: 'Pricing',
@@ -135,7 +135,7 @@ module.exports = {
             },
             {
               label: 'Support',
-              to: 'https://supabase.io/docs/support',
+              to: '/support',
             },
             {
               label: 'System Status',
