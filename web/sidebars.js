@@ -60,6 +60,7 @@ module.exports = {
         'guides/with-flutter',
         'guides/with-nextjs',
         'guides/with-react',
+        'guides/with-redwoodjs',
         'guides/with-svelte',
         'guides/with-vue-3',
       ],
@@ -70,6 +71,7 @@ module.exports = {
       collapsed: false,
       items: [
         'faq',
+        'going-into-prod',
         'handbook/contributing',
         'handbook/supasquad',
         'company/terms',
@@ -92,6 +94,7 @@ module.exports = {
       items: [
         'guides/database/introduction',
         'guides/database/tables',
+        'guides/database/functions',
         'guides/database/full-text-search',
         // 'guides/database/json',
         // 'guides/database/arrays',
@@ -149,9 +152,12 @@ module.exports = {
             'guides/auth/auth-github',
             'guides/auth/auth-gitlab',
             'guides/auth/auth-google',
+            'guides/auth/auth-slack',
+            'guides/auth/auth-spotify',
             'guides/auth/auth-twitter',
             'guides/auth/auth-twitch',
             'guides/auth/auth-twilio',
+            'guides/auth/auth-messagebird',
           ],
         },
         {
