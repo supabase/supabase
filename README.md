@@ -25,7 +25,7 @@ For full documentation, visit [supabase.io/docs](https://supabase.io/docs)
 - [Community Forum](https://github.com/supabase/supabase/discussions). Best for: help with building, discussion about database best practices.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Best for: bugs and errors you encounter using Supabase.
 - [Email Support](https://supabase.io/docs/support#business-support). Best for: problems with your database or infrastructure.
-- [Discord](https://discord.supabase.com). Best for: sharing you applications and hanging out with the community.
+- [Discord](https://discord.supabase.com). Best for: sharing your applications and hanging out with the community.
 
 ## Status
 
@@ -55,7 +55,7 @@ You can also [self-host](https://supabase.io/docs/guides/self-hosting) and [deve
 - [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Supabase listens to Postgres' built-in replication functionality, converts the replication byte stream into JSON, then broadcasts the JSON over websockets.
 - [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
 - [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
-- [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries etc.
+- [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
 - [GoTrue](https://github.com/netlify/gotrue) is an SWT based API for managing users and issuing SWT tokens.
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
 
