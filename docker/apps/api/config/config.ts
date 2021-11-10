@@ -5,8 +5,9 @@ import envSchema from 'env-schema'
  */
 export const ENV_SCHEMA = {
   type: 'object',
-  required: ['PORT', 'SUPABASE_URL', 'SUPABASE_KEY_ANON', 'SUPABASE_KEY_ADMIN'],
+  required: ['HOST', 'PORT', 'SUPABASE_URL', 'SUPABASE_KEY_ANON', 'SUPABASE_KEY_ADMIN'],
   properties: {
+    HOST: { type: 'string' },
     PORT: { type: 'string' },
     SUPABASE_URL: { type: 'string' },
     SUPABASE_KEY_ANON: { type: 'string' },

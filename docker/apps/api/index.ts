@@ -15,7 +15,7 @@ const main = async () => {
     await server.ready()
 
     // Start server
-    const address = await server.listen(process.env.PORT!)
+    const address = await server.listen(process.env.PORT!, process.env.HOST!)
 
     // Success
     console.log(`Server listening at ${address}`)
