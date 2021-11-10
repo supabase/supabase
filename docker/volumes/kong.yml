@@ -1,6 +1,5 @@
 _format_version: "1.1"
 
-
 ###
 ### Consumers / Users
 ###
@@ -21,14 +20,10 @@ acls:
   - consumer: service_role
     group: admin
 
-
-
-
 ###
 ### API Routes
 ###
 services:
-
   ## Open Auth routes
   - name: auth-v1-open
     url: http://auth:9999/verify
@@ -70,10 +65,10 @@ services:
     plugins:
       - name: cors
       - name: key-auth
-        config: 
+        config:
           hide_credentials: false
       - name: acl
-        config: 
+        config:
           hide_groups_header: true
           allow:
             - admin
@@ -94,7 +89,7 @@ services:
         config:
           hide_credentials: true
       - name: acl
-        config: 
+        config:
           hide_groups_header: true
           allow:
             - admin
@@ -112,10 +107,10 @@ services:
     plugins:
       - name: cors
       - name: key-auth
-        config: 
+        config:
           hide_credentials: false
       - name: acl
-        config: 
+        config:
           hide_groups_header: true
           allow:
             - admin
@@ -144,10 +139,10 @@ services:
           - /pg/
     plugins:
       - name: key-auth
-        config: 
+        config:
           hide_credentials: false
       - name: acl
         config:
-          hide_groups_header: true 
+          hide_groups_header: true
           allow:
             - admin
