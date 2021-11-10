@@ -118,14 +118,14 @@ pages:
       Other languages are built by the community and supported by Supabase.
 
       ## JavaScript
-      
+
       Via NPM
       ```bash
       npm install @supabase/supabase-js
       ```
-      
+
       Find the source code on [GitHub](https://github.com/supabase/supabase-js).  
-      
+
       Or via CDN
       ```js
       <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -488,7 +488,7 @@ pages:
     $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.update'
     notes: |
       User email: email updates will send an email to both the user's current and new email with a confirmation link.
-      
+
       User metadata: It's generally better to store user data in a table inside your public schema (i.e. `public.users`). 
       Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
     examples:
@@ -1347,6 +1347,7 @@ pages:
     title: 'from.getPublicUrl()'
     $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.getPublicUrl'
     notes: |
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.io](https://app.supabase.io), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none 
         - `objects` permissions: none
