@@ -1,3 +1,4 @@
 volumes/db/data
 volumes/storage
 .env
+test.http
