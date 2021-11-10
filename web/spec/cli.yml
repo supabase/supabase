@@ -23,6 +23,8 @@ info:
     ```bash
     npm install supabase -g
     ```
+    
+    There may be additional steps that you need to follow to setup the CLI. Located [here](https://supabase.io/docs/guides/local-development).
 
   definition: spec/combined.json
   libraries:
