@@ -1,0 +1,886 @@
+---
+id: with-react-native
+title: 'Quickstart: React Native'
+description: Learn how to use Supabase in your Flutter App.
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+## Intro
+
+This example provides the steps to build a simple user management app (from scratch!) using Supabase and React Native. It includes:
+
+- Supabase [Database](/docs/guides/database): a Postgres database for storing your user data.
+- Supabase [Auth](/docs/guides/auth): users can sign in with magic links (no passwords, only email).
+<!-- - Supabase [Storage](/docs/guides/storage): users can upload a photo. -->
+- [Row Level Security](/docs/guides/auth#row-level-security): data is protected so that individuals can only access their own data.
+- How to use TypeScript with Supabase and how to generate types from your database tables.
+- Instant [APIs](/docs/guides/api): APIs will be automatically generated when you create your database tables.
+
+By the end of this guide you'll have an app which allows users to login and update some basic profile details:
+
+![Supabase User Management example](/img/supabase-react-native-demo.jpeg)
+
+### Github
+
+Whenever you get stuck at any point, take a look at [this repo](https://github.com/supasquad/supabase-react-native-quickstart).
+
+## Project set up
+
+Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase
+and then creating a "schema" inside the database.
+
+### Create a project
+
+1. Go to [app.supabase.io](https://app.supabase.io).
+1. Click on "New Project".
+1. Enter your project details.
+1. Wait for the new database to launch.
+
+### Set up the database schema
+
+Now we are going to set up the database schema. We can use the "User Management Starter" quickstart in the SQL Editor,
+or you can just copy/paste the SQL from below and run it yourself.
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'SQL', value: 'SQL'},
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "SQL" section.
+2. Click "User Management Starter".
+3. Click "Run".
+```
+
+<video width="99%" muted playsInline controls="true">
+  <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
+</video>
+
+</TabItem>
+<TabItem value="SQL">
+
+```sql
+-- Create a table for public "profiles"
+create table profiles (
+  id uuid references auth.users not null,
+  updated_at timestamp with time zone,
+  username text unique,
+  avatar_url text,
+  website text,
+
+  primary key (id),
+  unique(username),
+  constraint username_length check (char_length(username) >= 3)
+);
+
+alter table profiles enable row level security;
+
+create policy "Public profiles are viewable by everyone."
+  on profiles for select
+  using ( true );
+
+create policy "Users can insert their own profile."
+  on profiles for insert
+  with check ( auth.uid() = id );
+
+create policy "Users can update own profile."
+  on profiles for update
+  using ( auth.uid() = id );
+
+-- Set up Realtime!
+begin;
+  drop publication if exists supabase_realtime;
+  create publication supabase_realtime;
+commit;
+alter publication supabase_realtime add table profiles;
+
+-- Set up Storage!
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true);
+
+create policy "Anyone can upload an avatar."
+  on storage.objects for insert
+  with check ( bucket_id = 'avatars' );
+
+```
+  
+You'll also need to make sure that the bucket is marked as public in the Storage section of the Supabase dashbaord.   
+
+</TabItem>
+</Tabs>
+
+### Get the API Keys
+
+Now that you've created some database tables, you are ready to insert data using the auto-generated API.
+We just need to get the URL and `anon` key from the API settings.
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'}
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "Settings" section.
+2. Click "API" in the sidebar.
+3. Find your API URL in this page.
+4. Find your "anon" key on this page.
+```
+
+<video width="99%" muted playsInline controls="true">
+  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+</video>
+
+</TabItem>
+</Tabs>
+
+## Building the App
+
+Let's start building the React Native app from scratch.
+
+### Initialize a Flutter app
+
+We can use [`react-native init`](https://reactnative.dev/docs/environment-setup) to initialize
+an app called `SupabaseReactNativeQuickstart`:
+
+```bash
+npx react-native init SupabaseReactNativeQuickstart --template react-native-template-typescript
+```
+
+Then let's install some additional dependencies:
+
+```bash
+  npm install @react-native-async-storage/async-storage @react-navigation/native @react-navigation/native-stack @supabase/supabase-js 
+  native-base react-native-gesture-handler react-native-image-crop-picker react-native-safe-area-context
+  react-native-screens react-native-svg react-native-url-polyfill styled-components styled-system
+```
+
+### Add script to generate TypeScript types 
+
+Now let's add a script called 'types' to generate our types based on our database schema. 
+
+```
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest",
+    "lint": "eslint .",
+    "types": "npx openapi-typescript https:[YOUR_SUPABASE_URL]/rest/v1/?apikey=[YOUR_SUPABASE_ANON_KEY] --output src/types/supabase.ts"
+  },
+```
+
+Now execute it to generate the types. 
+
+```
+npm run types
+```
+
+There should a file created in src/types/supabase. 
+
+We can now run the application to verify that everything is working. 
+
+```
+npx react-native run-android
+```
+
+or 
+
+```
+nox react-native run-ios
+```
+
+### Setup deep links
+
+Now that we have the dependencies installed let's setup deep links so users who have logged in via magic link or OAuth can come back to the app.
+
+```sh
+1. Go to the "Authentication" section.
+2. Click "Settings" in the sidebar.
+3. Type `io.supabase.rnquickstart://login-callback/` in the Additional Redirect URLs input field.
+4. Hit save.
+```
+
+![Supabase console deep link setting](/img/deeplink-setting.png)
+
+That is it on Supabase's end and the rest are platform specific settings:
+
+For Android, add an intent-filter to enable deep linking:
+
+```xml title="android/app/src/main/AndroidManifest.xml"
+<manifest ...>
+  <!-- ... other tags -->
+  <application ...>
+    <activity ...>
+      <!-- ... other tags -->
+
+      <!-- Add this intent-filter for Deep Links -->
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
+        <data
+          android:scheme="io.supabase.rnquickstart"
+          android:host="login-callback" />
+      </intent-filter>
+
+    </activity>
+  </application>
+</manifest>
+```
+
+For iOS add CFBundleURLTypes to enable deep linking:
+
+```xml title="ios/Runner/Info.plist"
+<!-- ... other tags -->
+<plist>
+<dict>
+  <!-- ... other tags -->
+
+  <!-- Add this array for Deep Links -->
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleTypeRole</key>
+      <string>Editor</string>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>io.supabase.rnquickstart</string>
+      </array>
+    </dict>
+  </array>
+  <!-- ... other tags -->
+</dict>
+</plist>
+```
+
+### Set Supabase credentials in config.ts
+
+Now we'll set our Supabase URL and anon key in config.ts. 
+
+```typescript title="src/services/supabase.ts"
+export const SUPABASE_URL = '[YOUR_SUPABASE_URL]';
+export const SUPABASE_ANON_KEY = '[YOUR_SUPABASE_ANON_KEY]';
+}
+```
+
+### Initialize Supabase client
+
+With the config set we can initialize the Supabase client inside our supabase.ts service.
+These variables will be exposed on the app, and that's completely fine since we have
+[Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
+
+```typescript title="src/services/supabase.ts"
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {createClient} from '@supabase/supabase-js';
+import {SUPABASE_ANON_KEY, SUPABASE_URL} from '../config';
+
+let client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  localStorage: AsyncStorage,
+  detectSessionInUrl: false,
+});
+
+export default client;
+}
+```
+
+AsyncStorage is the React Native equivalent of localStorage on the web equivalent and we set detectSessionInUrl to false as it's a web only feature. 
+
+
+### Set up AuthProvider
+
+We'll implement an AuthProvider to provider the user's authentication status and profile. 
+
+```typescript title="src/features/auth/AuthContext.tsx"
+import {AuthChangeEvent, Session} from '@supabase/gotrue-js';
+import {PostgrestError} from '@supabase/postgrest-js';
+import React from 'react';
+import supabase from '../../services/supabase';
+import {Profile} from '../../types/Profile';
+
+type AuthStatus = AuthChangeEvent;
+
+interface AuthContextValue {
+  authStatus: AuthStatus;
+  profile?: Profile;
+  setProfile: (profile: Profile) => void;
+  signOut: () => void;
+}
+
+const AuthContext = React.createContext<AuthContextValue>({
+  authStatus: 'SIGNED_OUT',
+  setProfile: (profile: Profile) => {},
+  signOut: () => {},
+});
+
+interface AuthProviderProps {
+  children: React.ReactElement | React.ReactElement[];
+}
+
+export default function AuthProvider({children}: AuthProviderProps) {
+  const [authStatus, setAuthStatus] = React.useState<AuthStatus>('SIGNED_OUT');
+  const [profile, setProfile] = React.useState<Profile>();
+
+  async function getProfile(
+    id: string,
+  ): Promise<{profile: Profile | null; error: PostgrestError | null}> {
+    const {data, error} = await supabase
+      .from<Profile>('profiles')
+      .select()
+      .eq('id', id);
+
+    if (data && data.length > 0) {
+      return {profile: data[0], error};
+    } else {
+      return {profile: null, error};
+    }
+  }
+
+  function getProfileFromSession(session: Session) {
+    if (session?.user) {
+      getProfile(session.user.id).then(({profile, error}) => {
+        if (profile) {
+          setProfile(profile);
+        }
+      });
+    }
+  }
+
+  function signOut() {
+    supabase.auth.signOut().then(() => {
+      setProfile(undefined);
+    });
+  }
+
+  React.useEffect(() => {
+    let session = supabase.auth.session();
+    session && getProfileFromSession(session);
+
+    supabase.auth.onAuthStateChange((event, session) => {
+      setAuthStatus(event);
+      session && getProfileFromSession(session);
+    });
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{authStatus, profile, setProfile, signOut}}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  return React.useContext(AuthContext);
+}
+
+```
+
+### Implement Navigation
+
+We'll implementation navigation using a simple Stack Navigator. This will also handle deep links used for sign in. We use two stack navigators, an Auth navigator
+that handles login and a home navigator that contains the user account screen. 
+
+```typescript title="src/components/Navigation.tsx"
+
+import * as React from 'react';
+import {
+  DarkTheme,
+  DefaultTheme,
+  NavigationContainer,
+} from '@react-navigation/native';
+import HomeStack from '../features/home';
+import AuthStack from '../features/auth';
+import {useAuth} from '../features/auth/AuthContext';
+import {Linking} from 'react-native';
+import {useColorMode} from 'native-base';
+
+export default function Navigation() {
+  const {authStatus} = useAuth();
+  const darkMode = useColorMode().colorMode === 'dark';
+
+  const linking = {
+    prefixes: ['io.supabase.rnquickstart://'],
+    async getInitialURL() {
+      const url = await Linking.getInitialURL();
+
+      if (url != null) {
+        if (url.includes('#')) {
+          return url.replace('#', '?');
+        } else {
+          return url;
+        }
+      }
+    },
+
+    subscribe(listener: any) {
+      Linking.addEventListener('url', ({url}) => {
+        if (url.includes('#')) {
+          listener(url.replace('#', '?'));
+        } else {
+          listener(url);
+        }
+      });
+    },
+  };
+
+  return (
+    <NavigationContainer
+      theme={darkMode ? DarkTheme : DefaultTheme}
+      linking={linking}>
+      {authStatus === 'SIGNED_IN' ? <HomeStack /> : <AuthStack />}
+    </NavigationContainer>
+  );
+}
+```
+
+### Auth Stack 
+
+Here we define the routes that we're going to use. The SignIn route is shown when the user is not logged-in. The login-callback route is triggered after the 
+user clicks the sign in link. It returns various parameters depending on whether it was successful or not. 
+
+```typescript title="src/features/auth/index.tsx"
+import React from 'react';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import SignIn from './SignIn';
+
+const Stack = createNativeStackNavigator();
+
+export type AuthStackParamList = {
+  SignIn: undefined;
+  'login-callback': {
+    error_code: number;
+    error_description: string;
+    access_token: string;
+    refresh_token: string;
+    expires_in: number;
+    token_type: string;
+    type: string;
+  };
+};
+
+export default function AuthStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="SignIn" component={SignIn}></Stack.Screen>
+      <Stack.Screen
+        name="login-callback"
+        component={SignIn}
+        options={{title: 'SignIn'}}></Stack.Screen>
+    </Stack.Navigator>
+  );
+}
+
+```
+
+### SignIn Screen 
+
+The SignIn component does two things. It allows the user to send a login link and it checks if it was triggered by the login-callback deep link. When that happens
+various session parameters are passed. We take the refresh_token and use that to signIn. 
+
+```typescript title="/src/features/auth/SignIn.tsx"
+import React from 'react';
+import {Button, Input, VStack, Text, useToast, Box} from 'native-base';
+import Layout from '../../components/Layout';
+import supabase from '../../services/supabase';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {AuthStackParamList} from '.';
+
+export type SignInProps = NativeStackScreenProps<
+  AuthStackParamList,
+  'login-callback' | 'SignIn'
+>;
+
+export default function SignIn({route}: SignInProps) {
+  const [email, setEmail] = React.useState<string>();
+  const [isSending, setSending] = React.useState(false);
+  const toast = useToast();
+
+  React.useEffect(() => {
+    if (route.params?.refresh_token) {
+      supabase.auth.signIn({refreshToken: route.params.refresh_token});
+    }
+  }, [route]);
+
+  async function sendMagicLink(email?: string) {
+    if (email) {
+      setSending(true);
+      let result = await supabase.auth.signIn(
+        {email},
+        {redirectTo: 'io.supabase.rnquickstart://login-callback/'},
+      );
+
+      setSending(false);
+
+      if (result.error) {
+        toast.show({
+          placement: 'top',
+          title: 'Sign In',
+          status: 'error',
+          description: 'There was a problem sending your link',
+        });
+      } else {
+        toast.show({
+          placement: 'top',
+          title: 'Sign In',
+          status: 'success',
+          description: 'A sign in link has been sent to your email',
+        });
+      }
+    }
+  }
+
+  return (
+    <Layout>
+      <VStack space={8}>
+        <Box>
+          <Text bold color="red.500">
+            {route.params?.error_description}
+          </Text>
+          {route.params?.error_code ? (
+            <Text>You can send another magic link</Text>
+          ) : null}
+        </Box>
+        <Input
+          value={email}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          placeholder="Enter your email address"
+          onChangeText={setEmail}
+        />
+
+        <Button isLoading={isSending} onPress={() => sendMagicLink(email)}>
+          Send magic link
+        </Button>
+      </VStack>
+    </Layout>
+  );
+}
+```
+
+
+### Home Stack 
+
+Our Home stack just displays the user's profile screen. 
+
+```typescript title="src/features/home/index.tsx"
+import React from 'react';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import Account from './Account';
+
+const Stack = createNativeStackNavigator();
+
+export type HomeStackParamList = {
+  Profile: undefined;
+};
+
+export default function HomeStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Account" component={Account}></Stack.Screen>
+    </Stack.Navigator>
+  );
+}
+
+```
+
+### Profile Screen 
+
+Here we display the user's profile information. We also provide the ability to update that information and set a profile avatar. With Supabase Storage with can use
+different options to encode the image data like a blob or ArrayBuffer. I find FormData to be particularly conveninent as it allows us to set the mime type for the image. 
+This makes the image visible in the Supabase dashboard. 
+
+
+```typescript title="src/features/home/account.tsx 
+
+import React from 'react';
+import {
+  Text,
+  Button,
+  Input,
+  Box,
+  VStack,
+  useToast,
+  KeyboardAvoidingView,
+} from 'native-base';
+import {Image, Platform} from 'react-native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {HomeStackParamList} from '.';
+import {useAuth} from '../auth/AuthContext';
+import Layout from '../../components/Layout';
+import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
+import supabase from '../../services/supabase';
+import {Profile} from '../../types/Profile';
+
+type AccountProps = NativeStackScreenProps<HomeStackParamList, 'Profile'>;
+
+export default function Account({route}: AccountProps) {
+  const {profile, signOut, setProfile} = useAuth();
+
+  const [username, setUsername] = React.useState<string>();
+  const [website, setWebsite] = React.useState<string>();
+  const [isUploading, setUploading] = React.useState(false);
+  const [isUpdating, setUpdating] = React.useState(false);
+
+  const user = supabase.auth.user();
+
+  const toast = useToast();
+
+  React.useEffect(() => {
+    if (profile) {
+      setUsername(profile.username || '');
+      setWebsite(profile.website || '');
+    }
+  }, [profile]);
+
+  async function onUpload(imageUrl: string) {
+    let {data, error} = await supabase
+      .from<Profile>('profiles')
+      .upsert({id: user?.id, avatar_url: imageUrl});
+
+    setUploading(false);
+    if (data && data.length > 0) {
+      setProfile(data[0]);
+      toast.show({
+        placement: 'top',
+        title: 'Upload',
+        status: 'success',
+        description: 'Photo uploaded successfully',
+      });
+    } else {
+      toast.show({
+        placement: 'top',
+        title: 'Upload',
+        status: 'error',
+        description: 'There was a problem updating your profile',
+      });
+    }
+  }
+
+  async function updateProfile() {
+    setUpdating(true);
+    let {data, error} = await supabase
+      .from<Profile>('profiles')
+      .upsert({id: user?.id, username, website});
+
+    setUpdating(false);
+    if (data && data.length > 0) {
+      setProfile(data[0]);
+      toast.show({
+        placement: 'top',
+        title: 'Profile',
+        status: 'success',
+        description: 'Profile updated successfully',
+      });
+    }
+  }
+
+  function uploadImage(image: ImageOrVideo) {
+    console.log({image});
+    let pathSegments = image.path?.split('/');
+    if (pathSegments) {
+      let filename = pathSegments[pathSegments?.length - 1];
+
+      const data = new FormData();
+      data.append('file', {
+        name: filename,
+        type: image.mime,
+        uri:
+          Platform.OS === 'ios'
+            ? image.path.replace('file://', '')
+            : image.path,
+      });
+
+      setUploading(true);
+      supabase.storage
+        .from('avatars')
+        .upload(filename, data)
+        .then(res => {
+          let result = supabase.storage.from('avatars').getPublicUrl(filename);
+          result.publicURL && onUpload(result.publicURL);
+        })
+        .catch(err => {
+          toast.show({
+            placement: 'top',
+            title: 'Upload',
+            status: 'error',
+            description:
+              err?.message || 'There was a problem uploading your photo',
+          });
+        });
+    }
+  }
+
+  function selectPhoto() {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 300,
+      cropping: true,
+      includeBase64: true,
+    }).then(uploadImage);
+  }
+
+  return (
+    <KeyboardAvoidingView
+      flex={1}
+      behavior={Platform.OS == 'ios' ? 'padding' : undefined}>
+      <Layout flex={1} justifyContent="flex-end">
+        <VStack space={6}>
+          <VStack space={4}>
+            <Image
+              source={{
+                uri: profile?.avatar_url,
+              }}
+              style={{width: 200, height: 200, alignSelf: 'center'}}
+            />
+            <Button
+              alignSelf="center"
+              onPress={selectPhoto}
+              isLoading={isUploading}>
+              Upload
+            </Button>
+          </VStack>
+
+          <Box>
+            <Text>User Name</Text>
+            <Input
+              autoCapitalize="none"
+              value={username}
+              onChangeText={setUsername}
+            />
+          </Box>
+
+          <Box>
+            <Text>Website</Text>
+            <Input
+              autoCapitalize="none"
+              value={website}
+              onChangeText={setWebsite}
+            />
+          </Box>
+
+          <Button isLoading={isUpdating} onPress={updateProfile}>
+            Update
+          </Button>
+
+          <Button onPress={signOut} variant="ghost">
+            Sign Out
+          </Button>
+        </VStack>
+      </Layout>
+    </KeyboardAvoidingView>
+  );
+}
+
+
+```
+
+### Launch!
+
+Now that we have all the components in place, let's update `src/App.tsx`:
+
+```typescript title="src/App.tsx"
+import React from 'react';
+import {NativeBaseProvider} from 'native-base';
+import Navigation from './components/Navigation';
+import AuthProvider from './features/auth/AuthContext';
+import {theme} from './theme';
+
+const App = () => {
+  return (
+    <NativeBaseProvider theme={theme}>
+      <AuthProvider>
+        <Navigation />
+      </AuthProvider>
+    </NativeBaseProvider>
+  );
+};
+export default App;
+
+```
+
+To make the app fit the Supabase color scheme we'll tweak the app's default theme as well. 
+
+```typescript title="src/theme.ts"
+import {extendTheme} from 'native-base';
+import {Platform} from 'react-native';
+
+export const theme = extendTheme({
+  colors: {
+    primary: {
+      50: '#dffef2',
+      100: '#b9f3de',
+      200: '#91ebc9',
+      300: '#68e1b5',
+      400: '#40d9a0',
+      500: '#26bf86',
+      600: '#1a9569',
+      700: '#0c6a4a',
+      800: '#01412c',
+      900: '#00170c',
+    },
+  },
+  components: {
+    Text: {
+      baseStyle: {},
+      defaultProps: {},
+      variants: {
+        error: {
+          color: 'red.500',
+          py: 1,
+        },
+      },
+      sizes: {},
+    },
+    Badge: {
+      defaultProps: {
+        rounded: 8,
+        px: 4,
+        mr: 2,
+      },
+    },
+    Box: {
+      defaultProps: {},
+    },
+    Input: {
+      baseStyle: ({colorMode}) => {
+        return {
+          padding: Platform.OS === 'ios' ? 4 : 2,
+          borderColor: colorMode === 'dark' ? 'gray.800' : 'gray.300',
+          backgroundColor: colorMode === 'dark' ? 'gray.800' : 'white',
+        };
+      },
+    },
+  },
+  config: {
+    useSystemColorMode: true,
+  },
+});
+
+```
+
+Once that's done, run this in a terminal window to launch on Android or iOS:
+
+```bash
+react-native run-android 
+react-native run-ios
+```
+
+And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
+
+![Supabase User Management example](/img/supabase-flutter-account-page.png)
+
+Congratulations, that is it! You have now built a fully functional user management app using Flutter and Supabase!
+
+## Next steps
+
+At this stage you have a fully functional application!
+
+- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
+- Sign in: [app.supabase.io](https://app.supabase.io)
