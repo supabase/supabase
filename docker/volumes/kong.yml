@@ -121,7 +121,7 @@ services:
             - admin
             - anon
 
-  ## Secure Storage routes
+  ## Storage routes: the storage server manages its own auth
   - name: storage-v1
     _comment: "Storage: /storage/v1/* -> http://storage:5000/*"
     url: http://storage:5000/
@@ -132,15 +132,6 @@ services:
           - /storage/v1/
     plugins:
       - name: cors
-      - name: key-auth
-        config: 
-          hide_credentials: false
-      - name: acl
-        config: 
-          hide_groups_header: true
-          allow:
-            - admin
-            - anon
 
   ## Secure Database routes
   - name: pg-meta
