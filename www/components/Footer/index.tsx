@@ -74,10 +74,11 @@ const Footer = (props: Props) => {
                         <li key={`${segment.title}_link_${idx}`}>
                           <a
                             href={link.url}
-                            className={`text-sm ${link.url
-                              ? 'text-gray-500 dark:text-dark-100'
-                              : 'text-gray-400 dark:text-dark-200'
-                              } hover:text-gray-900 dark:hover:text-gray-300`}
+                            className={`text-sm ${
+                              link.url
+                                ? 'text-gray-500 dark:text-dark-100'
+                                : 'text-gray-400 dark:text-dark-200'
+                            } hover:text-gray-900 dark:hover:text-gray-300`}
                           >
                             {link.text}
                             {!link.url && (

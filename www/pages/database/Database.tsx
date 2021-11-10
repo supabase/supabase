@@ -328,10 +328,7 @@ function Database() {
                 title="40+ preinstalled extensions"
                 text="We only show a few of the extensions supported by supabase here, but we preinstall many more that you can use right away."
               />
-              <Link
-                href="/docs/guides/database"
-                as="/docs/guides/database"
-              >
+              <Link href="/docs/guides/database" as="/docs/guides/database">
                 <a>
                   <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
                     Explore documentation
