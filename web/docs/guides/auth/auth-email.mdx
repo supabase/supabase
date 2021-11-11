@@ -1,0 +1,59 @@
+---
+id: auth-email
+title: "Login With Email"
+description: Use Supabase to Authenticate and Authorize your users using email.
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Overview
+
+Setting up Email logins for your  supabase application
+
+* Add Email authenticator to your [Supabase Project](https://app.supabase.io)
+* Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+
+## Add Email into your Supabase Project
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.io)
+- In the left sidebar, click the `Authentication` icon (near the top)
+- Click `Settings` from the list to go to the `Authentication Settings` page
+- Enter the final (hosted) URL of your app under `Site URL` (this is important)
+- Under `Email Auth` turn `Enable Email Signup` to ON
+- Click `Save`
+
+### Add login code to your client app
+
+The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+
+```js
+const { user, error } = await supabase.auth.signIn({
+  email: 'example@email.com',
+  password: 'example-password'
+})
+```
+
+Add this function which you can call from a button, link, or UI element.
+
+```js
+async function signInWithEmail() {
+  const { user, error } = await supabase.auth.signIn({
+    email: 'example@email.com',
+    password: 'example-password'
+  });
+}
+```
+
+To log out:
+
+```js
+async function signout() {
+  const { error } = await supabase.auth.signOut();
+}
+```
+
+## Resources
+
+* [Supabase Account - Free Tier OK](https://supabase.io)
+* [Supabase JS Client](https://github.com/supabase/supabase-js)
