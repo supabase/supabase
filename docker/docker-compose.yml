@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   # kong:
   #   container_name: supabase-kong
@@ -118,11 +120,4 @@ services:
   app-api:
     build:
       context: ./apps/api
-      # target: local ## "production" | "local"
-    volumes:
-      - .:/app
-    command: npm run start
-    ports:
-      - "8080:8080"
-    environment:
-      NODE_ENV: production
+      target: production ## "production" | "dev"

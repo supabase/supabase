@@ -1,0 +1,17 @@
+version: '3.8'
+
+services: 
+  app-api:
+    build:
+      context: ./apps/api
+    command: sh -c "npm install && npm run dev"
+    user: "1000:1000"
+    volumes:
+      - ./:/usr/src/app
+    ports:
+      - 8080:8080
+    tty: true
+    environment:
+      NODE_ENV: dev
+      HOST: 0.0.0.0
+      PORT: 8080
