@@ -5,7 +5,7 @@ import { ref } from 'vue'
 const allTodos = ref<Todo[]>([])
 
 /**
- * Retreive all todo for the signed in user
+ * Retrieve all todo for the signed in user
  */
 async function fetchTodos() {
   try {

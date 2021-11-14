@@ -265,8 +265,8 @@ function StoragePage() {
                         </p>
                       </Typography.Text>
                       <Link
-                        href="https://supabase.io/docs/reference/javascript/storage-createbucket"
-                        as="https://supabase.io/docs/reference/javascript/storage-createbucket"
+                        href="/docs/reference/javascript/storage-createbucket"
+                        as="/docs/reference/javascript/storage-createbucket"
                       >
                         <a>
                           <Button

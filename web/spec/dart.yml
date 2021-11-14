@@ -1002,6 +1002,7 @@ pages:
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.io](https://app.supabase.io), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none 
         - `objects` permissions: none
