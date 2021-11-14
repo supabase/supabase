@@ -1,20 +1,19 @@
+import { Typography } from '@supabase/ui'
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+import DocsLayout from '../components/layouts/DocsLayout'
 
 const Home: NextPage = () => {
   return (
-    <div className={styles.container}>
+    <div className="h-screen">
       <Head>
         <title>Introduction | Supabase</title>
         <meta name="description" content="Supabase docs" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      <main className={styles.main}></main>
-
-      <footer className={styles.footer}></footer>
+      <DocsLayout>
+        <Typography.Title level={1}>Introduction</Typography.Title>
+      </DocsLayout>
     </div>
   )
 }

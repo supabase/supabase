@@ -8,15 +8,20 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/ui": "^0.35.0",
     "next": "12.0.2",
+    "next-themes": "0.0.15",
     "react": "17.0.2",
     "react-dom": "17.0.2"
   },
   "devDependencies": {
     "@types/node": "16.11.6",
     "@types/react": "17.0.34",
+    "autoprefixer": "^10.4.0",
     "eslint": "7",
     "eslint-config-next": "12.0.2",
+    "postcss": "^8.3.11",
+    "tailwindcss": "^2.2.19",
     "typescript": "4.4.4"
   }
 }
