@@ -15,8 +15,7 @@ type TeamMember = {
 const data: TeamMember[] = [
   {
     name: 'Caryn Marooney',
-    img:
-      'https://res.cloudinary.com/crunchbase-production/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7,q_auto:eco,dpr_1/iqltjymln82pxxcwr6kq.png',
+    img: 'https://res.cloudinary.com/crunchbase-production/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7,q_auto:eco,dpr_1/iqltjymln82pxxcwr6kq.png',
     department: 'Board member',
     twitter: 'https://twitter.com/carynm650',
     active: true,

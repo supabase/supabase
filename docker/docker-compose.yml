@@ -13,7 +13,7 @@ services:
       KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
       # https://github.com/supabase/cli/issues/14
       KONG_DNS_ORDER: LAST,A,CNAME
-      KONG_PLUGINS: request-transformer,cors,key-auth
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl
   auth:
     container_name: supabase-auth
     image: supabase/gotrue:v2.1.8
@@ -101,6 +101,16 @@ services:
       # TODO: https://github.com/supabase/storage-api/issues/55
       REGION: stub
       GLOBAL_S3_BUCKET: stub
+  pg-meta:
+    container_name: supabase-pg-meta
+    image: supabase/postgres-meta:v0.26.1
+    depends_on:
+      - db
+    restart: unless-stopped
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: db
+      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
   db:
     container_name: supabase-db
     image: supabase/postgres:13.3.0

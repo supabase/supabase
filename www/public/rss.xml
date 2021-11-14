@@ -5,9 +5,17 @@
       <link>https://supabase.io</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 27 Oct 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Sat, 06 Nov 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.io/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.io/blog/2021/11/05/supabase-beta-october-2021</guid>
+  <title>Supabase Beta October 2021</title>
+  <link>https://supabase.io/blog/2021/11/05/supabase-beta-october-2021</link>
+  <description>Three new Auth providers, multi-schema support, and we're gearing up for another Launch Week.</description>
+  <pubDate>Sat, 06 Nov 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.io/blog/2021/10/28/supabase-series-a</guid>
   <title>Supabase $30m Series A</title>

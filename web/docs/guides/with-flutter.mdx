@@ -299,7 +299,10 @@ class AuthRequiredState<T extends StatefulWidget>
   @override
   void onUnauthenticated() {
     /// Users will be sent back to the LoginPage if they sign out.
-    Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+    if (mounted) {
+      /// Users will be sent back to the LoginPage if they sign out.
+      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+    }
   }
 }
 ```
@@ -527,7 +530,6 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
     if (error != null) {
       context.showErrorSnackBar(message: error.message);
     }
-    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   @override
@@ -536,11 +538,6 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
     if (user != null) {
       _getProfile(user.id);
     }
-  }
-
-  @override
-  void onUnauthenticated() {
-    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   @override

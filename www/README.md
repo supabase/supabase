@@ -6,7 +6,7 @@ This is a single repository for two different websites. Our documents were creat
 
 Install the [Vercel CLI](https://vercel.com/cli).
 
-You will need to run the marketing website and docs website seperately.
+You will need to run the marketing website and docs website separately.
 
 ```
 # tab 1

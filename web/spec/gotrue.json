@@ -4805,9 +4805,11 @@
 																		}
 																	],
 																	"type": {
-																		"type": "intrinsic",
-																		"name": "any"
-																	}
+																		"type": "reference",
+																		"id": 186,
+																		"name": "ApiError"
+																	},
+																	"defaultValue": "e as ApiError"
 																}
 															],
 															"groups": [
@@ -4981,15 +4983,15 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 498,
-																			"character": 19
+																			"line": 491,
+																			"character": 39
 																		}
 																	],
 																	"type": {
-																		"type": "reference",
-																		"id": 50,
-																		"name": "Session"
-																	}
+																		"type": "intrinsic",
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
 																},
 																{
 																	"id": 495,
@@ -5002,15 +5004,24 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 498,
-																			"character": 58
+																			"line": 491,
+																			"character": 79
 																		}
 																	],
 																	"type": {
-																		"type": "intrinsic",
-																		"name": "null"
-																	},
-																	"defaultValue": "null"
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "intrinsic",
+																				"name": "null"
+																			},
+																			{
+																				"type": "reference",
+																				"id": 186,
+																				"name": "ApiError"
+																			}
+																		]
+																	}
 																},
 																{
 																	"id": 494,
@@ -5023,16 +5034,15 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 498,
-																			"character": 45
+																			"line": 491,
+																			"character": 66
 																		}
 																	],
 																	"type": {
-																		"type": "reference",
-																		"id": 50,
-																		"name": "Session"
+																		"type": "intrinsic",
+																		"name": "null"
 																	},
-																	"defaultValue": "data"
+																	"defaultValue": "null"
 																},
 																{
 																	"id": 493,
@@ -5045,25 +5055,15 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 498,
-																			"character": 25
+																			"line": 491,
+																			"character": 51
 																		}
 																	],
 																	"type": {
-																		"type": "union",
-																		"types": [
-																			{
-																				"type": "intrinsic",
-																				"name": "null"
-																			},
-																			{
-																				"type": "reference",
-																				"id": 58,
-																				"name": "User"
-																			}
-																		]
+																		"type": "intrinsic",
+																		"name": "null"
 																	},
-																	"defaultValue": "data.user"
+																	"defaultValue": "null"
 																}
 															],
 															"groups": [
@@ -5102,15 +5102,15 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 500,
+																			"line": 498,
 																			"character": 19
 																		}
 																	],
 																	"type": {
-																		"type": "intrinsic",
-																		"name": "null"
-																	},
-																	"defaultValue": "null"
+																		"type": "reference",
+																		"id": 50,
+																		"name": "Session"
+																	}
 																},
 																{
 																	"id": 500,
@@ -5123,14 +5123,15 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 500,
-																			"character": 59
+																			"line": 498,
+																			"character": 58
 																		}
 																	],
 																	"type": {
 																		"type": "intrinsic",
-																		"name": "any"
-																	}
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
 																},
 																{
 																	"id": 499,
@@ -5143,15 +5144,16 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 500,
-																			"character": 46
+																			"line": 498,
+																			"character": 45
 																		}
 																	],
 																	"type": {
-																		"type": "intrinsic",
-																		"name": "null"
+																		"type": "reference",
+																		"id": 50,
+																		"name": "Session"
 																	},
-																	"defaultValue": "null"
+																	"defaultValue": "data"
 																},
 																{
 																	"id": 498,
@@ -5164,15 +5166,25 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 500,
-																			"character": 31
+																			"line": 498,
+																			"character": 25
 																		}
 																	],
 																	"type": {
-																		"type": "intrinsic",
-																		"name": "null"
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "intrinsic",
+																				"name": "null"
+																			},
+																			{
+																				"type": "reference",
+																				"id": 58,
+																				"name": "User"
+																			}
+																		]
 																	},
-																	"defaultValue": "null"
+																	"defaultValue": "data.user"
 																}
 															],
 															"groups": [
@@ -5278,15 +5290,15 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 514,
-																			"character": 19
+																			"line": 507,
+																			"character": 39
 																		}
 																	],
 																	"type": {
-																		"type": "reference",
-																		"id": 50,
-																		"name": "Session"
-																	}
+																		"type": "intrinsic",
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
 																},
 																{
 																	"id": 509,
@@ -5299,15 +5311,24 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 514,
-																			"character": 58
+																			"line": 507,
+																			"character": 79
 																		}
 																	],
 																	"type": {
-																		"type": "intrinsic",
-																		"name": "null"
-																	},
-																	"defaultValue": "null"
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "intrinsic",
+																				"name": "null"
+																			},
+																			{
+																				"type": "reference",
+																				"id": 186,
+																				"name": "ApiError"
+																			}
+																		]
+																	}
 																},
 																{
 																	"id": 508,
@@ -5320,16 +5341,15 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 514,
-																			"character": 45
+																			"line": 507,
+																			"character": 66
 																		}
 																	],
 																	"type": {
-																		"type": "reference",
-																		"id": 50,
-																		"name": "Session"
+																		"type": "intrinsic",
+																		"name": "null"
 																	},
-																	"defaultValue": "data"
+																	"defaultValue": "null"
 																},
 																{
 																	"id": 507,
@@ -5342,25 +5362,15 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 514,
-																			"character": 25
+																			"line": 507,
+																			"character": 51
 																		}
 																	],
 																	"type": {
-																		"type": "union",
-																		"types": [
-																			{
-																				"type": "intrinsic",
-																				"name": "null"
-																			},
-																			{
-																				"type": "reference",
-																				"id": 58,
-																				"name": "User"
-																			}
-																		]
+																		"type": "intrinsic",
+																		"name": "null"
 																	},
-																	"defaultValue": "data.user"
+																	"defaultValue": "null"
 																}
 															],
 															"groups": [
@@ -5399,15 +5409,15 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 516,
+																			"line": 514,
 																			"character": 19
 																		}
 																	],
 																	"type": {
-																		"type": "intrinsic",
-																		"name": "null"
-																	},
-																	"defaultValue": "null"
+																		"type": "reference",
+																		"id": 50,
+																		"name": "Session"
+																	}
 																},
 																{
 																	"id": 514,
@@ -5420,14 +5430,15 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 516,
-																			"character": 59
+																			"line": 514,
+																			"character": 58
 																		}
 																	],
 																	"type": {
 																		"type": "intrinsic",
-																		"name": "any"
-																	}
+																		"name": "null"
+																	},
+																	"defaultValue": "null"
 																},
 																{
 																	"id": 513,
@@ -5440,15 +5451,16 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 516,
-																			"character": 46
+																			"line": 514,
+																			"character": 45
 																		}
 																	],
 																	"type": {
-																		"type": "intrinsic",
-																		"name": "null"
+																		"type": "reference",
+																		"id": 50,
+																		"name": "Session"
 																	},
-																	"defaultValue": "null"
+																	"defaultValue": "data"
 																},
 																{
 																	"id": 512,
@@ -5461,15 +5473,25 @@
 																	"sources": [
 																		{
 																			"fileName": "GoTrueClient.ts",
-																			"line": 516,
-																			"character": 31
+																			"line": 514,
+																			"character": 25
 																		}
 																	],
 																	"type": {
-																		"type": "intrinsic",
-																		"name": "null"
+																		"type": "union",
+																		"types": [
+																			{
+																				"type": "intrinsic",
+																				"name": "null"
+																			},
+																			{
+																				"type": "reference",
+																				"id": 58,
+																				"name": "User"
+																			}
+																		]
 																	},
-																	"defaultValue": "null"
+																	"defaultValue": "data.user"
 																}
 															],
 															"groups": [
@@ -5840,9 +5862,11 @@
 																}
 															],
 															"type": {
-																"type": "intrinsic",
-																"name": "any"
-															}
+																"type": "reference",
+																"id": 186,
+																"name": "ApiError"
+															},
+															"defaultValue": "e as ApiError"
 														},
 														{
 															"id": 532,
@@ -6550,8 +6574,8 @@
 													"sources": [
 														{
 															"fileName": "GoTrueClient.ts",
-															"line": 461,
-															"character": 13
+															"line": 460,
+															"character": 29
 														}
 													]
 												}
@@ -6580,8 +6604,8 @@
 													"sources": [
 														{
 															"fileName": "GoTrueClient.ts",
-															"line": 462,
-															"character": 11
+															"line": 461,
+															"character": 8
 														}
 													],
 													"type": {
@@ -6611,7 +6635,7 @@
 														{
 															"fileName": "GoTrueClient.ts",
 															"line": 462,
-															"character": 39
+															"character": 9
 														}
 													],
 													"type": {
@@ -6643,8 +6667,8 @@
 											"sources": [
 												{
 													"fileName": "GoTrueClient.ts",
-													"line": 462,
-													"character": 4
+													"line": 460,
+													"character": 89
 												}
 											]
 										}
@@ -9923,7 +9947,7 @@
 					"sources": [
 						{
 							"fileName": "lib/cookies.ts",
-							"line": 164,
+							"line": 165,
 							"character": 28
 						}
 					]
@@ -9966,7 +9990,7 @@
 					"sources": [
 						{
 							"fileName": "lib/cookies.ts",
-							"line": 112,
+							"line": 113,
 							"character": 28
 						}
 					]
@@ -10242,7 +10266,7 @@
 					"sources": [
 						{
 							"fileName": "lib/cookies.ts",
-							"line": 129,
+							"line": 130,
 							"character": 24
 						}
 					]
@@ -10318,7 +10342,7 @@
 					"sources": [
 						{
 							"fileName": "lib/cookies.ts",
-							"line": 160,
+							"line": 161,
 							"character": 25
 						}
 					]
@@ -10400,7 +10424,7 @@
 					"sources": [
 						{
 							"fileName": "lib/cookies.ts",
-							"line": 144,
+							"line": 145,
 							"character": 26
 						}
 					]
@@ -11519,7 +11543,7 @@
 					"sources": [
 						{
 							"fileName": "lib/polyfills.ts",
-							"line": 6,
+							"line": 4,
 							"character": 34
 						}
 					]

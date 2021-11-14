@@ -14,7 +14,7 @@ After developing your project, and deciding it's time to Go Live With Real Users
 
 - Ensure RLS is enabled
     - Tables that do not have RLS enabled with reasonable policies allow any client to access and modify their data. This is unlikely to be what you want in the majority of cases.
-    - [Learn more about RLS](https://supabase.io/docs/guides/auth/row-level-security)
+    - [Learn more about RLS](/docs/guides/auth/row-level-security)
 - Ensure replication is disabled for tables containing sensitive data:
     - Today, Realtime does not respect RLS policies and any client with your anon key can listen to changes on tables where replication is enabled.
     - Go to the Database > Replication page in the Supabase Dashboard to manage these settings
