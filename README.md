@@ -138,10 +138,6 @@ Your all set! To see changes on your development server for supabase.io go to [h
 
 And to see changes on your development server for [Supabase Docs](https://supabase.io/docs/) go to [http://localhost:3005/docs](http://localhost:3005/docs)
 
-## What you can help with
-
-If you are new to contributing to supabase, you can help out the supabase team by creating docs, finding spelling and grammar errors, solving issues, finding issues, feature requests, and many others.
-
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
 
