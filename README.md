@@ -99,7 +99,7 @@ To get started you need to fork the repository and download it to your local mac
 
 ## To Start a Development Server
 
-To start a development server must choose if you want to work on supabase.io or [Supabase Docs](https://supabase.io/docs/).
+To start a development server must choose if you want to work on [Supabase website](https://supabase.io) or [Supabase Docs](https://supabase.io/docs/).
 
 1. cd into supabase.io
     ```sh
@@ -134,7 +134,7 @@ To start a development server must choose if you want to work on supabase.io or 
     yarn start
     ```
 
-Your all set! To see changes on your development server for supabase.io go to [http://localhost:3000](http://localhost:3000/).
+Your all set! To see changes on your development server for [Supabase website](https://supabase.io) go to [http://localhost:3000](http://localhost:3000/).
 
 And to see changes on your development server for [Supabase Docs](https://supabase.io/docs/) go to [http://localhost:3005/docs](http://localhost:3005/docs)
 
