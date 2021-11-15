@@ -20,6 +20,8 @@
 
 For full documentation, visit [supabase.io/docs](https://supabase.io/docs)
 
+To see how to Contribute visit [Getting Started](##Getting-Started)
+
 ## Community & Support
 
 - [Community Forum](https://github.com/supabase/supabase/discussions). Best for: help with building, discussion about database best practices.
@@ -74,6 +76,71 @@ Our client library is modular. Each sub-library is a standalone implementation f
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) \| [`Ruby`](https://github.com/supabase/postgrest-rb) \| [`Go`](https://github.com/supabase/postgrest-go) |
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust` \| `Ruby` \| `Go`                                                                                                                                        |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust` \| `Ruby` \| `Go`                                                                                                                                              |
+
+# Getting Started
+
+If you want to help Contribute but don't know how to start a local development server or just don't know where to start, follow these steps.
+
+## Installation
+
+To get started you need to fork the repository and download it to your local machine, by following the steps.
+
+1. Fork the repo
+
+2. Clone the repo
+   ```sh
+   git clone https://github.com/your_username/supabase.git
+   ```
+
+3. cd into the base of the repo
+   ```sh
+   cd supabase
+   ```
+
+## To Start a Development Server
+
+To start a development server must choose if you want to work on supabase.io or [Supabase Docs](https://supabase.io/docs/).
+
+1. cd into supabase.io
+    ```sh
+    cd www
+    ```
+    or cd into [Supabase Docs](https://supabase.io/docs/)
+    ```sh
+    cd web
+    ```
+
+2. Install the npm packages
+
+    npm
+    ```sh
+    npm install
+    ```
+
+    or with yarn
+    ```sh
+    yarn install
+    ```
+
+3. Start development server
+
+    npm
+    ```sh
+    npm run start
+    ```
+
+    or with yarn
+    ```sh
+    yarn start
+    ```
+
+Your all set! To see changes on your development server for supabase.io go to [http://localhost:3000](http://localhost:3000/).
+
+And to see changes on your development server for [Supabase Docs](https://supabase.io/docs/) go to [http://localhost:3005/docs](http://localhost:3005/docs)
+
+## What you can help with
+
+If you are new to contributing to supabase, you can help out the supabase team by creating docs, finding spelling and grammar errors, solving issues, finding issues, feature requests, and many others.
 
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
