@@ -9,10 +9,10 @@ import TabItem from '@theme/TabItem';
 
 ## Overview
 
-Setting up Email logins for your  supabase application
+Setting up Email logins for your Supabase application.
 
 * Add Email authenticator to your [Supabase Project](https://app.supabase.io)
-* Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+* Add the login code to your application - [Javascript](https://github.com/supabase/supabase-js) |  [Dart](https://github.com/supabase/supabase-dart)
 
 ## Add Email into your Supabase Project
 
@@ -27,6 +27,14 @@ Setting up Email logins for your  supabase application
 
 The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
 
+<Tabs
+  defaultValue="js"
+  groupId="guides/auth"
+  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+>
+
+<TabItem value="js">
+
 ```js
 const { user, error } = await supabase.auth.signIn({
   email: 'example@email.com',
@@ -34,7 +42,33 @@ const { user, error } = await supabase.auth.signIn({
 })
 ```
 
+</TabItem>
+
+<TabItem value="dart">
+
+```dart
+final res = await supabase.auth.signIn(
+  email: 'example@email.com',
+  password: 'example-password'
+);
+
+final user = res.data?.user;
+final error = res.error;
+```
+
+</TabItem>
+
+</Tabs>
+
 Add this function which you can call from a button, link, or UI element.
+
+<Tabs
+  defaultValue="js"
+  groupId="guides/auth"
+  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+>
+
+<TabItem value="js">
 
 ```js
 async function signInWithEmail() {
@@ -45,15 +79,55 @@ async function signInWithEmail() {
 }
 ```
 
+</TabItem>
+
+<TabItem value="dart">
+
+```dart
+function SignInWithEmail() {
+  await supabase.auth.signIn(
+    email: 'example@email.com',
+    password: 'example-password'
+  );
+}
+```
+
+</TabItem>
+
+</Tabs>
+
 To log out:
 
+<Tabs
+  defaultValue="js"
+  groupId="guides/auth"
+  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+>
+
+<TabItem value="js">
+
 ```js
-async function signout() {
+async function signOut() {
   const { error } = await supabase.auth.signOut();
 }
 ```
+
+</TabItem>
+
+<TabItem value="dart">
+
+```dart
+function SignOut() {
+  await supabase.auth.signOut();
+}
+```
+
+</TabItem>
+
+</Tabs>
 
 ## Resources
 
 * [Supabase Account - Free Tier OK](https://supabase.io)
 * [Supabase JS Client](https://github.com/supabase/supabase-js)
+* [Supabase Dart Client](https://github.com/supabase/supabase-dart)
