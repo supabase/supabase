@@ -98,7 +98,7 @@ pages:
     description: |
       ## Dart
 
-      Dart libraries are built and suppported by the community. 
+      Dart libraries are built and supported by the community. 
 
       ```bash
       dart pub add supabase
@@ -177,7 +177,7 @@ pages:
       - A user can sign up via email, phone number.
       - If you provide `email` without a `password`, the user will be sent a magic link.
       - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
-      - Similary, if you provide `phone` without a `password`, the user will be sent a one time password. 
+      - Similarly, if you provide `phone` without a `password`, the user will be sent a one time password. 
       - If you are looking to sign users in with OAuth in Flutter apps, go to [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider).
     examples:
       - name: Sign in with email.
@@ -461,7 +461,7 @@ pages:
           By default the data is returned in JSON format, however you can also request for it to be returned as Comma Separated Values.
         dart: |
           ```dart
-          fianl res = await supabase
+          final res = await supabase
             .from('users')
             .select()
             .csv()
