@@ -20,7 +20,7 @@
 
 For full documentation, visit [supabase.io/docs](https://supabase.io/docs)
 
-To see how to Contribute visit [Getting Started](##Getting-Started)
+To see how to Contribute, visit [Getting Started](##Getting-Started)
 
 ## Community & Support
 
