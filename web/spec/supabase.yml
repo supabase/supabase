@@ -42,6 +42,7 @@ info:
           - Reset Password (Email)
       - name: 'Auth (Server Only)'
         items:
+          - auth.api.createUser()
           - auth.api.deleteUser()
           - auth.api.generateLink()
           - auth.api.inviteUserByEmail()
@@ -332,7 +333,7 @@ pages:
 
   auth.signUp():
     title: 'signUp()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signUp'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
       - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
       - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
@@ -372,7 +373,7 @@ pages:
 
   auth.signIn():
     title: 'signIn()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signIn'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signIn'
     notes: |
       - A user can sign up either via email or OAuth.
       - If you provide `email` without a `password`, the user will be sent a magic link.
@@ -452,7 +453,7 @@ pages:
 
   auth.signOut():
     title: 'signOut()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signOut'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
     examples:
       - name: Sign out
         isSpotlight: true
@@ -463,7 +464,7 @@ pages:
 
   auth.session():
     title: 'session()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.session'
+    $ref: '@supabase/gotrue-js.GoTrueClient.session'
     examples:
       - name: Get the session data
         isSpotlight: true
@@ -474,7 +475,7 @@ pages:
 
   auth.user():
     title: 'user()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.user'
+    $ref: '@supabase/gotrue-js.GoTrueClient.user'
     examples:
       - name: Get the logged in user
         isSpotlight: true
@@ -485,7 +486,7 @@ pages:
 
   auth.update():
     title: 'update()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.update'
+    $ref: '@supabase/gotrue-js.GoTrueClient.update'
     notes: |
       User email: email updates will send an email to both the user's current and new email with a confirmation link.
 
@@ -516,7 +517,7 @@ pages:
 
   auth.setAuth():
     title: 'setAuth()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.setAuth'
+    $ref: '@supabase/gotrue-js.GoTrueClient.setAuth'
     examples:
       - name: Basic example.
         description: This is most useful on server-side functions where you cannot log the user in, but have access to the user's access token.
@@ -575,7 +576,7 @@ pages:
 
   auth.onAuthStateChange():
     title: 'onAuthStateChange()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.onAuthStateChange'
+    $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
     examples:
       - name: Listen to auth changes
         isSpotlight: true
@@ -587,7 +588,7 @@ pages:
           ```
 
   Reset Password (Email):
-    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.resetPasswordForEmail'
+    $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
     notes: |
       Sends a reset request to an email address.
 
@@ -612,12 +613,29 @@ pages:
             .resetPasswordForEmail('user@email.com')
           ```
 
-  auth.api.deleteUser():
-    title: 'deleteUser()'
-    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.deleteUser'
+  auth.api.createUser():
+    title: 'createUser()'
+    # $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
+    $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
     notes: |
       - Requires a `service_role` key.
-      - This function should only be called on a server. Never expose your `service_role` key in the browser.
+      - This function should be called on a server. Never expose your `service_role` key in the browser.
+    examples:
+      - name: Create a new user.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.api.createUser({
+            name: 'Yoda'
+          })
+          ```
+
+  auth.api.deleteUser():
+    title: 'deleteUser()'
+    $ref: '@supabase/gotrue-js.GoTrueApi.deleteUser'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should be called on a server. Never expose your `service_role` key in the browser.
     examples:
       - name: Remove a user completely.
         isSpotlight: true
@@ -631,7 +649,7 @@ pages:
 
   auth.api.inviteUserByEmail():
     title: 'inviteUserByEmail()'
-    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.inviteUserByEmail'
+    $ref: '@supabase/gotrue-js.GoTrueApi.inviteUserByEmail'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -647,7 +665,7 @@ pages:
 
   auth.api.sendMobileOTP():
     title: 'sendMobileOTP()'
-    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.sendMobileOTP'
+    $ref: '@supabase/gotrue-js.GoTrueApi.sendMobileOTP'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -663,7 +681,7 @@ pages:
 
   auth.api.resetPasswordForEmail():
     title: 'resetPasswordForEmail()'
-    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.resetPasswordForEmail'
+    $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -679,7 +697,7 @@ pages:
 
   auth.api.generateLink():
     title: 'generateLink()'
-    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.generateLink'
+    $ref: '@supabase/gotrue-js.GoTrueApi.generateLink'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
