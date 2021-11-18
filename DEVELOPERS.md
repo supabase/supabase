@@ -22,7 +22,7 @@ machine:
 
 ### Forking Supabase on Github
 
-To contribute code to Supabase, you must fork the [Supabase Repository](https://github.com/supabase/supabase). After you forked the repository you may now begin editing the source code.
+To contribute code to Supabase, you must fork the [Supabase Repository](https://github.com/supabase/supabase). After you fork the repository, you may now begin editing the source code.
 
 ## Building Supabase
 
