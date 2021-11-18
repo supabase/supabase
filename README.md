@@ -63,7 +63,7 @@ You can also [self-host](https://supabase.io/docs/guides/self-hosting) and [deve
 
 Our approach for client libraries is modular. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing tools.
 
-<table>
+<table style="table-layout:fixed; white-space: nowrap;">
   <tr>
     <th>Language</th>
     <th>Client</th>

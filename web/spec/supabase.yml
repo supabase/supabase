@@ -4,10 +4,9 @@ info:
   id: reference/supabase-js
   title: Supabase Client
   description: |
-
     Our approach for client libraries is modular. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing tools.
 
-    <table>
+    <table style="table-layout:fixed; white-space: nowrap;">
       <tr>
         <th>Language</th>
         <th>Client</th>
@@ -21,17 +20,6 @@ info:
         <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
         <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
       </tr>
-      <!-- TEMPLATE FOR NEW ROW -->
-      <!-- START ROW
-      <tr>
-        <td>lang</td>
-        <td><a href="https://github.com/supabase-community/supabase-lang" target="_blank" rel="noopener noreferrer">supabase-lang</a></td>
-        <td><a href="https://github.com/supabase-community/postgrest-lang" target="_blank" rel="noopener noreferrer">postgrest-lang</a></td>
-        <td><a href="https://github.com/supabase-community/gotrue-lang" target="_blank" rel="noopener noreferrer">gotrue-lang</a></td>
-        <td><a href="https://github.com/supabase-community/realtime-lang" target="_blank" rel="noopener noreferrer">realtime-lang</a></td>
-        <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
-      </tr>
-      END ROW -->
       <th colspan="6">⚡️ Official ⚡️</th>
       <tr>
         <td>JavaScript (TypeScript)</td>
