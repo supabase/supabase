@@ -38,7 +38,7 @@ To build Supabase, you clone the source code repository:
    cd supabase
    ```
 
-## Choosing Directory
+### Choosing Directory
 
 Before you start a development server, you must choose if you want to work on the [Supabase website](https://supabase.io) or [Supabase Docs](https://supabase.io/docs/).
 
@@ -76,7 +76,7 @@ To debug code, and to see changes in real time, it is often useful to have a loc
 
     or with yarn
     ```sh
-    yarn start
+    yarn dev
     ```
 
 2. To access the local server, enter the following URL into your web browser:
