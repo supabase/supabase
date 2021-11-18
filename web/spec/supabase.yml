@@ -826,7 +826,7 @@ pages:
             .select('name')
           ```
       - name: Query foreign tables
-        description: If your database has relationships, you can query related tables too.
+        description: If your database has foreign key relationships, you can query related tables too.
         js: |
           ```js
           const { data, error } = await supabase
