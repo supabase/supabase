@@ -7,7 +7,7 @@
 
 ## Development Setup
 
-This document describes how to set up your development environment to build and test Supabase, and explains the basic use of `git`, and `npm`.
+This document describes how to set up your development environment to build and test Supabase.
 
 ### Installing Dependencies
 
@@ -18,7 +18,7 @@ machine:
 
 * [Node.js v16.x (LTS)](http://nodejs.org)
 
-* [npm](https://www.npmjs.com/)
+* [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 
 ### Forking Supabase on Github
 
