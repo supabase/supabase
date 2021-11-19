@@ -510,11 +510,11 @@ const Reliability = () => {
             <p className="mb-10">
               We're launching{' '}
               <a
-                href="https://status.supabase.io"
+                href="https://status.supabase.com"
                 target="_blank"
                 className="text-brand-700 hover:text-brand-800"
               >
-                https://status.supabase.io
+                https://status.supabase.com
               </a>{' '}
               to keep track of uptime across all of our services and critical infrastructure.
             </p>

@@ -139,7 +139,7 @@ module.exports = {
             },
             {
               label: 'System Status',
-              to: 'https://status.supabase.io/',
+              to: 'https://status.supabase.com/',
             },
           ],
         },
