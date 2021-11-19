@@ -2,7 +2,7 @@
 
 - Frontend:
   - Vue 3, TypeScript
-  - [Supabase.js](https://supabase.io/docs/library/getting-started) for user management and realtime data syncing.
+  - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
   - [app.supabase.io](https://app.supabase.io/): hosted Postgres database with restful API for usage with Supabase.js.
 
@@ -79,7 +79,7 @@ create policy "Individuals can delete their own todos." on todos for
 
 ## Authors
 
-- [Supabase](https://supabase.io)
+- [Supabase](https://supabase.com)
 - [Alex Chiu](https://github.com/chiubaca)
 - [YK Sugi](https://twitter.com/ykdojo)
 

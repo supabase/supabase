@@ -616,7 +616,7 @@ function Home() {
 export default () => {
   if (typeof window !== 'undefined') {
     if (window.location.href.indexOf('localhost') === -1) {
-      window.location.replace('https://supabase.io')
+      window.location.replace('https://supabase.com')
     } else {
       window.location.replace('/docs')
     }

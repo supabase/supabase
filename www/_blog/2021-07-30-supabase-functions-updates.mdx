@@ -214,7 +214,7 @@ Shout out to [Paul Ramsey](https://github.com/pramsey), who gave us the implemen
 select
     *
 from
-   http_get('https://supabase.io')
+   http_get('https://supabase.com')
 cross join
    generate_series(1, 10) _;
 
@@ -223,7 +223,7 @@ Time: 3501.935 ms
 
 -- using pg_net to fetch from "supabase.io" 10 times
 select
-    net.http_get('https://supabase.io')
+    net.http_get('https://supabase.com')
 from
     generate_series (1,10) _;
 

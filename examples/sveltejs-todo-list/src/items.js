@@ -49,7 +49,7 @@ export const items = () => {
     return []
   }
 }
-// https://supabase.io/docs/library/subscribe/
+// https://supabase.com/docs/library/subscribe/
 // TODO docs #179
 export const subscription = () => {
   return supabase

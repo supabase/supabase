@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) là một giải pháp mã nguồn mở thay thế cho Firebase. Chúng tôi sử dụng công cụ mã nguồn mở cấp doanh nghiệp để xây dựng các chức năng mà Firebase có.
+[Supabase](https://supabase.com) là một giải pháp mã nguồn mở thay thế cho Firebase. Chúng tôi sử dụng công cụ mã nguồn mở cấp doanh nghiệp để xây dựng các chức năng mà Firebase có.
 
 - [x] Cơ sở dữ liệu Postgres tự chủ
 - [x] Cập nhật dữ liệu thời gian thực
@@ -18,13 +18,13 @@
 
 ## Tài liệu
 
-Để có tài liệu đầy đủ, hãy truy cập [supabase.io/docs](https://supabase.io/docs)
+Để có tài liệu đầy đủ, hãy truy cập [supabase.io/docs](https://supabase.com/docs)
 
 ## Hỗ trợ & Cộng đồng
 
 - [Diễn đàn cộng đồng](https://github.com/supabase/supabase/discussions). Tốt nhất cho: hỗ trợ xây dựng và thảo luận về các phương pháp hay nhất về cơ sở dữ liệu.
 - [Vấn đề trên GitHub](https://github.com/supabase/supabase/issues). Tốt nhất cho: các lỗi và "bugs" mà bạn gặp phải khi sử dụng Supabase.
-- [Hỗ trợ email](https://supabase.io/docs/support#business-support). Tốt nhất cho: các vấn đề với cơ sở dữ liệu hoặc cơ sở hạ tầng của bạn.
+- [Hỗ trợ email](https://supabase.com/docs/support#business-support). Tốt nhất cho: các vấn đề với cơ sở dữ liệu hoặc cơ sở hạ tầng của bạn.
 - [Discord](https://discord.supabase.com). Tốt nhất cho: chia sẻ ứng dụng của bạn hoặc dành thời gian với cộng đồng.
 
 ## Trạng thái
@@ -48,7 +48,7 @@ Supabase là sự kết hợp của các công cụ mã nguồn mở. Các tính
 
 Supabase là một [nền tảng lưu trữ cơ sở dữ liệu] (https://app.supabase.io). Bạn có thể đăng ký và bắt đầu sử dụng Supabase mà không cần cài đặt bất kỳ thứ gì. Chúng tôi vẫn đang phát triển tính năng chạy Supabase trong môi trường ảo hoá trên chính máy tính cá nhân của bạn - đây hiện là trọng tâm cốt lõi của chúng tôi, cùng với sự ổn định của nền tảng.
 
-![Kiến trúc](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Kiến trúc](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL] (https://www.postgresql.org/) là một hệ thống cơ sở dữ liệu quan hệ đối tượng với hơn 30 năm phát triển tích cực đã mang lại cho nó một danh tiếng mạnh mẽ về độ tin cậy, tính năng mạnh mẽ và hiệu suất.
 - [Realtime] (https://github.com/supabase/realtime) là một máy chủ Elixir cho phép bạn lắng nghe các lệnh chèn, cập nhật và xóa PostgreSQL bằng cách sử dụng websockets. Supabase lắng nghe chức năng sao chép có sẵn của Postgres, chuyển đổi luồng byte sao chép thành JSON, sau đó phát JSON qua các cổng web.

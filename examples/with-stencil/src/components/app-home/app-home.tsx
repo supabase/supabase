@@ -54,7 +54,7 @@ export class AppHome {
                   Stencil Store
                 </a>
                 {', and '}
-                <a rel="external" href="https://supabase.io" target="_blank">
+                <a rel="external" href="https://supabase.com" target="_blank">
                   Supabase
                 </a>
                 .

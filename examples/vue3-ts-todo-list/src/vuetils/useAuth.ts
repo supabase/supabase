@@ -53,7 +53,7 @@ async function handleSignup(credentials: Credentials) {
 
 /**
  * Handles signup via Third Party Login.
- * https://supabase.io/docs/guides/auth#third-party-logins
+ * https://supabase.com/docs/guides/auth#third-party-logins
  */
 async function handleOAuthLogin(provider: Provider) {
   const { error } = await supabase.auth.signIn({ provider })
