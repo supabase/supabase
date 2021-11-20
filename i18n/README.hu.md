@@ -6,7 +6,7 @@
 
 # Supabase
 
-A [Supabase](https://supabase.io) egy nyílt forráskódú Firebase alternatíva. A Firebase funkcióit építjük vállalati szintű nyílt forráskódú eszközökkel.
+A [Supabase](https://supabase.com) egy nyílt forráskódú Firebase alternatíva. A Firebase funkcióit építjük vállalati szintű nyílt forráskódú eszközökkel.
 
 - [x] Hosztolt Postgres Adatbázis
 - [x] Valós idejű feliratkozások
@@ -18,13 +18,13 @@ A [Supabase](https://supabase.io) egy nyílt forráskódú Firebase alternatíva
 
 ## Dokumentáció
 
-A teljes dokumentációért látogasson el a [supabase.io/docs](https://supabase.io/docs) oldalra.
+A teljes dokumentációért látogasson el a [supabase.io/docs](https://supabase.com/docs) oldalra.
 
 ## Közösség & Támogatás
 
 - [Közösségi Fórum](https://github.com/supabase/supabase/discussions). Segítség az építésben, beszélgetés az adatbázis legjobb gyakorlatairól.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Ha bugokat vagy hibákat észlelsz a Supabase használata közben.
-- [Emailes Támogatás](https://supabase.io/docs/support#business-support). Adatbázis és infrastruktúra hibáinak emailes megoldása.
+- [Emailes Támogatás](https://supabase.com/docs/support#business-support). Adatbázis és infrastruktúra hibáinak emailes megoldása.
 - [Discord](https://discord.supabase.com). Programok megosztása és kikapcsolódés a közösséggel.
 
 ## Állapot
@@ -47,9 +47,9 @@ A Supabase nyílt forráskódú eszközök kombinációja.A Firebase funkcióit 
 **Jelenlegi architektúra**
 
 Supabase egy [hosztolt platform](https://app.supabase.io). Regisztrálással letöltés nélkül is elkezdheted használni.
-De [hosztolhatod magadnak](https://supabase.io/docs/guides/self-hosting) és akár [fejlesztheted helyileg](https://supabase.io/docs/guides/local-development).
+De [hosztolhatod magadnak](https://supabase.com/docs/guides/self-hosting) és akár [fejlesztheted helyileg](https://supabase.com/docs/guides/local-development).
 
-![Architektúra](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Architektúra](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) egy objektum-kapcsolati adatbázis rendszer több mint 30 évnyi aktív fejlesztéssel ezalatt hírnevvet szerzett megbízhatóságáról, robosztus felépítéséről, és teljesítményéről.
 - [Valós idő](https://github.com/supabase/realtime) egy Elixir szerver ami lehetővé teszi hogy figyeld a PostgreSQL beillesztéseket, frissítéseket, és törléseket websocket-ek felhasználásával. Supabase figyeli a Postgres belső replikációs funkcióját, átalakítja a replikációs bájtokat egy JSON-be, majd a JSON-t elküldi a websocket kapcsolaton.

@@ -45,10 +45,10 @@ function StoragePage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.io/storage`,
+          url: `https://supabase.com/storage`,
           images: [
             {
-              url: `https://supabase.io${basePath}/images/product/storage/storage-og.jpg`,
+              url: `https://supabase.com${basePath}/images/product/storage/storage-og.jpg`,
             },
           ],
         }}

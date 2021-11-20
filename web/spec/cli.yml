@@ -23,8 +23,8 @@ info:
     ```bash
     npm install supabase -g
     ```
-    
-    There may be additional steps that you need to follow to setup the CLI. Located [here](https://supabase.io/docs/guides/local-development).
+
+    There may be additional steps that you need to follow to setup the CLI. Located [here](https://supabase.com/docs/guides/local-development).
 
   definition: spec/combined.json
   libraries:
@@ -91,8 +91,7 @@ pages:
       ```bash
       supabase eject
       ```
-      
+
       Run in any folder to create a `docker` folder with a `docker-compose.yml`. This is useful for self-hosting or adding custom configuration. 
 
       See our [Self Hosting](/docs/guides/hosting/overview) docs for more details.
-

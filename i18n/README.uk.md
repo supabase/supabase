@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) є альтернативою Firebase з відкритим кодом. Ми створюємо функціонал Firebase, використовуючи відкрите програмне забезпечення enterprise рівня.
+[Supabase](https://supabase.com) є альтернативою Firebase з відкритим кодом. Ми створюємо функціонал Firebase, використовуючи відкрите програмне забезпечення enterprise рівня.
 
 - [x] Хмарна база даних Postgres
 - [x] Підписка на оновлення в режимі реального часу
@@ -18,13 +18,13 @@
 
 ## Документація
 
-Для отримання повної документації, перейдіть на [supabase.io/docs](https://supabase.io/docs)
+Для отримання повної документації, перейдіть на [supabase.io/docs](https://supabase.com/docs)
 
 ## Спільнота та Підтримка
 
 - [Форум спільноти](https://github.com/supabase/supabase/discussions). Найкраще допоможе у створенні та обговоренні кращих практик використання.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Найкраще для помилок при використанні Supabase.
-- [Підтримка поштою](https://supabase.io/docs/support#business-support). Найкраще в разі проблем з вашою БД чи інфраструктурою.
+- [Підтримка поштою](https://supabase.com/docs/support#business-support). Найкраще в разі проблем з вашою БД чи інфраструктурою.
 
 ## Статус
 
@@ -47,7 +47,7 @@ Supabase – це поєднання відкритого програмного
 
 Supabase – це [хмарна платформа](https://app.supabase.io). Ви можете зареєструватися і почати використовувати її, нічого не встановлюючи. Ми досі продовжуємо покращувати зручність локальної розробки – це наш основний пріоритет, одночасно зі стабільністю платформи.
 
-![Architecture](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Architecture](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) – це об'єктно-реляційна система керування базами даних з більш ніж 30 роками активної розробки, котра завоювали міцну репутацію завдяки надійності та продуктивності.
 - [Realtime](https://github.com/supabase/realtime) являє собою Elixir сервер який дозволяє слухати зміни в PostgreSQL за допомогою веб-сокетів. Supabase використовує вбудований функціонал реплікації Postgres, перетворюючи бінарний протокол реплікації в JSON та передаючи по веб-сокетам.

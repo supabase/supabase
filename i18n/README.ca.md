@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) és una alternativa de codi obert a Firebase. Estem construint les funcionalitats de Firebase usant eines de codi obert de nivell empresarial.
+[Supabase](https://supabase.com) és una alternativa de codi obert a Firebase. Estem construint les funcionalitats de Firebase usant eines de codi obert de nivell empresarial.
 
 - [x] Allotjament de base de dades Postgres
 - [x] Subscripcions en temps real
@@ -18,13 +18,13 @@
 
 ## Documentació
 
-Per a veure la documentació completa, visita [supabase.io/docs](https://supabase.io/docs).
+Per a veure la documentació completa, visita [supabase.io/docs](https://supabase.com/docs).
 
 ## Comunitat i suport
 
 - [Fòrum de la comunitat](https://github.com/supabase/supabase/discussions). Millor per a: ajuda construint, discussions sobre les millors pràctiques de base de dades.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Millor per a: errors que et pots trobar utilitzant Supabase.
-- [Suport per correu electrònic](https://supabase.io/docs/support#business-*support). Millor per a: problemes amb la base de dades o infraestructura.
+- [Suport per correu electrònic](https://supabase.com/docs/support#business-*support). Millor per a: problemes amb la base de dades o infraestructura.
 - [Discord](https://discord.supabase.com). Millor per a: compartir les teves aplicacions i passar l’estona amb la comunitat.
 
 ## Estat
@@ -46,9 +46,9 @@ Supabase és una combinació d’eines de codi obert. Estem construint les funci
 
 **Arquitectura actual**
 
-Supabase és una [plataforma allotjada](https://app.supabase.io). Et pots registrar i començar a utilitzar Supabase sense instal·lar res. També podeu tenir una [_host_ pròpia](https://supabase.io/docs/guides/self-hosting) i [desenvolupar localment](https://supabase.io/docs/guides/local-development).
+Supabase és una [plataforma allotjada](https://app.supabase.io). Et pots registrar i començar a utilitzar Supabase sense instal·lar res. També podeu tenir una [_host_ pròpia](https://supabase.com/docs/guides/self-hosting) i [desenvolupar localment](https://supabase.com/docs/guides/local-development).
 
-![Arquitectura](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Arquitectura](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) és un sistema de base de dades objecte–relacional amb més de 30 anys de desenvolupament actiu que s’ha guanyat la seva forta reputació per ser de confiança, robust i d’alt rendiment.
 - [Temps real](https://github.com/supabase/realtime) és un server construït en Elixir que permet escoltar els _inserts_, _updates_ i _deletes_ de PostgreSQL utilitzant WebSockets. Supabase escolta a la funcionalitat de replicació integrada de PostgreSQL, converteix el byte de replicació en un JSON i després transmet el JSON a través de WebSockets.

@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) 是 Firebase 的開放原始碼替代方案。我們以企業等級的開放原始碼工具，打造 Firebase 的功能。
+[Supabase](https://supabase.com) 是 Firebase 的開放原始碼替代方案。我們以企業等級的開放原始碼工具，打造 Firebase 的功能。
 
 - [x] Postgres 資料庫託管
 - [x] 即時訂閱
@@ -18,13 +18,13 @@
 
 ## 說明文件
 
-完整的說明文件請見：[supabase.io/docs](https://supabase.io/docs)
+完整的說明文件請見：[supabase.io/docs](https://supabase.com/docs)
 
 ## 社群與支援
 
 - [社群論壇](https://github.com/supabase/supabase/discussions)。適合：打造、討論資料庫最佳作法的協助。
 - [GitHub Issues](https://github.com/supabase/supabase/issues)。適合：在使用 Supabase 的時候遇到臭蟲和錯誤。
-- [電子郵件支援](https://supabase.io/docs/support#business-support)。適合：資料庫或基礎建設遇到的問題。
+- [電子郵件支援](https://supabase.com/docs/support#business-support)。適合：資料庫或基礎建設遇到的問題。
 
 ## 狀態
 
@@ -47,7 +47,7 @@ Supabase 是一套開放原始碼工具的組合包。我們以企業等級的�
 
 Supabase 是[託管平台](https://app.supabase.io)。只要註冊，不必安裝任何東西，就可以開始使用 Supabase。目前還在打造本地端開發體驗：連同平台的穩定度，這是我們專注的核心。
 
-![架構](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![架構](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) 是經歷 30 年活躍開發的關聯物件資料庫系統，因此擁有可靠度、功能細緻度與效能著稱。
 - [Realtime](https://github.com/supabase/realtime) 是利用 Websocket 監聽 PostgreSQL 的 insert、update 和 delete 的 Elixir 伺服器。Supabase 監聽 Postgres 內建的複寫 (Replication) 功能，將複寫的 byte stream 轉換為 JSON 格式，接著透過 Websocket 將 JSON 進行廣播。
