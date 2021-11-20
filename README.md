@@ -20,6 +20,8 @@
 
 For full documentation, visit [supabase.com/docs](https://supabase.com/docs)
 
+To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
+
 ## Community & Support
 
 - [Community Forum](https://github.com/supabase/supabase/discussions). Best for: help with building, discussion about database best practices.
