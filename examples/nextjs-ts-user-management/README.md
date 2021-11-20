@@ -4,16 +4,16 @@ This example will set you up for a very common situation: users can sign up with
 
 This demonstrates how to use:
 
-- User signups using Supabase [Auth](https://supabase.io/auth).
-- User avatar images using Supabase [Storage](https://supabase.io/storage).
-- Public profiles restricted with [Policies](https://supabase.io/docs/guides/auth#policies).
+- User signups using Supabase [Auth](https://supabase.com/auth).
+- User avatar images using Supabase [Storage](https://supabase.com/storage).
+- Public profiles restricted with [Policies](https://supabase.com/docs/guides/auth#policies).
 - Frontend using [Next.js](<[nextjs.org/](https://nextjs.org/)>).
 
 ## Technologies used
 
 - Frontend:
   - [Next.js](https://github.com/vercel/next.js) - a React framework for production.
-  - [Supabase.js](https://supabase.io/docs/library/getting-started) for user management and realtime data syncing.
+  - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
   - [app.supabase.io](https://app.supabase.io/): hosted Postgres database with restful API for usage with Supabase.js.
 
@@ -119,6 +119,6 @@ create policy "Anyone can upload an avatar."
 
 ## Authors
 
-- [Supabase](https://supabase.io)
+- [Supabase](https://supabase.com)
 
 Supabase is open source. We'd love for you to follow along and get involved at https://github.com/supabase/supabase

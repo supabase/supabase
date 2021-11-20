@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) este o alternativă open source la Firebase. Construim trăsăturile Firebase folosind instrumente open source de calitate.
+[Supabase](https://supabase.com) este o alternativă open source la Firebase. Construim trăsăturile Firebase folosind instrumente open source de calitate.
 
 - [x] Bază de date Postgres găzduită
 - [x] Abonamente Realtime
@@ -18,13 +18,13 @@
 
 ## Documentație
 
-Pentru documentația completă vizitați [supabase.io/docs](https://supabase.io/docs)
+Pentru documentația completă vizitați [supabase.io/docs](https://supabase.com/docs)
 
 ## Comunitate și suport
 
 - [Forumul comunității](https://github.com/supabase/supabase/discussions). Cel mai bun pentru: ajutor în construire, discuție despre cele mai bune practici pentru bazele de date.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Cel mai bun pentru: bug-uri și erori întâlnite în timpul utilizării Supabase.
-- [Suport prin email](https://supabase.io/docs/support#business-support). Cel mai bun pentru: probleme cu baza dumneavostră de date sau de infrastructură.
+- [Suport prin email](https://supabase.com/docs/support#business-support). Cel mai bun pentru: probleme cu baza dumneavostră de date sau de infrastructură.
 
 ## Status
 
@@ -47,7 +47,7 @@ Supabase este o combinație de unelte open source. Construim trăsăturile din F
 
 Supabase este o [platformă găzduită](https://app.supabase.io). Puteți să vă înscrieți și să începeți să folosiți Supabase fără a instala orice. Experiența de developare locală încă mai este în dezvoltare, acesta fiind lucrul la care ne concentrăm cel mai mult, împreună cu stabilitatea platformei.
 
-![Arhitectură](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Arhitectură](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) este o bază de date de obiecte relațională cu peste 30 de ani de dezvoltare și o reputație pentru fiabilitate și performanță.
 - [Realtime](https://github.com/supabase/realtime) este un server Elixir care permite ascultarea inserțiilor, actualizărilor și ștergerilor bazei de date PostgreSQL prin intermediul websocket-urilor. Supabase ascultă funcționalitatea de replicare integrată PostgreSQL, convertește fluxul de octeți al replicării în JSON, apoi emite JSON-ul prin intermediul websocket-urilor.

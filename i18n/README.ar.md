@@ -8,7 +8,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io)هو بديل مفتوح المصدر لـ(Firebase). نحن نبني ميزات (Firebase) باستخدام أدوات مفتوحة المصدر عالية الجودة تستخدمها الشركات.
+[Supabase](https://supabase.com)هو بديل مفتوح المصدر لـ(Firebase). نحن نبني ميزات (Firebase) باستخدام أدوات مفتوحة المصدر عالية الجودة تستخدمها الشركات.
 
 - [x] قاعدة بيانات (Postgres) مستضافة.
 - [x] اشتراكات الوقت الفعلي.
@@ -20,13 +20,13 @@
 
 ## الشرح
 
-للحصول على الشرح الكامل، قم بزيارة [supabase.io/docs](https://supabase.io/docs).
+للحصول على الشرح الكامل، قم بزيارة [supabase.io/docs](https://supabase.com/docs).
 
 ## المجتمع والدعم
 
 - [مندى المجتمع](https://github.com/supabase/supabase/discussions). الأفضل لـ: المساعدة في البناء، والنقاش حول أفضل ممارسات قاعدة البيانات.
 - [مشاكل GitHub](https://github.com/supabase/supabase/issues). الأفضل لـ: المشاكل والأخطاء التي تواجهها عند استخدامك لـ(Supabase).
-- [دعم البريد الإلكتروني](https://supabase.io/docs/support#business-support). الأفضل لـ: مشاكل مع قاعدة بياناتك أو البنية التحتية.
+- [دعم البريد الإلكتروني](https://supabase.com/docs/support#business-support). الأفضل لـ: مشاكل مع قاعدة بياناتك أو البنية التحتية.
 
 ## الحالة
 

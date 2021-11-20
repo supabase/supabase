@@ -62,10 +62,10 @@ function Database() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.io/auth`,
+          url: `https://supabase.com/auth`,
           images: [
             {
-              url: `https://supabase.io${basePath}/images/product/database/database-og.jpg`,
+              url: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
             },
           ],
         }}

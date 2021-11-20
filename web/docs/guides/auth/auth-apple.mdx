@@ -1,11 +1,11 @@
 ---
 id: auth-apple
-title: "Login with Apple"
+title: 'Login with Apple'
 description: Add Apple OAuth to your Supabase project
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 To enable Apple Auth for your project, you need to set up an Apple OAuth application and add the application credentials to your Supabase Dashboard.
 
@@ -13,12 +13,12 @@ To enable Apple Auth for your project, you need to set up an Apple OAuth applica
 
 Apple OAuth consists of six broad steps:
 
-* Obtaining an `App Id` with “Sign In with Apple” capabilities.
-* Obtaining a `Services Id` - this will serve as the `client_id`.
-* Obtaining a `secret key` that will be used to get our `client_secret`.
-* Generating the `client_secret` using the `secret key`.
-* Add your `client id` and `client secret` keys to your [Supabase Project](https://supabase.io).
-* Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+- Obtaining an `App Id` with “Sign In with Apple” capabilities.
+- Obtaining a `Services Id` - this will serve as the `client_id`.
+- Obtaining a `secret key` that will be used to get our `client_secret`.
+- Generating the `client_secret` using the `secret key`.
+- Add your `client id` and `client secret` keys to your [Supabase Project](https://supabase.com).
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Steps
 
@@ -37,11 +37,11 @@ Apple OAuth consists of six broad steps:
 - Select `App IDs` and click `Continue`.
 - Select type `App` and click `Continue`.
 - Fill out your app information:
-    - App description.
-    - Bundle ID (Apple recommends reverse-domain name style, so if your domain is acme.com and your app is called roadrunner, use: "com.acme.roadrunner").
-    - Scroll down and check `Sign In With Apple`.
-    - Click `Continue` at the top right.
-    - Click `Register` at the top right.
+  - App description.
+  - Bundle ID (Apple recommends reverse-domain name style, so if your domain is acme.com and your app is called roadrunner, use: "com.acme.roadrunner").
+  - Scroll down and check `Sign In With Apple`.
+  - Click `Continue` at the top right.
+  - Click `Register` at the top right.
 
 ### Obtain a Services ID
 
@@ -52,26 +52,26 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 - Click on the `+` sign in the upper left next to `Identifiers`.
 - Select `Services IDs` and click `Continue`.
 - Fill out your information:
-    - App description.
-    - Bundle ID (you can't use the same Bundle ID from the previous step, but you can just add something to the beginning, such "app." to make it app.com.acme.roadrunner").
-    - SAVE THIS ID -- this ID will become your `client_id` later.
-    - Click `Continue` at the top right.
-    - Click `Register` at the top right.
+  - App description.
+  - Bundle ID (you can't use the same Bundle ID from the previous step, but you can just add something to the beginning, such "app." to make it app.com.acme.roadrunner").
+  - SAVE THIS ID -- this ID will become your `client_id` later.
+  - Click `Continue` at the top right.
+  - Click `Register` at the top right.
 
 ### Find your callback URL
 
-The next step requires a callback URL, which looks like this: 
+The next step requires a callback URL, which looks like this:
 
 `https://<project-ref>.supabase.co/auth/v1/callback`
 
-- Go to your [Supabase Project Dashboard](https://supabase.io).
+- Go to your [Supabase Project Dashboard](https://supabase.com).
 - Click on the `Settings` icon at the bottom of the left sidebar.
 - Click on `API` in the list.
 - Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
 - Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
 
 <video width="99%" muted playsInline controls="true">
-<source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
 </video>
 
 ### Configure your Services ID
@@ -86,7 +86,7 @@ The next step requires a callback URL, which looks like this:
 - Click `Continue` at the top right.
 - Click `Save` at the top right.
 
-### Download your secret key 
+### Download your secret key
 
 Now you'll need to download a `secret key` file from Apple that will be used to generate your `client_secret`.
 
@@ -108,11 +108,11 @@ Now you'll need to download a `secret key` file from Apple that will be used to 
 
 The `secret key` you downloaded is used to create the `client_secret` string you'll need to authenticate your users.
 
-According to the [Apple Docs](https://developer.apple.com/documentation/signinwithapplerestapi/generate_and_validate_tokens) it needs to be a JWT 
+According to the [Apple Docs](https://developer.apple.com/documentation/signinwithapplerestapi/generate_and_validate_tokens) it needs to be a JWT
 token encrypted using the Elliptic Curve Digital Signature Algorithm (ECDSA) with the P-256 curve and the SHA-256 hash algorithm.
 
-At this time, the easiest way to generate this JWT token is with [Ruby](https://www.ruby-lang.org/en/). 
-If you don't have Ruby installed, you can [Download Ruby Here](https://www.ruby-lang.org/en/downloads). 
+At this time, the easiest way to generate this JWT token is with [Ruby](https://www.ruby-lang.org/en/).
+If you don't have Ruby installed, you can [Download Ruby Here](https://www.ruby-lang.org/en/downloads).
 
 - Install Ruby (or check to make sure it's installed on your system).
 - Install [ruby-jwt](https://github.com/jwt/ruby-jwt).
@@ -144,13 +144,14 @@ token = JWT.encode(
 	"ES256",
 	header_fields=
 	{
-		kid: key_id 
+		kid: key_id
 	}
 )
 puts token
 ```
 
 1. Edit the `secret_gen.rb` file:
+
 - `key_file` = "Path to the private key you downloaded from Apple". It should look like this: `AuthKey_XXXXXXXXXX.p8`.
 - `team_id` = "Your Team ID". This is found at the top right of the Apple Developer site (next to your name).
 - `client_id` = "The Service ID of the service you created". This is the `Services ID` you created in the above step `Obtain a Services ID`. If you've lost this ID, you can find it in the Apple Developer Site:
@@ -163,13 +164,13 @@ puts token
   - Click `Keys` at the left.
   - Click on your newly-created key in the list.
   - Look under `Key ID` to find your key_id.
+
 2. From the command line, run: `ruby secret_gen.rb > client_secret.txt`.
 3. Your `client_secret` is now stored in this `client_secret.txt` file.
 
-
 ### Add your OAuth credentials to Supabase
 
-- Go to your [Supabase Dashboard](https://supabase.io).
+- Go to your [Supabase Dashboard](https://supabase.com).
 - In the left sidebar, click the `Authentication` icon (near the top).
 - Click `Settings` from the list to go to the `Authentication Settings` page.
 - Enter the final (hosted) URL of your app under `Site URL` (this is important).
@@ -183,7 +184,7 @@ The JavaScript client code is documented in the [Supabase OAuth Reference](/docs
 
 ```js
 const { user, session, error } = await supabase.auth.signIn({
-  provider: 'apple'
+  provider: 'apple',
 })
 ```
 
@@ -192,8 +193,8 @@ Add a function which you can call from a button, link, or UI element.
 ```js
 async function signInWithApple() {
   const { user, session, error } = await supabase.auth.signIn({
-    provider: 'apple'
-  });
+    provider: 'apple',
+  })
 }
 ```
 
@@ -201,14 +202,13 @@ To log out:
 
 ```js
 async function signout() {
-  const { error } = await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut()
 }
 ```
 
 ## Resources
 
-* [Apple Developer Account](https://developer.apple.com).
-* [Ruby](https://www.ruby-lang.org/en/) Docs.
-* [ruby-jwt](https://github.com/jwt/ruby-jwt) library.
-* Thanks to [Janak Amarasena](https://medium.com/@janakda) who did all the heavy lifting in [How to configure Sign In with Apple](https://medium.com/identity-beyond-borders/how-to-configure-sign-in-with-apple-77c61e336003).
-
+- [Apple Developer Account](https://developer.apple.com).
+- [Ruby](https://www.ruby-lang.org/en/) Docs.
+- [ruby-jwt](https://github.com/jwt/ruby-jwt) library.
+- Thanks to [Janak Amarasena](https://medium.com/@janakda) who did all the heavy lifting in [How to configure Sign In with Apple](https://medium.com/identity-beyond-borders/how-to-configure-sign-in-with-apple-77c61e336003).

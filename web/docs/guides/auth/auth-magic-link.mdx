@@ -1,11 +1,11 @@
 ---
 id: auth-magic-link
-title: "Login With Magic Link"
+title: 'Login With Magic Link'
 description: Use Supabase to Authenticate and Authorize your users using Magic Link.
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 By default, if no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
 
@@ -13,8 +13,8 @@ By default, if no password is provided, the user will be sent a "magic link" to 
 
 Setting up Magic Link logins for your Supabase application.
 
-* Add Magic Link authenticator to your [Supabase Project](https://app.supabase.io)
-* Add the login code to your application - [Javascript](https://github.com/supabase/supabase-js) |  [Dart](https://github.com/supabase/supabase-dart)
+- Add Magic Link authenticator to your [Supabase Project](https://app.supabase.io)
+- Add the login code to your application - [Javascript](https://github.com/supabase/supabase-js) | [Dart](https://github.com/supabase/supabase-dart)
 
 ## Add Magic Link into your Supabase Project
 
@@ -39,7 +39,7 @@ The JavaScript client code is documented here: [Supabase OAuth Client Code](/doc
 
 ```js
 const { user, error } = await supabase.auth.signIn({
-  email: 'example@email.com'
+  email: 'example@email.com',
 })
 ```
 
@@ -73,8 +73,8 @@ Add this function which you can call from a button, link, or UI element.
 ```js
 async function signInWithEmail() {
   const { user, error } = await supabase.auth.signIn({
-    email: 'example@email.com'
-  });
+    email: 'example@email.com',
+  })
 }
 ```
 
@@ -106,7 +106,7 @@ To log out:
 
 ```js
 async function signOut() {
-  const { error } = await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut()
 }
 ```
 
@@ -126,6 +126,6 @@ function SignOut() {
 
 ## Resources
 
-* [Supabase Account - Free Tier OK](https://supabase.io)
-* [Supabase JS Client](https://github.com/supabase/supabase-js)
-* [Supabase Dart Client](https://github.com/supabase/supabase-dart)
+- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Supabase Dart Client](https://github.com/supabase/supabase-dart)

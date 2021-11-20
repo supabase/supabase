@@ -1,18 +1,18 @@
 ---
 id: auth-email
-title: "Login With Email"
+title: 'Login With Email'
 description: Use Supabase to Authenticate and Authorize your users using email.
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 ## Overview
 
 Setting up Email logins for your Supabase application.
 
-* Add Email authenticator to your [Supabase Project](https://app.supabase.io)
-* Add the login code to your application - [Javascript](https://github.com/supabase/supabase-js) |  [Dart](https://github.com/supabase/supabase-dart)
+- Add Email authenticator to your [Supabase Project](https://app.supabase.io)
+- Add the login code to your application - [Javascript](https://github.com/supabase/supabase-js) | [Dart](https://github.com/supabase/supabase-dart)
 
 ## Add Email into your Supabase Project
 
@@ -38,7 +38,7 @@ The JavaScript client code is documented here: [Supabase OAuth Client Code](/doc
 ```js
 const { user, error } = await supabase.auth.signIn({
   email: 'example@email.com',
-  password: 'example-password'
+  password: 'example-password',
 })
 ```
 
@@ -74,8 +74,8 @@ Add this function which you can call from a button, link, or UI element.
 async function signInWithEmail() {
   const { user, error } = await supabase.auth.signIn({
     email: 'example@email.com',
-    password: 'example-password'
-  });
+    password: 'example-password',
+  })
 }
 ```
 
@@ -108,7 +108,7 @@ To log out:
 
 ```js
 async function signOut() {
-  const { error } = await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut()
 }
 ```
 
@@ -128,6 +128,6 @@ function SignOut() {
 
 ## Resources
 
-* [Supabase Account - Free Tier OK](https://supabase.io)
-* [Supabase JS Client](https://github.com/supabase/supabase-js)
-* [Supabase Dart Client](https://github.com/supabase/supabase-dart)
+- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Supabase Dart Client](https://github.com/supabase/supabase-dart)
