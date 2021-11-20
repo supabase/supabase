@@ -6,7 +6,7 @@
 .icon-electron {
   @apply absolute w-16 z-0;
   left: 17%;
-  top: 35%;
+  top: 25%;
 }
 .icon-vue {
   @apply absolute w-16 z-10;
