@@ -10,7 +10,7 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { Typography, Badge, Space, Dropdown, Button } from '@supabase/ui'
+import { Typography, Badge, Space, Dropdown, Button, IconChevronDown } from '@supabase/ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 import BlogHeader from '~/components/Blog/BlogHeader'
@@ -96,6 +96,7 @@ function Blog(props: any) {
                       <Button
                         type="outline"
                         className="sbui-select--medium"
+                        iconRight={<IconChevronDown />}
                       >
                         {category === 'all' ? 'Show all' : category}
                       </Button>
