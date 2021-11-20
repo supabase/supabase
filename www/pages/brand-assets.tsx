@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import { NextSeo } from 'next-seo'
 
 const { Title, Text } = Typography
 
@@ -15,8 +16,25 @@ const Index = () => {
   // base path for images
   const { basePath } = useRouter()
 
+  const meta_title = 'Branding | Supabase'
+  const meta_description = 'Get Supabase Brand assets here.'
+
   return (
     <>
+      <NextSeo
+        title={meta_title}
+        description={meta_description}
+        openGraph={{
+          title: meta_title,
+          description: meta_description,
+          url: `https://supabase.com/auth`,
+          images: [
+            {
+              url: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
+            },
+          ],
+        }}
+      />
       <Layout>
         <Container>
           <SectionContainer className="pb-0 md:pb-0 lg:pb-0">

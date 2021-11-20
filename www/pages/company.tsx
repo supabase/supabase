@@ -26,12 +26,33 @@ import {
   Space,
   Typography,
 } from '@supabase/ui'
+import { NextSeo } from 'next-seo'
 
 type Props = {}
 
-const Index = ({}: Props) => {
+const Index = ({ }: Props) => {
+  // base path for images
+  const { basePath } = useRouter()
+
+  const meta_title = 'Company | Supabase'
+  const meta_description = 'See how the supabase runs.'
+
   return (
     <>
+      <NextSeo
+        title={meta_title}
+        description={meta_description}
+        openGraph={{
+          title: meta_title,
+          description: meta_description,
+          url: `https://supabase.com/auth`,
+          images: [
+            {
+              url: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
+            },
+          ],
+        }}
+      />
       <Layout>
         <Header />
         <Community />
@@ -179,9 +200,8 @@ const Community = () => {
           `}
             >
               <div
-                className={`relative h-7 w-7 mx-auto lg:mx-0 ${
-                  x.invertImgDarkMode ? ' dark:filter dark:invert' : ''
-                }`}
+                className={`relative h-7 w-7 mx-auto lg:mx-0 ${x.invertImgDarkMode ? ' dark:filter dark:invert' : ''
+                  }`}
               >
                 <Image
                   layout="fill"
