@@ -30,7 +30,7 @@ import { NextSeo } from 'next-seo'
 
 type Props = {}
 
-const Index = ({ }: Props) => {
+const Index = ({}: Props) => {
   // base path for images
   const { basePath } = useRouter()
 
@@ -200,8 +200,9 @@ const Community = () => {
           `}
             >
               <div
-                className={`relative h-7 w-7 mx-auto lg:mx-0 ${x.invertImgDarkMode ? ' dark:filter dark:invert' : ''
-                  }`}
+                className={`relative h-7 w-7 mx-auto lg:mx-0 ${
+                  x.invertImgDarkMode ? ' dark:filter dark:invert' : ''
+                }`}
               >
                 <Image
                   layout="fill"
