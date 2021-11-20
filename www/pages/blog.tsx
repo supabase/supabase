@@ -44,14 +44,31 @@ function Blog(props: any) {
       category === 'all'
         ? props.blogs
         : props.blogs.filter((post: any) => {
-            const found = post.tags.includes(category)
-            return found
-          })
+          const found = post.tags.includes(category)
+          return found
+        })
     )
   }, [category])
 
+  const meta_title = 'Blog | Supabase'
+  const meta_description = 'Get all your Supabase News on the Supabase blog.'
+
   return (
     <>
+      <NextSeo
+        title={meta_title}
+        description={meta_description}
+        openGraph={{
+          title: meta_title,
+          description: meta_description,
+          url: `https://supabase.com/auth`,
+          images: [
+            {
+              url: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
+            },
+          ],
+        }}
+      />
       <Head>
         <link
           rel="alternate"

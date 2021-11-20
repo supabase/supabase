@@ -12,12 +12,30 @@ import ReactMarkdown from 'react-markdown'
 import CTABanner from '~/components/CTABanner'
 
 import Solutions from 'data/Solutions.json'
+import { NextSeo } from 'next-seo'
 
 export default function IndexPage() {
   const { basePath } = useRouter()
 
+  const meta_title = 'Pricing | Supabase'
+  const meta_description = 'Supabase pricing that you can afford for your next Supabase project.'
+
   return (
     <DefaultLayout>
+      <NextSeo
+        title={meta_title}
+        description={meta_description}
+        openGraph={{
+          title: meta_title,
+          description: meta_description,
+          url: `https://supabase.com/auth`,
+          images: [
+            {
+              url: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
+            },
+          ],
+        }}
+      />
       <div className="bg-white dark:bg-gray-800">
         <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative pt-24 md:pt-24 lg:pt-24">
           <div className="text-center">
