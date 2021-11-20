@@ -84,6 +84,10 @@ function Blog(props: any) {
                   <Space className="lg:justify-end" size={6}>
                     <Typography.Text>Select a category</Typography.Text>
                     <Dropdown
+                      style={{
+                        height: '50vh',
+                        overflow: 'auto',
+                      }}
                       overlay={[
                         <Dropdown.RadioGroup value={category} onChange={setCategory}>
                           <Dropdown.Radio value="all">Show all</Dropdown.Radio>
