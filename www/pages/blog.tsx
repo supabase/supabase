@@ -10,7 +10,7 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { Typography, Badge, Space, Select } from '@supabase/ui'
+import { Typography, Badge, Space, Dropdown, Button, IconChevronDown } from '@supabase/ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 import BlogHeader from '~/components/Blog/BlogHeader'
@@ -83,20 +83,32 @@ function Blog(props: any) {
                 <div className="col-span-12 lg:col-span-4 mt-4 lg:mt-0">
                   <Space className="lg:justify-end" size={6}>
                     <Typography.Text>Select a category</Typography.Text>
-                    <Select
-                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        setCategory(e.target.value)
-                      }
+                    <Dropdown
+                      style={{
+                        height: '50vh',
+                        overflow: 'auto',
+                      }}
+                      overlay={[
+                        <Dropdown.RadioGroup value={category} onChange={setCategory}>
+                          <Dropdown.Radio key={'all'} value="all">
+                            Show all
+                          </Dropdown.Radio>
+                          {props.categories.map((categoryId: string) => (
+                            <Dropdown.Radio key={categoryId} value={categoryId}>
+                              {categoryId}
+                            </Dropdown.Radio>
+                          ))}
+                        </Dropdown.RadioGroup>,
+                      ]}
                     >
-                      <Select.Option key={'all'} value={'all'}>
-                        Show all
-                      </Select.Option>
-                      {props.categories.map((categoryId: string) => (
-                        <Select.Option key={categoryId} value={categoryId}>
-                          {categoryId}
-                        </Select.Option>
-                      ))}
-                    </Select>
+                      <Button
+                        type="outline"
+                        className="sbui-select--medium"
+                        iconRight={<IconChevronDown />}
+                      >
+                        {category === 'all' ? 'Show all' : category}
+                      </Button>
+                    </Dropdown>
                   </Space>
                 </div>
               </div>
