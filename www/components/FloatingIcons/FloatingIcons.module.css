@@ -15,7 +15,7 @@
 }
 .icon-angular {
   @apply absolute w-12 z-10;
-  right: 24%;
+  right: 21%;
   top: 28%;
 }
 .icon-flutter {
