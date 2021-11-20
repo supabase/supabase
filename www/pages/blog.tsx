@@ -90,9 +90,13 @@ function Blog(props: any) {
                       }}
                       overlay={[
                         <Dropdown.RadioGroup value={category} onChange={setCategory}>
-                          <Dropdown.Radio value="all">Show all</Dropdown.Radio>
+                          <Dropdown.Radio key={'all'} value="all">
+                            Show all
+                          </Dropdown.Radio>
                           {props.categories.map((categoryId: string) => (
-                            <Dropdown.Radio value={categoryId}>{categoryId}</Dropdown.Radio>
+                            <Dropdown.Radio key={categoryId} value={categoryId}>
+                              {categoryId}
+                            </Dropdown.Radio>
                           ))}
                         </Dropdown.RadioGroup>,
                       ]}
