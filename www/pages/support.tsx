@@ -34,7 +34,7 @@ import { NextSeo } from 'next-seo'
 
 type Props = {}
 
-const Index = ({ }: Props) => {
+const Index = ({}: Props) => {
   // base path for images
   const { basePath } = useRouter()
 
