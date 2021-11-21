@@ -26,6 +26,7 @@ export default function Home() {
           <ClientLibrary
             language="Dart"
             releaseState="Beta"
+            docsUrl="https://supabase.io/docs/reference/dart/installing"
             gitUrl="https://github.com/supabase/supabase-dart"
           />
         </div>
