@@ -1,6 +1,7 @@
 # Supabase Studio
 
 Self hosted UI for Supabase projects.
+
 ## Status
 
 - [x] POC: Under heavy development
@@ -12,13 +13,14 @@ Warning: this is a work in progress. You can watch the development here:
 
 - Episode 1: https://www.youtube.com/watch?v=LHYrqBb4q9I
 - Episode 2: https://www.youtube.com/watch?v=R4gJhX_JFTo
+- Episode 3: https://www.youtube.com/watch?v=x5TKDQ-w3OQ
+- Episode 4: https://www.youtube.com/watch?v=wNoVi3wAmh0
 
 ### Built with
 
 - [Next.js](https://nextjs.org/)
 - [Tailwind](https://tailwindcss.com/)
 - [Supabase UI](https://ui.supabase.io/)
-
 
 ### Run locally
 
@@ -37,7 +39,7 @@ Run this repo
 # You can find you API params at app.supabase.io > project > settings > API
 
 NEXT_PUBLIC_SUPABASE_URL=URL
-NEXT_PUBLIC_SUAPBASE_ANON_KEY=API_KEY
+NEXT_PUBLIC_SUPABASE_ANON_KEY=API_KEY
 
 cd studio
 npm i
