@@ -1,7 +1,7 @@
 import { Typography, IconBookOpen, IconGitHub, Button, Badge } from '@supabase/ui'
 type ClientLibraryProps = {
   language: string
-  officalSupport?: boolean
+  officialSupport?: boolean
   releaseState?: string
   docsUrl?: string
   gitUrl: string
@@ -11,7 +11,7 @@ const iconUrl = 'https://app.supabase.io/icons/libraries/'
 export default function ClientLibrary({
   language,
   releaseState,
-  officalSupport,
+  officialSupport: officialSupport,
   docsUrl,
   gitUrl,
 }: ClientLibraryProps) {
@@ -28,7 +28,7 @@ export default function ClientLibrary({
             {language} {releaseState && <Badge color="yellow">{`Public ${releaseState}`}</Badge>}
           </Typography.Title>
           <Typography.Text>
-            {officalSupport
+            {officialSupport
               ? 'This library is officially supported'
               : 'This library is community supported'}
           </Typography.Text>

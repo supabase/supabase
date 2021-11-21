@@ -14,7 +14,7 @@ export default function Home() {
         <div className="mx-6 grid md:grid-cols-3 gap-12 mb-12">
           <ClientLibrary
             language="JavaScript"
-            officalSupport
+            officialSupport
             docsUrl="https://supabase.io/docs/reference/javascript/installing"
             gitUrl="https://github.com/supabase/supabase-js"
           />
