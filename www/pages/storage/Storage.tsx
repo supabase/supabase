@@ -206,7 +206,7 @@ function StoragePage() {
             // @ts-ignore
             content={ApiExamples}
             text={[
-              <p>Built from the ground-up for interoperable authentication.</p>,
+              <p>Built from the ground up for interoperable authentication.</p>,
               <p>
                 Fast and easy to implement using our powerful library clients. Asset optimization
                 and image transformation coming soon!
