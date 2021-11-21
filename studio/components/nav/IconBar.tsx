@@ -2,7 +2,6 @@ import {
   IconColumns,
   IconTerminal,
   IconUsers,
-  IconZap,
   IconHome,
   IconFile,
   IconArchive,
@@ -11,8 +10,10 @@ import {
   IconFileText,
   IconSettings,
 } from '@supabase/ui'
+import Image from 'next/image'
 import Link from 'next/link'
 import { ReactElement } from 'react'
+import SupabaseLogo from '../../public/supabase-logo.svg'
 
 /**
  * Route: Type definition for Sidebar Items
@@ -28,7 +29,7 @@ type Route = {
  * Full list of Sidebar Routes
  */
 const ROUTES: Route[] = [
-  { key: 'ICON', label: 'Supabase', icon: <IconZap size={20} strokeWidth={2} />, link: '/' },
+  { key: 'ICON', label: 'Supabase', icon: <Image src={SupabaseLogo} height={80} />, link: '/' },
   {
     key: 'HOME',
     label: 'Home',
