@@ -78,11 +78,11 @@ You should see an option to enable Phone Signup.
 
 Toggle it on, and copy the 3 values over from the twilio dashboard. Click save.
 
-Note: for "Twilio Message Service SID" you can use the Sender Phone Number generate above.
+Note: for "Twilio Message Service SID" you can use the Sender Phone Number generated above.
 
 ![Plug in Twilio credentials](/img/guides/auth-twilio/8.png)
 
-Now the backend should be setup, we can proceed to adding our client-side code!
+Now the backend should be setup, we can proceed to add our client-side code!
 
 #### SMS custom template
 
@@ -94,7 +94,7 @@ Use the variable `.Code` in the template to display the code.
 
 ### Using OTP with password based logins
 
-In this use scenario we'll be using the user's mobile phone number as an alternative to an email address when signing up along with a password. You may want to think hard about the permanency of this however. It is not uncommon for mobile phone numbers to be recycled by phone networks when users cancel their phone contracts or move countries, therefore granting access to the user's account to whomever takes over the phone number in the future. Soon we'll add multi-factor auth, which will mitigate this risk, but for now you may want to give some thought to allowing your users to recover their account by some other means in an emergency.
+In this use scenario we'll be using the user's mobile phone number as an alternative to an email address when signing up along with a password. You may want to think hard about the permanency of this however. It is not uncommon for mobile phone numbers to be recycled by phone networks when users cancel their phone contracts or move countries, therefore granting access to the user's account to whoever takes over the phone number in the future. Soon we'll add multi-factor auth, which will mitigate this risk, but for now you may want to give some thought to allowing your users to recover their account by some other means in an emergency.
 
 Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
 
@@ -246,7 +246,7 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/otp' \
 </TabItem>
 </Tabs>
 
-the second step is the same as the previous section, you need to collect the 6-digit pin from the user and pass it along with their phone number to the verify method:
+The second step is the same as the previous section, you need to collect the 6-digit pin from the user and pass it along with their phone number to the verify method:
 
 <Tabs
 defaultValue="JS"
