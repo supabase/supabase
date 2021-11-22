@@ -20,9 +20,9 @@ const BlogListItem = ({ blog }: Props) => {
     <div key={blog.slug}>
       <a href={`/blog/${blog.url}`}>
         <div className="inline-block">
-          <div className="flex flex-col space-y-3">
+          <div className="flex flex-col space-y-4">
             <div
-              className={`relative overflow-auto w-full h-40 border dark:border-dark rounded-sm shadow-sm`}
+              className={`relative overflow-auto w-full h-60 border dark:border-dark shadow-sm rounded-lg mb-4`}
             >
               <Image
                 layout="fill"
@@ -36,15 +36,33 @@ const BlogListItem = ({ blog }: Props) => {
             </div>
 
             <div>
-              <div className="space-x-3">
-                <Typography.Text type="secondary">{blog.date}</Typography.Text>
-                <Typography.Text type="secondary">•</Typography.Text>
-                <Typography.Text type="secondary">{blog.readingTime}</Typography.Text>
-              </div>
-              <Typography.Title level={4} className="m-0">
+              <Typography.Title level={3} className="m-0">
                 {blog.title}
               </Typography.Title>
             </div>
+            <Typography.Text type="secondary" small>
+              {blog.date}
+            </Typography.Text>
+
+            <Typography.Text className="m-0" type="secondary">
+              <p className="text-base mb-0">{blog.description}</p>
+            </Typography.Text>
+
+            {author && (
+              <div>
+                <Space size={4}>
+                  {author.author_image_url && (
+                    <img src={author.author_image_url} className="rounded-full w-10" />
+                  )}
+                  <Space direction="vertical" size={0}>
+                    <Typography.Text>{author.author}</Typography.Text>
+                    <Typography.Text type="secondary" small>
+                      {author.position}
+                    </Typography.Text>
+                  </Space>
+                </Space>
+              </div>
+            )}
 
             {/* {author && (
               <div>
@@ -63,19 +81,15 @@ const BlogListItem = ({ blog }: Props) => {
             )} */}
           </div>
           <div className="flex space-x-3">
-            {blog.tags &&
+            {/* {blog.tags &&
               blog.tags.map((tag: string) => (
                 <Link href={`/blog/tags/${tag}`} as={`/blog/tags/${tag}`}>
                   <div className="transition-opacity opacity-50 hover:opacity-100">
                     <Badge color="gray">{capitalize(tag.replace('-', ' '))}</Badge>
                   </div>
                 </Link>
-              ))}
+              ))} */}
           </div>
-
-          <Typography.Text className="m-0" type="secondary">
-            {blog.description}
-          </Typography.Text>
 
           {/* <Typography>
                 <ReactMarkdown>{blog.content.substring(0, 210) + '...'}</ReactMarkdown>
