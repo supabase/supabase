@@ -96,11 +96,14 @@ as $$
 declare
     sub text := current_setting('request.jwt.claim.sub', true);
     claims text := current_setting('request.jwt.claims', true);
+    id uuid;
 begin
   select case 
   	when sub is not null then sub::uuid
   	else (claims::json ->> 'sub')::uuid
-  end;
+  end into id;
+ 
+  return id;
 end $$;
 
 create or replace function auth.role() 
@@ -110,11 +113,14 @@ as $$
 declare
     jwt_role text := current_setting('request.jwt.claim.role', true);
     claims text := current_setting('request.jwt.claims', true);
+    user_role text;
 begin
   select case 
   	when jwt_role is not null then jwt_role::text
   	else (claims::json ->> 'role')::text
-  end;
+  end into user_role;
+ 
+  return user_role;
 end $$;
 
 create or replace function auth.email() 
@@ -124,11 +130,14 @@ as $$
 declare
     email text := current_setting('request.jwt.claim.email', true);
     claims text := current_setting('request.jwt.claims', true);
+    user_email text;
 begin
   select case 
   	when email is not null then email::text
   	else (claims::json ->> 'email')::text
-  end;
+  end into user_email;
+ 
+  return user_email;
 end $$;
 
 -- usage on auth functions to API roles
