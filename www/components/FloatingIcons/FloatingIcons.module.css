@@ -6,7 +6,7 @@
 .icon-electron {
   @apply absolute w-16 z-0;
   left: 17%;
-  top: 35%;
+  top: 25%;
 }
 .icon-vue {
   @apply absolute w-16 z-10;
@@ -16,7 +16,7 @@
 .icon-angular {
   @apply absolute w-12 z-10;
   right: 21%;
-  top: 33%;
+  top: 28%;
 }
 .icon-flutter {
   @apply absolute w-16 z-10;
