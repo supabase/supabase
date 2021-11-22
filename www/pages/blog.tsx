@@ -167,7 +167,7 @@ function FeaturedThumb(blog: PostTypes) {
       <a href={`/blog/${blog.url}`}>
         <a className="grid grid-cols-2 gap-16">
           <img
-            className="h-96 w-full object-cover border dark:border-dark"
+            className="h-96 w-full object-cover border dark:border-dark rounded-lg"
             src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
           />
           <Space direction="vertical" size={5} className="">
