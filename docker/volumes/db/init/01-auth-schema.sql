@@ -88,21 +88,48 @@ VALUES  ('20171026211738'),
         ('20180108183307'),
         ('20180119214651'),
         ('20180125194653');
-		
--- Gets the User ID from the request cookie
-create or replace function auth.uid() returns uuid as $$
-  select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
-$$ language sql stable;
 
--- Gets the User ID from the request cookie
-create or replace function auth.role() returns text as $$
-  select nullif(current_setting('request.jwt.claim.role', true), '')::text;
-$$ language sql stable;
+create or replace function auth.uid() 
+returns uuid 
+language plpgsql stable
+as $$
+declare
+    sub text := current_setting('request.jwt.claim.sub', true);
+    claims text := current_setting('request.jwt.claims', true);
+begin
+  select case 
+  	when sub is not null then sub::uuid
+  	else (claims::json ->> 'sub')::uuid
+  end;
+end $$;
 
--- Gets the User email
-create or replace function auth.email() returns text as $$
-  select nullif(current_setting('request.jwt.claim.email', true), '')::text;
-$$ language sql stable;
+create or replace function auth.role() 
+returns text 
+language plpgsql stable
+as $$
+declare
+    jwt_role text := current_setting('request.jwt.claim.role', true);
+    claims text := current_setting('request.jwt.claims', true);
+begin
+  select case 
+  	when jwt_role is not null then jwt_role::text
+  	else (claims::json ->> 'role')::text
+  end;
+end $$;
+
+create or replace function auth.email() 
+returns text 
+language plpgsql stable
+as $$
+declare
+    email text := current_setting('request.jwt.claim.email', true);
+    claims text := current_setting('request.jwt.claims', true);
+begin
+  select case 
+  	when email is not null then email::text
+  	else (claims::json ->> 'email')::text
+  end;
+end $$;
 
 -- usage on auth functions to API roles
 GRANT USAGE ON SCHEMA auth TO anon, authenticated, service_role;
