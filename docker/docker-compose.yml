@@ -1,3 +1,8 @@
+# Usage
+#   Start: docker-compose up
+#   Stop:  docker-compose down
+#   Destroy: docker-compose down -v
+
 version: "3.8"
 
 services:
