@@ -45,10 +45,10 @@ function StoragePage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.io/storage`,
+          url: `https://supabase.com/storage`,
           images: [
             {
-              url: `https://supabase.io${basePath}/images/product/storage/storage-og.jpg`,
+              url: `https://supabase.com${basePath}/images/product/storage/storage-og.jpg`,
             },
           ],
         }}
@@ -206,7 +206,7 @@ function StoragePage() {
             // @ts-ignore
             content={ApiExamples}
             text={[
-              <p>Built from the ground-up for interoperable authentication.</p>,
+              <p>Built from the ground up for interoperable authentication.</p>,
               <p>
                 Fast and easy to implement using our powerful library clients. Asset optimization
                 and image transformation coming soon!
@@ -265,8 +265,8 @@ function StoragePage() {
                         </p>
                       </Typography.Text>
                       <Link
-                        href="https://supabase.io/docs/reference/javascript/storage-createbucket"
-                        as="https://supabase.io/docs/reference/javascript/storage-createbucket"
+                        href="/docs/reference/javascript/storage-createbucket"
+                        as="/docs/reference/javascript/storage-createbucket"
                       >
                         <a>
                           <Button

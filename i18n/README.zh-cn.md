@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) 是一个开源的 Firebase 替代品。我们正在使用企业级的开源工具构建 Firebase 的功能。
+[Supabase](https://supabase.com) 是一个开源的 Firebase 替代品。我们正在使用企业级的开源工具构建 Firebase 的功能。
 
 - [x] Postgres 数据库托管
 - [x] 实时订阅
@@ -18,13 +18,13 @@
 
 ## 文档
 
-完整的文档，请访问 [supabase.io/docs](https://supabase.io/docs)
+完整的文档，请访问 [supabase.io/docs](https://supabase.com/docs)
 
 ## 社区与支持
 
 - [社区论坛](https://github.com/supabase/supabase/discussions)。适用于：帮助建立和讨论数据库的最佳实践。
 - [GitHub Issues](https://github.com/supabase/supabase/issues)。适用于：你在使用 Supabase 时遇到的 bug 和错误。
-- [电子邮件支持](https://supabase.io/docs/support#business-support)。适用于：你的数据库或基础设施的问题。
+- [电子邮件支持](https://supabase.com/docs/support#business-support)。适用于：你的数据库或基础设施的问题。
 
 ## 状态
 
@@ -47,7 +47,7 @@ Supabase 是一个开源工具的组合。我们正在使用企业级的开源�
 
 Supabase 是一个[托管平台](https://app.supabase.io)。你可以注册并开始使用 Supabase，而无需安装任何软件。我们仍在优化本地开发体验，这和平台稳定性一起作为我们当前的核心目标。
 
-![架构](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![架构](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) 是一个对象关系型数据库系统，经过 30 多年的积极开发，它在可靠性、功能健壮性和性能方面赢得了很好的声誉。
 - [Realtime](https://github.com/supabase/realtime) 是一个 Elixir 服务器，允许你使用 WebSocket 监听 PostgreSQL 的插入、更新和删除。Supabase 监听 Postgres 的内置复制功能，将复制的字节流转换为 JSON，然后通过 WebSocket 广播 JSON。

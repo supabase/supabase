@@ -60,7 +60,7 @@ function randomColor() {
 }
 
 const initialState = {
-  log: 'Start listerning...',
+  log: 'Start listening...',
   userPositions: {},
 }
 

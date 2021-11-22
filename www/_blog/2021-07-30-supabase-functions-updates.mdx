@@ -29,7 +29,7 @@ Postgres has built-in support for [SQL functions](https://www.postgresql.org/doc
 
 ![Postgres Functions](/images/blog/functions-updates/postgres-functions.png)
 
-You can call PostgreSQL Functions with `supabase-js` using your project API [[Docs](https://supabase.io/docs/reference/javascript/rpc)]:
+You can call PostgreSQL Functions with `supabase-js` using your project API [[Docs](/docs/reference/javascript/rpc)]:
 
 ```js hideCopy
 const { data, error } = await supabase.rpc('best_star_wars_series', {
@@ -39,7 +39,7 @@ const { data, error } = await supabase.rpc('best_star_wars_series', {
 
 ## PostgreSQL Triggers
 
-[Triggers](https://www.postgresql.org/docs/current/trigger-definition.html) are another amazing feature of Postgres, which allow you to execute any SQL code after inserting, updating, or deleting data.
+[Triggers](https://www.postgresql.org/docs/current/trigger-definition.html) are another amazing feature of Postgres, which allows you to execute any SQL code after inserting, updating, or deleting data.
 
 While triggers are a staple of Database Administrators, they can be a bit complex and hard to use. We plan to change that with a simple interface for building and managing PostgreSQL triggers.
 
@@ -92,7 +92,7 @@ Supabase will support several different targets.
 
 ### Hook Payload
 
-If the target is a Serverless function or an HTTP `POST` request, the payload is automatically generated from the underlying table data. The format matches Supabase [Realtime](https://supabase.io/docs/reference/javascript/subscribe), except in this case you don't a client to "listen" to the changes. This provides yet another mechanism for responding to database changes.
+If the target is a Serverless function or an HTTP `POST` request, the payload is automatically generated from the underlying table data. The format matches Supabase [Realtime](/docs/reference/javascript/subscribe), except in this case you don't a client to "listen" to the changes. This provides yet another mechanism for responding to database changes.
 
 ```ts hideCopy
 type InsertPayload = {
@@ -214,7 +214,7 @@ Shout out to [Paul Ramsey](https://github.com/pramsey), who gave us the implemen
 select
     *
 from
-   http_get('https://supabase.io')
+   http_get('https://supabase.com')
 cross join
    generate_series(1, 10) _;
 
@@ -223,7 +223,7 @@ Time: 3501.935 ms
 
 -- using pg_net to fetch from "supabase.io" 10 times
 select
-    net.http_get('https://supabase.io')
+    net.http_get('https://supabase.com')
 from
     generate_series (1,10) _;
 
@@ -248,4 +248,4 @@ Function Hooks is enabled today on all [new projects](https://app.supabase.io). 
 
 ![Enable hooks](/images/blog/functions-updates/enable-hooks.png)
 
-[^1]: Postgres also has the concept of [Hooks](https://supabase.io/blog/2021/07/01/roles-postgres-hooks), but they're more of an internal concept.
+[^1]: Postgres also has the concept of [Hooks](/blog/2021/07/01/roles-postgres-hooks), but they're more of an internal concept.

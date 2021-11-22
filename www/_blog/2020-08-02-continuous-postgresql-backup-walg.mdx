@@ -17,7 +17,7 @@ Have you ever wanted to restore your database's state to a particular moment in 
 
 ## Introduction
 
-[WAL-G](https://github.com/wal-g/wal-g) is an [open-source continuous archiving tool](https://www.citusdata.com/blog/2017/08/18/introducing-wal-g-faster-restores-for-postgres/) used to easily set up and recover from [physical backups](https://supabase.io/blog/2020/07/17/postgresql-physical-logical-backups) in Postgres. It mainly handles the storage and retrieval of physical backups and WAL archives to and from a chosen cloud storage provider. In this post, we will walk you through on how to effortlessly set up WAL-G for your database as well as guide you on what to do if and when disaster strikes.
+[WAL-G](https://github.com/wal-g/wal-g) is an [open-source continuous archiving tool](https://www.citusdata.com/blog/2017/08/18/introducing-wal-g-faster-restores-for-postgres/) used to easily set up and recover from [physical backups](/blog/2020/07/17/postgresql-physical-logical-backups) in Postgres. It mainly handles the storage and retrieval of physical backups and WAL archives to and from a chosen cloud storage provider. In this post, we will walk you through on how to effortlessly set up WAL-G for your database as well as guide you on what to do if and when disaster strikes.
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ For this tutorial, we will be using two instances running Postgres databases on 
 
 ### Installations
 
-Make sure the below packages are installed in your instances. Alternatively, you can spin up the [latest version](https://github.com/supabase/postgres/releases/tag/v0.13.0) of [Supabase Postgres](https://github.com/supabase/postgres) which would already have everything configured and installed, along with other [goodies](https://github.com/supabase/postgres#features). It is readily available in either the [AWS](https://aws.amazon.com/marketplace/pp/B08915TCJ2?qid=1595854723755&sr=0-1&ref_=srh_res_product_title) or [Digital Ocean](https://marketplace.digitalocean.com/apps/supabase-postgres) marketplaces and only takes [a few minutes](https://supabase.io/docs/postgres/postgres-intro) to get running.
+Make sure the below packages are installed in your instances. Alternatively, you can spin up the [latest version](https://github.com/supabase/postgres/releases/tag/v0.13.0) of [Supabase Postgres](https://github.com/supabase/postgres) which would already have everything configured and installed, along with other [goodies](https://github.com/supabase/postgres#features). It is readily available in either the [AWS](https://aws.amazon.com/marketplace/pp/B08915TCJ2?qid=1595854723755&sr=0-1&ref_=srh_res_product_title) or [Digital Ocean](https://marketplace.digitalocean.com/apps/supabase-postgres) marketplaces and only takes [a few minutes](/docs/postgres/postgres-intro) to get running.
 
 #### Postgres 12
 

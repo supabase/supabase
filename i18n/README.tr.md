@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) açık kaynaklı bir Firebase alternatifidir. Firebase'in özelliklerini kurumsal düzeyde açık kaynak araçları kullanarak oluşturuyoruz.
+[Supabase](https://supabase.com) açık kaynaklı bir Firebase alternatifidir. Firebase'in özelliklerini kurumsal düzeyde açık kaynak araçları kullanarak oluşturuyoruz.
 
 - [x] Barındırılan Postgres Veritabanı
 - [x] Gerçek zamanlı abonelikler
@@ -18,13 +18,13 @@
 
 ## Dokümantasyon
 
-Tam dokümantasyon için, ziyaret et [supabase.io/docs](https://supabase.io/docs)
+Tam dokümantasyon için, ziyaret et [supabase.io/docs](https://supabase.com/docs)
 
 ## Topluluk & Destek
 
 - [Topluluk Forumu](https://github.com/supabase/supabase/discussions). Şunun için en iyisi: yapı ile ilgili yardım, veritabanı için en iyi pratikleri tartışmak.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Şunun için en iyisi: Supabase kullanırken karşılaştığınız problem ve hatalar.
-- [Email Desteği](https://supabase.io/docs/support#business-support). Şunun için en iyisi:
+- [Email Desteği](https://supabase.com/docs/support#business-support). Şunun için en iyisi:
   veritabanınız veya altyapınızla ilgili sorunlar.
 
 ## Durum
@@ -48,7 +48,7 @@ Supabase, açık kaynaklı araçların bir kombinasyonudur. Firebase'in özellik
 
 Supabase [barındırılan bir platformdur](https://app.supabase.io). Hiçbir şey yüklemeden Supabase'e kaydolabilir ve kullanmaya başlayabilirsiniz. Hala yerel geliştirme deneyimini yaratıyoruz - bu, artık platform kararlılığı ile birlikte temel odak noktamız.
 
-![Architecture](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Architecture](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) güvenilirlik, özellik sağlamlığı ve performans açısından güçlü bir üne kavuşan 30 yılı aşkın aktif geliştirmeye sahip bir nesne ilişkisel veritabanı sistemidir.
 - [Realtime](https://github.com/supabase/realtime) Web soketleri kullanarak PostgreSQL eklerini, güncellemelerini ve silmelerini dinlemenizi sağlayan bir Elixir sunucusudur. Supabase, Postgres'in yerleşik çoğaltma işlevini dinler, çoğaltma bayt akışını JSON'a dönüştürür ve ardından JSON'yi web yuvaları üzerinden yayınlar.

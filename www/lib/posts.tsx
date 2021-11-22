@@ -29,7 +29,7 @@ export const getSortedPosts = (directory: Directories, limit?: number, tags?: an
     const fileContents = fs.readFileSync(fullPath, 'utf8')
     const { data, content } = matter(fileContents)
 
-    const options = { month: 'long', day: 'numeric', year: 'numeric' }
+    const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
     const formattedDate = new Date(data.date).toLocaleDateString('en-IN', options)
 
     const readingTime = generateReadingTime(content)

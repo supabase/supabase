@@ -45,7 +45,7 @@
       },
       {
         "text": "System Status",
-        "url": "https://status.supabase.io/"
+        "url": "https://status.supabase.com/"
       },
       {
         "text": "Terms of service",
@@ -79,7 +79,7 @@
       },
       {
         "text": "Open Source",
-        "url": "/oss"
+        "url": "/docs/oss"
       },
       {
         "text": "Careers",
@@ -99,7 +99,7 @@
       },
       {
         "text": "Security.txt",
-        "url": "https://supabase.io/.well-known/security.txt"
+        "url": "/.well-known/security.txt"
       }
     ]
   }

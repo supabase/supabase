@@ -29,7 +29,7 @@ export default function Header() {
                 <div className="flex-shrink-0 flex items-center text-white">
                   <img
                     className="h-8 w-auto"
-                    src="https://supabase.io/images/logo-dark.png"
+                    src="https://supabase.com/images/logo-dark.png"
                     alt="supabase"
                   />
                 </div>
@@ -54,7 +54,7 @@ export default function Header() {
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                {/** notificacoes */}
+                {/** notifications */}
 
                 {AuthUser() ? <MenuLogado /> : <MenuNotLogado />}
               </div>

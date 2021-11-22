@@ -172,7 +172,7 @@ SVELTE_APP_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
 Our app is almost functional, to make svelte work with supabase and .env files we first need to change the `rollup.config.js` file a bit.
-Supabase imports `json` files, to convert .json files to ES6 modules we need a the `@rollup/plugin-json` install it by running: 
+Supabase imports `json` files, to convert .json files to ES6 modules we need the `@rollup/plugin-json` install it by running: 
 
 ```bash
   npm install --save-dev @rollup/plugin-json
@@ -269,7 +269,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
 ```
 
 ### User store
-To access the user information in other places, we use writable store. Create a new file called `sessionStore.js`
+To access the user information in other places, we use a writable store. Create a new file called `sessionStore.js`
 ```javascript title="src/sessionStore.js"
 import { writable } from 'svelte/store';
 
@@ -427,7 +427,7 @@ npm run dev
 
 And then open the browser to [localhost:5000](http://localhost:5000) and you should see the completed app.
 
-> ⚠️ WARNING: Svelte uses by default `port 5000`, Supabase uses`port 3000`. To change the redirection port for supabase go to: `Authentication > Settings` and change the `Site Url` to `localhost:5000`
+> ⚠️ WARNING: Svelte uses by default `port 5000`, Supabase uses `port 3000`. To change the redirection port for supabase go to: `Authentication > Settings` and change the `Site Url` to `localhost:5000`
 
 ![Supabase Svelte](/img/supabase-svelte-demo.png)
 
