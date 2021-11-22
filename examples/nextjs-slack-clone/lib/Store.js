@@ -59,7 +59,7 @@ export const useStore = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.channelId])
 
-  // New message recieved from Postgres
+  // New message received from Postgres
   useEffect(() => {
     if (newMessage && newMessage.channel_id === Number(props.channelId)) {
       const handleAsync = async () => {
@@ -78,7 +78,7 @@ export const useStore = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deletedMessage])
 
-  // New channel recieved from Postgres
+  // New channel received from Postgres
   useEffect(() => {
     if (newChannel) setChannels(channels.concat(newChannel))
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -90,7 +90,7 @@ export const useStore = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deletedChannel])
 
-  // New or updated user recieved from Postgres
+  // New or updated user received from Postgres
   useEffect(() => {
     if (newOrUpdatedUser) users.set(newOrUpdatedUser.id, newOrUpdatedUser)
     // eslint-disable-next-line react-hooks/exhaustive-deps

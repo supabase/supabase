@@ -5,7 +5,7 @@ title: Acceptable Use Policy
 
 `Last Modified: 15 April 2021`
 
-This Acceptable Use Policy (this “Policy”) describes prohibited uses of the web services offered by Supabase, Inc. and its affiliates (the “Services”) and the website located at https://supabase.io (the “Supabase Site”). The examples described in this Policy are not exhaustive. We may modify this Policy at any time by posting a revised version on the Supabase Site. By using the Services or accessing the Supabase Site, you agree to the latest version of this Policy. If you violate the Policy or authorize or help others to do so, we may suspend or terminate your use of the Services.
+This Acceptable Use Policy (this “Policy”) describes prohibited uses of the web services offered by Supabase, Inc. and its affiliates (the “Services”) and the website located at https://supabase.com (the “Supabase Site”). The examples described in this Policy are not exhaustive. We may modify this Policy at any time by posting a revised version on the Supabase Site. By using the Services or accessing the Supabase Site, you agree to the latest version of this Policy. If you violate the Policy or authorize or help others to do so, we may suspend or terminate your use of the Services.
 
 ## No Illegal, Harmful, or Offensive Use or Content
 

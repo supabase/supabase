@@ -98,7 +98,7 @@ pages:
     description: |
       ## Dart
 
-      Dart libraries are built and suppported by the community. 
+      Dart libraries are built and supported by the community. 
 
       ```bash
       dart pub add supabase
@@ -177,7 +177,7 @@ pages:
       - A user can sign up via email, phone number.
       - If you provide `email` without a `password`, the user will be sent a magic link.
       - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
-      - Similary, if you provide `phone` without a `password`, the user will be sent a one time password. 
+      - Similarly, if you provide `phone` without a `password`, the user will be sent a one time password. 
       - If you are looking to sign users in with OAuth in Flutter apps, go to [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider).
     examples:
       - name: Sign in with email.
@@ -367,7 +367,7 @@ pages:
       Performs vertical filtering with SELECT.
     title: 'Fetch data: select()'
     notes: |
-      - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
       - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
     examples:
@@ -461,7 +461,7 @@ pages:
           By default the data is returned in JSON format, however you can also request for it to be returned as Comma Separated Values.
         dart: |
           ```dart
-          fianl res = await supabase
+          final res = await supabase
             .from('users')
             .select()
             .csv()
@@ -541,7 +541,7 @@ pages:
       Performs an UPSERT into the table.
     title: 'Upsert data: upsert()'
     notes: |
-      - Primary keys should to be included in the data payload in order for an update to work correctly. 
+      - Primary keys should be included in the data payload in order for an update to work correctly. 
       - Primary keys must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
     examples:
       - name: Upsert your data
@@ -1002,6 +1002,7 @@ pages:
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.io](https://app.supabase.io), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none 
         - `objects` permissions: none

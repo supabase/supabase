@@ -43,7 +43,7 @@ If the tool doesn't exist, we build and open source it ourselves.
 - [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Supabase listens to Postgres' built-in replication functionality, converts the replication byte stream into JSON, then broadcasts the JSON over websockets.
 - [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
 - [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
-- [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries etc.
+- [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
 - [GoTrue](https://github.com/netlify/gotrue) is an SWT based API for managing users and issuing SWT tokens.
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
 
@@ -97,7 +97,7 @@ Supabase creates several default roles in your Postgres database. To restore def
 
 ##### `postgres`
 
-The default PostgreSQL role. This has admin priveleges.  
+The default PostgreSQL role. This has admin privileges.  
 
 ##### `anon`
 
@@ -143,7 +143,7 @@ Use this tool to generate keys:
 
 ## Managing your secrets 
 
-Many components inside Supabase use secure secrets and password. These are listed in the self-hosting
+Many components inside Supabase use secure secrets and passwords. These are listed in the self-hosting
 [env file](https://github.com/supabase/supabase/blob/master/docker/.env.example), but we strongly recommend using a 
 secrets manager when deploying to production. Plain text files like dotenv lead to accidental costly leaks. 
 
@@ -160,4 +160,4 @@ Some suggested systems include:
 If you have decoupled your database from the middleware, then you should be able to redeploy the latest middleware at any time as long as it has no breaking changes.
 Supabase is evolving fast, and we'll continue to improve the migration strategy as part of our core offering.
 
-We realise that database migrations are difficult, and this is one of the problems we plan to make easy for developers.
+We realize that database migrations are difficult, and this is one of the problems we plan to make easy for developers.

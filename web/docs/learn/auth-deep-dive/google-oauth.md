@@ -40,7 +40,7 @@ Now choose Web Application (assuming you're creating a web app) and in the Autho
 
 ![Add your redirect URI](/img/auth-5-6.png)
 
-Now you can grab the client ID and secret from the pop up, and insert them into the google section inside the Supabase dashboard in Auth > Settings:
+Now you can grab the client ID and secret from the popup, and insert them into the google section inside the Supabase dashboard in Auth > Settings:
 
 ![take client id and secret](/img/auth-5-7.png)
 

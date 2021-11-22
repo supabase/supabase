@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) er et open source Firebase alternativ. Vi bygger Firebase features ved hjælp af anerkendte open source værktøjer.
+[Supabase](https://supabase.com) er et open source Firebase alternativ. Vi bygger Firebase features ved hjælp af anerkendte open source værktøjer.
 
 - [x] Hosted Postgres Database
 - [x] Realtids abonnementer
@@ -18,13 +18,13 @@
 
 ## Dokumentation
 
-For fuld dokumentation, besøg [supabase.io/docs](https://supabase.io/docs)
+For fuld dokumentation, besøg [supabase.io/docs](https://supabase.com/docs)
 
 ## Fælleskab & Support
 
 - [Community Forum](https://github.com/supabase/supabase/discussions). Bedst til: hjælp med at udvikle løsninger og diskussion om god praksis for databaseudvikling.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Bedst til: fejl du oplever i Supabase.
-- [Email Support](https://supabase.io/docs/support#business-support). Bedst til: problemer med din database eller infrastruktur.
+- [Email Support](https://supabase.com/docs/support#business-support). Bedst til: problemer med din database eller infrastruktur.
 
 ## Status
 
@@ -47,7 +47,7 @@ Supabase er en kombination af open source værktøjer. Vi bygger Firebase fuktio
 
 Supabase er en [hosted platform](https://app.supabase.io). Du kan skrive dig op og starte med at anvende Supabase uden nogen form for installation. Vi er stadig i gang med at forbedre den lokale udvikleroplevelse - dette er pt vores hovedfokus sammen med platformens generelle stabilitet.
 
-![Arkitektur](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Arkitektur](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) er en objektorienteret relationel database med mere end 30 års aktiv udvikling der har givet et stærkt omdømme for pålidelighed, funktionel robusthed og ydeevne.
 - [Realtime](https://github.com/supabase/realtime) er en Elixir server der giver mulighed for at lytte efter PostgreSQL oprettelser, opdateringer og sletninger ved hjælp af websockets. Supabase lytter efter Postgres' indbyggede replikeringsmekanisme, konverterer replika byte-strømmen til JSON og udsender derefter JSON gennem websockets.

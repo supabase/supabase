@@ -49,11 +49,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         description={DESCRIPTION}
         openGraph={{
           type: 'website',
-          url: 'https://supabase.io/',
+          url: 'https://supabase.com/',
           site_name: 'Supabase',
           images: [
             {
-              url: `https://supabase.io${basePath}/images/og/og-image.jpg`,
+              url: `https://supabase.com${basePath}/images/og/og-image.jpg`,
               width: 800,
               height: 600,
               alt: 'Supabase Og Image',

@@ -31,7 +31,7 @@
   /* See theme-specific "--custom" vars below  */
 
   /* 
-    Customisation here for both Light and Dark themes
+    Customization here for both Light and Dark themes
   */
   --custom-font-base: 'Inter', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto',
     'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica',
@@ -72,7 +72,7 @@
   --custom-shadow-xl: 0 30px 60px 0 rgba(0, 0, 0, 0.1);
 
   /* 
-    Infirma overrides with customisation
+    Infirma overrides with customization
   */
   /* Colors */
   --ifm-color-content: var(--custom-content-color);

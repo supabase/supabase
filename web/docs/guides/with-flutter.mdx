@@ -299,13 +299,16 @@ class AuthRequiredState<T extends StatefulWidget>
   @override
   void onUnauthenticated() {
     /// Users will be sent back to the LoginPage if they sign out.
-    Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+    if (mounted) {
+      /// Users will be sent back to the LoginPage if they sign out.
+      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+    }
   }
 }
 ```
 
 Let's also create a constant file to make it easier to use Supabase client. 
-We will also include an extension method delaration to call `showSnackBar` with one line of code. 
+We will also include an extension method declaration to call `showSnackBar` with one line of code. 
 
 ```dart title="lib/utils/constants.dart"
 import 'package:flutter/material.dart';
@@ -527,7 +530,6 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
     if (error != null) {
       context.showErrorSnackBar(message: error.message);
     }
-    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   @override
@@ -536,11 +538,6 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
     if (user != null) {
       _getProfile(user.id);
     }
-  }
-
-  @override
-  void onUnauthenticated() {
-    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   @override
@@ -650,7 +647,7 @@ photos and videos.
 
 ### Adding image uploading feature to Account page
 
-We will use [`image_picker`](https://pub.dev/packages/image_picker) plugin to select an image form the device.
+We will use [`image_picker`](https://pub.dev/packages/image_picker) plugin to select an image from the device.
 
 Run the following command to install it.
 

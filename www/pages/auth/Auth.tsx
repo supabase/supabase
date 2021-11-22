@@ -51,10 +51,10 @@ function AuthPage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.io/auth`,
+          url: `https://supabase.com/auth`,
           images: [
             {
-              url: `https://supabase.io${basePath}/images/product/auth/auth-og.jpg`,
+              url: `https://supabase.com${basePath}/images/product/auth/auth-og.jpg`,
             },
           ],
         }}
@@ -66,7 +66,7 @@ function AuthPage() {
           h1={[
             <span key={'authentication-h1'}>
               Open Source Auth
-              <br /> (without the integrations)
+              <br /> (with tons of integrations)
             </span>,
           ]}
           subheader={[
@@ -93,7 +93,7 @@ function AuthPage() {
               />
             </div>,
           ]}
-          documentation_url={'https://supabase.io/docs/guides/auth'}
+          documentation_url={'/docs/guides/auth'}
         />
 
         <SectionContainer>
@@ -197,7 +197,7 @@ function AuthPage() {
                 </div>
               </div>,
             ]}
-            documentation_link={'https://supabase.io/docs/guides/auth'}
+            documentation_link={'/docs/guides/auth'}
           />
         </SectionContainer>
 
@@ -229,7 +229,7 @@ function AuthPage() {
                 </p>
                 <p>Policies can be written in SQL or using the dashboard online.</p>
               </Typography.Text>
-              <Link href="https://supabase.io/docs/guides/auth#policy-examples">
+              <Link href="/docs/guides/auth#policy-examples">
                 <a>
                   <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
                     Explore documentation

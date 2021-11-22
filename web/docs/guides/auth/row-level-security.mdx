@@ -131,9 +131,11 @@ create policy "Team members can update team details if they belong to the team."
   );
 ```
 
+**Note:** If RLS is also enabled for _members_, the user must also have read (_select_) access to _members_. Otherwise the joined query will not yield any results.
+
 ### Policies with security definer functions
 
-Policies can also make use of `security definer functions`. This is useful in a many-to-many relationship where you want to restrict access to the linking table. Following the `teams` and `members` example from above, this example shows how you can use security definer function in combination with a policy to control access to the `members` table.
+Policies can also make use of `security definer functions`. This is useful in a many-to-many relationship where you want to restrict access to the linking table. Following the `teams` and `members` example from above, this example shows how you can use the security definer function in combination with a policy to control access to the `members` table.
 
 ```sql
 -- 1. Follow example for 'Policies with joins' above

@@ -16,12 +16,12 @@ How to restrict table access to authenticated users, row level policies, and ema
 
 Now that we know how to restrict access to tables based on JWT roles, we can combine this with user management to give us much more control over what data your users can read to and write from your database.
 
-We'll start with how user sessions work in Supabase, and later move onto writing user-centric policies.
+We'll start with how user sessions work in Supabase, and later move on to writing user-centric policies.
 
 Let's say we're signing a user up to our service for the first time. The typical way to do this is by invoking the following method in supabase-js:
 
 ```jsx
-// see full api reference here: https://supabase.io/docs/reference/javascript/auth-signup
+// see full api reference here: /docs/reference/javascript/auth-signup
 supabase.auth.signUp({ email, password })
 ```
 
@@ -70,9 +70,9 @@ If we put the access_token into [https://jwt.io](https://jwt.io) we'll see it de
 }
 ```
 
-The `authenticated` role is special in Supabase, it tells the API that this is an authenticated user and will know to compare the JWT against any polices you've added to the requested resource (table or row).
+The `authenticated` role is special in Supabase, it tells the API that this is an authenticated user and will know to compare the JWT against any policies you've added to the requested resource (table or row).
 
-The `sub` claim is usually what we use to match the JWT to rows in your database, since by default it is the unique identifier of the user in the `auth.users` table (as a sidenote - it's generally not recommended to alter the `auth` schema in any way in your Supabase database since the Auth API relies on it to function correctly).
+The `sub` claim is usually what we use to match the JWT to rows in your database, since by default it is the unique identifier of the user in the `auth.users` table (as a side note - it's generally not recommended to alter the `auth` schema in any way in your Supabase database since the Auth API relies on it to function correctly).
 
 For the curious, try heading to the SQL editor and querying:
 
@@ -80,7 +80,7 @@ For the curious, try heading to the SQL editor and querying:
 select * from auth.users;
 ```
 
-If supabase-js is loaded on your site (in this case http://localhost:3000) then it will automatically pluck the access_token out of the URL and initiate a session. You can check the [session()](https://supabase.io/docs/reference/javascript/auth-session) method to see if there is a valid session:
+If supabase-js is loaded on your site (in this case http://localhost:3000) then it will automatically pluck the access_token out of the URL and initiate a session. You can check the [session()](/docs/reference/javascript/auth-session) method to see if there is a valid session:
 
 ```jsx
 console.log(supabase.auth.session())
@@ -133,7 +133,7 @@ Note that the `anon key` (or `service role key`) is always needed to get past th
 
 There are some more notes here on how to structure your schema to best integrate with the `auth.users` table.
 
-Once you get the hang of polices you can start to get a little bit fancy. Let's say I work at Blizzard and I only want Blizzard staff members to be able to update people's high scores, I can write something like:
+Once you get the hang of policies you can start to get a little bit fancy. Let's say I work at Blizzard and I only want Blizzard staff members to be able to update people's high scores, I can write something like:
 
 ```sql
 create or replace function auth.email() returns text as $$

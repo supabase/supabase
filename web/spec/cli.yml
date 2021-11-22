@@ -24,6 +24,8 @@ info:
     npm install supabase -g
     ```
 
+    There may be additional steps that you need to follow to setup the CLI. Located [here](https://supabase.com/docs/guides/local-development).
+
   definition: spec/combined.json
   libraries:
     - name: 'sh'
@@ -49,7 +51,7 @@ pages:
       supabase init
       ```
 
-      This command will create a .supabase folder which holds all the configuration for developing your project locally. You don't need to check this into version control.
+      This command will create a .supabase folder which holds all the configurations for developing your project locally. You don't need to check this into version control.
 
       After you run `supabase init` you will be guided through a series of questions, and if everything goes well, you will see an output similar to this:
 
@@ -72,7 +74,7 @@ pages:
 
       This command uses Docker Compose to start all the open source [services](/docs/#how-it-works) of Supabase. This command will take a while to run, there are a lot of services to build.
 
-      Once this is running, you will see the healthy services in Docker Dashboard:
+      Once this is running, you will see the health services in Docker Dashboard:
 
       ![Docker Supabase](/img/docker-supabase.png)
 
@@ -89,8 +91,7 @@ pages:
       ```bash
       supabase eject
       ```
-      
+
       Run in any folder to create a `docker` folder with a `docker-compose.yml`. This is useful for self-hosting or adding custom configuration. 
 
       See our [Self Hosting](/docs/guides/hosting/overview) docs for more details.
-

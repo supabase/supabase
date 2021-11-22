@@ -7,7 +7,7 @@
 module.exports = {
   title: 'Supabase',
   tagline: 'Build in a weekend. Scale to millions.',
-  url: 'https://supabase.io',
+  url: 'https://supabase.com',
   baseUrl: '/',
   favicon: '/favicon.ico',
   organizationName: 'supabase', // Usually your GitHub org/user name.
@@ -95,15 +95,15 @@ module.exports = {
           items: [
             {
               label: 'Blog',
-              to: 'https://supabase.io/blog',
+              to: 'https://supabase.com/blog',
             },
             {
               label: 'Humans.txt',
-              to: 'https://supabase.io/humans.txt',
+              to: 'https://supabase.com/humans.txt',
             },
             {
               label: 'Lawyers.txt',
-              to: 'https://supabase.io/lawyers.txt',
+              to: 'https://supabase.com/lawyers.txt',
             },
           ],
         },
@@ -132,12 +132,12 @@ module.exports = {
               href: 'https://dev.to/supabase',
             },
             {
-              label: "Discord",
-              href: "https://discord.supabase.com"
+              label: 'Discord',
+              href: 'https://discord.supabase.com',
             },
             {
               label: 'RSS',
-              href: 'https://supabase.io/rss.xml',
+              href: 'https://supabase.com/rss.xml',
             },
           ],
         },
@@ -146,7 +146,7 @@ module.exports = {
           items: [
             {
               label: 'Brand Assets',
-              to: 'https://supabase.io/brand-assets',
+              to: 'https://supabase.com/brand-assets',
             },
           ],
         },

@@ -145,6 +145,8 @@ module.exports = {
           label: 'Authentication',
           collapsed: true,
           items: [
+            'guides/auth/auth-email',
+            'guides/auth/auth-magic-link',
             'guides/auth/auth-apple',
             'guides/auth/auth-bitbucket',
             'guides/auth/auth-discord',
@@ -152,9 +154,12 @@ module.exports = {
             'guides/auth/auth-github',
             'guides/auth/auth-gitlab',
             'guides/auth/auth-google',
+            'guides/auth/auth-slack',
+            'guides/auth/auth-spotify',
             'guides/auth/auth-twitter',
             'guides/auth/auth-twitch',
             'guides/auth/auth-twilio',
+            'guides/auth/auth-messagebird',
           ],
         },
         {

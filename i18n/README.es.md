@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) es una alternativa de código abierto a Firebase. Estamos construyendo las funcionalidades de Firebase usando herramientas de código abierto de nivel empresarial.
+[Supabase](https://supabase.com) es una alternativa de código abierto a Firebase. Estamos construyendo las funcionalidades de Firebase usando herramientas de código abierto de nivel empresarial.
 
 - [x] Alojamiento de base de datos Postgres
 - [x] Suscripciones en tiempo real
@@ -18,13 +18,13 @@
 
 ## Documentación
 
-Para ver la documentación completa, visita [supabase.io/docs](https://supabase.io/docs).
+Para ver la documentación completa, visita [supabase.io/docs](https://supabase.com/docs).
 
 ## Comunidad y soporte
 
 - [Foro de la comunidad](https://github.com/supabase/supabase/discussions). Mejor para: ayuda construyendo, discusiones acerca de las mejores practicas de base de datos.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Mejor para: bugs y errores que te puedes encontrar utilizando Supabase.
-- [Soporte por e-mail](https://supabase.io/docs/support#business-support). Mejor para: problemas con la base de datos o infraestructura.
+- [Soporte por e-mail](https://supabase.com/docs/support#business-support). Mejor para: problemas con la base de datos o infraestructura.
 - [Discord](https://discord.supabase.com). Mejor para: compartir tus aplicaciones y pasar el rato con la comunidad.
 
 ## Estatus
@@ -46,9 +46,9 @@ Supabase es una combinación de herramientas de código abierto. Estamos constru
 
 **Arquitectura actual**
 
-Supabase es una [plataforma alojada](https://app.supabase.io). Te puedes registrar y comenzar a utilizar Supabase sin instalar nada. También puedes tener un [_host_ propio](https://supabase.io/docs/guides/self-hosting) y [desarrollar en local](https://supabase.io/docs/guides/local-development).
+Supabase es una [plataforma alojada](https://app.supabase.io). Te puedes registrar y comenzar a utilizar Supabase sin instalar nada. También puedes tener un [_host_ propio](https://supabase.com/docs/guides/self-hosting) y [desarrollar en local](https://supabase.com/docs/guides/local-development).
 
-![Arquitectura](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Arquitectura](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) es un sistema de base de datos objeto-relacional con más de 30 años de desarrollo activo que se ha ganado su fuerte reputación por ser confiable, robusto y de alto rendimiento.
 - [Tiempo Real](https://github.com/supabase/realtime) es un server construido en Elixir que permite escuchar a los _inserts_, _updates_ y _deletes_ de PostgreSQL utilizando WebSockets. Supabase escucha a la funcionalidad de replicación integrada de PostgreSQL, convierte el byte de replicación en un JSON y después transmite el JSON a través de WebSockets.

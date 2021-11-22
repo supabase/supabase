@@ -24,7 +24,7 @@ const Home = (props) => {
         <div className="section">
           <h1>Collaborative Task Lists</h1>
           <small>
-            Powered by <a href="https://supabase.io">Supabase</a>
+            Powered by <a href="https://supabase.com">Supabase</a>
           </small>
         </div>
         <div className="section">

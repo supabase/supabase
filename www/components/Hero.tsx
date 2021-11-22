@@ -37,7 +37,7 @@ const Hero = () => {
                           </Button>
                         </a>
                       </Link>
-                      <Link href="https://app.supabase.io/docs" as="https://supabase.io/docs">
+                      <Link href="/docs" as="/docs">
                         <a>
                           <Button
                             className="mt-10 py-3"
@@ -80,7 +80,7 @@ const Hero = () => {
                       <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
                     </div>
                     <div
-                      className="w-full relative bg-dark-900 shadow-lg"
+                      className="w-full relative bg-dark-900 shadow-lg rounded-b-md"
                       style={{ padding: '56.25% 0 0 0' }}
                     >
                       <iframe

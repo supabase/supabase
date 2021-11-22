@@ -109,6 +109,6 @@ create policy "Anyone can update an avatar."
 
 ## Authors
 
-- [Supabase](https://supabase.io)
+- [Supabase](https://supabase.com)
 
 Supabase is open source. We'd love for you to follow along and get involved at https://github.com/supabase/supabase
