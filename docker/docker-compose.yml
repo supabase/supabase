@@ -52,7 +52,7 @@ services:
       GOTRUE_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v8.0.0
+    image: postgrest/postgrest:v9.0.0-a1
     depends_on:
       - db
     restart: unless-stopped
@@ -61,6 +61,7 @@ services:
       PGRST_DB_SCHEMA: public, storage
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUC: "false"
   realtime:
     container_name: supabase-realtime
     image: supabase/realtime:v0.15.0
