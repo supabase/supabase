@@ -26,7 +26,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.1.8
+    image: supabase/gotrue:v2.2.6
     depends_on:
       - db
     restart: unless-stopped
@@ -117,7 +117,7 @@ services:
 
   pg-meta:
     container_name: supabase-pg-meta
-    image: supabase/postgres-meta:v0.26.1
+    image: supabase/postgres-meta:v0.28.0
     depends_on:
       - db
     restart: unless-stopped
