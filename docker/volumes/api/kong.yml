@@ -129,11 +129,11 @@ services:
       - name: cors
 
   ## Secure Database routes
-  - name: pg-meta
+  - name: meta
     _comment: "pg-meta: /pg/* -> http://pg-meta:8080/*"
-    url: http://pg-meta:8080/
+    url: http://meta:8080/
     routes:
-      - name: pg-meta-all
+      - name: meta-all
         strip_path: true
         paths:
           - /pg/

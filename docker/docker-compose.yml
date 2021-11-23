@@ -65,7 +65,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v8.0.0
+    image: postgrest/postgrest:v8.0.0.20211102
     depends_on:
       - db
     restart: unless-stopped
@@ -74,7 +74,7 @@ services:
       PGRST_DB_SCHEMA: public, storage
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
-
+      PGRST_DB_USE_LEGACY_GUCS: "false"
   realtime:
     container_name: supabase-realtime
     image: supabase/realtime:v0.15.0
@@ -141,20 +141,12 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - type: volume
-        source: volume_database
-        target: /var/lib/postgresql/data
+      - /var/lib/postgresql/data/pgdata
       - type: bind
         source: ./volumes/db/init
         target: /docker-entrypoint-initdb.d
 
 volumes:
-  volume_database:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./volumes/db/data
-      o: bind
   volume_storage: 
     driver: local
     driver_opts:
