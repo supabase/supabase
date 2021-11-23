@@ -328,7 +328,7 @@ pages:
 
       ### Generate database types from OpenAPI specification
 
-      Supabase generates a OpenAPI specification file for your database which can be used to generate your data types for usage with TypeScript.
+      Supabase generates an OpenAPI specification file for your database which can be used to generate your data types for usage with TypeScript.
 
       The OpenAPI specification for your Supabase project can be accessed as follows:
 
@@ -805,7 +805,7 @@ pages:
     title: 'Fetch data: select()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.select'
     notes: |
-      - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
       - `select()` can be combined with [Filters](/docs/reference/javascript/using-filters)
     examples:
@@ -1006,7 +1006,7 @@ pages:
     title: 'Upsert data: upsert()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.upsert'
     notes: |
-      - Primary keys should to be included in the data payload in order for an update to work correctly. 
+      - Primary keys should be included in the data payload in order for an update to work correctly. 
       - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
     examples:
       - name: Upsert your data
@@ -1086,7 +1086,7 @@ pages:
     examples:
       - name: Call a Postgres function
         isSpotlight: true
-        description: This is an example invoking a Postgres function.
+        description: This is an example of invoking a Postgres function.
         js: |
           ```js
           const { data, error } = await supabase

@@ -4440,7 +4440,7 @@
 												"isExported": true
 											},
 											"comment": {
-												"text": "An array of files to be deletes, including the path and file name. For example [`folder/image.png`].\n"
+												"text": "An array of files to be deleted, including the path and file name. For example [`folder/image.png`].\n"
 											},
 											"type": {
 												"type": "array",
@@ -4606,7 +4606,7 @@
 												"isExported": true
 											},
 											"comment": {
-												"text": "The body of the file to be stored in the bucket."
+												"text": "The body of the file is to be stored in the bucket."
 											},
 											"type": {
 												"type": "union",
@@ -4876,7 +4876,7 @@
 												"isExported": true
 											},
 											"comment": {
-												"text": "The body of the file to be stored in the bucket."
+												"text": "The body of the file is to be stored in the bucket."
 											},
 											"type": {
 												"type": "union",
@@ -5172,7 +5172,7 @@
 												"isExported": true
 											},
 											"comment": {
-												"text": "The body of the file to be stored in the bucket."
+												"text": "The body of the file is to be stored in the bucket."
 											},
 											"type": {
 												"type": "union",

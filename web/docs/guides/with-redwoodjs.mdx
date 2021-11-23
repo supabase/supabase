@@ -11,10 +11,10 @@ import TabItem from '@theme/TabItem'
 
 For the sake of consistency with the other framework Quickstart examples, we'll build a RedwoodJS a little differently than normal.
 
-We **_won't use_** use Prisma to connect to the Supabase Postgres database or [Prisma migrations](https://redwoodjs.com/docs/cli-commands#prisma-migrate) as one typically might in a Redwood app.
-Instead, we'll rely on the Supabase client to do some of the work on the **web** side and use the client again on the **api** side to do data fetching as well.
+We **_won't use_** Prisma to connect to the Supabase Postgres database or [Prisma migrations](https://redwoodjs.com/docs/cli-commands#prisma-migrate) as one typically might in a Redwood app.
+Instead, we'll rely on the Supabase client to do some of the work on the **web** side and use the client again on the **API** side to do data fetching as well.
 
-That means, you will want to refrain from running any `yarn rw prisma migrate` commands and also double check your build commands on deployment to ensure Prisma won't reset your database.
+That means you will want to refrain from running any `yarn rw prisma migrate` commands and also double check your build commands on deployment to ensure Prisma won't reset your database.
 
 :::note
 TLDR; Prisma currently doesn't support cross-schema foreign keys, so introspecting the schema fails due to how your Supabase `public` schema references the `auth.users`.
@@ -80,7 +80,7 @@ Cells allow you to declaratively manage the lifecycle of a component that fetche
 
 :::note
 For the sake of consistency with the other framework Quickstart examples, we'll build a RedwoodJS a little differently than normal.
-We **_won't use_** use Prisma to connect to the Supabase Postgres database or [Prisma migrations](https://redwoodjs.com/docs/cli-commands#prisma-migrate) as one typically might in a Redwood app.
+We **_won't use_** Prisma to connect to the Supabase Postgres database or [Prisma migrations](https://redwoodjs.com/docs/cli-commands#prisma-migrate) as one typically might in a Redwood app.
 Instead, we'll rely on the Supabase client to do some of the work on the **`web`** side and use the client again on the **`api`** side to do data fetching as well.
 :::
 
@@ -90,7 +90,7 @@ Before we start building we're going to set up our Database and API. This is as 
 and then creating a "schema" inside the database.
 
 :::note
-When setting up Supabase, you'll interact with your project dashboard. However, most of the RedwoodJS setup steps will interact with the [Redwood CLI](https://redwoodjs.com/docs/cli-commands) to generate routes, pages, components and more.
+When setting up Supabase, you'll interact with your project dashboard. However, most of the RedwoodJS setup steps will interact with the [Redwood CLI](https://redwoodjs.com/docs/cli-commands) to generate routes, pages, components, and more.
 So be sure to have a terminal at the ready and in your project directory.
 :::
 
@@ -358,7 +358,7 @@ yarn rw generate page home /
 Note: the slash `/` is important here as it creates a root level route.
 :::
 
-You can stop the `dev` server if you want; to see your changes, just be sure to run`yarn rw dev` again.
+You can stop the `dev` server if you want; to see your changes, just be sure to run `yarn rw dev` again.
 
 You should see the `Home` page route in `web/src/Routes.js`:
 
@@ -592,7 +592,7 @@ export default Account
 
 :::note
 Note: You'll see the use of `useAuth()` several times in the quickstart. Redwood's `useAuth` hook provides convenient ways to access
-logIn, logOut, currentUser and access the the `supabase` authenticate client. We'll use it to get an instance
+logIn, logOut, currentUser, and access the `supabase` authenticate client. We'll use it to get an instance
 of the supabase client to interact with your API.
 :::
 
@@ -621,7 +621,7 @@ const HomePage = () => {
 export default HomePage
 ```
 
-> What we're doing here is show the sign in form if your aren't logged in and your account profile if you are.
+> What we're doing here is showing the sign in form if you aren't logged in and your account profile if you are.
 
 ### Launch!
 

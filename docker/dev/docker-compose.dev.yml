@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  mail:
+    container_name: supabase-mail
+    image: phamhieu/inbucket:latest
+    ports:
+      - '2500:2500' # SMTP
+      - '9000:9000' # web interface
+      - '1100:1100' # POP3
