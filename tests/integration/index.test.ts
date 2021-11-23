@@ -1,26 +1,9 @@
 import * as faker from 'faker'
-import * as helpers from '../helpers'
 import { createClient } from '@supabase/supabase-js'
 
 const unauthorized = createClient(process.env.SUPABASE_URL, 'FAKE_KEY')
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
 const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
-
-// // const pgMeta = `http://localhost:8000/pg/query`
-
-// // beforeAll(async () => {
-// //   return await axios.post(pgMeta, {
-// //     query: helpers.schemaInit
-// //   }, {
-// //     headers: {
-// //       apikey: process.env.SUPABASE_KEY_ADMIN
-// //     }
-// //   })
-// // })
-// afterAll(async () => {
-//   await admin.from('profiles').delete()
-//   await admin.from('profiles').delete()
-// })
 
 test('Unauthorized', async () => {
   const { error } = await unauthorized.from('profiles').select()
