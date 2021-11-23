@@ -31,16 +31,16 @@ const Hero = () => {
                         href="https://api.supabase.io/platform/login"
                         as="https://api.supabase.io/platform/login"
                       >
-                        <a>
-                          <Button className="mt-10 py-3" size="medium">
+                        <a className="mt-10">
+                          <Button className="py-3" size="medium">
                             Start your project
                           </Button>
                         </a>
                       </Link>
                       <Link href="/docs" as="/docs">
-                        <a>
+                        <a className="mt-10">
                           <Button
-                            className="mt-10 py-3"
+                            className="py-3"
                             size="medium"
                             type="text"
                             icon={<IconBookOpen />}
