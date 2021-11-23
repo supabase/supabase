@@ -91,54 +91,36 @@ VALUES  ('20171026211738'),
 
 create or replace function auth.uid() 
 returns uuid 
-language plpgsql stable
+language sql stable
 as $$
-declare
-    sub text := current_setting('request.jwt.claim.sub', true);
-    claims text := current_setting('request.jwt.claims', true);
-    id uuid;
-begin
-  select case 
-  	when sub is not null then sub::uuid
-  	else (claims::json ->> 'sub')::uuid
-  end into id;
- 
-  return id;
-end $$;
+  select 
+  	coalesce(
+		current_setting('request.jwt.claim.sub', true),
+		(current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+	)::uuid
+$$;
 
 create or replace function auth.role() 
 returns text 
-language plpgsql stable
+language sql stable
 as $$
-declare
-    jwt_role text := current_setting('request.jwt.claim.role', true);
-    claims text := current_setting('request.jwt.claims', true);
-    user_role text;
-begin
-  select case 
-  	when jwt_role is not null then jwt_role::text
-  	else (claims::json ->> 'role')::text
-  end into user_role;
- 
-  return user_role;
-end $$;
+  select 
+  	coalesce(
+		current_setting('request.jwt.claim.role', true),
+		(current_setting('request.jwt.claims', true)::jsonb ->> 'role')
+	)::text
+$$;
 
 create or replace function auth.email() 
 returns text 
-language plpgsql stable
+language sql stable
 as $$
-declare
-    email text := current_setting('request.jwt.claim.email', true);
-    claims text := current_setting('request.jwt.claims', true);
-    user_email text;
-begin
-  select case 
-  	when email is not null then email::text
-  	else (claims::json ->> 'email')::text
-  end into user_email;
- 
-  return user_email;
-end $$;
+  select 
+  	coalesce(
+		current_setting('request.jwt.claim.email', true),
+		(current_setting('request.jwt.claims', true)::jsonb ->> 'email')
+	)::text
+$$;
 
 -- usage on auth functions to API roles
 GRANT USAGE ON SCHEMA auth TO anon, authenticated, service_role;
