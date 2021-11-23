@@ -73,6 +73,7 @@ services:
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
       PGRST_DB_USE_LEGACY_GUCS: "false"
+
   realtime:
     container_name: supabase-realtime
     image: supabase/realtime:v0.15.0
@@ -115,8 +116,8 @@ services:
     volumes:
       - ./volumes/storage:/var/lib/storage
 
-  pg-meta:
-    container_name: supabase-pg-meta
+  meta:
+    container_name: supabase-meta
     image: supabase/postgres-meta:v0.28.0
     depends_on:
       - db

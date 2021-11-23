@@ -10,6 +10,4 @@ services:
       - '1100:1100' # POP3
   db:
     volumes:
-      - type: bind
-        source: ./dev/data.sql
-        target: /docker-entrypoint-initdb.d/data.sql
+      - ./dev/data.sql:/docker-entrypoint-initdb.d/data.sql
