@@ -1,2 +1,2 @@
 User-agent: *
-Sitemap: https://supabase.io/sitemap.xml
+Sitemap: https://supabase.com/sitemap.xml
