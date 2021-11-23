@@ -65,7 +65,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v9.0.0-a1
+    image: postgrest/postgrest:v8.0.0.20211102
     depends_on:
       - db
     restart: unless-stopped
