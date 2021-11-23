@@ -74,7 +74,7 @@ services:
       PGRST_DB_SCHEMA: public, storage
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
-      PGRST_DB_USE_LEGACY_GUC: "false"
+      PGRST_DB_USE_LEGACY_GUCS: "false"
   realtime:
     container_name: supabase-realtime
     image: supabase/realtime:v0.15.0
