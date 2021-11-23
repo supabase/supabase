@@ -65,6 +65,7 @@ const writeFile = (data) => {
 
 const main = async () => {
   const sponsorsResponse = await fetchAllSponsors()
+  console.log('sponsorsResponse.totalCount', sponsorsResponse.totalCount)
   const formatted = formatResults(sponsorsResponse)
   writeFile(formatted)
 }
