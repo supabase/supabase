@@ -116,17 +116,17 @@ function GithubExamples() {
               )
             })}
             <div className="container mx-auto hidden md:flex flex-row justify-between mt-3">
-                <div ref={prevRef} className="cursor-pointer ml-4">
-                  <Typography.Text>
-                    <IconArrowLeft />
-                  </Typography.Text>
-                </div>
-                <div ref={nextRef} className="cursor-pointer mr-4">
-                  <Typography.Text>
-                    <IconArrowRight />
-                  </Typography.Text>
-                </div>
+              <div ref={prevRef} className="cursor-pointer ml-4">
+                <Typography.Text>
+                  <IconArrowLeft />
+                </Typography.Text>
               </div>
+              <div ref={nextRef} className="cursor-pointer mr-4">
+                <Typography.Text>
+                  <IconArrowRight />
+                </Typography.Text>
+              </div>
+            </div>
           </Swiper>
         </div>
       </div>
