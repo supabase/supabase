@@ -11,6 +11,7 @@
     "docker:down": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down --remove-orphans",
     "docker:remove": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml rm -vfs",
     "test": "jest",
+    "perf:kong": "k6 run ./tests/performance/kong.js",
     "perf:meta": "k6 run ./tests/performance/meta.js"
   },
   "dependencies": {},
