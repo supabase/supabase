@@ -136,3 +136,6 @@ ALTER table "auth".refresh_tokens OWNER TO supabase_auth_admin;
 ALTER table "auth".audit_log_entries OWNER TO supabase_auth_admin;
 ALTER table "auth".instances OWNER TO supabase_auth_admin;
 ALTER table "auth".schema_migrations OWNER TO supabase_auth_admin;
+ALTER table "auth"."uid" OWNER TO supabase_auth_admin;
+ALTER table "auth"."role" OWNER TO supabase_auth_admin;
+ALTER table "auth"."email" OWNER TO supabase_auth_admin;
