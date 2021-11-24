@@ -22,13 +22,11 @@ services:
       KONG_DNS_ORDER: LAST,A,CNAME
       KONG_PLUGINS: request-transformer,cors,key-auth,acl
     volumes:
-      - type: bind
-        source: ./volumes/api/kong.yml
-        target: /var/lib/kong/kong.yml
+      - ./volumes/api/kong.yml:/var/lib/kong/kong.yml
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.1.8
+    image: supabase/gotrue:v2.2.6
     depends_on:
       - db
     restart: unless-stopped
@@ -75,6 +73,7 @@ services:
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
       PGRST_DB_USE_LEGACY_GUCS: "false"
+
   realtime:
     container_name: supabase-realtime
     image: supabase/realtime:v0.15.0
@@ -115,13 +114,11 @@ services:
       REGION: stub
       GLOBAL_S3_BUCKET: stub
     volumes:
-      - type: volume
-        source: volume_storage
-        target: /var/lib/storage
+      - ./volumes/storage:/var/lib/storage
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.26.1
+    image: supabase/postgres-meta:v0.28.0
     depends_on:
       - db
     restart: unless-stopped
@@ -139,17 +136,6 @@ services:
       - ${POSTGRES_PORT}:5432
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - /var/lib/postgresql/data/pgdata
-      - type: bind
-        source: ./volumes/db/init
-        target: /docker-entrypoint-initdb.d
-
-volumes:
-  volume_storage: 
-    driver: local
-    driver_opts:
-      type: none
-      device: ./volumes/storage/data
-      o: bind
+      - ./volumes/db/data:/var/lib/postgresql/data
+      - ./volumes/db/init:/docker-entrypoint-initdb.d
