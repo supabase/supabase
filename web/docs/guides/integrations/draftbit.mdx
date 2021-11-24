@@ -12,7 +12,7 @@ Draftbit is back-end agnostic and connects to Supabase via REST API.
 
 _Note_: For the demonstration purpose of this guide, we are using a pre-populated database in Supabase. We are calling `Groceries`. To follow along, rename it any way you prefer.
 
-![Prepopulated Database](/img/guides/integrations/draftbit/prepoulated-database.png)
+![Prepopulated Database](/img/guides/integrations/draftbit/prepopulated-database.png)
 
 If you don’t have a Draftbit account, create one [here](https://draftb.it/3Fkbask). Once you’ve got your account set up, Create a New App. You can select `Start From a Blank App` for this demo and proceed to the Builder interface.
 
@@ -39,12 +39,12 @@ To authorize your Draftbit app with Supabse, in the builder interface:
 - Open the **Settings** tab from the top menu bar.
 - In Project Settings, navigate to App Variables.
 - Enter a name to access the API Key such as `Authorization_Header`. When making the service connection in the next section, it will be passed as the value for the header `Authorization`.
-- The value of this key requires you to enter an authorization token that starts with syntax `Bearer <your-api-key>` (the space between `Bearer` and <your-api-key>` is required). Click **Add** after adding the value.
+- The value of this key requires you to enter an authorization token that starts with syntax `Bearer <your-api-key>` (the space between `Bearer` and `<your-api-key>` is required). Click **Add** after adding the value.
 - Enter another key name to access the API Key such as `Api_Key_Header`. When making the service connection in the next section, it will be passed as the header `apiKey` value.
 - The value of this key requires you to enter an authorization token that starts with syntax is `<your-api-key>`. Click **Add** after adding the value.
 - Click **Save** to save these keys and close the modal.
 
-![Add header values in Draftbit](/img/guides/integrations/draftbit/autheader.png)
+![Add header values in Draftbit](/img/guides/integrations/draftbit/authheader.png)
 
 ## Step 3: Add Supabase RESTful endpoint in Draftbit
 
