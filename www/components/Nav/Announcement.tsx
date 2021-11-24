@@ -1,14 +1,46 @@
-import React from 'react'
-import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
 
 import announcement from '~/data/Announcement.json'
-import { IconChevronRight, Button, IconX } from '@supabase/ui'
+import { IconChevronRight, IconX } from '@supabase/ui'
+import { useRouter } from 'next/router'
 
 const Announcement = () => {
+  const [hidden, setHidden] = useState(false)
+
+  const router = useRouter()
+
+  // override to hide announcement
   if (!announcement.show) return null
-  return (
-    <Link href={announcement.link}>
+
+  // construct the key for the announcement, based on the title text
+  const announcementKey = 'announcement_' + announcement.text.replace(/ /g, '')
+
+  // window.localStorage is kept inside useEffect
+  // to prevent error
+  useEffect(function () {
+    if (window.localStorage.getItem(announcementKey)) {
+      return setHidden(true)
+    }
+  }, [])
+
+  function handleClose(event: any) {
+    event.stopPropagation()
+
+    window.localStorage.setItem(announcementKey, 'hidden')
+    return setHidden(true)
+  }
+
+  function handleLink() {
+    router.push(announcement.link)
+    window.localStorage.setItem(announcementKey, 'hidden')
+  }
+
+  if (hidden) {
+    return null
+  } else {
+    return (
       <div
+        onClick={handleLink}
         className="
           relative
           cursor-pointer
@@ -35,12 +67,15 @@ const Announcement = () => {
             <IconChevronRight size={14} />
           </span>
         </div>
-        <div className="transition-opacity absolute right-4 h-full flex items-center opacity-50 hover:opacity-100">
+        <div
+          className="transition-opacity absolute right-4 h-full flex items-center opacity-50 hover:opacity-100"
+          onClick={handleClose}
+        >
           <IconX size={16} />
         </div>
       </div>
-    </Link>
-  )
+    )
+  }
 }
 
 export default Announcement
