@@ -1,5 +1,5 @@
 {
-  "name": "Supabase",
+  "name": "supabase",
   "description": "The open source Firebase alternative.",
   "version": "0.0.0",
   "author": "Supabase, Inc.",
@@ -10,7 +10,8 @@
     "docker:up": "cd docker && docker-compose up",
     "docker:down": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down --remove-orphans",
     "docker:remove": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml rm -vfs",
-    "test": "jest"
+    "test": "jest",
+    "perf": "export $(grep -v '^#' tests/.env.test) && k6 run ./tests/performance/meta.js --duration 10s"
   },
   "dependencies": {},
   "devDependencies": {
