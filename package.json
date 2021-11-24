@@ -11,7 +11,7 @@
     "docker:down": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down --remove-orphans",
     "docker:remove": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml rm -vfs",
     "test": "jest",
-    "perf": "export $(grep -v '^#' tests/.env.test) && k6 run ./tests/performance/meta.js --duration 10s"
+    "perf:meta": "k6 run ./tests/performance/meta.js"
   },
   "dependencies": {},
   "devDependencies": {
