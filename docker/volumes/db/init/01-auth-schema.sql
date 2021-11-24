@@ -140,3 +140,6 @@ ALTER table "auth".schema_migrations OWNER TO supabase_auth_admin;
 ALTER FUNCTION "auth"."uid" OWNER TO supabase_auth_admin;
 ALTER FUNCTION "auth"."role" OWNER TO supabase_auth_admin;
 ALTER FUNCTION "auth"."email" OWNER TO supabase_auth_admin;
+GRANT EXECUTE ON FUNCTION "auth"."uid"() TO PUBLIC;
+GRANT EXECUTE ON FUNCTION "auth"."role"() TO PUBLIC;
+GRANT EXECUTE ON FUNCTION "auth"."email"() TO PUBLIC;
