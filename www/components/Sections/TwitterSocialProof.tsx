@@ -56,18 +56,6 @@ function TwitterSocialProof() {
                 </a>
               </Link>
             </div>
-            <div className="w-min mx-auto hidden md:flex flex-row">
-              <div ref={prevRef} className="cursor-pointer mr-1">
-                <Typography.Text>
-                  <IconArrowLeft />
-                </Typography.Text>
-              </div>
-              <div ref={nextRef} className="cursor-pointer ml-1">
-                <Typography.Text>
-                  <IconArrowRight />
-                </Typography.Text>
-              </div>
-            </div>
           </Typography.Text>
         </div>
       </div>
@@ -121,6 +109,18 @@ function TwitterSocialProof() {
                 </SwiperSlide>
               )
             })}
+              <div className="container mx-auto hidden md:flex flex-row justify-between mt-3">
+                <div ref={prevRef} className="cursor-pointer ml-4">
+                  <Typography.Text>
+                    <IconArrowLeft />
+                  </Typography.Text>
+                </div>
+                <div ref={nextRef} className="cursor-pointer mr-4">
+                  <Typography.Text>
+                    <IconArrowRight />
+                  </Typography.Text>
+                </div>
+              </div>
           </Swiper>
         </div>
       </div>
