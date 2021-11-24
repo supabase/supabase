@@ -1,6 +1,4 @@
-volumes/db/data/**/*
-!volumes/db/data/.gitkeep
-volumes/storage/data/**/*
-!volumes/storage/data/.gitkeep
+volumes/db/data
+volumes/storage
 .env
 test.http
