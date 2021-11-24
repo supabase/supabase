@@ -51,11 +51,8 @@ const { user, error } = await supabase.auth.signIn({
 <TabItem value="dart">
 
 ```dart
-final res = await supabase.auth.signIn(
-  email: 'example@email.com'
-);
+final res = await supabase.auth.signIn(email: 'example@email.com');
 
-final user = res.data?.user;
 final error = res.error;
 ```
 
