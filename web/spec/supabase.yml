@@ -4,16 +4,105 @@ info:
   id: reference/supabase-js
   title: Supabase Client
   description: |
+    Our approach for client libraries is modular. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing tools.
 
-    Our client library is modular. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing tools.
-
-
-    | Repo                                                                                       | Official                                         | Community        |
-    |-----------------------|--------------------------------------------------|------------------|
-    | **`supabase-{lang}`** <br /> Combines libraries and adds enrichments.    | [`JavaScript`](https://github.com/supabase/supabase-js) | [`C#`](https://github.com/supabase/supabase-csharp), [`Python`](https://github.com/supabase/supabase-py), `Rust`, [`Dart`](https://github.com/supabase/supabase-dart) |
-    | `postgrest-{lang}` <br /> Client library to work with [PostgREST](https://github.com/postgrest/postgrest) | [`JavaScript`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp), [`Python`](https://github.com/supabase/postgrest-py), [`Rust`](https://github.com/supabase/postgrest-rs), [`Kotlin`](https://github.com/supabase/postgrest-kt), [`Dart`](https://github.com/supabase/postgrest-dart) |
-    | `realtime-{lang}` <br /> Client library to work with [Realtime](https://github.com/supabase/realtime) | [`JavaScript`](https://github.com/supabase/realtime-js) | [`C#`](https://github.com/supabase/realtime-csharp), [`Python`](https://github.com/supabase-community/realtime-py), `Rust`, [`Dart`](https://github.com/supabase/realtime-dart) |
-    | `gotrue-{lang}` <br /> Client library to work with [GoTrue](https://github.com/netlify/gotrue)   | [`JavaScript`](https://github.com/supabase/gotrue-js) | [`C#`](https://github.com/supabase/gotrue-csharp), [`Python`](https://github.com/supabase-community/gotrue-py), `Rust`, [`Kotlin`](https://github.com/supabase/gotrue-kt), [`Dart`](https://github.com/supabase/gotrue-dart) |
+    <table style={{tableLayout: 'fixed', whiteSpace: 'nowrap' }}>
+      <tr>
+        <th>Language</th>
+        <th>Client</th>
+        <th colspan="4">Feature-Clients (bundled in Supabase client)</th>
+      </tr>
+      <tr>
+        <th></th>
+        <th>Supabase</th>
+        <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
+        <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+        <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
+        <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+      </tr>
+      <th colspan="6">⚡️ Official ⚡️</th>
+      <tr>
+        <td>JavaScript (TypeScript)</td>
+        <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
+        <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
+        <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
+        <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
+        <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
+      </tr>
+      <th colspan="6">💚 Community 💚</th>
+      <tr>
+        <td>C#</td>
+        <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+        <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
+        <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
+        <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>Dart (Flutter)</td>
+        <td><a href="https://github.com/supabase/supabase-dart" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
+        <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
+        <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-lang</a></td>
+        <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
+        <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
+      </tr>
+      <tr>
+        <td>Go</td>
+        <td>-</td>
+        <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>Java</td>
+        <td>-</td>
+        <td>-</td>
+        <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>Kotlin</td>
+        <td>-</td>
+        <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+        <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>Python</td>
+        <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+        <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
+        <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
+        <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>Ruby</td>
+        <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
+        <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>Rust</td>
+        <td>-</td>
+        <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">postgrest-rs</a></td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>Swift</td>
+        <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
+        <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
+        <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
+        <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
+        <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
+      </tr>
+    </table>
 
   definition: spec/combined.json
   libraries:
@@ -42,6 +131,7 @@ info:
           - Reset Password (Email)
       - name: 'Auth (Server Only)'
         items:
+          - auth.api.createUser()
           - auth.api.deleteUser()
           - auth.api.generateLink()
           - auth.api.inviteUserByEmail()
@@ -238,7 +328,7 @@ pages:
 
       ### Generate database types from OpenAPI specification
 
-      Supabase generates a OpenAPI specification file for your database which can be used to generate your data types for usage with TypeScript.
+      Supabase generates an OpenAPI specification file for your database which can be used to generate your data types for usage with TypeScript.
 
       The OpenAPI specification for your Supabase project can be accessed as follows:
 
@@ -332,7 +422,7 @@ pages:
 
   auth.signUp():
     title: 'signUp()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signUp'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
       - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
       - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
@@ -372,7 +462,7 @@ pages:
 
   auth.signIn():
     title: 'signIn()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signIn'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signIn'
     notes: |
       - A user can sign up either via email or OAuth.
       - If you provide `email` without a `password`, the user will be sent a magic link.
@@ -452,7 +542,7 @@ pages:
 
   auth.signOut():
     title: 'signOut()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.signOut'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
     examples:
       - name: Sign out
         isSpotlight: true
@@ -463,7 +553,7 @@ pages:
 
   auth.session():
     title: 'session()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.session'
+    $ref: '@supabase/gotrue-js.GoTrueClient.session'
     examples:
       - name: Get the session data
         isSpotlight: true
@@ -474,7 +564,7 @@ pages:
 
   auth.user():
     title: 'user()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.user'
+    $ref: '@supabase/gotrue-js.GoTrueClient.user'
     examples:
       - name: Get the logged in user
         isSpotlight: true
@@ -485,7 +575,7 @@ pages:
 
   auth.update():
     title: 'update()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.update'
+    $ref: '@supabase/gotrue-js.GoTrueClient.update'
     notes: |
       User email: email updates will send an email to both the user's current and new email with a confirmation link.
 
@@ -516,7 +606,7 @@ pages:
 
   auth.setAuth():
     title: 'setAuth()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.setAuth'
+    $ref: '@supabase/gotrue-js.GoTrueClient.setAuth'
     examples:
       - name: Basic example.
         description: This is most useful on server-side functions where you cannot log the user in, but have access to the user's access token.
@@ -575,7 +665,7 @@ pages:
 
   auth.onAuthStateChange():
     title: 'onAuthStateChange()'
-    $ref: '@supabase/gotrue-js."GoTrueClient".GoTrueClient.onAuthStateChange'
+    $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
     examples:
       - name: Listen to auth changes
         isSpotlight: true
@@ -587,7 +677,7 @@ pages:
           ```
 
   Reset Password (Email):
-    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.resetPasswordForEmail'
+    $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
     notes: |
       Sends a reset request to an email address.
 
@@ -612,12 +702,29 @@ pages:
             .resetPasswordForEmail('user@email.com')
           ```
 
-  auth.api.deleteUser():
-    title: 'deleteUser()'
-    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.deleteUser'
+  auth.api.createUser():
+    title: 'createUser()'
+    # $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
+    $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
     notes: |
       - Requires a `service_role` key.
-      - This function should only be called on a server. Never expose your `service_role` key in the browser.
+      - This function should be called on a server. Never expose your `service_role` key in the browser.
+    examples:
+      - name: Create a new user.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.api.createUser({
+            name: 'Yoda'
+          })
+          ```
+
+  auth.api.deleteUser():
+    title: 'deleteUser()'
+    $ref: '@supabase/gotrue-js.GoTrueApi.deleteUser'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should be called on a server. Never expose your `service_role` key in the browser.
     examples:
       - name: Remove a user completely.
         isSpotlight: true
@@ -631,7 +738,7 @@ pages:
 
   auth.api.inviteUserByEmail():
     title: 'inviteUserByEmail()'
-    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.inviteUserByEmail'
+    $ref: '@supabase/gotrue-js.GoTrueApi.inviteUserByEmail'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -647,7 +754,7 @@ pages:
 
   auth.api.sendMobileOTP():
     title: 'sendMobileOTP()'
-    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.sendMobileOTP'
+    $ref: '@supabase/gotrue-js.GoTrueApi.sendMobileOTP'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -663,7 +770,7 @@ pages:
 
   auth.api.resetPasswordForEmail():
     title: 'resetPasswordForEmail()'
-    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.resetPasswordForEmail'
+    $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -679,7 +786,7 @@ pages:
 
   auth.api.generateLink():
     title: 'generateLink()'
-    $ref: '@supabase/gotrue-js."GoTrueApi".GoTrueApi.generateLink'
+    $ref: '@supabase/gotrue-js.GoTrueApi.generateLink'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -698,7 +805,7 @@ pages:
     title: 'Fetch data: select()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.select'
     notes: |
-      - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
       - `select()` can be combined with [Filters](/docs/reference/javascript/using-filters)
     examples:
@@ -719,7 +826,7 @@ pages:
             .select('name')
           ```
       - name: Query foreign tables
-        description: If your database has relationships, you can query related tables too.
+        description: If your database has foreign key relationships, you can query related tables too.
         js: |
           ```js
           const { data, error } = await supabase
@@ -899,7 +1006,7 @@ pages:
     title: 'Upsert data: upsert()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.upsert'
     notes: |
-      - Primary keys should to be included in the data payload in order for an update to work correctly. 
+      - Primary keys should be included in the data payload in order for an update to work correctly. 
       - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
     examples:
       - name: Upsert your data
@@ -979,7 +1086,7 @@ pages:
     examples:
       - name: Call a Postgres function
         isSpotlight: true
-        description: This is an example invoking a Postgres function.
+        description: This is an example of invoking a Postgres function.
         js: |
           ```js
           const { data, error } = await supabase

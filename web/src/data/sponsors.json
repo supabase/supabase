@@ -1,7 +1,7 @@
 [
   {
-    "tier": "$19 a month",
-    "sponsor": "dshukertjr"
+    "tier": "$5 a month",
+    "sponsor": "sabberworm"
   },
   {
     "tier": "$5 a month",
@@ -13,7 +13,15 @@
   },
   {
     "tier": "$5 a month",
+    "sponsor": "tinjaw"
+  },
+  {
+    "tier": "$5 a month",
     "sponsor": "ricdex"
+  },
+  {
+    "tier": "$49 a month",
+    "sponsor": "Illyism"
   },
   {
     "tier": "$5 a month",
@@ -33,6 +41,10 @@
   },
   {
     "tier": "$5 a month",
+    "sponsor": "zeluizr"
+  },
+  {
+    "tier": "$5 a month",
     "sponsor": "AndersGerner"
   },
   {
@@ -40,8 +52,8 @@
     "sponsor": "stopyellingatme"
   },
   {
-    "tier": "$5 a month",
-    "sponsor": "danalloway"
+    "tier": "$19 a month",
+    "sponsor": "Marviel"
   },
   {
     "tier": "$19 a month",
@@ -52,20 +64,8 @@
     "sponsor": "juzhiyuan"
   },
   {
-    "tier": "$19 a month",
-    "sponsor": "Alileus"
-  },
-  {
     "tier": "$5 a month",
     "sponsor": "gregaltuna"
-  },
-  {
-    "tier": "$19 a month",
-    "sponsor": "mkiisoft"
-  },
-  {
-    "tier": "$5 a month",
-    "sponsor": "emschwartz"
   },
   {
     "tier": "$5 a month",
@@ -76,10 +76,6 @@
     "sponsor": "alienzz"
   },
   {
-    "tier": "$19 a month",
-    "sponsor": "dsernst"
-  },
-  {
     "tier": "$5 a month",
     "sponsor": "zlwaterfield"
   },
@@ -88,12 +84,12 @@
     "sponsor": "Aaron-A"
   },
   {
-    "tier": "$49 a month",
-    "sponsor": "tmm"
+    "tier": "$5 a month",
+    "sponsor": "gabrielmip"
   },
   {
     "tier": "$5 a month",
-    "sponsor": "gabrielmip"
+    "sponsor": "glassmonkey"
   },
   {
     "tier": "$5 a month",
@@ -112,6 +108,10 @@
     "sponsor": "KoreyPeters"
   },
   {
+    "tier": "$49 a month",
+    "sponsor": "ymmtshny"
+  },
+  {
     "tier": "$19 a month",
     "sponsor": "fefurst"
   },
@@ -124,8 +124,20 @@
     "sponsor": "jvieirar"
   },
   {
+    "tier": "$19 a month",
+    "sponsor": "dshukertjr"
+  },
+  {
     "tier": "$5 a month",
     "sponsor": "CmplxStack"
+  },
+  {
+    "tier": "$19 a month",
+    "sponsor": "roblack"
+  },
+  {
+    "tier": "$5 a month",
+    "sponsor": "davilico05"
   },
   {
     "tier": "$19 a month",
@@ -133,11 +145,15 @@
   },
   {
     "tier": "$5 a month",
-    "sponsor": "ConorEB"
+    "sponsor": "hyochan"
   },
   {
-    "tier": "$19 a month",
-    "sponsor": "hype08"
+    "tier": "$5 a month",
+    "sponsor": "chunterb"
+  },
+  {
+    "tier": "$5 a month",
+    "sponsor": "madebyfabian"
   },
   {
     "tier": "$5 a month",
@@ -145,7 +161,7 @@
   },
   {
     "tier": "$5 a month",
-    "sponsor": "affluent-bilby-classifieds"
+    "sponsor": "herbievine"
   },
   {
     "tier": "$5 a month",
@@ -161,15 +177,15 @@
   },
   {
     "tier": "$19 a month",
+    "sponsor": "d-mok"
+  },
+  {
+    "tier": "$19 a month",
     "sponsor": "lIIIIIIIIIIIIIIIIIIIII"
   },
   {
     "tier": "$5 a month",
-    "sponsor": "hugodemelo"
-  },
-  {
-    "tier": "$5 a month",
-    "sponsor": "georgedalai"
+    "sponsor": "yujong-lee"
   },
   {
     "tier": "$5 a month",
@@ -177,6 +193,10 @@
   },
   {
     "tier": "$5 a month",
-    "sponsor": "i-infra"
+    "sponsor": "LeDragunov"
+  },
+  {
+    "tier": "$49 a month",
+    "sponsor": "CryptoJobsList"
   }
 ]

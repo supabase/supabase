@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io)は、オープンソースの Firebase 代替製品です。エンタープライズグレードのオープンソースツールを使って、Firebase の機能を構築しています。
+[Supabase](https://supabase.com)は、オープンソースの Firebase 代替製品です。エンタープライズグレードのオープンソースツールを使って、Firebase の機能を構築しています。
 
 - [x] ホスティングされた Postgres データベース
 - [x] リアルタイムサブスクリプション
@@ -18,13 +18,13 @@
 
 ## ドキュメンテーション
 
-詳しいドキュメントは[supabase.io/docs](https://supabase.io/docs)をご覧ください。
+詳しいドキュメントは[supabase.io/docs](https://supabase.com/docs)をご覧ください。
 
 ## コミュニティとサポート
 
 - [コミュニティフォーラム](https://github.com/supabase/supabase/discussions) どんな時に使うか：構築の手助け、データベースのベストプラクティスに関する議論など
 - [GitHub Issue](https://github.com/supabase/supabase/issues) どんな時に使うか: Supabase で起こったバグやエラーについて
-- [Email サポート](https://supabase.io/docs/support#business-support) どんな時に使うか: ユーザー自身のデータベースやインフラに何か問題が発生した場合
+- [Email サポート](https://supabase.com/docs/support#business-support) どんな時に使うか: ユーザー自身のデータベースやインフラに何か問題が発生した場合
 
 ## ステータス
 
@@ -48,7 +48,7 @@ Supabase は、オープンソースのツールを組み合わせてできて�
 Supabase は[ホスティングされたプラットフォーム](https://app.supabase.io)です。登録するだけで、何もインストールせずに使い始めることができます。
 更に現在ローカルでの開発環境を整えており、これはプラットフォームの安定性と並んで今最優先で進めているプロジェクトになります。
 
-![アーキテクチャー](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![アーキテクチャー](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/)は、30 年以上にわたって開発・改善されてきたオブジェクトリレーショナルデータベースシステムで、信頼性、機能の堅牢性、パフォーマンスの面で高い評価を得ています。
 - [Realtime](https://github.com/supabase/realtime)は、PostgreSQL の insert、update、delete の情報を WebSocket で受信できる Elixir サーバです。Supabase は Postgres に組み込まれたレプリケーション機能をリッスンし、レプリケーションのバイトストリームを JSON に変換し、その JSON を WebSocket でブロードキャストします。

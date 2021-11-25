@@ -145,6 +145,8 @@ module.exports = {
           label: 'Authentication',
           collapsed: true,
           items: [
+            'guides/auth/auth-email',
+            'guides/auth/auth-magic-link',
             'guides/auth/auth-apple',
             'guides/auth/auth-bitbucket',
             'guides/auth/auth-discord',

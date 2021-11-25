@@ -28,19 +28,19 @@ const Hero = () => {
                     </Typography.Text>
                     <Space>
                       <Link
-                        href="https://app.supabase.io/api/login"
-                        as="https://app.supabase.io/api/login"
+                        href="https://api.supabase.io/platform/login"
+                        as="https://api.supabase.io/platform/login"
                       >
-                        <a>
-                          <Button className="mt-10 py-3" size="medium">
+                        <a className="mt-10">
+                          <Button className="py-3" size="medium">
                             Start your project
                           </Button>
                         </a>
                       </Link>
                       <Link href="/docs" as="/docs">
-                        <a>
+                        <a className="mt-10">
                           <Button
-                            className="mt-10 py-3"
+                            className="py-3"
                             size="medium"
                             type="text"
                             icon={<IconBookOpen />}
@@ -80,7 +80,7 @@ const Hero = () => {
                       <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
                     </div>
                     <div
-                      className="w-full relative bg-dark-900 shadow-lg"
+                      className="w-full relative bg-dark-900 shadow-lg rounded-b-md"
                       style={{ padding: '56.25% 0 0 0' }}
                     >
                       <iframe

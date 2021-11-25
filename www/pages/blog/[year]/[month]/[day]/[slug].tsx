@@ -149,7 +149,7 @@ function BlogPostPage(props: any) {
         openGraph={{
           title: props.blog.title,
           description: props.blog.description,
-          url: `https://supabase.io/blog/${props.blog.slug}`,
+          url: `https://supabase.com/blog/${props.blog.slug}`,
           type: 'article',
           article: {
             //
@@ -166,7 +166,7 @@ function BlogPostPage(props: any) {
           },
           images: [
             {
-              url: `https://supabase.io${basePath}/images/blog/${
+              url: `https://supabase.com${basePath}/images/blog/${
                 props.blog.image ? props.blog.image : props.blog.thumb
               }`,
             },

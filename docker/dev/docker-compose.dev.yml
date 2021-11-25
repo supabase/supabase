@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  mail:
+    container_name: supabase-mail
+    image: inbucket/inbucket:stable
+    ports:
+      - '2500:2500' # SMTP
+      - '9000:9000' # web interface
+      - '1100:1100' # POP3
+  db:
+    volumes:
+      - ./dev/data.sql:/docker-entrypoint-initdb.d/data.sql

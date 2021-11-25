@@ -1,5 +1,5 @@
 import React from 'react'
-import sponsors from '../data/sponsors.json'
+import sponsors from '@site/src/data/sponsors.json'
 
 
 export default function Sponsors() {

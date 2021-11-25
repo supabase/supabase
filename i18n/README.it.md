@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) è una alternativa a Firebase con codice sorgente aperto. Stiamo sviluppando le funzionalità offerte da Firebase utilizzando strumenti con sorgente aperto a livello professionale.
+[Supabase](https://supabase.com) è una alternativa a Firebase con codice sorgente aperto. Stiamo sviluppando le funzionalità offerte da Firebase utilizzando strumenti con sorgente aperto a livello professionale.
 
 - [x] Database Postgres ospitato
 - [x] Sottoscrizioni in tempo reale
@@ -18,13 +18,13 @@
 
 ## Documentazione
 
-Per ottenere la documentazione completa, visitare il sito [supabase.io/docs](https://supabase.io/docs).
+Per ottenere la documentazione completa, visitare il sito [supabase.io/docs](https://supabase.com/docs).
 
 ## Comunità e Supporto
 
 - [Forum della Comunità](https://github.com/supabase/supabase/discussions). Indicato per: supporto allo sviluppo, discussioni sulle buone pratiche nell'utilizzo dei database.
 - [Issues su GitHub](https://github.com/supabase/supabase/issues). Indicato per: bug ed errori che potrebbero insorgere nell'utilizzo di Supabase.
-- [Email di Supporto](https://supabase.io/docs/support#business-support). Indicato per: problemi che potrebbero insorgere con i database o l'infrastruttura.
+- [Email di Supporto](https://supabase.com/docs/support#business-support). Indicato per: problemi che potrebbero insorgere con i database o l'infrastruttura.
 
 ## Stato
 
@@ -47,7 +47,7 @@ Supabase è un insieme di strumenti con sorgente aperto. Stiamo sviluppando le f
 
 Supabase è una [piattaforma ospitata](https://app.supabase.io). Ci si può iscrivere ed iniziare ad utilizzare Supabase senza la necessità di installare qualcosa. Ci impegnamo nel creare un'esperienza di sviluppo interamente in locale - attualmente é il nostro obiettivo primario, così come lo è la stabilità della piattaforma stessa.
 
-![Architettura](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Architettura](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) è un sistema di database relazionali ad oggetti, con oltre 30 anni di sviluppo all'attivo che gli hanno permesso di ottenere una ottima reputazione in termini di affidabilità, robustezza delle funzionalità e prestazioni.
 - [Realtime](https://github.com/supabase/realtime) è un server Elixir che consente di ascoltare eventi PostreSQL quali inserimento, aggiornamenti e rimozioni utilizzando i websocket. Supabase rimane in ascolto della funzionalità incorporata di replicazione di Postgres, convertendo il flusso di byte replicato in JSON, dopodichè diffondendo il JSON attraverso i websocket.

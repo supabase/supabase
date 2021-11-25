@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) është projekt publik (open-source) si alternativë e Firebase. Ne jemi duke ndërtuar funksionet e Firebase duke përdorur mjete nga produktet publike të shkallës së ndërmarrjes.
+[Supabase](https://supabase.com) është projekt publik (open-source) si alternativë e Firebase. Ne jemi duke ndërtuar funksionet e Firebase duke përdorur mjete nga produktet publike të shkallës së ndërmarrjes.
 
 - [x] Hosted Postgres Database
 - [x] Abonime në kohë reale
@@ -18,13 +18,13 @@
 
 ## Dokumentimi
 
-Për dokumentimin e plotë, vizitoni [supabase.io/docs](https://supabase.io/docs)
+Për dokumentimin e plotë, vizitoni [supabase.io/docs](https://supabase.com/docs)
 
 ## Komuniteti dhe Mbështetja
 
 - [Forumi i Komunitetit](https://github.com/supabase/supabase/discussions). Me e mirë për: ndihmë për ndërtime, diskutime për databasat dhe praktikat më të mira.
 - [GitHub Problemet](https://github.com/supabase/supabase/issues). Me e mirë për: të meta dhe gabime që ju përmballeni duke përdorur Supabase
-- [Mbështetje nëpërmjet Adresës Elektronike](https://supabase.io/docs/support#business-support). Më e mirë për: problemet me infrastrukturën e databases tuaj.
+- [Mbështetje nëpërmjet Adresës Elektronike](https://supabase.com/docs/support#business-support). Më e mirë për: problemet me infrastrukturën e databases tuaj.
 
 ## Statusi
 
@@ -47,7 +47,7 @@ Supabase është një kombinim i mjeteve që janë projekte të hapura (open sou
 
 Supabase është një [platform hostimi](https://app.supabase.io). Ti mundesh të regjistrohesh dhe të fillosh ta përdorish Supabase duke mos instaluar asgjë. Poashtu ne jemi duke punuar për ta ndërtuar eksperiencën për zhvillim lokal, por kjo nuk është fokusi ynë kryesorë dhe thelbësor, së bashku me stabilitetin e platformës.
 
-![Arkitektura](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Arkitektura](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) është një objekt-relacional i databasës si sistem me më shumë se 30 vite zhvillim aktiv e cila ka fituar një reputacion të fortë për besueshmërinë, karakteristikë të qëndrueshmërisë ,dhe performancë.
 - [Realtime](https://github.com/supabase/realtime) është një Elixir server që lejon të dëgjosh për insertime, fshirje dhe përdisime në databasën PostgreSQL duke përdorur websockets. Supabase dëgjon në Postgres' funksionaliteti i replikimit i integruar, ajo kthen rrjedhjen e bajteve të replikimit, pastaj transmeton JSON mbi/në websockets.
