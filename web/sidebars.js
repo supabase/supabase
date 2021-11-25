@@ -186,7 +186,11 @@ module.exports = {
       type: 'category',
       label: 'Integrations',
       collapsed: false,
-      items: ['guides/integrations/prisma'],
+      items: [
+        'guides/integrations/prisma',
+        'guides/integrations/auth0',
+        'guides/integrations/draftbit',
+      ],
     },
     // {
     //   type: 'category',

@@ -6,7 +6,7 @@ description: 'Swap out Supabase authentication with Auth0. Let Auth0 handle toke
 
 This guide steps through building a Next.js application with Auth0 and Supabase. We configure Auth0 to handle authenticating users and managing tokens, while writing our authorization logic in Supabase - using Row Level Security policies.
 
-_Note_: This guide is heavily inspired by the [Using Next.js and Auth0 with Supabase](https://auth0.com/blog/using-nextjs-and-auth0-with-supabase/) article on [Auth0's blog](https://auth0.com/blog/). Check it out for a practical step-by-step guide on integrating Auth0 and Supabase.
+> Note: This guide is heavily inspired by the [Using Next.js and Auth0 with Supabase](https://auth0.com/blog/using-nextjs-and-auth0-with-supabase/) article on [Auth0's blog](https://auth0.com/blog/). Check it out for a practical step-by-step guide on integrating Auth0 and Supabase.
 
 The full code example for this guide can be found [here](https://github.com/dijonmusters/supabase-auth0-example).
 
@@ -14,7 +14,7 @@ The full code example for this guide can be found [here](https://github.com/dijo
 
 [Next.js](https://nextjs.org/) is a web application framework built on top of React. We will be using it for this example, as it allows us to write server-side logic within our application. Auth0 have also written a [very well integrated authentication library](https://www.npmjs.com/package/@auth0/nextjs-auth0) specifically for Next.js.
 
-_Note_: API routes (serverless functions) in Next.js closely resemble the structure of Node server frameworks - such as Express, Koa and Fastify. The server-side logic in this guide could easily be refactored in one of these frameworks and managed as a separate application to the front-end.
+> Note: API routes (serverless functions) in Next.js closely resemble the structure of Node server frameworks - such as Express, Koa and Fastify. The server-side logic in this guide could easily be refactored in one of these frameworks and managed as a separate application to the front-end.
 
 If you don’t have an Auth0 account, create one [here](https://auth0.com/signup).
 
@@ -24,7 +24,7 @@ You will also need a Supabase account, which can be created by signing in [here]
 
 From the Auth0 dashboard, click the menu to the right of the Auth0 logo, and select `Create tenant`.
 
-![Create tenant from Auth0 dashboard](https://i.imgur.com/IYzHxeW.png)
+![Create tenant from Auth0 dashboard](/img/guides/integrations/auth0/IYzHxeW.png)
 
 Enter a `Domain` for your tenant - this will need to be unique.
 
@@ -32,7 +32,7 @@ Select a `Region` - this should be geographically close to the majority of your 
 
 Select `Development` for `Environment Tag` - this should be production when you're ready to go live.
 
-![Auth0 tenant settings](https://i.imgur.com/iSA3E0J.png)
+![Auth0 tenant settings](/img/guides/integrations/auth0/iSA3E0J.png)
 
 ## Step 2: Setting up an Auth0 application
 
@@ -40,7 +40,7 @@ From the sidebar menu, select `Applications` > `Applications` and click `Create 
 
 Give your application a name, select the `Regular Web Applications` option and click `Create`.
 
-![Auth0 application settings](https://i.imgur.com/ANU4Wez.png)
+![Auth0 application settings](/img/guides/integrations/auth0/ANU4Wez.png)
 
 Select `Settings` and navigate to the `Application URIs` section, and update the following:
 
@@ -68,7 +68,7 @@ Select the same `Region` you selected for your Auth0 tenant.
 
 Click `Create new project`.
 
-![New Supabase project settings](https://i.imgur.com/qnmJEU7.png)
+![New Supabase project settings](/img/guides/integrations/auth0/qnmJEU7.png)
 
 ## Step 4: Creating data in Supabase
 
@@ -86,17 +86,17 @@ Create two new columns:
 
 Click `Save` to create the new table.
 
-![Todo table](https://i.imgur.com/33kqP4K.png)
+![Todo table](/img/guides/integrations/auth0/33kqP4K.png)
 
 From the `Table editor` view, select the `todo` table and click `Insert row`.
 
 Fill out the `title` field and click `Save`.
 
-![New row settings](https://i.imgur.com/mEhHAWC.png)
+![New row settings](/img/guides/integrations/auth0/mEhHAWC.png)
 
 Click `Insert row` and add a couple of extra todos.
 
-![List of todos](https://i.imgur.com/dLOvhdq.png)
+![List of todos](/img/guides/integrations/auth0/dLOvhdq.png)
 
 ## Step 5: Building a Next.js app
 
@@ -119,13 +119,13 @@ NEXT_PUBLIC_SUPABASE_KEY=get-from-supabase-dashboard
 SUPABASE_SIGNING_SECRET=get-from-supabase-dashboard
 ```
 
-_Note_: Auth0 values can be found under `Settings > Basic Information` for your application.
+> Note: Auth0 values can be found under `Settings > Basic Information` for your application.
 
-![Auth0 settings](https://imgur.com/o07FaoV)
+![Auth0 settings](/img/guides/integrations/auth0/o07FaoV.png)
 
-_Note_: Supabase values can be found under `Settings > API` for your project.
+> Note: Supabase values can be found under `Settings > API` for your project.
 
-![Supabase settings](https://imgur.com/r1GAfLo)
+![Supabase settings](/img/guides/integrations/auth0/r1GAfLo.png)
 
 Restart your Next.js development server to read in the new values from `.env.local`.
 
@@ -151,7 +151,7 @@ import { handleAuth } from '@auth0/nextjs-auth0'
 export default handleAuth()
 ```
 
-_Note_: This will create a few API routes for us. The main ones we will use are `/api/auth/login` and `/api/auth/logout` to handle signing users in and out.
+> Note: This will create a few API routes for us. The main ones we will use are `/api/auth/login` and `/api/auth/logout` to handle signing users in and out.
 
 Open `pages/_app.js` and wrap our `Component` with the `UserProvider` from Auth0:
 
@@ -199,17 +199,17 @@ export const getServerSideProps = withPageAuthRequired()
 export default Index
 ```
 
-_Note_: `withPageAuthRequired` will automatically redirect the user to `/api/auth/login` if they are not currently logged in.
+> Note: `withPageAuthRequired` will automatically redirect the user to `/api/auth/login` if they are not currently logged in.
 
 Test this is working by navigating to `http://localhost:3000` which should redirect you to an Auth0 sign in screen.
 
-![Auth0 sign in screen](https://i.imgur.com/xLRL7S7.png)
+![Auth0 sign in screen](/img/guides/integrations/auth0/xLRL7S7.png)
 
 Either `Sign up` for a new account, or click `Continue with Google` to sign in.
 
 You should now be able to view the landing page.
 
-![Landing page](https://i.imgur.com/YdBKRy6.png)
+![Landing page](/img/guides/integrations/auth0/YdBKRy6.png)
 
 ## Step 6: Sign Auth0 token for Supabase
 
@@ -259,7 +259,7 @@ Our `payload` for the JWT will contain our user's unique identifier from Auth0 -
 
 We are signing this JWT using Supabase's signing secret, so Supabase will be able to validate it is authentic and hasn't been tampered with in transit.
 
-_Note_: We need to sign the user out and back in again to run the `afterCallback` function, and create our new token.
+> Note: We need to sign the user out and back in again to run the `afterCallback` function, and create our new token.
 
 Now we just need to send the token along with the request to Supabase.
 
@@ -387,7 +387,7 @@ export default Index
 
 Either way, when we reload our application, we are still getting the empty state for todos.
 
-![Empty todo list](https://i.imgur.com/XgEMwnN.png)
+![Empty todo list](/img/guides/integrations/auth0/XgEMwnN.png)
 
 This is because we enabled Row Level Security, which blocks all requests by default. To enable our user to select their `todos` we need to write a policy.
 
@@ -407,47 +407,47 @@ $$ language sql stable;
 
 This will create a function called `auth.user_id()`, which will inspect the `userId` field of our JWT payload.
 
-_Note_: To learn more about PostgreSQL functions, check out [our deep dive video](https://www.youtube.com/watch?v=MJZCCpCYEqk).
+> Note: To learn more about PostgreSQL functions, check out [our deep dive video](https://www.youtube.com/watch?v=MJZCCpCYEqk).
 
 Let's create a policy that checks whether this user is the owner of the todo.
 
 Select `Authentication` from the Supabase sidebar menu, click `Policies`, and then `New Policy` on the `todo` table.
 
-![Create new policy](https://i.imgur.com/M7XyhHe.png)
+![Create new policy](/img/guides/integrations/auth0/M7XyhHe.png)
 
 From the modal, select `Create a policy from scratch` and add the following.
 
-![Policy settings for SELECT](https://i.imgur.com/wuWz3am.png)
+![Policy settings for SELECT](/img/guides/integrations/auth0/wuWz3am.png)
 
 This policy is calling the function we just created to get the currently logged in user's ID `auth.user_id()` and checking whether this matches the `user_id` column for the current `todo`. If it does, then it will allow the user to select it, otherwise it will continue to deny.
 
 Click `Review` and then `Save policy`.
 
-_Note_: To learn more about RLS and policies, check out [our deep dive video](https://www.youtube.com/watch?v=Ow_Uzedfohk).
+> Note: To learn more about RLS and policies, check out [our deep dive video](https://www.youtube.com/watch?v=Ow_Uzedfohk).
 
 The last thing we need to do is update the `user_id` columns for our existing `todos`.
 
 Head back to the Supabase dashboard, and select `Table editor` from the sidebar.
 
-![User ID null in Supabase Table Editor](https://i.imgur.com/dLOvhdq.png)
+![User ID null in Supabase Table Editor](/img/guides/integrations/auth0/dLOvhdq.png)
 
 Each of our `user_id` columns are set to `NULL`!
 
 To get the ID for our Auth0 user, head over to the Auth0 dashboard, select `User Management` from the sidebar, click `Users` and select your test user.
 
-![List of users in Auth0 dashboard](https://i.imgur.com/GdXS013.png)
+![List of users in Auth0 dashboard](/img/guides/integrations/auth0/GdXS013.png)
 
 Copy their `user_id`.
 
-![User ID in Auth0 dashboard](https://i.imgur.com/tbvd0Uj.png)
+![User ID in Auth0 dashboard](/img/guides/integrations/auth0/tbvd0Uj.png)
 
 Update each row in Supabase.
 
-![User ID set to Auth0 user](https://i.imgur.com/tPu4Tt8.png)
+![User ID set to Auth0 user](/img/guides/integrations/auth0/tPu4Tt8.png)
 
 Now when we refresh our application, we should finally see our list of `todos`!
 
-_Note_: Check out [the repo](https://github.com/dijonmusters/supabase-auth0-example/blob/main/pages/index.js) for an example of writing new `todos` to Supabase.
+> Note: Check out [the repo](https://github.com/dijonmusters/supabase-auth0-example/blob/main/pages/index.js) for an example of writing new `todos` to Supabase.
 
 ## Resources
 
