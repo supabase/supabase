@@ -5,7 +5,7 @@ import { IconChevronRight, IconX } from '@supabase/ui'
 import { useRouter } from 'next/router'
 
 const Announcement = () => {
-  const [hidden, setHidden] = useState(false)
+  const [hidden, setHidden] = useState(true)
 
   const router = useRouter()
 
@@ -18,8 +18,8 @@ const Announcement = () => {
   // window.localStorage is kept inside useEffect
   // to prevent error
   useEffect(function () {
-    if (window.localStorage.getItem(announcementKey)) {
-      return setHidden(true)
+    if (!window.localStorage.getItem(announcementKey)) {
+      return setHidden(false)
     }
   }, [])
 
