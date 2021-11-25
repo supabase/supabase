@@ -65,7 +65,7 @@ const NavBar = () => {
             <Button disabled key="icon-command" type="default" size="tiny">
               <IconCommand size="tiny" />
             </Button>,
-            <Button disabled key="icon-command" type="default" size="tiny">
+            <Button disabled key="icon-letter" type="default" size="tiny">
               K
             </Button>,
           ]}
