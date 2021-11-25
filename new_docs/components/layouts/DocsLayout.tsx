@@ -9,7 +9,7 @@ const DocsLayout = ({ title, children }: { title: String; children: ReactElement
   return (
     <div className="h-screen">
       <Head>
-        <title>${title} | Supabase</title>
+        <title>{title} | Supabase</title>
         <meta name="description" content="Supabase docs" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
