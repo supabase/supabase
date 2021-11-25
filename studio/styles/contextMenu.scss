@@ -1,0 +1,17 @@
+.react-contexify {
+  @apply dark:bg-gray-700;
+  .react-contexify__item {
+    .react-contexify__item__content {
+      @apply dark:text-white text-sm;
+    }
+  }
+  .react-contexify__item:not(.react-contexify__item--disabled):hover
+    > .react-contexify__item__content,
+  .react-contexify__item:not(.react-contexify__item--disabled):focus
+    > .react-contexify__item__content {
+    @apply dark:bg-gray-600;
+  }
+  .react-contexify__separator {
+    @apply dark:bg-gray-500;
+  }
+}
