@@ -1,0 +1,29 @@
+{
+  "Overview": [
+    { "text": "Introduction", "link": "/" },
+    { "text": "Architecture", "link": "/architecture" },
+    { "text": "Database", "link": "/guides/database" },
+    { "text": "Auth", "link": "/guides/auth" },
+    { "text": "Storage", "link": "/guides/storage" },
+    { "text": "APIs", "link": "/guides/apis" },
+    { "text": "Examples and Resources", "link": "/guides/examples" }
+  ],
+  "Tutorials": [
+    { "text": "Quickstart: Angular", "link": "/guides/with-angular" },
+    { "text": "Quickstart: Next.js", "link": "/guides/with-next" },
+    { "text": "Quickstart: Flutter", "link": "/guides/with-flutter" },
+    { "text": "Quickstart: React", "link": "/guides/with-react" },
+    { "text": "Quickstart: RedwoodJS", "link": "/guides/with-redwoodjs" },
+    { "text": "Quickstart: Svelte", "link": "/guides/with-svelte" },
+    { "text": "Quickstart: Vue 3", "link": "/guides/with-vue-3" }
+  ],
+  "SEE ALSO": [
+    { "text": "FAQs", "link": "/faqs" },
+    { "text": "Going into Prod Checklist", "link": "/going-into-prod" },
+    { "text": "Contributing", "link": "/contributing" },
+    { "text": "SupaSquad", "link": "/supasquad" },
+    { "text": "Terms of Service", "link": "/terms" },
+    { "text": "Privacy Policy", "link": "/privacy" },
+    { "text": "Acceptable Use Policy", "link": "/aup" }
+  ]
+}
