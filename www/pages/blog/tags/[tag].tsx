@@ -7,7 +7,7 @@ import PostTypes from '~/types/post'
 import BlogHeader from '~/components/Blog/BlogHeader'
 
 export async function getStaticProps({ params }: any) {
-  const posts = getSortedPosts(0, [params.tag])
+  const posts = getSortedPosts('_blog', 0, [params.tag])
   return {
     props: {
       tag: params.tag,
@@ -17,7 +17,7 @@ export async function getStaticProps({ params }: any) {
 }
 
 export async function getStaticPaths() {
-  const categories = getAllCategories()
+  const categories = getAllCategories('_blog')
   return {
     paths: categories.map((category: any) => ({ params: { tag: category } })),
     fallback: false,

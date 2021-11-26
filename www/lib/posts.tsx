@@ -119,7 +119,7 @@ export const getPostdata = async (slug: string, directory: string) => {
   return postContent
 }
 
-export const getAllCategories = (directory: string) => {
+export const getAllCategories = (directory: Directories) => {
   const posts = getSortedPosts(directory)
   let categories: any = []
 
