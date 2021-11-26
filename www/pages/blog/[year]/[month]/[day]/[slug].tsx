@@ -187,10 +187,13 @@ function BlogPostPage(props: any) {
             <div className="col-span-12 lg:col-span-2">
               {/* Back button */}
               <Typography.Text type="secondary">
-                <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center">
+                <a
+                  href={'/blog'}
+                  className="hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center"
+                >
                   <IconChevronLeft />
                   Back
-                </span>
+                </a>
               </Typography.Text>
             </div>
             <div className="col-span-12 lg:col-span-10">
