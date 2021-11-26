@@ -418,7 +418,8 @@ nav.menu {
 .navbar-sidebar__items .menu .menu__link.menu__link--sublist::after {
   display: none;
 }
-.menu__list-item svg, .navbar__link svg {
+.menu__list-item svg,
+.navbar__link svg {
   display: none;
 }
 
@@ -533,6 +534,16 @@ a.card:hover {
   line-height: calc(var(--ifm-spacing-vertical) * 1);
 }
 
+.menu__link--sublist {
+  margin-bottom: 0;
+  /* padding: 0; */
+}
+
+.menu__link {
+  /* padding: 0;
+  margin: 0; */
+}
+
 /*
   Link chevrons
 */
@@ -540,21 +551,25 @@ a.card:hover {
   background-image: url('data:image/svg+xml;utf8,<svg alt="Arrow" xmlns="http://www.w3.org/2000/svg"  viewBox="-6 -6 38 38"><path fill="inherit" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg>');
   mask-image: url('data:image/svg+xml;utf8,<svg alt="Arrow" xmlns="http://www.w3.org/2000/svg"  viewBox="-6 -6 38 38"><path fill="inherit" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg>');
   -webkit-mask-size: cover;
-  width: 21px;
+  width: 16px;
+  height: 16px;
   mask-size: cover;
-  background: var(--ifm-color-gray-900);
+  background: var(--ifm-color-gray-700);
   -webkit-transform: rotate(180deg);
   transform: rotate(180deg);
   transition: var(--ifm-transition-fast) ease;
+  transform-origin: center;
+  filter: none;
 }
 .menu .menu__link.menu__link--sublist:hover::after,
 .menu .menu__link.menu__link--sublist.menu__link--active::after {
   background-image: url('data:image/svg+xml;utf8,<svg alt="Arrow" xmlns="http://www.w3.org/2000/svg"  viewBox="-6 -6 38 38"><path fill="inherit" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg>');
   mask-image: url('data:image/svg+xml;utf8,<svg alt="Arrow" xmlns="http://www.w3.org/2000/svg"  viewBox="-6 -6 38 38"><path fill="inherit" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg>');
   -webkit-mask-size: cover;
-  width: 21px;
+  width: 16px;
+  height: 16px;
   mask-size: cover;
-  background: var(--ifm-color-gray-900);
+  background: var(--ifm-color-gray-700);
 }
 
 .menu .menu__list-item.menu__list-item--collapsed .menu__link--sublist::after {
@@ -949,7 +964,6 @@ html[data-theme='dark'] .DocSearch {
   /* font-weight: 400; */
 }
 
-
 @media screen and (max-width: 580px) {
   .navbar__items .navbar-item-github {
     display: none !important;
@@ -977,7 +991,6 @@ html[data-theme='dark'] .navbar-item-github:before {
   background-repeat: no-repeat;
   background-position: center;
 }
-
 
 @media screen and (max-width: 580px) {
   .navbar__items .navbar-item-twitter {

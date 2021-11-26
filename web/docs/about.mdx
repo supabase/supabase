@@ -6,6 +6,15 @@ slug: /
 hide_table_of_contents: true
 ---
 
+import AngularLogo from '@site/static/img/libraries/angular-icon.svg'
+import ExpoLogo from '@site/static/img/libraries/expo-icon.svg'
+import DartLogo from '@site/static/img/libraries/dart-icon.svg'
+import JavascriptLogo from '@site/static/img/libraries/javascript-icon.svg'
+import NextjsLogo from '@site/static/img/libraries/nextjs-icon.svg'
+import ReactLogo from '@site/static/img/libraries/react-icon.svg'
+import SvelteLogo from '@site/static/img/libraries/svelte-icon.svg'
+import VuejsLogo from '@site/static/img/libraries/vuejs-icon.svg'
+
 import useBaseUrl from '@docusaurus/useBaseUrl'
 import Link from '@docusaurus/Link'
 import Tabs from '@theme/Tabs'
@@ -13,24 +22,24 @@ import TabItem from '@theme/TabItem'
 const frameworks = [
   {
     name: 'Angular',
-    logo: '/img/libraries/angular-icon.svg',
+    logo: AngularLogo,
     href: '/docs/guides/with-angular',
   },
   {
     name: 'Expo',
-    logo: '/img/libraries/expo-icon.svg',
+    logo: ExpoLogo,
     href: 'https://github.com/supabase/supabase/tree/master/examples/expo-todo-list',
   },
-  { name: 'Flutter', logo: '/img/libraries/dart-icon.svg', href: '/docs/guides/with-flutter' },
+  { name: 'Flutter', logo: DartLogo, href: '/docs/guides/with-flutter' },
   {
     name: 'Javascript',
-    logo: '/img/libraries/javascript-icon.svg',
+    logo: JavascriptLogo,
     href: 'https://github.com/supabase/supabase/tree/master/examples/javascript-auth',
   },
-  { name: 'Next.js', logo: '/img/libraries/nextjs-icon.svg', href: '/docs/guides/with-nextjs' },
-  { name: 'React', logo: '/img/libraries/react-icon.svg', href: '/docs/guides/with-react' },
-  { name: 'Svelte', logo: '/img/libraries/svelte-icon.svg', href: '/docs/guides/with-svelte' },
-  { name: 'Vue', logo: '/img/libraries/vuejs-icon.svg', href: '/docs/guides/with-vue-3' },
+  { name: 'Next.js', logo: NextjsLogo, href: '/docs/guides/with-nextjs' },
+  { name: 'React', logo: ReactLogo, href: '/docs/guides/with-react' },
+  { name: 'Svelte', logo: SvelteLogo, href: '/docs/guides/with-svelte' },
+  { name: 'Vue', logo: VuejsLogo, href: '/docs/guides/with-vue-3' },
 ]
 
 Supabase is an open source Firebase alternative.
@@ -84,19 +93,14 @@ Visit [app.supabase.io](https://app.supabase.io) to get started with the hosted 
 
 Supabase is just Postgres, which makes it compatible with a large number of tools and frameworks.
 
-<div class="container" style={{}}>
+<div>
   <div class="row is-multiline">
     {frameworks.map((x) => (
       <div key={x.name} class="col col--3">
         <Link class="card" to={x.href}>
           <div class="card__body" style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
             {x.logo && (
-              <img
-                src={useBaseUrl(x.logo)}
-                alt={x.name}
-                width="20"
-                style={{ display: 'block', maxHeight: 20 }}
-              />
+              <x.logo width="20" alt={x.name} style={{ display: 'block', maxHeight: 20 }} />
             )}
             <p>{x.name}</p>
           </div>
