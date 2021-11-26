@@ -19,7 +19,7 @@ const BlogListItem = ({ blog }: Props) => {
   return (
     <div key={blog.slug}>
       <a href={`/blog/${blog.url}`}>
-        <div className="inline-block">
+        <div className="inline-block min-w-full group">
           <div className="flex flex-col space-y-4">
             <div
               className={`relative overflow-auto w-full h-60 border dark:border-dark shadow-sm rounded-lg mb-4`}
@@ -32,6 +32,7 @@ const BlogListItem = ({ blog }: Props) => {
                     : `/images/blog/${blog.thumb}`
                 }
                 objectFit="cover"
+                className="transform duration-100 ease-in scale-100 group-hover:scale-105"
               />
             </div>
 
