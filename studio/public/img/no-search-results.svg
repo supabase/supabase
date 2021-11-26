@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="261px" height="189px" viewBox="0 0 261 189" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Graphics" transform="translate(-746.000000, -755.000000)">
+            <g id="Group" transform="translate(749.000000, 757.000000)">
+                <path d="M0.5,0.5 L52.5,0.5 L200.5,0.5 L200.5,170.5 L0.5,170.5 L0,51 L0.5,0.5 Z" id="Rectangle" stroke="#555555" stroke-width="5" fill-opacity="0" fill="#D8D8D8" stroke-dasharray="20"></path>
+                <path d="M185.5,147.5 C207.59139,147.5 225.5,129.59139 225.5,107.5 C225.5,85.40861 207.59139,67.5 185.5,67.5 C163.40861,67.5 145.5,85.40861 145.5,107.5 C145.5,129.59139 163.40861,147.5 185.5,147.5 Z M213,139 L253.500808,183.268325" id="Combined-Shape" stroke="#777777" stroke-width="10" fill-opacity="0" fill="#D8D8D8"></path>
+                <line x1="200.5" y1="0.5" x2="197.5" y2="0.5" id="Line" stroke="#555555" stroke-width="5" stroke-linecap="square"></line>
+                <line x1="3.5" y1="0.5" x2="0.5" y2="0.5" id="Line" stroke="#555555" stroke-width="5" stroke-linecap="square"></line>
+            </g>
+        </g>
+    </g>
+</svg>
