@@ -32,7 +32,4 @@ yarn-error.log*
 .env.staging.local
 .env.production.local
 
-# vercel
-.vercel/testing.json
-.vercel/project.json
-.vercel/README.txt
+!.vercel
