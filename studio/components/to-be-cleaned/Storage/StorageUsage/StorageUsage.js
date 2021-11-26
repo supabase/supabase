@@ -12,7 +12,7 @@ const StorageUsage = () => {
         }
       />
       <Typography.Text type="secondary">
-        <p className="mt-5">Usage statistics for storage are coming soon...</p>
+        <p className="mt-5">Usage statistics for storage are coming soon.</p>
       </Typography.Text>
     </div>
   )
