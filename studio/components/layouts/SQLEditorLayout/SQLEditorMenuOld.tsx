@@ -19,7 +19,7 @@ import {
 } from '@supabase/ui'
 
 import { IS_PLATFORM } from 'lib/constants'
-import { useProfile } from 'hooks'
+import { useStore } from 'hooks'
 import { useProjectContentStore } from 'stores/projectContentStore'
 import { useSqlStore, TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
 
@@ -110,7 +110,9 @@ const SideBarContent = observer(() => {
   const router = useRouter()
   const { ref } = router.query
 
-  const { profile: user } = useProfile()
+  const { ui } = useStore()
+  const { profile: user } = ui
+
   const sqlEditorStore: any = useSqlStore()
   const contentStore: any = useProjectContentStore(ref)
 
@@ -125,7 +127,7 @@ const SideBarContent = observer(() => {
       const snippet = await createSqlSnippet({ router })
 
       // reload the local sqlEditorStore
-      await sqlEditorStore.loadRemotePersistentData(contentStore, user.id)
+      await sqlEditorStore.loadRemotePersistentData(contentStore, user?.id)
 
       // select tab with new snippet
       if (snippet) sqlEditorStore.selectTab(snippet.id)
