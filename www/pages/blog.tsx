@@ -62,7 +62,7 @@ function Blog(props: any) {
   }, [category])
 
   useEffect(() => {
-    return props.categories.push('all')
+    return props.categories.unshift('all')
   }, [])
 
   // append 'all' category
@@ -96,7 +96,7 @@ function Blog(props: any) {
             <div className="mx-auto ">
               <div className="grid grid-cols-12">
                 <div className="col-span-12 lg:col-span-12">
-                  <Tabs scrollable size="medium" onChange={setCategory}>
+                  <Tabs scrollable size="medium" onChange={setCategory} defaultActiveId={'all'}>
                     {props.categories.map((categoryId: string) => (
                       <Tabs.Panel id={categoryId} label={categoryId}>
                         {/* <p>{categoryId}</p> */}
