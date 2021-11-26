@@ -1,0 +1,98 @@
+import { PostgresRelationship } from '@supabase/postgres-meta'
+
+export interface CreateColumnPayload {
+  tableId: number
+  name: string
+  type: string
+  check?: string
+  comment?: string
+  defaultValue?: any
+  defaultValueFormat?: 'expression' | 'literal'
+  isIdentity?: boolean
+  identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
+  isNullable?: boolean
+  isPrimaryKey?: boolean
+  isUnique?: boolean
+}
+
+export interface UpdateColumnPayload {
+  name?: string
+  comment?: string | null
+  type?: string
+  dropDefault?: boolean
+  defaultValue?: any
+  defaultValueFormat?: 'expression' | 'literal'
+  isIdentity?: boolean
+  isNullable?: boolean
+  isUnique?: boolean
+  identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
+}
+
+export interface CreateTablePayload {
+  name: string
+  schema?: string
+  comment?: string
+}
+
+export interface UpdateTablePayload {
+  name?: string
+  schema?: string
+  comment?: string
+  rls_enabled?: boolean
+  rls_forced?: boolean
+  replica_identity?: 'DEFAULT' | 'INDEX' | 'FULL' | 'NOTHING'
+  replica_identity_index?: string
+}
+
+export interface Field {
+  name: string
+  required: boolean
+  value: any
+  description?: string
+  enums?: string[]
+  format?: string
+  placeholder?: string
+  foreignKey?: { table: string; column: string }
+}
+
+export interface ColumnField {
+  id: string
+  name: string
+  comment?: string
+  format: string
+  defaultValue: string
+  foreignKey: PostgresRelationship | undefined
+  isNullable: boolean
+  isUnique: boolean
+  isArray: boolean
+  isIdentity: boolean
+  isPrimaryKey: boolean
+  isNewColumn: boolean
+}
+
+// export interface ForeignKey {
+//   table: PostgresTable
+//   column: PostgresColumn
+// }
+
+export interface EnumType {
+  id: number
+  name: string
+  values: any[]
+}
+
+export interface PostgresDataTypeOption {
+  name: string
+  description: string
+  type: 'number' | 'text' | 'time' | 'json' | 'bool' | 'others'
+}
+
+// export interface FormattedPostgresColumn extends PostgresColumn {
+//   isPrimaryKey: boolean
+//   foreignKey: ForeignKey
+// }
+
+// Probably belongs to a higher level
+export interface Dictionary<T> {
+  [Key: string]: T
+}
