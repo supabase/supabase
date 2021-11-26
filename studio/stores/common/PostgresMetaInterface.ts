@@ -12,6 +12,7 @@ export interface IPostgresMetaInterface<T> {
   count: number
   hasError: boolean
   isLoading: boolean
+  isInitialized: boolean
 
   load: () => void
   create: (payload: any) => Promise<T | { error: ResponseError }>
@@ -67,6 +68,10 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
     })
   }
 
+  get count() {
+    return Object.keys(this.data).length
+  }
+
   get hasError() {
     return this.state === this.STATES.ERROR
   }
@@ -75,8 +80,8 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
     return this.state === this.STATES.INITIAL || this.state === this.STATES.LOADING
   }
 
-  get count() {
-    return Object.keys(this.data).length
+  get isInitialized() {
+    return this.state !== this.STATES.INITIAL
   }
 
   async fetchData() {
