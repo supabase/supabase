@@ -50,10 +50,14 @@ function Blog(props: any) {
   const { basePath } = useRouter()
 
   useEffect(() => {
-    // Update the document title using the browser API
+    // contruct an array of blog posts
+    // not inluding the first blog post
+    const shiftedBlogs = [...props.blogs]
+    shiftedBlogs.shift()
+
     setBlogs(
       category === 'all'
-        ? props.blogs
+        ? shiftedBlogs
         : props.blogs.filter((post: any) => {
             const found = post.tags.includes(category)
             return found
@@ -80,7 +84,6 @@ function Blog(props: any) {
       </Head>
       <NextSeo title="Blog" description="Latest news from the Supabase team." />
       <DefaultLayout>
-        {/* <BlogHeader title="Blog" className="pb-0" /> */}
         <div className="bg-white dark:bg-dark-800 overflow-hidden py-12">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
             <div className="mx-auto ">
@@ -108,18 +111,14 @@ function Blog(props: any) {
               </div>
             </div>
 
-            <div className="">
-              <div className="">
-                <ol className="grid grid-cols-12 mt-16 gap-16">
-                  {blogs.map((blog: PostTypes, idx: number) => (
-                    <div className="col-span-4 mb-16">
-                      <BlogListItem blog={blog} key={idx} />
-                    </div>
-                  ))}
-                </ol>
-              </div>{' '}
-            </div>
-          </div>
+            <ol className="grid grid-cols-12 py-16 gap-8 lg:gap-16">
+              {blogs.map((blog: PostTypes, idx: number) => (
+                <div className="col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-4 mb-16">
+                  <BlogListItem blog={blog} key={idx} />
+                </div>
+              ))}
+            </ol>
+          </div>{' '}
         </div>
       </DefaultLayout>
     </>
@@ -154,7 +153,7 @@ function FeaturedThumb(blog: PostTypes) {
                   <span className="text-xl">{blog.description}</span>
                 </Typography.Text>
 
-                <Space className="block">
+                {/* <Space className="block">
                   {blog.tags &&
                     blog.tags.map((tag: string) => (
                       <a href={`/blog/tags/${tag}`}>
@@ -165,7 +164,7 @@ function FeaturedThumb(blog: PostTypes) {
                         </a>
                       </a>
                     ))}
-                </Space>
+                </Space> */}
               </Space>
             </div>
 
