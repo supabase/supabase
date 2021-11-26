@@ -11,8 +11,8 @@
     "docker:down": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down --remove-orphans",
     "docker:remove": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml rm -vfs",
     "test": "jest",
-    "perf:kong": "k6 run ./tests/performance/kong.js",
-    "perf:meta": "k6 run ./tests/performance/meta.js"
+    "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
+    "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables"
   },
   "dependencies": {},
   "devDependencies": {
