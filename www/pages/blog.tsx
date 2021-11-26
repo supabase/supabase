@@ -10,21 +10,9 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import {
-  Typography,
-  Badge,
-  Space,
-  Dropdown,
-  Button,
-  IconChevronDown,
-  Tabs,
-  Input,
-  IconMail,
-} from '@supabase/ui'
+import { Typography, Space, Tabs } from '@supabase/ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
-import BlogHeader from '~/components/Blog/BlogHeader'
-import { Panel } from '@supabase/ui/dist/cjs/components/Tabs/Tabs'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts('_blog')
@@ -132,58 +120,39 @@ function FeaturedThumb(blog: PostTypes) {
   return (
     <div key={blog.slug} className="cursor-pointer w-full">
       <a href={`/blog/${blog.url}`}>
-        <a className="grid grid-cols-2 gap-16">
+        <a className="grid lg:grid-cols-2 gap-8 lg:gap-16">
           <img
             className="h-96 w-full object-cover border dark:border-dark rounded-lg"
             src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
           />
-          <Space direction="vertical" size={5} className="">
+          <div className="flex flex-col space-y-4">
+            <div className="flex space-x-2">
+              <Typography.Text type="secondary">{blog.date}</Typography.Text>
+              <Typography.Text type="secondary">•</Typography.Text>
+              <Typography.Text type="secondary">{blog.readingTime}</Typography.Text>
+            </div>
+
             <div>
-              <Space className="mb-2">
-                <Typography.Text type="secondary">{blog.date}</Typography.Text>
-                <Typography.Text type="secondary">•</Typography.Text>
-                <Typography.Text type="secondary">{blog.readingTime}</Typography.Text>
-              </Space>
-
-              <Space direction="vertical" size={3}>
-                <Typography.Title level={2} className="m-0">
-                  {blog.title}
-                </Typography.Title>
-                <Typography.Text className="m-0" type="secondary">
-                  <span className="text-xl">{blog.description}</span>
-                </Typography.Text>
-
-                {/* <Space className="block">
-                  {blog.tags &&
-                    blog.tags.map((tag: string) => (
-                      <a href={`/blog/tags/${tag}`}>
-                        <a>
-                          <Badge color="gray" key={`${blog.slug}-${tag}-tag`} dot={false}>
-                            {tag}
-                          </Badge>
-                        </a>
-                      </a>
-                    ))}
-                </Space> */}
-              </Space>
+              <Typography.Title level={2}>{blog.title}</Typography.Title>
+              <Typography.Text className="m-0" type="secondary">
+                <span className="text-xl">{blog.description}</span>
+              </Typography.Text>
             </div>
 
             {author && (
-              <div>
-                <Space size={4}>
-                  {author.author_image_url && (
-                    <img src={author.author_image_url} className="rounded-full w-10" />
-                  )}
-                  <Space direction="vertical" size={0}>
-                    <Typography.Text>{author.author}</Typography.Text>
-                    <Typography.Text type="secondary" small>
-                      {author.position}
-                    </Typography.Text>
-                  </Space>
-                </Space>
+              <div className="flex space-x-3 items-center">
+                {author.author_image_url && (
+                  <img src={author.author_image_url} className="rounded-full w-10" />
+                )}
+                <div className="flex flex-col">
+                  <Typography.Text>{author.author}</Typography.Text>
+                  <Typography.Text type="secondary" small>
+                    {author.position}
+                  </Typography.Text>
+                </div>
               </div>
             )}
-          </Space>
+          </div>
         </a>
       </a>
     </div>
