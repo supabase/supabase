@@ -11,7 +11,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
 
   function telemetry() {
-    return post(`https://app.supabase.io/api/telemetry/page`, {
+    return post(`https://api.supabase.io/platform/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
     })

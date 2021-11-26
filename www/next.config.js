@@ -590,6 +590,11 @@ module.exports = withMDX({
         source: '/docs/reference/javascript/delete-user',
         destination: '/docs/reference/javascript/auth-api-deleteuser',
       },
+      {
+        permanent: true,
+        source: '/oss',
+        destination: '/docs/oss',
+      },
     ]
   },
 })
