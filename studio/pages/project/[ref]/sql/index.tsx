@@ -16,15 +16,16 @@ import getPgsqlSignatureHelpProvider from 'components/to-be-cleaned/SqlEditor/Pg
 
 import { useProjectContentStore } from 'stores/projectContentStore'
 
-import { useStore, withAuth, useProfile } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import { SQLEditorLayout } from 'components/layouts'
 
 const PageConfig = () => {
   const router = useRouter()
   const { ref } = router.query
 
-  const { meta } = useStore()
-  const { profile: user } = useProfile()
+  const { meta, ui } = useStore()
+  const { profile: user } = ui
+
   const contentStore: any = useProjectContentStore(ref)
   const sqlEditorStore: any = useSqlEditorStore(ref, meta)
 
