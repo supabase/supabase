@@ -104,51 +104,19 @@ function Blog(props: any) {
                       </Tabs.Panel>
                     ))}
                   </Tabs>
-                  {/* <Typography.Title level={2}>More posts from the team</Typography.Title> */}
                 </div>
-                {/* <div className="col-span-12 lg:col-span-4 mt-4 lg:mt-0">
-                  <Space className="lg:justify-end" size={6}>
-                    <Typography.Text>Select a category</Typography.Text>
-                    <Dropdown
-                      style={{
-                        height: '50vh',
-                        overflow: 'auto',
-                      }}
-                      overlay={[
-                        <Dropdown.RadioGroup value={category} onChange={setCategory}>
-                          <Dropdown.Radio key={'all'} value="all">
-                            Show all
-                          </Dropdown.Radio>
-                          {props.categories.map((categoryId: string) => (
-                            <Dropdown.Radio key={categoryId} value={categoryId}>
-                              {categoryId}
-                            </Dropdown.Radio>
-                          ))}
-                        </Dropdown.RadioGroup>,
-                      ]}
-                    >
-                      <Button
-                        type="outline"
-                        className="sbui-select--medium"
-                        iconRight={<IconChevronDown />}
-                      >
-                        {category === 'all' ? 'Show all' : category}
-                      </Button>
-                    </Dropdown>
-                  </Space>
-                </div> */}
               </div>
             </div>
 
             <div className="">
-              <div className="grid grid-cols-12 mt-16 gap-16">
-                {/* <ul> */}
-                {blogs.map((blog: PostTypes, idx: number) => (
-                  <div className="col-span-4 mb-16">
-                    <BlogListItem blog={blog} key={idx} />
-                  </div>
-                ))}
-                {/* </ul> */}
+              <div className="">
+                <ol className="grid grid-cols-12 mt-16 gap-16">
+                  {blogs.map((blog: PostTypes, idx: number) => (
+                    <div className="col-span-4 mb-16">
+                      <BlogListItem blog={blog} key={idx} />
+                    </div>
+                  ))}
+                </ol>
               </div>{' '}
             </div>
           </div>
