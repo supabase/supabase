@@ -64,9 +64,9 @@ Nuestra librería de cliente es modular. Cada sub-librería es una implementaci�
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
-    <th>Language</th>
-    <th>Client</th>
-    <th colspan="4">Feature-Clients (bundled in Supabase client)</th>
+    <th>Lenguaje</th>
+    <th>Cliente</th>
+    <th colspan="4">Funcionalidades-Clientes (incluidas en Supabase cliente)</th>
   </tr>
   <tr>
     <th></th>
@@ -87,7 +87,7 @@ Nuestra librería de cliente es modular. Cada sub-librería es una implementaci�
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
   END ROW -->
-  <th colspan="6">⚡️ Official ⚡️</th>
+  <th colspan="6">⚡️ Oficial ⚡️</th>
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
@@ -96,7 +96,7 @@ Nuestra librería de cliente es modular. Cada sub-librería es una implementaci�
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
     <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
   </tr>
-  <th colspan="6">💚 Community 💚</th>
+  <th colspan="6">💚 Comunidad 💚</th>
   <tr>
     <td>C#</td>
     <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
