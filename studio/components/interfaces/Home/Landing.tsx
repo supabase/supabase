@@ -20,7 +20,7 @@ const Landing = () => {
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
             <div className="flex items-center justify-between w-full md:w-auto">
-              <a href="https://supabase.io">
+              <a href="https://supabase.com">
                 <Image
                   src={theme == 'dark' ? '/img/supabase-dark.svg' : '/img/supabase-light.svg'}
                   alt=""
