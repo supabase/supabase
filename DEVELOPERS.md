@@ -63,6 +63,18 @@ Before you start a development server, you must choose if you want to work on th
     yarn install
     ```
 
+3. Build Project:
+
+    npm
+    ```sh
+    npm run build
+    ```
+
+    or with yarn
+    ```sh
+    yarn run build
+    ```
+
 ## Start a Development Server
 
 To debug code, and to see changes in real time, it is often useful to have a local HTTP server.
