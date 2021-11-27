@@ -42,7 +42,7 @@ To build Supabase, you clone the source code repository:
 
 Before you start a development server, you must choose if you want to work on the [Supabase Website](https://supabase.io), [Supabase Docs](https://supabase.io/docs/), or [Supabase Studio](https://app.supabase.io).
 
-1. Go to the [Supabase website](https://supabase.io) directory
+1. Go to the [Supabase Website](https://supabase.io) directory
     ```sh
     cd www
     ```
