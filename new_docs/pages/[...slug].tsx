@@ -1,7 +1,7 @@
 import { ReactElement } from 'react'
 import { getAllDocs, getDocsBySlug } from '../lib/docs'
 import markdownToHtml from '../lib/markdown'
-import DocsLayout from '../components/layouts/DocsLayout'
+import Layout from '../components/layouts/Layout'
 
 export default function Doc({
   meta,
@@ -10,7 +10,7 @@ export default function Doc({
   meta: { title: string; description: string }
   content: ReactElement
 }) {
-  return <DocsLayout meta={meta}>{content}</DocsLayout>
+  return <Layout meta={meta}>{content}</Layout>
 }
 
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
