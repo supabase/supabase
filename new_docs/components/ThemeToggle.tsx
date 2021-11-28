@@ -19,7 +19,7 @@ const ThemeToggle = () => {
       {resolvedTheme == 'dark' ? <IconSun /> : <IconMoon />}
     </button>
   ) : (
-    ''
+    <span />
   )
 }
 

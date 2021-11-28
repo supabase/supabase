@@ -6,7 +6,7 @@ import ThemeToggle from '../ThemeToggle'
 import menuItems from './menu-items.json'
 
 const SideBar = () => {
-  const { pathname } = useRouter()
+  const { asPath } = useRouter()
   return (
     <div className={`${styles.sidebar} fixed relative h-full`}>
       <Menu className={`border-r dark:border-gray-600`}>
@@ -15,13 +15,13 @@ const SideBar = () => {
             return (
               <span key={key}>
                 <Menu.Group title={key} />
-                {menuItems[key].map((item) => (
+                {menuItems[key].map((item: { link: string; text: string }) => (
                   <span key={item.link}>
                     <Link href={item.link} passHref>
                       <a>
                         <Menu.Item
-                          active={pathname === item.link}
-                          showActiveBar={pathname === item.link}
+                          active={asPath === item.link}
+                          showActiveBar={asPath === item.link}
                         >
                           {item.text}
                         </Menu.Item>
