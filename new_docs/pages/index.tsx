@@ -14,7 +14,7 @@ export default function Home({
 }
 
 export async function getStaticProps() {
-  const doc = getDocsBySlug('introduction')
+  const doc = getDocsBySlug('docs/introduction')
 
   const content = await markdownToHtml(doc.content || '')
 

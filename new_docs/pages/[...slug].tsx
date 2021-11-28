@@ -13,16 +13,16 @@ export default function Doc({
   return <DocsLayout meta={meta}>{content}</DocsLayout>
 }
 
-export async function getStaticProps({
-  params,
-}: {
-  params: { slug: string; meta: { [key: string]: any }; content: string }
-}) {
-  let doc = getDocsBySlug(params.slug)
+export async function getStaticProps({ params }: { params: { slug: string[] } }) {
+  let slug
 
-  if (!doc) {
-    doc = getDocsBySlug('404')
+  if (params.slug.length > 1) {
+    slug = `docs/${params.slug.join('/')}`
+  } else {
+    slug = `docs/${params.slug[0]}`
   }
+
+  let doc = getDocsBySlug(slug)
 
   const content = await markdownToHtml(doc.content || '')
 
@@ -34,17 +34,17 @@ export async function getStaticProps({
   }
 }
 
-export async function getStaticPaths() {
-  const docs = getAllDocs()
+export function getStaticPaths() {
+  let docs = getAllDocs()
 
   return {
-    paths: docs.map((doc) => {
+    paths: docs.map(() => {
       return {
         params: {
-          ...doc,
+          slug: docs.map((d) => d.slug),
         },
       }
     }),
-    fallback: false,
+    fallback: 'blocking',
   }
 }

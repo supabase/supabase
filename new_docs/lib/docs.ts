@@ -2,16 +2,15 @@ import fs from 'fs'
 import { join } from 'path'
 import matter from 'gray-matter'
 
-const docsDirectory = join(process.cwd(), 'docs')
+const docsDirectory = process.cwd()
 
 export function getDocsBySlug(slug: string) {
   const realSlug = slug.replace(/\.md$/, '')
-  const docsDirectory = join(process.cwd(), 'docs')
   let fullPath = join(docsDirectory, `${realSlug}.md`)
 
   if (!fs.existsSync(fullPath)) {
-    console.log('file not found, redirect to 404')
-    fullPath = join(docsDirectory, '404.md')
+    console.log(`\nfile ${fullPath} not found, redirect to 404\n`)
+    fullPath = join(docsDirectory, 'docs/404.md')
   }
 
   const fileContents = fs.readFileSync(fullPath, 'utf8')
@@ -22,8 +21,25 @@ export function getDocsBySlug(slug: string) {
 }
 
 export function getAllDocs() {
-  const slugs = fs.readdirSync(docsDirectory)
+  const slugs = walk('docs')
   const docs = slugs.map((slug) => getDocsBySlug(slug))
 
   return docs
+}
+
+function walk(dir: string) {
+  let results: string[] = []
+  const list = fs.readdirSync(dir)
+  list.forEach(function (file) {
+    file = dir + '/' + file
+    const stat = fs.statSync(file)
+    if (stat && stat.isDirectory()) {
+      /* Recurse into a subdirectory */
+      results = results.concat(walk(file))
+    } else {
+      /* Is a file */
+      results.push(file)
+    }
+  })
+  return results
 }

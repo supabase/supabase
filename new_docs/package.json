@@ -11,6 +11,7 @@
     "@mdx-js/loader": "^1.6.22",
     "@next/mdx": "^12.0.4",
     "@supabase/ui": "^0.35.0",
+    "@tailwindcss/typography": "^0.4.1",
     "gray-matter": "^4.0.3",
     "next": "12.0.2",
     "next-themes": "0.0.15",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@types/node": "16.11.6",
     "@types/react": "17.0.34",
+    "@types/remark-prism": "^1.3.0",
     "autoprefixer": "^10.4.0",
     "eslint": "7",
     "eslint-config-next": "12.0.2",

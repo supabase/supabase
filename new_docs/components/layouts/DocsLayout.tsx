@@ -12,7 +12,7 @@ const DocsLayout = ({
   meta: { title: string; description: string }
   children: ReactElement
 }) => {
-  const theme = 'okadia'
+  const theme = 'okaidia'
 
   return (
     <div className="h-screen">
@@ -27,22 +27,7 @@ const DocsLayout = ({
         <meta property="og:title" content={meta?.title} />
         <link
           rel="preload"
-          href="https://unpkg.com/prismjs@0.0.1/themes/prism-tomorrow.css"
-          as="script"
-        />
-        <link
-          rel="preload"
-          href="https://unpkg.com/prismjs@0.0.1/themes/prism-coy.css"
-          as="script"
-        />
-        <link
-          rel="preload"
           href="https://unpkg.com/prismjs@0.0.1/themes/prism-okaidia.css"
-          as="script"
-        />
-        <link
-          rel="preload"
-          href="https://unpkg.com/prismjs@0.0.1/themes/prism-funky.css"
           as="script"
         />
         <link href={`https://unpkg.com/prismjs@0.0.1/themes/prism-${theme}.css`} rel="stylesheet" />
@@ -53,8 +38,8 @@ const DocsLayout = ({
           <NavBar />
           <div className="flex flex-row ">
             <SideBar />
-            <article
-              className={`${styles.content} p-8 prose lg:prose-xl`}
+            <div
+              className={`prose lg:prose-xl ${styles.content} p-8`}
               dangerouslySetInnerHTML={{ __html: children }}
             />
           </div>
