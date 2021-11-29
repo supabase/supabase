@@ -14,7 +14,7 @@ toc_depth: 2
 ---
 
 
-PostgREST 9 was [released today](https://postgrest.org/en/v9.0/releases/v9.0.0.html). Let's have a look at some of the new features.
+PostgREST 9 was [released today](https://postgrest.org/en/v9.0/releases/v9.0.0.html). Let's take a look at some of the new features.
 
 ## Inner Joins
 
@@ -29,18 +29,19 @@ const { data, error } = await supabase
     .eq('users.username', 'Jane')
 ```
 
-With the new `!inner` keyword, you can now filter rows of the top-level table(`messages`) based on a filter(`eq`) of the embedded table(`users`). 
-This works across all Supabase client libraries and you can use it with any of the available operators(`gt`, `in`, etc.).
+With the new `!inner` keyword, you can now filter rows of the top-level table (`messages`) based on a filter (`eq`) of the embedded table (`users`). 
+This works across all Supabase client libraries and you can use it with any of the available operators (`gt`, `in`, etc.)
 
 [Read more](https://postgrest.org/en/v9.0/releases/v9.0.0.html#resource-embedding-with-top-level-filtering).
 
 ## Functions with unnamed parameters
 
-You can now make a `POST` request to functions with a single unnamed parameter. This is particularly useful for webhooks that send data as a JSON payload.
+You can now make `POST` requests to functions with a single unnamed parameter. This is particularly useful for webhooks that send JSON payloads.
 
-For example, imagine you were using Postmark as an email provider and you wanted to save all email bounces using their [bounce webhook](https://postmarkapp.com/developer/webhooks/bounce-webhook).
-Previously this wouldn't be possible with PostgREST, as every function required a named parameter. As of PostgREST 9, this is possible.
+For example, imagine you were using Postmark as an email provider and you wanted to save email bounces using their [bounce webhook](https://postmarkapp.com/developer/webhooks/bounce-webhook).
+Previously this wouldn't be possible with PostgREST, as every function required a named parameter. 
 
+As of PostgREST 9, this is possible.
 Simply create a function inside your PostgreSQL database to receive the raw JSON:
 
 ```sql hideCopy
@@ -58,10 +59,10 @@ as $$
 $$;
 ```
 
-And the webhook can send this data directly to your database:
+And the webhook can send data directly to your database via an `rpc` call:
 
 ```bash hideCopy
-POST /rest/v1/rpc/store_bounces HTTP/1.1
+POST https://<PROJECT_REF>.supabase.co/rest/v1/rpc/store_bounces HTTP/1.1
 Content-Type: application/json
 
 {
@@ -80,6 +81,7 @@ Content-Type: application/json
 
 [Read more](https://postgrest.org/en/v9.0/api.html#s-proc-single-unnamed).
 
+
 ## PostgreSQL 14 compatibility
 
 If you've ever done your own custom `auth` functions using PostgREST [HTTP Context](https://postgrest.org/en/v8.0/api.html#accessing-request-headers-cookies-and-jwt-claims), 
@@ -97,5 +99,8 @@ If you only use Supabase default `auth` functions(`auth.email()`, `auth.uid()`, 
 [Read more](https://postgrest.org/en/v9.0/releases/v9.0.0.html#postgresql-14-compatibility).
 
 ## Release notes
+
+There are a lot more improvements released in PostgREST 9, including [support for Partitioned Tables](https://postgrest.org/en/v9.0/releases/v9.0.0.html#partitioned-tables), 
+[improved doc](https://postgrest.org/en/v9.0/releases/v9.0.0.html#documentation-improvements), and [bug fixes](https://postgrest.org/en/v9.0/releases/v9.0.0.html#bug-fixes).
 
 You can see the full updates on the [PostgREST 9 release notes](https://postgrest.org/en/v9.0/releases/v9.0.0.html).
