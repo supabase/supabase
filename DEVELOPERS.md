@@ -40,15 +40,19 @@ To build Supabase, you clone the source code repository:
 
 ### Choosing Directory
 
-Before you start a development server, you must choose if you want to work on the [Supabase website](https://supabase.io) or [Supabase Docs](https://supabase.io/docs/).
+Before you start a development server, you must choose if you want to work on the [Supabase Website](https://supabase.com), [Supabase Docs](https://supabase.com/docs/), or [Supabase Studio](https://app.supabase.io).
 
-1. Go to the supabase.io directory
+1. Go to the [Supabase Website](https://supabase.com) directory
     ```sh
     cd www
     ```
-    or Go to the [Supabase Docs](https://supabase.io/docs/) directory
+    Go to the [Supabase Docs](https://supabase.com/docs/) directory
     ```sh
     cd web
+    ```
+    Go to the [Supabase Studio](https://app.supabase.io) directory
+    ```sh
+    cd studio
     ```
 
 2. Install npm dependencies:
@@ -65,13 +69,19 @@ Before you start a development server, you must choose if you want to work on th
 
 ## Start a Development Server
 
-To debug code, and to see changes in real time, it is often useful to have a local HTTP server.
+To debug code, and to see changes in real time, it is often useful to have a local HTTP server. Click one of the three links below to choose which development server you want to start.
+
+- [Supabase Website](###Supabase-Website-Development-Server)
+- [Supabase Docs](###Supabase-Docs-Development-Server)
+- [Supabase Studio](###Supabase-Studio-Development-Server)
+
+### Supabase Website Development Server
 
 1. Start development server
 
     npm
     ```sh
-    npm run start
+    npm run dev
     ```
 
     or with yarn
@@ -81,12 +91,58 @@ To debug code, and to see changes in real time, it is often useful to have a loc
 
 2. To access the local server, enter the following URL into your web browser:
 
-    [Supabase website](https://supabase.io)
     ```sh
-    http://localhost:3000
+    http://localhost:3000/
     ```
 
-    [Supabase Docs](https://supabase.io/docs/)
+### Supabase Docs Development Server
+
+1. Build development server
+
+    npm
+    ```sh
+    npm run build
+    ```
+
+    or with yarn
+    ```sh
+    yarn build
+    ```
+
+2. Start development server
+
+    npm
+    ```sh
+    npm run start
+    ```
+
+    or with yarn
+    ```sh
+    yarn start
+    ```
+
+3. To access the local server, enter the following URL into your web browser:
+
     ```sh
     http://localhost:3005/docs
+    ```
+
+### Supabase Studio Development Server
+
+1. Start development server
+
+    npm
+    ```sh
+    npm run dev
+    ```
+
+    or with yarn
+    ```sh
+    yarn dev
+    ```
+
+2. To access the local server, enter the following URL into your web browser:
+
+    ```sh
+    http://localhost:8082/
     ```
