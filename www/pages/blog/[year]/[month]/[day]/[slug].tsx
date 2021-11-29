@@ -242,6 +242,16 @@ function BlogPostPage(props: any) {
                   <article className={blogStyles['article']}>
                     <Typography>{content}</Typography>
                   </article>
+                  <div className="grid lg:grid-cols-1 gap-8 py-8">
+                    <div>
+                      {props.prevPost && <NextCard post={props.prevPost} label="Last post" />}
+                    </div>
+                    <div>
+                      {props.nextPost && (
+                        <NextCard post={props.nextPost} label="Next post" className="text-right" />
+                      )}
+                    </div>
+                  </div>
                 </div>
                 {/* Sidebar */}
                 <div className="col-span-12 lg:col-span-5 xl:col-span-3 xl:col-start-9 space-y-8">
@@ -283,7 +293,7 @@ function BlogPostPage(props: any) {
           </div>
         </div>
 
-        <div className="container px-8 sm:px-16 xl:px-20 py-16 mx-auto">
+        {/* <div className="container px-8 sm:px-16 xl:px-20 py-16 mx-auto">
           <div className="max-w-6xl mx-auto">
             <div className="py-4 grid grid-cols-12 lg:gap-16">
               <div className="col-span-12 lg:col-span-8">
@@ -345,7 +355,8 @@ function BlogPostPage(props: any) {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
+
         <CTABanner />
       </DefaultLayout>
     </>
