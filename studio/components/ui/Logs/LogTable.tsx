@@ -1,18 +1,20 @@
 import React from 'react'
 import Table from 'components/to-be-cleaned/Table'
-import { Tab } from '@headlessui/react'
 import { Typography } from '@supabase/ui'
+import dayjs from 'dayjs'
 
 interface Props {
-  data: LogData[] | null
+  data: LogData[] | null | undefined
 }
 
-interface LogData extends LogDataCommon {
-  [key: string]: string | number
+interface Metadata {
+  [key: string]: string | number | Object | Object[]
 }
-interface LogDataCommon {
+export interface LogData {
+  id: string
   timestamp: number
   event_message: string
+  metadata: Metadata
 }
 
 
@@ -33,10 +35,14 @@ const LogTable = ({ data }: Props) => {
   return (
     <Table containerClassName="mx-auto container"
       head={columns.map((c) => <Table.th key={c}>{c}</Table.th>)}
-      body={data.map(d => (
-        <Table.tr>
-          {columns.map(c => <Table.td key={c}>{d[c]}</Table.td>)}
-        </Table.tr>))}
+      body={data.map(d =>
+        <Table.tr key={d.id}>
+          {columns.map(c => <Table.td key={c} >
+            {c === "timestamp" &&
+              <Typography.Text className="block bg-green-800" code>{dayjs(d[c] / 1000).toString()}</Typography.Text>}
+            {c === "event_message" && <Typography.Text className="block" code>{d[c]}</Typography.Text>}
+          </Table.td>)}
+        </Table.tr>)}
     />
   )
 }
