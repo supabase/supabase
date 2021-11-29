@@ -23,9 +23,13 @@ export function withAuth(
     const rootStore = useStore()
     const [isConnecting, setConnecting] = useState(true)
 
-    const { profile, isLoading, isError } = useProfile()
     const { ref, slug } = router.query
     const { app, ui } = rootStore
+
+    const returning =
+      app.projects.isInitialized && app.organizations.isInitialized ? 'minimal' : undefined
+    const { profile, isLoading } = useProfile(returning)
+
     const isRedirecting = checkRedirectTo(isLoading, router, profile, redirectTo, redirectIfFound)
 
     // We might probably be able to bring this into a _middleware with next 12
@@ -40,14 +44,14 @@ export function withAuth(
     useEffect(() => {
       // this should run before redirecting
       if (!isLoading) {
-        if (!isError && profile) {
+        if (!profile) {
+          ui.setProfile(undefined)
+        } else if (returning !== 'minimal') {
           const { organizations, ...userProfile } = profile
           const projects: Project[] = flatten(organizations?.map((org: any) => org.projects))
           app.organizations.initialDataArray(organizations)
           app.projects.initialDataArray(projects)
           ui.setProfile(userProfile)
-        } else {
-          ui.setProfile(undefined)
         }
       }
 
@@ -55,7 +59,7 @@ export function withAuth(
       if (isRedirecting) {
         router.push(redirectTo)
       }
-    }, [isLoading, isRedirecting, isError, profile])
+    }, [isLoading, isRedirecting, profile])
 
     useEffect(() => {
       if (!isLoading && router.isReady) {

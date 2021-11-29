@@ -23,7 +23,7 @@ import toast from 'react-hot-toast'
 import { SQL_SNIPPET_SCHEMA_VERSION } from './SqlEditor.constants'
 
 import Telemetry from 'lib/telemetry'
-import { useProfile, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { debounce } from 'lodash'
 import { useWindowDimensions, useKeyboardShortcuts } from 'hooks'
 
@@ -355,11 +355,13 @@ const FavoriteButton = observer(() => {
   const router = useRouter()
   const { ref } = router.query
 
-  const { profile: user } = useProfile()
-  const [loading, setLoading] = useState(false)
+  const { ui } = useStore()
+  const { profile: user } = ui
 
   const sqlEditorStore = useSqlStore()
   const contentStore = useProjectContentStore(ref)
+
+  const [loading, setLoading] = useState(false)
 
   const id = sqlEditorStore.activeTab.id
 

@@ -29,7 +29,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
     get,
     // increase refresh rate x10 to 30s when focus lost
     // conditional fetching will cause cached data to clear (not desirable)
-    { refreshInterval: isActive ? 3000 : 30000 }
+    // { refreshInterval: isActive ? 3000 : 30000 }
   )
   const startDate = dayjs().subtract(7, 'day').format(DATE_FORMAT)
   const endDate = dayjs().format(DATE_FORMAT)

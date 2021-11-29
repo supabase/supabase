@@ -18,7 +18,7 @@
 
 ## Documentació
 
-Per a veure la documentació completa, visita [supabase.io/docs](https://supabase.com/docs).
+Per a veure la documentació completa, visita [supabase.com/docs](https://supabase.com/docs).
 
 ## Comunitat i suport
 

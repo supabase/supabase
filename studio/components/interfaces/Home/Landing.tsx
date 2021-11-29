@@ -20,7 +20,7 @@ const Landing = () => {
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
             <div className="flex items-center justify-between w-full md:w-auto">
-              <a href="#">
+              <a href="https://supabase.com">
                 <Image
                   src={theme == 'dark' ? '/img/supabase-dark.svg' : '/img/supabase-light.svg'}
                   alt=""
@@ -38,7 +38,7 @@ const Landing = () => {
               type="success"
               className="ml-8 font-medium hover:text-gray-300 focus:outline-none focus:text-gray-300 transition duration-150 ease-in-out"
             >
-              <Link href={`${API_URL}/login`}>Sign in</Link>
+              <Link href={`${API_URL}/login`}>Sign In</Link>
             </Typography.Text>
           </div>
         </nav>
