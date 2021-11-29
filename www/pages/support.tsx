@@ -35,12 +35,12 @@ import { NextSeo } from 'next-seo'
 type Props = {}
 
 const Index = ({}: Props) => {
-  // base path for images
-  const { basePath } = useRouter()
 
-  const meta_title = 'Support | Supabase'
+  const router = useRouter()
+
+  const meta_title = 'Help & Support | Supabase'
   const meta_description =
-    'Need with a Supabase problem, contact the Supabase team at support@supabase.io'
+    'Find help and support for Supabase. Our support agents provide answers on all types of issues, including account information, billing, and refunds.'
 
   return (
     <>
@@ -50,10 +50,10 @@ const Index = ({}: Props) => {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/auth`,
+          url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
+              url: `https://supabase.com/images/og/og-image.jpg`,
             },
           ],
         }}
