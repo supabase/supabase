@@ -5,12 +5,20 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 25 Nov 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Sat, 27 Nov 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
 <item>
+  <guid>https://supabase.com/blog/2021/11/28/whats-new-in-postgres-14</guid>
+  <title>New in PostgreSQL 14: What every developer should know</title>
+  <link>https://supabase.com/blog/2021/11/28/whats-new-in-postgres-14</link>
+  <description>A quick look at some new features and functionality in PostgreSQL 14.</description>
+  <pubDate>Sat, 27 Nov 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
   <guid>https://supabase.com/blog/2021/11/26/supabase-launch-week-the-trilogy</guid>
-  <title>Supabase Launch Week III: Holiday Special.</title>
+  <title>Supabase Launch Week III: Holiday Special</title>
   <link>https://supabase.com/blog/2021/11/26/supabase-launch-week-the-trilogy</link>
   <description>Tis the season to be shipping.</description>
   <pubDate>Thu, 25 Nov 2021 16:00:00 GMT</pubDate>
@@ -18,7 +26,7 @@
 
 <item>
   <guid>https://supabase.com/blog/2021/11/26/supabase-how-we-launch</guid>
-  <title>How we launch at Supabase.</title>
+  <title>How we launch at Supabase</title>
   <link>https://supabase.com/blog/2021/11/26/supabase-how-we-launch</link>
   <description>The history and methodology of Supabase Launch Week.</description>
   <pubDate>Thu, 25 Nov 2021 16:00:00 GMT</pubDate>

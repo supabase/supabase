@@ -1,24 +1,29 @@
-# Extermely simple setup - should be optimized before sending
-# to docker hub
-
 ## USAGE:
-# docker build -t next .
-# docker run -p 3010:3000 next
+# Build:        docker build --target production -t supabase/studio:latest . 
+# Run:          docker run -p 3000:3000 supabase/studio
+# Deploy:       docker push supabase/studio:latest
+# Clean build:  
+#    docker build --target production --no-cache -t supabase/studio:latest .
+#    docker builder prune
 
-FROM node:16
 
-RUN mkdir -p /home/app/ && chown -R node:node /home/app
-WORKDIR /home/app
-COPY --chown=node:node . .
+FROM node:14 as base
+WORKDIR /usr/src/app
+COPY package*.json ./
 
-# Sometimes need this for the pg-parser
-# RUN apk add --no-cache python build-base gcc g++ libpq
-
-USER node
-
-# Can change to "npm ci" eventually
-RUN npm install 
+FROM base as build
+ENV NODE_ENV=build
+RUN npm install
+COPY . .
 RUN npm run build
 
+FROM build as dev
+ENV NODE_ENV=dev
 EXPOSE 8082
-CMD [ "npm", "start" ]
+CMD [ "npm", "run", "dev" ]
+
+FROM build as production
+ENV NODE_ENV=production
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]
