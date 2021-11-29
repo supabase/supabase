@@ -166,7 +166,7 @@ const BouncerSettings: FC<Props> = ({}) => {
               <Typography.Text type="secondary">
                 <p>
                   Learn more about connection strings{' '}
-                  <Typography.Link href="https://supabase.io/docs/reference/postgres/connection-strings">
+                  <Typography.Link href="https://supabase.com/docs/reference/postgres/connection-strings">
                     with Supabase
                   </Typography.Link>{' '}
                   and{' '}

@@ -6,7 +6,7 @@ import JsonEditor from './JsonCodeEditor'
 import TwoOptionToggle from './TwoOptionToggle'
 import DrilldownViewer from './DrilldownViewer'
 import ActionBar from '../../ActionBar'
-import { minifyJSON, prettifyJSON } from 'lib/helpers'
+import { minifyJSON, prettifyJSON, tryParseJson } from 'lib/helpers'
 
 type JsonEditProps = {
   column: string
@@ -104,19 +104,11 @@ type ViewerProps = {
 }
 
 const Viewer: FC<ViewerProps> = ({ column, value }) => {
-  const json = parseJSON(value)
+  const json = tryParseJson(value)
   return (
     <>
       <Typography.Title level={4}>Viewing JSON Field: {column}</Typography.Title>
       <DrilldownViewer jsonData={json} />
     </>
   )
-}
-
-const parseJSON = (value: string) => {
-  try {
-    return JSON.parse(value)
-  } catch (err) {
-    return undefined
-  }
 }
