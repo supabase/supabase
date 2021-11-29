@@ -10,7 +10,7 @@ const DocsLayout = ({
   children,
 }: {
   meta: { title: string; description: string }
-  children: ReactElement
+  children: string
 }) => {
   const theme = 'okaidia'
 
@@ -38,10 +38,7 @@ const DocsLayout = ({
           <NavBar />
           <div className="flex flex-row ">
             <SideBar />
-            <div
-              className={`prose dark:prose-dark ${styles.content} p-8`}
-              dangerouslySetInnerHTML={{ __html: children }}
-            />
+            <div className={`prose dark:prose-dark ${styles.content} p-8`}>{children}</div>
           </div>
           <Footer />
         </main>

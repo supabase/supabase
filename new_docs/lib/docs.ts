@@ -5,12 +5,12 @@ import matter from 'gray-matter'
 const docsDirectory = process.cwd()
 
 export function getDocsBySlug(slug: string) {
-  const realSlug = slug.replace(/\.md$/, '')
-  let fullPath = join(docsDirectory, `${realSlug}.md`)
+  const realSlug = slug.replace(/\.mdx$/, '')
+  let fullPath = join(docsDirectory, `${realSlug}.mdx`)
 
   if (!fs.existsSync(fullPath)) {
     console.log(`\nfile ${fullPath} not found, redirect to 404\n`)
-    fullPath = join(docsDirectory, 'docs/404.md')
+    fullPath = join(docsDirectory, 'docs/404.mdx')
   }
 
   const fileContents = fs.readFileSync(fullPath, 'utf8')

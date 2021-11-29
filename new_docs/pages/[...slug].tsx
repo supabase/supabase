@@ -1,8 +1,12 @@
 import { ReactElement } from 'react'
 import { getAllDocs, getDocsBySlug } from '../lib/docs'
-import markdownToHtml from '../lib/markdown'
 import Layout from '../components/layouts/Layout'
+import { serialize } from 'next-mdx-remote/serialize'
+import { MDXRemote } from 'next-mdx-remote'
+import { MDXProvider } from '@mdx-js/react'
+import LinkCard from '../components/LinkCard'
 
+const components = { LinkCard }
 export default function Doc({
   meta,
   content,
@@ -10,7 +14,13 @@ export default function Doc({
   meta: { title: string; description: string }
   content: ReactElement
 }) {
-  return <Layout meta={meta}>{content}</Layout>
+  return (
+    <Layout meta={meta}>
+      <MDXProvider components={components}>
+        <MDXRemote {...content} />
+      </MDXProvider>
+    </Layout>
+  )
 }
 
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
@@ -24,7 +34,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
 
   let doc = getDocsBySlug(slug)
 
-  const content = await markdownToHtml(doc.content || '')
+  const content = await serialize(doc.content || '')
 
   return {
     props: {
