@@ -31,8 +31,8 @@ PostgreSQL continues to add innovations for complex data types, making JSON data
 
 ```sql hideCopy
 select (
-    '{ "PostgreSQL": { "release": 14 }}'::jsonb
-  )['PostgreSQL']['release'];
+  '{ "PostgreSQL": { "release": 14 }}'::jsonb
+)['PostgreSQL']['release'];
 
  jsonb 
 -------
@@ -68,7 +68,7 @@ create table sensor_range (
 Now, insert some data into the table. Note that, the insert statement below provides two time ranges that are not contiguous. 
  
  
-```sql
+```sql hideCopy
 insert into sensor_range (
   metric_desc,
   metric_level, 
@@ -94,12 +94,12 @@ values (
 
 Query the data in the table to see the inserted data rows
  
-```sql
+```sql hideCopy
 select * 
 from sensor_range;
 ``` 
 
-```
+``` hideCopy
 | `reading_id` | `metric_desc` | `metric_level` | `metric_ts`                                                                 |
 |--------------|---------------|----------------|-----------------------------------------------------------------------------|
 | 1            | Temperature   | high           | {[2021-11-01 6:00, 2021-11-01 10:00],[2021-11-05 14:00, 2021-11-05 20:00]}  |
@@ -122,7 +122,7 @@ An example of using query_id IN EXPLAIN (VERBOSE) statement
 Start by altering the system to enable the query_id
 
 
-```sql
+```sql hideCopy
 alter system set compute_query_id = 'on';
 ```
 
@@ -131,7 +131,7 @@ Restart the PostgreSQL database for the alter system statement to take effect.
 
 Run the following query that selects schema and table names from the catalog tables  
 
-```sql
+```sql hideCopy
 explain (verbose, costs off)
 select schemaname, tablename
 from pg_tables, pg_sleep(5)
@@ -151,7 +151,7 @@ Security remains top of mind for every organization, and PostgreSQL 14 brings so
 
 Have you ever wanted to [manage database user access](https://supabase.com/docs/guides/auth/managing-user-data) so that only specific individuals have read-only access? For example, consider a situation where you would like to host some sample data online for a demo and not allow demo users to modify or delete data. With the latest PostgreSQL version 14, you can easily set that up using a single GRANT statement. 
 
-```sql
+```sql hideCopy
 grant pg_read_all_data to bobfries;
 ```
  
