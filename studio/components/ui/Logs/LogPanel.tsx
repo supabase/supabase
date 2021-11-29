@@ -4,16 +4,17 @@ interface Props {
   title: string
   onRefresh?: () => void
   isLoading: boolean
-  children?: JSX.Element
+  heading?: JSX.Element
 }
 
 /**
  * Logs control panel header + wrapper
  */
-export default ({ title, onRefresh, isLoading }: Props) => (
-
+const LogPanel = ({ onRefresh, isLoading, heading }: Props) => (
   <div className="flex items-center justify-between w-full">
-    <Typography.Title level={5}>{title} </Typography.Title>
+    <div>
+      {heading}
+    </div>
     <Button
       type="outline"
       loading={isLoading}
@@ -24,3 +25,4 @@ export default ({ title, onRefresh, isLoading }: Props) => (
     </Button>
   </div>
 )
+export default LogPanel
