@@ -2,3 +2,6 @@ node_modules/
 .vercel
 .next
 .env.local
+.env.production
+.env.dev
+.env.*
