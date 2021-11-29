@@ -29,7 +29,7 @@ This blog will highlight some key features of the newly available PostgreSQL 14,
 
 PostgreSQL continues to add innovations for complex data types, making JSON data more accessible. In postgreSQL 14, developers can use subscripts to iterate through JSON key pairs and fetch corresponding values. For example, using this capability, nested JSON fields can be quickly traversed to retrieve values to reconstruct application objects.
 
-```sql noCopy
+```sql hideCopy
 select (
     '{ "PostgreSQL": { "release": 14 }}'::jsonb
   )['PostgreSQL']['release'];
@@ -48,7 +48,7 @@ In PostgreSQL 14, a single insert statement can be used to map data across multi
  
 First, create an enum data type to capture low, medium, and high sensor reading levels.
 
-```sql noCopy
+```sql hideCopy
 create type valid_levels as enum (
   'low', 'medium', 'high'
 );
@@ -56,7 +56,7 @@ create type valid_levels as enum (
  
 To store sensor reading metric data, create a table consisting of the sensor description, the level and the range of timestamps when the sensor was at that level.
  
-```sql noCopy
+```sql hideCopy
 create table sensor_range ( 
   reading_id serial primary key, 
   metric_desc varchar(100),
