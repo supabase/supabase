@@ -57,7 +57,7 @@ const GetStartedPanel: FC<Props> = ({}) => {
                     <Button type="default">SQL editor</Button>
                   </a>
                 </Link>
-                <a href="https://supabase.io/docs/guides/database" target="_blank">
+                <a href="https://supabase.com/docs/guides/database" target="_blank">
                   <Button type="text">Documentation</Button>
                 </a>
               </div>
@@ -85,7 +85,7 @@ const GetStartedPanel: FC<Props> = ({}) => {
                     <Button type="default">Try Auth</Button>
                   </a>
                 </Link>
-                <a href="https://supabase.io/docs/guides/auth" target="_blank">
+                <a href="https://supabase.com/docs/guides/auth" target="_blank">
                   <Button type="text">Documentation</Button>
                 </a>
               </div>
@@ -113,7 +113,7 @@ const GetStartedPanel: FC<Props> = ({}) => {
                     <Button type="default">Try Storage</Button>
                   </a>
                 </Link>
-                <a href="https://supabase.io/docs/guides/storage" target="_blank">
+                <a href="https://supabase.com/docs/guides/storage" target="_blank">
                   <Button type="text">Documentation</Button>
                 </a>
               </div>
