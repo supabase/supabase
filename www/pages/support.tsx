@@ -39,7 +39,8 @@ const Index = ({}: Props) => {
   const { basePath } = useRouter()
 
   const meta_title = 'Support | Supabase'
-  const meta_description = 'Need with a Supabase problem, contact the Supabase team at support@supabase.io'
+  const meta_description =
+    'Need with a Supabase problem, contact the Supabase team at support@supabase.io'
 
   return (
     <>
