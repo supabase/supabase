@@ -13,7 +13,6 @@ date: '2021-11-29'
 toc_depth: 2
 ---
 
-
 Supabase combines existing open-source tools with our own open-source contributions to provide a delightful experience for developers. As part of this goal we hope to build a community of communities, bringing together developers from many different tools, as well as new developers looking to get involved with open source.
 
 To kick off launch week we want to showcase some of the communities that make up the Supabase community, highlight some of their updates, and celebrate everyone who contributes their time to the Supabase mission. 
@@ -22,7 +21,7 @@ So let's get cracking, we've got a lot to cover. 🚀
 
 ## Open Source Spotlight: Kong API Gateway
 
-Supabase provides a whole bunch of features that are made up of a [collection of open-source tools](https://supabase.com/docs/architecture). To orchestrate these different services and functionalities we use the [Kong API Gateway](https://github.com/Kong/kong).
+Supabase provides a whole bunch of features that are made up of a [collection of open-source tools](/docs/architecture). To orchestrate these different services and functionalities we use the [Kong API Gateway](https://github.com/Kong/kong).
 
 As a user of our hosted offering you don't really need to know all this, but we love showcasing the amazing open-source tools that we work with, and so we've invited [Vik Gamov](https://twitter.com/gAmUssA) to give you a little intro to [Kong](https://github.com/Kong/kong):
 
@@ -38,44 +37,64 @@ As a user of our hosted offering you don't really need to know all this, but we 
 
 ## PostgreSQL 14 updates
 
-// TODO
+![Postgres-14](/images/blog/whats-new-in-postgres-14/whats-new-in-postgres-14-og.png)
+
+Every web developer knows the importance of choosing a suitable database for building modern apps.
+Even though NoSQL, NewSQL, and other types of databases have received a great deal of buzz in the last few years,
+relational database management systems (or RDBMS) are still relevant for several critical business use cases and will likely do so in the foreseeable future.
+Among the many open-source relational databases available, [PostgreSQL](/docs/guides/database/introduction) is a popular choice among developers.
+It was named [DBMS of the year in 2020](https://db-engines.com/en/blog_post/85) by
+DBEnginges, and with every release of PostgreSQL new features are available making it easy for developers and administrators to run their apps.
+
+[Gurjeet](https://twitter.com/0xGurjeet) one of our Postgres engineers has written up a [blogpost](/blog/2021/11/28/whats-new-in-postgres-14) with the most important updates the every dev should know.
 
 ## PostgREST updates
 
-// TODO
+![PostgREST-9](/images/blog/launch-week-three/community-day/postgrest-9-og.png)
+
+PostgREST 9 was made fully compatible with PostgreSQL 14 and it also brings a [much-requested feature](https://github.com/supabase/postgrest-js/issues/197) the ability to do `inner joins`.
+
+Here's an example with `supabase-js`:
+
+```js
+const { data, error } = await supabase
+    .from('messages')
+    .select('*, users!inner(*)')
+    .eq('users.username', 'Jane')
+```
+
+With the new `!inner` keyword, you can now filter rows of the top-level table(`messages`) based on a filter(`eq`) of the embedded table(`users`). This works across all Supabase client libraries and you can use it with any of the available operators(`gt`, `in`, etc.).
+
+Also, if you've ever done your own custom `auth` functions using PostgREST [HTTP Context](https://postgrest.org/en/v8.0/api.html#accessing-request-headers-cookies-and-jwt-claims), note that a breaking change was necessary for PostgreSQL 14 Compatibility. You'll need to update them:
+
+| From | To |
+| --- | --- |
+| current_setting('request.jwt.claim.custom-claim', true) | current_setting('request.jwt.claims', true)::json->>'custom-claim' |
+| current_setting('request.header.custom-header', true); | current_setting('request.headers', true)::json->>'custom-header'; |
+
+If you only use Supabase default `auth` functions(`auth.email()`, `auth.uid()`, `auth.role()`), then no action is required because they handle this change transparently,
+
+You can see the full updates on the [PostgREST 9 release notes](https://postgrest.org/en/v9.0/releases/v9.0.0.html).
 
 ## New community partner: GitGuardian
 
-![21W48-Blog-Banner-DetectorOfTheMonth-Supabase-1.jpeg](/images/blog/launch-week-three/community-day/21W48-Blog-Banner-DetectorOfTheMonth-Supabase-1.jpeg)
+![gitguardian-supabase-partnership.jpeg](/images/blog/launch-week-three/community-day/gitguardian-supabase-partnership.jpeg)
 
-[As you (hopefully) know](https://supabase.com/docs/learn/auth-deep-dive/auth-deep-dive-jwts#jwts-in-supabase), keeping your service role key secret is a crucial part of securing your database. But we also know that it can be difficult to make sure it stays secret as your team grows and you don't accidentally leak it. To help you with this, [we've partnered with GitGuardian](https://blog.gitguardian.com/the-detector-of-the-month-november-2021/).
+[As you (hopefully) know](/docs/learn/auth-deep-dive/auth-deep-dive-jwts#jwts-in-supabase), keeping your service role key secret is a crucial part of securing your database. But we also know that it can be difficult to make sure it stays secret as your team grows and you don't accidentally leak it. To help you with this, [we've partnered with GitGuardian](https://blog.gitguardian.com/the-detector-of-the-month-november-2021/).
 
 GitGuardian helps developers keep 250+ types of secrets out of source code. Their automated secrets detection and remediation solution secures every step of the development life cycle, helping you monitor your code for sensitive data. Read [their blog post](https://blog.gitguardian.com/the-detector-of-the-month-november-2021/) to learn more.
 
 ## Auth updates
 
-![0auth-providers__twitter.jpg](/images/blog/launch-week-three/community-day/0auth-providers__twitter.jpg)
+![new-oauth-providers.jpg](/images/blog/launch-week-three/community-day/new-oauth-providers.jpg)
 
-The beauty of building in the open is that the community can get involved in adding new OAuth providers, which is exactly what [@TheHarryET](https://twitter.com/TheHarryET) and [MonsterDeveloper](https://github.com/MonsterDeveloper) have been doing. Thanks to them you can now provide sign-in with [Slack](https://supabase.com/docs/guides/auth/auth-slack) as well as [Spotify](https://supabase.com/docs/guides/auth/auth-spotify) to your users, as well as use [MessageBird](https://supabase.com/docs/guides/auth/auth-messagebird) for phone auth as an alternative to the existing [Twilio](https://supabase.com/docs/guides/auth/auth-twilio) integration.
-
-To celebrate this, we've created a [Supabase Spotify playlist](https://open.spotify.com/playlist/6FMx89EJjNHvjhy5auyZHx?si=e5ff6428415f420b) for y'all to blast out when reading our Launch Week posts, as well as when building with Supabase. Some top coding tunes in here! 📻
-
-<iframe
-  className="w-full"
-  width="700"
-  height="350"
-  src="https://open.spotify.com/embed/playlist/6FMx89EJjNHvjhy5auyZHx"
-  frameBorder="0"
-  allowtransparency="true"
-  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-  allowfullscreen
-></iframe>
+The beauty of building in the open is that the community can get involved in adding new OAuth providers, which is exactly what [@TheHarryET](https://twitter.com/TheHarryET) and [MonsterDeveloper](https://github.com/MonsterDeveloper) have been doing. Thanks to them you can now provide sign-in with [Slack](/docs/guides/auth/auth-slack) as well as [Spotify](/docs/guides/auth/auth-spotify) to your users, as well as use [MessageBird](/docs/guides/auth/auth-messagebird) for phone auth as an alternative to the existing [Twilio](/docs/guides/auth/auth-twilio) integration.
 
 ## SupaSquad updates
 
-The [SupaSquad](https://supabase.com/docs/handbook/supasquad) is an official Supabase advocate program where community members help build and manage the Supabase community. 
+The [SupaSquad](/docs/handbook/supasquad) is an official Supabase advocate program where community members help build and manage the Supabase community. 
 
-Among many other awesome things, the SupaSquad has been absolutely on fire building [client libraries](https://supabase.com/docs/reference/javascript/supabase-client) for all flavors of backends and environments.
+Among many other awesome things, the SupaSquad has been absolutely on fire building [client libraries](/docs/reference/javascript/supabase-client) for all flavors of backends and environments.
 
 ![client-libs.jpg](/images/blog/launch-week-three/community-day/client-libs.jpg)
 
@@ -89,20 +108,25 @@ Among many other awesome things, the SupaSquad has been absolutely on fire build
 
 ## New tutorials and integration guides
 
-Our own [Jon Meyers](https://twitter.com/_dijonmusters) and the broader community have been busy creating awesome tutorials and integration guides to help everyone build even more amazing things with Supabase. Jon has added official guides for working with [Auth0](https://supabase.com/docs/guides/integrations/auth0), [Draftbit](https://supabase.com/docs/guides/integrations/draftbit), [Prisma](https://supabase.com/docs/guides/integrations/prisma), and [Vercel](https://supabase.com/docs/guides/integrations/vercel)!
+Our own [Jon Meyers](https://twitter.com/_dijonmusters) and the broader community have been busy creating awesome tutorials and integration guides to help everyone build even more amazing things with Supabase: 
+
+- Jon has added official guides for working with [Auth0](/docs/guides/integrations/auth0) and [Vercel](/docs/guides/integrations/vercel), 
+- [Jonny Summers-Muir](https://twitter.com/JSummersMuir) has been busy paving the way for [Prisma](/docs/guides/integrations/prisma), and 
+- [Aman Mittal](https://github.com/amandeepmittal) has hooked us up with a guide for [Draftbit](/docs/guides/integrations/draftbit)!
 
 And below are some of the community one's we've come across recently. If you've created one yourself, please notify us by tagging us in a Tweet!
 
+- [Supabase & Sveltekit - Build Twitter in 75 minutes](https://youtu.be/mPQyckogDYc)
 - [Supabase Auth With Next.Js 12 Middleware](https://jitsu.com/blog/supabase-nextjs-middleware#what-were-going-to-build)
 - [Vue 3 & Supabase | Workout Tracker App](https://www.youtube.com/watch?v=3tF0fGkd4ho)
 - [Use Supabase Auth with Vue.js 3](https://vueschool.io/articles/vuejs-tutorials/use-supabase-auth-with-vue-js-3/)
 - [Dynamic Jamstack with Stencil and Supabase](https://ionicframework.com/blog/dynamic-jamstack-with-stencil-and-supabase)
 
-## User stories
+## Developer stories
 
 Anytime we scroll through [madewithsupabase.com](https://www.madewithsupabase.com/) we're absolutely blown away by the awesome things y'all are building with Supabase. 
 
-So we've reached out to a couple of you to see if you'd be able to talk about how and what you're building with Supabase, and we've been overwhelmed by your gracious submissions! So we've started a user stories playlist and we are so excited to see many more of these stories in the future. 💚
+So we reached out to some of our users, requesting a short video to learn more and we were overwhelmed with your gracious submissions. We've started a user stories playlist and we are so excited to see many more of these stories in the future. 💚
 
 <iframe
   className="w-full"
@@ -115,3 +139,9 @@ So we've reached out to a couple of you to see if you'd be able to talk about ho
 ></iframe>
 
 And with that, we officially declare Launch Week as open 🥳 Check back [here](/blog) every day this week to see what new things we are shipping. We can't wait to share them with you 🚀
+
+## Want even more Supabase in your life?
+
+![tiktok.png](/images/blog/launch-week-three/community-day/toktok.png)
+
+We've got some stellar swag drops and behind the scenes footage for you on our new [TikTok page](https://www.tiktok.com/@supabase.com). Make sure to follow us there as we'll be giving away some swag randomly to 10 peeps who follow us during launch week!
