@@ -14,6 +14,7 @@ interface Props {
  */
 const LogPanel = ({ onRefresh, isLoading, heading, children }: Props) => (
   <Panel
+    noMargin
     title={
       <div
         className="flex items-center justify-between w-full"
@@ -31,8 +32,8 @@ const LogPanel = ({ onRefresh, isLoading, heading, children }: Props) => (
         </div>
       </div>
     }
-    footer={children}
   >
+    {children}
   </Panel>
 )
 export default LogPanel
