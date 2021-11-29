@@ -3,7 +3,7 @@ import { find, isUndefined, compact, includes, isEqual, omitBy, isNull, isString
 import { Dictionary } from '@supabase/grid'
 import { PostgresTable } from '@supabase/postgres-meta'
 
-import { uuidv4, minifyJSON } from 'lib/helpers'
+import { uuidv4, minifyJSON, tryParseJson } from 'lib/helpers'
 import { RowField } from './RowEditor.types'
 import { JSON_TYPES, NUMERICAL_TYPES } from '../SidePanelEditor.constants'
 
@@ -232,7 +232,7 @@ export const generateRowObjectFromFields = (
         rowObject[field.name] = value
       } else {
         if (isString(value)) {
-          rowObject[field.name] = JSON.parse(value)
+          rowObject[field.name] = tryParseJson(value)
         }
       }
     } else if (NUMERICAL_TYPES.includes(field.format) && value) {
