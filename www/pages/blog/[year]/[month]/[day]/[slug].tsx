@@ -255,38 +255,40 @@ function BlogPostPage(props: any) {
                 </div>
                 {/* Sidebar */}
                 <div className="col-span-12 lg:col-span-5 xl:col-span-3 xl:col-start-9 space-y-8">
-                  <div className="hidden lg:block">{toc}</div>
-                  <div>
-                    <Typography.Title className="mb-4" level={5}>
-                      Related articles
-                    </Typography.Title>
-                    <Space direction="vertical">
-                      {props.relatedPosts.map((post: any) => (
-                        <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
+                  <Space direction="vertical" size={8} className="lg:mb-16 lg:top-16 lg:sticky">
+                    <div className="hidden lg:block">{toc}</div>
+                    <div>
+                      <Typography.Title className="mb-4" level={5}>
+                        Related articles
+                      </Typography.Title>
+                      <Space direction="vertical">
+                        {props.relatedPosts.map((post: any) => (
+                          <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
+                            <div>
+                              <Typography.Text className="cursor-pointer">
+                                <Space>
+                                  <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
+                                  <span className="hover:text-gray-900 dark:hover:text-white">
+                                    {post.title}
+                                  </span>
+                                </Space>
+                              </Typography.Text>
+                              <Divider light className="mt-2" />
+                            </div>
+                          </Link>
+                        ))}
+                        <Link href={`/blog`} as={`/blog`}>
                           <div>
-                            <Typography.Text className="cursor-pointer">
-                              <Space>
-                                <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
-                                <span className="hover:text-gray-900 dark:hover:text-white">
-                                  {post.title}
-                                </span>
-                              </Space>
+                            <Typography.Text type="secondary">
+                              <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
+                                View all posts
+                              </span>
                             </Typography.Text>
-                            <Divider light className="mt-2" />
                           </div>
                         </Link>
-                      ))}
-                      <Link href={`/blog`} as={`/blog`}>
-                        <div>
-                          <Typography.Text type="secondary">
-                            <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
-                              View all posts
-                            </span>
-                          </Typography.Text>
-                        </div>
-                      </Link>
-                    </Space>
-                  </div>
+                      </Space>
+                    </div>
+                  </Space>
                 </div>
               </div>
             </div>
