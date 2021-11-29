@@ -189,6 +189,7 @@ module.exports = {
       items: [
         'guides/integrations/prisma',
         'guides/integrations/auth0',
+        'guides/integrations/vercel',
         'guides/integrations/draftbit',
       ],
     },
