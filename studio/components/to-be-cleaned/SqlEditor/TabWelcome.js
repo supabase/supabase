@@ -8,7 +8,7 @@ import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
 import { useProjectContentStore } from 'stores/projectContentStore'
 
 import Telemetry from 'lib/telemetry'
-import { useProfile } from 'hooks'
+import { useStore } from 'hooks'
 import { partition } from 'lodash'
 
 import { createSqlSnippet } from './SqlEditor.utils'
@@ -18,7 +18,9 @@ const TabWelcome = observer(() => {
   const router = useRouter()
   const { ref } = router.query
 
-  const { profile: user } = useProfile()
+  const { ui } = useStore()
+  const { profile: user } = ui
+
   const sqlEditorStore = useSqlStore()
   const contentStore = useProjectContentStore(ref)
 
