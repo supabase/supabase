@@ -25,12 +25,6 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/case-studies</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
     <loc>https://supabase.com/company</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -49,19 +43,13 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/case-studies/[slug]</loc>
+    <loc>https://supabase.com/database</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
     <loc>https://supabase.com/storage</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/database</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -460,6 +448,18 @@
 
   <url>
     <loc>https://supabase.com/blog/2021/11/05/supabase-beta-october-2021</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2021/11/26/supabase-how-we-launch</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2021/11/26/supabase-launch-week-the-trilogy</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
