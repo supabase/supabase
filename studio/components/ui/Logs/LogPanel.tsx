@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Icon, Typography } from '@supabase/ui'
+import { Button } from '@supabase/ui'
 import Panel from 'components/to-be-cleaned/Panel'
 
 interface Props {
