@@ -1,9 +1,10 @@
 import React from 'react'
 import Table from 'components/to-be-cleaned/Table'
 import { Tab } from '@headlessui/react'
+import { Typography } from '@supabase/ui'
 
 interface Props {
-  data: LogData[]
+  data: LogData[] | null
 }
 
 interface LogData extends LogDataCommon {
@@ -18,8 +19,17 @@ interface LogDataCommon {
 /**
  * Logs table view
  */
-const LogTable = ({ data=[] }: Props) => {
+const LogTable = ({ data }: Props) => {
   const columns = ["timestamp", "event_message"]
+
+  if (!data) {
+    return null
+  }
+
+  if (data === []) {
+    return <Typography.Text className="text-center">No data returned from query</Typography.Text>
+  }
+
   return (
     <Table containerClassName="mx-auto container"
       head={columns.map(c => <Table.th>{c}</Table.th>)}
