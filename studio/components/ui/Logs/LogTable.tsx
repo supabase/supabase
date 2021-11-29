@@ -32,10 +32,10 @@ const LogTable = ({ data }: Props) => {
 
   return (
     <Table containerClassName="mx-auto container"
-      head={columns.map(c => <Table.th>{c}</Table.th>)}
+      head={columns.map((c) => <Table.th key={c}>{c}</Table.th>)}
       body={data.map(d => (
         <Table.tr>
-          {columns.map(c => <Table.td>{d[c]}</Table.td>)}
+          {columns.map(c => <Table.td key={c}>{d[c]}</Table.td>)}
         </Table.tr>))}
     />
   )
