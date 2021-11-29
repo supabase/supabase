@@ -8,6 +8,17 @@
 version: "3.8"
 
 services:
+  studio:
+    container_name: supabase-studio
+    image: supabase/studio:latest
+    restart: unless-stopped
+    ports:
+      - ${STUDIO_PORT}:3000/tcp
+    environment:
+      SUPABASE_URL: http://kong:8000
+      STUDIO_PG_META_URL: http://meta:8080
+      SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+
   kong:
     container_name: supabase-kong
     image: kong:2.1
@@ -99,8 +110,8 @@ services:
       - rest
     restart: unless-stopped
     environment:
-      ANON_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYyNzIwODU0MCwiZXhwIjoxOTc0MzYzNzQwfQ.zcaQfHd3VA7XgJmdGfmV86OLVJT9s2MTmSy-e69BpUY
-      SERVICE_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaWF0IjoxNjI3MjA4NTQwLCJleHAiOjE5NzQzNjM3NDB9.pkT3PNpO4DtO45Ac5HK_TKCx8sGLgNtV__pr_ZrRSAU
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_KEY: ${SERVICE_ROLE_KEY}
       POSTGREST_URL: http://rest:3000
       PGRST_JWT_SECRET: ${JWT_SECRET}
       DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
