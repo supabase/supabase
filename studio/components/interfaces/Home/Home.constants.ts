@@ -3,7 +3,7 @@ export const CLIENT_LIBRARIES = [
     language: 'Javascript',
     officialSupport: true,
     releaseState: undefined,
-    docsUrl: 'https://supabase.io/docs/reference/javascript/installing',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/installing',
     gitUrl: 'https://github.com/supabase/supabase-js',
   },
   {
