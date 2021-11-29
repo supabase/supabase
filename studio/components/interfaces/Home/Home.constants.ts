@@ -17,7 +17,7 @@ export const CLIENT_LIBRARIES = [
     language: 'Dart',
     officialSupport: false,
     releaseState: 'Beta',
-    docsUrl: undefined,
+    docsUrl: 'https://supabase.com/docs/reference/dart/installing',
     gitUrl: 'https://github.com/supabase/supabase-dart',
   },
 ]
