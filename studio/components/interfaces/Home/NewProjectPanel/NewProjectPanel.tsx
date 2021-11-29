@@ -1,7 +1,6 @@
 import { FC } from 'react'
 import { Typography } from '@supabase/ui'
 
-import { Project } from 'types'
 import GetStartedPanel from './GetStartedPanel'
 import {
   DisplayApiSettings,
