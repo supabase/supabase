@@ -1,6 +1,7 @@
 ## USAGE:
-# Build:        docker build -t studio . 
-# Run:          docker run -p 3000:3000 studio
+# Build:        docker build -t supabase/studio:latest . 
+# Run:          docker run -p 3000:3000 supabase/studio
+# Deploy:       docker push supabase/studio:latest
 # Clean build:  
 #    docker build --no-cache -t studio . 
 #    docker builder prune
