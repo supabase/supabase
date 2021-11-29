@@ -119,6 +119,13 @@ function AuthPage() {
                   <img src={`${basePath}/images/product/auth/gitlab-icon.svg`} width={21} />
                   <img src={`${basePath}/images/product/auth/bitbucket-icon.svg`} width={21} />
                   <img src={`${basePath}/images/product/auth/twitter-icon.svg`} width={21} />
+                  <img src={`${basePath}/images/product/auth/apple-icon.svg`} width={21} />
+                  <img src={`${basePath}/images/product/auth/discord-icon.svg`} width={21} />
+                  <img src={`${basePath}/images/product/auth/microsoft-icon.svg`} width={21} />
+                  <img src={`${basePath}/images/product/auth/messagebird-icon.svg`} width={21} />
+                  <img src={`${basePath}/images/product/auth/twilio-icon.svg`} width={21} />
+                  <img src={`${basePath}/images/product/auth/twitch-icon.svg`} width={21} />
+                  <img src={`${basePath}/images/product/auth/spotify-icon.svg`} width={21} />
                 </Space>
               </p>
               <Typography.Title level={4}>All the social providers</Typography.Title>
