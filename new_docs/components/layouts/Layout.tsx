@@ -39,7 +39,7 @@ const DocsLayout = ({
           <div className="flex flex-row ">
             <SideBar />
             <div
-              className={`prose lg:prose-xl ${styles.content} p-8`}
+              className={`prose dark:prose-dark ${styles.content} p-8`}
               dangerouslySetInnerHTML={{ __html: children }}
             />
           </div>
