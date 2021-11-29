@@ -6,15 +6,11 @@ import { LOG_TYPE_LABEL_MAPPING } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
 import { withAuth } from 'hooks'
 import { get } from "lib/common/fetch"
-import LogTable from 'components/ui/Logs/LogTable'
+import LogTable, {LogData} from 'components/ui/Logs/LogTable'
 import useSWR from 'swr'
 import { API_URL } from 'lib/constants'
 import { Typography } from '@supabase/ui'
 
-interface LogsResponse {
-  data: any
-  error: any
-}
 /**
  * Acts as a container component for the entire log display
  */
@@ -28,7 +24,7 @@ const LogPage = () => {
     data,
     isValidating: isLoading,
     mutate,
-  } = useSWR<{ data: LogsResponse, error: any }>(`${API_URL}/projects/${ref}/logs?type=${type}`, get, {
+  } = useSWR<{ data: LogData[],  count: number, error: any }>(`${API_URL}/projects/${ref}/logs?type=${type}`, get, {
     revalidateOnFocus: false,
   })
   console.log(data)
