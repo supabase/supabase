@@ -6,8 +6,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import Connecting from 'components/ui/Loading'
 import { Project } from 'types'
 
-// const PLATFORM_ONLY_PAGES = ['storage', 'reports', 'settings']
-const PLATFORM_ONLY_PAGES: any = []
+const PLATFORM_ONLY_PAGES = ['storage', 'reports', 'settings']
 
 export function withAuth(
   WrappedComponent: ComponentType,
