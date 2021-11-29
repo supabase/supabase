@@ -47,13 +47,17 @@ const GetStartedPanel: FC<Props> = ({}) => {
                 </Typography.Text>
               </div>
               <div className="space-x-2">
-                <Link href={`/project/${ref}/editor/table`}>
-                  <Button type="default">Table editor</Button>
+                <Link href={`/project/${ref}/editor`}>
+                  <a>
+                    <Button type="default">Table editor</Button>
+                  </a>
                 </Link>
-                <Link href={`/project/${ref}/editor/sql`}>
-                  <Button type="default">SQL editor</Button>
+                <Link href={`/project/${ref}/sql`}>
+                  <a>
+                    <Button type="default">SQL editor</Button>
+                  </a>
                 </Link>
-                <a href="https://supabase.io/docs/guides/database" target="_blank">
+                <a href="https://supabase.com/docs/guides/database" target="_blank">
                   <Button type="text">Documentation</Button>
                 </a>
               </div>
@@ -77,9 +81,11 @@ const GetStartedPanel: FC<Props> = ({}) => {
               </div>
               <div className="space-x-2">
                 <Link href={`/project/${ref}/auth/users`}>
-                  <Button type="default">Try Auth</Button>
+                  <a>
+                    <Button type="default">Try Auth</Button>
+                  </a>
                 </Link>
-                <a href="https://supabase.io/docs/guides/auth" target="_blank">
+                <a href="https://supabase.com/docs/guides/auth" target="_blank">
                   <Button type="text">Documentation</Button>
                 </a>
               </div>
@@ -103,9 +109,11 @@ const GetStartedPanel: FC<Props> = ({}) => {
               </div>
               <div className="space-x-2">
                 <Link href={`/project/${ref}/storage/buckets`}>
-                  <Button type="default">Try Storage</Button>
+                  <a>
+                    <Button type="default">Try Storage</Button>
+                  </a>
                 </Link>
-                <a href="https://supabase.io/docs/guides/storage" target="_blank">
+                <a href="https://supabase.com/docs/guides/storage" target="_blank">
                   <Button type="text">Documentation</Button>
                 </a>
               </div>
