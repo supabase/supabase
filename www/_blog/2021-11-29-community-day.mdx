@@ -9,6 +9,7 @@ image: launch-week-three/community-day/supabase-oss.jpg
 thumb: launch-week-three/community-day/supabase-oss.jpg
 tags:
   - launch-week
+  - community
 date: '2021-11-29'
 toc_depth: 2
 ---
@@ -46,35 +47,23 @@ Among the many open-source relational databases available, [PostgreSQL](/docs/gu
 It was named [DBMS of the year in 2020](https://db-engines.com/en/blog_post/85) by
 DBEnginges, and with every release of PostgreSQL new features are available making it easy for developers and administrators to run their apps.
 
-[Gurjeet](https://twitter.com/0xGurjeet) one of our Postgres engineers has written up a [blogpost](/blog/2021/11/28/whats-new-in-postgres-14) with the most important updates the every dev should know.
+[Gurjeet](https://twitter.com/0xGurjeet), one of our Postgres engineers, has written up a [blogpost](/blog/2021/11/28/whats-new-in-postgres-14) with the most important updates the every dev should know.
 
-## PostgREST updates
+## PostgREST 9 updates
 
 ![PostgREST-9](/images/blog/launch-week-three/community-day/postgrest-9-og.png)
 
-PostgREST 9 was made fully compatible with PostgreSQL 14 and it also brings a [much-requested feature](https://github.com/supabase/postgrest-js/issues/197) the ability to do `inner joins`.
+We've had a lot of feedback on our Postgres APIs, and we've been hard at work with the [PostgREST team](https://github.com/orgs/PostgREST/people) to improve an already-incredible product. 
 
-Here's an example with `supabase-js`:
+Some new features include
 
-```js
-const { data, error } = await supabase
-    .from('messages')
-    .select('*, users!inner(*)')
-    .eq('users.username', 'Jane')
-```
+- Inner Joins
+- Functions with unnamed parameters
+- PostgreSQL 14 compatibility
 
-With the new `!inner` keyword, you can now filter rows of the top-level table(`messages`) based on a filter(`eq`) of the embedded table(`users`). This works across all Supabase client libraries and you can use it with any of the available operators(`gt`, `in`, etc.).
+From tomorrow, every Supabase project will be on PostgREST 9 (including existing projects).
 
-Also, if you've ever done your own custom `auth` functions using PostgREST [HTTP Context](https://postgrest.org/en/v8.0/api.html#accessing-request-headers-cookies-and-jwt-claims), note that a breaking change was necessary for PostgreSQL 14 Compatibility. You'll need to update them:
-
-| From | To |
-| --- | --- |
-| current_setting('request.jwt.claim.custom-claim', true) | current_setting('request.jwt.claims', true)::json->>'custom-claim' |
-| current_setting('request.header.custom-header', true); | current_setting('request.headers', true)::json->>'custom-header'; |
-
-If you only use Supabase default `auth` functions(`auth.email()`, `auth.uid()`, `auth.role()`), then no action is required because they handle this change transparently,
-
-You can see the full updates on the [PostgREST 9 release notes](https://postgrest.org/en/v9.0/releases/v9.0.0.html).
+Read about some of the new features in PostgREST 9 [here](/blog/2021/11/28/postgrest-9).
 
 ## New community partner: GitGuardian
 
