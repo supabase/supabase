@@ -1,5 +1,5 @@
 ## USAGE:
-# Build:        docker build -t supabase/studio:latest . 
+# Build:        docker build --target production -t supabase/studio:latest . 
 # Run:          docker run -p 3000:3000 supabase/studio
 # Deploy:       docker push supabase/studio:latest
 # Clean build:  
@@ -24,7 +24,6 @@ CMD [ "npm", "run", "dev" ]
 
 FROM build as production
 ENV NODE_ENV=production
-RUN npm ci
 COPY . .
 EXPOSE 3000
 CMD ["npm", "start"]
