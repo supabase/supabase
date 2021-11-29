@@ -31,11 +31,11 @@ import { NextSeo } from 'next-seo'
 type Props = {}
 
 const Index = ({}: Props) => {
-  // base path for images
-  const { basePath } = useRouter()
 
-  const meta_title = 'Company | Supabase'
-  const meta_description = 'See how the supabase runs.'
+  const router = useRouter()
+
+  const meta_title = 'One of the world\'s fastest-growing open source communities | Supabase'
+  const meta_description = 'Supabase is the community that builds the infrastructure for your applications. Build using Supabase for any size project—from a new startup to even large growing companies'
 
   return (
     <>
@@ -45,10 +45,10 @@ const Index = ({}: Props) => {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/auth`,
+          url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
+              url: `https://supabase.com/images/og/og-image.jpg`,
             },
           ],
         }}

@@ -15,10 +15,11 @@ import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 
 export default function IndexPage() {
-  const { basePath } = useRouter()
 
-  const meta_title = 'Pricing | Supabase'
-  const meta_description = 'Supabase pricing that you can afford for your next Supabase project.'
+  const router = useRouter()
+
+  const meta_title = 'Pricing & fees | Supabase'
+  const meta_description = 'Explore Supabase fees and pricing information. Find our competitive pricing tiers, with no hidden pricing. We have generous free tiers for those getting started, and Pay As You Go for those scaling up.'
 
   return (
     <DefaultLayout>
@@ -28,10 +29,10 @@ export default function IndexPage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/auth`,
+          url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
+              url: `https://supabase.com/images/og/og-image.jpg`,
             },
           ],
         }}
