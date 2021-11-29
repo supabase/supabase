@@ -187,10 +187,10 @@ module.exports = {
       label: 'Integrations',
       collapsed: false,
       items: [
-        'guides/integrations/prisma',
         'guides/integrations/auth0',
-        'guides/integrations/vercel',
         'guides/integrations/draftbit',
+        'guides/integrations/prisma',
+        'guides/integrations/vercel',
       ],
     },
     // {
