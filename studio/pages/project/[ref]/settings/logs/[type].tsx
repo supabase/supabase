@@ -36,11 +36,7 @@ const LogPage = () => {
   }) : logData
   return (
     <SettingsLayout title={title} className="p-4">
-      <LogPanel isLoading={isLoading} onRefresh={() => mutate()} />
-
-      <div className="flex flex-row justify-end p-4">
-        <Input className="max-w-32" placeholder="Search" onChange={e => setSearchQuery(e.target.value)} value={searchQuery} />
-      </div>
+      <LogPanel isLoading={isLoading} onRefresh={() => mutate()} onSearch={setSearchQuery}/>
       {error && (<Typography.Text className="text-center w-full block">Could not fetch data</Typography.Text>)}
       <LogTable data={filteredData} />
     </SettingsLayout>
