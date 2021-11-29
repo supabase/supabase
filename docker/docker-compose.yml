@@ -8,6 +8,17 @@
 version: "3.8"
 
 services:
+  studio:
+    container_name: supabase-studio
+    image: supabase/studio:latest
+    restart: unless-stopped
+    ports:
+      - ${STUDIO_PORT}:3000/tcp
+    environment:
+      - NEXT_PUBLIC_IS_PLATFORM=false
+      - NEXT_PUBLIC_API_URL=http://localhost:${KONG_HTTP_PORT}/platform
+      - SUPABASE_URL=http://localhost:${KONG_HTTP_PORT}
+
   kong:
     container_name: supabase-kong
     image: kong:2.1
