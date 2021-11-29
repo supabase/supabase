@@ -82,5 +82,12 @@
     "position": "Engineering",
     "username": "darora",
     "author_image_url": "https://github.com/darora.png"
+  },
+  "gurjeet": {
+    "author": "Gurjeet Singh",
+    "author_url": "https://github.com/gurjeet",
+    "position": "Engineering",
+    "username": "gurjeet",
+    "author_image_url": "https://github.com/gurjeet.png"
   }
 }
