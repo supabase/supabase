@@ -90,8 +90,8 @@ note that a breaking change was necessary for PostgreSQL 14 Compatibility. You'l
 
 | `From` | `To` |
 | --- | --- |
-| current_setting('request.jwt.claim.custom-claim', true) | current_setting('request.jwt.claims', true)::json->>'custom-claim' |
-| current_setting('request.header.custom-header', true); | current_setting('request.headers', true)::json->>'custom-header'; |
+| `current_setting('request.jwt.claim.custom-claim', true)` | `current_setting('request.jwt.claims', true)::json->>'custom-claim'` |
+| `current_setting('request.header.custom-header', true)` | `current_setting('request.headers', true)::json->>'custom-header'` |
 
 
 If you only use Supabase default `auth` functions(`auth.email()`, `auth.uid()`, `auth.role()`), then no action is required because we have updated the functions to handle these changes transparently.
