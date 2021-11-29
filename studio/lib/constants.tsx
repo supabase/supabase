@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IconArchive, IconDatabase, IconHeart, IconKey } from '@supabase/ui'
 import { concat, sortBy } from 'lodash'
 
@@ -360,28 +361,28 @@ export const METRIC_CATEGORIES = {
   // },
   API_DATABASE: {
     label: 'Database API',
-    icon: <IconDatabase size={METRIC_CATEGORIES_ICON_SIZE} />,
-    key: 'api_database',
+    icon: <IconDatabase size={ METRIC_CATEGORIES_ICON_SIZE } />,
+key: 'api_database',
   },
-  API_AUTH: {
-    label: 'Auth API',
-    icon: <IconKey size={METRIC_CATEGORIES_ICON_SIZE} />,
-    key: 'api_auth',
+API_AUTH: {
+  label: 'Auth API',
+    icon: <IconKey size={ METRIC_CATEGORIES_ICON_SIZE } />,
+  key: 'api_auth',
   },
-  API_STORAGE: {
-    label: 'Storage API',
-    icon: <IconArchive size={METRIC_CATEGORIES_ICON_SIZE} />,
-    key: 'api_storage',
+API_STORAGE: {
+  label: 'Storage API',
+    icon: <IconArchive size={ METRIC_CATEGORIES_ICON_SIZE } />,
+  key: 'api_storage',
   },
-  // API_REALTIME: {
-  //   label: 'Realtime API',
-  //   icon: '',
-  //   key: 'api_realtime',
-  // },
-  INSTANCE: {
-    label: 'Instance health',
-    icon: <IconHeart size={METRIC_CATEGORIES_ICON_SIZE} />,
-    key: 'instance',
+// API_REALTIME: {
+//   label: 'Realtime API',
+//   icon: '',
+//   key: 'api_realtime',
+// },
+INSTANCE: {
+  label: 'Instance health',
+    icon: <IconHeart size={ METRIC_CATEGORIES_ICON_SIZE } />,
+  key: 'instance',
   },
   // POSTGRES: {
   //   label: 'Postgres usage',
@@ -799,4 +800,12 @@ export const PASSWORD_STRENGTH_PERCENTAGE = {
   2: '50%',
   3: '80%',
   4: '100%',
+}
+
+export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
+  rest: 'Edge - PostgREST',
+  realtime: 'Edge - Realtime',
+  auth: 'Edge - Auth',
+  storage: 'Edge - Storage',
+  database: 'Database',
 }
