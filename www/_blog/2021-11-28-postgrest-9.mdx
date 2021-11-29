@@ -22,7 +22,7 @@ PostgREST 9  brings a [much-requested feature](https://github.com/supabase/postg
 
 Here's an example with `supabase-js`:
 
-```js
+```js hideCopy
 const { data, error } = await supabase
     .from('messages')
     .select('*, users!inner(*)')
@@ -43,7 +43,7 @@ Previously this wouldn't be possible with PostgREST, as every function required 
 
 Simply create a function inside your PostgreSQL database to receive the raw JSON:
 
-```sql
+```sql hideCopy
 create function store_bounces(json) 
 returns json 
 language sql
@@ -60,7 +60,7 @@ $$;
 
 And the webhook can send this data directly to your database:
 
-```bash
+```bash hideCopy
 POST /rest/v1/rpc/store_bounces HTTP/1.1
 Content-Type: application/json
 
