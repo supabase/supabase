@@ -49,7 +49,7 @@ export const getURL = () => {
       ? process.env.SITE_URL
       : process?.env?.VERCEL_URL && process.env.VERCEL_URL !== ''
       ? process.env.VERCEL_URL
-      : 'https://app.supabase.com'
+      : 'https://app.supabase.io'
   return url.includes('http') ? url : `https://${url}`
 }
 
