@@ -28,8 +28,10 @@ const LogPage = () => {
     data,
     isValidating: isLoading,
     mutate,
-  } = useSWR<{ data: LogsResponse, error: any }>(`${API_URL}/projects/${ref}/logs?type=${type}`, get)
-
+  } = useSWR<{ data: LogsResponse, error: any }>(`${API_URL}/projects/${ref}/logs?type=${type}`, get, {
+    revalidateOnFocus: false,
+  })
+  console.log(data)
   const { data: logData, error } = data || {}
   return (
     <SettingsLayout title={title} className="p-4">
