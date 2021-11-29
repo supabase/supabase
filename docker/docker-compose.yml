@@ -15,7 +15,7 @@ services:
     ports:
       - ${STUDIO_PORT}:3000/tcp
     environment:
-      - NEXT_PUBLIC_IS_PLATFORM=false
+      - NEXT_PUBLIC_IS_PLATFORM='false'
       - NEXT_PUBLIC_API_URL=http://localhost:${KONG_HTTP_PORT}/platform
       - SUPABASE_URL=http://localhost:${KONG_HTTP_PORT}
 
