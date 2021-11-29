@@ -72,7 +72,7 @@ const ProjectBuildingState: React.FC<ProjectBuildingState> = () => {
                   description={
                     <Text>
                       Browse the Supabase{' '}
-                      <Link href="https://supabase.io/docs">
+                      <Link href="https://supabase.com/docs">
                         <a className="text-green-500 hover:text-green-700" target="_blank">
                           documentation
                         </a>

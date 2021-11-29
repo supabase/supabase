@@ -72,7 +72,7 @@ const Subscription: FC<Props> = ({
           <div className="mt-2 px-6 pb-4">
             <Typography.Text type="secondary">
               See our{' '}
-              <a href="https://supabase.io/pricing" target="_blank" className="underline">
+              <a href="https://supabase.com/pricing" target="_blank" className="underline">
                 pricing
               </a>{' '}
               for a more detailed analysis of what Supabase has on offer.
