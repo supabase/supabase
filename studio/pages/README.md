@@ -7,7 +7,7 @@
 
 ## Template for building pages
 
-```ts
+```tsx
 import { NextPage } from 'next'
 import { observer } from 'mobx-react-lite'
 
