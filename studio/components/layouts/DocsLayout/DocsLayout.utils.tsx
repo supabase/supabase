@@ -64,7 +64,7 @@ export const generateDocsMenu = (
         {
           name: 'Guides',
           key: 'guides',
-          url: `https://supabase.io/docs`,
+          url: `https://supabase.com/docs`,
           icon: <IconBook size={14} strokeWidth={2} />,
           items: [],
           isExternal: true,
@@ -72,7 +72,7 @@ export const generateDocsMenu = (
         {
           name: 'API Reference',
           key: 'api-reference',
-          url: `https://supabase.io/docs/client/supabase-client`,
+          url: `https://supabase.com/docs/client/supabase-client`,
           icon: <IconBookOpen size={14} strokeWidth={2} />,
           items: [],
           isExternal: true,

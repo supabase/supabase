@@ -13,31 +13,34 @@ You need the following installed in your system:
 - [Docker](https://docs.docker.com/engine/install/) and docker-compose
 - [Git](https://git-scm.com/downloads)
 
-## Getting started
+## Quick Start
 
 ### Get the code
 
 Checkout the docker directory in the Supabase repo:
 
 ```sh
+# Get the code
 git clone --depth 1 https://github.com/supabase/supabase
+
+# Go to the docker folder
 cd supabase/docker
-```
 
-### Manage Secrets
-
-Copy `.env.example` to `.env` and populate the values.
-
-```sh
+# Copy the fake env vars
 cp .env.example .env
+
+# Start
+docker-compose up
 ```
 
-In particular, these are required:
+Now visit [http://localhost:3000](http://localhost:3000) to start using Supabase Studio.
 
-- `POSTGRES_PASSWORD`: the password for the `postgres` role 
-- `JWT_SECRET`: used by PostgREST and GoTrue, among others
-- `SITE_URL`: the base URL of your site
-- `SMTP_*`: mail server credentials
+
+## Securing your setup
+
+While we provided you with some example secrets for getting started, you should NEVER deploy your Supabase setup using the defaults we have provided.
+
+Please follow these steps to secure your Docker setup. We [strongly recommend](/docs/guides/hosting/overview#managing-your-secrets) using a secrets manager when deploying to production.
 
 ### Generate API Keys
 
@@ -45,25 +48,21 @@ Use your `JWT_SECRET` to generate a `anon` and `service` API keys using the [JWT
 
 Replace the values in these files:
 
-- `docker-compose.yml`: 
+- `.env`: 
   - `ANON_KEY` - replace with an `anon` key
-  - `SERVICE_KEY` - replace with a `service` key
+  - `SERVICE_ROLE_KEY` - replace with a `service` key
 - `volumes/kong.yml`
   - `anon` - replace with an `anon` key
   - `service_role` - replace with a `service` key
 
-### Start 
+### Update Secrets
 
-You can now start Supabase:
+Update the `.env` file with your own secrets. In particular, these are required:
 
-```sh
-docker-compose up
-```
-
-Your database will be persisted in `volumes/db/data`, and your storage objects in `volumes/storage`. 
-
-Try out the examples in `supabase/examples` to verify if it works correctly!
-
+- `POSTGRES_PASSWORD`: the password for the `postgres` role. 
+- `JWT_SECRET`: used by PostgREST and GoTrue, among others.
+- `SITE_URL`: the base URL of your site.
+- `SMTP_*`: mail server credentials. You can use any SMTP server.
 
 ## Configuration
 
