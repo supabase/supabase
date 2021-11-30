@@ -16,7 +16,7 @@ const sizes = {
 export default function Toggle({
   isOn = true,
   size = 'md',
-  onToggle = () => {},
+  onToggle = (value) => {},
   isDisabled = false,
 }) {
   const toggleSizes = sizes[size]
@@ -24,7 +24,7 @@ export default function Toggle({
     <span
       role="checkbox"
       aria-checked="false"
-      onClick={!isDisabled ? onToggle : () => {}}
+      onClick={!isDisabled ? () => onToggle(!isOn) : () => {}}
       className={`${isOn ? 'bg-green-500' : 'bg-gray-200'} ${toggleSizes.background} ${
         isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'
       } relative inline-block flex-shrink-0 border-transparent rounded-full transition-colors ease-in-out duration-200 focus:outline-none focus:ring `}
