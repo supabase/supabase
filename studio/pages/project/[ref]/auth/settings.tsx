@@ -1,7 +1,6 @@
 import useSWR from 'swr'
 import { observer } from 'mobx-react-lite'
 import { useState, useEffect } from 'react'
-import { toast } from 'react-hot-toast'
 import { useRouter } from 'next/router'
 import { AutoField, NumField } from 'uniforms-bootstrap4'
 import { Button, Divider, Typography, Toggle as UIToggle } from '@supabase/ui'
@@ -34,6 +33,8 @@ export default withAuth(observer(Auth))
 
 const Settings = () => {
   const router = useRouter()
+  const { ui } = useStore()
+
   const [model, setModel] = useState<any>({})
   const [smsProviderModel, setSmsProviderModel] = useState<any>({})
   const [externalProvidersModel, setExternalProvidersModel] = useState<any>({})
@@ -75,11 +76,14 @@ const Settings = () => {
     }
     const response = await patch(URL, model)
     if (response.error) {
-      toast.error(`Update config failed: ${response.error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Update config failed: ${response.error.message}`,
+      })
     } else {
       const updates = response
       setModel({ ...updates })
-      toast(`Settings saved`)
+      ui.setNotification({ category: 'success', message: 'Settings saved' })
     }
   }
 
@@ -98,9 +102,9 @@ const Settings = () => {
       if (response.error) throw response.error
       const updates = response
       setModel({ ...updates })
-      toast(`Settings saved`)
+      ui.setNotification({ category: 'success', message: 'Settings saved' })
     } catch (error: any) {
-      toast.error(`Update config failed: ${error.message}`)
+      ui.setNotification({ category: 'error', message: `Update config failed: ${error.message}` })
     }
   }
 
