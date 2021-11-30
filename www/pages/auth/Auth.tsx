@@ -100,10 +100,10 @@ function AuthPage() {
           <div className="grid grid-cols-12">
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
               <p className="mb-4">
-                <Space>
-                  <img src={`${basePath}/images/product/auth/google-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/facebook-icon.svg`} width={21} />
-                  <div>
+                <div className="flex items-center flex-wrap xl:w-64">
+                  <img className="mb-2 mr-2" src={`${basePath}/images/product/auth/google-icon.svg`} width={21} alt="google auth login icon"/>
+                  <img className="mb-2 mr-2" src={`${basePath}/images/product/auth/facebook-icon.svg`} width={21} alt="facebook auth login icon"/>
+                  <div className="mb-2 mr-2">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 32.58 31.77"
@@ -116,17 +116,18 @@ function AuthPage() {
                       />
                     </svg>
                   </div>
-                  <img src={`${basePath}/images/product/auth/gitlab-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/bitbucket-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/twitter-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/apple-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/discord-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/microsoft-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/messagebird-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/twilio-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/twitch-icon.svg`} width={21} />
-                  <img src={`${basePath}/images/product/auth/spotify-icon.svg`} width={21} />
-                </Space>
+                  <img className="mb-2 mr-2" src={`${basePath}/images/product/auth/gitlab-icon.svg`} width={21} alt="gitlab auth login icon"/>
+                  <img className="mb-2 mr-2" src={`${basePath}/images/product/auth/bitbucket-icon.svg`} width={21} alt="bitbucket auth login icon"/>
+                  <img className="mb-2 mr-2" src={`${basePath}/images/product/auth/twitter-icon.svg`} width={21} alt="twitter auth login icon"/>
+                  <img className="mb-2 mr-2" src={`${basePath}/images/product/auth/apple-icon.svg`} width={21} alt="apple auth login icon"/>
+                  <img className="mb-2 mr-2" src={`${basePath}/images/product/auth/discord-icon.svg`} width={21} alt="discord auth login icon"/>
+                  <img className="mb-2 mr-2" src={`${basePath}/images/product/auth/microsoft-icon.svg`} width={21} alt="microsoft auth login icon"/>
+                  <img className="mb-2 mr-2" src={`${basePath}/images/product/auth/messagebird-icon.svg`} width={21} alt="messagebird auth login icon"/>
+                  <img className="mb-2 mr-2" src={`${basePath}/images/product/auth/twilio-icon.svg`} width={21} alt="twilio auth login icon"/>
+                  <img className="mb-2 mr-2" src={`${basePath}/images/product/auth/twitch-icon.svg`} width={21} alt="twitch auth login icon"/>
+                  <img className="mb-2 mr-2" src={`${basePath}/images/product/auth/spotify-icon.svg`} width={21} alt="spotify auth login icon"/>
+                  <img className="mb-2 mr-2" src={`${basePath}/images/product/auth/slack-icon.svg`} width={21} alt="slack auth login icon"/>
+                </div>
               </p>
               <Typography.Title level={4}>All the social providers</Typography.Title>
               <Typography.Text>
