@@ -149,7 +149,7 @@ http_post
 
 After making a request, the extension will return an ID. You can use this ID to collect a response.
 
-```sql noCopy
+```sql hideCopy
 -- Collect the response from a request
 select
   *
@@ -207,7 +207,7 @@ To build asynchronous behavior, we use a PostgreSQL [background worker](https://
 
 Shout out to [Paul Ramsey](https://github.com/pramsey), who gave us the implementation idea in [pgsql-http](https://github.com/pramsey/pgsql-http/#to-do). While we originally hoped to add background workers to his extension, the implementation became too cumbersome and we decided to start with a clean slate. The advantage of being async can be seen by making some requests with both extensions:
 
-```sql noCopy
+```sql hideCopy
 \timing on
 
 -- using pgsql-http to fetch from "supabase.io" 10 times
