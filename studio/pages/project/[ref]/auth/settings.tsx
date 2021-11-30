@@ -220,8 +220,6 @@ const Settings = () => {
                       SMTP_PORT: "",
                       SMTP_USER: "",
                       SMTP_PASS: "",
-                      SMTP_SENDER_NAME: "",
-                      RATE_LIMIT_EMAIL_SENT: 30,
                     })
                   }
                   setCustomSMTP(!isCustomSMTPEnabled)
