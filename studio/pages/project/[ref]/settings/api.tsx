@@ -276,7 +276,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
   )
 }
 
-const PostgrestConfig = ({ config, projectRef }: any) => {
+const PostgrestConfig = observer(({ config, projectRef }: any) => {
   const PageState: any = useContext(PageContext)
   const { meta } = PageState
 
@@ -396,4 +396,4 @@ const PostgrestConfig = ({ config, projectRef }: any) => {
       </SchemaFormPanel>
     </>
   )
-}
+})
