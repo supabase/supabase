@@ -182,6 +182,17 @@ module.exports = {
         },
       ],
     },
+    {
+      type: 'category',
+      label: 'Integrations',
+      collapsed: false,
+      items: [
+        'guides/integrations/auth0',
+        'guides/integrations/draftbit',
+        'guides/integrations/prisma',
+        'guides/integrations/vercel',
+      ],
+    },
     // {
     //   type: 'category',
     //   label: 'Storage',
