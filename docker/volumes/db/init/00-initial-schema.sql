@@ -1,4 +1,5 @@
--- Set up reatime 
+-- Set up realtime
+create schema if not exists realtime;
 -- create publication supabase_realtime; -- defaults to empty publication
 create publication supabase_realtime;
 
