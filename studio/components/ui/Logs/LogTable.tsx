@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import Table from 'components/to-be-cleaned/Table'
-import { Typography, SidePanel } from '@supabase/ui'
+import { Typography } from '@supabase/ui'
 import dayjs from 'dayjs'
-import { Panel } from '@supabase/ui/dist/cjs/components/Tabs/Tabs'
 import LogSelection from './LogSelection'
-
+import DataGrid from '@supabase/react-data-grid'
 interface Props {
   data: LogData[] | null | undefined
 }
@@ -19,36 +17,62 @@ export interface LogData {
   metadata: Metadata
 }
 
+interface Column {
+  key: string
+  name: string
+}
+
 /**
  * Logs table view with focus side panel
  */
 const LogTable = ({ data }: Props) => {
-  const columns = ["timestamp", "event_message"]
-
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null);
+  const columns = ["timestamp", "event_message"].map(v => ({
+    key: v, name: v,
+    width: v === "timestamp" ? 240 : undefined,
+    resizable: true,
+    headerRenderer: () => {
+      return <div className="flex items-center justify-center font-mono h-full">{v}</div>
+    },
+    formatter: ({ row }: any) => {
+      let value = row[v]
+      if (v === 'timestamp') {
+        value = dayjs(Number(row["timestamp"]) / 1000).toString()
+      }
+      return <p className={`block whitespace-line-wrap ${row.id === focusedLog?.id ? "font-bold" : ""}`}>{value}</p>
+    }
+  }))
 
-  if (!data) {
-    return null
-  }
+  const logMap = (data || []).reduce((acc: any, d) => {
+    acc[d.id] = d
+    return acc
+  }, {})
+  useEffect(() => {
+    if (!data) return
+    if (focusedLog && !(focusedLog.id in logMap)) {
+      setFocusedLog(null)
+    }
+  }, [Object.keys(logMap)])
 
-  if (data === []) {
-    return <Typography.Text className="text-center">No data returned from query</Typography.Text>
-  }
+  if (!data) return null
 
   return (<section className="flex flex-row gap-x-4">
-    <Table containerClassName="mx-auto container overflow-y h-full"
-      head={columns.map((c) => <Table.th key={c}>{c}</Table.th>)}
-      body={data.map(d =>
-        <Table.tr key={d.id}>
-          {columns.map(c => <Table.td key={c} className={`${d.id === focusedLog?.id ? "bg-green-800" : ""} `} onClick={() => setFocusedLog(d)}>
-            {c === "timestamp" &&
-              <Typography.Text className="block bg-green-800" small code>{dayjs(d[c] / 1000).toString()}</Typography.Text>}
-            {c === "event_message" && <Typography.Text className="block" small code>{d[c]}</Typography.Text>}
-          </Table.td>)}
-        </Table.tr>)}
-    />
+    <div className="flex-grow w-2/3">
+      <DataGrid
+        onSelectedCellChange={({ idx, rowIdx }) => setFocusedLog(data[rowIdx])}
+        noRowsFallback={<Typography.Text className="text-center">No data returned from query</Typography.Text>}
+        columns={columns as any}
+        rowClass={r => `${r.id === focusedLog?.id ? "bg-green-800" : "cursor-pointer"}`}
+        rows={data}
+        rowKeyGetter={r => r.id}
+        onRowClick={r => {
+          const log = logMap[r.id]
+          setFocusedLog(logMap[r.id])
+        }}
+      />
+    </div>
     {focusedLog && (
-      <div className="sticky top-0">
+      <div className="sticky top-0 w-1/3">
         <LogSelection onClose={() => setFocusedLog(null)} log={focusedLog} />
       </div>
     )}
