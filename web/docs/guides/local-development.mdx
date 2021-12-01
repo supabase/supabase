@@ -12,6 +12,7 @@ Supabase provides a CLI so that you can develop your application locally, rather
 ## Prerequisites
 
 You will need to have these in your environment:
+
 - Git
 - Docker (make sure the daemon is up and running)
 - Supabase CLI (instructions [here](https://github.com/supabase/cli))
@@ -44,7 +45,6 @@ service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb
 
 #### Accessing Services Directly
 
-
 <Tabs
 defaultValue="Postgres"
 values={[
@@ -58,7 +58,7 @@ values={[
 postgresql://postgres:postgres@localhost:5432/postgres
 ```
 
-The local Postgres instance can be accessed through [`psql`](https://www.postgresql.org/docs/current/app-psql.html) 
+The local Postgres instance can be accessed through [`psql`](https://www.postgresql.org/docs/current/app-psql.html)
 or any other Postgres client, such as [pgadmin](https://www.pgadmin.org/).
 
 For example:
@@ -75,8 +75,8 @@ psql 'postgresql://postgres:postgres@localhost:5432/postgres'
 http://localhost:54321
 ```
 
-All of the services are accessible through the API Gateway [Kong](https://github.com/Kong/kong)). 
-If you are accessing these services without the client libraries, you may need to pass the client keys as an `Authorization` header. 
+All of the services are accessible through the API Gateway [Kong](https://github.com/Kong/kong)).
+If you are accessing these services without the client libraries, you may need to pass the client keys as an `Authorization` header.
 You can learn more about these JWT headers in our [Resources](/docs/learn/auth-deep-dive/auth-deep-dive-jwts).
 
 ```sh
@@ -90,14 +90,12 @@ http://localhost:54321/v1/storage/v1/        # Storage
 http://localhost:54321/v1/auth/v1/           # Auth (GoTrue)
 ```
 
-
 </TabItem>
 </Tabs>
 
-
 ## Example application
 
-Now that we've learned how to install and start Supabase locally, let's see how you can use it with a frontend application. 
+Now that we've learned how to install and start Supabase locally, let's see how you can use it with a frontend application.
 This quick-start guide will show you, how you can configure a React app which uses the Supabase stack.
 
 ```bash
@@ -107,8 +105,8 @@ npx create-react-app react-demo --use-npm
 # move into the new folder
 cd react-demo
 
-# set up Supabase 
-supabase init 
+# set up Supabase
+supabase init
 
 # Save the install supabase-js library
 npm install --save @supabase/supabase-js
@@ -145,7 +143,7 @@ When you're finished with Supabase, send <kbd>Ctrl-C</kbd> to stop the Docker se
 
 ## Migrations
 
-You can also use the CLI to manage your migrations. Follow the the tour [here](https://github.com/supabase/cli/tree/main/examples/tour) to get started.
+You can also use the CLI to manage your migrations. Follow the tour [here](https://github.com/supabase/cli/tree/main/examples/tour) to get started.
 
 ## Next steps
 
