@@ -173,6 +173,7 @@ info:
           - order()
           - range()
           - single()
+          - maybeSingle()
       - name: 'Filters'
         items:
           - Using Filters
@@ -1600,7 +1601,22 @@ pages:
           const { data, error } = await supabase
             .from('cities')
             .select('name, country_id')
+            .limit(1)
             .single()
+          ```
+
+  maybeSingle():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.maybeSingle'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .eq('name', 'Singapore')
+            .maybeSingle()
           ```
 
   Using Filters:
