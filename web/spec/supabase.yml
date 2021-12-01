@@ -283,7 +283,7 @@ pages:
           import { createClient } from '@supabase/supabase-js'
 
           const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', { 
-            fetch: fetch 
+            fetch: fetch.bind(globalThis) 
           })
           ```
 
@@ -855,6 +855,17 @@ pages:
               supplier:supplier_id ( name ),
               purchaser:purchaser_id ( name )
             `)
+          ```
+      - name: Filtering with inner joins
+        description: |
+          If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted 
+          to select all rows in a `message` table which belong to a user with the `username` "Jane":
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('messages')
+            .select('*, users!inner(*)')
+            .eq('users.username', 'Jane')
           ```
       - name: Querying with count option
         description: |

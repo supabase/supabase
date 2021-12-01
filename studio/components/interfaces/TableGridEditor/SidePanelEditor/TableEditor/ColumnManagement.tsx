@@ -9,7 +9,7 @@ import {
   IconTrash,
   Typography,
 } from '@supabase/ui'
-import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import { PostgresTable, PostgresColumn, PostgresRelationship } from '@supabase/postgres-meta'
 import {
   DragDropContext,
   Droppable,
@@ -85,7 +85,11 @@ const ColumnManagement: FC<Props> = ({
   const onUpdateColumn = (columnToUpdate: ColumnField, changes: Partial<ColumnField>) => {
     const updatedColumns = columns.map((column: ColumnField) => {
       if (column.id === columnToUpdate.id) {
-        return { ...column, ...changes }
+        const foreignKey =
+          'name' in changes && !isUndefined(column.foreignKey)
+            ? { ...column.foreignKey, source_column_name: changes.name }
+            : column.foreignKey
+        return { ...column, ...changes, foreignKey: foreignKey as PostgresRelationship }
       } else {
         return column
       }
