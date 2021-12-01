@@ -12,10 +12,10 @@ tags:
   - realtime
   - securitu
 date: '2021-12-02'
-toc_depth: 2
+toc_depth: 3
 ---
 
-Realtime is an server that listens to all changes in your PostgreSQL database, broadcasting those changes to clients through a websocket connection.
+Realtime is a server that listens to changes in your PostgreSQL database and broadcasts the changes to clients through a websocket connection.
 
 Today, we're announcing security improvements to Realtime, where database changes will be broadcast to authenticated users, respecting the same PostgreSQL policies that you use for Row Level Security.
 
@@ -38,10 +38,10 @@ Since the first commit of Realtime server back in [September 2019](https://githu
 we've worked hard to improve its usability and scalability. 
 
 Until now, Realtime did not adhere to RLS policies and instead broadcast all database changes to all clients. 
-This potentially surprising behavior is a key reason why Realtime has been an opt-in feature.
+The unsafe nature of this behavior is the reason why Realtime has been an opt-in feature, and a key reason why we are still in Beta.
 
-As more and more developers rely on Realtime to receive and send database changes in their apps and services, 
-security has become a primary concern for us as well as many others in the community who wish to build secure systems with Realtime.
+As more developers rely on Realtime to receive and send database changes in their apps and services, 
+security has become a primary concern for us and others in the community who wish to build secure systems with Realtime.
 
 Supabase projects have supported Row Level Security (RLS) for API authorization since our [Auth launch](https://supabase.io/blog/2020/08/05/supabase-auth). 
 In that time, it has quickly become the recommended way to implement authorization.
@@ -54,7 +54,7 @@ Before diving deeper into our Realtime RLS implementation, let's briefly cover h
 
 ## Row Level Security Primer
 
-When you need to control access to individual rows of data, PostgreSQL has you covered with [Row Level Security (RLS) policies](https://www.postgresql.org/docs/13/ddl-rowsecurity.html). 
+When you need to control access to individual rows of data, PostgreSQL has you covered with [Row Level Security (RLS) policies](https://www.postgresql.org/docs/current/ddl-rowsecurity.html). 
 An RLS policy is a snippet of SQL filtering which users have the authority to create/read/update/delete rows in a table.
 
 For example, the following policy would allow users to select their own rows in a todos table:
@@ -97,7 +97,7 @@ function that Realtime server invokes with database changes.
 
 ### WALRUS Implementation
 
-WALRUS inspects each record in the replication change to:
+[WALRUS](https://github.com/supabase/walrus) inspects each record in the replication change to:
 
 - Identify the source table (e.g. `public.notes`).
 - Identify the change's action (INSERT/UPDATE/DELETE/TRUNCATE*).
@@ -107,7 +107,7 @@ WALRUS inspects each record in the replication change to:
     - Query the source table to see if the record is visible to that subscriber.
 - Report the list of subscribers who are authorized to view the record back to Realtime server.
 
-*Realtime server does not broadcast TRUNCATE changes
+<small>*Realtime server does not broadcast TRUNCATE changes</small>
 
 **Efficiently Query to Check Access**
 
@@ -148,27 +148,31 @@ and the resultant processing time also grows.
 
 To get the most out of Realtime row level security, follow these guidelines:
 
-- If your data is insensitive or publicly available, such as stock prices listed under NASDAQ, then don't enable row level security!
+### Disable for public tables
+
+If your data is insensitive or publicly available, such as stock prices listed under NASDAQ, then don't enable row level security!
 
 The fastest security policy is one that doesn't exist :)
 
-- If you do need row level security, make sure that your policies are fast
+### Optimize your policies
+
+If you do need row level security, make sure that your policies are fast.
 
 Remember that your policy is executed *each* time a query touches the table that the policy is applied to. If your policy is slow, all access to that table will be slow. 
 Avoid joins within RLS policies when you can, and make sure all filter conditions use an index.
 
 Additionally, keep in mind that if you use joins within an RLS policy, any RLS policies on the tables you're joining to will also be executed in turn, adding to the overall overhead.
 
-- Keep your primary keys small and efficient
+### Small primary keys
+
+Keep your primary keys small and efficient.
 
 Use single column primary keys with a fixed field size (integer, uuid, etc.) over text or multi-column indexes.
 
 ## Next Steps
 
-Realtime RLS is available today on all existing and new Supabase projects. To get started, upgrade your Supabase JavaScript client to version v1.23.0 or C# client to version 0.2.6, 
-subscribe your users to any table in the `public` schema, enable row level security and create at least one row security policy on that table.
-
-Maintainers and contributors of Supabase clients written in Dart and Python are working hard to integrate Realtime RLS. Please check their respective GitHub repos to keep up to date with development.
+Realtime RLS is available today on all existing and new Supabase projects. To get started, upgrade your Supabase JavaScript client to version v1.23.0 
+and launch your new PostgreSQL database today: [database.new](https://database.new)
 
 ## Credits
 
