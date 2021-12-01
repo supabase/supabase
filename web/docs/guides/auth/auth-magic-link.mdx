@@ -27,7 +27,10 @@ Setting up Magic Link logins for your Supabase application.
 
 ### Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+Add logins using our client libraries:
+
+- [Javascript](/docs/reference/javascript/auth-signin#sign-in-with-magic-link)
+- [Dart](/docs/reference/dart/auth-signin#sign-in-with-magic-link)
 
 <Tabs
   defaultValue="js"
@@ -48,11 +51,8 @@ const { user, error } = await supabase.auth.signIn({
 <TabItem value="dart">
 
 ```dart
-final res = await supabase.auth.signIn(
-  email: 'example@email.com'
-);
+final res = await supabase.auth.signIn(email: 'example@email.com');
 
-final user = res.data?.user;
 final error = res.error;
 ```
 

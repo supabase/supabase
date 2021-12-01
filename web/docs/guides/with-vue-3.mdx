@@ -490,7 +490,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
         type="file"
         id="single"
         accept="image/*"
-        @change="uploadAvatar($event)"
+        @change="uploadAvatar"
         :disabled="uploading"
       />
     </div>
@@ -589,6 +589,11 @@ And then we can add the widget to the Account page:
 <script>
   // Import the new component
   import Avatar from './Avatar.vue'
+  
+  // 
+  components: {
+    Avatar,
+  }
 </script>
 ```
 
