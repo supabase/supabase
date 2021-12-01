@@ -118,6 +118,7 @@ export default class MetaStore implements IMetaStore {
     'net',
     'pg_catalog',
     'pgbouncer',
+    'realtime',
     'storage',
     'supabase_functions',
   ]
