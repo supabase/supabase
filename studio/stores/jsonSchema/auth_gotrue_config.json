@@ -236,6 +236,16 @@
       "title": "Spotify secret",
       "type": "string"
     },
+    "EXTERNAL_ETH_ENABLED": {
+      "title": "Ethereum enabled",
+      "type": "boolean",
+      "help": "Allow/disallow login with Ethereum Wallets."
+    },
+    "EXTERNAL_ETH_MESSAGE": {
+      "title": "Eth Nonce Message",
+      "type": "string",
+      "help": "Please enter the statement for the ETH nonce."
+    },
     "SMTP_ADMIN_EMAIL": {
       "title": "SMTP Admin Email",
       "type": "string"

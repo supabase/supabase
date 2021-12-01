@@ -38,6 +38,7 @@ const Settings = () => {
   const [model, setModel] = useState<any>({})
   const [smsProviderModel, setSmsProviderModel] = useState<any>({})
   const [externalProvidersModel, setExternalProvidersModel] = useState<any>({})
+  const [ethProvidersModel, setEthProvidersModel] = useState<any>({})
   const [isCustomSMTPEnabled, setCustomSMTP] = useState<any>(false)
   const URL = `${API_URL}/auth/${router.query.ref}/config`
   const { data: config, error }: any = useSWR(URL, get)
@@ -765,7 +766,44 @@ const Settings = () => {
           )}
         </SchemaFormPanel>
       </div>
+      <div className="my-8 mt-0">
+        <SchemaFormPanel
+          title="Ethereum Auth"
+          schema={pluckJsonSchemaFields(authConfig, [
+            'EXTERNAL_ETH_ENABLED',
+            'EXTERNAL_ETH_MESSAGE',
+          ])}
+          model={{
+            ETH_ENABLED: model.EXTERNAL_ETH_ENABLED,
+            ETH_MESSAGE: model.EXTERNAL_ETH_MESSAGE || undefined
+          }}
+          onChangeModel={(model: any) => setEthProvidersModel(model)}
+          onSubmit={(model: any) => onFormSubmit(model)}
+        >
+          <>
+            <UIToggle
+              layout="horizontal"
+              className="mb-4"
+              label={authConfig.properties.EXTERNAL_ETH_ENABLED.title}
+              onChange={() => {
+                handleToggle('EXTERNAL_ETH_ENABLED')
+              }}
+              checked={model.EXTERNAL_ETH_ENABLED}
+              descriptionText={authConfig.properties.EXTERNAL_ETH_ENABLED.help}
+            />
 
+            {model.EXTERNAL_ETH_ENABLED && (
+              <>
+                <AutoField
+                  name="EXTERNAL_ETH_MESSAGE"
+                  showInlineError
+                  errorMessage={authConfig.properties.EXTERNAL_ETH_MESSAGE.help}
+                />
+              </>
+            )}
+          </>
+        </SchemaFormPanel>
+      </div>
       <div className="my-8 mt-0">
         {config && (
           <AuditLog interval={config.isFreeTier ? '1 hour' : '7 days'} projectRef={projectRef} />
