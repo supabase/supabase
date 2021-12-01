@@ -1,6 +1,6 @@
 import { useProfile, useStore } from 'hooks'
 import { ComponentType, useEffect, useState } from 'react'
-import { flatten } from 'lodash'
+import { flatten, isUndefined } from 'lodash'
 import { NextRouter, useRouter } from 'next/router'
 import { IS_PLATFORM } from 'lib/constants'
 import Connecting from 'components/ui/Loading'
@@ -15,9 +15,6 @@ export function withAuth(
     redirectIfFound?: boolean
   }
 ) {
-  const redirectTo = options?.redirectTo ?? '/'
-  const redirectIfFound = options?.redirectIfFound
-
   return (props: any) => {
     const router = useRouter()
     const rootStore = useStore()
@@ -25,21 +22,19 @@ export function withAuth(
 
     const { ref, slug } = router.query
     const { app, ui } = rootStore
+    const page = router.pathname.split('/')[3]
+
+    const redirectTo = options?.redirectTo ?? (!isUndefined(ref) ? `/project/${ref}` : '/')
+    const redirectIfFound = options?.redirectIfFound
 
     const returning =
       app.projects.isInitialized && app.organizations.isInitialized ? 'minimal' : undefined
     const { profile, isLoading } = useProfile(returning)
 
-    const isRedirecting = checkRedirectTo(isLoading, router, profile, redirectTo, redirectIfFound)
-
-    // We might probably be able to bring this into a _middleware with next 12
-    if (!IS_PLATFORM) {
-      // Hide routes for self-hosted version until features are functionally ready
-      const page = router.pathname.split('/')[3]
-      if (PLATFORM_ONLY_PAGES.includes(page)) {
-        router.push(`/project/${ref}`)
-      }
-    }
+    const isAccessingBlockedPage = !IS_PLATFORM && PLATFORM_ONLY_PAGES.includes(page)
+    const isRedirecting =
+      isAccessingBlockedPage ||
+      checkRedirectTo(isLoading, router, profile, redirectTo, redirectIfFound)
 
     useEffect(() => {
       // this should run before redirecting
