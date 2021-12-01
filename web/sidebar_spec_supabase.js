@@ -39,7 +39,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Modifiers',
-      items: ['reference/javascript/using-modifiers', 'reference/javascript/limit', 'reference/javascript/order', 'reference/javascript/range', 'reference/javascript/single'],
+      items: ['reference/javascript/using-modifiers', 'reference/javascript/limit', 'reference/javascript/order', 'reference/javascript/range', 'reference/javascript/single', 'reference/javascript/maybesingle'],
       collapsed: true,
     },
     {
