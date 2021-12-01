@@ -1,6 +1,6 @@
 {
   "show": true,
   "text": "Supabase Launch Week III",
-  "cta": "Supabase Studio is now Open Source",
-  "link": "https://www.producthunt.com/posts/open-source-postgresql-dashboard"
+  "cta": "Realtime Postgres RLS now available",
+  "link": "/blog/2021/12/01/realtime-row-level-security-in-postgresql"
 }
