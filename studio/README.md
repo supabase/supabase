@@ -38,7 +38,7 @@ Project settings are managed outside of the Dashboard. If you use docker-compose
 
 ## Running within a self-hosted environment
 
-Firstly, follow the guide [here](https://www.notion.so/supabase/'%3Chttps://supabase.com/docs/guides/hosting/docker%3E') to get started with self-hosted Supabase.
+Firstly, follow the guide [here](https://supabase.com/docs/guides/hosting/docker) to get started with self-hosted Supabase.
 
 ```
 cd ..
