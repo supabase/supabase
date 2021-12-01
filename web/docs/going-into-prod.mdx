@@ -15,10 +15,9 @@ After developing your project, and deciding it's time to Go Live With Real Users
 - Ensure RLS is enabled
     - Tables that do not have RLS enabled with reasonable policies allow any client to access and modify their data. This is unlikely to be what you want in the majority of cases.
     - [Learn more about RLS](/docs/guides/auth/row-level-security)
-- Ensure replication is disabled for tables containing sensitive data:
-    - Today, Realtime does not respect RLS policies and any client with your anon key can listen to changes on tables where replication is enabled.
-    - Go to the Database > Replication page in the Supabase Dashboard to manage these settings
-    - We are launching [RLS for realtime](https://github.com/supabase/walrus) soon, but in the meantime you should only use it for tables containing public data (scoreboards, blog posts, etc.)
+- Enable replication on tables containing sensitive data by enabling Row Level Security (RLS) and setting row security policies:
+    - Go to the Authentication > Policies page in the Supabase Dashboard to enable RLS and create security policies
+    - Go to the Database > Replication page in the Supabase Dashboard to manage replication tables
 - Enable 2FA on Github
     - Since your Github account gives you administrative rights to your Supabase project, you should protect it with a strong password and 2FA using a U2F key or a TOTP app.
 - Ensure email confirmations are enabled in the Auth > Settings page

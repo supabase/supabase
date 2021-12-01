@@ -22,8 +22,6 @@
     "EXTERNAL_SLACK_ENABLED",
     "EXTERNAL_SPOTIFY_ENABLED",
     "EXTERNAL_SPOTIFY_ENABLED",
-    "SMTP_ADMIN_EMAIL",
-    "SMTP_MAX_FREQUENCY",
     "SMS_AUTOCONFIRM",
     "SMS_MAX_FREQUENCY",
     "SMS_OTP_EXP",
@@ -263,6 +261,14 @@
     "SMTP_SENDER_NAME": {
       "title": "SMTP Sender Name",
       "type": "string"
+    },
+    "RATE_LIMIT_EMAIL_SENT": {
+      "title": "Rate Limit",
+      "type": "number",
+      "help": "Maximum number of emails sent per hour (Default: 30, Max: 32,767)",
+      "minimum": 1,
+      "maximum": 32767,
+      "multipleof": 1
     },
     "MAILER_SECURE_EMAIL_CHANGE_ENABLED": {
       "title": "Double confirm email changes",

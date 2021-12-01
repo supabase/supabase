@@ -14,7 +14,6 @@
         "react": "^17.0.1",
         "react-dom": "^17.0.1",
         "react-scripts": "4.0.1",
-        "tailwindcss": "npm:@tailwindcss/postcss7-compat",
         "web-vitals": "^0.2.4"
     },
     "scripts": {

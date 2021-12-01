@@ -101,7 +101,7 @@ const AuthPolicies = observer(() => {
           <Button type="link">
             <a
               target="_blank"
-              href="https://supabase.io/docs/learn/auth-deep-dive/auth-row-level-security"
+              href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
             >
               What is RLS?
             </a>

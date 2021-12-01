@@ -39,7 +39,7 @@ const PageLayout = ({}) => {
           title="Storage"
           ctaButtonLabel="Create a new bucket"
           infoButtonLabel="About storage"
-          infoButtonUrl="https://supabase.io/docs/guides/storage"
+          infoButtonUrl="https://supabase.com/docs/guides/storage"
           onClickCta={openCreateBucketModal}
         >
           <Typography.Text type="secondary">
