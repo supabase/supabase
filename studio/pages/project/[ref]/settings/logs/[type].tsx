@@ -26,6 +26,7 @@ export const LogPage = () => {
   const [search, setSearch] = useState<string>('')
   const [queryParams, setQueryParams] = useState<string>('')
   const [where, setWhere] = useState<string>('')
+  const [mode, setMode] = useState<'simple' | 'custom'>('simple')
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
 
   const title = LOG_TYPE_LABEL_MAPPING[type as string]
@@ -53,7 +54,7 @@ export const LogPage = () => {
     }
     const qs = new URLSearchParams(params).toString()
     setQueryParams(qs)
-  }, [search, where])
+  }, [search, where, type])
 
   const countKey = `${API_URL}/projects/${ref}/logs?${queryParams}&count=true&period_start=${latestRefresh}`
   const { data: countData } = useSWR<{ data: [CountData] | []; error?: any }>(countKey, get, {
@@ -66,24 +67,39 @@ export const LogPage = () => {
     setLatestRefresh(new Date().toISOString())
     mutate()
   }
+  const handleModeToggle = () => {
+    if (mode === 'simple') {
+      setMode('custom')
+      setSearch('')
+    } else {
+      setMode('simple')
+    }
+  }
   return (
     <SettingsLayout title={title} className="p-4 space-y-4">
-      <LogPanel isLoading={isLoading} onRefresh={handleRefresh} onSearch={debouncedSearch} />
-      <div className="h-24">
-        <CodeEditor
-          className="p-4"
-          hideLineNumbers
-          id={'logs-where-editor'}
-          language="pgsql"
-          defaultValue={where}
-          onInputChange={(v) => debouncedWhere(v || '')}
-          onInputRun={handleRefresh}
-        />
-      </div>
+      <LogPanel
+        presets={[
+          { label: "Recent - All", onClick: () => setSearch('') },
+          { label: "Recent - Errors", onClick: () => setSearch('[Ee]rror|\\s[45][0-9][0-9]\\s') },
+        ]}
+        searchValue={search}
+        onCustomClick={handleModeToggle} isLoading={isLoading} onRefresh={handleRefresh} onSearch={debouncedSearch} />
+      {mode === 'custom' &&
+        <div>
+          <CodeEditor
+            className="p-4 h-24"
+            hideLineNumbers
+            id={'logs-where-editor'}
+            language="pgsql"
+            defaultValue={where}
+            onInputChange={(v) => debouncedWhere(v || '')}
+            onInputRun={handleRefresh}
+          />
+        </div>}
       {error && (
         <Typography.Text className="text-center w-full block">Could not fetch data</Typography.Text>
       )}
-      {newCount && newCount > 0 && <Button onClick={handleRefresh}>Load new logs</Button>}
+      {newCount ?  <Button type="dashed" onClick={handleRefresh} block>Load new logs</Button> : null}
       <LogTable data={logData} />
     </SettingsLayout>
   )
