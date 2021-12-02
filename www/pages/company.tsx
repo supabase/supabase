@@ -31,11 +31,11 @@ import { NextSeo } from 'next-seo'
 type Props = {}
 
 const Index = ({}: Props) => {
-
   const router = useRouter()
 
-  const meta_title = 'One of the world\'s fastest-growing open source communities | Supabase'
-  const meta_description = 'Supabase is the community that builds the infrastructure for your applications. Build using Supabase for any size project—from a new startup to even large growing companies'
+  const meta_title = "One of the world's fastest-growing open source communities | Supabase"
+  const meta_description =
+    'Supabase is the community that builds the infrastructure for your applications. Build using Supabase for any size project—from a new startup to even large growing companies'
 
   return (
     <>

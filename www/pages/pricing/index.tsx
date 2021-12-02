@@ -15,11 +15,11 @@ import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 
 export default function IndexPage() {
-
   const router = useRouter()
 
   const meta_title = 'Pricing & fees | Supabase'
-  const meta_description = 'Explore Supabase fees and pricing information. Find our competitive pricing tiers, with no hidden pricing. We have generous free tiers for those getting started, and Pay As You Go for those scaling up.'
+  const meta_description =
+    'Explore Supabase fees and pricing information. Find our competitive pricing tiers, with no hidden pricing. We have generous free tiers for those getting started, and Pay As You Go for those scaling up.'
 
   return (
     <DefaultLayout>
