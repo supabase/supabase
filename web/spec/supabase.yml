@@ -572,7 +572,7 @@ pages:
     title: 'user()'
     $ref: '@supabase/gotrue-js.GoTrueClient.user'
     notes: |
-      This method gets the user object stored in local storage.
+      This method gets the user object from memory.
     examples:
       - name: Get the logged in user
         isSpotlight: true
