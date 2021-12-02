@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Button, Dropdown, IconChevronDown } from '@supabase/ui'
 import dayjs from 'dayjs'
 import { DATE_FORMAT } from 'lib/constants'
@@ -11,7 +11,13 @@ import { DATE_FORMAT } from 'lib/constants'
  * Otherwise there won't be any data shown on the graphs
  */
 
-function DateRangePicker({ onChange, value, options, loading, currentBillingPeriodStart }) {
+const DateRangePicker: FC<any> = ({
+  onChange,
+  value,
+  options,
+  loading,
+  currentBillingPeriodStart,
+}) => {
   const [timePeriod, setTimePeriod] = useState(value)
 
   useEffect(() => {
@@ -23,7 +29,7 @@ function DateRangePicker({ onChange, value, options, loading, currentBillingPeri
 
   const today = dayjs().format(DATE_FORMAT)
 
-  function handleChange(x) {
+  function handleChange(x: any) {
     setTimePeriod(x)
 
     switch (x) {
@@ -164,7 +170,7 @@ function DateRangePicker({ onChange, value, options, loading, currentBillingPeri
         overlay={
           <>
             <Dropdown.RadioGroup value={timePeriod} onChange={(x) => handleChange(x)}>
-              {options.map((option) => {
+              {options.map((option: any) => {
                 return (
                   <Dropdown.Radio value={option.key} key={option.key}>
                     {option.label}
@@ -176,7 +182,7 @@ function DateRangePicker({ onChange, value, options, loading, currentBillingPeri
         }
       >
         <Button as="span" type="default" iconRight={<IconChevronDown />}>
-          {timePeriod && options.find((x) => x.key == timePeriod).label}
+          {timePeriod && options.find((x: any) => x.key == timePeriod).label}
         </Button>
       </Dropdown>
     </>

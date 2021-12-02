@@ -1,4 +1,5 @@
 import useSWR from 'swr'
+import { FC } from 'react'
 import { useRouter } from 'next/router'
 import { get } from 'lib/common/fetch'
 import { IconAlertCircle, Input, Loading, Typography } from '@supabase/ui'
@@ -8,11 +9,11 @@ import Panel from './Panel'
 
 const { Text, Title } = Typography
 
-export function DisplayApiSettings() {
+export const DisplayApiSettings = () => {
   const router = useRouter()
   const { ref } = router.query
 
-  const { data, error } = useSWR(`${API_URL}/props/project/${ref}/settings`, get)
+  const { data, error }: any = useSWR(`${API_URL}/props/project/${ref}/settings`, get)
 
   if (!data)
     return (
@@ -27,6 +28,7 @@ export function DisplayApiSettings() {
             </div>
           ) : (
             <div className="py-4">
+              {/* @ts-ignore */}
               <Loading active={true} />
             </div>
           )}
@@ -38,15 +40,16 @@ export function DisplayApiSettings() {
 
   // Get the API service
   const API_SERVICE_ID = 1
-  let apiService = services.find((x) => x.app.id == API_SERVICE_ID)
+  let apiService = services.find((x: any) => x.app.id == API_SERVICE_ID)
   let apiKeys = apiService.service_api_keys
 
   return (
     <ApiContentWrapper>
       {!data ? (
+        // @ts-ignore
         <Loading active={true} />
       ) : (
-        apiKeys.map((x, i) => (
+        apiKeys.map((x: any, i: number) => (
           <Panel.Content
             key={x.api_key}
             className={
@@ -56,9 +59,10 @@ export function DisplayApiSettings() {
           >
             <Input
               layout="horizontal"
+              // @ts-ignore
               label={
                 <>
-                  {x.tags?.split(',').map((x, i) => (
+                  {x.tags?.split(',').map((x: any, i: number) => (
                     <code key={`${x}${i}`} className="text-xs bg-gray-500 text-white px-2">
                       {x}
                     </code>
@@ -91,11 +95,11 @@ export function DisplayApiSettings() {
   )
 }
 
-export function DisplayConfigSettings() {
+export const DisplayConfigSettings = () => {
   const router = useRouter()
   const { ref } = router.query
 
-  const { data, error } = useSWR(`${API_URL}/props/project/${ref}/settings`, get)
+  const { data, error }: any = useSWR(`${API_URL}/props/project/${ref}/settings`, get)
 
   if (!data)
     return (
@@ -112,6 +116,7 @@ export function DisplayConfigSettings() {
             </div>
           ) : (
             <div className="py-4">
+              {/* @ts-ignore */}
               <Loading active={true} />
             </div>
           )}
@@ -124,14 +129,14 @@ export function DisplayConfigSettings() {
   // Get the API service
   const API_SERVICE_ID = 1
   let jwtSecret = project.jwt_secret ?? ''
-  let apiService = services.find((x) => x.app.id == API_SERVICE_ID)
+  let apiService = services.find((x: any) => x.app.id == API_SERVICE_ID)
   let apiConfig = apiService.app_config
 
   return (
     <section>
       <Panel
         title={
-          <Typography.Title level={6} className="mb-0">
+          <Typography.Title level={5} className="mb-0">
             Project Configuration
           </Typography.Title>
         }
@@ -141,9 +146,7 @@ export function DisplayConfigSettings() {
             label="URL"
             readOnly
             copy
-            readOnly
             disabled
-            copy
             className="input-mono"
             value={`https://${apiConfig.endpoint}`}
             descriptionText="A RESTful endpoint for querying and managing your database."
@@ -168,7 +171,7 @@ export function DisplayConfigSettings() {
   )
 }
 
-const ApiContentWrapper = ({ children }) => {
+const ApiContentWrapper: FC<any> = ({ children }) => {
   return (
     <Panel
       title={
@@ -187,7 +190,7 @@ const ApiContentWrapper = ({ children }) => {
   )
 }
 
-const ConfigContentWrapper = ({ children }) => {
+const ConfigContentWrapper: FC<any> = ({ children }) => {
   return (
     <Panel
       title={

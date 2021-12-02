@@ -1,8 +1,6 @@
-import * as React from 'react'
-
 import { Typography, IconAlertCircle } from '@supabase/ui'
 
-export default function AlphaPreview() {
+const AlphaPreview = () => {
   return (
     <div className="block w-full bg-yellow-500 bg-opacity-5 p-3 border border-yellow-500 border-opacity-50 rounded">
       <div className="flex space-x-3">
@@ -21,3 +19,5 @@ export default function AlphaPreview() {
     </div>
   )
 }
+
+export default AlphaPreview
