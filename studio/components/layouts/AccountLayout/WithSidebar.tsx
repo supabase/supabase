@@ -1,25 +1,22 @@
 import Link from 'next/link'
-// import IconSidebar from 'components/Layouts/IconSidebar'
+import { CSSProperties, FC, ReactNode } from 'react'
 import { Menu, Typography, IconArrowUpRight, Badge } from '@supabase/ui'
-import LayoutHeader from './ProjectLayout/LayoutHeader'
+import LayoutHeader from '../ProjectLayout/LayoutHeader'
 
-/**
- * layout for all pages under /project/ route
- *
- * @param {String}                      title
- * @param {JSX.Element|JSX.Element[]}   header
- * @param {JSX.Element|JSX.Element[]}   children
- * @param {CSSProperties}               sidebarStyle
- * @param {Array<Object>}               icons                     1st level group links
- * @param {Array<Object>}               links                     2nd level links related to group link
- * @param {Array<Object>}               subitems                  subitems link to different sections on the same page
- * @param {Number}                      subitemsParentKey         index of subitems parent link
- * @param {boolean}                     hideIconSidebar           Hides the left-most icon bar
- * @param {JSX.Element|JSX.Element[]}   customSidebarContent      For injecting custom JSX into the sidebar
- * @param {string}                      projectRef                Project ref string used in url
- */
+interface Props {
+  title: string
+  breadcrumbs: any[]
+  links: any[]
+  header?: ReactNode
+  subitems?: any[]
+  subitemsParentKey?: number
+  sidebarStyle?: CSSProperties
+  hideSidebar?: boolean
+  customSidebarContent?: ReactNode
+  children: ReactNode
+}
 
-const WithSidebar = ({
+const WithSidebar: FC<Props> = ({
   title,
   header,
   breadcrumbs = [],
@@ -28,18 +25,14 @@ const WithSidebar = ({
   links,
   subitems,
   subitemsParentKey,
-  icons = [],
-  hideIconSidebar = false,
   hideSidebar = false,
   customSidebarContent,
-  projectRef,
 }) => {
   const noContent = !links && !customSidebarContent
   const linksHaveHeaders = links && links[0].heading
 
   return (
     <div className={`flex `}>
-      {/* {!hideIconSidebar && <IconSidebar links={icons} projectRef={projectRef} key="IconSidebar" />} */}
       {!hideSidebar && !noContent && (
         <div
           id="with-sidebar"
@@ -89,8 +82,8 @@ const WithSidebar = ({
 }
 export default WithSidebar
 
-const LinksWithHeaders = ({ links, subitems, subitemsParentKey }) => {
-  return links.map((x) => (
+const LinksWithHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
+  return links.map((x: any) => (
     <div key={x.heading} className="py-5 border-b dark:border-dark px-3">
       <Menu.Group title={x.heading} />
       {x.versionLabel && (
@@ -108,13 +101,14 @@ const LinksWithHeaders = ({ links, subitems, subitemsParentKey }) => {
     </div>
   ))
 }
-const LinksWithoutHeaders = ({ links, subitems, subitemsParentKey }) => {
+const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
   return (
     <ul className="dash-product-menu space-y-1">
-      {links.map((x, i) => {
+      {links.map((x: any, i: number) => {
         // disable active state for link with subitems
         const isActive = x.isActive && !subitems
-        let render = (
+
+        let render: any = (
           <SidebarItem
             key={`${x.key || x.as}-${i}-sidebarItem`}
             id={`${x.key || x.as}-${i}`}
@@ -127,8 +121,9 @@ const LinksWithoutHeaders = ({ links, subitems, subitemsParentKey }) => {
             external={x.external || false}
           />
         )
+
         if (subitems && x.subitemsKey === subitemsParentKey) {
-          const subItemsRender = subitems.map((y, i) => (
+          const subItemsRender = subitems.map((y: any, i: number) => (
             <SidebarItem
               key={`${y.key || y.as}-${i}-sidebarItem`}
               id={`${y.key || y.as}-${i}`}
@@ -141,24 +136,24 @@ const LinksWithoutHeaders = ({ links, subitems, subitemsParentKey }) => {
           ))
           render = [render, ...subItemsRender]
         }
+
         return render
       })}
     </ul>
   )
 }
 
-const SidebarItem = ({ id, label, as, href, slug, isActive, isSubitem, onClick, external }) => {
+const SidebarItem: FC<any> = ({ id, label, as, href, isActive, isSubitem, onClick, external }) => {
   return (
     <Link href={href || ''} as={as || ''}>
       <a className="block" target={external ? '_blank' : '_self'}>
         <Menu.Item
           rounded
+          key={id}
           style={{
             marginLeft: isSubitem && '.5rem',
           }}
           active={isActive ? true : false}
-          key={id}
-          id={slug}
           onClick={onClick || (() => {})}
           icon={external && <IconArrowUpRight size={'tiny'} />}
         >

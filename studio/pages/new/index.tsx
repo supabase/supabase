@@ -7,7 +7,7 @@ import Router from 'next/router'
 import { API_URL } from 'lib/constants'
 import { useStore, withAuth } from 'hooks'
 import { post } from 'lib/common/fetch'
-import WizardLayout from 'components/layouts/WizardLayout'
+import { WizardLayout } from 'components/layouts'
 import FormField from 'components/to-be-cleaned/forms/FormField'
 import Panel from 'components/to-be-cleaned/Panel'
 

@@ -1,7 +1,7 @@
 import { Loading } from '@supabase/ui'
 import React from 'react'
 
-function Panel(props) {
+function Panel(props: any) {
   let headerClasses = []
 
   if (!props.hideHeaderStyling) {
@@ -25,7 +25,7 @@ function Panel(props) {
         rounded mb-8 ${props.className}`}
       >
         {props.title && (
-          <div className={headerClasses}>
+          <div className={headerClasses.join(' ')}>
             <div className="px-6 py-4 flex items-center">{props.title}</div>
           </div>
         )}
@@ -44,7 +44,7 @@ function Panel(props) {
   )
 }
 
-function Content(props) {
+function Content(props: any) {
   let classes = ['px-6 py-4']
   if (props.className) classes.push(props.className)
   return <div className={classes.join(' ')}>{props.children}</div>

@@ -29,7 +29,7 @@
 					},
 					"children": [
 						{
-							"id": 307,
+							"id": 311,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -41,7 +41,7 @@
 							},
 							"signatures": [
 								{
-									"id": 310,
+									"id": 314,
 									"name": "new SupabaseClient",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -53,7 +53,7 @@
 									},
 									"parameters": [
 										{
-											"id": 311,
+											"id": 315,
 											"name": "supabaseUrl",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -69,7 +69,7 @@
 											}
 										},
 										{
-											"id": 312,
+											"id": 316,
 											"name": "supabaseKey",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -85,7 +85,7 @@
 											}
 										},
 										{
-											"id": 313,
+											"id": 317,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -110,8 +110,8 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 35,
-									"character": 25
+									"line": 38,
+									"character": 3
 								}
 							]
 						},
@@ -181,6 +181,72 @@
 								"type": "reference",
 								"id": 37,
 								"name": "Fetch"
+							}
+						},
+						{
+							"id": 307,
+							"name": "headers",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true,
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "src/SupabaseClient.ts",
+									"line": 36,
+									"character": 19
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 308,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {
+										"isExported": true
+									},
+									"indexSignature": [
+										{
+											"id": 309,
+											"name": "__index",
+											"kind": 8192,
+											"kindString": "Index signature",
+											"flags": {
+												"isExported": true
+											},
+											"parameters": [
+												{
+													"id": 310,
+													"name": "key",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {
+														"isExported": true
+													},
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											],
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "src/SupabaseClient.ts",
+											"line": 36,
+											"character": 20
+										}
+									]
+								}
 							}
 						},
 						{
@@ -289,7 +355,7 @@
 							}
 						},
 						{
-							"id": 309,
+							"id": 313,
 							"name": "supabaseKey",
 							"kind": 1024,
 							"kindString": "Property",
@@ -304,7 +370,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 51,
+									"line": 54,
 									"character": 25
 								}
 							],
@@ -314,7 +380,7 @@
 							}
 						},
 						{
-							"id": 308,
+							"id": 312,
 							"name": "supabaseUrl",
 							"kind": 1024,
 							"kindString": "Property",
@@ -329,7 +395,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 50,
+									"line": 53,
 									"character": 25
 								}
 							],
@@ -339,7 +405,7 @@
 							}
 						},
 						{
-							"id": 314,
+							"id": 318,
 							"name": "storage",
 							"kind": 262144,
 							"kindString": "Accessor",
@@ -351,7 +417,7 @@
 							},
 							"getSignature": [
 								{
-									"id": 315,
+									"id": 319,
 									"name": "__get",
 									"kind": 524288,
 									"kindString": "Get signature",
@@ -370,13 +436,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 80,
+									"line": 83,
 									"character": 13
 								}
 							]
 						},
 						{
-							"id": 359,
+							"id": 364,
 							"name": "_closeChannel",
 							"kind": 2048,
 							"kindString": "Method",
@@ -386,7 +452,7 @@
 							},
 							"signatures": [
 								{
-									"id": 360,
+									"id": 365,
 									"name": "_closeChannel",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -395,7 +461,7 @@
 									},
 									"parameters": [
 										{
-											"id": 361,
+											"id": 366,
 											"name": "subscription",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -423,13 +489,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 201,
+									"line": 205,
 									"character": 23
 								}
 							]
 						},
 						{
-							"id": 332,
+							"id": 336,
 							"name": "_closeSubscription",
 							"kind": 2048,
 							"kindString": "Method",
@@ -439,7 +505,7 @@
 							},
 							"signatures": [
 								{
-									"id": 333,
+									"id": 337,
 									"name": "_closeSubscription",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -448,7 +514,7 @@
 									},
 									"parameters": [
 										{
-											"id": 334,
+											"id": 338,
 											"name": "subscription",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -476,13 +542,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 143,
+									"line": 146,
 									"character": 34
 								}
 							]
 						},
 						{
-							"id": 354,
+							"id": 359,
 							"name": "_getAuthHeaders",
 							"kind": 2048,
 							"kindString": "Method",
@@ -492,7 +558,7 @@
 							},
 							"signatures": [
 								{
-									"id": 355,
+									"id": 360,
 									"name": "_getAuthHeaders",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -502,7 +568,7 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 356,
+											"id": 361,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -511,7 +577,7 @@
 											},
 											"indexSignature": [
 												{
-													"id": 357,
+													"id": 362,
 													"name": "__index",
 													"kind": 8192,
 													"kindString": "Index signature",
@@ -520,7 +586,7 @@
 													},
 													"parameters": [
 														{
-															"id": 358,
+															"id": 363,
 															"name": "key",
 															"kind": 32768,
 															"kindString": "Parameter",
@@ -542,7 +608,7 @@
 											"sources": [
 												{
 													"fileName": "src/SupabaseClient.ts",
-													"line": 193,
+													"line": 197,
 													"character": 28
 												}
 											]
@@ -553,13 +619,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 193,
+									"line": 197,
 									"character": 25
 								}
 							]
 						},
 						{
-							"id": 352,
+							"id": 357,
 							"name": "_initPostgRESTClient",
 							"kind": 2048,
 							"kindString": "Method",
@@ -569,7 +635,7 @@
 							},
 							"signatures": [
 								{
-									"id": 353,
+									"id": 358,
 									"name": "_initPostgRESTClient",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -585,13 +651,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 185,
+									"line": 189,
 									"character": 30
 								}
 							]
 						},
 						{
-							"id": 349,
+							"id": 354,
 							"name": "_initRealtimeClient",
 							"kind": 2048,
 							"kindString": "Method",
@@ -601,7 +667,7 @@
 							},
 							"signatures": [
 								{
-									"id": 350,
+									"id": 355,
 									"name": "_initRealtimeClient",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -610,7 +676,7 @@
 									},
 									"parameters": [
 										{
-											"id": 351,
+											"id": 356,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -633,13 +699,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 178,
+									"line": 182,
 									"character": 29
 								}
 							]
 						},
 						{
-							"id": 337,
+							"id": 341,
 							"name": "_initSupabaseAuthClient",
 							"kind": 2048,
 							"kindString": "Method",
@@ -649,7 +715,7 @@
 							},
 							"signatures": [
 								{
-									"id": 338,
+									"id": 342,
 									"name": "_initSupabaseAuthClient",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -658,7 +724,7 @@
 									},
 									"parameters": [
 										{
-											"id": 339,
+											"id": 343,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -669,7 +735,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 340,
+													"id": 344,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -678,7 +744,7 @@
 													},
 													"children": [
 														{
-															"id": 341,
+															"id": 345,
 															"name": "autoRefreshToken",
 															"kind": 32,
 															"kindString": "Variable",
@@ -688,7 +754,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 157,
+																	"line": 160,
 																	"character": 20
 																}
 															],
@@ -711,7 +777,7 @@
 															}
 														},
 														{
-															"id": 343,
+															"id": 347,
 															"name": "detectSessionInUrl",
 															"kind": 32,
 															"kindString": "Variable",
@@ -721,7 +787,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 159,
+																	"line": 162,
 																	"character": 22
 																}
 															],
@@ -744,7 +810,37 @@
 															}
 														},
 														{
-															"id": 345,
+															"id": 353,
+															"name": "fetch",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true
+															},
+															"sources": [
+																{
+																	"fileName": "src/SupabaseClient.ts",
+																	"line": 165,
+																	"character": 9
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "reference",
+																		"id": 220,
+																		"name": "fetch"
+																	}
+																]
+															}
+														},
+														{
+															"id": 349,
 															"name": "headers",
 															"kind": 32,
 															"kindString": "Variable",
@@ -754,7 +850,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 161,
+																	"line": 164,
 																	"character": 11
 																}
 															],
@@ -768,7 +864,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 346,
+																			"id": 350,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -777,7 +873,7 @@
 																			},
 																			"indexSignature": [
 																				{
-																					"id": 347,
+																					"id": 351,
 																					"name": "__index",
 																					"kind": 8192,
 																					"kindString": "Index signature",
@@ -786,7 +882,7 @@
 																					},
 																					"parameters": [
 																						{
-																							"id": 348,
+																							"id": 352,
 																							"name": "key",
 																							"kind": 32768,
 																							"kindString": "Parameter",
@@ -811,7 +907,7 @@
 															}
 														},
 														{
-															"id": 344,
+															"id": 348,
 															"name": "localStorage",
 															"kind": 32,
 															"kindString": "Variable",
@@ -821,7 +917,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 160,
+																	"line": 163,
 																	"character": 16
 																}
 															],
@@ -869,7 +965,7 @@
 															}
 														},
 														{
-															"id": 342,
+															"id": 346,
 															"name": "persistSession",
 															"kind": 32,
 															"kindString": "Variable",
@@ -879,7 +975,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 158,
+																	"line": 161,
 																	"character": 18
 																}
 															],
@@ -907,18 +1003,19 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																341,
-																343,
 																345,
-																344,
-																342
+																347,
+																353,
+																349,
+																348,
+																346
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "src/SupabaseClient.ts",
-															"line": 156,
+															"line": 159,
 															"character": 34
 														}
 													]
@@ -936,13 +1033,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 156,
+									"line": 159,
 									"character": 33
 								}
 							]
 						},
 						{
-							"id": 316,
+							"id": 320,
 							"name": "from",
 							"kind": 2048,
 							"kindString": "Method",
@@ -951,7 +1048,7 @@
 							},
 							"signatures": [
 								{
-									"id": 317,
+									"id": 321,
 									"name": "from",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -963,7 +1060,7 @@
 									},
 									"typeParameter": [
 										{
-											"id": 318,
+											"id": 322,
 											"name": "T",
 											"kind": 131072,
 											"kindString": "Type parameter",
@@ -974,7 +1071,7 @@
 									],
 									"parameters": [
 										{
-											"id": 319,
+											"id": 323,
 											"name": "table",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1010,13 +1107,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 89,
+									"line": 92,
 									"character": 6
 								}
 							]
 						},
 						{
-							"id": 335,
+							"id": 339,
 							"name": "getSubscriptions",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1025,7 +1122,7 @@
 							},
 							"signatures": [
 								{
-									"id": 336,
+									"id": 340,
 									"name": "getSubscriptions",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1047,13 +1144,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 152,
+									"line": 155,
 									"character": 18
 								}
 							]
 						},
 						{
-							"id": 329,
+							"id": 333,
 							"name": "removeSubscription",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1062,7 +1159,7 @@
 							},
 							"signatures": [
 								{
-									"id": 330,
+									"id": 334,
 									"name": "removeSubscription",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1074,7 +1171,7 @@
 									},
 									"parameters": [
 										{
-											"id": 331,
+											"id": 335,
 											"name": "subscription",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1105,13 +1202,13 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 126,
+									"line": 129,
 									"character": 20
 								}
 							]
 						},
 						{
-							"id": 320,
+							"id": 324,
 							"name": "rpc",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1120,7 +1217,7 @@
 							},
 							"signatures": [
 								{
-									"id": 321,
+									"id": 325,
 									"name": "rpc",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1132,7 +1229,7 @@
 									},
 									"typeParameter": [
 										{
-											"id": 322,
+											"id": 326,
 											"name": "T",
 											"kind": 131072,
 											"kindString": "Type parameter",
@@ -1143,7 +1240,7 @@
 									],
 									"parameters": [
 										{
-											"id": 323,
+											"id": 327,
 											"name": "fn",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1159,7 +1256,7 @@
 											}
 										},
 										{
-											"id": 324,
+											"id": 328,
 											"name": "params",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1185,7 +1282,7 @@
 											}
 										},
 										{
-											"id": 325,
+											"id": 329,
 											"name": "__namedParameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1196,7 +1293,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 326,
+													"id": 330,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -1205,7 +1302,7 @@
 													},
 													"children": [
 														{
-															"id": 328,
+															"id": 332,
 															"name": "count",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1218,7 +1315,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 114,
+																	"line": 117,
 																	"character": 11
 																}
 															],
@@ -1246,7 +1343,7 @@
 															"defaultValue": "null"
 														},
 														{
-															"id": 327,
+															"id": 331,
 															"name": "head",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1259,7 +1356,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 113,
+																	"line": 116,
 																	"character": 10
 																}
 															],
@@ -1275,15 +1372,15 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																328,
-																327
+																332,
+																331
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "src/SupabaseClient.ts",
-															"line": 111,
+															"line": 114,
 															"character": 20
 														}
 													]
@@ -1307,7 +1404,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 109,
+									"line": 112,
 									"character": 5
 								}
 							]
@@ -1318,7 +1415,7 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								307
+								311
 							]
 						},
 						{
@@ -1328,36 +1425,37 @@
 								299,
 								303,
 								306,
+								307,
 								305,
 								302,
 								301,
 								300,
 								304,
-								309,
-								308
+								313,
+								312
 							]
 						},
 						{
 							"title": "Accessors",
 							"kind": 262144,
 							"children": [
-								314
+								318
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
+								364,
+								336,
 								359,
-								332,
+								357,
 								354,
-								352,
-								349,
-								337,
-								316,
-								335,
-								329,
-								320
+								341,
+								320,
+								339,
+								333,
+								324
 							]
 						}
 					],
@@ -1370,7 +1468,7 @@
 					]
 				},
 				{
-					"id": 362,
+					"id": 367,
 					"name": "DEFAULT_OPTIONS",
 					"kind": 2097152,
 					"kindString": "Object literal",
@@ -1379,7 +1477,7 @@
 					},
 					"children": [
 						{
-							"id": 364,
+							"id": 369,
 							"name": "autoRefreshToken",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1398,7 +1496,7 @@
 							"defaultValue": "true"
 						},
 						{
-							"id": 366,
+							"id": 371,
 							"name": "detectSessionInUrl",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1417,7 +1515,7 @@
 							"defaultValue": "true"
 						},
 						{
-							"id": 367,
+							"id": 372,
 							"name": "headers",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1432,14 +1530,14 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 368,
+									"id": 373,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"children": [
 										{
-											"id": 369,
+											"id": 374,
 											"name": "X-Client-Info",
 											"kind": 32,
 											"kindString": "Variable",
@@ -1463,7 +1561,7 @@
 											"title": "Variables",
 											"kind": 32,
 											"children": [
-												369
+												374
 											]
 										}
 									]
@@ -1472,7 +1570,7 @@
 							"defaultValue": "DEFAULT_HEADERS"
 						},
 						{
-							"id": 365,
+							"id": 370,
 							"name": "persistSession",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1491,7 +1589,7 @@
 							"defaultValue": "true"
 						},
 						{
-							"id": 363,
+							"id": 368,
 							"name": "schema",
 							"kind": 32,
 							"kindString": "Variable",
@@ -1515,11 +1613,11 @@
 							"title": "Variables",
 							"kind": 32,
 							"children": [
-								364,
-								366,
-								367,
-								365,
-								363
+								369,
+								371,
+								372,
+								370,
+								368
 							]
 						}
 					],
@@ -1548,7 +1646,7 @@
 					"title": "Object literals",
 					"kind": 2097152,
 					"children": [
-						362
+						367
 					]
 				}
 			],
@@ -1561,7 +1659,7 @@
 			]
 		},
 		{
-			"id": 370,
+			"id": 375,
 			"name": "\"index\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -1571,7 +1669,7 @@
 			"originalName": "/home/runner/work/supabase-js/supabase-js/src/index.ts",
 			"children": [
 				{
-					"id": 371,
+					"id": 376,
 					"name": "createClient",
 					"kind": 64,
 					"kindString": "Function",
@@ -1584,7 +1682,7 @@
 					},
 					"signatures": [
 						{
-							"id": 372,
+							"id": 377,
 							"name": "createClient",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -1596,7 +1694,7 @@
 							},
 							"parameters": [
 								{
-									"id": 373,
+									"id": 378,
 									"name": "supabaseUrl",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1609,7 +1707,7 @@
 									}
 								},
 								{
-									"id": 374,
+									"id": 379,
 									"name": "supabaseKey",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1622,7 +1720,7 @@
 									}
 								},
 								{
-									"id": 375,
+									"id": 380,
 									"name": "options",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1658,7 +1756,7 @@
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						371
+						376
 					]
 				}
 			],
@@ -9271,7 +9369,7 @@
 			"kind": 1,
 			"children": [
 				297,
-				370,
+				375,
 				62,
 				203,
 				173,

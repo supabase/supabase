@@ -1,4 +1,4 @@
-import React from 'react'
+import { FC } from 'react'
 
 /**
  * Render keyMap
@@ -6,18 +6,18 @@ import React from 'react'
  * @param {String} keyMap       ex: Command+Enter ; separate key using +
  */
 
-const customKeyChars = {
+const customKeyChars: any = {
   command: '⌘',
   control: '⌃',
   option: '⌥',
   enter: '↵',
 }
 
-export default function KeyMap({ keyMap }) {
+const KeyMap: FC<any> = ({ keyMap }) => {
   if (!keyMap) return null
 
   const keys = keyMap.split('+')
-  const keymapRender = keys.map((key) => {
+  const keymapRender = keys.map((key: any) => {
     let keyChar = key
     if (key.toLowerCase() in customKeyChars) keyChar = customKeyChars[key.toLowerCase()]
     return (
@@ -28,3 +28,5 @@ export default function KeyMap({ keyMap }) {
   })
   return <p className="inline-flex space-x-1.5">{keymapRender}</p>
 }
+
+export default KeyMap
