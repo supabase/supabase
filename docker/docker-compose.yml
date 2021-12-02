@@ -87,7 +87,7 @@ services:
 
   realtime:
     container_name: supabase-realtime
-    image: supabase/realtime:v0.15.0
+    image: supabase/realtime:v0.19.0
     depends_on:
       - db
     restart: unless-stopped
@@ -97,10 +97,17 @@ services:
       DB_NAME: postgres
       DB_USER: postgres
       DB_PASSWORD: ${POSTGRES_PASSWORD}
-      SLOT_NAME: supabase_realtime
+      DB_SSL: "false"
       PORT: 4000
-      SECURE_CHANNELS: "true"
       JWT_SECRET: ${JWT_SECRET}
+      REPLICATION_MODE: RLS
+      REPLICATION_POLL_INTERVAL: 100
+      SECURE_CHANNELS: "true"
+      SLOT_NAME: supabase_realtime_rls
+      TEMPORARY_SLOT: "true"
+    command: >
+      bash -c "./prod/rel/realtime/bin/realtime eval Realtime.Release.migrate
+      && ./prod/rel/realtime/bin/realtime start"
 
   storage:
     container_name: supabase-storage
