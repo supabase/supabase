@@ -37,7 +37,9 @@ Project settings are managed outside of the Dashboard. If you use docker-compose
   - [MildTomato](https://github.com/mildtomato), [phamhieu](https://github.com/phamhieu), [joshenlim](https://github.com/joshenlim)
 
 ### Developer Quickstart
+
 ```bash
+# You'll need to be on Node v14
 # in /studio
 
 npm i # install deps
