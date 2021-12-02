@@ -25,7 +25,7 @@ import {
 import { API_URL } from 'lib/constants'
 import { useOrganizationDetail, useStore, withAuth } from 'hooks'
 import { post, delete_ } from 'lib/common/fetch'
-import AccountLayout from 'components/layouts/AccountLayout'
+import { AccountLayout } from 'components/layouts'
 import { BillingSettings, InvoicesSettings } from 'components/interfaces/Organization'
 
 import Table from 'components/to-be-cleaned/Table'
