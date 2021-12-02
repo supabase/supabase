@@ -35,7 +35,6 @@ import { NextSeo } from 'next-seo'
 type Props = {}
 
 const Index = ({}: Props) => {
-
   const router = useRouter()
 
   const meta_title = 'Help & Support | Supabase'
