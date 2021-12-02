@@ -154,7 +154,10 @@ test("where clause will trigger a log refresh", async () => {
     return { data: [] }
   })
   const { container } = render(<LogPage />)
-  const editor = container.querySelector('.monaco-editor');
+  let editor = container.querySelector('.monaco-editor');
+  expect(editor).toBeFalsy()
+  userEvent.click(screen.getAllByText("Custom Query"))
+  editor = container.querySelector('.monaco-editor');
   userEvent.type(editor, "metadata.field = something")
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining("where"))
