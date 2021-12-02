@@ -75,21 +75,45 @@ Since that first tweet in May 2020, our platform has generated billions of log e
 
 ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/e8405948-f213-4a2f-87af-9a2e795e9508/Untitled.png)
 
-## **Why is Logflare joining Supabase?**
+## Why is Logflare joining Supabase?
 
-Chase quote:
-
-> I really like how Supabase is taking an existing, proven, piece of technology and making it more accessible for more users. A lot of people already use Postgres, but they don't take advantage of powerful features built into the database. Supabase is exposing these features more prominently, making them more accessible to more developers with technology, and educating people on how to leverage these features for a better experience for end users.
-
-> With Logflare, we've been trying to do this exact thing for analytics oriented databases. We've started with BigQuery. Logflare makes it easier to stream inserts with by automatically adapting the underlying schema for you. We make it easier to inspect and query your stream. And with Logflare Endpoints we're starting to make it easier to operationalize analytics by allowing people to build APIs from SQL statements. With Endpoints developers can enhance user facing applications without setting up traditionally tedious and brittle data pipelines. We've started with BigQuery but will soon be supporting other backends optimized for various analytics use cases.
-
-Read more on the Logflare blog post.
+<Quote img="aaron-epsilon3.png" caption="Chase Granberry, Founder of Logflare.">
+  <p>
+    I really like how Supabase is taking an existing, proven, piece of technology and making it more
+    accessible for more users. A lot of people already use Postgres, but they don't take advantage
+    of powerful features built into the database. Supabase is exposing these features more
+    prominently, making them more accessible to more developers with technology, and educating
+    people on how to leverage these features for a better experience for end users.
+  </p>
+  <p>
+    With Logflare, we've been trying to do this exact thing for analytics oriented databases. We've
+    started with BigQuery. Logflare makes it easier to stream inserts with by automatically adapting
+    the underlying schema for you. We make it easier to inspect and query your stream. And with
+    Logflare Endpoints we're starting to make it easier to operationalize analytics by allowing
+    people to build APIs from SQL statements. With Endpoints developers can enhance user facing
+    applications without setting up traditionally tedious and brittle data pipelines. We've started
+    with BigQuery but will soon be supporting other backends optimized for various analytics use
+    cases.
+  </p>
+</Quote>
 
 ## Supabase + Logs
 
 We still have a lot of technical work to integrate Logflare into Supabase, with plans of fully supporting the existing Vercel and Cloudflare integrations.
 
 In the past 10 days we've been working on a few of the new Dashboard features, which you can see in the sneak-peek here.
+
+<iframe
+  className="w-full video-with-border"
+  width="640"
+  height="385"
+  src="https://www.youtube-nocookie.com/embed/zHvatf2wySI"
+  frameBorder="1"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+Over the next few weeks we plan to release these features (once we have a chance to polish them up), and you'll be able to query your logs with your favourite language - SQL 😀.
 
 ## Open source
 
@@ -100,5 +124,3 @@ Right now Logflare works natively with Big Query. But as our track-record has pr
 If you're an existing Logflare user, we'll be migrating everything to Supabase in the coming months. We'll work closely with you to ensure that the transition is seamless, and introduce the same [pricing levels](https://logflare.app/pricing) that Logflare offers today.
 
 We've worked with Chase on a list of potential questions you might have about the transition. If you have any concerns or questions you can reach out to support@supabase.io.
-
-<script async src="https://platform.twitter.com/widgets.js?1=1" charset="utf-8"></script>
