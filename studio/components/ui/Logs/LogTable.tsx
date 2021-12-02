@@ -57,22 +57,19 @@ const LogTable = ({ data }: Props) => {
   if (!data) return null
 
   return (<section className="flex flex-row gap-x-4">
-    <div className="flex-grow w-2/3">
-      <DataGrid
-        onSelectedCellChange={({ idx, rowIdx }) => setFocusedLog(data[rowIdx])}
-        noRowsFallback={<Typography.Text className="text-center">No data returned from query</Typography.Text>}
-        columns={columns as any}
-        rowClass={r => `${r.id === focusedLog?.id ? "bg-green-800" : "cursor-pointer"}`}
-        rows={data}
-        rowKeyGetter={r => r.id}
-        onRowClick={r => {
-          const log = logMap[r.id]
-          setFocusedLog(logMap[r.id])
-        }}
-      />
-    </div>
+    <DataGrid
+      style={{ height: "unset", minHeight: "75vh" }}
+      className="flex-grow flex-1"
+      onSelectedCellChange={({ idx, rowIdx }) => setFocusedLog(data[rowIdx])}
+      noRowsFallback={<Typography.Text className="text-center">No data returned from query</Typography.Text>}
+      columns={columns as any}
+      rowClass={r => `${r.id === focusedLog?.id ? "bg-green-800" : "cursor-pointer"}`}
+      rows={data}
+      rowKeyGetter={r => r.id}
+      onRowClick={r => setFocusedLog(logMap[r.id])}
+    />
     {focusedLog && (
-      <div className="sticky top-0 w-1/3">
+      <div className="w-2/5">
         <LogSelection onClose={() => setFocusedLog(null)} log={focusedLog} />
       </div>
     )}

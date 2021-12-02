@@ -22,7 +22,7 @@ const LogSelection = ({ log, onClose }: Props) => (
     }
   >
     <div className="p-4 h-full flex-col">
-    <Typography.Text code className="block" small>{log.event_message} </Typography.Text>
+      <Typography.Text code className="block w-full overflow-x-auto" small>{log.event_message} </Typography.Text>
       <Input.TextArea label="Metadata" className="font-mono mt-4" size="tiny" rows={25} disabled value={JSON.stringify(log.metadata, null, 2)} />
     </div>
 
