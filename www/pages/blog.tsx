@@ -66,7 +66,7 @@ function Blog(props: any) {
         <div className="bg-gray-50 dark:bg-dark-800 overflow-hidden py-12">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
             <div className="mx-auto max-w-7xl">
-              <Typography.Title level={2}>Latests posts</Typography.Title>
+              <Typography.Title level={2}>Latest posts</Typography.Title>
               <div className="mt-5 max-w-lg mx-auto grid gap-16 lg:grid-cols-2 lg:max-w-none">
                 {props.blogs.slice(0, 2).map((blog: any, idx: any) => {
                   return FeaturedThumb(blog)
