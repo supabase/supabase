@@ -1,9 +1,9 @@
-import React from 'react'
+import { FC } from 'react'
 import Link from 'next/link'
 import BaseLayout from 'components/layouts'
 import { IconChevronRight, Typography } from '@supabase/ui'
 
-const WizardLayout = ({ organization, project, children }) => {
+const WizardLayout: FC<any> = ({ organization, project, children }) => {
   return (
     <BaseLayout hideHeader hideIconBar>
       <div className="flex flex-col h-full w-full">
@@ -19,7 +19,7 @@ const WizardLayout = ({ organization, project, children }) => {
 }
 export default WizardLayout
 
-const Header = ({ organization, project }) => {
+const Header: FC<any> = ({ organization, project }) => {
   let stepNumber = organization ? 1 : project ? 2 : 0
   return (
     <div className="p-3 border-b dark:border-dark">
@@ -50,13 +50,13 @@ const Header = ({ organization, project }) => {
               <Typography.Text type="secondary">
                 <IconChevronRight size="small" />
               </Typography.Text>
-              <Typography.Text small type={stepNumber < 1 && 'secondary'}>
+              <Typography.Text small type={stepNumber < 1 ? 'secondary' : 'default'}>
                 <a>{project ? project.name : 'Create a new project'}</a>
               </Typography.Text>
               <Typography.Text type="secondary">
                 <IconChevronRight size="small" />
               </Typography.Text>
-              <Typography.Text small type={stepNumber < 2 && 'secondary'}>
+              <Typography.Text small type={stepNumber < 2 ? 'secondary' : 'default'}>
                 <a>{project ? project.name : 'Extend your database'}</a>
               </Typography.Text>
             </div>
