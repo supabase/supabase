@@ -18,9 +18,22 @@ jest.mock('next/router')
 import { useRouter } from 'next/router'
 useRouter.mockReturnValue({ query: { ref: "123", type: "auth" } })
 
+// mock monaco editor
+jest.mock("@monaco-editor/react")
+import Editor, { useMonaco } from "@monaco-editor/react"
+Editor = jest.fn()
+Editor.mockImplementation((props) => {
+  return (
+    <textarea
+      className="monaco-editor"
+      onChange={e => props.onChange(e.target.value)}
+    ></textarea>
+  )
+})
+useMonaco.mockImplementation(v => v)
+
 import { LogPage } from 'pages/project/[ref]/settings/logs/[type]'
 import { render, fireEvent, waitFor, screen } from '@testing-library/react'
-import { SWRConfig } from 'swr'
 import userEvent from '@testing-library/user-event'
 
 beforeEach(() => {
@@ -121,5 +134,32 @@ test("poll count for new messages", async () => {
 
   userEvent.click(screen.getByText(/Load new logs/))
   await waitFor(() => screen.queryByText(/Load new logs/) === null)
+  await waitFor(() => screen.getByText(/happened/))
+})
+
+
+test("where clause will trigger a log refresh", async () => {
+  get.mockImplementation((url) => {
+
+    if (url.includes("where") && url.includes("something")) {
+      return {
+        data: [{
+          id: "some-uuid",
+          timestamp: 1621323232312,
+          event_message: "some event happened",
+          metadata: {}
+        }]
+      }
+    }
+    return { data: [] }
+  })
+  const { container } = render(<LogPage />)
+  const editor = container.querySelector('.monaco-editor');
+  userEvent.type(editor, "metadata.field = something")
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(expect.stringContaining("where"))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining("metadata.field"))
+  }, { timeout: 1000 })
+
   await waitFor(() => screen.getByText(/happened/))
 })
