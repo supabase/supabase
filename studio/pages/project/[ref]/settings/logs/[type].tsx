@@ -42,8 +42,8 @@ export const LogPage = () => {
       revalidateOnFocus: false,
     }
   )
-  const debouncedSearch = debounce(setSearch, 500)
-  const debouncedWhere = debounce(setWhere, 500)
+  const debouncedSearch = debounce(setSearch, 600)
+  const debouncedWhere = debounce(setWhere, 600)
 
   useEffect(() => {
     const params = {
@@ -69,12 +69,14 @@ export const LogPage = () => {
   return (
     <SettingsLayout title={title} className="p-4 space-y-4">
       <LogPanel isLoading={isLoading} onRefresh={handleRefresh} onSearch={debouncedSearch} />
-      <div className="h-16">
+      <div className="h-24">
         <CodeEditor
+          className="p-4"
+          hideLineNumbers
           id={'logs-where-editor'}
           language="pgsql"
           defaultValue={where}
-          onInputChange={(v) => setWhere(v || '')}
+          onInputChange={(v) => debouncedWhere(v || '')}
           onInputRun={handleRefresh}
         />
       </div>
