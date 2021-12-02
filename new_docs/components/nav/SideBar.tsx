@@ -9,7 +9,7 @@ const SideBar = () => {
   const { asPath } = useRouter()
   return (
     <div className={`${styles.sidebar} fixed relative h-full`}>
-      <Menu className={`border-r dark:border-gray-600`}>
+      <Menu>
         <div>
           {Object.keys(menuItems).map((key) => {
             return (

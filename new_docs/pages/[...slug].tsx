@@ -4,9 +4,8 @@ import Layout from '../components/layouts/Layout'
 import { serialize } from 'next-mdx-remote/serialize'
 import { MDXRemote } from 'next-mdx-remote'
 import { MDXProvider } from '@mdx-js/react'
-import LinkCard from '../components/LinkCard'
+import components from '../components'
 
-const components = { LinkCard }
 export default function Doc({
   meta,
   content,

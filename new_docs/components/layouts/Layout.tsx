@@ -33,12 +33,17 @@ const DocsLayout = ({
         <link href={`https://unpkg.com/prismjs@0.0.1/themes/prism-${theme}.css`} rel="stylesheet" />
       </Head>
 
-      <div className={`${styles.container} h-full`}>
+      <div className={`${styles.container} flex flex-1 h-full w-full`}>
         <main className={`${styles.main}`}>
           <NavBar />
-          <div className="flex flex-row ">
+          <div className="flex flex-row w-full">
             <SideBar />
-            <div className={`prose dark:prose-dark ${styles.content} p-8`}>{children}</div>
+            <div
+              style={{ maxWidth: 'none' }}
+              className={`prose flex flex-col flex-1 dark:prose-dark ${styles.content} p-8 border-l dark:border-gray-600`}
+            >
+              {children}
+            </div>
           </div>
           <Footer />
         </main>
