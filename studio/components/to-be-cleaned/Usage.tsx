@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { Loading, Typography } from '@supabase/ui'
 import { toast } from 'react-hot-toast'
@@ -32,10 +32,11 @@ const usageLimits = {
         title: 'Database space',
         tiers: {
           free: {
-            description: (stats) => `${(((stats?.dbSize || 0) / (500 * MB)) * 100).toFixed(2)} %`,
-            render: (stats) => {
-              let bytes = stats?.dbSize ? new Number(stats?.dbSize) : 0
-              let usage = {
+            description: (stats: any) =>
+              `${(((stats?.dbSize || 0) / (500 * MB)) * 100).toFixed(2)} %`,
+            render: (stats: any) => {
+              const bytes: any = stats?.dbSize ? new Number(stats?.dbSize) : 0
+              const usage = {
                 gb: bytes / GB || 0,
                 mb: bytes / MB || 0,
               }
@@ -52,10 +53,11 @@ const usageLimits = {
             },
           },
           pro: {
-            description: (stats) => `${(((stats?.dbSize || 0) / (8000 * MB)) * 100).toFixed(2)} %`,
-            render: (stats) => {
-              let bytes = stats?.dbSize ? new Number(stats?.dbSize) : 0
-              let usage = {
+            description: (stats: any) =>
+              `${(((stats?.dbSize || 0) / (8000 * MB)) * 100).toFixed(2)} %`,
+            render: (stats: any) => {
+              const bytes: any = stats?.dbSize ? new Number(stats?.dbSize) : 0
+              const usage = {
                 gb: bytes / GB || 0,
                 mb: bytes / MB || 0,
               }
@@ -83,27 +85,28 @@ const usageLimits = {
         title: 'Users',
         tiers: {
           free: {
-            description: (stats) => `${(((stats?.authUsers || 0) / 10000) * 100).toFixed(2)}%`,
-            render: (stats) => (
+            description: (stats: any) => `${(((stats?.authUsers || 0) / 10000) * 100).toFixed(2)}%`,
+            render: (stats: any) => (
               <SparkBar
                 value={stats?.authUsers || 0}
                 max={10000}
                 type={'horizontal'}
                 barClass={'bg-green-500'}
-                labelBottom={stats?.authUsers ? new Number(stats?.authUsers).toLocaleString() : 0}
+                labelBottom={stats?.authUsers ? new Number(stats?.authUsers).toLocaleString() : '0'}
                 labelTop={`${new Number(10000).toLocaleString()}`}
               />
             ),
           },
           pro: {
-            description: (stats) => `${(((stats?.authUsers || 0) / 100000) * 100).toFixed(2)}%`,
-            render: (stats) => (
+            description: (stats: any) =>
+              `${(((stats?.authUsers || 0) / 100000) * 100).toFixed(2)}%`,
+            render: (stats: any) => (
               <SparkBar
                 value={stats?.authUsers || 0}
                 max={100000}
                 type={'horizontal'}
                 barClass={'bg-green-500'}
-                labelBottom={stats?.authUsers ? new Number(stats?.authUsers).toLocaleString() : 0}
+                labelBottom={stats?.authUsers ? new Number(stats?.authUsers).toLocaleString() : '0'}
                 labelTop={`${new Number(100000).toLocaleString()}`}
               />
             ),
@@ -133,8 +136,9 @@ const usageLimits = {
         title: 'Storage space',
         tiers: {
           free: {
-            description: (stats) => `${(((stats?.bucketSize || 0) / (1 * GB)) * 100).toFixed(2)}%`,
-            render: (stats) => (
+            description: (stats: any) =>
+              `${(((stats?.bucketSize || 0) / (1 * GB)) * 100).toFixed(2)}%`,
+            render: (stats: any) => (
               <SparkBar
                 value={stats?.bucketSize / (1024 * 1024) || 0}
                 max={1 * 1024}
@@ -143,16 +147,16 @@ const usageLimits = {
                 labelBottom={
                   stats?.bucketSize
                     ? `${new Number(stats?.bucketSize / (1024 * 1024)).toLocaleString()} MB`
-                    : 0
+                    : '0'
                 }
                 labelTop={`${new Number(1 * 1024).toLocaleString()} MB`}
               />
             ),
           },
           pro: {
-            description: (stats) =>
+            description: (stats: any) =>
               `${(((stats?.bucketSize || 0) / (100 * GB)) * 100).toFixed(2)}%`,
-            render: (stats) => (
+            render: (stats: any) => (
               <SparkBar
                 value={stats?.bucketSize / (1024 * 1024) || 0}
                 max={100 * 1024}
@@ -161,7 +165,7 @@ const usageLimits = {
                 labelBottom={
                   stats?.bucketSize
                     ? `${new Number(stats?.bucketSize / (1024 * 1024)).toLocaleString()} MB`
-                    : 0
+                    : '0'
                 }
                 labelTop={`${new Number(100).toLocaleString()} GB`}
               />
@@ -186,12 +190,12 @@ const usageLimits = {
   },
 }
 
-export default function ProjectUsage({ projectRef, subscription_id }) {
+const ProjectUsage: FC<any> = ({ projectRef, subscription_id }) => {
   const { data: stats, error: usageError } = useSWR(`${API_URL}/projects/${projectRef}/usage`, get)
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [subscription, setSubscription] = useState(null)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<any>(null)
+  const [subscription, setSubscription] = useState<any>(null)
 
   useEffect(() => {
     let cancel = false
@@ -208,7 +212,7 @@ export default function ProjectUsage({ projectRef, subscription_id }) {
         })
         if (!cancel) setSubscription(data)
         if (error) throw error
-      } catch (error) {
+      } catch (error: any) {
         toast.error(error.message)
         if (!cancel) setError(error)
       } finally {
@@ -269,6 +273,7 @@ export default function ProjectUsage({ projectRef, subscription_id }) {
                         {feature.tiers[tier]?.description(stats)}
                       </td>
                       <td className="px-6 py-3 text-sm text-typography-body-light dark:text-typography-body-dark ">
+                        {/* @ts-ignore */}
                         {feature.tiers[tier]?.render ? feature.tiers[tier].render(stats) : null}
                       </td>
                     </tr>
@@ -283,12 +288,14 @@ export default function ProjectUsage({ projectRef, subscription_id }) {
   )
 }
 
-export function ProjectUsageMinimal({ projectRef, subscription_id, filter }) {
+export default ProjectUsage
+
+export const ProjectUsageMinimal: FC<any> = ({ projectRef, subscription_id, filter }) => {
   const { data: stats, error: usageError } = useSWR(`${API_URL}/projects/${projectRef}/usage`, get)
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [subscription, setSubscription] = useState(null)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<any>(null)
+  const [subscription, setSubscription] = useState<any>(null)
 
   useEffect(() => {
     let cancel = false
@@ -305,7 +312,7 @@ export function ProjectUsageMinimal({ projectRef, subscription_id, filter }) {
         })
         if (!cancel) setSubscription(data)
         if (error) throw error
-      } catch (error) {
+      } catch (error: any) {
         if (!cancel) setError(error)
       } finally {
         if (!cancel) setLoading(false)
@@ -338,6 +345,7 @@ export function ProjectUsageMinimal({ projectRef, subscription_id, filter }) {
                         </Typography.Text>
                       ) : null}
                       <div className="text-sm text-typography-body-light dark:text-typography-body-dark">
+                        {/* @ts-ignore */}
                         {feature.tiers[tier]?.render ? feature.tiers[tier].render(stats) : null}
                       </div>
                     </div>

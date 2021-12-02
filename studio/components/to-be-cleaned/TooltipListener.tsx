@@ -1,7 +1,8 @@
 import { useRef, useEffect } from 'react'
-import KeyMap from './KeyMap'
 import { renderToString } from 'react-dom/server'
+
 import { makeRandomString } from 'lib/helpers'
+import KeyMap from './KeyMap'
 
 /**
  * Hook for listening to hover action on the target element and show tooltip.
@@ -17,13 +18,13 @@ import { makeRandomString } from 'lib/helpers'
  */
 
 export default function TooltipListener({
-  title,
+  title = '',
   position = 'bottom',
   keyMap = null,
   className = '',
-  nowrap,
+  nowrap = false,
 }) {
-  const ref = useRef(null)
+  const ref = useRef<any>(null)
   const tooltipId = `tooltip-${makeRandomString(5)}`
   const tooltip = document.createElement('div')
   tooltip.id = tooltipId
