@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { useEffect, useState, useRef } from 'react'
+import { FC, useEffect, useState, useRef } from 'react'
 import Highlight, { defaultProps } from 'prism-react-renderer'
 import defaultTheme from 'prism-react-renderer/themes/palenight'
 import Clipboard from 'clipboard'
@@ -18,11 +18,11 @@ const prism = {
   plugins: ['line-numbers', 'show-language'],
 }
 
-const SimpleCodeBlock = ({ children, className: languageClassName, metastring }) => {
+const SimpleCodeBlock: FC<any> = ({ children, className: languageClassName, metastring }) => {
   const [showCopied, setShowCopied] = useState(false)
   const target = useRef(null)
   const button = useRef(null)
-  let highlightLines = []
+  let highlightLines: any = []
 
   if (metastring && highlightLinesRangeRegex.test(metastring)) {
     const highlightLinesRange = metastring.match(highlightLinesRangeRegex)[1]
@@ -36,10 +36,13 @@ const SimpleCodeBlock = ({ children, className: languageClassName, metastring })
   }, [showCopied])
 
   useEffect(() => {
-    let clipboard
+    let clipboard: any
 
+    // @ts-ignore
     if (button?.current?.button) {
+      // @ts-ignore
       clipboard = new Clipboard(button.current.button, {
+        // @ts-ignore
         target: () => target.current,
       })
     }
@@ -57,15 +60,14 @@ const SimpleCodeBlock = ({ children, className: languageClassName, metastring })
     language = prism.defaultLanguage
   }
 
-  const handleCopyCode = (code) => {
-    navigator.clipboard.writeText(code).then(() => setShowCopied(true))
+  const handleCopyCode = (code: any) => {
+    navigator?.clipboard?.writeText(code).then(() => setShowCopied(true))
   }
 
   return (
     <Highlight
-      className=""
       {...defaultProps}
-      theme={prism.theme || defaultTheme}
+      theme={(prism as any).theme || defaultTheme}
       code={children.trim()}
       language={language}
     >
