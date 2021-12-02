@@ -1,5 +1,5 @@
 import { FC, useEffect, useContext, createContext, FormEvent } from 'react'
-import { isEmpty, mapValues, has, filter, keyBy } from 'lodash'
+import { isEmpty, mapValues, has, filter, keyBy, isUndefined } from 'lodash'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import {
   Button,
@@ -217,7 +217,7 @@ class CreateFunctionStore implements ICreateFunctionStore {
         break
       }
       default: {
-        if (has(this.formState, key) && idx != undefined) {
+        if (has(this.formState, key) && !isUndefined(idx)) {
           // @ts-ignore
           this.formState[key].value[idx] = value
         } else {
