@@ -1,5 +1,5 @@
 import { FC, useEffect, useContext, createContext, FormEvent } from 'react'
-import { isEmpty, mapValues, has, filter, keyBy } from 'lodash'
+import { isEmpty, mapValues, has, filter, keyBy, isUndefined } from 'lodash'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import {
   Button,
@@ -195,27 +195,34 @@ class CreateFunctionStore implements ICreateFunctionStore {
     switch (operation) {
       case 'add': {
         if (has(this.formState, key)) {
-          ;(this.formState as any)[key].value.push(value)
+          // @ts-ignore
+          this.formState[key].value.push(value)
         } else {
-          ;(this.formState as any)[key] = { value: [value] }
+          const values = [value]
+          // @ts-ignore
+          this.formState[key] = { value: [value] }
         }
         break
       }
       case 'delete': {
         if (has(this.formState, key)) {
           const temp = filter(
-            (this.formState as any)[key].value,
+            // @ts-ignore
+            this.formState[key].value,
             (_: any, index: number) => index != idx
           ) as any
-          ;(this.formState as any)[key].value = temp
+          // @ts-ignore
+          this.formState[key].value = temp
         }
         break
       }
       default: {
-        if (has(this.formState, key) && idx) {
-          ;(this.formState as any)[key].value[idx] = value
+        if (has(this.formState, key) && !isUndefined(idx)) {
+          // @ts-ignore
+          this.formState[key].value[idx] = value
         } else {
-          ;(this.formState as any)[key] = { value: [{ value }] }
+          // @ts-ignore
+          this.formState[key] = { value: [value] }
         }
       }
     }
