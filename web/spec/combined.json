@@ -43337,7 +43337,7 @@
                             "isExported": true
                           },
                           "comment": {
-                            "text": "An array of files to be deletes, including the path and file name. For example [`folder/image.png`].\n"
+                            "text": "An array of files to be deleted, including the path and file name. For example [`folder/image.png`].\n"
                           },
                           "type": {
                             "type": "array",
