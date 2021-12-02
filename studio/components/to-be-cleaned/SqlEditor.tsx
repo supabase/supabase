@@ -32,7 +32,7 @@ const SqlEditor: FC<any> = ({
 
       // Enable pgsql format
       const formatprovider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
-        async provideDocumentFormattingEdits(model) {
+        async provideDocumentFormattingEdits(model: any) {
           const value = model.getValue()
           const formatted = await formatPgsql(value)
           return [
