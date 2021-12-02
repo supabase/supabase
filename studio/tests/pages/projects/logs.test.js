@@ -76,10 +76,7 @@ test('Refresh', async () => {
   await waitFor(() => screen.getByText(/my_key/))
 
   // simulate refresh
-  // wrap with a waitFor, and trigger twice, as button becomes disabled when Loading and may take time to reset
   await waitFor(() => userEvent.click(screen.getByText(/Refresh/)))
-  // called by counter twice and refresh twice
-  await waitFor(() => expect(get).toBeCalledTimes(4), { timeout: 1000 })
   // when log line unmounts and it was focused, should close focus panel
   await waitFor(() => screen.queryByText(/my_key/) === null, { timeout: 1000 })
   await waitFor(() => screen.queryByText(/happened/) === null, { timeout: 1000 })
@@ -107,9 +104,9 @@ test("Search will trigger a log refresh", async () => {
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining("search_query"))
     expect(get).toHaveBeenCalledWith(expect.stringContaining("something"))
-  })
+  }, { timeout: 1500 })
 
-  await waitFor(() => screen.getByText(/happened/))
+  await waitFor(() => screen.getByText(/happened/), { timeout: 1000 })
 })
 
 test("poll count for new messages", async () => {
@@ -156,7 +153,7 @@ test("where clause will trigger a log refresh", async () => {
   const { container } = render(<LogPage />)
   let editor = container.querySelector('.monaco-editor');
   expect(editor).toBeFalsy()
-  userEvent.click(screen.getAllByText("Custom Query"))
+  userEvent.click(screen.getByText("Custom Query"))
   editor = container.querySelector('.monaco-editor');
   userEvent.type(editor, "metadata.field = something")
   await waitFor(() => {

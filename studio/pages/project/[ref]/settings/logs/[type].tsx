@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { SettingsLayout } from 'components/layouts/'
 import { useRouter } from 'next/router'
 import LogPanel from 'components/ui/Logs/LogPanel'
@@ -43,8 +43,8 @@ export const LogPage = () => {
       revalidateOnFocus: false,
     }
   )
-  const debouncedSearch = debounce(setSearch, 600)
-  const debouncedWhere = debounce(setWhere, 600)
+
+  const debouncedQueryParams = useRef(debounce(setQueryParams, 600)).current
 
   useEffect(() => {
     const params = {
@@ -53,7 +53,8 @@ export const LogPage = () => {
       where: where || '',
     }
     const qs = new URLSearchParams(params).toString()
-    setQueryParams(qs)
+    debouncedQueryParams(qs)
+    return () => debouncedQueryParams.cancel()
   }, [search, where, type])
 
   const countKey = `${API_URL}/projects/${ref}/logs?${queryParams}&count=true&period_start=${latestRefresh}`
@@ -83,7 +84,7 @@ export const LogPage = () => {
           { label: "Recent - Errors", onClick: () => setSearch('[Ee]rror|\\s[45][0-9][0-9]\\s') },
         ]}
         searchValue={search}
-        onCustomClick={handleModeToggle} isLoading={isLoading} onRefresh={handleRefresh} onSearch={debouncedSearch} />
+        onCustomClick={handleModeToggle} isLoading={isLoading} onRefresh={handleRefresh} onSearch={setSearch} />
       {mode === 'custom' &&
         <div>
           <CodeEditor
@@ -92,14 +93,14 @@ export const LogPage = () => {
             id={'logs-where-editor'}
             language="pgsql"
             defaultValue={where}
-            onInputChange={(v) => debouncedWhere(v || '')}
+            onInputChange={(v) => setWhere(v || '')}
             onInputRun={handleRefresh}
           />
         </div>}
       {error && (
         <Typography.Text className="text-center w-full block">Could not fetch data</Typography.Text>
       )}
-      {newCount ?  <Button type="dashed" onClick={handleRefresh} block>Load new logs</Button> : null}
+      {newCount ? <Button type="dashed" onClick={handleRefresh} block>Load new logs</Button> : null}
       <LogTable data={logData} />
     </SettingsLayout>
   )
