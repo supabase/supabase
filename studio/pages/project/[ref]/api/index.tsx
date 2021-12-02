@@ -533,10 +533,9 @@ const ResourceContent = ({
         <div className="doc-section">
           <article className="text ">
             <p>
-              Supabase provides realtime functionality. Right now we recommend only using this on a
-              server-side application (see our notes in the Authentication section).
+              Supabase provides realtime functionality and broadcasts database changes to authorized users depending on Row Level
+              Security (RLS) policies.
             </p>
-            <p>We are building advanced auth so that you can use realtime streams from anywhere.</p>
             <p>
               <a href="https://supabase.com/docs/client/subscribe" target="_blank">
                 Learn more.
