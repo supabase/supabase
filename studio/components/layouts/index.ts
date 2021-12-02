@@ -7,6 +7,10 @@ import DocsLayout from './DocsLayout/DocsLayout'
 import SettingsLayout from './SettingsLayout/SettingsLayout'
 import StorageLayout from './StorageLayout/StorageLayout'
 
+import AccountLayout from './AccountLayout/AccountLayout'
+import WizardLayout from './WizardLayout'
+import VercelIntegrationLayout from './VercelIntegrationLayout'
+
 export {
   AuthLayout,
   DatabaseLayout,
@@ -15,5 +19,8 @@ export {
   SQLEditorLayout,
   SettingsLayout,
   StorageLayout,
+  AccountLayout,
+  WizardLayout,
+  VercelIntegrationLayout,
 }
 export default ProjectLayout

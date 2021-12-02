@@ -128,6 +128,7 @@ info:
           - auth.update()
           - auth.setAuth()
           - auth.onAuthStateChange()
+          - auth.api.getUser()
           - Reset Password (Email)
       - name: 'Auth (Server Only)'
         items:
@@ -173,6 +174,7 @@ info:
           - order()
           - range()
           - single()
+          - maybeSingle()
       - name: 'Filters'
         items:
           - Using Filters
@@ -428,6 +430,10 @@ pages:
       - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
       - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
       - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
+      - If signUp() is called for an existing confirmed user:
+          - If "Enable email confirmations" is enabled on the "Authentication" -> "Settings" page, an obfuscated / fake user object will be returned.
+          - If "Enable email confirmations" is disabled, an error with a message "User already registered" will be returned.
+      - To check if a user already exists, refer to getUser().
     examples:
       - name: Sign up.
         isSpotlight: true
@@ -565,6 +571,8 @@ pages:
   auth.user():
     title: 'user()'
     $ref: '@supabase/gotrue-js.GoTrueClient.user'
+    notes: |
+      This method gets the user object from memory.
     examples:
       - name: Get the logged in user
         isSpotlight: true
@@ -577,7 +585,9 @@ pages:
     title: 'update()'
     $ref: '@supabase/gotrue-js.GoTrueClient.update'
     notes: |
-      User email: email updates will send an email to both the user's current and new email with a confirmation link.
+      User email: Email updates will send an email to both the user's current and new email with a confirmation link by default.
+      To toggle this behavior off and only send a single confirmation link to the new email, toggle "Double confirm email changes" under "Authentication" -> "Settings" off.
+
 
       User metadata: It's generally better to store user data in a table inside your public schema (i.e. `public.users`). 
       Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
@@ -674,6 +684,22 @@ pages:
           supabase.auth.onAuthStateChange((event, session) => {
             console.log(event, session)
           })
+          ```
+  auth.api.getUser():
+    title: 'getUser()'
+    $ref: '@supabase/gotrue-js.GoTrueApi.getUser'
+    notes: |
+      - Fetches the user object from the database instead of local storage.
+      - Note that user() fetches the user object from local storage which might not be the most updated.
+      - Requires the user's access_token. 
+    examples:
+      - name: Fetch the user object using the access_token jwt.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.api.getUser(
+            'ACCESS_TOKEN_JWT',
+          )
           ```
 
   Reset Password (Email):
@@ -1611,7 +1637,22 @@ pages:
           const { data, error } = await supabase
             .from('cities')
             .select('name, country_id')
+            .limit(1)
             .single()
+          ```
+
+  maybeSingle():
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.maybeSingle'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .eq('name', 'Singapore')
+            .maybeSingle()
           ```
 
   Using Filters:
