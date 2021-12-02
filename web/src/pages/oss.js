@@ -18,7 +18,7 @@ export default function Oss() {
     .filter((v, i, a) => a.indexOf(v) === i) // remove duplicates
     .sort((a, b) => a.localeCompare(b)) // alphabetical
   const maintainerPills = ['All'].concat(maintainerTags)
-  
+
   return (
     <Layout title={`${siteConfig.title}`} description={siteConfig.tagline}>
       <section className={'section-lg'}>
