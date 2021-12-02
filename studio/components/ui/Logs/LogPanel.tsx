@@ -19,7 +19,9 @@ const LogPanel = ({ onRefresh, isLoading, heading, children, onSearch }: Props) 
       <div className="flex items-center justify-between w-full" >
         <Button type="secondary">Recent - All</Button>
         <div className="flex flex-row gap-x-4">
-          <Input className="max-w-32" placeholder="Search" onChange={e => onSearch ? onSearch(e.target.value) : null} />
+          <Input className="max-w-32" placeholder="Search" onChange={e => {
+            if(onSearch) onSearch(e.target.value)
+          }} />
           <Button
             type="outline"
             loading={isLoading}
