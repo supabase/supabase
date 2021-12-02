@@ -24,7 +24,7 @@ import {
 } from 'lib/constants'
 
 import { useStore, withAuth } from 'hooks'
-import WizardLayout from 'components/layouts/WizardLayout'
+import { WizardLayout } from 'components/layouts'
 import FormField from 'components/to-be-cleaned/forms/FormField'
 import Panel from 'components/to-be-cleaned/Panel'
 import InformationBox from 'components/ui/InformationBox'

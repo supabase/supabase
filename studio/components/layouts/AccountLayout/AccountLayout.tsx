@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { useStore } from 'hooks'
-import WithSidebar from 'components/layouts/WithSidebar'
+import WithSidebar from './WithSidebar'
 
 /**
  * layout for dashboard homepage, account and org settings
@@ -105,13 +105,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
           style={{ maxHeight: '100vh' }}
           className="w-full flex flex-col flex-1 overflow-y-auto"
         >
-          {/* @ts-ignore */}
-          <WithSidebar
-            breadcrumbs={breadcrumbs}
-            links={linksWithHeaders}
-            title={title}
-            hideIconSidebar
-          >
+          <WithSidebar title={title} breadcrumbs={breadcrumbs} links={linksWithHeaders}>
             {children}
           </WithSidebar>
         </main>
