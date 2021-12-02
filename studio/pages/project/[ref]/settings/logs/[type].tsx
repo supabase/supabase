@@ -55,7 +55,7 @@ export const LogPage = () => {
   } = useSWR<{ data: [CountData] | [], error?: any }>(countKey, get, {
     refreshInterval: 5000
   })
-  const newCount = countData?.data[0]?.count
+  const newCount = countData?.data?.[0]?.count
   const { data: logData, error } = data || {}
 
   const handleRefresh = () => {
