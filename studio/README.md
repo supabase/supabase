@@ -66,7 +66,7 @@ SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_KEY=
 ```
 
-Then run the follow commands to install dependencies and start the dashboard.
+Then run the following commands to install dependencies and start the dashboard.
 
 ```
 npm install
