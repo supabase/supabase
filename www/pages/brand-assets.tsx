@@ -53,7 +53,7 @@ const Index = () => {
             <div className="grid grid-cols-12 border dark:border-gray-600">
               <div className="col-span-12 lg:col-span-5">
                 <img
-                  src={`${router}/brand-assets/logo-preview.jpg`}
+                  src={`/brand-assets/logo-preview.jpg`}
                   width="100%"
                   className="object-cover h-full"
                 />
@@ -69,7 +69,7 @@ const Index = () => {
                       </p>
                       <p>Do not use any other color for the wordmark.</p>
                     </Typography.Text>
-                    <form method="get" action={`${router}/brand-assets/supabase-logos.zip`}>
+                    <form method="get" action={`/brand-assets/supabase-logos.zip`}>
                       <Button htmlType="submit" type="default" iconRight={<IconDownload />}>
                         Download logo kit
                       </Button>
