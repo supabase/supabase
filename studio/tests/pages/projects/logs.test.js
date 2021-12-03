@@ -100,7 +100,7 @@ test("Search will trigger a log refresh", async () => {
   })
   render(<LogPage />)
 
-  userEvent.type(screen.getByPlaceholderText(/Search/), "something")
+  userEvent.type(screen.getByPlaceholderText(/Filter/), "something")
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining("search_query"))
     expect(get).toHaveBeenCalledWith(expect.stringContaining("something"))
