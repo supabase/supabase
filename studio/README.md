@@ -36,6 +36,18 @@ Project settings are managed outside of the Dashboard. If you use docker-compose
 - Send a PR to `master` and tag the following members in your PR as reviewers
   - [MildTomato](https://github.com/mildtomato), [phamhieu](https://github.com/phamhieu), [joshenlim](https://github.com/joshenlim)
 
+### Developer Quickstart
+
+```bash
+# You'll need to be on Node v14
+# in /studio
+
+npm i # install deps
+npm run dev # start dev server
+npm run test # run tests
+npm run -- --watch # run tests in watch mode
+```
+
 ## Running within a self-hosted environment
 
 Firstly, follow the guide [here](https://supabase.com/docs/guides/hosting/docker) to get started with self-hosted Supabase.

@@ -4606,7 +4606,7 @@
 												"isExported": true
 											},
 											"comment": {
-												"text": "The body of the file is to be stored in the bucket."
+												"text": "The body of the file to be stored in the bucket."
 											},
 											"type": {
 												"type": "union",
@@ -4876,7 +4876,7 @@
 												"isExported": true
 											},
 											"comment": {
-												"text": "The body of the file is to be stored in the bucket."
+												"text": "The body of the file to be stored in the bucket."
 											},
 											"type": {
 												"type": "union",
@@ -5172,7 +5172,7 @@
 												"isExported": true
 											},
 											"comment": {
-												"text": "The body of the file is to be stored in the bucket."
+												"text": "The body of the file to be stored in the bucket."
 											},
 											"type": {
 												"type": "union",

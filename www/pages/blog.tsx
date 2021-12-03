@@ -2,7 +2,6 @@ import fs from 'fs'
 import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
-import Head from 'next/head'
 
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
@@ -36,7 +35,7 @@ function Blog(props: any) {
   const [category, setCategory] = useState('all')
   const [blogs, setBlogs] = useState(props.blogs)
 
-  const { basePath } = useRouter()
+  const router = useRouter()
 
   useEffect(() => {
     // Update the document title using the browser API
@@ -50,23 +49,38 @@ function Blog(props: any) {
     )
   }, [category])
 
+  const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
+  const meta_description = 'Get all your Supabase News on the Supabase blog.'
+
   return (
     <>
-      <Head>
-        <link
-          rel="alternate"
-          type="application/rss+xml"
-          title="RSS feed for blog posts"
-          href={`${basePath}/rss.xml`}
-        />
-      </Head>
-      <NextSeo title="Blog" description="Latest news from the Supabase team." />
+      <NextSeo
+        title={meta_title}
+        description={meta_description}
+        openGraph={{
+          title: meta_title,
+          description: meta_description,
+          url: `https://supabase.com/${router.pathname}`,
+          images: [
+            {
+              url: `https://supabase.com/images/og/og-image.jpg`,
+            },
+          ],
+        }}
+        additionalLinkTags={[
+          {
+            rel: 'alternate',
+            type: 'application/rss+xml',
+            href: `https://supabase.com/rss.xml`,
+          },
+        ]}
+      />
       <DefaultLayout>
         <BlogHeader title="Blog" />
         <div className="bg-gray-50 dark:bg-dark-800 overflow-hidden py-12">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
             <div className="mx-auto max-w-7xl">
-              <Typography.Title level={2}>Latests posts</Typography.Title>
+              <Typography.Title level={2}>Latest posts</Typography.Title>
               <div className="mt-5 max-w-lg mx-auto grid gap-16 lg:grid-cols-2 lg:max-w-none">
                 {props.blogs.slice(0, 2).map((blog: any, idx: any) => {
                   return FeaturedThumb(blog)

@@ -170,7 +170,6 @@ Supabase 是一个[托管平台](https://app.supabase.io)。你可以注册并�
   </tr>
 </table>
 
-
 ## 翻译
 
 - [翻译列表](/i18n/languages.md)

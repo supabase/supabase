@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from 'react'
+import React, { FC, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { toJS } from 'mobx'
-
 import { Input, Modal } from '@supabase/ui'
 
+import { useStore } from 'hooks'
 import { useProjectContentStore } from 'stores/projectContentStore'
-import { toast } from 'react-hot-toast'
 
-const EditModal = () => {
+const EditModal: FC<any> = () => {
   const router = useRouter()
   const { id, ref } = router.query
 
-  const [visible, setVisible] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [name, setName] = useState(null)
-  const [description, setDescription] = useState(null)
+  const { ui } = useStore()
+
+  const [visible, setVisible] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [name, setName] = useState<string>()
+  const [description, setDescription] = useState<string>()
 
   const contentStore = useProjectContentStore(ref)
 
@@ -55,9 +56,8 @@ const EditModal = () => {
       await contentStore.load()
       setVisible(!visible)
       return data
-    } catch (error) {
-      console.error(error)
-      toast.error(error.message)
+    } catch (error: any) {
+      ui.setNotification({ category: 'error', message: error.message })
       setLoading(false)
     }
   }
