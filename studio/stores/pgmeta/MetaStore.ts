@@ -516,7 +516,8 @@ export default class MetaStore implements IMetaStore {
           ...column,
           isPrimaryKey: false,
         })
-        await this.createColumn(columnPayload, column.foreignKey)
+        const addedColumn: any = await this.createColumn(columnPayload, column.foreignKey)
+        if (addedColumn.error) throw addedColumn.error
       } else {
         const originalColumn = find(originalColumns, { id: column.id })
         if (originalColumn) {
@@ -533,7 +534,13 @@ export default class MetaStore implements IMetaStore {
               category: 'loading',
               message: `Updating column ${column.name} from ${updatedTable.name}`,
             })
-            await this.updateColumn(column.id, columnPayload, updatedTable, column.foreignKey)
+            const updatedColumn: any = await this.updateColumn(
+              column.id,
+              columnPayload,
+              updatedTable,
+              column.foreignKey
+            )
+            if (updatedColumn.error) throw updatedColumn.error
           }
         }
       }
