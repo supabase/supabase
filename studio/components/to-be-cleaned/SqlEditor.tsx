@@ -1,9 +1,9 @@
 import Editor, { useMonaco } from '@monaco-editor/react'
-import { useEffect, useRef } from 'react'
+import { FC, useEffect, useRef } from 'react'
 import { Typography } from '@supabase/ui'
 import { useStore } from 'hooks'
 
-const SqlEditor = ({
+const SqlEditor: FC<any> = ({
   queryId,
   language = 'pgsql',
   defaultValue = '',
@@ -13,7 +13,7 @@ const SqlEditor = ({
 }) => {
   const monaco = useMonaco()
   const { meta } = useStore()
-  const editorRef = useRef()
+  const editorRef = useRef<any>()
 
   useEffect(() => {
     if (monaco) {
@@ -21,6 +21,7 @@ const SqlEditor = ({
       monaco.editor.defineTheme('supabase', {
         base: 'vs-dark',
         inherit: true,
+        colors: {},
         rules: [
           { token: '', background: '4a5568' },
           { token: 'string.sql', foreground: '24b47e' },
@@ -31,7 +32,7 @@ const SqlEditor = ({
 
       // Enable pgsql format
       const formatprovider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
-        async provideDocumentFormattingEdits(model) {
+        async provideDocumentFormattingEdits(model: any) {
           const value = model.getValue()
           const formatted = await formatPgsql(value)
           return [
@@ -52,7 +53,7 @@ const SqlEditor = ({
   useEffect(() => {
     if (editorRef.current) {
       // add margin above first line
-      editorRef.current?.changeViewZones((accessor) => {
+      editorRef.current?.changeViewZones((accessor: any) => {
         accessor.addZone({
           afterLineNumber: 0,
           heightInPx: 4,
@@ -62,7 +63,7 @@ const SqlEditor = ({
     }
   }, [queryId])
 
-  async function formatPgsql(value) {
+  async function formatPgsql(value: any) {
     try {
       const formatted = await meta.formatQuery(value)
       if (formatted.error) throw formatted.error
@@ -73,11 +74,11 @@ const SqlEditor = ({
     }
   }
 
-  const onMount = (editor, monaco) => {
+  const onMount = (editor: any, monaco: any) => {
     editorRef.current = editor
 
     // Add margin above first line
-    editor.changeViewZones((accessor) => {
+    editor.changeViewZones((accessor: any) => {
       accessor.addZone({
         afterLineNumber: 0,
         heightInPx: 4,

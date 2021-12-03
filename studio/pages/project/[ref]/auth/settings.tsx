@@ -18,8 +18,6 @@ import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
 import SecretField from 'components/to-be-cleaned/forms/SecretField'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 
-const SMTP_ADMIN_EMAIL = 'noreply@mail.app.supabase.io'
-
 const Auth = () => {
   return (
     <AuthLayout title="Auth">
@@ -38,7 +36,7 @@ const Settings = () => {
   const [model, setModel] = useState<any>({})
   const [smsProviderModel, setSmsProviderModel] = useState<any>({})
   const [externalProvidersModel, setExternalProvidersModel] = useState<any>({})
-  const [isCustomSMTPEnabled, setCustomSMTP] = useState<any>(false)
+  const [isCustomSMTPEnabled, setCustomSMTP] = useState<boolean>(false)
   const URL = `${API_URL}/auth/${router.query.ref}/config`
   const { data: config, error }: any = useSWR(URL, get)
   const { ref: projectRef } = router.query
@@ -55,12 +53,11 @@ const Settings = () => {
   useEffect(() => {
     if (config) {
       const temp =
-        (config.SMTP_ADMIN_EMAIL && config.SMTP_ADMIN_EMAIL !== SMTP_ADMIN_EMAIL) ||
+        config.SMTP_ADMIN_EMAIL ||
         config.SMTP_HOST ||
         config.SMTP_PORT ||
         config.SMTP_USER ||
-        config.SMTP_PASS ||
-        config.SMTP_SENDER_NAME
+        config.SMTP_PASS
       setCustomSMTP(temp)
     }
     setModel({ ...config })
@@ -156,15 +153,17 @@ const Settings = () => {
             'SMTP_USER',
             'SMTP_PASS',
             'SMTP_SENDER_NAME',
+            'RATE_LIMIT_EMAIL_SENT',
           ])}
           model={{
             MAILER_SECURE_EMAIL_CHANGE_ENABLED: model.MAILER_SECURE_EMAIL_CHANGE_ENABLED,
-            SMTP_ADMIN_EMAIL: isCustomSMTPEnabled ? model.SMTP_ADMIN_EMAIL : SMTP_ADMIN_EMAIL,
-            SMTP_HOST: isCustomSMTPEnabled ? model.SMTP_HOST : undefined,
-            SMTP_PORT: isCustomSMTPEnabled ? model.SMTP_PORT : undefined,
-            SMTP_USER: isCustomSMTPEnabled ? model.SMTP_USER : undefined,
-            SMTP_PASS: isCustomSMTPEnabled ? model.SMTP_PASS : undefined,
-            SMTP_SENDER_NAME: isCustomSMTPEnabled ? model.SMTP_SENDER_NAME : undefined,
+            SMTP_ADMIN_EMAIL: isCustomSMTPEnabled ? model.SMTP_ADMIN_EMAIL : "",
+            SMTP_HOST: isCustomSMTPEnabled ? model.SMTP_HOST : "",
+            SMTP_PORT: isCustomSMTPEnabled ? model.SMTP_PORT : "",
+            SMTP_USER: isCustomSMTPEnabled ? model.SMTP_USER : "",
+            SMTP_PASS: isCustomSMTPEnabled ? model.SMTP_PASS : "",
+            SMTP_SENDER_NAME: isCustomSMTPEnabled ? model.SMTP_SENDER_NAME : "",
+            RATE_LIMIT_EMAIL_SENT: isCustomSMTPEnabled ? model.RATE_LIMIT_EMAIL_SENT : 30,
           }}
           onSubmit={(model: any) =>
             onFormSubmit({
@@ -209,20 +208,22 @@ const Settings = () => {
             <label className="">Enable Custom SMTP</label>
             <div className="form-control flex items-center">
               <Toggle
-                onToggle={() => {
+                onToggle={(value : any) => {
                   /*
                    * temporary solution
                    * clear the values of SMTP when toggling
-                   */
-                  onFormSubmit({
-                    SMTP_ADMIN_EMAIL: SMTP_ADMIN_EMAIL,
-                    SMTP_HOST: null,
-                    SMTP_PORT: null,
-                    SMTP_USER: null,
-                    SMTP_PASS: null,
-                    SMTP_SENDER_NAME: null,
-                  })
-
+                   */ 
+                  if(!value) {
+                    onFormSubmit({
+                      SMTP_ADMIN_EMAIL: "",
+                      SMTP_HOST: "",
+                      SMTP_PORT: "",
+                      SMTP_USER: "",
+                      SMTP_PASS: "",
+                      SMTP_SENDER_NAME: "",
+                      RATE_LIMIT_EMAIL_SENT: 30,
+                    })
+                  }
                   setCustomSMTP(!isCustomSMTPEnabled)
                 }}
                 isOn={isCustomSMTPEnabled}
@@ -244,6 +245,12 @@ const Settings = () => {
                 name="SMTP_SENDER_NAME"
                 showInlineError
                 errorMessage="Please enter from name."
+              />
+              <NumField
+                showInlineError
+                step="1"
+                name="RATE_LIMIT_EMAIL_SENT"
+                errorMessage="Please enter a value between 1 to 32767"
               />
             </>
           )}

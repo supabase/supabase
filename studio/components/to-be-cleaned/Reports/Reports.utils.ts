@@ -1,5 +1,5 @@
 import { useProjectContentStore } from 'stores/projectContentStore'
-import { NEW_REPORT_SKELETON } from 'lib/constants'
+import { NEW_REPORT_SKELETON } from './Reports.constants'
 import toast from 'react-hot-toast'
 
 function handleErr(error: any) {
