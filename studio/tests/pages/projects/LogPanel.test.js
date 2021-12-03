@@ -45,3 +45,13 @@ test("Manual refresh", async () => {
   userEvent.click(btn)
   expect(mockFn).toBeCalled()
 })
+
+test("reset filters", () => {
+  const mockFn = jest.fn()
+  const { rerender } = render(<LogPanel showReset={false} />)
+  expect(() => screen.getByText(/Reset filters/)).toThrow()
+
+  rerender(<LogPanel showReset={true} onReset={mockFn} />)
+  userEvent.click(screen.getByText(/Reset filters/))
+  expect(mockFn).toBeCalled()
+})
