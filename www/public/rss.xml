@@ -5,9 +5,33 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 01 Dec 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 02 Dec 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.com/blog/2021/12/03/supabase-holiday-hackdays-hackathon</guid>
+  <title>Kicking off the Holiday Hackdays</title>
+  <link>https://supabase.com/blog/2021/12/03/supabase-holiday-hackdays-hackathon</link>
+  <description>Build cool stuff and celebrate open-source software with us during the Holiday Hackdays!</description>
+  <pubDate>Thu, 02 Dec 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2021/12/03/pg-graphql</guid>
+  <title>pg_graphql: A GraphQL extension for PostgreSQL</title>
+  <link>https://supabase.com/blog/2021/12/03/pg-graphql</link>
+  <description>GraphQL support is in development for PostgreSQL + Supabase.</description>
+  <pubDate>Thu, 02 Dec 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2021/12/03/launch-week-three-friday-five-more-things</guid>
+  <title>Five more things</title>
+  <link>https://supabase.com/blog/2021/12/03/launch-week-three-friday-five-more-things</link>
+  <description>It's never just one more thing!</description>
+  <pubDate>Thu, 02 Dec 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.com/blog/2021/12/02/supabase-acquires-logflare</guid>
   <title>Supabase acquires Logflare</title>
