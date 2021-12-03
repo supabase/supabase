@@ -2,7 +2,12 @@ import Papa from 'papaparse'
 import { makeObservable, observable } from 'mobx'
 import { find, isUndefined, isEqual, isEmpty, chunk, maxBy } from 'lodash'
 import { Query } from '@supabase/grid'
-import { PostgresColumn, PostgresTable, PostgresRelationship } from '@supabase/postgres-meta'
+import {
+  PostgresColumn,
+  PostgresTable,
+  PostgresRelationship,
+  PostgresPrimaryKey,
+} from '@supabase/postgres-meta'
 
 import { IS_PLATFORM, API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
@@ -118,6 +123,7 @@ export default class MetaStore implements IMetaStore {
     'net',
     'pg_catalog',
     'pgbouncer',
+    'realtime',
     'storage',
     'supabase_functions',
   ]
@@ -393,7 +399,7 @@ export default class MetaStore implements IMetaStore {
 
     // If the user is importing data via a spreadsheet
     if (!isUndefined(importContent)) {
-      if (importContent.file) {
+      if (importContent.file && importContent.rowCount > 0) {
         // Via a CSV file
         const { error }: any = await this.insertRowsViaSpreadsheet(
           importContent.file,
@@ -457,10 +463,24 @@ export default class MetaStore implements IMetaStore {
   }
 
   async updateTable(toastId: string, table: PostgresTable, payload: any, columns: ColumnField[]) {
-    // Remove any primary key constraints first (we'll add it back later)
-    if (table.primary_keys.length > 0) {
-      const removePK = await this.removePrimaryKey(table.schema, table.name)
-      if (removePK.error) throw removePK.error
+    // Prepare a check to see if primary keys to the tables were updated or not
+    const primaryKeyColumns = columns
+      .filter((column) => column.isPrimaryKey)
+      .map((column) => `"${column.name}"`)
+    const existingPrimaryKeyColumns = table.primary_keys.map(
+      (pk: PostgresPrimaryKey) => `"${pk.name}"`
+    )
+    const isPrimaryKeyUpdated = !isEqual(primaryKeyColumns, existingPrimaryKeyColumns)
+
+    if (isPrimaryKeyUpdated) {
+      // Remove any primary key constraints first (we'll add it back later)
+      // If we do it later, and if the user deleted a PK column, we'd need to do
+      // an additional check when removing PK if the column in the PK was removed
+      // So doing this one step earlier, lets us skip that additional check.
+      if (table.primary_keys.length > 0) {
+        const removePK = await this.removePrimaryKey(table.schema, table.name)
+        if (removePK.error) throw removePK.error
+      }
     }
 
     // Update the table
@@ -490,7 +510,12 @@ export default class MetaStore implements IMetaStore {
           category: 'loading',
           message: `Adding column ${column.name} to ${updatedTable.name}`,
         })
-        const columnPayload = generateCreateColumnPayload(updatedTable.id, column)
+        // Ensure that columns do not created as primary key first, cause the primary key will
+        // be added later on further down in the code
+        const columnPayload = generateCreateColumnPayload(updatedTable.id, {
+          ...column,
+          isPrimaryKey: false,
+        })
         await this.createColumn(columnPayload, column.foreignKey)
       } else {
         const originalColumn = find(originalColumns, { id: column.id })
@@ -514,11 +539,8 @@ export default class MetaStore implements IMetaStore {
       }
     }
 
-    // Add back the primary keys here
-    const primaryKeyColumns = columns
-      .filter((column) => column.isPrimaryKey)
-      .map((column) => `"${column.name}"`)
-    if (primaryKeyColumns.length > 0) {
+    // Then add back the primary keys again
+    if (isPrimaryKeyUpdated && primaryKeyColumns.length > 0) {
       const primaryKeys = await this.addPrimaryKey(
         updatedTable.schema,
         updatedTable.name,

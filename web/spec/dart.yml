@@ -425,6 +425,18 @@ pages:
             ''')
             .execute();
           ```
+      - name: Filtering with inner joins
+        description: |
+          If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted 
+          to select all rows in a `message` table which belong to a user with the `username` "Jane":
+        js: |
+          ```js
+          final res = await supabase
+            .from('messages')
+            .select('*, users!inner(*)')
+            .eq('users.username', 'Jane')
+            .execute();
+          ```
       - name: Querying with count option
         description: |
           You can get the number of rows by using the count option.

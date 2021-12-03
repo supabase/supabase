@@ -37,7 +37,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
 
   return (
     <div className="mx-6 space-y-6">
-      <Typography.Title level={4}>Statistics for the past 7 days</Typography.Title>
+      <Typography.Title level={4}>Statistics for past 24 hours</Typography.Title>
       <div className="">
         {startDate && endDate && (
           <div className="grid lg:grid-cols-4 lg:gap-8">

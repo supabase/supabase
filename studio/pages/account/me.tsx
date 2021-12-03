@@ -6,7 +6,7 @@ import { IconMoon, IconSun, Select, Typography } from '@supabase/ui'
 import { useProfile, useStore, withAuth } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import AccountLayout from 'components/layouts/AccountLayout'
+import { AccountLayout } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 

@@ -2,7 +2,6 @@ import fs from 'fs'
 import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
-import Head from 'next/head'
 
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
@@ -35,7 +34,7 @@ function Blog(props: any) {
   const [category, setCategory] = useState('all')
   const [blogs, setBlogs] = useState(props.blogs)
 
-  const { basePath } = useRouter()
+  const router = useRouter()
 
   useEffect(() => {
     // contruct an array of blog posts
@@ -59,18 +58,32 @@ function Blog(props: any) {
 
   // append 'all' category
   // const categories = props.categories.push('all')
+  const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
+  const meta_description = 'Get all your Supabase News on the Supabase blog.'
 
   return (
     <>
-      <Head>
-        <link
-          rel="alternate"
-          type="application/rss+xml"
-          title="RSS feed for blog posts"
-          href={`${basePath}/rss.xml`}
-        />
-      </Head>
-      <NextSeo title="Blog" description="Latest news from the Supabase team." />
+      <NextSeo
+        title={meta_title}
+        description={meta_description}
+        openGraph={{
+          title: meta_title,
+          description: meta_description,
+          url: `https://supabase.com/${router.pathname}`,
+          images: [
+            {
+              url: `https://supabase.com/images/og/og-image.jpg`,
+            },
+          ],
+        }}
+        additionalLinkTags={[
+          {
+            rel: 'alternate',
+            type: 'application/rss+xml',
+            href: `https://supabase.com/rss.xml`,
+          },
+        ]}
+      />
       <DefaultLayout>
         <div className="bg-white dark:bg-dark-800 overflow-hidden py-12">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">

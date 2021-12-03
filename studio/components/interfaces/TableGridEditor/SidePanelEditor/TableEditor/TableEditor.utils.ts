@@ -62,6 +62,10 @@ export const inferColumnType = (column: string, rows: object[]) => {
   // General strategy is to check the first row first, before checking across all the rows
   // to ensure uniformity in data type. Thinking we do this as an optimization instead of
   // checking all the rows up front.
+
+  // If there are no rows to infer for, default to text
+  if (rows.length === 0) return 'text'
+
   const columnData = (rows[0] as any)[column]
   const columnDataAcrossRows = rows.map((row: object) => (row as any)[column])
 
