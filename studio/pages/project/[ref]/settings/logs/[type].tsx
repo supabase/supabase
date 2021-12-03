@@ -79,8 +79,13 @@ export const LogPage = () => {
   return (
     <SettingsLayout title={title} className="p-4 space-y-4">
       <LogPanel
-        presets={[
-          { label: "Recent - All", onClick: () => setSearch('') },
+        templates={[
+          {
+            label: "Reset", onClick: () => {
+              setSearch("")
+              setWhere("")
+            }
+          },
           { label: "Recent - Errors", onClick: () => setSearch('[Ee]rror|\\s[45][0-9][0-9]\\s') },
         ]}
         searchValue={search}

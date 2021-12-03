@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Input } from '@supabase/ui'
+import { Button, Input, Dropdown, Typography } from '@supabase/ui'
 import Panel from 'components/to-be-cleaned/Panel'
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
   isLoading: boolean
   children?: JSX.Element
   searchValue?: string
-  presets?: {
+  templates?: {
     label: string
     onClick: () => void
   }[]
@@ -18,18 +18,25 @@ interface Props {
 /**
  * Logs control panel header + wrapper
  */
-const LogPanel = ({ onRefresh, isLoading, searchValue, children, onSearch, onCustomClick, presets = [] }: Props) => (
+const LogPanel = ({ onRefresh, isLoading, searchValue, children, onSearch, onCustomClick, templates = [] }: Props) => (
   <Panel
     title={
       <div className="flex items-center justify-between w-full" >
         <div className="flex flex-row gap-x-4">
-          {presets.map(p =>
-            <Button key={p.label} type="secondary" onClick={p.onClick}>{p.label}</Button>
-          )}
-          <Button type="primary" onClick={onCustomClick}>Custom Query</Button>
+          <Dropdown
+            overlay={templates.map(p =>
+              <Dropdown.Item key={p.label} onClick={p.onClick}>
+                <Typography.Text>{p.label}</Typography.Text>
+              </Dropdown.Item>
+            )}
+          >
+            <Button type="secondary" onClick={()=> console.log("templates clicked")}>Templates</Button>
+          </Dropdown>
+
+          <Button type="secondary" onClick={onCustomClick}>Custom Query</Button>
         </div>
         <div className="flex flex-row gap-x-4">
-          <Input className="max-w-32" placeholder="Search" onChange={e => {
+          <Input className="max-w-32" placeholder="Filter" onChange={e => {
             if (onSearch) onSearch(e.target.value)
           }} value={searchValue} />
           <Button
