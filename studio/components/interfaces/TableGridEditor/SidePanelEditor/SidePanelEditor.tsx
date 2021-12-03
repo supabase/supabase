@@ -208,9 +208,8 @@ const SidePanelEditor: FC<Props> = ({
     if (!saveTableError) {
       setIsEdited(false)
       closePanel()
-    } else {
-      meta.tables.load()
     }
+
     resolve()
   }
 
