@@ -58,7 +58,7 @@ const PageLayout = () => {
             title="Reports"
             ctaButtonLabel="Create report"
             // infoButtonLabel="About reports"
-            // infoButtonUrl="https://supabase.io/docs/guides/storage"
+            // infoButtonUrl="https://supabase.com/docs/guides/storage"
             onClickCta={() => createReport({ router })}
           >
             <Text type="secondary">Create custom reports for your projects.</Text>

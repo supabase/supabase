@@ -5,9 +5,81 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 25 Nov 2021 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 02 Dec 2021 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.com/blog/2021/12/03/supabase-holiday-hackdays-hackathon</guid>
+  <title>Kicking off the Holiday Hackdays</title>
+  <link>https://supabase.com/blog/2021/12/03/supabase-holiday-hackdays-hackathon</link>
+  <description>Build cool stuff and celebrate open-source software with us during the Holiday Hackdays!</description>
+  <pubDate>Thu, 02 Dec 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2021/12/03/pg-graphql</guid>
+  <title>pg_graphql: A GraphQL extension for PostgreSQL</title>
+  <link>https://supabase.com/blog/2021/12/03/pg-graphql</link>
+  <description>GraphQL support is in development for PostgreSQL + Supabase.</description>
+  <pubDate>Thu, 02 Dec 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2021/12/03/launch-week-three-friday-five-more-things</guid>
+  <title>Five more things</title>
+  <link>https://supabase.com/blog/2021/12/03/launch-week-three-friday-five-more-things</link>
+  <description>It's never just one more thing!</description>
+  <pubDate>Thu, 02 Dec 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2021/12/02/supabase-acquires-logflare</guid>
+  <title>Supabase acquires Logflare</title>
+  <link>https://supabase.com/blog/2021/12/02/supabase-acquires-logflare</link>
+  <description>Today, we're ecstatic to announce that Logflare is joining Supabase.</description>
+  <pubDate>Wed, 01 Dec 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2021/12/01/realtime-row-level-security-in-postgresql</guid>
+  <title>Realtime Postgres RLS now available on Supabase</title>
+  <link>https://supabase.com/blog/2021/12/01/realtime-row-level-security-in-postgresql</link>
+  <description>Realtime database changes are now broadcast to authenticated users, respecting the same PostgreSQL policies that you use for Row Level Security.</description>
+  <pubDate>Tue, 30 Nov 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2021/11/30/supabase-studio</guid>
+  <title>Supabase Studio</title>
+  <link>https://supabase.com/blog/2021/11/30/supabase-studio</link>
+  <description>The same Dashboard that you're using on our Platform is now available for local development and Self-Hosting.</description>
+  <pubDate>Mon, 29 Nov 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2021/11/29/community-day</guid>
+  <title>Community Day</title>
+  <link>https://supabase.com/blog/2021/11/29/community-day</link>
+  <description>Kicking off launch week by highlighting the communities around Supabase.</description>
+  <pubDate>Sun, 28 Nov 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2021/11/28/whats-new-in-postgres-14</guid>
+  <title>New in PostgreSQL 14: What every developer should know</title>
+  <link>https://supabase.com/blog/2021/11/28/whats-new-in-postgres-14</link>
+  <description>A quick look at some new features and functionality in PostgreSQL 14.</description>
+  <pubDate>Sat, 27 Nov 2021 16:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2021/11/28/postgrest-9</guid>
+  <title>PostgREST 9</title>
+  <link>https://supabase.com/blog/2021/11/28/postgrest-9</link>
+  <description>New features and updates in PostgREST version 9.</description>
+  <pubDate>Fri, 26 Nov 2021 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.com/blog/2021/11/26/supabase-launch-week-the-trilogy</guid>
   <title>Supabase Launch Week III: Holiday Special</title>

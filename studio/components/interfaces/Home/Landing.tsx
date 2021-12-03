@@ -32,7 +32,7 @@ const Landing = () => {
           </div>
           <div className="hidden md:block md:ml-10 md:pr-4">
             <Typography.Text className="ml-8 font-medium hover:text-gray-300 focus:outline-none focus:text-gray-300 transition duration-150 ease-in-out">
-              <Link href="https://supabase.io/docs">Documentation</Link>
+              <Link href="https://supabase.com/docs">Documentation</Link>
             </Typography.Text>
             <Typography.Text
               type="success"
@@ -58,7 +58,7 @@ const Landing = () => {
             <Link href={`${API_URL}/login`}>
               <Button size="large">Sign In</Button>
             </Link>
-            <Link href="https://supabase.io/docs">
+            <Link href="https://supabase.com/docs">
               <Button size="large" type="default">
                 Docs
               </Button>

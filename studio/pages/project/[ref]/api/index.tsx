@@ -394,7 +394,7 @@ const ResourceContent = ({
                 To read rows in <code>{resourceId}</code>, use the <code>select</code> method.
               </p>
               <p>
-                <a href="https://supabase.io/docs/client/select" target="_blank">
+                <a href="https://supabase.com/docs/client/select" target="_blank">
                   Learn more.
                 </a>
               </p>
@@ -427,7 +427,7 @@ const ResourceContent = ({
               <h4 className="text-white mt-0">Filtering</h4>
               <p>Supabase provides a wide range of filters.</p>
               <p>
-                <a href="https://supabase.io/docs/client/using-filters" target="_blank">
+                <a href="https://supabase.com/docs/client/using-filters" target="_blank">
                   Learn more.
                 </a>
               </p>
@@ -454,7 +454,7 @@ const ResourceContent = ({
                 <code>insert</code> will also return the replaced values for UPSERT.
               </p>
               <p>
-                <a href="https://supabase.io/docs/client/insert" target="_blank">
+                <a href="https://supabase.com/docs/client/insert" target="_blank">
                   Learn more.
                 </a>
               </p>
@@ -490,7 +490,7 @@ const ResourceContent = ({
                 <code>update</code> will also return the replaced values for UPDATE.
               </p>
               <p>
-                <a href="https://supabase.io/docs/client/update" target="_blank">
+                <a href="https://supabase.com/docs/client/update" target="_blank">
                   Learn more.
                 </a>
               </p>
@@ -514,7 +514,7 @@ const ResourceContent = ({
                 default, so remember to specify your filters!
               </p>
               <p>
-                <a href="https://supabase.io/docs/client/delete" target="_blank">
+                <a href="https://supabase.com/docs/client/delete" target="_blank">
                   Learn more.
                 </a>
               </p>
@@ -533,12 +533,11 @@ const ResourceContent = ({
         <div className="doc-section">
           <article className="text ">
             <p>
-              Supabase provides realtime functionality. Right now we recommend only using this on a
-              server-side application (see our notes in the Authentication section).
+              Supabase provides realtime functionality and broadcasts database changes to authorized users depending on Row Level
+              Security (RLS) policies.
             </p>
-            <p>We are building advanced auth so that you can use realtime streams from anywhere.</p>
             <p>
-              <a href="https://supabase.io/docs/client/subscribe" target="_blank">
+              <a href="https://supabase.com/docs/client/subscribe" target="_blank">
                 Learn more.
               </a>
             </p>
@@ -578,7 +577,7 @@ const ResourceContent = ({
           <article className="text ">
             <p>
               These docs are a work in progress! See our{' '}
-              <a href="https://supabase.io/docs/" target="_blank">
+              <a href="https://supabase.com/docs/" target="_blank">
                 docs
               </a>{' '}
               for the additional functionality Supabase has to offer.

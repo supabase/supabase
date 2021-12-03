@@ -30,7 +30,7 @@ const HelpPopover: FC<Props> = () => {
             </Typography.Title>
             <Typography.Text type="secondary" small>
               <p>
-                For issues with your project hosted on supabase.io, or other inquiries about our
+                For issues with your project hosted on supabase.com, or other inquiries about our
                 hosted services.
               </p>
             </Typography.Text>

@@ -27,10 +27,12 @@ export default function SchemaFormPanel({
   const onClickSubmit = () => {
     formRef
       .submit()
-      .then((response) => {
+      .then(() => {
         setSubmitButtonLoading(true)
       })
-      .catch(console.error)
+      .catch((error) => {
+        console.log('Error on submitting', error)
+      })
   }
 
   return (
