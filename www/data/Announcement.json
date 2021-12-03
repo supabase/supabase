@@ -1,6 +1,6 @@
 {
   "show": true,
   "text": "Supabase Launch Week III",
-  "cta": "Realtime Postgres RLS now available",
-  "link": "/blog/2021/12/01/realtime-row-level-security-in-postgresql"
+  "cta": "Supabase acquires Logflare",
+  "link": "/blog/2021/12/02/supabase-acquires-logflare"
 }
