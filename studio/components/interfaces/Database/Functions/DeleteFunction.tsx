@@ -1,5 +1,4 @@
 import { FC, useState } from 'react'
-import toast from 'react-hot-toast'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
 import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
@@ -11,7 +10,7 @@ type DeleteFunctionProps = {
 } & any
 
 const DeleteFunction: FC<DeleteFunctionProps> = ({ func, visible, setVisible }) => {
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
   const [loading, setLoading] = useState(false)
   const { id, name, schema } = func ?? {}
 
@@ -25,11 +24,17 @@ const DeleteFunction: FC<DeleteFunctionProps> = ({ func, visible, setVisible }) 
       if (response.error) {
         throw response.error
       } else {
-        toast.success(`Function ${name} removed`)
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully removed ${name}`,
+        })
         setVisible(false)
       }
     } catch (error: any) {
-      toast.error(`Deleting ${name} failed: ${error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to delete ${name}: ${error.message}`,
+      })
     } finally {
       setLoading(false)
     }

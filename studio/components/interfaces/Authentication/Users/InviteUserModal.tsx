@@ -1,18 +1,20 @@
 import { useContext, useState, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
-import { toast } from 'react-hot-toast'
 import { Button, Modal, Input, IconPlus, IconMail } from '@supabase/ui'
 
+import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
 
 const InviteUserModal = () => {
   const PageState: any = useContext(PageContext)
-  const inputRef = useRef(null)
-  const [visible, setVisible] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [emailValue, setEmailValue] = useState('')
+  const inputRef = useRef<any>(null)
+  const { ui } = useStore()
+
+  const [visible, setVisible] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [emailValue, setEmailValue] = useState<string>('')
 
   function handleToggle() {
     // reset data before showing modal again
@@ -30,33 +32,35 @@ const InviteUserModal = () => {
     const emailValidateRegex =
       /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
     if (!emailValidateRegex.test(emailValue)) {
-      // focus input
-      ;(inputRef?.current as any)?.focus()
-      // show error
-      let message = `${emailValue} is an invalid email`
-      if (emailValue.trim() == '') message = 'Please enter a valid email'
-      toast.error(message)
+      inputRef?.current?.focus()
+      const message =
+        emailValue.trim() === ''
+          ? 'Please enter a valid email'
+          : `${emailValue} is an invalid email`
+      ui.setNotification({ category: 'error', message: message })
       return
     }
 
-    try {
-      setLoading(true)
-      const response = await post(`${API_URL}/auth/${PageState.projectRef}/invite`, {
-        email: emailValue,
+    setLoading(true)
+    const response = await post(`${API_URL}/auth/${PageState.projectRef}/invite`, {
+      email: emailValue,
+    })
+
+    if (response.error) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to invite user: ${response.error.message}`,
       })
-      if (response.error) {
-        toast.error(`Inviting user failed: ${response.error.message}`)
-      } else {
-        PageState.fetchData(1)
-        toast(`Sent invite email to ${emailValue}`)
-      }
-    } catch (error) {
-      console.error('onInviteUser error:', error)
-      toast.error(`Inviting user failed`)
-    } finally {
-      setLoading(false)
-      setVisible(false)
+    } else {
+      PageState.fetchData(1)
+      ui.setNotification({
+        category: 'success',
+        message: `Sent invite email to ${emailValue}`,
+      })
     }
+
+    setLoading(false)
+    setVisible(false)
   }
 
   return (
