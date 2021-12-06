@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { FC, useEffect, createContext, useContext } from 'react'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { isEmpty, mapValues, has, without, union } from 'lodash'
@@ -15,7 +15,6 @@ import {
   IconTool,
   Badge,
 } from '@supabase/ui'
-import toast from 'react-hot-toast'
 import { Dictionary } from '@supabase/grid'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
@@ -241,7 +240,7 @@ function hasWhitespace(value: string) {
   return /\s/.test(value)
 }
 
-const CreateTriggerContext = React.createContext<ICreateTriggerStore | null>(null)
+const CreateTriggerContext = createContext<ICreateTriggerStore | null>(null)
 
 type CreateTriggerProps = {
   trigger?: any
@@ -249,8 +248,8 @@ type CreateTriggerProps = {
   setVisible: (value: boolean) => void
 } & any
 
-const CreateTrigger: React.FC<CreateTriggerProps> = ({ trigger, visible, setVisible }) => {
-  const { meta } = useStore()
+const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible }) => {
+  const { ui, meta } = useStore()
   const _localState = useLocalObservable(() => new CreateTriggerStore())
   _localState.meta = meta as any
 
@@ -258,7 +257,7 @@ const CreateTrigger: React.FC<CreateTriggerProps> = ({ trigger, visible, setVisi
   const router = useRouter()
   const { ref } = router.query
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchTables = async () => {
       await (_localState!.meta as any)!.tables!.load()
       const tables = (_localState!.meta as any)!.tables.list()
@@ -274,7 +273,7 @@ const CreateTrigger: React.FC<CreateTriggerProps> = ({ trigger, visible, setVisi
     fetchFunctions()
   }, [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (trigger) {
       _localState.formState.reset(trigger)
     } else {
@@ -294,19 +293,29 @@ const CreateTrigger: React.FC<CreateTriggerProps> = ({ trigger, visible, setVisi
           : await (_localState.meta as any).triggers.create(body)
 
         if (response.error) {
-          toast.error(`Error: ${response.error.message ?? 'submit request failed'}`)
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to create trigger: ${
+              response.error?.message ?? 'submit request failed'
+            }`,
+          })
           _localState.setLoading(false)
         } else {
-          toast.success(
-            `${_localState.isEditing ? 'Updated' : 'Created new'} trigger called ${response.name}`
-          )
+          ui.setNotification({
+            category: 'success',
+            message: `${_localState.isEditing ? 'Updated' : 'Created new'} trigger called ${
+              response.name
+            }`,
+          })
           _localState.setLoading(false)
           setVisible(!visible)
         }
       }
     } catch (error: any) {
-      console.error('Handle submit error:', error)
-      toast.error(error.message)
+      ui.setNotification({
+        category: 'error',
+        message: `Filed to create trigger: ${error.message}`,
+      })
       _localState.setLoading(false)
     }
   }
@@ -375,7 +384,7 @@ const CreateTrigger: React.FC<CreateTriggerProps> = ({ trigger, visible, setVisi
   )
 }
 
-const NoTableState: React.FC = ({}) => {
+const NoTableState: FC = ({}) => {
   // for the empty 'no tables' state link
   const router = useRouter()
   const { ref } = router.query
@@ -397,8 +406,8 @@ const NoTableState: React.FC = ({}) => {
 
 export default observer(CreateTrigger)
 
-const InputName: React.FC = observer(({}) => {
-  const _localState = React.useContext(CreateTriggerContext)
+const InputName: FC = observer(({}) => {
+  const _localState = useContext(CreateTriggerContext)
   return (
     <Input
       id="name"
@@ -419,8 +428,8 @@ const InputName: React.FC = observer(({}) => {
   )
 })
 
-const SelectEnabledMode: React.FC = observer(({}) => {
-  const _localState = React.useContext(CreateTriggerContext)
+const SelectEnabledMode: FC = observer(({}) => {
+  const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
       id="enabled-mode"
@@ -490,8 +499,8 @@ const SelectEnabledMode: React.FC = observer(({}) => {
   )
 })
 
-const SelectOrientation: React.FC = observer(({}) => {
-  const _localState = React.useContext(CreateTriggerContext)
+const SelectOrientation: FC = observer(({}) => {
+  const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
       id="orientation"
@@ -519,8 +528,8 @@ const SelectOrientation: React.FC = observer(({}) => {
   )
 })
 
-const ListboxTable: React.FC = observer(({}) => {
-  const _localState = React.useContext(CreateTriggerContext)
+const ListboxTable: FC = observer(({}) => {
+  const _localState = useContext(CreateTriggerContext)
 
   return (
     <Listbox
@@ -582,8 +591,8 @@ const ListboxTable: React.FC = observer(({}) => {
   )
 })
 
-const CheckboxEvents: React.FC = observer(({}) => {
-  const _localState = React.useContext(CreateTriggerContext)
+const CheckboxEvents: FC = observer(({}) => {
+  const _localState = useContext(CreateTriggerContext)
   return (
     // @ts-ignore
     <Checkbox.Group
@@ -628,8 +637,8 @@ const CheckboxEvents: React.FC = observer(({}) => {
   )
 })
 
-const ListboxActivation: React.FC = observer(({}) => {
-  const _localState = React.useContext(CreateTriggerContext)
+const ListboxActivation: FC = observer(({}) => {
+  const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
       id="activation"
@@ -680,8 +689,8 @@ const ListboxActivation: React.FC = observer(({}) => {
   )
 })
 
-const FunctionForm: React.FC = observer(({}) => {
-  const _localState = React.useContext(CreateTriggerContext)
+const FunctionForm: FC = observer(({}) => {
+  const _localState = useContext(CreateTriggerContext)
 
   return (
     <div className="space-y-4">
@@ -699,8 +708,8 @@ const FunctionForm: React.FC = observer(({}) => {
   )
 })
 
-const FunctionEmpty: React.FC = observer(({}) => {
-  const _localState = React.useContext(CreateTriggerContext)
+const FunctionEmpty: FC = observer(({}) => {
+  const _localState = useContext(CreateTriggerContext)
   return (
     <button
       type="button"
@@ -722,8 +731,8 @@ const FunctionEmpty: React.FC = observer(({}) => {
   )
 })
 
-const FunctionWithArguments: React.FC = observer(({}) => {
-  const _localState = React.useContext(CreateTriggerContext)
+const FunctionWithArguments: FC = observer(({}) => {
+  const _localState = useContext(CreateTriggerContext)
 
   return (
     <>

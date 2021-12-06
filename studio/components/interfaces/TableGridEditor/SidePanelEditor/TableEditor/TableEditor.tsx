@@ -1,9 +1,9 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
-import { toast } from 'react-hot-toast'
 import { Badge, Checkbox, Divider, SidePanel, Space, Input, Typography } from '@supabase/ui'
 import { PostgresTable } from '@supabase/postgres-meta'
 
+import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import ColumnManagement from './ColumnManagement'
@@ -57,6 +57,7 @@ const TableEditor: FC<Props> = ({
   saveChanges = () => {},
   updateEditorDirty = () => {},
 }) => {
+  const { ui } = useStore()
   const isNewRecord = isUndefined(table)
 
   const [errors, setErrors] = useState<any>({})
@@ -102,7 +103,9 @@ const TableEditor: FC<Props> = ({
   const onSaveChanges = (resolve: any) => {
     if (tableFields) {
       const errors: any = validateFields(tableFields)
-      if (errors.columns) toast.error(errors.columns)
+      if (errors.columns) {
+        ui.setNotification({ category: 'error', message: errors.columns })
+      }
       setErrors(errors)
 
       if (isEmpty(errors)) {

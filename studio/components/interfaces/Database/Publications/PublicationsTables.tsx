@@ -1,6 +1,5 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { toast } from 'react-hot-toast'
 import { Button, Toggle, Input, IconChevronLeft, IconSearch } from '@supabase/ui'
 
 import { useStore } from 'hooks'
@@ -19,7 +18,7 @@ const PublicationsTables: FC<Props> = ({
   onSelectBack,
   onPublicationUpdated,
 }) => {
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
 
   const tables =
@@ -48,7 +47,10 @@ const PublicationsTables: FC<Props> = ({
             onPublicationUpdated(res)
           }
         } catch (error: any) {
-          toast.error(error.message)
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to toggle replication for all tables: ${error.message}`,
+          })
         }
       },
     })

@@ -72,13 +72,16 @@ function InviteMemberModal({ organization, members = [] }) {
       user_id: PageState.selectedProfile.id,
     })
     if (response?.error) {
-      toast.error(response.error.message)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to add member: ${response.error.message}`,
+      })
       PageState.addMemberLoading = false
     } else {
       const newMember = response
       mutateOrgMembers([...PageState.members, newMember], false)
       toggle()
-      toast(`New member added`)
+      ui.setNotification({ category: 'success', message: 'Successfully added new member' })
     }
   }
 
@@ -120,6 +123,7 @@ export default observer(InviteMemberModal)
 
 const InputSearchWithResults = observer(({ className }) => {
   const PageState = useContext(PageContext)
+  const { ui } = useStore()
   const [loading, setLoading] = useState(false)
   const debounceSearchProfile = useCallback(debounce(searchProfile, 500), [PageState.keywords])
 
@@ -137,7 +141,10 @@ const InputSearchWithResults = observer(({ className }) => {
     setLoading(true)
     const response = await post(`${API_URL}/profile/search`, { keywords: PageState.keywords })
     if (response.error) {
-      toast.error(response.error.message)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to search profile: ${response.error.message}`,
+      })
       setLoading(false)
     } else {
       PageState.setProfiles(response)

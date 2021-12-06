@@ -4,11 +4,13 @@ import { useRouter } from 'next/router'
 import { AutoField } from 'uniforms-bootstrap4'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 
+import { useStore } from 'hooks'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
 import { useProjectContentStore } from 'stores/projectContentStore'
-import toast from 'react-hot-toast'
 
 const RenameQuery = observer(({ tabId, onComplete }) => {
+  const { ui } = useStore()
+
   const router = useRouter()
   const { ref } = router.query
 
@@ -40,8 +42,11 @@ const RenameQuery = observer(({ tabId, onComplete }) => {
       if (onComplete) onComplete()
       return Promise.resolve()
     } catch (error) {
-      toast.error(error.message)
-      console.error(error)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to rename query: ${error.message}`,
+      })
     }
   }
 

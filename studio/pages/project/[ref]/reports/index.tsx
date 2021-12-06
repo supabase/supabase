@@ -59,7 +59,16 @@ const PageLayout = () => {
             ctaButtonLabel="Create report"
             // infoButtonLabel="About reports"
             // infoButtonUrl="https://supabase.com/docs/guides/storage"
-            onClickCta={() => createReport({ router })}
+            onClickCta={() => {
+              try {
+                createReport({ router })
+              } catch (error: any) {
+                ui.setNotification({
+                  category: 'error',
+                  message: `Failed to create report: ${error.message}`,
+                })
+              }
+            }}
           >
             <Text type="secondary">Create custom reports for your projects.</Text>
             <Text type="secondary">
