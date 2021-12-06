@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { SettingsLayout } from 'components/layouts/'
 import { useRouter } from 'next/router'
 import LogPanel from 'components/ui/Logs/LogPanel'
