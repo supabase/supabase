@@ -5,6 +5,7 @@ import { Badge, Typography } from '@supabase/ui'
 import Table from 'components/to-be-cleaned/Table'
 
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import { IS_PLATFORM } from 'lib/constants'
 import UserDropdown from './UserDropdown'
 
 interface Props {
@@ -45,9 +46,7 @@ const UserListItem: FC<Props> = ({ user }) => {
           {user.id}
         </SimpleCodeBlock>
       </Table.td>
-      <Table.td className="text-right">
-        <UserDropdown user={user} />
-      </Table.td>
+      <Table.td className="text-right">{IS_PLATFORM && <UserDropdown user={user} />}</Table.td>
     </Table.tr>
   )
 }
