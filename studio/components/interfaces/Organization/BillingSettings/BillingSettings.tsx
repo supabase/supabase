@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import toast from 'react-hot-toast'
 import { useRouter } from 'next/router'
 import { FC, useState, useEffect } from 'react'
 import { Typography, Badge, Button, IconTrash, IconCreditCard } from '@supabase/ui'
 
+import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { post } from 'lib/common/fetch'
@@ -17,6 +17,7 @@ interface Props {
 
 const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
   const router = useRouter()
+  const { ui } = useStore()
 
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<any>(undefined)
@@ -53,7 +54,10 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
       setPaymentMethods(paymentMethods)
       setCustomer(customer)
     } catch (error: any) {
-      toast.error(error.message)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to get Stripe account: ${error.message}`,
+      })
       setError(error)
     } finally {
       setLoading(false)
@@ -73,7 +77,7 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
       })
       window.location.replace(billingPortal + (path ? path : null))
     } catch (error: any) {
-      toast.error(error.message)
+      ui.setNotification({ category: 'error', message: `Failed to redirect: ${error.message}` })
     } finally {
       setLoading(false)
     }
