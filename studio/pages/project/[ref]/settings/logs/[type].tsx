@@ -83,9 +83,15 @@ export const LogPage = () => {
         onReset={() => {
           setWhere('')
           setSearch('')
+          setMode('simple') // this is necessary to reset the value of the monaco editor
         }}
         templates={[
-          { label: "Recent - Errors", onClick: () => setSearch('[Ee]rror|\\s[45][0-9][0-9]\\s') },
+          { label: "Recent Errors", onClick: () => setSearch('[Ee]rror|\\s[45][0-9][0-9]\\s') },
+          { label: "POST or PATCH", onClick: () => {
+            setSearch('')
+            setMode('custom')
+            setWhere("REGEXP_CONTAINS(event_message, 'POST') OR REGEXP_CONTAINS(event_message, 'PATCH') ")
+          } },
         ]}
         searchValue={search}
         onCustomClick={handleModeToggle} isLoading={isLoading} onRefresh={handleRefresh} onSearch={setSearch} />
