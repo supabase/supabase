@@ -12,6 +12,7 @@ import { API_URL } from 'lib/constants'
 import { Typography, Button } from '@supabase/ui'
 import debounce from 'lodash/debounce'
 import CodeEditor from 'components/ui/CodeEditor'
+import { ButtonProps } from '@supabase/ui/dist/cjs/components/Button/Button'
 
 interface CountData {
   count: number
@@ -110,10 +111,12 @@ export const LogPage = () => {
       {error && (
         <Typography.Text className="text-center w-full block">Could not fetch data</Typography.Text>
       )}
-      {newCount ? <Button type="dashed" onClick={handleRefresh} block>Load new logs</Button> : null}
+      {newCount ? <LoadNewLogsButton onClick={handleRefresh} /> : null}
       <LogTable data={logData} />
     </SettingsLayout>
   )
 }
+
+const LoadNewLogsButton = (props: ButtonProps) => <Button type="dashed" block {...props}>Load new logs</Button>
 
 export default withAuth(observer(LogPage))
