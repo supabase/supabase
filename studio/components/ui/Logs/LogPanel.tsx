@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Input, Dropdown, Typography } from '@supabase/ui'
+import { Button, Input, Dropdown, Typography, IconChevronDown } from '@supabase/ui'
 import Panel from 'components/to-be-cleaned/Panel'
 
 interface Props {
@@ -35,13 +35,17 @@ const LogPanel = ({
       <div className="flex items-center justify-between w-full" >
         <div className="flex flex-row gap-x-4">
           <Dropdown
+            side="bottom"
+            align="start"
             overlay={templates.map(p =>
               <Dropdown.Item key={p.label} onClick={p.onClick}>
                 <Typography.Text>{p.label}</Typography.Text>
               </Dropdown.Item>
             )}
           >
-            <Button type="secondary" onClick={() => console.log("templates clicked")}>Templates</Button>
+            <Button
+              iconRight={<IconChevronDown />}
+              type="secondary" onClick={() => console.log("templates clicked")}>Templates</Button>
           </Dropdown>
 
           <Button type="secondary" onClick={onCustomClick}>Custom query</Button>
