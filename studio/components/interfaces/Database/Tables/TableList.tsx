@@ -1,6 +1,5 @@
 import { FC, ReactNode, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { toast } from 'react-hot-toast'
 import {
   Button,
   IconPlus,
@@ -51,7 +50,7 @@ const TableList: FC<{
   onEditTable: (table: any) => void
   onOpenTable: (table: any) => void
 }> = observer(({ onAddTable = () => {}, onEditTable = () => {}, onOpenTable = () => {} }) => {
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
   const tables =
     filterString.length === 0
@@ -70,10 +69,16 @@ const TableList: FC<{
           if (response.error) {
             throw response.error
           } else {
-            toast.success(`Successfully removed ${table.name}.`)
+            ui.setNotification({
+              category: 'success',
+              message: `Successfully removed ${table.name}.`,
+            })
           }
         } catch (error: any) {
-          toast.error(`Deleting ${table.name} failed: ${error.message}`)
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to delete ${table.name}: ${error.message}`,
+          })
         }
       },
     })
