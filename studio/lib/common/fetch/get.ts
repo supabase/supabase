@@ -1,4 +1,4 @@
-import { handleError, handleResponse, handleResponseError } from './base'
+import { handleError, handleResponse, handleResponseError, getAccessToken } from './base'
 import { uuidv4 } from '../../helpers'
 import { SupaResponse } from 'types/base'
 
@@ -9,6 +9,7 @@ export async function get<T = any>(
   const requestId = uuidv4()
   try {
     const { headers, ...otherOptions } = options ?? {}
+    const accessToken = getAccessToken()
     const response = await fetch(url, {
       method: 'GET',
       credentials: 'include',
@@ -17,6 +18,7 @@ export async function get<T = any>(
         'Content-Type': 'application/json',
         Accept: 'application/json',
         'X-Request-Id': requestId,
+        'Authorization': `Bearer ${accessToken}`,
         ...headers,
       },
       ...otherOptions,
