@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { Typography } from '@supabase/ui'
 import { AutoField, LongTextField } from 'uniforms-bootstrap4'
 
-import { API_URL } from 'lib/constants'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { useProjectAuthConfig, useStore } from 'hooks'
 import { pluckJsonSchemaFields } from 'lib/helpers'
 import { patch } from 'lib/common/fetch'
@@ -62,8 +62,9 @@ const Templates: FC<any> = ({ project }) => {
           onSubmit={(model: any) => onFormSubmit(model)}
         >
           <AutoField
-            name="SMS_TEMPLATE"
             showInlineError
+            name="SMS_TEMPLATE"
+            readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an sms body."
           />
@@ -83,14 +84,16 @@ const Templates: FC<any> = ({ project }) => {
           onSubmit={(model: any) => onFormSubmit(model)}
         >
           <AutoField
-            name="MAILER_SUBJECTS_CONFIRMATION"
             showInlineError
+            name="MAILER_SUBJECTS_CONFIRMATION"
+            readOnly={!IS_PLATFORM}
             errorMessage="Please enter a subject."
           />
           <LongTextField
+            showInlineError
             name="MAILER_TEMPLATES_CONFIRMATION_CONTENT"
             rows={6}
-            showInlineError
+            readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an email body."
           />
@@ -110,14 +113,16 @@ const Templates: FC<any> = ({ project }) => {
           onSubmit={(model: any) => onFormSubmit(model)}
         >
           <AutoField
-            name="MAILER_SUBJECTS_RECOVERY"
             showInlineError
+            name="MAILER_SUBJECTS_RECOVERY"
+            readOnly={!IS_PLATFORM}
             errorMessage="Please enter a subject."
           />
           <LongTextField
+            showInlineError
             name="MAILER_TEMPLATES_RECOVERY_CONTENT"
             rows={6}
-            showInlineError
+            readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an email body."
           />
@@ -138,14 +143,16 @@ const Templates: FC<any> = ({ project }) => {
             onSubmit={(model: any) => onFormSubmit(model)}
           >
             <AutoField
-              name="MAILER_SUBJECTS_MAGIC_LINK"
               showInlineError
+              name="MAILER_SUBJECTS_MAGIC_LINK"
+              readOnly={!IS_PLATFORM}
               errorMessage="Please enter a subject."
             />
             <LongTextField
+              showInlineError
               name="MAILER_TEMPLATES_MAGIC_LINK_CONTENT"
               rows={6}
-              showInlineError
+              readOnly={!IS_PLATFORM}
               inputClassName="font-mono"
               errorMessage="Please enter an email body."
             />
@@ -166,14 +173,16 @@ const Templates: FC<any> = ({ project }) => {
           onSubmit={(model: any) => onFormSubmit(model)}
         >
           <AutoField
-            name="MAILER_SUBJECTS_EMAIL_CHANGE"
             showInlineError
+            name="MAILER_SUBJECTS_EMAIL_CHANGE"
+            readOnly={!IS_PLATFORM}
             errorMessage="Please enter a subject."
           />
           <LongTextField
+            showInlineError
             name="MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT"
             rows={6}
-            showInlineError
+            readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an email body."
           />
@@ -193,14 +202,16 @@ const Templates: FC<any> = ({ project }) => {
           onSubmit={(model: any) => onFormSubmit(model)}
         >
           <AutoField
-            name="MAILER_SUBJECTS_INVITE"
             showInlineError
+            name="MAILER_SUBJECTS_INVITE"
+            readOnly={!IS_PLATFORM}
             errorMessage="Please enter a subject."
           />
           <LongTextField
+            showInlineError
             name="MAILER_TEMPLATES_INVITE_CONTENT"
             rows={6}
-            showInlineError
+            readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an email body."
           />
