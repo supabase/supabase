@@ -3,12 +3,11 @@ import { FC } from 'react'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { toast } from 'react-hot-toast'
 import { Typography } from '@supabase/ui'
 import { AutoField, LongTextField } from 'uniforms-bootstrap4'
 
 import { API_URL } from 'lib/constants'
-import { useProjectAuthConfig } from 'hooks'
+import { useProjectAuthConfig, useStore } from 'hooks'
 import { pluckJsonSchemaFields } from 'lib/helpers'
 import { patch } from 'lib/common/fetch'
 import { authConfig } from 'stores/jsonSchema'
@@ -16,6 +15,7 @@ import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 
 const Templates: FC<any> = ({ project }) => {
   const router = useRouter()
+  const { ui } = useStore()
   const magicLinkEnable = semver.gte(
     // @ts-ignore
     semver.coerce(toJS(project?.kpsVersion) || 'kps-v0.0.1'),
@@ -37,10 +37,16 @@ const Templates: FC<any> = ({ project }) => {
   const onFormSubmit = async (model: any) => {
     const response = await patch(`${API_URL}/auth/${router.query.ref}/config`, model)
     if (response.error) {
-      toast.error(`Update config failed: ${response.error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Update config failed: ${response.error.message}`,
+      })
     } else {
       mutateAuthConfig(response)
-      toast(`Settings saved`)
+      ui.setNotification({
+        category: 'success',
+        message: 'Settings saved!',
+      })
     }
   }
 

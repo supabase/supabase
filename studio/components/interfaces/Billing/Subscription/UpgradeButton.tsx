@@ -1,9 +1,9 @@
 import React, { useReducer, useState } from 'react'
 import { useRouter } from 'next/router'
-import { toast } from 'react-hot-toast'
 import { includes, without } from 'lodash'
 import { Button, Modal, Input, Divider, Typography } from '@supabase/ui'
 
+import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { post } from 'lib/common/fetch'
@@ -18,8 +18,9 @@ import { CancellationReasons } from './SubcriptionCancellation.constants'
 
 export default function UpgradeButton({ projectRef, paid }: any) {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [exitSurveyVisible, setExitSurveyVisible] = useState(false)
+  const { ui } = useStore()
+  const [loading, setLoading] = useState<boolean>(false)
+  const [exitSurveyVisible, setExitSurveyVisible] = useState<boolean>(false)
 
   /**
    * Get a link and then redirect them
@@ -34,7 +35,7 @@ export default function UpgradeButton({ projectRef, paid }: any) {
       window.location.replace(subscriptionPortal || billingPortal)
       setExitSurveyVisible(false)
     } catch (error: any) {
-      toast.error(error.message)
+      ui.setNotification({ category: 'error', message: `Failed to redirect: ${error.message}` })
     } finally {
       setExitSurveyVisible(false)
       setLoading(false)
@@ -64,11 +65,15 @@ export default function UpgradeButton({ projectRef, paid }: any) {
 }
 
 function UnsubcribeExitSurvey({ visible, setVisible, handleDowngrade }: any) {
-  const [loading, setLoading] = useState(false)
-  const [selectedCancellationReasons, dispatchSelectedCancellationReasons] = useReducer(reducer, [])
-  const [additionalFeedback, setAdditionalFeedback] = useState('')
   const router = useRouter()
   const { ref } = router.query
+
+  const { ui } = useStore()
+
+  const [loading, setLoading] = useState<boolean>(false)
+  const [additionalFeedback, setAdditionalFeedback] = useState('')
+
+  const [selectedCancellationReasons, dispatchSelectedCancellationReasons] = useReducer(reducer, [])
 
   const sendExitSurvey = async () => {
     try {
@@ -97,8 +102,7 @@ function UnsubcribeExitSurvey({ visible, setVisible, handleDowngrade }: any) {
       setLoading(false)
       await handleDowngrade()
     } catch (error: any) {
-      console.error(error)
-      toast.error(error)
+      ui.setNotification({ category: 'error', message: `Failed to submit exit survey: ${error}` })
     }
   }
 

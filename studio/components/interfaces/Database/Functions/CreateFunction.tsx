@@ -13,7 +13,6 @@ import {
   IconPlus,
   Toggle,
 } from '@supabase/ui'
-import { toast } from 'react-hot-toast'
 import { Dictionary } from '@supabase/grid'
 import { makeAutoObservable } from 'mobx'
 
@@ -292,7 +291,7 @@ type CreateFunctionProps = {
 } & any
 
 const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) => {
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
   const _localState = useLocalObservable(() => new CreateFunctionStore())
   _localState.meta = meta as any
 
@@ -321,18 +320,29 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
           : await (_localState!.meta as any).functions.create(body)
 
         if (response.error) {
-          toast.error(`Error: ${response.error.message ?? 'submit request failed'}`)
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to create function: ${
+              response.error?.message ?? 'Submit request failed'
+            }`,
+          })
           _localState.setLoading(false)
         } else {
-          toast.success(
-            `${_localState.isEditing ? 'Updated' : 'Created new'} function called ${response.name}`
-          )
+          ui.setNotification({
+            category: 'success',
+            message: `${_localState.isEditing ? 'Updated' : 'Created new'} function called ${
+              response.name
+            }`,
+          })
           _localState.setLoading(false)
           setVisible(!visible)
         }
       }
     } catch (error: any) {
-      toast.error(error.message)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to create function: ${error.message}`,
+      })
       _localState.setLoading(false)
     }
   }
