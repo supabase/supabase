@@ -1,3 +1,4 @@
+import { tryParseJson } from 'lib/helpers'
 import { SupaResponse } from 'types/base'
 
 export function handleError<T>(e: any, requestId: string): SupaResponse<T> {
@@ -61,4 +62,14 @@ export async function handleResponseError<T = unknown>(
     const error = { code: response.status, message, requestId }
     return { error } as unknown as SupaResponse<T>
   }
+}
+
+export function getAccessToken() {
+  const tokenData = window?.localStorage['supabase.auth.token']
+  if (!tokenData) return undefined
+  const tokenObj = tryParseJson(tokenData)
+  if (tokenObj === false) {
+    return ""
+  }
+  return tokenObj.currentSession.access_token
 }
