@@ -68,10 +68,10 @@ type TdProps = {
   colSpan?: number
   className?: string
   style?: React.CSSProperties
-}
-const Td: React.FC<TdProps> = ({ children, colSpan, className, style }) => {
+} &  React.HTMLProps<HTMLTableCellElement>
+const Td: React.FC<TdProps> = ({ children, colSpan, className, style , ...rest}) => {
   return (
-    <td className={className} colSpan={colSpan} style={style}>
+    <td className={className} colSpan={colSpan} style={style} {...rest}>
       {children}
     </td>
   )
