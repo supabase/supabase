@@ -111,7 +111,7 @@ export const LogPage = () => {
       {error && (
         <Typography.Text className="text-center w-full block">Could not fetch data</Typography.Text>
       )}
-      {newCount ? <LoadNewLogsButton onClick={handleRefresh} /> : null}
+      {newCount && <LoadNewLogsButton onClick={handleRefresh} />}
       <LogTable data={logData} />
     </SettingsLayout>
   )
