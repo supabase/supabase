@@ -1,8 +1,8 @@
 import { FC, useContext, useState } from 'react'
-import { toast } from 'react-hot-toast'
 import { observer } from 'mobx-react-lite'
 import { Button, Dropdown, Divider, IconTrash, IconMail, IconMoreHorizontal } from '@supabase/ui'
 
+import { useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
 import { post, delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -11,20 +11,29 @@ import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmM
 
 const UserDropdown: FC<{ user: any }> = ({ user }) => {
   const PageState: any = useContext(PageContext)
-  const [loading, setLoading] = useState(false)
+  const { ui } = useStore()
+  const [loading, setLoading] = useState<boolean>(false)
 
   async function handleResetPassword() {
     try {
       setLoading(true)
       const response = await post(`${API_URL}/auth/${PageState.projectRef}/recover`, user)
       if (response.error) {
-        toast.error(`Send password recovery failed: ${response.error.message}`)
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to send password recovery: ${response.error.message}`,
+        })
       } else {
-        toast(`Sent password recovery to ${user.email}`)
+        ui.setNotification({
+          category: 'success',
+          message: `Sent password recovery to ${user.email}`,
+        })
       }
-    } catch (error) {
-      console.error('handleResetPassword error:', error)
-      toast.error(`Send password recovery failed`)
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Send password recovery failed: ${error?.message}`,
+      })
     } finally {
       setLoading(false)
     }
@@ -35,13 +44,21 @@ const UserDropdown: FC<{ user: any }> = ({ user }) => {
       setLoading(true)
       const response = await post(`${API_URL}/auth/${PageState.projectRef}/magiclink`, user)
       if (response.error) {
-        toast.error(`Sending magic link failed: ${response.error.message}`)
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to send magic link: ${response.error.message}`,
+        })
       } else {
-        toast(`Sent magic link to ${user.email}`)
+        ui.setNotification({
+          category: 'success',
+          message: `Sent magic link to ${user.email}`,
+        })
       }
-    } catch (error) {
-      console.error('handleSendMagicLink error:', error)
-      toast.error(`Sending magic link failed`)
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to send magic link: ${error?.message}`,
+      })
     } finally {
       setLoading(false)
     }
@@ -52,13 +69,21 @@ const UserDropdown: FC<{ user: any }> = ({ user }) => {
       setLoading(true)
       const response = await post(`${API_URL}/auth/${PageState.projectRef}/otp`, user)
       if (response.error) {
-        toast.error(`Sending OTP failed: ${response.error.message}`)
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to OTP: ${response.error.message}`,
+        })
       } else {
-        toast(`Sent OTP to ${user.phone}`)
+        ui.setNotification({
+          category: 'success',
+          message: `Sent OTP to ${user.phone}`,
+        })
       }
-    } catch (error) {
-      console.error('handleSendOtp error:', error)
-      toast.error(`Sending OTP failed`)
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to send OTP: ${error?.message}`,
+      })
     } finally {
       setLoading(false)
     }
@@ -74,10 +99,14 @@ const UserDropdown: FC<{ user: any }> = ({ user }) => {
         setLoading(true)
         const response = await delete_(`${API_URL}/auth/${PageState.projectRef}/users`, user)
         if (response.error) {
-          toast.error(`Deleting user failed: ${response.error.message}`)
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to delete user: ${response.error.message}`,
+          })
         } else {
-          toast(`User ${user.email} deleted`)
+          ui.setNotification({ category: 'success', message: `Successfully deleted ${user.email}` })
           PageState.users = PageState.users.filter((x: any) => x.id != user.id)
+          PageState.totalUsers -= 1
         }
         setLoading(false)
       },

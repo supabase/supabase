@@ -30,7 +30,7 @@ const data: Investor[] = [
   {
     name: 'Y Combinator',
     round: 'A',
-    title: 'CEO @ Vercel',
+    title: 'Y Combinator',
     img: '/images/logos/yc--grey.png',
     lead: true,
     twitter: null,

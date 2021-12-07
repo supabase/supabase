@@ -1,8 +1,8 @@
 import { useCallback, useState, FC } from 'react'
-import toast from 'react-hot-toast'
 import { debounce, includes } from 'lodash'
 import { SidePanel, Typography } from '@supabase/ui'
 
+import { useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import ActionBar from '../../ActionBar'
 import { parseSpreadsheet, parseSpreadsheetText } from './SpreadsheetImport.utils'
@@ -27,6 +27,8 @@ const SpreadsheetImport: FC<Props> = ({
   closePanel,
   visible = false,
 }) => {
+  const { ui } = useStore()
+
   const [spreadsheetData, setSpreadsheetData] = useState<any>({
     headers: headers,
     rows: rows,
@@ -48,7 +50,10 @@ const SpreadsheetImport: FC<Props> = ({
     event.persist()
     const [file] = event.target.files || event.dataTransfer.files
     if (!file || !includes(UPLOAD_FILE_TYPES, file?.type)) {
-      toast('Sorry! We only accept CSV or TSV file types, please upload another file.')
+      ui.setNotification({
+        category: 'info',
+        message: 'Sorry! We only accept CSV or TSV file types, please upload another file.',
+      })
     } else {
       setUploadedFile(file)
       const { headers, rowCount, rowPreview, errors } = await parseSpreadsheet(
@@ -56,14 +61,18 @@ const SpreadsheetImport: FC<Props> = ({
         onProgressUpdate
       )
       if (errors.length <= 5) {
-        errors.map((error: any) =>
-          toast.error(`Error found at row ${error.row} - ${error.type}: ${error.code}`)
-        )
+        errors.map((error: any) => {
+          ui.setNotification({
+            category: 'error',
+            message: `Error found at row ${error.row} - ${error.type}: ${error.code}`,
+          })
+        })
       } else if (errors.length > 5) {
-        console.warn('Errors while parsing:', errors)
-        toast.error(
-          `Multiple errors have been detected on ${errors.length} rows. Do check the file you have uploaded for any discrepancies.`
-        )
+        ui.setNotification({
+          error: errors,
+          category: 'error',
+          message: `Multiple errors have been detected on ${errors.length} rows. Do check the file you have uploaded for any discrepancies.`,
+        })
       }
       setSpreadsheetData({ headers, rowCount, rows: rowPreview })
     }
@@ -79,14 +88,19 @@ const SpreadsheetImport: FC<Props> = ({
     if (text.length > 0) {
       const { headers, rows, errors } = await parseSpreadsheetText(text)
       if (errors.length <= 5) {
-        errors.map((error: any) =>
-          toast.error(`Error found at row ${error.row || 0} - ${error.type}: ${error.code}`)
-        )
+        errors.map((error: any) => {
+          ui.setNotification({
+            error,
+            category: 'error',
+            message: `Error found at row ${error.row || 0} - ${error.type}: ${error.code}`,
+          })
+        })
       } else if (errors.length > 5) {
-        console.warn('Errors while parsing:', errors)
-        toast.error(
-          `Multiple errors have been detected on ${errors.length} rows. Do check your input for any discrepancies.`
-        )
+        ui.setNotification({
+          error: errors,
+          category: 'error',
+          message: `Multiple errors have been detected on ${errors.length} rows. Do check your input for any discrepancies.`,
+        })
       }
       setSpreadsheetData({ headers, rows, rowCount: rows.length })
     } else {

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import toast from 'react-hot-toast'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
 import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
@@ -11,7 +10,7 @@ type DeleteHookProps = {
 } & any
 
 const DeleteHook: React.FC<DeleteHookProps> = ({ hook, visible, setVisible }) => {
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
   const [loading, setLoading] = React.useState(false)
   const { id, name, schema } = hook ?? {}
 
@@ -25,31 +24,32 @@ const DeleteHook: React.FC<DeleteHookProps> = ({ hook, visible, setVisible }) =>
       if (response.error) {
         throw response.error
       } else {
-        toast.success(`Hook ${name} removed`)
+        ui.setNotification({ category: 'success', message: `Successfully removed ${name}` })
         setVisible(false)
       }
     } catch (error: any) {
-      toast.error(`Deleting ${name} failed: ${error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to delete ${name}: ${error.message}`,
+      })
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <>
-      <TextConfirmModal
-        visible={visible}
-        onCancel={() => setVisible(!visible)}
-        onConfirm={handleDelete}
-        title="Delete this hook"
-        loading={loading}
-        confirmLabel={`Delete hook ${name}`}
-        confirmPlaceholder="Type in name of hook"
-        confirmString={name}
-        text={`This will delete your hook called ${name} of schema ${schema}.`}
-        alert="You cannot recover this hook once it is deleted!"
-      />
-    </>
+    <TextConfirmModal
+      visible={visible}
+      onCancel={() => setVisible(!visible)}
+      onConfirm={handleDelete}
+      title="Delete this hook"
+      loading={loading}
+      confirmLabel={`Delete hook ${name}`}
+      confirmPlaceholder="Type in name of hook"
+      confirmString={name}
+      text={`This will delete your hook called ${name} of schema ${schema}.`}
+      alert="You cannot recover this hook once it is deleted!"
+    />
   )
 }
 

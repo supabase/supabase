@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { toast } from 'react-hot-toast'
 import { Button, Select } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
 
@@ -9,8 +8,9 @@ import { API_URL } from 'lib/constants'
 import { get, post } from 'lib/common/fetch'
 
 const Associate = observer(() => {
-  const { app } = useStore()
+  const { ui, app } = useStore()
   const sortedOrganizations = app.organizations.list()
+
   const [awsMarketplace, setAwsMarketplace] = useState<any>()
   const [error, setError] = useState<any>('')
   const [loading, setLoading] = useState<any>(true)
@@ -66,7 +66,10 @@ const Associate = observer(() => {
           onSave()
         }
       } catch (error: any) {
-        toast.error(error.message)
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to get AWS Marketplace Information: ${error.message}`,
+        })
       }
     }
     getAwsMarketplaceInfo()

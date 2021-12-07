@@ -154,16 +154,17 @@ const SidePanelEditor: FC<Props> = ({
     },
     resolve: any
   ) => {
+    let toastId
     let saveTableError = false
     const { tableId, importContent, isRLSEnabled, isDuplicateRows } = configuration
 
-    if (isDuplicating) {
-      const duplicateTable = find(tables, { id: tableId }) as PostgresTable
-      const toastId = ui.setNotification({
-        category: 'loading',
-        message: `Duplicating table: ${duplicateTable.name}...`,
-      })
-      try {
+    try {
+      if (isDuplicating) {
+        const duplicateTable = find(tables, { id: tableId }) as PostgresTable
+        toastId = ui.setNotification({
+          category: 'loading',
+          message: `Duplicating table: ${duplicateTable.name}...`,
+        })
         const table: any = await meta.duplicateTable(payload, {
           isRLSEnabled,
           isDuplicateRows,
@@ -175,16 +176,11 @@ const SidePanelEditor: FC<Props> = ({
           message: `Table ${duplicateTable.name} has been successfully duplicated into ${table.name}!`,
         })
         onTableCreated(table)
-      } catch (error: any) {
-        saveTableError = true
-        ui.setNotification({ id: toastId, category: 'error', message: error.message })
-      }
-    } else if (isNewRecord) {
-      const toastId = ui.setNotification({
-        category: 'loading',
-        message: `Creating new table: ${payload.name}...`,
-      })
-      try {
+      } else if (isNewRecord) {
+        toastId = ui.setNotification({
+          category: 'loading',
+          message: `Creating new table: ${payload.name}...`,
+        })
         const table = await meta.createTable(toastId, payload, isRLSEnabled, columns, importContent)
         ui.setNotification({
           id: toastId,
@@ -192,32 +188,28 @@ const SidePanelEditor: FC<Props> = ({
           message: `Table ${table.name} is good to go!`,
         })
         onTableCreated(table)
-      } catch (error: any) {
-        saveTableError = true
-        ui.setNotification({ id: toastId, category: 'error', message: error.message })
-      }
-    } else if (selectedTableToEdit) {
-      const toastId = ui.setNotification({
-        category: 'loading',
-        message: `Updating table: ${selectedTableToEdit?.name}...`,
-      })
-      try {
+      } else if (selectedTableToEdit) {
+        toastId = ui.setNotification({
+          category: 'loading',
+          message: `Updating table: ${selectedTableToEdit?.name}...`,
+        })
         const table: any = await meta.updateTable(toastId, selectedTableToEdit, payload, columns)
         ui.setNotification({
           id: toastId,
           category: 'success',
           message: `Successfully updated ${table.name}!`,
         })
-      } catch (error: any) {
-        saveTableError = true
-        ui.setNotification({ id: toastId, category: 'error', message: error.message })
       }
+    } catch (error: any) {
+      saveTableError = true
+      ui.setNotification({ id: toastId, category: 'error', message: error.message })
     }
 
     if (!saveTableError) {
       setIsEdited(false)
       closePanel()
     }
+
     resolve()
   }
 

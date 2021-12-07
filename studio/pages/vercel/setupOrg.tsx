@@ -1,6 +1,5 @@
 import { FC, createContext, useEffect, useContext, useState } from 'react'
 import { useRouter } from 'next/router'
-import { toast } from 'react-hot-toast'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { Transition } from '@headlessui/react'
 import { Button, Typography } from '@supabase/ui'
@@ -79,7 +78,7 @@ const CreateOrganization = observer(({}) => {
   const PageState: any = useContext(PageContext)
   const router = useRouter()
 
-  const { app } = useStore()
+  const { ui, app } = useStore()
   const sortedOrganizations = app.organizations.list()
 
   const [orgName, setOrgName] = useState('')
@@ -91,7 +90,10 @@ const CreateOrganization = observer(({}) => {
       name: orgName,
     })
     if (response.error) {
-      toast.error(response.error.message)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to set up organization: ${response.error.message}`,
+      })
       setLoading(false)
     } else {
       const org = response
