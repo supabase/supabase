@@ -36,13 +36,13 @@ interface Props {
 }
 
 const TableEditorMenu: FC<Props> = ({
-                                      selectedSchema,
-                                      onSelectSchema = () => {},
-                                      onAddTable = () => {},
-                                      onEditTable = () => {},
-                                      onDeleteTable = () => {},
-                                      onDuplicateTable = () => {},
-                                    }) => {
+  selectedSchema,
+  onSelectSchema = () => {},
+  onAddTable = () => {},
+  onEditTable = () => {},
+  onDeleteTable = () => {},
+  onDuplicateTable = () => {},
+}) => {
   const { meta, ui } = useStore()
   const router = useRouter()
   const { id } = router.query
@@ -80,9 +80,7 @@ const TableEditorMenu: FC<Props> = ({
   const schemaTables =
     searchText.length === 0
       ? tables
-      : tables.filter((table) =>
-        table.name.toLowerCase().includes(searchText.toLowerCase())
-      )
+      : tables.filter((table) => table.name.toLowerCase().includes(searchText.toLowerCase()))
 
   const filteredSchemaViews =
     searchText.length === 0
@@ -94,19 +92,18 @@ const TableEditorMenu: FC<Props> = ({
   const maxScrollHeight = schemaViews.length > 0 ? 270 : 520
 
   return (
-    <div className='my-6 flex flex-col flex-grow'>
+    <div className="my-6 flex flex-col flex-grow">
       {/* Schema selection dropdown */}
-      <div className='mx-4'>
+      <div className="mx-4">
         {meta.schemas.isLoading ? (
-          <div
-            className='h-[30px] border border-gray-500 px-3 rounded flex items-center space-x-3'>
-            <IconLoader className='animate-spin' size={14} />
+          <div className="h-[30px] border border-gray-500 px-3 rounded flex items-center space-x-3">
+            <IconLoader className="animate-spin" size={14} />
             <Typography.Text small>Loading schemas...</Typography.Text>
           </div>
         ) : (
           <Listbox
             icon={<IconDatabase size={16} />}
-            size='tiny'
+            size="tiny"
             value={selectedSchema}
             onChange={(name: string) => {
               setSearchText('')
@@ -115,8 +112,7 @@ const TableEditorMenu: FC<Props> = ({
             }}
           >
             {schemas.map((schema) => (
-              <Listbox.Option key={schema.id} value={schema.name}
-                              label={schema.name}>
+              <Listbox.Option key={schema.id} value={schema.name} label={schema.name}>
                 {schema.name}
               </Listbox.Option>
             ))}
@@ -124,13 +120,13 @@ const TableEditorMenu: FC<Props> = ({
         )}
       </div>
 
-      <div className='mx-4 my-4 space-y-1'>
+      <div className="mx-4 my-4 space-y-1">
         {/* Add new table button */}
         {selectedSchema === 'public' && (
           <Button
             block
             icon={<IconPlus />}
-            type='text'
+            type="text"
             style={{ justifyContent: 'start' }}
             onClick={onAddTable}
           >
@@ -140,18 +136,18 @@ const TableEditorMenu: FC<Props> = ({
 
         {/* Table search input */}
         <Input
-          layout='vertical'
-          icon={<IconSearch size='tiny' />}
-          className='sbui-input-no-border'
-          placeholder='Search for a table'
+          layout="vertical"
+          icon={<IconSearch size="tiny" />}
+          className="sbui-input-no-border"
+          placeholder="Search for a table"
           onChange={(e) => setSearchText(e.target.value)}
           value={searchText}
-          size='tiny'
+          size="tiny"
           actions={
             searchText && (
               <IconX
                 size={'tiny'}
-                className='cursor-pointer mx-1'
+                className="cursor-pointer mx-1"
                 onClick={() => setSearchText('')}
               />
             )
@@ -161,54 +157,51 @@ const TableEditorMenu: FC<Props> = ({
 
       {/* List of tables belonging to selected schema */}
       {schemaTables.length > 0 && (
-        <div className='mx-2 mt-6 space-y-2'>
-          <div className='px-4 w-full flex items-center justify-between'>
-            <Typography.Text type='secondary' small>
+        <div className="mx-2 mt-6 space-y-2">
+          <div className="px-4 w-full flex items-center justify-between">
+            <Typography.Text type="secondary" small>
               All tables
             </Typography.Text>
-            <div className='cursor-pointer' onClick={refreshTables}>
-              <Typography.Text type='secondary'>
-                <IconRefreshCw className={isRefreshing ? 'animate-spin' : ''}
-                               size={14} />
+            <div className="cursor-pointer" onClick={refreshTables}>
+              <Typography.Text type="secondary">
+                <IconRefreshCw className={isRefreshing ? 'animate-spin' : ''} size={14} />
               </Typography.Text>
             </div>
           </div>
-          <div className='overflow-y-auto space-y-1'
-               style={{ maxHeight: maxScrollHeight }}>
+          <div className="overflow-y-auto space-y-1" style={{ maxHeight: maxScrollHeight }}>
             {schemaTables.map((table) => {
               const isActive = Number(id) === table.id
               return (
-                <Link key={table.name}
-                      href={`/project/${projectRef}/editor/${table.id}`}>
-                  <a className='block editor-product-menu'>
+                <Link key={table.name} href={`/project/${projectRef}/editor/${table.id}`}>
+                  <a className="block editor-product-menu">
                     <Menu.Item rounded active={isActive}>
-                      <div className='flex justify-between py-[2px]'>
-                        <Typography.Text className='truncate flex items-center'>
+                      <div className="flex justify-between py-[2px]">
+                        <Typography.Text className="truncate flex items-center">
                           {table.name}
                         </Typography.Text>
                         {isActive && (
                           <Dropdown
-                            side='bottom'
-                            align='start'
+                            side="bottom"
+                            align="start"
                             overlay={[
                               <Dropdown.Item
-                                key='edit-table'
-                                icon={<IconEdit size='tiny' />}
+                                key="edit-table"
+                                icon={<IconEdit size="tiny" />}
                                 onClick={() => onEditTable(table)}
                               >
                                 Edit Table
                               </Dropdown.Item>,
                               <Dropdown.Item
-                                key='duplicate-table'
-                                icon={<IconCopy size='tiny' />}
+                                key="duplicate-table"
+                                icon={<IconCopy size="tiny" />}
                                 onClick={() => onDuplicateTable(table)}
                               >
                                 Duplicate Table
                               </Dropdown.Item>,
-                              <Divider key='divider' light />,
+                              <Divider key="divider" light />,
                               <Dropdown.Item
-                                key='delete-table'
-                                icon={<IconTrash size='tiny' />}
+                                key="delete-table"
+                                icon={<IconTrash size="tiny" />}
                                 onClick={() => onDeleteTable(table)}
                               >
                                 Delete Table
@@ -216,8 +209,8 @@ const TableEditorMenu: FC<Props> = ({
                             ]}
                           >
                             <Button
-                              as='span'
-                              type='text'
+                              as="span"
+                              type="text"
                               icon={<IconChevronDown />}
                               style={{ padding: '3px' }}
                             />
@@ -235,25 +228,22 @@ const TableEditorMenu: FC<Props> = ({
 
       {/* List of views belonging to selected schema */}
       {filteredSchemaViews.length > 0 && (
-        <div className='mx-2 mt-6 space-y-2'>
-          <div className='px-4 w-full flex items-center justify-between'>
-            <Typography.Text type='secondary' small>
+        <div className="mx-2 mt-6 space-y-2">
+          <div className="px-4 w-full flex items-center justify-between">
+            <Typography.Text type="secondary" small>
               All Views
             </Typography.Text>
           </div>
-          <div className='overflow-y-auto space-y-1'
-               style={{ maxHeight: maxScrollHeight }}>
+          <div className="overflow-y-auto space-y-1" style={{ maxHeight: maxScrollHeight }}>
             {schemaViews.map((view: SchemaView) => {
               const viewId = Base64.encode(JSON.stringify(view))
               const isActive = id === viewId
               return (
-                <Link key={viewId}
-                      href={`/project/${projectRef}/editor/${viewId}`}>
-                  <div className='dash-product-menu'>
+                <Link key={viewId} href={`/project/${projectRef}/editor/${viewId}`}>
+                  <div className="dash-product-menu">
                     <Menu.Item key={viewId} rounded active={isActive}>
-                      <div className='flex justify-between'>
-                        <Typography.Text
-                          className='truncate'>{view.name}</Typography.Text>
+                      <div className="flex justify-between">
+                        <Typography.Text className="truncate">{view.name}</Typography.Text>
                       </div>
                     </Menu.Item>
                   </div>
@@ -265,16 +255,14 @@ const TableEditorMenu: FC<Props> = ({
       )}
 
       {searchText.length > 0 && schemaTables.length === 0 && filteredSchemaViews.length === 0 && (
-        <div className='my-2 mx-6'>
-          <Typography.Text type='secondary'>No tables or views
-            found</Typography.Text>
+        <div className="my-2 mx-6">
+          <Typography.Text type="secondary">No tables or views found</Typography.Text>
         </div>
       )}
 
       {searchText.length === 0 && schemaTables.length === 0 && filteredSchemaViews.length === 0 && (
-        <div className='my-2 mx-6'>
-          <Typography.Text type='secondary'>No tables
-            available</Typography.Text>
+        <div className="my-2 mx-6">
+          <Typography.Text type="secondary">No tables available</Typography.Text>
         </div>
       )}
     </div>
