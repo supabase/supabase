@@ -54,7 +54,7 @@ const Home: NextPage = () => {
                 <IconLoader className="animate-spin" size={14} />
                 <Typography.Text>Retrieving project usage statistics</Typography.Text>
               </div>
-            ) : hasProjectData ? (
+            ) : !usage.error && hasProjectData ? (
               <ProjectUsage project={project} />
             ) : (
               <NewProjectPanel />
