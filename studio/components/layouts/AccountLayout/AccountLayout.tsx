@@ -25,24 +25,14 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
     router.reload()
   }
 
-  let logoutLink =
-    GOTRUE_ENABLED
-      ? {
-          icon: '/icons/feather/power.svg',
-          label: 'Logout',
-          href:
-            GOTRUE_ENABLED
-              ? ''
-              : `${API_URL}/logout`,
-          key: `${API_URL}/logout`,
-          onClick: onClickLogout,
-        }
-      : {
-          icon: '/icons/feather/power.svg',
-          label: 'Logout',
-          href: `${API_URL}/logout`,
-          key: `${API_URL}/logout`,
-        }
+  let baseLogoutLink = {
+    icon: '/icons/feather/power.svg',
+    label: 'Logout',
+    href: `${API_URL}/logout`,
+    key: `${API_URL}/logout`,
+  }
+
+  let logoutLink = GOTRUE_ENABLED ? { ...baseLogoutLink, href: '', onClick: onClickLogout } : baseLogoutLink
 
   const organizationsLinks = app.organizations
     .list()
