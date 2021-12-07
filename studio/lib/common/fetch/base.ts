@@ -48,6 +48,9 @@ export async function handleResponseError<T = unknown>(
       const error = { code: response.status, message: resJson.error, requestId }
       return { error } as unknown as SupaResponse<T>
     }
+  } else if (resJson.message) {
+    const error = { code: response.status, message: resJson.message, requestId }
+    return { error } as unknown as SupaResponse<T>
   } else if (resJson.msg) {
     const error = { code: response.status, message: resJson.msg, requestId }
     return { error } as unknown as SupaResponse<T>
