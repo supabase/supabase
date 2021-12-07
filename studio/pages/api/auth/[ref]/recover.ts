@@ -25,10 +25,9 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
     'Content-Type': 'application/json',
     Accept: 'application/json',
     Authorization: `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-    apiKey: process.env.SUPABASE_ANON_KEY,
   })
   const url = `${process.env.SUPABASE_URL}/auth/v1/recover`
   const payload = { email: req.body.email }
-  const response = await post(url, payload, headers)
+  const response = await post(url, payload, { headers })
   return res.status(200).json(response)
 }
