@@ -106,6 +106,7 @@ const UserDropdown: FC<{ user: any }> = ({ user }) => {
         } else {
           ui.setNotification({ category: 'success', message: `Successfully deleted ${user.email}` })
           PageState.users = PageState.users.filter((x: any) => x.id != user.id)
+          PageState.totalUsers -= 1
         }
         setLoading(false)
       },
