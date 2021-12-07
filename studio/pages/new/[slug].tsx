@@ -4,7 +4,6 @@
 
 import { useRef, useState, createContext, useContext } from 'react'
 import Router, { useRouter } from 'next/router'
-import { toast } from 'react-hot-toast'
 import { debounce, values } from 'lodash'
 import { makeAutoObservable, toJS } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
@@ -70,6 +69,8 @@ export const Wizard = () => {
 
   const router = useRouter()
   const { slug } = router.query
+
+  const { ui } = useStore()
 
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
@@ -169,7 +170,10 @@ export const Wizard = () => {
     const response = await post(`${API_URL}/projects/new`, data)
     if (response.error) {
       setNewProjectLoading(false)
-      toast.error(response.error.message)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to create new project: ${response.error.message}`,
+      })
     } else {
       // Use redirect to reload store data properly
       // after creating a new project

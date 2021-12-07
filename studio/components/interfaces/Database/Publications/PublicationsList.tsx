@@ -1,6 +1,5 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { toast } from 'react-hot-toast'
 import { Button, Input, Toggle, IconSearch } from '@supabase/ui'
 
 import { useStore } from 'hooks'
@@ -12,7 +11,7 @@ interface Props {
 }
 
 const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
 
   const publications =
@@ -36,7 +35,10 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
             return data
           }
         } catch (error: any) {
-          toast.error(`Error: ${error.message}`)
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to toggle for ${publication.name}: ${error.message}`,
+          })
           return false
         }
       },

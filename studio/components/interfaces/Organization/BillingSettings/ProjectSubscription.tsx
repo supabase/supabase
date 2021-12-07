@@ -1,9 +1,9 @@
 import { FC, useState, useEffect } from 'react'
-import toast from 'react-hot-toast'
 import dayjs from 'dayjs'
 import { get as _get, maxBy } from 'lodash'
 import utc from 'dayjs/plugin/utc'
 
+import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { Dictionary } from '@supabase/grid'
 import { get, post } from 'lib/common/fetch'
@@ -17,6 +17,7 @@ interface Props {
 }
 
 const ProjectSubscription: FC<Props> = ({ project }) => {
+  const { ui } = useStore()
   const [loading, setLoading] = useState<boolean>(true)
   const [subscription, setSubscription] = useState<StripeSubscription>()
   const [paygStats, setPaygStats] = useState<Dictionary<number>>()
@@ -41,8 +42,10 @@ const ProjectSubscription: FC<Props> = ({ project }) => {
         fetchPaygStatistics()
       }
     } catch (error: any) {
-      console.error(error)
-      toast.error(error.message)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to get project subscription: ${error.message}`,
+      })
     } finally {
       setLoading(false)
     }

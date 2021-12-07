@@ -113,10 +113,10 @@ const TableEditorPage: NextPage = () => {
 
   const onConfirmDeleteTable = async () => {
     try {
-      const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
       const response: any = await meta.tables.del(selectedTableToDelete!.id)
-
       if (response.error) throw response.error
+
+      const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
 
       // For simplicity for now, we just open the first table within the same schema
       if (tables.length > 0) {

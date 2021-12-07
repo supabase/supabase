@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Typography } from '@supabase/ui'
 import { find, get, isEmpty, filter } from 'lodash'
-import toast from 'react-hot-toast'
 
 import { useStore } from 'hooks'
 import { formatPoliciesForStorage } from '../Storage.utils'
@@ -15,7 +14,7 @@ import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStor
 import PolicyEditorModal from 'components/to-be-cleaned/Auth/PolicyEditorModal'
 
 const StoragePolicies = () => {
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
   const storageStore = useStorageStore()
   const { buckets } = storageStore
 
@@ -77,7 +76,7 @@ const StoragePolicies = () => {
   const onCancelPolicyDelete = () => setSelectedPolicyToDelete({})
 
   const onSavePolicySuccess = async () => {
-    toast.success('Policy successfully saved!')
+    ui.setNotification({ category: 'success', message: 'Successfully saved policy!' })
     await fetchPolicies()
     onCancelPolicyEdit()
   }
@@ -91,7 +90,10 @@ const StoragePolicies = () => {
       payloads.map(async (payload) => {
         const res = await meta.policies.create(payload)
         if (res.error) {
-          toast.error(`Error adding policy: ${res.error.message}`)
+          ui.setNotification({
+            category: 'error',
+            message: `Error adding policy: ${res.error.message}`,
+          })
           return true
         }
         return false
@@ -102,7 +104,10 @@ const StoragePolicies = () => {
   const onCreatePolicy = async (payload) => {
     const res = await meta.policies.create(payload)
     if (res.error) {
-      toast.error(`Error adding policy: ${res.error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Error adding policy: ${res.error.message}`,
+      })
       return true
     }
     return false
@@ -111,7 +116,10 @@ const StoragePolicies = () => {
   const onUpdatePolicy = async (payload) => {
     const res = await meta.policies.update(payload.id, payload)
     if (res.error) {
-      toast.error(`Error updating policy: ${res.error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Error updating policy: ${res.error.message}`,
+      })
       return true
     }
     return false
@@ -120,9 +128,12 @@ const StoragePolicies = () => {
   const onDeletePolicy = async () => {
     const res = await meta.policies.del(selectedPolicyToDelete.id)
     if (res.error) {
-      toast.error(`Error deleting policy: ${res.error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to delete policy: ${res.error.message}`,
+      })
     } else {
-      toast.success('Successfully deleted policy!')
+      ui.setNotification({ category: 'success', message: 'Successfully deleted policy!' })
     }
     setSelectedPolicyToDelete({})
     await fetchPolicies()
