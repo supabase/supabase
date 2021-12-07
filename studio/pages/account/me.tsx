@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { toast } from 'react-hot-toast'
 import { IconMoon, IconSun, Select, Typography } from '@supabase/ui'
 
 import { useProfile, useStore, withAuth } from 'hooks'
@@ -40,10 +39,13 @@ const ProfileCard = observer(() => {
       const updatedUser = await post(`${API_URL}/profile/update`, model)
       mutateProfile(updatedUser, false)
       ui.setProfile(updatedUser)
-      toast(`Profile saved`)
+      ui.setNotification({ category: 'success', message: 'Successfully saved profile' })
     } catch (error) {
-      toast(`Couldn't update profile. Try again later.`)
-      console.error('updateUser error:', error)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: "Couldn't update profile. Please try again later.",
+      })
     }
   }
 

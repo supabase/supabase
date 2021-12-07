@@ -11,7 +11,6 @@ import {
   Typography,
 } from '@supabase/ui'
 import SVG from 'react-inlinesvg'
-import toast from 'react-hot-toast'
 import Link from 'next/link'
 
 import { API_URL } from 'lib/constants'
@@ -49,7 +48,7 @@ function formReducer(state: any, action: any) {
 }
 
 const SupportNew = () => {
-  const { app } = useStore()
+  const { ui, app } = useStore()
   const [formState, formDispatch] = useReducer(formReducer, DEFAULT)
   const [errors, setErrors] = useState<any>([])
   const [loading, setLoading] = useState<boolean>(false)
@@ -150,10 +149,12 @@ const SupportNew = () => {
       })
       setLoading(false)
       if (response.error) {
-        console.error(response.error)
-        toast.error(response.error.message)
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to submit support ticket: ${response.error.message}`,
+        })
       } else {
-        toast.success(`Support request sent. Thank you!`)
+        ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
         setSent(true)
       }
     }

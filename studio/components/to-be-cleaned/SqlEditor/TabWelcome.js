@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { toast } from 'react-hot-toast'
 import { IconChevronRight, IconLoader, Typography } from '@supabase/ui'
 
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
@@ -39,8 +38,11 @@ const TabWelcome = observer(() => {
       // select tab with new snippet
       sqlEditorStore.selectTab(snippet.id)
     } catch (error) {
-      console.error(error)
-      toast.error(error.message)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to create new query: ${error.message}`,
+      })
     }
   }
 

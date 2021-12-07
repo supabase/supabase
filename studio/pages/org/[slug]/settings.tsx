@@ -2,7 +2,6 @@ import { createContext, useEffect, useContext, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { toJS } from 'mobx'
-import toast from 'react-hot-toast'
 import { pluckJsonSchemaFields, pluckObjectFields, timeout } from 'lib/helpers'
 import { AutoField } from 'uniforms-bootstrap4'
 import { organizations } from 'stores/jsonSchema'
@@ -185,6 +184,8 @@ const TabsView = observer(() => {
 
 const GeneralSettings = observer(() => {
   const PageState: any = useContext(PageContext)
+  const { ui } = useStore()
+
   const formModel = toJS(PageState.organization)
   // remove warning null value for controlled input
   if (!formModel.billing_email) formModel.billing_email = ''
@@ -196,11 +197,14 @@ const GeneralSettings = observer(() => {
       model
     )
     if (response.error) {
-      toast.error(`Update organization failed: ${response.error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to update organization: ${response.error.message}`,
+      })
     } else {
       const updatedOrg = response
       PageState.onOrgUpdated(updatedOrg)
-      toast(`Settings saved`)
+      ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
     }
   }
 
@@ -261,6 +265,8 @@ const OrgDeletePanel = observer(() => {
 const OrgDeleteModal = observer(() => {
   const PageState: any = useContext(PageContext)
   const router = useRouter()
+  const { ui } = useStore()
+
   const { slug: orgSlug, name: orgName } = PageState.organization
 
   const [isOpen, setIsOpen] = useState(false)
@@ -277,7 +283,10 @@ const OrgDeleteModal = observer(() => {
 
     const response = await delete_(`${API_URL}/organizations/${orgSlug}/remove`)
     if (response.error) {
-      toast.error(`Delete organization failed: ${response.error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to delete organization: ${response.error.message}`,
+      })
       setLoading(false)
     } else {
       PageState.onOrgDeleted(PageState.organization)
@@ -332,6 +341,7 @@ const OrgDeleteModal = observer(() => {
 
 const TeamSettings = observer(() => {
   const PageState: any = useContext(PageContext)
+  const { ui } = useStore()
   const [isLeaving, setIsLeaving] = useState(false)
 
   const orgSlug = PageState.organization.slug
@@ -352,7 +362,7 @@ const TeamSettings = observer(() => {
         },
       })
     } catch (error: any) {
-      toast.error(`Error leaving: ${error?.message}`)
+      ui.setNotification({ category: 'error', message: `Error leaving: ${error?.message}` })
     } finally {
       setIsLeaving(false)
     }
@@ -501,12 +511,15 @@ const OwnerDropdown = observer(({ members, member }: any) => {
           member_id: member.id,
         })
         if (response.error) {
-          toast.error(`Delete user failed: ${response.error.message}`)
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to delete user: ${response.error.message}`,
+          })
           setLoading(false)
         } else {
           const updatedMembers = members.filter((x: any) => x.id !== member.id)
           mutateOrgMembers(updatedMembers)
-          toast(`Member removed`)
+          ui.setNotification({ category: 'success', message: 'Successfully removed member' })
         }
       },
     })
@@ -521,7 +534,10 @@ const OwnerDropdown = observer(({ members, member }: any) => {
       stripe_customer_id,
     })
     if (response.error) {
-      toast.error(`Transfer ownership failed: ${response.error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to transfer ownership: ${response.error.message}`,
+      })
       setLoading(false)
     } else {
       const updatedMembers = [...members]
@@ -531,7 +547,7 @@ const OwnerDropdown = observer(({ members, member }: any) => {
       if (newOwner) newOwner.is_owner = true
       mutateOrgMembers(updatedMembers)
       setOwnerTransferIsVisble(false)
-      toast(`Organization transfered`)
+      ui.setNotification({ category: 'success', message: 'Successfully transfered organization' })
     }
   }
 

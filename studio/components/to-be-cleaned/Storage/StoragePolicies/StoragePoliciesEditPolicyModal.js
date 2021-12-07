@@ -3,6 +3,7 @@ import { pull } from 'lodash'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
+import { useStore } from 'hooks'
 import { POLICY_MODAL_VIEWS } from 'lib/constants'
 import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
 import {
@@ -30,6 +31,7 @@ const StoragePoliciesEditPolicyModal = ({
   onCreatePolicies = () => {},
   onSaveSuccess = () => {},
 }) => {
+  const { ui } = useStore()
   const [previousView, setPreviousView] = useState('') // Mainly to decide which view to show when back from templates
   const [view, setView] = useState('')
 
@@ -103,14 +105,20 @@ const StoragePoliciesEditPolicyModal = ({
   const validatePolicyEditorFormFields = () => {
     const { name, definition, allowedOperations } = policyFormFields
     if (name.length === 0) {
-      return toast('Do give your policy a name')
+      return ui.setNotification({ category: 'info', message: 'Do give your policy a name' })
     }
     if (definition.length === 0) {
       // Will need to figure out how to strip away comments or something
-      return toast('Did you forget to provide a definition for your policy?')
+      return ui.setNotification({
+        category: 'info',
+        message: 'Did you forget to provide a definition for your policy?',
+      })
     }
     if (allowedOperations.length === 0) {
-      return toast('You will need to allow at least one operation in your policy')
+      return ui.setNotification({
+        category: 'info',
+        message: 'You will need to allow at least one operation in your policy',
+      })
     }
     const policySQLStatements = createSQLPolicies(bucketName, policyFormFields)
     setPolicyStatementsForReview(policySQLStatements)

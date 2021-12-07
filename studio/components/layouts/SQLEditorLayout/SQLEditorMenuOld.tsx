@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { toast } from 'react-hot-toast'
 import {
   Button,
   Dropdown,
@@ -133,8 +132,10 @@ const SideBarContent = observer(() => {
       if (snippet) sqlEditorStore.selectTab(snippet.id)
       setLoadingNewQuery(false)
     } catch (error: any) {
-      console.error(error)
-      toast.error(error.message)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to create new query: ${error.message}`,
+      })
       setLoadingNewQuery(false)
     }
   }

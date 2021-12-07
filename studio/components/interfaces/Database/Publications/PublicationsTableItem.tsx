@@ -1,6 +1,5 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { toast } from 'react-hot-toast'
 import { Badge, Toggle } from '@supabase/ui'
 
 import { useStore } from 'hooks'
@@ -12,7 +11,7 @@ interface Props {
 }
 
 const PublicationsTableItem: FC<Props> = ({ table, selectedPublication }) => {
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
 
   const publication = selectedPublication
   const enabledForAllTables = publication.tables == null
@@ -42,7 +41,10 @@ const PublicationsTableItem: FC<Props> = ({ table, selectedPublication }) => {
       if (error) throw error
       setLoading(false)
     } catch (error: any) {
-      toast.error(error.message)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to toggle replication for ${table.name}: ${error.message}`,
+      })
       setChecked(originalChecked)
       setLoading(false)
     }

@@ -1,13 +1,9 @@
 import { isEmpty } from 'lodash'
-import { useRouter } from 'next/router'
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { Button, IconSearch, Input } from '@supabase/ui'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import toast from 'react-hot-toast'
 
-import { API_URL } from 'lib/constants'
 import { withAuth, useStore } from 'hooks'
-import { get } from 'lib/common/fetch'
 import { AuthLayout } from 'components/layouts'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModalV2'
@@ -116,8 +112,7 @@ const AuthPolicies = observer(() => {
 })
 
 const AuthPoliciesTables = observer(() => {
-  const router = useRouter()
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
   const PageState: any = useContext(PageContext)
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
@@ -153,7 +148,7 @@ const AuthPoliciesTables = observer(() => {
   }
 
   const onSavePolicySuccess = async () => {
-    toast.success('Policy successfully saved!')
+    ui.setNotification({ category: 'success', message: 'Policy successfully saved!' })
     await refreshTables()
     closePolicyEditorModal()
   }
@@ -176,7 +171,10 @@ const AuthPoliciesTables = observer(() => {
     // const url = `${API_URL}/database/${router.query.ref}/tables?id=${payload.id}`
     // const res = await patch(url, payload)
     if (res.error) {
-      toast.error(`Failed to toggle RLS: ${res.error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to toggle RLS: ${res.error.message}`,
+      })
     } else {
       PageState.onTableUpdated(res)
     }
@@ -186,7 +184,10 @@ const AuthPoliciesTables = observer(() => {
   const onCreatePolicy = async (payload: any) => {
     const res = await PageState.meta.policies.create(payload)
     if (res.error) {
-      toast.error(`Error adding policy: ${res.error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Error adding policy: ${res.error.message}`,
+      })
       return true
     }
     return false
@@ -195,7 +196,10 @@ const AuthPoliciesTables = observer(() => {
   const onUpdatePolicy = async (payload: any) => {
     const res = await PageState.meta.policies.update(payload.id, payload)
     if (res.error) {
-      toast.error(`Error updating policy: ${res.error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Error updating policy: ${res.error.message}`,
+      })
       return true
     }
     return false
@@ -204,9 +208,12 @@ const AuthPoliciesTables = observer(() => {
   const onDeletePolicy = async () => {
     const res = await PageState.meta.policies.del(selectedPolicyToDelete.id)
     if (res.error) {
-      toast.error(`Error deleting policy: ${res.error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Error deleting policy: ${res.error.message}`,
+      })
     } else {
-      toast.success('Successfully deleted policy!')
+      ui.setNotification({ category: 'success', message: 'Successfully deleted policy!' })
     }
     await refreshTables()
     closeConfirmModal()
