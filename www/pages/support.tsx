@@ -29,12 +29,34 @@ import TwitterSocialProof from '~/components/Sections/TwitterSocialProof'
 
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
+import { useRouter } from 'next/router'
+import { NextSeo } from 'next-seo'
 
 type Props = {}
 
 const Index = ({}: Props) => {
+  const router = useRouter()
+
+  const meta_title = 'Help &amp Support | Supabase'
+  const meta_description =
+    'Find help and support for Supabase. Our support agents provide answers on all types of issues, including account information, billing, and refunds.'
+
   return (
     <>
+      <NextSeo
+        title={meta_title}
+        description={meta_description}
+        openGraph={{
+          title: meta_title,
+          description: meta_description,
+          url: `https://supabase.com/${router.pathname}`,
+          images: [
+            {
+              url: `https://supabase.com/images/og/og-image.jpg`,
+            },
+          ],
+        }}
+      />
       <Layout>
         <Container>
           <SectionContainer className="">

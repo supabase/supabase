@@ -12,6 +12,8 @@ interface Props {
   isReadOnly?: boolean
   onInputChange: (value?: string) => void
   onInputRun?: (value: string) => void
+  hideLineNumbers?: boolean
+  className?: string
 }
 
 const CodeEditor: FC<Props> = ({
@@ -19,8 +21,10 @@ const CodeEditor: FC<Props> = ({
   language,
   defaultValue,
   isReadOnly,
-  onInputChange = () => {},
-  onInputRun = () => {},
+  onInputChange = () => { },
+  onInputRun = () => { },
+  hideLineNumbers,
+  className = ""
 }) => {
   const monaco = useMonaco()
   const editorRef = useRef()
@@ -56,7 +60,7 @@ const CodeEditor: FC<Props> = ({
     <Editor
       path={id}
       theme="supabase"
-      className="monaco-editor"
+      className={"monaco-editor " + className}
       defaultLanguage={language}
       defaultValue={defaultValue}
       loading={<Connecting />}
@@ -68,6 +72,10 @@ const CodeEditor: FC<Props> = ({
         wordWrap: 'on',
         fixedOverflowWidgets: true,
         contextmenu: true,
+        lineNumbers: hideLineNumbers ? 'off' : undefined,
+        glyphMargin: hideLineNumbers ? false : undefined,
+        lineNumbersMinChars: hideLineNumbers ? 0 : undefined,
+        folding: hideLineNumbers? false : undefined
       }}
       onMount={onMount}
       onChange={onInputChange}
