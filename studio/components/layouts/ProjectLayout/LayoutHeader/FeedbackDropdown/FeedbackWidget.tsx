@@ -1,20 +1,23 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { toast } from 'react-hot-toast'
 import { Button, Typography, Divider } from '@supabase/ui'
 
+import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 
 const FeedbackWidget = ({ onClose, feedback, setFeedback, category, setCategory }: any) => {
-  const inputRef = useRef(null)
   const router = useRouter()
   const { ref } = router.query
+
+  const { ui } = useStore()
+  const inputRef = useRef<any>(null)
+
   const [isSending, setSending] = useState(false)
 
   useEffect(() => {
-    ;(inputRef?.current as any)?.focus()
+    inputRef?.current?.focus()
   }, [inputRef])
 
   function onFeedbackChange(e: any) {
@@ -37,7 +40,7 @@ const FeedbackWidget = ({ onClose, feedback, setFeedback, category, setCategory 
       })
       setSending(false)
       setFeedback('')
-      toast.success(`Feedback sent. Thank you!`)
+      ui.setNotification({ category: 'success', message: 'Feedback sent. Thank you!' })
     }
 
     return onClose()

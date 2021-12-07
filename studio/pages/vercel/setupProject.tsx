@@ -7,6 +7,7 @@ import { debounce } from 'lodash'
 import { Button, Typography } from '@supabase/ui'
 import { Dictionary } from '@supabase/grid'
 
+import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import {
   PROVIDERS,
@@ -153,6 +154,8 @@ const Connecting = () => (
 const CreateProject = observer(() => {
   const _store = useContext(PageContext)
   const router = useRouter()
+  const { ui } = useStore()
+
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
@@ -230,7 +233,10 @@ const CreateProject = observer(() => {
       const response = await createSupabaseProject(dbSql)
       if (response.error) {
         setLoading(false)
-        toast.error(response.error.message)
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to create project: ${response.error.message}`,
+        })
         return
       }
 
