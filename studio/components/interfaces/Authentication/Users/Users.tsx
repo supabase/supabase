@@ -4,19 +4,16 @@ import { observer } from 'mobx-react-lite'
 import { Button, Input, IconSearch, IconX } from '@supabase/ui'
 
 import { PageContext } from 'pages/project/[ref]/auth/users'
-import { IS_PLATFORM } from 'lib/constants'
 import UsersList from './UsersList'
 import InviteUserModal from './InviteUserModal'
 
 const Users = () => {
   const PageState: any = useContext(PageContext)
-  const inviteEnabled =
-    IS_PLATFORM &&
-    semver.gte(
-      // @ts-ignore
-      semver.coerce(PageState.projectKpsVersion || 'kps-v2.5.4'),
-      semver.coerce('kps-v2.5.3')
-    )
+  const inviteEnabled = semver.gte(
+    // @ts-ignore
+    semver.coerce(PageState.projectKpsVersion || 'kps-v2.5.4'),
+    semver.coerce('kps-v2.5.3')
+  )
 
   useEffect(() => {
     PageState.fetchData(1)
