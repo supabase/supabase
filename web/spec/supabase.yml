@@ -1689,7 +1689,7 @@ pages:
         .lt('population', 10000)
       ```
 
-      ### Conditionally Chaining
+      ### Conditional Chaining
 
       Filters can be built up one step at a time and then executed. For example:
 
