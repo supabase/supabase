@@ -20,7 +20,7 @@ export const generateSettingsMenu = (ref: string): ProductMenuGroup[] => {
     },
     {
       title: 'Logs',
-      items: ['rest', 'realtime', 'auth', 'storage', 'database'].map((type: string) => {
+      items: ['database', 'auth', 'realtime', 'rest', 'storage'].map((type: string) => {
         return {
           name: LOG_TYPE_LABEL_MAPPING[type],
           key: `logs-${type}`,
