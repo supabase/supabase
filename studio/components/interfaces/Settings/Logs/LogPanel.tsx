@@ -8,6 +8,7 @@ import {
   IconRefreshCw,
   IconX,
   Toggle,
+  IconSearch,
 } from '@supabase/ui'
 import { LogTemplate } from '.'
 
@@ -79,7 +80,7 @@ const LogPanel: FC<Props> = ({
 
           <div className="flex items-center space-x-2">
             <Typography.Text type="secondary" small>
-              Search via query
+              Search logs via query
             </Typography.Text>
             <Toggle size="tiny" checked={isCustomQuery} onChange={onCustomClick} />
           </div>
@@ -87,12 +88,12 @@ const LogPanel: FC<Props> = ({
         <div className="flex items-center gap-x-4">
           <Input
             size="tiny"
-            className="max-w-32"
-            placeholder="Filter"
+            icon={<IconSearch size={16} />}
+            placeholder="Search event messages"
             onChange={(e) => onSearch(e.target.value)}
             value={searchValue}
             actions={
-              showReset && <IconX size={'tiny'} className="cursor-pointer mx-1" onClick={onReset} />
+              showReset && <IconX size="tiny" className="cursor-pointer mx-1" onClick={onReset} />
             }
           />
         </div>

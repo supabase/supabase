@@ -1,9 +1,10 @@
 import useSWR from 'swr'
 import debounce from 'lodash/debounce'
 import { useEffect, useRef, useState } from 'react'
+import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Typography, Loading, IconLoader, IconAlertCircle } from '@supabase/ui'
+import { Typography, IconLoader, IconAlertCircle } from '@supabase/ui'
 
 import { withAuth } from 'hooks'
 import { get } from 'lib/common/fetch'
@@ -13,31 +14,17 @@ import CodeEditor from 'components/ui/CodeEditor'
 import {
   LogPanel,
   LogTable,
-  LogData,
-  TEMPLATES,
+  Count,
+  Logs,
   LogTemplate,
+  TEMPLATES,
 } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
-
-interface CountData {
-  count: number
-}
-
-interface Count {
-  data: [CountData] | []
-  error?: any
-}
-
-interface Logs {
-  data: LogData[]
-  count: number
-  error: any
-}
 
 /**
  * Acts as a container component for the entire log display
  */
-export const LogPage = () => {
+export const LogPage: NextPage = () => {
   const router = useRouter()
   const { ref, type } = router.query
 
@@ -83,7 +70,12 @@ export const LogPage = () => {
   }
 
   const handleModeToggle = () => {
-    setMode(mode === 'simple' ? 'custom' : 'simple')
+    if (mode === 'simple') {
+      setMode('custom')
+      // setWhere(DEFAULT_QUERY)
+    } else {
+      setMode('simple')
+    }
   }
 
   const onSelectTemplate = (template: LogTemplate) => {

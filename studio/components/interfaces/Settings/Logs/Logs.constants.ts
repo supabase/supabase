@@ -6,6 +6,8 @@ export const TEMPLATES: LogTemplate[] = [
     label: 'POST or PATCH',
     mode: 'custom',
     searchString:
-      "REGEXP_CONTAINS(event_message, 'POST') OR REGEXP_CONTAINS(event_message, 'PATCH') ",
+      "REGEXP_CONTAINS(event_message, 'POST') OR REGEXP_CONTAINS(event_message, 'PATCH')",
   },
 ]
+
+export const DEFAULT_QUERY = 'SELECT timestamp, event_message FROM postgres_logs;'
