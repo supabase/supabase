@@ -30,7 +30,7 @@ const signUpSubmitted = (event) => {
       response.error ? alert(response.error.message) : setToken(response)
     })
     .catch((err) => {
-      alert(err.response.text)
+      alert(err)
     })
 }
 
@@ -58,7 +58,7 @@ const logoutSubmitted = (event) => {
 
   supabase.auth
     .signOut()
-    .then((response) => {
+    .then((_response) => {
       document.querySelector('#access-token').value = ''
       document.querySelector('#refresh-token').value = ''
       alert('Logout successful')
@@ -69,7 +69,7 @@ const logoutSubmitted = (event) => {
 }
 
 function setToken(response) {
-  if (response.data.confirmation_sent_at && !response.data.access_token) {
+  if (response.user.confirmation_sent_at && !response?.data?.access_token) {
     alert('Confirmation Email Sent')
   } else {
     document.querySelector('#access-token').value = response.data.access_token
