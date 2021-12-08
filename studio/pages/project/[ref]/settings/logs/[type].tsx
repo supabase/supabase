@@ -62,7 +62,7 @@ export const LogPage = () => {
   const { data: countData } = useSWR<{ data: [CountData] | []; error?: any }>(countKey, get, {
     refreshInterval: 5000,
   })
-  const newCount = countData?.data?.[0]?.count
+  const newCount = countData?.data?.[0]?.count ?? 0
   const { data: logData, error } = data || {}
 
   const handleRefresh = () => {
@@ -111,7 +111,7 @@ export const LogPage = () => {
       {error && (
         <Typography.Text className="text-center w-full block">Could not fetch data</Typography.Text>
       )}
-      {newCount && <LoadNewLogsButton onClick={handleRefresh} />}
+      {newCount > 0 && <LoadNewLogsButton onClick={handleRefresh} />}
       <LogTable data={logData} />
     </SettingsLayout>
   )
