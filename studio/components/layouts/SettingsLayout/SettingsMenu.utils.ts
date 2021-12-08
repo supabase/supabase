@@ -1,15 +1,7 @@
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { LOG_TYPE_LABEL_MAPPING } from "lib/constants"
-export const generateSettingsMenu = (ref: string): ProductMenuGroup[] => {
-  const logItems = ['rest', 'realtime', 'auth', 'storage', 'database'].map((type: string) => {
-    return {
-      name: LOG_TYPE_LABEL_MAPPING[type],
-      key: `logs-${type}`,
-      url: `/project/${ref}/settings/logs/${type}`,
-      items: []
-    }
-  })
+import { LOG_TYPE_LABEL_MAPPING } from 'lib/constants'
 
+export const generateSettingsMenu = (ref: string): ProductMenuGroup[] => {
   return [
     {
       title: 'Project settings',
@@ -28,7 +20,14 @@ export const generateSettingsMenu = (ref: string): ProductMenuGroup[] => {
     },
     {
       title: 'Logs',
-      items: logItems,
+      items: ['rest', 'realtime', 'auth', 'storage', 'database'].map((type: string) => {
+        return {
+          name: LOG_TYPE_LABEL_MAPPING[type],
+          key: `logs-${type}`,
+          url: `/project/${ref}/settings/logs/${type}`,
+          items: [],
+        }
+      }),
     },
   ]
 }

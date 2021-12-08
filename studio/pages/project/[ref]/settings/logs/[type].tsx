@@ -62,7 +62,7 @@ export const LogPage = () => {
   const { data: countData } = useSWR<{ data: [CountData] | []; error?: any }>(countKey, get, {
     refreshInterval: 5000,
   })
-  const newCount = countData?.data?.[0]?.count
+  const newCount = countData?.data?.[0]?.count ?? 0
   const { data: logData, error } = data || {}
 
   const handleRefresh = () => {
@@ -80,23 +80,32 @@ export const LogPage = () => {
   return (
     <SettingsLayout title={title} className="p-4 space-y-4">
       <LogPanel
-        showReset={(where || search) ? true : false}
+        showReset={where || search ? true : false}
         onReset={() => {
           setWhere('')
           setSearch('')
           setMode('simple') // this is necessary to reset the value of the monaco editor
         }}
         templates={[
-          { label: "Recent Errors", onClick: () => setSearch('[Ee]rror|\\s[45][0-9][0-9]\\s') },
-          { label: "POST or PATCH", onClick: () => {
-            setSearch('')
-            setMode('custom')
-            setWhere("REGEXP_CONTAINS(event_message, 'POST') OR REGEXP_CONTAINS(event_message, 'PATCH') ")
-          } },
+          { label: 'Recent Errors', onClick: () => setSearch('[Ee]rror|\\s[45][0-9][0-9]\\s') },
+          {
+            label: 'POST or PATCH',
+            onClick: () => {
+              setSearch('')
+              setMode('custom')
+              setWhere(
+                "REGEXP_CONTAINS(event_message, 'POST') OR REGEXP_CONTAINS(event_message, 'PATCH') "
+              )
+            },
+          },
         ]}
         searchValue={search}
-        onCustomClick={handleModeToggle} isLoading={isLoading} onRefresh={handleRefresh} onSearch={setSearch} />
-      {mode === 'custom' &&
+        onCustomClick={handleModeToggle}
+        isLoading={isLoading}
+        onRefresh={handleRefresh}
+        onSearch={setSearch}
+      />
+      {mode === 'custom' && (
         <div>
           <CodeEditor
             className="p-4 h-24"
@@ -107,16 +116,21 @@ export const LogPage = () => {
             onInputChange={(v) => setWhere(v || '')}
             onInputRun={handleRefresh}
           />
-        </div>}
+        </div>
+      )}
       {error && (
         <Typography.Text className="text-center w-full block">Could not fetch data</Typography.Text>
       )}
-      {newCount && <LoadNewLogsButton onClick={handleRefresh} />}
+      {newCount > 0 && <LoadNewLogsButton onClick={handleRefresh} />}
       <LogTable data={logData} />
     </SettingsLayout>
   )
 }
 
-const LoadNewLogsButton = (props: ButtonProps) => <Button type="dashed" block {...props}>Load new logs</Button>
+const LoadNewLogsButton = (props: ButtonProps) => (
+  <Button type="dashed" block {...props}>
+    Load new logs
+  </Button>
+)
 
 export default withAuth(observer(LogPage))
