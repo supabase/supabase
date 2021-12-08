@@ -20,10 +20,10 @@
   "SEE ALSO": [
     { "text": "FAQs", "link": "/faqs" },
     { "text": "Going into Prod Checklist", "link": "/going-into-prod" },
-    { "text": "Contributing", "link": "/contributing" },
-    { "text": "SupaSquad", "link": "/supasquad" },
-    { "text": "Terms of Service", "link": "/terms" },
-    { "text": "Privacy Policy", "link": "/privacy" },
-    { "text": "Acceptable Use Policy", "link": "/aup" }
+    { "text": "Contributing", "link": "/handbook/contributing" },
+    { "text": "SupaSquad", "link": "/handbook/supasquad" },
+    { "text": "Terms of Service", "link": "/company/terms" },
+    { "text": "Privacy Policy", "link": "/company/privacy" },
+    { "text": "Acceptable Use Policy", "link": "/company/aup" }
   ]
 }
