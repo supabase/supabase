@@ -88,21 +88,39 @@ VALUES  ('20171026211738'),
         ('20180108183307'),
         ('20180119214651'),
         ('20180125194653');
-		
--- Gets the User ID from the request cookie
-create or replace function auth.uid() returns uuid as $$
-  select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
-$$ language sql stable;
 
--- Gets the User ID from the request cookie
-create or replace function auth.role() returns text as $$
-  select nullif(current_setting('request.jwt.claim.role', true), '')::text;
-$$ language sql stable;
+create or replace function auth.uid() 
+returns uuid 
+language sql stable
+as $$
+  select 
+  	coalesce(
+		current_setting('request.jwt.claim.sub', true),
+		(current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+	)::uuid
+$$;
 
--- Gets the User email
-create or replace function auth.email() returns text as $$
-  select nullif(current_setting('request.jwt.claim.email', true), '')::text;
-$$ language sql stable;
+create or replace function auth.role() 
+returns text 
+language sql stable
+as $$
+  select 
+  	coalesce(
+		current_setting('request.jwt.claim.role', true),
+		(current_setting('request.jwt.claims', true)::jsonb ->> 'role')
+	)::text
+$$;
+
+create or replace function auth.email() 
+returns text 
+language sql stable
+as $$
+  select 
+  	coalesce(
+		current_setting('request.jwt.claim.email', true),
+		(current_setting('request.jwt.claims', true)::jsonb ->> 'email')
+	)::text
+$$;
 
 -- usage on auth functions to API roles
 GRANT USAGE ON SCHEMA auth TO anon, authenticated, service_role;
@@ -118,3 +136,10 @@ ALTER table "auth".refresh_tokens OWNER TO supabase_auth_admin;
 ALTER table "auth".audit_log_entries OWNER TO supabase_auth_admin;
 ALTER table "auth".instances OWNER TO supabase_auth_admin;
 ALTER table "auth".schema_migrations OWNER TO supabase_auth_admin;
+
+ALTER FUNCTION "auth"."uid" OWNER TO supabase_auth_admin;
+ALTER FUNCTION "auth"."role" OWNER TO supabase_auth_admin;
+ALTER FUNCTION "auth"."email" OWNER TO supabase_auth_admin;
+GRANT EXECUTE ON FUNCTION "auth"."uid"() TO PUBLIC;
+GRANT EXECUTE ON FUNCTION "auth"."role"() TO PUBLIC;
+GRANT EXECUTE ON FUNCTION "auth"."email"() TO PUBLIC;

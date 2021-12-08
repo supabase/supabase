@@ -145,6 +145,8 @@ module.exports = {
           label: 'Authentication',
           collapsed: true,
           items: [
+            'guides/auth/auth-email',
+            'guides/auth/auth-magic-link',
             'guides/auth/auth-apple',
             'guides/auth/auth-bitbucket',
             'guides/auth/auth-discord',
@@ -178,6 +180,17 @@ module.exports = {
             'learn/auth-deep-dive/auth-google-oauth',
           ],
         },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Integrations',
+      collapsed: false,
+      items: [
+        'guides/integrations/auth0',
+        'guides/integrations/draftbit',
+        'guides/integrations/prisma',
+        'guides/integrations/vercel',
       ],
     },
     // {

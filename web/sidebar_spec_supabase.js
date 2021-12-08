@@ -9,13 +9,13 @@ module.exports = {
     {
       type: 'category',
       label: 'Auth',
-      items: ['reference/javascript/auth-signup', 'reference/javascript/auth-signin', 'reference/javascript/auth-signout', 'reference/javascript/auth-session', 'reference/javascript/auth-user', 'reference/javascript/auth-update', 'reference/javascript/auth-setauth', 'reference/javascript/auth-onauthstatechange', 'reference/javascript/reset-password-email'],
+      items: ['reference/javascript/auth-signup', 'reference/javascript/auth-signin', 'reference/javascript/auth-signout', 'reference/javascript/auth-session', 'reference/javascript/auth-user', 'reference/javascript/auth-update', 'reference/javascript/auth-setauth', 'reference/javascript/auth-onauthstatechange', 'reference/javascript/auth-api-getuser', 'reference/javascript/reset-password-email'],
       collapsed: true,
     },
     {
       type: 'category',
       label: 'Auth (Server Only)',
-      items: ['reference/javascript/auth-api-deleteuser', 'reference/javascript/auth-api-generatelink', 'reference/javascript/auth-api-inviteuserbyemail', 'reference/javascript/auth-api-sendmobileotp', 'reference/javascript/auth-api-resetpasswordforemail'],
+      items: ['reference/javascript/auth-api-createuser', 'reference/javascript/auth-api-deleteuser', 'reference/javascript/auth-api-generatelink', 'reference/javascript/auth-api-inviteuserbyemail', 'reference/javascript/auth-api-sendmobileotp', 'reference/javascript/auth-api-resetpasswordforemail'],
       collapsed: true,
     },
     {
@@ -39,7 +39,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Modifiers',
-      items: ['reference/javascript/using-modifiers', 'reference/javascript/limit', 'reference/javascript/order', 'reference/javascript/range', 'reference/javascript/single'],
+      items: ['reference/javascript/using-modifiers', 'reference/javascript/limit', 'reference/javascript/order', 'reference/javascript/range', 'reference/javascript/single', 'reference/javascript/maybesingle'],
       collapsed: true,
     },
     {

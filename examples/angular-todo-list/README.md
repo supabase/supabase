@@ -2,7 +2,7 @@
 
 - Frontend:
   - [Angular](https://angular.io)
-  - [Supabase.js](https://supabase.io/docs/library/getting-started) for user management and realtime data syncing.
+  - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
   - [app.supabase.io](https://app.supabase.io/): hosted Postgres database with restful API for usage with Supabase.js.
 
@@ -56,8 +56,8 @@ On [app.supabase.io](https://app.supabase.io), you can go to Authentication -> S
 
 Here, you can also enable external oauth providers, such as Google and GitHub.
 
-Instructions to activate Google provider : https://supabase.io/docs/guides/auth/auth-google
-Instructions to activate Github provider : https://supabase.io/docs/guides/auth/auth-github
+Instructions to activate Google provider : https://supabase.com/docs/guides/auth/auth-google
+Instructions to activate Github provider : https://supabase.com/docs/guides/auth/auth-github
 
 ## Supabase details
 
@@ -96,7 +96,7 @@ create policy "Individuals can delete their own todos." on todos for
 
 ## Authors
 
-- [Supabase](https://supabase.io)
+- [Supabase](https://supabase.com)
 - [Gerome Grignon](https://github.com/geromegrignon)
 
 Supabase is open source, we'd love for you to follow along and get involved at https://github.com/supabase/supabase

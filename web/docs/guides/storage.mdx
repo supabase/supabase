@@ -17,7 +17,7 @@ Files can be any sort of media file. This includes images, GIFs, and videos. It 
 
 ### Folders
 
-Folders are a way to organize your files (just like on your own computer).
+Folders are a way to organize your files (just like on your computer).
 There is no right or wrong way to
 organize your files. You can store them in whichever folder structure suits your project.
 
@@ -302,7 +302,7 @@ For example, if your file is stored in `public/subfolder/avatar.png` it would re
 
 ## Accessing objects
 
-For private buckets, you can access objects via the [download](/docs/reference/javascript/storage-from-download) method. This corresponds to `/object/auth/` API endpoint. Alternatively, you can create a publicly shareable URL an expiry date using the [createSignedUrl](/docs/reference/javascript/storage-from-createsignedurl) method which calls the `/object/sign/` API.
+For private buckets, you can access objects via the [download](/docs/reference/javascript/storage-from-download) method. This corresponds to `/object/auth/` API endpoint. Alternatively, you can create a publicly shareable URL with an expiry date using the [createSignedUrl](/docs/reference/javascript/storage-from-createsignedurl) method which calls the `/object/sign/` API.
 
 For public buckets, you can access the assets directly without a token or an Authorisation header. The [getPublicUrl](/docs/reference/javascript/storage-from-getpublicurl) helper method returns the full public URL for an asset. This calls the `/object/public/` API endpoint internally.
 

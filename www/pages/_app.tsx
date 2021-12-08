@@ -11,7 +11,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
 
   function telemetry() {
-    return post(`https://app.supabase.io/api/telemetry/page`, {
+    return post(`https://api.supabase.io/platform/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
     })
@@ -49,11 +49,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         description={DESCRIPTION}
         openGraph={{
           type: 'website',
-          url: 'https://supabase.io/',
+          url: 'https://supabase.com/',
           site_name: 'Supabase',
           images: [
             {
-              url: `https://supabase.io${basePath}/images/og/og-image.jpg`,
+              url: `https://supabase.com${basePath}/images/og/og-image.jpg`,
               width: 800,
               height: 600,
               alt: 'Supabase Og Image',

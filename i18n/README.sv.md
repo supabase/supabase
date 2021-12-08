@@ -6,7 +6,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.io) är ett open source-alternativ till Firebase. Vi bygger Firebase funktioner med hjälp av verktyg i företagsklass med öppen källkod.
+[Supabase](https://supabase.com) är ett open source-alternativ till Firebase. Vi bygger Firebase funktioner med hjälp av verktyg i företagsklass med öppen källkod.
 
 - [x] Hostad Postgres-databas
 - [x] Realtids-prenumerationer
@@ -18,13 +18,13 @@
 
 ## Dokumentation
 
-För fullständig dokumentation, besök [supabase.io/docs](https://supabase.io/docs)
+För fullständig dokumentation, besök [supabase.io/docs](https://supabase.com/docs)
 
 ## Community & Support
 
 - [Community-forum](https://github.com/supabase/supabase/discussions). Bäst för: Hjälp med att utveckla lösningar och diskussioner om bästa praxis vid databasutveckling.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Bäst för: Buggar och fel du stöter på när du använder Supabase.
-- [E-post-support](https://supabase.io/docs/support#business-support). Bäst för: Problem med din databas eller infrastruktur.
+- [E-post-support](https://supabase.com/docs/support#business-support). Bäst för: Problem med din databas eller infrastruktur.
 
 ## Status
 
@@ -47,7 +47,7 @@ Supabase är en samling verktyg med öppen källkod. Vi bygger funktionerna som 
 
 Supabase är en [hostad plattform](https://app.supabase.io). Du kan registrera dig och börja använda Supabase utan att installera någonting. Vi håller fortfarande på att förbättra den lokala utvecklarupplevelsen - detta är för närvarande vårt huvudfokus, tillsammans med plattformens övergripande stabilitet.
 
-![Arkitektur](https://supabase.io/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Arkitektur](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) är en objektrelationsdatabas med över 30 års aktiv utveckling , vilket har gett den ett gott rykte som pålitlig, robust och högpresterande.
 - [Realtime](https://github.com/supabase/realtime) är en Elexir-server som låter dig lyssna på skapande, uppdateringar och borttagningar i PostgreSQL med hjälp av websockets. Supabase lyssnar på PostgreSQL´s inbyggda replikeringsfunktionalitet, konverterar replikerings-byte-strömmen till JSON och sänder sedan JSON via websockets.

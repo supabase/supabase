@@ -5,7 +5,6 @@ sidebar_label: Overview
 description: Getting started with Self Hosting.
 ---
 
-import ExtensionsComponent from '../../../src/components/Extensions'
 import JwtGenerator from '@site/src/components/JwtGenerator'
 
 There are several ways to use Supabase:
@@ -13,21 +12,6 @@ There are several ways to use Supabase:
 - [Supabase Cloud](https://app.supabase.io): you don't need to deploy anything. We will manage and scale your infrastructure. 
 - [Docker](/docs/guides/hosting/docker): deploy to your own infrastructure.
 - Kubernetes: coming soon.
-
-#### Before you begin
-
-The self-hosted version of Supabase does not include a UI yet. 
-We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) and with a [WIP PR here](https://github.com/supabase/supabase/pull/2281). 
-[[more context](https://github.com/supabase/supabase/discussions/1001#discussioncomment-558696)]
-
-In the meantime, here are some suggestions for working with your Postgres Database:
-
-- `pgadmin`: https://www.pgadmin.org 
-- `dbeaver`: https://dbeaver.com 
-- `BeeKeeper`: https://beekeeperstudio.io
-- `HeidiSQL`: https://heidisql.com
-- `Table Plus`: https://www.tableplus.io
-
 
 ## Architecture
 
@@ -40,10 +24,10 @@ If the tool doesn't exist, we build and open source it ourselves.
 
 
 - [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
-- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Supabase listens to Postgres' built-in replication functionality, converts the replication byte stream into JSON, then broadcasts the JSON over websockets.
+- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
 - [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
 - [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
-- [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries etc.
+- [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
 - [GoTrue](https://github.com/netlify/gotrue) is an SWT based API for managing users and issuing SWT tokens.
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
 
@@ -97,7 +81,7 @@ Supabase creates several default roles in your Postgres database. To restore def
 
 ##### `postgres`
 
-The default PostgreSQL role. This has admin priveleges.  
+The default PostgreSQL role. This has admin privileges.  
 
 ##### `anon`
 
@@ -143,7 +127,7 @@ Use this tool to generate keys:
 
 ## Managing your secrets 
 
-Many components inside Supabase use secure secrets and password. These are listed in the self-hosting
+Many components inside Supabase use secure secrets and passwords. These are listed in the self-hosting
 [env file](https://github.com/supabase/supabase/blob/master/docker/.env.example), but we strongly recommend using a 
 secrets manager when deploying to production. Plain text files like dotenv lead to accidental costly leaks. 
 
@@ -160,4 +144,4 @@ Some suggested systems include:
 If you have decoupled your database from the middleware, then you should be able to redeploy the latest middleware at any time as long as it has no breaking changes.
 Supabase is evolving fast, and we'll continue to improve the migration strategy as part of our core offering.
 
-We realise that database migrations are difficult, and this is one of the problems we plan to make easy for developers.
+We realize that database migrations are difficult, and this is one of the problems we plan to make easy for developers.

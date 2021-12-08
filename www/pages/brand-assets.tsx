@@ -8,15 +8,33 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import { NextSeo } from 'next-seo'
 
 const { Title, Text } = Typography
 
 const Index = () => {
   // base path for images
-  const { basePath } = useRouter()
+  const router = useRouter()
+
+  const meta_title = 'Branding | Supabase'
+  const meta_description = 'Get Supabase Brand assets here.'
 
   return (
     <>
+      <NextSeo
+        title={meta_title}
+        description={meta_description}
+        openGraph={{
+          title: meta_title,
+          description: meta_description,
+          url: `https://supabase.com/${router.pathname}`,
+          images: [
+            {
+              url: `https://supabase.com/images/og/og-image.jpg`,
+            },
+          ],
+        }}
+      />
       <Layout>
         <Container>
           <SectionContainer className="pb-0 md:pb-0 lg:pb-0">
@@ -35,7 +53,7 @@ const Index = () => {
             <div className="grid grid-cols-12 border dark:border-gray-600">
               <div className="col-span-12 lg:col-span-5">
                 <img
-                  src={`${basePath}/brand-assets/logo-preview.jpg`}
+                  src={`/brand-assets/logo-preview.jpg`}
                   width="100%"
                   className="object-cover h-full"
                 />
@@ -51,7 +69,7 @@ const Index = () => {
                       </p>
                       <p>Do not use any other color for the wordmark.</p>
                     </Typography.Text>
-                    <form method="get" action={`${basePath}/brand-assets/supabase-logos.zip`}>
+                    <form method="get" action={`/brand-assets/supabase-logos.zip`}>
                       <Button htmlType="submit" type="default" iconRight={<IconDownload />}>
                         Download logo kit
                       </Button>

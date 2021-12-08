@@ -29,7 +29,7 @@ Using Postgres's "Row-Level-Security" policies, we can set rules on what data th
 
 We can say for example that the anon key should only be able to read from a particular table, but not write, update, nor delete.
 
-And these rules can be as complex as we want. We could say that the anon key can only delete rows which were inserted on a thursday afternoon between 4 and 6pm, and where the id column is an even number. Pretty strange, but it shows the power of policies.
+And these rules can be as complex as we want. We could say that the anon key can only delete rows which were inserted on a Thursday afternoon between 4 and 6pm, and where the id column is an even number. Pretty strange, but it shows the power of policies.
 
 Let's say we create a leaderboard table. We want people on our website to be able to read the leaderboard, but not write, update, or delete from it. We start by defining our table in SQL and adding some dummy data:
 

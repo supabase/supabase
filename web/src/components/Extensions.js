@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import extensions from '../data/extensions.json'
+import extensions from '@site/src/data/extensions.json'
 
 export default function Extensions() {
   const [filter, setFilter] = useState('')

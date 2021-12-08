@@ -30,7 +30,7 @@ const data: Investor[] = [
   {
     name: 'Y Combinator',
     round: 'A',
-    title: 'CEO @ Vercel',
+    title: 'Y Combinator',
     img: '/images/logos/yc--grey.png',
     lead: true,
     twitter: null,
@@ -334,9 +334,9 @@ const data: Investor[] = [
     linkedIn: null,
   },
   {
-    name: 'Aron Korenbit',
+    name: 'Aron Korenblit',
     round: 'A',
-    title: 'Airtable DevRel',
+    title: 'Education at Airtable',
     img: '',
     lead: false,
     twitter: null,

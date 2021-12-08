@@ -26,12 +26,33 @@ import {
   Space,
   Typography,
 } from '@supabase/ui'
+import { NextSeo } from 'next-seo'
 
 type Props = {}
 
 const Index = ({}: Props) => {
+  const router = useRouter()
+
+  const meta_title = "One of the world's fastest-growing open source communities | Supabase"
+  const meta_description =
+    'Supabase is the community that builds the infrastructure for your applications. Build using Supabase for any size project—from a new startup to even large growing companies'
+
   return (
     <>
+      <NextSeo
+        title={meta_title}
+        description={meta_description}
+        openGraph={{
+          title: meta_title,
+          description: meta_description,
+          url: `https://supabase.com/${router.pathname}`,
+          images: [
+            {
+              url: `https://supabase.com/images/og/og-image.jpg`,
+            },
+          ],
+        }}
+      />
       <Layout>
         <Header />
         <Community />

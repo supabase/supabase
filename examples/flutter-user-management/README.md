@@ -50,7 +50,7 @@ Go to the Authentication Settings page (the user icon). Enter the flutter app re
 
 This project uses very high-level Authorization using Postgres' Role Level Security.
 When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
-When a user logs in, they are issued a JWT with the role `authenticated` and thier UUID.
+When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.
 
 This is a trimmed-down schema, with the policies:
@@ -109,6 +109,6 @@ create policy "Anyone can update an avatar."
 
 ## Authors
 
-- [Supabase](https://supabase.io)
+- [Supabase](https://supabase.com)
 
 Supabase is open source. We'd love for you to follow along and get involved at https://github.com/supabase/supabase

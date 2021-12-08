@@ -27,13 +27,13 @@ const Auth = () => {
 
     const handleOAuthLogin = async (provider) => {
         // You need to enable the third party auth you want in Authentication > Settings
-        // Read more on: https://supabase.io/docs/guides/auth#third-party-logins
+        // Read more on: https://supabase.com/docs/guides/auth#third-party-logins
         let { error } = await supabase.auth.signIn({ provider });
         if (error) console.log("Error: ", error.message);
     };
 
     const forgotPassword = async (e) => {
-        // Read more on https://supabase.io/docs/reference/javascript/reset-password-email#notes
+        // Read more on https://supabase.com/docs/reference/javascript/reset-password-email#notes
         e.preventDefault();
         const email = prompt("Please enter your email:");
 

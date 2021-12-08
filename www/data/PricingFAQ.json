@@ -17,7 +17,7 @@
   },
   {
     "question": "Can I cap my usage so my bill doesn't run over?",
-    "answer": "Not yet, however we do not \"automatically\" upgrade you. This is to prevent surprise bill spikes. We have soft-limits which means that if you do go over we will not automatically bill you. We will reach out first to discuss moving up a tier."
+    "answer": "Not yet, however we do not \"automatically\" upgrade you. This is to prevent surprise bill spikes. We have soft limits which means that if you do go over we will not automatically bill you. We will reach out first to discuss moving up a tier."
   },
   {
     "question": "What are soft limits? ",
@@ -80,7 +80,7 @@
     "answer": "Contact us via <support@supabase.io>[](mailto:support@supabase.io) and we will be happy to help you upgrade."
   },
   {
-    "question": "What happens if I need to transfer my project to someone else in future?",
+    "question": "What happens if I need to transfer my project to someone else in the future?",
     "answer": "Contact us via <support@supabase.io>[](mailto:support@supabase.io) and we will be happy to help migrate your project to a new / another account."
   },
   {
@@ -101,7 +101,7 @@
   },
   {
     "question": "Where can I find Privacy and Terms of Use information for Supabase?",
-    "answer": "You can check out our privacy policy here [here](/docs/company/privacy) and terms of service [here](/docs/company/terms)."
+    "answer": "You can check out our privacy policy [here](/docs/company/privacy) and terms of service [here](/docs/company/terms)."
   },
   {
     "question": "What is the largest sized file I can deploy to storage?",

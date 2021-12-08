@@ -510,11 +510,11 @@ const Reliability = () => {
             <p className="mb-10">
               We're launching{' '}
               <a
-                href="https://status.supabase.io"
+                href="https://status.supabase.com"
                 target="_blank"
                 className="text-brand-700 hover:text-brand-800"
               >
-                https://status.supabase.io
+                https://status.supabase.com
               </a>{' '}
               to keep track of uptime across all of our services and critical infrastructure.
             </p>
@@ -665,7 +665,7 @@ const BetaPricing = () => (
 
       <div className="col-span-12 grid grid-cols-12 gap-x-2 lg:gap-x-8 mb-10">
         <div className="col-span-12 sm:col-span-9 xl:col-span-7 text-base">
-          <p className="mb-10">For up to date pricing info see: https://supabase.io/pricing</p>
+          <p className="mb-10">For up to date pricing info see: https://supabase.com/pricing</p>
           <p className="mb-10">
             We're working closely with many open source projects, infrastructure providers, and of
             course our Alpha Users, to provide a predictable and sustainable pricing model.
@@ -715,7 +715,7 @@ const BetaPricing = () => (
           </ul>
           <p>
             The Supabase Base Tier is now called the Supabase Pro tier as per the{' '}
-            <a href="https://supabase.io/pricing" className="text-brand-700 hover:text-brand-800">
+            <a href="https://supabase.com/pricing" className="text-brand-700 hover:text-brand-800">
               pricing page
             </a>
             .
@@ -971,7 +971,7 @@ const Beta = () => {
         openGraph={{
           title: site_title,
           description: DESCRIPTION,
-          url: `https://supabase.io/beta`,
+          url: `https://supabase.com/beta`,
           type: 'article',
           article: {
             //
@@ -986,7 +986,7 @@ const Beta = () => {
           },
           images: [
             {
-              url: 'https://supabase.io/og/og-image.jpg',
+              url: 'https://supabase.com/og/og-image.jpg',
             },
           ],
         }}
