@@ -14,3 +14,18 @@ export interface LogTemplate {
   mode: 'custom' | 'simple'
   searchString: string
 }
+
+export interface CountData {
+  count: number
+}
+
+export interface Count {
+  data: [CountData] | []
+  error?: any
+}
+
+export interface Logs {
+  data: LogData[]
+  count: number
+  error: any
+}
