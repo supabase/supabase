@@ -1,4 +1,5 @@
 import { FC, ReactNode } from 'react'
+import { isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
 import { useStore } from 'hooks'
@@ -13,20 +14,23 @@ interface Props {
   children: ReactNode
 }
 
-const SettingsLayout: FC<Props> = ({ title, className = "", children }) => {
+const SettingsLayout: FC<Props> = ({ title, className = '', children }) => {
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref ?? 'default'
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
+  const logType = router.query.type
+
+  const pageKey = !isUndefined(logType) ? `logs-${logType}` : page
 
   return (
     <BaseLayout
       title={title || 'Settings'}
       product="Settings"
-      productMenu={<ProductMenu page={page} menu={generateSettingsMenu(projectRef)} />}
+      productMenu={<ProductMenu page={pageKey} menu={generateSettingsMenu(projectRef)} />}
     >
-      <main style={{ maxHeight: '100vh' }} className={"flex-1 overflow-y-auto " + className}>
+      <main style={{ maxHeight: '100vh' }} className={'flex-1 overflow-y-auto ' + className}>
         {children}
       </main>
     </BaseLayout>
