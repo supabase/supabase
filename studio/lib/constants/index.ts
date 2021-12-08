@@ -89,9 +89,9 @@ export const POLICY_MODAL_VIEWS = {
 }
 
 export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
-  rest: 'Edge - PostgREST',
-  realtime: 'Edge - Realtime',
-  auth: 'Edge - Auth',
-  storage: 'Edge - Storage',
+  rest: 'PostgREST',
+  realtime: 'Realtime',
+  auth: 'Auth',
+  storage: 'Storage',
   database: 'Database',
 }
