@@ -106,66 +106,28 @@ alter table your_table replica identity full;
 
 ### Migrating between projects
 
-If you have an existing Supabase Project and you want to migrate it into a new (fresh) Project, you can simply follow these steps:
+You might want to migrate older projects to a new project, e.g. to use a newer Postgres version. We don't have a well-tested migration path, but here's something you can try:
 
 #### Before you begin
 
-- Make sure [Realtime is disabled](/docs/guides/api#managing-realtime). This will improve the performance of inserts on your new database.
-- Make sure you have [`psql`](https://www.postgresql.org/docs/13/app-psql.html) installed on your computer so that you can run `pg_dump`.
+- Make sure [Postgres](https://www.postgresql.org/download/) is installed so you can run `psql` and `pg_dump`.
+- Create a new Supabase project.
+- If you enabled Function Hooks on your old project, enable it on your new project.
+- Store the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
 
 #### Migrate the database
 
-First we want to grab the database structure only:
+1. Run `ALTER ROLE postgres SUPERUSER` in the *old* project's SQL editor
+2. Run `pg_dump --clean --if-exists --quote-all-identifiers -d $OLD_DB_URL > dump.sql` from your terminal
+3. Run `ALTER ROLE postgres NOSUPERUSER` in the *old* project's SQL editor
+4. Run `ALTER ROLE postgres SUPERUSER` in the *new* project's SQL editor
+5. Run `psql $NEW_DB_URL -f dump.sql` from your terminal
+6. Run `TRUNCATE storage.objects` in the *new* project's SQL editor
+7. Run `ALTER ROLE postgres NOSUPERUSER` in the *new* project's SQL editor
 
-```sh
-pg_dump \
--h db.PROJECT_REF.supabase.co \
--U postgres \
---clean \
---schema-only \
-> supabase_schema.sql
-```
+#### Caveats
 
-This command creates a file on your computer called `supabase_schema.sql`. 
-
-After creating a new Supabase project we can use it to restore the database structure:
-
-```sh
-psql \
--h db.NEW_PROJECT_REF.supabase.co \
--U postgres \
-< supabase_schema.sql
-```
-
-You may see some errors - the restore will attempt to drop any tables if they are present, 
-and if they aren't present then an error will be displayed. These errors are informative only and nothing to worry about.
-
-
-#### (Optionally) Migrate the data
-
-We can migrate everything in our database, however we don't want to migrate 
-the data in our `storage` schema because the files exist outside of the database. 
-For now, we can just get all the data inside the `public` and `auth` schemas:
-
-```sh
-pg_dump \
--h db.PROJECT_REF.supabase.co \
--U postgres \
---data-only \
--n public \
--n auth \
-> supabase_data.sql
-```
-
-This command creates a file on your computer called `supabase_data.sql`.  We can use this file to restore the data in our new database:
-
-```sh
-psql \
--h db.NEW_PROJECT_REF.supabase.co \
--U postgres \
-< supabase_data.sql
-```
-
+- The new project will have the old project's Storage buckets, but not the objects. You will need to migrate Storage objects manually.
 
 ### Resetting your project password
 
