@@ -3,6 +3,7 @@ id: with-redwoodjs
 title: 'Quickstart: RedwoodJS'
 description: Learn how to use Supabase in your RedwoodJS App.
 ---
+
 # Quickstart: RedwoodJS
 
 import Tabs from '@theme/Tabs'
@@ -108,12 +109,9 @@ Now we are going to set up the database schema. We can use the "User Management 
 or you can just copy/paste the SQL from below and run it yourself.
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
-<TabItem value="UI">
+defaultActiveId="UI"
+>
+<TabsPanel id="UI" label="UI">
 
 ```sh
 1. Go to the "SQL" section.
@@ -125,8 +123,8 @@ values={[
   <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
 </video>
 
-</TabItem>
-<TabItem value="SQL">
+</TabsPanel>
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 -- Create a table for public "profiles"
@@ -177,7 +175,7 @@ create policy "Anyone can upload an avatar."
 
 ```
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 #### Important Note about Prisma and Migrations
@@ -191,12 +189,8 @@ Because this Quick Start does not use Prisma to manage the database schema, seed
 Now that you've created some database tables, you are ready to insert data using the auto-generated API.
 We just need to get the URL as well as the `anon`, `service_role` and `JWT_SECRET` keys from the API settings.
 
-<Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'}
-]}>
-<TabItem value="UI">
+<Tabs defaultActiveId="UI">
+<TabsPanel id="UI" label="UI">
 
 ```sh
 1. Go to the "Settings" section.
@@ -209,7 +203,7 @@ values={[
   <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
 </video>
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 ## Building the App

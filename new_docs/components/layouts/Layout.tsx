@@ -36,14 +36,16 @@ const DocsLayout = ({
       <div className={`${styles.container} flex flex-1 h-full w-full`}>
         <main className={`${styles.main}`}>
           <NavBar />
-          <div className="flex flex-row">
-            <SideBar />
-            <div
-              style={{ maxWidth: 'none' }}
-              className={`prose flex flex-col flex-1 w-full dark:prose-dark ${styles.content} p-8 border-l dark:border-gray-600`}
-            >
-              <div className="mx-auto" style={{ maxWidth: 1400 }}>
-                {children}
+          <div>
+            <div className="flex flex-row">
+              <SideBar />
+              <div className="grid grid-cols-12 w-full max-w-7xl mx-auto">
+                <article className="col-span-8 prose dark:prose-dark p-8 max-w-none">
+                  {children}
+                </article>
+                <div className="col-span-4 prose dark:prose-dark p-8 max-w-none">
+                  <h5>On this page</h5>
+                </div>
               </div>
             </div>
           </div>

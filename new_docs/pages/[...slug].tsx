@@ -4,7 +4,8 @@ import Layout from '../components/layouts/Layout'
 import { serialize } from 'next-mdx-remote/serialize'
 import { MDXRemote } from 'next-mdx-remote'
 import { MDXProvider } from '@mdx-js/react'
-import components from '../components'
+import components from '../components/index'
+import { Tabs } from '@supabase/ui'
 
 export default function Doc({
   meta,
@@ -16,7 +17,7 @@ export default function Doc({
   return (
     <Layout meta={meta}>
       <MDXProvider components={components}>
-        <MDXRemote {...content} />
+        <MDXRemote {...content} components={components} />
       </MDXProvider>
     </Layout>
   )

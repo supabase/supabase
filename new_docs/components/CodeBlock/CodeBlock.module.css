@@ -1,0 +1,30 @@
+.code-block {
+  @apply rounded-lg;
+  /* padding-top: 8px !important; */
+  @apply border border-gray-600;
+}
+
+.code-block::before {
+  content: '';
+  background: #1e1e1e;
+  height: 10px;
+  width: 48px;
+  display: block;
+}
+
+.code-block::after {
+  content: '';
+  background: #1e1e1e;
+  height: 12px;
+  width: 48px;
+  display: block;
+}
+
+.code-block code .linenumber {
+  margin-right: 4px;
+}
+
+.code-block code::after,
+.code-block code::before {
+  content: none !important;
+}

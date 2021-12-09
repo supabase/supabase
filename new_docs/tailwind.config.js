@@ -9,6 +9,19 @@ module.exports = {
     extend: {
       typography(theme) {
         return {
+          DEFAULT: {
+            css: {
+              // color: theme('colors.gray.800'),
+              pre: {
+                color: theme('colors.gray.200'),
+                padding: 0,
+                backgroundColor: 'transparent',
+                marginTop: 0,
+              },
+
+              // ...
+            },
+          },
           dark: {
             css: {
               color: theme('colors.gray.300'),
@@ -27,10 +40,10 @@ module.exports = {
               h4: { color: theme('colors.gray.300') },
               code: { color: theme('colors.gray.300') },
               'a code': { color: theme('colors.gray.300') },
-              pre: {
-                color: theme('colors.gray.200'),
-                backgroundColor: theme('colors.gray.800'),
-              },
+              // pre: {
+              //   color: theme('colors.gray.200'),
+              //   backgroundColor: theme('colors.gray.800'),
+              // },
               thead: {
                 color: theme('colors.gray.100'),
                 borderBottomColor: theme('colors.gray.700'),
