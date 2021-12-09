@@ -96,7 +96,7 @@ export const LogPage: NextPage = () => {
         <LogPanel
           isCustomQuery={mode === 'custom'}
           isLoading={isValidating}
-          hasNewData={newCount > 0}
+          newCount={newCount}
           showReset={search.length > 0}
           searchValue={search}
           templates={TEMPLATES}
