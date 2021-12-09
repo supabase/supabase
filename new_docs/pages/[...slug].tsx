@@ -7,15 +7,23 @@ import { MDXProvider } from '@mdx-js/react'
 import components from '../components/index'
 import { Tabs } from '@supabase/ui'
 
+// table of contents extractor
+const toc = require('markdown-toc')
+
 export default function Doc({
   meta,
   content,
+  toc,
 }: {
   meta: { title: string; description: string }
   content: ReactElement
+  toc: any
 }) {
+  console.log('content', content)
+  console.log('meta', meta)
+  console.log('toc', toc)
   return (
-    <Layout meta={meta}>
+    <Layout meta={meta} toc={toc}>
       <MDXProvider components={components}>
         <MDXRemote {...content} components={components} />
       </MDXProvider>
@@ -40,6 +48,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
     props: {
       ...doc,
       content,
+      toc: toc(doc.content, { maxdepth: 2 }),
     },
   }
 }

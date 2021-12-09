@@ -8,9 +8,11 @@ import Footer from '../Footer'
 const DocsLayout = ({
   meta,
   children,
+  toc,
 }: {
   meta: { title: string; description: string }
   children: string
+  toc: any
 }) => {
   const theme = 'okaidia'
 
@@ -43,6 +45,13 @@ const DocsLayout = ({
             </article>
             <div className="col-span-4 prose dark:prose-dark p-8 max-w-none">
               <h5>On this page</h5>
+              {toc.json.map((item: any) => {
+                return (
+                  <li>
+                    <a href={`#${item.slug}`}>{item.content}</a>
+                  </li>
+                )
+              })}
             </div>
           </div>
         </div>
