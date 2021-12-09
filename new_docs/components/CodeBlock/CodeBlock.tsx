@@ -1,5 +1,5 @@
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
-import monokaiCustomTheme from '../../data/CodeEditorTheme'
+import monokaiCustomTheme from './CodeBlock.utils'
 import CodeBlockStyles from './CodeBlock.module.css'
 import { Button, IconCopy } from '@supabase/ui'
 import CopyToClipboard from 'react-copy-to-clipboard'
@@ -38,7 +38,7 @@ function CodeBlock(props: Props) {
       <SyntaxHighlighter
         language={lang}
         style={monokaiCustomTheme}
-        className={CodeBlockStyles['code-block']}
+        className={'code-block rounded-lg border border-gray-600 dark:border-dark'}
         customStyle={{
           padding: 0,
           fontSize: large ? 18 : 12,

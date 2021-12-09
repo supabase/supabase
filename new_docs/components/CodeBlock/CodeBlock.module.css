@@ -1,9 +1,3 @@
-.code-block {
-  @apply rounded-lg;
-  /* padding-top: 8px !important; */
-  @apply border border-gray-600;
-}
-
 .code-block::before {
   content: '';
   background: #1e1e1e;
