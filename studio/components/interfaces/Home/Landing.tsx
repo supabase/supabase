@@ -14,8 +14,8 @@ const Landing = () => {
 
   async function handleGithubSignIn() {
     try {
-      const { user, session, error } = await auth.signIn(
-        { 
+      const { error } = await auth.signIn(
+        {
           provider: 'github',
         },
         {
@@ -55,10 +55,13 @@ const Landing = () => {
               type="success"
               className="ml-8 font-medium hover:text-gray-300 focus:outline-none focus:text-gray-300 transition duration-150 ease-in-out"
             >
-              {GOTRUE_ENABLED ? 
-                <Button onClick= {handleGithubSignIn} icon={<IconGitHub />}>Sign In With Github</Button>
-                : <Link href={`${API_URL}/login`}>Sign In</Link>
-              }
+              {GOTRUE_ENABLED ? (
+                <Button onClick={handleGithubSignIn} icon={<IconGitHub />}>
+                  Sign In With Github
+                </Button>
+              ) : (
+                <Link href={`${API_URL}/login`}>Sign In</Link>
+              )}
             </Typography.Text>
           </div>
         </nav>
@@ -75,12 +78,15 @@ const Landing = () => {
             </p>
           </Typography.Text>
           <div className="mt-5 sm:mt-8 sm:flex sm:justify-center space-x-3">
-            {GOTRUE_ENABLED ? 
-              <Button onClick= {handleGithubSignIn} size="large" icon={<IconGitHub />}>Sign In With Github</Button>
-              : <Link href={`${API_URL}/login`}>
-                  <Button size="large">Sign In</Button>
-                </Link>
-            }
+            {GOTRUE_ENABLED ? (
+              <Button onClick={handleGithubSignIn} size="large" icon={<IconGitHub />}>
+                Sign In With Github
+              </Button>
+            ) : (
+              <Link href={`${API_URL}/login`}>
+                <Button size="large">Sign In</Button>
+              </Link>
+            )}
             <Link href="https://supabase.com/docs">
               <Button size="large" type="default">
                 Docs
