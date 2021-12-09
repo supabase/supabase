@@ -69,7 +69,23 @@ export function getAccessToken() {
   if (!tokenData) return undefined
   const tokenObj = tryParseJson(tokenData)
   if (tokenObj === false) {
-    return ""
+    return ''
   }
   return tokenObj.currentSession.access_token
+}
+
+export function constructHeaders(requestId: string, optionHeaders?: { [prop: string]: any }) {
+  let headers: { [prop: string]: any } = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'X-Request-Id': requestId,
+    ...optionHeaders,
+  }
+
+  if (process.env.NEXT_PUBLIC_GOTRUE_ENABLED) {
+    const accessToken = getAccessToken()
+    if (accessToken) headers.Authorization = `Bearer ${accessToken}`
+  }
+
+  return headers
 }
