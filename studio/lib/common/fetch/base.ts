@@ -1,3 +1,4 @@
+import { GOTRUE_ENABLED } from 'lib/gotrue'
 import { tryParseJson } from 'lib/helpers'
 import { SupaResponse } from 'types/base'
 
@@ -99,7 +100,7 @@ export function constructHeaders(requestId: string, optionHeaders?: { [prop: str
     ...optionHeaders,
   }
 
-  if (process.env.NEXT_PUBLIC_GOTRUE_ENABLED) {
+  if (GOTRUE_ENABLED) {
     const accessToken = getAccessToken()
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`
   }
