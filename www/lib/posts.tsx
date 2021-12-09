@@ -20,10 +20,8 @@ export const getSortedPosts = (directory: Directories, limit?: number, tags?: an
 
   let allPostsData = fileNames.map((filename) => {
     const slug = filename.replace('.mdx', '')
-    // console.log('slug', slug)
 
     const fullPath = path.join(postDirectory, filename)
-    // console.log('fullPath', fullPath)
 
     //Extracts contents of the MDX file
     const fileContents = fs.readFileSync(fullPath, 'utf8')
@@ -41,7 +39,6 @@ export const getSortedPosts = (directory: Directories, limit?: number, tags?: an
       const dates = getDatesFromFileName(filename)
       url = `${dates.year}/${dates.month}/${dates.day}/${slug.substring(FILENAME_SUBSTRING)}`
     } else {
-      // console.log(slug.substring(FILENAME_SUBSTRING))
       url = `/${directory.replace('_', '')}/${slug}`
     }
 

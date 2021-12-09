@@ -1,9 +1,6 @@
-import { Badge, Space, Typography } from '@supabase/ui'
+import { Space, Typography } from '@supabase/ui'
 import authors from 'lib/authors.json'
-import Link from 'next/link'
 import React from 'react'
-import { capitalize } from '~/lib/helpers'
-
 import Image from 'next/image'
 import PostTypes from '~/types/post'
 
@@ -15,7 +12,6 @@ const BlogListItem = ({ blog }: Props) => {
   // @ts-ignore
   const author = blog.author ? authors[blog.author] : authors['supabase']
 
-  console.log('blog', blog)
   return (
     <div key={blog.slug}>
       <a href={`/blog/${blog.url}`}>
@@ -65,38 +61,7 @@ const BlogListItem = ({ blog }: Props) => {
                 </Space>
               </div>
             )}
-
-            {/* {author && (
-              <div>
-                <Space size={4}>
-                  {author.author_image_url && (
-                    <img src={author.author_image_url} className="rounded-full w-8" />
-                  )}
-                  <Space direction="vertical" size={0}>
-                    <Typography.Text>{author.author}</Typography.Text>
-                    <Typography.Text type="secondary" small>
-                      {author.position}
-                    </Typography.Text>
-                  </Space>
-                </Space>
-              </div>
-            )} */}
           </div>
-          <div className="flex space-x-3">
-            {/* {blog.tags &&
-              blog.tags.map((tag: string) => (
-                <Link href={`/blog/tags/${tag}`} as={`/blog/tags/${tag}`}>
-                  <div className="transition-opacity opacity-50 hover:opacity-100">
-                    <Badge color="gray">{capitalize(tag.replace('-', ' '))}</Badge>
-                  </div>
-                </Link>
-              ))} */}
-          </div>
-
-          {/* <Typography>
-                <ReactMarkdown>{blog.content.substring(0, 210) + '...'}</ReactMarkdown>
-              </Typography>
-              <Typography.Link>Read more</Typography.Link> */}
         </div>
       </a>
     </div>
