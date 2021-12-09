@@ -1,4 +1,4 @@
-import { handleError, handleResponse, handleResponseError, getAccessToken } from './base'
+import { constructHeaders, handleError, handleResponse, handleResponseError } from './base'
 import { uuidv4 } from '../../helpers'
 import { SupaResponse } from 'types/base'
 
@@ -9,20 +9,14 @@ export async function patch<T = any>(
 ): Promise<SupaResponse<T>> {
   const requestId = uuidv4()
   try {
-    const { headers, ...otherOptions } = options ?? {}
-    const accessToken = getAccessToken()
+    const { headers: optionHeaders, ...otherOptions } = options ?? {}
+    const headers = constructHeaders(requestId, optionHeaders)
     const response = await fetch(url, {
       method: 'PATCH',
       body: JSON.stringify(data),
       credentials: 'include',
       referrerPolicy: 'no-referrer-when-downgrade',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'X-Request-Id': requestId,
-        'Authorization': `Bearer ${accessToken}`,
-        ...headers,
-      },
+      headers,
       ...otherOptions,
     })
 
