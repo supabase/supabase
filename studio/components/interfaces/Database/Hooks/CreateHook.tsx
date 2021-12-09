@@ -1,4 +1,5 @@
-import * as React from 'react'
+import { FC, useEffect, createContext, useContext, FormEvent } from 'react'
+import Link from 'next/link'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { isEmpty, mapValues, has, without, union, filter, keyBy } from 'lodash'
@@ -20,7 +21,6 @@ import {
 
 import Image from 'next/image'
 import SVG from 'react-inlinesvg'
-import toast from 'react-hot-toast'
 import { useStore } from 'hooks'
 
 class CreateHookFormState {
@@ -355,7 +355,7 @@ function isValidHttpUrl(value: string) {
   return url.protocol === 'http:' || url.protocol === 'https:'
 }
 
-const CreateHookContext = React.createContext<ICreateHookStore | null>(null)
+const CreateHookContext = createContext<ICreateHookStore | null>(null)
 
 type CreateHookProps = {
   hook?: any
@@ -363,7 +363,7 @@ type CreateHookProps = {
   setVisible: (value: boolean) => void
 } & any
 
-const CreateHook: React.FC<CreateHookProps> = ({ hook, visible = true, setVisible }) => {
+const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) => {
   const { meta, ui } = useStore()
   const project = ui.selectedProject
 
@@ -371,7 +371,7 @@ const CreateHook: React.FC<CreateHookProps> = ({ hook, visible = true, setVisibl
   _localState.meta = meta
   _localState.project = project
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchSchemas = async () => {
       await _localState.meta.tables.load()
       const tables = _localState!.meta!.tables.list(
@@ -383,7 +383,7 @@ const CreateHook: React.FC<CreateHookProps> = ({ hook, visible = true, setVisibl
     fetchSchemas()
   }, [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (hook) {
       _localState.formState.reset(hook)
     } else {
@@ -404,75 +404,79 @@ const CreateHook: React.FC<CreateHookProps> = ({ hook, visible = true, setVisibl
           : await _localState.meta.hooks.create(body)
 
         if (response.error) {
-          toast.error(`Error: ${response.error.message ?? 'submit request failed'}`)
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to create hook: ${response.error.message ?? 'Submit request failed'}`,
+          })
           _localState.setLoading(false)
         } else {
-          toast.success(
-            `${_localState.isEditing ? 'Updated' : 'Created new'} hook called ${response.name}`
-          )
+          ui.setNotification({
+            category: 'success',
+            message: `${_localState.isEditing ? 'Updated' : 'Created new'} hook called ${
+              response.name
+            }`,
+          })
           _localState.setLoading(false)
           setVisible(!visible)
         }
       }
     } catch (error: any) {
-      toast.error(error.message)
+      ui.setNotification({ category: 'error', message: `Failed to create hook: ${error.message}` })
       _localState.setLoading(false)
     }
   }
 
   return (
-    <>
-      <SidePanel
-        wide
-        visible={visible}
-        onCancel={() => setVisible(!visible)}
-        // @ts-ignore
-        contentStyle={{ padding: 0 }}
-        footerBackground={true}
-        title={_localState.title}
-        className={
-          'hooks-sidepanel transform transition-all duration-300 ease-in-out mr-0 ' + '' // (showCreateFunctionSidePanel ? 'mr-16' : '')
-        }
-        loading={_localState.loading}
-        onConfirm={handleSubmit}
-      >
-        <CreateHookContext.Provider value={_localState}>
-          <div className="space-y-6 mt-4 pb-8">
-            {_localState.isEditing ? (
-              <div className="px-6 space-y-6">
+    <SidePanel
+      wide
+      visible={visible}
+      onCancel={() => setVisible(!visible)}
+      // @ts-ignore
+      contentStyle={{ padding: 0 }}
+      footerBackground={true}
+      title={_localState.title}
+      className={
+        'hooks-sidepanel transform transition-all duration-300 ease-in-out mr-0 ' + '' // (showCreateFunctionSidePanel ? 'mr-16' : '')
+      }
+      loading={_localState.loading}
+      onConfirm={handleSubmit}
+    >
+      <CreateHookContext.Provider value={_localState}>
+        <div className="space-y-6 mt-4 pb-8">
+          {_localState.isEditing ? (
+            <div className="px-6 space-y-6">
+              <InputName />
+              <SelectEnabledMode />
+            </div>
+          ) : (
+            <>
+              <div className="px-6">
                 <InputName />
-                <SelectEnabledMode />
               </div>
-            ) : (
-              <>
-                <div className="px-6">
-                  <InputName />
-                </div>
-                <Divider light />
-                <div className="px-6 space-y-6">
-                  <Typography.Title level={5}>Conditions to fire hook</Typography.Title>
-                  <ListboxTable />
-                  <CheckboxEvents />
-                </div>
-                <Divider light />
-                <div className="px-6 space-y-6">
-                  <Typography.Title level={5}>Type of hook</Typography.Title>
-                  <RadioGroupHookService />
-                </div>
-                <ServiceConfigForm />
-              </>
-            )}
-          </div>
-        </CreateHookContext.Provider>
-      </SidePanel>
-    </>
+              <Divider light />
+              <div className="px-6 space-y-6">
+                <Typography.Title level={5}>Conditions to fire hook</Typography.Title>
+                <ListboxTable />
+                <CheckboxEvents />
+              </div>
+              <Divider light />
+              <div className="px-6 space-y-6">
+                <Typography.Title level={5}>Type of hook</Typography.Title>
+                <RadioGroupHookService />
+              </div>
+              <ServiceConfigForm />
+            </>
+          )}
+        </div>
+      </CreateHookContext.Provider>
+    </SidePanel>
   )
 }
 
 export default observer(CreateHook)
 
-const InputName: React.FC = observer(({}) => {
-  const _localState: any = React.useContext(CreateHookContext)
+const InputName: FC = observer(({}) => {
+  const _localState: any = useContext(CreateHookContext)
   return (
     <Input
       id="name"
@@ -492,8 +496,8 @@ const InputName: React.FC = observer(({}) => {
   )
 })
 
-const SelectEnabledMode: React.FC = observer(({}) => {
-  const _localState: any = React.useContext(CreateHookContext)
+const SelectEnabledMode: FC = observer(({}) => {
+  const _localState: any = useContext(CreateHookContext)
   return (
     <Select
       id="enabled-mode"
@@ -516,8 +520,8 @@ const SelectEnabledMode: React.FC = observer(({}) => {
   )
 })
 
-const CheckboxEvents: React.FC = observer(({}) => {
-  const _localState: any = React.useContext(CreateHookContext)
+const CheckboxEvents: FC = observer(({}) => {
+  const _localState: any = useContext(CreateHookContext)
   return (
     // @ts-ignore
     <Checkbox.Group
@@ -562,8 +566,36 @@ const CheckboxEvents: React.FC = observer(({}) => {
   )
 })
 
-const ListboxTable: React.FC = observer(({}) => {
-  const _localState: any = React.useContext(CreateHookContext)
+const ListboxTable: FC = observer(({}) => {
+  const { ui } = useStore()
+  const projectRef = ui.selectedProject?.ref
+  const _localState: any = useContext(CreateHookContext)
+
+  if (_localState.tables.length === 0) {
+    return (
+      <Input
+        label="Table"
+        layout="horizontal"
+        disabled
+        placeholder="No tables created, please create one first"
+        // @ts-ignore
+        descriptionText={
+          <div className="space-x-1">
+            <Typography.Text type="secondary">
+              This is the table the trigger will watch for changes. There's currently no tables
+              created - please create one
+            </Typography.Text>
+            <Link href={`/project/${projectRef}/editor`}>
+              <a>
+                <Typography.Link>here</Typography.Link>
+              </a>
+            </Link>
+            <Typography.Text type="secondary">first.</Typography.Text>
+          </div>
+        }
+      />
+    )
+  }
 
   return (
     <Listbox
@@ -666,8 +698,8 @@ const hookServiceOptions: {
     img_url: 'aws-lambda-severless-function.png',
   },
 ]
-const RadioGroupHookService: React.FC = observer(({}) => {
-  const _localState: any = React.useContext(CreateHookContext)
+const RadioGroupHookService: FC = observer(({}) => {
+  const _localState: any = useContext(CreateHookContext)
   return (
     <>
       <div className="provider-radio-group">
@@ -701,9 +733,9 @@ type RadioHookService = {
   badge: string
 }
 
-const RadioHookService: React.FC<RadioHookService> = observer(
+const RadioHookService: FC<RadioHookService> = observer(
   ({ id, description, label, img_url, badgeType, badge }) => {
-    const _localState: any = React.useContext(CreateHookContext)
+    const _localState: any = useContext(CreateHookContext)
     return (
       <Radio
         id={id}
@@ -739,8 +771,8 @@ const RadioHookService: React.FC<RadioHookService> = observer(
   }
 )
 
-const ServiceConfigForm: React.FC = observer(({}) => {
-  const _localState: any = React.useContext(CreateHookContext)
+const ServiceConfigForm: FC = observer(({}) => {
+  const _localState: any = useContext(CreateHookContext)
   return (
     <>
       {_localState.formState.hookService.value === 'http_request' ? (
@@ -770,8 +802,8 @@ const ServiceConfigForm: React.FC = observer(({}) => {
   )
 })
 
-const InputServiceUrl: React.FC = observer(({}) => {
-  const _localState: any = React.useContext(CreateHookContext)
+const InputServiceUrl: FC = observer(({}) => {
+  const _localState: any = useContext(CreateHookContext)
   return (
     <Input
       id="service-url"
@@ -793,8 +825,8 @@ const InputServiceUrl: React.FC = observer(({}) => {
   )
 })
 
-const InputServiceTimeout: React.FC = observer(({}) => {
-  const _localState: any = React.useContext(CreateHookContext)
+const InputServiceTimeout: FC = observer(({}) => {
+  const _localState: any = useContext(CreateHookContext)
   return (
     <Input
       id="timeout-ms"
@@ -815,8 +847,8 @@ const InputServiceTimeout: React.FC = observer(({}) => {
   )
 })
 
-const SelectServiceMethod: React.FC = observer(({}) => {
-  const _localState: any = React.useContext(CreateHookContext)
+const SelectServiceMethod: FC = observer(({}) => {
+  const _localState: any = useContext(CreateHookContext)
   return (
     <Select
       id="method"
@@ -837,8 +869,8 @@ const SelectServiceMethod: React.FC = observer(({}) => {
   )
 })
 
-const InputMultiServiceHeaders: React.FC = observer(({}) => {
-  const _localState: any = React.useContext(CreateHookContext)
+const InputMultiServiceHeaders: FC = observer(({}) => {
+  const _localState: any = useContext(CreateHookContext)
 
   function onAddArgument() {
     _localState.onFormArrayChange({
@@ -884,74 +916,72 @@ type InputServiceHeaderProps = {
   value: string
   error?: { name?: string; value?: string }
 }
-const InputServiceHeader: React.FC<InputServiceHeaderProps> = observer(
-  ({ idx, name, value, error }) => {
-    const _localState: any = React.useContext(CreateHookContext)
+const InputServiceHeader: FC<InputServiceHeaderProps> = observer(({ idx, name, value, error }) => {
+  const _localState: any = useContext(CreateHookContext)
 
-    function onNameChange(e: React.FormEvent<HTMLInputElement>) {
-      const _value = e.currentTarget.value
-      _localState.onFormArrayChange({
-        key: 'serviceHeaders',
-        value: { name: _value, value },
-        idx,
-        operation: 'update',
-      })
-    }
-
-    function onValueChange(e: React.FormEvent<HTMLInputElement>) {
-      const _value = e.currentTarget.value
-      _localState.onFormArrayChange({
-        key: 'serviceHeaders',
-        value: { name, value: _value },
-        idx,
-        operation: 'update',
-      })
-    }
-
-    function onDelete() {
-      _localState.onFormArrayChange({
-        key: 'serviceHeaders',
-        idx,
-        operation: 'delete',
-      })
-    }
-
-    return (
-      <div className="flex space-x-1">
-        <Input
-          id={`name-${idx}`}
-          className="flex-1"
-          placeholder="Header name"
-          value={name}
-          onChange={onNameChange}
-          size="small"
-          error={error?.name}
-        />
-        <Input
-          id={`value-${idx}`}
-          className="flex-1"
-          placeholder="Header value"
-          value={value}
-          onChange={onValueChange}
-          size="small"
-          error={error?.value}
-        />
-        <div>
-          <Button
-            danger
-            type="primary"
-            icon={<IconTrash size="tiny" />}
-            onClick={onDelete}
-            size="small"
-          />
-        </div>
-      </div>
-    )
+  function onNameChange(e: FormEvent<HTMLInputElement>) {
+    const _value = e.currentTarget.value
+    _localState.onFormArrayChange({
+      key: 'serviceHeaders',
+      value: { name: _value, value },
+      idx,
+      operation: 'update',
+    })
   }
-)
 
-const InputMultiServiceParams: React.FC = observer(({}) => {
-  const _localState: any = React.useContext(CreateHookContext)
+  function onValueChange(e: FormEvent<HTMLInputElement>) {
+    const _value = e.currentTarget.value
+    _localState.onFormArrayChange({
+      key: 'serviceHeaders',
+      value: { name, value: _value },
+      idx,
+      operation: 'update',
+    })
+  }
+
+  function onDelete() {
+    _localState.onFormArrayChange({
+      key: 'serviceHeaders',
+      idx,
+      operation: 'delete',
+    })
+  }
+
+  return (
+    <div className="flex space-x-1">
+      <Input
+        id={`name-${idx}`}
+        className="flex-1"
+        placeholder="Header name"
+        value={name}
+        onChange={onNameChange}
+        size="small"
+        error={error?.name}
+      />
+      <Input
+        id={`value-${idx}`}
+        className="flex-1"
+        placeholder="Header value"
+        value={value}
+        onChange={onValueChange}
+        size="small"
+        error={error?.value}
+      />
+      <div>
+        <Button
+          danger
+          type="primary"
+          icon={<IconTrash size="tiny" />}
+          onClick={onDelete}
+          size="small"
+        />
+      </div>
+    </div>
+  )
+})
+
+const InputMultiServiceParams: FC = observer(({}) => {
+  const _localState: any = useContext(CreateHookContext)
 
   function onAddArgument() {
     _localState.onFormArrayChange({
@@ -995,74 +1025,72 @@ type InputServiceParamsProps = {
   value: string
   error?: { name?: string; value?: string }
 }
-const InputServiceParam: React.FC<InputServiceParamsProps> = observer(
-  ({ idx, name, value, error }) => {
-    const _localState: any = React.useContext(CreateHookContext)
+const InputServiceParam: FC<InputServiceParamsProps> = observer(({ idx, name, value, error }) => {
+  const _localState: any = useContext(CreateHookContext)
 
-    function onNameChange(e: React.FormEvent<HTMLInputElement>) {
-      const _value = e.currentTarget.value
-      _localState.onFormArrayChange({
-        key: 'serviceParams',
-        value: { name: _value, value },
-        idx,
-        operation: 'update',
-      })
-    }
-
-    function onValueChange(e: React.FormEvent<HTMLInputElement>) {
-      const _value = e.currentTarget.value
-      _localState.onFormArrayChange({
-        key: 'serviceParams',
-        value: { name, value: _value },
-        idx,
-        operation: 'update',
-      })
-    }
-
-    function onDelete() {
-      _localState.onFormArrayChange({
-        key: 'serviceParams',
-        idx,
-        operation: 'delete',
-      })
-    }
-
-    return (
-      <div className="flex space-x-1">
-        <Input
-          id={`name-${idx}`}
-          className="flex-1"
-          placeholder="Param name"
-          value={name}
-          onChange={onNameChange}
-          size="small"
-          error={error?.name}
-        />
-        <Input
-          id={`value-${idx}`}
-          className="flex-1"
-          placeholder="Param value"
-          value={value}
-          onChange={onValueChange}
-          size="small"
-          error={error?.value}
-        />
-        <div>
-          <Button
-            danger
-            type="primary"
-            icon={<IconTrash size="tiny" />}
-            onClick={onDelete}
-            size="small"
-          />
-        </div>
-      </div>
-    )
+  function onNameChange(e: FormEvent<HTMLInputElement>) {
+    const _value = e.currentTarget.value
+    _localState.onFormArrayChange({
+      key: 'serviceParams',
+      value: { name: _value, value },
+      idx,
+      operation: 'update',
+    })
   }
-)
 
-const ServiceUnavailableBox: React.FC = observer(({}) => {
-  const _localState: any = React.useContext(CreateHookContext)
+  function onValueChange(e: FormEvent<HTMLInputElement>) {
+    const _value = e.currentTarget.value
+    _localState.onFormArrayChange({
+      key: 'serviceParams',
+      value: { name, value: _value },
+      idx,
+      operation: 'update',
+    })
+  }
+
+  function onDelete() {
+    _localState.onFormArrayChange({
+      key: 'serviceParams',
+      idx,
+      operation: 'delete',
+    })
+  }
+
+  return (
+    <div className="flex space-x-1">
+      <Input
+        id={`name-${idx}`}
+        className="flex-1"
+        placeholder="Param name"
+        value={name}
+        onChange={onNameChange}
+        size="small"
+        error={error?.name}
+      />
+      <Input
+        id={`value-${idx}`}
+        className="flex-1"
+        placeholder="Param value"
+        value={value}
+        onChange={onValueChange}
+        size="small"
+        error={error?.value}
+      />
+      <div>
+        <Button
+          danger
+          type="primary"
+          icon={<IconTrash size="tiny" />}
+          onClick={onDelete}
+          size="small"
+        />
+      </div>
+    </div>
+  )
+})
+
+const ServiceUnavailableBox: FC = observer(({}) => {
+  const _localState: any = useContext(CreateHookContext)
   return (
     <div className="px-6">
       <div className="block w-full bg-yellow-500 bg-opacity-5 p-3 px-6 border border-yellow-600 border-opacity-40 rounded">

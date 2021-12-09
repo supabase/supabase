@@ -2,9 +2,9 @@ import dayjs from 'dayjs'
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { toast } from 'react-hot-toast'
 import { Badge, Button, Typography, IconDownload } from '@supabase/ui'
 
+import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
@@ -17,8 +17,10 @@ interface Props {
 
 const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
   const router = useRouter()
-  const [isDownloading, setDownloading] = useState(false)
-  const [isRestoring, setRestoring] = useState(false)
+  const { ui } = useStore()
+
+  const [isDownloading, setDownloading] = useState<boolean>(false)
+  const [isRestoring, setRestoring] = useState<boolean>(false)
 
   async function restore(backup: any) {
     setRestoring(true)
@@ -29,8 +31,11 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
         }, 3000)
       })
     } catch (error) {
-      console.error('Restore error:', error)
-      toast.error(`You do not have permission to restore from this backup`)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `You do not have permission to restore from this backup`,
+      })
       setRestoring(false)
     }
   }
@@ -50,8 +55,11 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
 
       setDownloading(false)
     } catch (error) {
-      console.error('Download error:', error)
-      toast.error(`You do not have permission to download this backup`)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `You do not have permission to download this backup`,
+      })
       setDownloading(false)
     }
   }

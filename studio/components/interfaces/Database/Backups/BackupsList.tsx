@@ -49,10 +49,16 @@ const BackupsList: FC<Props> = ({}) => {
       </div> */}
 
       {tierId === STRIPE_PRODUCT_IDS.FREE && (
-        <div className="block w-full bg-white bg-opacity-5 p-3 px-6 border border-white border-opacity-20 rounded">
+        <div
+          className={[
+            'block w-full p-3 px-6 border rounded border-opacity-20',
+            'bg-gray-100 border-gray-600',
+            'dark:bg-gray-600 dark:border-gray-500',
+          ].join(' ')}
+        >
           <div className="flex space-x-3">
             <div className="mt-1">
-              <IconClock className="text-white" size="large" />
+              <IconClock size="large" />
             </div>
             <div className="flex justify-between w-full items-center">
               <div>

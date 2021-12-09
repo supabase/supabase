@@ -85,11 +85,14 @@ const ColumnManagement: FC<Props> = ({
   const onUpdateColumn = (columnToUpdate: ColumnField, changes: Partial<ColumnField>) => {
     const updatedColumns = columns.map((column: ColumnField) => {
       if (column.id === columnToUpdate.id) {
-        const foreignKey =
-          'name' in changes && !isUndefined(column.foreignKey)
-            ? { ...column.foreignKey, source_column_name: changes.name }
-            : column.foreignKey
-        return { ...column, ...changes, foreignKey: foreignKey as PostgresRelationship }
+        if ('name' in changes && !isUndefined(column.foreignKey)) {
+          const foreignKey: PostgresRelationship = {
+            ...column.foreignKey,
+            source_column_name: changes?.name ?? '',
+          }
+          return { ...column, ...changes, foreignKey }
+        }
+        return { ...column, ...changes }
       } else {
         return column
       }

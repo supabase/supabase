@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import toast from 'react-hot-toast'
 import { Typography, Loading, IconArrowRight } from '@supabase/ui'
 import { get as _get, maxBy } from 'lodash'
 import { Dictionary } from '@supabase/grid'
@@ -79,8 +78,11 @@ const Settings: FC<SettingsProps> = ({ project }) => {
         fetchPaygStatistics()
       }
     } catch (error: any) {
-      console.error(error)
-      toast.error(error.message)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to get subscription: ${error.message}`,
+      })
     } finally {
       setLoading(false)
     }

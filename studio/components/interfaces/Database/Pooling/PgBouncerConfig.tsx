@@ -1,9 +1,9 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Divider } from '@supabase/ui'
-import { toast } from 'react-hot-toast'
 import { AutoField } from 'uniforms-bootstrap4'
 
+import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
 import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
@@ -15,7 +15,9 @@ interface Props {
 }
 
 const PgbouncerConfig: FC<Props> = ({ projectRef, config }) => {
-  const [updates, setUpdates] = useState({
+  const { ui } = useStore()
+
+  const [updates, setUpdates] = useState<any>({
     // pgbouncer_status: config.pgbouncer_status,
     pgbouncer_enabled: config.pgbouncer_enabled,
     pool_mode: config.pool_mode || 'transaction',
@@ -30,14 +32,17 @@ const PgbouncerConfig: FC<Props> = ({ projectRef, config }) => {
         throw response.error
       } else {
         setUpdates({ ...response.project })
-        toast(`Settings saved`)
+        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
       }
     } catch (error: any) {
-      toast.error(`Update config failed: ${error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to update config: ${error.message}`,
+      })
     }
   }
 
-  let formSchema = {
+  const formSchema = {
     properties: {
       pgbouncer_enabled: {
         title: 'Enabled',
