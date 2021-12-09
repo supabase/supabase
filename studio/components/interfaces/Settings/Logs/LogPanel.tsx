@@ -17,7 +17,7 @@ interface Props {
   templates?: any
   isLoading: boolean
   isCustomQuery: boolean
-  hasNewData: boolean
+  newCount: number
   showReset: boolean
   onReset: () => void
   onRefresh?: () => void
@@ -34,7 +34,7 @@ const LogPanel: FC<Props> = ({
   templates = [],
   isLoading,
   isCustomQuery,
-  hasNewData,
+  newCount,
   showReset,
   onReset,
   onRefresh,
@@ -50,8 +50,16 @@ const LogPanel: FC<Props> = ({
             type="text"
             icon={
               <div className="relative">
-                {hasNewData && (
-                  <div className={['absolute -top-0.5 -right-0.5', 'h-2 w-2 z-50'].join(' ')}>
+                {newCount > 0 && (
+                  <div
+                    className={[
+                      'absolute flex items-center justify-center -top-0.5 -right-0.5',
+                      'h-3 w-3 z-50',
+                    ].join(' ')}
+                  >
+                    <div className="absolute ">
+                      <Typography.Text style={{ fontSize: '0.5rem' }}>{newCount}</Typography.Text>
+                    </div>
                     <div className="bg-green-500 rounded-full w-full h-full"></div>
                     <div className="absolute top-0 right-0 bg-green-500 rounded-full w-full h-full animate-ping"></div>
                   </div>
