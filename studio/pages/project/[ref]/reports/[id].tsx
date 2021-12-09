@@ -178,9 +178,8 @@ const Reports = () => {
     setSaving(true)
     const payload = {
       content: config,
-      type: 'report'
     }
-    await contentStore.update(id, payload)
+    await contentStore.update(id, payload, 'report')
     await fetchReport()
     setHasEdits(false)
     setSaving(false)
