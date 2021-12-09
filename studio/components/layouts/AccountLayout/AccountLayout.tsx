@@ -32,15 +32,16 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
     key: `${API_URL}/logout`,
   }
 
-  let logoutLink = GOTRUE_ENABLED ? { ...baseLogoutLink, href: '', onClick: onClickLogout } : baseLogoutLink
+  let logoutLink = GOTRUE_ENABLED
+    ? { ...baseLogoutLink, href: undefined, onClick: onClickLogout }
+    : baseLogoutLink
 
   const organizationsLinks = app.organizations
     .list()
     .map((x: any) => ({
       isActive: router.pathname.startsWith('/org/') && ui.selectedOrganization?.slug == x.slug,
       label: x.name,
-      href: '/org/[slug]/settings',
-      as: `/org/${x.slug}/settings`,
+      href: `/org/${x.slug}/settings`,
     }))
     .sort((a, b) => a.label.localeCompare(b.label))
 
@@ -52,7 +53,6 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
           isActive: router.pathname == '/',
           label: 'All projects',
           href: '/',
-          as: `/`,
         },
       ],
     },
