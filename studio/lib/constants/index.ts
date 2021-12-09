@@ -87,3 +87,11 @@ export const POLICY_MODAL_VIEWS = {
   EDITOR: 'EDITOR',
   REVIEW: 'REVIEW',
 }
+
+export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
+  rest: 'API',
+  realtime: 'Realtime',
+  auth: 'Auth',
+  storage: 'Storage',
+  database: 'Database',
+}
