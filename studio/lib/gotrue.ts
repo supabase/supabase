@@ -4,7 +4,7 @@ export const GOTRUE_ENABLED = (process.env.NEXT_PUBLIC_GOTRUE_ENABLED === 'true'
 export const GOTRUE_URL = process.env.GOTRUE_URL || 'http://localhost:8000/auth/v1'
 
 export const auth = new GoTrueClient({
-  url: process.env.NEXT_PUBLIC_GOTRUE_URL,
+  url: GOTRUE_URL,
   autoRefreshToken: true,
 })
 

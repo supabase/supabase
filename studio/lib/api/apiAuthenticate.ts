@@ -103,7 +103,7 @@ async function fetchUser(req: NextApiRequest, res: NextApiResponse): Promise<any
     `
   )
 
-  const { data } = process.env.GOTRUE_ENABLED
+  const { data } = GOTRUE_ENABLED
     ? await query.eq('gotrue_id', gotrue_id).single() 
     : await await query.eq('auth0_id', user_id_auth0).single() 
 
