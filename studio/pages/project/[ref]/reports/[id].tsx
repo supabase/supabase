@@ -178,6 +178,7 @@ const Reports = () => {
     setSaving(true)
     const payload = {
       content: config,
+      type: 'report'
     }
     await contentStore.update(id, payload)
     await fetchReport()
