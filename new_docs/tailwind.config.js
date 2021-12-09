@@ -6,7 +6,25 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
+    borderColor: (theme) => ({
+      ...theme('colors'),
+      DEFAULT: '#f0f2f5',
+      dark: theme('colors.gray.600', 'currentColor'),
+    }),
     extend: {
+      colors: {
+        gray: {
+          100: '#eeeeee',
+          200: '#e0e0e0',
+          300: '#bbbbbb',
+          400: '#666666',
+          500: '#444444',
+          600: '#2a2a2a',
+          700: '#1f1f1f',
+          800: '#181818',
+          900: '#0f0f0f',
+        },
+      },
       typography(theme) {
         return {
           DEFAULT: {

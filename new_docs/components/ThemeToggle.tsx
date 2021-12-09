@@ -1,25 +1,28 @@
 import { useEffect, useState } from 'react'
-import { Menu } from '@supabase/ui'
-import { useTheme } from 'next-themes'
 import { IconSun, IconMoon } from '@supabase/ui'
+
 const ThemeToggle = () => {
-  const [mounted, setMounted] = useState(false)
-  const { resolvedTheme, setTheme } = useTheme()
+  const [darkMode, setDarkMode] = useState<boolean>(true)
 
   useEffect(() => {
-    setMounted(true)
+    const isDarkMode = localStorage.getItem('supabaseDarkMode')
+    if (isDarkMode) {
+      setDarkMode(isDarkMode === 'true')
+      document.documentElement.className = isDarkMode === 'true' ? 'dark' : ''
+    }
   }, [])
 
-  return mounted ? (
-    <button
-      className="w-full flex justify-between"
-      onClick={() => setTheme(resolvedTheme == 'dark' ? 'light' : 'dark')}
-    >
-      {resolvedTheme == 'dark' ? <span>Light Mode</span> : <span>Dark Mode</span>}
-      {resolvedTheme == 'dark' ? <IconSun /> : <IconMoon />}
+  const updateTheme = (isDarkMode: boolean) => {
+    document.documentElement.className = isDarkMode ? 'dark' : ''
+    setDarkMode(isDarkMode)
+    localStorage.setItem('supabaseDarkMode', (!darkMode).toString())
+  }
+
+  return (
+    <button className="w-full flex justify-between" onClick={() => updateTheme(!darkMode)}>
+      {darkMode ? <span>Light Mode</span> : <span>Dark Mode</span>}
+      {darkMode ? <IconSun /> : <IconMoon />}
     </button>
-  ) : (
-    <span />
   )
 }
 

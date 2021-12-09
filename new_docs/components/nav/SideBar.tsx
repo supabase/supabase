@@ -8,12 +8,12 @@ import menuItems from './menu-items.json'
 const SideBar = () => {
   const { asPath } = useRouter()
   return (
-    <div className={`${styles.sidebar} fixed relative h-full`}>
+    <div className={`${styles.sidebar} fixed relative h-full py-4 border-r dark:border-dark`}>
       <Menu>
         <div>
           {Object.keys(menuItems).map((key) => {
             return (
-              <span key={key}>
+              <div key={key} className="mb-4">
                 <Menu.Group title={key} />
                 {menuItems[key].map((item: { link: string; text: string }) => (
                   <span key={item.link}>
@@ -29,7 +29,7 @@ const SideBar = () => {
                     </Link>
                   </span>
                 ))}
-              </span>
+              </div>
             )
           })}
         </div>

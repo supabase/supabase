@@ -21,7 +21,7 @@ const NavBar = () => {
 
   return (
     <nav
-      className={`${styles.navbar} flex justify-between top-0 sticky border-b dark:border-gray-600 p-4`}
+      className={`flex justify-between border-b dark:border-dark p-4 sticky top-0 z-10 bg-opacity-50 h-[72px] bg-white dark:bg-gray-800 backdrop-filter backdrop-blur  firefox:bg-opacity-90`}
     >
       <div className="flex items-center">
         <button className="block lg:hidden mr-2">

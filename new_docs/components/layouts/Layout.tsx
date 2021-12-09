@@ -15,7 +15,7 @@ const DocsLayout = ({
   const theme = 'okaidia'
 
   return (
-    <div className="h-screen">
+    <>
       <Head>
         <title>{meta?.title} | Supabase</title>
         <meta name="description" content={meta?.description} />
@@ -33,26 +33,22 @@ const DocsLayout = ({
         <link href={`https://unpkg.com/prismjs@0.0.1/themes/prism-${theme}.css`} rel="stylesheet" />
       </Head>
 
-      <div className={`${styles.container} flex flex-1 h-full w-full`}>
-        <main className={`${styles.main}`}>
-          <NavBar />
-          <div>
-            <div className="flex flex-row">
-              <SideBar />
-              <div className="grid grid-cols-12 w-full max-w-7xl mx-auto">
-                <article className="col-span-8 prose dark:prose-dark p-8 max-w-none">
-                  {children}
-                </article>
-                <div className="col-span-4 prose dark:prose-dark p-8 max-w-none">
-                  <h5>On this page</h5>
-                </div>
-              </div>
+      <main>
+        <NavBar />
+        <div className="flex flex-row">
+          <SideBar />
+          <div className="grid grid-cols-12 w-full max-w-7xl mx-auto">
+            <article className="col-span-8 prose dark:prose-dark p-8 max-w-none">
+              {children}
+            </article>
+            <div className="col-span-4 prose dark:prose-dark p-8 max-w-none">
+              <h5>On this page</h5>
             </div>
           </div>
-          <Footer />
-        </main>
-      </div>
-    </div>
+        </div>
+        <Footer />
+      </main>
+    </>
   )
 }
 
