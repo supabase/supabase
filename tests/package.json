@@ -1,0 +1,13 @@
+{
+  "name": "supabase-tests",
+  "version": "1.0.0",
+  "description": "These tests can be run with Docker.",
+  "scripts": {
+    "test:js": "node ./node_modules/.bin/cucumber-js tests/ -r tests/features/definitions"
+  },
+  "author": "Supabase, Inc.",
+  "license": "MIT",
+  "devDependencies": {
+    "cucumber": "^7.0.0-rc.0"
+  }
+}
