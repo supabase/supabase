@@ -66,12 +66,29 @@ export async function handleResponseError<T = unknown>(
 
 export function getAccessToken() {
   const tokenData = window?.localStorage['supabase.auth.token']
-  if (!tokenData) return undefined
+  if (!tokenData) {
+    // try to get from url fragment
+    const access_token = getParameterByName('access_token')
+    if (access_token) return access_token
+    else return undefined
+  }
   const tokenObj = tryParseJson(tokenData)
   if (tokenObj === false) {
     return ''
   }
   return tokenObj.currentSession.access_token
+}
+
+// get param from URL fragment
+function getParameterByName(name: string, url?: string) {
+  if (!url) url = window?.location?.href || ''
+  // eslint-disable-next-line no-useless-escape
+  name = name.replace(/[\[\]]/g, '\\$&')
+  const regex = new RegExp('[?&#]' + name + '(=([^&#]*)|&|#|$)'),
+    results = regex.exec(url)
+  if (!results) return null
+  if (!results[2]) return ''
+  return decodeURIComponent(results[2].replace(/\+/g, ' '))
 }
 
 export function constructHeaders(requestId: string, optionHeaders?: { [prop: string]: any }) {
