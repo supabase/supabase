@@ -132,7 +132,7 @@ function BlogPostPage(props: any) {
         </Space>
       </div>
       <div>
-        <Typography.Title level={5}>Table of contents</Typography.Title>
+        <Typography.Text type="secondary">Table of contents</Typography.Text>
         <Typography>
           <div className={blogStyles['toc']}>
             <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
@@ -182,22 +182,22 @@ function BlogPostPage(props: any) {
           "
         >
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 lg:col-span-2">
+            <div className="col-span-12 lg:col-span-2 mb-2">
               {/* Back button */}
               <Typography.Text type="secondary">
                 <a
                   href={'/blog'}
                   className="hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center"
                 >
-                  <IconChevronLeft />
+                  <IconChevronLeft style={{ padding: 0 }} />
                   Back
                 </a>
               </Typography.Text>
             </div>
-            <div className="col-span-12 lg:col-span-10">
+            <div className="col-span-12 lg:col-span-12 xl:col-span-10">
               {/* Title and description */}
               <div className="mb-16 space-y-8 max-w-5xl">
-                <div>
+                <div className="space-y-4">
                   <Typography.Text type="success">Blog post</Typography.Text>
                   <Typography.Title>{props.blog.title}</Typography.Title>
                   <div className="flex space-x-3">
@@ -227,7 +227,7 @@ function BlogPostPage(props: any) {
                   )}
                 </div>
               </div>
-              <div className="grid grid-cols-12 gap-8">
+              <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-7 xl:col-span-7">
                   {props.blog.thumb && (
@@ -256,9 +256,9 @@ function BlogPostPage(props: any) {
                   <Space direction="vertical" size={8} className="lg:mb-16 lg:top-16 lg:sticky">
                     <div className="hidden lg:block">{toc}</div>
                     <div>
-                      <Typography.Title className="mb-4" level={5}>
-                        Related articles
-                      </Typography.Title>
+                      <div className="mb-4">
+                        <Typography.Text type="secondary">Related articles</Typography.Text>
+                      </div>
                       <Space direction="vertical">
                         {props.relatedPosts.map((post: any) => (
                           <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
