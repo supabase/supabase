@@ -45,7 +45,7 @@ services:
       GOTRUE_API_PORT: 9999
 
       GOTRUE_DB_DRIVER: postgres
-      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@db:5432/postgres?sslmode=disable
+      GOTRUE_DB_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?search_path=auth
 
       GOTRUE_SITE_URL: ${SITE_URL}
       GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
