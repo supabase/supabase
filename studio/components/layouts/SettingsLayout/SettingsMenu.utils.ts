@@ -18,16 +18,16 @@ export const generateSettingsMenu = (ref: string): ProductMenuGroup[] => {
         },
       ],
     },
-    {
-      title: 'Logs',
-      items: ['database', 'auth', 'realtime', 'rest', 'storage'].map((type: string) => {
-        return {
-          name: LOG_TYPE_LABEL_MAPPING[type],
-          key: `logs-${type}`,
-          url: `/project/${ref}/settings/logs/${type}`,
-          items: [],
-        }
-      }),
-    },
+    // {
+    //   title: 'Logs',
+    //   items: ['database', 'auth', 'realtime', 'rest', 'storage'].map((type: string) => {
+    //     return {
+    //       name: LOG_TYPE_LABEL_MAPPING[type],
+    //       key: `logs-${type}`,
+    //       url: `/project/${ref}/settings/logs/${type}`,
+    //       items: [],
+    //     }
+    //   }),
+    // },
   ]
 }
