@@ -16,6 +16,7 @@ services:
     environment:
       SUPABASE_URL: http://kong:8000
       STUDIO_PG_META_URL: http://meta:8080
+      SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
 
   kong:
