@@ -99,6 +99,7 @@ typings/
 .dynamodb/
 
 .vscode
+.idea
 .vercel
 
 #include template .env file for docker-compose
