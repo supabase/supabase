@@ -144,7 +144,7 @@ input[type='radio'] {
 }
 
 code {
-  @apply p-1 m-0 font-mono text-sm bg-gray-600 rounded;
+  @apply p-1 m-0 font-mono text-sm bg-gray-100 dark:bg-gray-600 rounded;
 }
 
 div[data-radix-portal]:not(.portal--toast) {
