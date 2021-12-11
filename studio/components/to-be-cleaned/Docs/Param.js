@@ -22,7 +22,7 @@ const Param = ({
       {format && format != type && (
         <div className="mb-4">
           <h5 className="uppercase text-xs font-medium text-gray-400">Format</h5>
-          <code className="p-0 text-sm bg-gray-700">{format}</code>
+          <code className="p-0 text-sm bg-white dark:bg-gray-700">{format}</code>
         </div>
       )}
       {description !== false && (

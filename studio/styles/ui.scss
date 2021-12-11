@@ -195,12 +195,12 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
 /* Docs */
 .Docs {
   &--inner-wrapper {
-    background: linear-gradient(90deg, #ffffff 50%, #eeeeee 50%);
+    background: linear-gradient(90deg, #ffffff 50%, #f3f4f6 50%); /* bg-white bg-coolGray-100 */
     width: 100%;
   }
 
   .dark &--inner-wrapper {
-    background: linear-gradient(90deg, #1f1f1f 50%, #2a2a2a 50%);
+    background: linear-gradient(90deg, #1f1f1f 50%, #2a2a2a 50%); /* bg-gray-700 bg-gray-600 */
   }
 
   h1,
