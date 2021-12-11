@@ -37,16 +37,28 @@ const NavBar = () => {
         )}
         <ul className={`${styles.navLinks} flex`}>
           <li>
-            <Typography.Link>Overview</Typography.Link>
+            <Typography.Link>
+              <Link href="/">
+                <a>Overview</a>
+              </Link>
+            </Typography.Link>
           </li>
           <li>
-            <Typography.Link>Guides</Typography.Link>
+            <Typography.Link>
+              <Link href="/guides">
+                <a>Guides</a>
+              </Link>
+            </Typography.Link>
           </li>
           <li>
-            <Typography.Link>Reference</Typography.Link>
+            <Typography.Link>
+              <Link href="/docs/reference/javascript/supabase-client">
+                <a>Reference</a>
+              </Link>
+            </Typography.Link>
           </li>
           <li>
-            <Typography.Link>Login</Typography.Link>
+            <Typography.Link href="https://app.supabase.io">Login</Typography.Link>
           </li>
         </ul>
       </div>

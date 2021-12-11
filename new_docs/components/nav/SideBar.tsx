@@ -3,9 +3,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import styles from '../../styles/Home.module.css'
 import ThemeToggle from '../ThemeToggle'
-import menuItems from './menu-items.json'
 
-const SideBar = () => {
+const SideBar = ({ menuItems }: { menuItems: any }) => {
   const { asPath } = useRouter()
   return (
     <div className={`${styles.sidebar} fixed relative h-full py-4 border-r dark:border-dark`}>
@@ -15,18 +14,34 @@ const SideBar = () => {
             return (
               <div key={key} className="mb-4">
                 <Menu.Group title={key} />
-                {menuItems[key].map((item: { link: string; text: string }) => (
+                {menuItems[key].map((item: { link: string; text: string; sections: Array }) => (
                   <span key={item.link}>
-                    <Link href={item.link} passHref>
-                      <a>
-                        <Menu.Item
-                          active={asPath === item.link}
-                          showActiveBar={asPath === item.link}
-                        >
-                          {item.text}
-                        </Menu.Item>
-                      </a>
-                    </Link>
+                    {Array.isArray(item.sections) ? (
+                      <>
+                        <Menu.Group title={item.text} />
+                        {item.sections.map((section) => (
+                          <Link href={section.link} key={`${item.text}-${section.text}`}>
+                            <Menu.Item
+                              active={asPath == section.link}
+                              showActiveBar={asPath === section.link}
+                            >
+                              {section.text}
+                            </Menu.Item>
+                          </Link>
+                        ))}
+                      </>
+                    ) : (
+                      <Link href={item.link} passHref>
+                        <a>
+                          <Menu.Item
+                            active={asPath === item.link}
+                            showActiveBar={asPath === item.link}
+                          >
+                            {item.text}
+                          </Menu.Item>
+                        </a>
+                      </Link>
+                    )}
                   </span>
                 ))}
               </div>

@@ -5,7 +5,8 @@ import { serialize } from 'next-mdx-remote/serialize'
 import { MDXRemote } from 'next-mdx-remote'
 import { MDXProvider } from '@mdx-js/react'
 import components from '../components/index'
-import { Tabs } from '@supabase/ui'
+import menuItems from '../components/nav/menu-items.json'
+import { useRouter } from 'next/router'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -19,11 +20,26 @@ export default function Doc({
   content: ReactElement
   toc: any
 }) {
-  console.log('content', content)
-  console.log('meta', meta)
-  console.log('toc', toc)
+  const { asPath } = useRouter()
+  let page
+  switch (asPath) {
+    case '/guides':
+    case '/guides/local-development':
+    case /\/guides\/[a-zA-Z]*\/[a-zA-Z\-]*/.test(asPath) && asPath:
+      page = 'Guides'
+      break
+    case asPath.includes('/reference') && asPath:
+      page = 'Reference'
+      break
+    default:
+      page = 'Docs'
+      break
+  }
+
+  console.log('Page', page)
+
   return (
-    <Layout meta={meta} toc={toc}>
+    <Layout meta={meta} toc={toc} menuItems={menuItems[page]}>
       <MDXProvider components={components}>
         <MDXRemote {...content} components={components} />
       </MDXProvider>

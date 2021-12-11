@@ -1,29 +1,172 @@
 {
-  "Overview": [
-    { "text": "Introduction", "link": "/" },
-    { "text": "Architecture", "link": "/architecture" },
-    { "text": "Database", "link": "/guides/database" },
-    { "text": "Auth", "link": "/guides/auth" },
-    { "text": "Storage", "link": "/guides/storage" },
-    { "text": "APIs", "link": "/guides/apis" },
-    { "text": "Examples and Resources", "link": "/guides/examples" }
-  ],
-  "Tutorials": [
-    { "text": "Quickstart: Angular", "link": "/guides/with-angular" },
-    { "text": "Quickstart: Next.js", "link": "/guides/with-nextjs" },
-    { "text": "Quickstart: Flutter", "link": "/guides/with-flutter" },
-    { "text": "Quickstart: React", "link": "/guides/with-react" },
-    { "text": "Quickstart: RedwoodJS", "link": "/guides/with-redwoodjs" },
-    { "text": "Quickstart: Svelte", "link": "/guides/with-svelte" },
-    { "text": "Quickstart: Vue 3", "link": "/guides/with-vue-3" }
-  ],
-  "See Also": [
-    { "text": "FAQs", "link": "/faqs" },
-    { "text": "Going into Prod Checklist", "link": "/going-into-prod" },
-    { "text": "Contributing", "link": "/handbook/contributing" },
-    { "text": "SupaSquad", "link": "/handbook/supasquad" },
-    { "text": "Terms of Service", "link": "/company/terms" },
-    { "text": "Privacy Policy", "link": "/company/privacy" },
-    { "text": "Acceptable Use Policy", "link": "/company/aup" }
-  ]
+  "Docs": {
+    "Overview": [
+      { "text": "Introduction", "link": "/" },
+      { "text": "Architecture", "link": "/architecture" },
+      { "text": "Database", "link": "/guides/database" },
+      { "text": "Auth", "link": "/guides/auth" },
+      { "text": "Storage", "link": "/guides/storage" },
+      { "text": "APIs", "link": "/guides/apis" },
+      { "text": "Examples and Resources", "link": "/guides/examples" }
+    ],
+    "Tutorials": [
+      { "text": "Quickstart: Angular", "link": "/guides/with-angular" },
+      { "text": "Quickstart: Next.js", "link": "/guides/with-nextjs" },
+      { "text": "Quickstart: Flutter", "link": "/guides/with-flutter" },
+      { "text": "Quickstart: React", "link": "/guides/with-react" },
+      { "text": "Quickstart: RedwoodJS", "link": "/guides/with-redwoodjs" },
+      { "text": "Quickstart: Svelte", "link": "/guides/with-svelte" },
+      { "text": "Quickstart: Vue 3", "link": "/guides/with-vue-3" }
+    ],
+    "See Also": [
+      { "text": "FAQs", "link": "/faqs" },
+      { "text": "Going into Prod Checklist", "link": "/going-into-prod" },
+      { "text": "Contributing", "link": "/handbook/contributing" },
+      { "text": "SupaSquad", "link": "/handbook/supasquad" },
+      { "text": "Terms of Service", "link": "/company/terms" },
+      { "text": "Privacy Policy", "link": "/company/privacy" },
+      { "text": "Acceptable Use Policy", "link": "/company/aup" }
+    ]
+  },
+  "Guides": {
+    "Guides": [
+      { "text": "Overview", "link": "/guides" },
+      { "text": "Local Development", "link": "/guides/local-development" }
+    ],
+    "Database": [
+      { "text": "Introduction", "link": "/guides/database/introduction" },
+      { "text": "Tables", "link": "/guides/database/tables" },
+      { "text": "Functions", "link": "/guides/database/functions" },
+      { "text": "Full Text Search", "link": "/guides/database/full-text-search" },
+      {
+        "text": "Extensions",
+        "sections": [
+          {
+            "text": "Overview",
+            "link": "/guides/database/extensions"
+          },
+          {
+            "text": "plv8: Javascript Language",
+            "link": "/guides/database/extensions/plv8"
+          },
+          {
+            "text": "http: RESTful Client",
+            "link": "/guides/database/extensions/http"
+          },
+          {
+            "text": "uuid-ossp: Unique Identifiers",
+            "link": "/guides/database/extensions/uuid-ossp"
+          }
+        ]
+      },
+      {
+        "text": "Connecting to Postgres",
+        "sections": [
+          {
+            "text": "Overview",
+            "link": "/guides/database/connecting/connecting-to-postgres"
+          },
+          {
+            "text": "Direct Connections",
+            "link": "/guides/database/connecting/direct-connections"
+          },
+          {
+            "text": "Connection Pooling",
+            "link": "/guides/database/connecting/connection-pooling"
+          }
+        ]
+      },
+      {
+        "text": "Configuration",
+        "sections": [
+          {
+            "text": "Timeouts",
+            "link": "/guides/database/timeouts"
+          },
+          {
+            "text": "Direct Connections",
+            "link": "/guides/database/replication"
+          },
+          {
+            "text": "Passwords",
+            "link": "/guides/database/managing-passwords"
+          },
+          {
+            "text": "Timezones",
+            "link": "/guides/database/managing-timezones"
+          }
+        ]
+      }
+    ],
+    "Auth": [
+      {
+        "text": "Introduction",
+        "link": "/guides/auth/intro"
+      },
+      {
+        "text": "Authentication",
+        "sections": [
+          { "text": "Login With Email", "link": "/guides/auth/auth-email" },
+          { "text": "Login With Magic Link", "link": "/guides/auth/auth-magic-link" },
+          { "text": "Login With Apple", "link": "/guides/auth/auth-apple" },
+          { "text": "Login With Bitbucket", "link": "/guides/auth/auth-bitbucket" },
+          { "text": "Login With Discord", "link": "/guides/auth/auth-discord" },
+          { "text": "Login With Facebook", "link": "/guides/auth/auth-facebook" },
+          { "text": "Login With GitHub", "link": "/guides/auth/auth-gitHub" },
+          { "text": "Login With GitLab", "link": "/guides/auth/auth-gitLab" },
+          { "text": "Login With Google", "link": "/guides/auth/auth-google" },
+          { "text": "Login With Slack", "link": "/guides/auth/auth-slack" },
+          { "text": "Login With Spotify", "link": "/guides/auth/auth-spotify" },
+          { "text": "Login With Twitter", "link": "/guides/auth/auth-twitter" },
+          { "text": "Login With Twitch", "link": "/guides/auth/auth-twitch" },
+          { "text": "Phone Auth With Twilio", "link": "/guides/auth/auth-twilio" },
+          { "text": "Phone Auth With MessageBird", "link": "/guides/auth/auth-messageBird" }
+        ]
+      },
+      {
+        "text": "Authorization",
+        "sections": [
+          { "text": "Row Level Security", "link": "/guides/auth/row-level-security" },
+          { "text": "Managing User Data", "link": "/guides/auth/managing-user-data" }
+        ]
+      },
+      {
+        "text": "Deep Dive",
+        "link": [
+          { "text": "Part One: JWTs", "link": "/guides/auth-deep-dive/auth-deep-dive-jwts" },
+          {
+            "text": "Part Two: Row Level Security",
+            "link": "/guides/auth-deep-dive/auth-row-level-security"
+          },
+          { "text": "Part Three: Policies", "link": "/guides/auth-deep-dive/auth-policies" },
+          { "text": "Part Four: Gotrue", "link": "/guides/auth-deep-dive/auth-gotrue" },
+          { "text": "Part Five: Google Oauth", "link": "/guides/auth-deep-dive/auth-google-auth" }
+        ]
+      }
+    ],
+    "Integrations": [
+      {
+        "text": "Auth0",
+        "link": "/guides/integrations/auth0"
+      },
+      {
+        "text": "Draftbit",
+        "link": "/guides/integrations/draftbit"
+      },
+      {
+        "text": "Prisma",
+        "link": "/guides/integrations/prisma"
+      },
+      {
+        "text": "Vercel",
+        "link": "/guides/integrations/vercel"
+      }
+    ],
+    "Self Hosting": [
+      { "text": "Overview", "link": "/guides/hosting/overview" },
+      { "text": "Supabase Platform", "link": "/guides/hosting/platform" },
+      { "text": "With Docker", "link": "/guides/hosting/docker" }
+    ]
+  },
+  "Reference": {}
 }
