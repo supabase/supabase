@@ -146,3 +146,5 @@ To debug code, and to see changes in real time, it is often useful to have a loc
     ```sh
     http://localhost:8082/
     ```
+
+For more information on Supabase Studio, see the [Supabase Studio readme](./studio/README.md).
