@@ -36,8 +36,6 @@ export default function Doc({
       break
   }
 
-  console.log('Page', page)
-
   return (
     <Layout meta={meta} toc={toc} menuItems={menuItems[page]}>
       <MDXProvider components={components}>
