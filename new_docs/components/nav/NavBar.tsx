@@ -17,7 +17,10 @@ const NavBar = () => {
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
 
-  useEffect(() => setMounted(true), [])
+  useEffect(() => {
+    setMounted(true)
+    console.log({ resolvedTheme })
+  }, [])
 
   return (
     <nav
@@ -28,12 +31,17 @@ const NavBar = () => {
           <IconMenu />
         </button>
         {mounted && (
-          <Image
-            src={resolvedTheme === 'dark' ? `/supabase-dark.svg` : `/supabase-light.svg`}
-            width={200}
-            height={32}
-            alt="Supabase Logo"
-          />
+          <Link href="/" passHref>
+            <Image
+              className="cursor-pointer"
+              src={
+                resolvedTheme === 'dark' ? `/docs/supabase-dark.svg` : `/docs/supabase-light.svg`
+              }
+              width={200}
+              height={32}
+              alt="Supabase Logo"
+            />
+          </Link>
         )}
         <ul className={`${styles.navLinks} flex`}>
           <li>
