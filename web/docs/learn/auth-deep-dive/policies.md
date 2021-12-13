@@ -34,7 +34,7 @@ http://localhost:3000/#access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQ
 Let's break this up so that it's easier to read:
 
 ```jsx
-// the base url - whatever you set in the Auth Settings in app.supabase.io dashboard
+// the base url - whatever you set in the Auth Settings in app.supabase.com dashboard
 http://localhost:3000/
 
 // note we use the '#' (fragment) instead of '?' query param
@@ -61,7 +61,7 @@ If we put the access_token into [https://jwt.io](https://jwt.io) we'll see it de
   "aud": "authenticated",
   "exp": 1616429064,
   "sub": "5a4365e7-7c7d-4eaf-a8ee-9ec9432917ca",
-  "email": "ant@supabase.io",
+  "email": "ant@supabase.com",
   "app_metadata": {
     "provider": "email"
   },
@@ -166,4 +166,4 @@ You can get as creative as you like with these policies.
 <!-- - Watch [Part Three: Policies](/docs/learn/auth-deep-dive/auth-policies) -->
 - Watch [Part Four: GoTrue](/docs/learn/auth-deep-dive/auth-gotrue)
 - Watch [Part Five: Google Oauth](/docs/learn/auth-deep-dive/auth-google-oauth)
-- Sign up for Supabase: [app.supabase.io](https://app.supabase.io)
+- Sign up for Supabase: [app.supabase.com](https://app.supabase.com)

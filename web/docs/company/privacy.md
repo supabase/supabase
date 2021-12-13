@@ -5,7 +5,7 @@ title: Privacy Policy
 
 `Last modified: 27 March 2021`
 
-Thank you for your interest in Supabase, Inc., ("**_Supabase_**," "**_we_**", "**_our_**" or "**_us_**"). Supabase provides a suite of open source tools, stitched together to build a seamless developer experience. This Privacy Notice explains how information about you, that directly identifies you, or that makes you identifiable ("**_personal information_**") is collected, used and disclosed by Supabase in connection with our website at [supabase.io](https://supabase.com) (the "**_Site_**") and our services offered in connection with the Site (collectively with the Site, the "**_Service_**").
+Thank you for your interest in Supabase, Inc., ("**_Supabase_**," "**_we_**", "**_our_**" or "**_us_**"). Supabase provides a suite of open source tools, stitched together to build a seamless developer experience. This Privacy Notice explains how information about you, that directly identifies you, or that makes you identifiable ("**_personal information_**") is collected, used and disclosed by Supabase in connection with our website at [supabase.com](https://supabase.com) (the "**_Site_**") and our services offered in connection with the Site (collectively with the Site, the "**_Service_**").
 
 We may also provide you with additional privacy notices or disclosures where the scope of the inquiry, request, or personal information we require falls outside the scope of this Privacy Notice. In that case, the additional Privacy Notice or disclosures will govern how we may process the information you provide at that time. Please note that this Privacy Notice does not cover or apply to our processing of information about our employees or contractors.
 
@@ -16,7 +16,7 @@ Wherever our customers use our Service to submit, manage, or otherwise use conte
 ## Region-specific Disclosures
 
 - **California - Your California Privacy Rights:** If you are a California resident, California Civil Code Section 1798.83 permits you to request information regarding the disclosure of personal information to third parties for their direct marketing purposes during the immediately preceding calendar year. Note we do not share your personal information with third parties for their own marketing purposes.
-- **Nevada:** Chapter 603A of the Nevada Revised Statutes permits a Nevada resident to opt out of future sales of certain covered information that a website operator has collected or will collect about the resident. Note we do not sell your personal information within the meaning of Chapter 603A. However, if you would still like to submit such a request, please contact us at support@supabase.io.
+- **Nevada:** Chapter 603A of the Nevada Revised Statutes permits a Nevada resident to opt out of future sales of certain covered information that a website operator has collected or will collect about the resident. Note we do not sell your personal information within the meaning of Chapter 603A. However, if you would still like to submit such a request, please contact us at support@supabase.com.
 - **European Economic Area, United Kingdom or Switzerland:** If you are located in the European Economic Area ("**_EEA_**"), United Kingdom or Switzerland, or otherwise engage with Supabase’s European operations, please see the **Privacy Disclosures for the European Economic Area, United Kingdom and Switzerland** for additional European-specific privacy disclosures, including what constitutes your personal information, the lawful bases we rely on to process your personal information, how we use cookies when you access our Sites from the EEA, UK or Switzerland and your rights in respect of your personal information.
 
 **Note for International Visitors:** Personal information may be transferred to, stored and processed in a country other than the one in which it was collected. For example, the Sites are primarily hosted in and provided from the United States. Please note the country to which personal data is transferred may not provide the same level of protection for personal information as the country from which it was transferred.
@@ -110,7 +110,7 @@ For your convenience, our Site may provide links to third-party websites or serv
 
 ## 7. Children’s Privacy
 
-Our services are not intended for children under the age of 13. We do not knowingly solicit or collect personal information from children under the age of 13. If we learn that any personal information has been collected inadvertently from a child under 13, we will delete the information as soon as possible. If you believe that we might have collected information from a child under 13, please contact us at privacy@supabase.io.
+Our services are not intended for children under the age of 13. We do not knowingly solicit or collect personal information from children under the age of 13. If we learn that any personal information has been collected inadvertently from a child under 13, we will delete the information as soon as possible. If you believe that we might have collected information from a child under 13, please contact us at privacy@supabase.com.
 
 ## 8. Changes to Privacy Notice
 
@@ -118,13 +118,13 @@ We reserve the right to change this Privacy Notice from time to time in our sole
 
 ## 9. Contact Us
 
-For additional inquiries about this Privacy Notice, please send us an email at privacy@supabase.io.
+For additional inquiries about this Privacy Notice, please send us an email at privacy@supabase.com.
 
 This Privacy Notice was last modified on 27th March 2021
 
 ## Privacy disclosures for the European economic area, United Kingdom, and Switzerland.
 
-While we are primarily based in the United States, Supabase maintains operations in Europe and may direct our services to individuals located in the European Economic Area ("**_EEA_**"), United Kingdom and Switzerland, including through our Site [supabase.io](/) (collectively, our "**_European Services_**"). The following disclosures ("**_Privacy Disclosures_**") apply to our processing of personal data in connection with our European Services.
+While we are primarily based in the United States, Supabase maintains operations in Europe and may direct our services to individuals located in the European Economic Area ("**_EEA_**"), United Kingdom and Switzerland, including through our Site [supabase.com](/) (collectively, our "**_European Services_**"). The following disclosures ("**_Privacy Disclosures_**") apply to our processing of personal data in connection with our European Services.
 
 Supabase, Inc. is the data controller responsible for the processing of personal data in connection with our European Services. This means that we determine and are responsible for how your personal information is used.
 

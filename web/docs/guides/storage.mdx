@@ -89,7 +89,7 @@ const { data, error } = await supabase.storage.createBucket('avatars')
 ```dart
 void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
-  
+
   final storageResponse = await client
       .storage
       .createBucket('avatars');
@@ -143,7 +143,7 @@ const { data, error } = await supabase.storage
 ```dart
 void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
-  
+
   // Create file `example.txt` and upload it in `public` bucket
   final file = File('example.txt');
   file.writeAsStringSync('File content');
@@ -198,7 +198,7 @@ const { data, error } = await supabase.storage.from('avatars').download('public/
 ```dart
 void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
-  
+
   final storageResponse = await client
       .storage
       .from('public')
@@ -360,4 +360,4 @@ let us know on our [GitHub](https://github.com/supabase/supabase/discussions) an
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
 - Read more about storage in our [blog post](/blog/2021/03/30/supabase-storage).
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)
