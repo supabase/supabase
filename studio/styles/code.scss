@@ -49,11 +49,6 @@
     @apply text-green-500 #{!important};
   }
 
-  .token.console {
-    font-style: normal !important;
-    @apply text-teal-600 dark:text-teal-400 #{!important};
-  }
-
   .token.constant {
     font-style: normal !important;
     @apply text-blue-600 dark:text-blue-300 #{!important};
