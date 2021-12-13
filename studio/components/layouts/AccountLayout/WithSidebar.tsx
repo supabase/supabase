@@ -116,7 +116,6 @@ const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) =>
             isActive={isActive}
             label={x.label}
             href={x.href}
-            as={x.as}
             onClick={x.onClick}
             external={x.external || false}
           />
@@ -145,7 +144,7 @@ const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) =>
 
 const SidebarItem: FC<any> = ({ id, label, as, href, isActive, isSubitem, onClick, external }) => {
   return (
-    <Link href={href || ''} as={as || ''}>
+    <Link href={href || ''}>
       <a className="block" target={external ? '_blank' : '_self'}>
         <Menu.Item
           rounded

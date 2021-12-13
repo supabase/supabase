@@ -38,7 +38,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
               </>
             ) : (
               <Typography.Text small className="mx-2">
-                <Link as="/" href="/">
+                <Link href="/">
                   <a
                     className={`block px-2 py-1 focus:outline-none focus:bg-transparent cursor-pointer dark:hover:text-white`}
                   >
