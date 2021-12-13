@@ -24,9 +24,7 @@ const BlogListItem = ({ blog }: Props) => {
                 <Image
                   layout="fill"
                   src={
-                    !blog.thumb
-                      ? `/images/blog/blog-placeholder.png`
-                      : `/images/blog/${blog.thumb}`
+                    !blog.thumb ? `/images/blog/blog-placeholder.png` : `/images/blog/${blog.thumb}`
                   }
                   objectFit="cover"
                   className="transform duration-100 ease-in scale-100 group-hover:scale-105"
