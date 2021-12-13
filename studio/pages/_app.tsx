@@ -10,13 +10,15 @@ import 'styles/contextMenu.scss'
 
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
+import { useState } from 'react'
 import type { AppProps } from 'next/app'
-import { Toaster } from 'react-hot-toast'
+import { Toaster, ToastBar, toast } from 'react-hot-toast'
+import { Button, IconX } from '@supabase/ui'
+
 import { RootStore } from 'stores'
 import { StoreProvider } from 'hooks'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
-import { useState } from 'react'
 
 const PortalRootWithNoSSR = dynamic(
   // @ts-ignore
@@ -42,7 +44,25 @@ const PortalToast = () => (
           duration: 8000,
         },
       }}
-    />
+    >
+      {(t) => (
+        <ToastBar toast={t} style={t.style}>
+          {({ icon, message }) => (
+            <>
+              {icon}
+              {message}
+              {t.type !== 'loading' && (
+                <div className="ml-4">
+                  <Button className="!p-1" type="text" onClick={() => toast.dismiss(t.id)}>
+                    <IconX size={14} strokeWidth={2} />
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </ToastBar>
+      )}
+    </Toaster>
   </PortalRootWithNoSSR>
 )
 
