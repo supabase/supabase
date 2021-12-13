@@ -6,8 +6,9 @@ import {
   compact,
   isEqual,
   isNull,
-  has,
+  isNil,
   isUndefined,
+  has,
   some,
   chunk,
   get,
@@ -376,11 +377,15 @@ class StorageExplorerStore {
   /* Bucket CRUD */
 
   createBucket = async (bucketName, isPublic = false) => {
+    if (isNil(this.supabaseClient)) {
+      return toast.error('Failed to initialize supabase client, try refreshing your browser.')
+    }
+
     const { error } = await this.supabaseClient.storage.createBucket(bucketName, {
       public: isPublic,
     })
     if (error) {
-      toast(error.message)
+      toast.error(error.message)
       return this.closeCreateBucketModal()
     }
 
