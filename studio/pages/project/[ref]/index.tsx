@@ -47,34 +47,6 @@ const Home: NextPage = () => {
             {projectName}
           </Typography.Title>
         </div>
-        <button
-          onClick={() => {
-            ui.setNotification({ category: 'success', message: 'Oh yes' })
-          }}
-        >
-          Success
-        </button>
-        <button
-          onClick={() => {
-            ui.setNotification({ category: 'error', message: 'Oh no' })
-          }}
-        >
-          Error
-        </button>
-        <button
-          onClick={() => {
-            ui.setNotification({ category: 'loading', message: 'Oh wait' })
-          }}
-        >
-          Loading
-        </button>
-        <button
-          onClick={() => {
-            ui.setNotification({ category: 'info', message: 'Oh?' })
-          }}
-        >
-          Information
-        </button>
         {IS_PLATFORM && project && (
           <>
             {isUndefined(usage) ? (
