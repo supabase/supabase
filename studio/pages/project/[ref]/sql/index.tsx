@@ -41,7 +41,7 @@ const PageConfig = () => {
    */
   async function loadPersistantData() {
     if (sqlEditorStore === undefined) return
-    sqlEditorStore.loadRemotePersistentData(contentStore, (user as any)?.id)
+    await sqlEditorStore.loadRemotePersistentData(contentStore, (user as any)?.id)
   }
 
   return (
