@@ -434,7 +434,6 @@ export default class MetaStore implements IMetaStore {
           }
 
           if (!isUndefined(error)) {
-            console.log(error)
             this.rootStore.ui.setNotification({
               category: 'error',
               message: 'Do check your spreadsheet if there are any discrepancies.',
