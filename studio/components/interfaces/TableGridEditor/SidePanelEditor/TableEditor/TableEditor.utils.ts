@@ -1,8 +1,6 @@
-import { some, includes } from 'lodash'
-import dayjs from 'dayjs'
+import { some } from 'lodash'
 import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 
-import { tryParseJson } from 'lib/helpers'
 import { ImportContent, TableField } from './TableEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import { ColumnField } from '../SidePanelEditor.types'
@@ -43,6 +41,7 @@ export const generateTableFieldFromPostgresTable = (
     id: table.id,
     name: isDuplicating ? `${table.name}_duplicate` : table.name,
     comment: isDuplicating ? `This is a duplicate of ${table.name}` : table?.comment ?? '',
+    // @ts-ignore
     columns: table.columns.map((column: PostgresColumn) => {
       return generateColumnFieldFromPostgresColumn(column, table)
     }),
@@ -52,61 +51,8 @@ export const generateTableFieldFromPostgresTable = (
 
 export const formatImportedContentToColumnFields = (importContent: ImportContent) => {
   const columnFields = importContent.headers.map((header: string) => {
-    const columnType = inferColumnType(header, importContent.rows)
+    const columnType = importContent.columnTypeMap[header]
     return generateColumnField({ name: header, format: columnType })
   })
   return columnFields
-}
-
-export const inferColumnType = (column: string, rows: object[]) => {
-  // General strategy is to check the first row first, before checking across all the rows
-  // to ensure uniformity in data type. Thinking we do this as an optimization instead of
-  // checking all the rows up front.
-
-  // If there are no rows to infer for, default to text
-  if (rows.length === 0) return 'text'
-
-  const columnData = (rows[0] as any)[column]
-  const columnDataAcrossRows = rows.map((row: object) => (row as any)[column])
-
-  // Unable to infer any type as there's no data, default to text
-  if (!columnData) {
-    return 'text'
-  }
-
-  // Infer numerical data type (defaults to either int8 or float8)
-  if (Number(columnData)) {
-    const columnNumberCheck = rows.map((row: object) => Number((row as any)[column]))
-    if (columnNumberCheck.includes(NaN)) {
-      return 'text'
-    } else {
-      const columnFloatCheck = columnNumberCheck.map((num: number) => num % 1)
-      return columnFloatCheck.every((item) => item === 0) ? 'int8' : 'float8'
-    }
-  }
-
-  // Infer boolean type
-  if (includes(['true', 'false'], columnData.toLowerCase())) {
-    const isAllBoolean = columnDataAcrossRows.every((item: any) =>
-      includes(['true', 'false'], item.toLowerCase())
-    )
-    if (isAllBoolean) {
-      return 'boolean'
-    }
-  }
-
-  // Infer json type
-  if (tryParseJson(columnData)) {
-    const isAllJson = columnDataAcrossRows.every((item: any) => tryParseJson(columnData))
-    if (isAllJson) {
-      return 'jsonb'
-    }
-  }
-
-  // Infer datetime type
-  if (dayjs(columnData, 'YYYY-MM-DD hh:mm:ss').isValid() && Date.parse(columnData)) {
-    return 'timestamptz'
-  }
-
-  return 'text'
 }
