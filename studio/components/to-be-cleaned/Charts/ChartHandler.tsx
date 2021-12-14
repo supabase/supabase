@@ -78,7 +78,7 @@ const ChartHandler: FC<Props> = ({
 
       const { error, ...res } = await get(url)
 
-      if (error && !cancel) {
+      if ((error || isUndefined(res)) && !cancel) {
         setFetching(false)
         setFetchedData(undefined)
         return console.error('Chart error:', error)
