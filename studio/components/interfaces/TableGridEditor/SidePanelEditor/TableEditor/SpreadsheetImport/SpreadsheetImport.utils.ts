@@ -24,12 +24,12 @@ export const parseSpreadsheetText: any = (text: string) => {
 /**
  * For SpreadsheetImport side panel
  * @param file File object (CSV or TSV)
- * @returns {Object<headers, rows, errors>}
- * headers: String[]
- * rows: any[]
- * errors: Object[]
+ * @returns SpreadsheetData
  */
-export const parseSpreadsheet = (file: File, onProgressUpdate: (progress: number) => void): any => {
+export const parseSpreadsheet = (
+  file: File,
+  onProgressUpdate: (progress: number) => void
+): Promise<any> => {
   let headers: string[] = []
   let chunkNumber = 0
   let rowCount = 0
@@ -60,7 +60,10 @@ export const parseSpreadsheet = (file: File, onProgressUpdate: (progress: number
         rowCount += results.data.length
 
         if (results.errors.length > 0) {
-          errors.push(...results.errors)
+          const formattedErrors = results.errors.map((error) => {
+            return { ...error, data: results.data[error.row] }
+          })
+          errors.push(...formattedErrors)
         }
 
         chunkNumber += 1
