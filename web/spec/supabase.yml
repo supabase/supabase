@@ -215,6 +215,11 @@ pages:
       ```bash
       npm install @supabase/supabase-js
       ```
+      
+      Via Yarn
+      ```bash
+      yarn add @supabase/supabase-js
+      ```
 
       Find the source code on [GitHub](https://github.com/supabase/supabase-js).  
 
@@ -1687,6 +1692,26 @@ pages:
         .select('name, country_id')
         .gte('population', 1000)
         .lt('population', 10000)
+      ```
+
+      ### Conditional Chaining
+
+      Filters can be built up one step at a time and then executed. For example:
+
+      ```js
+      const filterByName = null
+      const filterPopLow = 1000
+      const filterPopHigh = 10000
+
+      let query = supabase
+        .from('cities')
+        .select('name, country_id')
+        
+      if (filterByName)  { query = query.eq('name', filterByName) }
+      if (filterPopLow)  { query = query.gte('population', filterPopLow) }
+      if (filterPopHigh) { query = query.lt('population', filterPopHigh) }
+
+      const { data, error } = await query
       ```
 
   .or():

@@ -162,7 +162,7 @@ const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, e
   }
 
   return (
-    <Link href={href}>
+    <Link href={href || ''}>
       <a className="block" target={external ? '_blank' : '_self'}>
         <Menu.Item
           rounded

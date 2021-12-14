@@ -57,7 +57,6 @@ const PolicySelection = ({
               target="_blank"
               className="text-green-400"
               href="https://supabase.com/docs/guides/auth#policies"
-              as="https://supabase.com/docs/guides/auth#policies"
             >
               here
             </a>

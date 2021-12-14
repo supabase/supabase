@@ -29,11 +29,11 @@ const SparkBar: FC<Props> = ({
     return (
       <div className="flex flex-col w-full">
         {hasLabels && (
-          <div className="flex justify-between pb-1">
-            <span className="text-typography-body-light dark:text-typography-body-dark text-sm">
+          <div className="flex justify-between pb-1 space-x-8">
+            <span className="text-typography-body-light dark:text-typography-body-dark text-sm truncate">
               {labelBottom}
             </span>
-            <span className="text-typography-body-light dark:text-typography-body-dark text-sm">
+            <span className="text-typography-body-light dark:text-typography-body-dark text-sm tabular-nums">
               {labelTop}
             </span>
           </div>

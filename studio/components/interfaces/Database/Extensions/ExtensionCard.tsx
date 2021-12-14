@@ -1,6 +1,5 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { toast } from 'react-hot-toast'
 import { Badge, Typography, Toggle } from '@supabase/ui'
 
 import { useStore } from 'hooks'
@@ -11,7 +10,7 @@ interface Props {
 }
 
 const ExtensionCard: FC<Props> = ({ extension }) => {
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
 
   const isOn = extension.installed_version !== null
   const [loading, setLoading] = useState(false)
@@ -32,10 +31,16 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
           if (response.error) {
             throw response.error
           } else {
-            toast.success(`${extension.name.toUpperCase()} is on.`)
+            ui.setNotification({
+              category: 'success',
+              message: `${extension.name.toUpperCase()} is on.`,
+            })
           }
         } catch (error: any) {
-          toast.error(`Toggle ${extension.name.toUpperCase()} failed: ${error.message}`)
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to toggle ${extension.name.toUpperCase()}: ${error.message}`,
+          })
         } finally {
           setLoading(false)
         }
@@ -54,10 +59,16 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
           if (response.error) {
             throw response.error
           } else {
-            toast(`${extension.name.toUpperCase()} is off.`)
+            ui.setNotification({
+              category: 'success',
+              message: `${extension.name.toUpperCase()} is off.`,
+            })
           }
         } catch (error: any) {
-          toast.error(`Toggle ${extension.name.toUpperCase()} failed: ${error.message}`)
+          ui.setNotification({
+            category: 'error',
+            message: `Toggle ${extension.name.toUpperCase()} failed: ${error.message}`,
+          })
         } finally {
           // Need to reload them because the delete function
           // removes the extension from the store

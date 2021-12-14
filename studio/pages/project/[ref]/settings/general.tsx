@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { toJS } from 'mobx'
 import { projects } from 'stores/jsonSchema'
-import { toast } from 'react-hot-toast'
 import { AutoField } from 'uniforms-bootstrap4'
 import {
   Modal,
@@ -39,6 +38,7 @@ const ProjectSettings = () => {
 export default withAuth(observer(ProjectSettings))
 
 const RestartServerButton: FC<any> = ({ projectRef }: any) => {
+  const { ui } = useStore()
   const [loading, setLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -49,10 +49,10 @@ const RestartServerButton: FC<any> = ({ projectRef }: any) => {
     setLoading(true)
     try {
       await post(`${API_URL}/projects/${projectRef}/restart`, {})
-      toast('Requested server restart')
+      ui.setNotification({ category: 'info', message: 'Requested server restart' })
       setLoading(false)
-    } catch (err) {
-      toast.error('Unable to restart server')
+    } catch (error) {
+      ui.setNotification({ error, category: 'error', message: 'Unable to restart server' })
       setLoading(false)
     }
     closeModal()
@@ -86,11 +86,14 @@ const GeneralSettings = observer(() => {
   const handleUpdateProject = async (model: any) => {
     const response = await post(`${API_URL}/projects/${project?.ref}/update`, model)
     if (response.error) {
-      toast.error(`Update project failed: ${response.error.message}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Update project failed: ${response.error.message}`,
+      })
     } else {
       const updatedProject = response
       app.onProjectUpdated(updatedProject)
-      toast(`Settings saved`)
+      ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
     }
   }
 
@@ -170,7 +173,8 @@ const GeneralSettings = observer(() => {
 
 const ProjectDeleteModal = ({ project }: any) => {
   const router = useRouter()
-  const { app } = useStore()
+  const { ui, app } = useStore()
+
   const [isOpen, setIsOpen] = useState(false)
   const [value, setValue] = useState('')
   const [loading, setLoading] = useState(false)
@@ -186,14 +190,14 @@ const ProjectDeleteModal = ({ project }: any) => {
       const response = await delete_(`${API_URL}/projects/${project.ref}/remove`)
       if (response.error) throw response.error
       app.onProjectDeleted(response)
-      toast.success(`Deleted ${project.name} successfully`, {
-        duration: 4000,
-      })
+      ui.setNotification({ category: 'success', message: `Successfully deleted ${project.name}` })
       router.push(`/`)
     } catch (error: any) {
       setLoading(false)
-      toast.error(error.message)
-      console.error(error)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to delete project ${project.name}: ${error.message}`,
+      })
     }
   }
 
