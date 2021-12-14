@@ -1,23 +1,10 @@
 import useSWR from 'swr'
 import { FC, createContext, useContext, useState } from 'react'
 import { indexOf } from 'lodash'
-import { toast } from 'react-hot-toast'
 import { useRouter } from 'next/router'
 import { AutoField } from 'uniforms-bootstrap4'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import {
-  Typography,
-  Input,
-  IconAlertCircle,
-  Button,
-  Modal,
-  IconKey,
-  Dropdown,
-  Divider,
-  IconRefreshCw,
-  IconPenTool,
-  IconChevronDown,
-} from '@supabase/ui'
+import { Typography, Input, IconAlertCircle, Modal, IconKey } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { useStore, withAuth } from 'hooks'
@@ -278,6 +265,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
 
 const PostgrestConfig = observer(({ config, projectRef }: any) => {
   const PageState: any = useContext(PageContext)
+  const { ui } = useStore()
   const { meta } = PageState
 
   const [updates, setUpdates] = useState({
@@ -295,10 +283,14 @@ const PostgrestConfig = observer(({ config, projectRef }: any) => {
       if (response.error) {
         throw response.error
       } else {
-        toast(`Settings saved`)
+        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
       }
     } catch (error: any) {
-      toast.error(`Update config failed: ${error.message}`)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to update config: ${error.message}`,
+      })
     }
   }
 

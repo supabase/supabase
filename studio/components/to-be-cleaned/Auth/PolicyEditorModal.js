@@ -1,7 +1,6 @@
 import { Modal, Typography, IconChevronLeft } from '@supabase/ui'
 import { useState, useEffect } from 'react'
 import { isEmpty } from 'lodash'
-import toast from 'react-hot-toast'
 
 import { POLICY_MODAL_VIEWS } from 'lib/constants'
 import { getGeneralPolicyTemplates } from './PolicyEditorModal.constants'
@@ -15,6 +14,7 @@ import PolicySelection from './PolicySelection'
 import PolicyEditor from './PolicyEditor'
 import PolicyReview from './PolicyReview'
 import PolicyTemplates from './PolicyTemplates'
+import { useStore } from 'hooks'
 
 const PolicyEditorModalTitle = ({
   view,
@@ -66,6 +66,8 @@ const PolicyEditorModal = ({
   onUpdatePolicy = () => {},
   onSaveSuccess = () => {},
 }) => {
+  const { ui } = useStore()
+
   const newPolicyTemplate = {
     schema,
     table,
@@ -126,21 +128,32 @@ const PolicyEditorModal = ({
     const { name, definition, check, command } = policyFormFields
 
     if (name.length === 0) {
-      return toast.error('Do give your policy a name')
+      return ui.setNotification({ category: 'error', message: 'Do give your policy a name' })
     }
     if (!command) {
-      return toast.error('You will need to allow at one operation in your policy')
+      return ui.setNotification({
+        category: 'error',
+        message: 'You will need to allow at one operation in your policy',
+      })
     }
     if (['SELECT', 'DELETE'].includes(command) && !definition) {
-      return toast.error('Did you forget to provide a USING expression for your policy?')
+      return ui.setNotification({
+        category: 'error',
+        message: 'Did you forget to provide a USING expression for your policy?',
+      })
     }
     if (command === 'INSERT' && !check) {
-      return toast.error('Did you forget to provide a WITH CHECK expression for your policy?')
+      return ui.setNotification({
+        category: 'error',
+        message: 'Did you forget to provide a WITH CHECK expression for your policy?',
+      })
     }
     if (command === 'UPDATE' && !definition && !check) {
-      return toast.error(
-        'You will need to provide either a USING, or WITH CHECK expression, or both for your policy'
-      )
+      return ui.setNotification({
+        category: 'error',
+        message:
+          'You will need to provide either a USING, or WITH CHECK expression, or both for your policy',
+      })
     }
     const policySQLStatement = createSQLPolicy(policyFormFields, selectedPolicyToEdit)
     setPolicyStatementForReview(policySQLStatement)

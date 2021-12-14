@@ -9,14 +9,13 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { Typography, Badge, Space, Dropdown, Button, IconChevronDown } from '@supabase/ui'
+import { Typography, Tabs } from '@supabase/ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
-import BlogHeader from '~/components/Blog/BlogHeader'
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPosts()
-  const categories = getAllCategories()
+  const allPostsData = getSortedPosts('_blog')
+  const categories = getAllCategories('_blog')
   const rss = generateRss(allPostsData)
 
   // create a rss feed in public directory
@@ -38,10 +37,14 @@ function Blog(props: any) {
   const router = useRouter()
 
   useEffect(() => {
-    // Update the document title using the browser API
+    // contruct an array of blog posts
+    // not inluding the first blog post
+    const shiftedBlogs = [...props.blogs]
+    shiftedBlogs.shift()
+
     setBlogs(
       category === 'all'
-        ? props.blogs
+        ? shiftedBlogs
         : props.blogs.filter((post: any) => {
             const found = post.tags.includes(category)
             return found
@@ -49,6 +52,12 @@ function Blog(props: any) {
     )
   }, [category])
 
+  useEffect(() => {
+    return props.categories.unshift('all')
+  }, [])
+
+  // append 'all' category
+  // const categories = props.categories.push('all')
   const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
   const meta_description = 'Get all your Supabase News on the Supabase blog.'
 
@@ -76,65 +85,41 @@ function Blog(props: any) {
         ]}
       />
       <DefaultLayout>
-        <BlogHeader title="Blog" />
-        <div className="bg-gray-50 dark:bg-dark-800 overflow-hidden py-12">
+        <div className="bg-white dark:bg-dark-800 overflow-hidden py-12">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
-            <div className="mx-auto max-w-7xl">
-              <Typography.Title level={2}>Latest posts</Typography.Title>
-              <div className="mt-5 max-w-lg mx-auto grid gap-16 lg:grid-cols-2 lg:max-w-none">
-                {props.blogs.slice(0, 2).map((blog: any, idx: any) => {
-                  return FeaturedThumb(blog)
-                })}
-              </div>
+            <div className="mx-auto ">
+              {props.blogs.slice(0, 1).map((blog: any, idx: any) => {
+                return FeaturedThumb(blog)
+              })}
             </div>
           </div>
-          <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-32">
-            <div className="mx-auto max-w-7xl">
+        </div>
+
+        <div className="border-t dark:border-dark">
+          <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
+            <div className="mx-auto ">
               <div className="grid grid-cols-12">
-                <div className="col-span-12 lg:col-span-8">
-                  <Typography.Title level={2}>More posts from the team</Typography.Title>
-                </div>
-                <div className="col-span-12 lg:col-span-4 mt-4 lg:mt-0">
-                  <Space className="lg:justify-end" size={6}>
-                    <Typography.Text>Select a category</Typography.Text>
-                    <Dropdown
-                      style={{
-                        height: '50vh',
-                        overflow: 'auto',
-                      }}
-                      overlay={[
-                        <Dropdown.RadioGroup value={category} onChange={setCategory}>
-                          <Dropdown.Radio key={'all'} value="all">
-                            Show all
-                          </Dropdown.Radio>
-                          {props.categories.map((categoryId: string) => (
-                            <Dropdown.Radio key={categoryId} value={categoryId}>
-                              {categoryId}
-                            </Dropdown.Radio>
-                          ))}
-                        </Dropdown.RadioGroup>,
-                      ]}
-                    >
-                      <Button
-                        type="outline"
-                        className="sbui-select--medium"
-                        iconRight={<IconChevronDown />}
-                      >
-                        {category === 'all' ? 'Show all' : category}
-                      </Button>
-                    </Dropdown>
-                  </Space>
+                <div className="col-span-12 lg:col-span-12">
+                  <Tabs scrollable size="medium" onChange={setCategory} defaultActiveId={'all'}>
+                    {props.categories.map((categoryId: string) => (
+                      <Tabs.Panel id={categoryId} label={categoryId}>
+                        {/* <p>{categoryId}</p> */}
+                        <></>
+                      </Tabs.Panel>
+                    ))}
+                  </Tabs>
                 </div>
               </div>
-              <div className="mt-12 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none">
-                {/* <ul> */}
-                {blogs.map((blog: PostTypes, idx: number) => (
-                  <BlogListItem blog={blog} key={idx} />
-                ))}
-                {/* </ul> */}
-              </div>{' '}
             </div>
-          </div>
+
+            <ol className="grid grid-cols-12 py-16 gap-8 lg:gap-16">
+              {blogs.map((blog: PostTypes, idx: number) => (
+                <div className="col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-4 mb-16">
+                  <BlogListItem blog={blog} key={idx} />
+                </div>
+              ))}
+            </ol>
+          </div>{' '}
         </div>
       </DefaultLayout>
     </>
@@ -146,57 +131,41 @@ function FeaturedThumb(blog: PostTypes) {
   const author = blog.author ? authors[blog.author] : authors['supabase']
 
   return (
-    <div key={blog.slug} className="my-6 cursor-pointer">
+    <div key={blog.slug} className="cursor-pointer w-full">
       <a href={`/blog/${blog.url}`}>
-        <a className="inline-block">
+        <a className="grid lg:grid-cols-2 gap-8 lg:gap-16">
           <img
-            className="h-96 w-full object-cover border dark:border-dark"
+            className="h-96 w-full object-cover border dark:border-dark rounded-lg"
             src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
           />
-          <Space direction="vertical" size={5} className="mt-4">
+          <div className="flex flex-col space-y-4">
+            <div className="flex space-x-2">
+              <Typography.Text type="secondary">{blog.date}</Typography.Text>
+              <Typography.Text type="secondary">•</Typography.Text>
+              <Typography.Text type="secondary">{blog.readingTime}</Typography.Text>
+            </div>
+
             <div>
-              <Space className="mb-2">
-                <Typography.Text type="secondary">{blog.date}</Typography.Text>
-                <Typography.Text type="secondary">•</Typography.Text>
-                <Typography.Text type="secondary">{blog.readingTime}</Typography.Text>
-              </Space>
-
-              <Space direction="vertical" size={3}>
-                <Typography.Title level={3} className="">
-                  {blog.title}
-                </Typography.Title>
-
-                <Space className="block">
-                  {blog.tags &&
-                    blog.tags.map((tag: string) => (
-                      <a href={`/blog/tags/${tag}`}>
-                        <a>
-                          <Badge key={`${blog.slug}-${tag}-tag`} dot={false}>
-                            {tag}
-                          </Badge>
-                        </a>
-                      </a>
-                    ))}
-                </Space>
-              </Space>
+              <Typography.Title level={2}>{blog.title}</Typography.Title>
+              <Typography.Text className="m-0" type="secondary">
+                <span className="text-xl">{blog.description}</span>
+              </Typography.Text>
             </div>
 
             {author && (
-              <div>
-                <Space size={4}>
-                  {author.author_image_url && (
-                    <img src={author.author_image_url} className="rounded-full w-10" />
-                  )}
-                  <Space direction="vertical" size={0}>
-                    <Typography.Text>{author.author}</Typography.Text>
-                    <Typography.Text type="secondary" small>
-                      {author.position}
-                    </Typography.Text>
-                  </Space>
-                </Space>
+              <div className="flex space-x-3 items-center">
+                {author.author_image_url && (
+                  <img src={author.author_image_url} className="rounded-full w-10" />
+                )}
+                <div className="flex flex-col">
+                  <Typography.Text>{author.author}</Typography.Text>
+                  <Typography.Text type="secondary" small>
+                    {author.position}
+                  </Typography.Text>
+                </div>
               </div>
             )}
-          </Space>
+          </div>
         </a>
       </a>
     </div>

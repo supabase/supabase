@@ -14,10 +14,15 @@
     @apply text-sm;
   }
 
+  .token.imports,
+  .token.property-access {
+    @apply text-blueGray-500 dark:text-blueGray-300 #{!important};
+  }
+
   .token.keyword.module,
   .token.function {
     font-style: normal !important;
-    color: #ccc !important;
+    @apply text-gray-600 dark:text-gray-300 #{!important};
   }
 
   .token.plain,
@@ -30,46 +35,40 @@
   .token.doc-comment.parameter.punctuation,
   .token.doc-comment.optional-parameter.punctuation {
     font-style: normal !important;
-    color: #ccc !important;
+    @apply text-gray-600 dark:text-gray-300 #{!important};
   }
 
   .token.keyword,
   .token.doc-comment.keyword {
     font-style: normal !important;
-    color: #569cd6 !important;
+    @apply text-blue-600 dark:text-blue-300 #{!important};
   }
 
   .token.string {
     font-style: normal !important;
-    color: #24b47e !important;
-  }
-
-  .token.console {
-    font-style: normal !important;
-    color: #49c1ad !important;
+    @apply text-green-500 #{!important};
   }
 
   .token.constant {
     font-style: normal !important;
-    color: #569cd6 !important;
+    @apply text-blue-600 dark:text-blue-300 #{!important};
   }
 
   .token.comment {
     font-style: normal !important;
-    color: #666 !important;
+    @apply text-gray-300 dark:text-gray-400 #{!important};
   }
 
   .token.number {
-    color: #b5cea8 !important;
+    @apply text-green-600 dark:text-green-200 #{!important};
   }
 
   .token.boolean,
   .token.doc-comment.class-name {
-    @apply text-green-500;
+    @apply text-green-500 dark:text-green-500;
   }
 
   .codeBlock {
-    @apply bg-gray-600;
     margin-bottom: 0;
     overflow: hidden;
     overflow-wrap: break-word;

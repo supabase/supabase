@@ -1,6 +1,5 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, partition, isEmpty } from 'lodash'
-import { toast } from 'react-hot-toast'
 import { Divider, SidePanel, Space, Typography } from '@supabase/ui'
 import { Dictionary, Query } from '@supabase/grid'
 import { PostgresTable } from '@supabase/postgres-meta'
@@ -77,7 +76,10 @@ const RowEditor: FC<Props> = ({
     // Possible low prio refactor: Shift fetching reference row retrieval to ReferenceRowViewer
     // in a useEffect, rather than trying to manage a loading state in this method
     if (!row.value) {
-      return toast.error(`Please enter a value in the ${row.name} field first`)
+      ui.setNotification({
+        category: 'error',
+        message: `Please enter a value in the ${row.name} field first`,
+      })
     }
     const foreignKey = row.foreignKey
     setReferenceRow({ loading: true, foreignKey, row: undefined })

@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react'
-import toast from 'react-hot-toast'
 import { SidePanel, Typography } from '@supabase/ui'
 
+import { useStore } from 'hooks'
 import JsonEditor from './JsonCodeEditor'
 import TwoOptionToggle from './TwoOptionToggle'
 import DrilldownViewer from './DrilldownViewer'
@@ -17,7 +17,8 @@ type JsonEditProps = {
 }
 
 const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, onSaveJSON }) => {
-  const [view, setView] = useState('edit')
+  const { ui } = useStore()
+  const [view, setView] = useState<'edit' | 'view'>('edit')
   const [jsonStr, setJsonStr] = useState('')
 
   useEffect(() => {
@@ -33,22 +34,18 @@ const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, 
       const message = error.message
         ? `Error: ${error.message}`
         : 'Hmm, invalid JSON seems to have an invalid structure.'
-      toast.error(message)
+      ui.setNotification({ category: 'error', message })
     } finally {
       resolve()
     }
-  }
-
-  function toggleView(option: string) {
-    setView(option)
   }
 
   function onInputChange(value: any) {
     setJsonStr(value ?? '')
   }
 
-  function onToggleClick(option: string) {
-    toggleView(option)
+  function onToggleClick(option: 'edit' | 'view') {
+    setView(option)
   }
 
   return (

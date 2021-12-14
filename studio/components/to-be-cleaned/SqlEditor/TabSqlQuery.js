@@ -18,7 +18,6 @@ import { timeout } from 'lib/helpers'
 import { IS_PLATFORM } from 'lib/constants'
 import { useSqlStore, UTILITY_TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
 import { useProjectContentStore } from 'stores/projectContentStore'
-import toast from 'react-hot-toast'
 
 import { SQL_SNIPPET_SCHEMA_VERSION } from './SqlEditor.constants'
 
@@ -401,8 +400,11 @@ const FavoriteButton = observer(() => {
       sqlEditorStore.selectTab(id)
       setLoading(false)
     } catch (error) {
-      toast.error(error.message)
-      console.error(error)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to add to favourites: ${error.message}`,
+      })
       setLoading(false)
     }
   }
@@ -435,8 +437,11 @@ const FavoriteButton = observer(() => {
       sqlEditorStore.selectTab(id)
       setLoading(false)
     } catch (error) {
-      toast.error(error.message)
-      console.error(error)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to remove from favourites: ${error.message}`,
+      })
       setLoading(false)
     }
   }

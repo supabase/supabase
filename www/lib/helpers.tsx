@@ -7,3 +7,7 @@ export const generateReadingTime = (text: string) => {
   const readTime = Math.ceil(minutes)
   return `${readTime} minute read`
 }
+
+export function capitalize(word: string) {
+  return word[0].toUpperCase() + word.substring(1).toLowerCase()
+}
