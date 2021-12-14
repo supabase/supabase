@@ -6,8 +6,9 @@ import {
   compact,
   isEqual,
   isNull,
-  has,
+  isNil,
   isUndefined,
+  has,
   some,
   chunk,
   get,
@@ -376,11 +377,15 @@ class StorageExplorerStore {
   /* Bucket CRUD */
 
   createBucket = async (bucketName, isPublic = false) => {
+    if (isNil(this.supabaseClient)) {
+      return toast.error('Failed to initialize supabase client, try refreshing your browser.')
+    }
+
     const { error } = await this.supabaseClient.storage.createBucket(bucketName, {
       public: isPublic,
     })
     if (error) {
-      toast(error.message)
+      toast.error(error.message)
       return this.closeCreateBucketModal()
     }
 
@@ -455,6 +460,7 @@ class StorageExplorerStore {
       return await new Promise((resolve, reject) => fileEntry.file(resolve, reject))
     } catch (err) {
       console.error('getFile error:', err)
+      return undefined
     }
   }
 
@@ -470,8 +476,10 @@ class StorageExplorerStore {
       const entry = queue.shift() || {}
       if (entry.isFile) {
         const file = await this.getFile(entry)
-        file.path = entry.fullPath.slice(1)
-        files.push(file)
+        if (!isUndefined(file)) {
+          file.path = entry.fullPath.slice(1)
+          files.push(file)
+        }
       } else if (entry.isDirectory) {
         queue.push(...(await this.readAllDirectoryEntries(entry.createReader())))
       }

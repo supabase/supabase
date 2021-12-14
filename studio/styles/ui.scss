@@ -195,8 +195,12 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
 /* Docs */
 .Docs {
   &--inner-wrapper {
-    background: linear-gradient(90deg, #1f1f1f 50%, #2a2a2a 50%);
+    background: linear-gradient(90deg, #ffffff 50%, #f3f4f6 50%); /* bg-white bg-coolGray-100 */
     width: 100%;
+  }
+
+  .dark &--inner-wrapper {
+    background: linear-gradient(90deg, #1f1f1f 50%, #2a2a2a 50%); /* bg-gray-700 bg-gray-600 */
   }
 
   h1,
@@ -206,13 +210,13 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
   }
 
   .doc-heading {
-    @apply text-white capitalize mt-4 w-1/2;
+    @apply text-black dark:text-white capitalize mt-4 w-1/2;
     hyphens: auto;
     max-width: 50%;
   }
 
   .doc-section {
-    @apply border-b dark:border-dark text-gray-300 flex;
+    @apply border-b dark:border-dark text-gray-600 dark:text-gray-300 flex;
   }
 
   .text {
@@ -233,7 +237,7 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
   }
 
   .code {
-    @apply flex-1 p-2 w-1/2 bg-gray-600 pb-4;
+    @apply flex-1 p-2 w-1/2 pb-4;
     max-width: 50%;
 
     h4 {

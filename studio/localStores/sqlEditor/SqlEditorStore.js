@@ -7,6 +7,7 @@ import QueryTab from './QueryTab'
 import Favorite from './Favorite'
 // import { useStore } from 'hooks'
 import { SchemasQuery, TableColumnsQuery, AllFunctionsQuery } from './queries'
+import { isUndefined } from 'lodash'
 
 let store = null
 let projectRef = null
@@ -36,6 +37,7 @@ export const useSqlStore = () => {
 class SqlEditorStore {
   meta
   projectRef
+  localStorageKey
   tabs = []
   favorites = []
   selectedTabId
@@ -55,6 +57,7 @@ class SqlEditorStore {
 
     this.meta = meta
     this.projectRef = projectRef
+    this.localStorageKey = `supabase-sql-${projectRef}`
 
     this.loadKeywords()
     this.loadSchemas()
@@ -165,6 +168,8 @@ class SqlEditorStore {
     }
 
     this.loadFavorites(json.favorites || [])
+
+    this.loadPreviousSession()
   }
 
   loadInitialData() {
@@ -215,6 +220,16 @@ class SqlEditorStore {
     this.favorites = values.map((x) => new Favorite(x.key, x.query, x.name, x.desc))
   }
 
+  loadPreviousSession() {
+    const tabId = localStorage.getItem(this.localStorageKey)
+    const allSnippets = this.tabs.concat(this.favorites)
+    const selectedTab = allSnippets.find((tab) => tab.id === tabId)
+
+    if (!isUndefined(selectedTab)) {
+      this.selectTab(selectedTab.id)
+    }
+  }
+
   async loadKeywords() {
     const query = 'select * from pg_get_keywords();'
     const response = await this.meta.query(query)
@@ -251,6 +266,9 @@ class SqlEditorStore {
   }
 
   selectTab(id) {
+    // Save selected tab in local storage
+    localStorage.setItem(this.localStorageKey, id)
+
     // reset new selected query tab
     const found = this.tabs.find((x) => x.id === this.selectedTabId)
     if (found && found.type == TAB_TYPES.SQL_QUERY) {
