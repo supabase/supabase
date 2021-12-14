@@ -1,14 +1,15 @@
-import { useCallback, useState, FC } from 'react'
+import { useCallback, useState, FC, useEffect } from 'react'
 import { debounce, includes } from 'lodash'
 import { SidePanel, Typography } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import ActionBar from '../../ActionBar'
-import { parseSpreadsheet, parseSpreadsheetText } from './SpreadsheetImport.utils'
-import { UPLOAD_FILE_TYPES } from './SpreadsheetImport.constants'
 import SpreadSheetTextInput from './SpreadSheetTextInput'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
+import { SpreadsheetData } from './SpreadsheetImport.types'
+import { parseSpreadsheet, parseSpreadsheetText } from './SpreadsheetImport.utils'
+import { UPLOAD_FILE_TYPES, EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
 
 interface Props {
   debounceDuration?: number
@@ -29,7 +30,16 @@ const SpreadsheetImport: FC<Props> = ({
 }) => {
   const { ui } = useStore()
 
-  const [spreadsheetData, setSpreadsheetData] = useState<any>({
+  useEffect(() => {
+    if (visible) {
+      if (headers.length === 0) {
+        setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
+        setUploadedFile(null)
+      }
+    }
+  }, [visible])
+
+  const [spreadsheetData, setSpreadsheetData] = useState<SpreadsheetData>({
     headers: headers,
     rows: rows,
     rowCount: 0,
@@ -81,11 +91,11 @@ const SpreadsheetImport: FC<Props> = ({
   }
 
   const removeUploadedFile = () => {
-    setSpreadsheetData({ headers: [], rows: [], rowCount: 0, columnTypeMap: {} })
+    setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
     setUploadedFile(null)
   }
 
-  const readInputSpreadsheet = async (text: string) => {
+  const readSpreadsheetText = async (text: string) => {
     if (text.length > 0) {
       const { headers, rows, errors } = await parseSpreadsheetText(text)
       if (errors.length <= 5) {
@@ -105,11 +115,11 @@ const SpreadsheetImport: FC<Props> = ({
       }
       setSpreadsheetData({ headers, rows, rowCount: rows.length, columnTypeMap: {} })
     } else {
-      setSpreadsheetData({ headers: [], rows: [], rowCount: 0, columnTypeMap: {} })
+      setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
     }
   }
 
-  const handler = useCallback(debounce(readInputSpreadsheet, debounceDuration), [])
+  const handler = useCallback(debounce(readSpreadsheetText, debounceDuration), [])
   const onInputChange = (event: any) => {
     setInput(event.target.value)
     handler(event.target.value)
