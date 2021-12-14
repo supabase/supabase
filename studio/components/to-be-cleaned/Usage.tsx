@@ -1,8 +1,8 @@
 import React, { FC, useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { Loading, Typography } from '@supabase/ui'
-import { toast } from 'react-hot-toast'
 
+import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { get, post } from 'lib/common/fetch'
 import SparkBar from 'components/ui/SparkBar'
@@ -191,6 +191,7 @@ const usageLimits = {
 }
 
 const ProjectUsage: FC<any> = ({ projectRef, subscription_id }) => {
+  const { ui } = useStore()
   const { data: stats, error: usageError } = useSWR(`${API_URL}/projects/${projectRef}/usage`, get)
 
   const [loading, setLoading] = useState<boolean>(false)
@@ -213,7 +214,10 @@ const ProjectUsage: FC<any> = ({ projectRef, subscription_id }) => {
         if (!cancel) setSubscription(data)
         if (error) throw error
       } catch (error: any) {
-        toast.error(error.message)
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to get subscription: ${error.message}`,
+        })
         if (!cancel) setError(error)
       } finally {
         if (!cancel) setLoading(false)

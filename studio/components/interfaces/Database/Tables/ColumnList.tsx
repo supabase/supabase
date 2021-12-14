@@ -1,6 +1,5 @@
 import { FC, ReactNode, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { toast } from 'react-hot-toast'
 import {
   Input,
   Button,
@@ -59,7 +58,7 @@ const ColumnList: FC<{
   onSelectBack = () => {},
   onColumnDeleted = () => {},
 }) => {
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
   const columns =
     filterString.length === 0
@@ -77,10 +76,16 @@ const ColumnList: FC<{
             throw response.error
           } else {
             onColumnDeleted()
-            toast(`${column.name} removed.`)
+            ui.setNotification({
+              category: 'success',
+              message: `Successfully removed ${column.name}.`,
+            })
           }
         } catch (error: any) {
-          toast.error(`Deleting ${column.name} failed: ${error.message}`)
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to delete ${column.name}: ${error.message}`,
+          })
         }
       },
     })

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, Typography } from '@supabase/ui'
-import { toast } from 'react-hot-toast'
 import Router from 'next/router'
 
 import { API_URL } from 'lib/constants'
@@ -15,7 +14,7 @@ import Panel from 'components/to-be-cleaned/Panel'
  * No org selected yet, create a new one
  */
 const Wizard = () => {
-  const { app } = useStore()
+  const { ui, app } = useStore()
   const [orgName, setOrgName] = useState('')
   const [newOrgLoading, setNewOrgLoading] = useState(false)
 
@@ -32,7 +31,7 @@ const Wizard = () => {
     e.preventDefault()
     const isOrgNameValid = validateOrgName(orgName)
     if (!isOrgNameValid) {
-      toast.error('Organization name is empty')
+      ui.setNotification({ category: 'error', message: 'Organization name is empty' })
       return
     }
 
@@ -43,7 +42,10 @@ const Wizard = () => {
 
     if (response.error) {
       setNewOrgLoading(false)
-      toast.error(response.error?.message ?? response.error)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to create organization: ${response.error?.message ?? response.error}`,
+      })
     } else {
       const org = response
       app.onOrgAdded(org)
