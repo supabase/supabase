@@ -83,6 +83,7 @@ const SpreadsheetImport: FC<Props> = ({
   }
 
   const resetSpreadsheetImport = () => {
+    setInput('')
     setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
     setUploadedFile(null)
     setErrors([])
@@ -91,7 +92,7 @@ const SpreadsheetImport: FC<Props> = ({
 
   const readSpreadsheetText = async (text: string) => {
     if (text.length > 0) {
-      const { headers, rows, errors } = await parseSpreadsheetText(text)
+      const { headers, rows, columnTypeMap, errors } = await parseSpreadsheetText(text)
       if (errors.length > 0) {
         ui.setNotification({
           error: errors,
@@ -100,7 +101,7 @@ const SpreadsheetImport: FC<Props> = ({
         })
       }
       setErrors(errors)
-      setSpreadsheetData({ headers, rows, rowCount: rows.length, columnTypeMap: {} })
+      setSpreadsheetData({ headers, rows, rowCount: rows.length, columnTypeMap })
     } else {
       setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
     }

@@ -6,16 +6,27 @@ import { tryParseJson } from 'lib/helpers'
 const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
 
 export const parseSpreadsheetText: any = (text: string) => {
+  const columnTypeMap: any = {}
   return new Promise((resolve) => {
     Papa.parse(text, {
       header: true,
       dynamicTyping: true,
       skipEmptyLines: true,
       complete: (results) => {
-        const headers = results.meta.fields
+        const headers = results.meta.fields || []
         const rows = results.data
         const errors = results.errors
-        resolve({ headers, rows, errors })
+
+        headers.forEach((header) => {
+          const type = inferColumnType(header, results.data as any[])
+          if (!has(columnTypeMap, header)) {
+            columnTypeMap[header] = type
+          } else if (columnTypeMap[header] !== type) {
+            columnTypeMap[header] = 'text'
+          }
+        })
+
+        resolve({ headers, rows, columnTypeMap, errors })
       },
     })
   })
