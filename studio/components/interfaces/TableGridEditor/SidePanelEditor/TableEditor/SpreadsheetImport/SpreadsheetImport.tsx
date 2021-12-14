@@ -188,8 +188,8 @@ const SpreadsheetImport: FC<Props> = ({
                   const key = `import-error-${idx}`
                   const isExpanded = expandedErrors.includes(key)
                   return (
-                    <div className="space-y-2">
-                      <div key={key} className="flex items-center space-x-2">
+                    <div key={key} className="space-y-2">
+                      <div className="flex items-center space-x-2">
                         <IconChevronRight
                           className={`cursor-pointer transform ${isExpanded ? 'rotate-90' : ''}`}
                           size={14}
