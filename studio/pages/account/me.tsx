@@ -101,13 +101,13 @@ function ThemeSettings() {
           descriptionText="Choose a theme preference"
           layout="horizontal"
           style={{ width: '50%' }}
-          icon={theme === 'light' ? <IconSun /> : <IconMoon />}
+          icon={theme === 'light' ? <IconSun /> : theme === 'dark' ? <IconMoon /> : undefined}
           onChange={(e: any) => {
             setTheme(e.target.value)
             ui.setTheme(e.target.value)
           }}
         >
-          {/* <Select.Option value="system">System default</Select.Option> */}
+          <Select.Option value="system">System default</Select.Option>
           <Select.Option value="dark">Dark</Select.Option>
           <Select.Option value="light">Light</Select.Option>
         </Select>
