@@ -1,6 +1,5 @@
 import { FC, ReactNode, useEffect } from 'react'
 import { find } from 'lodash'
-import { toast } from 'react-hot-toast'
 import { observer } from 'mobx-react-lite'
 
 import { useStore } from 'hooks'
@@ -67,10 +66,13 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
           `StorageLayout: Failed to getProjectConfig - ${projectUrl} ${projectApiKey}`
         )
       }
-    } catch (e) {
-      toast.error(
-        'Failed to fetch project configuration. Try refreshing your browser, or reach out to us at support@supabase.io'
-      )
+    } catch (error: any) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message:
+          'Failed to fetch project configuration. Try refreshing your browser, or reach out to us at support@supabase.io',
+      })
     }
     storageExplorerStore.setLoaded(true)
   }

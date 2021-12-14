@@ -29,7 +29,7 @@ export const generateProductRoutes = (ref: string): Route[] => {
       key: 'auth',
       label: 'Authentication',
       icon: <IconUsers size={18} strokeWidth={2} />,
-      link: IS_PLATFORM ? `/project/${ref}/auth/users` : `/project/${ref}/auth/policies`,
+      link: `/project/${ref}/auth/users`,
     },
     ...(IS_PLATFORM
       ? [

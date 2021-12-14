@@ -124,7 +124,7 @@ const DocView: FC<any> = observer(({}) => {
       <div className="Docs--inner-wrapper">
         <div className="sticky top-0 w-full flex flex-row-reverse z-40 ">
           <div
-            className="border-b border-gray-500 dark:border-gray-500 bg-gray-700"
+            className="border-b border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-700"
             style={{ width: '50%' }}
           >
             <div className="z-0 flex ">
@@ -132,8 +132,10 @@ const DocView: FC<any> = observer(({}) => {
                 type="button"
                 onClick={() => setSelectedLang('js')}
                 className={`${
-                  selectedLang == 'js' ? 'text-gray-300' : 'text-gray-400'
-                } relative inline-flex items-center p-1 px-2 bg-gray-600 border-r border-gray-500 dark:border-gray-500 text-sm font-medium hover:text-gray-300 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150`}
+                  selectedLang == 'js'
+                    ? 'text-gray-600 dark:text-gray-300'
+                    : 'text-gray-300 dark:text-gray-400'
+                } relative inline-flex items-center p-1 px-2 bg-coolGray-100 dark:bg-gray-600 border-r border-gray-200 dark:border-gray-500 text-sm font-medium hover:text-gray-600 dark:hover:text-gray-300 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150`}
               >
                 JavaScript
               </button>
@@ -141,16 +143,18 @@ const DocView: FC<any> = observer(({}) => {
                 type="button"
                 onClick={() => setSelectedLang('bash')}
                 className={`${
-                  selectedLang == 'bash' ? 'text-gray-300' : 'text-gray-400'
-                } relative inline-flex items-center p-1 px-2 bg-gray-600 border-r border-gray-500 dark:border-gray-500 text-sm font-medium hover:text-gray-300 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150`}
+                  selectedLang == 'bash'
+                    ? 'text-gray-600 dark:text-gray-300'
+                    : 'text-gray-300 dark:text-gray-400'
+                } relative inline-flex items-center p-1 px-2 bg-coolGray-100 dark:bg-gray-600 border-r border-gray-200 dark:border-gray-500 text-sm font-medium hover:text-gray-600 dark:hover:text-gray-300 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150`}
               >
                 Bash
               </button>
               {selectedLang == 'bash' && (
                 <div className="flex">
-                  <span className="text-sm text-gray-300 p-1 pl-2">Key:</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300 p-1 pl-2">Key:</span>
                   <select
-                    className="text-sm text-gray-300 border-none cursor-pointer p-0 pl-2 pr-8"
+                    className="text-sm text-gray-600 dark:text-gray-300 border-none cursor-pointer p-0 pl-2 pr-8"
                     value={showApiKey}
                     onChange={(e) => setShowApiKey(e.target.value)}
                   >
@@ -335,7 +339,7 @@ const ResourceContent = ({
 
   return (
     <>
-      <h2 className="text-white mt-0">
+      <h2 className="text-black dark:text-white mt-0">
         <code className="text-lg px-4 py-2">{resourceId}</code>
       </h2>
 
@@ -533,8 +537,8 @@ const ResourceContent = ({
         <div className="doc-section">
           <article className="text ">
             <p>
-              Supabase provides realtime functionality and broadcasts database changes to authorized users depending on Row Level
-              Security (RLS) policies.
+              Supabase provides realtime functionality and broadcasts database changes to authorized
+              users depending on Row Level Security (RLS) policies.
             </p>
             <p>
               <a href="https://supabase.com/docs/client/subscribe" target="_blank">

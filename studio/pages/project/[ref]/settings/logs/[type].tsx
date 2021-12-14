@@ -1,122 +1,144 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { SettingsLayout } from 'components/layouts/'
+import useSWR from 'swr'
+import debounce from 'lodash/debounce'
+import { useEffect, useRef, useState } from 'react'
+import { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import LogPanel from 'components/ui/Logs/LogPanel'
-import { LOG_TYPE_LABEL_MAPPING } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
+import { Typography, IconLoader, IconAlertCircle } from '@supabase/ui'
+
 import { withAuth } from 'hooks'
 import { get } from 'lib/common/fetch'
-import LogTable, { LogData } from 'components/ui/Logs/LogTable'
-import useSWR from 'swr'
-import { API_URL } from 'lib/constants'
-import { Typography, Button } from '@supabase/ui'
-import debounce from 'lodash/debounce'
+import { API_URL, LOG_TYPE_LABEL_MAPPING } from 'lib/constants'
+import { SettingsLayout } from 'components/layouts/'
 import CodeEditor from 'components/ui/CodeEditor'
-import { ButtonProps } from '@supabase/ui/dist/cjs/components/Button/Button'
+import {
+  LogPanel,
+  LogTable,
+  Count,
+  Logs,
+  LogTemplate,
+  TEMPLATES,
+} from 'components/interfaces/Settings/Logs'
+import { uuidv4 } from 'lib/helpers'
 
-interface CountData {
-  count: number
-}
 /**
  * Acts as a container component for the entire log display
  */
-export const LogPage = () => {
+export const LogPage: NextPage = () => {
   const router = useRouter()
   const { ref, type } = router.query
 
+  const [editorId, setEditorId] = useState<string>(uuidv4())
   const [search, setSearch] = useState<string>('')
   const [queryParams, setQueryParams] = useState<string>('')
   const [where, setWhere] = useState<string>('')
   const [mode, setMode] = useState<'simple' | 'custom'>('simple')
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
 
-  const title = LOG_TYPE_LABEL_MAPPING[type as string]
-
-  // handle log fetching
-  const {
-    data,
-    isValidating: isLoading,
-    mutate,
-  } = useSWR<{ data: LogData[]; count: number; error: any }>(
-    `${API_URL}/projects/${ref}/logs?${queryParams}`,
-    get,
-    {
-      revalidateOnFocus: false,
-    }
-  )
-
+  const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as string]}`
   const debouncedQueryParams = useRef(debounce(setQueryParams, 600)).current
 
   useEffect(() => {
     const params = {
       type: type as string,
       search_query: search || '',
-      where: where || '',
+      where: mode === 'custom' ? where || '' : '',
     }
     const qs = new URLSearchParams(params).toString()
     debouncedQueryParams(qs)
     return () => debouncedQueryParams.cancel()
-  }, [search, where, type])
+  }, [mode, search, where, type])
 
-  const countKey = `${API_URL}/projects/${ref}/logs?${queryParams}&count=true&period_start=${latestRefresh}`
-  const { data: countData } = useSWR<{ data: [CountData] | []; error?: any }>(countKey, get, {
-    refreshInterval: 5000,
-  })
-  const newCount = countData?.data?.[0]?.count
+  // handle log fetching
+  const logUrl = `${API_URL}/projects/${ref}/logs?${queryParams}`
+  const { data, isValidating, mutate } = useSWR<Logs>(logUrl, get, { revalidateOnFocus: false })
   const { data: logData, error } = data || {}
+
+  const countUrl = `${API_URL}/projects/${ref}/logs?${queryParams}&count=true&period_start=${latestRefresh}`
+  const { data: countData } = useSWR<Count>(countUrl, get, { refreshInterval: 5000 })
+  const newCount = countData?.data?.[0]?.count ?? 0
+
+  const handleReset = () => {
+    setWhere('')
+    setSearch('')
+    setEditorId(uuidv4())
+  }
 
   const handleRefresh = () => {
     setLatestRefresh(new Date().toISOString())
     mutate()
   }
+
   const handleModeToggle = () => {
     if (mode === 'simple') {
       setMode('custom')
-      setSearch('')
+      // setWhere(DEFAULT_QUERY)
     } else {
       setMode('simple')
     }
   }
+
+  const onSelectTemplate = (template: LogTemplate) => {
+    setMode(template.mode)
+    if (template.mode === 'simple') {
+      setSearch(template.searchString)
+      setWhere('')
+    } else {
+      setWhere(template.searchString)
+      setSearch('')
+      setEditorId(uuidv4())
+    }
+  }
+
   return (
-    <SettingsLayout title={title} className="p-4 space-y-4">
-      <LogPanel
-        showReset={(where || search) ? true : false}
-        onReset={() => {
-          setWhere('')
-          setSearch('')
-          setMode('simple') // this is necessary to reset the value of the monaco editor
-        }}
-        templates={[
-          { label: "Recent Errors", onClick: () => setSearch('[Ee]rror|\\s[45][0-9][0-9]\\s') },
-          { label: "POST or PATCH", onClick: () => {
-            setSearch('')
-            setMode('custom')
-            setWhere("REGEXP_CONTAINS(event_message, 'POST') OR REGEXP_CONTAINS(event_message, 'PATCH') ")
-          } },
-        ]}
-        searchValue={search}
-        onCustomClick={handleModeToggle} isLoading={isLoading} onRefresh={handleRefresh} onSearch={setSearch} />
-      {mode === 'custom' &&
-        <div>
-          <CodeEditor
-            className="p-4 h-24"
-            hideLineNumbers
-            id={'logs-where-editor'}
-            language="pgsql"
-            defaultValue={where}
-            onInputChange={(v) => setWhere(v || '')}
-            onInputRun={handleRefresh}
-          />
-        </div>}
-      {error && (
-        <Typography.Text className="text-center w-full block">Could not fetch data</Typography.Text>
-      )}
-      {newCount && <LoadNewLogsButton onClick={handleRefresh} />}
-      <LogTable data={logData} />
+    <SettingsLayout title={title}>
+      <div className="h-full flex flex-col flex-grow">
+        <LogPanel
+          isCustomQuery={mode === 'custom'}
+          isLoading={isValidating}
+          newCount={newCount}
+          showReset={search.length > 0}
+          searchValue={search}
+          templates={TEMPLATES}
+          onReset={handleReset}
+          onRefresh={handleRefresh}
+          onSearch={setSearch}
+          onCustomClick={handleModeToggle}
+          onSelectTemplate={onSelectTemplate}
+        />
+        {mode === 'custom' && (
+          <div className="min-h-[7rem] h-28">
+            <CodeEditor
+              id={editorId}
+              language="pgsql"
+              defaultValue={where}
+              onInputChange={(v) => setWhere(v || '')}
+              onInputRun={handleRefresh}
+            />
+          </div>
+        )}
+        <div className="flex flex-col flex-grow relative">
+          {isValidating && (
+            <div
+              className={[
+                'absolute top-0 w-full h-full bg-gray-800 flex items-center justify-center',
+                `${isValidating ? 'bg-opacity-75 z-50' : ''}`,
+              ].join(' ')}
+            >
+              <IconLoader className="animate-spin" />
+            </div>
+          )}
+          {error && (
+            <div className="flex w-full h-full justify-center items-center space-x-2 mx-auto">
+              <IconAlertCircle size={16} />
+              <Typography.Text type="secondary">Sorry! Could not fetch data</Typography.Text>
+            </div>
+          )}
+          <LogTable data={logData} isCustomQuery={mode === 'custom'} />
+        </div>
+      </div>
     </SettingsLayout>
   )
 }
-
-const LoadNewLogsButton = (props: ButtonProps) => <Button type="dashed" block {...props}>Load new logs</Button>
 
 export default withAuth(observer(LogPage))

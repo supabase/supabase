@@ -1,7 +1,7 @@
-import toast from 'react-hot-toast'
 import { FC, useState, useEffect } from 'react'
 import { Button, Loading, Typography, IconFileText, IconDownload } from '@supabase/ui'
 
+import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
 import Table from 'components/to-be-cleaned/Table'
@@ -11,6 +11,7 @@ interface Props {
 }
 
 const InvoicesSettings: FC<Props> = ({ organization }) => {
+  const { ui } = useStore()
   const [loading, setLoading] = useState<any>(false)
   const [error, setError] = useState<any>(null)
   const [stripeAccount, setStripeAccount] = useState<any>(null)
@@ -28,7 +29,10 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
       })
       setStripeAccount(response)
     } catch (error: any) {
-      toast.error(error.message)
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to get Stripe account: ${error.message}`,
+      })
       setError(error)
     } finally {
       setLoading(false)

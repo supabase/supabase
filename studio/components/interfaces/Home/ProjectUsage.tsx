@@ -26,7 +26,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
   const { data, error }: any = useSWR(
     // only fetch when browser window is active
     `${API_URL}/projects/${ref}/log-stats`,
-    get,
+    get
     // increase refresh rate x10 to 30s when focus lost
     // conditional fetching will cause cached data to clear (not desirable)
     // { refreshInterval: isActive ? 3000 : 30000 }
@@ -46,8 +46,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                 <PanelHeader
                   icon={<IconDatabase size="small" />}
                   title="Database"
-                  href={'/project/[ref]/editor/table'}
-                  as={`/project/${ref}/editor/table`}
+                  href={`/project/${ref}/editor/table`}
                 />
                 <ChartHandler
                   startDate={startDate}
@@ -73,8 +72,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                 <PanelHeader
                   icon={<IconKey size="small" />}
                   title="Auth"
-                  href={'/project/[ref]/auth/users'}
-                  as={`/project/${ref}/auth/users`}
+                  href={`/project/${ref}/auth/users`}
                 />
                 <ChartHandler
                   startDate={startDate}
@@ -100,8 +98,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                 <PanelHeader
                   icon={<IconArchive size="small" />}
                   title="Storage"
-                  href={'/project/[ref]/storage/buckets'}
-                  as={`/project/${ref}/storage/buckets`}
+                  href={`/project/${ref}/storage/buckets`}
                 />
                 <ChartHandler
                   startDate={startDate}
@@ -157,7 +154,7 @@ export default ProjectUsage
 const PanelHeader = (props: any) => {
   const Tag = props?.href ? Link : 'div'
   return (
-    <Tag href={props.href} as={props.as}>
+    <Tag href={props.href}>
       <div
         className={
           'flex items-center space-x-3 opacity-80 ' +

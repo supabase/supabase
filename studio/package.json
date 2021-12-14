@@ -33,7 +33,7 @@
     "markdown-table": "=2.0.0",
     "mobx": "^6.3.2",
     "mobx-react-lite": "^3.2.0",
-    "next": "11.1.1",
+    "next": "11.1.3",
     "next-compose-plugins": "^2.2.1",
     "openapi-types": "^9.1.0",
     "papaparse": "^5.3.1",
