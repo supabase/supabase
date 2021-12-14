@@ -6,7 +6,7 @@ import Telemetry from 'lib/telemetry'
 
 export interface IUiStore {
   language: 'en_US'
-  theme: 'dark' | 'light'
+  theme: 'dark' | 'light' | 'system'
 
   isDarkTheme: boolean
   selectedProject?: Project
@@ -25,7 +25,7 @@ export interface IUiStore {
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
   language: 'en_US' = 'en_US'
-  theme: 'dark' | 'light' = 'dark'
+  theme: 'dark' | 'light' | 'system' = 'dark'
 
   selectedProjectRef?: string
   selectedOrganizationSlug?: string
@@ -68,27 +68,33 @@ export default class UiStore implements IUiStore {
   }
 
   get isDarkTheme() {
-    return this.theme === 'dark'
+    return (
+      this.theme === 'dark' ||
+      (this.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    )
   }
 
   load() {
     if (typeof window === 'undefined') return
-    const savedTheme = (window.localStorage.getItem('theme') ?? 'dark') as 'dark' | 'light'
-    this.setTheme(savedTheme)
+    let savedTheme = (window.localStorage.getItem('theme') ?? 'dark') as 'dark' | 'light' | 'system'
+    if (['dark', 'light', 'system'].includes(savedTheme)) return this.setTheme(savedTheme)
+    this.setTheme('dark')
   }
 
   toggleTheme() {
-    if (this.theme === 'dark') {
-      this.setTheme('light')
-    } else {
-      this.setTheme('dark')
-    }
+    if (this.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+      return this.setTheme('light')
+    if (this.theme === 'dark') return this.setTheme('light')
+    this.setTheme('dark')
   }
 
-  setTheme(theme: 'dark' | 'light') {
+  setTheme(theme: 'dark' | 'light' | 'system') {
     this.theme = theme
     window.localStorage.setItem('theme', theme)
-    document.body.className = theme
+    if (theme !== 'system') return (document.body.className = theme)
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches)
+      return (document.body.className = 'dark')
+    document.body.className = 'light'
   }
 
   setProjectRef(ref?: string) {
