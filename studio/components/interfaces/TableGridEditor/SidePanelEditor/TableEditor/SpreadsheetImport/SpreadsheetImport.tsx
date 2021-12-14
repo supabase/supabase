@@ -33,6 +33,7 @@ const SpreadsheetImport: FC<Props> = ({
     headers: headers,
     rows: rows,
     rowCount: 0,
+    columnTypeMap: {},
   })
 
   const [input, setInput] = useState<string>('')
@@ -56,7 +57,7 @@ const SpreadsheetImport: FC<Props> = ({
       })
     } else {
       setUploadedFile(file)
-      const { headers, rowCount, rowPreview, errors } = await parseSpreadsheet(
+      const { headers, rowCount, columnTypeMap, errors } = await parseSpreadsheet(
         file,
         onProgressUpdate
       )
@@ -74,13 +75,13 @@ const SpreadsheetImport: FC<Props> = ({
           message: `Multiple errors have been detected on ${errors.length} rows. Do check the file you have uploaded for any discrepancies.`,
         })
       }
-      setSpreadsheetData({ headers, rowCount, rows: rowPreview })
+      setSpreadsheetData({ headers, rows: [], rowCount, columnTypeMap })
     }
     event.target.value = ''
   }
 
   const removeUploadedFile = () => {
-    setSpreadsheetData({ headers: [], rows: [], rowCount: 0 })
+    setSpreadsheetData({ headers: [], rows: [], rowCount: 0, columnTypeMap: {} })
     setUploadedFile(null)
   }
 
@@ -102,9 +103,9 @@ const SpreadsheetImport: FC<Props> = ({
           message: `Multiple errors have been detected on ${errors.length} rows. Do check your input for any discrepancies.`,
         })
       }
-      setSpreadsheetData({ headers, rows, rowCount: rows.length })
+      setSpreadsheetData({ headers, rows, rowCount: rows.length, columnTypeMap: {} })
     } else {
-      setSpreadsheetData({ headers: [], rows: [], rowCount: 0 })
+      setSpreadsheetData({ headers: [], rows: [], rowCount: 0, columnTypeMap: {} })
     }
   }
 
