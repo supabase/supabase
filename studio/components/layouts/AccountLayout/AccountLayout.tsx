@@ -24,8 +24,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
     .map((x: any) => ({
       isActive: router.pathname.startsWith('/org/') && ui.selectedOrganization?.slug == x.slug,
       label: x.name,
-      href: '/org/[slug]/settings',
-      as: `/org/${x.slug}/settings`,
+      href: `/org/${x.slug}/settings`,
     }))
     .sort((a, b) => a.label.localeCompare(b.label))
 
