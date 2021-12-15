@@ -16,7 +16,7 @@ export interface IUiStore {
 
   load: () => void
   toggleTheme: () => void
-  setTheme: (theme: 'dark' | 'light') => void
+  setTheme: (theme: 'dark' | 'light' | 'system') => void
   setProjectRef: (ref?: string) => void
   setOrganizationSlug: (slug?: string) => void
   setNotification: (notification: Notification) => string
