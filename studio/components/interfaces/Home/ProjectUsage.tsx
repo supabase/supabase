@@ -46,7 +46,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                 <PanelHeader
                   icon={<IconDatabase size="small" />}
                   title="Database"
-                  href={`/project/${ref}/editor/table`}
+                  href={`/project/${ref}/editor`}
                 />
                 <ChartHandler
                   startDate={startDate}
