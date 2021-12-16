@@ -69,6 +69,9 @@ export async function handleResponseError<T = unknown>(
 }
 
 export function getAccessToken() {
+  // ignore if server-side
+  if (typeof window === 'undefined') return ''
+
   const tokenData = window?.localStorage['supabase.auth.token']
   if (!tokenData) {
     // try to get from url fragment
@@ -85,6 +88,9 @@ export function getAccessToken() {
 
 // get param from URL fragment
 function getParameterByName(name: string, url?: string) {
+  // ignore if server-side
+  if (typeof window === 'undefined') return ''
+  
   if (!url) url = window?.location?.href || ''
   // eslint-disable-next-line no-useless-escape
   name = name.replace(/[\[\]]/g, '\\$&')
