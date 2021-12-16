@@ -9,17 +9,17 @@ Install the [Vercel CLI](https://vercel.com/cli).
 You will need to run the marketing website and docs website separately. To learn how to run both websites, see the [Development Guide](../DEVELOPERS.md) for more information.
 
 ```sh
-# cd into the supabase directory
+# step 1
 cd supabase
 
-# cd into the www directory
+# step 2
 cd www
 
-# install and run the website
+# step 3
 npm install
 npm run dev
 
-# visit the website
+# visit website
 http://localhost:3000
 ```
 
