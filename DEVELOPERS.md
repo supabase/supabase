@@ -1,5 +1,6 @@
 # Developing Supabase
 
+## Table of Contents
 * [Development Setup](##Development-Setup)
 * [Installing Dependencies](###Installing-Dependencies)
 * [Building Supabase](##Building-Supabase)
@@ -71,6 +72,7 @@ Before you start a development server, you must choose if you want to work on th
 
 To debug code, and to see changes in real time, it is often useful to have a local HTTP server. Click one of the three links below to choose which development server you want to start.
 
+### Table of Contents
 - [Supabase Website](###Supabase-Website-Development-Server)
 - [Supabase Docs](###Supabase-Docs-Development-Server)
 - [Supabase Studio](###Supabase-Studio-Development-Server)
