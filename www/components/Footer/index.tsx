@@ -2,6 +2,7 @@ import { useRouter } from 'next/router'
 import FooterLinks from 'data/Footer.json'
 import SectionContainer from '../Layouts/SectionContainer'
 import DarkModeToggle from '../DarkModeToggle'
+import Link from 'next/link'
 
 type Props = {
   darkMode: boolean
@@ -23,15 +24,19 @@ const Footer = (props: Props) => {
       <SectionContainer>
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
-            <img
-              className="w-40"
-              src={
-                darkMode
-                  ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
-                  : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
-              }
-              alt="Supabase"
-            />
+            <Link href="#" as=" ">
+              <a>
+                <img
+                  className="w-40"
+                  src={
+                    darkMode
+                      ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
+                      : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
+                  }
+                  alt="Supabase"
+                />
+              </a>
+            </Link>
             <div className="flex space-x-6">
               <a href="https://twitter.com/supabase" className="text-gray-300 hover:text-gray-400">
                 <span className="sr-only">Twitter</span>
