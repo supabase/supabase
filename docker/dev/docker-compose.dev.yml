@@ -13,4 +13,8 @@ services:
       - 5555:8080
   db:
     volumes:
+      - /var/lib/postgresql/data
       - ./dev/data.sql:/docker-entrypoint-initdb.d/data.sql
+  storage:
+    volumes:
+      - /var/lib/storage
