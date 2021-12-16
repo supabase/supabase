@@ -102,7 +102,9 @@ const Footer = (props: Props) => {
           </div>
         </div>
         <div className="mt-32 border-t dark:border-dark pt-8 flex justify-between">
-          <p className="mb-0 self-center text-base text-gray-400 dark:text-dark-400">&copy; Supabase Inc</p>
+          <p className="mb-0 self-center text-base text-gray-400 dark:text-dark-400">
+            &copy; Supabase Inc
+          </p>
           <DarkModeToggle darkMode={darkMode} updateTheme={updateTheme} />
         </div>
       </SectionContainer>
