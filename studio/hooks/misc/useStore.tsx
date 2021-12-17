@@ -33,7 +33,10 @@ export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
     }
   }, [theme, monaco])
 
-  const matchMediaEvent = useCallback(() => ui.theme === 'system' && ui.setTheme('system'), [])
+  const matchMediaEvent = useCallback(() => {
+    window.localStorage.getItem('theme') === 'system' &&
+      ui.setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+  }, [])
 
   useEffect(() => {
     ui.load()
