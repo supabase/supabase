@@ -1,3 +1,5 @@
+import { GOTRUE_ENABLED } from 'lib/gotrue'
+import { tryParseJson } from 'lib/helpers'
 import { SupaResponse } from 'types/base'
 
 export function handleError<T>(e: any, requestId: string): SupaResponse<T> {
@@ -64,4 +66,53 @@ export async function handleResponseError<T = unknown>(
     const error = { code: response.status, message, requestId }
     return { error } as unknown as SupaResponse<T>
   }
+}
+
+export function getAccessToken() {
+  // ignore if server-side
+  if (typeof window === 'undefined') return ''
+
+  const tokenData = window?.localStorage['supabase.auth.token']
+  if (!tokenData) {
+    // try to get from url fragment
+    const access_token = getParameterByName('access_token')
+    if (access_token) return access_token
+    else return undefined
+  }
+  const tokenObj = tryParseJson(tokenData)
+  if (tokenObj === false) {
+    return ''
+  }
+  return tokenObj.currentSession.access_token
+}
+
+// get param from URL fragment
+function getParameterByName(name: string, url?: string) {
+  // ignore if server-side
+  if (typeof window === 'undefined') return ''
+  
+  if (!url) url = window?.location?.href || ''
+  // eslint-disable-next-line no-useless-escape
+  name = name.replace(/[\[\]]/g, '\\$&')
+  const regex = new RegExp('[?&#]' + name + '(=([^&#]*)|&|#|$)'),
+    results = regex.exec(url)
+  if (!results) return null
+  if (!results[2]) return ''
+  return decodeURIComponent(results[2].replace(/\+/g, ' '))
+}
+
+export function constructHeaders(requestId: string, optionHeaders?: { [prop: string]: any }) {
+  let headers: { [prop: string]: any } = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'X-Request-Id': requestId,
+    ...optionHeaders,
+  }
+
+  if (GOTRUE_ENABLED) {
+    const accessToken = getAccessToken()
+    if (accessToken) headers.Authorization = `Bearer ${accessToken}`
+  }
+
+  return headers
 }

@@ -45,8 +45,8 @@ export const timeout = (ms: number) => {
 
 export const getURL = () => {
   const url =
-    process?.env?.SITE_URL && process.env.SITE_URL !== ''
-      ? process.env.SITE_URL
+    process?.env?.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL !== ''
+      ? process.env.NEXT_PUBLIC_SITE_URL
       : process?.env?.VERCEL_URL && process.env.VERCEL_URL !== ''
       ? process.env.VERCEL_URL
       : 'https://app.supabase.io'

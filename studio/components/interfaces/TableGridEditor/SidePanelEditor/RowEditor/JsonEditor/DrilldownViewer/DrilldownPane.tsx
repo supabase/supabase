@@ -49,13 +49,13 @@ const DrilldownPane: FC<Props> = ({ pane, jsonData, activeKey, onSelectKey = () 
         <div
           key={key}
           className={`
-              ${key === activeKey ? 'bg-gray-400' : ''}
+              ${key === activeKey ? 'bg-gray-100 dark:bg-gray-400' : ''}
               group flex items-center justify-between
-              cursor-pointer py-2 px-5 hover:bg-gray-500
+              cursor-pointer py-2 px-5 hover:bg-gray-100 dark:hover:bg-gray-500
             `}
           onClick={() => onSelectKey(key, pane)}
         >
-          <Typography.Text small className="font-mono !text-blue-300">
+          <Typography.Text small className="font-mono !text-blue-700 dark:!text-blue-300">
             {key}
           </Typography.Text>
           <div className={`${key === activeKey ? 'block' : 'hidden'} group-hover:block`}>
@@ -67,13 +67,13 @@ const DrilldownPane: FC<Props> = ({ pane, jsonData, activeKey, onSelectKey = () 
       ))}
       {keysWithoutChildren.map((key: string) => (
         <div key={key} className="py-2 px-5 flex space-x-2">
-          <Typography.Text small className="font-mono !text-blue-300">
+          <Typography.Text small className="font-mono !text-blue-700 dark:!text-blue-300">
             {key}:
           </Typography.Text>
           <Typography.Text
             small
             className={`font-mono break-all ${
-              typeof jsonData[key] !== 'string' ? '!text-green-400' : '!text-yellow-500'
+              typeof jsonData[key] !== 'string' ? '!text-green-700 dark:!text-green-400' : '!text-yellow-700 dark:!text-yellow-500'
             }`}
           >
             {isNull(jsonData[key])
