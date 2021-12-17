@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { useStore } from 'hooks'
 import WithSidebar from './WithSidebar'
+import { auth, GOTRUE_ENABLED } from 'lib/gotrue'
 
 /**
  * layout for dashboard homepage, account and org settings
@@ -18,6 +19,22 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
   const router = useRouter()
 
   const { app, ui } = useStore()
+
+  const onClickLogout = async () => {
+    await auth.signOut()
+    router.reload()
+  }
+
+  let baseLogoutLink = {
+    icon: '/icons/feather/power.svg',
+    label: 'Logout',
+    href: `${API_URL}/logout`,
+    key: `${API_URL}/logout`,
+  }
+
+  let logoutLink = GOTRUE_ENABLED
+    ? { ...baseLogoutLink, href: undefined, onClick: onClickLogout }
+    : baseLogoutLink
 
   const organizationsLinks = app.organizations
     .list()
@@ -36,7 +53,6 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
           isActive: router.pathname == '/',
           label: 'All projects',
           href: '/',
-          as: `/`,
         },
       ],
     },
@@ -60,12 +76,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
                 href: `/account/me`,
                 key: `/account/me`,
               },
-              {
-                icon: '/img/power.svg',
-                label: 'Logout',
-                href: `${API_URL}/logout`,
-                key: `${API_URL}/logout`,
-              },
+              logoutLink,
             ],
           },
         ]
