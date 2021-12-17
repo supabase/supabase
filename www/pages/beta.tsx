@@ -109,7 +109,9 @@ const Hero = (props: Props) => {
   return (
     <div
       style={{
-        backgroundImage: darkMode ? `url('${basePath}/images/beta-hero.png')` : `url('${basePath}/images/beta-hero-light.png')`,
+        backgroundImage: darkMode
+          ? `url('${basePath}/images/beta-hero.png')`
+          : `url('${basePath}/images/beta-hero-light.png')`,
         backgroundSize: '65%',
         backgroundPosition: '120% 50%',
       }}
