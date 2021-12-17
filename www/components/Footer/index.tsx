@@ -24,7 +24,7 @@ const Footer = (props: Props) => {
       <SectionContainer>
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
-            <Link href="#" as=" ">
+            <Link href="#" as='/'>
               <a>
                 <img
                   className="w-40"
