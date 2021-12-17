@@ -6,7 +6,7 @@ import Telemetry from 'lib/telemetry'
 
 export interface IUiStore {
   language: 'en_US'
-  theme: 'dark' | 'light' | 'system'
+  theme: 'dark' | 'light'
 
   isDarkTheme: boolean
   selectedProject?: Project
@@ -16,7 +16,7 @@ export interface IUiStore {
 
   load: () => void
   toggleTheme: () => void
-  setTheme: (theme: 'dark' | 'light' | 'system') => void
+  setTheme: (theme: 'dark' | 'light') => void
   setProjectRef: (ref?: string) => void
   setOrganizationSlug: (slug?: string) => void
   setNotification: (notification: Notification) => string
@@ -25,7 +25,7 @@ export interface IUiStore {
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
   language: 'en_US' = 'en_US'
-  theme: 'dark' | 'light' | 'system' = 'dark'
+  theme: 'dark' | 'light' = 'dark'
 
   selectedProjectRef?: string
   selectedOrganizationSlug?: string
@@ -68,33 +68,33 @@ export default class UiStore implements IUiStore {
   }
 
   get isDarkTheme() {
-    return (
-      this.theme === 'dark' ||
-      (this.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    )
+    return this.theme === 'dark'
   }
 
   load() {
     if (typeof window === 'undefined') return
-    let savedTheme = (window.localStorage.getItem('theme') ?? 'dark') as 'dark' | 'light' | 'system'
-    if (['dark', 'light', 'system'].includes(savedTheme)) return this.setTheme(savedTheme)
+    const localStorageThemeOption = window.localStorage.getItem('theme')
+    if (localStorageThemeOption === 'system')
+      return this.setTheme(
+        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      )
+    if (localStorageThemeOption === 'light') return this.setTheme('light')
+    window.localStorage.setItem('theme', 'dark')
     this.setTheme('dark')
   }
 
   toggleTheme() {
-    if (this.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    if (this.theme === 'dark') {
+      window.localStorage.setItem('theme', 'light')
       return this.setTheme('light')
-    if (this.theme === 'dark') return this.setTheme('light')
+    }
+    window.localStorage.setItem('theme', 'dark')
     this.setTheme('dark')
   }
 
-  setTheme(theme: 'dark' | 'light' | 'system') {
+  setTheme(theme: 'dark' | 'light') {
     this.theme = theme
-    window.localStorage.setItem('theme', theme)
-    if (theme !== 'system') return (document.body.className = theme)
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches)
-      return (document.body.className = 'dark')
-    document.body.className = 'light'
+    document.body.className = theme
   }
 
   setProjectRef(ref?: string) {

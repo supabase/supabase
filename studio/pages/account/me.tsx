@@ -78,13 +78,28 @@ const ProfileCard = observer(() => {
 })
 
 function ThemeSettings() {
-  const [theme, setTheme] = useState('')
+  const [value, setValue] = useState('')
   const { ui } = useStore()
 
   useEffect(() => {
-    const localStorageTheme = window.localStorage.getItem('theme')
-    if (localStorageTheme) setTheme(localStorageTheme)
+    const localStorageThemeOption = window.localStorage.getItem('theme')
+    if (localStorageThemeOption) return setValue(localStorageThemeOption)
+    window.localStorage.setItem('theme', 'dark')
+    setValue('dark')
   }, [])
+
+  const onThemeOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const themeOption = e.target.value as 'dark' | 'light' | 'system'
+    setValue(themeOption)
+    if (themeOption === 'system') {
+      window.localStorage.setItem('theme', 'system')
+      return ui.setTheme(
+        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      )
+    }
+    window.localStorage.setItem('theme', themeOption)
+    ui.setTheme(themeOption)
+  }
 
   return (
     <Panel
@@ -96,16 +111,13 @@ function ThemeSettings() {
     >
       <Panel.Content>
         <Select
-          value={theme}
+          value={value}
           label="Interface theme"
           descriptionText="Choose a theme preference"
           layout="horizontal"
           style={{ width: '50%' }}
-          icon={theme === 'light' ? <IconSun /> : theme === 'dark' ? <IconMoon /> : undefined}
-          onChange={(e: any) => {
-            setTheme(e.target.value)
-            ui.setTheme(e.target.value)
-          }}
+          icon={value === 'light' ? <IconSun /> : value === 'dark' ? <IconMoon /> : undefined}
+          onChange={onThemeOptionChange}
         >
           <Select.Option value="system">System default</Select.Option>
           <Select.Option value="dark">Dark</Select.Option>
