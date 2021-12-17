@@ -50,12 +50,12 @@ const Index = () => {
             </div>
           </SectionContainer>
           <SectionContainer>
-            <div className="grid grid-cols-12 border dark:border-gray-600">
+            <div className="grid grid-cols-12 border dark:border-gray-600 rounded-lg shadow-small">
               <div className="col-span-12 lg:col-span-5">
                 <img
                   src={`/brand-assets/logo-preview.jpg`}
                   width="100%"
-                  className="object-cover h-full"
+                  className="object-cover h-full rounded-l-lg"
                 />
               </div>
               <div className="col-span-12 lg:col-span-7 flex items-center">
