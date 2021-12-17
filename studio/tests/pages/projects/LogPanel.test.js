@@ -1,4 +1,4 @@
-import LogPanel from 'components/ui/Logs/LogPanel'
+import LogPanel from 'components/interfaces/Settings/Logs/LogPanel'
 import { render, waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -7,7 +7,7 @@ test('templates', async () => {
   render(<LogPanel templates={[
     { label: 'Some option', onClick: mockFn }
   ]} />)
-  const search = screen.getByPlaceholderText(/Filter/)
+  const search = screen.getByPlaceholderText(/Search/)
   userEvent.type(search, "12345")
 
 
@@ -24,7 +24,7 @@ test('templates', async () => {
 test("filter input change", async () => {
   const mockFn = jest.fn()
   render(<LogPanel onSearch={mockFn} />)
-  const search = screen.getByPlaceholderText(/Filter/)
+  const search = screen.getByPlaceholderText(/Search/)
   userEvent.type(search, "12345")
   expect(mockFn).toBeCalled()
 })
@@ -49,9 +49,9 @@ test("Manual refresh", async () => {
 test("reset filters", () => {
   const mockFn = jest.fn()
   const { rerender } = render(<LogPanel showReset={false} />)
-  expect(() => screen.getByText(/Reset filters/)).toThrow()
+  expect(() => screen.getByText(/Clear search/)).toThrow()
 
   rerender(<LogPanel showReset={true} onReset={mockFn} />)
-  userEvent.click(screen.getByText(/Reset filters/))
+  userEvent.click(screen.getByTitle(/Clear search/))
   expect(mockFn).toBeCalled()
 })
