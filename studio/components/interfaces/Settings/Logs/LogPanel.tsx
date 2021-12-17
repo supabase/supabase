@@ -101,7 +101,7 @@ const LogPanel: FC<Props> = ({
             onChange={(e) => onSearch(e.target.value)}
             value={searchValue}
             actions={
-              showReset && <IconX size="tiny" className="cursor-pointer mx-1" onClick={onReset} />
+              showReset && <IconX size="tiny" className="cursor-pointer mx-1" title="Clear search" onClick={onReset} />
             }
           />
         </div>
