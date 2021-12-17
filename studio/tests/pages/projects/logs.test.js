@@ -163,3 +163,38 @@ test("where clause will trigger a log refresh", async () => {
 
   await waitFor(() => screen.getByText(/happened/))
 })
+
+test('load older btn will fetch older logs', async () => {
+  get
+    .mockResolvedValueOnce({
+      data: [
+        {
+          id: 'some-uuid',
+          timestamp: 1621323232312,
+          event_message: 'first event',
+          metadata: {},
+        },
+      ],
+    })
+    .mockResolvedValueOnce({
+      data: [
+        {
+          id: 'some-uuid2',
+          timestamp: 1621323232310,
+          event_message: 'second event',
+          metadata: {},
+        },
+      ],
+    })
+  render(<LogPage />)
+  // should display first log but not second
+  await waitFor(() => screen.getByText('first event'))
+  expect(() => screen.getByText('second event')).toThrow()
+
+  userEvent.click(screen.getByText('Load older'))
+  // should display first and second log
+  await waitFor(() => screen.getByText('first event'))
+  await waitFor(() => screen.getByText('second event'))
+  expect(get).toBeCalledTimes(2)
+})
+
