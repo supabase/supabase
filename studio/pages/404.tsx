@@ -20,7 +20,7 @@ const Error404: NextPage = ({}) => {
   }, [])
 
   return (
-    <div className="w-full h-screen relative flex flex-col items-center justify-center mx-auto relative">
+    <div className="w-full h-screen relative flex flex-col items-center justify-center mx-auto">
       <div className="absolute top-0 w-full max-w-7xl mx-auto pt-6 px-8 sm:px-6 lg:px-8">
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">

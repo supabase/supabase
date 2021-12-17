@@ -24,9 +24,7 @@ const BlogListItem = ({ blog }: Props) => {
                 <Image
                   layout="fill"
                   src={
-                    !blog.thumb
-                      ? `https://images.unsplash.com/photo-1569982175971-d92b01cf8694?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1`
-                      : `/images/blog/${blog.thumb}`
+                    !blog.thumb ? `/images/blog/blog-placeholder.png` : `/images/blog/${blog.thumb}`
                   }
                   objectFit="cover"
                   className="transform duration-100 ease-in scale-100 group-hover:scale-105"
