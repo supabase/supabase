@@ -163,3 +163,25 @@ test("where clause will trigger a log refresh", async () => {
 
   await waitFor(() => screen.getByText(/happened/))
 })
+test('search= query param will populate the search bar', async () => {
+  useRouter.mockReturnValue({
+    query: { ref: '123', type: 'api', search: 'someSearch' },
+  })
+  render(<LogPage />)
+  // should populate input with the search query param
+  screen.getByDisplayValue('someSearch')
+})
+
+test('query= query param will populate the query input', async () => {
+  useRouter.mockReturnValue({
+    query: { ref: '123', type: 'api', query: 'some query', search: 'someSearch' },
+  })
+  render(<LogPage />)
+  // should populate input with the search query param
+  screen.getByText(/some query/)
+  let editor = container.querySelector('.monaco-editor')
+  expect(editor).toBeTruthy()
+  screen.getByText(/some query/)
+  // query takes precedence of search queryparam
+  expect(() => screen.getByDisplayValue(/someSearch/)).toThrow()
+})
