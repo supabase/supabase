@@ -117,7 +117,7 @@ export const PASSWORD_STRENGTH = {
 
 export const PASSWORD_STRENGTH_COLOR = {
   0: 'bg-red-500',
-  1: 'bg-red-400',
+  1: 'bg-red-500',
   2: 'bg-yellow-500',
   3: 'bg-yellow-500',
   4: 'bg-green-500',
