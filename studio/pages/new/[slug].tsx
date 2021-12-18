@@ -7,14 +7,7 @@ import { useRef, useState, useEffect } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import {
-  Button,
-  Typography,
-  Listbox,
-  IconUsers,
-  IconAlertCircle,
-  IconDollarSign,
-} from '@supabase/ui'
+import { Button, Typography, Listbox, IconUsers, IconAlertCircle } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
@@ -23,9 +16,6 @@ import {
   REGIONS,
   REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  PASSWORD_STRENGTH,
-  PASSWORD_STRENGTH_COLOR,
-  PASSWORD_STRENGTH_PERCENTAGE,
   PRICING_PLANS,
   PRICING_PLANS_DEFAULT,
   DEFAULT_FREE_PROJECTS_LIMIT,
@@ -38,6 +28,8 @@ import { getURL } from 'lib/helpers'
 import FormField from 'components/to-be-cleaned/forms/FormField'
 import Panel from 'components/to-be-cleaned/Panel'
 import InformationBox from 'components/ui/InformationBox'
+import { passwordStrength } from 'lib/helpers'
+import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 
 interface StripeCustomer {
   paymentMethods: any
@@ -164,22 +156,10 @@ export const Wizard = observer(() => {
   }
 
   async function checkPasswordStrength(value: any) {
-    let passwordStrength = ''
-    if (value && value !== '') {
-      const response = await post(`${API_URL}/profile/password-check`, { password: value })
-      if (!response.error) {
-        const { result } = response
-        const score = (PASSWORD_STRENGTH as any)[result.score]
-        const suggestions = result.feedback?.suggestions
-          ? result.feedback.suggestions.join(' ')
-          : ''
-        passwordStrength = `${score} ${suggestions}`
-        setPasswordStrengthScore(result.score)
-        setPasswordStrengthWarning(result.feedback.warning ? result.feedback.warning : '')
-      }
-    }
-
-    setPasswordStrengthMessage(passwordStrength)
+    const { message, warning, strength } = await passwordStrength(value)
+    setPasswordStrengthScore(strength)
+    setPasswordStrengthWarning(warning)
+    setPasswordStrengthMessage(message)
   }
 
   const onClickNext = async () => {
@@ -295,48 +275,13 @@ export const Wizard = observer(() => {
                   value={dbPass}
                   onChange={onDbPassChange}
                   description={
-                    <>
-                      {dbPass && (
-                        <div
-                          aria-valuemax={100}
-                          aria-valuemin={0}
-                          aria-valuenow={
-                            (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]
-                          }
-                          aria-valuetext={
-                            (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]
-                          }
-                          role="progressbar"
-                          className="mb-2 bg-bg-alt-light dark:bg-bg-alt-dark rounded overflow-hidden transition-all border dark:border-dark"
-                        >
-                          <div
-                            style={{
-                              width: (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore],
-                            }}
-                            className={`relative h-2 w-full ${
-                              (PASSWORD_STRENGTH_COLOR as any)[passwordStrengthScore]
-                            } transition-all duration-500 ease-out shadow-inner`}
-                          ></div>
-                        </div>
-                      )}
-                      <span
-                        className={
-                          passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH
-                            ? 'text-green-600'
-                            : ''
-                        }
-                      >
-                        {passwordStrengthMessage
-                          ? passwordStrengthMessage
-                          : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'}
-                      </span>
-                    </>
+                    <PasswordStrengthBar
+                      passwordStrengthScore={passwordStrengthScore}
+                      password={dbPass}
+                      passwordStrengthMessage={passwordStrengthMessage}
+                    />
                   }
-                  errorMessage={
-                    passwordStrengthWarning
-                      ? `${passwordStrengthWarning}. ${passwordErrorMessage}.`
-                      : passwordErrorMessage
-                  }
+                  errorMessage={passwordStrengthWarning}
                 />
               </Panel.Content>
 
