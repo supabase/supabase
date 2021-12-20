@@ -78,7 +78,7 @@ const DocView: FC<any> = observer(({}) => {
   const swaggerUrl = data?.autoApiService?.restUrl
   const headers: any = { apikey: API_KEY }
 
-  if (API_KEY?.length > 40) headers['authorization'] = `Bearer ${API_KEY}`
+  if (API_KEY?.length > 40) headers['Authorization'] = `Bearer ${API_KEY}`
 
   const { data: jsonSchema, error: jsonSchemaError } = useSWR(
     () => swaggerUrl,
