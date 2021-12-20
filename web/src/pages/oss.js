@@ -1,15 +1,18 @@
 import React from 'react'
+import { Octokit } from "@octokit/core"
 import Layout from '@theme/Layout'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
-import sponsors from '../data/sponsors.json'
 import maintainers from '../data/maintainers.json'
 import GithubCard from '../components/GithubCard'
-import { repos } from '../data/github'
 
 import Sponsors from '../components/Sponsors'
 
 export default function Oss() {
+  const octokit = new Octokit();
+
   const [activePill, setActivePill] = React.useState('All')
+  const [repos, setRepos] = React.useState([])
+
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
 
@@ -18,7 +21,16 @@ export default function Oss() {
     .filter((v, i, a) => a.indexOf(v) === i) // remove duplicates
     .sort((a, b) => a.localeCompare(b)) // alphabetical
   const maintainerPills = ['All'].concat(maintainerTags)
-  
+
+  React.useEffect(async () => {
+    const reposResponse = await octokit.request("GET /orgs/{org}/repos", {
+      org: "supabase",
+      type: "public",
+    });
+
+    setRepos(reposResponse.data.filter((r) => !!r.stargazers_count).sort((a, b) => b.stargazers_count - a.stargazers_count))
+  })
+
   return (
     <Layout title={`${siteConfig.title}`} description={siteConfig.tagline}>
       <section className={'section-lg'}>
@@ -90,7 +102,10 @@ export default function Oss() {
         <div className="container">
           <h2>Repositories</h2>
           <div className="row is-multiline">
-            {repos.map((props, idx) => (
+            {repos.length < 1 && <div>
+              {/* TODO Add Spinner Here */}
+            </div>}
+            {repos.length >= 1 && repos.map((props, idx) => (
               <div className={'col col--6'}>
                 <GithubCard
                   key={idx}
