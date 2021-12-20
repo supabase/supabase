@@ -168,7 +168,7 @@ export default class MetaStore implements IMetaStore {
     try {
       const headers: any = { 'Content-Type': 'application/json' }
       if (this.connectionString) headers['x-connection-encrypted'] = this.connectionString
-      let url = `${this.queryBaseUrl}/query`
+      const url = `${this.queryBaseUrl}/query`
       const response = await post(url, { query: value }, { headers })
       if (response.error) throw response.error
 
