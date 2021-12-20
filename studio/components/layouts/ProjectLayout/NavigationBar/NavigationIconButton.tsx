@@ -8,11 +8,11 @@ interface Props {
   label: string
 }
 
-const NavigationIconButton: FC<Props> = ({ route, isActive = false, label }) => {
+const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
   return (
     <Link href={route.link}>
       <a
-        title={label}
+        title={route.label}
         className={[
           'flex items-center justify-center h-10 w-10 rounded', // Layout
           'text-gray-600 hover:bg-gray-100', // Light mode
