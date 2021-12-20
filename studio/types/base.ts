@@ -3,6 +3,7 @@ export interface Organization {
   slug: string
   name: string
   billing_email: string
+  is_owner: boolean
 }
 
 export interface Project {
@@ -25,6 +26,7 @@ export interface User {
   first_name: string
   last_name: string
   is_alpha_user: boolean
+  total_free_projects_owned: number
 }
 
 export interface Member {

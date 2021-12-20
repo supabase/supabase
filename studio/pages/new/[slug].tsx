@@ -10,7 +10,7 @@ import { observer, useLocalObservable } from 'mobx-react-lite'
 import { Dictionary } from '@supabase/grid'
 import { Button, Typography, Listbox, IconUsers, IconAlertCircle } from '@supabase/ui'
 
-import { API_URL } from 'lib/constants'
+import { API_URL, DEFAULT_FREE_PROJECTS_LIMIT } from 'lib/constants'
 import { post } from 'lib/common/fetch'
 import {
   PROVIDERS,
@@ -94,6 +94,7 @@ export const Wizard = () => {
   ).current
 
   const organizations: any = Object.values(toJS(_pageState.store.app.organizations.list()))
+  const freeProjects: any = ui?.profile?.total_free_projects_owned ?? 0
 
   /*
    * Handle no org
@@ -181,7 +182,7 @@ export const Wizard = () => {
     }
   }
 
-  const overProjectLimit = currentOrg?.total_free_projects >= currentOrg?.project_limit
+  const overFreeProjectLimit = freeProjects >= DEFAULT_FREE_PROJECTS_LIMIT ? true : false
   const sortedOrganizations = organizations.sort((a: any, b: any) => a.name.localeCompare(b.name))
 
   return (
@@ -243,18 +244,20 @@ export const Wizard = () => {
               ))}
             </Listbox>
 
-            {overProjectLimit && (
+            {!currentOrg.is_owner ? (
               <InformationBox
                 icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
                 defaultVisibility={true}
                 hideCollapse
-                title="This organization has reached its project limit"
+                title="You do not have permission to create a project"
                 description={
                   <div className="space-y-3">
                     <p className="text-sm leading-normal">
-                      This organization can only have a maximum of {currentOrg.project_limit} free
-                      projects. You can either upgrade pre existing projects, choose another
-                      organization, or create a new organization.
+                      This organization can only have a maximum of {DEFAULT_FREE_PROJECTS_LIMIT}{' '}
+                      free projects. You can either upgrade pre existing projects, choose another
+                      organization, or create a new organization. Only the organization owner can
+                      create new projects. Contact your organizaton owner to create a new project
+                      for this organization.
                     </p>
                     <Button type="secondary" onClick={() => router.push('/new')}>
                       New organization
@@ -262,10 +265,29 @@ export const Wizard = () => {
                   </div>
                 }
               />
-            )}
+            ) : overFreeProjectLimit ? (
+              <InformationBox
+                icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+                defaultVisibility={true}
+                hideCollapse
+                title="Your account has reached its project limit"
+                description={
+                  <div className="space-y-3">
+                    <p className="text-sm leading-normal">
+                      You can only have a maximum of {DEFAULT_FREE_PROJECTS_LIMIT} free projects.
+                      You will need to either upgrade existing free tier projects to paid plans or
+                      delete them.
+                    </p>
+                    <Button type="secondary" onClick={() => router.push('/new')}>
+                      New organization
+                    </Button>
+                  </div>
+                }
+              />
+            ) : null}
           </Panel.Content>
 
-          {!overProjectLimit && (
+          {!overFreeProjectLimit && currentOrg.is_owner && (
             <>
               <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
                 <FormField

@@ -35,7 +35,7 @@ const Home: NextPage = () => {
   }
 
   const hasProjectData =
-    (usage && usage.bucketSize) || (usage && usage.authUsers !== '0') || (usage && usage.dbTables)
+    usage && (usage?.bucketSize || (usage?.authUsers ?? '0') !== '0' || usage?.dbTables)
       ? true
       : false
 
