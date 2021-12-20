@@ -57,7 +57,7 @@ export default class OpenApiStore implements IOpenApiStore {
     const restApiUrl = projectConfig.autoApiService?.restUrl
 
     const response = await get<OpenAPIV2.Document>(`${restApiUrl}?apikey=${apiKey}`, {
-      headers: { ...headers, apiKey: apiKey, authorization: `Bearer ${apiKey}` },
+      headers: { ...headers, apiKey: apiKey, Authorization: `Bearer ${apiKey}` },
       credentials: 'omit',
     })
     if (response.error) throw response.error
