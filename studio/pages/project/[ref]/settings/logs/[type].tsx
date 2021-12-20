@@ -36,8 +36,6 @@ export const LogPage: NextPage = () => {
 
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [search, setSearch] = useState<string>('')
-  const [queryParams, setQueryParams] = useState<string>('')
-  const [where, setWhere] = useState<string>('')
   const [mode, setMode] = useState<'simple' | 'custom'>('simple')
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
   const [params, setParams] = useState({
@@ -48,13 +46,12 @@ export const LogPage: NextPage = () => {
     timestamp_end: '',
   })
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as string]}`
-  const debouncedQueryParams = useRef(debounce(setQueryParams, 600)).current
+  const debouncedSetParams = useRef(debounce(setParams, 600)).current
 
   useEffect(() => {
-    const qs = genQueryParams(params)
-    debouncedQueryParams(qs)
-    return () => debouncedQueryParams.cancel()
-  }, [mode, search, where, type])
+    debouncedSetParams((prev) => ({ ...prev, type: type as string }))
+    return () => debouncedSetParams.cancel()
+  }, [type])
 
   const genQueryParams = (params: { [k: string]: string }) => {
     // remove keys which are empty strings, null, or undefined
@@ -114,8 +111,7 @@ export const LogPage: NextPage = () => {
   const newCount = countData?.data?.[0]?.count ?? 0
 
   const handleReset = () => {
-    setWhere('')
-    setSearch('')
+    setParams((prev) => ({ ...prev, search_query: '', where: '' }))
     setEditorId(uuidv4())
   }
 
@@ -136,13 +132,14 @@ export const LogPage: NextPage = () => {
   const onSelectTemplate = (template: LogTemplate) => {
     setMode(template.mode)
     if (template.mode === 'simple') {
-      setSearch(template.searchString)
-      setWhere('')
+      setParams((prev) => ({ ...prev, search_query: template.searchString, where: '' }))
     } else {
-      setWhere(template.searchString)
-      setSearch('')
+      setParams((prev) => ({ ...prev, where: template.searchString, search_query: '' }))
       setEditorId(uuidv4())
     }
+  }
+  const handleEditorChange = (v: string | undefined) => {
+    debouncedSetParams((prev) => ({ ...prev, where: v || '' }))
   }
 
   return (
@@ -166,8 +163,8 @@ export const LogPage: NextPage = () => {
             <CodeEditor
               id={editorId}
               language="pgsql"
-              defaultValue={where}
-              onInputChange={(v) => setWhere(v || '')}
+              defaultValue={params['where']}
+              onInputChange={handleEditorChange}
               onInputRun={handleRefresh}
             />
           </div>
