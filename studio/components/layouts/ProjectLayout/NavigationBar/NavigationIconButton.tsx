@@ -5,12 +5,14 @@ import { Route } from 'components/ui/ui.types'
 interface Props {
   route: Route
   isActive?: boolean
+  label: string
 }
 
-const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
+const NavigationIconButton: FC<Props> = ({ route, isActive = false, label }) => {
   return (
     <Link href={route.link}>
       <a
+        title={label}
         className={[
           'flex items-center justify-center h-10 w-10 rounded', // Layout
           'text-gray-600 hover:bg-gray-100', // Light mode
