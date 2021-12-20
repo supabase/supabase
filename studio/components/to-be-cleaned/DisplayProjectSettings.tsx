@@ -8,6 +8,7 @@ import { API_URL } from 'lib/constants'
 import Panel from './Panel'
 
 const { Text, Title } = Typography
+const API_SERVICE_ID = 1
 
 export const DisplayApiSettings = () => {
   const router = useRouter()
@@ -36,12 +37,9 @@ export const DisplayApiSettings = () => {
       </ApiContentWrapper>
     )
 
-  const { services } = data
-
   // Get the API service
-  const API_SERVICE_ID = 1
-  let apiService = services.find((x: any) => x.app.id == API_SERVICE_ID)
-  let apiKeys = apiService.service_api_keys
+  const apiService = (data?.services ?? []).find((x: any) => x.app.id == API_SERVICE_ID)
+  const apiKeys = apiService.service_api_keys
 
   return (
     <ApiContentWrapper>
@@ -124,13 +122,10 @@ export const DisplayConfigSettings = () => {
       </ConfigContentWrapper>
     )
 
-  const { project, services } = data
-
   // Get the API service
-  const API_SERVICE_ID = 1
-  let jwtSecret = project.jwt_secret ?? ''
-  let apiService = services.find((x: any) => x.app.id == API_SERVICE_ID)
-  let apiConfig = apiService.app_config
+  const jwtSecret = data?.project.jwt_secret ?? ''
+  const apiService = (data?.services ?? []).find((x: any) => x.app.id == API_SERVICE_ID)
+  const apiConfig = apiService.app_config
 
   return (
     <section>
@@ -159,7 +154,7 @@ export const DisplayConfigSettings = () => {
             readOnly
             copy
             reveal
-            disabled={true}
+            disabled
             value={jwtSecret}
             className="input-mono"
             descriptionText="Used to decode your JWTs. You can also use this to mint your own JWTs."
