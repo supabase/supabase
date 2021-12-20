@@ -6,8 +6,6 @@ import SectionContainer from './Layouts/SectionContainer'
 const Hero = () => {
   const { basePath } = useRouter()
 
-  
-
   return (
     <div className="overflow-hidden">
       <SectionContainer className="pb-0 pt-24">
@@ -29,10 +27,7 @@ const Hero = () => {
                       <p className="mt-3 text-base">Serverless functions coming soon</p>
                     </Typography.Text>
                     <Space>
-                       <Link
-                        href="https://app.supabase.io"
-                        as="https://app.supabase.io"
-                      >
+                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
                         <a className="mt-10">
                           <Button className="py-3" size="medium">
                             Start your project
