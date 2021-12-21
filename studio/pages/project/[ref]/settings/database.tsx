@@ -1,15 +1,19 @@
-import { FC, useState, useRef } from 'react'
-import { useStore, withAuth } from 'hooks'
-
-import { useRouter } from 'next/router'
-
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
+import useSWR from 'swr'
+import { FC, useState, useRef, useEffect } from 'react'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import useSWR from 'swr'
+import { useRouter } from 'next/router'
+import { debounce } from 'lodash'
+import { Typography, Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
 
-import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from 'lib/constants'
-import { get } from 'lib/common/fetch'
+import { useStore, withAuth } from 'hooks'
+import { get, patch } from 'lib/common/fetch'
 import { pluckObjectFields, passwordStrength } from 'lib/helpers'
+import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from 'lib/constants'
 
 import { SettingsLayout } from 'components/layouts'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
@@ -17,15 +21,6 @@ import Panel from 'components/to-be-cleaned/Panel'
 import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
-
-import { Typography, Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
-
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import timezone from 'dayjs/plugin/timezone'
-import utc from 'dayjs/plugin/utc'
-
-import { isUndefined, debounce } from 'lodash'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(timezone)
@@ -142,10 +137,26 @@ const Usage: FC<any> = ({ project }) => {
 }
 
 const ResetDbPassword: FC<any> = () => {
-  const [password, setPassword] = useState('')
-  const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
-  const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
-  const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
+  const { ui } = useStore()
+  const projectRef = ui.selectedProject?.ref
+
+  const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false)
+
+  const [password, setPassword] = useState<string>('')
+  const [passwordStrengthMessage, setPasswordStrengthMessage] = useState<string>('')
+  const [passwordStrengthWarning, setPasswordStrengthWarning] = useState<string>('')
+  const [passwordStrengthScore, setPasswordStrengthScore] = useState<number>(0)
+
+  useEffect(() => {
+    if (showResetDbPass) {
+      setIsUpdatingPassword(false)
+      setPassword('')
+      setPasswordStrengthMessage('')
+      setPasswordStrengthWarning('')
+      setPasswordStrengthScore(0)
+    }
+  }, [showResetDbPass])
 
   async function checkPasswordStrength(value: any) {
     const { message, warning, strength } = await passwordStrength(value)
@@ -158,13 +169,26 @@ const ResetDbPassword: FC<any> = () => {
     debounce((value) => checkPasswordStrength(value), 300)
   ).current
 
-  function onDbPassChange(e: any) {
+  const onDbPassChange = (e: any) => {
     const value = e.target.value
     setPassword(value)
     if (value == '') {
       setPasswordStrengthScore(-1)
       setPasswordStrengthMessage('')
     } else delayedCheckPasswordStrength(value)
+  }
+
+  const confirmResetDbPass = async () => {
+    if (passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+      setIsUpdatingPassword(true)
+      const res = await patch(`${API_URL}/projects/${projectRef}/db-password`, { password })
+      if (!res.error) {
+        ui.setNotification({ category: 'success', message: res.message })
+        setShowResetDbPass(false)
+      } else {
+        ui.setNotification({ category: 'error', message: 'Failed to reset password' })
+      }
+    }
   }
 
   return (
@@ -183,40 +207,40 @@ const ResetDbPassword: FC<any> = () => {
               </div>
             </div>
             <div className="flex items-end justify-end">
-              <Button type="default">Reset Database Password</Button>
+              <Button type="default" onClick={() => setShowResetDbPass(true)}>
+                Reset Database Password
+              </Button>
             </div>
           </div>
         </Panel.Content>
       </Panel>
       <Modal
         title="Reset database password"
-        visible={true}
         confirmText="Reset password"
         alignFooter="right"
         size="medium"
-        children={
-          <>
-            <div className="w-full space-y-8 mb-8">
-              <Input
-                type="password"
-                onChange={onDbPassChange}
-                label="New Password"
-                error={passwordStrengthWarning}
-                // @ts-ignore
-                descriptionText={
-                  <>
-                    <PasswordStrengthBar
-                      passwordStrengthScore={passwordStrengthScore}
-                      passwordStrengthMessage={passwordStrengthMessage}
-                      password={password}
-                    />
-                  </>
-                }
+        visible={showResetDbPass}
+        loading={isUpdatingPassword}
+        onCancel={() => setShowResetDbPass(false)}
+        onConfirm={() => confirmResetDbPass()}
+      >
+        <div className="w-full space-y-8 mb-8">
+          <Input
+            type="password"
+            onChange={onDbPassChange}
+            label="New Password"
+            error={passwordStrengthWarning}
+            // @ts-ignore
+            descriptionText={
+              <PasswordStrengthBar
+                passwordStrengthScore={passwordStrengthScore}
+                passwordStrengthMessage={passwordStrengthMessage}
+                password={password}
               />
-            </div>
-          </>
-        }
-      />
+            }
+          />
+        </div>
+      </Modal>
     </>
   )
 }
