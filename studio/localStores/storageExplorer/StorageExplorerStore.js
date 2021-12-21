@@ -104,7 +104,16 @@ class StorageExplorerStore {
   initializeSupabaseClient = (serviceKey, serviceEndpoint) => {
     this.supabaseClient = createClient(
       this.normalizeSupabaseURL(`https://${serviceEndpoint}`),
-      serviceKey
+      serviceKey,
+      {
+        localStorage: {
+          getItem: (key) => {
+            return undefined
+          },
+          setItem: (key, value) => {},
+          removeItem: (key) => {},
+        },
+      }
     )
   }
 
