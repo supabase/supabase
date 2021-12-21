@@ -3,12 +3,12 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button, Typography } from '@supabase/ui'
 
-type Props ={
+type Props = {
   darkMode: boolean
 }
 
 const Error500 = (props: Props) => {
-    const { darkMode } = props
+  const { darkMode } = props
 
   return (
     <div className="w-full h-full relative flex flex-col space-y-6 items-center justify-center mx-auto">
