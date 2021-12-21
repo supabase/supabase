@@ -435,14 +435,14 @@ export default class MetaStore implements IMetaStore {
 
           if (!isUndefined(error)) {
             this.rootStore.ui.setNotification({
-              id: toastId,
               category: 'error',
-              message: `Table ${table.name} has been created but we ran into an error while inserting rows:
-            ${error.message} - ${error.details}`,
+              message: 'Do check your spreadsheet if there are any discrepancies.',
             })
             this.rootStore.ui.setNotification({
               category: 'error',
-              message: 'Do check your spreadsheet if there are any discrepancies.',
+              message: `Table ${table.name} has been created but we ran into an error while inserting rows:
+            ${error.message}`,
+              error,
             })
           }
         } else {
