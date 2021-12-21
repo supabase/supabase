@@ -3,6 +3,7 @@ import {
   PASSWORD_STRENGTH_COLOR,
   PASSWORD_STRENGTH_PERCENTAGE,
 } from 'lib/constants'
+import { Typography } from '@supabase/ui'
 
 interface Props {
   passwordStrengthScore: number
@@ -36,7 +37,7 @@ const PasswordStrengthBar = ({
           ></div>
         </div>
       )}
-      <span
+      <Typography.Text
         className={
           passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH ? 'text-green-600' : ''
         }
@@ -44,7 +45,7 @@ const PasswordStrengthBar = ({
         {passwordStrengthMessage
           ? passwordStrengthMessage
           : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'}
-      </span>
+      </Typography.Text>
     </>
   )
 }
