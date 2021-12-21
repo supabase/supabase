@@ -396,7 +396,7 @@ export default function IndexPage() {
             <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:grid-rows-2 md:gap-x-8 md:gap-y-12">
               {pricingFaq.map((faq, i) => {
                 return (
-                  <Accordion>
+                  <Accordion bordered>
                     <Accordion.Item label={faq.question}>
                       <Typography>{faq.answer}</Typography>
                     </Accordion.Item>
