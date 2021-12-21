@@ -24,7 +24,7 @@ const Footer = (props: Props) => {
       <SectionContainer>
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
-            <Link href="#" as=" ">
+            <Link href="#" as="/">
               <a>
                 <img
                   className="w-40"
@@ -102,7 +102,9 @@ const Footer = (props: Props) => {
           </div>
         </div>
         <div className="mt-32 border-t dark:border-dark pt-8 flex justify-between">
-          <p className="text-base text-gray-400 dark:text-dark-400">&copy; Supabase Inc</p>
+          <p className="mb-0 self-center text-base text-gray-400 dark:text-dark-400">
+            &copy; Supabase Inc
+          </p>
           <DarkModeToggle darkMode={darkMode} updateTheme={updateTheme} />
         </div>
       </SectionContainer>
