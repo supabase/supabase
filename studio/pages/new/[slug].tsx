@@ -94,7 +94,10 @@ export const Wizard = () => {
   ).current
 
   const organizations: any = Object.values(toJS(_pageState.store.app.organizations.list()))
+  const sortedOrganizations = organizations.sort((a: any, b: any) => a.name.localeCompare(b.name))
+
   const freeProjects: any = ui?.profile?.total_free_projects_owned ?? 0
+  const overFreeProjectLimit = freeProjects >= DEFAULT_FREE_PROJECTS_LIMIT ? true : false
 
   /*
    * Handle no org
@@ -181,9 +184,6 @@ export const Wizard = () => {
       window.location.replace(`/project/${response.ref}/building`)
     }
   }
-
-  const overFreeProjectLimit = freeProjects >= DEFAULT_FREE_PROJECTS_LIMIT ? true : false
-  const sortedOrganizations = organizations.sort((a: any, b: any) => a.name.localeCompare(b.name))
 
   return (
     <WizardLayout organization={currentOrg} project={null}>

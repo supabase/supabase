@@ -1,9 +1,8 @@
-import { Dictionary } from '@supabase/grid'
 import { cloneDeep } from 'lodash'
 import { values } from 'mobx'
 import { Project } from 'types'
 
-import { API_URL } from 'lib/constants'
+import { API_URL, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { IRootStore } from '../RootStore'
 import DatabaseStore, { IDatabaseStore } from './DatabaseStore'
 import OrganizationStore from './OrganizationStore'
@@ -55,10 +54,20 @@ export default class AppStore implements IAppStore {
 
   onProjectDeleted(project: any) {
     if (project && project.id) {
+      const projectMetadata = this.projects.find((proj: any) => proj.id === project.id)
+
       // cleanup project saved queries
       localStorage.removeItem(`supabase-queries-state-${project.ref}`)
       localStorage.removeItem(`supabase_${project.ref}`)
+
       delete this.projects.data[project.id]
+
+      if (projectMetadata?.subscription_tier_prod_id === STRIPE_PRODUCT_IDS.FREE) {
+        const currentFreeProjectsCount = this.rootStore.ui.profile?.total_free_projects_owned ?? 0
+        const updatedFreeProjectsCount =
+          currentFreeProjectsCount > 0 ? currentFreeProjectsCount - 1 : 0
+        this.rootStore.ui.setProfileTotalFreeProjectsOwnedCount(updatedFreeProjectsCount)
+      }
     }
   }
 

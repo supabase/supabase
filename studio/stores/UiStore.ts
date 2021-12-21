@@ -21,6 +21,7 @@ export interface IUiStore {
   setOrganizationSlug: (slug?: string) => void
   setNotification: (notification: Notification) => string
   setProfile: (value?: User) => void
+  setProfileTotalFreeProjectsOwnedCount: (value: number) => void
 }
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
@@ -106,12 +107,16 @@ export default class UiStore implements IUiStore {
   }
 
   setProfile(value?: User) {
-    if (value?.id != this.profile?.id) {
+    if (value?.id !== this.profile?.id) {
       this.profile = value
 
       if (value) {
         Telemetry.sendIdentify(value)
       }
     }
+  }
+
+  setProfileTotalFreeProjectsOwnedCount(value: number) {
+    this.profile = { ...this.profile, total_free_projects_owned: value } as User
   }
 }
