@@ -27,7 +27,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Realtime',
-      items: ['reference/javascript/subscribe', 'reference/javascript/removesubscription', 'reference/javascript/getsubscriptions'],
+      items: ['reference/javascript/subscribe', 'reference/javascript/removesubscription', 'reference/javascript/removeallsubscriptions', 'reference/javascript/getsubscriptions'],
       collapsed: true,
     },
     {
