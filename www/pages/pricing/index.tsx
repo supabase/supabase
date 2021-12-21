@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/PricingTableRow'
-import { Badge, Button, Divider, Space, Typography } from '@supabase/ui'
+import { Accordion, Button, Typography } from '@supabase/ui'
 
 import pricing from '~/data/Pricing.json'
 import pricingFaq from '~/data/PricingFAQ.json'
@@ -396,20 +396,11 @@ export default function IndexPage() {
             <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:grid-rows-2 md:gap-x-8 md:gap-y-12">
               {pricingFaq.map((faq, i) => {
                 return (
-                  <div className="rounded-lg border-2 border-gray-600">
-                    <div className="p-2">
-                      <dt className="text-lg leading-6 font-medium text-white">
-                        <Typography.Title className="border-b border-gray-600 pb-2" level={4}>
-                          {faq.question}
-                        </Typography.Title>
-                      </dt>
-                      <dd className="mt-2 text-base">
-                        <Typography>
-                          <ReactMarkdown>{faq.answer}</ReactMarkdown>
-                        </Typography>
-                      </dd>
-                    </div>
-                  </div>
+                  <Accordion>
+                    <Accordion.Item label={faq.question}>
+                      <Typography>{faq.answer}</Typography>
+                    </Accordion.Item>
+                  </Accordion>
                 )
               })}
             </dl>
