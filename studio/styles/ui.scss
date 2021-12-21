@@ -310,3 +310,9 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
     cursor: row-resize;
   }
 }
+
+.radix-tooltip-arrow {
+  polygon {
+    @apply fill-[#eeeeee] dark:fill-[#1f1f1f];
+  }
+}
