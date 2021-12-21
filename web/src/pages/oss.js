@@ -35,7 +35,7 @@ export default function Oss() {
     <Layout title={`${siteConfig.title}`} description={siteConfig.tagline}>
       <section className={'section-lg'}>
         <div className="container">
-          <div className={'row '}>
+          <div className={'row'}>
             <div className="col">
               <h2 className="with-underline">Open source</h2>
               <p className="">
