@@ -10,7 +10,8 @@ import 'styles/contextMenu.scss'
 
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
-import { useState } from 'react'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import type { AppProps } from 'next/app'
 import { Toaster, ToastBar, toast } from 'react-hot-toast'
 import { Button, IconX } from '@supabase/ui'
@@ -68,6 +69,17 @@ const PortalToast = () => (
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [rootStore] = useState(() => new RootStore())
+  const router = useRouter()
+
+  useEffect(() => {
+    if (router.asPath.includes('error_description')) {
+      rootStore.ui.setNotification({
+        category: 'error',
+        message:
+          'Please verify your email on Github first before logging in to the Supabase dashboard',
+      })
+    }
+  }, [])
 
   return (
     <StoreProvider rootStore={rootStore}>
