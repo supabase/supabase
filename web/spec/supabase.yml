@@ -150,6 +150,7 @@ info:
         items:
           - subscribe()
           - removeSubscription()
+          - removeAllSubscriptions()
           - getSubscriptions()
       - name: 'Storage'
         items:
@@ -1272,6 +1273,19 @@ pages:
         js: |
           ```js
           supabase.removeSubscription(mySubscription)
+          ```
+
+  removeAllSubscriptions():
+    title: 'removeAllSubscriptions()'
+    $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.removeAllSubscriptions'
+    notes: |
+      - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
+    examples:
+      - name: Removes all subscriptions
+        isSpotlight: true
+        js: |
+          ```js
+          supabase.removeAllSubscriptions()
           ```
 
   getSubscriptions():
