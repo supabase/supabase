@@ -394,7 +394,7 @@ export default function IndexPage() {
           <Typography.Title level={2}>Frequently asked questions</Typography.Title>
           <div className="mt-16">
             <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:grid-rows-2 md:gap-x-8 md:gap-y-12">
-              {pricingFaq.map((faq, i) => {
+              {pricingFaq.map((faq) => {
                 return (
                   <Accordion bordered>
                     <Accordion.Item label={faq.question}>
