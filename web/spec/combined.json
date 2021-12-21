@@ -25246,7 +25246,8 @@
                           "kind": 32768,
                           "kindString": "Parameter",
                           "flags": {
-                            "isExported": true
+                            "isExported": true,
+                            "isOptional": true
                           },
                           "comment": {
                             "text": "The columns to retrieve, separated by commas."
