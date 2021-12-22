@@ -4,7 +4,7 @@ import { Typography } from '@supabase/ui'
 import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
-import { API_URL } from 'lib/constants'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { useStore, withAuth } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { snakeToCamel } from 'lib/helpers'
@@ -78,7 +78,7 @@ const DocView: FC<any> = observer(({}) => {
   const swaggerUrl = data?.autoApiService?.restUrl
   const headers: any = { apikey: API_KEY }
 
-  if (API_KEY?.length > 40) headers['authorization'] = `Bearer ${API_KEY}`
+  if (API_KEY?.length > 40) headers['Authorization'] = `Bearer ${API_KEY}`
 
   const { data: jsonSchema, error: jsonSchemaError } = useSWR(
     () => swaggerUrl,
@@ -112,7 +112,13 @@ const DocView: FC<any> = observer(({}) => {
     )
 
   // Data Loaded
-  const { autoApiService } = data
+  const autoApiService = {
+    ...data.autoApiService,
+    endpoint: IS_PLATFORM
+      ? `https://${data?.autoApiService?.endpoint}`
+      : data.autoApiService.endpoint,
+  }
+
   const { query } = router
   const { page, resource, rpc } = query
   const { paths, definitions } = PageState.jsonSchema
