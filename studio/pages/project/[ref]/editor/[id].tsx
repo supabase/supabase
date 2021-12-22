@@ -113,7 +113,9 @@ const TableEditorPage: NextPage = () => {
 
   const onConfirmDeleteTable = async () => {
     try {
-      const response: any = await meta.tables.del(selectedTableToDelete!.id)
+      if (isUndefined(selectedTableToDelete)) return
+
+      const response: any = await meta.tables.del(selectedTableToDelete.id)
       if (response.error) throw response.error
 
       const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
@@ -126,12 +128,13 @@ const TableEditorPage: NextPage = () => {
       }
       ui.setNotification({
         category: 'success',
-        message: `Successfully deleted ${selectedTableToDelete!.name}`,
+        message: `Successfully deleted ${selectedTableToDelete.name}`,
       })
     } catch (error: any) {
       ui.setNotification({
+        error,
         category: 'error',
-        message: `Failed to delete ${selectedTableToDelete!.name}: ${error.message}`,
+        message: `Failed to delete ${selectedTableToDelete?.name}: ${error.message}`,
       })
     } finally {
       setIsDeleting(false)

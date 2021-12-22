@@ -70,7 +70,7 @@ const HelpPopover: FC<Props> = () => {
                   alt="discord illustration header"
                 />
                 <a
-                  href="https://discord.com/invite/AYybku5cUz"
+                  href="https://discord.supabase.com"
                   target="_blank"
                   className="block  cursor-pointer"
                 >
