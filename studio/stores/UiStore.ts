@@ -7,6 +7,7 @@ import Telemetry from 'lib/telemetry'
 export interface IUiStore {
   language: 'en_US'
   theme: 'dark' | 'light'
+  themeOption: 'dark' | 'light' | 'system'
 
   isDarkTheme: boolean
   selectedProject?: Project
@@ -16,6 +17,7 @@ export interface IUiStore {
 
   load: () => void
   setTheme: (theme: 'dark' | 'light') => void
+  onThemeOptionChange: (themeOption: 'dark' | 'light' | 'system') => void
   setProjectRef: (ref?: string) => void
   setOrganizationSlug: (slug?: string) => void
   setNotification: (notification: Notification) => string
@@ -25,6 +27,7 @@ export default class UiStore implements IUiStore {
   rootStore: IRootStore
   language: 'en_US' = 'en_US'
   theme: 'dark' | 'light' = 'dark'
+  themeOption: 'dark' | 'light' | 'system' = 'dark'
 
   selectedProjectRef?: string
   selectedOrganizationSlug?: string
@@ -73,18 +76,36 @@ export default class UiStore implements IUiStore {
   load() {
     if (typeof window === 'undefined') return
     const localStorageThemeOption = window.localStorage.getItem('theme')
-    if (localStorageThemeOption === 'system')
+    if (localStorageThemeOption === 'system') {
+      this.themeOption = localStorageThemeOption
       return this.setTheme(
         window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
       )
-    if (localStorageThemeOption === 'light') return this.setTheme('light')
+    }
+    if (localStorageThemeOption === 'light') {
+      this.themeOption = localStorageThemeOption
+      return this.setTheme('light')
+    }
     window.localStorage.setItem('theme', 'dark')
+    this.themeOption = 'dark'
     this.setTheme('dark')
   }
 
   setTheme(theme: 'dark' | 'light') {
     this.theme = theme
     document.body.className = theme
+  }
+
+  onThemeOptionChange(themeOption: 'dark' | 'light' | 'system') {
+    this.themeOption = themeOption
+    if (themeOption === 'system') {
+      window.localStorage.setItem('theme', 'system')
+      return this.setTheme(
+        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      )
+    }
+    window.localStorage.setItem('theme', themeOption)
+    this.setTheme(themeOption)
   }
 
   setProjectRef(ref?: string) {
