@@ -1,6 +1,5 @@
 import useSWR, { KeyLoader } from 'swr'
-import debounce from 'lodash/debounce'
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
@@ -35,7 +34,7 @@ export const LogPage: NextPage = () => {
   const { ref, type } = router.query
 
   const [editorId, setEditorId] = useState<string>(uuidv4())
-  const [search, setSearch] = useState<string>('')
+  const [editorValue, setEditorValue] = useState('')
   const [mode, setMode] = useState<'simple' | 'custom'>('simple')
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
   const [params, setParams] = useState({
@@ -46,11 +45,9 @@ export const LogPage: NextPage = () => {
     timestamp_end: '',
   })
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as string]}`
-  const debouncedSetParams = useRef(debounce(setParams, 600)).current
 
   useEffect(() => {
-    debouncedSetParams((prev) => ({ ...prev, type: type as string }))
-    return () => debouncedSetParams.cancel()
+    setParams({ ...params, type: type as string })
   }, [type])
 
   const genQueryParams = (params: { [k: string]: string }) => {
@@ -110,11 +107,6 @@ export const LogPage: NextPage = () => {
   const { data: countData } = useSWR<Count>(countUrl, get, { refreshInterval: 5000 })
   const newCount = countData?.data?.[0]?.count ?? 0
 
-  const handleReset = () => {
-    setParams((prev) => ({ ...prev, search_query: '', where: '' }))
-    setEditorId(uuidv4())
-  }
-
   const handleRefresh = () => {
     setLatestRefresh(new Date().toISOString())
     mutate()
@@ -134,12 +126,16 @@ export const LogPage: NextPage = () => {
     if (template.mode === 'simple') {
       setParams((prev) => ({ ...prev, search_query: template.searchString, where: '' }))
     } else {
+      setEditorValue(template.searchString)
       setParams((prev) => ({ ...prev, where: template.searchString, search_query: '' }))
       setEditorId(uuidv4())
     }
   }
-  const handleEditorChange = (v: string | undefined) => {
-    debouncedSetParams((prev) => ({ ...prev, where: v || '' }))
+  const handleEditorSubmit = () => {
+    setParams((prev) => ({ ...prev, where: editorValue }))
+  }
+  const handleSearch = (v: string) => {
+    setParams((prev) => ({ ...prev, search_query: v || '' }))
   }
 
   return (
@@ -149,25 +145,35 @@ export const LogPage: NextPage = () => {
           isCustomQuery={mode === 'custom'}
           isLoading={isValidating}
           newCount={newCount}
-          showReset={search.length > 0}
-          searchValue={search}
           templates={TEMPLATES}
-          onReset={handleReset}
           onRefresh={handleRefresh}
-          onSearch={setSearch}
+          onSearch={handleSearch}
+          defaultSearchValue={params.search_query}
           onCustomClick={handleModeToggle}
           onSelectTemplate={onSelectTemplate}
         />
         {mode === 'custom' && (
-          <div className="min-h-[7rem] h-28">
-            <CodeEditor
-              id={editorId}
-              language="pgsql"
-              defaultValue={params['where']}
-              onInputChange={handleEditorChange}
-              onInputRun={handleRefresh}
-            />
-          </div>
+          <React.Fragment>
+            <div className="min-h-[7rem] h-28">
+              <CodeEditor
+                id={editorId}
+                language="pgsql"
+                defaultValue={editorValue}
+                onInputChange={(v) => setEditorValue(v || '')}
+                onInputRun={handleRefresh}
+              />
+              <div className="flex flex-row justify-end mt-2">
+                {editorValue && (
+                  <Button type="text" onClick={() => setEditorValue('')}>
+                    Clear
+                  </Button>
+                )}
+                <Button type={editorValue ? 'secondary' : 'text'} onClick={handleEditorSubmit}>
+                  Run
+                </Button>
+              </div>
+            </div>
+          </React.Fragment>
         )}
         <div className="flex flex-col flex-grow relative">
           {isValidating && (
