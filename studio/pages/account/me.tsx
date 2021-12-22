@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { IconMoon, IconSun, Select, Typography } from '@supabase/ui'
 
@@ -78,28 +78,8 @@ const ProfileCard = observer(() => {
 })
 
 function ThemeSettings() {
-  const [value, setValue] = useState('')
   const { ui } = useStore()
-
-  useEffect(() => {
-    const localStorageThemeOption = window.localStorage.getItem('theme')
-    if (localStorageThemeOption) return setValue(localStorageThemeOption)
-    window.localStorage.setItem('theme', 'dark')
-    setValue('dark')
-  }, [])
-
-  const onThemeOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const themeOption = e.target.value as 'dark' | 'light' | 'system'
-    setValue(themeOption)
-    if (themeOption === 'system') {
-      window.localStorage.setItem('theme', 'system')
-      return ui.setTheme(
-        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      )
-    }
-    window.localStorage.setItem('theme', themeOption)
-    ui.setTheme(themeOption)
-  }
+  const [value, setValue] = useState(ui.themeOption)
 
   return (
     <Panel
@@ -117,7 +97,10 @@ function ThemeSettings() {
           layout="horizontal"
           style={{ width: '50%' }}
           icon={value === 'light' ? <IconSun /> : value === 'dark' ? <IconMoon /> : undefined}
-          onChange={onThemeOptionChange}
+          onChange={(e: any) => {
+            setValue(e.target.value)
+            ui.onThemeOptionChange(e.target.value)
+          }}
         >
           <Select.Option value="system">System default</Select.Option>
           <Select.Option value="dark">Dark</Select.Option>
