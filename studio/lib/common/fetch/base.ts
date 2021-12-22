@@ -88,7 +88,7 @@ export function getAccessToken() {
 }
 
 // get param from URL fragment
-function getParameterByName(name: string, url?: string) {
+export function getParameterByName(name: string, url?: string) {
   // ignore if server-side
   if (typeof window === 'undefined') return ''
 

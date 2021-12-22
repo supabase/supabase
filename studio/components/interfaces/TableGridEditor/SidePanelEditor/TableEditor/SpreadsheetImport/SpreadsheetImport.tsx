@@ -1,14 +1,15 @@
-import { useCallback, useState, FC } from 'react'
+import { useCallback, useState, FC, useEffect } from 'react'
 import { debounce, includes } from 'lodash'
-import { SidePanel, Typography } from '@supabase/ui'
+import { SidePanel, Typography, Tabs, IconArrowRight, IconChevronRight } from '@supabase/ui'
 
 import { useStore } from 'hooks'
-import Telemetry from 'lib/telemetry'
 import ActionBar from '../../ActionBar'
-import { parseSpreadsheet, parseSpreadsheetText } from './SpreadsheetImport.utils'
-import { UPLOAD_FILE_TYPES } from './SpreadsheetImport.constants'
 import SpreadSheetTextInput from './SpreadSheetTextInput'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
+import SpreadsheetPreview from './SpreadsheetPreview'
+import { SpreadsheetData } from './SpreadsheetImport.types'
+import { parseSpreadsheet, parseSpreadsheetText } from './SpreadsheetImport.utils'
+import { UPLOAD_FILE_TYPES, EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
 
 interface Props {
   debounceDuration?: number
@@ -29,17 +30,25 @@ const SpreadsheetImport: FC<Props> = ({
 }) => {
   const { ui } = useStore()
 
-  const [spreadsheetData, setSpreadsheetData] = useState<any>({
-    headers: headers,
-    rows: rows,
-    rowCount: 0,
-  })
+  useEffect(() => {
+    if (visible) {
+      if (headers.length === 0) {
+        resetSpreadsheetImport()
+      }
+    }
+  }, [visible])
 
   const [input, setInput] = useState<string>('')
   const [uploadedFile, setUploadedFile] = useState<any>(null)
-
-  const [view, setView] = useState<string>('fileUpload')
   const [parseProgress, setParseProgress] = useState<number>(0)
+  const [spreadsheetData, setSpreadsheetData] = useState<SpreadsheetData>({
+    headers: headers,
+    rows: rows,
+    rowCount: 0,
+    columnTypeMap: {},
+  })
+  const [errors, setErrors] = useState<any>([])
+  const [expandedErrors, setExpandedErrors] = useState<string[]>([])
 
   const onProgressUpdate = (progress: number) => {
     setParseProgress(progress)
@@ -56,62 +65,60 @@ const SpreadsheetImport: FC<Props> = ({
       })
     } else {
       setUploadedFile(file)
-      const { headers, rowCount, rowPreview, errors } = await parseSpreadsheet(
+      const { headers, rowCount, columnTypeMap, errors } = await parseSpreadsheet(
         file,
         onProgressUpdate
       )
-      if (errors.length <= 5) {
-        errors.map((error: any) => {
-          ui.setNotification({
-            category: 'error',
-            message: `Error found at row ${error.row} - ${error.type}: ${error.code}`,
-          })
-        })
-      } else if (errors.length > 5) {
+      if (errors.length > 0) {
         ui.setNotification({
           error: errors,
           category: 'error',
-          message: `Multiple errors have been detected on ${errors.length} rows. Do check the file you have uploaded for any discrepancies.`,
+          message: `Some issues have been detected on ${errors.length} rows. More details below the content preview.`,
         })
       }
-      setSpreadsheetData({ headers, rowCount, rows: rowPreview })
+      setErrors(errors)
+      setSpreadsheetData({ headers, rows: [], rowCount, columnTypeMap })
     }
     event.target.value = ''
   }
 
-  const removeUploadedFile = () => {
-    setSpreadsheetData({ headers: [], rows: [], rowCount: 0 })
+  const resetSpreadsheetImport = () => {
+    setInput('')
+    setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
     setUploadedFile(null)
+    setErrors([])
+    setExpandedErrors([])
   }
 
-  const readInputSpreadsheet = async (text: string) => {
+  const readSpreadsheetText = async (text: string) => {
     if (text.length > 0) {
-      const { headers, rows, errors } = await parseSpreadsheetText(text)
-      if (errors.length <= 5) {
-        errors.map((error: any) => {
-          ui.setNotification({
-            error,
-            category: 'error',
-            message: `Error found at row ${error.row || 0} - ${error.type}: ${error.code}`,
-          })
-        })
-      } else if (errors.length > 5) {
+      const { headers, rows, columnTypeMap, errors } = await parseSpreadsheetText(text)
+      if (errors.length > 0) {
         ui.setNotification({
           error: errors,
           category: 'error',
-          message: `Multiple errors have been detected on ${errors.length} rows. Do check your input for any discrepancies.`,
+          message: `Some issues have been detected on ${errors.length} rows. More details below the content preview.`,
         })
       }
-      setSpreadsheetData({ headers, rows, rowCount: rows.length })
+      setErrors(errors)
+      setSpreadsheetData({ headers, rows, rowCount: rows.length, columnTypeMap })
     } else {
-      setSpreadsheetData({ headers: [], rows: [], rowCount: 0 })
+      setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
     }
   }
 
-  const handler = useCallback(debounce(readInputSpreadsheet, debounceDuration), [])
+  const handler = useCallback(debounce(readSpreadsheetText, debounceDuration), [])
   const onInputChange = (event: any) => {
     setInput(event.target.value)
     handler(event.target.value)
+  }
+
+  const onSelectExpandError = (key: string) => {
+    if (expandedErrors.includes(key)) {
+      setExpandedErrors(expandedErrors.filter((error) => error !== key))
+    } else {
+      setExpandedErrors(expandedErrors.concat([key]))
+    }
   }
 
   return (
@@ -120,7 +127,11 @@ const SpreadsheetImport: FC<Props> = ({
       visible={visible}
       align="right"
       title="Add content to new table"
-      onCancel={closePanel}
+      onCancel={(event: any) => {
+        // Only close if specifically hit the X button, this is to have the
+        // side panel work with toast messages (clicking on toast will close the panel)
+        if (event?.target) closePanel()
+      }}
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
@@ -131,72 +142,83 @@ const SpreadsheetImport: FC<Props> = ({
               file: uploadedFile,
               ...spreadsheetData,
             })
-            Telemetry.sendEvent('table_editor', 'spreadsheet_import_method', view)
           }}
         />
       }
     >
       <div className="flex flex-col">
-        <div className="flex items-center justify-center border dark:border-dark rounded-md w-full mb-4">
-          <div
-            className={`
-              flex items-center justify-center w-1/2 p-2 cursor-pointer hover:bg-bg-secondary-light dark:hover:bg-bg-alt-dark
-              transition ease-in-out duration-150 border-r dark:border-dark
-              ${
-                view === 'fileUpload'
-                  ? ' text-typography-body-light dark:text-typography-body-dark bg-bg-alt-light dark:bg-bg-alt-dark'
-                  : ' text-typography-body-secondary-light dark:text-typography-body-secondary-dark'
-              }
-            `}
-            onClick={() => setView('fileUpload')}
-          >
-            <p className="text-sm">Upload CSV</p>
-          </div>
-          <div
-            className={`
-              flex items-center justify-center w-1/2 p-2 cursor-pointer hover:bg-bg-secondary-light dark:hover:bg-bg-alt-dark
-              transition ease-in-out duration-150
-              ${
-                view === 'pasteText'
-                  ? ' text-typography-body-light dark:text-typography-body-dark bg-bg-alt-light dark:bg-bg-alt-dark'
-                  : ' text-typography-body-secondary-light dark:text-typography-body-secondary-dark'
-              }
-            `}
-            onClick={() => setView('pasteText')}
-          >
-            <p className="text-sm">Paste Text</p>
-          </div>
-        </div>
-
-        {view === 'pasteText' ? (
-          <SpreadSheetTextInput input={input} onInputChange={onInputChange} />
-        ) : (
-          <SpreadSheetFileUpload
-            parseProgress={parseProgress}
-            uploadedFile={uploadedFile}
-            onFileUpload={onFileUpload}
-            removeUploadedFile={removeUploadedFile}
-          />
-        )}
+        <Tabs block>
+          {/* @ts-ignore */}
+          <Tabs.Panel id="fileUpload" label="Upload CSV">
+            <SpreadSheetFileUpload
+              parseProgress={parseProgress}
+              uploadedFile={uploadedFile}
+              onFileUpload={onFileUpload}
+              removeUploadedFile={resetSpreadsheetImport}
+            />
+          </Tabs.Panel>
+          {/* @ts-ignore */}
+          <Tabs.Panel id="pasteText" label="Paste text">
+            <SpreadSheetTextInput input={input} onInputChange={onInputChange} />
+          </Tabs.Panel>
+        </Tabs>
       </div>
+
       {spreadsheetData.headers.length > 0 && (
-        <div className="py-5">
-          <Typography.Text>
-            <p>Content Preview</p>
-            <p className="mt-2 text-sm">
-              Your table will have {spreadsheetData.rowCount.toLocaleString()} rows and the
-              following {spreadsheetData.headers.length} columns.
-            </p>
-          </Typography.Text>
-          <div className="flex flex-wrap items-center mt-3">
-            {spreadsheetData.headers.map((header: string) => (
-              <Typography.Text key={`preview_${header}`}>
-                <div className="rounded-md border dark:border-gray-500 border-dashed py-1 px-3 mr-2 mb-2 text-sm">
-                  {header}
-                </div>
+        <div className="py-5 space-y-5">
+          <div className="space-y-2">
+            <div className="flex flex-col space-y-1">
+              <Typography.Text>Content Preview</Typography.Text>
+              <Typography.Text type="secondary">
+                Your table will have {spreadsheetData.rowCount.toLocaleString()} rows and the
+                following {spreadsheetData.headers.length} columns.
               </Typography.Text>
-            ))}
+            </div>
+            <SpreadsheetPreview headers={spreadsheetData.headers} />
           </div>
+          {errors.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex flex-col space-y-1">
+                <Typography.Text>Issues found in spreadsheet</Typography.Text>
+                <Typography.Text type="secondary">
+                  Your table can still be created nonetheless despite issues in the following rows.
+                </Typography.Text>
+              </div>
+              <div className="space-y-2">
+                {errors.map((error: any, idx: number) => {
+                  const key = `import-error-${idx}`
+                  const isExpanded = expandedErrors.includes(key)
+                  return (
+                    <div key={key} className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <IconChevronRight
+                          className={`cursor-pointer transform ${isExpanded ? 'rotate-90' : ''}`}
+                          size={14}
+                          onClick={() => onSelectExpandError(key)}
+                        />
+                        <Typography.Text className="w-14">Row: {error.row}</Typography.Text>
+                        <Typography.Text>{error.message}</Typography.Text>
+                        {error.data?.__parsed_extra && (
+                          <>
+                            <IconArrowRight size={14} />
+                            <Typography.Text>Extra field(s):</Typography.Text>
+                            {error.data?.__parsed_extra.map((value: any) => (
+                              <Typography.Text code small>
+                                {value}
+                              </Typography.Text>
+                            ))}
+                          </>
+                        )}
+                      </div>
+                      {isExpanded && (
+                        <SpreadsheetPreview headers={spreadsheetData.headers} rows={[error.data]} />
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </SidePanel>

@@ -56,7 +56,7 @@ const Footer = (props: Props) => {
                 </svg>
               </a>
 
-              <a href="https://discord.gg/gdDfTaNpGb" className="text-gray-300 hover:text-gray-400">
+              <a href="https://discord.supabase.com/" className="text-gray-300 hover:text-gray-400">
                 <span className="sr-only">Discord</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 71 55" aria-hidden="true">
                   <path
