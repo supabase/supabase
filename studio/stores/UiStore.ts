@@ -15,7 +15,6 @@ export interface IUiStore {
   profile?: User
 
   load: () => void
-  toggleTheme: () => void
   setTheme: (theme: 'dark' | 'light') => void
   setProjectRef: (ref?: string) => void
   setOrganizationSlug: (slug?: string) => void
@@ -79,15 +78,6 @@ export default class UiStore implements IUiStore {
         window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
       )
     if (localStorageThemeOption === 'light') return this.setTheme('light')
-    window.localStorage.setItem('theme', 'dark')
-    this.setTheme('dark')
-  }
-
-  toggleTheme() {
-    if (this.theme === 'dark') {
-      window.localStorage.setItem('theme', 'light')
-      return this.setTheme('light')
-    }
     window.localStorage.setItem('theme', 'dark')
     this.setTheme('dark')
   }
