@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { FC } from 'react'
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
@@ -20,8 +20,6 @@ const NavigationBar: FC<Props> = ({}) => {
   const activeRoute = router.pathname.split('/')[3]
   const productRoutes = generateProductRoutes(projectRef)
   const otherRoutes = generateOtherRoutes(projectRef)
-
-  const [value, setValue] = useState(ui.themeOption)
 
   return (
     <div className="h-screen w-14 flex flex-col justify-between p-2 overflow-y-hidden bg-sidebar-light dark:bg-sidebar-dark border-r dark:border-dark">
@@ -82,11 +80,8 @@ const NavigationBar: FC<Props> = ({}) => {
               <div className="w-[240px] py-1 flex items-center justify-between">
                 <Typography.Text>Theme</Typography.Text>
                 <Select
-                  value={value}
-                  onChange={(e: any) => {
-                    setValue(e.target.value)
-                    ui.onThemeOptionChange(e.target.value)
-                  }}
+                  value={ui.themeOption}
+                  onChange={(e: any) => ui.onThemeOptionChange(e.target.value)}
                 >
                   <Select.Option value="system">System default</Select.Option>
                   <Select.Option value="dark">Dark</Select.Option>
