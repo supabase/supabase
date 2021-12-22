@@ -95,3 +95,7 @@ export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
   storage: 'Storage',
   database: 'Database',
 }
+
+export const GOTRUE_ERRORS = {
+  UNVERIFIED_GITHUB_USER: 'Error sending confirmation mail',
+}
