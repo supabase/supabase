@@ -18,6 +18,8 @@ import { Button, IconX } from '@supabase/ui'
 
 import { RootStore } from 'stores'
 import { StoreProvider } from 'hooks'
+import { getParameterByName } from 'lib/common/fetch'
+import { GOTRUE_ERRORS } from 'lib/constants'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 
@@ -72,11 +74,12 @@ function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
 
   useEffect(() => {
-    if (router.asPath.includes('error_description')) {
+    const errorDescription = getParameterByName('error_description', router.asPath)
+    if (errorDescription === GOTRUE_ERRORS.UNVERIFIED_GITHUB_USER) {
       rootStore.ui.setNotification({
         category: 'error',
         message:
-          'Please verify your email on Github first before logging in to the Supabase dashboard',
+          'Please verify your email on Github first, then reach out to us at support@supabase.io to log into the dashboard',
       })
     }
   }, [])
