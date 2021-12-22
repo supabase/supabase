@@ -35,6 +35,7 @@ Flag.mockImplementation(({ children }) => <>{children}</>)
 import { LogPage } from 'pages/project/[ref]/settings/logs/[type]'
 import { render, fireEvent, waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {getToggleByText} from "../../helpers"
 
 beforeEach(() => {
   get.mockReset()
@@ -103,7 +104,7 @@ test('Search will trigger a log refresh', async () => {
   })
   render(<LogPage />)
 
-  userEvent.type(screen.getByPlaceholderText(/Filter/), 'something')
+  userEvent.type(screen.getByPlaceholderText(/Search/), 'something')
   await waitFor(
     () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('search_query'))
@@ -118,7 +119,7 @@ test('Search will trigger a log refresh', async () => {
 test('poll count for new messages', async () => {
   get.mockImplementation((url) => {
     if (url.includes('count')) {
-      return { data: [{ count: 3 }] }
+      return { data: [{ count: 125 }] }
     }
     return {
       data: [
@@ -133,10 +134,11 @@ test('poll count for new messages', async () => {
   })
   render(<LogPage />)
   await waitFor(() => screen.queryByText(/happened/) === null)
-  await waitFor(() => screen.getByText(/Load new logs/))
+  // should display new logs count
+  await waitFor(() => screen.getByText(/125/))
 
-  userEvent.click(screen.getByText(/Load new logs/))
-  await waitFor(() => screen.queryByText(/Load new logs/) === null)
+  userEvent.click(screen.getByText(/Refresh/))
+  await waitFor(() => screen.queryByText(/125/) === null)
   await waitFor(() => screen.getByText(/happened/))
 })
 
@@ -159,7 +161,14 @@ test('where clause will trigger a log refresh', async () => {
   const { container } = render(<LogPage />)
   let editor = container.querySelector('.monaco-editor')
   expect(editor).toBeFalsy()
-  userEvent.click(screen.getByText('Custom query'))
+  // TODO: abstract this out into a toggle selection helper
+  const toggle = getToggleByText(/via query/)
+  expect(toggle).toBeTruthy()
+  userEvent.click(toggle)
+  await waitFor(() => {
+    editor = container.querySelector('.monaco-editor')
+    expect(editor).toBeTruthy()
+  })
   editor = container.querySelector('.monaco-editor')
   userEvent.type(editor, 'metadata.field = something')
   await waitFor(
