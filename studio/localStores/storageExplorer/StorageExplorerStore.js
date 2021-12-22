@@ -64,6 +64,8 @@ class StorageExplorerStore {
   selectedItemsToMove = []
   selectedFilePreview = {}
 
+  DEFAULT_OPTIONS = { limit: LIMIT, offset: OFFSET, sortBy: { column: this.sortBy, order: 'asc' } }
+
   /* Supabase client */
   supabaseClient = null
 
@@ -764,7 +766,7 @@ class StorageExplorerStore {
     return null
   }
 
-  deleteFiles = async (files, showToast = true) => {
+  deleteFiles = async (files, updateExplorerUI = true) => {
     this.closeFilePreview()
 
     // If every file has the 'prefix' property, then just construct the prefix
@@ -798,12 +800,11 @@ class StorageExplorerStore {
     )
     this.filePreviewCache = updatedFilePreviewCache
 
-    if (showToast) {
+    if (updateExplorerUI) {
       toast.success(`Successfully deleted ${prefixes.length} file(s)`)
+      await this.refetchAllOpenedFolders()
+      this.clearSelectedItemsToDelete()
     }
-
-    await this.refetchAllOpenedFolders()
-    this.clearSelectedItemsToDelete()
   }
 
   downloadSelectedFiles = async () => {
@@ -995,9 +996,26 @@ class StorageExplorerStore {
 
   deleteFolder = async (folder) => {
     const files = await this.getAllItemsAlongFolder(folder)
-    const showFilesDeleteToast = false
+    const updateExplorerUI = false
 
-    await this.deleteFiles(files, showFilesDeleteToast)
+    await this.deleteFiles(files, updateExplorerUI)
+
+    // [Start] Check parent folder if its empty, if yes, reinstate the .emptyFolderPlaceholder
+    const prefixes = files[0].prefix.split('/')
+    const parentFolderPrefix = prefixes.slice(0, prefixes.length - 1).join('/')
+
+    const { data: items, error } = await this.supabaseClient.storage
+      .from(this.selectedBucket.name)
+      .list(parentFolderPrefix, this.DEFAULT_OPTIONS)
+    if (!error && parentFolderPrefix.length > 0 && items.length === 0) {
+      const prefixToPlaceholder = `${parentFolderPrefix}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`
+      await this.supabaseClient.storage
+        .from(this.selectedBucket.name)
+        .upload(prefixToPlaceholder, new File([], EMPTY_FOLDER_PLACEHOLDER_FILE_NAME))
+    }
+
+    await this.refetchAllOpenedFolders()
+    this.clearSelectedItemsToDelete()
     toast.success(`Successfully deleted ${folder.name}`)
   }
 
