@@ -28,7 +28,6 @@ const UsersList = ({}) => {
           <>
             {PageState.usersLoading && (
               <Table.tr>
-                {/* @ts-ignore */}
                 <Table.td
                   colSpan={7}
                   className="h-14 p-4 whitespace-nowrap border-t leading-5 text-gray-300 text-sm"
@@ -39,14 +38,17 @@ const UsersList = ({}) => {
             )}
             {!PageState.usersLoading && PageState.users.length == 0 && (
               <Table.tr>
-                {/* @ts-ignore */}
                 <Table.td
                   colSpan={7}
                   className="h-14 p-4 whitespace-nowrap border-t leading-5 text-gray-300 text-sm"
                 >
                   <div className="flex items-center space-x-3 opacity-75">
                     <IconAlertCircle size={16} strokeWidth={2} />
-                    <Typography.Text type="secondary">No users in your project yet</Typography.Text>
+                    <Typography.Text type="secondary">
+                      {PageState.filterKeywords
+                        ? `No users matched the search query "${PageState.filterKeywords}"`
+                        : 'No users in your project yet'}
+                    </Typography.Text>
                   </div>
                 </Table.td>
               </Table.tr>
