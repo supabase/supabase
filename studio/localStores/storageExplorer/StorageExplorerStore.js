@@ -12,6 +12,7 @@ import {
   some,
   chunk,
   get,
+  uniq,
 } from 'lodash'
 import toast from 'react-hot-toast'
 import { createClient } from '@supabase/supabase-js'
@@ -293,6 +294,8 @@ class StorageExplorerStore {
       return this.removeTempRows(columnIndex)
     }
 
+    this.updateFolderAfterEdit(formattedName, columnIndex)
+
     const emptyPlaceholderFile = `${formattedName}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`
     const pathToFolder = this.openedFolders
       .slice(0, columnIndex)
@@ -304,13 +307,12 @@ class StorageExplorerStore {
     await this.supabaseClient.storage
       .from(this.selectedBucket.name)
       .upload(formattedPathToEmptyPlaceholderFile, new File([], EMPTY_FOLDER_PLACEHOLDER_FILE_NAME))
+
     if (pathToFolder.length > 0) {
       await this.supabaseClient.storage
         .from(this.selectedBucket.name)
         .remove([`${pathToFolder}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`])
     }
-
-    this.updateFolderAfterEdit(formattedName, columnIndex)
   }
 
   setFilePreview = async (file) => {
@@ -766,7 +768,7 @@ class StorageExplorerStore {
     return null
   }
 
-  deleteFiles = async (files, updateExplorerUI = true) => {
+  deleteFiles = async (files, isDeleteFolder = false) => {
     this.closeFilePreview()
 
     // If every file has the 'prefix' property, then just construct the prefix
@@ -800,7 +802,18 @@ class StorageExplorerStore {
     )
     this.filePreviewCache = updatedFilePreviewCache
 
-    if (updateExplorerUI) {
+    if (!isDeleteFolder) {
+      // If parent folders are empty, reinstate .emptyFolderPlaceholder to persist them
+      const parentFolderPrefixes = uniq(
+        prefixes.map((prefix) => {
+          const segments = prefix.split('/')
+          return segments.slice(0, segments.length - 1).join('/')
+        })
+      )
+      await Promise.all(
+        parentFolderPrefixes.map((prefix) => this.validateParentFolderEmpty(prefix))
+      )
+
       toast.success(`Successfully deleted ${prefixes.length} file(s)`)
       await this.refetchAllOpenedFolders()
       this.clearSelectedItemsToDelete()
@@ -994,24 +1007,28 @@ class StorageExplorerStore {
     this.openedFolders = updatedOpenedFolders
   }
 
-  deleteFolder = async (folder) => {
-    const files = await this.getAllItemsAlongFolder(folder)
-    const updateExplorerUI = false
-
-    await this.deleteFiles(files, updateExplorerUI)
-
-    // [Start] Check parent folder if its empty, if yes, reinstate the .emptyFolderPlaceholder
-    const prefixes = files[0].prefix.split('/')
-    const parentFolderPrefix = prefixes.slice(0, prefixes.length - 1).join('/')
-
+  // Check parent folder if its empty, if yes, reinstate .emptyFolderPlaceholder
+  // Used when deleting folder or deleting files
+  validateParentFolderEmpty = async (parentFolderPrefix) => {
     const { data: items, error } = await this.supabaseClient.storage
       .from(this.selectedBucket.name)
       .list(parentFolderPrefix, this.DEFAULT_OPTIONS)
-    if (!error && parentFolderPrefix.length > 0 && items.length === 0) {
+    if (!error && items.length === 0) {
       const prefixToPlaceholder = `${parentFolderPrefix}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`
       await this.supabaseClient.storage
         .from(this.selectedBucket.name)
         .upload(prefixToPlaceholder, new File([], EMPTY_FOLDER_PLACEHOLDER_FILE_NAME))
+    }
+  }
+
+  deleteFolder = async (folder) => {
+    const isDeleteFolder = true
+    const files = await this.getAllItemsAlongFolder(folder)
+    await this.deleteFiles(files, isDeleteFolder)
+
+    const parentFolderPrefix = this.openedFolders.map((folder) => folder.name).join('/')
+    if (parentFolderPrefix.length > 0) {
+      await this.validateParentFolderEmpty(parentFolderPrefix)
     }
 
     await this.refetchAllOpenedFolders()
