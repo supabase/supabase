@@ -46,7 +46,11 @@ const UsersList = ({}) => {
                 >
                   <div className="flex items-center space-x-3 opacity-75">
                     <IconAlertCircle size={16} strokeWidth={2} />
-                    <Typography.Text type="secondary">No users in your project yet</Typography.Text>
+                    <Typography.Text type="secondary">
+                      {PageState.filterKeywords
+                        ? `No users matched the search query "${PageState.filterKeywords}"`
+                        : 'No users in your project yet'}
+                    </Typography.Text>
                   </div>
                 </Table.td>
               </Table.tr>
