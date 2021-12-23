@@ -397,11 +397,11 @@ export default function IndexPage() {
               {pricingFaq.map((faq) => {
                 return (
                   <div>
-                  <Accordion bordered>
-                    <Accordion.Item label={faq.question}>
-                      <Typography>{faq.answer}</Typography>
-                    </Accordion.Item>
-                  </Accordion>
+                    <Accordion bordered>
+                      <Accordion.Item label={faq.question}>
+                        <Typography>{faq.answer}</Typography>
+                      </Accordion.Item>
+                    </Accordion>
                   </div>
                 )
               })}
