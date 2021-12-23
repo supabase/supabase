@@ -396,11 +396,13 @@ export default function IndexPage() {
             <div className="grid grid-cols-2 gap-y-10 gap-x-10">
               {pricingFaq.map((faq) => {
                 return (
+                  <div>
                   <Accordion bordered>
                     <Accordion.Item label={faq.question}>
                       <Typography>{faq.answer}</Typography>
                     </Accordion.Item>
                   </Accordion>
+                  </div>
                 )
               })}
             </div>
