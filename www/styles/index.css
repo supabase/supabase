@@ -92,6 +92,11 @@ body {
   /* overflow: hidden; */
 }
 
+::selection {
+  @apply bg-green-300;
+  color: #333 !important;
+}
+
 .section--bg-masked {
   position: absolute;
   width: 100%;
