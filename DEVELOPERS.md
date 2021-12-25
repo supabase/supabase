@@ -1,7 +1,7 @@
 # Developing Supabase
 
 * [Development Setup](#Development-Setup)
-* [Installing Dependencies](##Installing-Dependencies)
+* [Installing Dependencies](#Installing-Dependencies)
 * [Building Supabase](#Building-Supabase)
 * [Start a Development Server](#Start-a-Development-Server)
 
