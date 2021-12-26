@@ -399,7 +399,9 @@ export default function IndexPage() {
                   <div>
                     <Accordion bordered>
                       <Accordion.Item label={faq.question}>
-                        <Typography>{faq.answer}</Typography>
+                        <Typography>
+                          <ReactMarkdown>{faq.answer}</ReactMarkdown>
+                        </Typography>
                       </Accordion.Item>
                     </Accordion>
                   </div>
