@@ -37,7 +37,7 @@ export default function Doc({
   }
 
   return (
-    <Layout meta={meta} toc={toc} menuItems={menuItems[page]}>
+    <Layout meta={meta} toc={toc} menuItems={menuItems[page]} currentPage={page}>
       <MDXProvider components={components}>
         <MDXRemote {...content} components={components} />
       </MDXProvider>
