@@ -10,13 +10,18 @@ import 'styles/contextMenu.scss'
 
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import type { AppProps } from 'next/app'
-import { Toaster } from 'react-hot-toast'
+import { Toaster, ToastBar, toast } from 'react-hot-toast'
+import { Button, IconX } from '@supabase/ui'
+
 import { RootStore } from 'stores'
 import { StoreProvider } from 'hooks'
+import { getParameterByName } from 'lib/common/fetch'
+import { GOTRUE_ERRORS } from 'lib/constants'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
-import { useState } from 'react'
 
 const PortalRootWithNoSSR = dynamic(
   // @ts-ignore
@@ -42,12 +47,42 @@ const PortalToast = () => (
           duration: 8000,
         },
       }}
-    />
+    >
+      {(t) => (
+        <ToastBar toast={t} style={t.style}>
+          {({ icon, message }) => (
+            <>
+              {icon}
+              {message}
+              {t.type !== 'loading' && (
+                <div className="ml-4">
+                  <Button className="!p-1" type="text" onClick={() => toast.dismiss(t.id)}>
+                    <IconX size={14} strokeWidth={2} />
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </ToastBar>
+      )}
+    </Toaster>
   </PortalRootWithNoSSR>
 )
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [rootStore] = useState(() => new RootStore())
+  const router = useRouter()
+
+  useEffect(() => {
+    const errorDescription = getParameterByName('error_description', router.asPath)
+    if (errorDescription === GOTRUE_ERRORS.UNVERIFIED_GITHUB_USER) {
+      rootStore.ui.setNotification({
+        category: 'error',
+        message:
+          'Please verify your email on Github first, then reach out to us at support@supabase.io to log into the dashboard',
+      })
+    }
+  }, [])
 
   return (
     <StoreProvider rootStore={rootStore}>

@@ -75,7 +75,9 @@ const TableEditorMenu: FC<Props> = ({
   }
 
   const schemas: PostgresSchema[] = meta.schemas.list()
-  const tables: PostgresTable[] = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
+  const tables: PostgresTable[] = meta.tables.list(
+    (table: PostgresTable) => table.schema === selectedSchema
+  )
 
   const schemaTables =
     searchText.length === 0
@@ -89,7 +91,7 @@ const TableEditorMenu: FC<Props> = ({
 
   // Temp fix - Ideally we'd just take up all the remaining space but
   // can't seem to figure that out immediately
-  const maxScrollHeight = schemaViews.length > 0 ? 270 : 520
+  const maxScrollHeight = schemaViews.length > 0 ? 270 : 515
 
   return (
     <div className="my-6 flex flex-col flex-grow">

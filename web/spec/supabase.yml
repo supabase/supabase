@@ -150,6 +150,7 @@ info:
         items:
           - subscribe()
           - removeSubscription()
+          - removeAllSubscriptions()
           - getSubscriptions()
       - name: 'Storage'
         items:
@@ -215,6 +216,11 @@ pages:
       ```bash
       npm install @supabase/supabase-js
       ```
+      
+      Via Yarn
+      ```bash
+      yarn add @supabase/supabase-js
+      ```
 
       Find the source code on [GitHub](https://github.com/supabase/supabase-js).  
 
@@ -275,8 +281,8 @@ pages:
           })
           ```
 
-          By default the API server points to the `public` schema. You can enable others database schemas within the Dashboard. 
-          Go to `Settings > API > Schema` and add the schema which you want to expose to on the API.
+          By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard. 
+          Go to `Settings > API > Schema` and add the schema which you want to expose to the API.
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
       - name: Custom `fetch` implementation
@@ -1269,6 +1275,19 @@ pages:
           supabase.removeSubscription(mySubscription)
           ```
 
+  removeAllSubscriptions():
+    title: 'removeAllSubscriptions()'
+    $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.removeAllSubscriptions'
+    notes: |
+      - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
+    examples:
+      - name: Removes all subscriptions
+        isSpotlight: true
+        js: |
+          ```js
+          supabase.removeAllSubscriptions()
+          ```
+
   getSubscriptions():
     title: 'getSubscriptions()'
     $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.getSubscriptions'
@@ -1687,6 +1706,26 @@ pages:
         .select('name, country_id')
         .gte('population', 1000)
         .lt('population', 10000)
+      ```
+
+      ### Conditional Chaining
+
+      Filters can be built up one step at a time and then executed. For example:
+
+      ```js
+      const filterByName = null
+      const filterPopLow = 1000
+      const filterPopHigh = 10000
+
+      let query = supabase
+        .from('cities')
+        .select('name, country_id')
+        
+      if (filterByName)  { query = query.eq('name', filterByName) }
+      if (filterPopLow)  { query = query.gte('population', filterPopLow) }
+      if (filterPopHigh) { query = query.lt('population', filterPopHigh) }
+
+      const { data, error } = await query
       ```
 
   .or():

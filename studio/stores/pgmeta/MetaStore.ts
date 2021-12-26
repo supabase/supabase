@@ -116,6 +116,7 @@ export default class MetaStore implements IMetaStore {
 
   connectionString?: string
   baseUrl: string
+  queryBaseUrl: string
   excludedSchemas = [
     'auth',
     'extensions',
@@ -132,6 +133,7 @@ export default class MetaStore implements IMetaStore {
     const { projectRef, connectionString } = options
     this.rootStore = rootStore
     this.baseUrl = `/api/pg-meta/${projectRef}`
+    this.queryBaseUrl = `${API_URL}/pg-meta/${projectRef}`
 
     const headers: any = {}
     if (IS_PLATFORM && connectionString) {
@@ -166,7 +168,7 @@ export default class MetaStore implements IMetaStore {
     try {
       const headers: any = { 'Content-Type': 'application/json' }
       if (this.connectionString) headers['x-connection-encrypted'] = this.connectionString
-      const url = `${this.baseUrl}/query`
+      const url = `${this.queryBaseUrl}/query`
       const response = await post(url, { query: value }, { headers })
       if (response.error) throw response.error
 
@@ -302,6 +304,8 @@ export default class MetaStore implements IMetaStore {
     // Duplicate foreign key constraints over
     const relationships = metadata.duplicateTable.relationships
     if (relationships.length > 0) {
+      // @ts-ignore, but might need to investigate, sounds bad:
+      // Type instantiation is excessively deep and possibly infinite
       relationships.map(async (relationship: PostgresRelationship) => {
         const relation = await this.rootStore.meta.addForeignKey({
           ...relationship,
@@ -410,13 +414,12 @@ export default class MetaStore implements IMetaStore {
           const { error }: any = await this.insertRowsViaSpreadsheet(
             importContent.file,
             table,
-            (progress: any) => {
+            (progress: number) => {
               this.rootStore.ui.setNotification({
                 id: toastId,
+                progress,
                 category: 'loading',
-                message: `Adding ${importContent.rowCount.toLocaleString()} rows to ${
-                  table.name
-                }... (${progress}%)`,
+                message: `Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`,
               })
             }
           )
@@ -432,25 +435,24 @@ export default class MetaStore implements IMetaStore {
 
           if (!isUndefined(error)) {
             this.rootStore.ui.setNotification({
-              id: toastId,
               category: 'error',
-              message: `Table ${table.name} has been created but we ran into an error while inserting rows:
-            ${error.message} - ${error.details}`,
+              message: 'Do check your spreadsheet if there are any discrepancies.',
             })
             this.rootStore.ui.setNotification({
               category: 'error',
-              message: 'Do check your spreadsheet if there are any discrepancies.',
+              message: `Table ${table.name} has been created but we ran into an error while inserting rows:
+            ${error.message}`,
+              error,
             })
           }
         } else {
           // Via text copy and paste
-          await this.insertTableRows(table, importContent.rows, (progress: any) => {
+          await this.insertTableRows(table, importContent.rows, (progress: number) => {
             this.rootStore.ui.setNotification({
               id: toastId,
+              progress,
               category: 'loading',
-              message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
-                table.name
-              }... (${progress}%)`,
+              message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`,
             })
           })
 
@@ -527,8 +529,7 @@ export default class MetaStore implements IMetaStore {
           ...column,
           isPrimaryKey: false,
         })
-        const addedColumn: any = await this.createColumn(columnPayload, column.foreignKey)
-        if (addedColumn.error) throw addedColumn.error
+        await this.createColumn(columnPayload, column.foreignKey)
       } else {
         const originalColumn = find(originalColumns, { id: column.id })
         if (originalColumn) {
@@ -545,13 +546,7 @@ export default class MetaStore implements IMetaStore {
               category: 'loading',
               message: `Updating column ${column.name} from ${updatedTable.name}`,
             })
-            const updatedColumn: any = await this.updateColumn(
-              column.id,
-              columnPayload,
-              updatedTable,
-              column.foreignKey
-            )
-            if (updatedColumn.error) throw updatedColumn.error
+            await this.updateColumn(column.id, columnPayload, updatedTable, column.foreignKey)
           }
         }
       }
@@ -573,7 +568,7 @@ export default class MetaStore implements IMetaStore {
   async insertRowsViaSpreadsheet(
     file: any,
     table: PostgresTable,
-    onProgressUpdate: (progress: any) => void
+    onProgressUpdate: (progress: number) => void
   ) {
     let chunkNumber = 0
     let insertError: any = undefined
@@ -601,7 +596,7 @@ export default class MetaStore implements IMetaStore {
           } else {
             chunkNumber += 1
             const progress = (chunkNumber * CHUNK_SIZE) / file.size
-            const progressPercentage = progress > 1 ? 100 : Number((progress * 100).toFixed(2))
+            const progressPercentage = progress > 1 ? 100 : progress * 100
             onProgressUpdate(progressPercentage)
             parser.resume()
           }
@@ -618,7 +613,7 @@ export default class MetaStore implements IMetaStore {
   async insertTableRows(
     table: PostgresTable,
     rows: any,
-    onProgressUpdate: (progress: any) => void
+    onProgressUpdate: (progress: number) => void
   ) {
     let insertError = undefined
     let insertProgress = 0
@@ -649,7 +644,7 @@ export default class MetaStore implements IMetaStore {
       if (hasFailedBatch) {
         break
       }
-      onProgressUpdate((insertProgress * 100).toFixed(2))
+      onProgressUpdate(insertProgress * 100)
     }
   }
 }

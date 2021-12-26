@@ -31,15 +31,17 @@ This command will create a `supabase` folder which holds all the configuration f
 supabase start
 ```
 
-This command uses Docker Compose to start all the open source [services](/docs/#how-it-works) of Supabase. This command will take a while to run, there are a lot of services to build.
+This command uses Docker to start all the open source [services](/docs/#how-it-works) of Supabase. This command will take a while to run, there are a lot of services to build.
 
 Once this is running, you will see an output that contains your local Supabase credentials:
 
 ```txt
 Started local development setup.
-API URL: http://localhost:54321
-DB URL: postgresql://postgres:postgres@localhost:5432/postgres
-anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJ9.ZopqoUt20nEV9cklpv9e3yw3PVyZLmKs5qLD6nGL1SI
+
+         API URL: http://localhost:54321
+          DB URL: postgresql://postgres:postgres@localhost:54322/postgres
+      Studio URL: http://localhost:54323
+        anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJ9.ZopqoUt20nEV9cklpv9e3yw3PVyZLmKs5qLD6nGL1SI
 service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIn0.M2d2z4SFn5C7HlJlaSLfrzuYim9nbY_XI40uWFN3hEE
 ```
 
@@ -55,7 +57,7 @@ values={[
 
 ```sh
 # Default URL:
-postgresql://postgres:postgres@localhost:5432/postgres
+postgresql://postgres:postgres@localhost:54322/postgres
 ```
 
 The local Postgres instance can be accessed through [`psql`](https://www.postgresql.org/docs/current/app-psql.html)
@@ -64,7 +66,7 @@ or any other Postgres client, such as [pgadmin](https://www.pgadmin.org/).
 For example:
 
 ```bash
-psql 'postgresql://postgres:postgres@localhost:5432/postgres'
+psql 'postgresql://postgres:postgres@localhost:54322/postgres'
 ```
 
 </TabItem>
@@ -81,13 +83,13 @@ You can learn more about these JWT headers in our [Resources](/docs/learn/auth-d
 
 ```sh
 curl 'http://localhost:54321/rest/v1/' \
-    -H "apikey: SUPABASE_KEY" \
-    -H "Authorization: Bearer SUPABASE_KEY"
+    -H "apikey: <anon key>" \
+    -H "Authorization: Bearer <anon key>"
 
-http://localhost:54321/v1/rest/v1/           # REST (PostgREST)
-http://localhost:54321/v1/realtime/v1/       # Realtime
-http://localhost:54321/v1/storage/v1/        # Storage
-http://localhost:54321/v1/auth/v1/           # Auth (GoTrue)
+http://localhost:54321/rest/v1/           # REST (PostgREST)
+http://localhost:54321/realtime/v1/       # Realtime
+http://localhost:54321/storage/v1/        # Storage
+http://localhost:54321/auth/v1/           # Auth (GoTrue)
 ```
 
 </TabItem>

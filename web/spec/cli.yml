@@ -2,17 +2,13 @@ openref: 0.1
 
 info:
   id: reference/cli
-  title: Getting started
+  title: About
   description: |
-
     The Supabase CLI can be found in our [CLI](https://github.com/supabase/cli) repository.
 
-    The CLI is still under heavy development, but it will contain all the functionality for working with Supabase projects and the Supabase platform.
-
     - [x] Running Supabase locally
-    - [x] Self-hosting
-    - [ ] Managing database migrations (in progress)
-    - [ ] Pushing your local changes to production
+    - [x] Managing database migrations
+    - [x] Pushing your local changes to production
     - [ ] Manage your Supabase Account
     - [ ] Manage your Supabase Projects
     - [ ] Generating types directly from your database schema
@@ -20,78 +16,194 @@ info:
 
     ## Installing the CLI
 
-    ```bash
-    npm install supabase -g
-    ```
+    Installation instructions can be found [here](https://github.com/supabase/cli#install-the-cli).
 
-    There may be additional steps that you need to follow to setup the CLI. Located [here](https://supabase.com/docs/guides/local-development).
+    ## Support
 
+    Report issues to our [issue tracker](https://github.com/supabase/cli/issues).
   definition: spec/combined.json
   libraries:
-    - name: 'sh'
-      id: 'sh'
-      version: '0.0.1'
+    - name: "sh"
+      id: "sh"
+      version: "0.0.1"
   docs:
     path: reference/cli/
     sidebar:
-      - name: 'About'
+      - name: "About"
         items:
           - index
-          - supabase init
-      - name: 'Local Development'
+      - name: "Command reference"
         items:
+          - supabase help
+          - supabase init
           - supabase start
-          - supabase stop
-          - supabase eject
+          - supabase db branch list
+          - supabase db branch create
+          - supabase db branch delete
+          - supabase db switch
+          - supabase db changes
+          - supabase db commit
+          - supabase db reset
+          - supabase db remote set
+          - supabase db remote commit
+          - supabase db push
+          - supabase migration new
+      - name: "Config reference"
+        items:
+          - Config reference
 
 pages:
-  supabase init:
+  supabase help:
     description: |
-      ```bash
-      supabase init
+      ```
+      Help provides help for any command in the application.
+      Simply type supabase help [path to command] for full details.
+
+      Usage:
+        supabase help [command]
       ```
 
-      This command will create a .supabase folder which holds all the configurations for developing your project locally. You don't need to check this into version control.
+  supabase init:
+    description: |
+      ```
+      Initialize a project to use Supabase CLI.
 
-      After you run `supabase init` you will be guided through a series of questions, and if everything goes well, you will see an output similar to this:
-
-      ```txt
-      ✔ Port for Supabase URL: · 8000
-      ✔ Port for PostgreSQL database: · 5432
-      ✔ Project initialized.
-      Supabase URL: http://localhost:8000
-      Supabase Key: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJhdWQiOiIiLCJzdWIiOiIiLCJSb2xlIjoicG9zdGdyZXMifQ.magCcozTMKNrl76Tj2dsM7XTl_YH0v0ilajzAvIlw3U
-      Database URL: postgres://postgres:postgres@localhost:5432/postgres
-
-      Run supabase start to start the local emulator.
+      Usage:
+        supabase init
       ```
 
   supabase start:
     description: |
-      ```bash
-      supabase start
+      ```
+      Start the Supabase local development setup.
+
+      Usage:
+        supabase start
       ```
 
-      This command uses Docker Compose to start all the open source [services](/docs/#how-it-works) of Supabase. This command will take a while to run, there are a lot of services to build.
-
-      Once this is running, you will see the health services in Docker Dashboard:
-
-      ![Docker Supabase](/img/docker-supabase.png)
-
-  supabase stop:
+  supabase db branch list:
     description: |
-      ```bash
-      supabase stop
+      ```
+      List branches.
+
+      Usage:
+        supabase db branch list
       ```
 
-      When you are finished with Supabase, run `supabase stop` to stop the Docker services.
-
-  supabase eject:
+  supabase db branch create:
     description: |
-      ```bash
-      supabase eject
+      ```
+      Create a branch.
+
+      Usage:
+        supabase db branch create <branch name>
       ```
 
-      Run in any folder to create a `docker` folder with a `docker-compose.yml`. This is useful for self-hosting or adding custom configuration. 
+  supabase db branch delete:
+    description: |
+      ```
+      Delete a branch.
 
-      See our [Self Hosting](/docs/guides/hosting/overview) docs for more details.
+      Usage:
+        supabase db branch delete <branch name>
+      ```
+
+  supabase db switch:
+    description: |
+      ```
+      Switch branches.
+
+      Usage:
+        supabase db switch <branch name>
+      ```
+
+  supabase db changes:
+    description: |
+      ```
+      Diffs the local database with current migrations, then print the diff to standard output.
+
+      Usage:
+        supabase db changes
+      ```
+
+  supabase db commit:
+    description: |
+      ```
+      Diffs the local database with current migrations, writing it as a new migration.
+
+      Usage:
+        supabase db commit <migration name>
+      ```
+
+  supabase db reset:
+    description: |
+      ```
+      Resets the local database to reflect current migrations. Any changes on the local database that is not committed will be lost.
+
+      Usage:
+        supabase db reset
+      ```
+
+  supabase db remote set:
+    description: |
+      ```
+      Set the remote database to push migrations to.
+
+      Usage:
+        supabase db remote set <remote database url>
+      ```
+
+  supabase db remote commit:
+    description: |
+      ```
+      Commit changes on the remote database since the last pushed migration.
+
+      Usage:
+        supabase db remote commit
+      ```
+
+  supabase db push:
+    description: |
+      ```
+      Push new migrations to the remote database.
+
+      Usage:
+        supabase db push
+      ```
+
+  supabase migration new:
+    description: |
+      ```
+      Create an empty migration.
+
+      Usage:
+        supabase migration new <migration name>
+      ```
+
+  Config reference:
+    description: |
+      The config file resides in `supabase/config.json` after you run `supabase init`.
+
+      #### `projectId` (required)
+
+      A string used to distinguish different Supabase projects on the same host. Defaults to the working directory name when running `supabase init`.
+
+      #### `ports.api` (required)
+
+      Host port used for the API URL. Defaults to `54321`.
+
+      #### `ports.db` (required)
+
+      Host port used for the DB URL. Defaults to `54322`.
+
+      #### `ports.studio` (required)
+
+      Host port used for Supabase Studio. Defaults to `54323`.
+
+      #### `ports.inbucket` (optional)
+
+      Host port used for the web interface of Inbucket email testing server. When not specified, emails are automatically confirmed. When specified, emails are not sent to the recipient, but rather monitored and accessible via the web interface.
+
+      #### `dbVersion` (required)
+
+      Server version number used for the database. This needs to match the server version number of the remote database you intend to link to with `supabase db remote set`. You can retrieve it by running `SHOW server_version_num`.
