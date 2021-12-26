@@ -52,7 +52,7 @@ info:
         <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
         <td>-</td>
         <td>-</td>
-        <td>-</td>
+        <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">storage-go</a></td>
       </tr>
       <tr>
         <td>Java</td>
@@ -691,7 +691,7 @@ pages:
     notes: |
       - Fetches the user object from the database instead of local storage.
       - Note that user() fetches the user object from local storage which might not be the most updated.
-      - Requires the user's access_token. 
+      - Requires the user's access_token.
     examples:
       - name: Fetch the user object using the access_token jwt.
         isSpotlight: true
