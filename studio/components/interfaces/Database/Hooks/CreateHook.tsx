@@ -2,7 +2,7 @@ import { FC, useEffect, createContext, useContext, FormEvent } from 'react'
 import Link from 'next/link'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { isEmpty, mapValues, has, without, union, filter, keyBy } from 'lodash'
+import { isEmpty, mapValues, has, without, union, filter, keyBy, isUndefined } from 'lodash'
 import { Dictionary } from '@supabase/grid'
 import {
   Input,
@@ -244,7 +244,7 @@ class CreateHookStore implements ICreateHookStore {
         break
       }
       default: {
-        if (has(this.formState, key) && idx) {
+        if (has(this.formState, key) && !isUndefined(idx)) {
           ;(this.formState as any)[key].value[idx] = value
         } else {
           ;(this.formState as any)[key] = { value: [{ value }] }
@@ -357,11 +357,11 @@ function isValidHttpUrl(value: string) {
 
 const CreateHookContext = createContext<ICreateHookStore | null>(null)
 
-type CreateHookProps = {
+interface CreateHookProps {
   hook?: any
   visible: boolean
   setVisible: (value: boolean) => void
-} & any
+}
 
 const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) => {
   const { meta, ui } = useStore()
@@ -724,7 +724,7 @@ const RadioGroupHookService: FC = observer(({}) => {
   )
 })
 
-type RadioHookService = {
+interface RadioHookService {
   id: string
   description: string
   label: string
@@ -910,7 +910,7 @@ const InputMultiServiceHeaders: FC = observer(({}) => {
   )
 })
 
-type InputServiceHeaderProps = {
+interface InputServiceHeaderProps {
   idx: number
   name: string
   value: string
@@ -1019,7 +1019,7 @@ const InputMultiServiceParams: FC = observer(({}) => {
   )
 })
 
-type InputServiceParamsProps = {
+interface InputServiceParamsProps {
   idx: number
   name: string
   value: string

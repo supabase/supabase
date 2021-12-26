@@ -1,4 +1,4 @@
-import { Badge, Card, Divider, IconFile, Space, Typography } from '@supabase/ui'
+import { Badge, Card, Divider, IconChevronLeft, IconFile, Space, Typography } from '@supabase/ui'
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
 import hydrate from 'next-mdx-remote/hydrate'
@@ -36,7 +36,7 @@ const slug = require('rehype-slug')
 const toc = require('markdown-toc')
 
 export async function getStaticPaths() {
-  const paths = getAllPostSlugs()
+  const paths = getAllPostSlugs('_blog')
   return {
     paths,
     fallback: false,
@@ -45,7 +45,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }: any) {
   const filePath = `${params.year}-${params.month}-${params.day}-${params.slug}`
-  const postContent = await getPostdata(filePath)
+  const postContent = await getPostdata(filePath, '_blog')
   const { data, content } = matter(postContent)
 
   const mdxSource: any = await renderToString(content, {
@@ -57,9 +57,9 @@ export async function getStaticProps({ params }: any) {
     },
   })
 
-  const relatedPosts = getSortedPosts(5, mdxSource.scope.tags)
+  const relatedPosts = getSortedPosts('_blog', 5, mdxSource.scope.tags)
 
-  const allPosts = getSortedPosts()
+  const allPosts = getSortedPosts('_blog')
 
   const currentIndex = allPosts
     .map(function (e) {
@@ -132,7 +132,7 @@ function BlogPostPage(props: any) {
         </Space>
       </div>
       <div>
-        <Typography.Title level={5}>Table of contents</Typography.Title>
+        <Typography.Text type="secondary">Table of contents</Typography.Text>
         <Typography>
           <div className={blogStyles['toc']}>
             <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
@@ -174,33 +174,47 @@ function BlogPostPage(props: any) {
         }}
       />
       <DefaultLayout>
-        <div className="bg-white dark:bg-dark-800 overflow-hidden mb-12">
-          <div className="container px-8 sm:px-16 xl:px-20 lg:mt-16 mx-auto">
-            <div className="max-w-6xl mx-auto">
-              <div className="lg:py-12 grid grid-cols-12 lg:gap-16">
-                <div className="col-span-12 lg:col-span-10">
-                  <Link href={`/blog`} as={`/blog`}>
-                    <a>
-                      <Typography.Text type="secondary">
-                        <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
-                          View more posts
-                        </span>
-                      </Typography.Text>
-                    </a>
-                  </Link>
-                  <Space className="my-4">
+        <div
+          className="
+          bg-white dark:bg-dark-800
+            container px-8 sm:px-16 xl:px-20 mx-auto
+            py-16
+          "
+        >
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-12 lg:col-span-2 mb-2">
+              {/* Back button */}
+              <Typography.Text type="secondary">
+                <a
+                  href={'/blog'}
+                  className="hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center"
+                >
+                  <IconChevronLeft style={{ padding: 0 }} />
+                  Back
+                </a>
+              </Typography.Text>
+            </div>
+            <div className="col-span-12 lg:col-span-12 xl:col-span-10">
+              {/* Title and description */}
+              <div className="mb-16 space-y-8 max-w-5xl">
+                <div className="space-y-4">
+                  <Typography.Text type="success">Blog post</Typography.Text>
+                  <Typography.Title>{props.blog.title}</Typography.Title>
+                  <div className="flex space-x-3">
                     <Typography.Text>{props.blog.date}</Typography.Text>
                     <Typography.Text type="secondary">•</Typography.Text>
                     <Typography.Text>
                       {generateReadingTime(props.blog.content.renderedOutput)}
                     </Typography.Text>
-                  </Space>
-                  <Typography.Title>{props.blog.title}</Typography.Title>
+                  </div>
                   {author && (
                     <div className="mt-6 mb-8 lg:mb-0">
                       <Space size={4}>
                         {author.author_image_url && (
-                          <img src={author.author_image_url} className="rounded-full w-10" />
+                          <img
+                            src={author.author_image_url}
+                            className="rounded-full w-10 border dark:border-dark"
+                          />
                         )}
                         <Space direction="vertical" size={0}>
                           <Typography.Text>{author.author}</Typography.Text>
@@ -213,10 +227,73 @@ function BlogPostPage(props: any) {
                   )}
                 </div>
               </div>
+              <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
+                {/* Content */}
+                <div className="col-span-12 lg:col-span-7 xl:col-span-7">
+                  {props.blog.thumb && (
+                    <img
+                      src={'/images/blog/' + props.blog.thumb}
+                      className="object-cover mb-8 border dark:border-gray-600"
+                      style={{ maxHeight: '520px' }}
+                    />
+                  )}
+                  <article className={blogStyles['article']}>
+                    <Typography>{content}</Typography>
+                  </article>
+                  <div className="grid lg:grid-cols-1 gap-8 py-8">
+                    <div>
+                      {props.prevPost && <NextCard post={props.prevPost} label="Last post" />}
+                    </div>
+                    <div>
+                      {props.nextPost && (
+                        <NextCard post={props.nextPost} label="Next post" className="text-right" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {/* Sidebar */}
+                <div className="col-span-12 lg:col-span-5 xl:col-span-3 xl:col-start-9 space-y-8">
+                  <Space direction="vertical" size={8} className="lg:mb-16 lg:top-16 lg:sticky">
+                    <div className="hidden lg:block">{toc}</div>
+                    <div>
+                      <div className="mb-4">
+                        <Typography.Text type="secondary">Related articles</Typography.Text>
+                      </div>
+                      <Space direction="vertical">
+                        {props.relatedPosts.map((post: any) => (
+                          <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
+                            <div>
+                              <Typography.Text className="cursor-pointer">
+                                <Space>
+                                  <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
+                                  <span className="hover:text-gray-900 dark:hover:text-white">
+                                    {post.title}
+                                  </span>
+                                </Space>
+                              </Typography.Text>
+                              <Divider light className="mt-2" />
+                            </div>
+                          </Link>
+                        ))}
+                        <Link href={`/blog`} as={`/blog`}>
+                          <div>
+                            <Typography.Text type="secondary">
+                              <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
+                                View all posts
+                              </span>
+                            </Typography.Text>
+                          </div>
+                        </Link>
+                      </Space>
+                    </div>
+                  </Space>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div className="container px-8 sm:px-16 xl:px-20 py-16 mx-auto">
+
+        {/* <div className="container px-8 sm:px-16 xl:px-20 py-16 mx-auto">
           <div className="max-w-6xl mx-auto">
             <div className="py-4 grid grid-cols-12 lg:gap-16">
               <div className="col-span-12 lg:col-span-8">
@@ -278,7 +355,8 @@ function BlogPostPage(props: any) {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
+
         <CTABanner />
       </DefaultLayout>
     </>

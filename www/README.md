@@ -6,23 +6,21 @@ This is a single repository for two different websites. Our documents were creat
 
 Install the [Vercel CLI](https://vercel.com/cli).
 
-You will need to run the marketing website and docs website separately.
+You will need to run the marketing website and docs website separately. To learn how to run both websites, see the [Development Guide](../DEVELOPERS.md) for more information.
 
-```
-# tab 1
-make dev
+```sh
+# step 1
+cd supabase
 
-# tab 2
+# step 2
 cd www
+
+# step 3
 npm install
 npm run dev
 
-# tab 3
-cd web/spec
-make
-npm install
-npm run gen:supabase
-npm run start
+# visit website
+http://localhost:3000
 ```
 
 In production, this setup is deployed as two different vercel websites (`docs` and `www`)
@@ -31,6 +29,3 @@ In production, this setup is deployed as two different vercel websites (`docs` a
 
 - Referencing resources in nested folders may not work for `web` (eg `/web/static/folder/nestedfolder/asset`) may not work.
 - Possibly need to prepend all images/assets in docs site with baseUrl.
-
-<!-- // we need to check this -->
-<!-- - Don't use `Link` since that adds `/new` to the links. Use plain `a` tags when possible. -->

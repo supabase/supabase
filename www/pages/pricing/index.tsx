@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/PricingTableRow'
-import { Badge, Button, Divider, Space, Typography } from '@supabase/ui'
+import { Accordion, Badge, Button, Divider, Space, Typography } from '@supabase/ui'
 
 import pricing from '~/data/Pricing.json'
 import pricingFaq from '~/data/PricingFAQ.json'
@@ -393,22 +393,19 @@ export default function IndexPage() {
         <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
           <Typography.Title level={2}>Frequently asked questions</Typography.Title>
           <div className="mt-16">
-            <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:grid-rows-2 md:gap-x-8 md:gap-y-12">
-              {pricingFaq.map((faq, i) => {
+            <div className="grid grid-cols-2 gap-y-10 gap-x-10">
+              {pricingFaq.map((faq) => {
                 return (
                   <div>
-                    <dt className="text-lg leading-6 font-medium text-white">
-                      <Typography.Title level={4}>{faq.question}</Typography.Title>
-                    </dt>
-                    <dd className="mt-2 text-base ">
-                      <Typography>
-                        <ReactMarkdown>{faq.answer}</ReactMarkdown>
-                      </Typography>
-                    </dd>
+                    <Accordion bordered>
+                      <Accordion.Item label={faq.question}>
+                        <Typography>{faq.answer}</Typography>
+                      </Accordion.Item>
+                    </Accordion>
                   </div>
                 )
               })}
-            </dl>
+            </div>
           </div>
         </div>
       </div>
