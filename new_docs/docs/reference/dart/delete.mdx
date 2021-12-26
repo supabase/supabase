@@ -1,0 +1,76 @@
+---
+id: delete
+title: "Delete data: delete()"
+slug: delete
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
+---
+
+import Tabs from '@theme/Tabs';
+import TabsPanel from '@theme/TabsPanel';
+
+Performs a DELETE on the table.
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final res = await supabase
+  .from('cities')
+  .delete()
+  .match({ 'id': 666 })
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+
+
+
+
+## Notes
+
+TODO update link to dart
+- `delete()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### Delete records
+
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final res = await supabase
+  .from('cities')
+  .delete()
+  .match({ 'id': 666 })
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>

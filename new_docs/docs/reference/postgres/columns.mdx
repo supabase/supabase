@@ -1,0 +1,95 @@
+---
+id: columns
+title: "Columns"
+slug: columns
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Creating columns.
+
+
+<Tabs
+  defaultValue="sql"
+  groupId="reference/postgres"
+  values={[{ label: 'SQL', value: 'sql' }]}>
+
+<TabItem value="sql">
+
+```sql
+create table table_name (
+  id integer primary key,
+  data jsonb,
+  name text
+);
+```
+
+
+</TabItem>
+
+</Tabs>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### During table creation
+
+
+
+<Tabs
+  defaultValue="sql"
+  groupId="reference/postgres"
+  values={[{ label: 'SQL', value: 'sql' }]}>
+
+<TabItem value="sql">
+
+```sql
+create table table_name (
+  id integer primary key,
+  data jsonb,
+  name text
+);
+```
+
+
+</TabItem>
+
+</Tabs>
+
+### Create column
+
+
+
+<Tabs
+  defaultValue="sql"
+  groupId="reference/postgres"
+  values={[{ label: 'SQL', value: 'sql' }]}>
+
+<TabItem value="sql">
+
+```sql
+alter table new_table
+add new_column text;
+```
+
+
+</TabItem>
+
+</Tabs>

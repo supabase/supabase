@@ -1,0 +1,84 @@
+---
+id: initializing
+title: "Initializing"
+slug: initializing
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
+---
+
+import Tabs from '@theme/Tabs';
+import TabsPanel from '@theme/TabsPanel';
+
+## Dart
+You can initialize a new Supabase client using the `SupabaseClient()` method.
+
+The Supabase client is your entrypoint to the rest of the Supabase functionality
+and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+
+## Flutter
+
+For `supabase_flutter`, you will be using the static `initialize()` method on `Supabase` class.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### Dart SupabaseClient()
+
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final supabase = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+### Flutter initialize()
+
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart title="main.dart"
+Future<void> main() async {
+  await Supabase.initialize(url: 'https://xyzcompany.supabase.co', anonKey: 'public-anon-key');
+  runApp(MyApp());
+}
+```
+
+
+</TabsPanel>
+
+</Tabs>

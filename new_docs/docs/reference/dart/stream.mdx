@@ -1,0 +1,147 @@
+---
+id: stream
+title: "stream()"
+slug: stream
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
+---
+
+import Tabs from '@theme/Tabs';
+import TabsPanel from '@theme/TabsPanel';
+
+Notifies of data at the queried table.
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+supabase
+  .from('countries')
+  .stream()
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+
+
+
+
+## Notes
+
+- `stream()` will emit the initial data as well as any further change on the database as `Stream` of `List<Map<String, dynamic>>` by combining Postgrest and Realtime.
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### Listening to a specific table
+
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+supabase
+  .from('countries')
+  .stream()
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+### Listening to a specific rows within a table
+
+You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+This syntax is the as how you can filter data in Realtime
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+supabase
+  .from('countries:id=eq.120')
+  .stream()
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+### With `order()`
+
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+supabase
+  .from('countries')
+  .stream()
+  .order('name', ascending: false)
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+### With `limit()`
+
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+supabase
+  .from('countries')
+  .stream()
+  .order('name', ascending: false)
+  .limit(10)
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>

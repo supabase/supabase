@@ -1,0 +1,72 @@
+---
+id: auth-onauthstatechange
+title: "auth.onAuthStateChange()"
+slug: auth-onauthstatechange
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
+---
+
+import Tabs from '@theme/Tabs';
+import TabsPanel from '@theme/TabsPanel';
+
+Receive a notification every time an auth event happens.
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final subscription = supabase.auth.onAuthStateChange((event, session) {
+  print(session?.user?.id);
+  // handle auth state change
+});
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### Listen to auth changes
+
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final subscription = supabase.auth.onAuthStateChange((event, session) {
+  print(session?.user?.id);
+  // handle auth state change
+});
+```
+
+
+</TabsPanel>
+
+</Tabs>
