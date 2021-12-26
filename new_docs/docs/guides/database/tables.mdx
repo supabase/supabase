@@ -5,7 +5,7 @@ description: Creating and using Postgres tables.
 ---
 
 import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import TabsPanel from '@theme/TabsPanel';
 
 
 In Postgres, data is stored in "tables". 
@@ -32,12 +32,12 @@ and run the SQL queries yourself.
 
 
 <Tabs
-defaultValue="UI"
+defaultActiveId="UI"
 values={[
   {label: 'UI', value: 'UI'},
   {label: 'SQL', value: 'SQL'},
 ]}>
-<TabItem value="UI">
+<TabsPanel id="UI" label="UI">
 
 ```sh
 1. Go to the "Table editor" section.
@@ -53,8 +53,8 @@ values={[
 <source src="/docs/videos/api/api-create-table-sm.mp4" type="video/mp4" muted playsInline />
 </video>
 
-</TabItem>
-<TabItem value="SQL">
+</TabsPanel>
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 -- Create a table called "todos" with a column to store tasks.
@@ -65,7 +65,7 @@ create table todos (
 );
 ```
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 

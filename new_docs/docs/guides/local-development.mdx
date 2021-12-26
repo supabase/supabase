@@ -5,7 +5,7 @@ description: How to use Supabase on your local development machine.
 ---
 
 import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import TabsPanel from '@theme/TabsPanel';
 
 Supabase provides a CLI so that you can develop your application locally, rather than connecting to a live project.
 
@@ -64,12 +64,12 @@ service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb
 
 
 <Tabs
-defaultValue="Postgres"
+defaultActiveId="Postgres"
 values={[
   {label: 'Postgres', value: 'Postgres'},
   {label: 'API Gateway', value: 'Kong'},
 ]}>
-<TabItem value="Postgres">
+<TabsPanel id="Postgres" label="Postgres">
 
 ```sh
 # Default URL:
@@ -85,8 +85,8 @@ For example:
 psql 'postgresql://postgres:postgres@localhost:5432/postgres'
 ```
 
-</TabItem>
-<TabItem value="Kong">
+</TabsPanel>
+<TabsPanel id="Kong" label="Kong">
 
 ```sh
 # Default URL:
@@ -109,7 +109,7 @@ http://localhost:54321/v1/auth/v1/           # Auth (GoTrue)
 ```
 
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 

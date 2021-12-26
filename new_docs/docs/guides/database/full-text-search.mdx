@@ -5,7 +5,7 @@ description: How to use full text search in PostgreSQL.
 ---
 
 import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import TabsPanel from '@theme/TabsPanel';
 
 
 Postgres has built-in functions to handle `Full Text Search` queries. This is like a "search engine" within Postgres.
@@ -17,13 +17,13 @@ For this guide we'll use the following example data:
 
 
 <Tabs
-defaultValue="Data"
+defaultActiveId="Data"
 values={[
   {label: 'Data', value: 'Data'},
   {label: 'SQL', value: 'SQL'},
 ]}>
 
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 create table books (
@@ -42,8 +42,8 @@ values
   ('Harry Potter and the Goblet of Fire','J.K. Rowling','Fourth year of school starts, big drama ensues.');
 ```
 
-</TabItem>
-<TabItem value="Data">
+</TabsPanel>
+<TabsPanel id="Data" label="Data">
 
 | id    | title | author | description |
 | ----  | ---- | ---- | ----------- |
@@ -53,7 +53,7 @@ values
 |    4 | Green Eggs and Ham | Dr. Seuss | Sam has changing food preferences and eats unusually colored food. |
 |    5 | Harry Potter and the Goblet of Fire | J.K. Rowling | Fourth year of school starts, big drama ensues.  |
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 
@@ -88,13 +88,13 @@ The `@@` symbol is the "match" symbol for Full Text Search. It returns any match
 Take the following example:
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
 ]}>
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 select * 
@@ -102,8 +102,8 @@ from books
 where name = 'Harry';
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabsPanel>
+<TabsPanel id="JS" label="JS">
 
 ```js
 const { data, error } = await supabase
@@ -112,9 +112,9 @@ const { data, error } = await supabase
   .eq('name', 'Harry')
 ```
 
-</TabItem>
+</TabsPanel>
   
-<TabItem value="DART">
+<TabsPanel id="DART" label="DART">
 
 ```dart
 final result = await client
@@ -124,7 +124,7 @@ final result = await client
   .execute();
 ```
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 
@@ -132,13 +132,13 @@ The equality symbol above (`=`) is very "strict" on what it matches. In a full t
 example above:
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
 ]}>
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 select * 
@@ -146,8 +146,8 @@ from books
 where to_tsvector(name) @@ to_tsquery('Harry');
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabsPanel>
+<TabsPanel id="JS" label="JS">
 
 ```js
 const { data, error } = await supabase
@@ -156,8 +156,8 @@ const { data, error } = await supabase
   .textSearch('name', `'Harry'`)
 ```
 
-</TabItem>
-<TabItem value="DART">
+</TabsPanel>
+<TabsPanel id="DART" label="DART">
 
 ```dart
 final result = await client
@@ -167,7 +167,7 @@ final result = await client
   .execute();
 ```
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 ## Basic Full Text Queries
@@ -177,14 +177,14 @@ final result = await client
 To find all `books` where the `description` contain the word `big`:
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 select 
@@ -196,8 +196,8 @@ where
   @@ to_tsquery('big');
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabsPanel>
+<TabsPanel id="JS" label="JS">
 
 ```js
 const { data, error } = await supabase
@@ -206,8 +206,8 @@ const { data, error } = await supabase
   .textSearch('description', `'big'`)
 ```
 
-</TabItem>
-<TabItem value="DART">
+</TabsPanel>
+<TabsPanel id="DART" label="DART">
 
 ```dart
 final result = await client
@@ -217,15 +217,15 @@ final result = await client
   .execute();
 ```
 
-</TabItem>
-<TabItem value="Data">
+</TabsPanel>
+<TabsPanel id="Data" label="Data">
 
 | id | title                               | author            | description                                     |
 | -- | ----------------------------------- | ----------------- | ----------------------------------------------- |
 | 3  | Tootle                              | Gertrude Crampton | Little toy train has big dreams.                     |
 | 5  | Harry Potter and the Goblet of Fire | J.K. Rowling      | Fourth year of school starts, big drama ensues. |
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 ### Search multiple columns
@@ -233,12 +233,12 @@ final result = await client
 To find all `books` where `description` or `title` contain the word `little`:
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Data', value: 'Data'},
 ]}>
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 select 
@@ -250,15 +250,15 @@ where
   @@ to_tsquery('little');
 ```
 
-</TabItem>
-<TabItem value="Data">
+</TabsPanel>
+<TabsPanel id="Data" label="Data">
 
 | id | title                 | author                 | description                                 |
 | -- | --------------------- | ---------------------- | ------------------------------------------- |
 | 1  | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
 | 3  | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 ### Match all search words
@@ -266,14 +266,14 @@ where
 To find all `books` where `description` contains BOTH of the words `little` and `big`, we can  use the `&` symbol:
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 select 
@@ -285,8 +285,8 @@ where
   @@ to_tsquery('little & big'); -- use & for AND in the search query
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabsPanel>
+<TabsPanel id="JS" label="JS">
 
 ```js
 const { data, error } = await supabase
@@ -295,8 +295,8 @@ const { data, error } = await supabase
   .textSearch('description', `'little' & 'big'`)
 ```
 
-</TabItem>
-<TabItem value="DART">
+</TabsPanel>
+<TabsPanel id="DART" label="DART">
 
 ```dart
 final result = await client
@@ -306,14 +306,14 @@ final result = await client
   .execute();
 ```
 
-</TabItem>
-<TabItem value="Data">
+</TabsPanel>
+<TabsPanel id="Data" label="Data">
 
 | id | title  | author            | description                      |
 | -- | ------ | ----------------- | -------------------------------- |
 | 3  | Tootle | Gertrude Crampton | Little toy train has big dreams. |
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 ### Match any search words
@@ -321,14 +321,14 @@ final result = await client
 To find all `books` where `description` contain ANY of the words `little` or `big`, use the `|` symbol:
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 select 
@@ -340,8 +340,8 @@ where
   @@ to_tsquery('little | big'); -- use | for OR in the search query
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabsPanel>
+<TabsPanel id="JS" label="JS">
 
 ```js
 const { data, error } = await supabase
@@ -350,8 +350,8 @@ const { data, error } = await supabase
   .textSearch('description', `'little' | 'big'`)
 ```
 
-</TabItem>
-<TabItem value="DART">
+</TabsPanel>
+<TabsPanel id="DART" label="DART">
 
 ```dart
 final result = await client
@@ -361,15 +361,15 @@ final result = await client
   .execute();
 ```
 
-</TabItem>
-<TabItem value="Data">
+</TabsPanel>
+<TabsPanel id="Data" label="Data">
 
 | id | title                 | author                 | description                                 |
 | -- | --------------------- | ---------------------- | ------------------------------------------- |
 | 1  | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
 | 3  | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 Notice how searching for `big` includes results with the word `bigger` (or `biggest`, etc).
@@ -388,12 +388,12 @@ We can use a special feature of Postgres called
 to ensure that the index is updated any time the values in the `title` and `description` columns change.
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Data', value: 'Data'},
 ]}>
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 alter table 
@@ -407,8 +407,8 @@ select id, fts
 from books;
 ```
 
-</TabItem>
-<TabItem value="Data">
+</TabsPanel>
+<TabsPanel id="Data" label="Data">
 
 | id | fts                                                                                                             |
 | -- | --------------------------------------------------------------------------------------------------------------- |
@@ -418,7 +418,7 @@ from books;
 | 4  | 'chang':3 'color':9 'eat':7 'egg':12 'food':4,10 'green':11 'ham':14 'prefer':5 'sam':1 'unus':8                |
 | 5  | 'big':6 'drama':7 'ensu':8 'fire':15 'fourth':1 'goblet':13 'harri':9 'potter':10 'school':4 'start':5 'year':2 |
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 ### Search using the new column
@@ -426,14 +426,14 @@ from books;
 Now that we've created and populated our index, we can search it using the same techniques as before:
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 select 
@@ -444,8 +444,8 @@ where
   fts @@ to_tsquery('little & big');
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabsPanel>
+<TabsPanel id="JS" label="JS">
 
 ```js
 const { data, error } = await supabase
@@ -454,8 +454,8 @@ const { data, error } = await supabase
   .textSearch('fts', `'little' & 'big'`)
 ```
 
-</TabItem>
-<TabItem value="DART">
+</TabsPanel>
+<TabsPanel id="DART" label="DART">
 
 ```dart
 final result = await client
@@ -465,14 +465,14 @@ final result = await client
   .execute();
 ```
 
-</TabItem>
-<TabItem value="Data">
+</TabsPanel>
+<TabsPanel id="Data" label="Data">
 
 | id | title  | author            | description                      | fts                                                     |
 | -- | ------ | ----------------- | -------------------------------- | ------------------------------------------------------- |
 | 3  | Tootle | Gertrude Crampton | Little toy train has big dreams. | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3 |
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 ## Query Operators
@@ -487,13 +487,13 @@ For example, to find the phrase `big dreams`, where the a match for "big" is fol
 
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
 ]}>
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 select 
@@ -504,8 +504,8 @@ where
   to_tsvector(description) @@ to_tsquery('big <-> dreams');
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabsPanel>
+<TabsPanel id="JS" label="JS">
 
 ```js
 const { data, error } = await supabase
@@ -514,8 +514,8 @@ const { data, error } = await supabase
   .textSearch('description', `'big' <-> 'dreams'`)
 ```
 
-</TabItem>
-<TabItem value="DART">
+</TabsPanel>
+<TabsPanel id="DART" label="DART">
 
 ```dart
 final result = await client
@@ -525,20 +525,20 @@ final result = await client
   .execute();
 ```
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 
 We can also use the `<->` to find words within a certain distance of eachother. For example to find `year` and `school` within 2 words of each other:
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
 ]}>
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 select 
@@ -549,8 +549,8 @@ where
   to_tsvector(description) @@ to_tsquery('year <2> school');
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabsPanel>
+<TabsPanel id="JS" label="JS">
 
 ```js
 const { data, error } = await supabase
@@ -559,8 +559,8 @@ const { data, error } = await supabase
   .textSearch('description', `'year' <2> 'school'`)
 ```
 
-</TabItem>
-<TabItem value="DART">
+</TabsPanel>
+<TabsPanel id="DART" label="DART">
 
 ```dart
 final result = await client
@@ -570,7 +570,7 @@ final result = await client
   .execute();
 ```
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 
@@ -580,13 +580,13 @@ The negation symbol can be used to find phrases which _don't_ contain a search t
 For example, to find records that have the word `big` but not `little`:
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'Javascript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
 ]}>
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 select 
@@ -597,8 +597,8 @@ where
   to_tsvector(description) @@ to_tsquery('big & !little');
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabsPanel>
+<TabsPanel id="JS" label="JS">
 
 ```js
 const { data, error } = await supabase
@@ -607,8 +607,8 @@ const { data, error } = await supabase
   .textSearch('description', `'big' & !'little'`)
 ```
 
-</TabItem>
-<TabItem value="DART">
+</TabsPanel>
+<TabsPanel id="DART" label="DART">
 
 ```dart
 final result = await client
@@ -618,7 +618,7 @@ final result = await client
   .execute();
 ```
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 

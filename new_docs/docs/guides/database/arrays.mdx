@@ -5,7 +5,7 @@ description: How to use arrays in PostgreSQL and the Supabase API.
 ---
 
 import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+import TabsPanel from '@theme/TabsPanel'
 
 PostgreSQL supports flexible [array types](https://www.postgresql.org/docs/12/arrays.html).  
 These arrays are also supported in the Supabase dashboard and in the Javascript API.
@@ -17,13 +17,13 @@ These arrays are also supported in the Supabase dashboard and in the Javascript 
 Create a test table with a text array (an array of strings):
 
 <Tabs
-defaultValue="UI"
+defaultActiveId="UI"
 values={[
   {label: 'UI', value: 'UI'},
   {label: 'SQL', value: 'SQL'},
 ]}>
 
-<TabItem value="UI">
+<TabsPanel id="UI" label="UI">
 
 ```bash
 1. Got the Table Editor
@@ -36,28 +36,28 @@ values={[
         - Save the new column
 ```
 
-</TabItem>
+</TabsPanel>
 
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 CREATE TABLE arraytest (id integer NOT NULL, textarray text ARRAY);
 ```
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 ### Insert a record with an array value
 
 <Tabs
-defaultValue="UI"
+defaultActiveId="UI"
 values={[
   {label: 'UI', value: 'UI'},
   {label: 'SQL', value: 'SQL'},
   {label: 'JS', value: 'JavaScript'},
 ]}>
 
-<TabItem value="UI">
+<TabsPanel id="UI" label="UI">
 
 ```bash
 - Table Editor
@@ -68,17 +68,17 @@ values={[
     - Save the new row
 ```
 
-</TabItem>
+</TabsPanel>
 
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 INSERT INTO arraytest (id, textarray) VALUES (1, ARRAY['Harry', 'Larry', 'Moe']);
 ```
 
-</TabItem>
+</TabsPanel>
 
-<TabItem value="JavaScript">
+<TabsPanel id="JavaScript" label="JavaScript">
 To insert a record from the Javascript client:
 
 ```js
@@ -87,20 +87,20 @@ const { data, error } = await supabase
   .insert([{ id: 2, textarray: ['one', 'two', 'three', 'four'] }])
 ```
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 
 ### View the results
 
 <Tabs
-defaultValue="UI"
+defaultActiveId="UI"
 values={[
   {label: 'UI', value: 'UI'},
   {label: 'SQL', value: 'SQL'},
 ]}>
 
-<TabItem value="UI">
+<TabsPanel id="UI" label="UI">
 
 ```bash
 - Table Editor
@@ -113,8 +113,8 @@ Your first array data!
 | --- | ----------------------- |
 | 1   | ["Harry","Larry","Moe"] |
 
-</TabItem>
-<TabItem value="SQL">
+</TabsPanel>
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 SELECT * FROM arraytest;
@@ -126,7 +126,7 @@ Your first array data!
 | --- | ----------------------- |
 | 1   | ["Harry","Larry","Moe"] |
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 ### Query Array Data
@@ -134,13 +134,13 @@ Your first array data!
 To query an array, PostgreSQL uses 1-based arrays, so be careful, since you're probably used to 0-based arrays in Javascript.
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'JS', value: 'JavaScript'},
 ]}>
 
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 To select the first item from the array and get the total length of the array:
 
@@ -154,8 +154,8 @@ returns:
 | --------- | ------------ |
 | Harry     | 3            |
 
-</TabItem>
-<TabItem value="JavaScript">
+</TabsPanel>
+<TabsPanel id="JavaScript" label="JavaScript">
 
 This returns the entire array field:
 
@@ -174,7 +174,7 @@ returns:
 ]
 ```
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 

@@ -6,7 +6,7 @@ description: 'Supabase provides client libraries in several languages.'
 
 
 import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import TabsPanel from '@theme/TabsPanel';
 
 
 The [Supabase Client](/docs/reference/javascript/supabase-client) makes it simple for developers to build secure and scalable products. 
@@ -19,10 +19,10 @@ If confirmations are disabled the response will contain an access token and also
 
 <Tabs
   groupId="libraries"
-  defaultValue="js"
+  defaultActiveId="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
 
-<TabItem value="js">
+<TabsPanel id="js" label="js">
 
 ```js
 const { error, data } = await supabase.auth.signUp({
@@ -32,8 +32,8 @@ const { error, data } = await supabase.auth.signUp({
 ```
 
 
-</TabItem>
-<TabItem value="py">
+</TabsPanel>
+<TabsPanel id="py" label="py">
 
 ```py
 import os
@@ -49,9 +49,9 @@ user = supabase.auth.sign_up(
 ```
 
 
-</TabItem>
+</TabsPanel>
   
-<TabItem value="dart">
+<TabsPanel id="dart" label="dart">
 
 ```dart
 import 'package:supabase/supabase.dart';
@@ -66,7 +66,7 @@ void main() async {
 }
 ```
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 
@@ -76,10 +76,10 @@ Existing users can log in using [`signIn()`](/docs/reference/javascript/auth-sig
 
 <Tabs
   groupId="libraries"
-  defaultValue="js"
+  defaultActiveId="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
 
-<TabItem value="js">
+<TabsPanel id="js" label="js">
 
 ```js
 const { error, data } = await supabase.auth.signIn({
@@ -89,8 +89,8 @@ const { error, data } = await supabase.auth.signIn({
 ```
 
 
-</TabItem>
-<TabItem value="py">
+</TabsPanel>
+<TabsPanel id="py" label="py">
 
 ```py
 import os
@@ -106,9 +106,9 @@ user = supabase.auth.sign_in(
 ```
 
 
-</TabItem>
+</TabsPanel>
   
-<TabItem value="dart">
+<TabsPanel id="dart" label="dart">
 
 ```dart
 import 'package:supabase/supabase.dart';
@@ -123,7 +123,7 @@ void main() async {
 }
 ```
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 
@@ -132,10 +132,10 @@ If there is an email, but no password passed to [`signIn()`](/docs/reference/jav
 
 <Tabs
   groupId="libraries"
-  defaultValue="js"
+  defaultActiveId="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
 
-<TabItem value="js">
+<TabsPanel id="js" label="js">
 
 ```js
 const { error, data } = await supabase.auth.signIn({
@@ -144,8 +144,8 @@ const { error, data } = await supabase.auth.signIn({
 ```
 
 
-</TabItem>
-<TabItem value="py">
+</TabsPanel>
+<TabsPanel id="py" label="py">
 
 ```py
 import os
@@ -160,9 +160,9 @@ user = supabase.auth.sign_in(
 ```
 
 
-</TabItem>
+</TabsPanel>
   
-<TabItem value="dart">
+<TabsPanel id="dart" label="dart">
 
 ```dart
 import 'package:supabase/supabase.dart';
@@ -177,7 +177,7 @@ void main() async {
 }
 ```
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 
@@ -187,10 +187,10 @@ Third party logins are also handled through [`signIn()`](/docs/reference/javascr
 
 <Tabs
   groupId="libraries"
-  defaultValue="js"
+  defaultActiveId="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
 
-<TabItem value="js">
+<TabsPanel id="js" label="js">
 
 ```js
 const { user, error } = await supabase.auth.signIn({
@@ -200,17 +200,17 @@ const { user, error } = await supabase.auth.signIn({
 ```
 
 
-</TabItem>
-<TabItem value="py">
+</TabsPanel>
+<TabsPanel id="py" label="py">
 
 ```py
 # Not yet implemented
 ```
 
 
-</TabItem>
+</TabsPanel>
   
-<TabItem value="dart">
+<TabsPanel id="dart" label="dart">
 
 ```dart
 import 'package:supabase/supabase.dart';
@@ -224,7 +224,7 @@ void main() async {
 }
 ```
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 
@@ -235,10 +235,10 @@ Since Postgres is a Relational database, the client makes it simple to query tab
 
 <Tabs
   groupId="libraries"
-  defaultValue="js"
+  defaultActiveId="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
 
-<TabItem value="js">
+<TabsPanel id="js" label="js">
 
 ```js
 const { data, error } = await supabase
@@ -252,8 +252,8 @@ const { data, error } = await supabase
 ```
 
 
-</TabItem>
-<TabItem value="py">
+</TabsPanel>
+<TabsPanel id="py" label="py">
 
 ```py
 import os
@@ -267,9 +267,9 @@ data = supabase.table('countries').select('name').execute()
 ```
 
 
-</TabItem>
+</TabsPanel>
   
-<TabItem value="dart">
+<TabsPanel id="dart" label="dart">
 
 ```dart
 import 'package:supabase/supabase.dart';
@@ -285,7 +285,7 @@ void main() async {
 }
 ```
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 
@@ -295,10 +295,10 @@ You can do advanced [filtering](/docs/reference/javascript/using-filters) to ext
 
 <Tabs
   groupId="libraries"
-  defaultValue="js"
+  defaultActiveId="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
 
-<TabItem value="js">
+<TabsPanel id="js" label="js">
 
 ```js
 const { data, error } = await supabase
@@ -309,8 +309,8 @@ const { data, error } = await supabase
 ```
 
 
-</TabItem>
-<TabItem value="py">
+</TabsPanel>
+<TabsPanel id="py" label="py">
 
 ```py
 data = supabase.table('cities').select('name, country_id').eq('name', 'Germany').execute()
@@ -319,9 +319,9 @@ assert len(data.get("data", [])) > 0
 ```
 
 
-</TabItem>
+</TabsPanel>
   
-<TabItem value="dart">
+<TabsPanel id="dart" label="dart">
 
 ```dart
 import 'package:supabase/supabase.dart';
@@ -339,7 +339,7 @@ void main() async {
 }
 ```
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 
@@ -350,10 +350,10 @@ You can create data easily using [`insert()`](/docs/reference/javascript/insert)
 
 <Tabs
   groupId="libraries"
-  defaultValue="js"
+  defaultActiveId="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
 
-<TabItem value="js">
+<TabsPanel id="js" label="js">
 
 ```js
 const { data, error } = await supabase
@@ -365,8 +365,8 @@ const { data, error } = await supabase
 ```
 
 
-</TabItem>
-<TabItem value="py">
+</TabsPanel>
+<TabsPanel id="py" label="py">
 
 ```py
 data = supabase.table('cities').insert({'name': 'Gotham', 'country_id': 556 }).execute()
@@ -382,9 +382,9 @@ data = supabase.table('cities').insert([
 ```
 
 
-</TabItem>
+</TabsPanel>
   
-<TabItem value="dart">
+<TabsPanel id="dart" label="dart">
 
 ```dart
 import 'package:supabase/supabase.dart';
@@ -403,7 +403,7 @@ void main() async {
 }
 ```
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 
@@ -415,10 +415,10 @@ The Supabase client makes it simple to listen to realtime database changes, usin
 
 <Tabs
   groupId="libraries"
-  defaultValue="js"
+  defaultActiveId="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
 
-<TabItem value="js">
+<TabsPanel id="js" label="js">
 
 ```js
 const mySubscription = supabase
@@ -430,17 +430,17 @@ const mySubscription = supabase
 ```
 
 
-</TabItem>
-<TabItem value="py">
+</TabsPanel>
+<TabsPanel id="py" label="py">
 
 ```py
 # Not yet implemented
 ```
 
 
-</TabItem>
+</TabsPanel>
   
-<TabItem value="dart">
+<TabsPanel id="dart" label="dart">
 
 ```dart
 import 'package:supabase/supabase.dart';
@@ -460,7 +460,7 @@ void main() async {
 }
 ```
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 
@@ -470,10 +470,10 @@ You can even [listen to Row Level changes](/docs/reference/javascript/subscribe#
 
 <Tabs
   groupId="libraries"
-  defaultValue="js"
+  defaultActiveId="js"
   values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
 
-<TabItem value="js">
+<TabsPanel id="js" label="js">
 
 ```js
 const mySubscription = supabase
@@ -483,17 +483,17 @@ const mySubscription = supabase
 ```
 
 
-</TabItem>
-<TabItem value="py">
+</TabsPanel>
+<TabsPanel id="py" label="py">
 
 ```py
 # Not yet implemented
 ```
 
 
-</TabItem>
+</TabsPanel>
   
-<TabItem value="dart">
+<TabsPanel id="dart" label="dart">
 
 ```dart
 import 'package:supabase/supabase.dart';
@@ -513,7 +513,7 @@ void main() async {
 }
 ```
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 

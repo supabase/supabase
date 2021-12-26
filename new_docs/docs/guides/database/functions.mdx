@@ -5,7 +5,7 @@ description: Creating and using Postgres functions.
 ---
 
 import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import TabsPanel from '@theme/TabsPanel';
 
 
 Postgres has built-in support for [SQL functions](https://www.postgresql.org/docs/current/sql-createfunction.html). 
@@ -43,13 +43,13 @@ For this guide we'll use the following example data:
 
 
 <Tabs
-defaultValue="Data"
+defaultActiveId="Data"
 values={[
   {label: 'Data', value: 'Data'},
   {label: 'SQL', value: 'SQL'},
 ]}>
 
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 create table planets (
@@ -77,8 +77,8 @@ values
   (4, 'Chewbacca', 3);
 ```
 
-</TabItem>
-<TabItem value="Data">
+</TabsPanel>
+<TabsPanel id="Data" label="Data">
 
 <h4>Planets</h4>
 
@@ -97,7 +97,7 @@ values
 |    3 | Princess Leia | 2 | 
 |    4 | Chewbacca | 3 | 
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 
@@ -132,21 +132,21 @@ At it's most basic a function has the following parts:
 #### Execute
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'JS', value: 'JS'},
   {label: 'Dart', value: 'Dart'},
 ]}>
 
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 select hello_world();
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabsPanel>
+<TabsPanel id="JS" label="JS">
 
 ```js 
 const { data, error } = supabase
@@ -155,8 +155,8 @@ const { data, error } = supabase
 
 Reference: [rpc()](/docs/reference/javascript/rpc)
 
-</TabItem>
-<TabItem value="Dart">
+</TabsPanel>
+<TabsPanel id="Dart" label="Dart">
 
 ```dart 
 final res = await supabase
@@ -166,7 +166,7 @@ final res = await supabase
 
 Reference: [rpc()](/docs/reference/dart/rpc)
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 
@@ -189,14 +189,14 @@ $$;
 Because this function returns a table set, we can also apply filters and selectors. For example, if we only wanted the first planet:
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'JS', value: 'JS'},
   {label: 'Dart', value: 'Dart'},
 ]}>
 
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 select *
@@ -204,8 +204,8 @@ from get_planets()
 where id = 1;
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabsPanel>
+<TabsPanel id="JS" label="JS">
 
 ```js 
 const { data, error } = supabase
@@ -215,8 +215,8 @@ const { data, error } = supabase
 
 Reference: [rpc()](/docs/reference/javascript/rpc)
 
-</TabItem>
-<TabItem value="Dart">
+</TabsPanel>
+<TabsPanel id="Dart" label="Dart">
 
 ```dart 
 final res = await supabase
@@ -227,7 +227,7 @@ final res = await supabase
 
 Reference: [rpc()](/docs/reference/dart/rpc)
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 
@@ -258,21 +258,21 @@ $$;
 Because this function returns a table set, we can also apply filters and selectors. For example, if we only wanted the `name` of the first planet:
 
 <Tabs
-defaultValue="SQL"
+defaultActiveId="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
   {label: 'JS', value: 'JS'},
   {label: 'Dart', value: 'Dart'},
 ]}>
 
-<TabItem value="SQL">
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 select * from add_planet('Jakku');
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabsPanel>
+<TabsPanel id="JS" label="JS">
 
 ```js 
 const { data, error } = supabase
@@ -281,8 +281,8 @@ const { data, error } = supabase
 
 Reference: [rpc()](/docs/reference/javascript/rpc)
 
-</TabItem>
-<TabItem value="Dart">
+</TabsPanel>
+<TabsPanel id="Dart" label="Dart">
 
 ```dart 
 final res = await supabase
@@ -292,7 +292,7 @@ final res = await supabase
 
 Reference: [rpc()](/docs/reference/dart/rpc)
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 

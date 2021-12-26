@@ -7,7 +7,7 @@ description: A UUID generator for PostgreSQL.
 # uuid-ossp: Unique Identifiers
 
 import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import TabsPanel from '@theme/TabsPanel';
 
 The `uuid-ossp` extension can be used to generate a `UUID`.
 
@@ -22,12 +22,12 @@ This makes them particularly well suited as Primary Keys. It is occasionally ref
 ### Enabling
 
 <Tabs
-defaultValue="UI"
+defaultActiveId="UI"
 values={[
   {label: 'UI', value: 'UI'},
   {label: 'SQL', value: 'SQL'},
 ]}>
-<TabItem value="UI">
+<TabsPanel id="UI" label="UI">
 
 ```sh
 1. Go to the Database page.
@@ -36,8 +36,8 @@ values={[
 4. Click the toggle.
 ```
 
-</TabItem>
-<TabItem value="SQL">
+</TabsPanel>
+<TabsPanel id="SQL" label="SQL">
 
 ```sql 
 
@@ -54,7 +54,7 @@ To disable an extension you can call `drop extension`.
 
 It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
 
-</TabItem>
+</TabsPanel>
 
 </Tabs>
 
