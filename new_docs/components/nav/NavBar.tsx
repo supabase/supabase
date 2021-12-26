@@ -13,7 +13,7 @@ import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import styles from '../../styles/Home.module.css'
-const NavBar = () => {
+const NavBar = ({ currentPage }: { currentPage: string }) => {
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
 
@@ -45,22 +45,25 @@ const NavBar = () => {
         )}
         <ul className={`${styles.navLinks} flex`}>
           <li>
-            <Typography.Link>
+            <Typography.Link
+              type="default"
+              className={`${currentPage === 'Docs' ? 'underline' : ''}`}
+            >
               <Link href="/">
                 <a>Overview</a>
               </Link>
             </Typography.Link>
           </li>
           <li>
-            <Typography.Link>
+            <Typography.Link className={`${currentPage === 'Guides' ? 'underline' : ''}`}>
               <Link href="/guides">
                 <a>Guides</a>
               </Link>
             </Typography.Link>
           </li>
           <li>
-            <Typography.Link>
-              <Link href="/docs/reference/javascript/supabase-client">
+            <Typography.Link className={`${currentPage === 'Reference' ? 'underline' : ''}`}>
+              <Link href="/reference/javascript/supabase-client">
                 <a>Reference</a>
               </Link>
             </Typography.Link>

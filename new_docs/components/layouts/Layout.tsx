@@ -10,11 +10,13 @@ const DocsLayout = ({
   children,
   toc,
   menuItems,
+  currentPage,
 }: {
   meta: { title: string; description: string }
   children: string
   toc: any
   menuItems
+  currentPage: string
 }) => {
   const theme = 'okaidia'
 
@@ -38,7 +40,7 @@ const DocsLayout = ({
       </Head>
 
       <main>
-        <NavBar />
+        <NavBar currentPage={currentPage} />
         <div className="flex flex-row">
           <SideBar menuItems={menuItems} />
           <div className="grid grid-cols-12 w-full max-w-7xl mx-auto">
