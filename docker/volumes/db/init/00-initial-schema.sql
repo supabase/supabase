@@ -1,4 +1,5 @@
--- Set up reatime 
+-- Set up realtime
+create schema if not exists realtime;
 -- create publication supabase_realtime; -- defaults to empty publication
 create publication supabase_realtime;
 
@@ -7,7 +8,7 @@ create user supabase_admin;
 alter user  supabase_admin with superuser createdb createrole replication bypassrls;
 
 -- Extension namespacing
-create SCHEMA IF NOT exists extensions;
+create schema if not exists extensions;
 create extension if not exists "uuid-ossp"      with schema extensions;
 create extension if not exists pgcrypto         with schema extensions;
 create extension if not exists pgjwt            with schema extensions;

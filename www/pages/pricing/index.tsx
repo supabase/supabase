@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/PricingTableRow'
-import { Badge, Button, Divider, Space, Typography } from '@supabase/ui'
+import { Accordion, Badge, Button, Divider, Space, Typography } from '@supabase/ui'
 
 import pricing from '~/data/Pricing.json'
 import pricingFaq from '~/data/PricingFAQ.json'
@@ -12,12 +12,31 @@ import ReactMarkdown from 'react-markdown'
 import CTABanner from '~/components/CTABanner'
 
 import Solutions from 'data/Solutions.json'
+import { NextSeo } from 'next-seo'
 
 export default function IndexPage() {
-  const { basePath } = useRouter()
+  const router = useRouter()
+
+  const meta_title = 'Pricing & fees | Supabase'
+  const meta_description =
+    'Explore Supabase fees and pricing information. Find our competitive pricing tiers, with no hidden pricing. We have generous free tiers for those getting started, and Pay As You Go for those scaling up.'
 
   return (
     <DefaultLayout>
+      <NextSeo
+        title={meta_title}
+        description={meta_description}
+        openGraph={{
+          title: meta_title,
+          description: meta_description,
+          url: `https://supabase.com/${router.pathname}`,
+          images: [
+            {
+              url: `https://supabase.com/images/og/og-image.jpg`,
+            },
+          ],
+        }}
+      />
       <div className="bg-white dark:bg-gray-800">
         <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative pt-24 md:pt-24 lg:pt-24">
           <div className="text-center">
@@ -374,22 +393,19 @@ export default function IndexPage() {
         <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
           <Typography.Title level={2}>Frequently asked questions</Typography.Title>
           <div className="mt-16">
-            <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:grid-rows-2 md:gap-x-8 md:gap-y-12">
-              {pricingFaq.map((faq, i) => {
+            <div className="grid grid-cols-2 gap-y-10 gap-x-10">
+              {pricingFaq.map((faq) => {
                 return (
                   <div>
-                    <dt className="text-lg leading-6 font-medium text-white">
-                      <Typography.Title level={4}>{faq.question}</Typography.Title>
-                    </dt>
-                    <dd className="mt-2 text-base ">
-                      <Typography>
-                        <ReactMarkdown>{faq.answer}</ReactMarkdown>
-                      </Typography>
-                    </dd>
+                    <Accordion bordered>
+                      <Accordion.Item label={faq.question}>
+                        <Typography>{faq.answer}</Typography>
+                      </Accordion.Item>
+                    </Accordion>
                   </div>
                 )
               })}
-            </dl>
+            </div>
           </div>
         </div>
       </div>

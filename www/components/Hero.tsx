@@ -22,15 +22,12 @@ const Hero = () => {
                     <Typography.Text>
                       <p className="mt-5 text-base sm:mt-5 lg:text-lg ">
                         Create a backend in less than 2 minutes. Start your project with a Postgres
-                        Database, Authentication, instant APIs, realtime subscriptions and Storage.
+                        Database, Authentication, instant APIs, Realtime subscriptions and Storage.
                       </p>
                       <p className="mt-3 text-base">Serverless functions coming soon</p>
                     </Typography.Text>
                     <Space>
-                      <Link
-                        href="https://api.supabase.io/platform/login"
-                        as="https://api.supabase.io/platform/login"
-                      >
+                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
                         <a className="mt-10">
                           <Button className="py-3" size="medium">
                             Start your project

@@ -82,5 +82,26 @@
     "position": "Engineering",
     "username": "darora",
     "author_image_url": "https://github.com/darora.png"
+  },
+  "gurjeet": {
+    "author": "Gurjeet Singh",
+    "author_url": "https://github.com/gurjeet",
+    "position": "Engineering",
+    "username": "gurjeet",
+    "author_image_url": "https://github.com/gurjeet.png"
+  },
+  "wenbo_xie": {
+    "author": "Wen Bo Xie",
+    "author_url": "https://github.com/w3b6x9",
+    "position": "Engineering",
+    "username": "w3b6x9",
+    "author_image_url": "https://github.com/w3b6x9.png"
+  },
+  "oli_rice": {
+    "author": "Oliver Rice",
+    "author_url": "https://github.com/olirice",
+    "position": "Engineering",
+    "username": "olirice",
+    "author_image_url": "https://github.com/olirice.png"
   }
 }
