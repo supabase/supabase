@@ -20,7 +20,7 @@ import {
   IconLoader,
   IconRefreshCw,
 } from '@supabase/ui'
-import { PostgresTable } from '@supabase/postgres-meta'
+import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
 import { useStore } from 'hooks'
@@ -74,11 +74,15 @@ const TableEditorMenu: FC<Props> = ({
     setIsRefreshing(false)
   }
 
-  const schemas = meta.schemas.list()
-  const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
+  const schemas: PostgresSchema[] = meta.schemas.list()
+  const tables: PostgresTable[] = meta.tables.list(
+    (table: PostgresTable) => table.schema === selectedSchema
+  )
 
   const schemaTables =
-    searchText.length === 0 ? tables : tables.filter((table) => table.name.includes(searchText))
+    searchText.length === 0
+      ? tables
+      : tables.filter((table) => table.name.toLowerCase().includes(searchText.toLowerCase()))
 
   const filteredSchemaViews =
     searchText.length === 0
@@ -87,7 +91,7 @@ const TableEditorMenu: FC<Props> = ({
 
   // Temp fix - Ideally we'd just take up all the remaining space but
   // can't seem to figure that out immediately
-  const maxScrollHeight = schemaViews.length > 0 ? 270 : 520
+  const maxScrollHeight = schemaViews.length > 0 ? 270 : 515
 
   return (
     <div className="my-6 flex flex-col flex-grow">

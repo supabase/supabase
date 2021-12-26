@@ -6,7 +6,7 @@ module.exports = withMDX({
 
   trailingSlash: false,
   images: {
-    domains: ['github.com', 'ca.slack-edge.com', 'res.cloudinary.com'],
+    domains: ['github.com', 'ca.slack-edge.com', 'res.cloudinary.com', 'images.unsplash.com'],
   },
   async headers() {
     return [

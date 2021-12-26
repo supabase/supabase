@@ -22,7 +22,7 @@ function Panel(props: any) {
       <div
         className={`
         border border-panel-border-light dark:border-panel-border-dark
-        rounded ${props.noMargin? "" : "mb-8"} ${props.className}`}
+        rounded ${props.noMargin ? '' : 'mb-8'} ${props.className}`}
       >
         {props.title && (
           <div className={headerClasses.join(' ')}>

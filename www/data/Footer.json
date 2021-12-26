@@ -40,10 +40,6 @@
         "url": "/brand-assets"
       },
       {
-        "text": "Case Studies",
-        "url": "/blog/tags/case-study"
-      },
-      {
         "text": "System Status",
         "url": "https://status.supabase.com/"
       },

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { CSSProperties, FC, ReactNode } from 'react'
 import { Menu, Typography, IconArrowUpRight, Badge } from '@supabase/ui'
+import { isUndefined } from 'lodash'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
 
 interface Props {
@@ -116,7 +117,6 @@ const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) =>
             isActive={isActive}
             label={x.label}
             href={x.href}
-            as={x.as}
             onClick={x.onClick}
             external={x.external || false}
           />
@@ -143,9 +143,26 @@ const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) =>
   )
 }
 
-const SidebarItem: FC<any> = ({ id, label, as, href, isActive, isSubitem, onClick, external }) => {
+const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, external }) => {
+  if (isUndefined(href)) {
+    return (
+      <Menu.Item
+        rounded
+        key={id}
+        style={{
+          marginLeft: isSubitem && '.5rem',
+        }}
+        active={isActive ? true : false}
+        onClick={onClick || (() => {})}
+        icon={external && <IconArrowUpRight size={'tiny'} />}
+      >
+        {isSubitem ? <Typography.Text small>{label}</Typography.Text> : label}
+      </Menu.Item>
+    )
+  }
+
   return (
-    <Link href={href || ''} as={as || ''}>
+    <Link href={href || ''}>
       <a className="block" target={external ? '_blank' : '_self'}>
         <Menu.Item
           rounded

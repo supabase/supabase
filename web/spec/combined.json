@@ -1211,6 +1211,46 @@
                   ]
                 },
                 {
+                  "id": 336,
+                  "name": "removeAllSubscriptions",
+                  "kind": 2048,
+                  "kindString": "Method",
+                  "flags": {
+                    "isExported": true
+                  },
+                  "signatures": [
+                    {
+                      "id": 337,
+                      "name": "removeAllSubscriptions",
+                      "kind": 4096,
+                      "kindString": "Call signature",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "comment": {
+                        "shortText": "Removes all subscriptions and disconnects the Websocket connection."
+                      },
+                      "type": {
+                        "type": "reference",
+                        "typeArguments": [
+                          {
+                            "type": "intrinsic",
+                            "name": "unknown"
+                          }
+                        ],
+                        "name": "Promise"
+                      }
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "src/SupabaseClient.ts",
+                      "line": 129,
+                      "character": 20
+                    }
+                  ]
+                },
+                {
                   "id": 324,
                   "name": "rpc",
                   "kind": 2048,
@@ -25206,7 +25246,8 @@
                           "kind": 32768,
                           "kindString": "Parameter",
                           "flags": {
-                            "isExported": true
+                            "isExported": true,
+                            "isOptional": true
                           },
                           "comment": {
                             "text": "The columns to retrieve, separated by commas."

@@ -3,11 +3,11 @@ const snippets = {
     title: 'API URL',
     bash: {
       language: 'bash',
-      code: `https://${endpoint}`,
+      code: `${endpoint}`,
     },
     js: {
       language: 'bash',
-      code: `https://${endpoint}`,
+      code: `${endpoint}`,
     },
   }),
   install: () => ({
@@ -29,7 +29,7 @@ const snippets = {
       code: `
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://${endpoint}'
+const supabaseUrl = '${endpoint}'
 const supabaseKey = process.env.SUPABASE_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)`,
     },
@@ -50,7 +50,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)`,
     bash: {
       language: 'bash',
       code: `
-curl 'https://${endpoint}/rest/v1/' \\
+curl '${endpoint}/rest/v1/' \\
 -H "apikey: ${defaultApiKey}" ${
         showBearer
           ? `\\
@@ -62,7 +62,7 @@ curl 'https://${endpoint}/rest/v1/' \\
     js: {
       language: 'js',
       code: `
-const SUPABASE_URL = "https://${endpoint}"
+const SUPABASE_URL = "${endpoint}"
 
 const supabase = createClient(SUPABASE_URL, process.env.${keyName || 'SUPABASE_KEY'});
 `,
@@ -87,7 +87,7 @@ const supabase = createClient(SUPABASE_URL, process.env.${keyName || 'SUPABASE_K
       bash: {
         language: 'bash',
         code: `
-curl -X POST 'https://${endpoint}/rest/v1/rpc/${rpcName}' \\${bashParams}
+curl -X POST '${endpoint}/rest/v1/rpc/${rpcName}' \\${bashParams}
 -H "Content-Type: application/json" \\
 -H "apikey: ${apiKey}" ${
           showBearer
@@ -199,7 +199,7 @@ const ${listenerName} = supabase
     bash: {
       language: 'bash',
       code: `
-curl 'https://${endpoint}/rest/v1/${resourceId}?select=*' \\
+curl '${endpoint}/rest/v1/${resourceId}?select=*' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}"
 `,
@@ -224,7 +224,7 @@ let { data: ${resourceId}, error } = await supabase
     bash: {
       language: 'bash',
       code: `
-curl 'https://${endpoint}/rest/v1/${resourceId}?select=${columnName}' \\
+curl '${endpoint}/rest/v1/${resourceId}?select=${columnName}' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}"
 `,
@@ -243,7 +243,7 @@ let { data: ${resourceId}, error } = await supabase
     bash: {
       language: 'bash',
       code: `
-curl 'https://${endpoint}/rest/v1/${resourceId}?select=some_column,other_table(foreign_key)' \\
+curl '${endpoint}/rest/v1/${resourceId}?select=some_column,other_table(foreign_key)' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}"
 `,
@@ -267,7 +267,7 @@ let { data: ${resourceId}, error } = await supabase
     bash: {
       language: 'bash',
       code: `
-curl 'https://${endpoint}/rest/v1/${resourceId}?select=*' \\
+curl '${endpoint}/rest/v1/${resourceId}?select=*' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Range: 0-9"
@@ -288,7 +288,7 @@ let { data: ${resourceId}, error } = await supabase
     bash: {
       language: 'bash',
       code: `
-curl 'https://${endpoint}/rest/v1/${resourceId}?id=eq.1&select=*' \\
+curl '${endpoint}/rest/v1/${resourceId}?id=eq.1&select=*' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Range: 0-9"
@@ -325,7 +325,7 @@ let { data: ${resourceId}, error } = await supabase
     bash: {
       language: 'bash',
       code: `
-curl -X POST 'https://${endpoint}/rest/v1/${resourceId}' \\
+curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Content-Type: application/json" \\
@@ -349,7 +349,7 @@ const { data, error } = await supabase
     bash: {
       language: 'bash',
       code: `
-curl -X POST 'https://${endpoint}/rest/v1/${resourceId}' \\
+curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Content-Type: application/json" \\
@@ -373,7 +373,7 @@ const { data, error } = await supabase
     bash: {
       language: 'bash',
       code: `
-curl -X POST 'https://${endpoint}/rest/v1/${resourceId}' \\
+curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Content-Type: application/json" \\
@@ -395,7 +395,7 @@ const { data, error } = await supabase
     bash: {
       language: 'bash',
       code: `
-curl -X PATCH 'https://${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
+curl -X PATCH '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Content-Type: application/json" \\
@@ -418,7 +418,7 @@ const { data, error } = await supabase
     bash: {
       language: 'bash',
       code: `
-curl -X DELETE 'https://${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
+curl -X DELETE '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}"
 `,
@@ -438,7 +438,7 @@ const { data, error } = await supabase
     bash: {
       language: 'bash',
       code: `
-curl -X POST 'https://${endpoint}/auth/v1/signup' \\
+curl -X POST '${endpoint}/auth/v1/signup' \\
 -H "apikey: ${apiKey}" \\
 -H "Content-Type: application/json" \\
 -d '{
@@ -462,7 +462,7 @@ let { user, error } = await supabase.auth.signUp({
     bash: {
       language: 'bash',
       code: `
-curl -X POST 'https://${endpoint}/auth/v1/token?grant_type=password' \\
+curl -X POST '${endpoint}/auth/v1/token?grant_type=password' \\
 -H "apikey: ${apiKey}" \\
 -H "Content-Type: application/json" \\
 -d '{
@@ -486,7 +486,7 @@ let { user, error } = await supabase.auth.signIn({
     bash: {
       language: 'bash',
       code: `
-curl -X POST 'https://${endpoint}/auth/v1/magiclink' \\
+curl -X POST '${endpoint}/auth/v1/magiclink' \\
 -H "apikey: ${apiKey}" \\
 -H "Content-Type: application/json" \\
 -d '{
@@ -508,7 +508,7 @@ let { user, error } = await supabase.auth.signIn({
     bash: {
       language: 'bash',
       code: `
-curl -X POST 'https://${endpoint}/auth/v1/signup' \\
+curl -X POST '${endpoint}/auth/v1/signup' \\
 -H "apikey: ${apiKey}" \\
 -H "Content-Type: application/json" \\
 -d '{
@@ -532,7 +532,7 @@ let { user, error } = await supabase.auth.signUp({
     bash: {
       language: 'bash',
       code: `
-curl -X POST 'https://${endpoint}/auth/v1/otp' \\
+curl -X POST '${endpoint}/auth/v1/otp' \\
 -H "apikey: ${apiKey}" \\
 -H "Content-Type: application/json" \\
 -d '{
@@ -554,7 +554,7 @@ let { user, error } = await supabase.auth.signIn({
     bash: {
       language: 'bash',
       code: `
-curl -X POST 'https://${endpoint}/auth/v1/verify' \\
+curl -X POST '${endpoint}/auth/v1/verify' \\
 -H "apikey: ${apiKey}" \\
 -H "Content-Type: application/json" \\
 -d '{
@@ -579,7 +579,7 @@ let { session, error } = await supabase.auth.verifyOTP({
     bash: {
       language: 'bash',
       code: `
-curl -X POST 'https://${endpoint}/auth/v1/invite' \\
+curl -X POST '${endpoint}/auth/v1/invite' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Content-Type: application/json" \\
@@ -617,7 +617,7 @@ let { user, error } = await supabase.auth.signIn({
     bash: {
       language: 'bash',
       code: `
-curl -X GET 'https://${endpoint}/auth/v1/user' \\
+curl -X GET '${endpoint}/auth/v1/user' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer USER_TOKEN"
 `,
@@ -634,7 +634,7 @@ const user = supabase.auth.user()
     bash: {
       language: 'bash',
       code: `
-      curl -X POST 'https://${endpoint}/auth/v1/recover' \\
+      curl -X POST '${endpoint}/auth/v1/recover' \\
 -H "apikey: ${apiKey}" \\
 -H "Content-Type: application/json" \\
 -d '{
@@ -654,7 +654,7 @@ let { data, error } = await supabase.auth.api.resetPasswordForEmail(email)
     bash: {
       language: 'bash',
       code: `
-      curl -X PUT 'https://${endpoint}/auth/v1/user' \\
+      curl -X PUT '${endpoint}/auth/v1/user' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer <USERS-ACCESS-TOKEN>" \\
 -H "Content-Type: application/json" \\
@@ -683,7 +683,7 @@ const { user, error } = await supabase.auth.update({
     bash: {
       language: 'bash',
       code: `
-curl -X POST 'https://${endpoint}/auth/v1/logout' \\
+curl -X POST '${endpoint}/auth/v1/logout' \\
 -H "apikey: ${apiKey}" \\
 -H "Content-Type: application/json" \\
 -H "Authorization: Bearer USER_TOKEN"'

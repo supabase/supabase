@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import { keyBy } from 'lodash'
 
 import { get, post, patch, delete_ } from 'lib/common/fetch'
-import { UserContentMap } from 'types'
+import { UserContent, UserContentMap } from 'types'
 import { IRootStore } from '../RootStore'
 import { API_URL } from 'lib/constants'
 
@@ -137,7 +137,7 @@ export default class ProjectContentStore implements IProjectContentStore {
     }
   }
 
-  async update(id: any, updates: any, type: string) {
+  async update(id: any, updates: any, type: UserContent['type']) {
     try {
       const headers = {
         'Content-Type': 'application/json',
