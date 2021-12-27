@@ -228,7 +228,6 @@ const ResetDbPassword: FC<any> = () => {
           <Input
             type="password"
             onChange={onDbPassChange}
-            label="New Password"
             error={passwordStrengthWarning}
             // @ts-ignore
             descriptionText={
