@@ -86,6 +86,7 @@ p {
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  @apply bg-white dark:bg-gray-800;
 }
 
 .section--masked {
