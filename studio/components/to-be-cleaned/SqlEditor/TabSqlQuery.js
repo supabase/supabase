@@ -14,7 +14,7 @@ import {
 } from '@supabase/ui'
 import Editor from '@monaco-editor/react'
 
-import { timeout } from 'lib/helpers'
+import { copyToClipboard, timeout } from 'lib/helpers'
 import { IS_PLATFORM } from 'lib/constants'
 import { useSqlStore, UTILITY_TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
 import { useProjectContentStore } from 'stores/projectContentStore'
@@ -240,10 +240,11 @@ const ResultsDropdown = observer(() => {
 
   function onCopyAsMarkdown() {
     if (navigator) {
-      navigator.clipboard.writeText(sqlEditorStore.activeTab.markdownData)
+      copyToClipboard(sqlEditorStore.activeTab.markdownData, () => {
+        ui.setNotification({ category: 'success', message: 'Copied results to clipboard' })
+        Telemetry.sendEvent('sql_editor', 'sql_copy_as_markdown', '')
+      })
     }
-    ui.setNotification({ category: 'success', message: 'Copied results to clipboard' })
-    Telemetry.sendEvent('sql_editor', 'sql_copy_as_markdown', '')
   }
 
   return (
@@ -571,7 +572,7 @@ const Results = ({ results }) => {
       const colKey = columns[idx].key
       const cellValue = results[rowIdx]?.[colKey] ?? ''
       const value = formatClipboardValue(cellValue)
-      navigator.clipboard.writeText(value)
+      copyToClipboard(value)
     }
   }
 
