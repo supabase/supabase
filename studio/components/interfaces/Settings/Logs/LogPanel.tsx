@@ -111,7 +111,7 @@ const LogPanel: FC<Props> = ({
             <Input
               size="tiny"
               icon={<IconSearch size={16} />}
-              placeholder="Search event messages"
+              placeholder="Search events"
               onChange={(e) => setSearch(e.target.value)}
               value={search}
               actions={[
@@ -126,7 +126,7 @@ const LogPanel: FC<Props> = ({
                 ),
                 <Button
                   key="go"
-                  size="small"
+                  size="tiny"
                   title="Go"
                   type="secondary"
                   onClick={() => onSearch(search)}
