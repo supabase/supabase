@@ -162,16 +162,22 @@ export const LogPage: NextPage = () => {
                 onInputChange={(v) => setEditorValue(v || '')}
                 onInputRun={handleRefresh}
               />
-              <div className="flex flex-row justify-end mt-2">
-                {editorValue && (
-                  <Button type="text" onClick={() => setEditorValue('')}>
-                    Clear
-                  </Button>
-                )}
-                <Button type={editorValue ? 'secondary' : 'text'} onClick={handleEditorSubmit}>
-                  Run
+            </div>
+            <div className="flex flex-row gap-x-2 justify-end p-2">
+              {editorValue && (
+                <Button
+                  type="text"
+                  onClick={() => {
+                    setEditorValue('')
+                    setEditorId(uuidv4())
+                  }}
+                >
+                  Clear
                 </Button>
-              </div>
+              )}
+              <Button type={editorValue ? 'secondary' : 'text'} onClick={handleEditorSubmit}>
+                Run
+              </Button>
             </div>
           </React.Fragment>
         )}
