@@ -23,7 +23,7 @@ import {
   STORAGE_ROW_STATUS,
   STORAGE_SORT_BY,
 } from 'components/to-be-cleaned/Storage/Storage.constants.ts'
-import { timeout } from 'lib/helpers'
+import { timeout, copyToClipboard } from 'lib/helpers'
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -369,12 +369,15 @@ class StorageExplorerStore {
     const filePreview = find(this.filePreviewCache, { id: file.id })
     if (filePreview) {
       // Already generated signed URL
-      window.navigator?.clipboard?.writeText(filePreview.url)
+      copyToClipboard(filePreview.url, () => {
+        toast(`Copied URL for ${file.name} to clipboard.`)
+      })
     } else {
       // Need to generate signed URL, and might as well save it to cache as well
       const signedUrl = await this.fetchFilePreview(file.name)
-      window.navigator?.clipboard?.writeText(signedUrl)
-
+      copyToClipboard(signedUrl, () => {
+        toast(`Copied URL for ${file.name} to clipboard.`)
+      })
       const fileCache = {
         id: file.id,
         url: signedUrl,
@@ -383,7 +386,6 @@ class StorageExplorerStore {
       }
       this.addFileToPreviewCache(fileCache)
     }
-    toast(`Copied URL for ${file.name} to clipboard.`)
   }
 
   /* Methods that involve the storage client library */

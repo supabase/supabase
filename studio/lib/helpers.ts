@@ -152,3 +152,12 @@ export const snakeToCamel = (str: string) =>
   str.replace(/([-_][a-z])/g, (group: string) =>
     group.toUpperCase().replace('-', '').replace('_', '')
   )
+
+export const copyToClipboard = (str: string, callback = () => {}) => {
+  const focused = window.document.hasFocus()
+  if (focused) {
+    window.navigator?.clipboard?.writeText(str).then(callback)
+  } else {
+    console.warn('Unable to copy to clipboard')
+  }
+}
