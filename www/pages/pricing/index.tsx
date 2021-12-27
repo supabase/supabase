@@ -393,17 +393,19 @@ export default function IndexPage() {
         <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
           <Typography.Title level={2}>Frequently asked questions</Typography.Title>
           <div className="mt-16">
-            <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:grid-rows-2 md:gap-x-8 md:gap-y-12">
+            <div className="grid grid-cols-2 gap-y-10 gap-x-10">
               {pricingFaq.map((faq) => {
                 return (
-                  <Accordion bordered>
-                    <Accordion.Item label={faq.question}>
-                      <Typography>{faq.answer}</Typography>
-                    </Accordion.Item>
-                  </Accordion>
+                  <div>
+                    <Accordion bordered>
+                      <Accordion.Item label={faq.question}>
+                        <Typography>{faq.answer}</Typography>
+                      </Accordion.Item>
+                    </Accordion>
+                  </div>
                 )
               })}
-            </dl>
+            </div>
           </div>
         </div>
       </div>

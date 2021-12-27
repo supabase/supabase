@@ -18,7 +18,6 @@ import {
   DraggableProvided,
 } from 'react-beautiful-dnd'
 
-// import Hooks from 'lib/Hooks'
 import Column from './Column'
 import InformationBox from 'components/ui/InformationBox'
 import ForeignKeySelector from '../ForeignKeySelector/ForeignKeySelector'
@@ -60,25 +59,26 @@ const ColumnManagement: FC<Props> = ({
   const saveColumnForeignKey = (
     foreignKeyConfiguration: { table: PostgresTable; column: PostgresColumn } | undefined
   ) => {
-    // @ts-ignore
-    onUpdateColumn(selectedColumnToEditRelation, {
-      foreignKey: !isUndefined(foreignKeyConfiguration)
-        ? {
-            id: 0,
-            constraint_name: '',
-            source_schema: table?.schema,
-            source_table_name: table?.name,
-            source_column_name: selectedColumnToEditRelation?.name,
-            target_table_schema: foreignKeyConfiguration.table.schema,
-            target_table_name: foreignKeyConfiguration.table.name,
-            target_column_name: foreignKeyConfiguration.column.name,
-          }
-        : undefined,
-      ...(!isUndefined(foreignKeyConfiguration) && {
-        format: foreignKeyConfiguration.column.format,
-        defaultValue: '',
-      }),
-    })
+    if (!isUndefined(selectedColumnToEditRelation)) {
+      onUpdateColumn(selectedColumnToEditRelation, {
+        foreignKey: !isUndefined(foreignKeyConfiguration)
+          ? {
+              id: 0,
+              constraint_name: '',
+              source_schema: table?.schema ?? '',
+              source_table_name: table?.name ?? '',
+              source_column_name: selectedColumnToEditRelation?.name,
+              target_table_schema: foreignKeyConfiguration.table.schema,
+              target_table_name: foreignKeyConfiguration.table.name,
+              target_column_name: foreignKeyConfiguration.column.name,
+            }
+          : undefined,
+        ...(!isUndefined(foreignKeyConfiguration) && {
+          format: foreignKeyConfiguration.column.format,
+          defaultValue: '',
+        }),
+      })
+    }
     setSelectedColumnToEditRelation(undefined)
   }
 
