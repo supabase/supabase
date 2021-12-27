@@ -140,7 +140,7 @@ const InputSearchWithResults = observer(({ className }) => {
     }
     setLoading(true)
     const response = await post(`${API_URL}/profile/search`, { keywords: PageState.keywords })
-    if (response.error) {
+    if (response?.error) {
       ui.setNotification({
         category: 'error',
         message: `Failed to search profile: ${response.error.message}`,
