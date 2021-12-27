@@ -5,7 +5,7 @@ import { CSVLink } from 'react-csv'
 import { useMonaco } from '@monaco-editor/react'
 import { IconLoader, Typography } from '@supabase/ui'
 
-import { uuidv4 } from 'lib/helpers'
+import { copyToClipboard, uuidv4 } from 'lib/helpers'
 import { useStore } from 'hooks'
 import { SQL_TEMPLATES } from './SQLEditor.constants'
 import { getResultsMarkdown } from './SQLEditor.utils'
@@ -109,8 +109,9 @@ const SQLEditor: FC<Props> = ({ queryId, templateId }) => {
       return ui.setNotification({ category: 'info', message: 'There are no results to be copied' })
     }
     const markdown = getResultsMarkdown(results)
-    navigator?.clipboard.writeText(markdown)
-    ui.setNotification({ category: 'success', message: 'Results copied to clipboard' })
+    copyToClipboard(markdown, () => {
+      ui.setNotification({ category: 'success', message: 'Results copied to clipboard' })
+    })
   }
 
   const onSelectDownload = () => {
