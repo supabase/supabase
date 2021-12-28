@@ -193,14 +193,7 @@ const ProjectDeleteModal = ({ project }: any) => {
       const response = await delete_(`${API_URL}/projects/${project.ref}/remove`)
       if (response.error) throw response.error
 
-      app.onProjectDeleted(response)
-      if (profile && project.subscription_tier_prod_id === STRIPE_PRODUCT_IDS.FREE) {
-        mutateProfile({
-          ...profile,
-          total_free_projects_owned: profile.total_free_projects_owned - 1,
-        })
-      }
-
+      app.onProjectDeleted(response, mutateProfile)
       ui.setNotification({ category: 'success', message: `Successfully deleted ${project.name}` })
       router.push(`/`)
     } catch (error: any) {

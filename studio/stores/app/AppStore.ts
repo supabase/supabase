@@ -13,7 +13,7 @@ export interface IAppStore {
   organizations: OrganizationStore
   database: IDatabaseStore
   onProjectUpdated: (project: any) => void
-  onProjectDeleted: (project: any) => void
+  onProjectDeleted: (project: any, mutateProfile: Function) => void
   onOrgAdded: (org: any) => void
   onOrgUpdated: (org: any) => void
   onOrgDeleted: (org: any) => void
@@ -52,8 +52,9 @@ export default class AppStore implements IAppStore {
     }
   }
 
-  onProjectDeleted(project: any) {
+  onProjectDeleted(project: any, mutateProfile: Function) {
     if (project && project.id) {
+      const profile = this.rootStore.ui.profile
       const projectMetadata = this.projects.find((proj: any) => proj.id === project.id)
 
       // cleanup project saved queries
@@ -61,6 +62,13 @@ export default class AppStore implements IAppStore {
       localStorage.removeItem(`supabase_${project.ref}`)
 
       delete this.projects.data[project.id]
+
+      if (profile && projectMetadata?.subscription_tier_prod_id === STRIPE_PRODUCT_IDS.FREE) {
+        mutateProfile({
+          ...profile,
+          total_free_projects_owned: profile.total_free_projects_owned - 1,
+        })
+      }
     }
   }
 

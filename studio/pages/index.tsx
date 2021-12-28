@@ -42,14 +42,7 @@ const Home: NextPage = () => {
       return ui.setNotification({ category: 'error', message: response.error.message })
     }
 
-    app.onProjectDeleted(response)
-    if (project.subscription_tier_prod_id === STRIPE_PRODUCT_IDS.FREE) {
-      mutateProfile({
-        ...profile,
-        total_free_projects_owned: profile.total_free_projects_owned - 1,
-      })
-    }
-
+    app.onProjectDeleted(response, mutateProfile)
     ui.setNotification({ category: 'success', message: `Deleted ${project.name} successfully!` })
     setIsDeletingProject(false)
     setSelectedProjectToDelete(undefined)
