@@ -52,7 +52,7 @@ const ProductHeader = (props: Types) => (
           </Link>
           {props.documentation_url && (
             <Link href={props.documentation_url} as={props.documentation_url}>
-              <a>
+              <a className="ml-2">
                 <Button type="text" size="medium" icon={<IconBookOpen />}>
                   See documentation
                 </Button>
