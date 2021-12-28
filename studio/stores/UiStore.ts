@@ -21,7 +21,6 @@ export interface IUiStore {
   setOrganizationSlug: (slug?: string) => void
   setNotification: (notification: Notification) => string
   setProfile: (value?: User) => void
-  setProfileTotalFreeProjectsOwnedCount: (value: number) => void
 }
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
@@ -112,9 +111,5 @@ export default class UiStore implements IUiStore {
     }
 
     this.profile = value
-  }
-
-  setProfileTotalFreeProjectsOwnedCount(value: number) {
-    this.profile = { ...this.profile, total_free_projects_owned: value } as User
   }
 }

@@ -61,13 +61,6 @@ export default class AppStore implements IAppStore {
       localStorage.removeItem(`supabase_${project.ref}`)
 
       delete this.projects.data[project.id]
-
-      if (projectMetadata?.subscription_tier_prod_id === STRIPE_PRODUCT_IDS.FREE) {
-        const currentFreeProjectsCount = this.rootStore.ui.profile?.total_free_projects_owned ?? 0
-        const updatedFreeProjectsCount =
-          currentFreeProjectsCount > 0 ? currentFreeProjectsCount - 1 : 0
-        this.rootStore.ui.setProfileTotalFreeProjectsOwnedCount(updatedFreeProjectsCount)
-      }
     }
   }
 
