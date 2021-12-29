@@ -71,7 +71,7 @@ function InviteMemberModal({ organization, members = [] }) {
       user_id: PageState.selectedProfile.id,
     })
     if (isUndefined(response)) {
-      ui.setNotification({ category: 'error', message: 'Failed to search profile' })
+      ui.setNotification({ category: 'error', message: 'Failed to add member' })
     } else if (response?.error) {
       ui.setNotification({
         category: 'error',
