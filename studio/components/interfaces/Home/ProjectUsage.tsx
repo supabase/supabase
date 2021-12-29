@@ -1,31 +1,42 @@
 import useSWR from 'swr'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
-import { IconArchive, IconDatabase, IconKey, IconZap, Typography } from '@supabase/ui'
+import {
+  IconArchive,
+  IconDatabase,
+  IconKey,
+  IconZap,
+  Typography,
+  Button,
+  Dropdown,
+} from '@supabase/ui'
 
 import Panel from 'components/to-be-cleaned/Panel'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 
-import { useIsActive } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
 
 const DATETIME_FORMAT = 'MMM D, ha'
-
+const CHART_INTERVALS = [
+  ['minutely', '60 minutes'],
+  ['hourly', '24 hours'],
+  ['daily', '7 days'],
+]
 interface Props {
   project: any
 }
 
 const ProjectUsage: FC<Props> = ({ project }) => {
+  const [interval, setInterval] = useState<string>('minutely')
   const router = useRouter()
   const { ref } = router.query
-  const isActive = useIsActive()
   const { data, error }: any = useSWR(
     // only fetch when browser window is active
-    `${API_URL}/projects/${ref}/log-stats`,
+    `${API_URL}/projects/${ref}/log-stats?interval=${interval}`,
     get
     // increase refresh rate x10 to 30s when focus lost
     // conditional fetching will cause cached data to clear (not desirable)
@@ -34,10 +45,30 @@ const ProjectUsage: FC<Props> = ({ project }) => {
   const startDate = dayjs().subtract(7, 'day').format(DATE_FORMAT)
   const endDate = dayjs().format(DATE_FORMAT)
   const charts = data?.data
-
+  const selectedInterval = CHART_INTERVALS.find(([k, _l]) => k === interval) || CHART_INTERVALS[1]
   return (
     <div className="mx-6 space-y-6">
-      <Typography.Title level={4}>Statistics for past 24 hours</Typography.Title>
+      <div className="flex flex-row justify-between w-full">
+        <Typography.Title level={4}>Statistics for past {selectedInterval[1]}</Typography.Title>
+
+        <Dropdown
+          side="bottom"
+          align="center"
+          overlay={
+            <>
+              <Dropdown.RadioGroup value={interval} onChange={setInterval}>
+                {CHART_INTERVALS.map(([k, l]) => (
+                  <Dropdown.Radio key={k} value={k}>
+                    <Typography.Text>{l}</Typography.Text>
+                  </Dropdown.Radio>
+                ))}
+              </Dropdown.RadioGroup>
+            </>
+          }
+        >
+          <Button type="outline">{selectedInterval[1]}</Button>
+        </Dropdown>
+      </div>
       <div className="">
         {startDate && endDate && (
           <div className="grid lg:grid-cols-4 lg:gap-8">
