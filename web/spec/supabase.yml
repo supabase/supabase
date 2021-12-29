@@ -828,8 +828,8 @@ pages:
         js: |
           ```js
           const { data: user, error } = await supabase.auth.api.generateLink({
-            type: 'invite',
-            email: 'email@example.com'
+            'invite',
+            'email@example.com'
           })
           ```
 
