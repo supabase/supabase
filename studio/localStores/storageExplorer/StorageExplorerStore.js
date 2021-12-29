@@ -432,13 +432,18 @@ class StorageExplorerStore {
     // Deleting a bucket requires the bucket to be empty first
     // hence delete bucket and empty bucket are coupled tightly here
     const { id, name: bucketName } = bucket
-    const bucketIndex = findIndex(this.buckets, { id })
 
     const { error: emptyBucketError } = await this.supabaseClient.storage.emptyBucket(id)
-    if (emptyBucketError) toast(emptyBucketError.message)
+    if (emptyBucketError) {
+      toast(emptyBucketError.message)
+      return false
+    }
 
     const { error: deleteBucketError } = await this.supabaseClient.storage.deleteBucket(id)
-    if (deleteBucketError) toast(deleteBucketError.message)
+    if (deleteBucketError) {
+      toast(deleteBucketError.message)
+      return false
+    }
 
     await this.fetchBuckets()
     if (bucketName === this.selectedBucket.name) {
@@ -448,6 +453,7 @@ class StorageExplorerStore {
     }
     this.clearSelectedItemsToDelete()
     this.closeDeleteBucketModal()
+    return true
   }
 
   toggleBucketPublic = async (bucket) => {
