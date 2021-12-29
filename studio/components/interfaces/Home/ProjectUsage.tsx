@@ -22,9 +22,9 @@ import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
 
 const DATETIME_FORMAT = 'MMM D, ha'
 const CHART_INTERVALS = [
-  ['minutely', '60 minutes'],
-  ['hourly', '24 hours'],
-  ['daily', '7 days'],
+  {key: 'minutely', label:'60 minutes', startValue: 1, startUnit: 'hour'},
+  {key: 'hourly', label:'24 hours', startValue: 24, startUnit: 'hour'},
+  {key: 'daily', label:'7 days', startValue: 7, startUnit: 'day'},
 ]
 interface Props {
   project: any
@@ -42,14 +42,14 @@ const ProjectUsage: FC<Props> = ({ project }) => {
     // conditional fetching will cause cached data to clear (not desirable)
     // { refreshInterval: isActive ? 3000 : 30000 }
   )
-  const startDate = dayjs().subtract(7, 'day').format(DATE_FORMAT)
+  const selectedInterval = CHART_INTERVALS.find(i => i.key === interval) || CHART_INTERVALS[0]
+  const startDate = dayjs().subtract(selectedInterval.startValue, selectedInterval.startUnit).format(DATE_FORMAT)
   const endDate = dayjs().format(DATE_FORMAT)
   const charts = data?.data
-  const selectedInterval = CHART_INTERVALS.find(([k, _l]) => k === interval) || CHART_INTERVALS[1]
   return (
     <div className="mx-6 space-y-6">
       <div className="flex flex-row justify-between w-full">
-        <Typography.Title level={4}>Statistics for past {selectedInterval[1]}</Typography.Title>
+        <Typography.Title level={4}>Statistics for past {selectedInterval.label}</Typography.Title>
 
         <Dropdown
           side="bottom"
@@ -57,16 +57,16 @@ const ProjectUsage: FC<Props> = ({ project }) => {
           overlay={
             <>
               <Dropdown.RadioGroup value={interval} onChange={setInterval}>
-                {CHART_INTERVALS.map(([k, l]) => (
-                  <Dropdown.Radio key={k} value={k}>
-                    <Typography.Text>{l}</Typography.Text>
+                {CHART_INTERVALS.map(i => (
+                  <Dropdown.Radio key={i.key} value={i.key}>
+                    <Typography.Text>{i.label}</Typography.Text>
                   </Dropdown.Radio>
                 ))}
               </Dropdown.RadioGroup>
             </>
           }
         >
-          <Button type="outline">{selectedInterval[1]}</Button>
+          <Button type="outline">{selectedInterval.label}</Button>
         </Dropdown>
       </div>
       <div className="">
