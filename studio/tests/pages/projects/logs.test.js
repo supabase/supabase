@@ -97,7 +97,7 @@ test('Refreshpage', async () => {
   await waitFor(() => screen.getByText(/my_key/))
 
   // simulate refresh
-  await waitFor(() => userEvent.click(screen.getByText(/Refresh/)))
+  userEvent.click(screen.getByText(/Refresh/))
   // when log line unmounts and it was focused, should close focus panel
   await waitFor(() => screen.queryByText(/my_key/) === null, { timeout: 1000 })
   await waitFor(() => screen.queryByText(/happened/) === null, { timeout: 1000 })

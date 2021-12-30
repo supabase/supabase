@@ -110,7 +110,6 @@ export const LogPage: NextPage = () => {
   const handleRefresh = () => {
     setLatestRefresh(new Date().toISOString())
     setSize(1)
-    mutate()
   }
 
   const handleModeToggle = () => {

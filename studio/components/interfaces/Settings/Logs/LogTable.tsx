@@ -50,12 +50,13 @@ const LogTable = ({ isCustomQuery, data }: Props) => {
     }, {})
   }, [JSON.stringify(data)])
 
+  const strLogMap = JSON.stringify(logMap)
   useEffect(() => {
-    if (!data) return
+    if (data === null || data === undefined) return
     if (focusedLog && !(focusedLog.id in logMap)) {
       setFocusedLog(null)
     }
-  }, [Object.keys(logMap)])
+  }, [strLogMap])
 
   if (!data) return null
 
@@ -64,7 +65,7 @@ const LogTable = ({ isCustomQuery, data }: Props) => {
 
   const logDataRows = useMemo(() => {
     return Object.values(logMap).sort((a, b) => a.timestamp - b.timestamp)
-  }, [JSON.stringify(Object.keys(logMap))])
+  }, [strLogMap])
   return (
     <section className="flex flex-1 flex-row" style={{ maxHeight }}>
       <DataGrid
