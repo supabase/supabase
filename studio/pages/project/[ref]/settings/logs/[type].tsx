@@ -31,7 +31,7 @@ import Flag from 'components/ui/Flag/Flag'
  */
 export const LogPage: NextPage = () => {
   const router = useRouter()
-  const { ref, type } = router.query
+  const { ref, type, q, s, ts } = router.query
 
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState('')
@@ -49,6 +49,26 @@ export const LogPage: NextPage = () => {
   useEffect(() => {
     setParams({ ...params, type: type as string })
   }, [type])
+
+  useEffect(() => {
+    // on mount, set initial values
+    if (q) {
+      onSelectTemplate({
+        mode: 'custom',
+        searchString: q as string,
+      })
+    }
+    if (!q && s) {
+      onSelectTemplate({
+        mode: 'simple',
+        searchString: s as string,
+      })
+    }
+    if (ts) {
+      setParams({ ...params, timestamp_start: ts as string })
+    }
+    //
+  }, [])
 
   const genQueryParams = (params: { [k: string]: string }) => {
     // remove keys which are empty strings, null, or undefined
@@ -109,6 +129,7 @@ export const LogPage: NextPage = () => {
 
   const handleRefresh = () => {
     setLatestRefresh(new Date().toISOString())
+    setParams({ ...params, timestamp_start: '' })
     setSize(1)
     mutate()
   }
