@@ -210,18 +210,22 @@ test('s= query param will populate the search bar', async () => {
   render(<LogPage />)
   // should populate search input with the search param
   screen.getByDisplayValue('someSearch')
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('search_query=someSearch'))
+  })
+
 })
 
 test('q= query param will populate the query input', async () => {
   useRouter.mockReturnValue({
-    query: { ref: '123', type: 'api', q: 'some query', s: 'someSearch' },
+    query: { ref: '123', type: 'api', q: 'some_query', s: 'someSearch' },
   })
   render(<LogPage />)
   // should populate editor with the query param
-  screen.getByText(/some query/)
-  let editor = container.querySelector('.monaco-editor')
-  expect(editor).toBeTruthy()
-  screen.getByText(/some query/)
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('where=some_query'))
+  })
+
   // query takes precedence of search queryparam
   expect(() => !screen.queryByDisplayValue(/someSearch/))
 })
