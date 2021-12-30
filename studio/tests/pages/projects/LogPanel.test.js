@@ -1,15 +1,12 @@
-import LogPanel from 'components/ui/Logs/LogPanel'
+import LogPanel from 'components/interfaces/Settings/Logs/LogPanel'
 import { render, waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 test('templates', async () => {
   const mockFn = jest.fn()
-  render(<LogPanel templates={[
-    { label: 'Some option', onClick: mockFn }
-  ]} />)
-  const search = screen.getByPlaceholderText(/Filter/)
-  userEvent.type(search, "12345")
-
+  render(<LogPanel templates={[{ label: 'Some option', onClick: mockFn }]} />)
+  const search = screen.getByPlaceholderText(/Search/)
+  userEvent.type(search, '12345')
 
   // TODO templates dropdown interaction currently cannot be tested
   // https://github.com/supabase/ui/issues/299
@@ -21,21 +18,22 @@ test('templates', async () => {
   // expect(mockFn).toBeCalled()
 })
 
-test("filter input change", async () => {
+test('filter input change and submit', async () => {
   const mockFn = jest.fn()
   render(<LogPanel onSearch={mockFn} />)
-  const search = screen.getByPlaceholderText(/Filter/)
-  userEvent.type(search, "12345")
+  const search = screen.getByPlaceholderText(/Search/)
+  userEvent.type(search, '12345')
+  expect(mockFn).not.toBeCalled()
+  userEvent.click(screen.getByText('Go'))
   expect(mockFn).toBeCalled()
 })
 
-test("filter input value", async () => {
-  render(<LogPanel searchValue={"1234"} />)
-  screen.getByDisplayValue("1234")
+test('filter input value', async () => {
+  render(<LogPanel defaultSearchValue={'1234'} />)
+  screen.getByDisplayValue('1234')
 })
 
-
-test("Manual refresh", async () => {
+test('Manual refresh', async () => {
   const mockFn = jest.fn()
   render(<LogPanel onRefresh={mockFn} />)
   let btn
@@ -46,12 +44,13 @@ test("Manual refresh", async () => {
   expect(mockFn).toBeCalled()
 })
 
-test("reset filters", () => {
-  const mockFn = jest.fn()
-  const { rerender } = render(<LogPanel showReset={false} />)
-  expect(() => screen.getByText(/Reset filters/)).toThrow()
+test('reset search filter', async () => {
+  const { rerender } = render(<LogPanel />)
+  expect(() => screen.getByTitle(/Clear search/)).toThrow()
 
-  rerender(<LogPanel showReset={true} onReset={mockFn} />)
-  userEvent.click(screen.getByText(/Reset filters/))
-  expect(mockFn).toBeCalled()
+  rerender(<LogPanel defaultSearchValue="something123" />)
+  await waitFor(() => screen.getByDisplayValue(/something123/))
+  userEvent.click(screen.getByTitle(/Clear search/))
+  expect(() => screen.getByTitle(/Clear search/)).toThrow()
+  expect(() => screen.getByDisplayValue(/something123/)).toThrow()
 })

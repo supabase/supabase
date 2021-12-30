@@ -1,5 +1,6 @@
 import { GOTRUE_ENABLED } from 'lib/gotrue'
 import { tryParseJson } from 'lib/helpers'
+import { isUndefined } from 'lodash'
 import { SupaResponse } from 'types/base'
 
 export function handleError<T>(e: any, requestId: string): SupaResponse<T> {
@@ -87,10 +88,10 @@ export function getAccessToken() {
 }
 
 // get param from URL fragment
-function getParameterByName(name: string, url?: string) {
+export function getParameterByName(name: string, url?: string) {
   // ignore if server-side
   if (typeof window === 'undefined') return ''
-  
+
   if (!url) url = window?.location?.href || ''
   // eslint-disable-next-line no-useless-escape
   name = name.replace(/[\[\]]/g, '\\$&')
@@ -109,7 +110,8 @@ export function constructHeaders(requestId: string, optionHeaders?: { [prop: str
     ...optionHeaders,
   }
 
-  if (GOTRUE_ENABLED) {
+  const hasAuthHeader = !isUndefined(optionHeaders) && 'Authorization' in optionHeaders
+  if (GOTRUE_ENABLED && !hasAuthHeader) {
     const accessToken = getAccessToken()
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`
   }

@@ -39,7 +39,7 @@ const Error404: NextPage = ({}) => {
       </div>
       <div className="absolute">
         <Typography.Title
-          className={`filter transition opacity-[5%] duration-200 ${
+          className={`select-none filter transition opacity-[5%] duration-200 ${
             show404 ? 'blur-sm' : 'blur-none'
           }`}
           style={{ fontSize: '28rem' }}

@@ -1,11 +1,18 @@
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Modal, Button, Input, Space, Typography } from '@supabase/ui'
 
-const DeleteBucketModal = ({
+interface Props {
+  visible: boolean
+  bucket: any
+  onSelectCancel: () => void
+  onSelectDelete: (bucket: any) => void
+}
+
+const DeleteBucketModal: FC<Props> = ({
   visible = false,
   bucket = {},
-  onSelectCancel = () => {},
-  onSelectDelete = () => {},
+  onSelectCancel,
+  onSelectDelete,
 }) => {
   const [deleting, setDeleting] = useState(false)
   const [validationInput, setValidationInput] = useState('')
