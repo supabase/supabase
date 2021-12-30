@@ -203,27 +203,39 @@ test('where clause will trigger a log refresh', async () => {
 })
 
 
-test('search= query param will populate the search bar', async () => {
+test('s= query param will populate the search bar', async () => {
   useRouter.mockReturnValue({
-    query: { ref: '123', type: 'api', search: 'someSearch' },
+    query: { ref: '123', type: 'api', s: 'someSearch' },
   })
   render(<LogPage />)
-  // should populate input with the search query param
+  // should populate search input with the search param
   screen.getByDisplayValue('someSearch')
 })
 
-test('query= query param will populate the query input', async () => {
+test('q= query param will populate the query input', async () => {
   useRouter.mockReturnValue({
-    query: { ref: '123', type: 'api', query: 'some query', search: 'someSearch' },
+    query: { ref: '123', type: 'api', q: 'some query', s: 'someSearch' },
   })
   render(<LogPage />)
-  // should populate input with the search query param
+  // should populate editor with the query param
   screen.getByText(/some query/)
   let editor = container.querySelector('.monaco-editor')
   expect(editor).toBeTruthy()
   screen.getByText(/some query/)
   // query takes precedence of search queryparam
-  expect(() => screen.getByDisplayValue(/someSearch/)).toThrow()
+  expect(() => !screen.queryByDisplayValue(/someSearch/))
+})
+
+test('ts= query param will set the timestamp_start param', async () => {
+  useRouter.mockReturnValue({
+    query: { ref: '123', type: 'api', ts: 123456 },
+  })
+  render(<LogPage />)
+
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_start=123456'))
+  })
+
 })
 
 test('load older btn will fetch older logs', async () => {
