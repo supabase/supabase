@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View, StyleSheet, SafeAreaView, FlatList} from 'react-native';
 import {Styles} from '../lib/constants';
 import {Text} from 'react-native-elements';
@@ -12,6 +12,7 @@ export default function TodoList() {
   const {user} = useUser();
   const [todos, setTodos] = useState([]);
   const [newTaskText, setNewTaskText] = useState('');
+  const componentMounted = useRef(true);
 
   useEffect(() => {
     const fetchTodos = async () => {
@@ -22,10 +23,17 @@ export default function TodoList() {
       if (error) {
         console.log('error', error);
       } else {
-        setTodos(data.todos);
+        console.log('Todos: ', data);
+        setTodos(data);
       }
     };
-    fetchTodos();
+    if (componentMounted.current) {
+      fetchTodos();
+    }
+
+    return () => {
+      componentMounted.current = false;
+    };
   }, []);
 
   const addTodo = async taskText => {
@@ -77,6 +85,7 @@ export default function TodoList() {
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Input
+          autoFocus
           label="New todo"
           leftIcon={{type: 'font-awesome', name: 'tasks'}}
           onChangeText={text => setNewTaskText(text)}
@@ -97,7 +106,7 @@ export default function TodoList() {
                     checked={todo.is_complete}
                     onPress={() => toggleCompleted(todo.id, todo.is_complete)}
                   />
-                  <Text h3 style={[styles.mtAuto]}>
+                  <Text h4 style={[styles.mtAuto]}>
                     {todo.task}
                   </Text>
                   <Button title="Delete" onPress={() => deleteTodo(todo.id)} />
