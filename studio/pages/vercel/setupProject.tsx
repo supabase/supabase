@@ -218,7 +218,7 @@ const CreateProject = observer(() => {
       auth_site_url: _store.selectedVercelProjectUrl,
       vercel_configuration_id: _store.configurationId,
     }
-    return await post(`${API_URL}/projects/new`, data)
+    return await post(`${API_URL}/projects`, data)
   }
 
   async function onCreateProject() {

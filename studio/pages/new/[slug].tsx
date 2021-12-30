@@ -167,7 +167,7 @@ export const Wizard = () => {
       db_pass: dbPass,
       db_region: dbRegion,
     }
-    const response = await post(`${API_URL}/projects/new`, data)
+    const response = await post(`${API_URL}/projects`, data)
     if (response.error) {
       setNewProjectLoading(false)
       ui.setNotification({
