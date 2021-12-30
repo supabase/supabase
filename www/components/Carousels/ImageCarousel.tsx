@@ -169,7 +169,7 @@ function ImageCarousel(props: ImageCarouselProps) {
           {props.content.map((content, i) => {
             return (
               <SwiperSlide key={i}>
-                <div className="bg-white dark:bg-gray-800">
+                <div className="bg-white dark:bg-gray-800 p-px">
                   <Typography.Title level={4}>{content.title}</Typography.Title>
                   <Typography.Text>
                     <p className="text-base">{content.text}</p>

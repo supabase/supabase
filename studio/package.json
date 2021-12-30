@@ -1,6 +1,6 @@
 {
   "name": "studio",
-  "version": "0.0.5",
+  "version": "0.0.8",
   "private": true,
   "scripts": {
     "dev": "next dev -p 8082",
@@ -15,6 +15,7 @@
     "@monaco-editor/react": "^4.3.1",
     "@next/bundle-analyzer": "^12.0.4",
     "@radix-ui/react-portal": "^0.1.1",
+    "@radix-ui/react-tooltip": "^0.1.6",
     "@sentry/browser": "^6.15.0",
     "@sentry/nextjs": "^6.15.0",
     "@supabase/grid": "^2.3.9",

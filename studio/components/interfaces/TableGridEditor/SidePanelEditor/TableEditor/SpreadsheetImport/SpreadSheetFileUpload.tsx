@@ -1,5 +1,5 @@
 import { DragEvent, useRef, useState, FC } from 'react'
-import { Button, Typography, IconLoader } from '@supabase/ui'
+import { Button, Typography, IconLoader, IconFileText } from '@supabase/ui'
 import SparkBar from 'components/ui/SparkBar'
 
 interface Props {
@@ -62,8 +62,11 @@ const SpreadSheetFileUpload: FC<Props> = ({
           </Typography.Text>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center border dark:border-gray-500 border-dashed rounded-md h-48">
-          <Typography.Title level={4}>{uploadedFile.name}</Typography.Title>
+        <div className="flex flex-col items-center justify-center border dark:border-gray-500 border-dashed rounded-md h-32 space-y-2">
+          <div className="flex items-center space-x-2">
+            <IconFileText size={16} strokeWidth={2} />
+            <Typography.Title level={4}>{uploadedFile.name}</Typography.Title>
+          </div>
           {parseProgress === 100 ? (
             <Button type="outline" onClick={removeUploadedFile}>
               Remove File

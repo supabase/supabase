@@ -116,6 +116,7 @@ export default class MetaStore implements IMetaStore {
 
   connectionString?: string
   baseUrl: string
+  queryBaseUrl: string
   excludedSchemas = [
     'auth',
     'extensions',
@@ -132,6 +133,7 @@ export default class MetaStore implements IMetaStore {
     const { projectRef, connectionString } = options
     this.rootStore = rootStore
     this.baseUrl = `/api/pg-meta/${projectRef}`
+    this.queryBaseUrl = `${API_URL}/pg-meta/${projectRef}`
 
     const headers: any = {}
     if (IS_PLATFORM && connectionString) {
@@ -166,7 +168,7 @@ export default class MetaStore implements IMetaStore {
     try {
       const headers: any = { 'Content-Type': 'application/json' }
       if (this.connectionString) headers['x-connection-encrypted'] = this.connectionString
-      const url = `${this.baseUrl}/query`
+      const url = `${this.queryBaseUrl}/query`
       const response = await post(url, { query: value }, { headers })
       if (response.error) throw response.error
 
@@ -433,14 +435,14 @@ export default class MetaStore implements IMetaStore {
 
           if (!isUndefined(error)) {
             this.rootStore.ui.setNotification({
-              id: toastId,
               category: 'error',
-              message: `Table ${table.name} has been created but we ran into an error while inserting rows:
-            ${error.message} - ${error.details}`,
+              message: 'Do check your spreadsheet if there are any discrepancies.',
             })
             this.rootStore.ui.setNotification({
               category: 'error',
-              message: 'Do check your spreadsheet if there are any discrepancies.',
+              message: `Table ${table.name} has been created but we ran into an error while inserting rows:
+            ${error.message}`,
+              error,
             })
           }
         } else {

@@ -52,7 +52,7 @@ info:
         <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
         <td>-</td>
         <td>-</td>
-        <td>-</td>
+        <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">storage-go</a></td>
       </tr>
       <tr>
         <td>Java</td>
@@ -150,6 +150,7 @@ info:
         items:
           - subscribe()
           - removeSubscription()
+          - removeAllSubscriptions()
           - getSubscriptions()
       - name: 'Storage'
         items:
@@ -470,6 +471,22 @@ pages:
         hideCodeBlock: true
         description: |
           You can sign up with OAuth providers using the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers) method.
+      - name: Sign up with Phone.
+        description: |
+          Supabase supports Phone Auth. After a user verified thier number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            phone: '+13334445555',
+            password: 'some-password',
+          })
+          
+          // After receiving an SMS with One Time Password.
+          let { session, error } = await supabase.auth.verifyOTP({
+            phone: '+13334445555',
+            token: '123456',
+          })
+          ```
 
   auth.signIn():
     title: 'signIn()'
@@ -504,6 +521,15 @@ pages:
           const { user, session, error } = await supabase.auth.signIn({
             // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
             provider: 'github'
+          })
+          ```
+      - name: Sign in with Phone.
+        description: Supabase supports Phone Auth. 
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            phone: '+13334445555',
+            password: 'some-password',
           })
           ```
       - name: Sign in with redirect.
@@ -696,7 +722,7 @@ pages:
     notes: |
       - Fetches the user object from the database instead of local storage.
       - Note that user() fetches the user object from local storage which might not be the most updated.
-      - Requires the user's access_token. 
+      - Requires the user's access_token.
     examples:
       - name: Fetch the user object using the access_token jwt.
         isSpotlight: true
@@ -1272,6 +1298,19 @@ pages:
         js: |
           ```js
           supabase.removeSubscription(mySubscription)
+          ```
+
+  removeAllSubscriptions():
+    title: 'removeAllSubscriptions()'
+    $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.removeAllSubscriptions'
+    notes: |
+      - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
+    examples:
+      - name: Removes all subscriptions
+        isSpotlight: true
+        js: |
+          ```js
+          supabase.removeAllSubscriptions()
           ```
 
   getSubscriptions():

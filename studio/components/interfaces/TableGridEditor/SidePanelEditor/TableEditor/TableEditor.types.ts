@@ -1,3 +1,4 @@
+import { Dictionary } from '@supabase/grid'
 import { ColumnField } from '../SidePanelEditor.types'
 
 export interface TableField {
@@ -13,4 +14,5 @@ export interface ImportContent {
   headers: string[]
   rowCount: number
   rows: object[]
+  columnTypeMap: Dictionary<any>
 }

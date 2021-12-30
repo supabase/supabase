@@ -86,12 +86,14 @@ const ChartHandler: FC<Props> = ({
 
       // Convert null values to 0
       // TODO: Chart endpoint should handle this data formatting to 0 instead of client.
-      const formattedChartData = res.data.map((dataPoint: Dictionary<any>, idx: number) => {
-        return {
-          ...dataPoint,
-          [attribute]: dataPoint[attribute] ? Number(dataPoint[attribute]) : 0,
+      const formattedChartData = (res?.data ?? []).map(
+        (dataPoint: Dictionary<any>, idx: number) => {
+          return {
+            ...dataPoint,
+            [attribute]: dataPoint[attribute] ? Number(dataPoint[attribute]) : 0,
+          }
         }
-      })
+      )
 
       if (!cancel) {
         setFetchedData({ ...res, data: formattedChartData })

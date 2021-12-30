@@ -1,7 +1,6 @@
 import { createContext, useContext, useCallback, useState, useEffect } from 'react'
-import { debounce } from 'lodash'
+import { debounce, isUndefined } from 'lodash'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import toast from 'react-hot-toast'
 import { post } from 'lib/common/fetch'
 import { Button, IconKey, IconLoader, IconUser, IconX, Input, Typography } from '@supabase/ui'
 import { Modal } from '@supabase/ui'
@@ -71,7 +70,9 @@ function InviteMemberModal({ organization, members = [] }) {
       org_id: orgId,
       user_id: PageState.selectedProfile.id,
     })
-    if (response?.error) {
+    if (isUndefined(response)) {
+      ui.setNotification({ category: 'error', message: 'Failed to add member' })
+    } else if (response?.error) {
       ui.setNotification({
         category: 'error',
         message: `Failed to add member: ${response.error.message}`,
@@ -140,7 +141,9 @@ const InputSearchWithResults = observer(({ className }) => {
     }
     setLoading(true)
     const response = await post(`${API_URL}/profile/search`, { keywords: PageState.keywords })
-    if (response.error) {
+    if (isUndefined(response)) {
+      ui.setNotification({ category: 'error', message: 'Failed to search profile' })
+    } else if (response.error) {
       ui.setNotification({
         category: 'error',
         message: `Failed to search profile: ${response.error.message}`,
