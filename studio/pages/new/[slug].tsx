@@ -20,6 +20,8 @@ import {
   PASSWORD_STRENGTH,
   PASSWORD_STRENGTH_COLOR,
   PASSWORD_STRENGTH_PERCENTAGE,
+  PRICING_PLANS,
+  PRICING_PLANS_DEFAULT,
 } from 'lib/constants'
 
 import { useStore, withAuth } from 'hooks'
@@ -75,6 +77,7 @@ export const Wizard = () => {
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
+  const [dbPricingPlan, setDbPricingPlan] = useState(PRICING_PLANS_DEFAULT)
   const [newProjectedLoading, setNewProjectLoading] = useState(false)
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
@@ -83,7 +86,8 @@ export const Wizard = () => {
   const canSubmit =
     projectName != '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-    dbRegion != ''
+    dbRegion != '' &&
+    dbPricingPlan != ''
   const passwordErrorMessage =
     dbPass != '' && passwordStrengthScore < DEFAULT_MINIMUM_PASSWORD_STRENGTH
       ? 'You need a stronger password'
@@ -139,6 +143,10 @@ export const Wizard = () => {
     setDbRegion(e.target.value)
   }
 
+  function onDbPricingPlanChange(e: any) {
+    setDbPricingPlan(e.target.value)
+  }
+
   async function checkPasswordStrength(value: any) {
     let passwordStrength = ''
     if (value && value !== '') {
@@ -166,6 +174,7 @@ export const Wizard = () => {
       name: projectName,
       db_pass: dbPass,
       db_region: dbRegion,
+      db_pricing_plan: dbPricingPlan,
     }
     const response = await post(`${API_URL}/projects`, data)
     if (response.error) {
@@ -333,7 +342,7 @@ export const Wizard = () => {
                 />
               </Panel.Content>
 
-              <Panel.Content className="Form section-block--body has-inputs-centered ">
+              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                 <FormField
                   // @ts-ignore
                   label="Region"
@@ -342,6 +351,24 @@ export const Wizard = () => {
                   value={dbRegion}
                   onChange={onDbRegionChange}
                   description="Select a region close to you for the best performance."
+                />
+              </Panel.Content>
+
+              <Panel.Content className="Form section-block--body has-inputs-centered ">
+                <FormField
+                  // @ts-ignore
+                  label="Pricing Plan"
+                  type="select"
+                  choices={PRICING_PLANS}
+                  value={dbPricingPlan}
+                  onChange={onDbPricingPlanChange}
+                  description={[
+                    'Select a pricing plan. ',
+                    <a className="underline" target="_blank" href="https://supabase.com/pricing">
+                      More details
+                    </a>,
+                    '.',
+                  ]}
                 />
               </Panel.Content>
             </>
