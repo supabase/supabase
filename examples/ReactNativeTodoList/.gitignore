@@ -58,5 +58,7 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
-.env.example
 .env
+.prettierrc.js
+.idea/
+.vscode
