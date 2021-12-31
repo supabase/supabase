@@ -362,13 +362,14 @@ export const Wizard = () => {
                   choices={PRICING_PLANS}
                   value={dbPricingPlan}
                   onChange={onDbPricingPlanChange}
-                  description={[
-                    'Select a pricing plan. ',
-                    <a className="underline" target="_blank" href="https://supabase.com/pricing">
-                      More details
-                    </a>,
-                    '.',
-                  ]}
+                  description={
+                    <>
+                      Select a pricing plan.&nbsp;
+                      <a className="underline" target="_blank" href="https://supabase.com/pricing">
+                        More details
+                      </a>
+                    </>
+                  }
                 />
               </Panel.Content>
             </>
