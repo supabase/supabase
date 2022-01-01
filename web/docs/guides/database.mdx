@@ -118,10 +118,10 @@ Migrating projects can be achieved using standard PostgreSQL tooling. This is pa
 #### Migrate the database
 
 1. Run `ALTER ROLE postgres SUPERUSER` in the *old* project's SQL editor
-2. Run `pg_dump --clean --if-exists --quote-all-identifiers -d $OLD_DB_URL > dump.sql` from your terminal
+2. Run `pg_dump --clean --if-exists --quote-all-identifiers -h $OLD_DB_URL -U postgres > dump.sql` from your terminal
 3. Run `ALTER ROLE postgres NOSUPERUSER` in the *old* project's SQL editor
 4. Run `ALTER ROLE postgres SUPERUSER` in the *new* project's SQL editor
-5. Run `psql $NEW_DB_URL -f dump.sql` from your terminal
+5. Run `psql -h $NEW_DB_URL -U postgres -f dump.sql` from your terminal
 6. Run `TRUNCATE storage.objects` in the *new* project's SQL editor
 7. Run `ALTER ROLE postgres NOSUPERUSER` in the *new* project's SQL editor
 
