@@ -33,33 +33,33 @@ body,
   box-sizing: border-box;
 }
 
-input,
-input[type='text'],
-input[type='email'],
-input[type='url'],
-input[type='password'],
-input[type='number'],
-input[type='date'],
-input[type='datetime-local'],
-input[type='month'],
-input[type='search'],
-input[type='tel'],
-input[type='time'],
-input[type='week'],
-input[multiple],
-textarea,
-select {
-  @apply block box-border w-full rounded-md shadow-sm text-sm border border-solid transition-all;
+// input,
+// input[type='text'],
+// input[type='email'],
+// input[type='url'],
+// input[type='password'],
+// input[type='number'],
+// input[type='date'],
+// input[type='datetime-local'],
+// input[type='month'],
+// input[type='search'],
+// input[type='tel'],
+// input[type='time'],
+// input[type='week'],
+// input[multiple],
+// textarea,
+// select {
+//   @apply block box-border w-full rounded-md shadow-sm text-sm border border-solid transition-all;
 
-  @apply border-input-border-light dark:border-input-border-dark focus:outline-none;
+//   @apply border-input-border-light dark:border-input-border-dark focus:outline-none;
 
-  @apply bg-transparent text-form-light dark:text-form-dark;
+//   @apply bg-transparent text-form-light dark:text-form-dark;
 
-  @apply focus:border-input-border-focus-light dark:focus:border-input-border-focus-dark;
-  @apply focus:ring-input-border-focus-light dark:focus:ring-input-border-focus-dark;
+//   @apply focus:border-input-border-focus-light dark:focus:border-input-border-focus-dark;
+//   @apply focus:ring-input-border-focus-light dark:focus:ring-input-border-focus-dark;
 
-  transition: box-shadow 0.3s ease-in-out;
-}
+//   transition: box-shadow 0.3s ease-in-out;
+// }
 
 input,
 select,

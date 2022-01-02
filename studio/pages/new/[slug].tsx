@@ -224,7 +224,7 @@ export const Wizard = () => {
               <br />
             </Typography.Text>
           </Panel.Content>
-          <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4">
+          <Panel.Content className="Form section-block--body has-inputs-centered border-t border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4">
             <Listbox
               label="Organization"
               layout="horizontal"
