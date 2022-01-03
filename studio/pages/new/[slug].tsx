@@ -461,17 +461,21 @@ const EmptyPaymentMethodWarning = observer(({ dbPricingPlan }: { dbPricingPlan: 
    * Get a link and then redirect them
    * path is used to determine what path inside billing portal to redirect to
    */
-  async function redirectToPortal(path: any) {
-    try {
-      setLoading(true)
-      let { billingPortal } = await post(`${API_URL}/stripe/billing`, {
-        stripe_customer_id: _pageState.stripeCustomerId,
-        returnTo: `${getURL()}${router.asPath}`,
+  async function redirectToPortal() {
+    setLoading(true)
+    const response = await post(`${API_URL}/stripe/checkout`, {
+      stripe_customer_id: _pageState.stripeCustomerId,
+      returnTo: `${getURL()}${router.asPath}`,
+    })
+    if (response.error) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to redirect: ${response.error.message}`,
       })
-      window.location.replace(billingPortal + (path ? path : null))
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: `Failed to redirect: ${error.message}` })
       setLoading(false)
+    } else {
+      const { setupCheckoutPortal } = response
+      window.location.replace(setupCheckoutPortal)
     }
   }
 
@@ -488,11 +492,7 @@ const EmptyPaymentMethodWarning = observer(({ dbPricingPlan }: { dbPricingPlan: 
             <p className="text-sm leading-normal">
               You are required to add a default payment method in order to create a paid project.
             </p>
-            <Button
-              loading={loading}
-              type="secondary"
-              onClick={() => redirectToPortal('/payment-methods')}
-            >
+            <Button loading={loading} type="secondary" onClick={() => redirectToPortal()}>
               Add a payment method
             </Button>
           </div>
