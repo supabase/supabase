@@ -3,6 +3,9 @@ export interface Organization {
   slug: string
   name: string
   billing_email: string
+  project_limit: number
+  stripe_customer_id?: string
+  total_free_projects?: number
 }
 
 export interface Project {
