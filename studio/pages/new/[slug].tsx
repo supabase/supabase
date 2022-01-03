@@ -2,12 +2,11 @@
  * Org is selected, creating a new project
  */
 
-import Router, { NextRouter, useRouter } from 'next/router'
-import { useRef, useState, createContext, useContext, useEffect } from 'react'
+import Router, { useRouter } from 'next/router'
+import { useRef, useState, useEffect } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
-import { makeAutoObservable, toJS } from 'mobx'
-import { observer, useLocalObservable } from 'mobx-react-lite'
-import { Dictionary } from '@supabase/grid'
+import { toJS } from 'mobx'
+import { observer } from 'mobx-react-lite'
 import {
   Button,
   Typography,
@@ -32,13 +31,13 @@ import {
 } from 'lib/constants'
 
 import { useStore, withAuth } from 'hooks'
-import { IRootStore } from 'stores'
 import { WizardLayout } from 'components/layouts'
+import { Organization } from 'types'
+import { getURL } from 'lib/helpers'
+
 import FormField from 'components/to-be-cleaned/forms/FormField'
 import Panel from 'components/to-be-cleaned/Panel'
 import InformationBox from 'components/ui/InformationBox'
-import { Organization } from 'types'
-import { getURL } from 'lib/helpers'
 
 interface StripeCustomer {
   paymentMethods: any
@@ -46,95 +45,28 @@ interface StripeCustomer {
   error?: any
 }
 
-interface IHomePageStore {
-  store: IRootStore
-  organizations: Dictionary<any>[]
-  currentOrg: Organization | undefined
-  isEmptyOrganizations: boolean
-  isEmptyPaymentMethod: boolean | undefined
-  isInvalidSlug: boolean
-  isOverFreeProjectLimit: boolean
-  stripeCustomerId: string | undefined
-  loadStripeAccount: () => void
-}
-class HomePageStore implements IHomePageStore {
-  store: IRootStore
-  router: NextRouter
-
-  stripeCustomerError: Error | undefined
-  stripeCustomer: StripeCustomer | undefined
-
-  constructor(store: IRootStore, router: NextRouter) {
-    makeAutoObservable(this)
-    this.store = store
-    this.router = router
-  }
-
-  get organizations() {
-    return values(toJS(this.store.app.organizations.list()))
-  }
-
-  get currentOrg() {
-    const { slug } = this.router.query
-    return this.organizations.find((o: any) => o.slug === slug)
-  }
-
-  get stripeCustomerId() {
-    return this.currentOrg?.stripe_customer_id
-  }
-
-  get isEmptyOrganizations() {
-    return this.organizations.length <= 0
-  }
-
-  get isEmptyPaymentMethod() {
-    if (!this.stripeCustomer?.paymentMethods) return undefined
-    return this.stripeCustomer?.paymentMethods?.data?.length <= 0
-  }
-
-  get isInvalidSlug() {
-    return isUndefined(this.currentOrg)
-  }
-
-  get isOverFreeProjectLimit() {
-    const freeProjects = this.currentOrg?.total_free_projects ?? 0
-    const limit = this.currentOrg?.project_limit ?? 0
-    return freeProjects >= limit
-  }
-
-  async loadStripeAccount() {
-    try {
-      const customer = await post(`${API_URL}/stripe/customer`, {
-        stripe_customer_id: this.stripeCustomerId,
-      })
-      if (customer.error) throw customer.error
-      this.stripeCustomer = customer
-    } catch (error: any) {
-      this.stripeCustomerError = error
-    }
+async function fetchStripeAccount(stripeCustomerId: string) {
+  try {
+    const customer = await post(`${API_URL}/stripe/customer`, {
+      stripe_customer_id: stripeCustomerId,
+    })
+    if (customer.error) throw customer.error
+    return customer
+  } catch (error: any) {
+    return { error }
   }
 }
-const PageContext = createContext<IHomePageStore>(undefined!)
 
 export const PageLayout = () => {
-  const store = useStore()
-  const router = useRouter()
-  const _pageState = useLocalObservable(() => new HomePageStore(store, router))
-
-  return (
-    <PageContext.Provider value={_pageState}>
-      <Wizard />
-    </PageContext.Provider>
-  )
+  return <Wizard />
 }
 
 export default withAuth(observer(PageLayout))
 
 export const Wizard = observer(() => {
-  const _pageState = useContext(PageContext)
-
   const router = useRouter()
-  const { ui } = useStore()
+  const { slug } = router.query
+  const { app, ui } = useStore()
 
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
@@ -144,6 +76,18 @@ export const Wizard = observer(() => {
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
+  const [stripeCustomer, setStripeCustomer] = useState<StripeCustomer | undefined>(undefined)
+
+  const organizations = values(toJS(app.organizations.list()))
+  const currentOrg = organizations.find((o: any) => o.slug === slug)
+  const stripeCustomerId = currentOrg?.stripe_customer_id
+  const isEmptyOrganizations = organizations.length <= 0
+  const isEmptyPaymentMethod = stripeCustomer
+    ? stripeCustomer.paymentMethods?.data?.length <= 0
+    : undefined
+  const isOverFreeProjectLimit = (ui.profile?.total_free_projects ?? 0) >= 2
+  const isInvalidSlug = isUndefined(currentOrg)
+  const isSelectFreeTier = dbPricingPlan === PRICING_PLANS.FREE
 
   const canSubmit =
     projectName != '' &&
@@ -159,31 +103,34 @@ export const Wizard = observer(() => {
     debounce((value) => checkPasswordStrength(value), 300)
   ).current
 
-  useEffect(() => {
-    /*
-     * Handle no org
-     * redirect to new org route
-     */
-    if (_pageState.isEmptyOrganizations) {
-      router.push(`/new`)
-    }
-  }, [_pageState.isEmptyOrganizations])
+  /*
+   * Handle no org
+   * redirect to new org route
+   */
+  if (isEmptyOrganizations) {
+    router.push(`/new`)
+  }
+
+  /*
+   * Redirect to first org if the slug doesn't match an org slug
+   * this is mainly to capture the /project/new url, which is redirected from database.new
+   */
+  if (isInvalidSlug && organizations.length > 0) {
+    router.push(`/new/${organizations[0].slug}`)
+  }
 
   useEffect(() => {
-    /*
-     * Redirect to first org if the slug doesn't match an org slug
-     * this is mainly to capture the /project/new url, which is redirected from database.new
-     */
-    if (_pageState.isInvalidSlug && _pageState.organizations.length > 0) {
-      router.push(`/new/${_pageState.organizations[0].slug}`)
+    async function loadStripeAccountAsync(id: string) {
+      const res = await fetchStripeAccount(id)
+      if (!res.error) {
+        setStripeCustomer(res)
+      }
     }
-  }, [_pageState.isInvalidSlug, _pageState.organizations])
 
-  useEffect(() => {
-    if (_pageState.stripeCustomerId) {
-      _pageState.loadStripeAccount()
+    if (stripeCustomerId) {
+      loadStripeAccountAsync(stripeCustomerId)
     }
-  }, [_pageState.stripeCustomerId])
+  }, [stripeCustomerId])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -230,7 +177,7 @@ export const Wizard = observer(() => {
     setNewProjectLoading(true)
     const data = {
       cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
-      org_id: _pageState.currentOrg?.id,
+      org_id: currentOrg?.id,
       name: projectName,
       db_pass: dbPass,
       db_region: dbRegion,
@@ -251,7 +198,7 @@ export const Wizard = observer(() => {
   }
 
   return (
-    <WizardLayout organization={_pageState.currentOrg} project={null}>
+    <WizardLayout organization={currentOrg} project={null}>
       <Panel
         hideHeaderStyling
         title={
@@ -294,10 +241,10 @@ export const Wizard = observer(() => {
             <Listbox
               label="Organization"
               layout="horizontal"
-              value={_pageState.currentOrg?.slug}
+              value={currentOrg?.slug}
               onChange={(slug) => (window.location.href = `/new/${slug}`)}
             >
-              {_pageState.organizations.map((x: any) => (
+              {organizations.map((x: any) => (
                 <Listbox.Option
                   key={x.id}
                   label={x.name}
@@ -415,8 +362,12 @@ export const Wizard = observer(() => {
                 ))}
               </Listbox>
 
-              <FreeProjectLimitWarning dbPricingPlan={dbPricingPlan} />
-              <EmptyPaymentMethodWarning dbPricingPlan={dbPricingPlan} />
+              {!isSelectFreeTier && isOverFreeProjectLimit && (
+                <FreeProjectLimitWarning currentOrg={currentOrg} />
+              )}
+              {!isSelectFreeTier && isEmptyPaymentMethod && (
+                <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
+              )}
             </Panel.Content>
           </>
         </>
@@ -425,10 +376,7 @@ export const Wizard = observer(() => {
   )
 })
 
-const FreeProjectLimitWarning = observer(({ dbPricingPlan }: { dbPricingPlan: string }) => {
-  const _pageState = useContext(PageContext)
-  const isSelectFreeTier = dbPricingPlan === PRICING_PLANS.FREE
-  if (!isSelectFreeTier || !_pageState.isOverFreeProjectLimit) return null
+const FreeProjectLimitWarning = ({ currentOrg }: { currentOrg: Organization | undefined }) => {
   return (
     <div className="mt-4">
       <InformationBox
@@ -439,65 +387,70 @@ const FreeProjectLimitWarning = observer(({ dbPricingPlan }: { dbPricingPlan: st
         description={
           <div className="space-y-3">
             <p className="text-sm leading-normal">
-              This organization can only have a maximum of {_pageState.currentOrg?.project_limit}{' '}
-              free projects. You can only choose paid pricing plan.
+              This organization can only have a maximum of {currentOrg?.project_limit} free
+              projects. You can only choose paid pricing plan.
             </p>
           </div>
         }
       />
     </div>
   )
-})
+}
 
-const EmptyPaymentMethodWarning = observer(({ dbPricingPlan }: { dbPricingPlan: string }) => {
-  const _pageState = useContext(PageContext)
-  const router = useRouter()
-  const { ui } = useStore()
+const EmptyPaymentMethodWarning = observer(
+  ({ stripeCustomerId }: { stripeCustomerId: string | undefined }) => {
+    const router = useRouter()
+    const { ui } = useStore()
 
-  const [loading, setLoading] = useState<boolean>(false)
-  const isSelectPadiTier = dbPricingPlan !== PRICING_PLANS.FREE
+    const [loading, setLoading] = useState<boolean>(false)
 
-  /**
-   * Get a link and then redirect them
-   * path is used to determine what path inside billing portal to redirect to
-   */
-  async function redirectToPortal() {
-    setLoading(true)
-    const response = await post(`${API_URL}/stripe/checkout`, {
-      stripe_customer_id: _pageState.stripeCustomerId,
-      returnTo: `${getURL()}${router.asPath}`,
-    })
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to redirect: ${response.error.message}`,
-      })
-      setLoading(false)
-    } else {
-      const { setupCheckoutPortal } = response
-      window.location.replace(setupCheckoutPortal)
+    /**
+     * Get a link and then redirect them
+     * path is used to determine what path inside billing portal to redirect to
+     */
+    async function redirectToPortal() {
+      if (stripeCustomerId) {
+        setLoading(true)
+        const response = await post(`${API_URL}/stripe/checkout`, {
+          stripe_customer_id: stripeCustomerId,
+          returnTo: `${getURL()}${router.asPath}`,
+        })
+        if (response.error) {
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to redirect: ${response.error.message}`,
+          })
+          setLoading(false)
+        } else {
+          const { setupCheckoutPortal } = response
+          window.location.replace(setupCheckoutPortal)
+        }
+      } else {
+        ui.setNotification({
+          category: 'error',
+          message: `Invalid customer id`,
+        })
+      }
     }
+    return (
+      <div className="mt-4">
+        <InformationBox
+          icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+          defaultVisibility={true}
+          hideCollapse
+          title="No payment methods"
+          description={
+            <div className="space-y-3">
+              <p className="text-sm leading-normal">
+                You are required to add a default payment method in order to create a paid project.
+              </p>
+              <Button loading={loading} type="secondary" onClick={() => redirectToPortal()}>
+                Add a payment method
+              </Button>
+            </div>
+          }
+        />
+      </div>
+    )
   }
-
-  if (!isSelectPadiTier || !_pageState.isEmptyPaymentMethod) return null
-  return (
-    <div className="mt-4">
-      <InformationBox
-        icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
-        defaultVisibility={true}
-        hideCollapse
-        title="No payment methods"
-        description={
-          <div className="space-y-3">
-            <p className="text-sm leading-normal">
-              You are required to add a default payment method in order to create a paid project.
-            </p>
-            <Button loading={loading} type="secondary" onClick={() => redirectToPortal()}>
-              Add a payment method
-            </Button>
-          </div>
-        }
-      />
-    </div>
-  )
-})
+)
