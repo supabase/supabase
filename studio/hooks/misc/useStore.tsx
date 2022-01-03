@@ -1,6 +1,6 @@
 import { useMonaco } from '@monaco-editor/react'
 import { autorun } from 'mobx'
-import { createContext, FC, useContext, useEffect } from 'react'
+import { createContext, FC, useContext, useEffect, useCallback } from 'react'
 import toast from 'react-hot-toast'
 
 import { IRootStore } from 'stores'
@@ -33,8 +33,14 @@ export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
     }
   }, [theme, monaco])
 
+  const matchMediaEvent = useCallback(() => {
+    ui.themeOption === 'system' &&
+      ui.setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+  }, [])
+
   useEffect(() => {
     ui.load()
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', matchMediaEvent)
 
     autorun(() => {
       if (ui.notification) {
@@ -71,6 +77,10 @@ export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
         }
       }
     })
+    return () =>
+      window
+        .matchMedia('(prefers-color-scheme: dark)')
+        .removeEventListener('change', matchMediaEvent)
   }, [])
 
   return <StoreContext.Provider value={rootStore}>{children}</StoreContext.Provider>
