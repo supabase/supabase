@@ -358,11 +358,11 @@ export const Wizard = observer(() => {
                     addOnBefore={() => <IconDollarSign />}
                   >
                     {`${v}${
-                      v === PRICING_PLANS.FREE
-                        ? ''
-                        : v === PRICING_PLANS.PRO
+                      v === PRICING_PLANS.PRO
                         ? ' - $25/month'
-                        : ' - $25/month plus usage costs'
+                        : v === PRICING_PLANS.PAYG
+                        ? ' - $25/month plus usage costs'
+                        : ''
                     }`}
                   </Listbox.Option>
                 ))}
