@@ -362,9 +362,7 @@ export const Wizard = observer(() => {
                 ))}
               </Listbox>
 
-              {!isSelectFreeTier && isOverFreeProjectLimit && (
-                <FreeProjectLimitWarning currentOrg={currentOrg} />
-              )}
+              {!isSelectFreeTier && isOverFreeProjectLimit && <FreeProjectLimitWarning />}
               {!isSelectFreeTier && isEmptyPaymentMethod && (
                 <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
               )}
@@ -376,19 +374,19 @@ export const Wizard = observer(() => {
   )
 })
 
-const FreeProjectLimitWarning = ({ currentOrg }: { currentOrg: Organization | undefined }) => {
+const FreeProjectLimitWarning = () => {
   return (
     <div className="mt-4">
       <InformationBox
         icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
         defaultVisibility={true}
         hideCollapse
-        title="This organization has reached its free project limit"
+        title="Your account has reached its free project limit"
         description={
           <div className="space-y-3">
             <p className="text-sm leading-normal">
-              This organization can only have a maximum of {currentOrg?.project_limit} free
-              projects. You can only choose paid pricing plan.
+              Your account can only have a maximum of 2 free projects. You can only choose paid
+              pricing plan.
             </p>
           </div>
         }
@@ -438,11 +436,12 @@ const EmptyPaymentMethodWarning = observer(
           icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
           defaultVisibility={true}
           hideCollapse
-          title="No payment methods"
+          title="This organization has no payment methods"
           description={
             <div className="space-y-3">
               <p className="text-sm leading-normal">
-                You are required to add a default payment method in order to create a paid project.
+                It's required to add a default payment method for an organization in order to create
+                a paid project.
               </p>
               <Button loading={loading} type="secondary" onClick={() => redirectToPortal()}>
                 Add a payment method
