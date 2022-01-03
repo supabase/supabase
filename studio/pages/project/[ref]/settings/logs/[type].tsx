@@ -23,6 +23,7 @@ import { uuidv4 } from 'lib/helpers'
 import useSWRInfinite from 'swr/infinite'
 import { isUndefined } from 'lodash'
 import Flag from 'components/ui/Flag/Flag'
+import { useFlag } from 'hooks'
 
 /**
  * Acts as a container component for the entire log display
@@ -30,6 +31,7 @@ import Flag from 'components/ui/Flag/Flag'
  *
  */
 export const LogPage: NextPage = () => {
+  const logsCustomSql = useFlag('logsCustomSql')
   const router = useRouter()
   const { ref, type } = router.query
 
@@ -40,11 +42,13 @@ export const LogPage: NextPage = () => {
   const [params, setParams] = useState({
     type: '',
     search_query: '',
+    sql: '',
     where: '',
     timestamp_start: '',
     timestamp_end: '',
   })
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as string]}`
+  const isCustomQuery = logsCustomSql && editorValue.toLowerCase().includes('select') ? true : false
 
   useEffect(() => {
     setParams({ ...params, type: type as string })
@@ -124,15 +128,24 @@ export const LogPage: NextPage = () => {
   const onSelectTemplate = (template: LogTemplate) => {
     setMode(template.mode)
     if (template.mode === 'simple') {
-      setParams((prev) => ({ ...prev, search_query: template.searchString, where: '' }))
+      setParams((prev) => ({ ...prev, search_query: template.searchString, sql: '', where: '' }))
     } else {
       setEditorValue(template.searchString)
-      setParams((prev) => ({ ...prev, where: template.searchString, search_query: '' }))
+      setParams((prev) => ({
+        ...prev,
+        where: isCustomQuery ? '' : template.searchString,
+        sql: isCustomQuery ? template.searchString : '',
+        search_query: '',
+      }))
       setEditorId(uuidv4())
     }
   }
   const handleEditorSubmit = () => {
-    setParams((prev) => ({ ...prev, where: editorValue }))
+    setParams((prev) => ({
+      ...prev,
+      where: isCustomQuery ? '' : editorValue,
+      sql: isCustomQuery ? editorValue : '',
+    }))
   }
   const handleSearch = (v: string) => {
     setParams((prev) => ({ ...prev, search_query: v || '' }))
