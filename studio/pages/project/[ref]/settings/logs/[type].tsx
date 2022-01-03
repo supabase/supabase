@@ -32,7 +32,6 @@ import Flag from 'components/ui/Flag/Flag'
 export const LogPage: NextPage = () => {
   const router = useRouter()
   const { ref, type, q, s, ts } = router.query
-
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState('')
   const [mode, setMode] = useState<'simple' | 'custom'>('simple')
@@ -154,10 +153,27 @@ export const LogPage: NextPage = () => {
   }
   const handleEditorSubmit = () => {
     setParams((prev) => ({ ...prev, where: editorValue }))
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        q: editorValue,
+      },
+    })
   }
   const handleSearch = (v: string) => {
     setParams((prev) => ({ ...prev, search_query: v || '' }))
+
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        s: v || '',
+      },
+    })
   }
+
+
 
   return (
     <SettingsLayout title={title}>

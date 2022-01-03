@@ -18,6 +18,7 @@ import { useRouter } from 'next/router'
 const router = jest.fn()
 router.query = { ref: '123', type: 'auth' }
 router.push = jest.fn()
+router.pathname = 'logs/path'
 useRouter.mockReturnValue(router)
 
 // mock monaco editor
@@ -226,8 +227,9 @@ test('where clause will trigger a log refresh', async () => {
 })
 
 test('s= query param will populate the search bar', async () => {
-  useRouter.mockReturnValue({
+  useRouter.mockReturnValueOnce({
     query: { ref: '123', type: 'api', s: 'someSearch' },
+    push: jest.fn()
   })
   render(<LogPage />)
   // should populate search input with the search param
@@ -238,8 +240,10 @@ test('s= query param will populate the search bar', async () => {
 })
 
 test('q= query param will populate the query input', async () => {
-  useRouter.mockReturnValue({
+  useRouter.mockReturnValueOnce({
     query: { ref: '123', type: 'api', q: 'some_query', s: 'someSearch' },
+    push: jest.fn()
+
   })
   render(<LogPage />)
   // should populate editor with the query param
@@ -252,8 +256,9 @@ test('q= query param will populate the query input', async () => {
 })
 
 test('ts= query param will set the timestamp_start param', async () => {
-  useRouter.mockReturnValue({
+  useRouter.mockReturnValueOnce({
     query: { ref: '123', type: 'api', ts: 123456 },
+    push: jest.fn()
   })
   render(<LogPage />)
 
