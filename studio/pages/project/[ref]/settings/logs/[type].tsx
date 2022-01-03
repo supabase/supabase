@@ -27,7 +27,13 @@ import Flag from 'components/ui/Flag/Flag'
 /**
  * Acts as a container component for the entire log display
  *
- *
+ * ## Query Params Syncing
+ * Query params are synced on query submission.
+ * 
+ * params used are:
+ * - `q` for the editor query.
+ * - `s` for search query.
+ * - `ts` for timestamp start value.
  */
 export const LogPage: NextPage = () => {
   const router = useRouter()
