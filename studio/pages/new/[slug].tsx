@@ -8,7 +8,14 @@ import { debounce, isUndefined, values } from 'lodash'
 import { makeAutoObservable, toJS } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { Dictionary } from '@supabase/grid'
-import { Button, Typography, Listbox, IconUsers, IconAlertCircle } from '@supabase/ui'
+import {
+  Button,
+  Typography,
+  Listbox,
+  IconUsers,
+  IconAlertCircle,
+  IconDollarSign,
+} from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
@@ -31,6 +38,7 @@ import FormField from 'components/to-be-cleaned/forms/FormField'
 import Panel from 'components/to-be-cleaned/Panel'
 import InformationBox from 'components/ui/InformationBox'
 import { Organization } from 'types'
+import { getURL } from 'lib/helpers'
 
 interface StripeCustomer {
   paymentMethods: any
@@ -40,10 +48,10 @@ interface StripeCustomer {
 
 interface IHomePageStore {
   store: IRootStore
-  router: NextRouter
   organizations: Dictionary<any>[]
   currentOrg: Organization | undefined
   isEmptyOrganizations: boolean
+  isEmptyPaymentMethod: boolean | undefined
   isInvalidSlug: boolean
   isOverFreeProjectLimit: boolean
   stripeCustomerId: string | undefined
@@ -77,6 +85,11 @@ class HomePageStore implements IHomePageStore {
 
   get isEmptyOrganizations() {
     return this.organizations.length <= 0
+  }
+
+  get isEmptyPaymentMethod() {
+    if (!this.stripeCustomer?.paymentMethods) return undefined
+    return this.stripeCustomer?.paymentMethods?.data?.length <= 0
   }
 
   get isInvalidSlug() {
@@ -117,7 +130,7 @@ export const PageLayout = () => {
 
 export default withAuth(observer(PageLayout))
 
-export const Wizard = () => {
+export const Wizard = observer(() => {
   const _pageState = useContext(PageContext)
 
   const router = useRouter()
@@ -166,11 +179,11 @@ export const Wizard = () => {
     }
   }, [_pageState.isInvalidSlug, _pageState.organizations])
 
-  // useEffect(() => {
-  //   if (_pageState.stripeCustomerId) {
-  //     _pageState.loadStripeAccount()
-  //   }
-  // }, [_pageState.stripeCustomerId])
+  useEffect(() => {
+    if (_pageState.stripeCustomerId) {
+      _pageState.loadStripeAccount()
+    }
+  }, [_pageState.stripeCustomerId])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -190,8 +203,8 @@ export const Wizard = () => {
     setDbRegion(e.target.value)
   }
 
-  function onDbPricingPlanChange(e: any) {
-    setDbPricingPlan(e.target.value)
+  function onDbPricingPlanChange(value: string) {
+    setDbPricingPlan(value)
   }
 
   async function checkPasswordStrength(value: any) {
@@ -295,132 +308,193 @@ export const Wizard = () => {
                 </Listbox.Option>
               ))}
             </Listbox>
-
-            {_pageState.isOverFreeProjectLimit && (
-              <InformationBox
-                icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
-                defaultVisibility={true}
-                hideCollapse
-                title="This organization has reached its project limit"
-                description={
-                  <div className="space-y-3">
-                    <p className="text-sm leading-normal">
-                      This organization can only have a maximum of{' '}
-                      {_pageState.currentOrg?.project_limit} free projects. You can either upgrade
-                      pre existing projects, choose another organization, or create a new
-                      organization.
-                    </p>
-                    <Button type="secondary" onClick={() => router.push('/new')}>
-                      New organization
-                    </Button>
-                  </div>
-                }
-              />
-            )}
           </Panel.Content>
 
-          {!_pageState.isOverFreeProjectLimit && (
-            <>
-              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                <FormField
-                  // @ts-ignore
-                  label="Name"
-                  type="text"
-                  placeholder="Project name"
-                  value={projectName}
-                  onChange={onProjectNameChange}
-                  autoFocus
-                />
-              </Panel.Content>
+          <>
+            <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
+              <FormField
+                // @ts-ignore
+                label="Name"
+                type="text"
+                placeholder="Project name"
+                value={projectName}
+                onChange={onProjectNameChange}
+                autoFocus
+              />
+            </Panel.Content>
 
-              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                <FormField
-                  // @ts-ignore
-                  label="Database Password"
-                  type="password"
-                  placeholder="Type in a strong password"
-                  value={dbPass}
-                  onChange={onDbPassChange}
-                  description={
-                    <>
-                      {dbPass && (
-                        <div
-                          aria-valuemax={100}
-                          aria-valuemin={0}
-                          aria-valuenow={
-                            (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]
-                          }
-                          aria-valuetext={
-                            (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]
-                          }
-                          role="progressbar"
-                          className="mb-2 bg-bg-alt-light dark:bg-bg-alt-dark rounded overflow-hidden transition-all border dark:border-dark"
-                        >
-                          <div
-                            style={{
-                              width: (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore],
-                            }}
-                            className={`relative h-2 w-full ${
-                              (PASSWORD_STRENGTH_COLOR as any)[passwordStrengthScore]
-                            } transition-all duration-500 ease-out shadow-inner`}
-                          ></div>
-                        </div>
-                      )}
-                      <span
-                        className={
-                          passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH
-                            ? 'text-green-600'
-                            : ''
+            <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+              <FormField
+                // @ts-ignore
+                label="Database Password"
+                type="password"
+                placeholder="Type in a strong password"
+                value={dbPass}
+                onChange={onDbPassChange}
+                description={
+                  <>
+                    {dbPass && (
+                      <div
+                        aria-valuemax={100}
+                        aria-valuemin={0}
+                        aria-valuenow={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
+                        aria-valuetext={
+                          (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]
                         }
+                        role="progressbar"
+                        className="mb-2 bg-bg-alt-light dark:bg-bg-alt-dark rounded overflow-hidden transition-all border dark:border-dark"
                       >
-                        {passwordStrengthMessage
-                          ? passwordStrengthMessage
-                          : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'}
-                      </span>
-                    </>
-                  }
-                  errorMessage={
-                    passwordStrengthWarning
-                      ? `${passwordStrengthWarning}. ${passwordErrorMessage}.`
-                      : passwordErrorMessage
-                  }
-                />
-              </Panel.Content>
+                        <div
+                          style={{
+                            width: (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore],
+                          }}
+                          className={`relative h-2 w-full ${
+                            (PASSWORD_STRENGTH_COLOR as any)[passwordStrengthScore]
+                          } transition-all duration-500 ease-out shadow-inner`}
+                        ></div>
+                      </div>
+                    )}
+                    <span
+                      className={
+                        passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH
+                          ? 'text-green-600'
+                          : ''
+                      }
+                    >
+                      {passwordStrengthMessage
+                        ? passwordStrengthMessage
+                        : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'}
+                    </span>
+                  </>
+                }
+                errorMessage={
+                  passwordStrengthWarning
+                    ? `${passwordStrengthWarning}. ${passwordErrorMessage}.`
+                    : passwordErrorMessage
+                }
+              />
+            </Panel.Content>
 
-              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                <FormField
-                  // @ts-ignore
-                  label="Region"
-                  type="select"
-                  choices={REGIONS}
-                  value={dbRegion}
-                  onChange={onDbRegionChange}
-                  description="Select a region close to you for the best performance."
-                />
-              </Panel.Content>
+            <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+              <FormField
+                // @ts-ignore
+                label="Region"
+                type="select"
+                choices={REGIONS}
+                value={dbRegion}
+                onChange={onDbRegionChange}
+                description="Select a region close to you for the best performance."
+              />
+            </Panel.Content>
 
-              <Panel.Content className="Form section-block--body has-inputs-centered ">
-                <FormField
-                  // @ts-ignore
-                  label="Pricing Plan"
-                  type="select"
-                  choices={PRICING_PLANS}
-                  value={dbPricingPlan}
-                  onChange={onDbPricingPlanChange}
-                  description={
-                    <>
-                      Select a pricing plan.&nbsp;
-                      <a className="underline" target="_blank" href="https://supabase.com/pricing">
-                        More details
-                      </a>
-                    </>
-                  }
-                />
-              </Panel.Content>
-            </>
-          )}
+            <Panel.Content className="Form section-block--body has-inputs-centered ">
+              <Listbox
+                label="Pricing Plan"
+                layout="horizontal"
+                value={dbPricingPlan}
+                onChange={onDbPricingPlanChange}
+                // @ts-ignore
+                descriptionText={
+                  <>
+                    Select a pricing plan.&nbsp;
+                    <a className="underline" target="_blank" href="https://supabase.com/pricing">
+                      More details
+                    </a>
+                  </>
+                }
+              >
+                {Object.entries(PRICING_PLANS).map(([k, v]) => (
+                  <Listbox.Option
+                    key={k}
+                    label={v}
+                    value={v}
+                    addOnBefore={() => <IconDollarSign />}
+                  >
+                    {v}
+                  </Listbox.Option>
+                ))}
+              </Listbox>
+
+              <FreeProjectLimitWarning />
+              <EmptyPaymentMethodWarning />
+            </Panel.Content>
+          </>
         </>
       </Panel>
     </WizardLayout>
   )
-}
+})
+
+const FreeProjectLimitWarning = observer(() => {
+  const _pageState = useContext(PageContext)
+  if (!_pageState.isOverFreeProjectLimit) return null
+  return (
+    <InformationBox
+      icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+      defaultVisibility={true}
+      hideCollapse
+      title="This organization has reached its free project limit"
+      description={
+        <div className="space-y-3">
+          <p className="text-sm leading-normal">
+            This organization can only have a maximum of {_pageState.currentOrg?.project_limit} free
+            projects. You can only choose paid pricing plan.
+          </p>
+        </div>
+      }
+    />
+  )
+})
+
+const EmptyPaymentMethodWarning = observer(() => {
+  const _pageState = useContext(PageContext)
+  const router = useRouter()
+  const { ui } = useStore()
+
+  const [loading, setLoading] = useState<boolean>(false)
+
+  /**
+   * Get a link and then redirect them
+   * path is used to determine what path inside billing portal to redirect to
+   */
+  async function redirectToPortal(path: any) {
+    try {
+      setLoading(true)
+      let { billingPortal } = await post(`${API_URL}/stripe/billing`, {
+        stripe_customer_id: _pageState.stripeCustomerId,
+        returnTo: `${getURL()}${router.asPath}`,
+      })
+      window.location.replace(billingPortal + (path ? path : null))
+    } catch (error: any) {
+      ui.setNotification({ category: 'error', message: `Failed to redirect: ${error.message}` })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (!_pageState.isEmptyPaymentMethod) return null
+  return (
+    <div className="mt-4">
+      <InformationBox
+        icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+        defaultVisibility={true}
+        hideCollapse
+        title="No payment methods"
+        description={
+          <div className="space-y-3">
+            <p className="text-sm leading-normal">
+              You are required to add a default payment method in order to create a paid project.
+            </p>
+            <Button
+              loading={loading}
+              type="secondary"
+              onClick={() => redirectToPortal('/payment-methods')}
+            >
+              Add a payment method
+            </Button>
+          </div>
+        }
+      />
+    </div>
+  )
+})
