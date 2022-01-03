@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Typography, IconLoader, IconAlertCircle, IconRewind, Button } from '@supabase/ui'
+import { Typography, IconLoader, IconAlertCircle, IconRewind, Button, IconInfo } from '@supabase/ui'
 
 import { withAuth } from 'hooks'
 import { get } from 'lib/common/fetch'
@@ -177,6 +177,18 @@ export const LogPage: NextPage = () => {
               />
             </div>
             <div className="flex flex-row gap-x-2 justify-end p-2">
+              <Flag name="logsCustomSql">
+                {isCustomQuery && (
+                  // we don't have a slim Alert component yet
+                  <div className="flex flex-row items-center">
+                    <IconInfo size="small" />
+                    <span>
+                      Custom queries are restricted to a {type === 'database' ? '2 hour' : '7 day'}{' '}
+                      querying window.
+                    </span>
+                  </div>
+                )}
+              </Flag>
               {editorValue && (
                 <Button
                   type="text"
