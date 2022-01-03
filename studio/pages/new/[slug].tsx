@@ -411,10 +411,10 @@ const EmptyPaymentMethodWarning = observer(
      * Get a link and then redirect them
      * path is used to determine what path inside billing portal to redirect to
      */
-    async function redirectToPortal() {
+    async function redirectToPortal(path: any) {
       if (stripeCustomerId) {
         setLoading(true)
-        const response = await post(`${API_URL}/stripe/checkout`, {
+        const response = await post(`${API_URL}/stripe/billing`, {
           stripe_customer_id: stripeCustomerId,
           returnTo: `${getURL()}${router.asPath}`,
         })
@@ -425,8 +425,8 @@ const EmptyPaymentMethodWarning = observer(
           })
           setLoading(false)
         } else {
-          const { setupCheckoutPortal } = response
-          window.location.replace(setupCheckoutPortal)
+          const { billingPortal } = response
+          window.location.replace(`${billingPortal}${path ? path : ''}`)
         }
       } else {
         ui.setNotification({
@@ -448,7 +448,11 @@ const EmptyPaymentMethodWarning = observer(
                 It's required to add a default payment method for an organization in order to create
                 a paid project.
               </p>
-              <Button loading={loading} type="secondary" onClick={() => redirectToPortal()}>
+              <Button
+                loading={loading}
+                type="secondary"
+                onClick={() => redirectToPortal('/payment-methods')}
+              >
                 Add a payment method
               </Button>
             </div>
