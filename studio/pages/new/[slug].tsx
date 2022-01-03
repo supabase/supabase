@@ -396,7 +396,7 @@ export const Wizard = observer(() => {
                 // @ts-ignore
                 descriptionText={
                   <>
-                    Select a pricing plan.&nbsp;
+                    Select a plan that suits your needs.&nbsp;
                     <a className="underline" target="_blank" href="https://supabase.com/pricing">
                       More details
                     </a>
@@ -415,8 +415,8 @@ export const Wizard = observer(() => {
                 ))}
               </Listbox>
 
-              <FreeProjectLimitWarning />
-              <EmptyPaymentMethodWarning />
+              <FreeProjectLimitWarning dbPricingPlan={dbPricingPlan} />
+              <EmptyPaymentMethodWarning dbPricingPlan={dbPricingPlan} />
             </Panel.Content>
           </>
         </>
@@ -425,9 +425,10 @@ export const Wizard = observer(() => {
   )
 })
 
-const FreeProjectLimitWarning = observer(() => {
+const FreeProjectLimitWarning = observer(({ dbPricingPlan }: { dbPricingPlan: string }) => {
   const _pageState = useContext(PageContext)
-  if (!_pageState.isOverFreeProjectLimit) return null
+  const isSelectFreeTier = dbPricingPlan === PRICING_PLANS.FREE
+  if (!isSelectFreeTier || !_pageState.isOverFreeProjectLimit) return null
   return (
     <InformationBox
       icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
@@ -446,12 +447,13 @@ const FreeProjectLimitWarning = observer(() => {
   )
 })
 
-const EmptyPaymentMethodWarning = observer(() => {
+const EmptyPaymentMethodWarning = observer(({ dbPricingPlan }: { dbPricingPlan: string }) => {
   const _pageState = useContext(PageContext)
   const router = useRouter()
   const { ui } = useStore()
 
   const [loading, setLoading] = useState<boolean>(false)
+  const isSelectPadiTier = dbPricingPlan !== PRICING_PLANS.FREE
 
   /**
    * Get a link and then redirect them
@@ -467,12 +469,11 @@ const EmptyPaymentMethodWarning = observer(() => {
       window.location.replace(billingPortal + (path ? path : null))
     } catch (error: any) {
       ui.setNotification({ category: 'error', message: `Failed to redirect: ${error.message}` })
-    } finally {
       setLoading(false)
     }
   }
 
-  if (!_pageState.isEmptyPaymentMethod) return null
+  if (!isSelectPadiTier || !_pageState.isEmptyPaymentMethod) return null
   return (
     <div className="mt-4">
       <InformationBox
