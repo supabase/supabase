@@ -32,7 +32,6 @@ import {
 
 import { useStore, withAuth } from 'hooks'
 import { WizardLayout } from 'components/layouts'
-import { Organization } from 'types'
 import { getURL } from 'lib/helpers'
 
 import FormField from 'components/to-be-cleaned/forms/FormField'
