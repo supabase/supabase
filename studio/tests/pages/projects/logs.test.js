@@ -15,7 +15,10 @@ observer.mockImplementation((v) => v)
 // mock the router
 jest.mock('next/router')
 import { useRouter } from 'next/router'
-useRouter.mockReturnValue({ query: { ref: '123', type: 'auth' } })
+const router = jest.fn()
+router.query = { ref: '123', type: 'auth' }
+router.push = jest.fn()
+useRouter.mockReturnValue(router)
 
 // mock monaco editor
 jest.mock('@monaco-editor/react')
@@ -128,6 +131,16 @@ test('Search will trigger a log refresh', async () => {
     () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('search_query'))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('something'))
+
+      // updates router query params
+      expect(router.push).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pathname: expect.any(String),
+          query: expect.objectContaining({
+            s: expect.stringContaining('something'),
+          }),
+        })
+      )
     },
     { timeout: 1500 }
   )
@@ -195,13 +208,22 @@ test('where clause will trigger a log refresh', async () => {
     () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('metadata.field'))
+
+      // updates router query params
+      expect(router.push).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pathname: expect.any(String),
+          query: expect.objectContaining({
+            q: expect.stringContaining('something'),
+          }),
+        })
+      )
     },
     { timeout: 1000 }
   )
 
   await waitFor(() => screen.getByText(/happened/))
 })
-
 
 test('s= query param will populate the search bar', async () => {
   useRouter.mockReturnValue({
@@ -213,7 +235,6 @@ test('s= query param will populate the search bar', async () => {
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('search_query=someSearch'))
   })
-
 })
 
 test('q= query param will populate the query input', async () => {
@@ -239,7 +260,6 @@ test('ts= query param will set the timestamp_start param', async () => {
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_start=123456'))
   })
-
 })
 
 test('load older btn will fetch older logs', async () => {
