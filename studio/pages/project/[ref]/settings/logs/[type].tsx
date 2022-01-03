@@ -131,7 +131,6 @@ export const LogPage: NextPage = () => {
     setLatestRefresh(new Date().toISOString())
     setParams({ ...params, timestamp_start: '' })
     setSize(1)
-    mutate()
   }
 
   const handleModeToggle = () => {
