@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { isUndefined } from 'lodash'
-import { Button, Divider, IconHome, Dropdown, IconUser, Toggle, Typography } from '@supabase/ui'
+import { Button, Divider, IconHome, Dropdown, IconUser, Select, Typography } from '@supabase/ui'
 
 import { IS_PLATFORM } from 'lib/constants'
 import { useStore } from 'hooks'
@@ -77,13 +77,16 @@ const NavigationBar: FC<Props> = ({}) => {
               : []),
             <Divider key="d1" light />,
             <Dropdown.Misc key="theme">
-              <div className="w-[200px] pt-1">
-                <Toggle
-                  size="small"
-                  label="Enable dark mode"
-                  checked={ui.isDarkTheme}
-                  onChange={() => ui.toggleTheme()}
-                />
+              <div className="w-[240px] py-1 flex items-center justify-between">
+                <Typography.Text>Theme</Typography.Text>
+                <Select
+                  value={ui.themeOption}
+                  onChange={(e: any) => ui.onThemeOptionChange(e.target.value)}
+                >
+                  <Select.Option value="system">System default</Select.Option>
+                  <Select.Option value="dark">Dark</Select.Option>
+                  <Select.Option value="light">Light</Select.Option>
+                </Select>
               </div>
             </Dropdown.Misc>,
           ]}
