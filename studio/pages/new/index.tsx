@@ -1,13 +1,16 @@
-import { observer } from 'mobx-react-lite'
-import { Button, Form, Input, Typography } from '@supabase/ui'
 import Router from 'next/router'
+import { observer } from 'mobx-react-lite'
 
-import { API_URL } from 'lib/constants'
 import { useStore, withAuth } from 'hooks'
+import { API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
-import { WizardLayout } from 'components/layouts'
 
+import { Button, Form, Input, Typography } from '@supabase/ui'
+
+import { WizardLayout } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
+
+const { Text, Title } = Typography
 
 /**
  * No org selected yet, create a new one
@@ -62,37 +65,31 @@ const Wizard = () => {
         {({ isSubmitting }: any) => (
           <Panel
             hideHeaderStyling
-            title={[
-              <div key="panel-title">
-                <Typography.Title level={4} className="mb-0">
-                  Create a new organization
-                </Typography.Title>
-              </div>,
-            ]}
-            footer={[
-              <div key="panel-footer" className="flex items-center w-full justify-between">
+            title={<Title level={4}>Create a new organization</Title>}
+            footer={
+              <div className="flex items-center w-full justify-between">
                 <Button type="default" onClick={() => Router.push('/')}>
                   Cancel
                 </Button>
                 <div className="space-x-3">
-                  <Typography.Text type="secondary" small>
+                  <Text type="secondary" small>
                     You can rename your organization later
-                  </Typography.Text>
+                  </Text>
                   <Button loading={isSubmitting} htmlType="submit">
                     Create organization
                   </Button>
                 </div>
-              </div>,
-            ]}
+              </div>
+            }
           >
             <Panel.Content className="pt-0">
-              <Typography.Text>
+              <Text>
                 This is your organization's name within Supabase.
                 <br />
-              </Typography.Text>
-              <Typography.Text type="secondary">
+              </Text>
+              <Text type="secondary">
                 For example, you can use the name of your company or department
-              </Typography.Text>
+              </Text>
             </Panel.Content>
             <Panel.Content>
               <Input
