@@ -23,6 +23,7 @@ import { uuidv4 } from 'lib/helpers'
 import useSWRInfinite from 'swr/infinite'
 import { isUndefined } from 'lodash'
 import Flag from 'components/ui/Flag/Flag'
+import { useFlag } from 'hooks'
 
 /**
  * Acts as a container component for the entire log display
@@ -36,6 +37,7 @@ import Flag from 'components/ui/Flag/Flag'
  * - `ts` for timestamp start value.
  */
 export const LogPage: NextPage = () => {
+  const logsQueryParamsSyncing = useFlag('logsQueryParamsSyncing')
   const router = useRouter()
   const { ref, type, q, s, ts } = router.query
   const [editorId, setEditorId] = useState<string>(uuidv4())
@@ -56,6 +58,7 @@ export const LogPage: NextPage = () => {
   }, [type])
 
   useEffect(() => {
+    if (!logsQueryParamsSyncing) return
     // on mount, set initial values
     if (q) {
       onSelectTemplate({
@@ -159,6 +162,7 @@ export const LogPage: NextPage = () => {
   }
   const handleEditorSubmit = () => {
     setParams((prev) => ({ ...prev, where: editorValue }))
+    if (!logsQueryParamsSyncing) return
     router.push({
       pathname: router.pathname,
       query: {
@@ -169,7 +173,7 @@ export const LogPage: NextPage = () => {
   }
   const handleSearch = (v: string) => {
     setParams((prev) => ({ ...prev, search_query: v || '' }))
-
+    if (!logsQueryParamsSyncing) return
     router.push({
       pathname: router.pathname,
       query: {

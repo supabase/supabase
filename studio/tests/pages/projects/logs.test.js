@@ -32,9 +32,13 @@ Editor.mockImplementation((props) => {
 })
 useMonaco.mockImplementation((v) => v)
 
+// mock usage flags
 jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'
 Flag.mockImplementation(({ children }) => <>{children}</>)
+jest.mock('hooks')
+import {useFlag} from 'hooks'
+useFlag.mockReturnValue(true)
 
 import { SWRConfig } from 'swr'
 jest.mock('pages/project/[ref]/settings/logs/[type]')
