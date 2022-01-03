@@ -2,9 +2,9 @@
  * Org is selected, creating a new project
  */
 
-import { useRef, useState, createContext, useContext } from 'react'
-import Router, { useRouter } from 'next/router'
-import { debounce, values } from 'lodash'
+import Router, { NextRouter, useRouter } from 'next/router'
+import { useRef, useState, createContext, useContext, useEffect } from 'react'
+import { debounce, isUndefined, values } from 'lodash'
 import { makeAutoObservable, toJS } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { Dictionary } from '@supabase/grid'
@@ -25,37 +25,88 @@ import {
 } from 'lib/constants'
 
 import { useStore, withAuth } from 'hooks'
+import { IRootStore } from 'stores'
 import { WizardLayout } from 'components/layouts'
 import FormField from 'components/to-be-cleaned/forms/FormField'
 import Panel from 'components/to-be-cleaned/Panel'
 import InformationBox from 'components/ui/InformationBox'
+import { Organization } from 'types'
+
+interface StripeCustomer {
+  paymentMethods: any
+  customer: any
+  error?: any
+}
 
 interface IHomePageStore {
-  store: any
-  projectOrganizations: Dictionary<any>[]
+  store: IRootStore
+  router: NextRouter
+  organizations: Dictionary<any>[]
+  currentOrg: Organization | undefined
+  isEmptyOrganizations: boolean
+  isInvalidSlug: boolean
+  isOverFreeProjectLimit: boolean
+  stripeCustomerId: string | undefined
+  loadStripeAccount: () => void
 }
 class HomePageStore implements IHomePageStore {
-  store: any
+  store: IRootStore
+  router: NextRouter
 
-  constructor(store: any) {
+  stripeCustomerError: Error | undefined
+  stripeCustomer: StripeCustomer | undefined
+
+  constructor(store: IRootStore, router: NextRouter) {
     makeAutoObservable(this)
     this.store = store
+    this.router = router
   }
 
-  get projectOrganizations() {
-    const projects = values(this.store?.projects?.data) ?? []
-    const orgIds = projects.map((x: any) => x.organization_id)
-    const temp = values(this.store?.organizations?.data) ?? []
-    return temp
-      .filter((x: any) => orgIds.includes(x.id))
-      .sort((a: any, b: any) => a.name.localeCompare(b.name))
+  get organizations() {
+    return values(toJS(this.store.app.organizations.list()))
+  }
+
+  get currentOrg() {
+    const { slug } = this.router.query
+    return this.organizations.find((o: any) => o.slug === slug)
+  }
+
+  get stripeCustomerId() {
+    return this.currentOrg?.stripe_customer_id
+  }
+
+  get isEmptyOrganizations() {
+    return this.organizations.length <= 0
+  }
+
+  get isInvalidSlug() {
+    return isUndefined(this.currentOrg)
+  }
+
+  get isOverFreeProjectLimit() {
+    const freeProjects = this.currentOrg?.total_free_projects ?? 0
+    const limit = this.currentOrg?.project_limit ?? 0
+    return freeProjects >= limit
+  }
+
+  async loadStripeAccount() {
+    try {
+      const customer = await post(`${API_URL}/stripe/customer`, {
+        stripe_customer_id: this.stripeCustomerId,
+      })
+      if (customer.error) throw customer.error
+      this.stripeCustomer = customer
+    } catch (error: any) {
+      this.stripeCustomerError = error
+    }
   }
 }
 const PageContext = createContext<IHomePageStore>(undefined!)
 
 export const PageLayout = () => {
   const store = useStore()
-  const _pageState = useLocalObservable(() => new HomePageStore(store))
+  const router = useRouter()
+  const _pageState = useLocalObservable(() => new HomePageStore(store, router))
 
   return (
     <PageContext.Provider value={_pageState}>
@@ -70,8 +121,6 @@ export const Wizard = () => {
   const _pageState = useContext(PageContext)
 
   const router = useRouter()
-  const { slug } = router.query
-
   const { ui } = useStore()
 
   const [projectName, setProjectName] = useState('')
@@ -97,33 +146,31 @@ export const Wizard = () => {
     debounce((value) => checkPasswordStrength(value), 300)
   ).current
 
-  const organizations: any = Object.values(toJS(_pageState.store.app.organizations.list()))
+  useEffect(() => {
+    /*
+     * Handle no org
+     * redirect to new org route
+     */
+    if (_pageState.isEmptyOrganizations) {
+      router.push(`/new`)
+    }
+  }, [_pageState.isEmptyOrganizations])
 
-  /*
-   * Handle no org
-   * redirect to new org route
-   */
-  if (organizations.length <= 0) {
-    router.push(`/new`)
-  }
+  useEffect(() => {
+    /*
+     * Redirect to first org if the slug doesn't match an org slug
+     * this is mainly to capture the /project/new url, which is redirected from database.new
+     */
+    if (_pageState.isInvalidSlug && _pageState.organizations.length > 0) {
+      router.push(`/new/${_pageState.organizations[0].slug}`)
+    }
+  }, [_pageState.isInvalidSlug, _pageState.organizations])
 
-  /*
-   * Handle org slug redirect
-   */
-  const found = organizations.find((o: any) => o.slug === slug)
-
-  /*
-   * Redirect to first org if the slug doesn't match an org slug
-   * this is mainly to capture the /project/new url, which is redirected from database.new
-   */
-  if (!found) {
-    router.push(`/new/${organizations[0].slug}`)
-  }
-
-  /*
-   * currentOrg can now be used for any org meta data and for creating new project
-   */
-  const currentOrg = organizations.find((o: any) => o.slug === slug)
+  // useEffect(() => {
+  //   if (_pageState.stripeCustomerId) {
+  //     _pageState.loadStripeAccount()
+  //   }
+  // }, [_pageState.stripeCustomerId])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -170,7 +217,7 @@ export const Wizard = () => {
     setNewProjectLoading(true)
     const data = {
       cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
-      org_id: currentOrg.id,
+      org_id: _pageState.currentOrg?.id,
       name: projectName,
       db_pass: dbPass,
       db_region: dbRegion,
@@ -190,11 +237,8 @@ export const Wizard = () => {
     }
   }
 
-  const overProjectLimit = currentOrg?.total_free_projects >= currentOrg?.project_limit
-  const sortedOrganizations = organizations.sort((a: any, b: any) => a.name.localeCompare(b.name))
-
   return (
-    <WizardLayout organization={currentOrg} project={null}>
+    <WizardLayout organization={_pageState.currentOrg} project={null}>
       <Panel
         hideHeaderStyling
         title={
@@ -237,10 +281,10 @@ export const Wizard = () => {
             <Listbox
               label="Organization"
               layout="horizontal"
-              value={currentOrg?.slug}
-              onChange={(slug) => router.push(`/new/${slug}`)}
+              value={_pageState.currentOrg?.slug}
+              onChange={(slug) => (window.location.href = `/new/${slug}`)}
             >
-              {sortedOrganizations.map((x: any) => (
+              {_pageState.organizations.map((x: any) => (
                 <Listbox.Option
                   key={x.id}
                   label={x.name}
@@ -252,7 +296,7 @@ export const Wizard = () => {
               ))}
             </Listbox>
 
-            {overProjectLimit && (
+            {_pageState.isOverFreeProjectLimit && (
               <InformationBox
                 icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
                 defaultVisibility={true}
@@ -261,9 +305,10 @@ export const Wizard = () => {
                 description={
                   <div className="space-y-3">
                     <p className="text-sm leading-normal">
-                      This organization can only have a maximum of {currentOrg.project_limit} free
-                      projects. You can either upgrade pre existing projects, choose another
-                      organization, or create a new organization.
+                      This organization can only have a maximum of{' '}
+                      {_pageState.currentOrg?.project_limit} free projects. You can either upgrade
+                      pre existing projects, choose another organization, or create a new
+                      organization.
                     </p>
                     <Button type="secondary" onClick={() => router.push('/new')}>
                       New organization
@@ -274,7 +319,7 @@ export const Wizard = () => {
             )}
           </Panel.Content>
 
-          {!overProjectLimit && (
+          {!_pageState.isOverFreeProjectLimit && (
             <>
               <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
                 <FormField
