@@ -28,12 +28,29 @@ Editor.mockImplementation((props) => {
 })
 useMonaco.mockImplementation((v) => v)
 
+jest.mock('components/ui/Flag/Flag')
+import Flag from 'components/ui/Flag/Flag'
+Flag.mockImplementation(({ children }) => <>{children}</>)
+
+import { SWRConfig } from 'swr'
+jest.mock('pages/project/[ref]/settings/logs/[type]')
 import { LogPage } from 'pages/project/[ref]/settings/logs/[type]'
+LogPage.mockImplementation((props) => {
+  const Page = jest.requireActual('pages/project/[ref]/settings/logs/[type]').LogPage
+  // wrap with SWR to reset the cache each time
+  return (
+    <SWRConfig value={{ provider: () => new Map() }}>
+      <Page {...props} />
+    </SWRConfig>
+  )
+})
+
 import { render, fireEvent, waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {getToggleByText} from "../../helpers"
+import { getToggleByText } from '../../helpers'
 
 beforeEach(() => {
+  // reset mocks between tests
   get.mockReset()
 })
 test('can display log data and metadata', async () => {
@@ -57,7 +74,7 @@ test('can display log data and metadata', async () => {
   await waitFor(() => screen.getByText(/something_value/))
 })
 
-test('Refresh', async () => {
+test('Refreshpage', async () => {
   const data = [
     {
       id: 'some-uuid',
@@ -68,15 +85,19 @@ test('Refresh', async () => {
       },
     },
   ]
-  get.mockResolvedValueOnce({ data }).mockResolvedValueOnce({ data: [] })
+  get.mockImplementation((url) => {
+    if (url.includes('count')) return { count: 0 }
+    return { data }
+  })
   render(<LogPage />)
-
+  await waitFor(() => screen.getByText(/happened/))
+  get.mockResolvedValueOnce({ data: [] })
   const row = screen.getByText(/happened/)
   fireEvent.click(row)
   await waitFor(() => screen.getByText(/my_key/))
 
   // simulate refresh
-  await waitFor(() => userEvent.click(screen.getByText(/Refresh/)))
+  userEvent.click(screen.getByText(/Refresh/))
   // when log line unmounts and it was focused, should close focus panel
   await waitFor(() => screen.queryByText(/my_key/) === null, { timeout: 1000 })
   await waitFor(() => screen.queryByText(/happened/) === null, { timeout: 1000 })
@@ -101,6 +122,8 @@ test('Search will trigger a log refresh', async () => {
   render(<LogPage />)
 
   userEvent.type(screen.getByPlaceholderText(/Search/), 'something')
+  userEvent.click(screen.getByText('Go'))
+
   await waitFor(
     () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('search_query'))
@@ -167,6 +190,7 @@ test('where clause will trigger a log refresh', async () => {
   })
   editor = container.querySelector('.monaco-editor')
   userEvent.type(editor, 'metadata.field = something')
+  userEvent.click(screen.getByText('Run'))
   await waitFor(
     () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
@@ -176,4 +200,44 @@ test('where clause will trigger a log refresh', async () => {
   )
 
   await waitFor(() => screen.getByText(/happened/))
+})
+
+test('load older btn will fetch older logs', async () => {
+  get.mockImplementation((url) => {
+    if (url.includes('count')) {
+      return {}
+    }
+    return {
+      data: [
+        {
+          id: 'some-uuid',
+          timestamp: 1621323232312,
+          event_message: 'first event',
+          metadata: {},
+        },
+      ],
+    }
+  })
+  render(<LogPage />)
+  // should display first log but not second
+  await waitFor(() => screen.getByText('first event'))
+  expect(() => screen.getByText('second event')).toThrow()
+
+  get.mockResolvedValueOnce({
+    data: [
+      {
+        id: 'some-uuid2',
+        timestamp: 1621323232310,
+        event_message: 'second event',
+        metadata: {},
+      },
+    ],
+  })
+  // should display first and second log
+  userEvent.click(screen.getByText('Load older'))
+  await waitFor(() => screen.getByText('first event'))
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_end=1'))
+  })
+  await waitFor(() => screen.getByText('second event'))
 })

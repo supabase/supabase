@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 import {
   Button,
   Input,
@@ -13,13 +13,11 @@ import {
 import { LogTemplate } from '.'
 
 interface Props {
-  searchValue?: string
+  defaultSearchValue?: string
   templates?: any
   isLoading: boolean
   isCustomQuery: boolean
   newCount: number
-  showReset: boolean
-  onReset: () => void
   onRefresh?: () => void
   onSearch?: (query: string) => void
   onCustomClick?: () => void
@@ -30,18 +28,25 @@ interface Props {
  * Logs control panel header + wrapper
  */
 const LogPanel: FC<Props> = ({
-  searchValue,
   templates = [],
   isLoading,
   isCustomQuery,
   newCount,
-  showReset,
-  onReset,
   onRefresh,
   onSearch = () => {},
+  defaultSearchValue = '',
   onCustomClick,
   onSelectTemplate,
 }) => {
+  const [search, setSearch] = useState('')
+
+  // sync local state with provided default value
+  useEffect(() => {
+    if (search !== defaultSearchValue) {
+      setSearch(defaultSearchValue)
+    }
+  }, [defaultSearchValue])
+
   return (
     <div className="bg-panel-header-light dark:bg-panel-header-dark">
       <div className="px-2 py-1 flex items-center justify-between w-full">
@@ -94,16 +99,43 @@ const LogPanel: FC<Props> = ({
           </div>
         </div>
         <div className="flex items-center gap-x-4">
-          <Input
-            size="tiny"
-            icon={<IconSearch size={16} />}
-            placeholder="Search event messages"
-            onChange={(e) => onSearch(e.target.value)}
-            value={searchValue}
-            actions={
-              showReset && <IconX size="tiny" className="cursor-pointer mx-1" title="Clear search" onClick={onReset} />
-            }
-          />
+          {/* wrap with form so that if user presses enter, the search value will submit automatically */}
+          <form
+            id="log-panel-search"
+            onSubmit={(e) => {
+              // prevent redirection
+              e.preventDefault()
+              onSearch(search)
+            }}
+          >
+            <Input
+              size="tiny"
+              icon={<IconSearch size={16} />}
+              placeholder="Search events"
+              onChange={(e) => setSearch(e.target.value)}
+              value={search}
+              actions={[
+                search && (
+                  <IconX
+                    key="clear-search"
+                    size="tiny"
+                    className="cursor-pointer mx-1"
+                    title="Clear search"
+                    onClick={() => setSearch('')}
+                  />
+                ),
+                <Button
+                  key="go"
+                  size="tiny"
+                  title="Go"
+                  type="secondary"
+                  onClick={() => onSearch(search)}
+                >
+                  Go
+                </Button>,
+              ]}
+            />
+          </form>
         </div>
       </div>
     </div>
