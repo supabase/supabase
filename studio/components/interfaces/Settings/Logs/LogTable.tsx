@@ -1,10 +1,11 @@
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Typography } from '@supabase/ui'
 import DataGrid from '@supabase/react-data-grid'
 
 import LogSelection from './LogSelection'
 import { LogData } from './Logs.types'
+import { isNil } from 'lodash'
 
 interface Props {
   isCustomQuery: boolean
@@ -43,23 +44,29 @@ const LogTable = ({ isCustomQuery, data }: Props) => {
     },
   }))
 
-  const logMap = (data || []).reduce((acc: any, d) => {
-    acc[d.id] = d
-    return acc
-  }, {})
+  const logMap: { [id: string]: LogData } = useMemo(() => {
+    return (data || []).reduce((acc: any, d) => {
+      acc[d.id] = d
+      return acc
+    }, {})
+  }, [JSON.stringify(data)])
 
+  const strLogMap = JSON.stringify(logMap)
   useEffect(() => {
-    if (!data) return
+    if (isNil(data)) return
     if (focusedLog && !(focusedLog.id in logMap)) {
       setFocusedLog(null)
     }
-  }, [Object.keys(logMap)])
+  }, [strLogMap])
 
   if (!data) return null
 
   // [Joshen] Hmm quite hacky now, but will do
   const maxHeight = isCustomQuery ? 'calc(100vh - 42px - 10rem)' : 'calc(100vh - 42px - 3rem)'
 
+  const logDataRows = useMemo(() => {
+    return Object.values(logMap).sort((a, b) => a.timestamp - b.timestamp)
+  }, [strLogMap])
   return (
     <section className="flex flex-1 flex-row" style={{ maxHeight }}>
       <DataGrid
@@ -75,7 +82,7 @@ const LogTable = ({ isCustomQuery, data }: Props) => {
         }
         columns={columns as any}
         rowClass={(r) => `${r.id === focusedLog?.id ? 'bg-green-800' : 'cursor-pointer'}`}
-        rows={data}
+        rows={logDataRows}
         rowKeyGetter={(r) => r.id}
         onRowClick={(r) => setFocusedLog(logMap[r.id])}
       />

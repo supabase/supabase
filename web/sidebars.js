@@ -148,6 +148,7 @@ module.exports = {
             'guides/auth/auth-email',
             'guides/auth/auth-magic-link',
             'guides/auth/auth-apple',
+            'guides/auth/auth-azure',
             'guides/auth/auth-bitbucket',
             'guides/auth/auth-discord',
             'guides/auth/auth-facebook',
