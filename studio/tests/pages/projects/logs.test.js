@@ -232,7 +232,7 @@ test('custom sql querying', async () => {
   userEvent.type(editor, 'select count(*) as my_count from edge_logs')
 
   // should show sandbox warning alert
-  await waitFor(() => screen.getByText(/free users are restricted to a 7 day querying window/))
+  await waitFor(() => screen.getByText(/restricted to a 7 day querying window/))
 
   // should trigger query
   userEvent.click(screen.getByText('Run'))
