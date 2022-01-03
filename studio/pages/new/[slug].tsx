@@ -430,20 +430,22 @@ const FreeProjectLimitWarning = observer(({ dbPricingPlan }: { dbPricingPlan: st
   const isSelectFreeTier = dbPricingPlan === PRICING_PLANS.FREE
   if (!isSelectFreeTier || !_pageState.isOverFreeProjectLimit) return null
   return (
-    <InformationBox
-      icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
-      defaultVisibility={true}
-      hideCollapse
-      title="This organization has reached its free project limit"
-      description={
-        <div className="space-y-3">
-          <p className="text-sm leading-normal">
-            This organization can only have a maximum of {_pageState.currentOrg?.project_limit} free
-            projects. You can only choose paid pricing plan.
-          </p>
-        </div>
-      }
-    />
+    <div className="mt-4">
+      <InformationBox
+        icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+        defaultVisibility={true}
+        hideCollapse
+        title="This organization has reached its free project limit"
+        description={
+          <div className="space-y-3">
+            <p className="text-sm leading-normal">
+              This organization can only have a maximum of {_pageState.currentOrg?.project_limit}{' '}
+              free projects. You can only choose paid pricing plan.
+            </p>
+          </div>
+        }
+      />
+    </div>
   )
 })
 
