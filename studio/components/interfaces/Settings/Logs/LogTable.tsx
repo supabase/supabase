@@ -5,6 +5,7 @@ import DataGrid from '@supabase/react-data-grid'
 
 import LogSelection from './LogSelection'
 import { LogData } from './Logs.types'
+import { isNil } from 'lodash'
 
 interface Props {
   isCustomQuery: boolean
@@ -52,7 +53,7 @@ const LogTable = ({ isCustomQuery, data }: Props) => {
 
   const strLogMap = JSON.stringify(logMap)
   useEffect(() => {
-    if (data === null || data === undefined) return
+    if (isNil(data)) return
     if (focusedLog && !(focusedLog.id in logMap)) {
       setFocusedLog(null)
     }
