@@ -39,7 +39,7 @@ const Users = () => {
     PageState.fetchData(1)
   }
 
-  function RefreshUsers() {
+  function refreshUsers() {
     PageState.fetchData(1)
   }
 
