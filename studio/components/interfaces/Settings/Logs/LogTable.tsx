@@ -79,7 +79,7 @@ const LogTable = ({ isCustomQuery, data = [] }: Props) => {
 
   const logDataRows = useMemo(() => {
     if (!isChrono) return data
-    return Object.values(logMap).sort((a, b) => a.timestamp - b.timestamp)
+    return Object.values(logMap).sort((a, b) => b.timestamp - a.timestamp)
   }, [strData])
   return (
     <section className="flex flex-1 flex-row" style={{ maxHeight }}>
