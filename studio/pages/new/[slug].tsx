@@ -251,8 +251,7 @@ export const Wizard = observer(() => {
               label="Organization"
               layout="horizontal"
               value={currentOrg?.slug}
-              // [Joshen] Should we use router.push?
-              onChange={(slug) => (window.location.href = `/new/${slug}`)}
+              onChange={(slug) => router.push(`/new/${slug}`)}
             >
               {organizations.map((x: any) => (
                 <Listbox.Option
