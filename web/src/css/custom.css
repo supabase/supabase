@@ -252,6 +252,11 @@ body {
   display: inline-block;
 }
 
+::selection {
+  background: #6EE7B7;
+  color: #333 !important;
+}
+
 h4,
 h5,
 h6 {
