@@ -269,7 +269,7 @@ export const Wizard = observer(() => {
               <NotOrganizationOwnerWarning />
             ) : (
               <>
-                {!isSelectFreeTier && isOverFreeProjectLimit && <FreeProjectLimitWarning />}
+                {isSelectFreeTier && isOverFreeProjectLimit && <FreeProjectLimitWarning />}
                 {!isSelectFreeTier && isEmptyPaymentMethod && (
                   <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
                 )}
