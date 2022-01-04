@@ -1,7 +1,7 @@
 import semver from 'semver'
 import { useEffect, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, IconSearch, IconX } from '@supabase/ui'
+import { Button, Input, IconSearch, IconX, IconRefreshCw } from '@supabase/ui'
 
 import { PageContext } from 'pages/project/[ref]/auth/users'
 import UsersList from './UsersList'
@@ -39,6 +39,10 @@ const Users = () => {
     PageState.fetchData(1)
   }
 
+  function refreshUsers() {
+    PageState.fetchData(1)
+  }
+
   return (
     <div className="">
       <div className="flex justify-between">
@@ -64,7 +68,10 @@ const Users = () => {
             ]}
           />
         </div>
-        {inviteEnabled && <InviteUserModal />}
+        <div className='flex items-center'>
+          <Button className="mr-2" size="tiny" icon={<IconRefreshCw />} type="default" onClick={refreshUsers}>Reload</Button>
+          {inviteEnabled && <InviteUserModal />}
+        </div>
       </div>
       <section className="overflow-visible mt-4">
         <div className="relative section-block--body rounded">
