@@ -28,6 +28,7 @@ import {
   PASSWORD_STRENGTH_PERCENTAGE,
   PRICING_PLANS,
   PRICING_PLANS_DEFAULT,
+  DEFAULT_FREE_PROJECTS_LIMIT,
 } from 'lib/constants'
 
 import { useStore, withAuth } from 'hooks'
@@ -80,19 +81,28 @@ export const Wizard = observer(() => {
   const organizations = values(toJS(app.organizations.list()))
   const currentOrg = organizations.find((o: any) => o.slug === slug)
   const stripeCustomerId = currentOrg?.stripe_customer_id
+
+  const totalFreeProjects = ui.profile?.total_free_projects ?? 0
+  const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
+
   const isEmptyOrganizations = organizations.length <= 0
   const isEmptyPaymentMethod = stripeCustomer
     ? stripeCustomer.paymentMethods?.data?.length <= 0
     : undefined
-  const isOverFreeProjectLimit = (ui.profile?.total_free_projects ?? 0) >= 2
+  const isOverFreeProjectLimit = totalFreeProjects >= freeProjectsLimit
   const isInvalidSlug = isUndefined(currentOrg)
   const isSelectFreeTier = dbPricingPlan === PRICING_PLANS.FREE
+
+  const canCreateProject =
+    currentOrg?.is_owner &&
+    (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit && !isEmptyPaymentMethod))
 
   const canSubmit =
     projectName != '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
     dbRegion != '' &&
     dbPricingPlan != ''
+
   const passwordErrorMessage =
     dbPass != '' && passwordStrengthScore < DEFAULT_MINIMUM_PASSWORD_STRENGTH
       ? 'You need a stronger password'
@@ -241,6 +251,7 @@ export const Wizard = observer(() => {
               label="Organization"
               layout="horizontal"
               value={currentOrg?.slug}
+              // [Joshen] Should we use router.push?
               onChange={(slug) => (window.location.href = `/new/${slug}`)}
             >
               {organizations.map((x: any) => (
@@ -254,130 +265,161 @@ export const Wizard = observer(() => {
                 </Listbox.Option>
               ))}
             </Listbox>
+
+            {!currentOrg?.is_owner ? (
+              <NotOrganizationOwnerWarning />
+            ) : (
+              <>
+                {!isSelectFreeTier && isOverFreeProjectLimit && <FreeProjectLimitWarning />}
+                {!isSelectFreeTier && isEmptyPaymentMethod && (
+                  <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
+                )}
+              </>
+            )}
           </Panel.Content>
 
-          <>
-            <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-              <FormField
-                // @ts-ignore
-                label="Name"
-                type="text"
-                placeholder="Project name"
-                value={projectName}
-                onChange={onProjectNameChange}
-                autoFocus
-              />
-            </Panel.Content>
+          {canCreateProject && (
+            <>
+              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <FormField
+                  // @ts-ignore
+                  label="Name"
+                  type="text"
+                  placeholder="Project name"
+                  value={projectName}
+                  onChange={onProjectNameChange}
+                  autoFocus
+                />
+              </Panel.Content>
 
-            <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-              <FormField
-                // @ts-ignore
-                label="Database Password"
-                type="password"
-                placeholder="Type in a strong password"
-                value={dbPass}
-                onChange={onDbPassChange}
-                description={
-                  <>
-                    {dbPass && (
-                      <div
-                        aria-valuemax={100}
-                        aria-valuemin={0}
-                        aria-valuenow={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
-                        aria-valuetext={
-                          (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]
-                        }
-                        role="progressbar"
-                        className="mb-2 bg-bg-alt-light dark:bg-bg-alt-dark rounded overflow-hidden transition-all border dark:border-dark"
-                      >
+              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <FormField
+                  // @ts-ignore
+                  label="Database Password"
+                  type="password"
+                  placeholder="Type in a strong password"
+                  value={dbPass}
+                  onChange={onDbPassChange}
+                  description={
+                    <>
+                      {dbPass && (
                         <div
-                          style={{
-                            width: (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore],
-                          }}
-                          className={`relative h-2 w-full ${
-                            (PASSWORD_STRENGTH_COLOR as any)[passwordStrengthScore]
-                          } transition-all duration-500 ease-out shadow-inner`}
-                        ></div>
-                      </div>
-                    )}
-                    <span
-                      className={
-                        passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH
-                          ? 'text-green-600'
-                          : ''
-                      }
+                          aria-valuemax={100}
+                          aria-valuemin={0}
+                          aria-valuenow={
+                            (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]
+                          }
+                          aria-valuetext={
+                            (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]
+                          }
+                          role="progressbar"
+                          className="mb-2 bg-bg-alt-light dark:bg-bg-alt-dark rounded overflow-hidden transition-all border dark:border-dark"
+                        >
+                          <div
+                            style={{
+                              width: (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore],
+                            }}
+                            className={`relative h-2 w-full ${
+                              (PASSWORD_STRENGTH_COLOR as any)[passwordStrengthScore]
+                            } transition-all duration-500 ease-out shadow-inner`}
+                          ></div>
+                        </div>
+                      )}
+                      <span
+                        className={
+                          passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH
+                            ? 'text-green-600'
+                            : ''
+                        }
+                      >
+                        {passwordStrengthMessage
+                          ? passwordStrengthMessage
+                          : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'}
+                      </span>
+                    </>
+                  }
+                  errorMessage={
+                    passwordStrengthWarning
+                      ? `${passwordStrengthWarning}. ${passwordErrorMessage}.`
+                      : passwordErrorMessage
+                  }
+                />
+              </Panel.Content>
+
+              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <FormField
+                  // @ts-ignore
+                  label="Region"
+                  type="select"
+                  choices={REGIONS}
+                  value={dbRegion}
+                  onChange={onDbRegionChange}
+                  description="Select a region close to you for the best performance."
+                />
+              </Panel.Content>
+
+              <Panel.Content className="Form section-block--body has-inputs-centered ">
+                <Listbox
+                  label="Pricing Plan"
+                  layout="horizontal"
+                  value={dbPricingPlan}
+                  onChange={onDbPricingPlanChange}
+                  // @ts-ignore
+                  descriptionText={
+                    <>
+                      Select a plan that suits your needs.&nbsp;
+                      <a className="underline" target="_blank" href="https://supabase.com/pricing">
+                        More details
+                      </a>
+                    </>
+                  }
+                >
+                  {Object.entries(PRICING_PLANS).map(([k, v]) => (
+                    <Listbox.Option
+                      key={k}
+                      label={v}
+                      value={v}
+                      addOnBefore={() => <IconDollarSign />}
                     >
-                      {passwordStrengthMessage
-                        ? passwordStrengthMessage
-                        : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'}
-                    </span>
-                  </>
-                }
-                errorMessage={
-                  passwordStrengthWarning
-                    ? `${passwordStrengthWarning}. ${passwordErrorMessage}.`
-                    : passwordErrorMessage
-                }
-              />
-            </Panel.Content>
-
-            <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-              <FormField
-                // @ts-ignore
-                label="Region"
-                type="select"
-                choices={REGIONS}
-                value={dbRegion}
-                onChange={onDbRegionChange}
-                description="Select a region close to you for the best performance."
-              />
-            </Panel.Content>
-
-            <Panel.Content className="Form section-block--body has-inputs-centered ">
-              <Listbox
-                label="Pricing Plan"
-                layout="horizontal"
-                value={dbPricingPlan}
-                onChange={onDbPricingPlanChange}
-                // @ts-ignore
-                descriptionText={
-                  <>
-                    Select a plan that suits your needs.&nbsp;
-                    <a className="underline" target="_blank" href="https://supabase.com/pricing">
-                      More details
-                    </a>
-                  </>
-                }
-              >
-                {Object.entries(PRICING_PLANS).map(([k, v]) => (
-                  <Listbox.Option
-                    key={k}
-                    label={v}
-                    value={v}
-                    addOnBefore={() => <IconDollarSign />}
-                  >
-                    {`${v}${
-                      v === PRICING_PLANS.PRO
-                        ? ' - $25/month'
-                        : v === PRICING_PLANS.PAYG
-                        ? ' - $25/month plus usage costs'
-                        : ''
-                    }`}
-                  </Listbox.Option>
-                ))}
-              </Listbox>
-
-              {!isSelectFreeTier && isOverFreeProjectLimit && <FreeProjectLimitWarning />}
-              {!isSelectFreeTier && isEmptyPaymentMethod && (
-                <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
-              )}
-            </Panel.Content>
-          </>
+                      {`${v}${
+                        v === PRICING_PLANS.PRO
+                          ? ' - $25/month'
+                          : v === PRICING_PLANS.PAYG
+                          ? ' - $25/month plus usage costs'
+                          : ''
+                      }`}
+                    </Listbox.Option>
+                  ))}
+                </Listbox>
+              </Panel.Content>
+            </>
+          )}
         </>
       </Panel>
     </WizardLayout>
   )
 })
+
+const NotOrganizationOwnerWarning = () => {
+  return (
+    <div className="mt-4">
+      <InformationBox
+        icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+        defaultVisibility={true}
+        hideCollapse
+        title="You do not have permission to create a project"
+        description={
+          <div className="space-y-3">
+            <p className="text-sm leading-normal">
+              Only the organization owner can create new projects. Contact your organizaton owner to
+              create a new project for this organization.
+            </p>
+          </div>
+        }
+      />
+    </div>
+  )
+}
 
 const FreeProjectLimitWarning = () => {
   return (
