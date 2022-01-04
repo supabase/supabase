@@ -9,33 +9,43 @@ import { isNil } from 'lodash'
 
 interface Props {
   isCustomQuery: boolean
-  data?: LogData[]
+  data?: Array<LogData | Object>
 }
+type LogMap = { [id: string]: LogData }
 
 /**
  * Logs table view with focus side panel
+ *
+ * When in custom data display mode, the side panel will not open when focusing on logs.
  */
-const LogTable = ({ isCustomQuery, data }: Props) => {
+const LogTable = ({ isCustomQuery, data = [] }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
-  const columns = ['timestamp', 'event_message'].map((v) => ({
+  const columnNames = Object.keys(data[0] || {})
+  // whether it the data structure is LogData format.
+  const isChrono =
+    columnNames.includes('timestamp') &&
+    columnNames.includes('event_message') &&
+    columnNames.length === 4
+
+  const columns = (isChrono ? ['timestamp', 'event_message'] : columnNames).map((v) => ({
     key: v,
     name: v,
-    width: v === 'timestamp' ? 210 : undefined,
+    width: isChrono && v === 'timestamp' ? 210 : undefined,
     resizable: true,
     headerRenderer: () => {
       return <div className="flex items-center text-xs font-mono h-full">{v}</div>
     },
     formatter: ({ row }: any) => {
       let value = row[v]
-      if (v === 'timestamp') {
+      if (isChrono && v === 'timestamp') {
         value = dayjs(Number(row['timestamp']) / 1000).toISOString()
       }
       return (
         <p
           className={[
             'block whitespace-wrap font-mono',
-            `${row.id === focusedLog?.id ? 'font-bold' : ''}`,
-            `${v === 'timestamp' ? 'text-green-500' : ''}`,
+            `${isChrono && row.id === focusedLog?.id ? 'font-bold' : ''}`,
+            `${isChrono && v === 'timestamp' ? 'text-green-500' : ''}`,
           ].join(' ')}
         >
           {value}
@@ -44,15 +54,18 @@ const LogTable = ({ isCustomQuery, data }: Props) => {
     },
   }))
 
-  const logMap: { [id: string]: LogData } = useMemo(() => {
-    return (data || []).reduce((acc: any, d) => {
+  const logMap = useMemo(() => {
+    if (!isChrono) return {} as LogMap
+    const logData = data as LogData[]
+    return logData.reduce((acc: LogMap, d: LogData) => {
       acc[d.id] = d
       return acc
-    }, {})
+    }, {}) as LogMap
   }, [JSON.stringify(data)])
 
   const strLogMap = JSON.stringify(logMap)
   useEffect(() => {
+    if (!isChrono) return
     if (isNil(data)) return
     if (focusedLog && !(focusedLog.id in logMap)) {
       setFocusedLog(null)
@@ -65,6 +78,7 @@ const LogTable = ({ isCustomQuery, data }: Props) => {
   const maxHeight = isCustomQuery ? 'calc(100vh - 42px - 10rem)' : 'calc(100vh - 42px - 3rem)'
 
   const logDataRows = useMemo(() => {
+    if (!isChrono) return data
     return Object.values(logMap).sort((a, b) => a.timestamp - b.timestamp)
   }, [strLogMap])
   return (
@@ -72,7 +86,10 @@ const LogTable = ({ isCustomQuery, data }: Props) => {
       <DataGrid
         style={{ height: '100%' }}
         className="flex-grow flex-1"
-        onSelectedCellChange={({ idx, rowIdx }) => setFocusedLog(data[rowIdx])}
+        onSelectedCellChange={({ idx, rowIdx }) => {
+          if (!isChrono) return
+          setFocusedLog(data[rowIdx] as LogData)
+        }}
         noRowsFallback={
           <div className="p-4">
             <Typography.Text type="secondary" small className="font-mono">
@@ -81,10 +98,22 @@ const LogTable = ({ isCustomQuery, data }: Props) => {
           </div>
         }
         columns={columns as any}
-        rowClass={(r) => `${r.id === focusedLog?.id ? 'bg-green-800' : 'cursor-pointer'}`}
+        rowClass={(r) => {
+          if (!isChrono) return 'cursor-pointer'
+          const row = r as LogData
+          return `${row.id === focusedLog?.id ? 'bg-green-800' : 'cursor-pointer'}`
+        }}
         rows={logDataRows}
-        rowKeyGetter={(r) => r.id}
-        onRowClick={(r) => setFocusedLog(logMap[r.id])}
+        rowKeyGetter={(r) => {
+          if (!isChrono) return Object.keys(r)[0]
+          const row = r as LogData
+          return row.id
+        }}
+        onRowClick={(r) => {
+          if (!isChrono) return
+          const row = r as LogData
+          setFocusedLog(logMap[row.id])
+        }}
       />
       {focusedLog && (
         <div className="w-2/5 flex flex-col">
