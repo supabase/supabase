@@ -48,7 +48,7 @@ export const LogPage: NextPage = () => {
     timestamp_end: '',
   })
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as string]}`
-  const isCustomQuery = logsCustomSql && editorValue.toLowerCase().includes('select') ? true : false
+  const isSelectQuery = logsCustomSql && editorValue.toLowerCase().includes('select') ? true : false
 
   useEffect(() => {
     setParams({ ...params, type: type as string })
@@ -133,8 +133,8 @@ export const LogPage: NextPage = () => {
       setEditorValue(template.searchString)
       setParams((prev) => ({
         ...prev,
-        where: isCustomQuery ? '' : template.searchString,
-        sql: isCustomQuery ? template.searchString : '',
+        where: isSelectQuery ? '' : template.searchString,
+        sql: isSelectQuery ? template.searchString : '',
         search_query: '',
       }))
       setEditorId(uuidv4())
@@ -143,8 +143,8 @@ export const LogPage: NextPage = () => {
   const handleEditorSubmit = () => {
     setParams((prev) => ({
       ...prev,
-      where: isCustomQuery ? '' : editorValue,
-      sql: isCustomQuery ? editorValue : '',
+      where: isSelectQuery ? '' : editorValue,
+      sql: isSelectQuery ? editorValue : '',
     }))
   }
   const handleSearch = (v: string) => {
@@ -178,14 +178,14 @@ export const LogPage: NextPage = () => {
             </div>
             <div className="flex flex-row gap-x-2 justify-end p-2">
               <Flag name="logsCustomSql">
-                {isCustomQuery && (
+                {isSelectQuery && (
                   // we don't have a slim Alert component yet
                   <div className="flex flex-row items-center">
                     <IconInfo size="small" />
-                    <span>
+                    <Typography.Text small={true}>
                       Custom queries are restricted to a {type === 'database' ? '2 hour' : '7 day'}{' '}
                       querying window.
-                    </span>
+                    </Typography.Text>
                   </div>
                 )}
               </Flag>
@@ -226,16 +226,18 @@ export const LogPage: NextPage = () => {
           <LogTable data={logData} isCustomQuery={mode === 'custom'} />
           {/* Footer section of log ui, appears below table */}
           <div className="p-2">
-            <Flag name="logsLoadOlder">
-              <Button
-                // trigger page increase
-                onClick={() => setSize(size + 1)}
-                icon={<IconRewind />}
-                type="secondary"
-              >
-                Load older
-              </Button>
-            </Flag>
+            {!isSelectQuery && (
+              <Flag name="logsLoadOlder">
+                <Button
+                  // trigger page increase
+                  onClick={() => setSize(size + 1)}
+                  icon={<IconRewind />}
+                  type="secondary"
+                >
+                  Load older
+                </Button>
+              </Flag>
+            )}
           </div>
         </div>
       </div>
