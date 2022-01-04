@@ -392,6 +392,22 @@ export default function IndexPage() {
       <div className="bg-gray-50 dark:bg-gray-800 border-t dark:border-gray-600">
         <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
           <Typography.Title level={2}>Frequently asked questions</Typography.Title>
+          <Typography className="w-5/12 mb-4">
+            Can&apos;t find the answer to your question, ask someone in the community either on our
+            Discord or Github.
+          </Typography>
+          <Link href="https://discord.supabase.com">
+            <a>
+              <Button type="default" className="mr-2" size="small">
+                Discord
+              </Button>
+            </a>
+          </Link>
+          <Link href="https://github.com/supabase/supabase/discussions">
+            <a>
+              <Button size="small">Github</Button>
+            </a>
+          </Link>
           <div className="mt-16">
             <div className="grid grid-cols-2 gap-y-10 gap-x-10">
               {pricingFaq.map((faq) => {
