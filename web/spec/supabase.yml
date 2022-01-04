@@ -852,10 +852,10 @@ pages:
         isSpotlight: false
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.generateLink({
-            type: 'invite',
-            email: 'email@example.com'
-          })
+          const { data: user, error } = await supabase.auth.api.generateLink(
+            'invite',
+            'email@example.com'
+          )
           ```
 
   select():
