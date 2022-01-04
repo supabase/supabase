@@ -981,7 +981,7 @@ const Beta = () => {
             //
             // to do: author urls should be internal in future
             // currently we have external links to github profiles
-            authors: [authors['supabase'].authorURL],
+            authors: [authors['supabase'].author_url],
             tags: ['beta'],
           },
           images: [
