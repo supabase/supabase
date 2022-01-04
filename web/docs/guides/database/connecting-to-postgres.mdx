@@ -92,9 +92,9 @@ Connection pools are useful for managing a large number of _temporary_ connectio
 
 ### How connection pooling works
 
-A "connection pool" is a system (external to Postgres) which manage connections, rather than PostgreSQL's native system. Supabase uses [PgBouncer](https://www.pgbouncer.org/) for connection pooling.
+A "connection pool" is a system (external to Postgres) which manages connections, rather than PostgreSQL's native system. Supabase uses [PgBouncer](https://www.pgbouncer.org/) for connection pooling.
 
-When a client makes a request, PgBouncer "allocates" and available connection to the client.
+When a client makes a request, PgBouncer "allocates" an available connection to the client.
 When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
 
 
