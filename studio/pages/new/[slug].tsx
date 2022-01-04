@@ -94,14 +94,14 @@ export const Wizard = observer(() => {
   const isSelectFreeTier = dbPricingPlan === PRICING_PLANS.FREE
 
   const canCreateProject =
-    currentOrg?.is_owner &&
-    (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit && !isEmptyPaymentMethod))
+    currentOrg?.is_owner && (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
 
   const canSubmit =
     projectName != '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
     dbRegion != '' &&
-    dbPricingPlan != ''
+    dbPricingPlan != '' &&
+    (isSelectFreeTier || (!isSelectFreeTier && !isEmptyPaymentMethod))
 
   const passwordErrorMessage =
     dbPass != '' && passwordStrengthScore < DEFAULT_MINIMUM_PASSWORD_STRENGTH
@@ -268,12 +268,7 @@ export const Wizard = observer(() => {
             {!currentOrg?.is_owner ? (
               <NotOrganizationOwnerWarning />
             ) : (
-              <>
-                {isSelectFreeTier && isOverFreeProjectLimit && <FreeProjectLimitWarning />}
-                {!isSelectFreeTier && isEmptyPaymentMethod && (
-                  <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
-                )}
-              </>
+              <>{isSelectFreeTier && isOverFreeProjectLimit && <FreeProjectLimitWarning />}</>
             )}
           </Panel.Content>
 
@@ -390,6 +385,10 @@ export const Wizard = observer(() => {
                     </Listbox.Option>
                   ))}
                 </Listbox>
+
+                {!isSelectFreeTier && isEmptyPaymentMethod && (
+                  <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
+                )}
               </Panel.Content>
             </>
           )}
@@ -472,7 +471,7 @@ const EmptyPaymentMethodWarning = observer(
       } else {
         ui.setNotification({
           category: 'error',
-          message: `Invalid customer id`,
+          message: `Invalid customer ID`,
         })
       }
     }
@@ -486,7 +485,7 @@ const EmptyPaymentMethodWarning = observer(
           description={
             <div className="space-y-3">
               <p className="text-sm leading-normal">
-                It's required to add a payment method for your organization before creating a paid
+                You need to add a payment method for your organization before creating a paid
                 project.
               </p>
               <Button loading={loading} type="secondary" onClick={() => redirectToPortal()}>
