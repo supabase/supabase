@@ -49,7 +49,11 @@ const Wizard = () => {
     } else {
       const org = response
       app.onOrgAdded(org)
-      Router.push('/new/[slug]', `/new/${org.slug}`)
+
+      // Router.push('/new/[slug]', `/new/${org.slug}`)
+      // Using window.location.href for now as organization metadata needs to refresh
+      // We do not get is_owner nor stripe_customer_id from the response here
+      window.location.href = `/new/${org.slug}`
     }
   }
 
