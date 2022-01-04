@@ -411,10 +411,10 @@ const EmptyPaymentMethodWarning = observer(
      * Get a link and then redirect them
      * path is used to determine what path inside billing portal to redirect to
      */
-    async function redirectToPortal(path: any) {
+    async function redirectToPortal(path?: any) {
       if (stripeCustomerId) {
         setLoading(true)
-        const response = await post(`${API_URL}/stripe/billing`, {
+        const response = await post(`${API_URL}/stripe/checkout`, {
           stripe_customer_id: stripeCustomerId,
           returnTo: `${getURL()}${router.asPath}`,
         })
@@ -425,8 +425,8 @@ const EmptyPaymentMethodWarning = observer(
           })
           setLoading(false)
         } else {
-          const { billingPortal } = response
-          window.location.replace(`${billingPortal}${path ? path : ''}`)
+          const { setupCheckoutPortal } = response
+          window.location.replace(`${setupCheckoutPortal}${path ? path : ''}`)
         }
       } else {
         ui.setNotification({
@@ -441,18 +441,14 @@ const EmptyPaymentMethodWarning = observer(
           icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
           defaultVisibility={true}
           hideCollapse
-          title="This organization has no payment methods"
+          title="Your organization has no payment methods"
           description={
             <div className="space-y-3">
               <p className="text-sm leading-normal">
-                It's required to add a default payment method for an organization in order to create
-                a paid project.
+                It's required to add a payment method for your organization before creating a paid
+                project.
               </p>
-              <Button
-                loading={loading}
-                type="secondary"
-                onClick={() => redirectToPortal('/payment-methods')}
-              >
+              <Button loading={loading} type="secondary" onClick={() => redirectToPortal()}>
                 Add a payment method
               </Button>
             </div>
