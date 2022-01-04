@@ -24,6 +24,7 @@ test('can display log data', async () => {
 })
 
 test('dedupes log lines with exact id', async () => {
+  // chronological mode requires 4 columns
   render(
     <LogTable
       data={[
@@ -31,11 +32,13 @@ test('dedupes log lines with exact id', async () => {
           id: 'seome-uuid',
           timestamp: 1621323232312,
           event_message: 'some event happened',
+          metadata: {}
         },
         {
           id: 'seome-uuid',
           timestamp: 1621323232312,
           event_message: 'some event happened',
+          metadata: {}
         },
       ]}
     />
