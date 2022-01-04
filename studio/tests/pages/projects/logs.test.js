@@ -31,6 +31,9 @@ useMonaco.mockImplementation((v) => v)
 jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'
 Flag.mockImplementation(({ children }) => <>{children}</>)
+jest.mock('hooks')
+import { useFlag } from 'hooks'
+useFlag.mockReturnValue(true)
 
 import { SWRConfig } from 'swr'
 jest.mock('pages/project/[ref]/settings/logs/[type]')
@@ -230,7 +233,6 @@ test('custom sql querying', async () => {
   })
   editor = container.querySelector('.monaco-editor')
   userEvent.type(editor, 'select count(*) as my_count from edge_logs')
-
   // should show sandbox warning alert
   await waitFor(() => screen.getByText(/restricted to a 7 day querying window/))
 
@@ -252,6 +254,9 @@ test('custom sql querying', async () => {
   // clicking on the row value should not show log selection panel
   userEvent.click(screen.getByText(/12345/))
   await waitFor(() => expect(() => screen.getByText(/Metadata/)).toThrow())
+
+  // should not see chronological features
+  await waitFor(() => screen.queryByText(/Load older/)) //column header
 })
 
 test('load older btn will fetch older logs', async () => {
