@@ -22,7 +22,6 @@ import {
 import { uuidv4 } from 'lib/helpers'
 import useSWRInfinite from 'swr/infinite'
 import { isUndefined } from 'lodash'
-import Flag from 'components/ui/Flag/Flag'
 
 /**
  * Acts as a container component for the entire log display
@@ -201,16 +200,14 @@ export const LogPage: NextPage = () => {
           <LogTable data={logData} isCustomQuery={mode === 'custom'} />
           {/* Footer section of log ui, appears below table */}
           <div className="p-2">
-            <Flag name="logsLoadOlder">
-              <Button
-                // trigger page increase
-                onClick={() => setSize(size + 1)}
-                icon={<IconRewind />}
-                type="secondary"
-              >
-                Load older
-              </Button>
-            </Flag>
+            <Button
+              // trigger page increase
+              onClick={() => setSize(size + 1)}
+              icon={<IconRewind />}
+              type="secondary"
+            >
+              Load older
+            </Button>
           </div>
         </div>
       </div>
