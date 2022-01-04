@@ -61,7 +61,7 @@ function APISection(props: Props) {
               </Tabs.Panel>
             ))}
         </Tabs>
-        <div className="bg-gray-800 overflow-hidden">
+        <div className="overflow-hidden">
           <Swiper
             // @ts-ignore
             onSwiper={setApiSwiper}
