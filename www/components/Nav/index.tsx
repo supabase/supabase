@@ -247,7 +247,7 @@ const Nav = (props: Props) => {
                     Star us on GitHub
                   </Button>
                 </a>
-                <a href="https://api.supabase.io/platform/login">
+                <a href="https://app.supabase.io/">
                   <Button>Start your project</Button>
                 </a>
               </div>
@@ -297,7 +297,7 @@ const Nav = (props: Props) => {
               <div className="mt-6 mb-12">
                 <div className="pt-2 pb-4 space-y-1">
                   <a
-                    href="https://api.supabase.io/platform/login"
+                    href="https://app.supabase.io/"
                     className="block pl-3 pr-4 text-base font-medium text-gray-600 dark:text-white"
                   >
                     Sign in

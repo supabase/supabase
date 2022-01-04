@@ -42,10 +42,7 @@ const ProductHeader = (props: Types) => (
           </Typography.Text>
         )}
         <div className="mt-12 flex flex-row md:flex-row md:items-center">
-          <Link
-            href="https://api.supabase.io/platform/login"
-            as="https://api.supabase.io/platform/login"
-          >
+          <Link href="https://app.supabase.io/" as="https://app.supabase.io/">
             <a>
               <Button size="medium">Start a project</Button>
             </a>
