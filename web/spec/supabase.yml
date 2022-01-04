@@ -772,7 +772,9 @@ pages:
         js: |
           ```js
           const { data: user, error } = await supabase.auth.api.createUser({
-            name: 'Yoda'
+            email: 'user@email.com',
+            password: 'password',
+            data: { name: 'Yoda' }
           })
           ```
 
