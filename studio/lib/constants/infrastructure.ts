@@ -130,3 +130,5 @@ export const PASSWORD_STRENGTH_PERCENTAGE = {
   3: '80%',
   4: '100%',
 }
+
+export const DEFAULT_FREE_PROJECTS_LIMIT = 2

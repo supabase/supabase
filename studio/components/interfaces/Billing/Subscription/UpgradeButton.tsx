@@ -1,10 +1,10 @@
 import React, { useReducer, useState } from 'react'
 import { useRouter } from 'next/router'
 import { includes, without } from 'lodash'
-import { Button, Modal, Input, Divider, Typography } from '@supabase/ui'
+import { Button, Modal, Input, Divider, Typography, IconCheckCircle } from '@supabase/ui'
 
 import { useStore } from 'hooks'
-import { API_URL } from 'lib/constants'
+import { API_URL, DEFAULT_FREE_PROJECTS_LIMIT } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { post } from 'lib/common/fetch'
 import { CancellationReasons } from './SubcriptionCancellation.constants'
@@ -18,9 +18,14 @@ import { CancellationReasons } from './SubcriptionCancellation.constants'
 
 export default function UpgradeButton({ projectRef, paid }: any) {
   const router = useRouter()
-  const { ui } = useStore()
+  const { ui, app } = useStore()
   const [loading, setLoading] = useState<boolean>(false)
   const [exitSurveyVisible, setExitSurveyVisible] = useState<boolean>(false)
+  const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState<boolean>(false)
+
+  const freeProjectsLimit = ui?.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
+  const freeProjectsOwned = ui?.profile?.total_free_projects ?? 0
+  const isOrgOwner = ui.selectedOrganization?.is_owner
 
   /**
    * Get a link and then redirect them
@@ -44,7 +49,11 @@ export default function UpgradeButton({ projectRef, paid }: any) {
 
   function handleUpgradeButton() {
     if (paid) {
-      setExitSurveyVisible(true)
+      if (freeProjectsOwned >= DEFAULT_FREE_PROJECTS_LIMIT) {
+        setShowFreeProjectLimitWarning(true)
+      } else {
+        setExitSurveyVisible(true)
+      }
     } else {
       redirectToPortal()
     }
@@ -57,9 +66,42 @@ export default function UpgradeButton({ projectRef, paid }: any) {
         setVisible={setExitSurveyVisible}
         handleDowngrade={redirectToPortal}
       />
-      <Button onClick={handleUpgradeButton} type={paid ? 'outline' : 'primary'} loading={loading}>
-        {paid ? 'Cancel subscription' : 'Upgrade to Pro'}
-      </Button>
+      <Modal
+        closable
+        visible={showFreeProjectLimitWarning}
+        onCancel={() => setShowFreeProjectLimitWarning(false)}
+        title="Free project limit reached"
+        description="Please delete one of your free projects to downgrade this project back to free tier"
+        size="tiny"
+        showIcon
+        layout="vertical"
+        customFooter={
+          <div className="flex w-full items-end">
+            <Button
+              block
+              icon={<IconCheckCircle strokeWidth={2} />}
+              onClick={() => setShowFreeProjectLimitWarning(false)}
+            >
+              OK
+            </Button>
+          </div>
+        }
+      />
+      <div className="flex flex-col items-end space-y-2">
+        <Button
+          disabled={!isOrgOwner}
+          onClick={handleUpgradeButton}
+          type={paid ? 'secondary' : 'primary'}
+          loading={loading}
+        >
+          {paid ? 'Cancel subscription' : 'Upgrade to Pro'}
+        </Button>
+        {!isOrgOwner && (
+          <Typography.Text type="secondary" small>
+            Only the organization owner can amend subscriptions
+          </Typography.Text>
+        )}
+      </div>
     </>
   )
 }

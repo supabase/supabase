@@ -123,7 +123,7 @@ export default class UiStore implements IUiStore {
   }
 
   setProfile(value?: User) {
-    if (value && value?.id != this.profile?.id) {
+    if (value && value?.id !== this.profile?.id) {
       Telemetry.sendIdentify(value)
     }
 
