@@ -69,7 +69,7 @@ const Users = () => {
           />
         </div>
         <div className='flex items-center'>
-          <Button className="mr-2" size="tiny" icon={<IconRefreshCw />} type="default" onClick={RefreshUsers} >Reload</Button>
+          <Button className="mr-2" size="tiny" icon={<IconRefreshCw />} type="default" onClick={refreshUsers}>Reload</Button>
           {inviteEnabled && <InviteUserModal />}
         </div>
       </div>
