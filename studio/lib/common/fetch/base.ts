@@ -1,4 +1,3 @@
-import { GOTRUE_ENABLED } from 'lib/gotrue'
 import { tryParseJson } from 'lib/helpers'
 import { isUndefined } from 'lodash'
 import { SupaResponse } from 'types/base'
@@ -110,7 +109,7 @@ export function constructHeaders(requestId: string, optionHeaders?: { [prop: str
   }
 
   const hasAuthHeader = !isUndefined(optionHeaders) && 'Authorization' in optionHeaders
-  if (GOTRUE_ENABLED && !hasAuthHeader) {
+  if (!hasAuthHeader) {
     const accessToken = getAccessToken()
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`
   }
