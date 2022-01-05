@@ -199,11 +199,9 @@ You might have noticed [this](https://github.com/pramsey/pgsql-http#why-this-is-
 
 > "What happens if the web page takes a long time to return?" Your SQL call will just wait there until it does. Make sure your web service fails fast.
 
-Luckily pg_cron implements [Background Workers](https://paquier.xyz/postgresql-2/postgres-9-3-feature-highlight-custom-background-workers/):
-
-> Care is taken that these extra processes do not interfere with other postmaster tasks: only one such process is started on each ServerLoop iteration. This means a large number of them could be waiting to be started up and postmaster is still able to quickly service external connection requests.
-
-This means that even if your endpoint takes a long time to return, it's not going to be blocking your core Postgres functions. Either way, you should probably only call endpoints that will return a response quickly, or set the http extension to fail fast (`http.timeout_msec = 300`).
+pgsql-http is completely synchronous, as a network call is ongoing, any other work in the same extension is blocked,
+however core Postgres functions should remain unaffected.
+Either way, you should probably only call endpoints that will return a response quickly, or set the http extension to fail fast (`http.timeout_msec = 300`).
 
 If you're familiar with `C`, you could also help `@pramsey` to implement async functions: https://github.com/pramsey/pgsql-http/issues/105
 
