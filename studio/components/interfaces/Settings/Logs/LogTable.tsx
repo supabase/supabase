@@ -22,30 +22,30 @@ const LogTable = ({ isCustomQuery, data = [] }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const columnNames = Object.keys(data[0] || {})
   // whether it the data structure is LogData format.
-  const isChrono =
+  const hasLogDataFormat =
     columnNames.includes('timestamp') &&
     columnNames.includes('event_message') &&
     columnNames.length === 4
 
-  const columns = (isChrono ? ['timestamp', 'event_message'] : columnNames).map((v) => ({
+  const columns = (hasLogDataFormat ? ['timestamp', 'event_message'] : columnNames).map((v) => ({
     key: v,
     name: v,
-    width: isChrono && v === 'timestamp' ? 210 : undefined,
+    width: hasLogDataFormat && v === 'timestamp' ? 210 : undefined,
     resizable: true,
     headerRenderer: () => {
       return <div className="flex items-center text-xs font-mono h-full">{v}</div>
     },
     formatter: ({ row }: any) => {
       let value = row[v]
-      if (isChrono && v === 'timestamp') {
+      if (hasLogDataFormat && v === 'timestamp') {
         value = dayjs(Number(row['timestamp']) / 1000).toISOString()
       }
       return (
         <p
           className={[
             'block whitespace-wrap font-mono',
-            `${isChrono && row.id === focusedLog?.id ? 'font-bold' : ''}`,
-            `${isChrono && v === 'timestamp' ? 'text-green-500' : ''}`,
+            `${hasLogDataFormat && row.id === focusedLog?.id ? 'font-bold' : ''}`,
+            `${hasLogDataFormat && v === 'timestamp' ? 'text-green-500' : ''}`,
           ].join(' ')}
         >
           {value}
@@ -55,7 +55,7 @@ const LogTable = ({ isCustomQuery, data = [] }: Props) => {
   }))
 
   const logMap = useMemo(() => {
-    if (!isChrono) return {} as LogMap
+    if (!hasLogDataFormat) return {} as LogMap
     const logData = data as LogData[]
     return logData.reduce((acc: LogMap, d: LogData) => {
       acc[d.id] = d
@@ -65,7 +65,7 @@ const LogTable = ({ isCustomQuery, data = [] }: Props) => {
 
   const strData = JSON.stringify(data)
   useEffect(() => {
-    if (!isChrono) return
+    if (!hasLogDataFormat) return
     if (isNil(data)) return
     if (focusedLog && !(focusedLog.id in logMap)) {
       setFocusedLog(null)
@@ -78,7 +78,7 @@ const LogTable = ({ isCustomQuery, data = [] }: Props) => {
   const maxHeight = isCustomQuery ? 'calc(100vh - 42px - 10rem)' : 'calc(100vh - 42px - 3rem)'
 
   const logDataRows = useMemo(() => {
-    if (!isChrono) return data
+    if (!hasLogDataFormat) return data
     return Object.values(logMap).sort((a, b) => b.timestamp - a.timestamp)
   }, [strData])
   return (
@@ -87,7 +87,7 @@ const LogTable = ({ isCustomQuery, data = [] }: Props) => {
         style={{ height: '100%' }}
         className="flex-grow flex-1"
         onSelectedCellChange={({ idx, rowIdx }) => {
-          if (!isChrono) return
+          if (!hasLogDataFormat) return
           setFocusedLog(data[rowIdx] as LogData)
         }}
         noRowsFallback={
@@ -99,18 +99,18 @@ const LogTable = ({ isCustomQuery, data = [] }: Props) => {
         }
         columns={columns as any}
         rowClass={(r) => {
-          if (!isChrono) return 'cursor-pointer'
+          if (!hasLogDataFormat) return 'cursor-pointer'
           const row = r as LogData
           return `${row.id === focusedLog?.id ? 'bg-green-800' : 'cursor-pointer'}`
         }}
         rows={logDataRows}
         rowKeyGetter={(r) => {
-          if (!isChrono) return Object.keys(r)[0]
+          if (!hasLogDataFormat) return Object.keys(r)[0]
           const row = r as LogData
           return row.id
         }}
         onRowClick={(r) => {
-          if (!isChrono) return
+          if (!hasLogDataFormat) return
           const row = r as LogData
           setFocusedLog(logMap[row.id])
         }}
