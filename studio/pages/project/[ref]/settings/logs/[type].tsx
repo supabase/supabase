@@ -176,33 +176,35 @@ export const LogPage: NextPage = () => {
                 onInputRun={handleRefresh}
               />
             </div>
-            <div className="flex flex-row gap-x-2 justify-end p-2">
+            <div className="flex flex-row justify-end p-2 w-full">
               <Flag name="logsCustomSql">
                 {isSelectQuery && (
-                  // we don't have a slim Alert component yet
-                  <div className="flex flex-row items-center">
-                    <IconInfo size="small" />
-                    <Typography.Text small={true}>
+                  <div className="flex flex-grow flex-row items-center gap-x-1">
+                    {/* // we don't have a slim Alert component yet */}
+                    <IconInfo size="tiny" />
+                    <Typography.Text small={true} type="secondary">
                       Custom queries are restricted to a {type === 'database' ? '2 hour' : '7 day'}{' '}
                       querying window.
                     </Typography.Text>
                   </div>
                 )}
               </Flag>
-              {editorValue && (
-                <Button
-                  type="text"
-                  onClick={() => {
-                    setEditorValue('')
-                    setEditorId(uuidv4())
-                  }}
-                >
-                  Clear
+              <div className="flex flex-row gap-x-2 justify-end p-2">
+                {editorValue && (
+                  <Button
+                    type="text"
+                    onClick={() => {
+                      setEditorValue('')
+                      setEditorId(uuidv4())
+                    }}
+                  >
+                    Clear
+                  </Button>
+                )}
+                <Button type={editorValue ? 'secondary' : 'text'} onClick={handleEditorSubmit}>
+                  Run
                 </Button>
-              )}
-              <Button type={editorValue ? 'secondary' : 'text'} onClick={handleEditorSubmit}>
-                Run
-              </Button>
+              </div>
             </div>
           </React.Fragment>
         )}
