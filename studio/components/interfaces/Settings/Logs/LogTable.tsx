@@ -65,7 +65,8 @@ const LogTable = ({ isCustomQuery, data }: Props) => {
   const maxHeight = isCustomQuery ? 'calc(100vh - 42px - 10rem)' : 'calc(100vh - 42px - 3rem)'
 
   const logDataRows = useMemo(() => {
-    return Object.values(logMap).sort((a, b) => a.timestamp - b.timestamp)
+    // sort in timestamp descending order
+    return Object.values(logMap).sort((a, b) => b.timestamp - a.timestamp)
   }, [strLogMap])
   return (
     <section className="flex flex-1 flex-row" style={{ maxHeight }}>

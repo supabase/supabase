@@ -32,8 +32,10 @@ export async function handleResponseError<T = unknown>(
   requestId: string
 ): Promise<SupaResponse<T>> {
   let resJson: { [prop: string]: any }
+
+  const resTxt = await response.text()
   try {
-    resJson = await response.json()
+    resJson = JSON.parse(resTxt)
   } catch (_) {
     resJson = {}
   }
@@ -59,11 +61,8 @@ export async function handleResponseError<T = unknown>(
     return { error } as unknown as SupaResponse<T>
   } else if (resJson.error && resJson.error.message) {
     return { error: { code: response.status, ...resJson.error } } as unknown as SupaResponse<T>
-  } else if (response.statusText) {
-    const error = { code: response.status, message: response.statusText, requestId }
-    return { error } as unknown as SupaResponse<T>
   } else {
-    const message = `An error has occured: ${response.status}`
+    const message = resTxt ?? `An error has occured: ${response.status}`
     const error = { code: response.status, message, requestId }
     return { error } as unknown as SupaResponse<T>
   }

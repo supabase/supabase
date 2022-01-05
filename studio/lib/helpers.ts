@@ -54,7 +54,7 @@ export const getURL = () => {
 }
 
 /**
- * Gnerates a random string using alpha characters
+ * Generates a random string using alpha characters
  */
 export const makeRandomString = (length: number) => {
   var result = ''
@@ -100,7 +100,7 @@ export const pluckJsonSchemaFields = (jsonSchema: any, fields: any) => {
 }
 
 /**
- * before return to frontend, we should filter sensitive project props
+ * Before return to frontend, we should filter sensitive project props
  */
 export const filterSensitiveProjectProps = (project: any) => {
   project.db_user_supabase = undefined
