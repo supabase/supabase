@@ -5,7 +5,7 @@ test('can display log data', async () => {
     <LogTable
       data={[
         {
-          id: 'seome-uuid',
+          id: 'some-uuid',
           timestamp: 1621323232312,
           event_message: 'some event happened',
           metadata: {
@@ -29,13 +29,13 @@ test('dedupes log lines with exact id', async () => {
     <LogTable
       data={[
         {
-          id: 'seome-uuid',
+          id: 'some-uuid',
           timestamp: 1621323232312,
           event_message: 'some event happened',
           metadata: {}
         },
         {
-          id: 'seome-uuid',
+          id: 'some-uuid',
           timestamp: 1621323232312,
           event_message: 'some event happened',
           metadata: {}
