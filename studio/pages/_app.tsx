@@ -91,38 +91,33 @@ const GotrueWrapper: FC = ({ children }) => {
     let timer: any
     const currentSession = auth.session()
 
+    function tokenRefreshed() {
+      setLoading(false)
+      // clean subscription
+      if (subscription) subscription.unsubscribe()
+      // clean timer
+      if (timer) clearTimeout(timer)
+    }
+
     if (currentSession != undefined && currentSession != null) {
       // if there is an active session, go ahead
       setLoading(false)
     } else {
       // else wait for TOKEN_REFRESHED event before continue
       const response = auth.onAuthStateChange((_event, session) => {
-        if (loading && _event == 'TOKEN_REFRESHED') {
-          setLoading(false)
-          // clean timer if available
-          if (timer) {
-            clearTimeout(timer)
-          }
+        if (loading && _event === 'TOKEN_REFRESHED') {
+          tokenRefreshed()
         }
       })
       subscription = response.data ?? null
 
       // we need a timeout here, in case token refresh fails
-      timer = setTimeout(() => {
-        // check tokenData again, cos it will be cleared when token refresh fails
-        if (!doesTokenDataExist()) {
-          setLoading(false)
-        }
-      }, 5 * 1000)
+      timer = setTimeout(() => setLoading(false), 5 * 1000)
     }
 
     return () => {
-      if (subscription) {
-        subscription.unsubscribe()
-      }
-      if (timer) {
-        clearTimeout(timer)
-      }
+      if (subscription) subscription.unsubscribe()
+      if (timer) clearTimeout(timer)
     }
   }, [])
 
