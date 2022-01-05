@@ -21,7 +21,7 @@ type LogMap = { [id: string]: LogData }
 const LogTable = ({ isCustomQuery, data = [] }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const columnNames = Object.keys(data[0] || {})
-  // whether it the data structure is LogData format.
+  // whether the data structure is LogData format.
   const hasLogDataFormat =
     columnNames.includes('timestamp') &&
     columnNames.includes('event_message') &&
