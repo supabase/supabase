@@ -23,7 +23,7 @@ export const REGIONS_DEFAULT = REGIONS.EAST_US
 export const PRICING_PLANS = {
   FREE: 'Free tier',
   PRO: 'Pro tier',
-  PAYG: 'Pay as you go',
+  // PAYG: 'Pay as you go',
 }
 
 export const PRICING_PLANS_DEFAULT = PRICING_PLANS.PRO

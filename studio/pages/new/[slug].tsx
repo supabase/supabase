@@ -369,19 +369,8 @@ export const Wizard = observer(() => {
                   }
                 >
                   {Object.entries(PRICING_PLANS).map(([k, v]) => (
-                    <Listbox.Option
-                      key={k}
-                      label={v}
-                      value={v}
-                      addOnBefore={() => <IconDollarSign />}
-                    >
-                      {`${v}${
-                        v === PRICING_PLANS.PRO
-                          ? ' - $25/month'
-                          : v === PRICING_PLANS.PAYG
-                          ? ' - $25/month plus usage costs'
-                          : ''
-                      }`}
+                    <Listbox.Option key={k} label={v} value={v}>
+                      {`${v}${v === PRICING_PLANS.PRO ? ' - $25/month' : ''}`}
                     </Listbox.Option>
                   ))}
                 </Listbox>
