@@ -245,11 +245,7 @@ export const Wizard = observer(() => {
               ))}
             </Listbox>
 
-            {!currentOrg?.is_owner ? (
-              <NotOrganizationOwnerWarning />
-            ) : (
-              <>{isSelectFreeTier && isOverFreeProjectLimit && <FreeProjectLimitWarning />}</>
-            )}
+            {!currentOrg?.is_owner && <NotOrganizationOwnerWarning />}
           </Panel.Content>
 
           {canCreateProject && (
@@ -296,35 +292,38 @@ export const Wizard = observer(() => {
                   description="Select a region close to you for the best performance."
                 />
               </Panel.Content>
-
-              <Panel.Content className="Form section-block--body has-inputs-centered ">
-                <Listbox
-                  label="Pricing Plan"
-                  layout="horizontal"
-                  value={dbPricingPlan}
-                  onChange={onDbPricingPlanChange}
-                  // @ts-ignore
-                  descriptionText={
-                    <>
-                      Select a plan that suits your needs.&nbsp;
-                      <a className="underline" target="_blank" href="https://supabase.com/pricing">
-                        More details
-                      </a>
-                    </>
-                  }
-                >
-                  {Object.entries(PRICING_PLANS).map(([k, v]) => (
-                    <Listbox.Option key={k} label={v} value={v}>
-                      {`${v}${v === PRICING_PLANS.PRO ? ' - $25/month' : ''}`}
-                    </Listbox.Option>
-                  ))}
-                </Listbox>
-
-                {!isSelectFreeTier && isEmptyPaymentMethod && (
-                  <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
-                )}
-              </Panel.Content>
             </>
+          )}
+
+          {currentOrg?.is_owner && (
+            <Panel.Content className="Form section-block--body has-inputs-centered ">
+              <Listbox
+                label="Pricing Plan"
+                layout="horizontal"
+                value={dbPricingPlan}
+                onChange={onDbPricingPlanChange}
+                // @ts-ignore
+                descriptionText={
+                  <>
+                    Select a plan that suits your needs.&nbsp;
+                    <a className="underline" target="_blank" href="https://supabase.com/pricing">
+                      More details
+                    </a>
+                  </>
+                }
+              >
+                {Object.entries(PRICING_PLANS).map(([k, v]) => (
+                  <Listbox.Option key={k} label={v} value={v}>
+                    {`${v}${v === PRICING_PLANS.PRO ? ' - $25/month' : ''}`}
+                  </Listbox.Option>
+                ))}
+              </Listbox>
+
+              {isSelectFreeTier && isOverFreeProjectLimit && <FreeProjectLimitWarning />}
+              {!isSelectFreeTier && isEmptyPaymentMethod && (
+                <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
+              )}
+            </Panel.Content>
           )}
         </>
       </Panel>
