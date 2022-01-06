@@ -250,8 +250,8 @@ const Nav = (props: Props) => {
                     Star us on GitHub
                   </Button>
                 </a>
-                <a href="https://app.supabase.io/" target="_blank">
-                  <Button type="default">Log in</Button>
+                <a href="https://app.supabase.io/">
+                  <Button type="default">Sign in</Button>
                 </a>
                 <a href="https://app.supabase.io/">
                   <Button>Start your project</Button>
