@@ -10,7 +10,6 @@
     "deploy:staging": "VERCEL_ORG_ID=team_E6KJ1W561hMTjon1QSwOh0WO VERCEL_PROJECT_ID=QmcmhbiAtCMFTAHCuGgQscNbke4TzgWULECctNcKmxWCoT vercel --prod -A .vercel/staging.json"
   },
   "dependencies": {
-    "@auth0/nextjs-auth0": "^1.6.1",
     "@headlessui/react": "^1.4.1",
     "@monaco-editor/react": "^4.3.1",
     "@next/bundle-analyzer": "^12.0.4",
@@ -21,7 +20,7 @@
     "@supabase/grid": "^2.3.9",
     "@supabase/postgres-meta": "^0.26.1",
     "@supabase/react-data-grid": "^7.1.0-beta.7",
-    "@supabase/supabase-js": "^1.28.0",
+    "@supabase/supabase-js": "^1.29.1",
     "@supabase/ui": "^0.35.0",
     "ajv": "^8.6.3",
     "analytics-node": "^3.5.0",
