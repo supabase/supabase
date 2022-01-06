@@ -9,6 +9,7 @@ const fiveYears = new Date(now.getFullYear() + 5, now.getMonth(), now.getDate())
 const anonToken = `
 {  
     "role": "anon",
+    "iss": "supabase",
     "iat": ${Math.floor(today / 1000)},
     "exp": ${Math.floor(fiveYears / 1000)}
 }
@@ -17,6 +18,7 @@ const anonToken = `
 const serviceToken = `
 {  
     "role": "service_role",
+    "iss": "supabase",
     "iat": ${Math.floor(today / 1000)},
     "exp": ${Math.floor(fiveYears / 1000)}
 }
