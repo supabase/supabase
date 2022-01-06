@@ -83,8 +83,7 @@ export const LogPage: NextPage = () => {
     } else if (prevPageData.data.length === 0) {
       // no rows returned, indicates that no more data to retrieve and append.
       return null
-    }else {
-
+    } else {
       const len = prevPageData.data.length
       const { timestamp: tsLimit }: LogData = prevPageData.data[len - 1]
       // create new key from params
