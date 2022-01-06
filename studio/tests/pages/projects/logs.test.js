@@ -31,6 +31,9 @@ useMonaco.mockImplementation((v) => v)
 jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'
 Flag.mockImplementation(({ children }) => <>{children}</>)
+jest.mock('hooks')
+import { useFlag } from 'hooks'
+useFlag.mockReturnValue(true)
 
 import { SWRConfig } from 'swr'
 jest.mock('pages/project/[ref]/settings/logs/[type]')
@@ -200,6 +203,60 @@ test('where clause will trigger a log refresh', async () => {
   )
 
   await waitFor(() => screen.getByText(/happened/))
+})
+
+test('custom sql querying', async () => {
+  get.mockImplementation((url) => {
+    if (url.includes('sql=') && url.includes('select')) {
+      return {
+        data: [
+          {
+            my_count: 12345,
+          },
+        ],
+      }
+    }
+    return { data: [] }
+  })
+  const { container } = render(<LogPage />)
+  let editor = container.querySelector('.monaco-editor')
+  expect(editor).toBeFalsy()
+  // TODO: abstract this out into a toggle selection helper
+  const toggle = getToggleByText(/via query/)
+  expect(toggle).toBeTruthy()
+  userEvent.click(toggle)
+
+  // type into the query editor
+  await waitFor(() => {
+    editor = container.querySelector('.monaco-editor')
+    expect(editor).toBeTruthy()
+  })
+  editor = container.querySelector('.monaco-editor')
+  userEvent.type(editor, 'select count(*) as my_count from edge_logs')
+  // should show sandbox warning alert
+  await waitFor(() => screen.getByText(/restricted to a 7 day querying window/))
+
+  // should trigger query
+  userEvent.click(screen.getByText('Run'))
+  await waitFor(
+    () => {
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('sql='))
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'))
+      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('where'))
+    },
+    { timeout: 1000 }
+  )
+
+  await waitFor(() => screen.getByText(/my_count/)) //column header
+  await waitFor(() => screen.getByText(/12345/)) // row value
+
+  // clicking on the row value should not show log selection panel
+  userEvent.click(screen.getByText(/12345/))
+  await waitFor(() => expect(() => screen.getByText(/Metadata/)).toThrow())
+
+  // should not see chronological features
+  await waitFor(() => screen.queryByText(/Load older/)) //column header
 })
 
 test('load older btn will fetch older logs', async () => {
