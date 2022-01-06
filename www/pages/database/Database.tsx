@@ -104,6 +104,7 @@ function Database() {
               />
             </div>,
           ]}
+          documentation_url={'/docs/guides/database'}
         />
 
         <SectionContainer>
