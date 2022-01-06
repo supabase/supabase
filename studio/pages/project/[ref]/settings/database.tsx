@@ -279,6 +279,9 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
 }
 
 const GeneralSettings: FC<any> = ({ projectRef }) => {
+  const { ui } = useStore()
+  const isOwner = ui.selectedOrganization?.is_owner
+
   const { data, error }: any = useSWR(`${API_URL}/props/project/${projectRef}/settings`, get)
 
   if (data?.error || error) {
@@ -375,7 +378,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
             </Panel.Content>
           </Panel>
         </section>
-        <ResetDbPassword />
+        {isOwner && <ResetDbPassword />}
         <DownloadCertificate createdAt={connectionInfo.inserted_at} />
       </div>
       <div>
