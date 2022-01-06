@@ -243,9 +243,15 @@ const Nav = (props: Props) => {
               </div>
               <div className="hidden lg:flex items-center sm:space-x-3">
                 <a href="https://github.com/supabase/supabase" target="_blank">
-                  <Button type="default" icon={<IconStar />}>
+                  <Button
+                    className="sbui-btn sbui-btn-text sbui-btn--tiny sbui-btn--text-align-center"
+                    icon={<IconStar />}
+                  >
                     Star us on GitHub
                   </Button>
+                </a>
+                <a href="https://app.supabase.io/" target="_blank">
+                  <Button type="default">Log in</Button>
                 </a>
                 <a href="https://app.supabase.io/">
                   <Button>Start your project</Button>
