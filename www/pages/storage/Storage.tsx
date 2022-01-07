@@ -87,6 +87,7 @@ function StoragePage() {
               />
             </div>,
           ]}
+          documentation_url={'/docs/guides/storage'}
         />
 
         <SectionContainer>
