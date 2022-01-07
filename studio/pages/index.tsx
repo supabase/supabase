@@ -1,19 +1,21 @@
 import { NextPage } from 'next'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
+import { NextRouter, useRouter } from 'next/router'
 import { isUndefined } from 'lodash'
 import { Typography } from '@supabase/ui'
 
 import { Project } from 'types'
 import { useProfile, useStore, withAuth } from 'hooks'
 import { post, delete_ } from 'lib/common/fetch'
-import { API_URL, IS_PLATFORM, PROJECT_STATUS, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { API_URL, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { AccountLayout } from 'components/layouts'
+import { auth } from 'lib/gotrue'
 import Landing from 'components/interfaces/Home/Landing'
 import ProjectList from 'components/interfaces/Home/ProjectList'
 import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
 import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
+import Connecting from 'components/ui/Loading'
 
 const Home: NextPage = () => {
   const { app, ui } = useStore()
@@ -26,7 +28,23 @@ const Home: NextPage = () => {
   const [selectedProjectToDelete, setSelectedProjectToDelete] = useState<Project>()
 
   if (!profile) {
-    return <Landing />
+    return <UnauthorizedLanding />
+  } else {
+    const isRedirect = isRedirectFromThirdPartyService(router)
+    if (isRedirect) {
+      const queryParams = (router.query as any) || {}
+      const params = new URLSearchParams(queryParams)
+      if (router.query?.next?.includes('https://vercel.com')) {
+        router.push(`/vercel/integrate?${params.toString()}`)
+      }
+      if (router.query?.next?.includes('https://database.new')) {
+        router.push('/new/project')
+      }
+      if (router.query['x-amzn-marketplace-token'] != undefined) {
+        router.push(`/account/associate?${params.toString()}`)
+      }
+      return <Connecting />
+    }
   }
 
   const onSelectDeleteProject = async (project: Project) => {
@@ -103,3 +121,29 @@ const Home: NextPage = () => {
   )
 }
 export default withAuth(observer(Home))
+
+// detect for redirect from 3rd party service like vercel, aws...
+function isRedirectFromThirdPartyService(router: NextRouter) {
+  return router.query.next !== undefined || router.query['x-amzn-marketplace-token'] !== undefined
+}
+
+const UnauthorizedLanding = () => {
+  const router = useRouter()
+  const autoLogin = isRedirectFromThirdPartyService(router)
+
+  useEffect(() => {
+    if (autoLogin) {
+      const queryParams = (router.query as any) || {}
+      const params = new URLSearchParams(queryParams)
+      // trigger github signIn
+      auth.signIn(
+        { provider: 'github' },
+        {
+          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}?${params.toString()}`,
+        }
+      )
+    }
+  }, [])
+
+  return autoLogin ? <Connecting /> : <Landing />
+}
