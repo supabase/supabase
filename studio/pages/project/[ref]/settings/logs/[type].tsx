@@ -282,8 +282,12 @@ export const LogPage: NextPage = () => {
                   </Typography.Text>
                 </div>
                 <details className="cursor-pointer">
-                  <summary><Typography.Text type="secondary">Error Message</Typography.Text></summary>
-                  <Typography.Text className="block whitespace-pre-wrap" small code type="warning">{JSON.stringify(error, null, 2)}</Typography.Text>
+                  <summary>
+                    <Typography.Text type="secondary">Error Message</Typography.Text>
+                  </summary>
+                  <Typography.Text className="block whitespace-pre-wrap" small code type="warning">
+                    {JSON.stringify(error, null, 2)}
+                  </Typography.Text>
                 </details>
               </Card>
             </div>
