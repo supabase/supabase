@@ -335,10 +335,10 @@ const Settings = () => {
             <UIToggle
               layout="horizontal"
               label={authConfig.properties.SMS_AUTOCONFIRM.title}
-              onChange={() => {
-                handleToggle('SMS_AUTOCONFIRM')
+              onChange={(value) => {
+                handleToggle('SMS_AUTOCONFIRM', !value)
               }}
-              checked={model.SMS_AUTOCONFIRM}
+              checked={!model.SMS_AUTOCONFIRM}
               descriptionText={authConfig.properties.SMS_AUTOCONFIRM.help}
             />
           </>
