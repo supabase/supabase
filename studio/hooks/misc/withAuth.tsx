@@ -83,7 +83,7 @@ function checkRedirectTo(
   redirectIfFound?: boolean
 ) {
   if (loading) return false
-  if (router.asPath == redirectTo) return false
+  if (router.pathname == redirectTo) return false
 
   // If redirectTo is set, redirect if the user was not found.
   if (redirectTo && !redirectIfFound && !profile) return true
