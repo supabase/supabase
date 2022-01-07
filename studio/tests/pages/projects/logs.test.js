@@ -42,15 +42,21 @@ LogPage.mockImplementation((props) => {
   const Page = jest.requireActual('pages/project/[ref]/settings/logs/[type]').LogPage
   // wrap with SWR to reset the cache each time
   return (
-    <SWRConfig value={{ provider: () => new Map() }}>
+    <SWRConfig
+      value={{
+        provider: () => new Map(),
+        shouldRetryOnError: false,
+      }}
+    >
       <Page {...props} />
     </SWRConfig>
   )
 })
 
-import { render, fireEvent, waitFor, screen } from '@testing-library/react'
+import { render, fireEvent, waitFor, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { getToggleByText } from '../../helpers'
+import { wait } from '@testing-library/user-event/dist/utils'
 
 beforeEach(() => {
   // reset mocks between tests
@@ -297,4 +303,28 @@ test('load older btn will fetch older logs', async () => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_end=1'))
   })
   await waitFor(() => screen.getByText('second event'))
+})
+
+test('bug: load older btn does not error out when previous page is empty', async () => {
+  // bugfix for https://sentry.io/organizations/supabase/issues/2903331460/?project=5459134&referrer=slack
+  get.mockImplementation((url) => {
+    if (url.includes('count')) {
+      return {}
+    }
+    return { data: [] }
+  })
+  render(<LogPage />)
+
+  userEvent.click(screen.getByText('Load older'))
+  // NOTE: potential race condition, since we are asserting that something DOES NOT EXIST
+  // wait for 500s to make sure all ui logic is complete
+  // need to wrap in act because internal react state is changing during this time.
+  await act(async () => await wait(100))
+
+  // clicking load older multiple times should not give error
+  await waitFor(() => {
+    expect(screen.queryByText(/Sorry/)).toBeNull()
+    expect(screen.queryByText(/An error occured/)).toBeNull()
+    expect(screen.queryByText(/undefined/)).toBeNull()
+  })
 })

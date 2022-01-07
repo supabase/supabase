@@ -122,6 +122,7 @@ If we put this token into https://jwt.io, we see it decodes to:
 ```js
 {
   "role": "anon",
+  "iss": "supabase",
   "iat": 1614205174,
   "exp": 1929781174
 }
