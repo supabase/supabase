@@ -37,7 +37,7 @@ jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'
 Flag.mockImplementation(({ children }) => <>{children}</>)
 jest.mock('hooks')
-import {useFlag} from 'hooks'
+import { useFlag } from 'hooks'
 useFlag.mockReturnValue(true)
 
 import { SWRConfig } from 'swr'
@@ -47,15 +47,21 @@ LogPage.mockImplementation((props) => {
   const Page = jest.requireActual('pages/project/[ref]/settings/logs/[type]').LogPage
   // wrap with SWR to reset the cache each time
   return (
-    <SWRConfig value={{ provider: () => new Map() }}>
+    <SWRConfig
+      value={{
+        provider: () => new Map(),
+        shouldRetryOnError: false,
+      }}
+    >
       <Page {...props} />
     </SWRConfig>
   )
 })
 
-import { render, fireEvent, waitFor, screen } from '@testing-library/react'
+import { render, fireEvent, waitFor, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { getToggleByText } from '../../helpers'
+import { wait } from '@testing-library/user-event/dist/utils'
 
 beforeEach(() => {
   // reset mocks between tests
@@ -233,7 +239,7 @@ test('where clause will trigger a log refresh', async () => {
 test('s= query param will populate the search bar', async () => {
   useRouter.mockReturnValueOnce({
     query: { ref: '123', type: 'api', s: 'someSearch' },
-    push: jest.fn()
+    push: jest.fn(),
   })
   render(<LogPage />)
   // should populate search input with the search param
@@ -246,8 +252,7 @@ test('s= query param will populate the search bar', async () => {
 test('q= query param will populate the query input', async () => {
   useRouter.mockReturnValueOnce({
     query: { ref: '123', type: 'api', q: 'some_query', s: 'someSearch' },
-    push: jest.fn()
-
+    push: jest.fn(),
   })
   render(<LogPage />)
   // should populate editor with the query param
@@ -262,13 +267,66 @@ test('q= query param will populate the query input', async () => {
 test('ts= query param will set the timestamp_start param', async () => {
   useRouter.mockReturnValueOnce({
     query: { ref: '123', type: 'api', ts: 123456 },
-    push: jest.fn()
+    push: jest.fn(),
   })
   render(<LogPage />)
 
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_start=123456'))
   })
+})
+test('custom sql querying', async () => {
+  get.mockImplementation((url) => {
+    if (url.includes('sql=') && url.includes('select')) {
+      return {
+        data: [
+          {
+            my_count: 12345,
+          },
+        ],
+      }
+    }
+    return { data: [] }
+  })
+  const { container } = render(<LogPage />)
+  let editor = container.querySelector('.monaco-editor')
+  expect(editor).toBeFalsy()
+  // TODO: abstract this out into a toggle selection helper
+  const toggle = getToggleByText(/via query/)
+  expect(toggle).toBeTruthy()
+  userEvent.click(toggle)
+
+  // type into the query editor
+  await waitFor(() => {
+    editor = container.querySelector('.monaco-editor')
+    expect(editor).toBeTruthy()
+  })
+  editor = container.querySelector('.monaco-editor')
+  userEvent.type(editor, 'select count(*) as my_count from edge_logs')
+  // should show sandbox warning alert
+  await waitFor(() => screen.getByText(/restricted to a 7 day querying window/))
+
+  // should trigger query
+  userEvent.click(screen.getByText('Run'))
+  await waitFor(
+    () => {
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('sql='))
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'))
+      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('where'))
+    },
+    { timeout: 1000 }
+  )
+
+  await waitFor(() => screen.getByText(/my_count/)) //column header
+  await waitFor(() => screen.getByText(/12345/)) // row value
+
+  // clicking on the row value should not show log selection panel
+  userEvent.click(screen.getByText(/12345/))
+  await waitFor(() => expect(() => screen.getByText(/Metadata/)).toThrow())
+
+  // should not see chronological features
+  await waitFor(() => screen.queryByText(/Load older/)) //column header
 })
 
 test('load older btn will fetch older logs', async () => {
@@ -309,4 +367,28 @@ test('load older btn will fetch older logs', async () => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_end=1'))
   })
   await waitFor(() => screen.getByText('second event'))
+})
+
+test('bug: load older btn does not error out when previous page is empty', async () => {
+  // bugfix for https://sentry.io/organizations/supabase/issues/2903331460/?project=5459134&referrer=slack
+  get.mockImplementation((url) => {
+    if (url.includes('count')) {
+      return {}
+    }
+    return { data: [] }
+  })
+  render(<LogPage />)
+
+  userEvent.click(screen.getByText('Load older'))
+  // NOTE: potential race condition, since we are asserting that something DOES NOT EXIST
+  // wait for 500s to make sure all ui logic is complete
+  // need to wrap in act because internal react state is changing during this time.
+  await act(async () => await wait(100))
+
+  // clicking load older multiple times should not give error
+  await waitFor(() => {
+    expect(screen.queryByText(/Sorry/)).toBeNull()
+    expect(screen.queryByText(/An error occured/)).toBeNull()
+    expect(screen.queryByText(/undefined/)).toBeNull()
+  })
 })

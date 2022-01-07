@@ -1,3 +1,6 @@
+import { post } from 'lib/common/fetch'
+import { PASSWORD_STRENGTH, DEFAULT_MINIMUM_PASSWORD_STRENGTH, API_URL } from 'lib/constants'
+
 export const tryParseJson = (jsonString: any) => {
   try {
     let parsed = JSON.parse(jsonString)
@@ -54,7 +57,7 @@ export const getURL = () => {
 }
 
 /**
- * Gnerates a random string using alpha characters
+ * Generates a random string using alpha characters
  */
 export const makeRandomString = (length: number) => {
   var result = ''
@@ -100,7 +103,7 @@ export const pluckJsonSchemaFields = (jsonSchema: any, fields: any) => {
 }
 
 /**
- * before return to frontend, we should filter sensitive project props
+ * Before return to frontend, we should filter sensitive project props
  */
 export const filterSensitiveProjectProps = (project: any) => {
   project.db_user_supabase = undefined
@@ -159,5 +162,39 @@ export const copyToClipboard = (str: string, callback = () => {}) => {
     window.navigator?.clipboard?.writeText(str).then(callback)
   } else {
     console.warn('Unable to copy to clipboard')
+  }
+}
+
+export async function passwordStrength(value: string) {
+  let message = ''
+  let warning = ''
+  let strength = 0
+
+  if (value && value !== '') {
+    const response = await post(`${API_URL}/profile/password-check`, { password: value })
+    if (!response.error) {
+      const { result } = response
+      const score = (PASSWORD_STRENGTH as any)[result.score]
+      const suggestions = result.feedback?.suggestions ? result.feedback.suggestions.join(' ') : ''
+
+      // set message :string
+      message = `${score} ${suggestions}`
+
+      // set strength :number
+      strength = result.score
+
+      // warning message for anything below 4 strength :string
+      if (result.score < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+        warning = `${
+          result?.feedback?.warning ? result?.feedback?.warning + '.' : ''
+        } You need a stronger password.`
+      }
+    }
+  }
+
+  return {
+    message,
+    warning,
+    strength,
   }
 }

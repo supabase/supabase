@@ -252,6 +252,11 @@ body {
   display: inline-block;
 }
 
+::selection {
+  background: #6EE7B7;
+  color: #333 !important;
+}
+
 h4,
 h5,
 h6 {
@@ -445,9 +450,6 @@ a.card:hover {
   transition: all 0.2s ease;
   border: 1px solid var(--custom-primary);
   box-shadow: var(--custom-shadow-xl), 0 0 0 1px var(--custom-primary) !important;
-}
-.avatar__intro {
-  padding-left: 15px;
 }
 
 /*

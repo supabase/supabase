@@ -42,17 +42,14 @@ const ProductHeader = (props: Types) => (
           </Typography.Text>
         )}
         <div className="mt-12 flex flex-row md:flex-row md:items-center">
-          <Link
-            href="https://api.supabase.io/platform/login"
-            as="https://api.supabase.io/platform/login"
-          >
+          <Link href="https://app.supabase.io/" as="https://app.supabase.io/">
             <a>
               <Button size="medium">Start a project</Button>
             </a>
           </Link>
           {props.documentation_url && (
             <Link href={props.documentation_url} as={props.documentation_url}>
-              <a>
+              <a className="ml-2">
                 <Button type="text" size="medium" icon={<IconBookOpen />}>
                   See documentation
                 </Button>

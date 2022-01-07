@@ -3,7 +3,15 @@ import React, { useEffect, useRef, useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Typography, IconLoader, IconAlertCircle, IconRewind, Button } from '@supabase/ui'
+import {
+  Typography,
+  IconLoader,
+  IconAlertCircle,
+  IconRewind,
+  Button,
+  IconInfo,
+  Card,
+} from '@supabase/ui'
 
 import { withAuth } from 'hooks'
 import { get } from 'lib/common/fetch'
@@ -30,7 +38,7 @@ import { useFlag } from 'hooks'
  *
  * ## Query Params Syncing
  * Query params are synced on query submission.
- * 
+ *
  * params used are:
  * - `q` for the editor query.
  * - `s` for search query.
@@ -38,6 +46,7 @@ import { useFlag } from 'hooks'
  */
 export const LogPage: NextPage = () => {
   const logsQueryParamsSyncing = useFlag('logsQueryParamsSyncing')
+  const logsCustomSql = useFlag('logsCustomSql')
   const router = useRouter()
   const { ref, type, q, s, ts } = router.query
   const [editorId, setEditorId] = useState<string>(uuidv4())
@@ -47,11 +56,13 @@ export const LogPage: NextPage = () => {
   const [params, setParams] = useState({
     type: '',
     search_query: '',
+    sql: '',
     where: '',
     timestamp_start: '',
     timestamp_end: '',
   })
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as string]}`
+  const isSelectQuery = logsCustomSql && editorValue.toLowerCase().includes('select') ? true : false
 
   useEffect(() => {
     setParams({ ...params, type: type as string })
@@ -96,6 +107,9 @@ export const LogPage: NextPage = () => {
     if (prevPageData === null) {
       // reduce interval window limit by using the timestamp of the last log
       queryParams = genQueryParams(params)
+    } else if (prevPageData.data.length === 0) {
+      // no rows returned, indicates that no more data to retrieve and append.
+      return null
     } else {
       const len = prevPageData.data.length
       const { timestamp: tsLimit }: LogData = prevPageData.data[len - 1]
@@ -108,18 +122,16 @@ export const LogPage: NextPage = () => {
   }
   const {
     data = [],
+    error: swrError,
     isValidating,
     mutate,
     size,
     setSize,
   } = useSWRInfinite<Logs>(getKeyLogs, get, { revalidateOnFocus: false })
-
-  // const { data, isValidating, mutate } = useSWR<Logs>(logUrl, get, { revalidateOnFocus: false })
   let logData: LogData[] = []
-  let error: null | string = null
-
+  let error: null | string = swrError ? swrError.message : null
   data.forEach((response: Logs) => {
-    if (response && response.data) {
+    if (!error && response && response.data) {
       logData = [...logData, ...response.data]
     }
     if (!error && response && response.error) {
@@ -153,15 +165,24 @@ export const LogPage: NextPage = () => {
   const onSelectTemplate = (template: LogTemplate) => {
     setMode(template.mode)
     if (template.mode === 'simple') {
-      setParams((prev) => ({ ...prev, search_query: template.searchString, where: '' }))
+      setParams((prev) => ({ ...prev, search_query: template.searchString, sql: '', where: '' }))
     } else {
       setEditorValue(template.searchString)
-      setParams((prev) => ({ ...prev, where: template.searchString, search_query: '' }))
+      setParams((prev) => ({
+        ...prev,
+        where: isSelectQuery ? '' : template.searchString,
+        sql: isSelectQuery ? template.searchString : '',
+        search_query: '',
+      }))
       setEditorId(uuidv4())
     }
   }
   const handleEditorSubmit = () => {
-    setParams((prev) => ({ ...prev, where: editorValue }))
+    setParams((prev) => ({
+      ...prev,
+      where: isSelectQuery ? '' : editorValue,
+      sql: isSelectQuery ? editorValue : '',
+    }))
     if (!logsQueryParamsSyncing) return
     router.push({
       pathname: router.pathname,
@@ -182,8 +203,6 @@ export const LogPage: NextPage = () => {
       },
     })
   }
-
-
 
   return (
     <SettingsLayout title={title}>
@@ -210,21 +229,35 @@ export const LogPage: NextPage = () => {
                 onInputRun={handleRefresh}
               />
             </div>
-            <div className="flex flex-row gap-x-2 justify-end p-2">
-              {editorValue && (
-                <Button
-                  type="text"
-                  onClick={() => {
-                    setEditorValue('')
-                    setEditorId(uuidv4())
-                  }}
-                >
-                  Clear
+            <div className="flex flex-row justify-end p-2 w-full">
+              <Flag name="logsCustomSql">
+                {isSelectQuery && (
+                  <div className="flex flex-grow flex-row items-center gap-x-1">
+                    {/* // we don't have a slim Alert component yet */}
+                    <IconInfo size="tiny" />
+                    <Typography.Text small={true} type="secondary">
+                      Custom queries are restricted to a {type === 'database' ? '2 hour' : '7 day'}{' '}
+                      querying window.
+                    </Typography.Text>
+                  </div>
+                )}
+              </Flag>
+              <div className="flex flex-row gap-x-2 justify-end p-2">
+                {editorValue && (
+                  <Button
+                    type="text"
+                    onClick={() => {
+                      setEditorValue('')
+                      setEditorId(uuidv4())
+                    }}
+                  >
+                    Clear
+                  </Button>
+                )}
+                <Button type={editorValue ? 'secondary' : 'text'} onClick={handleEditorSubmit}>
+                  Run
                 </Button>
-              )}
-              <Button type={editorValue ? 'secondary' : 'text'} onClick={handleEditorSubmit}>
-                Run
-              </Button>
+              </div>
             </div>
           </React.Fragment>
         )}
@@ -240,24 +273,33 @@ export const LogPage: NextPage = () => {
             </div>
           )}
           {error && (
-            <div className="flex w-full h-full justify-center items-center space-x-2 mx-auto">
-              <IconAlertCircle size={16} />
-              <Typography.Text type="secondary">Sorry! Could not fetch data</Typography.Text>
+            <div className="flex w-full h-full justify-center items-center mx-auto">
+              <Card className="flex flex-col gap-y-2">
+                <div className="flex flex-row gap-x-2 py-2">
+                  <IconAlertCircle size={16} />
+                  <Typography.Text type="secondary">
+                    Sorry! An error occured when fetching data.
+                  </Typography.Text>
+                </div>
+                <Typography.Text type="warning">{error}</Typography.Text>
+              </Card>
             </div>
           )}
           <LogTable data={logData} isCustomQuery={mode === 'custom'} />
           {/* Footer section of log ui, appears below table */}
           <div className="p-2">
-            <Flag name="logsLoadOlder">
-              <Button
-                // trigger page increase
-                onClick={() => setSize(size + 1)}
-                icon={<IconRewind />}
-                type="secondary"
-              >
-                Load older
-              </Button>
-            </Flag>
+            {!isSelectQuery && (
+              <Flag name="logsLoadOlder">
+                <Button
+                  // trigger page increase
+                  onClick={() => setSize(size + 1)}
+                  icon={<IconRewind />}
+                  type="secondary"
+                >
+                  Load older
+                </Button>
+              </Flag>
+            )}
           </div>
         </div>
       </div>
