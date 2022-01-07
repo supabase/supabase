@@ -49,7 +49,6 @@ import dayjs from 'dayjs'
  */
 export const LogPage: NextPage = () => {
   const logsQueryParamsSyncing = useFlag('logsQueryParamsSyncing')
-  const logsCustomSql = useFlag('logsCustomSql')
   const router = useRouter()
   const { ref, type, q, s, te } = router.query
   const [editorId, setEditorId] = useState<string>(uuidv4())
@@ -66,7 +65,7 @@ export const LogPage: NextPage = () => {
     timestamp_end: '',
   })
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as string]}`
-  const isSelectQuery = logsCustomSql && editorValue.toLowerCase().includes('select') ? true : false
+  const isSelectQuery = editorValue.toLowerCase().includes('select') ? true : false
 
   useEffect(() => {
     setParams({ ...params, type: type as string })
@@ -260,18 +259,16 @@ export const LogPage: NextPage = () => {
               />
             </div>
             <div className="flex flex-row justify-end p-2 w-full">
-              <Flag name="logsCustomSql">
-                {isSelectQuery && (
-                  <div className="flex flex-grow flex-row items-center gap-x-1">
-                    {/* // we don't have a slim Alert component yet */}
-                    <IconInfo size="tiny" />
-                    <Typography.Text small={true} type="secondary">
-                      Custom queries are restricted to a {type === 'database' ? '2 hour' : '7 day'}{' '}
-                      querying window.
-                    </Typography.Text>
-                  </div>
-                )}
-              </Flag>
+              {isSelectQuery && (
+                <div className="flex flex-grow flex-row items-center gap-x-1">
+                  {/* // we don't have a slim Alert component yet */}
+                  <IconInfo size="tiny" />
+                  <Typography.Text small={true} type="secondary">
+                    Custom queries are restricted to a {type === 'database' ? '2 hour' : '7 day'}{' '}
+                    querying window.
+                  </Typography.Text>
+                </div>
+              )}
               <div className="flex flex-row gap-x-2 justify-end p-2">
                 {editorValue && (
                   <Button
