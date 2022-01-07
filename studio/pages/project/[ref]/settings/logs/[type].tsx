@@ -76,8 +76,7 @@ export const LogPage: NextPage = () => {
         mode: 'custom',
         searchString: q as string,
       })
-    }
-    if (!q && s) {
+    } else if (s) {
       onSelectTemplate({
         mode: 'simple',
         searchString: s as string,
@@ -86,8 +85,7 @@ export const LogPage: NextPage = () => {
     if (ts) {
       setParams({ ...params, timestamp_start: ts as string })
     }
-    //
-  }, [])
+  }, [logsQueryParamsSyncing])
 
   const genQueryParams = (params: { [k: string]: string }) => {
     // remove keys which are empty strings, null, or undefined
