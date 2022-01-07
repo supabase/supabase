@@ -124,7 +124,7 @@ export default withAuth(observer(Home))
 
 // detect for redirect from 3rd party service like vercel, aws...
 function isRedirectFromThirdPartyService(router: NextRouter) {
-  return router.query.next != undefined || router.query['x-amzn-marketplace-token'] != undefined
+  return router.query.next !== undefined || router.query['x-amzn-marketplace-token'] !== undefined
 }
 
 const UnauthorizedLanding = () => {
