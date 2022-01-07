@@ -274,14 +274,17 @@ export const LogPage: NextPage = () => {
           )}
           {error && (
             <div className="flex w-full h-full justify-center items-center mx-auto">
-              <Card className="flex flex-col gap-y-2">
+              <Card className="flex flex-col gap-y-2  w-1/3">
                 <div className="flex flex-row gap-x-2 py-2">
                   <IconAlertCircle size={16} />
                   <Typography.Text type="secondary">
                     Sorry! An error occured when fetching data.
                   </Typography.Text>
                 </div>
-                <Typography.Text type="warning">{error}</Typography.Text>
+                <details className="cursor-pointer">
+                  <summary><Typography.Text type="secondary">Error Message</Typography.Text></summary>
+                  <Typography.Text className="block whitespace-pre-wrap" small code type="warning">{JSON.stringify(error, null, 2)}</Typography.Text>
+                </details>
               </Card>
             </div>
           )}
