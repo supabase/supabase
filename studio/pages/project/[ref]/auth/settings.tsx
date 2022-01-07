@@ -198,6 +198,8 @@ const Settings = () => {
             className="mb-4"
             label={authConfig.properties.MAILER_AUTOCONFIRM.title}
             onChange={(value) => {
+              // If MAILER_AUTOCONFIRM is set to true, it means we are disabling email confirmations.
+              // "Enable email confirmations" should be toggled off.
               handleToggle('MAILER_AUTOCONFIRM', !value)
             }}
             checked={!model.MAILER_AUTOCONFIRM}
@@ -336,8 +338,11 @@ const Settings = () => {
               layout="horizontal"
               label={authConfig.properties.SMS_AUTOCONFIRM.title}
               onChange={(value) => {
+                // If SMS_AUTOCONFIRM is set to true, it means we are disabling phone confirmations.
+                // "Enable phone confirmations" should be toggled off.
                 handleToggle('SMS_AUTOCONFIRM', !value)
               }}
+              // 
               checked={!model.SMS_AUTOCONFIRM}
               descriptionText={authConfig.properties.SMS_AUTOCONFIRM.help}
             />
