@@ -772,7 +772,9 @@ pages:
         js: |
           ```js
           const { data: user, error } = await supabase.auth.api.createUser({
-            name: 'Yoda'
+            email: 'user@email.com',
+            password: 'password',
+            data: { name: 'Yoda' }
           })
           ```
 
@@ -852,10 +854,10 @@ pages:
         isSpotlight: false
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.generateLink({
-            type: 'invite',
-            email: 'email@example.com'
-          })
+          const { data: user, error } = await supabase.auth.api.generateLink(
+            'invite',
+            'email@example.com'
+          )
           ```
 
   select():

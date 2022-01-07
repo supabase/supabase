@@ -1,6 +1,5 @@
 import { GoTrueClient, User } from '@supabase/gotrue-js'
 
-export const GOTRUE_ENABLED = (process.env.NEXT_PUBLIC_GOTRUE_ENABLED === 'true') || false
 export const GOTRUE_URL = process.env.NEXT_PUBLIC_GOTRUE_URL || 'http://localhost:8000/auth/v1'
 
 export const auth = new GoTrueClient({
@@ -8,7 +7,7 @@ export const auth = new GoTrueClient({
   autoRefreshToken: true,
 })
 
-export const getAuthUser = async (token: String): Promise<any>  => {
+export const getAuthUser = async (token: String): Promise<any> => {
   try {
     const { data: user, error } = await auth.api.getUser(token.replace('Bearer ', ''))
     if (error) throw error
