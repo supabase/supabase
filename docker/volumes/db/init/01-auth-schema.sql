@@ -95,8 +95,8 @@ language sql stable
 as $$
   select 
   	coalesce(
-		current_setting('request.jwt.claim.sub', true),
-		(current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+		nullif(current_setting('request.jwt.claim.sub', true), ''),
+		(nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub')
 	)::uuid
 $$;
 
@@ -106,8 +106,8 @@ language sql stable
 as $$
   select 
   	coalesce(
-		current_setting('request.jwt.claim.role', true),
-		(current_setting('request.jwt.claims', true)::jsonb ->> 'role')
+		nullif(current_setting('request.jwt.claim.role', true), ''),
+		(nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role')
 	)::text
 $$;
 
@@ -117,8 +117,8 @@ language sql stable
 as $$
   select 
   	coalesce(
-		current_setting('request.jwt.claim.email', true),
-		(current_setting('request.jwt.claims', true)::jsonb ->> 'email')
+		nullif(current_setting('request.jwt.claim.email', true), ''),
+		(nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'email')
 	)::text
 $$;
 
