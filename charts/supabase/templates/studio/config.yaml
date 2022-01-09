@@ -1,0 +1,10 @@
+{{- if .Values.studio.enable -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "supabase.studio.fullname" . }}
+  labels:
+    {{- include "supabase.labels" . | nindent 4 }}
+data:
+  {{- toYaml .Values.studio.environment | nindent 2 }}
+{{- end }}

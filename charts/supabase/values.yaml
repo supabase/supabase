@@ -1,0 +1,770 @@
+# Studio Application
+studio:
+  enable: true
+  replicaCount: 1
+  image:
+    repository: supabase/studio
+    pullPolicy: IfNotPresent
+    tag: "latest"
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  environment:
+    SUPABASE_URL: http://kong:8000
+    STUDIO_PG_META_URL: http://meta:8080
+    SUPABASE_ANON_KEY: ${ANON_KEY}
+    SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+
+  service:
+    type: ClusterIP
+    port: 3000
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts: []
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+
+# Auth Service
+auth:
+  replicaCount: 1
+  image:
+    repository: supabase/gotrue
+    pullPolicy: IfNotPresent
+    tag: "v2.2.12"
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  environment:
+    GOTRUE_API_HOST: "0.0.0.0"
+    GOTRUE_API_PORT: "9999"
+    GOTRUE_DB_DRIVER: postgres
+    GOTRUE_DB_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?search_path=auth
+    GOTRUE_SITE_URL: ${SITE_URL}
+    GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
+    GOTRUE_DISABLE_SIGNUP: ${DISABLE_SIGNUP}
+    GOTRUE_JWT_SECRET: ${JWT_SECRET}
+    GOTRUE_JWT_EXP: ${JWT_EXPIRY}
+    GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+    GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
+    GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM}
+    GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
+    GOTRUE_SMTP_HOST: ${SMTP_HOST}
+    GOTRUE_SMTP_PORT: ${SMTP_PORT}
+    GOTRUE_SMTP_USER: ${SMTP_USER}
+    GOTRUE_SMTP_PASS: ${SMTP_PASS}
+    GOTRUE_SMTP_SENDER_NAME: ${SMTP_SENDER_NAME}
+    GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
+    GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+    GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
+    GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/v1/verify
+    GOTRUE_EXTERNAL_PHONE_ENABLED: ${ENABLE_PHONE_SIGNUP}
+    GOTRUE_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
+
+  service:
+    type: ClusterIP
+    port: 9999
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts: []
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+# Rest Service
+rest:
+  replicaCount: 1
+  image:
+    repository: postgrest/postgrest
+    pullPolicy: IfNotPresent
+    tag: "v9.0.0"
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  environment:
+    PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
+    PGRST_DB_SCHEMA: public,storage
+    PGRST_DB_ANON_ROLE: anon
+    PGRST_JWT_SECRET: ${JWT_SECRET}
+    PGRST_DB_USE_LEGACY_GUCS: "false"
+
+  service:
+    type: ClusterIP
+    port: 3000
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts: []
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+realtime:
+  replicaCount: 1
+  image:
+    repository: supabase/realtime
+    pullPolicy: IfNotPresent
+    tag: "v0.19.3"
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  environment:
+    DB_HOST: db
+    DB_PORT: '5432'
+    DB_NAME: postgres
+    DB_USER: postgres
+    DB_PASSWORD: ${POSTGRES_PASSWORD}
+    DB_SSL: "false"
+    PORT: '4000'
+    JWT_SECRET: ${JWT_SECRET}
+    REPLICATION_MODE: RLS
+    REPLICATION_POLL_INTERVAL: '100'
+    SECURE_CHANNELS: "true"
+    SLOT_NAME: supabase_realtime_rls
+    TEMPORARY_SLOT: "true"
+
+  service:
+    type: ClusterIP
+    port: 4000
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts: []
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+# Meta Service
+meta:
+  replicaCount: 1
+  image:
+    repository: supabase/postgres-meta
+    pullPolicy: IfNotPresent
+    tag: "v0.29.0"
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  environment:
+    PG_META_PORT: '8080'
+    PG_META_DB_HOST: db
+    PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts: []
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+storage:
+  replicaCount: 1
+  image:
+    repository: supabase/storage-api
+    pullPolicy: IfNotPresent
+    tag: "v0.10.0"
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  environment:
+    ANON_KEY: ${ANON_KEY}
+    SERVICE_KEY: ${SERVICE_ROLE_KEY}
+    POSTGREST_URL: http://rest:3000
+    PGRST_JWT_SECRET: ${JWT_SECRET}
+    DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
+    PGOPTIONS: -c search_path=storage,public
+    FILE_SIZE_LIMIT: '52428800'
+    STORAGE_BACKEND: file
+    FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+    TENANT_ID: stub
+    REGION: stub
+    GLOBAL_S3_BUCKET: stub
+
+  service:
+    type: ClusterIP
+    port: 5000
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts: []
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  persistence:
+    enable: true
+    storageClassName: ""
+    annotations: {}
+    size: 10Gi
+    accessModes:
+      - ReadWriteOnce
+    class: ""
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+kong:
+  replicaCount: 1
+  image:
+    repository: kong
+    pullPolicy: IfNotPresent
+    tag: "2.1"
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  environment:
+    KONG_DATABASE: "off"
+    KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+    # https://github.com/supabase/cli/issues/14
+    KONG_DNS_ORDER: LAST,A,CNAME
+    KONG_PLUGINS: request-transformer,cors,key-auth,acl
+
+  service:
+    type: NodePort
+    port: 8000
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts: []
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  config: {}
+  # config: |
+  #   _format_version: "1.1"
+
+  #   ###
+  #   ### Consumers / Users
+  #   ###
+  #   consumers:
+  #     - username: anon
+  #       keyauth_credentials:
+  #         - key: JWT_ANON_KEY
+  #     - username: service_role
+  #       keyauth_credentials:
+  #         - key: JWT_SERVICE_KEY
+
+  #   ###
+  #   ### Access Control List
+  #   ###
+  #   acls:
+  #     - consumer: anon
+  #       group: anon
+  #     - consumer: service_role
+  #       group: admin
+
+  #   ###
+  #   ### API Routes
+  #   ###
+  #   services:
+  #     ## Open Auth routes
+  #     - name: auth-v1-open
+  #       url: http://svc.cluster.local:9999/verify
+  #       routes:
+  #         - name: auth-v1-open
+  #           strip_path: true
+  #           paths:
+  #             - /auth/v1/verify
+  #       plugins:
+  #         - name: cors
+  #     - name: auth-v1-open-callback
+  #       url: http://svc.cluster.local:9999/callback
+  #       routes:
+  #         - name: auth-v1-open-callback
+  #           strip_path: true
+  #           paths:
+  #             - /auth/v1/callback
+  #       plugins:
+  #         - name: cors
+  #     - name: auth-v1-open-authorize
+  #       url: http://svc.cluster.local:9999/authorize
+  #       routes:
+  #         - name: auth-v1-open-authorize
+  #           strip_path: true
+  #           paths:
+  #             - /auth/v1/authorize
+  #       plugins:
+  #         - name: cors
+
+  #     ## Secure Auth routes
+  #     - name: auth-v1
+  #       _comment: "GoTrue: /auth/v1/* -> http://svc.cluster.local:9999/*"
+  #       url: http://svc.cluster.local:9999/
+  #       routes:
+  #         - name: auth-v1-all
+  #           strip_path: true
+  #           paths:
+  #             - /auth/v1/
+  #       plugins:
+  #         - name: cors
+  #         - name: key-auth
+  #           config:
+  #             hide_credentials: false
+  #         - name: acl
+  #           config:
+  #             hide_groups_header: true
+  #             allow:
+  #               - admin
+  #               - anon
+
+  #     ## Secure REST routes
+  #     - name: rest-v1
+  #       _comment: "PostgREST: /rest/v1/* -> http://DATABASE_ENDPOINT:3000/*"
+  #       url: http://DATABASE_ENDPOINT:3000/
+  #       routes:
+  #         - name: rest-v1-all
+  #           strip_path: true
+  #           paths:
+  #             - /rest/v1/
+  #       plugins:
+  #         - name: cors
+  #         - name: key-auth
+  #           config:
+  #             hide_credentials: true
+  #         - name: acl
+  #           config:
+  #             hide_groups_header: true
+  #             allow:
+  #               - admin
+  #               - anon
+
+  #     ## Secure Realtime routes
+  #     - name: realtime-v1
+  #       _comment: "Realtime: /realtime/v1/* -> ws://svc.cluster.local:4000/socket/*"
+  #       url: http://svc.cluster.local:4000/socket/
+  #       routes:
+  #         - name: realtime-v1-all
+  #           strip_path: true
+  #           paths:
+  #             - /realtime/v1/
+  #       plugins:
+  #         - name: cors
+  #         - name: key-auth
+  #           config:
+  #             hide_credentials: false
+  #         - name: acl
+  #           config:
+  #             hide_groups_header: true
+  #             allow:
+  #               - admin
+  #               - anon
+
+  #     ## Storage routes: the storage server manages its own auth
+  #     - name: storage-v1
+  #       _comment: "Storage: /storage/v1/* -> http://svc.cluster.local:5000/*"
+  #       url: http://svc.cluster.local:5000/
+  #       routes:
+  #         - name: storage-v1-all
+  #           strip_path: true
+  #           paths:
+  #             - /storage/v1/
+  #       plugins:
+  #         - name: cors
+
+  #     ## Secure Database routes
+  #     - name: meta
+  #       _comment: "pg-meta: /pg/* -> http://svc.cluster.local:8080/*"
+  #       url: http://svc.cluster.local:8080/
+  #       routes:
+  #         - name: meta-all
+  #           strip_path: true
+  #           paths:
+  #             - /pg/
+  #       plugins:
+  #         - name: key-auth
+  #           config:
+  #             hide_credentials: false
+  #         - name: acl
+  #           config:
+  #             hide_groups_header: true
+  #             allow:
+  #               - admin
+
+
+
+
+# Postgres Database
+# A standalone Postgres database configured to work with Supabase services.
+database:
+  image:
+    repository: tdeoliv/supabase-bitnami-postgres
+    tag: latest
+  # image:
+  #   tag: "12.9.0-debian-10-r40"
+  #   debug: true
+  containerSecurityContext:
+    runAsUser: 0
+  postgresqlPassword: YOUR_PASSWORD
+  extraEnv:
+    - name: POSTGRESQL_WAL_LEVEL
+      value: LOGICAL
+  initdbScriptsConfigMap: "{{ .Release.Name }}-initdb"
+  # initdbScriptsConfigMap: my-release-initdb # This is required
+

@@ -1,0 +1,149 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "supabase.kong.fullname" . }}
+  labels:
+    {{- include "supabase.labels" . | nindent 4 }}
+data:
+  {{- toYaml .Values.kong.environment | nindent 2 }}
+{{- if .Values.kong.config -}}
+  kong.yml:
+  {{- toYaml .Values.kong.config | nindent 4 }}
+{{- else }}
+  kong.yml: >-
+    _format_version: "1.1"
+
+    consumers:
+      - username: anon
+        keyauth_credentials:
+          - key: {{ .Values.kong.credentials.anonKey }}
+      - username: service_role
+        keyauth_credentials:
+          - key: {{ .Values.kong.credentials.serviceRoleKey }}
+
+    acls:
+      - consumer: anon
+        group: anon
+      - consumer: service_role
+        group: admin
+
+    services:
+      - name: auth-v1-open
+        url: http://{{ include "supabase.auth.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:9999/verify
+        routes:
+          - name: auth-v1-open
+            strip_path: true
+            paths:
+              - /auth/v1/verify
+        plugins:
+          - name: cors
+      - name: auth-v1-open-callback
+        url: http://{{ include "supabase.auth.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:9999/callback
+        routes:
+          - name: auth-v1-open-callback
+            strip_path: true
+            paths:
+              - /auth/v1/callback
+        plugins:
+          - name: cors
+      - name: auth-v1-open-authorize
+        url: http://{{ include "supabase.auth.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:9999/authorize
+        routes:
+          - name: auth-v1-open-authorize
+            strip_path: true
+            paths:
+              - /auth/v1/authorize
+        plugins:
+          - name: cors
+
+
+      - name: auth-v1
+        _comment: "GoTrue: /auth/v1/* -> http://{{ include "supabase.auth.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:9999/*"
+        url: http://{{ include "supabase.auth.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:9999
+        routes:
+          - name: auth-v1-all
+            strip_path: true
+            paths:
+              - /auth/v1/
+        plugins:
+          - name: cors
+          - name: key-auth
+            config:
+              hide_credentials: false
+          - name: acl
+            config:
+              hide_groups_header: true
+              allow:
+                - admin
+                - anon
+
+
+      - name: rest-v1
+        _comment: "PostgREST: /rest/v1/* -> http://{{ include "supabase.rest.fullname" . }}.{{ .Release.Namespace }}:3000/*"
+        url: http://{{ include "supabase.rest.fullname" . }}.{{ .Release.Namespace }}:3000/
+        routes:
+          - name: rest-v1-all
+            strip_path: true
+            paths:
+              - /rest/v1/
+        plugins:
+          - name: cors
+          - name: key-auth
+            config:
+              hide_credentials: true
+          - name: acl
+            config:
+              hide_groups_header: true
+              allow:
+                - admin
+                - anon
+
+      - name: realtime-v1
+        _comment: "Realtime: /realtime/v1/* -> ws://{{ include "supabase.realtime.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:4000/socket/*"
+        url: http://{{ include "supabase.realtime.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:4000/socket
+        routes:
+          - name: realtime-v1-all
+            strip_path: true
+            paths:
+              - /realtime/v1/
+        plugins:
+          - name: cors
+          - name: key-auth
+            config:
+              hide_credentials: false
+          - name: acl
+            config:
+              hide_groups_header: true
+              allow:
+                - admin
+                - anon
+
+      - name: storage-v1
+        _comment: "Storage: /storage/v1/* -> http://{{ include "supabase.storage.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:5000/*"
+        url: http://{{ include "supabase.storage.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:5000/
+        routes:
+          - name: storage-v1-all
+            strip_path: true
+            paths:
+              - /storage/v1/
+        plugins:
+          - name: cors
+
+      - name: meta
+        _comment: "pg-meta: /pg/* -> http://{{ include "supabase.meta.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:8080/*"
+        url: http://{{ include "supabase.meta.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:8080/
+        routes:
+          - name: meta-all
+            strip_path: true
+            paths:
+              - /pg/
+        plugins:
+          - name: key-auth
+            config:
+              hide_credentials: false
+          - name: acl
+            config:
+              hide_groups_header: true
+              allow:
+                - admin
+{{- end }}

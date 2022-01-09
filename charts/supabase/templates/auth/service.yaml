@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "supabase.auth.fullname" . }}
+  labels:
+    {{- include "supabase.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.auth.service.type }}
+  ports:
+    - port: {{ .Values.auth.service.port }}
+      targetPort: 9999
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "supabase.auth.selectorLabels" . | nindent 4 }}

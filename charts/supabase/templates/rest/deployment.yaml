@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "supabase.rest.fullname" . }}
+  labels:
+    {{- include "supabase.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.rest.autoscaling.enabled }}
+  replicas: {{ .Values.rest.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "supabase.rest.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.rest.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "supabase.rest.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.rest.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "supabase.rest.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.rest.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "supabase.rest.name" $ }}
+          securityContext:
+            {{- toYaml .Values.rest.securityContext | nindent 12 }}
+          image: "{{ .Values.rest.image.repository }}:{{ .Values.rest.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.rest.image.pullPolicy }}
+          env:
+            {{- range $key, $value := .Values.rest.environment }}
+            - name: {{ $key }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "supabase.rest.fullname" $ }}
+                  key: {{ $key }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.rest.resources | nindent 12 }}
+      {{- with .Values.rest.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.rest.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.rest.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
