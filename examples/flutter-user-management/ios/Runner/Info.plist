@@ -55,5 +55,7 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo Library Access to upload profile avatar</string>
 </dict>
 </plist>
