@@ -31,8 +31,9 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- TODO: Add your SCHEME here -->
-                <data android:scheme="io.supabase.flutterdemo" />
+                <!-- TODO: Add your SCHEME and HOST here -->
+                <data android:scheme="io.supabase.flutterdemo"
+                      android:host="login-callback" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
