@@ -44,10 +44,10 @@ If the user go to `/private/profile` and is not logged-in, it'll be redirected h
 
 **Handle refreshing of tokens** (if expired) or redirects to `/login` if it fails
 
-More use cases can be found on [Supabase Strategy - Use cases](https://github.com/mitchelvanbever/remix-auth-supabase#using-the-authenticator--strategy-)
+More use cases can be found on [Remix Auth Supabase - Use cases](https://github.com/mitchelvanbever/remix-auth-supabase#using-the-authenticator--strategy-)
 
 ## Related Links
 
 - [Remix Auth](https://github.com/sergiodxa/remix-auth)
-- [Supabase Strategy](https://github.com/mitchelvanbever/remix-auth-supabase)
+- [Remix Auth Supabase](https://github.com/mitchelvanbever/remix-auth-supabase)
 - [supabase-js](https://github.com/supabase/supabase-js)
