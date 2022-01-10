@@ -25,7 +25,7 @@ You must use `checkSession` instead of `isAuthenticated`
 
 ## Example
 
-This is using Remix Auth, `@afaik/remix-auth-supabase-strategy` and `supabase-js` packages.
+This is using Remix Auth, `remix-auth-supabase` and `supabase-js` packages.
 
 > Thanks to Remix, we can securely use server only authentication with `supabase.auth.api.signInWithEmail`
 >
@@ -44,10 +44,10 @@ If the user go to `/private/profile` and is not logged-in, it'll be redirected h
 
 **Handle refreshing of tokens** (if expired) or redirects to `/login` if it fails
 
-More use cases can be found on [Supabase Strategy - Use cases](https://github.com/mitchelvanbever/remix-auth-supabase-strategy#using-the-authenticator--strategy-)
+More use cases can be found on [Supabase Strategy - Use cases](https://github.com/mitchelvanbever/remix-auth-supabase#using-the-authenticator--strategy-)
 
 ## Related Links
 
 - [Remix Auth](https://github.com/sergiodxa/remix-auth)
-- [Supabase Strategy](https://github.com/mitchelvanbever/remix-auth-supabase-strategy)
+- [Supabase Strategy](https://github.com/mitchelvanbever/remix-auth-supabase)
 - [supabase-js](https://github.com/supabase/supabase-js)
