@@ -54,3 +54,11 @@ test('reset search filter', async () => {
   expect(() => screen.getByTitle(/Clear search/)).toThrow()
   expect(() => screen.getByDisplayValue(/something123/)).toThrow()
 })
+
+test('timestamp from filter', async () => {
+  render(<LogPanel />)
+  const dropdown = await screen.findByText(/Now/)
+  
+  // click the dropdown
+  throw Error('not impl')
+})
