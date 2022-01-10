@@ -58,7 +58,20 @@ test('reset search filter', async () => {
 test('timestamp from filter', async () => {
   render(<LogPanel />)
   const dropdown = await screen.findByText(/Now/)
-  
+
   // click the dropdown
   throw Error('not impl')
+
+  await screen.findByLabelText('From')
+  // display iso timestamp
+  const year = new Date().getFullYear()
+  await screen.findByDisplayValue(year)
+
+  // input actions
+  await screen.findByRole('button', { name: /Clear input/ })
+  const set = await screen.findByRole('button', { name: 'Set' })
+
+  userEvent.click(set)
+  await screen.findByRole('button', { name: /Custom/ })
+  await screen.findByTitle('Clear timestamp filter')
 })
