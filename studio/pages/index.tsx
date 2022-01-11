@@ -37,7 +37,7 @@ const Home: NextPage = () => {
       if (router.query?.next?.includes('https://vercel.com')) {
         router.push(`/vercel/integrate?${params.toString()}`)
       }
-      if (router.query?.next?.includes('https://database.new')) {
+      if (router.query?.next?.includes('new-project')) {
         router.push('/new/project')
       }
       if (router.query['x-amzn-marketplace-token'] != undefined) {
