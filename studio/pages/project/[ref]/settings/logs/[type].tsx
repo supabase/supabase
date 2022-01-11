@@ -159,6 +159,7 @@ export const LogPage: NextPage = () => {
   }
   const handleSearch = (v: string) => {
     setParams((prev) => ({ ...prev, search_query: v || '', where: '', sql: '' }))
+    setEditorValue('')
   }
 
   return (
