@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, Typography } from '@supabase/ui'
-import Router from 'next/router'
+import { useRouter } from 'next/router'
 
 import { API_URL } from 'lib/constants'
 import { useStore, withAuth } from 'hooks'
@@ -15,6 +15,8 @@ import Panel from 'components/to-be-cleaned/Panel'
  */
 const Wizard = () => {
   const { ui, app } = useStore()
+  const router = useRouter()
+
   const [orgName, setOrgName] = useState('')
   const [newOrgLoading, setNewOrgLoading] = useState(false)
 
@@ -49,11 +51,7 @@ const Wizard = () => {
     } else {
       const org = response
       app.onOrgAdded(org)
-
-      // Router.push('/new/[slug]', `/new/${org.slug}`)
-      // Using window.location.href for now as organization metadata needs to refresh
-      // We do not get is_owner nor stripe_customer_id from the response here
-      window.location.href = `/new/${org.slug}`
+      router.push(`/new/${org.slug}`)
     }
   }
 
@@ -70,7 +68,7 @@ const Wizard = () => {
         ]}
         footer={[
           <div key="panel-footer" className="flex items-center w-full justify-between">
-            <Button type="default" onClick={() => Router.push('/')}>
+            <Button type="default" onClick={() => router.push('/')}>
               Cancel
             </Button>
             <div className="space-x-3">

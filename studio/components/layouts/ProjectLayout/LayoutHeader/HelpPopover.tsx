@@ -7,6 +7,7 @@ import {
   Popover,
   Typography,
 } from '@supabase/ui'
+import { useRouter } from 'next/router'
 import { FC } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -16,6 +17,10 @@ import SVG from 'react-inlinesvg'
 interface Props {}
 
 const HelpPopover: FC<Props> = () => {
+  const router = useRouter()
+  const projectRef = router.query.ref
+  const supportUrl = `/support/new${projectRef ? `?ref=${projectRef}` : ''}`
+
   return (
     <Popover
       className="w-80"
@@ -34,7 +39,7 @@ const HelpPopover: FC<Props> = () => {
                 hosted services.
               </p>
             </Typography.Text>
-            <Link href="/support/new">
+            <Link href={supportUrl}>
               <Button className="sbui-default-button--dark-white" icon={<IconMail />}>
                 Contact support team
               </Button>
