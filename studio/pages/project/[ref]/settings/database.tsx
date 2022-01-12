@@ -188,6 +188,7 @@ const ResetDbPassword: FC<any> = () => {
       } else {
         ui.setNotification({ category: 'error', message: 'Failed to reset password' })
       }
+      setIsUpdatingPassword(false)
     }
   }
 
@@ -279,9 +280,6 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
 }
 
 const GeneralSettings: FC<any> = ({ projectRef }) => {
-  const { ui } = useStore()
-  const isOwner = ui.selectedOrganization?.is_owner
-
   const { data, error }: any = useSWR(`${API_URL}/props/project/${projectRef}/settings`, get)
 
   if (data?.error || error) {
@@ -378,7 +376,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
             </Panel.Content>
           </Panel>
         </section>
-        {isOwner && <ResetDbPassword />}
+        <ResetDbPassword />
         <DownloadCertificate createdAt={connectionInfo.inserted_at} />
       </div>
       <div>

@@ -200,7 +200,7 @@ const CreateProject = observer(() => {
   async function createSupabaseProject(dbSql: string) {
     const data = {
       cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
-      org_id: _store.supabaseOrgId,
+      org_id: Number(_store.supabaseOrgId),
       name: projectName,
       db_pass: dbPass,
       db_region: dbRegion,
