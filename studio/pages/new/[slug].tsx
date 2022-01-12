@@ -8,7 +8,6 @@ import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { Button, Typography, Listbox, IconUsers, IconAlertCircle } from '@supabase/ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
@@ -207,38 +206,13 @@ export const Wizard = observer(() => {
               <Typography.Text type="secondary" small>
                 You can rename your project later
               </Typography.Text>
-
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Button onClick={() => {}} loading={newProjectedLoading} disabled={true}>
-                    Create new project
-                  </Button>
-                </Tooltip.Trigger>
-                <Tooltip.Content side="top">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'shadow px-2 py-1 rounded border',
-                      'bg-white flex flex-col space-y-1 items-center justify-center',
-                      'dark:bg-gray-800 dark:border-gray-700',
-                    ].join(' ')}
-                  >
-                    <Typography.Text small>
-                      Sorry! New projects cannot be created at the moment.{' '}
-                    </Typography.Text>
-                    <Typography.Text small>Check status.supabase.com for updates!</Typography.Text>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Root>
-
-              {/* TODO: Revert back after incident is resolved */}
-              {/* <Button
+              <Button
                 onClick={onClickNext}
                 loading={newProjectedLoading}
                 disabled={newProjectedLoading || !canSubmit}
               >
                 Create new project
-              </Button> */}
+              </Button>
             </div>
           </div>
         }
