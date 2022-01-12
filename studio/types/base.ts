@@ -4,9 +4,13 @@ export interface Organization {
   name: string
   billing_email: string
   project_limit: number
-  stripe_customer_id?: string
-  total_free_projects?: number
+  members: any[]
+  projects: any[]
   is_owner?: boolean
+  stripe_customer_id?: string
+  stripe_customer_object?: any
+  total_free_projects?: number
+  total_paid_projects?: number
 }
 
 export interface Project {

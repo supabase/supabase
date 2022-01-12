@@ -253,7 +253,7 @@ const Nav = (props: Props) => {
                 <a href="https://app.supabase.io/">
                   <Button type="default">Sign in</Button>
                 </a>
-                <a href="https://app.supabase.io/">
+                <a href="https://app.supabase.io/new/project">
                   <Button>Start your project</Button>
                 </a>
               </div>
