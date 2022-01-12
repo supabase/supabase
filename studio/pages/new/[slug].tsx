@@ -61,6 +61,9 @@ export const Wizard = observer(() => {
   const { slug } = router.query
   const { app, ui } = useStore()
 
+  // TODO Clean up
+  const { secret } = router.query
+
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
@@ -232,13 +235,15 @@ export const Wizard = observer(() => {
               </Tooltip.Root>
 
               {/* TODO: Revert back after incident is resolved */}
-              {/* <Button
-                onClick={onClickNext}
-                loading={newProjectedLoading}
-                disabled={newProjectedLoading || !canSubmit}
-              >
-                Create new project
-              </Button> */}
+              {secret == 'inian' && (
+                <Button
+                  onClick={onClickNext}
+                  loading={newProjectedLoading}
+                  disabled={newProjectedLoading || !canSubmit}
+                >
+                  Create new project
+                </Button>
+              )}
             </div>
           </div>
         }
