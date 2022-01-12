@@ -4,7 +4,19 @@ import { indexOf } from 'lodash'
 import { useRouter } from 'next/router'
 import { AutoField } from 'uniforms-bootstrap4'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { Typography, Input, IconAlertCircle, Modal, IconKey } from '@supabase/ui'
+import {
+  Typography,
+  Input,
+  IconAlertCircle,
+  Modal,
+  IconKey,
+  Button,
+  Dropdown,
+  Divider,
+  IconPenTool,
+  IconRefreshCw,
+  IconChevronDown,
+} from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { useStore, withAuth } from 'hooks'
@@ -15,6 +27,7 @@ import MultiSelectUI from 'components/to-be-cleaned/MultiSelect'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { DisplayApiSettings } from 'components/to-be-cleaned/DisplayProjectSettings'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { uuidv4 } from 'lib/helpers'
 
 const PageContext: any = createContext(null)
 
@@ -100,17 +113,27 @@ const ServiceList: FC<any> = ({ projectRef }) => {
   const apiService = services.find((x: any) => x.app.id == API_SERVICE_ID)
   const apiConfig = apiService?.app_config
 
+  const updateString =
+    'Successfully submitted JWT secret update request. Please wait while your project is updated.'
   async function handleGenerateNewJwtToken() {
     try {
+      const trackingId = uuidv4()
       const res = await patch(`${API_URL}/projects/${ref}/config?app=secrets`, {
         jwt_secret: 'ROLL',
+        change_tracking_id: trackingId,
       })
       if (res.error) throw res.error
       setIsGeneratingKey(false)
       // refetch data in forms
       mutateSettings()
       mutateConfig()
-      ui.setNotification({ category: 'success', message: 'Successfully updated JWT secret' })
+      ui.setNotification({ category: 'info', message: updateString })
+      /**
+         TODO (darora): set up polling for the event that indicates completion of JWT update process
+         if the process fails or times out we should show an error including the trackingId
+
+         Additionally, the local state for the project should be updated when said event is found (e.g. JWT secret, API keys).
+      */
     } catch (error: any) {
       ui.setNotification({ category: 'error', message: error.message })
     }
@@ -119,15 +142,17 @@ const ServiceList: FC<any> = ({ projectRef }) => {
   async function handleCustomNewJwtToken() {
     setIsLoadingCreatingKey(true)
     try {
+      const trackingId = uuidv4()
       const res = await patch(`${API_URL}/projects/${ref}/config?app=secrets`, {
         jwt_secret: customToken,
+        change_tracking_id: trackingId,
       })
       if (res.error) throw res.error
       setIsCreatingKey(false)
       // refetch data in forms
       mutateSettings()
       mutateConfig()
-      ui.setNotification({ category: 'success', message: 'Successfully updated JWT secret' })
+      ui.setNotification({ category: 'info', message: updateString })
     } catch (error: any) {
       ui.setNotification({ category: 'error', message: error.message })
     } finally {
@@ -174,11 +199,17 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                 layout="horizontal"
               />
               {/* Temporarily hide the jwt secret rolling feature */}
-              {/* <div className="space-y-3">
+              <div className="space-y-3">
                 <div className="p-3 px-6 dark:bg-bg-alt-dark bg-bg-alt-light rounded-md shadow-sm border dark:border-dark flex items-center justify-between">
                   <div>
                     <Typography.Text>Generate a new JWT secret</Typography.Text>
                     <div>
+                      <Typography.Text type="danger">
+                        This will invalidate all existing API keys! <br />
+                        Your project will also be restarted during this process, which will
+                        terminate any existing connections.
+                      </Typography.Text>
+                      <br />
                       <Typography.Text type="secondary">
                         A random secret will be created, or you can create your own.
                       </Typography.Text>
@@ -212,7 +243,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                     </Dropdown>
                   </div>
                 </div>
-              </div> */}
+              </div>
             </Panel.Content>
           </Panel>
         </section>
@@ -225,10 +256,17 @@ const ServiceList: FC<any> = ({ projectRef }) => {
         buttonLabel="Generate new secret"
         buttonLoadingLabel="Generating"
         children={
-          <Typography.Text type="secondary">
-            Are you sure you want to genereate a random new JWT secret? This action cannot be undone
-            and the old JWT secret will be lost.
-          </Typography.Text>
+          <div>
+            <Typography.Text type="danger">
+              Are you sure you want to genereate a random new JWT secret? This action cannot be
+              undone and the old JWT secret will be lost.
+            </Typography.Text>
+            <br />
+            <Typography.Text type="danger">
+              All existing API keys will be invalidated, and any open connections will be
+              terminated.
+            </Typography.Text>
+          </div>
         }
         onSelectCancel={() => setIsGeneratingKey(false)}
         onSelectConfirm={handleGenerateNewJwtToken}
@@ -248,6 +286,10 @@ const ServiceList: FC<any> = ({ projectRef }) => {
         <Typography.Text type="secondary">
           Create a custom JWT secret. Make sure it is a strong combination of characters that cannot
           be guessed easily.
+        </Typography.Text>
+        <br />
+        <Typography.Text type="danger">
+          All existing API keys will be invalidated, and any open connections will be terminated.
         </Typography.Text>
         <Input
           onChange={(e: any) => setCustomToken(e.target.value)}
