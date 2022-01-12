@@ -48,6 +48,7 @@ const StorageExplorer = observer(({ bucket }) => {
     addNewFolderPlaceholder,
     addNewFolder,
     fetchFolderContents,
+    fetchMoreFolderContents,
     fetchFoldersByPath,
     renameFolder,
     deleteFolder,
@@ -308,6 +309,7 @@ const StorageExplorer = observer(({ bucket }) => {
           onSelectCreateFolder={onSelectCreateFolder}
           onChangeView={onChangeView}
           onChangeSortBy={onChangeSortBy}
+          onColumnLoadMore={fetchMoreFolderContents}
         />
         <PreviewPane
           isOpen={!isEmpty(selectedFilePreview)}
