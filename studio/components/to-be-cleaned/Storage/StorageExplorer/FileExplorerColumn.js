@@ -72,6 +72,7 @@ const FileExplorerColumn = ({
   onCreateFolder = () => {},
   onSelectAllItemsInColumn = () => {},
   onSelectColumnEmptySpace = () => {},
+  onColumnLoadMore = () => {},
 }) => {
   const [isDraggedOver, setIsDraggedOver] = useState(false)
   const fileExplorerColumnRef = useRef(null)
@@ -244,9 +245,9 @@ const FileExplorerColumn = ({
           return 37
         }}
         // Scaffold props for infinite loading
-        hasNextPage={false}
-        isLoadingNextPage={false}
-        onLoadNextPage={() => {}}
+        hasNextPage={column.status !== STORAGE_ROW_STATUS.LOADING && column.hasMoreItems}
+        isLoadingNextPage={column.isLoadingMoreItems}
+        onLoadNextPage={() => onColumnLoadMore(index, column)}
       />
 
       {/* Search empty state */}
