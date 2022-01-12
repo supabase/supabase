@@ -2,7 +2,6 @@ import { createContext, useContext } from 'react'
 import { makeAutoObservable } from 'mobx'
 import {
   find,
-  findIndex,
   compact,
   isEqual,
   isNull,
@@ -43,7 +42,7 @@ export const useStorageExplorerStore = () => {
   return useContext(StorageExplorerContext)
 }
 
-const LIMIT = 100000
+const LIMIT = 5
 const OFFSET = 0
 const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 1 year
 const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
@@ -235,6 +234,12 @@ class StorageExplorerStore {
 
   popColumnAtIndex = (index) => {
     this.columns = this.columns.slice(0, index + 1)
+  }
+
+  setColumnIsLoadingMore = (index, isLoadingMoreItems = true) => {
+    this.columns = this.columns.map((col, idx) => {
+      return idx === index ? { ...col, isLoadingMoreItems } : col
+    })
   }
 
   pushOpenedFolderAtIndex = (folder, index) => {
@@ -944,6 +949,8 @@ class StorageExplorerStore {
       .from(this.selectedBucket.name)
       .list(prefix, options, parameters)
 
+    console.log('Initial fetch', prefix, options, items)
+
     if (showLoading) {
       this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
     }
@@ -951,9 +958,40 @@ class StorageExplorerStore {
     if (!error) {
       const formattedItems = this.formatFolderItems(items)
       this.pushColumnAtIndex(
-        { id: folderId || folderName, name: folderName, items: formattedItems },
+        {
+          id: folderId || folderName,
+          name: folderName,
+          items: formattedItems,
+          hasMoreItems: formattedItems.length === LIMIT,
+          isLoadingMoreItems: false,
+        },
         index
       )
+    }
+  }
+
+  fetchMoreFolderContents = async (index, column) => {
+    this.setColumnIsLoadingMore(index)
+
+    // [Joshen] Bug on the backend that sorting will not be respected
+    // when we fetch more contents, but its okay, not blocking frontend
+    const prefix = this.openedFolders.map((folder) => folder.name).join('/')
+    const options = {
+      limit: LIMIT,
+      offset: column.items.length,
+      sortBy: { column: this.sortBy, order: 'asc' },
+    }
+    const parameters = { signal: this.abortController.signal }
+
+    console.log('fetchMoreFolderContents', { column, prefix, options })
+
+    const { data: items, error } = await this.supabaseClient.storage
+      .from(this.selectedBucket.name)
+      .list(prefix, options, parameters)
+
+    if (!error) {
+      // [Joshen] WE LEFT OFF HERE
+      console.log('Fetched more', items)
     }
   }
 
