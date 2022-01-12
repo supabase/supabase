@@ -4,6 +4,7 @@
 * [Installing Dependencies](#Installing-Dependencies)
 * [Building Supabase](#Building-Supabase)
 * [Start a Development Server](#Start-a-Development-Server)
+* [Build in Public](#Build-in-Public)
 
 ## Development Setup
 
@@ -148,3 +149,9 @@ To debug code, and to see changes in real time, it is often useful to have a loc
     ```
 
 For more information on Supabase Studio, see the [Supabase Studio readme](./studio/README.md).
+
+## Build in Public
+
+Videos of building supabase made in public.
+
+- [Contributing to open source as  a beginner - Supabase](https://youtu.be/OAqhsylUuWg) - [@imskr](https://github.com/imskr)
