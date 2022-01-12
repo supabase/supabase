@@ -6,7 +6,6 @@ import { makeAutoObservable } from 'mobx'
 import { debounce } from 'lodash'
 import { Button, Typography } from '@supabase/ui'
 import { Dictionary } from '@supabase/grid'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
@@ -331,34 +330,9 @@ const CreateProject = observer(() => {
           </Typography.Text>
         </div>
       </div>
-
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger>
-          <Button disabled={true} loading={false} onClick={() => {}}>
-            Create project
-          </Button>
-        </Tooltip.Trigger>
-        <Tooltip.Content side="top">
-          <Tooltip.Arrow className="radix-tooltip-arrow" />
-          <div
-            className={[
-              'shadow px-2 py-1 rounded border',
-              'bg-white flex flex-col space-y-1 items-center justify-center',
-              'dark:bg-gray-800 dark:border-gray-700',
-            ].join(' ')}
-          >
-            <Typography.Text small>
-              Sorry! New projects cannot be created at the moment.{' '}
-            </Typography.Text>
-            <Typography.Text small>Check status.supabase.com for updates!</Typography.Text>
-          </div>
-        </Tooltip.Content>
-      </Tooltip.Root>
-
-      {/* TODO: Revert back after incident is resolved */}
-      {/* <Button disabled={loading || !canSubmit} loading={loading} onClick={onCreateProject}>
+      <Button disabled={loading || !canSubmit} loading={loading} onClick={onCreateProject}>
         Create project
-      </Button> */}
+      </Button>
     </div>
   )
 })
