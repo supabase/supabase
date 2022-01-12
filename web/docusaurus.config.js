@@ -43,8 +43,8 @@ module.exports = {
       apiKey: '766d56f13dd1e82f43253559b7c86636',
       indexName: 'supabase',
     },
-    image: '/img/supabase-og-image.png', // used for meta tag, in particular og:image and twitter:image
-    metaImage: '/img/supabase-og-image.png',
+    image: '/supabase-logo.png', // used for meta tag, in particular og:image and twitter:image
+    metaImage: '/supabase-logo.png',
     navbar: {
       // classNames: 'shadow--md',
       // title: 'supabase',
