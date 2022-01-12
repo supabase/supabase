@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react'
+import React, { FC, SyntheticEvent, useEffect, useMemo, useState } from 'react'
 import {
   Button,
   Input,
@@ -9,9 +9,11 @@ import {
   IconX,
   Toggle,
   IconSearch,
+  IconClock,
 } from '@supabase/ui'
 import { LogTemplate } from '.'
-
+import { isNull } from 'lodash'
+import dayjs from 'dayjs'
 interface Props {
   defaultSearchValue?: string
   templates?: any
@@ -39,7 +41,8 @@ const LogPanel: FC<Props> = ({
   onSelectTemplate,
 }) => {
   const [search, setSearch] = useState('')
-
+  const [from, setFrom] = useState({ value: '', error: '' })
+  const [defaultTimestamp, setDefaultTimestamp] = useState(dayjs().toISOString())
   // sync local state with provided default value
   useEffect(() => {
     if (search !== defaultSearchValue) {
@@ -47,6 +50,18 @@ const LogPanel: FC<Props> = ({
     }
   }, [defaultSearchValue])
 
+  const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let error = ''
+    const value = e.target.value
+    //   // try to parse the iso value
+    //   if (isNaN(Date.parse(value)))
+    setFrom({ value, error })
+  }
+  const handleFromReset = () => {
+    const value = dayjs().toISOString()
+    setFrom({ value, error: '' })
+    setDefaultTimestamp(value)
+  }
   return (
     <div className="bg-panel-header-light dark:bg-panel-header-dark">
       <div className="px-2 py-1 flex items-center justify-between w-full">
@@ -99,6 +114,47 @@ const LogPanel: FC<Props> = ({
           </div>
         </div>
         <div className="flex items-center gap-x-4">
+          <div>
+            <Dropdown
+              side="bottom"
+              align="end"
+              overlay={
+                <Dropdown.Misc>
+                  <Input
+                    label="From"
+                    labelOptional="UTC"
+                    size="tiny"
+                    value={from.value === '' ? defaultTimestamp : from.value}
+                    onChange={handleFromChange}
+                    actions={[
+                      search && (
+                        <IconX
+                          key="reset-from"
+                          size="tiny"
+                          className="cursor-pointer mx-1"
+                          title="Reset input"
+                          onClick={handleFromReset}
+                        />
+                      ),
+                      <Button
+                        key="set"
+                        size="tiny"
+                        title="Set"
+                        type="secondary"
+                        onClick={() => onSearch(search)}
+                      >
+                        Set
+                      </Button>,
+                    ]}
+                  />
+                </Dropdown.Misc>
+              }
+            >
+              <Button type="outline" icon={<IconClock size="tiny" />}>
+                {from.value ? 'Custom' : 'Now'}
+              </Button>
+            </Dropdown>
+          </div>
           {/* wrap with form so that if user presses enter, the search value will submit automatically */}
           <form
             id="log-panel-search"
