@@ -1,6 +1,7 @@
 import LogPanel from 'components/interfaces/Settings/Logs/LogPanel'
 import { render, waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { clickDropdown } from 'tests/helpers'
 
 test('templates', async () => {
   const mockFn = jest.fn()
@@ -60,8 +61,8 @@ test('timestamp from filter', async () => {
   const dropdown = await screen.findByText(/Now/)
 
   // click the dropdown
-  throw Error('not impl')
-
+  clickDropdown(dropdown)
+  
   await screen.findByLabelText('From')
   // display iso timestamp
   const year = new Date().getFullYear()
