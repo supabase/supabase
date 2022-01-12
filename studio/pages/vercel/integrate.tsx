@@ -226,7 +226,7 @@ const Connecting = () => (
 const ProjectLinksEmptyState = () => (
   <div className="flex flex-col space-y-4">
     <Typography.Text>
-      You haven’t created a Supabase project yet. Get started by creating a new Supabase project,
+      You haven't created a Supabase project yet. Get started by creating a new Supabase project,
       then close this window and retry adding integration.
     </Typography.Text>
     <Typography.Link href="https://app.supabase.io">

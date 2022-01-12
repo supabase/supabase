@@ -3,21 +3,23 @@ var axios = require('axios')
 var fs = require('fs')
 
 const query = `
-query BIO_QUERY($username: String!) { 
-  organization(login: $username) {
+query Sponsors {
+  organization(login: "supabase") {
     id
-    sponsorshipsAsMaintainer(first: 100) {
-      totalCount
+    sponsors(first: 100) {
       nodes {
-        createdAt
-        privacyLevel
-        tier {
-          name
+        ... on Organization {
+          id
+          createdAt
+          name : login
         }
-        sponsor {
+        ... on User {
+          id
+          createdAt
           login
         }
       }
+      totalCount
     }
   }
 }
@@ -39,10 +41,11 @@ const fetchAllSponsors = async () => {
       },
     }
   )
-  return data.data.organization.sponsorshipsAsMaintainer
+  return data.data.organization.sponsors
 }
 
 const formatResults = (graphqlResponse) => {
+  console.log('graph', graphqlResponse)
   return graphqlResponse.nodes
     .filter((x) => !!x.sponsor)
     .map((x) => ({
@@ -65,6 +68,7 @@ const writeFile = (data) => {
 
 const main = async () => {
   const sponsorsResponse = await fetchAllSponsors()
+  // console.log('sponsorsResponse.totalCount', sponsorsResponse.totalCount)
   const formatted = formatResults(sponsorsResponse)
   writeFile(formatted)
 }

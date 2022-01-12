@@ -3,7 +3,15 @@ import React, { useEffect, useRef, useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Typography, IconLoader, IconAlertCircle, IconRewind, Button, IconInfo } from '@supabase/ui'
+import {
+  Typography,
+  IconLoader,
+  IconAlertCircle,
+  IconRewind,
+  Button,
+  IconInfo,
+  Card,
+} from '@supabase/ui'
 
 import { withAuth } from 'hooks'
 import { get } from 'lib/common/fetch'
@@ -72,6 +80,9 @@ export const LogPage: NextPage = () => {
     if (prevPageData === null) {
       // reduce interval window limit by using the timestamp of the last log
       queryParams = genQueryParams(params)
+    } else if (prevPageData.data.length === 0) {
+      // no rows returned, indicates that no more data to retrieve and append.
+      return null
     } else {
       const len = prevPageData.data.length
       const { timestamp: tsLimit }: LogData = prevPageData.data[len - 1]
@@ -84,18 +95,16 @@ export const LogPage: NextPage = () => {
   }
   const {
     data = [],
+    error: swrError,
     isValidating,
     mutate,
     size,
     setSize,
   } = useSWRInfinite<Logs>(getKeyLogs, get, { revalidateOnFocus: false })
-
-  // const { data, isValidating, mutate } = useSWR<Logs>(logUrl, get, { revalidateOnFocus: false })
   let logData: LogData[] = []
-  let error: null | string = null
-
+  let error: null | string = swrError ? swrError.message : null
   data.forEach((response: Logs) => {
-    if (response && response.data) {
+    if (!error && response && response.data) {
       logData = [...logData, ...response.data]
     }
     if (!error && response && response.error) {
@@ -145,10 +154,12 @@ export const LogPage: NextPage = () => {
       ...prev,
       where: isSelectQuery ? '' : editorValue,
       sql: isSelectQuery ? editorValue : '',
+      search_query: ''
     }))
   }
   const handleSearch = (v: string) => {
-    setParams((prev) => ({ ...prev, search_query: v || '' }))
+    setParams((prev) => ({ ...prev, search_query: v || '', where: '', sql: '' }))
+    setEditorValue('')
   }
 
   return (
@@ -220,9 +231,16 @@ export const LogPage: NextPage = () => {
             </div>
           )}
           {error && (
-            <div className="flex w-full h-full justify-center items-center space-x-2 mx-auto">
-              <IconAlertCircle size={16} />
-              <Typography.Text type="secondary">Sorry! Could not fetch data</Typography.Text>
+            <div className="flex w-full h-full justify-center items-center mx-auto">
+              <Card className="flex flex-col gap-y-2">
+                <div className="flex flex-row gap-x-2 py-2">
+                  <IconAlertCircle size={16} />
+                  <Typography.Text type="secondary">
+                    Sorry! An error occured when fetching data.
+                  </Typography.Text>
+                </div>
+                <Typography.Text type="warning">{error}</Typography.Text>
+              </Card>
             </div>
           )}
           <LogTable data={logData} isCustomQuery={mode === 'custom'} />
