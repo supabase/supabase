@@ -20,11 +20,10 @@ import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 import { get } from 'lib/common/fetch'
 import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
 
-const DATETIME_FORMAT = 'MMM D, ha'
 const CHART_INTERVALS = [
-  {key: 'minutely', label:'60 minutes', startValue: 1, startUnit: 'hour'},
-  {key: 'hourly', label:'24 hours', startValue: 24, startUnit: 'hour'},
-  {key: 'daily', label:'7 days', startValue: 7, startUnit: 'day'},
+  { key: 'minutely', label: '60 minutes', startValue: 1, startUnit: 'hour', format: 'MMM D, h:ma' },
+  { key: 'hourly', label: '24 hours', startValue: 24, startUnit: 'hour', format: 'MMM D, ha' },
+  { key: 'daily', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
 ]
 interface Props {
   project: any
@@ -42,10 +41,13 @@ const ProjectUsage: FC<Props> = ({ project }) => {
     // conditional fetching will cause cached data to clear (not desirable)
     // { refreshInterval: isActive ? 3000 : 30000 }
   )
-  const selectedInterval = CHART_INTERVALS.find(i => i.key === interval) || CHART_INTERVALS[0]
-  const startDate = dayjs().subtract(selectedInterval.startValue, selectedInterval.startUnit).format(DATE_FORMAT)
+  const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[0]
+  const startDate = dayjs()
+    .subtract(selectedInterval.startValue, selectedInterval.startUnit)
+    .format(DATE_FORMAT)
   const endDate = dayjs().format(DATE_FORMAT)
   const charts = data?.data
+  const datetimeFormat = selectedInterval.format || 'MMM D, ha'
   return (
     <div className="mx-6 space-y-6">
       <div className="flex flex-row justify-between w-full">
@@ -57,7 +59,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
           overlay={
             <>
               <Dropdown.RadioGroup value={interval} onChange={setInterval}>
-                {CHART_INTERVALS.map(i => (
+                {CHART_INTERVALS.map((i) => (
                   <Dropdown.Radio key={i.key} value={i.key}>
                     <Typography.Text>{i.label}</Typography.Text>
                   </Dropdown.Radio>
@@ -87,7 +89,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   provider="log-stats"
                   interval="1d"
                   hideChartType
-                  customDateFormat={DATETIME_FORMAT}
+                  customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
                 />
@@ -113,7 +115,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   provider="log-stats"
                   interval="1d"
                   hideChartType
-                  customDateFormat={DATETIME_FORMAT}
+                  customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
                 />
@@ -139,7 +141,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   provider="log-stats"
                   interval="1d"
                   hideChartType
-                  customDateFormat={DATETIME_FORMAT}
+                  customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
                 />
@@ -161,7 +163,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   provider="log-stats"
                   interval="1h"
                   hideChartType
-                  customDateFormat={DATETIME_FORMAT}
+                  customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
                 />
