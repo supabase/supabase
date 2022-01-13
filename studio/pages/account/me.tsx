@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconMoon, IconSun, Select, Typography, Input, Listbox } from '@supabase/ui'
+import { IconMoon, IconSun, Typography, Input, Listbox } from '@supabase/ui'
 
 import { useProfile, useStore, withAuth } from 'hooks'
 import { post } from 'lib/common/fetch'
