@@ -26,7 +26,7 @@ export const PRICING_PLANS = {
   // PAYG: 'Pay as you go',
 }
 
-export const PRICING_PLANS_DEFAULT = PRICING_PLANS.PRO
+export const PRICING_PLANS_DEFAULT = PRICING_PLANS.FREE
 
 export const PROVIDERS = {
   AWS: {
