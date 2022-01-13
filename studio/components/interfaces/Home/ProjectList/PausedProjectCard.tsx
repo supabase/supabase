@@ -1,6 +1,5 @@
 import { FC } from 'react'
 import { Typography, Badge, Button } from '@supabase/ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { Project } from 'types'
 
@@ -37,33 +36,9 @@ const PausedProjectCard: FC<Props> = ({
             </Badge>
           </div>
           <div className="flex items-center space-x-2">
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <Button size="tiny" onClick={() => {}}>
-                  Restore
-                </Button>
-              </Tooltip.Trigger>
-              <Tooltip.Content side="top">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'shadow px-2 py-1 rounded border',
-                    'bg-white flex flex-col space-y-1 items-center justify-center',
-                    'dark:bg-gray-800 dark:border-gray-700',
-                  ].join(' ')}
-                >
-                  <Typography.Text small>
-                    Sorry! New projects cannot be created at the moment.{' '}
-                  </Typography.Text>
-                  <Typography.Text small>Check status.supabase.com for updates!</Typography.Text>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Root>
-
-            {/* TODO: Revert back after incident is resolved */}
-            {/* <Button size="tiny" onClick={() => onSelectRestore()}>
+            <Button size="tiny" onClick={() => onSelectRestore()}>
               Restore
-            </Button> */}
+            </Button>
             <Button size="tiny" type="outline" onClick={() => onSelectDelete()}>
               Delete
             </Button>
