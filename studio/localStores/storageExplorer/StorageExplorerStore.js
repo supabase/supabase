@@ -272,10 +272,11 @@ class StorageExplorerStore {
   }
 
   addNewFolderPlaceholder = (columnIndex) => {
+    const isPrepend = true
     const folderName = 'Untitled folder'
     const folderType = STORAGE_ROW_TYPES.FOLDER
     const columnIdx = columnIndex === -1 ? this.getLatestColumnIndex() : columnIndex
-    this.addTempRow(folderType, folderName, STORAGE_ROW_STATUS.EDITING, columnIdx)
+    this.addTempRow(folderType, folderName, STORAGE_ROW_STATUS.EDITING, columnIdx, {}, isPrepend)
   }
 
   addNewFolder = async (folderName, columnIndex) => {
@@ -1230,11 +1231,13 @@ class StorageExplorerStore {
     return formattedItems
   }
 
-  addTempRow = (type, name, status, columnIndex, metadata = {}) => {
+  addTempRow = (type, name, status, columnIndex, metadata = {}, isPrepend = false) => {
     const updatedColumns = this.columns.map((column, idx) => {
       if (idx === columnIndex) {
         const tempRow = { type, name, status, metadata }
-        const updatedItems = column.items.concat([tempRow])
+        const updatedItems = isPrepend
+          ? [tempRow].concat(column.items)
+          : column.items.concat([tempRow])
         return { ...column, items: updatedItems }
       }
       return column
