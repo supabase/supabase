@@ -42,7 +42,7 @@ export const useStorageExplorerStore = () => {
   return useContext(StorageExplorerContext)
 }
 
-const LIMIT = 5
+const LIMIT = 200
 const OFFSET = 0
 const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 1 year
 const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
@@ -942,8 +942,6 @@ class StorageExplorerStore {
       .from(this.selectedBucket.name)
       .list(prefix, options, parameters)
 
-    console.log('Initial fetch', prefix, options, items)
-
     if (showLoading) {
       this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
     }
@@ -976,15 +974,24 @@ class StorageExplorerStore {
     }
     const parameters = { signal: this.abortController.signal }
 
-    console.log('fetchMoreFolderContents', { column, prefix, options })
-
     const { data: items, error } = await this.supabaseClient.storage
       .from(this.selectedBucket.name)
       .list(prefix, options, parameters)
 
     if (!error) {
-      // [Joshen] WE LEFT OFF HERE
-      console.log('Fetched more', items)
+      // Add items to column
+      const formattedItems = this.formatFolderItems(items)
+      this.columns = this.columns.map((col, idx) => {
+        if (idx === index) {
+          return {
+            ...col,
+            items: col.items.concat(formattedItems),
+            isLoadingMoreItems: false,
+            hasMoreItems: items.length === LIMIT,
+          }
+        }
+        return col
+      })
     }
   }
 
@@ -1023,6 +1030,8 @@ class StorageExplorerStore {
         id: null,
         name: idx === 0 ? this.selectedBucket.name : pathsWithEmptyPrefix[idx],
         items: formattedItems,
+        hasMoreItems: formattedItems.length === LIMIT,
+        isLoadingMoreItems: false,
       }
     })
 
