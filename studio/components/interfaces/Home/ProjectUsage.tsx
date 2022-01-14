@@ -55,13 +55,13 @@ const ProjectUsage: FC<Props> = ({ project }) => {
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
   return (
     <div className="mx-6 space-y-6">
-      <div className="flex flex-row justify-between w-full">
+      <div className="flex flex-row justify-between align-center w-full">
         <Typography.Title level={4}>Statistics for past {selectedInterval.label}</Typography.Title>
 
         {logsUsageChartIntervals && (
           <Dropdown
             side="bottom"
-            align="center"
+            align="end"
             overlay={
               <Dropdown.RadioGroup value={interval} onChange={setInterval}>
                 {CHART_INTERVALS.map((i) => (
@@ -72,7 +72,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
               </Dropdown.RadioGroup>
             }
           >
-            <Button type="text" iconRight={<IconChevronDown size="small" />}>
+            <Button type="text" iconRight={<IconChevronDown />}>
               {selectedInterval.label}
             </Button>
           </Dropdown>
