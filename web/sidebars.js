@@ -53,7 +53,7 @@ module.exports = {
     },
     {
       type: 'category',
-      label: 'Tutorials',
+      label: 'Quickstarts',
       collapsed: false,
       items: [
         'guides/with-angular',
