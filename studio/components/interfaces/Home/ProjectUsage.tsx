@@ -11,6 +11,7 @@ import {
   Typography,
   Button,
   Dropdown,
+  IconChevronDown,
 } from '@supabase/ui'
 
 import Panel from 'components/to-be-cleaned/Panel'
@@ -19,6 +20,7 @@ import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 
 import { get } from 'lib/common/fetch'
 import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
+import { useFlag } from 'hooks'
 
 const CHART_INTERVALS = [
   { key: 'minutely', label: '60 minutes', startValue: 1, startUnit: 'hour', format: 'MMM D, h:ma' },
@@ -30,6 +32,7 @@ interface Props {
 }
 
 const ProjectUsage: FC<Props> = ({ project }) => {
+  const logsUsageChartIntervals = useFlag('logsUsageChartIntervals')
   const [interval, setInterval] = useState<string>('minutely')
   const router = useRouter()
   const { ref } = router.query
@@ -41,7 +44,9 @@ const ProjectUsage: FC<Props> = ({ project }) => {
     // conditional fetching will cause cached data to clear (not desirable)
     // { refreshInterval: isActive ? 3000 : 30000 }
   )
-  const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[0]
+  const selectedInterval = logsUsageChartIntervals
+    ? CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[0]
+    : CHART_INTERVALS[2]
   const startDate = dayjs()
     .subtract(selectedInterval.startValue, selectedInterval.startUnit)
     .format(DATE_FORMAT)
@@ -53,11 +58,11 @@ const ProjectUsage: FC<Props> = ({ project }) => {
       <div className="flex flex-row justify-between w-full">
         <Typography.Title level={4}>Statistics for past {selectedInterval.label}</Typography.Title>
 
-        <Dropdown
-          side="bottom"
-          align="center"
-          overlay={
-            <>
+        {logsUsageChartIntervals && (
+          <Dropdown
+            side="bottom"
+            align="center"
+            overlay={
               <Dropdown.RadioGroup value={interval} onChange={setInterval}>
                 {CHART_INTERVALS.map((i) => (
                   <Dropdown.Radio key={i.key} value={i.key}>
@@ -65,11 +70,13 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   </Dropdown.Radio>
                 ))}
               </Dropdown.RadioGroup>
-            </>
-          }
-        >
-          <Button type="outline">{selectedInterval.label}</Button>
-        </Dropdown>
+            }
+          >
+            <Button type="text" iconRight={<IconChevronDown size="small" />}>
+              {selectedInterval.label}
+            </Button>
+          </Dropdown>
+        )}
       </div>
       <div className="">
         {startDate && endDate && (
