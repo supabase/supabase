@@ -9,7 +9,13 @@ import TabItem from '@theme/TabItem';
 
 ## Overview
 
-Supabase generates APIs directly from your database schema. The API is:
+Supabase generates three types of API directly from your database schema. 
+
+- REST - interact with your database through a restful interface.
+- Realtime - listen to database changes.
+- GraphQL - [coming soon](https://supabase.com/blog/2021/12/03/pg-graphql).
+
+The APIs are:
 
 - Instant and auto-generated: as you update your database the changes are immediately accessible through your API. 
 - Self documenting: Supabase generates documentation in the Dashboard which updates as you make database changes. 
@@ -43,6 +49,11 @@ It provides everything you need from a CRUD API:
 
 Supabase provides a Realtime API using [Realtime](https://github.com/supabase/realtime). You can use this to listen to database changes over websockets. 
 Realtime leverages PostgreSQL's built-in logical replication. You can manage your Realtime API simply by managing Postgres publications.
+
+### GraphQL API
+
+[Coming soon](https://supabase.com/blog/2021/12/03/pg-graphql). We are developing `pg_graphql`, an open source PostgreSQL extension for GraphQL. 
+`pg_graphql` inspects an existing PostgreSQL schema and reflects a GraphQL schema with resolvers. We will expose `pg_graphql` via the existing REST interface.
 
 
 ## Getting started
