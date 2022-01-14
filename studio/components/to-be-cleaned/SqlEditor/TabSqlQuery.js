@@ -567,7 +567,7 @@ const Results = ({ results }) => {
   }
 
   function onCopyCell() {
-    if (cellPosition) {
+    if (columns && cellPosition) {
       const { idx, rowIdx } = cellPosition
       const colKey = columns[idx].key
       const cellValue = results[rowIdx]?.[colKey] ?? ''
