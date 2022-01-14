@@ -113,7 +113,6 @@ module.exports = {
       collapsed: false,
       items: [
         'guides/auth',
-        'guides/auth/intro',
         {
           type: 'category',
           label: 'Authentication',
