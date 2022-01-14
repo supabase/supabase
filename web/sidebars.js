@@ -69,7 +69,6 @@ module.exports = {
       collapsed: false,
       items: [
         'guides/database',
-        'guides/database/introduction',
         'guides/database/connecting-to-postgres',
         'guides/database/tables',
         'guides/database/functions',
