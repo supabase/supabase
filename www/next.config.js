@@ -615,6 +615,11 @@ module.exports = withMDX({
         source: '/docs/guides/database/connecting/direct-connections',
         destination: '/docs/guides/database/connection-pooling',
       },
+      {
+        permanent: true,
+        source: '/docs/guides',
+        destination: '/docs/',
+      },
     ]
   },
 })

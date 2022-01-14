@@ -67,24 +67,8 @@ module.exports = {
     },
     {
       type: 'category',
-      label: 'See Also',
-      collapsed: false,
-      items: [
-        'faq',
-        'going-into-prod',
-        'handbook/contributing',
-        'handbook/supasquad',
-        'company/terms',
-        'company/privacy',
-        'company/aup',
-      ],
-    },
-  ],
-  guides: [
-    {
-      type: 'category',
       label: 'Guides',
-      items: ['guides', 'guides/local-development'],
+      items: ['guides/local-development'],
       collapsed: false,
     },
     {
@@ -196,6 +180,20 @@ module.exports = {
       label: 'Self Hosting',
       collapsed: false,
       items: ['guides/hosting/overview', 'guides/hosting/platform', 'guides/hosting/docker'],
+    },
+    {
+      type: 'category',
+      label: 'See Also',
+      collapsed: false,
+      items: [
+        'faq',
+        'going-into-prod',
+        'handbook/contributing',
+        'handbook/supasquad',
+        'company/terms',
+        'company/privacy',
+        'company/aup',
+      ],
     },
   ],
   postgresServer: [
