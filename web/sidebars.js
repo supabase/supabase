@@ -43,10 +43,8 @@ module.exports = {
       items: [
         'about',
         'architecture',
-        'guides/database',
-        'guides/auth',
-        'guides/storage',
-        'guides/api',
+        'guides/hosting/platform',
+        'guides/local-development',
         'guides/examples',
       ],
       collapsed: false,
@@ -67,15 +65,10 @@ module.exports = {
     },
     {
       type: 'category',
-      label: 'Guides',
-      items: ['guides/local-development'],
-      collapsed: false,
-    },
-    {
-      type: 'category',
       label: 'Database',
       collapsed: false,
       items: [
+        'guides/database',
         'guides/database/introduction',
         'guides/database/connecting-to-postgres',
         'guides/database/tables',
@@ -111,9 +104,16 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'APIs',
+      collapsed: false,
+      items: ['guides/api'],
+    },
+    {
+      type: 'category',
       label: 'Auth',
       collapsed: false,
       items: [
+        'guides/auth',
         'guides/auth/intro',
         {
           type: 'category',
@@ -160,6 +160,12 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Storage',
+      collapsed: false,
+      items: ['guides/storage'],
+    },
+    {
+      type: 'category',
       label: 'Integrations',
       collapsed: false,
       items: [
@@ -179,7 +185,7 @@ module.exports = {
       type: 'category',
       label: 'Self Hosting',
       collapsed: false,
-      items: ['guides/hosting/overview', 'guides/hosting/platform', 'guides/hosting/docker'],
+      items: ['guides/hosting/overview', 'guides/hosting/docker'],
     },
     {
       type: 'category',
