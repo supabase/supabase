@@ -23,6 +23,14 @@ ProjectUsage.mockImplementation((props) => {
   )
 })
 
+jest.mock('components/ui/Flag/Flag')
+import Flag from 'components/ui/Flag/Flag'
+Flag.mockImplementation(({ children }) => <>{children}</>)
+jest.mock('hooks')
+import { useFlag } from 'hooks'
+useFlag.mockReturnValue(true)
+
+
 
 beforeEach(() => {
   get.mockReset()
