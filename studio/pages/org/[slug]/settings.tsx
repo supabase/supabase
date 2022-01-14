@@ -96,7 +96,7 @@ const PageLayout = observer(() => {
 
   return (
     <AccountLayout
-      title={PageState.organization.name || 'Supabase'}
+      title={PageState.organization?.name || 'Supabase'}
       // @ts-ignore
       breadcrumbs={[
         {
@@ -126,6 +126,8 @@ const OrganizationSettings = observer(() => {
     }
   }, [members, products, isOrgDetailError])
 
+  if (!PageState.organization) return <div />
+
   return (
     <div className="p-4 pt-0">
       <TabsView />
@@ -142,7 +144,7 @@ const TabsView = observer(() => {
       <div className="space-y-3">
         <section className="mt-4">
           <Typography.Title level={3}>
-            {PageState.organization.name || 'Organization'} settings
+            {PageState.organization?.name || 'Organization'} settings
           </Typography.Title>
         </section>
         <nav className="">
