@@ -1,5 +1,5 @@
 import { FC, useEffect, useContext, createContext, FormEvent } from 'react'
-import { isEmpty, mapValues, has, filter, keyBy, isUndefined } from 'lodash'
+import { isEmpty, mapValues, has, filter, keyBy, isUndefined, partition, isNull } from 'lodash'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import {
   Button,
@@ -20,6 +20,7 @@ import { POSTGRES_DATA_TYPES } from 'lib/constants'
 import { useStore } from 'hooks'
 import Panel from 'components/to-be-cleaned/Panel'
 import SqlEditor from 'components/to-be-cleaned/SqlEditor'
+
 
 class CreateFunctionFormState {
   id: number | undefined
@@ -752,7 +753,13 @@ const SelectSchema: FC = observer(({}) => {
 })
 
 const SelectLanguage: FC = observer(({}) => {
+  const { meta } = useStore()
   const _localState = useContext(CreateFunctionContext)
+
+  const [enabledExtensions] = partition(
+    meta.extensions.list(),
+    (ext: any) => !isNull(ext.installed_version)
+  )
 
   return (
     <div className={`space-y-4 px-6`}>
@@ -771,7 +778,14 @@ const SelectLanguage: FC = observer(({}) => {
         size="small"
       >
         <Select.Option value="sql">sql</Select.Option>
-        <Select.Option value="plpgsql">plpgsql</Select.Option>
+        {
+          //map through all selected extensions that start with pl
+          enabledExtensions.filter((ex:any) => {
+             return ex.name.startsWith('pl')
+          }).map(ex => (<Select.Option key={ex.name} value={ex.name}>{ex.name}</Select.Option>))
+          
+        }
+        
       </Select>
     </div>
   )
