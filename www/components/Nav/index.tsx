@@ -243,11 +243,17 @@ const Nav = (props: Props) => {
               </div>
               <div className="hidden lg:flex items-center sm:space-x-3">
                 <a href="https://github.com/supabase/supabase" target="_blank">
-                  <Button type="default" icon={<IconStar />}>
+                  <Button
+                    className="sbui-btn sbui-btn-text sbui-btn--tiny sbui-btn--text-align-center"
+                    icon={<IconStar />}
+                  >
                     Star us on GitHub
                   </Button>
                 </a>
-                <a href="https://api.supabase.io/platform/login">
+                <a href="https://app.supabase.io/">
+                  <Button type="default">Sign in</Button>
+                </a>
+                <a href="https://app.supabase.io/new/project">
                   <Button>Start your project</Button>
                 </a>
               </div>
@@ -297,7 +303,7 @@ const Nav = (props: Props) => {
               <div className="mt-6 mb-12">
                 <div className="pt-2 pb-4 space-y-1">
                   <a
-                    href="https://api.supabase.io/platform/login"
+                    href="https://app.supabase.io/"
                     className="block pl-3 pr-4 text-base font-medium text-gray-600 dark:text-white"
                   >
                     Sign in
@@ -317,7 +323,7 @@ const Nav = (props: Props) => {
                     Developers
                   </a>
                   <a
-                    href="/docs"
+                    href="/company"
                     className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
                   >
                     Company

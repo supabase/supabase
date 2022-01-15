@@ -208,21 +208,25 @@ function BlogPostPage(props: any) {
                     </Typography.Text>
                   </div>
                   {author && (
-                    <div className="mt-6 mb-8 lg:mb-0">
-                      <Space size={4}>
-                        {author.author_image_url && (
-                          <img
-                            src={author.author_image_url}
-                            className="rounded-full w-10 border dark:border-dark"
-                          />
-                        )}
-                        <Space direction="vertical" size={0}>
-                          <Typography.Text>{author.author}</Typography.Text>
-                          <Typography.Text type="secondary" small>
-                            {author.position}
-                          </Typography.Text>
-                        </Space>
-                      </Space>
+                    <div className="mt-6 mb-8 lg:mb-0 w-max">
+                      <Link href={author.author_url}>
+                        <a className="cursor-pointer">
+                          <Space size={4}>
+                            {author.author_image_url && (
+                              <img
+                                src={author.author_image_url}
+                                className="rounded-full w-10 border dark:border-dark"
+                              />
+                            )}
+                            <Space direction="vertical" size={0}>
+                              <Typography.Text>{author.author}</Typography.Text>
+                              <Typography.Text type="secondary" small>
+                                {author.position}
+                              </Typography.Text>
+                            </Space>
+                          </Space>
+                        </a>
+                      </Link>
                     </div>
                   )}
                 </div>

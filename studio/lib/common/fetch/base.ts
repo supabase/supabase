@@ -1,4 +1,3 @@
-import { GOTRUE_ENABLED } from 'lib/gotrue'
 import { tryParseJson } from 'lib/helpers'
 import { isUndefined } from 'lodash'
 import { SupaResponse } from 'types/base'
@@ -32,8 +31,10 @@ export async function handleResponseError<T = unknown>(
   requestId: string
 ): Promise<SupaResponse<T>> {
   let resJson: { [prop: string]: any }
+
+  const resTxt = await response.text()
   try {
-    resJson = await response.json()
+    resJson = JSON.parse(resTxt)
   } catch (_) {
     resJson = {}
   }
@@ -59,11 +60,8 @@ export async function handleResponseError<T = unknown>(
     return { error } as unknown as SupaResponse<T>
   } else if (resJson.error && resJson.error.message) {
     return { error: { code: response.status, ...resJson.error } } as unknown as SupaResponse<T>
-  } else if (response.statusText) {
-    const error = { code: response.status, message: response.statusText, requestId }
-    return { error } as unknown as SupaResponse<T>
   } else {
-    const message = `An error has occured: ${response.status}`
+    const message = resTxt ?? `An error has occured: ${response.status}`
     const error = { code: response.status, message, requestId }
     return { error } as unknown as SupaResponse<T>
   }
@@ -111,7 +109,7 @@ export function constructHeaders(requestId: string, optionHeaders?: { [prop: str
   }
 
   const hasAuthHeader = !isUndefined(optionHeaders) && 'Authorization' in optionHeaders
-  if (GOTRUE_ENABLED && !hasAuthHeader) {
+  if (!hasAuthHeader) {
     const accessToken = getAccessToken()
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`
   }

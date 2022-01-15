@@ -93,6 +93,7 @@ module.exports = {
       collapsed: false,
       items: [
         'guides/database/introduction',
+        'guides/database/connecting-to-postgres',
         'guides/database/tables',
         'guides/database/functions',
         'guides/database/full-text-search',
@@ -109,16 +110,6 @@ module.exports = {
             'guides/database/extensions/plv8',
             'guides/database/extensions/http',
             'guides/database/extensions/uuid-ossp',
-          ],
-        },
-        {
-          type: 'category',
-          label: 'Connecting to Postgres',
-          collapsed: true,
-          items: [
-            'guides/database/connecting/connecting-to-postgres',
-            'guides/database/connecting/direct-connections',
-            'guides/database/connecting/connection-pooling',
           ],
         },
         {
@@ -148,6 +139,7 @@ module.exports = {
             'guides/auth/auth-email',
             'guides/auth/auth-magic-link',
             'guides/auth/auth-apple',
+            'guides/auth/auth-azure',
             'guides/auth/auth-bitbucket',
             'guides/auth/auth-discord',
             'guides/auth/auth-facebook',

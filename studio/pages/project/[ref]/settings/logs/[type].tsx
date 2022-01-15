@@ -1,10 +1,17 @@
-import useSWR from 'swr'
-import debounce from 'lodash/debounce'
-import { useEffect, useRef, useState } from 'react'
+import useSWR, { KeyLoader } from 'swr'
+import React, { useEffect, useRef, useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Typography, IconLoader, IconAlertCircle } from '@supabase/ui'
+import {
+  Typography,
+  IconLoader,
+  IconAlertCircle,
+  IconRewind,
+  Button,
+  IconInfo,
+  Card,
+} from '@supabase/ui'
 
 import { withAuth } from 'hooks'
 import { get } from 'lib/common/fetch'
@@ -18,55 +25,104 @@ import {
   Logs,
   LogTemplate,
   TEMPLATES,
+  LogData,
 } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
+import useSWRInfinite from 'swr/infinite'
+import { isUndefined } from 'lodash'
+import Flag from 'components/ui/Flag/Flag'
+import { useFlag } from 'hooks'
 
 /**
  * Acts as a container component for the entire log display
+ *
+ *
  */
 export const LogPage: NextPage = () => {
+  const logsCustomSql = useFlag('logsCustomSql')
   const router = useRouter()
   const { ref, type } = router.query
 
   const [editorId, setEditorId] = useState<string>(uuidv4())
-  const [search, setSearch] = useState<string>('')
-  const [queryParams, setQueryParams] = useState<string>('')
-  const [where, setWhere] = useState<string>('')
+  const [editorValue, setEditorValue] = useState('')
   const [mode, setMode] = useState<'simple' | 'custom'>('simple')
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
-
+  const [params, setParams] = useState({
+    type: '',
+    search_query: '',
+    sql: '',
+    where: '',
+    timestamp_start: '',
+    timestamp_end: '',
+  })
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as string]}`
-  const debouncedQueryParams = useRef(debounce(setQueryParams, 600)).current
+  const isSelectQuery = logsCustomSql && editorValue.toLowerCase().includes('select') ? true : false
 
   useEffect(() => {
-    const params = {
-      type: type as string,
-      search_query: search || '',
-      where: mode === 'custom' ? where || '' : '',
+    setParams({ ...params, type: type as string })
+  }, [type])
+
+  const genQueryParams = (params: { [k: string]: string }) => {
+    // remove keys which are empty strings, null, or undefined
+    for (const k in params) {
+      const v = params[k]
+      if (v === null || v === '' || isUndefined(v)) {
+        delete params[k]
+      }
     }
     const qs = new URLSearchParams(params).toString()
-    debouncedQueryParams(qs)
-    return () => debouncedQueryParams.cancel()
-  }, [mode, search, where, type])
-
+    return qs
+  }
   // handle log fetching
-  const logUrl = `${API_URL}/projects/${ref}/logs?${queryParams}`
-  const { data, isValidating, mutate } = useSWR<Logs>(logUrl, get, { revalidateOnFocus: false })
-  const { data: logData, error } = data || {}
+  const getKeyLogs: KeyLoader<Logs> = (_pageIndex: number, prevPageData) => {
+    let queryParams
+    // if prev page data is 100 items, could possibly have more records that are not yet fetched within this interval
+    if (prevPageData === null) {
+      // reduce interval window limit by using the timestamp of the last log
+      queryParams = genQueryParams(params)
+    } else if (prevPageData.data.length === 0) {
+      // no rows returned, indicates that no more data to retrieve and append.
+      return null
+    } else {
+      const len = prevPageData.data.length
+      const { timestamp: tsLimit }: LogData = prevPageData.data[len - 1]
+      // create new key from params
+      queryParams = genQueryParams({ ...params, timestamp_end: String(tsLimit) })
+    }
 
-  const countUrl = `${API_URL}/projects/${ref}/logs?${queryParams}&count=true&period_start=${latestRefresh}`
+    const logUrl = `${API_URL}/projects/${ref}/logs?${queryParams}`
+    return logUrl
+  }
+  const {
+    data = [],
+    error: swrError,
+    isValidating,
+    mutate,
+    size,
+    setSize,
+  } = useSWRInfinite<Logs>(getKeyLogs, get, { revalidateOnFocus: false })
+  let logData: LogData[] = []
+  let error: null | string = swrError ? swrError.message : null
+  data.forEach((response: Logs) => {
+    if (!error && response && response.data) {
+      logData = [...logData, ...response.data]
+    }
+    if (!error && response && response.error) {
+      error = response.error
+    }
+  })
+
+  const countUrl = `${API_URL}/projects/${ref}/logs?${genQueryParams({
+    ...params,
+    count: String(true),
+    period_start: String(latestRefresh),
+  })}`
   const { data: countData } = useSWR<Count>(countUrl, get, { refreshInterval: 5000 })
   const newCount = countData?.data?.[0]?.count ?? 0
 
-  const handleReset = () => {
-    setWhere('')
-    setSearch('')
-    setEditorId(uuidv4())
-  }
-
   const handleRefresh = () => {
     setLatestRefresh(new Date().toISOString())
-    mutate()
+    setSize(1)
   }
 
   const handleModeToggle = () => {
@@ -81,13 +137,29 @@ export const LogPage: NextPage = () => {
   const onSelectTemplate = (template: LogTemplate) => {
     setMode(template.mode)
     if (template.mode === 'simple') {
-      setSearch(template.searchString)
-      setWhere('')
+      setParams((prev) => ({ ...prev, search_query: template.searchString, sql: '', where: '' }))
     } else {
-      setWhere(template.searchString)
-      setSearch('')
+      setEditorValue(template.searchString)
+      setParams((prev) => ({
+        ...prev,
+        where: isSelectQuery ? '' : template.searchString,
+        sql: isSelectQuery ? template.searchString : '',
+        search_query: '',
+      }))
       setEditorId(uuidv4())
     }
+  }
+  const handleEditorSubmit = () => {
+    setParams((prev) => ({
+      ...prev,
+      where: isSelectQuery ? '' : editorValue,
+      sql: isSelectQuery ? editorValue : '',
+      search_query: ''
+    }))
+  }
+  const handleSearch = (v: string) => {
+    setParams((prev) => ({ ...prev, search_query: v || '', where: '', sql: '' }))
+    setEditorValue('')
   }
 
   return (
@@ -97,25 +169,55 @@ export const LogPage: NextPage = () => {
           isCustomQuery={mode === 'custom'}
           isLoading={isValidating}
           newCount={newCount}
-          showReset={search.length > 0}
-          searchValue={search}
           templates={TEMPLATES}
-          onReset={handleReset}
           onRefresh={handleRefresh}
-          onSearch={setSearch}
+          onSearch={handleSearch}
+          defaultSearchValue={params.search_query}
           onCustomClick={handleModeToggle}
           onSelectTemplate={onSelectTemplate}
         />
         {mode === 'custom' && (
-          <div className="min-h-[7rem] h-28">
-            <CodeEditor
-              id={editorId}
-              language="pgsql"
-              defaultValue={where}
-              onInputChange={(v) => setWhere(v || '')}
-              onInputRun={handleRefresh}
-            />
-          </div>
+          <React.Fragment>
+            <div className="min-h-[7rem] h-28">
+              <CodeEditor
+                id={editorId}
+                language="pgsql"
+                defaultValue={editorValue}
+                onInputChange={(v) => setEditorValue(v || '')}
+                onInputRun={handleRefresh}
+              />
+            </div>
+            <div className="flex flex-row justify-end p-2 w-full">
+              <Flag name="logsCustomSql">
+                {isSelectQuery && (
+                  <div className="flex flex-grow flex-row items-center gap-x-1">
+                    {/* // we don't have a slim Alert component yet */}
+                    <IconInfo size="tiny" />
+                    <Typography.Text small={true} type="secondary">
+                      Custom queries are restricted to a {type === 'database' ? '2 hour' : '7 day'}{' '}
+                      querying window.
+                    </Typography.Text>
+                  </div>
+                )}
+              </Flag>
+              <div className="flex flex-row gap-x-2 justify-end p-2">
+                {editorValue && (
+                  <Button
+                    type="text"
+                    onClick={() => {
+                      setEditorValue('')
+                      setEditorId(uuidv4())
+                    }}
+                  >
+                    Clear
+                  </Button>
+                )}
+                <Button type={editorValue ? 'secondary' : 'text'} onClick={handleEditorSubmit}>
+                  Run
+                </Button>
+              </div>
+            </div>
+          </React.Fragment>
         )}
         <div className="flex flex-col flex-grow relative">
           {isValidating && (
@@ -129,12 +231,34 @@ export const LogPage: NextPage = () => {
             </div>
           )}
           {error && (
-            <div className="flex w-full h-full justify-center items-center space-x-2 mx-auto">
-              <IconAlertCircle size={16} />
-              <Typography.Text type="secondary">Sorry! Could not fetch data</Typography.Text>
+            <div className="flex w-full h-full justify-center items-center mx-auto">
+              <Card className="flex flex-col gap-y-2">
+                <div className="flex flex-row gap-x-2 py-2">
+                  <IconAlertCircle size={16} />
+                  <Typography.Text type="secondary">
+                    Sorry! An error occured when fetching data.
+                  </Typography.Text>
+                </div>
+                <Typography.Text type="warning">{error}</Typography.Text>
+              </Card>
             </div>
           )}
           <LogTable data={logData} isCustomQuery={mode === 'custom'} />
+          {/* Footer section of log ui, appears below table */}
+          <div className="p-2">
+            {!isSelectQuery && (
+              <Flag name="logsLoadOlder">
+                <Button
+                  // trigger page increase
+                  onClick={() => setSize(size + 1)}
+                  icon={<IconRewind />}
+                  type="secondary"
+                >
+                  Load older
+                </Button>
+              </Flag>
+            )}
+          </div>
         </div>
       </div>
     </SettingsLayout>

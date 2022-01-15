@@ -1,9 +1,10 @@
 # Developing Supabase
 
-* [Development Setup](##Development-Setup)
-* [Installing Dependencies](###Installing-Dependencies)
-* [Building Supabase](##Building-Supabase)
-* [Start a Development Server](##Start-a-Development-Server)
+* [Development Setup](#Development-Setup)
+* [Installing Dependencies](#Installing-Dependencies)
+* [Building Supabase](#Building-Supabase)
+* [Start a Development Server](#Start-a-Development-Server)
+* [Build in Public](#Build-in-Public)
 
 ## Development Setup
 
@@ -71,9 +72,9 @@ Before you start a development server, you must choose if you want to work on th
 
 To debug code, and to see changes in real time, it is often useful to have a local HTTP server. Click one of the three links below to choose which development server you want to start.
 
-- [Supabase Website](###Supabase-Website-Development-Server)
-- [Supabase Docs](###Supabase-Docs-Development-Server)
-- [Supabase Studio](###Supabase-Studio-Development-Server)
+- [Supabase Website](#Supabase-Website-Development-Server)
+- [Supabase Docs](#Supabase-Docs-Development-Server)
+- [Supabase Studio](#Supabase-Studio-Development-Server)
 
 ### Supabase Website Development Server
 
@@ -148,3 +149,9 @@ To debug code, and to see changes in real time, it is often useful to have a loc
     ```
 
 For more information on Supabase Studio, see the [Supabase Studio readme](./studio/README.md).
+
+## Build in Public
+
+Videos of building supabase made in public.
+
+- [Contributing to open source as  a beginner - Supabase](https://youtu.be/OAqhsylUuWg) - [@imskr](https://github.com/imskr)

@@ -20,6 +20,14 @@ export const REGIONS = {
 
 export const REGIONS_DEFAULT = REGIONS.EAST_US
 
+export const PRICING_PLANS = {
+  FREE: 'Free tier',
+  PRO: 'Pro tier',
+  // PAYG: 'Pay as you go',
+}
+
+export const PRICING_PLANS_DEFAULT = PRICING_PLANS.FREE
+
 export const PROVIDERS = {
   AWS: {
     id: 'AWS',
@@ -109,7 +117,7 @@ export const PASSWORD_STRENGTH = {
 
 export const PASSWORD_STRENGTH_COLOR = {
   0: 'bg-red-500',
-  1: 'bg-red-400',
+  1: 'bg-red-500',
   2: 'bg-yellow-500',
   3: 'bg-yellow-500',
   4: 'bg-green-500',
@@ -122,3 +130,5 @@ export const PASSWORD_STRENGTH_PERCENTAGE = {
   3: '80%',
   4: '100%',
 }
+
+export const DEFAULT_FREE_PROJECTS_LIMIT = 2

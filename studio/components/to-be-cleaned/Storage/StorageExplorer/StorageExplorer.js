@@ -47,7 +47,6 @@ const StorageExplorer = observer(({ bucket }) => {
     loadExplorerPreferences,
     addNewFolderPlaceholder,
     addNewFolder,
-    deleteBucket,
     fetchFolderContents,
     fetchFoldersByPath,
     renameFolder,
@@ -207,9 +206,6 @@ const StorageExplorer = observer(({ bucket }) => {
     if (selectedItemsToDelete.length === 1) {
       const [itemToDelete] = selectedItemsToDelete
       switch (itemToDelete.type) {
-        case STORAGE_ROW_TYPES.BUCKET:
-          await deleteBucket(itemToDelete)
-          break
         case STORAGE_ROW_TYPES.FOLDER:
           await deleteFolder(itemToDelete)
           break

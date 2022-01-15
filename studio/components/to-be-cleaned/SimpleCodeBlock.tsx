@@ -11,6 +11,7 @@ import defaultTheme from 'prism-react-renderer/themes/palenight'
 import Clipboard from 'clipboard'
 import rangeParser from 'parse-numeric-range'
 import { Button } from '@supabase/ui'
+import { copyToClipboard } from 'lib/helpers'
 
 const highlightLinesRangeRegex = /{([\d,-]+)}/
 const prism = {
@@ -61,7 +62,7 @@ const SimpleCodeBlock: FC<any> = ({ children, className: languageClassName, meta
   }
 
   const handleCopyCode = (code: any) => {
-    navigator?.clipboard?.writeText(code).then(() => setShowCopied(true))
+    copyToClipboard(code, () => setShowCopied(true))
   }
 
   return (

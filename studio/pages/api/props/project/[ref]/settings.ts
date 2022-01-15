@@ -55,7 +55,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
         app: { id: 1, name: 'Auto API' },
         app_config: {
           db_schema: 'public',
-          endpoint: 'localhost:8000',
+          endpoint: process.env.SUPABASE_URL,
           realtime_enabled: true,
         },
       },

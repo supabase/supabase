@@ -9,6 +9,7 @@ import { Dictionary } from '@supabase/grid'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
+import { passwordStrength } from 'lib/helpers'
 import {
   PROVIDERS,
   REGIONS,
@@ -22,8 +23,9 @@ import {
   fetchVercelProject,
   prepareVercelEvns,
 } from 'components/to-be-cleaned/Integration/Vercel.utils'
-import Loading from 'components/ui/Loading'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
+import Loading from 'components/ui/Loading'
+import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 
 const PASSWORD_STRENGTH = {
   0: "That's terrible.",
@@ -165,6 +167,7 @@ const CreateProject = observer(() => {
   const delayedCheckPasswordStrength = useRef(
     debounce((value: string) => checkPasswordStrength(value), 300)
   ).current
+
   const canSubmit =
     projectName != '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
@@ -189,28 +192,15 @@ const CreateProject = observer(() => {
   }
 
   async function checkPasswordStrength(value: string) {
-    let passwordStrength = ''
-    if (value && value !== '') {
-      const response = await post(`${API_URL}/profile/password-check`, { password: value })
-      if (!response.error) {
-        const { result } = response
-        const score = (PASSWORD_STRENGTH as any)[result.score]
-        const warning = result.feedback.warning ? `${result.feedback.warning}.` : ''
-        const suggestions = result.feedback?.suggestions
-          ? result.feedback.suggestions.join(' ')
-          : ''
-        passwordStrength = `${score} ${warning} ${suggestions}`
-        setPasswordStrengthScore(result.score)
-      }
-    }
-
-    setPasswordStrengthMessage(passwordStrength)
+    const { message, strength } = await passwordStrength(value)
+    setPasswordStrengthScore(strength)
+    setPasswordStrengthMessage(message)
   }
 
   async function createSupabaseProject(dbSql: string) {
     const data = {
       cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
-      org_id: _store.supabaseOrgId,
+      org_id: Number(_store.supabaseOrgId),
       name: projectName,
       db_pass: dbPass,
       db_region: dbRegion,
@@ -218,7 +208,7 @@ const CreateProject = observer(() => {
       auth_site_url: _store.selectedVercelProjectUrl,
       vercel_configuration_id: _store.configurationId,
     }
-    return await post(`${API_URL}/projects/new`, data)
+    return await post(`${API_URL}/projects`, data)
   }
 
   async function onCreateProject() {
@@ -294,7 +284,7 @@ const CreateProject = observer(() => {
         <label htmlFor="dbPass" className="block w-full text-base normal-case">
           Database password
         </label>
-        <div className="mt-1">
+        <div className="mt-1 space-y-2">
           <input
             type="password"
             name="dbPass"
@@ -304,16 +294,11 @@ const CreateProject = observer(() => {
             placeholder="· · · · · · · · · · · · ·"
             className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
           />
-          {passwordStrengthMessage && (
-            <Typography.Text type="secondary">
-              <p className="py-2">{passwordStrengthMessage}</p>
-            </Typography.Text>
-          )}
-          {passwordStrengthScore >= 0 && passwordStrengthScore < DEFAULT_MINIMUM_PASSWORD_STRENGTH && (
-            <Typography.Text type="danger">
-              <p>You need a stronger password</p>
-            </Typography.Text>
-          )}
+          <PasswordStrengthBar
+            password={dbPass}
+            passwordStrengthScore={passwordStrengthScore}
+            passwordStrengthMessage={passwordStrengthMessage}
+          />
         </div>
       </div>
       <div className="py-2 pb-4">

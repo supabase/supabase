@@ -1,5 +1,5 @@
 import { FC, ReactNode, useEffect } from 'react'
-import { find } from 'lodash'
+import { find, filter, get as _get } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
 import { useStore } from 'hooks'
@@ -8,6 +8,7 @@ import { get } from 'lib/common/fetch'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import StorageMenu from './StorageMenu'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { formatPoliciesForStorage } from 'components/to-be-cleaned/Storage/Storage.utils'
 import CreateBucketModal from 'components/to-be-cleaned/Storage/CreateBucketModal'
 import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
 import ToggleBucketPublicModal from 'components/to-be-cleaned/Storage/ToggleBucketPublicModal'
@@ -18,7 +19,7 @@ interface Props {
 }
 
 const StorageLayout: FC<Props> = ({ title, children }) => {
-  const { ui } = useStore()
+  const { ui, meta } = useStore()
   const ref = ui.selectedProject?.ref
 
   const storageExplorerStore = useStorageStore()
@@ -77,6 +78,27 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     storageExplorerStore.setLoaded(true)
   }
 
+  const onSelectDeleteBucket = async (bucket: any) => {
+    const res = await deleteBucket(bucket)
+    // Ideally this should be within deleteBucket as its a necessary side effect
+    // but we'll do so once we refactor to remove the StorageExplorerStore
+    if (res) {
+      const policies = meta.policies.list()
+      const storageObjectsPolicies = filter(policies, { table: 'objects' })
+      const formattedStorageObjectPolicies = formatPoliciesForStorage(storageObjectsPolicies)
+      const bucketPolicies = _get(
+        find(formattedStorageObjectPolicies, { name: bucket.name }),
+        ['policies'],
+        []
+      )
+      await Promise.all(
+        bucketPolicies.map((policy: any) => {
+          meta.policies.del(policy.id)
+        })
+      )
+    }
+  }
+
   return (
     <ProjectLayout title={title || 'Storage'} product="Storage" productMenu={<StorageMenu />}>
       {children}
@@ -89,7 +111,7 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
         visible={showDeleteBucketModal}
         bucket={selectedBucketToEdit}
         onSelectCancel={closeDeleteBucketModal}
-        onSelectDelete={deleteBucket}
+        onSelectDelete={onSelectDeleteBucket}
       />
       <ToggleBucketPublicModal
         visible={showToggleBucketPublicModal}

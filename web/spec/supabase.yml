@@ -52,7 +52,7 @@ info:
         <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
         <td>-</td>
         <td>-</td>
-        <td>-</td>
+        <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">storage-go</a></td>
       </tr>
       <tr>
         <td>Java</td>
@@ -471,6 +471,22 @@ pages:
         hideCodeBlock: true
         description: |
           You can sign up with OAuth providers using the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers) method.
+      - name: Sign up with Phone.
+        description: |
+          Supabase supports Phone Auth. After a user verified thier number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            phone: '+13334445555',
+            password: 'some-password',
+          })
+          
+          // After receiving an SMS with One Time Password.
+          let { session, error } = await supabase.auth.verifyOTP({
+            phone: '+13334445555',
+            token: '123456',
+          })
+          ```
 
   auth.signIn():
     title: 'signIn()'
@@ -505,6 +521,15 @@ pages:
           const { user, session, error } = await supabase.auth.signIn({
             // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
             provider: 'github'
+          })
+          ```
+      - name: Sign in with Phone.
+        description: Supabase supports Phone Auth. 
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            phone: '+13334445555',
+            password: 'some-password',
           })
           ```
       - name: Sign in with redirect.
@@ -691,13 +716,55 @@ pages:
             console.log(event, session)
           })
           ```
+      - name: Listen to sign in
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'SIGNED_IN') console.log('SIGNED_IN', session)
+          })
+          ```
+      - name: Listen to sign out
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'SIGNED_OUT') console.log('SIGNED_OUT', session)
+          })
+          ```
+      - name: Listen to token refresh
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'TOKEN_REFRESHED') console.log('TOKEN_REFRESHED', session)
+          })
+          ```
+      - name: Listen to user updates
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'USER_UPDATED') console.log('USER_UPDATED', session)
+          })
+          ```
+      - name: Listen to user deleted
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'USER_DELETED') console.log('USER_DELETED', session)
+          })
+          ```
+      - name: Listen to password recovery events
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
+          })
+          ```
   auth.api.getUser():
     title: 'getUser()'
     $ref: '@supabase/gotrue-js.GoTrueApi.getUser'
     notes: |
       - Fetches the user object from the database instead of local storage.
       - Note that user() fetches the user object from local storage which might not be the most updated.
-      - Requires the user's access_token. 
+      - Requires the user's access_token.
     examples:
       - name: Fetch the user object using the access_token jwt.
         isSpotlight: true
@@ -747,7 +814,9 @@ pages:
         js: |
           ```js
           const { data: user, error } = await supabase.auth.api.createUser({
-            name: 'Yoda'
+            email: 'user@email.com',
+            password: 'password',
+            data: { name: 'Yoda' }
           })
           ```
 
@@ -827,10 +896,10 @@ pages:
         isSpotlight: false
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.generateLink({
-            type: 'invite',
-            email: 'email@example.com'
-          })
+          const { data: user, error } = await supabase.auth.api.generateLink(
+            'invite',
+            'email@example.com'
+          )
           ```
 
   select():

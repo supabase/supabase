@@ -2,12 +2,11 @@
  * Org is selected, creating a new project
  */
 
-import { useRef, useState, createContext, useContext } from 'react'
 import Router, { useRouter } from 'next/router'
-import { debounce, values } from 'lodash'
-import { makeAutoObservable, toJS } from 'mobx'
-import { observer, useLocalObservable } from 'mobx-react-lite'
-import { Dictionary } from '@supabase/grid'
+import { useRef, useState, useEffect } from 'react'
+import { debounce, isUndefined, values } from 'lodash'
+import { toJS } from 'mobx'
+import { observer } from 'mobx-react-lite'
 import { Button, Typography, Listbox, IconUsers, IconAlertCircle } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
@@ -17,73 +16,85 @@ import {
   REGIONS,
   REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  PASSWORD_STRENGTH,
-  PASSWORD_STRENGTH_COLOR,
-  PASSWORD_STRENGTH_PERCENTAGE,
+  PRICING_PLANS,
+  PRICING_PLANS_DEFAULT,
+  DEFAULT_FREE_PROJECTS_LIMIT,
 } from 'lib/constants'
 
 import { useStore, withAuth } from 'hooks'
 import { WizardLayout } from 'components/layouts'
+import { getURL } from 'lib/helpers'
+
 import FormField from 'components/to-be-cleaned/forms/FormField'
 import Panel from 'components/to-be-cleaned/Panel'
 import InformationBox from 'components/ui/InformationBox'
+import { passwordStrength } from 'lib/helpers'
+import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 
-interface IHomePageStore {
-  store: any
-  projectOrganizations: Dictionary<any>[]
+interface StripeCustomer {
+  paymentMethods: any
+  customer: any
+  error?: any
 }
-class HomePageStore implements IHomePageStore {
-  store: any
 
-  constructor(store: any) {
-    makeAutoObservable(this)
-    this.store = store
-  }
-
-  get projectOrganizations() {
-    const projects = values(this.store?.projects?.data) ?? []
-    const orgIds = projects.map((x: any) => x.organization_id)
-    const temp = values(this.store?.organizations?.data) ?? []
-    return temp
-      .filter((x: any) => orgIds.includes(x.id))
-      .sort((a: any, b: any) => a.name.localeCompare(b.name))
+async function fetchStripeAccount(stripeCustomerId: string) {
+  try {
+    const customer = await post(`${API_URL}/stripe/customer`, {
+      stripe_customer_id: stripeCustomerId,
+    })
+    if (customer.error) throw customer.error
+    return customer
+  } catch (error: any) {
+    return { error }
   }
 }
-const PageContext = createContext<IHomePageStore>(undefined!)
 
 export const PageLayout = () => {
-  const store = useStore()
-  const _pageState = useLocalObservable(() => new HomePageStore(store))
-
-  return (
-    <PageContext.Provider value={_pageState}>
-      <Wizard />
-    </PageContext.Provider>
-  )
+  return <Wizard />
 }
 
 export default withAuth(observer(PageLayout))
 
-export const Wizard = () => {
-  const _pageState = useContext(PageContext)
-
+export const Wizard = observer(() => {
   const router = useRouter()
   const { slug } = router.query
-
-  const { ui } = useStore()
+  const { app, ui } = useStore()
 
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
+  const [dbPricingPlan, setDbPricingPlan] = useState(PRICING_PLANS_DEFAULT)
   const [newProjectedLoading, setNewProjectLoading] = useState(false)
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
+  const [stripeCustomer, setStripeCustomer] = useState<StripeCustomer | undefined>(undefined)
+
+  const organizations = values(toJS(app.organizations.list()))
+  const currentOrg = organizations.find((o: any) => o.slug === slug)
+  const stripeCustomerId = currentOrg?.stripe_customer_id
+
+  const totalFreeProjects = ui.profile?.total_free_projects ?? 0
+  const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
+
+  const isEmptyOrganizations = organizations.length <= 0
+  const isEmptyPaymentMethod = stripeCustomer
+    ? stripeCustomer.paymentMethods?.data?.length <= 0
+    : undefined
+  const isOverFreeProjectLimit = totalFreeProjects >= freeProjectsLimit
+  const isInvalidSlug = isUndefined(currentOrg)
+  const isSelectFreeTier = dbPricingPlan === PRICING_PLANS.FREE
+
+  const canCreateProject =
+    currentOrg?.is_owner && (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
 
   const canSubmit =
     projectName != '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-    dbRegion != ''
+    dbRegion != '' &&
+    dbPricingPlan != '' &&
+    (isSelectFreeTier || (!isSelectFreeTier && !isEmptyPaymentMethod))
+
   const passwordErrorMessage =
     dbPass != '' && passwordStrengthScore < DEFAULT_MINIMUM_PASSWORD_STRENGTH
       ? 'You need a stronger password'
@@ -93,33 +104,34 @@ export const Wizard = () => {
     debounce((value) => checkPasswordStrength(value), 300)
   ).current
 
-  const organizations: any = Object.values(toJS(_pageState.store.app.organizations.list()))
-
   /*
    * Handle no org
    * redirect to new org route
    */
-  if (organizations.length <= 0) {
+  if (isEmptyOrganizations) {
     router.push(`/new`)
   }
-
-  /*
-   * Handle org slug redirect
-   */
-  const found = organizations.find((o: any) => o.slug === slug)
 
   /*
    * Redirect to first org if the slug doesn't match an org slug
    * this is mainly to capture the /project/new url, which is redirected from database.new
    */
-  if (!found) {
+  if (isInvalidSlug && organizations.length > 0) {
     router.push(`/new/${organizations[0].slug}`)
   }
 
-  /*
-   * currentOrg can now be used for any org meta data and for creating new project
-   */
-  const currentOrg = organizations.find((o: any) => o.slug === slug)
+  useEffect(() => {
+    async function loadStripeAccountAsync(id: string) {
+      const res = await fetchStripeAccount(id)
+      if (!res.error) {
+        setStripeCustomer(res)
+      }
+    }
+
+    if (stripeCustomerId) {
+      loadStripeAccountAsync(stripeCustomerId)
+    }
+  }, [stripeCustomerId])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -139,35 +151,28 @@ export const Wizard = () => {
     setDbRegion(e.target.value)
   }
 
-  async function checkPasswordStrength(value: any) {
-    let passwordStrength = ''
-    if (value && value !== '') {
-      const response = await post(`${API_URL}/profile/password-check`, { password: value })
-      if (!response.error) {
-        const { result } = response
-        const score = (PASSWORD_STRENGTH as any)[result.score]
-        const suggestions = result.feedback?.suggestions
-          ? result.feedback.suggestions.join(' ')
-          : ''
-        passwordStrength = `${score} ${suggestions}`
-        setPasswordStrengthScore(result.score)
-        setPasswordStrengthWarning(result.feedback.warning ? result.feedback.warning : '')
-      }
-    }
+  function onDbPricingPlanChange(value: string) {
+    setDbPricingPlan(value)
+  }
 
-    setPasswordStrengthMessage(passwordStrength)
+  async function checkPasswordStrength(value: any) {
+    const { message, warning, strength } = await passwordStrength(value)
+    setPasswordStrengthScore(strength)
+    setPasswordStrengthWarning(warning)
+    setPasswordStrengthMessage(message)
   }
 
   const onClickNext = async () => {
     setNewProjectLoading(true)
     const data = {
       cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
-      org_id: currentOrg.id,
+      org_id: currentOrg?.id,
       name: projectName,
       db_pass: dbPass,
       db_region: dbRegion,
+      db_pricing_plan: dbPricingPlan,
     }
-    const response = await post(`${API_URL}/projects/new`, data)
+    const response = await post(`${API_URL}/projects`, data)
     if (response.error) {
       setNewProjectLoading(false)
       ui.setNotification({
@@ -180,9 +185,6 @@ export const Wizard = () => {
       window.location.replace(`/project/${response.ref}/building`)
     }
   }
-
-  const overProjectLimit = currentOrg?.total_free_projects >= currentOrg?.project_limit
-  const sortedOrganizations = organizations.sort((a: any, b: any) => a.name.localeCompare(b.name))
 
   return (
     <WizardLayout organization={currentOrg} project={null}>
@@ -231,7 +233,7 @@ export const Wizard = () => {
               value={currentOrg?.slug}
               onChange={(slug) => router.push(`/new/${slug}`)}
             >
-              {sortedOrganizations.map((x: any) => (
+              {organizations.map((x: any) => (
                 <Listbox.Option
                   key={x.id}
                   label={x.name}
@@ -243,29 +245,10 @@ export const Wizard = () => {
               ))}
             </Listbox>
 
-            {overProjectLimit && (
-              <InformationBox
-                icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
-                defaultVisibility={true}
-                hideCollapse
-                title="This organization has reached its project limit"
-                description={
-                  <div className="space-y-3">
-                    <p className="text-sm leading-normal">
-                      This organization can only have a maximum of {currentOrg.project_limit} free
-                      projects. You can either upgrade pre existing projects, choose another
-                      organization, or create a new organization.
-                    </p>
-                    <Button type="secondary" onClick={() => router.push('/new')}>
-                      New organization
-                    </Button>
-                  </div>
-                }
-              />
-            )}
+            {!currentOrg?.is_owner && <NotOrganizationOwnerWarning />}
           </Panel.Content>
 
-          {!overProjectLimit && (
+          {canCreateProject && (
             <>
               <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
                 <FormField
@@ -288,52 +271,17 @@ export const Wizard = () => {
                   value={dbPass}
                   onChange={onDbPassChange}
                   description={
-                    <>
-                      {dbPass && (
-                        <div
-                          aria-valuemax={100}
-                          aria-valuemin={0}
-                          aria-valuenow={
-                            (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]
-                          }
-                          aria-valuetext={
-                            (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]
-                          }
-                          role="progressbar"
-                          className="mb-2 bg-bg-alt-light dark:bg-bg-alt-dark rounded overflow-hidden transition-all border dark:border-dark"
-                        >
-                          <div
-                            style={{
-                              width: (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore],
-                            }}
-                            className={`relative h-2 w-full ${
-                              (PASSWORD_STRENGTH_COLOR as any)[passwordStrengthScore]
-                            } transition-all duration-500 ease-out shadow-inner`}
-                          ></div>
-                        </div>
-                      )}
-                      <span
-                        className={
-                          passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH
-                            ? 'text-green-600'
-                            : ''
-                        }
-                      >
-                        {passwordStrengthMessage
-                          ? passwordStrengthMessage
-                          : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'}
-                      </span>
-                    </>
+                    <PasswordStrengthBar
+                      passwordStrengthScore={passwordStrengthScore}
+                      password={dbPass}
+                      passwordStrengthMessage={passwordStrengthMessage}
+                    />
                   }
-                  errorMessage={
-                    passwordStrengthWarning
-                      ? `${passwordStrengthWarning}. ${passwordErrorMessage}.`
-                      : passwordErrorMessage
-                  }
+                  errorMessage={passwordStrengthWarning}
                 />
               </Panel.Content>
 
-              <Panel.Content className="Form section-block--body has-inputs-centered ">
+              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                 <FormField
                   // @ts-ignore
                   label="Region"
@@ -346,8 +294,140 @@ export const Wizard = () => {
               </Panel.Content>
             </>
           )}
+
+          {currentOrg?.is_owner && (
+            <Panel.Content className="Form section-block--body has-inputs-centered ">
+              <Listbox
+                label="Pricing Plan"
+                layout="horizontal"
+                value={dbPricingPlan}
+                onChange={onDbPricingPlanChange}
+                // @ts-ignore
+                descriptionText={
+                  <>
+                    Select a plan that suits your needs.&nbsp;
+                    <a className="underline" target="_blank" href="https://supabase.com/pricing">
+                      More details
+                    </a>
+                  </>
+                }
+              >
+                {Object.entries(PRICING_PLANS).map(([k, v]) => (
+                  <Listbox.Option key={k} label={v} value={v}>
+                    {`${v}${v === PRICING_PLANS.PRO ? ' - $25/month' : ''}`}
+                  </Listbox.Option>
+                ))}
+              </Listbox>
+
+              {isSelectFreeTier && isOverFreeProjectLimit && <FreeProjectLimitWarning />}
+              {!isSelectFreeTier && isEmptyPaymentMethod && (
+                <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
+              )}
+            </Panel.Content>
+          )}
         </>
       </Panel>
     </WizardLayout>
   )
+})
+
+const NotOrganizationOwnerWarning = () => {
+  return (
+    <div className="mt-4">
+      <InformationBox
+        icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+        defaultVisibility={true}
+        hideCollapse
+        title="You do not have permission to create a project"
+        description={
+          <div className="space-y-3">
+            <p className="text-sm leading-normal">
+              Only the organization owner can create new projects. Contact your organization owner to
+              create a new project for this organization.
+            </p>
+          </div>
+        }
+      />
+    </div>
+  )
 }
+
+const FreeProjectLimitWarning = () => {
+  return (
+    <div className="mt-4">
+      <InformationBox
+        icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+        defaultVisibility={true}
+        hideCollapse
+        title="Your account has reached its free project limit"
+        description={
+          <div className="space-y-3">
+            <p className="text-sm leading-normal">
+              Your account can only have a maximum of 2 free projects. You can only choose paid
+              pricing plan.
+            </p>
+          </div>
+        }
+      />
+    </div>
+  )
+}
+
+const EmptyPaymentMethodWarning = observer(
+  ({ stripeCustomerId }: { stripeCustomerId: string | undefined }) => {
+    const router = useRouter()
+    const { ui } = useStore()
+
+    const [loading, setLoading] = useState<boolean>(false)
+
+    /**
+     * Get a link and then redirect them
+     * path is used to determine what path inside billing portal to redirect to
+     */
+    async function redirectToPortal(path?: any) {
+      if (stripeCustomerId) {
+        setLoading(true)
+        const response = await post(`${API_URL}/stripe/checkout`, {
+          stripe_customer_id: stripeCustomerId,
+          returnTo: `${getURL()}${router.asPath}`,
+        })
+        if (response.error) {
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to redirect: ${response.error.message}`,
+          })
+          setLoading(false)
+        } else {
+          const { setupCheckoutPortal } = response
+          window.location.replace(`${setupCheckoutPortal}${path ? path : ''}`)
+        }
+      } else {
+        ui.setNotification({
+          category: 'error',
+          message: `Invalid customer ID`,
+        })
+      }
+    }
+    return (
+      <div className="mt-4">
+        <InformationBox
+          icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+          defaultVisibility={true}
+          hideCollapse
+          title="Your organization has no payment methods"
+          description={
+            <div className="space-y-3">
+              <p className="text-sm leading-normal">
+                You need to add a payment method for your organization before creating a paid
+                project.
+              </p>
+              <Button loading={loading} type="secondary" onClick={() => redirectToPortal()}>
+                Add a payment method
+              </Button>
+            </div>
+          }
+        />
+      </div>
+    )
+  }
+)

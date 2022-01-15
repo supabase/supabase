@@ -23,7 +23,7 @@ import {
   STORAGE_ROW_STATUS,
   STORAGE_SORT_BY,
 } from 'components/to-be-cleaned/Storage/Storage.constants.ts'
-import { timeout } from 'lib/helpers'
+import { timeout, copyToClipboard } from 'lib/helpers'
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -369,12 +369,15 @@ class StorageExplorerStore {
     const filePreview = find(this.filePreviewCache, { id: file.id })
     if (filePreview) {
       // Already generated signed URL
-      window.navigator?.clipboard?.writeText(filePreview.url)
+      copyToClipboard(filePreview.url, () => {
+        toast(`Copied URL for ${file.name} to clipboard.`)
+      })
     } else {
       // Need to generate signed URL, and might as well save it to cache as well
       const signedUrl = await this.fetchFilePreview(file.name)
-      window.navigator?.clipboard?.writeText(signedUrl)
-
+      copyToClipboard(signedUrl, () => {
+        toast(`Copied URL for ${file.name} to clipboard.`)
+      })
       const fileCache = {
         id: file.id,
         url: signedUrl,
@@ -383,7 +386,6 @@ class StorageExplorerStore {
       }
       this.addFileToPreviewCache(fileCache)
     }
-    toast(`Copied URL for ${file.name} to clipboard.`)
   }
 
   /* Methods that involve the storage client library */
@@ -430,13 +432,18 @@ class StorageExplorerStore {
     // Deleting a bucket requires the bucket to be empty first
     // hence delete bucket and empty bucket are coupled tightly here
     const { id, name: bucketName } = bucket
-    const bucketIndex = findIndex(this.buckets, { id })
 
     const { error: emptyBucketError } = await this.supabaseClient.storage.emptyBucket(id)
-    if (emptyBucketError) toast(emptyBucketError.message)
+    if (emptyBucketError) {
+      toast(emptyBucketError.message)
+      return false
+    }
 
     const { error: deleteBucketError } = await this.supabaseClient.storage.deleteBucket(id)
-    if (deleteBucketError) toast(deleteBucketError.message)
+    if (deleteBucketError) {
+      toast(deleteBucketError.message)
+      return false
+    }
 
     await this.fetchBuckets()
     if (bucketName === this.selectedBucket.name) {
@@ -446,6 +453,7 @@ class StorageExplorerStore {
     }
     this.clearSelectedItemsToDelete()
     this.closeDeleteBucketModal()
+    return true
   }
 
   toggleBucketPublic = async (bucket) => {
