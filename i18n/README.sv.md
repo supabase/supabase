@@ -47,7 +47,7 @@ Supabase är en samling verktyg med öppen källkod. Vi bygger funktionerna som 
 
 Supabase är en [hostad plattform](https://app.supabase.io). Du kan registrera dig och börja använda Supabase utan att installera någonting. Vi håller fortfarande på att förbättra den lokala utvecklarupplevelsen - detta är för närvarande vårt huvudfokus, tillsammans med plattformens övergripande stabilitet.
 
-![Arkitektur](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Arkitektur](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) är en objektrelationsdatabas med över 30 års aktiv utveckling , vilket har gett den ett gott rykte som pålitlig, robust och högpresterande.
 - [Realtime](https://github.com/supabase/realtime) är en Elexir-server som låter dig lyssna på skapande, uppdateringar och borttagningar i PostgreSQL med hjälp av websockets. Supabase lyssnar på PostgreSQL´s inbyggda replikeringsfunktionalitet, konverterar replikerings-byte-strömmen till JSON och sänder sedan JSON via websockets.
