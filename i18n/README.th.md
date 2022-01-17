@@ -16,15 +16,15 @@
 - [x] ที่เก็บข้อมูล (Storage)
 - [ ] ฟังก์ชัน (กำลังจะมาในอนาคต)
 
-## Documentation
+## เอกสารข้อมูล
 
 เข้าไปที่ [supabase.io/docs](https://supabase.com/docs) สำหรับเอกสารข้อมูล (Documentation) ฉบับเต็ม
 
-## Community & Support
+## ชุมชนและการสนับสนุน
 
-- [Community Forum](https://github.com/supabase/supabase/discussions). สำหรับ: ความช่วยเหลือในการใช้งาน Supabase หรือการพูดคุยแลกเปลี่ยนข้อมูลเกี่ยวกับ Databases Best Practices
+- [ฟอรั่มชุมชน](https://github.com/supabase/supabase/discussions). สำหรับ: ความช่วยเหลือในการใช้งาน Supabase หรือการพูดคุยแลกเปลี่ยนข้อมูลเกี่ยวกับ Databases Best Practices
 - [GitHub Issues](https://github.com/supabase/supabase/issues). สำหรับ: Bugs และ Erros ที่พบในการใช้งาน Supabase
-- [Email Support](https://supabase.com/docs/support#business-support). สำหรับ: ปัญหาที่พบสำหรับ Database หรือ Infrastructure ของคุณ
+- [การช่วยเหลือทางอีเมล](https://supabase.com/docs/support#business-support). สำหรับ: ปัญหาที่พบสำหรับ Database หรือ Infrastructure ของคุณ
 
 ## Status
 
@@ -47,10 +47,10 @@ Supabase สร้างขึ้นมาจากการรวมกัน�
 
 Supabase เป็น [hosted platform](https://app.supabase.io). คุณสามารถลงทะเบียนและเริ่มใช้งาน Supabase ได้เลยโดยไม่ต้องติดตั้งอะไรเพิ่มเติม นอกเหนือไปจากนั้นเรากำลังพัฒนาระบบเพื่อการพัฒนาเว็บบน local (local development experience) ที่เป็นจุดมุ่งหมายของเราในตอนนี้ รวมถึงความมั่นคงของระบบ
 
-![สถาปัตยกรรม](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![สถาปัตยกรรม](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) เป็นระบบฐานข้อมูลแบบ object-relational ที่ถูกพัฒนาอย่างต่อเนื่องมากว่า 30 ปี และเป็นที่ยอมรับในเรื่องของเสถียรภาพ ความมั่นคง และประสิทธิภาพ
-- [Realtime](https://github.com/supabase/realtime) เป็นเซิร์ฟเวอร์ที่พัฒนาขึ้นด้วย Elixir ที่ทำหน้าที่ตรวจจับเมื่อมีการเปลี่ยนแปลงของข้อมูล (inserts, updates, and deletes operation) ใน Postgres ด้วย websockets. Supabase คอยตรวจจับเมื่อ Postgres มีการทำซ้ำ (replication) ทำการแปลงข้อมูลเป็น JSON และกระจายข้อมูลผ่าน websockets
+- [Realtime](https://github.com/supabase/realtime) เป็นเซิร์ฟเวอร์ที่พัฒนาขึ้นด้วย Elixir ที่ทำหน้าที่ตรวจจับเมื่อมีการเปลี่ยนแปลงของข้อมูล (ทั้งการ insert, update และ delete) ใน Postgres ด้วย websockets. Supabase คอยตรวจจับเมื่อ Postgres มีการทำซ้ำ (replication) ทำการแปลงข้อมูลเป็น JSON และกระจายข้อมูลผ่าน websockets
 - [PostgREST](http://postgrest.org/) เป็น web server ที่ทำหน้าที่ในการแปลงฐานข้อมูล Postgres ให้กลายเป็น RESTful API โดยตรง
 - [Storage](https://github.com/supabase/storage-api) ทำหน้าที่ในการเป็น RESTful interface สำหรับการจัดการไฟล์ที่ถูกเก็บใน S3 และใช้ Postgres ในการจัดการ permissions
 - [postgres-meta](https://github.com/supabase/postgres-meta) เป็น RESTful API สำหรับจัดการ Postgres ของคุณ ทำให้คุณสามารถเรียกดูตาราง (Database tables), เพิ่ม Roles และเรียกดูข้อมูล (run queries) ได้
@@ -66,13 +66,6 @@ Supabase เป็น [hosted platform](https://app.supabase.io). คุณส�
   - `realtime-{lang}`: ไคลเอนต์ไลบรารี่ในการทำงานกับ [Realtime](https://github.com/supabase/realtime)
   - `gotrue-{lang}`: ไคลเอนต์ไลบรารี่ในการทำงานกับ [GoTrue](https://github.com/netlify/gotrue)
 
-| Repo                  | Official                                         | Community                                                                                                                                                                                                                                                                                                                            |
-| --------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` \| [`Ruby`](https://github.com/supabase/supabase-rb) \| `Go`                                                                                             |
-| `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) \| [`Ruby`](https://github.com/supabase/postgrest-rb) \| [`Go`](https://github.com/supabase/postgrest-go) |
-| `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust` \| `Ruby` \| `Go`                                                                                                                                        |
-| `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust` \| `Ruby` \| `Go`                                                                                                                                              |
-
 <!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
 
@@ -82,6 +75,6 @@ Supabase เป็น [hosted platform](https://app.supabase.io). คุณส�
 
 ---
 
-## Sponsors
+## การสนับสนุน
 
-[![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
+[![สนับสนุนเราได้ที่นี่](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)

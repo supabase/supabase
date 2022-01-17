@@ -72,7 +72,7 @@ const Landing = () => {
               Authentication, instant APIs, and realtime subscriptions.
             </p>
           </Typography.Text>
-          <div className="mt-5 sm:mt-8 sm:flex sm:justify-center space-x-3">
+          <div className="mt-5 sm:mt-8 sm:justify-center space-x-3 flex items-center">
             <Button onClick={handleGithubSignIn} size="large" icon={<IconGitHub />}>
               Sign In With Github
             </Button>

@@ -1,5 +1,4 @@
-import { screen, getByText } from '@testing-library/react'
-
+import { screen, getByText, fireEvent } from '@testing-library/react'
 interface SelectorOptions {
     container?: HTMLElement
 }
@@ -24,4 +23,14 @@ export const getToggleByText = (text: string | RegExp, options: SelectorOptions 
         return textNode
     }
 
+}
+
+export const clickDropdown = (elem: HTMLElement) => {
+    fireEvent.pointerDown(
+        elem,
+        new window.PointerEvent('pointerdown', {
+            ctrlKey: false,
+            button: 0,
+        })
+    );
 }

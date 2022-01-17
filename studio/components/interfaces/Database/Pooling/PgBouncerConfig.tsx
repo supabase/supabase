@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Divider } from '@supabase/ui'
+import { Divider, Typography } from '@supabase/ui'
 import { AutoField } from 'uniforms-bootstrap4'
 
 import { useStore } from 'hooks'
@@ -66,7 +66,6 @@ const PgbouncerConfig: FC<Props> = ({ projectRef, config }) => {
             value: 'statement',
           },
         ],
-        help: 'Specify when a connection can be returned to the pool. To find out the most suitable mode for your use case, click here.',
       },
       ignore_startup_parameters: {
         title: 'Ignore Startup Parameters',
@@ -102,12 +101,25 @@ const PgbouncerConfig: FC<Props> = ({ projectRef, config }) => {
                 showInlineError
                 errorMessage="You must select one of the three options"
               />
+              <div className="flex !mt-1" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
+                <Typography.Text type="secondary">
+                  Specify when a connection can be returned to the pool. To find out the most
+                  suitable mode for your use case,{' '}
+                  <Typography.Link
+                    target="_blank"
+                    href="https://supabase.com/blog/2021/04/02/supabase-pgbouncer#pool-modes"
+                  >
+                    click here
+                  </Typography.Link>
+                  .
+                </Typography.Text>
+              </div>
               <Divider light />
               {/* <AutoField
-              name="default_pool_size"
-              showInlineError
-              errorMessage="Value must be within 1 and 20"
-            /> */}
+                name="default_pool_size"
+                showInlineError
+                errorMessage="Value must be within 1 and 20"
+              /> */}
               <AutoField name="ignore_startup_parameters" />
             </>
           )}
