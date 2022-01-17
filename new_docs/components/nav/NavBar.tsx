@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
   IconMenu,
-  Typography,
   IconGitHub,
   IconTwitter,
   IconSearch,
@@ -9,18 +8,31 @@ import {
   IconCommand,
   Button,
 } from '@supabase/ui'
-import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import styles from '../../styles/Home.module.css'
 const NavBar = ({ currentPage }: { currentPage: string }) => {
   const [mounted, setMounted] = useState(false)
-  const { resolvedTheme } = useTheme()
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return (
+      typeof window !== 'undefined' && window.localStorage.getItem('supabaseDarkMode') == 'true'
+    )
+  })
 
   useEffect(() => {
+    setIsDarkMode(localStorage.getItem('supabaseDarkMode') === 'true')
     setMounted(true)
-    console.log({ resolvedTheme })
-  }, [])
+  }, [isDarkMode])
+
+  const pageLinks = [
+    { text: 'Overview', active: currentPage == 'Docs', link: '/' },
+    { text: 'Guides', active: currentPage == 'Guides', link: '/guides' },
+    {
+      text: 'Reference',
+      active: currentPage == 'Reference',
+      link: '/reference/javascript/supabase-client',
+    },
+  ]
 
   return (
     <nav
@@ -31,55 +43,49 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
           <IconMenu />
         </button>
         {mounted && (
-          <Link href="/" passHref>
-            <Image
-              className="cursor-pointer"
-              src={
-                resolvedTheme === 'dark' ? `/docs/supabase-dark.svg` : `/docs/supabase-light.svg`
-              }
-              width={200}
-              height={32}
-              alt="Supabase Logo"
-            />
+          <Link href="/">
+            <a>
+              <Image
+                className="cursor-pointer"
+                src={isDarkMode ? `/docs/supabase-light.svg` : `/docs/supabase-dark.svg`}
+                width={200}
+                height={32}
+                alt="Supabase Logo"
+              />
+            </a>
           </Link>
         )}
+
         <ul className={`${styles.navLinks} flex`}>
-          <li>
-            <Typography.Link
-              type="default"
-              className={`${currentPage === 'Docs' ? 'underline' : ''}`}
-            >
-              <Link href="/">
-                <a>Overview</a>
+          {pageLinks.map((p) => (
+            <li key={`${p.text}-${p.link}`}>
+              <Link href={p.link}>
+                <a
+                  className={`${p.active ? 'text-gray-800 dark:text-gray-200' : 'text-green-400'}`}
+                >
+                  {p.text}
+                </a>
               </Link>
-            </Typography.Link>
-          </li>
+            </li>
+          ))}
           <li>
-            <Typography.Link className={`${currentPage === 'Guides' ? 'underline' : ''}`}>
-              <Link href="/guides">
-                <a>Guides</a>
-              </Link>
-            </Typography.Link>
-          </li>
-          <li>
-            <Typography.Link className={`${currentPage === 'Reference' ? 'underline' : ''}`}>
-              <Link href="/reference/javascript/supabase-client">
-                <a>Reference</a>
-              </Link>
-            </Typography.Link>
-          </li>
-          <li>
-            <Typography.Link href="https://app.supabase.io">Login</Typography.Link>
+            <Link href="https://app.supabase.io">
+              <a className={`text-green-400`}>Login</a>
+            </Link>
           </li>
         </ul>
       </div>
       <div className={`${styles.navRight} flex items-center`}>
-        <Typography.Link href="https://github.com/supabase/supabase">
-          <IconGitHub />
-        </Typography.Link>
-        <Typography.Link href="https://twitter.com/supabase">
-          <IconTwitter />
-        </Typography.Link>
+        <Link href="https://github.com/supabase/supabase">
+          <a>
+            <IconGitHub className="text-green-400" />
+          </a>
+        </Link>
+        <Link href="https://twitter.com/supabase">
+          <a>
+            <IconTwitter className="text-green-400" />
+          </a>
+        </Link>
         <Input
           placeholder="Search"
           icon={<IconSearch />}
