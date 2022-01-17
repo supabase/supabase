@@ -1,0 +1,97 @@
+---
+id: auth-notion
+title: 'Login with Notion'
+description: Add Notion OAuth to your Supabase project
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+To enable Notion Auth for your project, you need to set up a Notion Application and add the Application OAuth credentials to your Supabase Dashboard.
+
+## Overview
+
+Setting up Notion logins for your application consists of 3 parts:
+
+- Create and configure a Notion Application [Notion Developer Portal](https://www.notion.so/my-integrations)
+- Add your Notion OAuth Consumer keys to your [Supabase Project](https://app.supabase.io)
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+
+## Steps
+
+### Access your Notion account
+
+- Go to [notion.so](https://notion.so/).
+- Click on `Login` at the top right to log in.
+
+![notion.so](/img/guides/auth-notion/notion.png)
+
+- Once logged in, go to [notion.so/my-integrations](https://notion.so/my-integrations).
+
+![notion.so](/img/guides/auth-notion/notion-developer.png)
+
+### Find your callback URL
+
+In the next step you require a callback URL, which looks like this:
+
+`https://<project-ref>.supabase.co/auth/v1/callback`
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.io).
+- Click on the `Settings` icon at the bottom of the left sidebar.
+- Click on `API` in the list.
+- Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
+- Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
+
+<video width="99%" muted playsInline controls="true">
+  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+</video>
+
+### Create a Notion Application
+
+- Click on `New integration` in the center of the screen.
+- Enter the name of your application and click `Submit`.
+
+### Add your Notion credentials into your Supabase Project
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.io)
+- In the left sidebar, click the `Authentication` icon (near the top)
+- Click `Settings` from the list to go to the `Authentication Settings` page
+- Enter the final (hosted) URL of your app under `Site URL` (this is important)
+- Under `External OAuth Providers` turn `Notion Enabled` to ON
+- Enter your `Internal Integration Token` saved in the previous step
+- Click `Save`
+
+### Add login code to your client app
+
+The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'notion',
+})
+```
+
+Add this function which you can call from a button, link, or UI element.
+
+```js
+async function signInWithNotion() {
+  const { user, session, error } = await supabase.auth.signIn({
+    provider: 'notion',
+  })
+}
+```
+
+To log out:
+
+```js
+async function signout() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+## Resources
+
+- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Notion Account](https://Notion.com)
+- [Notion Developer Portal](https://Notion.com/developers)
