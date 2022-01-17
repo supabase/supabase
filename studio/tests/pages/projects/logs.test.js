@@ -136,7 +136,7 @@ test('Search will trigger a log refresh', async () => {
   render(<LogPage />)
 
   userEvent.type(screen.getByPlaceholderText(/Search/), 'something')
-  userEvent.click(screen.getByText('Go'))
+  userEvent.click(screen.getByTitle('Go'))
 
   await waitFor(
     () => {
@@ -204,7 +204,7 @@ test('where clause will trigger a log refresh', async () => {
   const { container } = render(<LogPage />)
   // fill search bar with some value, should be ignored when in custom mode
   userEvent.type(screen.getByPlaceholderText(/Search/), 'search_value')
-  userEvent.click(screen.getByText('Go'))
+  userEvent.click(screen.getByTitle('Go'))
   // clear mock calls, for clean assertions
   get.mockClear()
 
@@ -235,7 +235,7 @@ test('where clause will trigger a log refresh', async () => {
           }),
         })
       )
-      
+
       // should ignore search bar value
       expect(get).not.toHaveBeenCalledWith(expect.stringContaining('search_value'))
     },

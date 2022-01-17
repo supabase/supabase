@@ -110,8 +110,6 @@ const LogPanel: FC<Props> = ({
               }}
             >
               <Input
-                size="tiny"
-                icon={<IconSearch size={16} />}
                 placeholder="Search events"
                 onChange={(e) => setSearch(e.target.value)}
                 value={search}
@@ -125,6 +123,7 @@ const LogPanel: FC<Props> = ({
                       onClick={() => setSearch('')}
                     />
                   ),
+
                   <Button
                     key="go"
                     size="tiny"
@@ -132,7 +131,7 @@ const LogPanel: FC<Props> = ({
                     type="secondary"
                     onClick={() => onSearch(search)}
                   >
-                    Go
+                    <IconSearch size={16} />
                   </Button>,
                 ]}
               />
