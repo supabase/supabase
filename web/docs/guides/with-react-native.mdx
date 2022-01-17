@@ -166,7 +166,7 @@ We need the API URL and the `anon` key that you copied [earlier](#get-the-api-ke
 These variables will be exposed on the browser, and that's completely fine since we have 
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```js title="lib/initSupabase.js"
+```js title="lib/supabase.js"
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
@@ -256,7 +256,7 @@ export default function Auth() {
 const styles = StyleSheet.create({
   container: {
     marginTop: 40,
-    padding: Styles.spacing,
+    padding: 12,
   },
   verticallySpaced: {
     paddingTop: 4,
@@ -389,8 +389,6 @@ export default function Account({ session }) {
 }
 
 ```
-
-
 
 ### Launch!
 
