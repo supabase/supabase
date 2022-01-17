@@ -154,7 +154,7 @@ export const LogPage: NextPage = () => {
       ...prev,
       where: isSelectQuery ? '' : editorValue,
       sql: isSelectQuery ? editorValue : '',
-      search_query: ''
+      search_query: '',
     }))
   }
   const handleSearch = (v: string) => {
@@ -247,16 +247,14 @@ export const LogPage: NextPage = () => {
           {/* Footer section of log ui, appears below table */}
           <div className="p-2">
             {!isSelectQuery && (
-              <Flag name="logsLoadOlder">
-                <Button
-                  // trigger page increase
-                  onClick={() => setSize(size + 1)}
-                  icon={<IconRewind />}
-                  type="secondary"
-                >
-                  Load older
-                </Button>
-              </Flag>
+              <Button
+                // trigger page increase
+                onClick={() => setSize(size + 1)}
+                icon={<IconRewind />}
+                type="secondary"
+              >
+                Load older
+              </Button>
             )}
           </div>
         </div>
