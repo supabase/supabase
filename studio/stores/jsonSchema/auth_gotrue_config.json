@@ -367,6 +367,10 @@
         {
           "value": "messagebird",
           "label": "Messagebird"
+        },
+        {
+          "value": "vonage",
+          "label": "Vonage"
         }
       ]
     },
@@ -391,6 +395,20 @@
       "title": "Messagebird originator",
       "type": "string",
       "help": "Messagebird sender name or phone number"
+    },
+    "SMS_VONAGE_API_KEY": {
+      "title": "Vonage API Key",
+      "type": "string"
+    },
+    "SMS_VONAGE_API_SECRET": {
+      "title": "Vonage API Secret",
+      "type": "string",
+      "help": "Vonage API secret"
+    },
+    "SMS_VONAGE_FROM": {
+      "title": "Vonage From",
+      "type": "string",
+      "help": "Vonage phone number or alphanumeric Sender ID (up to 11 characters; up to 8 for India)."
     },
     "SMS_TEMPLATE": {
       "title": "Body",
