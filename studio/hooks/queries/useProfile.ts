@@ -19,7 +19,11 @@ export function useProfile(returning?: 'minimal') {
   function mutateProfile(updatedUser: User, revalidate?: boolean) {
     mutate(
       url,
-      { first_name: updatedUser.first_name, last_name: updatedUser.last_name },
+      {
+        first_name: updatedUser.first_name,
+        last_name: updatedUser.last_name,
+        total_free_projects: updatedUser.total_free_projects,
+      },
       revalidate ?? true
     )
   }
