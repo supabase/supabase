@@ -202,6 +202,12 @@ test('where clause will trigger a log refresh', async () => {
     return { data: [] }
   })
   const { container } = render(<LogPage />)
+  // fill search bar with some value, should be ignored when in custom mode
+  userEvent.type(screen.getByPlaceholderText(/Search/), 'search_value')
+  userEvent.click(screen.getByText('Go'))
+  // clear mock calls, for clean assertions
+  get.mockClear()
+
   let editor = container.querySelector('.monaco-editor')
   expect(editor).toBeFalsy()
   // TODO: abstract this out into a toggle selection helper
@@ -229,6 +235,9 @@ test('where clause will trigger a log refresh', async () => {
           }),
         })
       )
+      
+      // should ignore search bar value
+      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('search_value'))
     },
     { timeout: 1000 }
   )

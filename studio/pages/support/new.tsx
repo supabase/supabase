@@ -12,11 +12,13 @@ import {
 } from '@supabase/ui'
 import SVG from 'react-inlinesvg'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import { API_URL } from 'lib/constants'
 import { useStore, withAuth } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { Project } from 'types'
+import { isUndefined } from 'lodash'
 
 const DEFAULT = {
   category: {
@@ -49,6 +51,9 @@ function formReducer(state: any, action: any) {
 
 const SupportNew = () => {
   const { ui, app } = useStore()
+  const router = useRouter()
+  const projectRef = router.query.ref
+
   const [formState, formDispatch] = useReducer(formReducer, DEFAULT)
   const [errors, setErrors] = useState<any>([])
   const [loading, setLoading] = useState<boolean>(false)
@@ -72,7 +77,12 @@ const SupportNew = () => {
   useEffect(() => {
     // set project default
     if (sortedProjects.length > 1) {
-      handleOnChange({ name: 'project', value: sortedProjects[0].ref })
+      const selectedProject = sortedProjects.find((project: Project) => project.ref === projectRef)
+      if (!isUndefined(selectedProject)) {
+        handleOnChange({ name: 'project', value: selectedProject.ref })
+      } else {
+        handleOnChange({ name: 'project', value: sortedProjects[0].ref })
+      }
     } else {
       // set as 'No specific project'
       handleOnChange({ name: 'project', value: projectDefaults[0].ref })
