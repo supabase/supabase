@@ -109,6 +109,14 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td>-</td>
   </tr>
   <tr>
+    <td>D</td>
+    <td><a href="https://github.com/csharpdf/dupabase" target="_blank" rel="noopener noreferrer">dupabase</a></td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
     <td>Dart (Flutter)</td>
     <td><a href="https://github.com/supabase/supabase-dart" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
