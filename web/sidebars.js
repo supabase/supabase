@@ -152,6 +152,7 @@ module.exports = {
             'guides/auth/auth-twitch',
             'guides/auth/auth-twilio',
             'guides/auth/auth-messagebird',
+            'guides/auth/auth-vonage',
           ],
         },
         {
