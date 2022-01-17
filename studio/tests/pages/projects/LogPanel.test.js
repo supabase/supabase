@@ -17,7 +17,12 @@ test('templates', async () => {
   // userEvent.click(screen.getByText("Some option"))
   // expect(mockFn).toBeCalled()
 })
-
+test('custom mode', async () => {
+  render(<LogPanel isCustomQuery />)
+  await waitFor(() => {
+    expect(() => screen.getByPlaceholderText(/Search/)).toThrow()
+  })
+})
 test('filter input change and submit', async () => {
   const mockFn = jest.fn()
   render(<LogPanel onSearch={mockFn} />)

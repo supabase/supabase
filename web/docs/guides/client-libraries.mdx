@@ -37,7 +37,7 @@ const { error, data } = await supabase.auth.signUp({
 
 ```py
 import os
-from supabase_py import create_client, Client
+from supabase import create_client, Client
 
 url: str = os.environ.get("SUPABASE_TEST_URL")
 key: str = os.environ.get("SUPABASE_TEST_KEY")
@@ -94,7 +94,7 @@ const { error, data } = await supabase.auth.signIn({
 
 ```py
 import os
-from supabase_py import create_client, Client
+from supabase import create_client, Client
 
 url: str = os.environ.get("SUPABASE_TEST_URL")
 key: str = os.environ.get("SUPABASE_TEST_KEY")
@@ -149,7 +149,7 @@ const { error, data } = await supabase.auth.signIn({
 
 ```py
 import os
-from supabase_py import create_client, Client
+from supabase import create_client, Client
 
 url: str = os.environ.get("SUPABASE_TEST_URL")
 key: str = os.environ.get("SUPABASE_TEST_KEY")
@@ -257,7 +257,7 @@ const { data, error } = await supabase
 
 ```py
 import os
-from supabase_py import create_client, Client
+from supabase import create_client, Client
 
 url: str = os.environ.get("SUPABASE_TEST_URL")
 key: str = os.environ.get("SUPABASE_TEST_KEY")

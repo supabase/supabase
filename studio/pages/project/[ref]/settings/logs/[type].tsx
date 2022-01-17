@@ -180,6 +180,7 @@ export const LogPage: NextPage = () => {
       ...prev,
       where: isSelectQuery ? '' : editorValue,
       sql: isSelectQuery ? editorValue : '',
+      search_query: ''
     }))
     if (!logsQueryParamsSyncing) return
     router.push({
@@ -192,7 +193,7 @@ export const LogPage: NextPage = () => {
     })
   }
   const handleSearch = (v: string) => {
-    setParams((prev) => ({ ...prev, search_query: v || '' }))
+    setParams((prev) => ({ ...prev, search_query: v || '', where: '', sql: '' }))
     if (!logsQueryParamsSyncing) return
     router.push({
       pathname: router.pathname,
@@ -202,6 +203,7 @@ export const LogPage: NextPage = () => {
         s: v || '',
       },
     })
+    setEditorValue('')
   }
 
   return (

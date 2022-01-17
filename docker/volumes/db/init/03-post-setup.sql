@@ -4,7 +4,7 @@ RETURNS event_trigger
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    NOTIFY ddl_command_end;
+    NOTIFY pgrst, 'reload schema';
 END;
 $$;
 CREATE EVENT TRIGGER api_restart ON ddl_command_end

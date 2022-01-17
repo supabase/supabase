@@ -64,6 +64,11 @@ Update the `.env` file with your own secrets. In particular, these are required:
 - `SITE_URL`: the base URL of your site.
 - `SMTP_*`: mail server credentials. You can use any SMTP server.
 
+
+### Securing the Dashboard
+
+The Docker setup doesn't include a management database for managing users and logins. If you plan to deploy the Studio to the web we suggest you put it behind a web proxy with Basic Auth or hide it behind a VPN. 
+
 ## Configuration
 
 To keep the setup simple, we made some choices that may not be optimal for production:
