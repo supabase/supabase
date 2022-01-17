@@ -4,9 +4,8 @@ import Head from 'next/head'
 import { observer } from 'mobx-react-lite'
 import { Button, IconGitHub, Typography } from '@supabase/ui'
 
-import { API_URL } from 'lib/constants'
 import { useStore } from 'hooks'
-import { auth, GOTRUE_ENABLED } from 'lib/gotrue'
+import { auth } from 'lib/gotrue'
 
 const Landing = () => {
   const { ui } = useStore()
@@ -55,13 +54,9 @@ const Landing = () => {
               type="success"
               className="ml-8 font-medium hover:text-gray-300 focus:outline-none focus:text-gray-300 transition duration-150 ease-in-out"
             >
-              {GOTRUE_ENABLED ? (
-                <Button onClick={handleGithubSignIn} icon={<IconGitHub />}>
-                  Sign In With Github
-                </Button>
-              ) : (
-                <Link href={`${API_URL}/login`}>Sign In</Link>
-              )}
+              <Button onClick={handleGithubSignIn} icon={<IconGitHub />}>
+                Sign In With Github
+              </Button>
             </Typography.Text>
           </div>
         </nav>
@@ -77,16 +72,10 @@ const Landing = () => {
               Authentication, instant APIs, and realtime subscriptions.
             </p>
           </Typography.Text>
-          <div className="mt-5 sm:mt-8 sm:flex sm:justify-center space-x-3">
-            {GOTRUE_ENABLED ? (
-              <Button onClick={handleGithubSignIn} size="large" icon={<IconGitHub />}>
-                Sign In With Github
-              </Button>
-            ) : (
-              <Link href={`${API_URL}/login`}>
-                <Button size="large">Sign In</Button>
-              </Link>
-            )}
+          <div className="mt-5 sm:mt-8 sm:justify-center space-x-3 flex items-center">
+            <Button onClick={handleGithubSignIn} size="large" icon={<IconGitHub />}>
+              Sign In With Github
+            </Button>
             <Link href="https://supabase.com/docs">
               <Button size="large" type="default">
                 Docs

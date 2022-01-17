@@ -16,7 +16,7 @@ export async function fetchVercelProjects({
     url = `${url}?${query}`
   }
   const response = await get(url, {
-    headers: { Authorization: `Bearer ${vercelToken}` },
+    headers: { vercel_authorization: `Bearer ${vercelToken}` },
   })
   if (response.error != null) {
     return { error: `Retrieve vercel projects failed. ${response.error?.message}` }
@@ -48,7 +48,7 @@ export async function fetchVercelProject({
     url = `${url}?${query}`
   }
   const data = await get(url, {
-    headers: { Authorization: `Bearer ${vercelToken}` },
+    headers: { vercel_authorization: `Bearer ${vercelToken}` },
   })
   if (data.error != null) {
     return { error: `Retrieve vercel project failed. ${data.error.message}` }
@@ -74,7 +74,7 @@ export async function fetchVercelProjectEnvs({
     url = `${url}?${query}`
   }
   const response = await get(url, {
-    headers: { Authorization: `Bearer ${vercelToken}` },
+    headers: { vercel_authorization: `Bearer ${vercelToken}` },
   })
   if (response.error != null) {
     return { error: `Retrieve vercel project envs failed. ${response.error?.message}` }
@@ -114,7 +114,7 @@ export async function createVercelEnv({
     url,
     { key, value, type, target },
     {
-      headers: { Authorization: `Bearer ${vercelToken}` },
+      headers: { vercel_authorization: `Bearer ${vercelToken}` },
     }
   )
 }

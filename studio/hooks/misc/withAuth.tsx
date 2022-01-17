@@ -24,7 +24,7 @@ export function withAuth(
     const { app, ui } = rootStore
     const page = router.pathname.split('/')[3]
 
-    const redirectTo = options?.redirectTo ?? (!isUndefined(ref) ? `/project/${ref}` : '/')
+    const redirectTo = options?.redirectTo ?? defaultRedirectTo(ref)
     const redirectIfFound = options?.redirectIfFound
 
     const returning =
@@ -75,6 +75,10 @@ export function withAuth(
   }
 }
 
+function defaultRedirectTo(ref: string | string[] | undefined) {
+  return IS_PLATFORM ? '/' : !isUndefined(ref) ? `/project/${ref}` : '/'
+}
+
 function checkRedirectTo(
   loading: boolean,
   router: NextRouter,
@@ -83,7 +87,7 @@ function checkRedirectTo(
   redirectIfFound?: boolean
 ) {
   if (loading) return false
-  if (router.asPath == redirectTo) return false
+  if (router.pathname == redirectTo) return false
 
   // If redirectTo is set, redirect if the user was not found.
   if (redirectTo && !redirectIfFound && !profile) return true

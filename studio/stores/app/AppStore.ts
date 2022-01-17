@@ -1,9 +1,8 @@
-import { Dictionary } from '@supabase/grid'
 import { cloneDeep } from 'lodash'
 import { values } from 'mobx'
-import { Project } from 'types'
+import { Organization, Project } from 'types'
 
-import { API_URL } from 'lib/constants'
+import { API_URL, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { IRootStore } from '../RootStore'
 import DatabaseStore, { IDatabaseStore } from './DatabaseStore'
 import OrganizationStore from './OrganizationStore'
@@ -14,7 +13,7 @@ export interface IAppStore {
   organizations: OrganizationStore
   database: IDatabaseStore
   onProjectUpdated: (project: any) => void
-  onProjectDeleted: (project: any) => void
+  onProjectDeleted: (project: any, mutateProfile: Function) => void
   onOrgAdded: (org: any) => void
   onOrgUpdated: (org: any) => void
   onOrgDeleted: (org: any) => void
@@ -53,28 +52,42 @@ export default class AppStore implements IAppStore {
     }
   }
 
-  onProjectDeleted(project: any) {
+  onProjectDeleted(project: any, mutateProfile: Function) {
     if (project && project.id) {
+      const profile = this.rootStore.ui.profile
+      const projectMetadata = this.projects.find((proj: any) => proj.id === project.id)
+
       // cleanup project saved queries
       localStorage.removeItem(`supabase-queries-state-${project.ref}`)
       localStorage.removeItem(`supabase_${project.ref}`)
       delete this.projects.data[project.id]
+
+      if (profile && projectMetadata?.subscription_tier_prod_id === STRIPE_PRODUCT_IDS.FREE) {
+        mutateProfile({
+          ...profile,
+          total_free_projects: profile.total_free_projects - 1,
+        })
+      }
     }
   }
 
-  onOrgUpdated(org: any) {
+  onOrgUpdated(updatedOrg: Organization) {
+    if (updatedOrg && updatedOrg.id) {
+      const originalOrg = this.organizations.data[updatedOrg.id]
+      this.organizations.data[updatedOrg.id] = {
+        ...originalOrg,
+        ...updatedOrg,
+      }
+    }
+  }
+
+  onOrgAdded(org: Organization) {
     if (org && org.id) {
-      this.organizations.data[org.id] = { ...org }
+      this.organizations.data[org.id] = org
     }
   }
 
-  onOrgAdded(org: any) {
-    if (org && org.id) {
-      this.organizations.data[org.id] = { ...org }
-    }
-  }
-
-  onOrgDeleted(org: any) {
+  onOrgDeleted(org: Organization) {
     if (org && org.id) {
       const projects = values(this.projects.data)
       // cleanup projects saved queries

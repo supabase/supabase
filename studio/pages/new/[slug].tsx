@@ -7,14 +7,7 @@ import { useRef, useState, useEffect } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import {
-  Button,
-  Typography,
-  Listbox,
-  IconUsers,
-  IconAlertCircle,
-  IconDollarSign,
-} from '@supabase/ui'
+import { Button, Typography, Listbox, IconUsers, IconAlertCircle } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
@@ -23,11 +16,9 @@ import {
   REGIONS,
   REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  PASSWORD_STRENGTH,
-  PASSWORD_STRENGTH_COLOR,
-  PASSWORD_STRENGTH_PERCENTAGE,
   PRICING_PLANS,
   PRICING_PLANS_DEFAULT,
+  DEFAULT_FREE_PROJECTS_LIMIT,
 } from 'lib/constants'
 
 import { useStore, withAuth } from 'hooks'
@@ -37,6 +28,8 @@ import { getURL } from 'lib/helpers'
 import FormField from 'components/to-be-cleaned/forms/FormField'
 import Panel from 'components/to-be-cleaned/Panel'
 import InformationBox from 'components/ui/InformationBox'
+import { passwordStrength } from 'lib/helpers'
+import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 
 interface StripeCustomer {
   paymentMethods: any
@@ -80,19 +73,28 @@ export const Wizard = observer(() => {
   const organizations = values(toJS(app.organizations.list()))
   const currentOrg = organizations.find((o: any) => o.slug === slug)
   const stripeCustomerId = currentOrg?.stripe_customer_id
+
+  const totalFreeProjects = ui.profile?.total_free_projects ?? 0
+  const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
+
   const isEmptyOrganizations = organizations.length <= 0
   const isEmptyPaymentMethod = stripeCustomer
     ? stripeCustomer.paymentMethods?.data?.length <= 0
     : undefined
-  const isOverFreeProjectLimit = (ui.profile?.total_free_projects ?? 0) >= 2
+  const isOverFreeProjectLimit = totalFreeProjects >= freeProjectsLimit
   const isInvalidSlug = isUndefined(currentOrg)
   const isSelectFreeTier = dbPricingPlan === PRICING_PLANS.FREE
+
+  const canCreateProject =
+    currentOrg?.is_owner && (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
 
   const canSubmit =
     projectName != '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
     dbRegion != '' &&
-    dbPricingPlan != ''
+    dbPricingPlan != '' &&
+    (isSelectFreeTier || (!isSelectFreeTier && !isEmptyPaymentMethod))
+
   const passwordErrorMessage =
     dbPass != '' && passwordStrengthScore < DEFAULT_MINIMUM_PASSWORD_STRENGTH
       ? 'You need a stronger password'
@@ -154,22 +156,10 @@ export const Wizard = observer(() => {
   }
 
   async function checkPasswordStrength(value: any) {
-    let passwordStrength = ''
-    if (value && value !== '') {
-      const response = await post(`${API_URL}/profile/password-check`, { password: value })
-      if (!response.error) {
-        const { result } = response
-        const score = (PASSWORD_STRENGTH as any)[result.score]
-        const suggestions = result.feedback?.suggestions
-          ? result.feedback.suggestions.join(' ')
-          : ''
-        passwordStrength = `${score} ${suggestions}`
-        setPasswordStrengthScore(result.score)
-        setPasswordStrengthWarning(result.feedback.warning ? result.feedback.warning : '')
-      }
-    }
-
-    setPasswordStrengthMessage(passwordStrength)
+    const { message, warning, strength } = await passwordStrength(value)
+    setPasswordStrengthScore(strength)
+    setPasswordStrengthWarning(warning)
+    setPasswordStrengthMessage(message)
   }
 
   const onClickNext = async () => {
@@ -241,7 +231,7 @@ export const Wizard = observer(() => {
               label="Organization"
               layout="horizontal"
               value={currentOrg?.slug}
-              onChange={(slug) => (window.location.href = `/new/${slug}`)}
+              onChange={(slug) => router.push(`/new/${slug}`)}
             >
               {organizations.map((x: any) => (
                 <Listbox.Option
@@ -254,85 +244,58 @@ export const Wizard = observer(() => {
                 </Listbox.Option>
               ))}
             </Listbox>
+
+            {!currentOrg?.is_owner && <NotOrganizationOwnerWarning />}
           </Panel.Content>
 
-          <>
-            <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-              <FormField
-                // @ts-ignore
-                label="Name"
-                type="text"
-                placeholder="Project name"
-                value={projectName}
-                onChange={onProjectNameChange}
-                autoFocus
-              />
-            </Panel.Content>
+          {canCreateProject && (
+            <>
+              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <FormField
+                  // @ts-ignore
+                  label="Name"
+                  type="text"
+                  placeholder="Project name"
+                  value={projectName}
+                  onChange={onProjectNameChange}
+                  autoFocus
+                />
+              </Panel.Content>
 
-            <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-              <FormField
-                // @ts-ignore
-                label="Database Password"
-                type="password"
-                placeholder="Type in a strong password"
-                value={dbPass}
-                onChange={onDbPassChange}
-                description={
-                  <>
-                    {dbPass && (
-                      <div
-                        aria-valuemax={100}
-                        aria-valuemin={0}
-                        aria-valuenow={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
-                        aria-valuetext={
-                          (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]
-                        }
-                        role="progressbar"
-                        className="mb-2 bg-bg-alt-light dark:bg-bg-alt-dark rounded overflow-hidden transition-all border dark:border-dark"
-                      >
-                        <div
-                          style={{
-                            width: (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore],
-                          }}
-                          className={`relative h-2 w-full ${
-                            (PASSWORD_STRENGTH_COLOR as any)[passwordStrengthScore]
-                          } transition-all duration-500 ease-out shadow-inner`}
-                        ></div>
-                      </div>
-                    )}
-                    <span
-                      className={
-                        passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH
-                          ? 'text-green-600'
-                          : ''
-                      }
-                    >
-                      {passwordStrengthMessage
-                        ? passwordStrengthMessage
-                        : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'}
-                    </span>
-                  </>
-                }
-                errorMessage={
-                  passwordStrengthWarning
-                    ? `${passwordStrengthWarning}. ${passwordErrorMessage}.`
-                    : passwordErrorMessage
-                }
-              />
-            </Panel.Content>
+              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <FormField
+                  // @ts-ignore
+                  label="Database Password"
+                  type="password"
+                  placeholder="Type in a strong password"
+                  value={dbPass}
+                  onChange={onDbPassChange}
+                  description={
+                    <PasswordStrengthBar
+                      passwordStrengthScore={passwordStrengthScore}
+                      password={dbPass}
+                      passwordStrengthMessage={passwordStrengthMessage}
+                    />
+                  }
+                  errorMessage={passwordStrengthWarning}
+                />
+              </Panel.Content>
 
-            <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-              <FormField
-                // @ts-ignore
-                label="Region"
-                type="select"
-                choices={REGIONS}
-                value={dbRegion}
-                onChange={onDbRegionChange}
-                description="Select a region close to you for the best performance."
-              />
-            </Panel.Content>
+              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <FormField
+                  // @ts-ignore
+                  label="Region"
+                  type="select"
+                  choices={REGIONS}
+                  value={dbRegion}
+                  onChange={onDbRegionChange}
+                  description="Select a region close to you for the best performance."
+                />
+              </Panel.Content>
+            </>
+          )}
 
+          {currentOrg?.is_owner && (
             <Panel.Content className="Form section-block--body has-inputs-centered ">
               <Listbox
                 label="Pricing Plan"
@@ -350,34 +313,44 @@ export const Wizard = observer(() => {
                 }
               >
                 {Object.entries(PRICING_PLANS).map(([k, v]) => (
-                  <Listbox.Option
-                    key={k}
-                    label={v}
-                    value={v}
-                    addOnBefore={() => <IconDollarSign />}
-                  >
-                    {`${v}${
-                      v === PRICING_PLANS.PRO
-                        ? ' - $25/month'
-                        : v === PRICING_PLANS.PAYG
-                        ? ' - $25/month plus usage costs'
-                        : ''
-                    }`}
+                  <Listbox.Option key={k} label={v} value={v}>
+                    {`${v}${v === PRICING_PLANS.PRO ? ' - $25/month' : ''}`}
                   </Listbox.Option>
                 ))}
               </Listbox>
 
-              {!isSelectFreeTier && isOverFreeProjectLimit && <FreeProjectLimitWarning />}
+              {isSelectFreeTier && isOverFreeProjectLimit && <FreeProjectLimitWarning />}
               {!isSelectFreeTier && isEmptyPaymentMethod && (
                 <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
               )}
             </Panel.Content>
-          </>
+          )}
         </>
       </Panel>
     </WizardLayout>
   )
 })
+
+const NotOrganizationOwnerWarning = () => {
+  return (
+    <div className="mt-4">
+      <InformationBox
+        icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+        defaultVisibility={true}
+        hideCollapse
+        title="You do not have permission to create a project"
+        description={
+          <div className="space-y-3">
+            <p className="text-sm leading-normal">
+              Only the organization owner can create new projects. Contact your organization owner to
+              create a new project for this organization.
+            </p>
+          </div>
+        }
+      />
+    </div>
+  )
+}
 
 const FreeProjectLimitWarning = () => {
   return (
@@ -431,7 +404,7 @@ const EmptyPaymentMethodWarning = observer(
       } else {
         ui.setNotification({
           category: 'error',
-          message: `Invalid customer id`,
+          message: `Invalid customer ID`,
         })
       }
     }
@@ -445,7 +418,7 @@ const EmptyPaymentMethodWarning = observer(
           description={
             <div className="space-y-3">
               <p className="text-sm leading-normal">
-                It's required to add a payment method for your organization before creating a paid
+                You need to add a payment method for your organization before creating a paid
                 project.
               </p>
               <Button loading={loading} type="secondary" onClick={() => redirectToPortal()}>

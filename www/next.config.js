@@ -598,7 +598,22 @@ module.exports = withMDX({
       {
         permanent: true,
         source: '/docs/reference/postgres/connection-strings',
-        destination: '/docs/guides/database/connecting/connecting-to-postgres',
+        destination: '/docs/guides/database/connecting-to-postgres',
+      },
+      {
+        permanent: true,
+        source: '/docs/guides/database/connecting/connecting-to-postgres',
+        destination: '/docs/guides/database/connecting-to-postgres',
+      },
+      {
+        permanent: true,
+        source: '/docs/guides/database/connecting/direct-connections',
+        destination: '/docs/guides/database/connecting-to-postgres',
+      },
+      {
+        permanent: true,
+        source: '/docs/guides/database/connecting/direct-connections',
+        destination: '/docs/guides/database/connection-pooling',
       },
     ]
   },

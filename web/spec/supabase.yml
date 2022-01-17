@@ -716,6 +716,48 @@ pages:
             console.log(event, session)
           })
           ```
+      - name: Listen to sign in
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'SIGNED_IN') console.log('SIGNED_IN', session)
+          })
+          ```
+      - name: Listen to sign out
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'SIGNED_OUT') console.log('SIGNED_OUT', session)
+          })
+          ```
+      - name: Listen to token refresh
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'TOKEN_REFRESHED') console.log('TOKEN_REFRESHED', session)
+          })
+          ```
+      - name: Listen to user updates
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'USER_UPDATED') console.log('USER_UPDATED', session)
+          })
+          ```
+      - name: Listen to user deleted
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'USER_DELETED') console.log('USER_DELETED', session)
+          })
+          ```
+      - name: Listen to password recovery events
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
+          })
+          ```
   auth.api.getUser():
     title: 'getUser()'
     $ref: '@supabase/gotrue-js.GoTrueApi.getUser'
@@ -772,7 +814,9 @@ pages:
         js: |
           ```js
           const { data: user, error } = await supabase.auth.api.createUser({
-            name: 'Yoda'
+            email: 'user@email.com',
+            password: 'password',
+            data: { name: 'Yoda' }
           })
           ```
 
@@ -852,10 +896,10 @@ pages:
         isSpotlight: false
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.generateLink({
-            type: 'invite',
-            email: 'email@example.com'
-          })
+          const { data: user, error } = await supabase.auth.api.generateLink(
+            'invite',
+            'email@example.com'
+          )
           ```
 
   select():
