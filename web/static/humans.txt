@@ -16,6 +16,7 @@ Francesco Ceccon
 Gurjeet Singh https://gurjeet.singh.im
 Hieu Pham
 Inian P
+Joel Lee
 Jon M
 Jonny Summers-Muir
 Joshen Lim
@@ -50,6 +51,7 @@ Supabase would not be possible without the work of some other amazing open sourc
 - PostgREST - https://github.com/PostgREST
 - Kong - https://github.com/kong/
 - Next.js - https://nextjs.org/
+- Tailwind CSS - https://tailwindcss.com/
 - Phoenix - https://www.phoenixframework.org/
 - Docusaurus - https://v2.docusaurus.io/
 - GoAuth - https://github.com/netlify/gotrue

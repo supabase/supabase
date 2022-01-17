@@ -36,13 +36,19 @@ import { useFlag } from 'hooks'
 /**
  * Acts as a container component for the entire log display
  *
+ * ## Query Params Syncing
+ * Query params are synced on query submission.
  *
+ * params used are:
+ * - `q` for the editor query.
+ * - `s` for search query.
+ * - `ts` for timestamp start value.
  */
 export const LogPage: NextPage = () => {
+  const logsQueryParamsSyncing = useFlag('logsQueryParamsSyncing')
   const logsCustomSql = useFlag('logsCustomSql')
   const router = useRouter()
-  const { ref, type } = router.query
-
+  const { ref, type, q, s, ts } = router.query
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState('')
   const [mode, setMode] = useState<'simple' | 'custom'>('simple')
@@ -61,6 +67,25 @@ export const LogPage: NextPage = () => {
   useEffect(() => {
     setParams({ ...params, type: type as string })
   }, [type])
+
+  useEffect(() => {
+    if (!logsQueryParamsSyncing) return
+    // on mount, set initial values
+    if (q) {
+      onSelectTemplate({
+        mode: 'custom',
+        searchString: q as string,
+      })
+    } else if (s) {
+      onSelectTemplate({
+        mode: 'simple',
+        searchString: s as string,
+      })
+    }
+    if (ts) {
+      setParams({ ...params, timestamp_start: ts as string })
+    }
+  }, [logsQueryParamsSyncing])
 
   const genQueryParams = (params: { [k: string]: string }) => {
     // remove keys which are empty strings, null, or undefined
@@ -122,6 +147,7 @@ export const LogPage: NextPage = () => {
 
   const handleRefresh = () => {
     setLatestRefresh(new Date().toISOString())
+    setParams({ ...params, timestamp_start: '' })
     setSize(1)
   }
 
@@ -154,11 +180,29 @@ export const LogPage: NextPage = () => {
       ...prev,
       where: isSelectQuery ? '' : editorValue,
       sql: isSelectQuery ? editorValue : '',
-      search_query: ''
+      search_query: '',
     }))
+    if (!logsQueryParamsSyncing) return
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        q: editorValue,
+        s: undefined,
+      },
+    })
   }
   const handleSearch = (v: string) => {
     setParams((prev) => ({ ...prev, search_query: v || '', where: '', sql: '' }))
+    if (!logsQueryParamsSyncing) return
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        q: undefined,
+        s: v || '',
+      },
+    })
     setEditorValue('')
   }
 
@@ -232,14 +276,21 @@ export const LogPage: NextPage = () => {
           )}
           {error && (
             <div className="flex w-full h-full justify-center items-center mx-auto">
-              <Card className="flex flex-col gap-y-2">
+              <Card className="flex flex-col gap-y-2  w-1/3">
                 <div className="flex flex-row gap-x-2 py-2">
                   <IconAlertCircle size={16} />
                   <Typography.Text type="secondary">
                     Sorry! An error occured when fetching data.
                   </Typography.Text>
                 </div>
-                <Typography.Text type="warning">{error}</Typography.Text>
+                <details className="cursor-pointer">
+                  <summary>
+                    <Typography.Text type="secondary">Error Message</Typography.Text>
+                  </summary>
+                  <Typography.Text className="block whitespace-pre-wrap" small code type="warning">
+                    {JSON.stringify(error, null, 2)}
+                  </Typography.Text>
+                </details>
               </Card>
             </div>
           )}
@@ -247,16 +298,14 @@ export const LogPage: NextPage = () => {
           {/* Footer section of log ui, appears below table */}
           <div className="p-2">
             {!isSelectQuery && (
-              <Flag name="logsLoadOlder">
-                <Button
-                  // trigger page increase
-                  onClick={() => setSize(size + 1)}
-                  icon={<IconRewind />}
-                  type="secondary"
-                >
-                  Load older
-                </Button>
-              </Flag>
+              <Button
+                // trigger page increase
+                onClick={() => setSize(size + 1)}
+                icon={<IconRewind />}
+                type="secondary"
+              >
+                Load older
+              </Button>
             )}
           </div>
         </div>
