@@ -24,7 +24,7 @@ export function withAuth(
     const { app, ui } = rootStore
     const page = router.pathname.split('/')[3]
 
-    const redirectTo = options?.redirectTo ?? (!isUndefined(ref) ? `/project/${ref}` : '/')
+    const redirectTo = options?.redirectTo ?? defaultRedirectTo(ref)
     const redirectIfFound = options?.redirectIfFound
 
     const returning =
@@ -73,6 +73,10 @@ export function withAuth(
 
     return <WrappedComponent {...props} />
   }
+}
+
+function defaultRedirectTo(ref: string | string[] | undefined) {
+  return IS_PLATFORM ? '/' : !isUndefined(ref) ? `/project/${ref}` : '/'
 }
 
 function checkRedirectTo(

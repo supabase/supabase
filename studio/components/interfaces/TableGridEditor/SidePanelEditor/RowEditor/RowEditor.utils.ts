@@ -226,7 +226,7 @@ export const generateRowObjectFromFields = (
 ): object => {
   const rowObject = {} as any
   fields.forEach((field) => {
-    const value = field.value.length === 0 ? null : field.value
+    const value = (field?.value ?? '').length === 0 ? null : field.value
     if (field.format.includes('json') || (field.format.startsWith('_') && value)) {
       if (typeof field.value === 'object') {
         rowObject[field.name] = value

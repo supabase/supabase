@@ -156,42 +156,43 @@ const LogPanel: FC<Props> = ({
             </Dropdown>
           </div>
           {/* wrap with form so that if user presses enter, the search value will submit automatically */}
-          <form
-            id="log-panel-search"
-            onSubmit={(e) => {
-              // prevent redirection
-              e.preventDefault()
-              onSearch(search)
-            }}
-          >
-            <Input
-              size="tiny"
-              icon={<IconSearch size={16} />}
-              placeholder="Search events"
-              onChange={(e) => setSearch(e.target.value)}
-              value={search}
-              actions={[
-                search && (
-                  <IconX
-                    key="clear-search"
+          {!isCustomQuery && (
+            <form
+              id="log-panel-search"
+              onSubmit={(e) => {
+                // prevent redirection
+                e.preventDefault()
+                onSearch(search)
+              }}
+            >
+              <Input
+                placeholder="Search events"
+                onChange={(e) => setSearch(e.target.value)}
+                value={search}
+                actions={[
+                  search && (
+                    <IconX
+                      key="clear-search"
+                      size="tiny"
+                      className="cursor-pointer mx-1"
+                      title="Clear search"
+                      onClick={() => setSearch('')}
+                    />
+                  ),
+
+                  <Button
+                    key="go"
                     size="tiny"
-                    className="cursor-pointer mx-1"
-                    title="Clear search"
-                    onClick={() => setSearch('')}
-                  />
-                ),
-                <Button
-                  key="go"
-                  size="tiny"
-                  title="Go"
-                  type="secondary"
-                  onClick={() => onSearch(search)}
-                >
-                  Go
-                </Button>,
-              ]}
-            />
-          </form>
+                    title="Go"
+                    type="secondary"
+                    onClick={() => onSearch(search)}
+                  >
+                    <IconSearch size={16} />
+                  </Button>,
+                ]}
+              />
+            </form>
+          )}
         </div>
       </div>
     </div>
