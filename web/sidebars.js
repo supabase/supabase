@@ -147,6 +147,7 @@ module.exports = {
             'guides/auth/auth-gitlab',
             'guides/auth/auth-google',
             'guides/auth/auth-messagebird',
+            'guides/auth/auth-notion',
             'guides/auth/auth-slack',
             'guides/auth/auth-spotify',
             'guides/auth/auth-twilio',
