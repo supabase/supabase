@@ -29,7 +29,7 @@ test('filter input change and submit', async () => {
   const search = screen.getByPlaceholderText(/Search/)
   userEvent.type(search, '12345')
   expect(mockFn).not.toBeCalled()
-  userEvent.click(screen.getByText('Go'))
+  userEvent.click(screen.getByTitle('Go'))
   expect(mockFn).toBeCalled()
 })
 
