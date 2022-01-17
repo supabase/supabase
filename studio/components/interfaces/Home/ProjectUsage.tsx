@@ -1,43 +1,83 @@
 import useSWR from 'swr'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
-import { IconArchive, IconDatabase, IconKey, IconZap, Typography } from '@supabase/ui'
+import {
+  IconArchive,
+  IconDatabase,
+  IconKey,
+  IconZap,
+  Typography,
+  Button,
+  Dropdown,
+  IconChevronDown,
+} from '@supabase/ui'
 
 import Panel from 'components/to-be-cleaned/Panel'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 
-import { useIsActive } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
+import { useFlag } from 'hooks'
 
-const DATETIME_FORMAT = 'MMM D, ha'
-
+const CHART_INTERVALS = [
+  { key: 'minutely', label: '60 minutes', startValue: 1, startUnit: 'hour', format: 'MMM D, h:ma' },
+  { key: 'hourly', label: '24 hours', startValue: 24, startUnit: 'hour', format: 'MMM D, ha' },
+  { key: 'daily', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
+]
 interface Props {
   project: any
 }
 
 const ProjectUsage: FC<Props> = ({ project }) => {
+  const logsUsageChartIntervals = useFlag('logsUsageChartIntervals')
+  const [interval, setInterval] = useState<string>('minutely')
   const router = useRouter()
   const { ref } = router.query
-  const isActive = useIsActive()
   const { data, error }: any = useSWR(
     // only fetch when browser window is active
-    `${API_URL}/projects/${ref}/log-stats`,
+    `${API_URL}/projects/${ref}/log-stats?interval=${interval}`,
     get
     // increase refresh rate x10 to 30s when focus lost
     // conditional fetching will cause cached data to clear (not desirable)
     // { refreshInterval: isActive ? 3000 : 30000 }
   )
-  const startDate = dayjs().subtract(7, 'day').format(DATE_FORMAT)
+  const selectedInterval = logsUsageChartIntervals
+    ? CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[0]
+    : CHART_INTERVALS[2]
+  const startDate = dayjs()
+    .subtract(selectedInterval.startValue, selectedInterval.startUnit)
+    .format(DATE_FORMAT)
   const endDate = dayjs().format(DATE_FORMAT)
   const charts = data?.data
-
+  const datetimeFormat = selectedInterval.format || 'MMM D, ha'
   return (
     <div className="mx-6 space-y-6">
-      <Typography.Title level={4}>Statistics for past 24 hours</Typography.Title>
+      <div className="flex flex-row justify-between align-center w-full">
+        <Typography.Title level={4}>Statistics for past {selectedInterval.label}</Typography.Title>
+
+        {logsUsageChartIntervals && (
+          <Dropdown
+            side="bottom"
+            align="end"
+            overlay={
+              <Dropdown.RadioGroup value={interval} onChange={setInterval}>
+                {CHART_INTERVALS.map((i) => (
+                  <Dropdown.Radio key={i.key} value={i.key}>
+                    <Typography.Text>{i.label}</Typography.Text>
+                  </Dropdown.Radio>
+                ))}
+              </Dropdown.RadioGroup>
+            }
+          >
+            <Button type="text" iconRight={<IconChevronDown />}>
+              {selectedInterval.label}
+            </Button>
+          </Dropdown>
+        )}
+      </div>
       <div className="">
         {startDate && endDate && (
           <div className="grid lg:grid-cols-4 lg:gap-8">
@@ -56,7 +96,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   provider="log-stats"
                   interval="1d"
                   hideChartType
-                  customDateFormat={DATETIME_FORMAT}
+                  customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
                 />
@@ -82,7 +122,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   provider="log-stats"
                   interval="1d"
                   hideChartType
-                  customDateFormat={DATETIME_FORMAT}
+                  customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
                 />
@@ -108,7 +148,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   provider="log-stats"
                   interval="1d"
                   hideChartType
-                  customDateFormat={DATETIME_FORMAT}
+                  customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
                 />
@@ -130,7 +170,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   provider="log-stats"
                   interval="1h"
                   hideChartType
-                  customDateFormat={DATETIME_FORMAT}
+                  customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
                 />
