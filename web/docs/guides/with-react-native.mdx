@@ -19,9 +19,6 @@ This example provides the steps to build a simple user management app (from scra
 
 By the end of this guide you'll have an app which allows users to login and update some basic profile details:
 
-![Supabase User Management example](/img/user-management-demo.png)
-
-
 ## Project set up
 
 Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase 
@@ -151,7 +148,7 @@ We can use [`react-native`](https://reactnative.dev/blog/2016/11/08/introducing-
 an app called `supabaseReactNative`:
 
 ```bash
-npx react-native init supabaseReactNative
+expo init supabaseReactNative
 cd supabaseReactNative
 ```
 
@@ -183,7 +180,6 @@ We'll use Magic Links, so users can sign in with their email without using passw
 ```jsx title="components/Auth.js"
 import React, {useState} from 'react';
 import {Alert, StyleSheet, View} from 'react-native';
-import {Styles} from '../lib/constants';
 import {supabaseClient} from '../lib/initSupabase';
 
 import {Button, Input} from 'react-native-elements';
@@ -423,17 +419,15 @@ export default function App() {
 Once that's done, run this in a terminal window:
 
 ```bash
-npx react-native run-ios
+npm run start
 ```
 or
 ```bash
-npx react-native run-android
+yarn start
 ```
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-
-![Supabase User demo](/img/supabase-react-demo.png)
 
 ## Bonus: Profile photos
 
@@ -447,7 +441,9 @@ We can start by creating a new component:
 
 ```jsx title="components/Avatar.js"
 import { useEffect, useState } from 'react'
-import { supabase } from '../utils/supabaseClient'
+import { supabase } from '../lib/supabase'
+import {Alert, StyleSheet, View, Image} from 'react-native'
+import {Button, Input} from 'react-native-elements'
 
 export default function Avatar({ url, size, onUpload }) {
   const [avatarUrl, setAvatarUrl] = useState(null)
@@ -501,65 +497,28 @@ export default function Avatar({ url, size, onUpload }) {
   }
 
   return (
-    <div>
+    <View>
       {avatarUrl ? (
-        <img
+        <Image
           src={avatarUrl}
           alt="Avatar"
           className="avatar image"
-          style={{ height: size, width: size }}
         />
       ) : (
-        <div className="avatar no-image" style={{ height: size, width: size }} />
+        <View className="avatar no-image" />
       )}
-      <div style={{ width: size }}>
-        <label className="button primary block" htmlFor="single">
-          {uploading ? 'Uploading ...' : 'Upload'}
-        </label>
-        <input
-          style={{
-            visibility: 'hidden',
-            position: 'absolute',
-          }}
+      <View>
+        <Input
           type="file"
           id="single"
           accept="image/*"
           onChange={uploadAvatar}
           disabled={uploading}
         />
-      </div>
-    </div>
+      </View>
+    </View>
   )
 }
-```
-
-
-### Add the new widget
-
-And then we can add the widget to the Account page:
-
-
-```jsx title="components/Account.js"
-// Import the new component
-import Avatar from './Avatar'
-
-// ...
-
-return (
-  <div className="form-widget">
-    {/* Add to the body */}
-    <Avatar
-      url={avatar_url}
-      size={150}
-      onUpload={(url) => {
-        setAvatarUrl(url)
-        updateProfile({ username, website, avatar_url: url })
-      }}
-    />
-    {/* ... */}
-  </div>
-)
-
 ```
 
 ## Next steps
