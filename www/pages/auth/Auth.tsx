@@ -176,6 +176,12 @@ function AuthPage() {
                   />
                   <img
                     className="mb-2 mr-2"
+                    src={`${basePath}/images/product/auth/vonage-icon.svg`}
+                    width={21}
+                    alt="vonage auth login icon"
+                  />
+                  <img
+                    className="mb-2 mr-2"
                     src={`${basePath}/images/product/auth/twitch-icon.svg`}
                     width={21}
                     alt="twitch auth login icon"
