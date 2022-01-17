@@ -11,8 +11,7 @@ import {
   IconSearch,
   IconClock,
 } from '@supabase/ui'
-import { LogTemplate } from '.'
-import { isNull } from 'lodash'
+import { LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
 interface Props {
   defaultSearchValue?: string
@@ -21,7 +20,7 @@ interface Props {
   isCustomQuery: boolean
   newCount: number
   onRefresh?: () => void
-  onSearch?: (query: string) => void
+  onSearch?: LogSearchCallback
   onCustomClick?: () => void
   onSelectTemplate: (template: LogTemplate) => void
 }
@@ -62,6 +61,9 @@ const LogPanel: FC<Props> = ({
     setFrom({ value, error: '' })
     setDefaultTimestamp(value)
   }
+
+  const handleSearch = () => onSearch({ query: search, from: from.value })
+
   return (
     <div className="bg-panel-header-light dark:bg-panel-header-dark">
       <div className="px-2 py-1 flex items-center justify-between w-full">
@@ -127,12 +129,12 @@ const LogPanel: FC<Props> = ({
                     value={from.value === '' ? defaultTimestamp : from.value}
                     onChange={handleFromChange}
                     actions={[
-                      search && (
+                      from.value && (
                         <IconX
                           key="reset-from"
                           size="tiny"
                           className="cursor-pointer mx-1"
-                          title="Reset input"
+                          title="Reset"
                           onClick={handleFromReset}
                         />
                       ),
@@ -141,7 +143,7 @@ const LogPanel: FC<Props> = ({
                         size="tiny"
                         title="Set"
                         type="secondary"
-                        onClick={() => onSearch(search)}
+                        onClick={handleSearch}
                       >
                         Set
                       </Button>,
@@ -154,6 +156,7 @@ const LogPanel: FC<Props> = ({
                 {from.value ? 'Custom' : 'Now'}
               </Button>
             </Dropdown>
+            <Button icon={<IconX />} title="Clear timestamp filter" />
           </div>
           {/* wrap with form so that if user presses enter, the search value will submit automatically */}
           {!isCustomQuery && (
@@ -162,7 +165,7 @@ const LogPanel: FC<Props> = ({
               onSubmit={(e) => {
                 // prevent redirection
                 e.preventDefault()
-                onSearch(search)
+                handleSearch()
               }}
             >
               <Input
@@ -180,13 +183,7 @@ const LogPanel: FC<Props> = ({
                     />
                   ),
 
-                  <Button
-                    key="go"
-                    size="tiny"
-                    title="Go"
-                    type="secondary"
-                    onClick={() => onSearch(search)}
-                  >
+                  <Button key="go" size="tiny" title="Go" type="secondary" onClick={handleSearch}>
                     <IconSearch size={16} />
                   </Button>,
                 ]}
