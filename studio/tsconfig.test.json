@@ -1,7 +1,6 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    // minimal target of es6 required for extending Event using es6 class features, see radix setup file (tests/setup/radix.js)
     "target": "es6",
     "jsx": "react-jsx"
   }
