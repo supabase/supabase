@@ -143,6 +143,15 @@ const authProviders = [
     platform: true,
     selfHosted: true,
   },
+  {
+    name: 'Vonage',
+    // logo: '/img/libraries/dart-icon.svg',
+    href: '/docs/guides/auth/auth-vonage',
+    official: false,
+    supporter: 'Supabase',
+    platform: true,
+    selfHosted: true,
+  },
 ]
 
 export default authProviders
