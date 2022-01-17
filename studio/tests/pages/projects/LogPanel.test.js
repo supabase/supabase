@@ -62,22 +62,32 @@ test('reset search filter', async () => {
 })
 
 test('timestamp from filter', async () => {
-  render(<LogPanel />)
+  const mockFn = jest.fn()
+  render(<LogPanel onSearch={mockFn} />)
   const dropdown = await screen.findByText(/Now/)
 
   // click the dropdown
   clickDropdown(dropdown)
-  
-  await screen.findByLabelText('From')
+
+  // TODO: use screen.findByLabelText when https://github.com/supabase/ui/issues/310 is resolved
+  await screen.findByText('From')
   // display iso timestamp
   const year = new Date().getFullYear()
-  await screen.findByDisplayValue(year)
+  const input = await screen.findByDisplayValue(RegExp(year))
+
+  // replace the input's value
+  userEvent.clear(input)
+  // get time 20 mins before
+  const newDate = new Date()
+  newDate.setMinutes(new Date().getMinutes() - 20)
+  userEvent.type(input, newDate.toISOString())
 
   // input actions
-  await screen.findByRole('button', { name: /Clear input/ })
+  await screen.findByTitle("Reset")
   const set = await screen.findByRole('button', { name: 'Set' })
 
   userEvent.click(set)
-  await screen.findByRole('button', { name: /Custom/ })
+  expect(mockFn).toBeCalled()
+  await screen.findByText("Custom")
   await screen.findByTitle('Clear timestamp filter')
 })

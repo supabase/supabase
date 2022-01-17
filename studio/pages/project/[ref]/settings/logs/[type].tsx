@@ -26,6 +26,7 @@ import {
   LogTemplate,
   TEMPLATES,
   LogData,
+  LogSearchCallback,
 } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
 import useSWRInfinite from 'swr/infinite'
@@ -171,6 +172,7 @@ export const LogPage: NextPage = () => {
         where: isSelectQuery ? '' : template.searchString,
         sql: isSelectQuery ? template.searchString : '',
         search_query: '',
+        timestamp_start: ''
       }))
       setEditorId(uuidv4())
     }
@@ -189,18 +191,26 @@ export const LogPage: NextPage = () => {
         ...router.query,
         q: editorValue,
         s: undefined,
+        ts: undefined
       },
     })
   }
-  const handleSearch = (v: string) => {
-    setParams((prev) => ({ ...prev, search_query: v || '', where: '', sql: '' }))
+  const handleSearch: LogSearchCallback = ({ query, from }) => {
+    setParams((prev) => ({
+      ...prev,
+      search_query: query || '',
+      timestamp_start: from,
+      where: '',
+      sql: '',
+    }))
     if (!logsQueryParamsSyncing) return
     router.push({
       pathname: router.pathname,
       query: {
         ...router.query,
         q: undefined,
-        s: v || '',
+        s: query || '',
+        ts: from
       },
     })
     setEditorValue('')
