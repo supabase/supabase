@@ -269,6 +269,9 @@ const Settings = () => {
             'SMS_TWILIO_MESSAGE_SERVICE_SID',
             'SMS_MESSAGEBIRD_ORIGINATOR',
             'SMS_MESSAGEBIRD_ACCESS_KEY',
+            'SMS_VONAGE_API_KEY',
+            'SMS_VONAGE_API_SECRET',
+            'SMS_VONAGE_FROM',
           ])}
           model={{
             SMS_PROVIDER: model.SMS_PROVIDER,
@@ -277,6 +280,9 @@ const Settings = () => {
             SMS_TWILIO_MESSAGE_SERVICE_SID: model.SMS_TWILIO_MESSAGE_SERVICE_SID || undefined,
             SMS_MESSAGEBIRD_ORIGINATOR: model.SMS_MESSAGEBIRD_ORIGINATOR || undefined,
             SMS_MESSAGEBIRD_ACCESS_KEY: model.SMS_MESSAGEBIRD_ACCESS_KEY || undefined,
+            SMS_VONAGE_API_KEY: model.SMS_VONAGE_API_KEY || undefined,
+            SMS_VONAGE_API_SECRET: model.SMS_VONAGE_API_SECRET || undefined,
+            SMS_VONAGE_FROM: model.SMS_VONAGE_FROM || undefined,
           }}
           onChangeModel={(model: any) => setSmsProviderModel(model)}
           onSubmit={(model: any) => onFormSubmit(model)}
