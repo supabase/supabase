@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 import { makeObservable, observable } from 'mobx'
-import { find, isUndefined, isEqual, isEmpty, chunk, maxBy } from 'lodash'
+import { find, isUndefined, isEqual, isEmpty, chunk, filter, map } from 'lodash'
 import { Query } from '@supabase/grid'
 import {
   PostgresColumn,
@@ -380,14 +380,18 @@ export default class MetaStore implements IMetaStore {
         message: `Adding ${columns.length} columns to ${table.name}...`,
       })
 
-      for (const column of columns) {
-        // We create all columns without primary keys first
-        const columnPayload = generateCreateColumnPayload(table.id, {
-          ...column,
-          isPrimaryKey: false,
+      const createdColumns = await Promise.all(
+        map(columns, (column) => {
+          const columnPayload = generateCreateColumnPayload(table.id, {
+            ...column,
+            isPrimaryKey: false,
+          })
+          return this.columns.create(columnPayload) as Promise<any>
         })
-        const newColumn: any = await this.columns.create(columnPayload)
-        if (newColumn.error) throw newColumn.error
+      )
+      const errors = filter(createdColumns, (created) => created.error)
+      if (errors.length > 0) {
+        throw errors
       }
 
       // Then add the primary key constraints here to support composite keys
