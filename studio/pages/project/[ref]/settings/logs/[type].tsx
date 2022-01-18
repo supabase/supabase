@@ -227,6 +227,7 @@ export const LogPage: NextPage = () => {
           onRefresh={handleRefresh}
           onSearch={handleSearch}
           defaultSearchValue={params.search_query}
+          defaultFromValue={params.timestamp_start}
           onCustomClick={handleModeToggle}
           onSelectTemplate={onSelectTemplate}
         />

@@ -61,6 +61,11 @@ test('reset search filter', async () => {
   expect(() => screen.getByDisplayValue(/something123/)).toThrow()
 })
 
+test('timestamp from filter default value', async ()=>{
+  render(<LogPanel defaultFromValue='2022-01-18T10:43:39+0000' />)
+  clickDropdown(await screen.findByText('Custom'))
+  await screen.findByDisplayValue('2022-01-18T10:43:39+0000')
+})
 test('timestamp from filter', async () => {
   const mockFn = jest.fn()
   render(<LogPanel onSearch={mockFn} />)
