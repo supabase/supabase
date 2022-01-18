@@ -15,7 +15,11 @@ observer.mockImplementation((v) => v)
 // mock the router
 jest.mock('next/router')
 import { useRouter } from 'next/router'
-useRouter.mockReturnValue({ query: { ref: '123', type: 'auth' } })
+const router = jest.fn()
+router.query = { ref: '123', type: 'auth' }
+router.push = jest.fn()
+router.pathname = 'logs/path'
+useRouter.mockReturnValue(router)
 
 // mock monaco editor
 jest.mock('@monaco-editor/react')
@@ -28,6 +32,7 @@ Editor.mockImplementation((props) => {
 })
 useMonaco.mockImplementation((v) => v)
 
+// mock usage flags
 jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'
 Flag.mockImplementation(({ children }) => <>{children}</>)
@@ -131,12 +136,22 @@ test('Search will trigger a log refresh', async () => {
   render(<LogPage />)
 
   userEvent.type(screen.getByPlaceholderText(/Search/), 'something')
-  userEvent.click(screen.getByText('Go'))
+  userEvent.click(screen.getByTitle('Go'))
 
   await waitFor(
     () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('search_query'))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('something'))
+
+      // updates router query params
+      expect(router.push).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pathname: expect.any(String),
+          query: expect.objectContaining({
+            s: expect.stringContaining('something'),
+          }),
+        })
+      )
     },
     { timeout: 1500 }
   )
@@ -189,7 +204,7 @@ test('where clause will trigger a log refresh', async () => {
   const { container } = render(<LogPage />)
   // fill search bar with some value, should be ignored when in custom mode
   userEvent.type(screen.getByPlaceholderText(/Search/), 'search_value')
-  userEvent.click(screen.getByText('Go'))
+  userEvent.click(screen.getByTitle('Go'))
   // clear mock calls, for clean assertions
   get.mockClear()
 
@@ -210,6 +225,17 @@ test('where clause will trigger a log refresh', async () => {
     () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('metadata.field'))
+
+      // updates router query params
+      expect(router.push).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pathname: expect.any(String),
+          query: expect.objectContaining({
+            q: expect.stringContaining('something'),
+          }),
+        })
+      )
+
       // should ignore search bar value
       expect(get).not.toHaveBeenCalledWith(expect.stringContaining('search_value'))
     },
@@ -219,6 +245,45 @@ test('where clause will trigger a log refresh', async () => {
   await waitFor(() => screen.getByText(/happened/))
 })
 
+test('s= query param will populate the search bar', async () => {
+  useRouter.mockReturnValueOnce({
+    query: { ref: '123', type: 'api', s: 'someSearch' },
+    push: jest.fn(),
+  })
+  render(<LogPage />)
+  // should populate search input with the search param
+  screen.getByDisplayValue('someSearch')
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('search_query=someSearch'))
+  })
+})
+
+test('q= query param will populate the query input', async () => {
+  useRouter.mockReturnValueOnce({
+    query: { ref: '123', type: 'api', q: 'some_query', s: 'someSearch' },
+    push: jest.fn(),
+  })
+  render(<LogPage />)
+  // should populate editor with the query param
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('where=some_query'))
+  })
+
+  // query takes precedence of search queryparam
+  expect(() => !screen.queryByDisplayValue(/someSearch/))
+})
+
+test('ts= query param will set the timestamp_start param', async () => {
+  useRouter.mockReturnValueOnce({
+    query: { ref: '123', type: 'api', ts: 123456 },
+    push: jest.fn(),
+  })
+  render(<LogPage />)
+
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_start=123456'))
+  })
+})
 test('custom sql querying', async () => {
   get.mockImplementation((url) => {
     if (url.includes('sql=') && url.includes('select')) {

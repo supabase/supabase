@@ -48,7 +48,7 @@ Supabase adalah gabungan alat sumber terbuka. Kami membina ciri Firebase menggun
 Supabase ialah [platform yang dihoskan](https://app.supabase.io). Anda boleh mendaftar dan mula menggunakan Supabase tanpa memasang apa-apa.
 Anda juga boleh [host sendiri](https://supabase.com/docs/guides/self-hosting) dan [lokal](https://supabase.com/docs/guides/local-development).
 
-![Seni bina](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Seni bina](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) adalah sistem pangkalan data objek-relasional dengan pengembangan aktif lebih dari 30 tahun yang menjadikannya reputasi yang kuat untuk kebolehpercayaan, ketahanan ciri, dan prestasi.
 - [Realtime](https://github.com/supabase/realtime) adalah pelayan Elixir yang membolehkan anda mendengar sisipan, kemas kini dan pemadaman PostgreSQL menggunakan soket web. Supabase mendengar fungsi replikasi terbina dalam Postgres, menukar aliran bait(byte) replikasi menjadi JSON, kemudian menyiarkan JSON melalui soket web.
