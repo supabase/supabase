@@ -58,11 +58,12 @@ const LogPanel: FC<Props> = ({
   }, [defaultFromValue])
 
   const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let error = ''
     const value = e.target.value
-    //   // try to parse the iso value
-    //   if (isNaN(Date.parse(value)))
-    setFrom({ value, error })
+    if (value !== '' && isNaN(Date.parse(value))) {
+      setFrom({value, error: 'Invalid ISO 8601 timestamp' })
+    } else {
+      setFrom({ value, error: '' })
+    }
   }
   const handleFromReset = () => {
     const value = dayjs().toISOString()
@@ -137,6 +138,7 @@ const LogPanel: FC<Props> = ({
                         labelOptional="UTC"
                         value={from.value === '' ? defaultTimestamp : from.value}
                         onChange={handleFromChange}
+                        error={from.error}
                         actions={[
                           from.value && (
                             <IconX

@@ -82,6 +82,13 @@ test('timestamp from filter', async () => {
 
   // replace the input's value
   userEvent.clear(input)
+
+  // type some random input to check for error handling
+  userEvent.type(input, '123456')
+  await screen.findByText(/[iI]nvalid ISO 8601 timestamp/)
+  userEvent.clear(input)
+  await expect(screen.findByText(/[iI]nvalid ISO 8601 timestamp/)).rejects.toThrow()
+
   // get time 20 mins before
   const newDate = new Date()
   newDate.setMinutes(new Date().getMinutes() - 20)
