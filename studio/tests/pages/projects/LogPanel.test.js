@@ -101,7 +101,7 @@ test('timestamp from filter', async () => {
   userEvent.click(set)
   expect(mockFn).toBeCalled()
   await screen.findByText('Custom')
-  await screen.findByTitle('Clear timestamp filter')
+  await screen.findByTitle(/Clear timestamp filter/)
 })
 
 test('custom query mode hides elements', async () => {

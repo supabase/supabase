@@ -13,6 +13,7 @@ import {
 } from '@supabase/ui'
 import { LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 interface Props {
   defaultSearchValue?: string
   defaultFromValue?: string
@@ -25,6 +26,8 @@ interface Props {
   onCustomClick?: () => void
   onSelectTemplate: (template: LogTemplate) => void
 }
+
+dayjs.extend(utc)
 
 /**
  * Logs control panel header + wrapper
@@ -43,7 +46,7 @@ const LogPanel: FC<Props> = ({
 }) => {
   const [search, setSearch] = useState('')
   const [from, setFrom] = useState({ value: '', error: '' })
-  const [defaultTimestamp, setDefaultTimestamp] = useState(dayjs().toISOString())
+  const [defaultTimestamp, setDefaultTimestamp] = useState(dayjs().utc().toISOString())
   // sync local state with provided default value
   useEffect(() => {
     if (search !== defaultSearchValue) {
@@ -52,7 +55,7 @@ const LogPanel: FC<Props> = ({
   }, [defaultSearchValue])
 
   useEffect(() => {
-    if (defaultFromValue && from.value !== defaultFromValue) {
+    if (from.value !== defaultFromValue) {
       setFrom({ value: defaultFromValue, error: '' })
     }
   }, [defaultFromValue])
@@ -60,19 +63,21 @@ const LogPanel: FC<Props> = ({
   const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     if (value !== '' && isNaN(Date.parse(value))) {
-      setFrom({value, error: 'Invalid ISO 8601 timestamp' })
+      setFrom({ value, error: 'Invalid ISO 8601 timestamp' })
     } else {
       setFrom({ value, error: '' })
     }
   }
-  const handleFromReset = () => {
-    const value = dayjs().toISOString()
-    setFrom({ value, error: '' })
+  const handleFromReset = async () => {
+    setFrom({ value: '', error: '' })
+    const value = dayjs().utc().toISOString()
     setDefaultTimestamp(value)
+    onSearch({ query: search, from: '' })
   }
 
   const handleSearch = () => onSearch({ query: search, from: from.value })
 
+  const showFromReset = from.value !== '' 
   return (
     <div className="bg-panel-header-light dark:bg-panel-header-dark">
       <div className="px-2 py-1 flex items-center justify-between w-full">
@@ -127,7 +132,7 @@ const LogPanel: FC<Props> = ({
         <div className="flex items-center gap-x-4">
           {!isCustomQuery && (
             <>
-              <div className="flex flex-row gap-x-1">
+              <div className="flex flex-row">
                 <Dropdown
                   side="bottom"
                   align="end"
@@ -139,6 +144,7 @@ const LogPanel: FC<Props> = ({
                         value={from.value === '' ? defaultTimestamp : from.value}
                         onChange={handleFromChange}
                         error={from.error}
+                        className="w-72"
                         actions={[
                           from.value && (
                             <IconX
@@ -163,11 +169,26 @@ const LogPanel: FC<Props> = ({
                     </Dropdown.Misc>
                   }
                 >
-                  <Button as="span" type="outline" icon={<IconClock size="tiny" />}>
+                  <Button
+                    as="span"
+                    size="tiny"
+                    className={showFromReset ? '!rounded-r-none' : ''}
+                    type={showFromReset ? 'outline' : 'text'}
+                    icon={<IconClock size="tiny" />}
+                  >
                     {from.value ? 'Custom' : 'Now'}
                   </Button>
                 </Dropdown>
-                <Button icon={<IconX />} title="Clear timestamp filter" />
+                {showFromReset && (
+                  <Button
+                    size="tiny"
+                    className={showFromReset ? '!rounded-l-none' : ''}
+                    icon={<IconX size="tiny" />}
+                    type="outline"
+                    title="Clear timestamp filter"
+                    onClick={handleFromReset}
+                  />
+                )}
               </div>
               {/* wrap with form so that if user presses enter, the search value will submit automatically */}
               <form

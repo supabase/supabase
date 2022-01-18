@@ -274,21 +274,22 @@ test('q= query param will populate the query input', async () => {
   expect(() => !screen.queryByDisplayValue(/someSearch/))
 })
 
-test('ts= query param will populate the timestamp from input', async () => {
+test('te= query param will populate the timestamp from input', async () => {
   // get time 20 mins before
   const newDate = new Date()
   newDate.setMinutes(new Date().getMinutes() - 20)
   const isoString = newDate.toISOString()
+  const unixMicro = newDate.getTime() * 1000 //microseconds
 
   useRouter.mockReturnValueOnce({
-    query: { ref: '123', type: 'api', ts: isoString },
+    query: { ref: '123', type: 'api', te: unixMicro },
     push: jest.fn(),
   })
   render(<LogPage />)
 
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(
-      expect.stringContaining(`timestamp_start=${encodeURIComponent(isoString)}`)
+      expect.stringContaining(`timestamp_end=${encodeURIComponent(unixMicro)}`)
     )
   })
   clickDropdown(await screen.findByText('Custom'))
