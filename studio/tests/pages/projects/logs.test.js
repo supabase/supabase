@@ -287,7 +287,9 @@ test('ts= query param will populate the timestamp from input', async () => {
   render(<LogPage />)
 
   await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining(`timestamp_start=${encodeURIComponent(isoString)}`))
+    expect(get).toHaveBeenCalledWith(
+      expect.stringContaining(`timestamp_start=${encodeURIComponent(isoString)}`)
+    )
   })
   clickDropdown(await screen.findByText('Custom'))
   await screen.findByDisplayValue(isoString)
@@ -340,10 +342,10 @@ test('custom sql querying', async () => {
 
   // clicking on the row value should not show log selection panel
   userEvent.click(screen.getByText(/12345/))
-  await waitFor(() => expect(() => screen.getByText(/Metadata/)).toThrow())
+  await expect(screen.findByText(/Metadata/)).rejects.toThrow()
 
   // should not see chronological features
-  await waitFor(() => screen.queryByText(/Load older/)) //column header
+  await expect(screen.findByText(/Load older/)).rejects.toThrow()
 })
 
 test('load older btn will fetch older logs', async () => {
