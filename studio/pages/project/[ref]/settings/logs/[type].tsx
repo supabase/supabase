@@ -83,13 +83,11 @@ export const LogPage: NextPage = () => {
         mode: 'simple',
         searchString: s as string,
       })
-    } else {
-      setParams({ ...params, search_query: '', where: '', sql: '' })
     }
     if (te) {
-      setParams({ ...params, timestamp_end: te as string })
+      setParams(prev => ({ ...prev, timestamp_end: te as string }))
     } else {
-      setParams({ ...params, timestamp_end: '' })
+      setParams(prev => ({ ...prev, timestamp_end: '' }))
 
     }
   }, [logsQueryParamsSyncing])
