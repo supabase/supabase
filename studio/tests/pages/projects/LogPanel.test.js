@@ -61,8 +61,8 @@ test('reset search filter', async () => {
   expect(() => screen.getByDisplayValue(/something123/)).toThrow()
 })
 
-test('timestamp from filter default value', async ()=>{
-  render(<LogPanel defaultFromValue='2022-01-18T10:43:39+0000' />)
+test('timestamp from filter default value', async () => {
+  render(<LogPanel defaultFromValue="2022-01-18T10:43:39+0000" />)
   clickDropdown(await screen.findByText('Custom'))
   await screen.findByDisplayValue('2022-01-18T10:43:39+0000')
 })
@@ -88,11 +88,21 @@ test('timestamp from filter', async () => {
   userEvent.type(input, newDate.toISOString())
 
   // input actions
-  await screen.findByTitle("Reset")
+  await screen.findByTitle('Reset')
   const set = await screen.findByRole('button', { name: 'Set' })
 
   userEvent.click(set)
   expect(mockFn).toBeCalled()
-  await screen.findByText("Custom")
+  await screen.findByText('Custom')
   await screen.findByTitle('Clear timestamp filter')
+})
+
+test('custom query mode hides elements', async () => {
+  const { rerender } = render(<LogPanel isCustomQuery={false} />)
+  await screen.findByPlaceholderText(/Search/)
+  await screen.findByText('Now')
+  rerender(<LogPanel isCustomQuery={true} />)
+  await expect(screen.findByPlaceholderText(/Search/)).rejects.toThrow()
+  await expect(screen.findByText('Now')).rejects.toThrow()
+  await expect(screen.findByText('Custom')).rejects.toThrow()
 })
