@@ -60,8 +60,9 @@ LogPage.mockImplementation((props) => {
 
 import { render, fireEvent, waitFor, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { getToggleByText } from '../../helpers'
+import { clickDropdown, getToggleByText } from '../../helpers'
 import { wait } from '@testing-library/user-event/dist/utils'
+import { find } from 'lodash'
 
 beforeEach(() => {
   // reset mocks between tests
@@ -273,16 +274,23 @@ test('q= query param will populate the query input', async () => {
   expect(() => !screen.queryByDisplayValue(/someSearch/))
 })
 
-test('ts= query param will set the timestamp_start param', async () => {
+test('ts= query param will populate the timestamp from input', async () => {
+  // get time 20 mins before
+  const newDate = new Date()
+  newDate.setMinutes(new Date().getMinutes() - 20)
+  const isoString = newDate.toISOString()
+
   useRouter.mockReturnValueOnce({
-    query: { ref: '123', type: 'api', ts: 123456 },
+    query: { ref: '123', type: 'api', ts: isoString },
     push: jest.fn(),
   })
   render(<LogPage />)
 
   await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_start=123456'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining(`timestamp_start=${encodeURIComponent(isoString)}`))
   })
+  clickDropdown(await screen.findByText('Custom'))
+  await screen.findByDisplayValue(isoString)
 })
 test('custom sql querying', async () => {
   get.mockImplementation((url) => {

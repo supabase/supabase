@@ -15,6 +15,7 @@ import { LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
 interface Props {
   defaultSearchValue?: string
+  defaultFromValue?: string
   templates?: any
   isLoading: boolean
   isCustomQuery: boolean
@@ -36,6 +37,7 @@ const LogPanel: FC<Props> = ({
   onRefresh,
   onSearch = () => {},
   defaultSearchValue = '',
+  defaultFromValue = '',
   onCustomClick,
   onSelectTemplate,
 }) => {
@@ -48,6 +50,12 @@ const LogPanel: FC<Props> = ({
       setSearch(defaultSearchValue)
     }
   }, [defaultSearchValue])
+
+  useEffect(() => {
+    if (defaultFromValue && from.value !== defaultFromValue) {
+      setFrom({ value: defaultFromValue, error: '' })
+    }
+  }, [defaultFromValue])
 
   const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let error = ''
@@ -125,7 +133,6 @@ const LogPanel: FC<Props> = ({
                   <Input
                     label="From"
                     labelOptional="UTC"
-                    size="tiny"
                     value={from.value === '' ? defaultTimestamp : from.value}
                     onChange={handleFromChange}
                     actions={[
