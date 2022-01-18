@@ -124,78 +124,80 @@ const LogPanel: FC<Props> = ({
           </div>
         </div>
         <div className="flex items-center gap-x-4">
-          <div>
-            <Dropdown
-              side="bottom"
-              align="end"
-              overlay={
-                <Dropdown.Misc>
-                  <Input
-                    label="From"
-                    labelOptional="UTC"
-                    value={from.value === '' ? defaultTimestamp : from.value}
-                    onChange={handleFromChange}
-                    actions={[
-                      from.value && (
-                        <IconX
-                          key="reset-from"
-                          size="tiny"
-                          className="cursor-pointer mx-1"
-                          title="Reset"
-                          onClick={handleFromReset}
-                        />
-                      ),
-                      <Button
-                        key="set"
-                        size="tiny"
-                        title="Set"
-                        type="secondary"
-                        onClick={handleSearch}
-                      >
-                        Set
-                      </Button>,
-                    ]}
-                  />
-                </Dropdown.Misc>
-              }
-            >
-              <Button type="outline" icon={<IconClock size="tiny" />}>
-                {from.value ? 'Custom' : 'Now'}
-              </Button>
-            </Dropdown>
-            <Button icon={<IconX />} title="Clear timestamp filter" />
-          </div>
-          {/* wrap with form so that if user presses enter, the search value will submit automatically */}
           {!isCustomQuery && (
-            <form
-              id="log-panel-search"
-              onSubmit={(e) => {
-                // prevent redirection
-                e.preventDefault()
-                handleSearch()
-              }}
-            >
-              <Input
-                placeholder="Search events"
-                onChange={(e) => setSearch(e.target.value)}
-                value={search}
-                actions={[
-                  search && (
-                    <IconX
-                      key="clear-search"
-                      size="tiny"
-                      className="cursor-pointer mx-1"
-                      title="Clear search"
-                      onClick={() => setSearch('')}
-                    />
-                  ),
+            <>
+              <div className="flex flex-row gap-x-1">
+                <Dropdown
+                  side="bottom"
+                  align="end"
+                  overlay={
+                    <Dropdown.Misc>
+                      <Input
+                        label="From"
+                        labelOptional="UTC"
+                        value={from.value === '' ? defaultTimestamp : from.value}
+                        onChange={handleFromChange}
+                        actions={[
+                          from.value && (
+                            <IconX
+                              key="reset-from"
+                              size="tiny"
+                              className="cursor-pointer mx-1"
+                              title="Reset"
+                              onClick={handleFromReset}
+                            />
+                          ),
+                          <Button
+                            key="set"
+                            size="tiny"
+                            title="Set"
+                            type="secondary"
+                            onClick={handleSearch}
+                          >
+                            Set
+                          </Button>,
+                        ]}
+                      />
+                    </Dropdown.Misc>
+                  }
+                >
+                  <Button type="outline" icon={<IconClock size="tiny" />}>
+                    {from.value ? 'Custom' : 'Now'}
+                  </Button>
+                </Dropdown>
+                <Button icon={<IconX />} title="Clear timestamp filter" />
+              </div>
+              {/* wrap with form so that if user presses enter, the search value will submit automatically */}
+              <form
+                id="log-panel-search"
+                onSubmit={(e) => {
+                  // prevent redirection
+                  e.preventDefault()
+                  handleSearch()
+                }}
+              >
+                <Input
+                  placeholder="Search events"
+                  onChange={(e) => setSearch(e.target.value)}
+                  value={search}
+                  actions={[
+                    search && (
+                      <IconX
+                        key="clear-search"
+                        size="tiny"
+                        className="cursor-pointer mx-1"
+                        title="Clear search"
+                        onClick={() => setSearch('')}
+                      />
+                    ),
 
-                  <Button key="go" size="tiny" title="Go" type="secondary" onClick={handleSearch}>
-                    <IconSearch size={16} />
-                  </Button>,
-                ]}
-              />
-            </form>
+                    <Button key="go" size="tiny" title="Go" type="secondary" onClick={handleSearch}>
+                      <IconSearch size={16} />
+                    </Button>,
+                  ]}
+                />
+              </form>
+            </>
           )}
         </div>
       </div>
