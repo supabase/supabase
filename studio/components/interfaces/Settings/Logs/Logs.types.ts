@@ -10,7 +10,7 @@ export interface LogData {
 }
 
 export interface LogTemplate {
-  label: string
+  label?: string
   mode: 'custom' | 'simple'
   searchString: string
 }
