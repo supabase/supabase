@@ -112,7 +112,7 @@ const LogPanel: FC<Props> = ({
               </Dropdown.Item>
             ))}
           >
-            <Button type="text" iconRight={<IconChevronDown />}>
+            <Button as="span" type="text" iconRight={<IconChevronDown />}>
               Templates
             </Button>
           </Dropdown>
@@ -163,7 +163,7 @@ const LogPanel: FC<Props> = ({
                     </Dropdown.Misc>
                   }
                 >
-                  <Button type="outline" icon={<IconClock size="tiny" />}>
+                  <Button as="span" type="outline" icon={<IconClock size="tiny" />}>
                     {from.value ? 'Custom' : 'Now'}
                   </Button>
                 </Dropdown>
