@@ -10,6 +10,7 @@ import {
   Toggle,
   IconSearch,
   IconClock,
+  Popover,
 } from '@supabase/ui'
 import { LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
@@ -77,7 +78,7 @@ const LogPanel: FC<Props> = ({
 
   const handleSearch = () => onSearch({ query: search, from: from.value })
 
-  const showFromReset = from.value !== '' 
+  const showFromReset = from.value !== ''
   return (
     <div className="bg-panel-header-light dark:bg-panel-header-dark">
       <div className="px-2 py-1 flex items-center justify-between w-full">
@@ -133,40 +134,39 @@ const LogPanel: FC<Props> = ({
           {!isCustomQuery && (
             <>
               <div className="flex flex-row">
-                <Dropdown
+                <Popover
                   side="bottom"
                   align="end"
+                  portalled
                   overlay={
-                    <Dropdown.Misc>
-                      <Input
-                        label="From"
-                        labelOptional="UTC"
-                        value={from.value === '' ? defaultTimestamp : from.value}
-                        onChange={handleFromChange}
-                        error={from.error}
-                        className="w-72"
-                        actions={[
-                          from.value && (
-                            <IconX
-                              key="reset-from"
-                              size="tiny"
-                              className="cursor-pointer mx-1"
-                              title="Reset"
-                              onClick={handleFromReset}
-                            />
-                          ),
-                          <Button
-                            key="set"
+                    <Input
+                      label="From"
+                      labelOptional="UTC"
+                      value={from.value === '' ? defaultTimestamp : from.value}
+                      onChange={handleFromChange}
+                      error={from.error}
+                      className="w-72 p-3"
+                      actions={[
+                        from.value && (
+                          <IconX
+                            key="reset-from"
                             size="tiny"
-                            title="Set"
-                            type="secondary"
-                            onClick={handleSearch}
-                          >
-                            Set
-                          </Button>,
-                        ]}
-                      />
-                    </Dropdown.Misc>
+                            className="cursor-pointer mx-1"
+                            title="Reset"
+                            onClick={handleFromReset}
+                          />
+                        ),
+                        <Button
+                          key="set"
+                          size="tiny"
+                          title="Set"
+                          type="secondary"
+                          onClick={handleSearch}
+                        >
+                          Set
+                        </Button>,
+                      ]}
+                    />
                   }
                 >
                   <Button
@@ -178,7 +178,7 @@ const LogPanel: FC<Props> = ({
                   >
                     {from.value ? 'Custom' : 'Now'}
                   </Button>
-                </Dropdown>
+                </Popover>
                 {showFromReset && (
                   <Button
                     size="tiny"
