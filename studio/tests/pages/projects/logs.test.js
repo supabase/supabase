@@ -292,7 +292,7 @@ test('te= query param will populate the timestamp from input', async () => {
       expect.stringContaining(`timestamp_end=${encodeURIComponent(unixMicro)}`)
     )
   })
-  clickDropdown(await screen.findByText('Custom'))
+  userEvent.click(await screen.findByText('Custom'))
   await screen.findByDisplayValue(isoString)
 })
 test('custom sql querying', async () => {

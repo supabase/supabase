@@ -63,7 +63,7 @@ test('reset search filter', async () => {
 
 test('timestamp from filter default value', async () => {
   render(<LogPanel defaultFromValue="2022-01-18T10:43:39+0000" />)
-  clickDropdown(await screen.findByText('Custom'))
+  userEvent.click(await screen.findByText('Custom'))
   await screen.findByDisplayValue('2022-01-18T10:43:39+0000')
 })
 test('timestamp from filter', async () => {
@@ -72,7 +72,7 @@ test('timestamp from filter', async () => {
   const dropdown = await screen.findByText(/Now/)
 
   // click the dropdown
-  clickDropdown(dropdown)
+  userEvent.click(dropdown)
 
   // TODO: use screen.findByLabelText when https://github.com/supabase/ui/issues/310 is resolved
   await screen.findByText('From')
