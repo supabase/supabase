@@ -216,6 +216,21 @@ curl '[SUPABASE_URL]/rest/v1/todos' \
 [delete()](/docs/reference/javascript/delete),
 [rpc()](/docs/reference/javascript/rpc) (call Postgres functions).
 
+### Safeguards towards accidental deletes and updates
+
+For new projects, by default, the Postgres extension [safeupdate](https://github.com/eradman/pg-safeupdate) is enabled for all queries coming from the API. 
+This ensures that any `delete()` or `update()` would fail if there are no accompanying filters provided.
+This can be disabled by running the following query on the SQL editor on the dashboard:
+
+```sql
+ALTER ROLE authenticator SET session_preload_libraries TO DEFAULT;
+```
+
+To reenable it :
+```sql
+ALTER ROLE authenticator SET session_preload_libraries = 'safeupdate';
+```
+The above can also be run to enable it for existing projects. Settings are applied immediately and as such no restarts are needed after running any of the two.
 
 ### Managing Realtime 
 
