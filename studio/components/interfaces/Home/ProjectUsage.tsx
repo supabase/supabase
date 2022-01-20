@@ -35,6 +35,7 @@ interface Props {
 }
 
 const ProjectUsage: FC<Props> = ({ project }) => {
+  const logsTimestampFilter = useFlag('logsTimestampFilter')
   const logsUsageChartIntervals = useFlag('logsUsageChartIntervals')
   const [interval, setInterval] = useState<string>('minutely')
   const router = useRouter()
@@ -57,6 +58,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
   const charts = data?.data
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
   const handleBarClick = (v: any) => {
+    if (!logsTimestampFilter) return
     if (!v || !v.activePayload?.[0]?.payload) return
     // returns rechart internal tooltip data type
     const payload = v.activePayload[0].payload
