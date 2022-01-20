@@ -223,7 +223,8 @@ This ensures that any `delete()` or `update()` would fail if there are no accomp
 This can be disabled by running the following query on the SQL editor on the dashboard:
 
 ```sql
-ALTER ROLE authenticator SET session_preload_libraries TO DEFAULT;
+alter role "authenticator"
+set "session_preload_libraries" to default;
 ```
 
 To reenable it :
