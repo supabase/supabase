@@ -34,7 +34,7 @@ Azure OAuth consists of six broad steps:
 - The redirect / callback URI should look like this: `https://<project-ref>.supabase.co/auth/v1/callback`
 - Click "Register" at the bottom of the form.
 
-![Register an application.](/img/guides/azure-register-app.png)
+![Register an application.](/img/guides/auth-azure/azure-register-app.png)
 
 ### Obtain a Client ID
 
@@ -42,7 +42,7 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 
 - Once your app has been registered, the client id can be found under the [list of app registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) under the column titled  "Application (client) ID".
 
-![Obtain the client id](/img/guides/azure-client-id.png)
+![Obtain the client id](/img/guides/auth-azure/azure-client-id.png)
 
 ### Obtain a Secret ID
 
@@ -54,7 +54,7 @@ This will serve as the `client_secret` when you make API calls to authenticate t
 - Enter a description and choose your preferred expiry for the secret.
 - Once the secret is generated, save the value (not the secret ID). 
 
-![Obtain the client secret](/img/guides/azure-client-secret.png)
+![Obtain the client secret](/img/guides/auth-azure/azure-client-secret.png)
 
 ### Add login code to your client app
 

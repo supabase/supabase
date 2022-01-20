@@ -9,7 +9,9 @@ import TabItem from '@theme/TabItem';
 
 Supabase provides a CLI so that you can develop your application locally, rather than connecting to a live project.
 
-## Prerequisites
+## Getting started
+
+### Prerequisites
 
 You will need to have these in your environment:
 
@@ -17,7 +19,13 @@ You will need to have these in your environment:
 - Docker (make sure the daemon is up and running)
 - Supabase CLI (instructions [here](https://github.com/supabase/cli))
 
-## Initialize your project
+### Initialize git
+
+```bash
+git init
+```
+
+### Initialize your project
 
 ```bash
 supabase init
@@ -25,7 +33,7 @@ supabase init
 
 This command will create a `supabase` folder which holds all the configuration for developing your project locally.
 
-## Start
+### Start
 
 ```bash
 supabase start
@@ -45,7 +53,7 @@ Started local development setup.
 service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIn0.M2d2z4SFn5C7HlJlaSLfrzuYim9nbY_XI40uWFN3hEE
 ```
 
-#### Accessing Services Directly
+### Accessing Services Directly
 
 <Tabs
 defaultValue="Postgres"
@@ -95,7 +103,7 @@ http://localhost:54321/auth/v1/           # Auth (GoTrue)
 </TabItem>
 </Tabs>
 
-## Example application
+### Example application
 
 Now that we've learned how to install and start Supabase locally, let's see how you can use it with a frontend application.
 This quick-start guide will show you, how you can configure a React app which uses the Supabase stack.
@@ -139,7 +147,7 @@ npm start       # Start the React app
 
 If everything is working, you should have a React app running on `http://localhost:3000` and Supabase services running on `http://localhost:54321`
 
-## Stop
+### Stop
 
 When you're finished with Supabase, send <kbd>Ctrl-C</kbd> to stop the Docker services.
 
