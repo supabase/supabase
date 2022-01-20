@@ -26,12 +26,14 @@ import {
   LogTemplate,
   TEMPLATES,
   LogData,
+  LogSearchCallback,
 } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
 import useSWRInfinite from 'swr/infinite'
 import { isUndefined } from 'lodash'
 import Flag from 'components/ui/Flag/Flag'
 import { useFlag } from 'hooks'
+import dayjs from 'dayjs'
 
 /**
  * Acts as a container component for the entire log display
@@ -48,7 +50,7 @@ export const LogPage: NextPage = () => {
   const logsQueryParamsSyncing = useFlag('logsQueryParamsSyncing')
   const logsCustomSql = useFlag('logsCustomSql')
   const router = useRouter()
-  const { ref, type, q, s, ts } = router.query
+  const { ref, type, q, s, te } = router.query
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState('')
   const [mode, setMode] = useState<'simple' | 'custom'>('simple')
@@ -82,8 +84,11 @@ export const LogPage: NextPage = () => {
         searchString: s as string,
       })
     }
-    if (ts) {
-      setParams({ ...params, timestamp_start: ts as string })
+    if (te) {
+      setParams(prev => ({ ...prev, timestamp_end: te as string }))
+    } else {
+      setParams(prev => ({ ...prev, timestamp_end: '' }))
+
     }
   }, [logsQueryParamsSyncing])
 
@@ -147,7 +152,14 @@ export const LogPage: NextPage = () => {
 
   const handleRefresh = () => {
     setLatestRefresh(new Date().toISOString())
-    setParams({ ...params, timestamp_start: '' })
+    setParams({ ...params, timestamp_end: '' })
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        te: undefined
+      },
+    })
     setSize(1)
   }
 
@@ -171,6 +183,7 @@ export const LogPage: NextPage = () => {
         where: isSelectQuery ? '' : template.searchString,
         sql: isSelectQuery ? template.searchString : '',
         search_query: '',
+        timestamp_end: ''
       }))
       setEditorId(uuidv4())
     }
@@ -189,18 +202,27 @@ export const LogPage: NextPage = () => {
         ...router.query,
         q: editorValue,
         s: undefined,
+        te: undefined
       },
     })
   }
-  const handleSearch = (v: string) => {
-    setParams((prev) => ({ ...prev, search_query: v || '', where: '', sql: '' }))
+  const handleSearch: LogSearchCallback = ({ query, from }) => {
+    const unixMicro = dayjs(from).valueOf() * 1000
+    setParams((prev) => ({
+      ...prev,
+      search_query: query || '',
+      timestamp_end: from ? String(unixMicro) : '' ,
+      where: '',
+      sql: '',
+    }))
     if (!logsQueryParamsSyncing) return
     router.push({
       pathname: router.pathname,
       query: {
         ...router.query,
         q: undefined,
-        s: v || '',
+        s: query || '',
+        te: unixMicro
       },
     })
     setEditorValue('')
@@ -217,6 +239,7 @@ export const LogPage: NextPage = () => {
           onRefresh={handleRefresh}
           onSearch={handleSearch}
           defaultSearchValue={params.search_query}
+          defaultFromValue={params.timestamp_end ? dayjs(Number(params.timestamp_end)/1000).toISOString() : ''}
           onCustomClick={handleModeToggle}
           onSelectTemplate={onSelectTemplate}
         />
