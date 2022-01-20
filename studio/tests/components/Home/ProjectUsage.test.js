@@ -92,19 +92,3 @@ test('dropdown options changes chart query', async () => {
   await waitFor(() => screen.getByText(/Statistics for past 24 hours/))
   expect(get).toHaveBeenCalledWith(expect.stringContaining('interval=hourly'))
 })
-test('chart navigation to logs', async () => {
-  get.mockImplementation((url) => {
-    if (url.includes('usage')) return {}
-    return { data: MOCK_CHART_DATA }
-  })
-  const { container } = render(<ProjectUsage project="12345" />)
-  // click on the log bar chart
-  const panel = (await screen.findByText(/API Requests/)).parentElement
-  const bar = panel.querySelector('path.recharts-rectangle')
-
-  userEvent.click(bar)
-  expect(mockPush).toBeCalledTimes(1)
-  const viewLogsButton = getByText(panel, /View logs/)
-  userEvent.click(viewLogsButton)
-  expect(mockPush).toBeCalledTimes(2)
-})
