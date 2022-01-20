@@ -31,7 +31,7 @@ interface Props {
   hideChartType?: boolean
   data?: ChartData
   isLoading?: boolean
-  onBarClick?: (v: TooltipProps) => void
+  onBarClick?: (v: any) => void
 }
 
 /**
