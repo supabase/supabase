@@ -3,6 +3,13 @@ import { render, waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { clickDropdown } from 'tests/helpers'
 
+jest.mock('components/ui/Flag/Flag')
+import Flag from 'components/ui/Flag/Flag'
+Flag.mockImplementation(({ children }) => <>{children}</>)
+jest.mock('hooks')
+import { useFlag } from 'hooks'
+useFlag.mockReturnValue(true)
+
 test('templates', async () => {
   const mockFn = jest.fn()
   render(<LogPanel templates={[{ label: 'Some option', onClick: mockFn }]} />)
