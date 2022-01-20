@@ -229,7 +229,8 @@ set "session_preload_libraries" to default;
 
 To reenable it :
 ```sql
-ALTER ROLE authenticator SET session_preload_libraries = 'safeupdate';
+alter role "authenticator" 
+set "session_preload_libraries" = 'safeupdate';
 ```
 The above can also be run to enable it for existing projects. Settings are applied immediately and as such no restarts are needed after running any of the two.
 
