@@ -1,6 +1,6 @@
 ---
-id: with-react-native
-title: "Quickstart: React Native"
+id: with-expo
+title: "Quickstart: Expo"
 description: Learn how to use Supabase in your React Native App.
 ---
 
@@ -144,18 +144,20 @@ Let's start building the React Native app from scratch.
 
 ### Initialize a React Native app
 
-We can use [`react-native`](https://reactnative.dev/blog/2016/11/08/introducing-button-yarn-and-a-public-roadmap#speed-up-react-native-init-using-yarn) to initialize 
+We can use [`expo`](https://docs.expo.dev/get-started/create-a-new-app/) to initialize 
 an app called `supabaseReactNative`:
 
 ```bash
+#select the "Blank" template when prompted
 expo init supabaseReactNative
+
 cd supabaseReactNative
 ```
 
 Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
 
 ```bash
-npm install @supabase/supabase-js
+yarn add @supabase/supabase-js
 ```
 
 Now let's create a helper file to initialize the Supabase client.
@@ -178,33 +180,29 @@ Let's set up a React Native component to manage logins and sign ups.
 We'll use Magic Links, so users can sign in with their email without using passwords.
 
 ```jsx title="components/Auth.js"
-import React, {useState} from 'react';
-import {Alert, StyleSheet, View} from 'react-native';
-import {supabaseClient} from '../lib/initSupabase';
-
-import {Button, Input} from 'react-native-elements';
+import React, {useState} from 'react'
+import {Alert, StyleSheet, View} from 'react-native'
+import {supabaseClient} from '../lib/initSupabase'
+import {Button, Input} from 'react-native-elements'
 
 export default function Auth() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState('');
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState('')
 
-  const handleLogin = async type => {
-    setLoading(type);
-    const {error, user} =
-      type === 'LOGIN'
-        ? await supabaseClient.auth.signIn({email, password})
-        : await supabaseClient.auth.signUp({email, password});
-    console.log('Error: ', error);
-    console.log('User: ', user);
-    if (!error && user && type === 'SIGNUP') {
-      Alert.alert('Check your email for the login link!');
-    }
-    if (error) {
-      Alert.alert(error.message);
-    }
-    setLoading('');
-  };
+  async function signInWithEmail() {
+    const { user, error } = await supabase.auth.signIn({
+      email: email,
+      password: password,
+    })
+  }
+
+  async function signUpWithEmail() {
+    const { user, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    })
+  }
 
   return (
     <View>
@@ -232,17 +230,13 @@ export default function Auth() {
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Button
           title="Sign in"
-          disabled={!!loading.length}
-          loading={loading === 'LOGIN'}
-          onPress={() => handleLogin('LOGIN')}
+          onPress={() => signInWithEmail(email, password)}
         />
       </View>
       <View style={styles.verticallySpaced}>
         <Button
           title="Sign up"
-          disabled={!!loading.length}
-          loading={loading === 'SIGNUP'}
-          onPress={() => handleLogin('SIGNUP')}
+          onPress={() => signUpWithEmail(email, password)}
         />
       </View>
     </View>
@@ -418,10 +412,6 @@ export default function App() {
 
 Once that's done, run this in a terminal window:
 
-```bash
-npm run start
-```
-or
 ```bash
 yarn start
 ```
