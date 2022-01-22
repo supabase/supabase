@@ -143,6 +143,10 @@ input[type='radio'] {
   display: none;
 }
 
+.dark {
+  color-scheme: dark;
+}
+
 code {
   @apply p-1 m-0 font-mono text-sm bg-gray-100 dark:bg-gray-600 rounded;
 }
