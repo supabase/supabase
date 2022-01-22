@@ -62,7 +62,7 @@ The JavaScript client code is documented in the [Supabase OAuth Reference](/docs
 
 ```js
 const { user, session, error } = await supabase.auth.signIn({
-  provider: 'Azure',
+  provider: 'azure',
 })
 ```
 
@@ -71,7 +71,7 @@ Add a function which you can call from a button, link, or UI element.
 ```js
 async function signInWithAzure() {
   const { user, session, error } = await supabase.auth.signIn({
-    provider: 'Azure',
+    provider: 'azure',
   }, {
       scopes: 'email',
   })
