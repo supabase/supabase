@@ -10,7 +10,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^1.6.0",
     "leaflet": "^1.7.1",
-    "nanoid": "^3.1.12",
+    "nanoid": "^3.1.31",
     "next": "^11.1.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
