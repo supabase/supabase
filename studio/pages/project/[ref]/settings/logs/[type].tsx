@@ -85,10 +85,9 @@ export const LogPage: NextPage = () => {
       })
     }
     if (te) {
-      setParams(prev => ({ ...prev, timestamp_end: te as string }))
+      setParams((prev) => ({ ...prev, timestamp_end: te as string }))
     } else {
-      setParams(prev => ({ ...prev, timestamp_end: '' }))
-
+      setParams((prev) => ({ ...prev, timestamp_end: '' }))
     }
   }, [logsQueryParamsSyncing])
 
@@ -110,7 +109,7 @@ export const LogPage: NextPage = () => {
     if (prevPageData === null) {
       // reduce interval window limit by using the timestamp of the last log
       queryParams = genQueryParams(params)
-    } else if (prevPageData.data.length === 0) {
+    } else if ((prevPageData?.data ?? []).length === 0) {
       // no rows returned, indicates that no more data to retrieve and append.
       return null
     } else {
@@ -157,7 +156,7 @@ export const LogPage: NextPage = () => {
       pathname: router.pathname,
       query: {
         ...router.query,
-        te: undefined
+        te: undefined,
       },
     })
     setSize(1)
@@ -183,7 +182,7 @@ export const LogPage: NextPage = () => {
         where: isSelectQuery ? '' : template.searchString,
         sql: isSelectQuery ? template.searchString : '',
         search_query: '',
-        timestamp_end: ''
+        timestamp_end: '',
       }))
       setEditorId(uuidv4())
     }
@@ -202,7 +201,7 @@ export const LogPage: NextPage = () => {
         ...router.query,
         q: editorValue,
         s: undefined,
-        te: undefined
+        te: undefined,
       },
     })
   }
@@ -211,7 +210,7 @@ export const LogPage: NextPage = () => {
     setParams((prev) => ({
       ...prev,
       search_query: query || '',
-      timestamp_end: from ? String(unixMicro) : '' ,
+      timestamp_end: from ? String(unixMicro) : '',
       where: '',
       sql: '',
     }))
@@ -222,7 +221,7 @@ export const LogPage: NextPage = () => {
         ...router.query,
         q: undefined,
         s: query || '',
-        te: unixMicro
+        te: unixMicro,
       },
     })
     setEditorValue('')
@@ -239,7 +238,9 @@ export const LogPage: NextPage = () => {
           onRefresh={handleRefresh}
           onSearch={handleSearch}
           defaultSearchValue={params.search_query}
-          defaultFromValue={params.timestamp_end ? dayjs(Number(params.timestamp_end)/1000).toISOString() : ''}
+          defaultFromValue={
+            params.timestamp_end ? dayjs(Number(params.timestamp_end) / 1000).toISOString() : ''
+          }
           onCustomClick={handleModeToggle}
           onSelectTemplate={onSelectTemplate}
         />
