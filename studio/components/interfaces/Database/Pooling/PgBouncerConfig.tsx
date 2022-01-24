@@ -107,7 +107,7 @@ const PgbouncerConfig: FC<Props> = ({ projectRef, config }) => {
                   suitable mode for your use case,{' '}
                   <Typography.Link
                     target="_blank"
-                    href="https://supabase.com/blog/2021/04/02/supabase-pgbouncer#pool-modes"
+                    href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
                   >
                     click here
                   </Typography.Link>
