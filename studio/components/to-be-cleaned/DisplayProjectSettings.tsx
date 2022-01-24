@@ -39,7 +39,7 @@ export const DisplayApiSettings = () => {
 
   // Get the API service
   const apiService = (data?.services ?? []).find((x: any) => x.app.id == API_SERVICE_ID)
-  const apiKeys = apiService.service_api_keys
+  const apiKeys = apiService?.service_api_keys ?? []
 
   return (
     <ApiContentWrapper>
