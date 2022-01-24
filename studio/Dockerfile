@@ -7,12 +7,12 @@
 #    docker builder prune
 
 
-FROM node:14 as base
+FROM node:14-slim as base
 WORKDIR /usr/src/app
 # Do `npm ci` separately so we can cache `node_modules`
 # https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
 COPY package*.json ./
-RUN npm clean-install
+RUN npm clean-install && npm cache clean --force
 COPY . .
 
 FROM base as dev
@@ -20,6 +20,6 @@ EXPOSE 8082
 CMD ["npm", "run", "dev"]
 
 FROM base as production
-RUN npm run build
+RUN npm run build && rm -rf .next/cache/webpack && npm prune --production
 EXPOSE 3000
 CMD ["npm", "run", "start"]
