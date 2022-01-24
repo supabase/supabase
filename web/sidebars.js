@@ -55,10 +55,10 @@ module.exports = {
       collapsed: false,
       items: [
         'guides/with-angular',
+        'guides/with-expo',
         'guides/with-flutter',
         'guides/with-nextjs',
         'guides/with-react',
-        'guides/with-react-native',
         'guides/with-redwoodjs',
         'guides/with-svelte',
         'guides/with-vue-3',
