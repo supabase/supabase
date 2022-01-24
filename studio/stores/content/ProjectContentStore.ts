@@ -11,6 +11,7 @@ import { API_URL } from 'lib/constants'
 
 export interface IProjectContentStore {
   isLoading: boolean
+  isInitialized: boolean
   error: any
 
   load: () => void
@@ -45,6 +46,10 @@ export default class ProjectContentStore implements IProjectContentStore {
 
   get isLoading() {
     return this.state === this.STATES.INITIAL || this.state === this.STATES.LOADING
+  }
+
+  get isInitialized() {
+    return this.state !== this.STATES.INITIAL
   }
 
   async fetchData() {

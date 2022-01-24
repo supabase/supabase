@@ -97,7 +97,7 @@ const TableEditorMenu: FC<Props> = ({
     <div className="my-6 flex flex-col flex-grow">
       {/* Schema selection dropdown */}
       <div className="mx-4">
-        {meta.schemas.isLoading ? (
+        {!meta.schemas.isInitialized ? (
           <div className="h-[30px] border border-gray-500 px-3 rounded flex items-center space-x-3">
             <IconLoader className="animate-spin" size={14} />
             <Typography.Text small>Loading schemas...</Typography.Text>
