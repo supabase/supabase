@@ -28,9 +28,9 @@ const TableEditorLayout: FC<Props> = ({
   children,
 }) => {
   const { meta } = useStore()
-  const { isLoading, error } = meta.tables
+  const { isInitialized, isLoading, error } = meta.tables
 
-  const [loaded, setLoaded] = useState<boolean>(false)
+  const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
   useEffect(() => {
     meta.schemas.load()
