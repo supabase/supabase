@@ -129,7 +129,6 @@ info:
           - auth.setAuth()
           - auth.onAuthStateChange()
           - auth.api.getUser()
-          - Reset Password (Email)
       - name: 'Auth (Server Only)'
         items:
           - auth.api.createUser()
@@ -138,6 +137,7 @@ info:
           - auth.api.inviteUserByEmail()
           - auth.api.sendMobileOTP()
           - auth.api.resetPasswordForEmail()
+          - auth.api.updateUserById()
       - name: 'Database'
         items:
           - select()
@@ -216,7 +216,7 @@ pages:
       ```bash
       npm install @supabase/supabase-js
       ```
-      
+
       Via Yarn
       ```bash
       yarn add @supabase/supabase-js
@@ -480,7 +480,7 @@ pages:
             phone: '+13334445555',
             password: 'some-password',
           })
-          
+
           // After receiving an SMS with One Time Password.
           let { session, error } = await supabase.auth.verifyOTP({
             phone: '+13334445555',
@@ -524,7 +524,7 @@ pages:
           })
           ```
       - name: Sign in with Phone.
-        description: Supabase supports Phone Auth. 
+        description: Supabase supports Phone Auth.
         js: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
@@ -900,6 +900,22 @@ pages:
             'invite',
             'email@example.com'
           )
+          ```
+  auth.api.updateUserById():
+    title: 'updateUserById()'
+    $ref: '@supabase/gotrue-js.GoTrueApi.updateUserById'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should only be called on a server. Never expose your `service_role` key in the browser.
+    examples:
+      - name: Updates the user data.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.api.updateUserById({
+            uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            attributes: { app_metadata: { plan: 'trial' } } ,
+          })
           ```
 
   select():
