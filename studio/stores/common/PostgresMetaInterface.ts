@@ -23,6 +23,12 @@ export interface IPostgresMetaInterface<T> {
   byId: (id: number | string) => T | undefined
   initialDataArray: (value: T[]) => void
 }
+
+// [TODO] Need to refactor the logic for 'isInitialized'
+// Should avoid page level "loaded" state like TableEditorLayout
+// The logic should be - state should be INITIAL at first, and only
+// taken as initialized after the first trigger of the load method.
+// https://github.com/supabase/supabase/pull/5128#pullrequestreview-860706726
 export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<T> {
   STATES = {
     INITIAL: 'initial',
