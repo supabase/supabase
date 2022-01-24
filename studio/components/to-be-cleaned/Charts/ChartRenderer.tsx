@@ -115,11 +115,6 @@ const NoData = () => (
       <IconBarChart2 />
     </Typography.Text>
     <Typography.Text>No data to show</Typography.Text>
-    <div className="text-center">
-      <Typography.Text small className="opacity-50">
-        May take 24 hours for data to appear
-      </Typography.Text>
-    </div>
   </div>
 )
 
