@@ -12,6 +12,7 @@ module.exports = {
   favicon: '/favicon.ico',
   organizationName: 'supabase', // Usually your GitHub org/user name.
   projectName: 'supabase', // Usually your repo name.
+  onBrokenLinks: 'warn',
   themeConfig: {
     forceDarkMode: true,
     darkMode: true,
