@@ -23,7 +23,7 @@ interface Props {
   hideIconBar?: boolean
 }
 
-const BaseLayout: FC<Props> = ({
+const ProjectLayout: FC<Props> = ({
   title,
   isLoading = false,
   product = '',
@@ -88,4 +88,4 @@ const BaseLayout: FC<Props> = ({
   )
 }
 
-export default observer(BaseLayout)
+export default observer(ProjectLayout)

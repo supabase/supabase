@@ -10,6 +10,7 @@ import {
   Tooltip,
   Cell,
   ResponsiveContainer,
+  TooltipProps,
 } from 'recharts'
 
 import dayjs from 'dayjs'
@@ -17,6 +18,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { formatBytes } from 'lib/helpers'
+import { TooltipType } from 'recharts/types/util/types'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(timezone)
@@ -115,11 +117,6 @@ const NoData = () => (
       <IconBarChart2 />
     </Typography.Text>
     <Typography.Text>No data to show</Typography.Text>
-    <div className="text-center">
-      <Typography.Text small className="opacity-50">
-        May take 24 hours for data to appear
-      </Typography.Text>
-    </div>
   </div>
 )
 
@@ -146,6 +143,7 @@ export function BarChart({
   highlightedValue,
   customDateFormat,
   label,
+  onBarClick,
 }: any) {
   const hasData = data ? dataCheck(data, attribute) : true
 
@@ -190,9 +188,13 @@ export function BarChart({
                   left: 0,
                   bottom: 0,
                 }}
-                className="overflow-visible"
+                className="overflow-visible cursor-pointer"
                 onMouseMove={onMouseMove}
                 onMouseLeave={onMouseLeave}
+                onClick={(tooltipData: any) => {
+                  // receives tooltip data https://github.com/recharts/recharts/blob/2a3405ff64a0c050d2cf94c36f0beef738d9e9c2/src/chart/generateCategoricalChart.tsx
+                  if (onBarClick) onBarClick(tooltipData)
+                }}
               >
                 <XAxis
                   dataKey="period_start"
@@ -217,7 +219,9 @@ export function BarChart({
                   {data?.map((entry: any, index: any) => (
                     <Cell
                       key={`cell-${index}`}
-                      className="transition-all duration-300"
+                      className={`transition-all duration-300 ${
+                        onBarClick ? 'cursor-pointer' : ''
+                      }`}
                       fill={
                         focusBar === index || mouseLeave ? '#3ecf8e' : 'rgba(62, 207, 142, 0.2)'
                       }

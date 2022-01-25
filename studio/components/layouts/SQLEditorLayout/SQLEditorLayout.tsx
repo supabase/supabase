@@ -14,9 +14,9 @@ interface Props {
 
 const SQLEditorLayout: FC<Props> = ({ title, children }) => {
   const { content } = useStore()
-  const { isLoading, error } = content
+  const { isInitialized, isLoading, error } = content
 
-  const [loaded, setLoaded] = useState(false)
+  const [loaded, setLoaded] = useState(isInitialized)
 
   useEffect(() => {
     content.load()

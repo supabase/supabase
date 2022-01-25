@@ -15,6 +15,7 @@ import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 import { BarChart, AreaChart } from './ChartRenderer'
 import { ChartData } from './ChartHandler.types'
+import { TooltipProps } from 'recharts'
 
 interface Props {
   label: string
@@ -30,6 +31,7 @@ interface Props {
   hideChartType?: boolean
   data?: ChartData
   isLoading?: boolean
+  onBarClick?: (v: any) => void
 }
 
 /**
@@ -55,6 +57,7 @@ const ChartHandler: FC<Props> = ({
   hideChartType = false,
   data,
   isLoading,
+  onBarClick,
 }) => {
   const router = useRouter()
   const { ref } = router.query
@@ -169,6 +172,7 @@ const ChartHandler: FC<Props> = ({
           highlightedValue={highlightedValue}
           label={label}
           customDateFormat={customDateFormat}
+          onBarClick={onBarClick}
         />
       ) : (
         <AreaChart

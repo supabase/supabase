@@ -72,3 +72,19 @@ Then run the following commands to install dependencies and start the dashboard.
 npm install
 npm run dev
 ```
+
+## UI Testing Notes
+
+### `<Popover>` vs `<Dropdown>`
+
+When simulating clicks on these components, do the following:
+
+```js
+// for Popovers
+import userEvent from '@testing-library/user-event'
+userEvent.click('Hello world')
+
+// for Popovers
+import clickDropdown from 'tests/helpers'
+clickDropdown('Hello world')
+```

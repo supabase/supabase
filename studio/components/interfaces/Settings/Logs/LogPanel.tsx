@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react'
+import React, { FC, SyntheticEvent, useEffect, useMemo, useState } from 'react'
 import {
   Button,
   Input,
@@ -9,20 +9,27 @@ import {
   IconX,
   Toggle,
   IconSearch,
+  IconClock,
+  Popover,
 } from '@supabase/ui'
-import { LogTemplate } from '.'
-
+import { LogSearchCallback, LogTemplate } from '.'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import Flag from 'components/ui/Flag/Flag'
 interface Props {
   defaultSearchValue?: string
+  defaultFromValue?: string
   templates?: any
   isLoading: boolean
   isCustomQuery: boolean
   newCount: number
   onRefresh?: () => void
-  onSearch?: (query: string) => void
+  onSearch?: LogSearchCallback
   onCustomClick?: () => void
   onSelectTemplate: (template: LogTemplate) => void
 }
+
+dayjs.extend(utc)
 
 /**
  * Logs control panel header + wrapper
@@ -35,11 +42,13 @@ const LogPanel: FC<Props> = ({
   onRefresh,
   onSearch = () => {},
   defaultSearchValue = '',
+  defaultFromValue = '',
   onCustomClick,
   onSelectTemplate,
 }) => {
   const [search, setSearch] = useState('')
-
+  const [from, setFrom] = useState({ value: '', error: '' })
+  const [defaultTimestamp, setDefaultTimestamp] = useState(dayjs().utc().toISOString())
   // sync local state with provided default value
   useEffect(() => {
     if (search !== defaultSearchValue) {
@@ -47,6 +56,30 @@ const LogPanel: FC<Props> = ({
     }
   }, [defaultSearchValue])
 
+  useEffect(() => {
+    if (from.value !== defaultFromValue) {
+      setFrom({ value: defaultFromValue, error: '' })
+    }
+  }, [defaultFromValue])
+
+  const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    if (value !== '' && isNaN(Date.parse(value))) {
+      setFrom({ value, error: 'Invalid ISO 8601 timestamp' })
+    } else {
+      setFrom({ value, error: '' })
+    }
+  }
+  const handleFromReset = async () => {
+    setFrom({ value: '', error: '' })
+    const value = dayjs().utc().toISOString()
+    setDefaultTimestamp(value)
+    onSearch({ query: search, from: '' })
+  }
+
+  const handleSearch = () => onSearch({ query: search, from: from.value })
+
+  const showFromReset = from.value !== ''
   return (
     <div className="bg-panel-header-light dark:bg-panel-header-dark">
       <div className="px-2 py-1 flex items-center justify-between w-full">
@@ -86,7 +119,7 @@ const LogPanel: FC<Props> = ({
               </Dropdown.Item>
             ))}
           >
-            <Button type="text" iconRight={<IconChevronDown />}>
+            <Button as="span" type="text" iconRight={<IconChevronDown />}>
               Templates
             </Button>
           </Dropdown>
@@ -99,43 +132,98 @@ const LogPanel: FC<Props> = ({
           </div>
         </div>
         <div className="flex items-center gap-x-4">
-          {/* wrap with form so that if user presses enter, the search value will submit automatically */}
           {!isCustomQuery && (
-            <form
-              id="log-panel-search"
-              onSubmit={(e) => {
-                // prevent redirection
-                e.preventDefault()
-                onSearch(search)
-              }}
-            >
-              <Input
-                placeholder="Search events"
-                onChange={(e) => setSearch(e.target.value)}
-                value={search}
-                actions={[
-                  search && (
-                    <IconX
-                      key="clear-search"
-                      size="tiny"
-                      className="cursor-pointer mx-1"
-                      title="Clear search"
-                      onClick={() => setSearch('')}
-                    />
-                  ),
-
-                  <Button
-                    key="go"
-                    size="tiny"
-                    title="Go"
-                    type="secondary"
-                    onClick={() => onSearch(search)}
+            <>
+              <Flag name="logsTimestampFilter">
+                <div className="flex flex-row">
+                  <Popover
+                    side="bottom"
+                    align="end"
+                    portalled
+                    overlay={
+                      <Input
+                        label="From"
+                        labelOptional="UTC"
+                        value={from.value === '' ? defaultTimestamp : from.value}
+                        onChange={handleFromChange}
+                        error={from.error}
+                        className="w-72 p-3"
+                        actions={[
+                          from.value && (
+                            <IconX
+                              key="reset-from"
+                              size="tiny"
+                              className="cursor-pointer mx-1"
+                              title="Reset"
+                              onClick={handleFromReset}
+                            />
+                          ),
+                          <Button
+                            key="set"
+                            size="tiny"
+                            title="Set"
+                            type="secondary"
+                            onClick={handleSearch}
+                          >
+                            Set
+                          </Button>,
+                        ]}
+                      />
+                    }
                   >
-                    <IconSearch size={16} />
-                  </Button>,
-                ]}
-              />
-            </form>
+                    <Button
+                      as="span"
+                      size="tiny"
+                      className={showFromReset ? '!rounded-r-none' : ''}
+                      type={showFromReset ? 'outline' : 'text'}
+                      icon={<IconClock size="tiny" />}
+                    >
+                      {from.value ? 'Custom' : 'Now'}
+                    </Button>
+                  </Popover>
+                  {showFromReset && (
+                    <Button
+                      size="tiny"
+                      className={showFromReset ? '!rounded-l-none' : ''}
+                      icon={<IconX size="tiny" />}
+                      type="outline"
+                      title="Clear timestamp filter"
+                      onClick={handleFromReset}
+                    />
+                  )}
+                </div>
+              </Flag>
+              {/* wrap with form so that if user presses enter, the search value will submit automatically */}
+              <form
+                id="log-panel-search"
+                onSubmit={(e) => {
+                  // prevent redirection
+                  e.preventDefault()
+                  handleSearch()
+                }}
+              >
+                <Input
+                  placeholder="Search events"
+                  onChange={(e) => setSearch(e.target.value)}
+                  value={search}
+                  actions={[
+                    search && (
+                      <IconX
+                        key="clear-search"
+                        size="tiny"
+                        className="cursor-pointer mx-1"
+                        title="Clear search"
+                        onClick={() => setSearch('')}
+                      />
+                    ),
+
+                    <Button key="go" size="tiny" title="Go" type="secondary" onClick={handleSearch}>
+                      <IconSearch size={16} />
+                    </Button>,
+                  ]}
+                />
+              </form>
+            </>
           )}
         </div>
       </div>

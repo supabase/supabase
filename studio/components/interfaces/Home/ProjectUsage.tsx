@@ -21,6 +21,9 @@ import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 import { get } from 'lib/common/fetch'
 import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
 import { useFlag } from 'hooks'
+import { TooltipProps } from 'recharts'
+import { TooltipType } from 'recharts/types/util/types'
+import { TooltipContentProps, TooltipTriggerProps } from '@radix-ui/react-tooltip'
 
 const CHART_INTERVALS = [
   { key: 'minutely', label: '60 minutes', startValue: 1, startUnit: 'hour', format: 'MMM D, h:ma' },
@@ -32,6 +35,7 @@ interface Props {
 }
 
 const ProjectUsage: FC<Props> = ({ project }) => {
+  const logsTimestampFilter = useFlag('logsTimestampFilter')
   const logsUsageChartIntervals = useFlag('logsUsageChartIntervals')
   const [interval, setInterval] = useState<string>('minutely')
   const router = useRouter()
@@ -53,6 +57,21 @@ const ProjectUsage: FC<Props> = ({ project }) => {
   const endDate = dayjs().format(DATE_FORMAT)
   const charts = data?.data
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
+  const handleBarClick = (v: any) => {
+    if (!logsTimestampFilter) return
+    if (!v || !v.activePayload?.[0]?.payload) return
+    // returns rechart internal tooltip data type
+    const payload = v.activePayload[0].payload
+    const timestamp = payload.timestamp
+    const timestampDigits = String(timestamp).length
+    if (timestampDigits < 16) {
+      // pad unix timestamp with additional 0 and then forward
+      const paddedTimestamp = String(timestamp) + '0'.repeat(16 - timestampDigits)
+      router.push(`/project/${ref}/settings/logs/rest?te=${paddedTimestamp}`)
+    } else {
+      router.push(`/project/${ref}/settings/logs/rest?te=${timestamp}`)
+    }
+  }
   return (
     <div className="mx-6 space-y-6">
       <div className="flex flex-row justify-between align-center w-full">
@@ -99,6 +118,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
+                  onBarClick={handleBarClick}
                 />
                 <ProjectUsageMinimal
                   projectRef={project.ref}
@@ -125,6 +145,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
+                  onBarClick={handleBarClick}
                 />
                 <ProjectUsageMinimal
                   projectRef={project.ref}
@@ -151,6 +172,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
+                  onBarClick={handleBarClick}
                 />
                 <ProjectUsageMinimal
                   projectRef={project.ref}
@@ -173,6 +195,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
+                  onBarClick={handleBarClick}
                 />
                 {/* Empty space just so the cards are of the same height */}
                 <div className="py-[26px]" />

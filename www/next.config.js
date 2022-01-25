@@ -615,6 +615,21 @@ module.exports = withMDX({
         source: '/docs/guides/database/connecting/direct-connections',
         destination: '/docs/guides/database/connection-pooling',
       },
+      {
+        permanent: true,
+        source: '/docs/guides',
+        destination: '/docs/',
+      },
+      {
+        permanent: true,
+        source: '/guides/database/introduction',
+        destination: '/guides/database',
+      },
+      {
+        permanent: true,
+        source: '/guides/auth',
+        destination: '/guides/auth/intro',
+      },
     ]
   },
 })

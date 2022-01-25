@@ -14,8 +14,8 @@ services:
     ports:
       - ${STUDIO_PORT}:3000/tcp
     environment:
-      SUPABASE_URL: http://kong:8000
-      STUDIO_PG_META_URL: http://meta:8080
+      SUPABASE_URL: ${KONG_URL}
+      STUDIO_PG_META_URL: ${META_URL}
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
 
