@@ -72,17 +72,28 @@ test('timestamp from filter default value', async () => {
   render(<LogPanel defaultFromValue="2022-01-18T10:43:39+0000" />)
   userEvent.click(await screen.findByText('Custom'))
   await screen.findByDisplayValue('2022-01-18T10:43:39+0000')
-})
-test('timestamp from filter', async () => {
-  const mockFn = jest.fn()
-  render(<LogPanel onSearch={mockFn} />)
-  const dropdown = await screen.findByText(/Now/)
-
-  // click the dropdown
-  userEvent.click(dropdown)
-
   // TODO: use screen.findByLabelText when https://github.com/supabase/ui/issues/310 is resolved
   await screen.findByText('From')
+  await screen.findByTitle('Reset')
+})
+
+test('timestamp from filter error handling', async () => {
+  const mockFn = jest.fn()
+  render(<LogPanel onSearch={mockFn} />)
+  userEvent.click(await screen.findByText(/Now/))
+
+  // display iso timestamp
+  const year = new Date().getFullYear()
+  const input = await screen.findByDisplayValue(RegExp(year))
+  userEvent.clear(input)
+  userEvent.type(input, '123456')
+  await screen.findByText(/[iI]nvalid ISO 8601 timestamp/)
+})
+
+test('timestamp from filter value change', async () => {
+  const mockFn = jest.fn()
+  render(<LogPanel onSearch={mockFn} />)
+  userEvent.click(await screen.findByText(/Now/))
   // display iso timestamp
   const year = new Date().getFullYear()
   const input = await screen.findByDisplayValue(RegExp(year))
@@ -90,19 +101,12 @@ test('timestamp from filter', async () => {
   // replace the input's value
   userEvent.clear(input)
 
-  // type some random input to check for error handling
-  userEvent.type(input, '123456')
-  await screen.findByText(/[iI]nvalid ISO 8601 timestamp/)
-  userEvent.clear(input)
-  await expect(screen.findByText(/[iI]nvalid ISO 8601 timestamp/)).rejects.toThrow()
-
   // get time 20 mins before
   const newDate = new Date()
   newDate.setMinutes(new Date().getMinutes() - 20)
   userEvent.type(input, newDate.toISOString())
 
   // input actions
-  await screen.findByTitle('Reset')
   const set = await screen.findByRole('button', { name: 'Set' })
 
   userEvent.click(set)
