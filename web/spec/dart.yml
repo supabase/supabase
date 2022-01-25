@@ -772,6 +772,7 @@ pages:
     title: 'stream()'
     notes: |
       - `stream()` will emit the initial data as well as any further change on the database as `Stream` of `List<Map<String, dynamic>>` by combining Postgrest and Realtime.
+      - Takes a list of primary key columns as its argument.
     examples:
       - name: Listening to a specific table
         isSpotlight: true
@@ -779,7 +780,7 @@ pages:
           ```dart
           supabase
             .from('countries')
-            .stream()
+            .stream(['id'])
             .execute();
           ```
       - name: Listening to a specific rows within a table
@@ -790,7 +791,7 @@ pages:
           ```dart
           supabase
             .from('countries:id=eq.120')
-            .stream()
+            .stream(['id'])
             .execute();
           ```
       - name: With `order()`
@@ -798,7 +799,7 @@ pages:
           ```dart
           supabase
             .from('countries')
-            .stream()
+            .stream(['id'])
             .order('name', ascending: false)
             .execute();
           ```
@@ -807,7 +808,7 @@ pages:
           ```dart
           supabase
             .from('countries')
-            .stream()
+            .stream(['id'])
             .order('name', ascending: false)
             .limit(10)
             .execute();
