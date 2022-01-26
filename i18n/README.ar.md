@@ -39,7 +39,7 @@
 
 <kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
-## كيف تعمل (Supabase)؟
+## كيف يعمل (Supabase)؟
 
  <span dir="ltr">Supabase</span> عبارة عن مجموعة من الأدوات مفتوحة المصدر. نحن نبني ميزات <span dir="ltr">Firebase</span> باستخدام أدوات مفتوحة المصدر عالية الجودة تستخدمها الشركات. إذا كانت الأدوات والمجتمعات موجودة ، باستخدام <span dir="ltr">MIT</span> أو<span dir="ltr">Apache 2</span> أو ترخيص مفتوح مكافئ ، فسنستخدم هذه الأداة وندعمها. إذا لم تكن الأداة موجودة ، فإننا نبنيها ونفتح مصدرها بأنفسنا. <span dir="ltr">Supabase</span> ليس تعيين 1 إلى 1 لـ<span dir="ltr">Firebase</span>. هدفنا هو منح المطورين تجربة مطور تشبه <span dir="ltr">Firebase</span> باستخدام أدوات مفتوحة المصدر.
 
