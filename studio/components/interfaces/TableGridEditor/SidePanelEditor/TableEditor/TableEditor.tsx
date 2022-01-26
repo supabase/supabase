@@ -175,7 +175,7 @@ const TableEditor: FC<Props> = ({
               <Badge color="green">Recommended</Badge>
             </div>
           }
-          description="Restrict access to your table by enabling RLS and writing Postgres policies"
+          description="Restrict access to your table by enabling RLS and writing Postgres policies. If RLS is not enabled, anyone with the anon key can modify and delete your data."
           checked={tableFields?.isRLSEnabled}
           onChange={() => onUpdateField({ isRLSEnabled: !tableFields?.isRLSEnabled })}
           size="medium"
