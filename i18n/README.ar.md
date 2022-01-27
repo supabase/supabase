@@ -46,6 +46,18 @@ Supabase عبارة عن مجموعة من الأدوات مفتوحة المص�
 
 **الهيكلة الحالية**
 
+(supabase) هي [منصة مستضافة](https://app.supabase.io), يمكنك التسجيل والبدأ باستخدامها دون الحاجة لتثبيت أي شئ. يمكنك أيضا [استضافتها ذاتيا](https://supabase.com/docs/guides/self-hosting) و [تطويرها داخليا](https://supabase.com/docs/guides/local-development).
+
+![Architecture](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+
+- [PostgreSQL](https://www.postgresql.org/) هي قاعدة بيانات قائمة على العلاقات الشيئية مع ٣٠ سنة من التطوير النشط التي اكسبتها سمعة وموثقية قوية وتمتاز بالمتانة والأداء.
+- [Realtime](https://github.com/supabase/realtime)
+- [PostgREST](http://postgrest.org/)
+- [Storage](https://github.com/supabase/storage-api)
+- [postgres-meta](https://github.com/supabase/postgres-meta)
+- [GoTrue](https://github.com/netlify/gotrue)
+- [Kong](https://github.com/Kong/kong)
+
 #### المكتبات
 
 مكتباتنا معيارية. كل مكتبة فرعية هي تطبيق مستقل لنظام خارجي واحد. هذه إحدى الطرق التي ندعم بها الأدوات الحالية.
