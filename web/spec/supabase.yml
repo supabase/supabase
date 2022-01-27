@@ -576,6 +576,22 @@ pages:
             });
           });
           ```
+      - name: Sign in with Open ID Connect.
+        description: |
+          Supabase support signing in with Open ID Connect.
+        js: |
+          ```js
+           const { user, session, error } = await supabase.auth.signIn({
+            phone: '+13334445555',
+            password: 'some-password',
+            open_id_connect: {
+              id_token: string,
+              nonce: string,
+              provider: string
+            }
+          })
+          ```
+       
 
   auth.signOut():
     title: 'signOut()'
