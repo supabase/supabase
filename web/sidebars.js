@@ -168,6 +168,7 @@ module.exports = {
       label: 'Integrations',
       collapsed: false,
       items: [
+        'guides/integrations/appsmith',
         'guides/integrations/auth0',
         'guides/integrations/draftbit',
         'guides/integrations/prisma',
