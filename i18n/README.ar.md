@@ -50,9 +50,9 @@ Supabase عبارة عن مجموعة من الأدوات مفتوحة المص�
 ![Architecture](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) هي قاعدة بيانات قائمة على العلاقات الشيئية مع ٣٠ سنة من التطوير النشط التي اكسبتها سمعة وموثقية قوية وتمتاز بالمتانة والأداء.
-- [Realtime](https://github.com/supabase/realtime) 
+- [Realtime](https://github.com/supabase/realtime)
 - [PostgREST](http://postgrest.org/)
-- [Storage](https://github.com/supabase/storage-api) 
+- [Storage](https://github.com/supabase/storage-api)
 - [postgres-meta](https://github.com/supabase/postgres-meta)
 - [GoTrue](https://github.com/netlify/gotrue)
 - [Kong](https://github.com/Kong/kong)
