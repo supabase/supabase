@@ -582,8 +582,6 @@ pages:
         js: |
           ```js
            const { user, session, error } = await supabase.auth.signIn({
-            phone: '+13334445555',
-            password: 'some-password',
             openIDConnect: {
               IDToken: string,
               nonce: string,
