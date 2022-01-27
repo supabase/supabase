@@ -303,7 +303,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo = pluckObjectFields(formModel, DB_FIELDS)
 
-  const defaultURIConnString =
+  const defaultUriConnString =
     `postgresql://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
     `${connectionInfo.db_host}:${connectionInfo.db_port.toString()}` +
     `/${connectionInfo.db_name}`
@@ -311,10 +311,10 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
     `user=${connectionInfo.db_user} password=[YOUR-PASSWORD] ` +
     `host=${connectionInfo.db_host} port=${connectionInfo.db_port.toString()}` +
     ` dbname=${connectionInfo.db_name}`
-  const defaultPSQLConnString = 
-    `psql -h db.` + `${connectionInfo.db_host}` + `.supabase.co -p ` +
-    `${connectionInfo.db_port.toString()}` + ` -d ${connectionInfo.db_name}` +
-    ` -U ${connectionInfo.db_user}`
+  const defaultPsqlConnString = 
+    `psql -h db.${connectionInfo.db_host}.supabase.co -p ` +
+    `${connectionInfo.db_port.toString()} -d ${connectionInfo.db_name} ` +
+    `-U ${connectionInfo.db_user}`
 
   return (
     <>
@@ -396,12 +396,12 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
               <Tabs type="underlined">
                 {/* @ts-ignore */}
                 <Tabs.Panel id="psql" label="PSQL">
-                  <Input copy readOnly disabled value={defaultPSQLConnString} />
+                  <Input copy readOnly disabled value={defaultPsqlConnString} />
                 </Tabs.Panel>
 
                 {/* @ts-ignore */}
                 <Tabs.Panel id="uri" label="URI">
-                  <Input copy readOnly disabled value={defaultURIConnString} />
+                  <Input copy readOnly disabled value={defaultUriConnString} />
                 </Tabs.Panel>
 
                 {/* @ts-ignore */}
@@ -442,7 +442,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
 
                 {/* @ts-ignore */}
                 <Tabs.Panel id="nodejs" label="Nodejs">
-                  <Input copy readOnly disabled value={defaultURIConnString} />
+                  <Input copy readOnly disabled value={defaultUriConnString} />
                 </Tabs.Panel>
 
                 {/* @ts-ignore */}
