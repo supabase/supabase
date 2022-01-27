@@ -21,6 +21,7 @@ import CodeEditor from 'components/ui/CodeEditor'
 import {
   LogPanel,
   LogTable,
+  LogEventChart,
   Count,
   Logs,
   LogTemplate,
@@ -205,12 +206,12 @@ export const LogPage: NextPage = () => {
       },
     })
   }
-  const handleSearch: LogSearchCallback = ({ query, from }) => {
-    const unixMicro = dayjs(from).valueOf() * 1000
+  const handleSearch: LogSearchCallback = ({ query, from, fromMicro }) => {
+    const unixMicro = fromMicro ? fromMicro : dayjs(from).valueOf() * 1000
     setParams((prev) => ({
       ...prev,
       search_query: query || '',
-      timestamp_end: from ? String(unixMicro) : '',
+      timestamp_end: unixMicro ? String(unixMicro) : '',
       where: '',
       sql: '',
     }))
@@ -287,6 +288,14 @@ export const LogPage: NextPage = () => {
             </div>
           </React.Fragment>
         )}
+        <div>
+          <LogEventChart
+            data={logData}
+            onBarClick={(timestampMicro) => {
+              handleSearch({ query: params.search_query, fromMicro: timestampMicro })
+            }}
+          />
+        </div>
         <div className="flex flex-col flex-grow relative">
           {isValidating && (
             <div
