@@ -54,6 +54,7 @@ export const LogPage: NextPage = () => {
   const { ref, type, q, s, te } = router.query
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState('')
+  const [showChart, setShowChart] = useState(true)
   const [mode, setMode] = useState<'simple' | 'custom'>('simple')
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
   const [params, setParams] = useState({
@@ -232,6 +233,8 @@ export const LogPage: NextPage = () => {
     <SettingsLayout title={title}>
       <div className="h-full flex flex-col flex-grow">
         <LogPanel
+          isShowingEventChart={showChart}
+          onToggleEventChart={() => setShowChart(!showChart)}
           isCustomQuery={mode === 'custom'}
           isLoading={isValidating}
           newCount={newCount}
@@ -288,14 +291,16 @@ export const LogPage: NextPage = () => {
             </div>
           </React.Fragment>
         )}
-        <div>
-          <LogEventChart
-            data={logData}
-            onBarClick={(timestampMicro) => {
-              handleSearch({ query: params.search_query, fromMicro: timestampMicro })
-            }}
-          />
-        </div>
+        {showChart && mode !== 'custom' && (
+          <div>
+            <LogEventChart
+              data={logData}
+              onBarClick={(timestampMicro) => {
+                handleSearch({ query: params.search_query, fromMicro: timestampMicro })
+              }}
+            />
+          </div>
+        )}
         <div className="flex flex-col flex-grow relative">
           {isValidating && (
             <div
