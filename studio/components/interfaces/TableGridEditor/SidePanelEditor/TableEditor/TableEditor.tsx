@@ -131,14 +131,14 @@ const TableEditor: FC<Props> = ({
 
   return (
     <SidePanel
-      wide
+      size="large"
       key="TableEditor"
       visible={visible}
       // @ts-ignore
-      title={<HeaderTitle table={table} isDuplicating={isDuplicating} />}
+      header={<HeaderTitle table={table} isDuplicating={isDuplicating} />}
       className={`transition-all ease-in duration-100 ${isImportingSpreadsheet ? ' mr-32' : ''}`}
       onCancel={closePanel}
-      onConfirm={(resolve: () => void) => onSaveChanges(resolve)}
+      onConfirm={() => (resolve: () => void) => onSaveChanges(resolve)}
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
@@ -148,7 +148,7 @@ const TableEditor: FC<Props> = ({
         />
       }
     >
-      <Space direction="vertical" size={6} style={{ width: '100%' }}>
+      <div className="space-y-10 py-6">
         <Input
           label="Name"
           layout="horizontal"
@@ -209,7 +209,7 @@ const TableEditor: FC<Props> = ({
             />
           </>
         )}
-      </Space>
+      </div>
       <SpreadsheetImport
         visible={isImportingSpreadsheet}
         headers={importContent?.headers}

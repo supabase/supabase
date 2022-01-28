@@ -44,8 +44,9 @@
   flex-wrap: wrap;
 }
 
+// TO DO: REMOVE
 label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):not(.sbui-radio-container):not(.checkbox-pill) {
-  @apply inline-block text-input-label-light dark:text-input-label-dark text-sm py-2;
+  @apply inline-block text-scale-1100 text-sm py-2;
   width: 33%;
   align-self: top;
 }
@@ -74,6 +75,10 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
 
 .Form .form-error {
   @apply text-red-400;
+}
+
+.Form .text-danger {
+  @apply text-red-900;
 }
 
 .Form .form-help {
@@ -122,6 +127,7 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
 }
 
 .table-container thead th {
+  @apply text-scale-900 font-normal text-sm;
   @apply bg-table-header-light dark:bg-table-header-dark;
   @apply border-t border-b border-table-border-light dark:border-table-border-dark;
 }
@@ -149,7 +155,7 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
 }
 
 .table-container tbody td {
-  @apply border-b p-3 px-4 text-sm text-gray-300 border-table-border-light dark:border-table-border-dark;
+  @apply border-b p-3 px-4 text-sm text-gray-1100 border-table-border-light dark:border-table-border-dark;
 }
 
 .table-container tbody td:first-child {
@@ -313,7 +319,7 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
 
 .radix-tooltip-arrow {
   polygon {
-    @apply dark:fill-[#1f1f1f];
-    fill: #eeeeee;
+    @apply fill-scale-100 dark:fill-scale-100;
+    // fill: #eeeeee;
   }
 }

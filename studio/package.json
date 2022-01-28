@@ -17,12 +17,12 @@
     "@radix-ui/react-tooltip": "^0.1.6",
     "@sentry/browser": "^6.15.0",
     "@sentry/nextjs": "^6.15.0",
-    "@supabase/grid": "^2.4.3",
+    "@supabase/grid": "v2.5.0-alpha.4",
     "@supabase/postgres-meta": "^0.26.1",
     "@supabase/react-data-grid": "^7.1.0-beta.7",
     "@supabase/shared-types": "^0.1.15",
     "@supabase/supabase-js": "^1.29.1",
-    "@supabase/ui": "^0.36.4",
+    "@supabase/ui": "0.37.0-alpha.40",
     "ajv": "^8.6.3",
     "analytics-node": "^3.5.0",
     "clipboard": "^2.0.8",
@@ -62,6 +62,7 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.2",
     "@testing-library/dom": "^8.11.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
@@ -80,11 +81,11 @@
     "@types/semver": "^7.3.9",
     "@types/sqlstring": "^2.3.0",
     "@types/zxcvbn": "^4.4.1",
-    "autoprefixer": "^10.2.6",
+    "autoprefixer": "^10.4.2",
     "jest": "^27.4.0",
     "jest-canvas-mock": "^2.3.1",
-    "postcss": "^8.3.5",
-    "tailwindcss": "^2.2.4",
+    "postcss": "^8.4.6",
+    "tailwindcss": "^3.0.22",
     "ts-jest": "^27.0.7",
     "typescript": "4.3.4"
   }
