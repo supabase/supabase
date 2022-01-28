@@ -1,20 +1,24 @@
-# Supabase Integration Doc
+---
+id: appsmith
+title: 'appsmith'
+description: 'Integration supabase with appsmith'
+---
 
 This guide explains how to quickly build a Support Dashboard by connecting a Supabase back-end to an Appsmith front-end.
 
 [Appsmith](https://www.appsmith.com/) is an open-source framework for building internal tools. It lets you drag-and-drop UI components to build pages, connect to any API, database or GraphQL source and write logic with JavaScript objects.
 
-If you don’t have an Appsmith account, create one [here](https://app.appsmith.com/user/signup).
+If you don’t have an Appsmith account, create one [here](https://app.appsmith.com/user/signup).
 
 Let’s get started!
 
 # Step 1: Set up your Backend on Supabase
 
-- On the [Supabase dashboard](https://app.supabase.io), click `New project` and set the name to **Support Dashboard**
+- On the [Supabase dashboard](https://app.supabase.io), click `New project` and set the name to **Support Dashboard**
 
 ![create-project-supabase-01](/img/guides/integrations/appsmith/create-project-supabase-01.png)
 
-- Create a new table by clicking on the Create Table option on the side navigation.
+- Create a new table by clicking on the Create Table option on the side navigation.
 - Supabase provides many ways to add data to the tables, from writing queries to creating schemas using UI to simply uploading CSV files. For our support dashboard, we will be creating the **tickets** table by uploading the [CSV file](https://raw.githubusercontent.com/vihar/datasets/master/tickets.csv) on Supabase.
 
 ![create-table-supabase-02](/img/guides/integrations/appsmith/create-table-supabase-02.png)
@@ -39,7 +43,7 @@ The database is now set up.
 
 # Step 3: Build UI on Appsmith
 
-- Click on the + icon next to widgets and drag and drop a Tab widget. We can configure using the property pane by clicking on the cog icon on the top-right corner.
+- Click on the + icon next to widgets and drag and drop a Tab widget. We can configure using the property pane by clicking on the cog icon on the top-right corner.
 - As seen in the below screenshot, we have added four tabs to support the dashboard.
 
 ![property-pane-appsmith-06](/img/guides/integrations/appsmith/property-pane-appsmith-06.png)
@@ -71,7 +75,7 @@ VALUES('{{appsmith.store.ticket.id}}','{{moment().format('yyyy-mm-ddHH:MM:ss')}}
 '{{c_category.selectedOptionValue}}','{{c_assignee.selectedOptionValue}}');
 ```
 
-- Click the **Confirm** button on the modal and under **Events**, set the **onClick** property to execute the create_new_ticket query.
+- Click the **Confirm** button on the modal and under **Events**, set the **onClick** property to execute the create_new_ticket query.
 - Create a second query named **get_tickets** that will list all the tickets.
 
  ****
@@ -80,19 +84,19 @@ VALUES('{{appsmith.store.ticket.id}}','{{moment().format('yyyy-mm-ddHH:MM:ss')}}
 SELECT * FROM public."tickets";
 ```
 
-- Drag and drop a table widget under the **Assigned To Me** tab. Open the property pane and add the following snippet under **Table Data** to bind the query results.
+- Drag and drop a table widget under the **Assigned To Me** tab. Open the property pane and add the following snippet under **Table Data** to bind the query results.
 
 ```jsx
 {{get_tickets.data.filter(t => t.assignedTo === 'confidence@appsmith.com' && t.status !== 'closed')}}
 ```
 
-- Drag and drop a table widget under the **Resolved** tab. Open the property pane and add the following snippet under **Table Data** to bind the query results.
+- Drag and drop a table widget under the **Resolved** tab. Open the property pane and add the following snippet under **Table Data** to bind the query results.
 
 ```jsx
 {{get_tickets.data.filter(t => t.status === 'open')}}
 ```
 
-- Drag and drop a table widget under the **Closed** tab. Open the property pane and add the following snippet under **Table Data** to bind the query results.
+- Drag and drop a table widget under the **Closed** tab. Open the property pane and add the following snippet under **Table Data** to bind the query results.
 
 ```jsx
 {{get_tickets.data.filter(t => t.status === 'closed')}}
