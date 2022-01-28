@@ -171,7 +171,7 @@ function AuthComponentExample(props: Props) {
                         </svg>
                       </Button>
                     </Link>
-                    
+
                     <Link href="https://supabase.com/docs/guides/auth/auth-gitlab">
                       <Button type="default" size="large">
                         <svg
