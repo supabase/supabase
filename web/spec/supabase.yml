@@ -515,11 +515,11 @@ pages:
           })
           ```
       - name: Sign in using third-party providers.
-        description: Supabase supports OAuth logins.
+        description: Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
         js: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
-            // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
+            // provider can be 'github', 'google', 'gitlab', and more
             provider: 'github'
           })
           ```
