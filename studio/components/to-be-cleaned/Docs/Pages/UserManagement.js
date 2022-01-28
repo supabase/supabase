@@ -156,7 +156,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
       <div className="doc-section ">
         <article className="text ">
           <p>
-            Users can log in with Google, Facebook, Gitlab, Github, Azure, or Bitbucket. You must
+            Users can log in with Third Party OAuth like Google, Facebook, Github, and more. You must
             first enable each of these in the{' '}
             <span className="text-green-500">
               <Link key={'AUTH'} href={`/project/${router.query.ref}/auth/settings`}>
@@ -166,9 +166,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
             tab.
           </p>
           <p>
-            <code>provider</code> can be <code>google</code>, <code>gitlab</code>,{' '}
-            <code>azure</code>, <code>facebook</code>, <code>github</code>, or{' '}
-            <code>bitbucket</code>
+            Vew all the available <a href='https://supabase.com/docs/guides/auth#providers' target='_blank'>Third Part OAuth providers</a>
           </p>
           <p>
             After they have logged in, all interactions using the Supabase JS client will be
