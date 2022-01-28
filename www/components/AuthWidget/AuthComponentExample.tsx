@@ -104,7 +104,7 @@ function AuthComponentExample(props: Props) {
                   </div>
                   <Typography.Text>Sign in with</Typography.Text>
                   <div className="flex justify-evenly">
-                    <Link href="">
+                    <Link href="https://supabase.com/docs/guides/auth/auth-facebook">
                       <Button type="default" size="large">
                         <svg
                           aria-hidden="true"
@@ -120,7 +120,8 @@ function AuthComponentExample(props: Props) {
                         </svg>
                       </Button>
                     </Link>
-                    <Link href="">
+
+                    <Link href="https://supabase.com/docs/guides/auth/auth-google">
                       <Button type="default" size="large">
                         <svg
                           aria-hidden="true"
@@ -136,7 +137,8 @@ function AuthComponentExample(props: Props) {
                         </svg>
                       </Button>
                     </Link>
-                    <Link href="">
+
+                    <Link href="https://supabase.com/docs/guides/auth/auth-github">
                       <Button type="default" size="large">
                         <svg
                           aria-hidden="true"
@@ -152,7 +154,8 @@ function AuthComponentExample(props: Props) {
                         </svg>
                       </Button>
                     </Link>
-                    <Link href="">
+
+                    <Link href="https://supabase.com/docs/guides/auth/auth-bitbucket">
                       <Button type="default" size="large">
                         <svg
                           aria-hidden="true"
@@ -168,7 +171,8 @@ function AuthComponentExample(props: Props) {
                         </svg>
                       </Button>
                     </Link>
-                    <Link href="">
+                    
+                    <Link href="https://supabase.com/docs/guides/auth/auth-gitlab">
                       <Button type="default" size="large">
                         <svg
                           aria-hidden="true"
