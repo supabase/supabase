@@ -143,7 +143,7 @@ const ColumnManagement: FC<Props> = ({
             <>
               {hasImportContent ? (
                 <div className="flex items-center space-x-3">
-                  <Button type="secondary" icon={<IconEdit />} onClick={onSelectImportData}>
+                  <Button type="default" icon={<IconEdit />} onClick={onSelectImportData}>
                     Edit content
                   </Button>
                   <Button danger type="outline" icon={<IconTrash />} onClick={onClearImportContent}>
@@ -151,7 +151,7 @@ const ColumnManagement: FC<Props> = ({
                   </Button>
                 </div>
               ) : (
-                <Button type="secondary" onClick={onSelectImportData}>
+                <Button type="default" onClick={onSelectImportData}>
                   Import data via spreadsheet
                 </Button>
               )}
@@ -291,7 +291,7 @@ const ColumnManagement: FC<Props> = ({
         </div>
 
         {!hasImportContent && (
-          <Button type="secondary" onClick={() => onAddColumn()}>
+          <Button type="default" onClick={() => onAddColumn()}>
             Add column
           </Button>
         )}

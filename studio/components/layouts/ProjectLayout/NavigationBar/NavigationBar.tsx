@@ -22,7 +22,18 @@ const NavigationBar: FC<Props> = ({}) => {
   const otherRoutes = generateOtherRoutes(projectRef)
 
   return (
-    <div className="h-screen w-14 flex flex-col justify-between p-2 overflow-y-hidden bg-sidebar-light dark:bg-sidebar-dark border-r dark:border-dark">
+    <div
+      className="
+      h-screen w-14 
+      flex flex-col 
+      justify-between 
+      p-2 
+      overflow-y-hidden 
+      bg-sidebar-light 
+      dark:bg-sidebar-dark 
+      border-r 
+      dark:border-dark"
+    >
       <ul className="flex flex-col space-y-2">
         <Link href={'/'}>
           <a className="block">

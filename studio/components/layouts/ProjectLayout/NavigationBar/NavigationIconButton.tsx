@@ -17,10 +17,11 @@ const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
         <Link href={route.link}>
           <a
             className={[
+              'transition-all',
               'flex items-center justify-center h-10 w-10 rounded', // Layout
-              'text-gray-600 hover:bg-gray-100', // Light mode
-              'dark:text-gray-400 dark:hover:bg-bg-alt-dark dark:hover:text-white', // Dark mode
-              `${isActive ? 'bg-gray-100 dark:bg-bg-alt-dark dark:!text-white' : ''}`,
+              'bg-scale-200 hover:bg-scale-100', // Light mode
+              'text-scale-900 hover:text-scale-1100 ', // Dark mode
+              `${isActive ? 'bg-scale-1200 shadow-sm hover:bg-scale-1200 text-scale-100' : ''}`,
             ].join(' ')}
           >
             {route.icon}
@@ -31,12 +32,11 @@ const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
         <Tooltip.Arrow className="radix-tooltip-arrow" />
         <div
           className={[
-            'shadow px-2 py-1 rounded border',
-            'bg-white',
-            'dark:bg-gray-800 dark:border-gray-700',
+            'bg-scale-100 shadow py-1 px-2 rounded leading-none', // background
+            'border border-scale-200 ', //border
           ].join(' ')}
         >
-          <Typography.Text small>{route.label}</Typography.Text>
+          <span className="text-scale-1200 text-xs">{route.label}</span>
         </div>
       </Tooltip.Content>
     </Tooltip.Root>
