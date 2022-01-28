@@ -40,6 +40,9 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
 
   return (
     <BarChart
+      className="py-1 px-2"
+      minimalHeader
+      minmalChart
       data={aggregated}
       attribute="count"
       label="Events"
@@ -48,7 +51,7 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
         // 60s before
         onBarClick((Number(timestamp) + 60) * 1000 * 1000)
       }}
-      customDateFormat="YYYY-MM-DDTHH:mm:ss"
+      customDateFormat="D MMM, HH:mm"
     />
   )
 }
