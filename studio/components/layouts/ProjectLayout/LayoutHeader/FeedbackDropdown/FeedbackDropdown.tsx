@@ -1,8 +1,5 @@
 import { useState } from 'react'
-import { Transition } from '@headlessui/react'
-import { Button, IconMessageCircle } from '@supabase/ui'
-
-import { clickOutsideListener } from 'hooks'
+import { Button, IconMessageCircle, Popover } from '@supabase/ui'
 import FeedbackWidget from './FeedbackWidget'
 
 const FeedbackDropdown = () => {
@@ -10,35 +7,18 @@ const FeedbackDropdown = () => {
   const [feedback, setFeedback] = useState('')
   const [category, setCategory] = useState('Feedback')
 
-  const clickContainerRef = clickOutsideListener(() => {
-    if (isOpen) setIsOpen(false)
-  })
-
   function onOpen() {
     setIsOpen((isOpen) => !isOpen)
   }
 
   return (
-    <div ref={clickContainerRef} className="relative inline-block text-left mr-1">
-      <div>
-        <Button
-          onClick={onOpen}
-          type="default"
-          icon={<IconMessageCircle size={16} strokeWidth={2} />}
-        >
-          <span className="block md:hidden">Feedback</span>
-          <span className="hidden md:block">Feedback on this page?</span>
-        </Button>
-      </div>
-      <Transition
-        show={isOpen}
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
-      >
+    <Popover
+      open={isOpen}
+      onOpenChange={(e) => setIsOpen(e)}
+      size="content"
+      side="bottom"
+      align="end"
+      overlay={
         <FeedbackWidget
           onClose={() => setIsOpen(false)}
           setFeedback={setFeedback}
@@ -46,8 +26,17 @@ const FeedbackDropdown = () => {
           category={category}
           setCategory={setCategory}
         />
-      </Transition>
-    </div>
+      }
+    >
+      <Button
+        as="span"
+        onClick={onOpen}
+        type="default"
+        icon={<IconMessageCircle size={16} strokeWidth={1.5} className="text-scale-900" />}
+      >
+        Feedback on this page?
+      </Button>
+    </Popover>
   )
 }
 

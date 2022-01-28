@@ -138,7 +138,7 @@ const RowEditor: FC<Props> = ({
 
   return (
     <SidePanel
-      wide
+      size="large"
       key="RowEditor"
       visible={visible}
       // @ts-ignore
