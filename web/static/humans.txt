@@ -11,9 +11,6 @@ Chris Copplestone
 Dave Wilson
 David Thyresson
 Div Arora
-Erkin
-Francesco Ceccon
-Gurjeet Singh https://gurjeet.singh.im
 Hieu Pham
 Inian P
 Isaiah Hamilton
@@ -29,7 +26,6 @@ Mark Burggraf
 Oli R
 Paul Copplestone
 Rory Wilding
-Shakeel-Abbas Hussein
 Stanislav M
 Steve Chavez
 Thor Schaeff
@@ -56,4 +52,4 @@ Supabase would not be possible without the work of some other amazing open sourc
 - Tailwind CSS - https://tailwindcss.com/
 - Phoenix - https://www.phoenixframework.org/
 - Docusaurus - https://v2.docusaurus.io/
-- GoAuth - https://github.com/netlify/gotrue
+- GoTrue - https://github.com/netlify/gotrue
