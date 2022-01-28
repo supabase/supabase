@@ -129,6 +129,7 @@ info:
           - auth.setAuth()
           - auth.onAuthStateChange()
           - auth.api.getUser()
+          - auth.api.resetPasswordForEmail()
       - name: 'Auth (Server Only)'
         items:
           - auth.api.createUser()
@@ -136,7 +137,6 @@ info:
           - auth.api.generateLink()
           - auth.api.inviteUserByEmail()
           - auth.api.sendMobileOTP()
-          - auth.api.resetPasswordForEmail()
           - auth.api.updateUserById()
       - name: 'Database'
         items:
