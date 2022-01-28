@@ -11,6 +11,7 @@ import {
   IconSearch,
   IconClock,
   Popover,
+  IconBarChart2,
 } from '@supabase/ui'
 import { LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
@@ -27,6 +28,8 @@ interface Props {
   onSearch?: LogSearchCallback
   onCustomClick?: () => void
   onSelectTemplate: (template: LogTemplate) => void
+  isShowingEventChart: boolean
+  onToggleEventChart: () => void
 }
 
 dayjs.extend(utc)
@@ -45,6 +48,8 @@ const LogPanel: FC<Props> = ({
   defaultFromValue = '',
   onCustomClick,
   onSelectTemplate,
+  isShowingEventChart,
+  onToggleEventChart,
 }) => {
   const [search, setSearch] = useState('')
   const [from, setFrom] = useState({ value: '', error: '' })
@@ -193,6 +198,22 @@ const LogPanel: FC<Props> = ({
                   )}
                 </div>
               </Flag>
+              {!isCustomQuery && (
+                <Button
+                  size="tiny"
+                  type={isShowingEventChart ? 'outline' : 'text'}
+                  title={isShowingEventChart ? 'Hide event chart' : 'Show event chart'}
+                  onClick={onToggleEventChart}
+                  icon={
+                    <div className="relative">
+                      <IconBarChart2 size="small" />
+                      {isShowingEventChart && (
+                        <IconX className="w-3 h-3 absolute bottom-0 right-0 text-white -mb-1 -mr-1" />
+                      )}
+                    </div>
+                  }
+                />
+              )}
               {/* wrap with form so that if user presses enter, the search value will submit automatically */}
               <form
                 id="log-panel-search"

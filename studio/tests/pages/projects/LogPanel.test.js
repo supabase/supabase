@@ -31,6 +31,17 @@ test('custom mode', async () => {
     expect(() => screen.getByPlaceholderText(/Search/)).toThrow()
   })
 })
+
+test('toggle event chart', async () => {
+  const mockFn = jest.fn()
+  const { rerender } = render(<LogPanel onToggleEventChart={mockFn} isShowingEventChart={true} />)
+  const button = await screen.findByTitle('Hide event chart')
+  userEvent.click(button)
+  expect(mockFn).toBeCalled()
+  rerender(<LogPanel isShowingEventChart={false} />)
+  await screen.findByTitle('Show event chart')
+})
+
 test('filter input change and submit', async () => {
   const mockFn = jest.fn()
   render(<LogPanel onSearch={mockFn} />)
