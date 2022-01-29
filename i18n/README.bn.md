@@ -174,10 +174,10 @@
   </tr>
 </table>
 
-## Translations
+## অনুবাদ
 
-- [List of translations](/i18n/languages.md) <!--- Keep only this -->
+- [অনুবাদের তালিকা](/i18n/languages.md) <!--- Keep only this -->
 
-## Sponsors
+## স্পনসর
 
 [![নতুন স্পনসর](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
