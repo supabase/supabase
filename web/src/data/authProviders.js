@@ -144,6 +144,15 @@ const authProviders = [
     selfHosted: true,
   },
   {
+    name: 'Zoom',
+    // logo: '/img/libraries/dart-icon.svg',
+    href: '/docs/guides/auth/auth-zoom',
+    official: true,
+    supporter: 'Supabase',
+    platform: true,
+    selfHosted: true,
+  },
+  {
     name: 'Twilio',
     // logo: '/img/libraries/dart-icon.svg',
     href: '/docs/guides/auth/auth-twilio',
