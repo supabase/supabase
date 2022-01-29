@@ -12,7 +12,7 @@ If you don’t have an Appsmith account, create one [here](https://app.appsmith
 
 Let’s get started!
 
-# Step 1: Set up your Backend on Supabase
+## Step 1: Set up your Backend on Supabase
 
 - On the [Supabase dashboard](https://app.supabase.io), click `New project` and set the name to **Support Dashboard**
 
@@ -25,7 +25,7 @@ Let’s get started!
 
 The database is now set up. 
 
-# Step 2: Connect the database to Appsmith
+## Step 2: Connect the database to Appsmith
 
 - Note down the database connection information under Project Settings in Supabase.
 
@@ -41,7 +41,7 @@ The database is now set up.
 
 ![connect-supabase-datasource-05](/img/guides/integrations/appsmith/connect-supabase-datasource-05.png)
 
-# Step 3: Build UI on Appsmith
+## Step 3: Build UI on Appsmith
 
 - Click on the + icon next to widgets and drag and drop a Tab widget. We can configure using the property pane by clicking on the cog icon on the top-right corner.
 - As seen in the below screenshot, we have added four tabs to support the dashboard.
@@ -58,7 +58,7 @@ The database is now set up.
 
 ![modal-appsmith-08](/img/guides/integrations/appsmith/modal-appsmith-08.png)
 
-# Step 4: Writing Queries in Appsmith and binding data to widgets
+## Step 4: Writing Queries in Appsmith and binding data to widgets
 
 - Click on the + icon next to Datasources on the navigation bar and click New Query next to the Supabase connection here to create a new query.
 
@@ -102,7 +102,7 @@ SELECT * FROM public."tickets";
 {{get_tickets.data.filter(t => t.status === 'closed')}}
 ```
 
-# Step 5: Creating Charts in Appsmith
+## Step 5: Creating Charts in Appsmith
 
 - On the **Home** tab, click on the first Chart widget. Add Title **Open Issues By Category**. Change the **Chart Type** property to **Column Chart**.
 - Update the x-axis and y-axis Labels under **Axis** on the property pane.
@@ -144,3 +144,8 @@ SELECT * FROM public."tickets";
   }
 ]
 ```
+
+## Resources
+- [Appsmith](https://www.appsmith.com/) official website.
+- [Appsmith GitHub](https://github.com/appsmithorg).
+- [Appsmith](https://docs.appsmith.com/) documentation.
