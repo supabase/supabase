@@ -99,6 +99,15 @@ const authProviders = [
     selfHosted: true,
   },
   {
+    name: 'Notion',
+    // logo: '/img/libraries/notion-icon.svg',
+    href: '/docs/guides/auth/auth-notion',
+    official: true,
+    supporter: 'Supabase',
+    platform: true,
+    selfHosted: true,
+  },
+  {
     name: 'Slack',
     // logo: '/img/libraries/dart-icon.svg',
     href: '/docs/guides/auth/auth-slack',
