@@ -21,7 +21,7 @@ machine:
 
 * [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 
-### Forking Supabase on Github
+### Forking Supabase on GitHub
 
 To contribute code to Supabase, you must fork the [Supabase Repository](https://github.com/supabase/supabase). After you fork the repository, you may now begin editing the source code.
 
@@ -29,7 +29,7 @@ To contribute code to Supabase, you must fork the [Supabase Repository](https://
 
 To build Supabase, you clone the source code repository:
 
-2. Clone your Github forked repository:
+2. Clone your GitHub forked repository:
    ```sh
    git clone https://github.com/<github_username>/supabase.git
    ```

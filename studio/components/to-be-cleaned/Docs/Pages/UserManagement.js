@@ -156,7 +156,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
       <div className="doc-section ">
         <article className="text ">
           <p>
-            Users can log in with Third Party OAuth like Google, Facebook, Github, and more. You must
+            Users can log in with Third Party OAuth like Google, Facebook, GitHub, and more. You must
             first enable each of these in the{' '}
             <span className="text-green-500">
               <Link key={'AUTH'} href={`/project/${router.query.ref}/auth/settings`}>
