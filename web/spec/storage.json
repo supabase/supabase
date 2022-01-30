@@ -6,7 +6,7 @@
 	"originalName": "",
 	"children": [
 		{
-			"id": 286,
+			"id": 289,
 			"name": "\"SupabaseStorageClient\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -16,7 +16,7 @@
 			"originalName": "/home/runner/work/storage-js/storage-js/src/SupabaseStorageClient.ts",
 			"children": [
 				{
-					"id": 287,
+					"id": 290,
 					"name": "SupabaseStorageClient",
 					"kind": 128,
 					"kindString": "Class",
@@ -25,7 +25,7 @@
 					},
 					"children": [
 						{
-							"id": 288,
+							"id": 291,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -34,7 +34,7 @@
 							},
 							"signatures": [
 								{
-									"id": 289,
+									"id": 292,
 									"name": "new SupabaseStorageClient",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -43,7 +43,7 @@
 									},
 									"parameters": [
 										{
-											"id": 290,
+											"id": 293,
 											"name": "url",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -56,7 +56,7 @@
 											}
 										},
 										{
-											"id": 291,
+											"id": 294,
 											"name": "headers",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -66,7 +66,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 292,
+													"id": 295,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -75,7 +75,7 @@
 													},
 													"indexSignature": [
 														{
-															"id": 293,
+															"id": 296,
 															"name": "__index",
 															"kind": 8192,
 															"kindString": "Index signature",
@@ -84,7 +84,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 294,
+																	"id": 297,
 																	"name": "key",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -115,7 +115,7 @@
 											"defaultValue": "{}"
 										},
 										{
-											"id": 295,
+											"id": 298,
 											"name": "fetch",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -132,7 +132,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 287,
+										"id": 290,
 										"name": "SupabaseStorageClient"
 									},
 									"overwrites": {
@@ -156,7 +156,7 @@
 							}
 						},
 						{
-							"id": 304,
+							"id": 307,
 							"name": "fetch",
 							"kind": 1024,
 							"kindString": "Property",
@@ -184,7 +184,7 @@
 							}
 						},
 						{
-							"id": 300,
+							"id": 303,
 							"name": "headers",
 							"kind": 1024,
 							"kindString": "Property",
@@ -202,7 +202,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 301,
+									"id": 304,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -211,7 +211,7 @@
 									},
 									"indexSignature": [
 										{
-											"id": 302,
+											"id": 305,
 											"name": "__index",
 											"kind": 8192,
 											"kindString": "Index signature",
@@ -220,7 +220,7 @@
 											},
 											"parameters": [
 												{
-													"id": 303,
+													"id": 306,
 													"name": "key",
 													"kind": 32768,
 													"kindString": "Parameter",
@@ -255,7 +255,7 @@
 							}
 						},
 						{
-							"id": 299,
+							"id": 302,
 							"name": "url",
 							"kind": 1024,
 							"kindString": "Property",
@@ -281,7 +281,7 @@
 							}
 						},
 						{
-							"id": 316,
+							"id": 319,
 							"name": "createBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -290,7 +290,7 @@
 							},
 							"signatures": [
 								{
-									"id": 317,
+									"id": 320,
 									"name": "createBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -303,7 +303,7 @@
 									},
 									"parameters": [
 										{
-											"id": 318,
+											"id": 321,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -319,7 +319,7 @@
 											}
 										},
 										{
-											"id": 319,
+											"id": 322,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -329,7 +329,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 320,
+													"id": 323,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -338,7 +338,7 @@
 													},
 													"children": [
 														{
-															"id": 321,
+															"id": 324,
 															"name": "public",
 															"kind": 32,
 															"kindString": "Variable",
@@ -363,7 +363,7 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																321
+																324
 															]
 														}
 													],
@@ -385,7 +385,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 322,
+													"id": 325,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -394,7 +394,7 @@
 													},
 													"children": [
 														{
-															"id": 323,
+															"id": 326,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -423,7 +423,7 @@
 															}
 														},
 														{
-															"id": 324,
+															"id": 327,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -457,8 +457,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																323,
-																324
+																326,
+																327
 															]
 														}
 													],
@@ -495,7 +495,7 @@
 							}
 						},
 						{
-							"id": 344,
+							"id": 347,
 							"name": "deleteBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -504,7 +504,7 @@
 							},
 							"signatures": [
 								{
-									"id": 345,
+									"id": 348,
 									"name": "deleteBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -516,7 +516,7 @@
 									},
 									"parameters": [
 										{
-											"id": 346,
+											"id": 349,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -538,7 +538,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 347,
+													"id": 350,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -547,7 +547,7 @@
 													},
 													"children": [
 														{
-															"id": 348,
+															"id": 351,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -567,7 +567,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 349,
+																			"id": 352,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -576,7 +576,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 350,
+																					"id": 353,
 																					"name": "message",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -601,7 +601,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						350
+																						353
 																					]
 																				}
 																			],
@@ -622,7 +622,7 @@
 															}
 														},
 														{
-															"id": 351,
+															"id": 354,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -656,8 +656,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																348,
-																351
+																351,
+																354
 															]
 														}
 													],
@@ -694,7 +694,7 @@
 							}
 						},
 						{
-							"id": 336,
+							"id": 339,
 							"name": "emptyBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -703,7 +703,7 @@
 							},
 							"signatures": [
 								{
-									"id": 337,
+									"id": 340,
 									"name": "emptyBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -715,7 +715,7 @@
 									},
 									"parameters": [
 										{
-											"id": 338,
+											"id": 341,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -737,7 +737,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 339,
+													"id": 342,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -746,7 +746,7 @@
 													},
 													"children": [
 														{
-															"id": 340,
+															"id": 343,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -766,7 +766,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 341,
+																			"id": 344,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -775,7 +775,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 342,
+																					"id": 345,
 																					"name": "message",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -800,7 +800,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						342
+																						345
 																					]
 																				}
 																			],
@@ -821,7 +821,7 @@
 															}
 														},
 														{
-															"id": 343,
+															"id": 346,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -855,8 +855,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																340,
-																343
+																343,
+																346
 															]
 														}
 													],
@@ -893,7 +893,7 @@
 							}
 						},
 						{
-							"id": 296,
+							"id": 299,
 							"name": "from",
 							"kind": 2048,
 							"kindString": "Method",
@@ -902,7 +902,7 @@
 							},
 							"signatures": [
 								{
-									"id": 297,
+									"id": 300,
 									"name": "from",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -914,7 +914,7 @@
 									},
 									"parameters": [
 										{
-											"id": 298,
+											"id": 301,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -946,7 +946,7 @@
 							]
 						},
 						{
-							"id": 310,
+							"id": 313,
 							"name": "getBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -955,7 +955,7 @@
 							},
 							"signatures": [
 								{
-									"id": 311,
+									"id": 314,
 									"name": "getBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -967,7 +967,7 @@
 									},
 									"parameters": [
 										{
-											"id": 312,
+											"id": 315,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -989,7 +989,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 313,
+													"id": 316,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -998,7 +998,7 @@
 													},
 													"children": [
 														{
-															"id": 314,
+															"id": 317,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1028,7 +1028,7 @@
 															}
 														},
 														{
-															"id": 315,
+															"id": 318,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1062,8 +1062,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																314,
-																315
+																317,
+																318
 															]
 														}
 													],
@@ -1100,7 +1100,7 @@
 							}
 						},
 						{
-							"id": 305,
+							"id": 308,
 							"name": "listBuckets",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1109,7 +1109,7 @@
 							},
 							"signatures": [
 								{
-									"id": 306,
+									"id": 309,
 									"name": "listBuckets",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1125,7 +1125,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 307,
+													"id": 310,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -1134,7 +1134,7 @@
 													},
 													"children": [
 														{
-															"id": 308,
+															"id": 311,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1167,7 +1167,7 @@
 															}
 														},
 														{
-															"id": 309,
+															"id": 312,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1201,8 +1201,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																308,
-																309
+																311,
+																312
 															]
 														}
 													],
@@ -1239,7 +1239,7 @@
 							}
 						},
 						{
-							"id": 325,
+							"id": 328,
 							"name": "updateBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1248,7 +1248,7 @@
 							},
 							"signatures": [
 								{
-									"id": 326,
+									"id": 329,
 									"name": "updateBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1260,7 +1260,7 @@
 									},
 									"parameters": [
 										{
-											"id": 327,
+											"id": 330,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1276,7 +1276,7 @@
 											}
 										},
 										{
-											"id": 328,
+											"id": 331,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1286,7 +1286,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 329,
+													"id": 332,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -1295,7 +1295,7 @@
 													},
 													"children": [
 														{
-															"id": 330,
+															"id": 333,
 															"name": "public",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1320,7 +1320,7 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																330
+																333
 															]
 														}
 													],
@@ -1341,7 +1341,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 331,
+													"id": 334,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -1350,7 +1350,7 @@
 													},
 													"children": [
 														{
-															"id": 332,
+															"id": 335,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1370,7 +1370,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 333,
+																			"id": 336,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -1379,7 +1379,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 334,
+																					"id": 337,
 																					"name": "message",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -1404,7 +1404,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						334
+																						337
 																					]
 																				}
 																			],
@@ -1425,7 +1425,7 @@
 															}
 														},
 														{
-															"id": 335,
+															"id": 338,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1459,8 +1459,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																332,
-																335
+																335,
+																338
 															]
 														}
 													],
@@ -1502,29 +1502,29 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								288
+								291
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								304,
-								300,
-								299
+								307,
+								303,
+								302
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								316,
-								344,
-								336,
-								296,
-								310,
-								305,
-								325
+								319,
+								347,
+								339,
+								299,
+								313,
+								308,
+								328
 							]
 						}
 					],
@@ -1549,7 +1549,7 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						287
+						290
 					]
 				}
 			],
@@ -1562,7 +1562,7 @@
 			]
 		},
 		{
-			"id": 352,
+			"id": 355,
 			"name": "\"index\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -1572,7 +1572,7 @@
 			"originalName": "/home/runner/work/storage-js/storage-js/src/index.ts",
 			"children": [
 				{
-					"id": 353,
+					"id": 356,
 					"name": "Bucket",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -1582,7 +1582,7 @@
 					"target": 64
 				},
 				{
-					"id": 354,
+					"id": 357,
 					"name": "FileObject",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -1592,7 +1592,7 @@
 					"target": 71
 				},
 				{
-					"id": 356,
+					"id": 359,
 					"name": "FileOptions",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -1602,7 +1602,7 @@
 					"target": 85
 				},
 				{
-					"id": 358,
+					"id": 361,
 					"name": "Metadata",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -1612,7 +1612,7 @@
 					"target": 93
 				},
 				{
-					"id": 357,
+					"id": 360,
 					"name": "SearchOptions",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -1622,7 +1622,7 @@
 					"target": 89
 				},
 				{
-					"id": 355,
+					"id": 358,
 					"name": "SortBy",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -1637,12 +1637,12 @@
 					"title": "References",
 					"kind": 16777216,
 					"children": [
-						353,
-						354,
 						356,
-						358,
 						357,
-						355
+						359,
+						361,
+						360,
+						358
 					]
 				}
 			],
@@ -3048,7 +3048,7 @@
 					"extendedBy": [
 						{
 							"type": "reference",
-							"id": 287,
+							"id": 290,
 							"name": "SupabaseStorageClient"
 						}
 					]
@@ -3416,8 +3416,54 @@
 							"sources": [
 								{
 									"fileName": "lib/StorageFileApi.ts",
-									"line": 332,
+									"line": 331,
 									"character": 15
+								}
+							]
+						},
+						{
+							"id": 266,
+							"name": "_removeEmptyFolders",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 267,
+									"name": "_removeEmptyFolders",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 268,
+											"name": "path",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "lib/StorageFileApi.ts",
+									"line": 335,
+									"character": 21
 								}
 							]
 						},
@@ -3500,7 +3546,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 196,
+																	"line": 197,
 																	"character": 8
 																}
 															],
@@ -3529,7 +3575,7 @@
 																					"sources": [
 																						{
 																							"fileName": "lib/StorageFileApi.ts",
-																							"line": 196,
+																							"line": 197,
 																							"character": 21
 																						}
 																					],
@@ -3551,7 +3597,7 @@
 																			"sources": [
 																				{
 																					"fileName": "lib/StorageFileApi.ts",
-																					"line": 196,
+																					"line": 197,
 																					"character": 9
 																				}
 																			]
@@ -3575,7 +3621,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 197,
+																	"line": 198,
 																	"character": 9
 																}
 															],
@@ -3604,7 +3650,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 198,
+																	"line": 199,
 																	"character": 13
 																}
 															],
@@ -3637,7 +3683,7 @@
 													"sources": [
 														{
 															"fileName": "lib/StorageFileApi.ts",
-															"line": 195,
+															"line": 196,
 															"character": 13
 														}
 													]
@@ -3651,7 +3697,7 @@
 							"sources": [
 								{
 									"fileName": "lib/StorageFileApi.ts",
-									"line": 192,
+									"line": 193,
 									"character": 23
 								}
 							]
@@ -3719,7 +3765,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 221,
+																	"line": 222,
 																	"character": 46
 																}
 															],
@@ -3748,7 +3794,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 221,
+																	"line": 222,
 																	"character": 66
 																}
 															],
@@ -3780,7 +3826,7 @@
 													"sources": [
 														{
 															"fileName": "lib/StorageFileApi.ts",
-															"line": 221,
+															"line": 222,
 															"character": 40
 														}
 													]
@@ -3794,7 +3840,7 @@
 							"sources": [
 								{
 									"fileName": "lib/StorageFileApi.ts",
-									"line": 221,
+									"line": 222,
 									"character": 16
 								}
 							]
@@ -3859,7 +3905,7 @@
 													"sources": [
 														{
 															"fileName": "lib/StorageFileApi.ts",
-															"line": 243,
+															"line": 242,
 															"character": 8
 														}
 													],
@@ -3888,7 +3934,7 @@
 																			"sources": [
 																				{
 																					"fileName": "lib/StorageFileApi.ts",
-																					"line": 243,
+																					"line": 242,
 																					"character": 21
 																				}
 																			],
@@ -3910,7 +3956,7 @@
 																	"sources": [
 																		{
 																			"fileName": "lib/StorageFileApi.ts",
-																			"line": 243,
+																			"line": 242,
 																			"character": 9
 																		}
 																	]
@@ -3934,7 +3980,7 @@
 													"sources": [
 														{
 															"fileName": "lib/StorageFileApi.ts",
-															"line": 244,
+															"line": 243,
 															"character": 9
 														}
 													],
@@ -3963,7 +4009,7 @@
 													"sources": [
 														{
 															"fileName": "lib/StorageFileApi.ts",
-															"line": 245,
+															"line": 244,
 															"character": 13
 														}
 													],
@@ -3996,8 +4042,8 @@
 											"sources": [
 												{
 													"fileName": "lib/StorageFileApi.ts",
-													"line": 242,
-													"character": 4
+													"line": 241,
+													"character": 29
 												}
 											]
 										}
@@ -4007,7 +4053,7 @@
 							"sources": [
 								{
 									"fileName": "lib/StorageFileApi.ts",
-									"line": 240,
+									"line": 241,
 									"character": 14
 								}
 							]
@@ -4121,7 +4167,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 316,
+																	"line": 315,
 																	"character": 19
 																}
 															],
@@ -4154,7 +4200,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 316,
+																	"line": 315,
 																	"character": 47
 																}
 															],
@@ -4186,7 +4232,7 @@
 													"sources": [
 														{
 															"fileName": "lib/StorageFileApi.ts",
-															"line": 316,
+															"line": 315,
 															"character": 13
 														}
 													]
@@ -4200,7 +4246,7 @@
 							"sources": [
 								{
 									"fileName": "lib/StorageFileApi.ts",
-									"line": 312,
+									"line": 311,
 									"character": 12
 								}
 							]
@@ -4284,7 +4330,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 172,
+																	"line": 173,
 																	"character": 19
 																}
 															],
@@ -4313,7 +4359,7 @@
 																					"sources": [
 																						{
 																							"fileName": "lib/StorageFileApi.ts",
-																							"line": 172,
+																							"line": 173,
 																							"character": 30
 																						}
 																					],
@@ -4335,7 +4381,7 @@
 																			"sources": [
 																				{
 																					"fileName": "lib/StorageFileApi.ts",
-																					"line": 172,
+																					"line": 173,
 																					"character": 20
 																				}
 																			]
@@ -4359,7 +4405,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 172,
+																	"line": 173,
 																	"character": 54
 																}
 															],
@@ -4391,7 +4437,7 @@
 													"sources": [
 														{
 															"fileName": "lib/StorageFileApi.ts",
-															"line": 172,
+															"line": 173,
 															"character": 13
 														}
 													]
@@ -4405,7 +4451,7 @@
 							"sources": [
 								{
 									"fileName": "lib/StorageFileApi.ts",
-									"line": 169,
+									"line": 170,
 									"character": 12
 								}
 							]
@@ -4476,7 +4522,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 262,
+																	"line": 261,
 																	"character": 47
 																}
 															],
@@ -4509,7 +4555,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 262,
+																	"line": 261,
 																	"character": 75
 																}
 															],
@@ -4541,7 +4587,7 @@
 													"sources": [
 														{
 															"fileName": "lib/StorageFileApi.ts",
-															"line": 262,
+															"line": 261,
 															"character": 41
 														}
 													]
@@ -4555,7 +4601,7 @@
 							"sources": [
 								{
 									"fileName": "lib/StorageFileApi.ts",
-									"line": 262,
+									"line": 261,
 									"character": 14
 								}
 							]
@@ -4704,7 +4750,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 159,
+																	"line": 160,
 																	"character": 19
 																}
 															],
@@ -4733,7 +4779,7 @@
 																					"sources": [
 																						{
 																							"fileName": "lib/StorageFileApi.ts",
-																							"line": 159,
+																							"line": 160,
 																							"character": 26
 																						}
 																					],
@@ -4755,7 +4801,7 @@
 																			"sources": [
 																				{
 																					"fileName": "lib/StorageFileApi.ts",
-																					"line": 159,
+																					"line": 160,
 																					"character": 20
 																				}
 																			]
@@ -4779,7 +4825,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 159,
+																	"line": 160,
 																	"character": 50
 																}
 															],
@@ -4811,7 +4857,7 @@
 													"sources": [
 														{
 															"fileName": "lib/StorageFileApi.ts",
-															"line": 159,
+															"line": 160,
 															"character": 13
 														}
 													]
@@ -4825,7 +4871,7 @@
 							"sources": [
 								{
 									"fileName": "lib/StorageFileApi.ts",
-									"line": 145,
+									"line": 146,
 									"character": 14
 								}
 							]
@@ -4974,7 +5020,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 131,
+																	"line": 132,
 																	"character": 19
 																}
 															],
@@ -5003,7 +5049,7 @@
 																					"sources": [
 																						{
 																							"fileName": "lib/StorageFileApi.ts",
-																							"line": 131,
+																							"line": 132,
 																							"character": 26
 																						}
 																					],
@@ -5025,7 +5071,7 @@
 																			"sources": [
 																				{
 																					"fileName": "lib/StorageFileApi.ts",
-																					"line": 131,
+																					"line": 132,
 																					"character": 20
 																				}
 																			]
@@ -5049,7 +5095,7 @@
 															"sources": [
 																{
 																	"fileName": "lib/StorageFileApi.ts",
-																	"line": 131,
+																	"line": 132,
 																	"character": 50
 																}
 															],
@@ -5081,7 +5127,7 @@
 													"sources": [
 														{
 															"fileName": "lib/StorageFileApi.ts",
-															"line": 131,
+															"line": 132,
 															"character": 13
 														}
 													]
@@ -5095,7 +5141,7 @@
 							"sources": [
 								{
 									"fileName": "lib/StorageFileApi.ts",
-									"line": 117,
+									"line": 118,
 									"character": 14
 								}
 							]
@@ -5420,6 +5466,7 @@
 							"kind": 2048,
 							"children": [
 								263,
+								266,
 								224,
 								234,
 								240,
@@ -5441,7 +5488,7 @@
 					]
 				},
 				{
-					"id": 272,
+					"id": 275,
 					"name": "DEFAULT_FILE_OPTIONS",
 					"kind": 2097152,
 					"kindString": "Object literal",
@@ -5450,7 +5497,7 @@
 					},
 					"children": [
 						{
-							"id": 273,
+							"id": 276,
 							"name": "cacheControl",
 							"kind": 32,
 							"kindString": "Variable",
@@ -5469,7 +5516,7 @@
 							"defaultValue": "\"3600\""
 						},
 						{
-							"id": 274,
+							"id": 277,
 							"name": "contentType",
 							"kind": 32,
 							"kindString": "Variable",
@@ -5488,7 +5535,7 @@
 							"defaultValue": "\"text/plain;charset=UTF-8\""
 						},
 						{
-							"id": 275,
+							"id": 278,
 							"name": "upsert",
 							"kind": 32,
 							"kindString": "Variable",
@@ -5512,9 +5559,9 @@
 							"title": "Variables",
 							"kind": 32,
 							"children": [
-								273,
-								274,
-								275
+								276,
+								277,
+								278
 							]
 						}
 					],
@@ -5531,7 +5578,7 @@
 					}
 				},
 				{
-					"id": 266,
+					"id": 269,
 					"name": "DEFAULT_SEARCH_OPTIONS",
 					"kind": 2097152,
 					"kindString": "Object literal",
@@ -5540,7 +5587,7 @@
 					},
 					"children": [
 						{
-							"id": 267,
+							"id": 270,
 							"name": "limit",
 							"kind": 32,
 							"kindString": "Variable",
@@ -5559,7 +5606,7 @@
 							"defaultValue": "100"
 						},
 						{
-							"id": 268,
+							"id": 271,
 							"name": "offset",
 							"kind": 32,
 							"kindString": "Variable",
@@ -5578,14 +5625,14 @@
 							"defaultValue": "0"
 						},
 						{
-							"id": 269,
+							"id": 272,
 							"name": "sortBy",
 							"kind": 2097152,
 							"kindString": "Object literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 270,
+									"id": 273,
 									"name": "column",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5604,7 +5651,7 @@
 									"defaultValue": "\"name\""
 								},
 								{
-									"id": 271,
+									"id": 274,
 									"name": "order",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5628,8 +5675,8 @@
 									"title": "Variables",
 									"kind": 32,
 									"children": [
-										270,
-										271
+										273,
+										274
 									]
 								}
 							],
@@ -5651,15 +5698,15 @@
 							"title": "Variables",
 							"kind": 32,
 							"children": [
-								267,
-								268
+								270,
+								271
 							]
 						},
 						{
 							"title": "Object literals",
 							"kind": 2097152,
 							"children": [
-								269
+								272
 							]
 						}
 					],
@@ -5688,8 +5735,8 @@
 					"title": "Object literals",
 					"kind": 2097152,
 					"children": [
-						272,
-						266
+						275,
+						269
 					]
 				}
 			],
@@ -6932,7 +6979,7 @@
 			]
 		},
 		{
-			"id": 276,
+			"id": 279,
 			"name": "\"lib/index\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -6942,7 +6989,7 @@
 			"originalName": "/home/runner/work/storage-js/storage-js/src/lib/index.ts",
 			"children": [
 				{
-					"id": 279,
+					"id": 282,
 					"name": "Bucket",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -6952,7 +6999,7 @@
 					"target": 64
 				},
 				{
-					"id": 285,
+					"id": 288,
 					"name": "DEFAULT_HEADERS",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -6962,7 +7009,7 @@
 					"target": 98
 				},
 				{
-					"id": 280,
+					"id": 283,
 					"name": "FileObject",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -6972,7 +7019,7 @@
 					"target": 71
 				},
 				{
-					"id": 282,
+					"id": 285,
 					"name": "FileOptions",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -6982,7 +7029,7 @@
 					"target": 85
 				},
 				{
-					"id": 284,
+					"id": 287,
 					"name": "Metadata",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -6992,7 +7039,7 @@
 					"target": 93
 				},
 				{
-					"id": 283,
+					"id": 286,
 					"name": "SearchOptions",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -7002,7 +7049,7 @@
 					"target": 89
 				},
 				{
-					"id": 281,
+					"id": 284,
 					"name": "SortBy",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -7012,7 +7059,7 @@
 					"target": 82
 				},
 				{
-					"id": 277,
+					"id": 280,
 					"name": "StorageBucketApi",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -7022,7 +7069,7 @@
 					"target": 101
 				},
 				{
-					"id": 278,
+					"id": 281,
 					"name": "StorageFileApi",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -7037,15 +7084,15 @@
 					"title": "References",
 					"kind": 16777216,
 					"children": [
-						279,
-						285,
-						280,
 						282,
-						284,
+						288,
 						283,
-						281,
-						277,
-						278
+						285,
+						287,
+						286,
+						284,
+						280,
+						281
 					]
 				}
 			],
@@ -7907,14 +7954,14 @@
 			"title": "Modules",
 			"kind": 1,
 			"children": [
-				286,
-				352,
+				289,
+				355,
 				100,
 				166,
 				97,
 				1,
 				163,
-				276,
+				279,
 				63,
 				95
 			]
