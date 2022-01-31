@@ -473,7 +473,7 @@ pages:
           You can sign up with OAuth providers using the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers) method.
       - name: Sign up with Phone.
         description: |
-          Supabase supports Phone Auth. After a user verified thier number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
+          Supabase supports Phone Auth. After a user has verified their number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
         js: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
