@@ -62,8 +62,8 @@ create view transcripts as
         courses.code,
         grades.result
     from grades
-    left join students where grades.student_id = students.id
-    left join courses where grades.course_id = courses.id;
+    left join students on grades.student_id = students.id
+    left join courses on grades.course_id = courses.id;
 ```
 
 Once done, we can now access the underlying query with:
@@ -95,8 +95,8 @@ select
     courses.code,
     grades.result
 from grades
-left join students where grades.student_id = students.id
-left join courses where grades.course_id = courses.id;
+left join students on grades.student_id = students.id
+left join courses on grades.course_id = courses.id;
 ```
 
 We can run this instead:
@@ -119,8 +119,8 @@ select
     courses.code,
     grades.result
 from grades
-    left join students where grades.student_id = students.id
-    left join courses where grades.course_id = courses.id
+    left join students on grades.student_id = students.id
+    left join courses on grades.course_id = courses.id
 where courses.code != 'PG101';
 ```
 
@@ -151,8 +151,8 @@ create materialized view transcripts as
         courses.code,
         grades.result
     from grades
-    left join students where grades.student_id = students.id
-    left join courses where grades.course_id = courses.id;
+    left join students on grades.student_id = students.id
+    left join courses on grades.course_id = courses.id;
 ```
 
 Reading from the materialized view is the same as a conventional view:
