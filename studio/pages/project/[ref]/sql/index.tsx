@@ -72,16 +72,16 @@ const SqlEditor = observer(() => {
       const darkTheme = theme ? (theme === 'dark' ? true : false) : true
 
       monaco.editor.defineTheme('supabase', {
-        base: 'vs-dark', // can also be vs-dark or hc-black
+        base: darkTheme ? 'vs-dark' : 'vs', // can also be hc-black
         inherit: true, // can also be false to completely replace the builtin rules
         rules: [
-          { token: '', background: darkTheme ? '1f1f1f' : '30313f' },
+          { token: '', background: darkTheme ? '1f1f1f' : 'f0f0f0' },
           { token: 'string.sql', foreground: '24b47e' },
           { token: 'comment', foreground: '666666' },
-          { token: 'predefined.sql', foreground: 'D4D4D4' },
+          // { token: 'predefined.sql', foreground: 'D4D4D4' },
         ],
         colors: {
-          'editor.background': darkTheme ? '#1f1f1f' : '#30313f',
+          'editor.background': darkTheme ? '#1f1f1f' : '#f0f0f0',
           // 'editorGutter.background': '#30313f',
           // 'editorLineNumber.foreground': '#555671',
         },
