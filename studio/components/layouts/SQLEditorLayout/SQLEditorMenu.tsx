@@ -90,7 +90,7 @@ const SqlEditorMenu: FC<Props> = ({
               <div>
                 <Menu.Item rounded active={page === 'templates'}>
                   <Typography.Text className="truncate" small>
-                    Welcome
+                    Query Templates
                   </Typography.Text>
                 </Menu.Item>
               </div>
