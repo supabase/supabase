@@ -39,7 +39,7 @@ export const AlphaNumbers = [
     ),
     value: 5460,
     unit: null,
-    name: 'Github Stars',
+    name: 'GitHub Stars',
   },
   {
     icon: (
@@ -60,7 +60,7 @@ export const AlphaNumbers = [
     ),
     value: 505,
     unit: null,
-    name: 'Github issues resolved',
+    name: 'GitHub issues resolved',
   },
   {
     icon: (
@@ -106,7 +106,7 @@ export const AlphaNumbers = [
     ),
     value: 88,
     unit: null,
-    name: 'Active Github contributors',
+    name: 'Active GitHub contributors',
   },
   {
     icon: (

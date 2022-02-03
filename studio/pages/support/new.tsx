@@ -25,6 +25,10 @@ const DEFAULT = {
     value: 'Problem',
     error: '',
   },
+  severity: {
+    value: 'Low',
+    error: '',
+  },
   project: {
     value: '',
     error: '',
@@ -38,6 +42,65 @@ const DEFAULT = {
     error: '',
   },
 }
+
+/*
+ * Move this to schema files
+ */
+const categoryOptions = [
+  {
+    value: 'Problem',
+    label: 'Issue with project / API / Client library / REST API',
+    description: 'Issues with project API, client libraries',
+  },
+  {
+    value: 'Sales',
+    label: 'Sales enquiry',
+    description: 'Questions about pricing, paid plans and Enterprise plans',
+  },
+  {
+    value: 'Billing',
+    label: 'Billing',
+    description: 'Issues with credit card charges | invoices | overcharing',
+  },
+  {
+    value: 'Abuse',
+    label: 'Abuse report',
+    description: 'Report abuse of a Supabase project or Supabase brand',
+  },
+  {
+    value: 'Refund',
+    label: 'Refund enquiry',
+    description: 'Formal enquiry form for requesting refunds',
+  },
+]
+
+const severityOptions = [
+  {
+    value: 'Low',
+    label: 'Low',
+    description: 'General guidance',
+  },
+  {
+    value: 'Normal',
+    label: 'Normal',
+    description: 'System impaired',
+  },
+  {
+    value: 'High',
+    label: 'High',
+    description: 'Production system impaired',
+  },
+  {
+    value: 'Urgent',
+    label: 'Urgent',
+    description: 'Production system down',
+  },
+  {
+    value: 'Critical',
+    label: 'Critical',
+    description: 'Business-critical system down (Unavailable for free projects)',
+  },
+]
 
 function formReducer(state: any, action: any) {
   return {
@@ -89,43 +152,26 @@ const SupportNew = () => {
     }
   }, [])
 
-  /*
-   * Move this to schema files
-   */
-  const categoryOptions = [
-    {
-      value: 'Problem',
-      label: 'Issue with project / API / Client library / REST API',
-      description: 'Issues with project API, client libraries',
-    },
-    {
-      value: 'Sales',
-      label: 'Sales enquiry',
-      description: 'Questions about pricing, paid plans and Enterprise plans',
-    },
-    {
-      value: 'Billing',
-      label: 'Billing',
-      description: 'Issues with credit card charges | invoices | overcharing',
-    },
-    {
-      value: 'Abuse',
-      label: 'Abuse report',
-      description: 'Report abuse of a Supabase project or Supabase brand',
-    },
-    {
-      value: 'Refund',
-      label: 'Refund enquiry',
-      description: 'Formal enquiry form for requesting refunds',
-    },
-  ]
-
   function handleOnChange(x: any) {
     formDispatch({
       name: x.name,
       value: x.value,
       error: x.error,
     })
+    // Reset severity value when changing project to prevent selection of Critical
+    if (x.name === 'project') {
+      const selectedProject = projects.find((project: any) => project.ref === x.value)
+      if (
+        (selectedProject?.subscription_tier ?? 'Free') === 'Free' &&
+        formState.severity.value === 'Critical'
+      ) {
+        formDispatch({
+          name: 'severity',
+          value: 'Low',
+          error: '',
+        })
+      }
+    }
   }
 
   async function handleSubmit(e: any) {
@@ -156,6 +202,7 @@ const SupportNew = () => {
         verified: true,
         tags: ['dashboard-support-form'],
         subject: formState.subject.value,
+        severity: formState.severity.value,
       })
       setLoading(false)
       if (response.error) {
@@ -275,6 +322,41 @@ const SupportNew = () => {
                                     {organization?.name}
                                   </span>
                                 </div>
+                              )
+                            }}
+                          />
+                        )
+                      })}
+                    </Listbox>
+                  </div>
+
+                  <div className="px-6">
+                    <Listbox
+                      value={formState.severity.value}
+                      label="Severity"
+                      layout="horizontal"
+                      onChange={(value) => handleOnChange({ name: 'severity', value })}
+                    >
+                      {severityOptions.map((option: any) => {
+                        const selectedProject = projects.find(
+                          (project: any) => project.ref === formState.project.value
+                        )
+                        const isAllowedCritical =
+                          (selectedProject?.subscription_tier ?? 'Free') !== 'Free'
+                        return (
+                          <Listbox.Option
+                            key={`option-${option.value}`}
+                            label={option.label}
+                            value={option.value}
+                            disabled={option.value === 'Critical' && !isAllowedCritical}
+                            children={({ active, selected }: any) => {
+                              return (
+                                <>
+                                  <span>{option.label}</span>
+                                  <span className="opacity-50 block text-xs">
+                                    {option.description}
+                                  </span>
+                                </>
                               )
                             }}
                           />

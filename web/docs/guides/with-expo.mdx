@@ -154,10 +154,12 @@ expo init supabaseReactNative
 cd supabaseReactNative
 ```
 
-Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
+Then let's install the additional dependencies: [supabase-js](https://github.com/supabase/supabase-js)
 
 ```bash
 yarn add @supabase/supabase-js
+yarn add react-native-elements
+yarn add react-native-safe-area-context
 ```
 
 Now let's create a helper file to initialize the Supabase client.
@@ -177,12 +179,12 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ### Set up a Login component
 
 Let's set up a React Native component to manage logins and sign ups. 
-We'll use Magic Links, so users can sign in with their email without using passwords.
+Users would be able to sign in with their email and password.
 
 ```jsx title="components/Auth.js"
 import React, {useState} from 'react'
 import {Alert, StyleSheet, View} from 'react-native'
-import {supabaseClient} from '../lib/initSupabase'
+import {supabase} from '../lib/supabase'
 import {Button, Input} from 'react-native-elements'
 
 export default function Auth() {
@@ -267,7 +269,7 @@ Let's create a new component for that called `Account.js`.
 
 ```jsx title="components/Account.js"
 import { useState, useEffect } from 'react'
-import { supabase } from '../utils/supabaseClient'
+import { supabase } from '../utils/supabase'
 import {StyleSheet, View} from 'react-native'
 
 import {Button, Input} from 'react-native-elements'
@@ -386,10 +388,10 @@ Now that we have all the components in place, let's update `app.js`:
 
 ```jsx title="app.js"
 import { useState, useEffect } from 'react'
-import { supabase } from './lib/supabaseClient'
+import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
 import Account from './components/Account'
-import View from 'react-native'
+import { View } from 'react-native'
 
 export default function App() {
   const [session, setSession] = useState(null)

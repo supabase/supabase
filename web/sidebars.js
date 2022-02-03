@@ -129,12 +129,14 @@ module.exports = {
             'guides/auth/auth-github',
             'guides/auth/auth-gitlab',
             'guides/auth/auth-google',
+            'guides/auth/auth-notion',
             'guides/auth/auth-slack',
             'guides/auth/auth-spotify',
-            'guides/auth/auth-twitter',
             'guides/auth/auth-twitch',
+            'guides/auth/auth-twitter',
             'guides/auth/auth-twilio',
             'guides/auth/auth-messagebird',
+            'guides/auth/auth-zoom',
           ],
         },
         {
@@ -168,6 +170,7 @@ module.exports = {
       label: 'Integrations',
       collapsed: false,
       items: [
+        'guides/integrations/appsmith',
         'guides/integrations/auth0',
         'guides/integrations/draftbit',
         'guides/integrations/prisma',
