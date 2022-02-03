@@ -180,8 +180,8 @@ export const LogPage: NextPage = () => {
       setEditorValue(template.searchString)
       setParams((prev) => ({
         ...prev,
-        where: isSelectQuery ? '' : template.searchString,
-        sql: isSelectQuery ? template.searchString : '',
+        where: isSelectQuery ? '' : cleanEditorValue(template.searchString),
+        sql: isSelectQuery ? cleanEditorValue(template.searchString) : '',
         search_query: '',
         timestamp_end: '',
       }))
@@ -191,8 +191,8 @@ export const LogPage: NextPage = () => {
   const handleEditorSubmit = () => {
     setParams((prev) => ({
       ...prev,
-      where: isSelectQuery ? '' : editorValue,
-      sql: isSelectQuery ? editorValue : '',
+      where: isSelectQuery ? '' : cleanEditorValue(editorValue),
+      sql: isSelectQuery ? cleanEditorValue(editorValue) : '',
       search_query: '',
     }))
     if (!logsQueryParamsSyncing) return
@@ -200,7 +200,7 @@ export const LogPage: NextPage = () => {
       pathname: router.pathname,
       query: {
         ...router.query,
-        q: editorValue,
+        q: cleanEditorValue(editorValue),
         s: undefined,
         te: undefined,
       },
@@ -227,7 +227,10 @@ export const LogPage: NextPage = () => {
     })
     setEditorValue('')
   }
-
+  const cleanEditorValue = (value: string) => {
+    if (typeof value !== "string") return value
+    return value.replace(/\n/g, ' ')
+  }
   return (
     <SettingsLayout title={title}>
       <div className="h-full flex flex-col flex-grow">
