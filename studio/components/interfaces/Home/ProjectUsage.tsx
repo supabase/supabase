@@ -34,7 +34,7 @@ interface Props {
 const ProjectUsage: FC<Props> = ({ project }) => {
   const logsTimestampFilter = useFlag('logsTimestampFilter')
   const logsUsageChartIntervals = useFlag('logsUsageChartIntervals')
-  const [interval, setInterval] = useState<string>('minutely')
+  const [interval, setInterval] = useState<string>('hourly')
   const router = useRouter()
   const { ref } = router.query
   const { data, error }: any = useSWR(
@@ -46,7 +46,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
     // { refreshInterval: isActive ? 3000 : 30000 }
   )
   const selectedInterval = logsUsageChartIntervals
-    ? CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[0]
+    ? CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
     : CHART_INTERVALS[2]
   const startDate = dayjs()
     .subtract(selectedInterval.startValue, selectedInterval.startUnit)
