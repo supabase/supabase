@@ -33,7 +33,7 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
 }
 
 const useAggregated = (data: LogData[]) => {
-  const truncateToMinute = (micro: number) => Math.round(micro / 1000 / 1000 / 60) * 60
+  const truncateToMinute = (micro: number) => Math.floor(micro / 1000 / 1000 / 60) * 60
   return useMemo(() => {
     const countMap = data
       .map((d) => {
