@@ -5,7 +5,7 @@ import utc from 'dayjs/plugin/utc'
 import { useMemo } from 'react'
 dayjs.extend(utc)
 interface Props {
-  data: LogData[]
+  data?: LogData[]
   onBarClick: (timestamp: number) => void
 }
 
