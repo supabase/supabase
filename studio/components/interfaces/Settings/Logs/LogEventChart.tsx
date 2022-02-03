@@ -28,6 +28,7 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
         onBarClick((Number(timestamp) + 60) * 1000 * 1000)
       }}
       customDateFormat="MMM D, HH:mm"
+      displayDateInUtc
     />
   )
 }

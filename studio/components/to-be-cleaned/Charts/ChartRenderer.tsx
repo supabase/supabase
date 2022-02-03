@@ -45,6 +45,7 @@ const Header = ({
   customDateFormat,
   label,
   minimalHeader = false,
+  displayDateInUtc= false
 }: any) => {
   let FOCUS_FORMAT = customDateFormat
     ? customDateFormat
@@ -85,9 +86,11 @@ const Header = ({
       }
     }
   }
+  const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
+
 
   const chartTitle = (
-    <Typography.Text small={minimalHeader? true : false} className="mb-0" type="secondary">
+    <Typography.Text small={minimalHeader ? true : false} className="mb-0" type="secondary">
       {label ?? attribute}
     </Typography.Text>
   )
@@ -100,12 +103,14 @@ const Header = ({
   const date = (
     <Typography.Text type="secondary" className="opacity-50" small>
       {focus ? (
-        data && data[focus] && dayjs(data[focus].period_start).format(FOCUS_FORMAT)
+        data && data[focus] && day(data[focus].period_start).format(FOCUS_FORMAT)
       ) : (
         <span className="opacity-0">x</span>
       )}
     </Typography.Text>
   )
+
+
 
   if (minimalHeader) {
     return (
@@ -165,6 +170,7 @@ export function BarChart({
   format,
   highlightedValue,
   customDateFormat,
+  displayDateInUtc = false,
   label,
   onBarClick,
   minimalHeader,
@@ -191,6 +197,8 @@ export function BarChart({
     setMouseLeave(true)
   }
 
+  const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
+
   return (
     <Loading active={!data}>
       <div className={className}>
@@ -203,8 +211,9 @@ export function BarChart({
           label={label}
           format={format}
           customDateFormat={customDateFormat}
+          displayDateInUtc={displayDateInUtc}
         />
-        <div style={{ width: '100%', height: minmalChart ? "96px" :'160px' }}>
+        <div style={{ width: '100%', height: minmalChart ? '96px' : '160px' }}>
           {hasData ? (
             <>
               <ResponsiveContainer>
@@ -263,12 +272,12 @@ export function BarChart({
               {data && (
                 <div className="flex items-center justify-between -mt-5">
                   <Typography.Text type="secondary" className="opacity-50" small>
-                    {dayjs(data[0].period_start).format(
+                    {day(data[0].period_start).format(
                       customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME
                     )}
                   </Typography.Text>
                   <Typography.Text type="secondary" className="opacity-50" small>
-                    {dayjs(data[data?.length - 1]?.period_start).format(
+                    {day(data[data?.length - 1]?.period_start).format(
                       customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME
                     )}
                   </Typography.Text>
