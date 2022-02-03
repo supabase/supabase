@@ -399,6 +399,10 @@
       "type": "string",
       "options": [
         {
+          "value": "textlocal",
+          "label": "Textlocal"
+        },
+        {
           "value": "twilio",
           "label": "Twilio"
         },
@@ -411,6 +415,14 @@
           "label": "Vonage"
         }
       ]
+    },
+    "SMS_TEXTLOCAL_API_KEY": {
+      "title": "Textlocal API Key",
+      "type": "string"
+    },
+    "SMS_TEXTLOCAL_SENDER": {
+      "title": "Textlocal Sender",
+      "type": "string"
     },
     "SMS_TWILIO_ACCOUNT_SID": {
       "title": "Twilio Account SID",

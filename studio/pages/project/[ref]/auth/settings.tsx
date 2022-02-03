@@ -264,20 +264,21 @@ const Settings = () => {
           title="Phone Auth"
           schema={pluckJsonSchemaFields(authConfig, [
             'SMS_PROVIDER',
-            'SMS_TWILIO_ENABLED',
+            'SMS_TEXTLOCAL_API_KEY',
+            'SMS_TEXTLOCAL_SENDER',
             'SMS_TWILIO_ACCOUNT_SID',
             'SMS_TWILIO_AUTH_TOKEN',
             'SMS_TWILIO_MESSAGE_SERVICE_SID',
-            'SMS_MESSENGER_ENABLED',
             'SMS_MESSAGEBIRD_ORIGINATOR',
             'SMS_MESSAGEBIRD_ACCESS_KEY',
-            'SMS_VONAGE_ENABLED',
             'SMS_VONAGE_API_KEY',
             'SMS_VONAGE_API_SECRET',
             'SMS_VONAGE_FROM'
           ])}
           model={{
             SMS_PROVIDER: model.SMS_PROVIDER,
+            SMS_TEXTLOCAL_API_KEY: model.SMS_TEXTLOCAL_API_KEY,
+            SMS_TEXTLOCAL_SENDER: model.SMS_TEXTLOCAL_SENDER,
             SMS_TWILIO_ACCOUNT_SID: model.SMS_TWILIO_ACCOUNT_SID || undefined,
             SMS_TWILIO_AUTH_TOKEN: model.SMS_TWILIO_AUTH_TOKEN || undefined,
             SMS_TWILIO_MESSAGE_SERVICE_SID: model.SMS_TWILIO_MESSAGE_SERVICE_SID || undefined,
@@ -340,7 +341,7 @@ const Settings = () => {
                       errorMessage="Please enter the twilio message service sid."
                     />
                   </>
-                ) : (
+                ) : (smsProviderModel?.SMS_PROVIDER === 'vonage' ? (
                   <>
                     <AutoField
                       name="SMS_VONAGE_API_KEY"
@@ -358,7 +359,20 @@ const Settings = () => {
                       errorMessage="Please enter the vonage message service sid."
                     />
                   </>
-                ))}
+                ) : (
+                  <>
+                    <AutoField
+                      name="SMS_TEXTLOCAL_API_KEY"
+                      showInlineError
+                      errorMessage="Please enter the vonage account sid."
+                    />
+                    <SecretField
+                      name="SMS_TEXTLOCAL_SENDER"
+                      showInlineError
+                      errorMessage="Please enter the vonage auth token."
+                    />
+                  </>
+                )))}
               </>
             )}
             <UIToggle
