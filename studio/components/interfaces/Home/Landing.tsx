@@ -55,7 +55,7 @@ const Landing = () => {
               className="ml-8 font-medium hover:text-gray-300 focus:outline-none focus:text-gray-300 transition duration-150 ease-in-out"
             >
               <Button onClick={handleGithubSignIn} icon={<IconGitHub />}>
-                Sign In With Github
+                Sign In With GitHub
               </Button>
             </Typography.Text>
           </div>
@@ -74,7 +74,7 @@ const Landing = () => {
           </Typography.Text>
           <div className="mt-5 sm:mt-8 sm:justify-center space-x-3 flex items-center">
             <Button onClick={handleGithubSignIn} size="large" icon={<IconGitHub />}>
-              Sign In With Github
+              Sign In With GitHub
             </Button>
             <Link href="https://supabase.com/docs">
               <Button size="large" type="default">

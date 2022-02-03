@@ -592,6 +592,11 @@ module.exports = withMDX({
       },
       {
         permanent: true,
+        source: '/docs/reference/javascript/reset-password-email',
+        destination: '/docs/reference/javascript/auth-api-resetpasswordforemail',
+      },
+      {
+        permanent: true,
         source: '/oss',
         destination: '/docs/oss',
       },

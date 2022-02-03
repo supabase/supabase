@@ -69,11 +69,11 @@ const logoutSubmitted = (event) => {
 }
 
 function setToken(response) {
-  if (response.user.confirmation_sent_at && !response?.data?.access_token) {
+  if (response.user.confirmation_sent_at && !response?.session?.access_token) {
     alert('Confirmation Email Sent')
   } else {
-    document.querySelector('#access-token').value = response.data.access_token
-    document.querySelector('#refresh-token').value = response.data.refresh_token
+    document.querySelector('#access-token').value = response.session.access_token
+    document.querySelector('#refresh-token').value = response.session.refresh_token
     alert('Logged in as ' + response.user.email)
   }
 }

@@ -129,7 +129,7 @@ info:
           - auth.setAuth()
           - auth.onAuthStateChange()
           - auth.api.getUser()
-          - Reset Password (Email)
+          - auth.api.resetPasswordForEmail()
       - name: 'Auth (Server Only)'
         items:
           - auth.api.createUser()
@@ -137,7 +137,7 @@ info:
           - auth.api.generateLink()
           - auth.api.inviteUserByEmail()
           - auth.api.sendMobileOTP()
-          - auth.api.resetPasswordForEmail()
+          - auth.api.updateUserById()
       - name: 'Database'
         items:
           - select()
@@ -216,7 +216,7 @@ pages:
       ```bash
       npm install @supabase/supabase-js
       ```
-      
+
       Via Yarn
       ```bash
       yarn add @supabase/supabase-js
@@ -473,14 +473,14 @@ pages:
           You can sign up with OAuth providers using the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers) method.
       - name: Sign up with Phone.
         description: |
-          Supabase supports Phone Auth. After a user verified thier number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
+          Supabase supports Phone Auth. After a user has verified their number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
         js: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
             phone: '+13334445555',
             password: 'some-password',
           })
-          
+
           // After receiving an SMS with One Time Password.
           let { session, error } = await supabase.auth.verifyOTP({
             phone: '+13334445555',
@@ -515,16 +515,16 @@ pages:
           })
           ```
       - name: Sign in using third-party providers.
-        description: Supabase supports OAuth logins.
+        description: Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
         js: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
-            // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
+            // provider can be 'github', 'google', 'gitlab', and more
             provider: 'github'
           })
           ```
       - name: Sign in with Phone.
-        description: Supabase supports Phone Auth. 
+        description: Supabase supports Phone Auth.
         js: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
@@ -775,32 +775,6 @@ pages:
           )
           ```
 
-  Reset Password (Email):
-    $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
-    notes: |
-      Sends a reset request to an email address.
-
-      When the user clicks the reset link in the email they will be forwarded to:
-
-      `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`
-
-      Your app must detect `type=recovery` in the fragment and display a password reset form to the user.
-
-      You should then use the access_token in the url and new password to update the user as follows:
-
-      ```js
-      const { error, data } = await supabase.auth.api
-            .updateUser(access_token, { password : new_password })
-      ```
-    examples:
-      - name: Reset password
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = supabase.auth.api
-            .resetPasswordForEmail('user@email.com')
-          ```
-
   auth.api.createUser():
     title: 'createUser()'
     # $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
@@ -873,16 +847,27 @@ pages:
     title: 'resetPasswordForEmail()'
     $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
     notes: |
-      - Requires a `service_role` key.
-      - This function should only be called on a server. Never expose your `service_role` key in the browser.
+      Sends a reset request to an email address.
+
+      When the user clicks the reset link in the email they will be forwarded to:
+
+      `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`
+
+      Your app must detect `type=recovery` in the fragment and display a password reset form to the user.
+
+      You should then use the access_token in the url and new password to update the user as follows:
+
+      ```js
+      const { error, data } = await supabase.auth.api
+            .updateUser(access_token, { password : new_password })
+      ```
     examples:
-      - name: Basic example.
-        isSpotlight: false
+      - name: Reset password
+        isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth
-            .api
-            .resetPasswordForEmail('email@example.com')
+          const { data, error } = supabase.auth.api
+            .resetPasswordForEmail('user@email.com')
           ```
 
   auth.api.generateLink():
@@ -900,6 +885,68 @@ pages:
             'invite',
             'email@example.com'
           )
+          ```
+
+  auth.api.updateUserById():
+    title: 'updateUserById()'
+    $ref: '@supabase/gotrue-js.GoTrueApi.updateUserById'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should only be called on a server. Never expose your `service_role` key in the browser.
+    examples:
+      - name: Updates a user's email.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.api.updateUserById({
+            uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            attributes: { email: 'new@email.com' } },
+          })
+          ```
+      - name: Updates a user's password.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.api.updateUserById({
+            uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            attributes: { password: 'new@email.com' } },
+          })
+          ```
+      - name: Updates a user's metadata.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.api.updateUserById({
+            uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            attributes: { user_metadata: { hello: 'world' } },
+          })
+          ```
+      - name: Updates a user's app_metadata.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.api.updateUserById({
+            uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            attributes: { app_metadata: { plan: 'trial' } },
+          })
+          ```
+      - name: Confirms a user's email address.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.api.updateUserById({
+            uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            attributes: { email_confirm: true },
+          })
+          ```
+      - name: Confirms a user's phone number.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.api.updateUserById({
+            uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            attributes: { phone_number: true },
+          })
           ```
 
   select():
