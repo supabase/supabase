@@ -377,6 +377,9 @@ const Settings = () => {
             'EXTERNAL_GITLAB_ENABLED',
             'EXTERNAL_GITLAB_CLIENT_ID',
             'EXTERNAL_GITLAB_SECRET',
+            'EXTERNAL_LINKEDIN_ENABLED',
+            'EXTERNAL_LINKEDIN_CLIENT_ID',
+            'EXTERNAL_LINKEDIN_SECRET',
             'EXTERNAL_NOTION_ENABLED',
             'EXTERNAL_NOTION_CLIENT_ID',
             'EXTERNAL_NOTION_SECRET',
@@ -418,6 +421,9 @@ const Settings = () => {
             EXTERNAL_GOOGLE_ENABLED: model.EXTERNAL_GOOGLE_ENABLED,
             EXTERNAL_GOOGLE_CLIENT_ID: model.EXTERNAL_GOOGLE_CLIENT_ID || undefined,
             EXTERNAL_GOOGLE_SECRET: model.EXTERNAL_GOOGLE_SECRET || undefined,
+            EXTERNAL_LINKEDIN_ENABLED: model.EXTERNAL_NOTION_ENABLED || undefined,
+            EXTERNAL_LINKEDIN_CLIENT_ID: model.EXTERNAL_NOTION_CLIENT_ID || undefined,
+            EXTERNAL_LINKEDIN_SECRET: model.EXTERNAL_NOTION_SECRET || undefined,
             EXTERNAL_NOTION_ENABLED: model.EXTERNAL_NOTION_ENABLED || undefined,
             EXTERNAL_NOTION_CLIENT_ID: model.EXTERNAL_NOTION_CLIENT_ID || undefined,
             EXTERNAL_NOTION_SECRET: model.EXTERNAL_NOTION_SECRET || undefined,
@@ -664,6 +670,35 @@ const Settings = () => {
               />
               <SecretField
                 name="EXTERNAL_GOOGLE_SECRET"
+                showInlineError
+                errorMessage="Please enter the secret."
+              />
+            </>
+          )}
+          <Divider light />
+          <ToggleField
+            name="EXTERNAL_LINKEDIN_ENABLED"
+            addOns={
+              externalProvidersModel.EXTERNAL_LINKEDIN_ENABLED && (
+                <a
+                  className="pl-4 text-gray-400"
+                  href="https://www.linkedin.com/developers/apps"
+                  target="_blank"
+                >
+                  Create new credentials
+                </a>
+              )
+            }
+          />
+          {externalProvidersModel.EXTERNAL_LINKEDIN_ENABLED && (
+            <>
+              <AutoField
+                name="EXTERNAL_LINKEDIN_CLIENT_ID"
+                showInlineError
+                errorMessage="Please enter the client id."
+              />
+              <SecretField
+                name="EXTERNAL_LINKEDIN_SECRET"
                 showInlineError
                 errorMessage="Please enter the secret."
               />
