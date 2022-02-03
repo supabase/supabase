@@ -21,9 +21,6 @@ import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 import { get } from 'lib/common/fetch'
 import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
 import { useFlag } from 'hooks'
-import { TooltipProps } from 'recharts'
-import { TooltipType } from 'recharts/types/util/types'
-import { TooltipContentProps, TooltipTriggerProps } from '@radix-ui/react-tooltip'
 
 const CHART_INTERVALS = [
   { key: 'minutely', label: '60 minutes', startValue: 1, startUnit: 'hour', format: 'MMM D, h:ma' },
