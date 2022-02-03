@@ -264,11 +264,14 @@ const Settings = () => {
           title="Phone Auth"
           schema={pluckJsonSchemaFields(authConfig, [
             'SMS_PROVIDER',
+            'SMS_TWILIO_ENABLED',
             'SMS_TWILIO_ACCOUNT_SID',
             'SMS_TWILIO_AUTH_TOKEN',
             'SMS_TWILIO_MESSAGE_SERVICE_SID',
+            'SMS_MESSENGER_ENABLED',
             'SMS_MESSAGEBIRD_ORIGINATOR',
             'SMS_MESSAGEBIRD_ACCESS_KEY',
+            'SMS_VONAGE_ENABLED',
             'SMS_VONAGE_API_KEY',
             'SMS_VONAGE_API_SECRET',
             'SMS_VONAGE_FROM'
@@ -319,7 +322,7 @@ const Settings = () => {
                       errorMessage="Please enter the messagebird originator."
                     />
                   </>
-                ) : (
+                ) : (smsProviderModel?.SMS_PROVIDER === 'twilio' ? (
                   <>
                     <AutoField
                       name="SMS_TWILIO_ACCOUNT_SID"
@@ -337,7 +340,25 @@ const Settings = () => {
                       errorMessage="Please enter the twilio message service sid."
                     />
                   </>
-                )}
+                ) : (
+                  <>
+                    <AutoField
+                      name="SMS_VONAGE_API_KEY"
+                      showInlineError
+                      errorMessage="Please enter the vonage account sid."
+                    />
+                    <SecretField
+                      name="SMS_VONAGE_API_SECRET"
+                      showInlineError
+                      errorMessage="Please enter the vonage auth token."
+                    />
+                    <AutoField
+                      name="SMS_VONAGE_FROM"
+                      showInlineError
+                      errorMessage="Please enter the vonage message service sid."
+                    />
+                  </>
+                ))}
               </>
             )}
             <UIToggle
