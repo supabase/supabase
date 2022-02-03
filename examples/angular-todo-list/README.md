@@ -57,7 +57,7 @@ On [app.supabase.io](https://app.supabase.io), you can go to Authentication -> S
 Here, you can also enable external oauth providers, such as Google and GitHub.
 
 Instructions to activate Google provider : https://supabase.com/docs/guides/auth/auth-google
-Instructions to activate Github provider : https://supabase.com/docs/guides/auth/auth-github
+Instructions to activate GitHub provider : https://supabase.com/docs/guides/auth/auth-github
 
 ## Supabase details
 

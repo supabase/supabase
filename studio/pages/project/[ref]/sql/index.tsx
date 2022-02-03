@@ -62,32 +62,31 @@ const PageLayout = observer(() => {
 })
 
 const SqlEditor = observer(() => {
-  const { meta } = useStore()
+  const { meta, ui } = useStore()
+  const { isDarkTheme } = ui
   const sqlEditorStore: any = useSqlStore()
   const monaco = useMonaco()
   const [theme, setTheme] = useState(localStorage.getItem('theme'))
 
   useEffect(() => {
     if (monaco) {
-      const darkTheme = theme ? (theme === 'dark' ? true : false) : true
-
       monaco.editor.defineTheme('supabase', {
-        base: 'vs-dark', // can also be vs-dark or hc-black
+        base: isDarkTheme ? 'vs-dark' : 'vs', // can also be hc-black
         inherit: true, // can also be false to completely replace the builtin rules
         rules: [
-          { token: '', background: darkTheme ? '1f1f1f' : '30313f' },
+          { token: '', background: isDarkTheme ? '1f1f1f' : 'f0f0f0' },
           { token: 'string.sql', foreground: '24b47e' },
           { token: 'comment', foreground: '666666' },
-          { token: 'predefined.sql', foreground: 'D4D4D4' },
+          // { token: 'predefined.sql', foreground: 'D4D4D4' },
         ],
         colors: {
-          'editor.background': darkTheme ? '#1f1f1f' : '#30313f',
+          'editor.background': isDarkTheme ? '#1f1f1f' : '#f0f0f0',
           // 'editorGutter.background': '#30313f',
           // 'editorLineNumber.foreground': '#555671',
         },
       })
     }
-  }, [theme, monaco])
+  }, [monaco, isDarkTheme])
 
   useEffect(() => {
     if (monaco) {
