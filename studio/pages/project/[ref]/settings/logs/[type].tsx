@@ -294,7 +294,7 @@ export const LogPage: NextPage = () => {
         {showChart && mode !== 'custom' && (
           <div>
             <LogEventChart
-              data={logData}
+              data={!isValidating? logData: undefined}
               onBarClick={(timestampMicro) => {
                 handleSearch({ query: params.search_query, fromMicro: timestampMicro })
               }}
