@@ -125,9 +125,9 @@ function AuthPage(props: Props) {
                     return (
                       <img
                         className="mb-2 mr-2"
-                        src={`${basePath}${auth.path}`}
+                        src={`${basePath}/images/product/auth/${auth.name}-icon.svg`}
                         width={21}
-                        alt={auth.alt}
+                        alt={`${auth.name} auth login icon`}
                       />
                     )
                   })}
