@@ -65,7 +65,9 @@ export const LogPage: NextPage = () => {
     timestamp_end: '',
   })
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as string]}`
-  const isSelectQuery = editorValue.toLowerCase().includes('select') ? true : false
+  const checkIfSelectQuery = (value: string) =>
+    value.toLowerCase().includes('select') ? true : false
+  const isSelectQuery = checkIfSelectQuery(editorValue)
 
   useEffect(() => {
     setParams({ ...params, type: type as string })
@@ -180,8 +182,12 @@ export const LogPage: NextPage = () => {
       setEditorValue(template.searchString)
       setParams((prev) => ({
         ...prev,
-        where: isSelectQuery ? '' : cleanEditorValue(template.searchString),
-        sql: isSelectQuery ? cleanEditorValue(template.searchString) : '',
+        where: checkIfSelectQuery(template.searchString)
+          ? ''
+          : cleanEditorValue(template.searchString),
+        sql: checkIfSelectQuery(template.searchString)
+          ? cleanEditorValue(template.searchString)
+          : '',
         search_query: '',
         timestamp_end: '',
       }))
@@ -228,7 +234,7 @@ export const LogPage: NextPage = () => {
     setEditorValue('')
   }
   const cleanEditorValue = (value: string) => {
-    if (typeof value !== "string") return value
+    if (typeof value !== 'string') return value
     return value.replace(/\n/g, ' ')
   }
   return (
