@@ -259,6 +259,18 @@
       "title": "Spotify secret",
       "type": "string"
     },
+    "EXTERNAL_ZOOM_ENABLED": {
+      "title": "Zoom enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_ZOOM_CLIENT_ID": {
+      "title": "Zoom client ID",
+      "type": "string"
+    },
+    "EXTERNAL_ZOOM_SECRET": {
+      "title": "Zoom secret",
+      "type": "string"
+    },
     "SMTP_ADMIN_EMAIL": {
       "title": "SMTP Admin Email",
       "type": "string"

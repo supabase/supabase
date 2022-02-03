@@ -395,6 +395,9 @@ const Settings = () => {
             'EXTERNAL_SPOTIFY_ENABLED',
             'EXTERNAL_SPOTIFY_CLIENT_ID',
             'EXTERNAL_SPOTIFY_SECRET',
+            'EXTERNAL_ZOOM_ENABLED',
+            'EXTERNAL_ZOOM_CLIENT_ID',
+            'EXTERNAL_ZOOM_SECRET',
           ])}
           model={{
             EXTERNAL_APPLE_ENABLED: model.EXTERNAL_APPLE_ENABLED,
@@ -439,6 +442,9 @@ const Settings = () => {
             EXTERNAL_SPOTIFY_ENABLED: model.EXTERNAL_SPOTIFY_ENABLED,
             EXTERNAL_SPOTIFY_CLIENT_ID: model.EXTERNAL_SPOTIFY_CLIENT_ID || undefined,
             EXTERNAL_SPOTIFY_SECRET: model.EXTERNAL_SPOTIFY_SECRET || undefined,
+            EXTERNAL_ZOOM_ENABLED: model.EXTERNAL_ZOOM_ENABLED,
+            EXTERNAL_ZOOM_CLIENT_ID: model.EXTERNAL_ZOOM_CLIENT_ID || undefined,
+            EXTERNAL_ZOOM_SECRET: model.EXTERNAL_ZOOM_SECRET || undefined,
           }}
           onChangeModel={(model) => setExternalProvidersModel(model)}
           onReset={() => onFormReset()}
@@ -840,6 +846,35 @@ const Settings = () => {
               />
               <SecretField
                 name="EXTERNAL_SPOTIFY_SECRET"
+                showInlineError
+                errorMessage="Please enter the secret."
+              />
+            </>
+          )}
+          <Divider light />
+          <ToggleField
+            name="EXTERNAL_ZOOM_ENABLED"
+            addOns={
+              externalProvidersModel.EXTERNAL_ZOOM_ENABLED && (
+                <a
+                  className="pl-4 text-gray-400"
+                  href="https://developers.zoom.us/"
+                  target="_blank"
+                >
+                  Create new credentials
+                </a>
+              )
+            }
+          />
+          {externalProvidersModel.EXTERNAL_ZOOM_ENABLED && (
+            <>
+              <AutoField
+                name="EXTERNAL_ZOOM_CLIENT_ID"
+                showInlineError
+                errorMessage="Please enter the client id."
+              />
+              <SecretField
+                name="EXTERNAL_ZOOM_SECRET"
                 showInlineError
                 errorMessage="Please enter the secret."
               />
