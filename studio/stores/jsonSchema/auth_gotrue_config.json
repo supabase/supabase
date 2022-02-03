@@ -16,6 +16,7 @@
     "EXTERNAL_GITHUB_ENABLED",
     "EXTERNAL_GITLAB_ENABLED",
     "EXTERNAL_GOOGLE_ENABLED",
+    "EXTERNAL_NOTION_ENABLED",
     "EXTERNAL_TWITCH_ENABLED",
     "EXTERNAL_TWITTER_ENABLED",
     "EXTERNAL_SLACK_ENABLED",
@@ -184,6 +185,18 @@
     },
     "EXTERNAL_GOOGLE_SECRET": {
       "title": "Google secret",
+      "type": "string"
+    },
+    "EXTERNAL_NOTION_ENABLED": {
+      "title": "Notion enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_NOTION_CLIENT_ID": {
+      "title": "Notion client ID",
+      "type": "string"
+    },
+    "EXTERNAL_NOTION_SECRET": {
+      "title": "Notion secret",
       "type": "string"
     },
     "EXTERNAL_TWITCH_ENABLED": {
