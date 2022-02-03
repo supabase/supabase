@@ -54,12 +54,13 @@ const useAggregated = (data: LogData[]) => {
     if (!oldestEvent) return []
     const currentTimestamp = new Date().getTime()
     const oldestTimestampMicro = oldestEvent.timestamp
+    const latestTimestamp = truncateToMinute(data[0]['timestamp'])
     const minutesDifference = Math.round(
       (currentTimestamp - oldestTimestampMicro / 1000) / 1000 / 60
     )
     for (const minToAdd of Array.from(Array(minutesDifference).keys())) {
       const tsToCheck = truncateToMinute(oldestTimestampMicro) + minToAdd * 60
-      if (!(tsToCheck in countMap)) {
+      if (!(tsToCheck in countMap) && tsToCheck <= latestTimestamp) {
         countMap[tsToCheck] = 0
       }
     }
