@@ -134,9 +134,9 @@ module.exports = {
             'guides/auth/auth-spotify',
             'guides/auth/auth-twitch',
             'guides/auth/auth-twitter',
+            'guides/auth/auth-zoom',
             'guides/auth/auth-twilio',
             'guides/auth/auth-messagebird',
-            'guides/auth/auth-zoom',
           ],
         },
         {
