@@ -45,8 +45,10 @@ const PolicyRow = ({
           </Typography.Text>
         </div>
         <div className="relative w-64">
-          <div className="top-0 right-0 absolute inline-block visible-child my-2 font-mono text-xs text-gray-400 text-right ">
-            {policy.command}
+          <div className="top-0 right-0 absolute inline-block visible-child my-2">
+            <Typography.Text type="secondary" className='font-mono text-right' small>
+              {policy.command}
+            </Typography.Text>
           </div>
           <div className="top-0 right-0 absolute inline-block -mr-3 hidden-child">
             <Button type="outline" className="mx-2" onClick={() => onSelectEditPolicy(policy)}>
