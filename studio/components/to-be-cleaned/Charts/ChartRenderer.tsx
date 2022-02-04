@@ -344,7 +344,7 @@ export function AreaChart({
       >
         {hasData ? (
           <>
-            <ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={160}>
               <RechartAreaChart
                 data={data}
                 margin={{
