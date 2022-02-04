@@ -187,6 +187,12 @@ module.exports = {
     // },
     {
       type: 'category',
+      label: 'Platform',
+      collapsed: false,
+      items: ['guides/platform/logs'],
+    },
+    {
+      type: 'category',
       label: 'Self Hosting',
       collapsed: false,
       items: ['guides/hosting/overview', 'guides/hosting/docker'],
