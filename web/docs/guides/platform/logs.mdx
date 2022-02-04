@@ -1,0 +1,67 @@
+---
+id: logs
+title: Log Browser
+description: Getting started with Supabase Platform Log Browser
+---
+
+The Supabase Platform provides a log browser that allows log tracing and debugging. Currently, PostgreSQL and Cloudflare edge logs are available.
+
+The features discussed in this article are only available through the Supabase platform and is not available on self-hosted.
+
+The log browser can be accessed through:
+
+- `Project Overview > Settings > API`
+- `Project Overview > Settings > Database`
+
+## Basic Querying Features
+
+- Simple regex-based search on the event message.
+- Timestamp filtering to a point in time, through an ISO-8601 string in UTC timezone.
+
+## Advanced Querying Features
+
+To access advanced querying features, you will need to enable to toggle for **custom queries**. Doing so will display an SQL editor that allows you to craft your queries.
+
+Advanced queries can take two forms, **WHERE queries** and **SELECT queries**.
+
+### WHERE Queries
+
+To perform advanced filtering, you add in additional `WHERE` filters into the query editor. These will be inserted and combined with the existing query. Doing so will allow you to access chronological features such as **loading older logs** and **metadata viewing**.
+
+For example, you may enter the following to query across the event message as well as the timestamp field simultaneously:
+
+```sql
+REGEXP_CONTAINS(event_message, "/auth") AND REGEXP_CONTAINS(event_message, "400") AND timestamp < 1643971681000
+```
+
+### SELECT Queries
+
+`SELECT` queries allows for much more complex and powerful aggregated result sets, that would allow more in-depth analysis of log data.
+
+For example, you may enter the following into the API logs dashboard to query for each user's IP address:
+
+```sql
+SELECT timestamp,  h.x_real_ip
+FROM edge_logs
+  LEFT JOIN UNNEST(metadata) as m ON TRUE
+  LEFT JOIN UNNEST(m.request) AS r ON TRUE
+  LEFT JOIN UNNEST(r.headers) AS h ON TRUE
+WHERE h.x_real_ip IS NOT NULL
+```
+
+You may notice that the table name reference, `edge_logs`, is required in order to formulate the SELECT query. Likewise, when querying the database logs, you would need to provide a table name reference as well.
+
+The table references are as follows:
+
+- API - `edge_logs`
+- Database - `postgres_logs`
+
+Note that cross-table joining is currently not supported.
+
+#### Unnesting Arrays
+
+In the above example, in order to query the metadata field, we need to unnest the field and add it as a join. By observing the metadata field, we can see that it is actually an array of objects. In order to query any value that is an array, we would need to unnest the field and add it to the query as a join, thereby allowing us to reference the nested fields within the array.
+
+### Template Queries
+
+Templates are available to help shorten the time needed to craft these queries. There are examples for each complexity level, which can serve as a foundation for your custom queries.
