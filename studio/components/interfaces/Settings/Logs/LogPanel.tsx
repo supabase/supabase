@@ -1,4 +1,4 @@
-import React, { FC, SyntheticEvent, useEffect, useMemo, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import {
   Button,
   Input,
@@ -11,7 +11,6 @@ import {
   IconSearch,
   IconClock,
   Popover,
-  IconBarChart2,
 } from '@supabase/ui'
 import { LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
@@ -199,20 +198,12 @@ const LogPanel: FC<Props> = ({
                 </div>
               </Flag>
               {!isCustomQuery && (
-                <Button
-                  size="tiny"
-                  type={'text'}
-                  title={isShowingEventChart ? 'Hide event chart' : 'Show event chart'}
-                  onClick={onToggleEventChart}
-                  icon={
-                    <div className="relative">
-                      <IconBarChart2 size="small" />
-                      {isShowingEventChart && (
-                        <IconX className="w-3 h-3 absolute bottom-0 right-0 text-white -mb-1 -mr-1" />
-                      )}
-                    </div>
-                  }
-                />
+                <div className="flex items-center space-x-2">
+                  <Typography.Text type="secondary" small>
+                    Show event chart
+                  </Typography.Text>
+                  <Toggle size="tiny" checked={isShowingEventChart} onChange={onToggleEventChart} />
+                </div>
               )}
               {/* wrap with form so that if user presses enter, the search value will submit automatically */}
               <form
