@@ -48,7 +48,6 @@ function DarkModeToggle(props: Props) {
   const { darkMode, updateTheme } = props
 
   const toggleDarkMode = () => {
-    localStorage.setItem('supabaseDarkMode', (!darkMode).toString())
     updateTheme(!darkMode)
   }
 

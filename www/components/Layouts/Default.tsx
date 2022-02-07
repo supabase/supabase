@@ -8,25 +8,36 @@ type Props = {
   children: React.ReactNode
 }
 
+const MODE_STORAGE_KEY = 'supabaseDarkMode'
+const DARK_COLOR_SCHEME_CLASSNAME = 'dark'
+// Prevents flash of dark if the user is on light theme by injecting the right classname while the page loads.
+// rather than after the page hydrates. Defaults to dark.
+const setInitialTheme = `
+  function getUserPreference() {
+    try {
+      return window.localStorage.getItem('${MODE_STORAGE_KEY}') === 'true' 
+        ? '${DARK_COLOR_SCHEME_CLASSNAME}' : ''
+    } catch (err) {}
+    return '${DARK_COLOR_SCHEME_CLASSNAME}'
+  }
+  document.documentElement.className = getUserPreference()
+`
+
 const DefaultLayout = (props: Props) => {
   const { hideHeader = false, hideFooter = false, children } = props
-  const [darkMode, setDarkMode] = useState<boolean>(true)
-
-  useEffect(() => {
-    const isDarkMode = localStorage.getItem('supabaseDarkMode')
-    if (isDarkMode) {
-      setDarkMode(isDarkMode === 'true')
-      document.documentElement.className = isDarkMode === 'true' ? 'dark' : ''
-    }
-  }, [])
+  const initialMode =
+    typeof window != 'undefined' ? window.localStorage.getItem(MODE_STORAGE_KEY) === 'true' : true
+  const [darkMode, setDarkMode] = useState<boolean>(initialMode)
 
   const updateTheme = (isDarkMode: boolean) => {
-    document.documentElement.className = isDarkMode ? 'dark' : ''
+    document.documentElement.className = isDarkMode ? DARK_COLOR_SCHEME_CLASSNAME : ''
+    window.localStorage.setItem(MODE_STORAGE_KEY, (!darkMode).toString())
     setDarkMode(isDarkMode)
   }
 
   return (
     <>
+      <script dangerouslySetInnerHTML={{ __html: setInitialTheme }} />
       {!hideHeader && <Nav darkMode={darkMode} />}
       <div className="min-h-screen bg-white dark:bg-gray-800">
         <main>{children}</main>
