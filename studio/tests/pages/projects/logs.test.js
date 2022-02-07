@@ -377,7 +377,7 @@ test('bug: load older btn does not error out when previous page is empty', async
 test('log event chart hide', async () => {
   render(<LogPage />)
   await screen.findByText('Events')
-  const button = await screen.findByTitle('Hide event chart')
-  userEvent.click(button)
+  const toggle = getToggleByText(/Show event chart/)
+  userEvent.click(toggle)
   await expect(screen.findByText('Events')).rejects.toThrow()
 })
