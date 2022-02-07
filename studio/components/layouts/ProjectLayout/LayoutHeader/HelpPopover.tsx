@@ -48,7 +48,7 @@ const HelpPopover: FC<Props> = () => {
               </Link>
               <Link href="supabase.com/docs/">
                 <Button type="secondary" size="tiny" icon={<IconBookOpen />}>
-                  Documentation
+                  Docs
                 </Button>
               </Link>
             </div>
