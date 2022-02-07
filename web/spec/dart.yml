@@ -429,7 +429,7 @@ pages:
         description: |
           If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted 
           to select all rows in a `message` table which belong to a user with the `username` "Jane":
-        js: |
+        dart: |
           ```dart
           final res = await supabase
             .from('messages')
