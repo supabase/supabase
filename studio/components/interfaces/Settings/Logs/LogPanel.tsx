@@ -201,7 +201,7 @@ const LogPanel: FC<Props> = ({
               {!isCustomQuery && (
                 <Button
                   size="tiny"
-                  type={isShowingEventChart ? 'outline' : 'text'}
+                  type={'text'}
                   title={isShowingEventChart ? 'Hide event chart' : 'Show event chart'}
                   onClick={onToggleEventChart}
                   icon={
