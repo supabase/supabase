@@ -1,7 +1,16 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useState, useEffect } from 'react'
-import { Typography, Badge, Button, IconTrash, IconCreditCard } from '@supabase/ui'
+import {
+  Typography,
+  Badge,
+  Button,
+  IconTrash,
+  IconCreditCard,
+  Input,
+  IconPlus,
+  IconEdit2,
+} from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
@@ -24,7 +33,7 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
   const [customer, setCustomer] = useState<any>(null)
   const [paymentMethods, setPaymentMethods] = useState<any>(null)
 
-  const { stripe_customer_id, name: orgName, slug: orgSlug } = organization
+  const { stripe_customer_id, stripe_customer_object, name: orgName, slug: orgSlug } = organization
 
   const customerBalance = customer && customer.balance ? customer.balance / 100 : 0
   const isCredit = customerBalance < 0
@@ -33,6 +42,8 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
     isCredit && customerBalance !== 0
       ? customerBalance.toString().replace('-', '')
       : customerBalance
+
+  const { city, country, line1, line2, postal_code, state } = stripe_customer_object?.address ?? {}
 
   useEffect(() => {
     if (stripe_customer_id) {
@@ -104,15 +115,43 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-12 gap-12">
-            <div className="col-span-12 lg:col-span-6">
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-12 lg:col-span-7">
               <Panel
                 loading={loading}
                 title={[
-                  <Typography.Title key="panel-title" className="block" level={4}>
-                    Balance
-                  </Typography.Title>,
+                  <div className="w-full flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <Typography.Title level={5}>Billing address</Typography.Title>
+                      <Typography.Text type="secondary">
+                        This will be the address reflected in all invoices
+                      </Typography.Text>
+                    </div>
+                    <Button
+                      key="panel-footer"
+                      type="outline"
+                      icon={<IconEdit2 />}
+                      onClick={() => redirectToPortal('/customer/update')}
+                    >
+                      Edit address
+                    </Button>
+                  </div>,
                 ]}
+              >
+                <Panel.Content className="space-y-2">
+                  <Input readOnly layout="horizontal" label="Country" value={country || ''} />
+                  {city && <Input readOnly layout="horizontal" label="City" value={city} />}
+                  <Input readOnly layout="horizontal" label="Address" value={line1 || ''} />
+                  <Input readOnly layout="horizontal" label="" value={line2 || ''} />
+                  <Input readOnly layout="horizontal" label="" value={postal_code || ''} />
+                </Panel.Content>
+              </Panel>
+            </div>
+            <div className="col-span-12 lg:col-span-5">
+              <Panel
+                className="!mb-4"
+                loading={loading}
+                title={[<Typography.Title level={5}>Balance</Typography.Title>]}
               >
                 <Panel.Content>
                   {isCredit && <Badge>You have credits available</Badge>}
@@ -130,23 +169,20 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
                   </Typography.Title>
                 </Panel.Content>
               </Panel>
-            </div>
-            <div className="col-span-12 lg:col-span-6">
               <Panel
                 loading={loading}
                 title={[
-                  <Typography.Title key="panel-title" className="block" level={4}>
-                    Payment methods
-                  </Typography.Title>,
-                ]}
-                footer={[
-                  <Button
-                    key="panel-footer"
-                    type="outline"
-                    onClick={() => redirectToPortal('/payment-methods')}
-                  >
-                    {paymentMethods ? 'Add another payment method' : 'Add a payment method'}
-                  </Button>,
+                  <div className="w-full flex items-center justify-between">
+                    <Typography.Title level={5}>Payment methods</Typography.Title>
+                    <Button
+                      key="panel-footer"
+                      type="outline"
+                      icon={<IconPlus />}
+                      onClick={() => redirectToPortal('/payment-methods')}
+                    >
+                      {(paymentMethods?.data ?? []).length >= 1 ? 'Add another' : 'Add new'}
+                    </Button>
+                  </div>,
                 ]}
               >
                 <Panel.Content>
