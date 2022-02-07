@@ -29,7 +29,10 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - name: Install Deps
-      run: apt-get update && apt-get install -y jq && npm ci
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install jq
+        npm ci
       working-directory: ./web
       
     - name: Pull Specs
