@@ -81,7 +81,7 @@ function AuthPage(props: Props) {
             "Including PostgreSQL's policy engine, for fine-grained access rules.",
           ]}
           image={[
-            <div className="w-full header--light block">
+            <div className="w-full header--light block" key="light">
               <Image
                 src={`${basePath}/images/product/auth/header--light.png`}
                 alt="auth header"
@@ -90,7 +90,7 @@ function AuthPage(props: Props) {
                 height="1074"
               />
             </div>,
-            <div className="w-full header--dark mr-0 dark:block">
+            <div className="w-full header--dark mr-0 dark:block" key="dark">
               <Image
                 src={`${basePath}/images/product/auth/header--dark.png`}
                 alt="auth header"
@@ -128,6 +128,7 @@ function AuthPage(props: Props) {
                         src={`${basePath}/images/product/auth/${auth.name}-icon.svg`}
                         width={21}
                         alt={`${auth.name} auth login icon`}
+                        key={auth.name}
                       />
                     )
                   })}
@@ -179,7 +180,7 @@ function AuthPage(props: Props) {
             content={ApiExamples}
             size="large"
             text={[
-              <Typography.Text>
+              <Typography.Text key={0}>
                 <p className="text-base lg:text-lg">
                   APIs that you can understand. With powerful libraries that work on client and
                   server-side applications.
@@ -192,7 +193,7 @@ function AuthPage(props: Props) {
               </Typography.Text>,
             ]}
             footer={[
-              <div className="grid grid-cols-12 md:gap-8 lg:gap-0 xl:gap-16 mt-8">
+              <div className="grid grid-cols-12 md:gap-8 lg:gap-0 xl:gap-16 mt-8" key={0}>
                 <div className="col-span-12 sm:col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
                     icon={<IconBriefcase />}
