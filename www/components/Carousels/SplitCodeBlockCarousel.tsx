@@ -70,7 +70,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
       >
         {props.content.map((extension, i) => {
           return (
-            <Tabs.Panel label={extension.title} id={i.toString()}>
+            <Tabs.Panel label={extension.title} id={i.toString()} key={i}>
               <span></span>
             </Tabs.Panel>
           )
@@ -140,7 +140,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
                         </Typography.Text>
                         {extension.badges &&
                           extension.badges.map((badge, i) => {
-                            return <Badge>{badge}</Badge>
+                            return <Badge key={badge}>{badge}</Badge>
                           })}
                       </div>
                     </Space>

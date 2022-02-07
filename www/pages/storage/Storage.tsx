@@ -58,7 +58,7 @@ function StoragePage() {
           icon={Solutions['storage'].icon}
           title={Solutions['storage'].name}
           h1={[
-            <span>
+            <span key={0}>
               Store and serve
               <br /> any type of digital content
             </span>,
@@ -68,7 +68,7 @@ function StoragePage() {
             'With custom policies and permissions that are familiar and easy to implement.',
           ]}
           image={[
-            <div className="w-full header--light block">
+            <div className="w-full header--light block" key="light">
               <Image
                 src={`${basePath}/images/product/storage/header--light.png`}
                 alt="storage header"
@@ -77,7 +77,7 @@ function StoragePage() {
                 height="1067"
               />
             </div>,
-            <div className="w-full header--dark mr-0 dark:block">
+            <div className="w-full header--dark mr-0 dark:block" key="dark">
               <Image
                 src={`${basePath}/images/product/storage/header--dark.png`}
                 alt="storage header"
@@ -176,9 +176,12 @@ function StoragePage() {
             // @ts-ignore
             content={DashboardViewData}
             footer={[
-              <Typography.Title level={4}>Check out our example app</Typography.Title>,
+              <Typography.Title level={4} key="title">
+                Check out our example app
+              </Typography.Title>,
               // !! Update this example !!
               <ExampleCard
+                key="example"
                 type={'example'}
                 products={['database', 'auth', 'storage']}
                 title={'Profile management example'}
@@ -207,14 +210,14 @@ function StoragePage() {
             // @ts-ignore
             content={ApiExamples}
             text={[
-              <p>Built from the ground up for interoperable authentication.</p>,
-              <p>
+              <p key={0}>Built from the ground up for interoperable authentication.</p>,
+              <p key={1}>
                 Fast and easy to implement using our powerful library clients. Asset optimization
                 and image transformation coming soon!
               </p>,
             ]}
             footer={[
-              <div className="grid grid-cols-12 gap-8 lg:gap-0 xl:gap-16 my-8">
+              <div className="grid grid-cols-12 gap-8 lg:gap-0 xl:gap-16 my-8" key={0}>
                 <div className="col-span-6 lg:col-span-12 lg:mb-8 xl:mb-0 xl:col-span-4">
                   <FeatureColumn
                     icon={<IconWifi />}
