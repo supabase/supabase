@@ -643,7 +643,7 @@ const ListboxActivation: FC = observer(({}) => {
     <Listbox
       id="activation"
       label="Trigger type"
-      descriptionText="This dertermines when your Hook fires"
+      descriptionText="This determines when your Hook fires"
       onChange={(_value) => {
         _localState!.onFormChange({
           key: 'activation',
