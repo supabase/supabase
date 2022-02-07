@@ -430,7 +430,7 @@ pages:
           If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted 
           to select all rows in a `message` table which belong to a user with the `username` "Jane":
         js: |
-          ```js
+          ```dart
           final res = await supabase
             .from('messages')
             .select('*, users!inner(*)')
@@ -515,8 +515,7 @@ pages:
       Performs an UPDATE on the table.
     title: 'Modify data: update()'
     notes: |
-      TODO update the link to dart
-      - `update()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to update.
+      - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
     examples:
       - name: Updating your data
         isSpotlight: true
@@ -598,8 +597,7 @@ pages:
       Performs a DELETE on the table.
     title: 'Delete data: delete()'
     notes: |
-      TODO update link to dart
-      - `delete()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
+      - `delete()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to delete.
     examples:
       - name: Delete records
         isSpotlight: true
