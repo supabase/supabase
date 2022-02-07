@@ -19,8 +19,6 @@ const FeedbackDropdown = () => {
   }
 
   let width = window.innerWidth
-  let FeedbackSM = 'Feedback'
-  let feedbackLG = 'Feedback on this page?'
 
   return (
     <div ref={clickContainerRef} className="relative inline-block text-left mr-1">
@@ -30,7 +28,7 @@ const FeedbackDropdown = () => {
           type="default"
           icon={<IconMessageCircle size={16} strokeWidth={2} />}
         >
-          {width < 710 ? FeedbackSM : feedbackLG}
+          {width < 710 ? 'Feedback' : 'Feedback on this page?'}
         </Button>
       </div>
       <Transition
