@@ -54,7 +54,7 @@ const LogPanel: FC<Props> = ({
   const [from, setFrom] = useState({ value: '', error: '' })
   const [defaultTimestamp, setDefaultTimestamp] = useState(dayjs().utc().toISOString())
 
-  // sync local state with provided default value
+  // Sync local state with provided default value
   useEffect(() => {
     if (search !== defaultSearchValue) {
       setSearch(defaultSearchValue)
