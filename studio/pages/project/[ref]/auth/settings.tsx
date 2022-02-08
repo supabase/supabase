@@ -264,19 +264,29 @@ const Settings = () => {
           title="Phone Auth"
           schema={pluckJsonSchemaFields(authConfig, [
             'SMS_PROVIDER',
+            'SMS_TEXTLOCAL_API_KEY',
+            'SMS_TEXTLOCAL_SENDER',
             'SMS_TWILIO_ACCOUNT_SID',
             'SMS_TWILIO_AUTH_TOKEN',
             'SMS_TWILIO_MESSAGE_SERVICE_SID',
             'SMS_MESSAGEBIRD_ORIGINATOR',
             'SMS_MESSAGEBIRD_ACCESS_KEY',
+            'SMS_VONAGE_API_KEY',
+            'SMS_VONAGE_API_SECRET',
+            'SMS_VONAGE_FROM'
           ])}
           model={{
             SMS_PROVIDER: model.SMS_PROVIDER,
+            SMS_TEXTLOCAL_API_KEY: model.SMS_TEXTLOCAL_API_KEY,
+            SMS_TEXTLOCAL_SENDER: model.SMS_TEXTLOCAL_SENDER,
             SMS_TWILIO_ACCOUNT_SID: model.SMS_TWILIO_ACCOUNT_SID || undefined,
             SMS_TWILIO_AUTH_TOKEN: model.SMS_TWILIO_AUTH_TOKEN || undefined,
             SMS_TWILIO_MESSAGE_SERVICE_SID: model.SMS_TWILIO_MESSAGE_SERVICE_SID || undefined,
             SMS_MESSAGEBIRD_ORIGINATOR: model.SMS_MESSAGEBIRD_ORIGINATOR || undefined,
             SMS_MESSAGEBIRD_ACCESS_KEY: model.SMS_MESSAGEBIRD_ACCESS_KEY || undefined,
+            SMS_VONAGE_API_KEY: model.SMS_VONAGE_API_KEY || undefined,
+            SMS_VONAGE_API_SECRET: model.SMS_VONAGE_API_SECRET || undefined,
+            SMS_VONAGE_FROM: model.SMS_VONAGE_FROM || undefined,
           }}
           onChangeModel={(model: any) => setSmsProviderModel(model)}
           onSubmit={(model: any) => onFormSubmit(model)}
@@ -313,6 +323,37 @@ const Settings = () => {
                       errorMessage="Please enter the messagebird originator."
                     />
                   </>
+                ) : (smsProviderModel?.SMS_PROVIDER === 'textlocal' ? (
+                  <>
+                    <AutoField
+                      name="SMS_TEXTLOCAL_API_KEY"
+                      showInlineError
+                      errorMessage="Please enter the vonage account sid."
+                    />
+                    <SecretField
+                      name="SMS_TEXTLOCAL_SENDER"
+                      showInlineError
+                      errorMessage="Please enter the vonage auth token."
+                    />
+                  </>
+                ) : (smsProviderModel?.SMS_PROVIDER === 'vonage' ? (
+                  <>
+                    <AutoField
+                      name="SMS_VONAGE_API_KEY"
+                      showInlineError
+                      errorMessage="Please enter the vonage account sid."
+                    />
+                    <SecretField
+                      name="SMS_VONAGE_API_SECRET"
+                      showInlineError
+                      errorMessage="Please enter the vonage auth token."
+                    />
+                    <AutoField
+                      name="SMS_VONAGE_FROM"
+                      showInlineError
+                      errorMessage="Please enter the vonage message service sid."
+                    />
+                  </>
                 ) : (
                   <>
                     <AutoField
@@ -331,7 +372,7 @@ const Settings = () => {
                       errorMessage="Please enter the twilio message service sid."
                     />
                   </>
-                )}
+                )))}
               </>
             )}
             <UIToggle
@@ -377,6 +418,12 @@ const Settings = () => {
             'EXTERNAL_GITLAB_ENABLED',
             'EXTERNAL_GITLAB_CLIENT_ID',
             'EXTERNAL_GITLAB_SECRET',
+            'EXTERNAL_LINKEDIN_ENABLED',
+            'EXTERNAL_LINKEDIN_CLIENT_ID',
+            'EXTERNAL_LINKEDIN_SECRET',
+            'EXTERNAL_NOTION_ENABLED',
+            'EXTERNAL_NOTION_CLIENT_ID',
+            'EXTERNAL_NOTION_SECRET',
             'EXTERNAL_TWITCH_ENABLED',
             'EXTERNAL_TWITCH_CLIENT_ID',
             'EXTERNAL_TWITCH_SECRET',
@@ -415,6 +462,12 @@ const Settings = () => {
             EXTERNAL_GOOGLE_ENABLED: model.EXTERNAL_GOOGLE_ENABLED,
             EXTERNAL_GOOGLE_CLIENT_ID: model.EXTERNAL_GOOGLE_CLIENT_ID || undefined,
             EXTERNAL_GOOGLE_SECRET: model.EXTERNAL_GOOGLE_SECRET || undefined,
+            EXTERNAL_LINKEDIN_ENABLED: model.EXTERNAL_LINKEDIN_ENABLED,
+            EXTERNAL_LINKEDIN_CLIENT_ID: model.EXTERNAL_LINKEDIN_CLIENT_ID || undefined,
+            EXTERNAL_LINKEDIN_SECRET: model.EXTERNAL_LINKEDIN_SECRET || undefined,
+            EXTERNAL_NOTION_ENABLED: model.EXTERNAL_NOTION_ENABLED,
+            EXTERNAL_NOTION_CLIENT_ID: model.EXTERNAL_NOTION_CLIENT_ID || undefined,
+            EXTERNAL_NOTION_SECRET: model.EXTERNAL_NOTION_SECRET || undefined,
             EXTERNAL_TWITCH_ENABLED: model.EXTERNAL_TWITCH_ENABLED,
             EXTERNAL_TWITCH_CLIENT_ID: model.EXTERNAL_TWITCH_CLIENT_ID || undefined,
             EXTERNAL_TWITCH_SECRET: model.EXTERNAL_TWITCH_SECRET || undefined,
@@ -658,6 +711,64 @@ const Settings = () => {
               />
               <SecretField
                 name="EXTERNAL_GOOGLE_SECRET"
+                showInlineError
+                errorMessage="Please enter the secret."
+              />
+            </>
+          )}
+          <Divider light />
+          <ToggleField
+            name="EXTERNAL_LINKEDIN_ENABLED"
+            addOns={
+              externalProvidersModel.EXTERNAL_LINKEDIN_ENABLED && (
+                <a
+                  className="pl-4 text-gray-400"
+                  href="https://www.linkedin.com/developers/apps"
+                  target="_blank"
+                >
+                  Create new credentials
+                </a>
+              )
+            }
+          />
+          {externalProvidersModel.EXTERNAL_LINKEDIN_ENABLED && (
+            <>
+              <AutoField
+                name="EXTERNAL_LINKEDIN_CLIENT_ID"
+                showInlineError
+                errorMessage="Please enter the client id."
+              />
+              <SecretField
+                name="EXTERNAL_LINKEDIN_SECRET"
+                showInlineError
+                errorMessage="Please enter the secret."
+              />
+            </>
+          )}
+          <Divider light />
+          <ToggleField
+            name="EXTERNAL_NOTION_ENABLED"
+            addOns={
+              externalProvidersModel.EXTERNAL_NOTION_ENABLED && (
+                <a
+                  className="pl-4 text-gray-400"
+                  href="https://www.notion.so/my-integrations"
+                  target="_blank"
+                >
+                  Create new credentials
+                </a>
+              )
+            }
+          />
+          {externalProvidersModel.EXTERNAL_NOTION_ENABLED && (
+            <>
+              <AutoField
+                name="EXTERNAL_NOTION_CLIENT_ID"
+                showInlineError
+                errorMessage="Please enter the client id."
+              />
+              <SecretField
+                name="EXTERNAL_NOTION_SECRET"
                 showInlineError
                 errorMessage="Please enter the secret."
               />
