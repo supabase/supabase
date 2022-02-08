@@ -21,9 +21,6 @@ import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 import { get } from 'lib/common/fetch'
 import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
 import { useFlag } from 'hooks'
-import { TooltipProps } from 'recharts'
-import { TooltipType } from 'recharts/types/util/types'
-import { TooltipContentProps, TooltipTriggerProps } from '@radix-ui/react-tooltip'
 
 const CHART_INTERVALS = [
   { key: 'minutely', label: '60 minutes', startValue: 1, startUnit: 'hour', format: 'MMM D, h:ma' },
@@ -37,7 +34,7 @@ interface Props {
 const ProjectUsage: FC<Props> = ({ project }) => {
   const logsTimestampFilter = useFlag('logsTimestampFilter')
   const logsUsageChartIntervals = useFlag('logsUsageChartIntervals')
-  const [interval, setInterval] = useState<string>('minutely')
+  const [interval, setInterval] = useState<string>('hourly')
   const router = useRouter()
   const { ref } = router.query
   const { data, error }: any = useSWR(
@@ -49,7 +46,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
     // { refreshInterval: isActive ? 3000 : 30000 }
   )
   const selectedInterval = logsUsageChartIntervals
-    ? CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[0]
+    ? CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
     : CHART_INTERVALS[2]
   const startDate = dayjs()
     .subtract(selectedInterval.startValue, selectedInterval.startUnit)
@@ -57,7 +54,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
   const endDate = dayjs().format(DATE_FORMAT)
   const charts = data?.data
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
-  const handleBarClick = (v: any) => {
+  const handleBarClick = (v: any, search: string) => {
     if (!logsTimestampFilter) return
     if (!v || !v.activePayload?.[0]?.payload) return
     // returns rechart internal tooltip data type
@@ -67,9 +64,9 @@ const ProjectUsage: FC<Props> = ({ project }) => {
     if (timestampDigits < 16) {
       // pad unix timestamp with additional 0 and then forward
       const paddedTimestamp = String(timestamp) + '0'.repeat(16 - timestampDigits)
-      router.push(`/project/${ref}/settings/logs/rest?te=${paddedTimestamp}`)
+      router.push(`/project/${ref}/settings/logs/rest?te=${paddedTimestamp}&s=${search}`)
     } else {
-      router.push(`/project/${ref}/settings/logs/rest?te=${timestamp}`)
+      router.push(`/project/${ref}/settings/logs/rest?te=${timestamp}&s=${search}`)
     }
   }
   return (
@@ -118,7 +115,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
-                  onBarClick={handleBarClick}
+                  onBarClick={(v)=> handleBarClick(v, "/rest")}
                 />
                 <ProjectUsageMinimal
                   projectRef={project.ref}
@@ -145,7 +142,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
-                  onBarClick={handleBarClick}
+                  onBarClick={(v)=> handleBarClick(v, "/auth")}
                 />
                 <ProjectUsageMinimal
                   projectRef={project.ref}
@@ -172,7 +169,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
-                  onBarClick={handleBarClick}
+                  onBarClick={(v)=> handleBarClick(v, "/storage")}
                 />
                 <ProjectUsageMinimal
                   projectRef={project.ref}
@@ -195,7 +192,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
-                  onBarClick={handleBarClick}
+                  onBarClick={(v)=> handleBarClick(v, "/realtime")}
                 />
                 {/* Empty space just so the cards are of the same height */}
                 <div className="py-[26px]" />

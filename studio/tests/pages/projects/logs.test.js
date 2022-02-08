@@ -63,21 +63,19 @@ import userEvent from '@testing-library/user-event'
 import { clickDropdown, getToggleByText } from '../../helpers'
 import { wait } from '@testing-library/user-event/dist/utils'
 import { find } from 'lodash'
-
+import { logDataFixture } from '../../fixtures'
 beforeEach(() => {
   // reset mocks between tests
   get.mockReset()
 })
 test('can display log data and metadata', async () => {
   const data = [
-    {
-      id: 'seome-uuid',
-      timestamp: 1621323232312,
+    logDataFixture({
       event_message: 'some event happened',
       metadata: {
         my_key: 'something_value',
       },
-    },
+    }),
   ]
   get.mockResolvedValue({ data })
   render(<LogPage />)
@@ -91,14 +89,12 @@ test('can display log data and metadata', async () => {
 
 test('Refreshpage', async () => {
   const data = [
-    {
-      id: 'some-uuid',
-      timestamp: 1621323232312,
+    logDataFixture({
       event_message: 'some event happened',
       metadata: {
         my_key: 'something_value',
       },
-    },
+    }),
   ]
   get.mockImplementation((url) => {
     if (url.includes('count')) return { count: 0 }
@@ -122,14 +118,7 @@ test('Search will trigger a log refresh', async () => {
   get.mockImplementation((url) => {
     if (url.includes('search_query') && url.includes('something')) {
       return {
-        data: [
-          {
-            id: 'some-uuid',
-            timestamp: 1621323232312,
-            event_message: 'some event happened',
-            metadata: {},
-          },
-        ],
+        data: [logDataFixture({ event_message: 'some event happened' })],
       }
     }
     return { data: [] }
@@ -166,14 +155,7 @@ test('poll count for new messages', async () => {
       return { data: [{ count: 125 }] }
     }
     return {
-      data: [
-        {
-          id: 'some-uuid',
-          timestamp: 1621323232312,
-          event_message: 'some event happened',
-          metadata: {},
-        },
-      ],
+      data: [logDataFixture({ event_message: 'something happened' })],
     }
   })
   render(<LogPage />)
@@ -190,14 +172,7 @@ test('where clause will trigger a log refresh', async () => {
   get.mockImplementation((url) => {
     if (url.includes('where') && url.includes('something')) {
       return {
-        data: [
-          {
-            id: 'some-uuid',
-            timestamp: 1621323232312,
-            event_message: 'some event happened',
-            metadata: {},
-          },
-        ],
+        data: [logDataFixture({ event_message: 'some event happened' })],
       }
     }
     return { data: [] }
@@ -355,14 +330,7 @@ test('load older btn will fetch older logs', async () => {
       return {}
     }
     return {
-      data: [
-        {
-          id: 'some-uuid',
-          timestamp: 1621323232312,
-          event_message: 'first event',
-          metadata: {},
-        },
-      ],
+      data: [logDataFixture({ event_message: 'first event' })],
     }
   })
   render(<LogPage />)
@@ -371,14 +339,7 @@ test('load older btn will fetch older logs', async () => {
   expect(() => screen.getByText('second event')).toThrow()
 
   get.mockResolvedValueOnce({
-    data: [
-      {
-        id: 'some-uuid2',
-        timestamp: 1621323232310,
-        event_message: 'second event',
-        metadata: {},
-      },
-    ],
+    data: [logDataFixture({ event_message: 'second event' })],
   })
   // should display first and second log
   userEvent.click(screen.getByText('Load older'))
@@ -411,4 +372,12 @@ test('bug: load older btn does not error out when previous page is empty', async
     expect(screen.queryByText(/An error occured/)).toBeNull()
     expect(screen.queryByText(/undefined/)).toBeNull()
   })
+})
+
+test('log event chart hide', async () => {
+  render(<LogPage />)
+  await screen.findByText('Events')
+  const toggle = getToggleByText(/Show event chart/)
+  userEvent.click(toggle)
+  await expect(screen.findByText('Events')).rejects.toThrow()
 })

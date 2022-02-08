@@ -3,6 +3,7 @@ import {
   Divider,
   IconHelpCircle,
   IconMail,
+  IconBookOpen,
   IconMessageCircle,
   Popover,
   Typography,
@@ -39,11 +40,18 @@ const HelpPopover: FC<Props> = () => {
                 hosted services.
               </p>
             </Typography.Text>
-            <Link href={supportUrl}>
-              <Button className="sbui-default-button--dark-white" icon={<IconMail />}>
-                Contact support team
-              </Button>
-            </Link>
+            <div className='flex space-x-1'>
+              <Link href={supportUrl}>
+                <Button className="sbui-default-button--dark-white" size="tiny" icon={<IconMail />}>
+                  Contact support
+                </Button>
+              </Link>
+              <Link href="supabase.com/docs/">
+                <Button type="secondary" size="tiny" icon={<IconBookOpen />}>
+                  Docs
+                </Button>
+              </Link>
+            </div>
             <Typography.Text type="secondary" small className="block opacity-50">
               Expected response time is based on your billing tier. Pro and Pay as You Go plans are
               prioritised.
@@ -67,18 +75,18 @@ const HelpPopover: FC<Props> = () => {
                 className="relative px-5 py-4 pb-12 rounded overflow-hidden space-y-2 shadow-md"
                 style={{ background: '#404EED' }}
               >
-                <Image
-                  className="absolute left-0 top-0 opacity-50"
-                  src={'/img/support/discord-bg-small.jpg'}
-                  layout="fill"
-                  objectFit="cover"
-                  alt="discord illustration header"
-                />
                 <a
                   href="https://discord.supabase.com"
                   target="_blank"
-                  className="block  cursor-pointer"
+                  className="block cursor-pointer"
                 >
+                  <Image
+                    className="absolute left-0 top-0 opacity-50"
+                    src={'/img/support/discord-bg-small.jpg'}
+                    layout="fill"
+                    objectFit="cover"
+                    alt="discord illustration header"
+                  />
                   <Button
                     className="sbui-default-button--dark-white"
                     type="default"

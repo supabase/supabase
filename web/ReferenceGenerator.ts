@@ -176,8 +176,11 @@ function generateExamples(id: string, specExamples: any, allLanguages: any) {
 /**
  * A spotlight is an example which appears at the top of the page.
  */
-function generateSpotlight(id: string, specExamples: any, allLanguages: any) {
-  const spotlight = specExamples.find((x) => x.isSpotlight) || null
+function generateSpotlight(id: string, specExamples: any | any[], allLanguages: any) {
+  if (!Array.isArray(specExamples)) {
+    throw new Error(`Examples for each spec should be an array, received: \n${specExamples}`)
+  }
+  const spotlight = (specExamples && specExamples.find((x) => x.isSpotlight)) || null
   const spotlightContent = !spotlight
     ? ''
     : Tabs(id, allLanguages, generateTabs(allLanguages, spotlight))

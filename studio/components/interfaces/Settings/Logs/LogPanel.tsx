@@ -1,4 +1,4 @@
-import React, { FC, SyntheticEvent, useEffect, useMemo, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import {
   Button,
   Input,
@@ -27,6 +27,8 @@ interface Props {
   onSearch?: LogSearchCallback
   onCustomClick?: () => void
   onSelectTemplate: (template: LogTemplate) => void
+  isShowingEventChart: boolean
+  onToggleEventChart: () => void
 }
 
 dayjs.extend(utc)
@@ -45,11 +47,14 @@ const LogPanel: FC<Props> = ({
   defaultFromValue = '',
   onCustomClick,
   onSelectTemplate,
+  isShowingEventChart,
+  onToggleEventChart,
 }) => {
   const [search, setSearch] = useState('')
   const [from, setFrom] = useState({ value: '', error: '' })
   const [defaultTimestamp, setDefaultTimestamp] = useState(dayjs().utc().toISOString())
-  // sync local state with provided default value
+
+  // Sync local state with provided default value
   useEffect(() => {
     if (search !== defaultSearchValue) {
       setSearch(defaultSearchValue)
@@ -193,6 +198,14 @@ const LogPanel: FC<Props> = ({
                   )}
                 </div>
               </Flag>
+              {!isCustomQuery && (
+                <div className="flex items-center space-x-2">
+                  <Typography.Text type="secondary" small>
+                    Show event chart
+                  </Typography.Text>
+                  <Toggle size="tiny" checked={isShowingEventChart} onChange={onToggleEventChart} />
+                </div>
+              )}
               {/* wrap with form so that if user presses enter, the search value will submit automatically */}
               <form
                 id="log-panel-search"

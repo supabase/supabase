@@ -85,7 +85,7 @@ function Database() {
             'PostgreSQL is one of the worlds most scalable databases.',
           ]}
           image={[
-            <div className="w-full header--light block">
+            <div className="w-full header--light block" key="light">
               <Image
                 src={`${basePath}/images/product/database/header--light-2.png`}
                 alt="database header"
@@ -94,7 +94,7 @@ function Database() {
                 height="1116"
               />
             </div>,
-            <div className="w-full header--dark mr-0 dark:block">
+            <div className="w-full header--dark mr-0 dark:block" key="dark">
               <Image
                 src={`${basePath}/images/product/database/header--dark-2.png`}
                 alt="database header"
@@ -226,6 +226,7 @@ function Database() {
                   footer={[
                     <TweetCard
                       handle="@Elsolo244"
+                      key="@Elsolo244"
                       img_url={`${basePath}/images/twitter-profiles/v6citnk33y2wpeyzrq05_400x400.jpeg`}
                       quote="Where has
                 @supabase
@@ -242,6 +243,7 @@ function Database() {
                   footer={[
                     <TweetCard
                       handle="@jim_bisenius"
+                      key="@jim_bisenius"
                       img_url={`${basePath}/images/twitter-profiles/rLgwUZSB_400x400.jpg`}
                       quote="@MongoDB or @MySQL?!?! Please, let me introduce you to @supabase and the wonderful world of @PostgreSQL before it's too late!!"
                     />,
@@ -258,13 +260,13 @@ function Database() {
             content={ApiExamplesData}
             title="Never write an API again"
             text={[
-              <p>
+              <p key={0}>
                 We introspect your database and provide instant APIs. Focus on building your
                 product, while Supabase handles the CRUD.
               </p>,
             ]}
             footer={[
-              <div className="grid grid-cols-12">
+              <div className="grid grid-cols-12" key={0}>
                 <div className="mt-0 col-span-12 lg:col-span-6 xl:col-span-12 xl:mb-8">
                   <Space>
                     <Typography.Text type="secondary">
@@ -284,7 +286,7 @@ function Database() {
                     </Badge>
                   </Space>
                 </div>
-                <div className="col-span-12 lg:col-span-6 xl:col-span-10 hidden xl:block">
+                <div className="col-span-12 lg:col-span-6 xl:col-span-10 hidden xl:block" key={1}>
                   {/* <TweetCard
                     handle="@eunjae_lee"
                     img_url="https://pbs.twimg.com/profile_images/1188191474401320965/eGjSYbQd_400x400.jpg"
