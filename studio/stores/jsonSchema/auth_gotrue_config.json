@@ -408,7 +408,8 @@
     },
     "SMS_TEXTLOCAL_SENDER": {
       "title": "Textlocal Sender",
-      "type": "string"
+      "type": "string",
+      "help": "Textlocal sender phone number"
     },
     "SMS_TWILIO_ACCOUNT_SID": {
       "title": "Twilio Account SID",
@@ -442,7 +443,8 @@
     },
     "SMS_VONAGE_FROM": {
       "title": "Vonage Sender",
-      "type": "string"
+      "type": "string",
+      "help": "Vonage sender phone number"
     },
     "SMS_TEMPLATE": {
       "title": "Body",
