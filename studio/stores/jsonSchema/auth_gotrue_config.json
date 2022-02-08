@@ -385,10 +385,6 @@
       "type": "string",
       "options": [
         {
-          "value": "textlocal",
-          "label": "Textlocal"
-        },
-        {
           "value": "twilio",
           "label": "Twilio"
         },
@@ -399,6 +395,10 @@
         {
           "value": "vonage",
           "label": "Vonage"
+        },
+        {
+          "value": "textlocal",
+          "label": "Textlocal"
         }
       ]
     },
