@@ -323,22 +323,17 @@ const Settings = () => {
                       errorMessage="Please enter the messagebird originator."
                     />
                   </>
-                ) : (smsProviderModel?.SMS_PROVIDER === 'twilio' ? (
+                ) : (smsProviderModel?.SMS_PROVIDER === 'textlocal' ? (
                   <>
                     <AutoField
-                      name="SMS_TWILIO_ACCOUNT_SID"
+                      name="SMS_TEXTLOCAL_API_KEY"
                       showInlineError
-                      errorMessage="Please enter the twilio account sid."
+                      errorMessage="Please enter the vonage account sid."
                     />
                     <SecretField
-                      name="SMS_TWILIO_AUTH_TOKEN"
+                      name="SMS_TEXTLOCAL_SENDER"
                       showInlineError
-                      errorMessage="Please enter the twilio auth token."
-                    />
-                    <AutoField
-                      name="SMS_TWILIO_MESSAGE_SERVICE_SID"
-                      showInlineError
-                      errorMessage="Please enter the twilio message service sid."
+                      errorMessage="Please enter the vonage auth token."
                     />
                   </>
                 ) : (smsProviderModel?.SMS_PROVIDER === 'vonage' ? (
@@ -362,14 +357,19 @@ const Settings = () => {
                 ) : (
                   <>
                     <AutoField
-                      name="SMS_TEXTLOCAL_API_KEY"
+                      name="SMS_TWILIO_ACCOUNT_SID"
                       showInlineError
-                      errorMessage="Please enter the vonage account sid."
+                      errorMessage="Please enter the twilio account sid."
                     />
                     <SecretField
-                      name="SMS_TEXTLOCAL_SENDER"
+                      name="SMS_TWILIO_AUTH_TOKEN"
                       showInlineError
-                      errorMessage="Please enter the vonage auth token."
+                      errorMessage="Please enter the twilio auth token."
+                    />
+                    <AutoField
+                      name="SMS_TWILIO_MESSAGE_SERVICE_SID"
+                      showInlineError
+                      errorMessage="Please enter the twilio message service sid."
                     />
                   </>
                 )))}
