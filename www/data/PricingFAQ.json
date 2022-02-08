@@ -117,7 +117,7 @@
   },
   {
     "question": "What if I need one project for development and one for production?",
-    "answer": "We are working on multi-environment projects. For now, you can create a project for your development backend and production backend. We give you four free projects as part of our free tier. This means you could have two development and two production servers as part of your free tier."
+    "answer": "We are working on multi-environment projects. For now, you can create a project for your development backend and production backend. We give you 2 free projects as part of our free tier. This means you could have a development and a production server as part of your free tier."
   },
   {
     "question": "Can I self host Supabase for free?",

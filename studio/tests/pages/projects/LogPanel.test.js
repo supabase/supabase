@@ -1,7 +1,7 @@
 import LogPanel from 'components/interfaces/Settings/Logs/LogPanel'
 import { render, waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { clickDropdown } from 'tests/helpers'
+import { getToggleByText } from 'tests/helpers'
 
 jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'
@@ -31,6 +31,16 @@ test('custom mode', async () => {
     expect(() => screen.getByPlaceholderText(/Search/)).toThrow()
   })
 })
+
+test('toggle event chart', async () => {
+  const mockFn = jest.fn()
+  const { rerender } = render(<LogPanel onToggleEventChart={mockFn} isShowingEventChart={true} />)
+  const toggle = getToggleByText(/Show event chart/)
+  userEvent.click(toggle)
+  expect(mockFn).toBeCalled()
+  rerender(<LogPanel isShowingEventChart={false} />)
+})
+
 test('filter input change and submit', async () => {
   const mockFn = jest.fn()
   render(<LogPanel onSearch={mockFn} />)

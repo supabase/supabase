@@ -83,7 +83,7 @@ const FeedbackWidget = ({ onClose, feedback, setFeedback, category, setCategory 
                   <span className="cursor-pointer transition-colors text-green-600 hover:text-green-700">
                     browse our docs
                   </span>
-                </a>{' '}
+                </a>
                 .
               </p>
             </Typography.Text>
