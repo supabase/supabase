@@ -160,17 +160,17 @@ const SpreadsheetImport: FC<Props> = ({
         </div>
 
         {spreadsheetData.headers.length > 0 && (
-          <div className="py-5 space-y-5">
-            <div className="space-y-2">
-              <div className="flex flex-col space-y-1">
-                <Typography.Text>Content Preview</Typography.Text>
-                <Typography.Text type="secondary">
-                  Your table will have {spreadsheetData.rowCount.toLocaleString()} rows and the
-                  following {spreadsheetData.headers.length} columns.
-                </Typography.Text>
-              </div>
-              <SpreadsheetPreview headers={spreadsheetData.headers} />
+        <div className="py-5 space-y-5">
+          <div className="space-y-2">
+            <div className="flex flex-col space-y-1">
+              <Typography.Text>Content Preview</Typography.Text>
+              <Typography.Text type="secondary">
+                Your table will have {spreadsheetData.rowCount.toLocaleString()} rows and the
+                following {spreadsheetData.headers.length} columns.
+              </Typography.Text>
             </div>
+            <SpreadsheetPreview headers={spreadsheetData.headers} rows={spreadsheetData.rows} />
+          </div>
             {errors.length > 0 && (
               <div className="space-y-2">
                 <div className="flex flex-col space-y-1">
