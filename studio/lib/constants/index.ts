@@ -88,14 +88,6 @@ export const POLICY_MODAL_VIEWS = {
   REVIEW: 'REVIEW',
 }
 
-export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
-  rest: 'API',
-  realtime: 'Realtime',
-  auth: 'Auth',
-  storage: 'Storage',
-  database: 'Database',
-}
-
 export const GOTRUE_ERRORS = {
   UNVERIFIED_GITHUB_USER: 'Error sending confirmation mail',
 }
