@@ -46,11 +46,11 @@ const HelpPopover: FC<Props> = () => {
                   Contact support
                 </Button>
               </Link>
-              <Link href="supabase.com/docs/">
+              <a href='https://supabase.com/docs/'>
                 <Button type="secondary" size="tiny" icon={<IconBookOpen />}>
                   Docs
                 </Button>
-              </Link>
+              </a>
             </div>
             <Typography.Text type="secondary" small className="block opacity-50">
               Expected response time is based on your billing tier. Pro and Pay as You Go plans are
@@ -75,18 +75,18 @@ const HelpPopover: FC<Props> = () => {
                 className="relative px-5 py-4 pb-12 rounded overflow-hidden space-y-2 shadow-md"
                 style={{ background: '#404EED' }}
               >
+                <Image
+                  className="absolute left-0 top-0 opacity-50"
+                  src={'/img/support/discord-bg-small.jpg'}
+                  layout="fill"
+                  objectFit="cover"
+                  alt="discord illustration header"
+                />
                 <a
                   href="https://discord.supabase.com"
                   target="_blank"
                   className="block cursor-pointer"
                 >
-                  <Image
-                    className="absolute left-0 top-0 opacity-50"
-                    src={'/img/support/discord-bg-small.jpg'}
-                    layout="fill"
-                    objectFit="cover"
-                    alt="discord illustration header"
-                  />
                   <Button
                     className="sbui-default-button--dark-white"
                     type="default"
@@ -99,18 +99,18 @@ const HelpPopover: FC<Props> = () => {
             </div>
             <div className="px-5">
               <div className="relative px-5 py-4 pb-12 rounded overflow-hidden space-y-2 shadow-md">
+                <Image
+                  className="absolute left-0 top-0 opacity-50"
+                  src={'/img/support/github-bg.jpg?v-1'}
+                  layout="fill"
+                  objectFit="cover"
+                  alt="discord illustration header"
+                />
                 <a
                   href="https://github.com/supabase/supabase/discussions"
                   target="_blank"
                   className="block cursor-pointer"
                 >
-                  <Image
-                    className="absolute left-0 top-0 opacity-50"
-                    src={'/img/support/github-bg.jpg?v-1'}
-                    layout="fill"
-                    objectFit="cover"
-                    alt="discord illustration header"
-                  />
                   <Button type="default" icon={<IconMessageCircle />}>
                     GitHub Discussions
                   </Button>
