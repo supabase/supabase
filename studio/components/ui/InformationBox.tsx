@@ -9,6 +9,9 @@ interface Props {
   urlLabel?: string
   defaultVisibility?: boolean
   hideCollapse?: boolean
+  className?: string
+  block?: boolean
+  size?: 'tiny' | 'small' | 'normal' | 'large'
 }
 
 const InformationBox: FC<Props> = ({
@@ -19,10 +22,19 @@ const InformationBox: FC<Props> = ({
   urlLabel = 'Read more',
   defaultVisibility = false,
   hideCollapse = false,
+  className = '',
+  block = false,
+  size = 'normal',
 }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(defaultVisibility)
+
+  const padding = { tiny: 'py-1', small: 'py-2', normal: 'py-3', large: 'py-4' }[size]
   return (
-    <div className="block w-full bg-gray-100 dark:bg-gray-600 py-3 border border-gray-600 dark:border-gray-500 border-opacity-20 rounded">
+    <div
+      className={`${
+        block ? 'block w-full' : ''
+      } bg-gray-100 dark:bg-gray-600 ${padding} border border-gray-600 dark:border-gray-500 border-opacity-20 rounded ${className}`}
+    >
       <div className="flex flex-col">
         <div className="flex items-center justify-between px-3">
           <div className="flex space-x-3 w-full lg:items-center">

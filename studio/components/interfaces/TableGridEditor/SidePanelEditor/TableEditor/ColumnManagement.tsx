@@ -178,6 +178,7 @@ const ColumnManagement: FC<Props> = ({
 
         {primaryKeyColumns.length > 1 && (
           <InformationBox
+            block
             icon={<IconKey className="text-white" size="large" />}
             title="Composite primary key selected"
             description="The columns that you've selected will grouped as a primary key, and will serve
