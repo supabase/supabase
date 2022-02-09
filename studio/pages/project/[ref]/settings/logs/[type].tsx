@@ -45,7 +45,7 @@ import InformationBox from 'components/ui/InformationBox'
  * params used are:
  * - `q` for the editor query.
  * - `s` for search query.
- * - `ts` for timestamp start value.
+ * - `te` for timestamp start value.
  */
 export const LogPage: NextPage = () => {
   const logsQueryParamsSyncing = useFlag('logsQueryParamsSyncing')
