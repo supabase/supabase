@@ -35,6 +35,7 @@ import { isUndefined } from 'lodash'
 import Flag from 'components/ui/Flag/Flag'
 import { useFlag } from 'hooks'
 import dayjs from 'dayjs'
+import InformationBox from 'components/ui/InformationBox'
 
 /**
  * Acts as a container component for the entire log display
@@ -258,16 +259,16 @@ export const LogPage: NextPage = () => {
                 onInputRun={handleRefresh}
               />
             </div>
-            <div className="flex flex-row justify-end p-2 w-full">
+            <div className="flex flex-row justify-between items-center px-2 py-1 w-full">
               {isSelectQuery && (
-                <div className="flex flex-grow flex-row items-center gap-x-1">
-                  {/* // we don't have a slim Alert component yet */}
-                  <IconInfo size="tiny" />
-                  <Typography.Text small={true} type="secondary">
-                    Custom queries are restricted to a {type === 'database' ? '2 hour' : '7 day'}{' '}
-                    querying window.
-                  </Typography.Text>
-                </div>
+                <InformationBox
+                  block
+                  size="tiny"
+                  icon={<IconInfo size="tiny" />}
+                  title={`Custom queries are restricted to a ${
+                    type === 'database' ? '2 hour' : '7 day'
+                  } querying window.`}
+                />
               )}
               <div className="flex flex-row gap-x-2 justify-end p-2">
                 {editorValue && (
