@@ -87,6 +87,7 @@ const ColumnForeignKeyInformation: FC<{
 }> = ({ columnName, foreignKey, onSelectEditRelation, onSelectRemoveRelation }) => {
   return (
     <InformationBox
+      block
       icon={<IconLink />}
       title={
         <div className="flex items-center justify-between">
@@ -125,6 +126,7 @@ const ColumnForeignKeyAdded: FC<{
 }> = ({ columnName, foreignKey, onSelectEditRelation, onSelectRemoveRelation }) => {
   return (
     <InformationBox
+      block
       icon={<IconLink />}
       title={
         <div className="flex items-center justify-between">
@@ -165,6 +167,7 @@ const ColumnForeignKeyRemoved: FC<{
 }> = ({ columnName, originalForeignKey, onSelectEditRelation }) => {
   return (
     <InformationBox
+      block
       icon={<IconLink />}
       title={
         <div className="flex items-center justify-between">
@@ -210,6 +213,7 @@ const ColumnForeignKeyUpdated: FC<{
 }) => {
   return (
     <InformationBox
+      block
       icon={<IconLink />}
       title={
         <div className="flex items-center justify-between">
