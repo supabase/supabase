@@ -32,7 +32,6 @@ import {
 import { uuidv4 } from 'lib/helpers'
 import useSWRInfinite from 'swr/infinite'
 import { isUndefined } from 'lodash'
-import Flag from 'components/ui/Flag/Flag'
 import { useFlag } from 'hooks'
 import dayjs from 'dayjs'
 import InformationBox from 'components/ui/InformationBox'
