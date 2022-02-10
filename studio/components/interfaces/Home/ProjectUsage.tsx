@@ -21,6 +21,8 @@ import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 import { get } from 'lib/common/fetch'
 import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
 import { useFlag } from 'hooks'
+import StackedAreaChart from 'components/ui/charts/StackedAreaChart'
+import Table from 'components/to-be-cleaned/Table'
 
 const CHART_INTERVALS = [
   { key: 'minutely', label: '60 minutes', startValue: 1, startUnit: 'hour', format: 'MMM D, h:ma' },
@@ -201,6 +203,45 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                 /> */}
               </Panel.Content>
             </Panel>
+            <div>
+              <Panel>
+                <Panel.Content className="space-y-4">
+                  <PanelHeader title="API Status Codes" />
+                  <StackedAreaChart
+                    label="Status Codes"
+                    customDateFormat={datetimeFormat}
+                    data={[]}
+                    isLoading={!charts && !error ? true : false}
+                  />
+                </Panel.Content>
+              </Panel>
+
+              <Panel>
+                <Panel.Content className="space-y-4">
+                  <PanelHeader title="Top Routes" />
+                  <Table
+                    head={
+                      <>
+                        <Table.th>Path</Table.th>
+                        <Table.th>Count</Table.th>
+                        <Table.th>Avg. Latency</Table.th>
+                      </>
+                    }
+                    body={
+                      <>
+                        {[{ path: '123', count: 123, average_latency: 123 }].map((row) => (
+                          <Table.tr>
+                            <Table.td>{row.path}</Table.td>
+                            <Table.td>{row.count}</Table.td>
+                            <Table.td>{row.average_latency}</Table.td>
+                          </Table.tr>
+                        ))}
+                      </>
+                    }
+                  />
+                </Panel.Content>
+              </Panel>
+            </div>
           </div>
         )}
       </div>
