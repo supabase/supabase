@@ -38,7 +38,7 @@ export default function Home() {
                       'button hero--button button--md button--primary responsive-button',
                       styles.button
                     )}
-                    to={'/careers'}
+                    to={'https://boards.greenhouse.io/supabase'}
                     style={{ marginTop: 10 }}
                   >
                     Join the team →
