@@ -230,15 +230,7 @@ pages:
       //or
       <script src="https://unpkg.com/@supabase/supabase-js"></script>
       ```
-
-      ## Python
-
-      ```bash
-      pip install supabase-py
-      ```
-
-      Find the source code on [GitHub](https://github.com/supabase/supabase-py).
-
+      
   Initializing:
     $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.constructor'
     description: |
