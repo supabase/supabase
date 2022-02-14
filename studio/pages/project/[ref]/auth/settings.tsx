@@ -264,13 +264,13 @@ const Settings = () => {
           title="Phone Auth"
           schema={pluckJsonSchemaFields(authConfig, [
             'SMS_PROVIDER',
-            'SMS_TEXTLOCAL_API_KEY',
-            'SMS_TEXTLOCAL_SENDER',
             'SMS_TWILIO_ACCOUNT_SID',
             'SMS_TWILIO_AUTH_TOKEN',
             'SMS_TWILIO_MESSAGE_SERVICE_SID',
             'SMS_MESSAGEBIRD_ORIGINATOR',
             'SMS_MESSAGEBIRD_ACCESS_KEY',
+            'SMS_TEXTLOCAL_API_KEY',
+            'SMS_TEXTLOCAL_SENDER',
             'SMS_VONAGE_API_KEY',
             'SMS_VONAGE_API_SECRET',
             'SMS_VONAGE_FROM'
@@ -717,7 +717,7 @@ const Settings = () => {
             </>
           )}
           <Divider light />
-          <ToggleField
+          {/* <ToggleField
             name="EXTERNAL_LINKEDIN_ENABLED"
             addOns={
               externalProvidersModel.EXTERNAL_LINKEDIN_ENABLED && (
@@ -774,7 +774,7 @@ const Settings = () => {
               />
             </>
           )}
-          <Divider light />
+          <Divider light /> */}
           <ToggleField
             name="EXTERNAL_TWITCH_ENABLED"
             addOns={
