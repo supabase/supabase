@@ -9,6 +9,7 @@ import { TableEditorLayout } from 'components/layouts'
 import { EmptyState, SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import router from 'next/router'
+import { SidePanel } from '@supabase/ui'
 
 const Editor: NextPage = () => {
   const { meta, ui } = useStore()
@@ -74,14 +75,6 @@ const Editor: NextPage = () => {
     >
       <EmptyState selectedSchema={selectedSchema} onAddTable={onAddTable} />
       {/* On this page it'll only handle tables */}
-      <SidePanelEditor
-        selectedSchema={selectedSchema}
-        isDuplicating={isDuplicating}
-        selectedTableToEdit={selectedTableToEdit}
-        sidePanelKey={sidePanelKey}
-        closePanel={onClosePanel}
-        onTableCreated={(table: any) => router.push(`/project/${projectRef}/editor/${table.id}`)}
-      />
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedTableToDelete)}
@@ -91,6 +84,14 @@ const Editor: NextPage = () => {
         buttonLoadingLabel="Deleting"
         onSelectCancel={() => setIsDeleting(false)}
         onSelectConfirm={onConfirmDeleteTable}
+      />
+      <SidePanelEditor
+        selectedSchema={selectedSchema}
+        isDuplicating={isDuplicating}
+        selectedTableToEdit={selectedTableToEdit}
+        sidePanelKey={sidePanelKey}
+        closePanel={onClosePanel}
+        onTableCreated={(table: any) => router.push(`/project/${projectRef}/editor/${table.id}`)}
       />
     </TableEditorLayout>
   )

@@ -21,7 +21,7 @@ import { useStore, withAuth } from 'hooks'
 import { SettingsLayout } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import ConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModalV2'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 
 const ProjectSettings = () => {
   return (

@@ -2,7 +2,13 @@ import React, { useState } from 'react'
 import { Modal } from '@supabase/ui'
 import { render, unmountComponentAtNode } from 'react-dom'
 
-function ConfirmModal({ title, message, onConfirm, onAsyncConfirm, variant = 'danger' }) {
+function ConfirmModal({
+  title,
+  message: description,
+  onConfirm,
+  onAsyncConfirm,
+  variant = 'danger',
+}) {
   const [loading, setLoading] = useState(false)
 
   function onCancelClick() {
@@ -29,12 +35,7 @@ function ConfirmModal({ title, message, onConfirm, onAsyncConfirm, variant = 'da
     <Modal
       variant={variant}
       visible={true}
-      title={title}
-      description={message}
-      showIcon={false}
       size="small"
-      onConfirmText="OK"
-      onCancelText="Cancel"
       onCancel={onCancelClick}
       onConfirm={onConfirmClick}
       loading={loading}

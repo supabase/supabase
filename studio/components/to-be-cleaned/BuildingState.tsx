@@ -109,7 +109,7 @@ const ProjectBuildingState: React.FC<ProjectBuildingState> = () => {
       <div className="max-w-7xl mx-auto w-full my-16 space-y-16">
         <div className="space-y-8">
           <div className="mx-6">
-            <Typography.Title level={4}>Client libraries</Typography.Title>
+            <h5>Client libraries</h5>
           </div>
           <div className="mx-6 grid md:grid-cols-3 gap-12 mb-12">
             {CLIENT_LIBRARIES.map((library) => (
@@ -119,7 +119,7 @@ const ProjectBuildingState: React.FC<ProjectBuildingState> = () => {
         </div>
         <div className="space-y-8">
           <div className="mx-6">
-            <Typography.Title level={4}>Example projects</Typography.Title>
+            <h5>Example projects</h5>
           </div>
           <div className="mx-6 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {EXAMPLE_PROJECTS.map((project) => (

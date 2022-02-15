@@ -43,9 +43,7 @@ const Home: NextPage = () => {
     <BaseLayout>
       <div className="max-w-7xl mx-auto w-full my-16 space-y-16">
         <div className="mx-6 flex space-x-6 items-center">
-          <Typography.Title level={2} className="m-0">
-            {projectName}
-          </Typography.Title>
+          <h1 className="text-3xl">{projectName}</h1>
         </div>
         {IS_PLATFORM && project && (
           <>

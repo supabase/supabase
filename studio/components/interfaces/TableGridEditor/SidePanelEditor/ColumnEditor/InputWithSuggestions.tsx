@@ -6,9 +6,8 @@
 // the component over to the UI library
 
 import { FC, useEffect, useRef, useState } from 'react'
-import { Input, Typography } from '@supabase/ui'
+import { Button, Dropdown, IconList, Input } from '@supabase/ui'
 import { Suggestion } from './ColumnEditor.types'
-import { timeout } from 'lib/helpers'
 
 const MAX_SUGGESTIONS = 3
 const DEFAULT_SUGGESTIONS_WIDTH = 400
@@ -45,21 +44,8 @@ const InputWithSuggestions: FC<Props> = ({
   onSelectSuggestion = () => {},
 }) => {
   const ref = useRef(null)
-  const [isFocused, setIsFocused] = useState<boolean>(false)
-  const [derviedSuggestionsWidth, setDerivedSuggestionsWidth] =
-    useState<number>(DEFAULT_SUGGESTIONS_WIDTH)
   const [filteredSuggestions, setFilteredSuggestions] = useState<Suggestion[]>(suggestions)
-  const showSuggestions = isFocused && filteredSuggestions.length > 0
-
-  useEffect(() => {
-    // This is super hacky but will go away when we bring it into the UI library
-    // It's mainly cause I can't pass a ref into Input
-    const parentInputFieldWidth = (ref?.current as any).children[0]?.children[0]?.children[
-      layout === 'horizontal' ? 1 : 0
-    ]?.offsetWidth
-    const width = suggestionsWidth || parentInputFieldWidth || DEFAULT_SUGGESTIONS_WIDTH
-    setDerivedSuggestionsWidth(width)
-  }, [ref.current])
+  const showSuggestions = filteredSuggestions.length > 0
 
   useEffect(() => {
     setFilteredSuggestions(suggestions.slice(0, MAX_SUGGESTIONS))
@@ -92,45 +78,34 @@ const InputWithSuggestions: FC<Props> = ({
         className={className}
         type="text"
         value={value}
-        onFocus={() => setIsFocused(true)}
-        onBlur={async () => {
-          await timeout(100)
-          setIsFocused(false)
-        }}
         onChange={onInputChange}
+        actions={
+          showSuggestions && (
+            <Dropdown
+              size={'medium'}
+              align="end"
+              side="bottom"
+              overlay={
+                <>
+                  <Dropdown.Label>Suggestions</Dropdown.Label>
+                  <Dropdown.Seperator />
+                  {filteredSuggestions.map((suggestion: Suggestion) => (
+                    <Dropdown.Item
+                      key={suggestion.name}
+                      onClick={() => onSelectSuggestion(suggestion)}
+                    >
+                      <div className="text-sm">{suggestion.name}</div>
+                      <div className="text-xs text-scale-900">{suggestion.description}</div>
+                    </Dropdown.Item>
+                  ))}
+                </>
+              }
+            >
+              <Button as="span" type="default" icon={<IconList strokeWidth={1.5} />}></Button>
+            </Dropdown>
+          )
+        }
       />
-      {showSuggestions && (
-        <div
-          className="z-10 absolute top-11 right-0"
-          style={{ width: `calc(${derviedSuggestionsWidth}px)` }}
-        >
-          <div className="bg-gray-800 border border-gray-600 shadow rounded-md py-1">
-            <p className="px-4">
-              <Typography.Text small className="opacity-50">
-                {suggestionsHeader}
-              </Typography.Text>
-            </p>
-            <div className="flex flex-col mt-2">
-              {filteredSuggestions.map((suggestion: Suggestion) => (
-                <div
-                  key={suggestion.name}
-                  className="px-4 py-2 cursor-pointer flex grid grid-cols-12 gap-2 hover:bg-green-600 !bg-opacity-40"
-                  onClick={() => onSelectSuggestion(suggestion)}
-                >
-                  <div className="col-span-6">
-                    <Typography.Text>{suggestion.name}</Typography.Text>
-                  </div>
-                  <div className="col-span-6">
-                    <Typography.Text small className="opacity-50">
-                      {suggestion.description}
-                    </Typography.Text>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

@@ -61,10 +61,10 @@ module.exports = ui({
     './node_modules/@supabase/ui/dist/config/default-theme.js',
   ],
   theme: {
-    maxHeight: {
-      12: '3rem',
-      48: '12rem',
-    },
+    // maxHeight: {
+    //   12: '3rem',
+    //   48: '12rem',
+    // },
     borderColor: (theme) => ({
       ...theme('colors'),
       DEFAULT: 'var(--colors-scale5)',
@@ -171,15 +171,15 @@ module.exports = ui({
           dark: 'var(--colors-scale3)',
         },
         'panel-header': {
-          light: 'var(--colors-scale2)',
-          dark: 'var(--colors-scale4)',
+          light: 'var(--colors-scale1)',
+          dark: 'var(--colors-scale3)',
         },
         'panel-footer': {
           light: 'var(--colors-scale1)',
           dark: 'var(--colors-scale3)',
         },
         'panel-border': {
-          light: 'var(--colors-scale2)',
+          light: 'var(--colors-scale4)',
           dark: 'var(--colors-scale4)',
         },
         'panel-border-interior': {
