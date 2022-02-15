@@ -1,4 +1,4 @@
-import { LogTemplate, LogType } from '.'
+import { LogTemplate } from '.'
 
 export const TEMPLATES: LogTemplate[] = [
   {
@@ -57,7 +57,7 @@ ORDER BY
   },
 ]
 
-export const LOG_TYPE_LABEL_MAPPING: { [k: LogType]: string } = {
+export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
   api: 'API',
   database: 'Database',
 }
