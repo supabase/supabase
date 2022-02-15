@@ -28,7 +28,6 @@ import {
   TEMPLATES,
   LogData,
   LogSearchCallback,
-  LogType,
   LOG_TYPE_LABEL_MAPPING,
 } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
@@ -66,7 +65,7 @@ export const LogPage: NextPage = () => {
     timestamp_start: '',
     timestamp_end: '',
   })
-  const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as LogType]}`
+  const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as keyof typeof LOG_TYPE_LABEL_MAPPING]}`
   const checkIfSelectQuery = (value: string) =>
     value.toLowerCase().includes('select') ? true : false
   const isSelectQuery = checkIfSelectQuery(editorValue)
@@ -248,7 +247,7 @@ export const LogPage: NextPage = () => {
           isCustomQuery={mode === 'custom'}
           isLoading={isValidating}
           newCount={newCount}
-          templates={TEMPLATES.filter((template) => template.for?.includes(type as LogType))}
+          templates={TEMPLATES.filter((template) => template.for?.includes(type as string))}
           onRefresh={handleRefresh}
           onSearch={handleSearch}
           defaultSearchValue={params.search_query}
