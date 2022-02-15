@@ -192,21 +192,29 @@ const ColumnManagement: FC<Props> = ({
             {/* Drag handle */}
             {isNewRecord && <div className="w-[5%]" />}
             <div className="w-[25%]">
-              <Typography.Text small>Name</Typography.Text>
+              <h5 className="text-xs text-scale-900" small>
+                Name
+              </h5>
             </div>
             <div className="w-[25%]">
-              <Typography.Text small>Type</Typography.Text>
+              <h5 className="text-xs text-scale-900" small>
+                Type
+              </h5>
             </div>
             <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
-              <Typography.Text small>Default Value</Typography.Text>
+              <h5 className="text-xs text-scale-900" small>
+                Default Value
+              </h5>
               <div>
-                <Typography.Text>
+                <h5 className="text-xs text-scale-900">
                   <IconHelpCircle size={15} strokeWidth={1.5} />
-                </Typography.Text>
+                </h5>
               </div>
             </div>
             <div className="w-[10%]">
-              <Typography.Text small>Primary</Typography.Text>
+              <h5 className="text-xs text-scale-900" small>
+                Primary
+              </h5>
             </div>
             {/* Empty space */}
             <div className={`${hasImportContent ? 'w-[10%]' : 'w-0'}`} />

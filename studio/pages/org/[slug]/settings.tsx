@@ -31,6 +31,7 @@ import { BillingSettings, InvoicesSettings } from 'components/interfaces/Organiz
 import Table from 'components/to-be-cleaned/Table'
 import Panel from 'components/to-be-cleaned/Panel'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import ConfirmDialog from 'components/ui/Dialogs/ConfirmDialog'
 import InviteMemberModal from 'components/to-be-cleaned/ModalsDeprecated/InviteMemberModal'
 import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
@@ -607,6 +608,7 @@ const OwnerDropdown = observer(({ members, member }: any) => {
             <Dropdown.Item onClick={handleMemberDelete} icon={<IconTrash size="tiny" />}>
               Remove member
             </Dropdown.Item>
+            <Dropdown.Item icon={<IconTrash size="tiny" />}>Remove Member</Dropdown.Item>
           </>
         }
       >

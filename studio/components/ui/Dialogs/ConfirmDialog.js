@@ -1,4 +1,4 @@
-import { Modal, Button, Space } from '@supabase/ui'
+import { Modal, Button, Form } from '@supabase/ui'
 import { useState, useEffect } from 'react'
 
 // [Joshen] I feel like having the confirm modal as a component to import is better than firing
@@ -29,22 +29,12 @@ const ConfirmModal = ({
   }
 
   return (
-    <Modal
-      visible={visible}
-      title={title}
-      description={description}
-      size={size}
-      customFooter={
-        <Space>
-          <Button type="secondary" onClick={onSelectCancel}>
-            Cancel
-          </Button>
-          <Button type="primary" danger={danger} loading={loading} onClick={onConfirm}>
-            {loading ? buttonLoadingLabel : buttonLabel}
-          </Button>
-        </Space>
-      }
-    />
+    <Modal visible={visible} title={title} description={description} size={size}>
+      <Form onSubmit={() => console.log('submitting confirm dialog')}>
+        <p>Hello</p>
+        <Button htmlType="submit">Confirm</Button>
+      </Form>
+    </Modal>
   )
 }
 

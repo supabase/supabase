@@ -344,9 +344,7 @@ export const ProjectUsageMinimal: FC<any> = ({ projectRef, subscription_id, filt
                   return (
                     <div key={feature.title}>
                       {feature.tiers[tier]?.render && feature.title !== 'Transfer limits' ? (
-                        <Typography.Text type="secondary" className="opacity-50">
-                          {feature.title}
-                        </Typography.Text>
+                        <h5 className="text-scale-900 text-sm">{feature.title}</h5>
                       ) : null}
                       <div className="text-sm text-typography-body-light dark:text-typography-body-dark">
                         {/* @ts-ignore */}

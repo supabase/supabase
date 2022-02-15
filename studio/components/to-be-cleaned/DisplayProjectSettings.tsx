@@ -201,12 +201,12 @@ const ApiContentWrapper: FC<any> = ({ children }) => {
     <Panel
       title={
         <div className="space-y-3">
-          <Title level={5}>Project API keys</Title>
-          <Text className="block" type="secondary">
+          <h5 className="text-base">Project API keys</h5>
+          <p className="text-sm text-scale-1000">
             Your API is secured behind an API gateway which requires an API Key for every request.
             <br />
             You can use the keys below to use Supabase client libraries.
-          </Text>
+          </p>
         </div>
       }
     >
@@ -220,7 +220,7 @@ const ConfigContentWrapper: FC<any> = ({ children }) => {
     <Panel
       title={
         <div className="space-y-3">
-          <Title level={5}>Project Configuration</Title>
+          <h5 className="text-base">Project Configuration</h5>
         </div>
       }
     >

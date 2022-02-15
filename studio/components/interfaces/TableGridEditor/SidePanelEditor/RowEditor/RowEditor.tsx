@@ -142,7 +142,7 @@ const RowEditor: FC<Props> = ({
       key="RowEditor"
       visible={visible}
       // @ts-ignore
-      title={<HeaderTitle isNewRecord={isNewRecord} tableName={selectedTable.name} />}
+      header={<HeaderTitle isNewRecord={isNewRecord} tableName={selectedTable.name} />}
       className={`transition-all ease-in duration-100 ${
         isEditingJson || isViewingReferenceRow ? ' mr-32' : ''
       }`}
@@ -157,45 +157,49 @@ const RowEditor: FC<Props> = ({
         />
       }
     >
-      <Space direction="vertical" size={6} style={{ width: '100%', marginBottom: '2rem' }}>
-        {requiredFields.map((field: RowField) => {
-          return (
-            <InputField
-              key={field.id}
-              field={field}
-              errors={errors}
-              onUpdateField={onUpdateField}
-              onEditJson={setSelectedValueForJsonEdit}
-              onViewForeignKey={() => onViewForeignKey(field)}
-            />
-          )
-        })}
-        {optionalFields.length > 0 && (
-          <>
-            <Divider light className="mb-4" />
-            <div>
+      <SidePanel.Content>
+        <div className="space-y-10 py-6">
+          {requiredFields.map((field: RowField) => {
+            return (
+              <InputField
+                key={field.id}
+                field={field}
+                errors={errors}
+                onUpdateField={onUpdateField}
+                onEditJson={setSelectedValueForJsonEdit}
+                onViewForeignKey={() => onViewForeignKey(field)}
+              />
+            )
+          })}
+        </div>
+      </SidePanel.Content>
+      {optionalFields.length > 0 && (
+        <>
+          <SidePanel.Seperator />
+          <SidePanel.Content>
+            <div className="space-y-10 py-6">
               <div>
-                <Typography.Text>Optional Fields</Typography.Text>
+                <h3 className="text-base text-scale-1200">Optional Fields</h3>
+                <p className="text-sm text-scale-900">
+                  These are columns that do not need any value
+                </p>
               </div>
-              <Typography.Text type="secondary">
-                These are columns that do not need any value
-              </Typography.Text>
+              {optionalFields.map((field: RowField) => {
+                return (
+                  <InputField
+                    key={field.id}
+                    field={field}
+                    errors={errors}
+                    onUpdateField={onUpdateField}
+                    onEditJson={setSelectedValueForJsonEdit}
+                    onViewForeignKey={() => onViewForeignKey(field)}
+                  />
+                )
+              })}
             </div>
-          </>
-        )}
-        {optionalFields.map((field: RowField) => {
-          return (
-            <InputField
-              key={field.id}
-              field={field}
-              errors={errors}
-              onUpdateField={onUpdateField}
-              onEditJson={setSelectedValueForJsonEdit}
-              onViewForeignKey={() => onViewForeignKey(field)}
-            />
-          )
-        })}
-      </Space>
+          </SidePanel.Content>
+        </>
+      )}
 
       <JsonEdit
         visible={isEditingJson}

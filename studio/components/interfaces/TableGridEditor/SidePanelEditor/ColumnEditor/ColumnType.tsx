@@ -34,19 +34,19 @@ const ColumnType: FC<Props> = ({
   const inferIcon = (type: string) => {
     switch (type) {
       case 'number':
-        return <IconHash size={16} className="text-green-600" strokeWidth={2} />
+        return <IconHash size={16} className="text-scale-1200" strokeWidth={1.5} />
       case 'time':
-        return <IconCalendar size={16} className="text-green-600" strokeWidth={2} />
+        return <IconCalendar size={16} className="text-scale-1200" strokeWidth={1.5} />
       case 'text':
-        return <IconType size={16} className="text-green-600" strokeWidth={2} />
+        return <IconType size={16} className="text-scale-1200" strokeWidth={1.5} />
       case 'json':
         return (
-          <div className="text-green-600" style={{ padding: '0px 1px' }}>
+          <div className="text-scale-1200" style={{ padding: '0px 1px' }}>
             {'{ }'}
           </div>
         )
       case 'bool':
-        return <IconToggleRight size={16} className="text-green-600" strokeWidth={2} />
+        return <IconToggleRight size={16} className="text-scale-1200" strokeWidth={1.5} />
       default:
         return <div />
     }
@@ -61,6 +61,7 @@ const ColumnType: FC<Props> = ({
       error={error}
       className={`${className} ${disabled ? 'column-type-disabled' : ''}`}
       onChange={(value: string) => onOptionSelect(value)}
+      optionsWidth={480}
     >
       <Listbox.Option key="empty" value="" label="---">
         ---
@@ -77,7 +78,7 @@ const ColumnType: FC<Props> = ({
             value={enumType.name}
             label={enumType.name}
             addOnBefore={() => {
-              return <div className="mx-1 w-2 h-2 rounded-full bg-green-700" />
+              return <div className="mx-1 w-2 h-2 rounded-full bg-scale-1200" />
             }}
           >
             <div className="flex items-center space-x-4">
@@ -113,14 +114,8 @@ const ColumnType: FC<Props> = ({
           addOnBefore={() => inferIcon(option.type)}
         >
           <div className="flex items-center space-x-4">
-            <Typography.Text>
-              <p>{option.name}</p>
-            </Typography.Text>
-            <p>
-              <Typography.Text small className="opacity-50">
-                {option.description}
-              </Typography.Text>
-            </p>
+            <span className="text-scale-1200">{option.name}</span>
+            <span className="text-scale-900">{option.description}</span>
           </div>
         </Listbox.Option>
       ))}
