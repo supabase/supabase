@@ -46,7 +46,7 @@ The password is the same password you used when creating the Supabase project.
 
 ![supabase-connection-db-info](/img/guides/integrations/snaplet/supabase-connection-db-info.png)
 
-You’ll have to confirm providing Snaplet access to your database. Snaplet will prompt you to only provide `read-only` access to your database. Snaplet has a guide in their documentation on how to to do so [here](https://docs.snaplet.dev/postgresql/create-read-only-role).
+You’ll have to confirm providing Snaplet access to your database. Snaplet will prompt you to only provide `read-only` access to your database. Snaplet has a guide in their documentation on how to do so [here](https://docs.snaplet.dev/postgresql/create-read-only-role).
 
 > Note that whatever connection string you provide here will be that of your Data Source – essentially the production database in a real-life scenario
 
@@ -83,7 +83,7 @@ Your data target is where you want Snaplet to restore the captured snapshot of y
 
 Snaplet requires the ability to drop the database schemas whilst restoring a snapshot. In order to do that, Snaplet requires `superuser` privileges.
 
-1. Navigate to your the `SQL Editor` in your Supabase console
+1. Navigate to the `SQL Editor` in your Supabase console
 2. Click on `new query`
 3. Paste `alter user postgres with superuser;` into the SQL editor
 4. Run the query
@@ -102,7 +102,7 @@ You're now ready to restore your production snapshot into your Supabase developm
 1. Navigate to your project directory
 2. Run `snaplet setup` – you will be prompted to enter your database credentials. These are the database credentials of your **data target.** This could be your staging or development database
 
-Once you have successfully completed the above steps, you will have be presented with a list of options – these options are databases that are connected to your Snaplet account.
+Once completed, you will be presented with a list of databases that are connected to your Snaplet account.
 
 1. Select a data source from the list
 2. Run `snaplet restore`
@@ -111,4 +111,4 @@ Once you have successfully completed the above steps, you will have be presented
 
 As a Supabase user, you can see how this solves an issue developers all typically experience when attempting to create multiple development environments and populating each of those environments with data that can be worked with. Snaplet simplifies this process down to creating the respective Supabase projects, connecting the data source (The production database) to Snaplet and telling Snaplet where to restore that data (staging and development databases).
 
-If you want to learn more about Snaplet, you can explore the Snaplet [docs](https://docs.snaplet.dev/). If you have any questions, feel free to [reach out on Discord](https://discord.com/invite/6HUuajc866) .
+If you want to learn more about Snaplet, you can explore the Snaplet [docs](https://docs.snaplet.dev/). If you have any questions, feel free to [reach out on Discord](https://discord.com/invite/6HUuajc866).
