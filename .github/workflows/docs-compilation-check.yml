@@ -23,6 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      # Ref: https://github.com/actions/setup-node/issues/214
       - name: Reconfigure git to use HTTP authentication
         run: >
           git config --global url."https://github.com/".insteadOf
