@@ -26,7 +26,8 @@ const FeedbackDropdown = () => {
           type="default"
           icon={<IconMessageCircle size={16} strokeWidth={2} />}
         >
-          Feedback on this page?
+          <span className="block md:hidden">Feedback</span>
+          <span className="hidden md:block">Feedback on this page?</span>
         </Button>
       </div>
       <Transition

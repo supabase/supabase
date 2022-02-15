@@ -137,7 +137,7 @@ Once you get the hang of policies you can start to get a little bit fancy. Let's
 
 ```sql
 create or replace function auth.email() returns text as $$
-  select nullif(current_setting('request.jwt.claim.email', true), '')::text;
+  select nullif(current_setting('request.jwt.claims', true)::json->>'email', '')::text;
 $$ language sql;
 
 create policy "Only Blizzard staff can update leaderboard"

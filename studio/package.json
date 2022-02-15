@@ -17,7 +17,7 @@
     "@radix-ui/react-tooltip": "^0.1.6",
     "@sentry/browser": "^6.15.0",
     "@sentry/nextjs": "^6.15.0",
-    "@supabase/grid": "^2.4.0",
+    "@supabase/grid": "^2.4.1",
     "@supabase/postgres-meta": "^0.26.1",
     "@supabase/react-data-grid": "^7.1.0-beta.7",
     "@supabase/supabase-js": "^1.29.1",

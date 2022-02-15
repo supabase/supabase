@@ -47,6 +47,12 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     EXTERNAL_GITHUB_ENABLED: false,
     EXTERNAL_GITHUB_CLIENT_ID: null,
     EXTERNAL_GITHUB_SECRET: null,
+    EXTERNAL_LINKEDIN_ENABLED: false,
+    EXTERNAL_LINKEDIN_CLIENT_ID: null,
+    EXTERNAL_LINKEDIN_SECRET: null,
+    EXTERNAL_NOTION_ENABLED: false,
+    EXTERNAL_NOTION_CLIENT_ID: null,
+    EXTERNAL_NOTION_SECRET: null,
     EXTERNAL_BITBUCKET_ENABLED: false,
     EXTERNAL_BITBUCKET_CLIENT_ID: null,
     EXTERNAL_BITBUCKET_SECRET: null,
@@ -120,6 +126,11 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     EXTERNAL_SLACK_SECRET: null,
     SMS_MESSAGEBIRD_ACCESS_KEY: null,
     SMS_MESSAGEBIRD_ORIGINATOR: null,
+    SMS_VONAGE_API_KEY: null,
+    SMS_VONAGE_API_SECRET: null,
+    SMS_VONAGE_FROM: null,
+    SMS_TEXTLOCAL_API_KEY: null,
+    SMS_TEXTLOCAL_SENDER: null,
   })
 }
 
