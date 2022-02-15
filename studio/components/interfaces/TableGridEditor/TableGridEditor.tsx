@@ -149,21 +149,19 @@ const TableGridEditor: FC<Props> = ({
         onError={onError}
         onSqlQuery={onSqlQuery}
       />
-      {!isUndefined(selectedSchema) && (
-        <SidePanelEditor
-          selectedSchema={selectedSchema}
-          isDuplicating={isDuplicating}
-          selectedTable={selectedTable as PostgresTable}
-          selectedRowToEdit={selectedRowToEdit}
-          selectedColumnToEdit={selectedColumnToEdit}
-          selectedTableToEdit={selectedTableToEdit}
-          sidePanelKey={sidePanelKey}
-          onRowCreated={onRowCreated}
-          onRowUpdated={onRowUpdated}
-          onTableCreated={onTableCreated}
-          closePanel={onClosePanel}
-        />
-      )}
+      <SidePanelEditor
+        selectedSchema={selectedSchema}
+        isDuplicating={isDuplicating}
+        selectedTable={selectedTable as PostgresTable}
+        selectedRowToEdit={selectedRowToEdit}
+        selectedColumnToEdit={selectedColumnToEdit}
+        selectedTableToEdit={selectedTableToEdit}
+        sidePanelKey={sidePanelKey}
+        onRowCreated={onRowCreated}
+        onRowUpdated={onRowUpdated}
+        onTableCreated={onTableCreated}
+        closePanel={onClosePanel}
+      />
     </>
   )
 }
