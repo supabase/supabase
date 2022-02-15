@@ -87,7 +87,7 @@ services:
 
   realtime:
     container_name: supabase-realtime
-    image: supabase/realtime:v0.21.0
+    image: supabase/realtime:v0.22.0
     depends_on:
       - db
     restart: unless-stopped
@@ -147,7 +147,7 @@ services:
   db:
     container_name: supabase-db
     image: supabase/postgres:14.1.0
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    command: [postgres, -c, config_file=/etc/postgresql/postgresql.conf, -c, log_statement=none]
     restart: unless-stopped
     ports:
       - ${POSTGRES_PORT}:5432
