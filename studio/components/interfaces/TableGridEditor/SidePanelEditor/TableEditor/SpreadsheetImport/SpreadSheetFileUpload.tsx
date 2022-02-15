@@ -32,20 +32,18 @@ const SpreadSheetFileUpload: FC<Props> = ({
   }
 
   return (
-    <>
-      <Typography.Text>
-        <p className="mb-3">
+    <div className="space-y-10">
+      <div>
+        <p className="text-sm text-scale-1100 mb-2">
           Upload a CSV or TSV file. The first row should be the headers of the table, and your
           headers should not include any special characters other than hyphens (
-          <Typography.Text code>-</Typography.Text>) or underscores (
-          <Typography.Text code>_</Typography.Text>).
+          <span className="text-code">-</span>) or underscores (<span className="text-code">_</span>
+          ).
         </p>
-        <Typography.Text type="secondary">
-          <p className="text-sm opacity-50 mb-3">
-            Tip: Datetime columns should be formatted as YYYY-MM-DD HH:mm:ss
-          </p>
-        </Typography.Text>
-      </Typography.Text>
+        <p className="text-xs text-scale-900">
+          Tip: Datetime columns should be formatted as YYYY-MM-DD HH:mm:ss
+        </p>
+      </div>
       {!uploadedFile ? (
         <div
           className={`flex items-center justify-center border dark:border-gray-500 border-dashed rounded-md h-48 ${
@@ -64,8 +62,8 @@ const SpreadSheetFileUpload: FC<Props> = ({
       ) : (
         <div className="flex flex-col items-center justify-center border dark:border-gray-500 border-dashed rounded-md h-32 space-y-2">
           <div className="flex items-center space-x-2">
-            <IconFileText size={16} strokeWidth={2} />
-            <Typography.Title level={4}>{uploadedFile.name}</Typography.Title>
+            <IconFileText size={14} strokeWidth={1.5} />
+            <h3 className="text-scale-1200 text-base">{uploadedFile.name}</h3>
           </div>
           {parseProgress === 100 ? (
             <Button type="outline" onClick={removeUploadedFile}>
@@ -87,7 +85,7 @@ const SpreadSheetFileUpload: FC<Props> = ({
         </div>
       )}
       <input ref={uploadButtonRef} className="hidden" type="file" onChange={onFileUpload} />
-    </>
+    </div>
   )
 }
 

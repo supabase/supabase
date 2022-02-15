@@ -43,7 +43,7 @@ const ConfirmationModal: FC<Props> = ({
     <Modal
       layout="vertical"
       visible={visible}
-      title={title}
+      header={title}
       description={description}
       size={size}
       onCancel={onSelectCancel}

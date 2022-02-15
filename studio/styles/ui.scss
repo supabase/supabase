@@ -45,7 +45,7 @@
 }
 
 // TO DO: REMOVE
-label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):not(.sbui-radio-container):not(.checkbox-pill) {
+.form-group label {
   @apply inline-block text-scale-1100 text-sm py-2;
   width: 33%;
   align-self: top;
