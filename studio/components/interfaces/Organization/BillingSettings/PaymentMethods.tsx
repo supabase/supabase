@@ -41,7 +41,7 @@ const PaymentMethods: FC<Props> = ({ loading, paymentMethods, redirectToPortal }
         }
       >
         <Panel.Content>
-          {loading ? (
+          {loading && paymentMethods.length === 0 ? (
             <div className="flex items-center space-x-4">
               <IconLoader className="animate-spin" size={14} />
               <Typography.Text>Retrieving payment methods</Typography.Text>

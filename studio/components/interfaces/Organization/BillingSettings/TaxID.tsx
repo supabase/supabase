@@ -28,7 +28,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, redirectToPortal }) => {
         }
       >
         <Panel.Content className="w-3/5">
-          {loading ? (
+          {loading && taxIds.length === 0 ? (
             <div className="flex items-center space-x-4">
               <IconLoader className="animate-spin" size={14} />
               <Typography.Text>Retrieving tax information</Typography.Text>
