@@ -6,7 +6,7 @@ import { isUndefined } from 'lodash'
 import { Typography } from '@supabase/ui'
 
 import { Project } from 'types'
-import { useProfile, useStore, withAuth } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import { post, delete_ } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { AccountLayout } from 'components/layouts'
@@ -22,7 +22,6 @@ const Home: NextPage = () => {
   const { profile } = ui
 
   const router = useRouter()
-  const { mutateProfile } = useProfile()
 
   const [isDeletingProject, setIsDeletingProject] = useState<boolean>(false)
   const [selectedProjectToDelete, setSelectedProjectToDelete] = useState<Project>()
@@ -60,7 +59,7 @@ const Home: NextPage = () => {
       return ui.setNotification({ category: 'error', message: response.error.message })
     }
 
-    app.onProjectDeleted(response, mutateProfile)
+    app.onProjectDeleted(response)
     ui.setNotification({ category: 'success', message: `Deleted ${project.name} successfully!` })
 
     setIsDeletingProject(false)
