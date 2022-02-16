@@ -6,7 +6,7 @@ import { get as _get, maxBy } from 'lodash'
 import { Dictionary } from '@supabase/grid'
 
 import { API_URL } from 'lib/constants'
-import { useStore, withAuth } from 'hooks'
+import { useStore, useSubscriptionStats, withAuth } from 'hooks'
 import { post, get } from 'lib/common/fetch'
 import {
   DATE_FORMAT,
@@ -50,6 +50,8 @@ type SettingsProps = {
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
+
+  const subscriptionStats = useSubscriptionStats()
 
   const [loading, setLoading] = useState<boolean>(true)
   const [subscription, setSubscription] = useState<StripeSubscription>()
@@ -121,6 +123,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
         project={project}
         subscription={subscription}
         paygStats={paygStats}
+        subscriptionStats={subscriptionStats}
         currentPeriodStart={subscription?.billing.current_period_start}
         currentPeriodEnd={subscription?.billing.current_period_end}
       />
