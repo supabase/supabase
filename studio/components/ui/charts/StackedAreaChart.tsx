@@ -1,39 +1,122 @@
-import { AreaChart, XAxis, YAxis, Area, Tooltip, ResponsiveContainer } from 'recharts'
-interface Props {
-  label: string
-  customDateFormat: string
-  data: any[]
-  isLoading: boolean
+import { TooltipContent } from '@radix-ui/react-tooltip'
+import { NoData } from 'components/to-be-cleaned/Charts/ChartRenderer'
+import dayjs from 'dayjs'
+import { useMemo } from 'react'
+import {
+  AreaChart,
+  XAxis,
+  YAxis,
+  Area,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  AreaProps,
+} from 'recharts'
+
+type Datum = {
+  [key: string]: any
 }
 
-const StackedAreaChart: React.FC<Props> = () => (
-  <ResponsiveContainer>
-    <AreaChart
-      width={730}
-      height={250}
-      data={[
-        {
-          day: '05-01',
-          temperature: [-1, 10],
-        },
-        {
-          day: '05-02',
-          temperature: [2, 15],
-        },
-      ]}
-      margin={{
-        top: 20,
-        right: 20,
-        bottom: 20,
-        left: 20,
-      }}
-    >
-      <XAxis dataKey="day" />
-      <YAxis />
-      <Area dataKey="temperature" stroke="#8884d8" fill="#8884d8" />
-      <Tooltip />
-    </AreaChart>
-  </ResponsiveContainer>
-)
+type Data = Datum[]
+interface Props {
+  data?: Data
+  isLoading: boolean
+  xAxisKey: string
+  xAxisFormatAsDate?: boolean
+  dateFormat?: string
+  yAxisKey: string
+  stackKey: string
+  size?: 'small' | 'normal' | 'large'
+  styleMap: {
+    [key: string]: Pick<AreaProps, 'fill' | 'stroke'>
+  }
+}
+
+const StackedAreaChart: React.FC<Props> = ({
+  data,
+  xAxisKey,
+  dateFormat,
+  yAxisKey,
+  stackKey,
+  isLoading,
+  size = 'normal',
+  styleMap = {},
+  xAxisFormatAsDate = false,
+}) => {
+  if (!isLoading && (data === undefined || data === null)) return <NoData />
+  const transformed = useMemo(() => {
+    if (!data) return []
+    const mapping = data.reduce((acc, datum) => {
+      const x = datum[xAxisKey]
+      const y = datum[yAxisKey]
+      const s = datum[stackKey]
+      if (!acc[x]) {
+        acc[x] = {}
+      }
+      acc[x][s] = y
+      return acc
+    }, {})
+
+    const flattened = Object.entries(mapping).map(([x, sMap]) => ({
+      ...(sMap as Datum),
+      [xAxisKey]: x,
+    }))
+    return flattened
+  }, [JSON.stringify(data)])
+  const dataKeys = Object.keys(transformed[0] || {}).filter((k) => k !== xAxisKey && k !== yAxisKey)
+
+  const formatToDate = (value: string | number | any) => {
+    if (!dateFormat) return value
+    if (typeof value === 'number') {
+      const unix = String(value).length > 10 ? Number(String(value).slice(0, 10)) : value
+      return dayjs.unix(unix).format(dateFormat)
+    } else {
+      return dayjs(value).format(dateFormat)
+    }
+  }
+  const minHeight = { small: '120px', normal: '160px', large: '280px' }[size]
+  return (
+    <ResponsiveContainer height="100%" minHeight={minHeight} width="100%">
+      <AreaChart data={transformed} onClick={(_tooltipData: any) => {}}>
+        <CartesianGrid strokeDasharray="3 3" style={{ stroke: '#444444' }} />
+        <XAxis
+          dataKey={xAxisKey}
+          angle={0}
+          axisLine={{ stroke: '#444444' }}
+          tickLine={{ stroke: '#444444' }}
+          tickFormatter={xAxisFormatAsDate ? formatToDate : undefined}
+          tickMargin={12}
+          interval="preserveStartEnd"
+          style={{ fontSize: '12px' }}
+        />
+        <YAxis
+          style={{ fontSize: '12px' }}
+          minTickGap={10}
+          axisLine={{ stroke: '#444444' }}
+          tickLine={{ stroke: '#444444' }}
+        />
+        {dataKeys.map((k, index) => (
+          <Area
+            key={index}
+            dataKey={String(k)}
+            type="monotone"
+            legendType="circle"
+            fill={'rgba(62, 207, 142, 0.2)'}
+            stroke="#4884d8"
+            connectNulls
+            stackId={1}
+            {...(styleMap[k] || {})}
+          />
+        ))}
+        <Tooltip
+          labelFormatter={xAxisFormatAsDate ? formatToDate : undefined}
+          labelClassName="text-gray-100"
+          contentStyle={{ backgroundColor: '#444444', borderColor: '#444444', fontSize: '12px' }}
+          wrapperClassName="bg-gray-600"
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  )
+}
 
 export default StackedAreaChart
