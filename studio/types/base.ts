@@ -36,7 +36,6 @@ export interface User {
   last_name: string
   is_alpha_user: boolean
   free_project_limit: number
-  total_free_projects: number
 }
 
 export interface Member {
