@@ -16,11 +16,11 @@ const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
         <Link href={route.link}>
           <a
             className={[
-              'transition-all',
+              'transition-colors duration-200',
               'flex items-center justify-center h-10 w-10 rounded', // Layout
               'bg-scale-200 hover:bg-scale-500', // Light mode
               'text-scale-900 hover:text-scale-1200 ', // Dark mode
-              `${isActive ? 'bg-scale-500 shadow-sm hover:bg-scale-1200 text-scale-1200' : ''}`,
+              `${isActive ? 'bg-scale-500 shadow-sm text-scale-1200' : ''}`,
             ].join(' ')}
           >
             {route.icon}

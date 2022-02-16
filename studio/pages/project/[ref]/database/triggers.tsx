@@ -177,7 +177,7 @@ const SchemaTable: FC<SchemaTableProps> = observer(
   ({ filterString, schema, editTrigger, deleteTrigger }) => {
     return (
       <div key={schema} className="">
-        <div className="z-10 sticky top-0 backdrop-filter backdrop-blur">
+        <div className="sticky top-0 backdrop-filter backdrop-blur">
           <div className="flex space-x-1 items-baseline py-2 px-6">
             <Typography.Title level={5} className="opacity-50">
               schema
