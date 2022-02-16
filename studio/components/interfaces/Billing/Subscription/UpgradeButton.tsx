@@ -1,9 +1,9 @@
-import React, { useReducer, useState } from 'react'
+import { FC, useReducer, useState } from 'react'
 import { useRouter } from 'next/router'
 import { includes, without } from 'lodash'
 import { Button, Modal, Input, Divider, Typography, IconCheckCircle } from '@supabase/ui'
 
-import { useStore } from 'hooks'
+import { SubscriptionStats, useStore } from 'hooks'
 import { API_URL, DEFAULT_FREE_PROJECTS_LIMIT } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { post } from 'lib/common/fetch'
@@ -16,7 +16,13 @@ import { CancellationReasons } from './SubcriptionCancellation.constants'
  * @param {Boolean}  props.paid              Tier name
  */
 
-export default function UpgradeButton({ projectRef, paid }: any) {
+interface Props {
+  projectRef: string
+  paid: boolean
+  subscriptionStats: SubscriptionStats
+}
+
+const UpgradeButton: FC<Props> = ({ projectRef, paid, subscriptionStats }) => {
   const router = useRouter()
   const { ui, app } = useStore()
   const [loading, setLoading] = useState<boolean>(false)
@@ -24,7 +30,7 @@ export default function UpgradeButton({ projectRef, paid }: any) {
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState<boolean>(false)
 
   const freeProjectsLimit = ui?.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
-  const freeProjectsOwned = ui?.profile?.total_free_projects ?? 0
+  const freeProjectsOwned = subscriptionStats.total_free_projects ?? 0
   const isOrgOwner = ui.selectedOrganization?.is_owner
 
   /**
@@ -49,7 +55,7 @@ export default function UpgradeButton({ projectRef, paid }: any) {
 
   function handleUpgradeButton() {
     if (paid) {
-      if (freeProjectsOwned >= DEFAULT_FREE_PROJECTS_LIMIT) {
+      if (freeProjectsOwned >= freeProjectsLimit) {
         setShowFreeProjectLimitWarning(true)
       } else {
         setExitSurveyVisible(true)
@@ -105,6 +111,8 @@ export default function UpgradeButton({ projectRef, paid }: any) {
     </>
   )
 }
+
+export default UpgradeButton
 
 function UnsubcribeExitSurvey({ visible, setVisible, handleDowngrade }: any) {
   const router = useRouter()

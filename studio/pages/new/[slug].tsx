@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite'
 import { Button, Typography, Listbox, IconUsers, IconAlertCircle } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
-import { post, get } from 'lib/common/fetch'
+import { post } from 'lib/common/fetch'
 import {
   PROVIDERS,
   REGIONS,
@@ -30,18 +30,12 @@ import Panel from 'components/to-be-cleaned/Panel'
 import InformationBox from 'components/ui/InformationBox'
 import { passwordStrength } from 'lib/helpers'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { useSubscriptionStats } from 'hooks'
 
 interface StripeCustomer {
   paymentMethods: any
   customer: any
   error?: any
-}
-
-interface SubscriptionStats {
-  total_paid_projects: number
-  total_free_projects: number
-  total_pro_projects: number
-  total_payg_projects: number
 }
 
 async function fetchStripeAccount(stripeCustomerId: string) {
@@ -51,16 +45,6 @@ async function fetchStripeAccount(stripeCustomerId: string) {
     })
     if (customer.error) throw customer.error
     return customer
-  } catch (error: any) {
-    return { error }
-  }
-}
-
-async function fetchProfileSubscriptionStats() {
-  try {
-    const subscriptions = await get(`${API_URL}/profile/subscriptions`)
-    if (subscriptions.error) throw subscriptions.error
-    return subscriptions
   } catch (error: any) {
     return { error }
   }
@@ -77,6 +61,8 @@ export const Wizard = observer(() => {
   const { slug } = router.query
   const { app, ui } = useStore()
 
+  const subscriptionStats = useSubscriptionStats()
+
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
@@ -86,15 +72,12 @@ export const Wizard = observer(() => {
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
   const [stripeCustomer, setStripeCustomer] = useState<StripeCustomer | undefined>(undefined)
-  const [subscriptionStats, setSubscriptionStats] = useState<SubscriptionStats | undefined>(
-    undefined
-  )
 
   const organizations = values(toJS(app.organizations.list()))
   const currentOrg = organizations.find((o: any) => o.slug === slug)
   const stripeCustomerId = currentOrg?.stripe_customer_id
 
-  const totalFreeProjects = subscriptionStats?.total_free_projects ?? 0
+  const totalFreeProjects = subscriptionStats.total_free_projects
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
 
   const isEmptyOrganizations = organizations.length <= 0
@@ -107,7 +90,7 @@ export const Wizard = observer(() => {
 
   const canCreateProject =
     currentOrg?.is_owner &&
-    subscriptionStats != undefined &&
+    (subscriptionStats.isError || subscriptionStats.isLoading) &&
     (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
 
   const canSubmit =
@@ -149,17 +132,6 @@ export const Wizard = observer(() => {
       loadStripeAccountAsync(stripeCustomerId)
     }
   }, [stripeCustomerId])
-
-  useEffect(() => {
-    async function loadProfileSubscriptionStatsAsync() {
-      const res = await fetchProfileSubscriptionStats()
-      if (!res.error) {
-        setSubscriptionStats(res)
-      }
-    }
-
-    loadProfileSubscriptionStatsAsync()
-  }, [])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
