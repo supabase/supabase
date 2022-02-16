@@ -106,7 +106,9 @@ export const Wizard = observer(() => {
   const isSelectFreeTier = dbPricingPlan === PRICING_PLANS.FREE
 
   const canCreateProject =
-    currentOrg?.is_owner && (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
+    currentOrg?.is_owner &&
+    subscriptionStats != undefined &&
+    (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
 
   const canSubmit =
     projectName != '' &&
@@ -345,7 +347,9 @@ export const Wizard = observer(() => {
                 ))}
               </Listbox>
 
-              {isSelectFreeTier && isOverFreeProjectLimit && <FreeProjectLimitWarning />}
+              {isSelectFreeTier && isOverFreeProjectLimit && (
+                <FreeProjectLimitWarning limit={freeProjectsLimit} />
+              )}
               {!isSelectFreeTier && isEmptyPaymentMethod && (
                 <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
               )}
@@ -379,7 +383,7 @@ const NotOrganizationOwnerWarning = () => {
   )
 }
 
-const FreeProjectLimitWarning = () => {
+const FreeProjectLimitWarning = ({ limit }: { limit: number }) => {
   return (
     <div className="mt-4">
       <InformationBox
@@ -391,8 +395,8 @@ const FreeProjectLimitWarning = () => {
         description={
           <div className="space-y-3">
             <p className="text-sm leading-normal">
-              Your account can only have a maximum of 2 free projects. You can only choose paid
-              pricing plan.
+              {`Your account can only have a maximum of ${limit} free projects. You can only choose paid
+              pricing plan.`}
             </p>
           </div>
         }
