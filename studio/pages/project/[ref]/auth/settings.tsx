@@ -277,8 +277,8 @@ const Settings = () => {
           ])}
           model={{
             SMS_PROVIDER: model.SMS_PROVIDER,
-            SMS_TEXTLOCAL_API_KEY: model.SMS_TEXTLOCAL_API_KEY,
-            SMS_TEXTLOCAL_SENDER: model.SMS_TEXTLOCAL_SENDER,
+            SMS_TEXTLOCAL_API_KEY: model.SMS_TEXTLOCAL_API_KEY || undefined,
+            SMS_TEXTLOCAL_SENDER: model.SMS_TEXTLOCAL_SENDER || undefined,
             SMS_TWILIO_ACCOUNT_SID: model.SMS_TWILIO_ACCOUNT_SID || undefined,
             SMS_TWILIO_AUTH_TOKEN: model.SMS_TWILIO_AUTH_TOKEN || undefined,
             SMS_TWILIO_MESSAGE_SERVICE_SID: model.SMS_TWILIO_MESSAGE_SERVICE_SID || undefined,
