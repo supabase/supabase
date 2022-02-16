@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { get as _get, maxBy } from 'lodash'
 import utc from 'dayjs/plugin/utc'
 
-import { useStore } from 'hooks'
+import { useStore, useSubscriptionStats } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { Dictionary } from '@supabase/grid'
 import { get, post } from 'lib/common/fetch'
@@ -18,6 +18,8 @@ interface Props {
 
 const ProjectSubscription: FC<Props> = ({ project }) => {
   const { ui } = useStore()
+  const subscriptionStats = useSubscriptionStats()
+
   const [loading, setLoading] = useState<boolean>(true)
   const [subscription, setSubscription] = useState<StripeSubscription>()
   const [paygStats, setPaygStats] = useState<Dictionary<number>>()
@@ -81,6 +83,7 @@ const ProjectSubscription: FC<Props> = ({ project }) => {
       // @ts-ignore
       subscription={subscription}
       paygStats={paygStats}
+      subscriptionStats={subscriptionStats}
       // @ts-ignore
       currentPeriodStart={subscription?.billing.current_period_start}
       // @ts-ignore
