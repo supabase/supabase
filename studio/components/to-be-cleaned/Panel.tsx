@@ -28,7 +28,10 @@ function Panel(props: any) {
           <div className="px-6 py-4 flex items-center">{props.title}</div>
         </div>
       )}
-      <div className="bg-panel-body-light dark:bg-panel-body-dark">{props.children}</div>
+
+      <div className={`bg-panel-body-light dark:bg-panel-body-dark ${props.bodyClassName || ''}`}>
+        {props.children}
+      </div>
       {props.footer && (
         <div
           className="
