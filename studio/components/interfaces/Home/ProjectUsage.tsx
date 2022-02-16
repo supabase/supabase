@@ -23,7 +23,7 @@ import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
 import { useFlag } from 'hooks'
 import StackedAreaChart from 'components/ui/charts/StackedAreaChart'
 import Table from 'components/to-be-cleaned/Table'
-import { EndpointResponse, StatusCodesDatum } from './ChartData.types'
+import { EndpointResponse, PathsDatum, StatusCodesDatum } from './ChartData.types'
 
 const CHART_INTERVALS = [
   { key: 'minutely', label: '60 minutes', startValue: 1, startUnit: 'hour', format: 'MMM D, h:ma' },
@@ -47,7 +47,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
     `${API_URL}/projects/${ref}/analytics/endpoints/usage.api-codes?interval=${interval}`,
     get
   )
-  const { data: pathsData, error: _pathsFetchError }: any = useSWR(
+  const { data: pathsData, error: _pathsFetchError }: any = useSWR<EndpointResponse<PathsDatum>>(
     `${API_URL}/projects/${ref}/analytics/endpoints/usage.api-paths?interval=${interval}`,
     get
   )
@@ -232,7 +232,11 @@ const ProjectUsage: FC<Props> = ({ project }) => {
               </Panel.Content>
             </Panel>
 
-            <Panel className="col-start-3 col-span-2" wrapWithLoading={false}>
+            <Panel
+              className="col-start-3 col-span-2 pb-0"
+              bodyClassName="h-full"
+              wrapWithLoading={false}
+            >
               <Panel.Content className="space-y-4">
                 <PanelHeader title="Top Routes" />
                 <Table
@@ -240,16 +244,23 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     <>
                       <Table.th>Path</Table.th>
                       <Table.th>Count</Table.th>
-                      <Table.th>Avg. Latency</Table.th>
+                      <Table.th>Avg. Latency (ms)</Table.th>
                     </>
                   }
                   body={
                     <>
-                      {[{ path: '123', count: 123, average_latency: 123 }].map((row) => (
+                      {(pathsData?.result || []).map((row: PathsDatum) => (
                         <Table.tr>
-                          <Table.td>{row.path}</Table.td>
+                          <Table.td>
+                            <span
+                              className={`bg-gray-500 text-gray-200 rounded p-1 mr-2 text-xs font-mono`}
+                            >
+                              {row.method}
+                            </span>
+                            {row.path}
+                          </Table.td>
                           <Table.td>{row.count}</Table.td>
-                          <Table.td>{row.average_latency}</Table.td>
+                          <Table.td>{Number(row.avg_origin_time).toFixed(2)}</Table.td>
                         </Table.tr>
                       ))}
                     </>
