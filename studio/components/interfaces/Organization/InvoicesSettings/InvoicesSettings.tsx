@@ -23,27 +23,36 @@ interface Props {
 const InvoicesSettings: FC<Props> = ({ organization }) => {
   const { ui } = useStore()
   const [loading, setLoading] = useState<any>(false)
-  const [error, setError] = useState<any>(null)
 
   const [page, setPage] = useState(1)
-  const [invoices, setInvoices] = useState<any>(null)
+  const [invoices, setInvoices] = useState<any>([])
 
   const { stripe_customer_id } = organization
   const offset = (page - 1) * PAGE_LIMIT
 
   useEffect(() => {
-    fetchInvoices()
-  }, [stripe_customer_id, page])
+    let cancel = false
 
-  const fetchInvoices = async () => {
-    console.log('Fetching invoices, page:', page)
-    setLoading(true)
-    const invoices = await get(
-      `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}`
-    )
-    setInvoices(invoices)
-    setLoading(false)
-  }
+    const fetchInvoices = async () => {
+      setLoading(true)
+      const invoices = await get(
+        `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}`
+      )
+      if (!cancel) {
+        if (invoices.error) {
+          ui.setNotification({ category: 'error', message: invoices.error.message })
+        } else {
+          setInvoices(invoices)
+        }
+        setLoading(false)
+      }
+    }
+    fetchInvoices()
+
+    return () => {
+      cancel = true
+    }
+  }, [stripe_customer_id, page])
 
   return (
     <div className="my-4 container max-w-4xl space-y-1">
@@ -57,10 +66,10 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
             <Table.th key="header-download" className="text-right"></Table.th>,
           ]}
           body={
-            !invoices || invoices.length === 0 ? (
+            invoices.length === 0 ? (
               <Table.tr>
                 <Table.td colSpan={5} className="p-3 py-12 text-center">
-                  <Typography.Text>
+                  <Typography.Text type="secondary">
                     {loading ? 'Checking for invoices' : 'No invoices for this organization yet'}
                   </Typography.Text>
                 </Table.td>
@@ -101,7 +110,7 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
                   <Table.td colSpan={5}>
                     <div className="flex items-center justify-between">
                       <Typography.Text type="secondary" small>
-                        Showing {offset + 1} to 10 of 100 invoices
+                        Showing {offset + 1} to {offset + invoices.length} invoices
                       </Typography.Text>
                       <div className="flex items-center space-x-2">
                         <Button
