@@ -1,10 +1,20 @@
 import { FC, useState, useEffect } from 'react'
-import { Button, Loading, Typography, IconFileText, IconDownload } from '@supabase/ui'
+import {
+  Button,
+  Loading,
+  Typography,
+  IconFileText,
+  IconDownload,
+  IconChevronLeft,
+  IconChevronRight,
+} from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
-import { post } from 'lib/common/fetch'
+import { get } from 'lib/common/fetch'
 import Table from 'components/to-be-cleaned/Table'
+
+const PAGE_LIMIT = 10
 
 interface Props {
   organization: any
@@ -14,34 +24,26 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
   const { ui } = useStore()
   const [loading, setLoading] = useState<any>(false)
   const [error, setError] = useState<any>(null)
-  const [stripeAccount, setStripeAccount] = useState<any>(null)
-  const { stripe_customer_id } = organization
 
-  /**
-   * Get stripe account to populate page
-   */
-  const getStripeAccount = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await post(`${API_URL}/stripe/customer`, {
-        stripe_customer_id: stripe_customer_id,
-      })
-      setStripeAccount(response)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to get Stripe account: ${error.message}`,
-      })
-      setError(error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const [page, setPage] = useState(1)
+  const [invoices, setInvoices] = useState<any>(null)
+
+  const { stripe_customer_id } = organization
+  const offset = (page - 1) * PAGE_LIMIT
 
   useEffect(() => {
-    getStripeAccount()
-  }, [stripe_customer_id])
+    fetchInvoices()
+  }, [stripe_customer_id, page])
+
+  const fetchInvoices = async () => {
+    console.log('Fetching invoices, page:', page)
+    setLoading(true)
+    const invoices = await get(
+      `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}`
+    )
+    setInvoices(invoices)
+    setLoading(false)
+  }
 
   return (
     <div className="my-4 container max-w-4xl space-y-1">
@@ -55,7 +57,7 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
             <Table.th key="header-download" className="text-right"></Table.th>,
           ]}
           body={
-            !stripeAccount || (stripeAccount && stripeAccount.invoices?.data <= 0) ? (
+            !invoices || invoices.length === 0 ? (
               <Table.tr>
                 <Table.td colSpan={5} className="p-3 py-12 text-center">
                   <Typography.Text>
@@ -64,36 +66,63 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
                 </Table.td>
               </Table.tr>
             ) : (
-              stripeAccount.invoices?.data.map((x: any) => {
-                return (
-                  <Table.tr key={x.id}>
-                    <Table.td>
-                      <IconFileText size="xxl" />
-                    </Table.td>
-                    <Table.td>
-                      <Typography.Text>
-                        {new Date(x.period_end * 1000).toLocaleString()}
+              <>
+                {invoices.map((x: any) => {
+                  return (
+                    <Table.tr key={x.id}>
+                      <Table.td>
+                        <IconFileText size="xxl" />
+                      </Table.td>
+                      <Table.td>
+                        <Typography.Text>
+                          {new Date(x.period_end * 1000).toLocaleString()}
+                        </Typography.Text>
+                      </Table.td>
+                      <Table.td>
+                        <Typography.Text>${x.subtotal / 100}</Typography.Text>
+                      </Table.td>
+                      <Table.td>
+                        <Typography.Text>{x.number}</Typography.Text>
+                      </Table.td>
+                      <Table.td className="align-right">
+                        <div className="flex items-center space-x-2 justify-end">
+                          <a href={x.hosted_invoice_url} target="_blank">
+                            <Button type="outline">View invoice</Button>
+                          </a>
+                          <form method="get" action={x.invoice_pdf}>
+                            <Button type="outline" icon={<IconDownload />} htmlType="submit" />
+                          </form>
+                        </div>
+                      </Table.td>
+                    </Table.tr>
+                  )
+                })}
+                <Table.tr key="navigation">
+                  <Table.td colSpan={5}>
+                    <div className="flex items-center justify-between">
+                      <Typography.Text type="secondary" small>
+                        Showing {offset + 1} to 10 of 100 invoices
                       </Typography.Text>
-                    </Table.td>
-                    <Table.td>
-                      <Typography.Text>${x.subtotal / 100}</Typography.Text>
-                    </Table.td>
-                    <Table.td>
-                      <Typography.Text>{x.number}</Typography.Text>
-                    </Table.td>
-                    <Table.td className="align-right">
-                      <div className="flex items-center space-x-2 justify-end">
-                        <a href={x.hosted_invoice_url} target="_blank">
-                          <Button type="outline">View invoice</Button>
-                        </a>
-                        <form method="get" action={x.invoice_pdf}>
-                          <Button type="outline" icon={<IconDownload />} htmlType="submit" />
-                        </form>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          icon={<IconChevronLeft />}
+                          type="secondary"
+                          size="tiny"
+                          disabled={page === 1}
+                          onClick={() => setPage(page - 1)}
+                        />
+                        <Button
+                          icon={<IconChevronRight />}
+                          type="secondary"
+                          size="tiny"
+                          disabled={invoices.length < PAGE_LIMIT}
+                          onClick={() => setPage(page + 1)}
+                        />
                       </div>
-                    </Table.td>
-                  </Table.tr>
-                )
-              })
+                    </div>
+                  </Table.td>
+                </Table.tr>
+              </>
             )
           }
         />
