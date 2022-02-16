@@ -90,7 +90,8 @@ export const Wizard = observer(() => {
 
   const canCreateProject =
     currentOrg?.is_owner &&
-    (subscriptionStats.isError || subscriptionStats.isLoading) &&
+    !subscriptionStats.isError &&
+    !subscriptionStats.isLoading &&
     (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
 
   const canSubmit =
