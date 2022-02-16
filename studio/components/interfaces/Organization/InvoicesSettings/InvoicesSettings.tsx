@@ -25,6 +25,7 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
   const [loading, setLoading] = useState<any>(false)
 
   const [page, setPage] = useState(1)
+  const [count, setCount] = useState(0)
   const [invoices, setInvoices] = useState<any>([])
 
   const { stripe_customer_id } = organization
@@ -35,14 +36,15 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
 
     const fetchInvoices = async () => {
       setLoading(true)
-      const invoices = await get(
+      const res = await get(
         `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}`
       )
       if (!cancel) {
-        if (invoices.error) {
-          ui.setNotification({ category: 'error', message: invoices.error.message })
+        if (res.error) {
+          ui.setNotification({ category: 'error', message: res.error.message })
         } else {
-          setInvoices(invoices)
+          setInvoices(res.invoices)
+          setCount(res.count)
         }
         setLoading(false)
       }
@@ -110,7 +112,7 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
                   <Table.td colSpan={5}>
                     <div className="flex items-center justify-between">
                       <Typography.Text type="secondary" small>
-                        Showing {offset + 1} to {offset + invoices.length} invoices
+                        Showing {offset + 1} to {offset + invoices.length} out of {count} invoices
                       </Typography.Text>
                       <div className="flex items-center space-x-2">
                         <Button
@@ -124,7 +126,7 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
                           icon={<IconChevronRight />}
                           type="secondary"
                           size="tiny"
-                          disabled={invoices.length < PAGE_LIMIT}
+                          disabled={page * PAGE_LIMIT >= count}
                           onClick={() => setPage(page + 1)}
                         />
                       </div>
