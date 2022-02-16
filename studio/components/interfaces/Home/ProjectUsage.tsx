@@ -51,7 +51,6 @@ const ProjectUsage: FC<Props> = ({ project }) => {
     `${API_URL}/projects/${ref}/analytics/endpoints/usage.api-paths?interval=${interval}`,
     get
   )
-  console.log({ codesData, pathsData })
   const selectedInterval = logsUsageChartIntervals
     ? CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
     : CHART_INTERVALS[2]
