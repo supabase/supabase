@@ -47,6 +47,7 @@ const Home: NextPage = () => {
             {projectName}
           </Typography.Title>
         </div>
+        <ProjectUsage project={project} />
         {IS_PLATFORM && project && (
           <>
             {isUndefined(usage) ? (

@@ -133,7 +133,7 @@ const Header = ({
   )
 }
 
-const NoData = () => (
+export const NoData = () => (
   <div
     className="
       h-full w-full

@@ -23,6 +23,7 @@ import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
 import { useFlag } from 'hooks'
 import StackedAreaChart from 'components/ui/charts/StackedAreaChart'
 import Table from 'components/to-be-cleaned/Table'
+import { EndpointResponse, StatusCodesDatum } from './ChartData.types'
 
 const CHART_INTERVALS = [
   { key: 'minutely', label: '60 minutes', startValue: 1, startUnit: 'hour', format: 'MMM D, h:ma' },
@@ -39,13 +40,18 @@ const ProjectUsage: FC<Props> = ({ project }) => {
   const router = useRouter()
   const { ref } = router.query
   const { data, error }: any = useSWR(
-    // only fetch when browser window is active
     `${API_URL}/projects/${ref}/log-stats?interval=${interval}`,
     get
-    // increase refresh rate x10 to 30s when focus lost
-    // conditional fetching will cause cached data to clear (not desirable)
-    // { refreshInterval: isActive ? 3000 : 30000 }
   )
+  const { data: codesData, error: codesFetchError } = useSWR<EndpointResponse<StatusCodesDatum>>(
+    `${API_URL}/projects/${ref}/analytics/endpoints/usage.api-codes?interval=${interval}`,
+    get
+  )
+  const { data: pathsData, error: _pathsFetchError }: any = useSWR(
+    `${API_URL}/projects/${ref}/analytics/endpoints/usage.api-paths?interval=${interval}`,
+    get
+  )
+  console.log({ codesData, pathsData })
   const selectedInterval = logsUsageChartIntervals
     ? CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
     : CHART_INTERVALS[2]
@@ -203,45 +209,55 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                 /> */}
               </Panel.Content>
             </Panel>
-            <div>
-              <Panel>
-                <Panel.Content className="space-y-4">
-                  <PanelHeader title="API Status Codes" />
-                  <StackedAreaChart
-                    label="Status Codes"
-                    customDateFormat={datetimeFormat}
-                    data={[]}
-                    isLoading={!charts && !error ? true : false}
-                  />
-                </Panel.Content>
-              </Panel>
+            <Panel className="col-start-1 col-span-2" wrapWithLoading={false}>
+              <Panel.Content className="space-y-4">
+                <PanelHeader title="API Status Codes" />
+                <StackedAreaChart
+                  dateFormat={datetimeFormat}
+                  data={codesData?.result}
+                  stackKey="status_code"
+                  xAxisKey="timestamp"
+                  yAxisKey="count"
+                  isLoading={!codesData && !codesFetchError ? true : false}
+                  xAxisFormatAsDate
+                  size="large"
+                  styleMap={{
+                    200: { stroke: '#08cc49', fill: '#0bee56' },
+                    201: { stroke: '#0ad83a', fill: '#0ce43e' },
+                    400: { stroke: '#d2b40a', fill: '#e2c10a' },
+                    401: { stroke: '#cc940e ', fill: '#dfa210 ' },
+                    404: { stroke: '#d0a40a', fill: '#dfb00b' },
+                    500: { stroke: '#d56d0c', fill: '#e0740e' },
+                  }}
+                />
+              </Panel.Content>
+            </Panel>
 
-              <Panel>
-                <Panel.Content className="space-y-4">
-                  <PanelHeader title="Top Routes" />
-                  <Table
-                    head={
-                      <>
-                        <Table.th>Path</Table.th>
-                        <Table.th>Count</Table.th>
-                        <Table.th>Avg. Latency</Table.th>
-                      </>
-                    }
-                    body={
-                      <>
-                        {[{ path: '123', count: 123, average_latency: 123 }].map((row) => (
-                          <Table.tr>
-                            <Table.td>{row.path}</Table.td>
-                            <Table.td>{row.count}</Table.td>
-                            <Table.td>{row.average_latency}</Table.td>
-                          </Table.tr>
-                        ))}
-                      </>
-                    }
-                  />
-                </Panel.Content>
-              </Panel>
-            </div>
+            <Panel className="col-start-3 col-span-2" wrapWithLoading={false}>
+              <Panel.Content className="space-y-4">
+                <PanelHeader title="Top Routes" />
+                <Table
+                  head={
+                    <>
+                      <Table.th>Path</Table.th>
+                      <Table.th>Count</Table.th>
+                      <Table.th>Avg. Latency</Table.th>
+                    </>
+                  }
+                  body={
+                    <>
+                      {[{ path: '123', count: 123, average_latency: 123 }].map((row) => (
+                        <Table.tr>
+                          <Table.td>{row.path}</Table.td>
+                          <Table.td>{row.count}</Table.td>
+                          <Table.td>{row.average_latency}</Table.td>
+                        </Table.tr>
+                      ))}
+                    </>
+                  }
+                />
+              </Panel.Content>
+            </Panel>
           </div>
         )}
       </div>
