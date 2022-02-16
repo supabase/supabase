@@ -490,7 +490,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_APPLE_ENABLED && (
                 <a
-                  className="pl-4 text-gray-400"
+                  className="pl-4 text-scale-900"
                   href="https://developer.apple.com/account/resources/identifiers/add/bundleId"
                   target="_blank"
                 >
@@ -519,7 +519,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_AZURE_ENABLED && (
                 <a
-                  className="pl-4 text-gray-400"
+                  className="pl-4 text-scale-900"
                   href="https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app"
                   target="_blank"
                 >
@@ -548,7 +548,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_BITBUCKET_ENABLED && (
                 <a
-                  className="pl-4 text-gray-400"
+                  className="pl-4 text-scale-900"
                   href="https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/"
                   target="_blank"
                 >
@@ -577,7 +577,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_DISCORD_ENABLED && (
                 <a
-                  className="pl-4 text-gray-400"
+                  className="pl-4 text-scale-900"
                   href="https://discord.com/developers/applications#top"
                   target="_blank"
                 >
@@ -606,7 +606,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_FACEBOOK_ENABLED && (
                 <a
-                  className="pl-4 text-gray-400"
+                  className="pl-4 text-scale-900"
                   href="https://developers.facebook.com/apps/"
                   target="_blank"
                 >
@@ -635,7 +635,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_GITHUB_ENABLED && (
                 <a
-                  className="pl-4 text-gray-400"
+                  className="pl-4 text-scale-900"
                   href="https://github.com/settings/applications/new"
                   target="_blank"
                 >
@@ -664,7 +664,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_GITLAB_ENABLED && (
                 <a
-                  className="pl-4 text-gray-400"
+                  className="pl-4 text-scale-900"
                   href="https://gitlab.com/oauth/applications"
                   target="_blank"
                 >
@@ -693,7 +693,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_GOOGLE_ENABLED && (
                 <a
-                  className="pl-4 text-gray-400"
+                  className="pl-4 text-scale-900"
                   href="https://console.developers.google.com/apis/credentials"
                   target="_blank"
                 >
@@ -780,7 +780,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_TWITCH_ENABLED && (
                 <a
-                  className="pl-4 text-gray-400"
+                  className="pl-4 text-scale-900"
                   href="https://dev.twitch.tv/console"
                   target="_blank"
                 >
@@ -809,7 +809,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_TWITTER_ENABLED && (
                 <a
-                  className="pl-4 text-gray-400"
+                  className="pl-4 text-scale-900"
                   href="https://developer.twitter.com/en/portal/dashboard"
                   target="_blank"
                 >
@@ -837,7 +837,11 @@ const Settings = () => {
             name="EXTERNAL_SLACK_ENABLED"
             addOns={
               externalProvidersModel.EXTERNAL_SLACK_ENABLED && (
-                <a className="pl-4 text-gray-400" href="https://api.slack.com/apps" target="_blank">
+                <a
+                  className="pl-4 text-scale-900"
+                  href="https://api.slack.com/apps"
+                  target="_blank"
+                >
                   Create new credentials
                 </a>
               )
@@ -863,7 +867,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_SPOTIFY_ENABLED && (
                 <a
-                  className="pl-4 text-gray-400"
+                  className="pl-4 text-scale-900"
                   href="https://developer.spotify.com/dashboard/"
                   target="_blank"
                 >
@@ -942,7 +946,7 @@ const AuditLog = ({ interval, projectRef }: any) => {
           </Typography.Title>
           <div className="flex-1 text-right">
             <Button
-              type="outline"
+              type="default"
               className="hover:border-gray-400"
               disabled={isLoading}
               loading={isLoading}

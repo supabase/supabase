@@ -161,8 +161,8 @@ module.exports = ui({
           dark: 'var(--colors-scale4)', // '#1a1a1a',
         },
         'table-border': {
-          light: 'var(--colors-scale3)', // gray[100],
-          dark: 'var(--colors-scale5)', // '#1a1a1a',
+          light: 'var(--colors-scale4)', // gray[100],
+          dark: 'var(--colors-scale4)', // '#1a1a1a',
         },
 
         /* Panels */
