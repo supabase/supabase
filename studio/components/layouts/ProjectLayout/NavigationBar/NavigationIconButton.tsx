@@ -1,6 +1,5 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { Typography } from '@supabase/ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { Route } from 'components/ui/ui.types'
@@ -19,9 +18,9 @@ const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
             className={[
               'transition-all',
               'flex items-center justify-center h-10 w-10 rounded', // Layout
-              'bg-scale-200 hover:bg-scale-100', // Light mode
-              'text-scale-900 hover:text-scale-1100 ', // Dark mode
-              `${isActive ? 'bg-scale-1200 shadow-sm hover:bg-scale-1200 text-scale-100' : ''}`,
+              'bg-scale-200 hover:bg-scale-500', // Light mode
+              'text-scale-900 hover:text-scale-1200 ', // Dark mode
+              `${isActive ? 'bg-scale-500 shadow-sm hover:bg-scale-1200 text-scale-1200' : ''}`,
             ].join(' ')}
           >
             {route.icon}

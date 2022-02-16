@@ -33,27 +33,34 @@ body,
   box-sizing: border-box;
 }
 
-// input,
-// input[type='text'],
-// input[type='email'],
-// input[type='url'],
-// input[type='password'],
-// input[type='number'],
-// input[type='date'],
-// input[type='datetime-local'],
-// input[type='month'],
-// input[type='search'],
-// input[type='tel'],
-// input[type='time'],
-// input[type='week'],
-// input[multiple],
-// textarea,
-// select 
-.form-control
+.form-group .form-text,
+.Form .form-text {
+  @apply text-scale-900;
+}
+
+.form-group input,
+.form-group input[type='text'],
+.form-group input[type='email'],
+.form-group input[type='url'],
+.form-group input[type='password'],
+.form-group input[type='number'],
+.form-group input[type='date'],
+.form-group input[type='datetime-local'],
+.form-group input[type='month'],
+.form-group input[type='search'],
+.form-group input[type='tel'],
+.form-group input[type='time'],
+.form-group input[type='week'],
+.form-group input[multiple],
+.form-group textarea,
+.form-group select,
+input.form-control,
+.form-control input,
+.form-control textarea
 {
   @apply block ;
   @apply  box-border ;
-  @apply  w-full ;
+  // @apply  w-full ;
   @apply  rounded-md ;
   @apply  shadow-sm ;
   @apply  transition-all;
@@ -73,40 +80,39 @@ body,
   @apply focus:ring-current focus:ring-2;
 }
 
-// input,
-// select,
-// textarea {
-//   @apply px-4 py-2;
-// }
+.form-group input,
+.form-group select,
+.form-group textarea {
+  @apply px-4 py-2;
+}
 
-// input:focus,
-// input[type='text']:focus,
-// input[type='email']:focus,
-// input[type='url']:focus,
-// input[type='password']:focus,
-// input[type='number']:focus,
-// input[type='date']:focus,
-// input[type='datetime-local']:focus,
-// input[type='month']:focus,
-// input[type='search']:focus,
-// input[type='tel']:focus,
-// input[type='time']:focus,
-// input[type='week']:focus,
-// input[multiple]:focus,
-// textarea:focus,
-// select:focus,
-// input:focus 
-
+.form-group input:focus,
+.form-group input[type='text']:focus,
+.form-group input[type='email']:focus,
+.form-group input[type='url']:focus,
+.form-group input[type='password']:focus,
+.form-group input[type='number']:focus,
+.form-group input[type='date']:focus,
+.form-group input[type='datetime-local']:focus,
+.form-group input[type='month']:focus,
+.form-group input[type='search']:focus,
+.form-group input[type='tel']:focus,
+.form-group input[type='time']:focus,
+.form-group input[type='week']:focus,
+.form-group input[multiple]:focus,
+.form-group textarea:focus,
+.form-group select:focus,
+.form-group input:focus 
 .form-control:focus{
   box-shadow: 0 0 0 2px rgba(62, 207, 142, 0.1);
 }
 
 // icons in date / time inputs
-// .dark input[type='date']::-webkit-calendar-picker-indicator,
-// .dark input[type='datetime-local']::-webkit-calendar-picker-indicator,
-// .dark input[type='time']::-webkit-calendar-picker-indicator {
-//   filter: invert(0.8);
-// }
+.dark input[type='date']::-webkit-calendar-picker-indicator,
+.dark input[type='datetime-local']::-webkit-calendar-picker-indicator,
+.dark input[type='time']::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+}
 
 select option {
   @apply text-bg-primary-dark;
@@ -127,9 +133,9 @@ input[type='submit']:hover {
   @apply btn-primary-hover;
 }
 
-// input::placeholder {
-//   @apply text-input-placeholder-light dark:text-input-placeholder-dark;
-// }
+.form-group input::placeholder {
+  @apply text-scale-900;
+}
 
 .billing-input-fixed {
   @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-300 leading-tight bg-gray-700;

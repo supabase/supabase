@@ -10,12 +10,12 @@ interface Props {
 
 const ProductMenu: FC<Props> = ({ page, menu }) => {
   return (
-    <div className="my-3 flex flex-col space-y-8 overflow-y-auto">
+    <div className="flex flex-col space-y-8 overflow-y-auto">
       <Menu type="pills">
         {menu.map((group: ProductMenuGroup, idx: number) => (
           <>
-            <div key={group.title} className="space-y-8 mb-4">
-              <div className="mx-4">
+            <div key={group.title} className="space-y-8 my-6">
+              <div className="mx-3">
                 <Menu.Group
                   //@ts-ignore
                   title={
