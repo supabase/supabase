@@ -6,7 +6,7 @@ description: Getting started with Supabase Platform Log Browser
 
 The Supabase Platform provides a log browser that allows log tracing and debugging. Currently, PostgreSQL and Cloudflare edge logs are available.
 
-The features discussed in this article are only available through the Supabase platform and is not available on self-hosted.
+The features discussed in this article are only available through the Supabase platform and are not available on self-hosted.
 
 The log browser can be accessed through:
 
@@ -24,7 +24,7 @@ The log browser can be accessed through:
 
 ## Advanced Querying Features
 
-To access advanced querying features, you will need to enable to toggle for **custom queries**. Doing so will display an SQL editor that allows you to craft your queries.
+To access advanced querying features, you will need to enable **custom queries**. Doing so will display an SQL editor that allows you to craft your queries.
 
 ![Enabling query mode](/img/guides/platform/logs/query-mode.png)
 
@@ -42,7 +42,7 @@ REGEXP_CONTAINS(event_message, "/auth") AND REGEXP_CONTAINS(event_message, "400"
 
 ### SELECT Queries
 
-`SELECT` queries allows for much more complex and powerful aggregated result sets, that would allow more in-depth analysis of log data.
+`SELECT` queries allow for much more complex and powerful aggregated result sets, that would allow more in-depth analysis of log data.
 
 For example, you may enter the following into the API logs dashboard to query for each user's IP address:
 
