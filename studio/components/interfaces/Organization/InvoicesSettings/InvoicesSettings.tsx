@@ -31,20 +31,40 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
   const { stripe_customer_id } = organization
   const offset = (page - 1) * PAGE_LIMIT
 
+  // [For Hieu] This is where I'm thinking we fetch the count
+  useEffect(() => {
+    let cancel = false
+    const fetchInvoiceCount = async () => {
+      const res = await get(`${API_URL}/stripe/invoices?&customer=${stripe_customer_id}?count=true`)
+      if (!cancel) {
+        if (res.error) {
+          ui.setNotification({ category: 'error', message: res.error.message })
+        } else {
+          setCount(res.count)
+        }
+      }
+    }
+    fetchInvoiceCount()
+
+    return () => {
+      cancel = true
+    }
+  }, [stripe_customer_id])
+
+  // [For Hieu] Followed by fetching the invoices themselves
   useEffect(() => {
     let cancel = false
 
     const fetchInvoices = async () => {
       setLoading(true)
-      const res = await get(
+      const invoices = await get(
         `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}`
       )
       if (!cancel) {
-        if (res.error) {
-          ui.setNotification({ category: 'error', message: res.error.message })
+        if (invoices.error) {
+          ui.setNotification({ category: 'error', message: invoices.error.message })
         } else {
-          setInvoices(res.invoices)
-          setCount(res.count)
+          setInvoices(invoices)
         }
         setLoading(false)
       }
