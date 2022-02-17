@@ -2,8 +2,8 @@ import useSWR from 'swr'
 import { FC } from 'react'
 import { useRouter } from 'next/router'
 import { get } from 'lib/common/fetch'
+import { Badge, IconAlertCircle, Input, Loading, Typography } from '@supabase/ui'
 import { JwtSecretUpdateStatus, ProjectEvents } from '@supabase/shared-types/out/events'
-import { IconAlertCircle, Input, Loading, Typography } from '@supabase/ui'
 
 import { useJwtSecretUpdateStatus } from 'hooks'
 import { API_URL } from 'lib/constants'
@@ -71,15 +71,17 @@ export const DisplayApiSettings = () => {
               label={
                 <>
                   {x.tags?.split(',').map((x: any, i: number) => (
-                    <code key={`${x}${i}`} className="text-xs bg-gray-500 text-white px-2">
+                    <code key={`${x}${i}`} className="text-xs  text-white px-2">
                       {x}
                     </code>
                   ))}
                   {x.tags === 'service_role' && (
-                    <code className="text-xs bg-red-500 px-2 ml-1 text-white">{'secret'}</code>
+                    <>
+                      <code className="text-xs bg-red-900 px-2 ml-1 text-white">{'secret'}</code>
+                    </>
                   )}
                   {x.tags === 'anon' && (
-                    <code className="text-xs bg-gray-500 text-white px-2 ml-1">{'public'}</code>
+                    <code className="text-xs text-white px-2 ml-1">{'public'}</code>
                   )}
                 </>
               }
