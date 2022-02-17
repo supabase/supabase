@@ -33,7 +33,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Storage',
-      items: ['reference/javascript/storage-createbucket', 'reference/javascript/storage-getbucket', 'reference/javascript/storage-listbuckets', 'reference/javascript/storage-updatebucket', 'reference/javascript/storage-deletebucket', 'reference/javascript/storage-emptybucket', 'reference/javascript/storage-from-upload', 'reference/javascript/storage-from-download', 'reference/javascript/storage-from-list', 'reference/javascript/storage-from-update', 'reference/javascript/storage-from-move', 'reference/javascript/storage-from-remove', 'reference/javascript/storage-from-createsignedurl', 'reference/javascript/storage-from-getpublicurl'],
+      items: ['reference/javascript/storage-createbucket', 'reference/javascript/storage-getbucket', 'reference/javascript/storage-listbuckets', 'reference/javascript/storage-updatebucket', 'reference/javascript/storage-deletebucket', 'reference/javascript/storage-emptybucket', 'reference/javascript/storage-from-upload', 'reference/javascript/storage-from-download', 'reference/javascript/storage-from-list', 'reference/javascript/storage-from-update', 'reference/javascript/storage-from-move', 'reference/javascript/storage-from-remove', 'reference/javascript/storage-from-createsignedurl', 'reference/javascript/storage-from-createsignedurls', 'reference/javascript/storage-from-getpublicurl'],
       collapsed: true,
     },
     {
