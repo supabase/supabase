@@ -59,7 +59,7 @@ FROM edge_logs
 GROUP BY
   cf.country
 ORDER BY
-  DESC count
+  count DESC
 `,
     for: ['api'],
   },
