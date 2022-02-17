@@ -26,6 +26,8 @@ export default function Oss() {
     const reposResponse = await octokit.request("GET /orgs/{org}/repos", {
       org: "supabase",
       type: "public",
+      per_page: 6,
+      page: 1
     });
 
     setRepos(reposResponse.data.filter((r) => !!r.stargazers_count).sort((a, b) => b.stargazers_count - a.stargazers_count))
