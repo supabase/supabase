@@ -11,10 +11,12 @@ import { chargeableProducts } from '../PAYGUsage/PAYGUsage.constants'
 import { formatBytes } from 'lib/helpers'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { Dictionary } from '@supabase/grid'
+import { SubscriptionStats } from 'hooks'
 
 interface Props {
   project: any
   subscription: StripeSubscription
+  subscriptionStats: SubscriptionStats
   paygStats?: Dictionary<number>
   loading?: boolean
   showProjectName?: boolean
@@ -25,6 +27,7 @@ interface Props {
 const Subscription: FC<Props> = ({
   project,
   subscription,
+  subscriptionStats,
   paygStats,
   loading = false,
   showProjectName = false,
@@ -59,7 +62,11 @@ const Subscription: FC<Props> = ({
               </Typography.Title>
             </div>
             {/* @ts-ignore */}
-            <UpgradeButton projectRef={project.ref} paid={paid} />
+            <UpgradeButton
+              subscriptionStats={subscriptionStats}
+              projectRef={project.ref}
+              paid={paid}
+            />
           </div>
           {paid && (
             <div className="px-6 pt-4">

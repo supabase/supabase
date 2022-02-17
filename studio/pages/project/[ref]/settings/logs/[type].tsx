@@ -15,7 +15,7 @@ import {
 
 import { withAuth } from 'hooks'
 import { get } from 'lib/common/fetch'
-import { API_URL, LOG_TYPE_LABEL_MAPPING } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts/'
 import CodeEditor from 'components/ui/CodeEditor'
 import {
@@ -28,13 +28,14 @@ import {
   TEMPLATES,
   LogData,
   LogSearchCallback,
+  LOG_TYPE_LABEL_MAPPING,
 } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
 import useSWRInfinite from 'swr/infinite'
 import { isUndefined } from 'lodash'
-import Flag from 'components/ui/Flag/Flag'
 import { useFlag } from 'hooks'
 import dayjs from 'dayjs'
+import InformationBox from 'components/ui/InformationBox'
 
 /**
  * Acts as a container component for the entire log display
@@ -45,11 +46,10 @@ import dayjs from 'dayjs'
  * params used are:
  * - `q` for the editor query.
  * - `s` for search query.
- * - `ts` for timestamp start value.
+ * - `te` for timestamp start value.
  */
 export const LogPage: NextPage = () => {
   const logsQueryParamsSyncing = useFlag('logsQueryParamsSyncing')
-  const logsCustomSql = useFlag('logsCustomSql')
   const router = useRouter()
   const { ref, type, q, s, te } = router.query
   const [editorId, setEditorId] = useState<string>(uuidv4())
@@ -65,8 +65,10 @@ export const LogPage: NextPage = () => {
     timestamp_start: '',
     timestamp_end: '',
   })
-  const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as string]}`
-  const isSelectQuery = logsCustomSql && editorValue.toLowerCase().includes('select') ? true : false
+  const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as keyof typeof LOG_TYPE_LABEL_MAPPING]}`
+  const checkIfSelectQuery = (value: string) =>
+    value.toLowerCase().includes('select') ? true : false
+  const isSelectQuery = checkIfSelectQuery(editorValue)
 
   useEffect(() => {
     setParams({ ...params, type: type as string })
@@ -181,8 +183,12 @@ export const LogPage: NextPage = () => {
       setEditorValue(template.searchString)
       setParams((prev) => ({
         ...prev,
-        where: isSelectQuery ? '' : template.searchString,
-        sql: isSelectQuery ? template.searchString : '',
+        where: checkIfSelectQuery(template.searchString)
+          ? ''
+          : cleanEditorValue(template.searchString),
+        sql: checkIfSelectQuery(template.searchString)
+          ? cleanEditorValue(template.searchString)
+          : '',
         search_query: '',
         timestamp_end: '',
       }))
@@ -192,8 +198,8 @@ export const LogPage: NextPage = () => {
   const handleEditorSubmit = () => {
     setParams((prev) => ({
       ...prev,
-      where: isSelectQuery ? '' : editorValue,
-      sql: isSelectQuery ? editorValue : '',
+      where: isSelectQuery ? '' : cleanEditorValue(editorValue),
+      sql: isSelectQuery ? cleanEditorValue(editorValue) : '',
       search_query: '',
     }))
     if (!logsQueryParamsSyncing) return
@@ -228,7 +234,10 @@ export const LogPage: NextPage = () => {
     })
     setEditorValue('')
   }
-
+  const cleanEditorValue = (value: string) => {
+    if (typeof value !== 'string') return value
+    return value.replace(/\n/g, ' ')
+  }
   return (
     <SettingsLayout title={title}>
       <div className="h-full flex flex-col flex-grow">
@@ -238,7 +247,7 @@ export const LogPage: NextPage = () => {
           isCustomQuery={mode === 'custom'}
           isLoading={isValidating}
           newCount={newCount}
-          templates={TEMPLATES}
+          templates={TEMPLATES.filter((template) => template.for?.includes(type as string))}
           onRefresh={handleRefresh}
           onSearch={handleSearch}
           defaultSearchValue={params.search_query}
@@ -259,19 +268,17 @@ export const LogPage: NextPage = () => {
                 onInputRun={handleRefresh}
               />
             </div>
-            <div className="flex flex-row justify-end p-2 w-full">
-              <Flag name="logsCustomSql">
-                {isSelectQuery && (
-                  <div className="flex flex-grow flex-row items-center gap-x-1">
-                    {/* // we don't have a slim Alert component yet */}
-                    <IconInfo size="tiny" />
-                    <Typography.Text small={true} type="secondary">
-                      Custom queries are restricted to a {type === 'database' ? '2 hour' : '7 day'}{' '}
-                      querying window.
-                    </Typography.Text>
-                  </div>
-                )}
-              </Flag>
+            <div className="flex flex-row justify-between items-center px-2 py-1 w-full">
+              {isSelectQuery && (
+                <InformationBox
+                  block
+                  size="tiny"
+                  icon={<IconInfo size="tiny" />}
+                  title={`Custom queries are restricted to a ${
+                    type === 'database' ? '2 hour' : '7 day'
+                  } querying window.`}
+                />
+              )}
               <div className="flex flex-row gap-x-2 justify-end p-2">
                 {editorValue && (
                   <Button

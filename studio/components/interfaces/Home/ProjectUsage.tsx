@@ -64,9 +64,9 @@ const ProjectUsage: FC<Props> = ({ project }) => {
     if (timestampDigits < 16) {
       // pad unix timestamp with additional 0 and then forward
       const paddedTimestamp = String(timestamp) + '0'.repeat(16 - timestampDigits)
-      router.push(`/project/${ref}/settings/logs/rest?te=${paddedTimestamp}&s=${search}`)
+      router.push(`/project/${ref}/settings/logs/api?te=${paddedTimestamp}`)
     } else {
-      router.push(`/project/${ref}/settings/logs/rest?te=${timestamp}&s=${search}`)
+      router.push(`/project/${ref}/settings/logs/api?te=${timestamp}`)
     }
   }
   return (
