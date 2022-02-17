@@ -1,9 +1,10 @@
-import { handleError, handleResponse, handleResponseError, constructHeaders } from './base'
+import { handleError, handleHeadResponse, handleResponseError, constructHeaders } from './base'
 import { uuidv4 } from '../../helpers'
 import { SupaResponse } from 'types/base'
 
 export async function head<T = any>(
   url: string,
+  headersToRetrieve: string[],
   options?: { [prop: string]: any }
 ): Promise<SupaResponse<T>> {
   const requestId = uuidv4()
@@ -17,14 +18,8 @@ export async function head<T = any>(
       headers,
       ...otherOptions,
     })
-    console.log(
-      'HEAD',
-      response.headers,
-      response.headers.keys(),
-      response.headers.get('X-Total-Count')
-    )
     if (!response.ok) return handleResponseError(response, requestId)
-    return handleResponse(response, requestId)
+    return handleHeadResponse(response, requestId, headersToRetrieve)
   } catch (error) {
     return handleError(error, requestId)
   }

@@ -31,20 +31,19 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
   const { stripe_customer_id } = organization
   const offset = (page - 1) * PAGE_LIMIT
 
-  // [For Hieu] This is where I'm thinking we fetch the count
   useEffect(() => {
     let cancel = false
     const fetchInvoiceCount = async () => {
-      const res = await head(`${API_URL}/stripe/invoices?customer=${stripe_customer_id}`)
-      console.log('fetchInvoiceCount', res)
-      //   if (!cancel) {
-      //     console.log('fetchInvoiceCount', res)
-      //     if (res.error) {
-      //       ui.setNotification({ category: 'error', message: res.error.message })
-      //     } else {
-      //       setCount(res.count)
-      //     }
-      //   }
+      const res = await head(`${API_URL}/stripe/invoices?customer=${stripe_customer_id}`, [
+        'X-Total-Count',
+      ])
+      if (!cancel) {
+        if (res.error) {
+          ui.setNotification({ category: 'error', message: res.error.message })
+        } else {
+          setCount(res['X-Total-Count'])
+        }
+      }
     }
     fetchInvoiceCount()
 
