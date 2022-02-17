@@ -25,6 +25,7 @@ export default function SchemaFormPanel({
   }
 
   const onClickSubmit = () => {
+    console.log('onClickSubmit', formRef)
     formRef
       .submit()
       .then(() => {
@@ -78,6 +79,7 @@ export default function SchemaFormPanel({
           model={model}
           children={children}
           onSubmit={async (args) => {
+            console.log('onSubmit', args)
             onSubmit(args)
               .then(() => {
                 setSubmitButtonLoading(false)

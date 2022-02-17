@@ -157,12 +157,12 @@ const Settings = () => {
           ])}
           model={{
             MAILER_SECURE_EMAIL_CHANGE_ENABLED: model.MAILER_SECURE_EMAIL_CHANGE_ENABLED,
-            SMTP_ADMIN_EMAIL: isCustomSMTPEnabled ? model.SMTP_ADMIN_EMAIL : "",
-            SMTP_HOST: isCustomSMTPEnabled ? model.SMTP_HOST : "",
-            SMTP_PORT: isCustomSMTPEnabled ? model.SMTP_PORT : "",
-            SMTP_USER: isCustomSMTPEnabled ? model.SMTP_USER : "",
-            SMTP_PASS: isCustomSMTPEnabled ? model.SMTP_PASS : "",
-            SMTP_SENDER_NAME: isCustomSMTPEnabled ? model.SMTP_SENDER_NAME : "",
+            SMTP_ADMIN_EMAIL: isCustomSMTPEnabled ? model.SMTP_ADMIN_EMAIL : '',
+            SMTP_HOST: isCustomSMTPEnabled ? model.SMTP_HOST : '',
+            SMTP_PORT: isCustomSMTPEnabled ? model.SMTP_PORT : '',
+            SMTP_USER: isCustomSMTPEnabled ? model.SMTP_USER : '',
+            SMTP_PASS: isCustomSMTPEnabled ? model.SMTP_PASS : '',
+            SMTP_SENDER_NAME: isCustomSMTPEnabled ? model.SMTP_SENDER_NAME : '',
             RATE_LIMIT_EMAIL_SENT: isCustomSMTPEnabled ? model.RATE_LIMIT_EMAIL_SENT : 30,
           }}
           onSubmit={(model: any) =>
@@ -210,19 +210,19 @@ const Settings = () => {
             <label className="">Enable Custom SMTP</label>
             <div className="form-control flex items-center">
               <Toggle
-                onToggle={(value : any) => {
+                onToggle={(value: any) => {
                   /*
                    * temporary solution
                    * clear the values of SMTP when toggling
-                   */ 
-                  if(!value) {
+                   */
+                  if (!value) {
                     onFormSubmit({
-                      SMTP_ADMIN_EMAIL: "",
-                      SMTP_HOST: "",
-                      SMTP_PORT: "",
-                      SMTP_USER: "",
-                      SMTP_PASS: "",
-                      SMTP_SENDER_NAME: "",
+                      SMTP_ADMIN_EMAIL: '',
+                      SMTP_HOST: '',
+                      SMTP_PORT: '',
+                      SMTP_USER: '',
+                      SMTP_PASS: '',
+                      SMTP_SENDER_NAME: '',
                       RATE_LIMIT_EMAIL_SENT: 30,
                     })
                   }
@@ -273,12 +273,12 @@ const Settings = () => {
             'SMS_TEXTLOCAL_SENDER',
             'SMS_VONAGE_API_KEY',
             'SMS_VONAGE_API_SECRET',
-            'SMS_VONAGE_FROM'
+            'SMS_VONAGE_FROM',
           ])}
           model={{
             SMS_PROVIDER: model.SMS_PROVIDER,
-            SMS_TEXTLOCAL_API_KEY: model.SMS_TEXTLOCAL_API_KEY,
-            SMS_TEXTLOCAL_SENDER: model.SMS_TEXTLOCAL_SENDER,
+            SMS_TEXTLOCAL_API_KEY: model.SMS_TEXTLOCAL_API_KEY || undefined,
+            SMS_TEXTLOCAL_SENDER: model.SMS_TEXTLOCAL_SENDER || undefined,
             SMS_TWILIO_ACCOUNT_SID: model.SMS_TWILIO_ACCOUNT_SID || undefined,
             SMS_TWILIO_AUTH_TOKEN: model.SMS_TWILIO_AUTH_TOKEN || undefined,
             SMS_TWILIO_MESSAGE_SERVICE_SID: model.SMS_TWILIO_MESSAGE_SERVICE_SID || undefined,
@@ -323,7 +323,7 @@ const Settings = () => {
                       errorMessage="Please enter the messagebird originator."
                     />
                   </>
-                ) : (smsProviderModel?.SMS_PROVIDER === 'textlocal' ? (
+                ) : smsProviderModel?.SMS_PROVIDER === 'textlocal' ? (
                   <>
                     <AutoField
                       name="SMS_TEXTLOCAL_API_KEY"
@@ -336,7 +336,7 @@ const Settings = () => {
                       errorMessage="Please enter the vonage auth token."
                     />
                   </>
-                ) : (smsProviderModel?.SMS_PROVIDER === 'vonage' ? (
+                ) : smsProviderModel?.SMS_PROVIDER === 'vonage' ? (
                   <>
                     <AutoField
                       name="SMS_VONAGE_API_KEY"
@@ -372,7 +372,7 @@ const Settings = () => {
                       errorMessage="Please enter the twilio message service sid."
                     />
                   </>
-                )))}
+                )}
               </>
             )}
             <UIToggle
@@ -383,7 +383,7 @@ const Settings = () => {
                 // "Enable phone confirmations" should be toggled off.
                 handleToggle('SMS_AUTOCONFIRM', !value)
               }}
-              // 
+              //
               checked={!model.SMS_AUTOCONFIRM}
               descriptionText={authConfig.properties.SMS_AUTOCONFIRM.help}
             />
