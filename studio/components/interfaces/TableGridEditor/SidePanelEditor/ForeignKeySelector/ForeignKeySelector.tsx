@@ -126,6 +126,7 @@ const ForeignKeySelector: FC<Props> = ({
     >
       <div className="space-y-6">
         <InformationBox
+          block
           icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
           title="What are foreign keys?"
           description={

@@ -174,6 +174,7 @@ module.exports = {
         'guides/integrations/auth0',
         'guides/integrations/draftbit',
         'guides/integrations/prisma',
+        'guides/integrations/snaplet',
         'guides/integrations/vercel',
       ],
     },
