@@ -4,7 +4,12 @@ import { indexOf } from 'lodash'
 import { useRouter } from 'next/router'
 import { AutoField } from 'uniforms-bootstrap4'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { ProjectEvents } from '@supabase/shared-types/out/events'
+import {
+  JwtSecretUpdateError,
+  JwtSecretUpdateProgress,
+  JwtSecretUpdateStatus,
+  ProjectEvents,
+} from '@supabase/shared-types/out/events'
 import {
   Typography,
   Input,
@@ -29,6 +34,26 @@ import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { DisplayApiSettings } from 'components/to-be-cleaned/DisplayProjectSettings'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { uuidv4 } from 'lib/helpers'
+
+const JWT_SECRET_UPDATE_ERROR_MESSAGES = {
+  [JwtSecretUpdateError.APIServicesConfigurationUpdateFailed]:
+    'failed to update configuration for API services',
+  [JwtSecretUpdateError.APIServicesRestartFailed]: 'failed to restart API services',
+  [JwtSecretUpdateError.DatabaseAdminAPIConfigurationUpdateFailed]:
+    'failed to update configuration for database admin API',
+  [JwtSecretUpdateError.PostgreSQLRestartFailed]: 'failed to restart PostgreSQL service',
+  [JwtSecretUpdateError.SupabaseAPIKeyUpdateFailed]: 'failed to update Supabase API key',
+}
+
+const JWT_SECRET_UPDATE_PROGRESS_MESSAGES = {
+  [JwtSecretUpdateProgress.RestartedAPIServices]: 'restarted API services',
+  [JwtSecretUpdateProgress.RestartedPostgreSQL]: 'restarted PostgreSQL service',
+  [JwtSecretUpdateProgress.Started]: 'started updating',
+  [JwtSecretUpdateProgress.UpdatedAPIServicesConfiguration]:
+    'updated configuration for API services',
+  [JwtSecretUpdateProgress.UpdatedDatabaseAdminAPIConfiguration]:
+    'updated configuration for database admin API',
+}
 
 const PageContext: any = createContext(null)
 
@@ -95,35 +120,37 @@ const ServiceList: FC<any> = ({ projectRef }) => {
     changeTrackingId,
     isError: isJwtSecretUpdateStatusError,
     isLoading: isJwtSecretUpdateStatusLoading,
-    mutateJwtSecretUpdateStatus,
-    jwtSecretUpdateMessage,
+    jwtSecretUpdateError,
+    jwtSecretUpdateProgress,
     jwtSecretUpdateStatus,
+    mutateJwtSecretUpdateStatus,
   }: any = useJwtSecretUpdateStatus(ref)
 
-  const {
-    ProjectJwtSecretUpdated: JwtSecretUpdated,
-    ProjectJwtSecretUpdateFailure: JwtSecretUpdateFailure,
-    ProjectJwtSecretUpdateProgress: JwtSecretUpdateProgress,
-  } = ProjectEvents
+  const { Failed, Updated, Updating } = JwtSecretUpdateStatus
 
-  const isJwtSecretUpdateFailure = jwtSecretUpdateStatus === JwtSecretUpdateFailure
-  const isJwtSecretUpdateProgress = jwtSecretUpdateStatus === JwtSecretUpdateProgress
+  const isJwtSecretUpdateFailed = jwtSecretUpdateStatus === Failed
   const isNotUpdatingJwtSecret =
-    !jwtSecretUpdateStatus || jwtSecretUpdateStatus === JwtSecretUpdated
+    jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === Updated
+  console.log(isNotUpdatingJwtSecret)
+  const isUpdatingJwtSecret = jwtSecretUpdateStatus === Updating
+  const jwtSecretUpdateErrorMessage =
+    JWT_SECRET_UPDATE_ERROR_MESSAGES[jwtSecretUpdateError as JwtSecretUpdateError]
+  const jwtSecretUpdateProgressMessage =
+    JWT_SECRET_UPDATE_PROGRESS_MESSAGES[jwtSecretUpdateProgress as JwtSecretUpdateProgress]
 
   const previousJwtSecretUpdateStatus = useRef()
   useEffect(() => {
-    if (previousJwtSecretUpdateStatus.current === JwtSecretUpdateProgress) {
+    if (previousJwtSecretUpdateStatus.current === Updating) {
       switch (jwtSecretUpdateStatus) {
-        case JwtSecretUpdated:
+        case Updated:
           mutateConfig()
           mutateSettings()
           ui.setNotification({ category: 'success', message: 'Successfully updated JWT secret' })
           break
-        case JwtSecretUpdateFailure:
+        case Failed:
           ui.setNotification({
             category: 'error',
-            message: `JWT secret update failed: ${jwtSecretUpdateMessage}`,
+            message: `JWT secret update failed: ${jwtSecretUpdateErrorMessage}`,
           })
           break
       }
@@ -223,9 +250,9 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                 reveal={isNotUpdatingJwtSecret}
                 disabled
                 value={
-                  isJwtSecretUpdateFailure
+                  isJwtSecretUpdateFailed
                     ? 'JWT secret update failed'
-                    : isJwtSecretUpdateProgress
+                    : isUpdatingJwtSecret
                     ? 'Updating JWT secret...'
                     : config?.jwt_secret || ''
                 }
@@ -237,18 +264,18 @@ const ServiceList: FC<any> = ({ projectRef }) => {
               />
               <div className="space-y-3">
                 <div className="p-3 px-6 dark:bg-bg-alt-dark bg-bg-alt-light rounded-md shadow-sm border dark:border-dark flex items-center justify-between">
-                  {isJwtSecretUpdateFailure ? (
+                  {isJwtSecretUpdateFailed ? (
                     <Typography.Text type="danger">
                       Failed to update JWT secret, please contact Supabase support with the
                       following details: <br />
                       Change tracking ID: {changeTrackingId} <br />
-                      Error message: {jwtSecretUpdateMessage}
+                      Error message: {jwtSecretUpdateErrorMessage}
                     </Typography.Text>
                   ) : (
                     <>
-                      {isJwtSecretUpdateProgress ? (
+                      {isUpdatingJwtSecret ? (
                         <Typography.Text>
-                          JWT secret update progress: {jwtSecretUpdateMessage}
+                          JWT secret update progress: {jwtSecretUpdateProgressMessage}
                         </Typography.Text>
                       ) : (
                         <div>
@@ -267,7 +294,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                         </div>
                       )}
                       <div className="flex flex-col items-end">
-                        {isJwtSecretUpdateProgress ? (
+                        {isUpdatingJwtSecret ? (
                           <Button loading type="secondary">
                             Updating JWT secret...
                           </Button>

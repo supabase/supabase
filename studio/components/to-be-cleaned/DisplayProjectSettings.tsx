@@ -2,7 +2,7 @@ import useSWR from 'swr'
 import { FC } from 'react'
 import { useRouter } from 'next/router'
 import { get } from 'lib/common/fetch'
-import { ProjectEvents } from '@supabase/shared-types/out/events'
+import { JwtSecretUpdateStatus, ProjectEvents } from '@supabase/shared-types/out/events'
 import { IconAlertCircle, Input, Loading, Typography } from '@supabase/ui'
 
 import { useJwtSecretUpdateStatus } from 'hooks'
@@ -23,14 +23,9 @@ export const DisplayApiSettings = () => {
     jwtSecretUpdateStatus,
   }: any = useJwtSecretUpdateStatus(ref)
 
-  const {
-    ProjectJwtSecretUpdated: JwtSecretUpdated,
-    ProjectJwtSecretUpdateFailure: JwtSecretUpdateFailure,
-    ProjectJwtSecretUpdateProgress: JwtSecretUpdateProgress,
-  } = ProjectEvents
-
   const isNotUpdatingJwtSecret =
-    !jwtSecretUpdateStatus || jwtSecretUpdateStatus === JwtSecretUpdated
+    jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
+  console.log(isNotUpdatingJwtSecret)
 
   if (!data || isJwtSecretUpdateStatusLoading)
     return (
@@ -95,9 +90,9 @@ export const DisplayApiSettings = () => {
               disabled
               reveal={x.tags !== 'anon' && isNotUpdatingJwtSecret}
               value={
-                jwtSecretUpdateStatus === JwtSecretUpdateFailure
+                jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
                   ? 'JWT secret update failed, new API key may have issues'
-                  : jwtSecretUpdateStatus === JwtSecretUpdateProgress
+                  : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
                   ? 'Updating JWT secret...'
                   : x.api_key
               }
@@ -126,14 +121,8 @@ export const DisplayConfigSettings = () => {
     jwtSecretUpdateStatus,
   }: any = useJwtSecretUpdateStatus(ref)
 
-  const {
-    ProjectJwtSecretUpdated: JwtSecretUpdated,
-    ProjectJwtSecretUpdateFailure: JwtSecretUpdateFailure,
-    ProjectJwtSecretUpdateProgress: JwtSecretUpdateProgress,
-  } = ProjectEvents
-
   const isNotUpdatingJwtSecret =
-    !jwtSecretUpdateStatus || jwtSecretUpdateStatus === JwtSecretUpdated
+    jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
 
   if (!data || isJwtSecretUpdateStatusLoading)
     return (
@@ -192,9 +181,9 @@ export const DisplayConfigSettings = () => {
             reveal={isNotUpdatingJwtSecret}
             disabled
             value={
-              jwtSecretUpdateStatus === JwtSecretUpdateFailure
+              jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
                 ? 'JWT secret update failed'
-                : jwtSecretUpdateStatus === JwtSecretUpdateProgress
+                : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
                 ? 'Updating JWT secret...'
                 : jwtSecret
             }
