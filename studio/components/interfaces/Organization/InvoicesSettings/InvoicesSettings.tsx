@@ -33,6 +33,8 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
 
   useEffect(() => {
     let cancel = false
+    const page = 1
+
     const fetchInvoiceCount = async () => {
       const res = await head(`${API_URL}/stripe/invoices?customer=${stripe_customer_id}`, [
         'X-Total-Count',
@@ -45,6 +47,9 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
         }
       }
     }
+
+    setPage(page)
+    fetchInvoices(page)
     fetchInvoiceCount()
 
     return () => {
@@ -52,29 +57,23 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
     }
   }, [stripe_customer_id])
 
-  useEffect(() => {
-    let cancel = false
+  const fetchInvoices = async (page: number) => {
+    setLoading(true)
+    setPage(page)
 
-    const fetchInvoices = async () => {
-      setLoading(true)
-      const invoices = await get(
-        `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}`
-      )
-      if (!cancel) {
-        if (invoices.error) {
-          ui.setNotification({ category: 'error', message: invoices.error.message })
-        } else {
-          setInvoices(invoices)
-        }
-        setLoading(false)
-      }
-    }
-    fetchInvoices()
+    const offset = (page - 1) * PAGE_LIMIT
+    const invoices = await get(
+      `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}`
+    )
 
-    return () => {
-      cancel = true
+    if (invoices.error) {
+      ui.setNotification({ category: 'error', message: invoices.error.message })
+    } else {
+      setInvoices(invoices)
     }
-  }, [stripe_customer_id, page])
+
+    setLoading(false)
+  }
 
   return (
     <div className="my-4 container max-w-4xl space-y-1">
@@ -140,14 +139,14 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
                           type="secondary"
                           size="tiny"
                           disabled={page === 1}
-                          onClick={() => setPage(page - 1)}
+                          onClick={async () => await fetchInvoices(page - 1)}
                         />
                         <Button
                           icon={<IconChevronRight />}
                           type="secondary"
                           size="tiny"
                           disabled={page * PAGE_LIMIT >= count}
-                          onClick={() => setPage(page + 1)}
+                          onClick={async () => await fetchInvoices(page + 1)}
                         />
                       </div>
                     </div>
