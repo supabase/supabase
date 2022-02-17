@@ -35,8 +35,9 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
   useEffect(() => {
     let cancel = false
     const fetchInvoiceCount = async () => {
-      const res = await get(`${API_URL}/stripe/invoices?&customer=${stripe_customer_id}?count=true`)
+      const res = await get(`${API_URL}/stripe/invoices?customer=${stripe_customer_id}&count=true`)
       if (!cancel) {
+        console.log('fetchInvoiceCount', res)
         if (res.error) {
           ui.setNotification({ category: 'error', message: res.error.message })
         } else {
