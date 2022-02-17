@@ -69,7 +69,7 @@ module.exports = {
         },
         {
           label: 'Careers',
-          to: '/careers',
+          to: 'https://boards.greenhouse.io/supabase',
           activeBasePath: '/careers',
           position: 'left',
         },
