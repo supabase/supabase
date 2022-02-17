@@ -11,7 +11,7 @@ import {
 
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
+import { get, head } from 'lib/common/fetch'
 import Table from 'components/to-be-cleaned/Table'
 
 const PAGE_LIMIT = 10
@@ -35,15 +35,16 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
   useEffect(() => {
     let cancel = false
     const fetchInvoiceCount = async () => {
-      const res = await get(`${API_URL}/stripe/invoices?customer=${stripe_customer_id}&count=true`)
-      if (!cancel) {
-        console.log('fetchInvoiceCount', res)
-        if (res.error) {
-          ui.setNotification({ category: 'error', message: res.error.message })
-        } else {
-          setCount(res.count)
-        }
-      }
+      const res = await head(`${API_URL}/stripe/invoices?customer=${stripe_customer_id}`)
+      console.log('fetchInvoiceCount', res)
+      //   if (!cancel) {
+      //     console.log('fetchInvoiceCount', res)
+      //     if (res.error) {
+      //       ui.setNotification({ category: 'error', message: res.error.message })
+      //     } else {
+      //       setCount(res.count)
+      //     }
+      //   }
     }
     fetchInvoiceCount()
 
@@ -52,7 +53,6 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
     }
   }, [stripe_customer_id])
 
-  // [For Hieu] Followed by fetching the invoices themselves
   useEffect(() => {
     let cancel = false
 
