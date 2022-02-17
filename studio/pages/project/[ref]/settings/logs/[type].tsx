@@ -268,10 +268,11 @@ export const LogPage: NextPage = () => {
                 onInputRun={handleRefresh}
               />
             </div>
-            <div className="flex flex-row justify-between items-center px-2 py-1 w-full">
+            <div className="flex flex-row justify-end items-center px-2 py-1 w-full">
               {isSelectQuery && (
                 <InformationBox
-                  block
+                className="shrink mr-auto"
+                  block={false}
                   size="tiny"
                   icon={<IconInfo size="tiny" />}
                   title={`Custom queries are restricted to a ${
