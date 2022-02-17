@@ -20,7 +20,7 @@
     "@supabase/grid": "^2.4.1",
     "@supabase/postgres-meta": "^0.26.1",
     "@supabase/react-data-grid": "^7.1.0-beta.7",
-    "@supabase/shared-types": "^0.1.14",
+    "@supabase/shared-types": "^0.1.15",
     "@supabase/supabase-js": "^1.29.1",
     "@supabase/ui": "^0.35.0",
     "ajv": "^8.6.3",
