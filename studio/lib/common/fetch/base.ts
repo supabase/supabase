@@ -32,7 +32,7 @@ export async function handleHeadResponse<T>(
   headers: string[]
 ): Promise<SupaResponse<T>> {
   try {
-    const res = {}
+    const res = {} as any
     headers.forEach((header: string) => {
       res[header] = response.headers.get(header)
     })
