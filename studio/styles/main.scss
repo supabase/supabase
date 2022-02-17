@@ -56,22 +56,19 @@ body,
 .form-group select,
 input.form-control,
 .form-control input,
-.form-control textarea
-{
-  @apply block ;
-  @apply  box-border ;
+.form-control textarea {
+  @apply block;
+  @apply box-border;
   // @apply  w-full ;
-  @apply  rounded-md ;
-  @apply  shadow-sm ;
-  @apply  transition-all;
-  @apply  text-scale-1200  ;
-  @apply  border;
-  @apply  focus:shadow-md;
+  @apply rounded-md;
+  @apply shadow-sm;
+  @apply transition-all;
+  @apply text-scale-1200;
+  @apply border;
+  @apply focus:shadow-md;
 
-  @apply  focus:border-scale-900;
-  @apply  focus:ring-scale-400;
-      
-
+  @apply focus:border-scale-900;
+  @apply focus:ring-scale-400;
 
   @apply bg-scale-200 dark:bg-scale-200;
   @apply border border-scale-700;
@@ -102,8 +99,7 @@ input.form-control,
 .form-group input[multiple]:focus,
 .form-group textarea:focus,
 .form-group select:focus,
-.form-group input:focus 
-.form-control:focus{
+.form-group input:focus .form-control:focus {
   box-shadow: 0 0 0 2px rgba(62, 207, 142, 0.1);
 }
 
@@ -120,7 +116,7 @@ select option {
 
 input.is-invalid {
   @apply bg-red-100;
-  @apply border border-red-700 ;
+  @apply border border-red-700;
   @apply focus:ring-red-500;
   @apply placeholder:text-red-600;
 }
@@ -167,7 +163,8 @@ input[type='radio'] {
 }
 
 code {
-  @apply p-1 m-0 font-mono text-sm bg-gray-100 dark:bg-gray-600 rounded;
+  // use supabase-ui code style
+  @apply text-code;
 }
 
 div[data-radix-portal]:not(.portal--toast) {
