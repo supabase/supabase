@@ -7,7 +7,7 @@ import { useRef, useState, useEffect } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { Button, Typography, Listbox, IconUsers, IconAlertCircle } from '@supabase/ui'
+import { Button, Typography, Listbox, IconUsers, IconAlertCircle, Loading } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
@@ -326,6 +326,15 @@ export const Wizard = observer(() => {
               {!isSelectFreeTier && isEmptyPaymentMethod && (
                 <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
               )}
+            </Panel.Content>
+          )}
+
+          {subscriptionStats.isLoading && (
+            <Panel.Content>
+              <div className="py-10">
+                {/* @ts-ignore */}
+                <Loading active={true} />
+              </div>
             </Panel.Content>
           )}
         </>
