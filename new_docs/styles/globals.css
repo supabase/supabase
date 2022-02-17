@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+::selection {
+  @apply bg-green-300;
+  color: #333 !important;
+}
