@@ -11,7 +11,7 @@ import {
 
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
+import { get, head } from 'lib/common/fetch'
 import Table from 'components/to-be-cleaned/Table'
 
 const PAGE_LIMIT = 10
@@ -33,18 +33,38 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
 
   useEffect(() => {
     let cancel = false
-
-    const fetchInvoices = async () => {
-      setLoading(true)
-      const res = await get(
-        `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}`
-      )
+    const fetchInvoiceCount = async () => {
+      const res = await head(`${API_URL}/stripe/invoices?customer=${stripe_customer_id}`, [
+        'X-Total-Count',
+      ])
       if (!cancel) {
         if (res.error) {
           ui.setNotification({ category: 'error', message: res.error.message })
         } else {
-          setInvoices(res.invoices)
-          setCount(res.count)
+          setCount(res['X-Total-Count'])
+        }
+      }
+    }
+    fetchInvoiceCount()
+
+    return () => {
+      cancel = true
+    }
+  }, [stripe_customer_id])
+
+  useEffect(() => {
+    let cancel = false
+
+    const fetchInvoices = async () => {
+      setLoading(true)
+      const invoices = await get(
+        `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}`
+      )
+      if (!cancel) {
+        if (invoices.error) {
+          ui.setNotification({ category: 'error', message: invoices.error.message })
+        } else {
+          setInvoices(invoices)
         }
         setLoading(false)
       }

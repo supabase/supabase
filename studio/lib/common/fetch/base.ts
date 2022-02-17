@@ -26,6 +26,22 @@ export async function handleResponse<T>(
   }
 }
 
+export async function handleHeadResponse<T>(
+  response: Response,
+  requestId: string,
+  headers: string[]
+): Promise<SupaResponse<T>> {
+  try {
+    const res = {} as any
+    headers.forEach((header: string) => {
+      res[header] = response.headers.get(header)
+    })
+    return res
+  } catch (e) {
+    return handleError(response, requestId) as SupaResponse<T>
+  }
+}
+
 export async function handleResponseError<T = unknown>(
   response: Response,
   requestId: string
