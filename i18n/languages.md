@@ -2,6 +2,7 @@
 
 - [Arabic | العربية](/i18n/README.ar.md)
 - [Albanian / Shqip](/i18n/README.sq.md)
+- [Bangla / বাংলা](/i18n/README.bn.md)
 - [Catalan / Català](/i18n/README.ca.md)
 - [Danish / Dansk](/i18n/README.da.md)
 - [Dutch / Nederlands](/i18n/README.nl.md)
@@ -36,4 +37,3 @@
 - [Turkish / Türkçe](/i18n/README.tr.md)
 - [Ukrainian / Українська](/i18n/README.uk.md)
 - [Vietnamese / Tiếng Việt](/i18n/README.vi-vn.md)
-- [Bangla / বাংলা](/i18n/README.bn.md)
