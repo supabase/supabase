@@ -36,3 +36,4 @@
 - [Turkish / Türkçe](/i18n/README.tr.md)
 - [Ukrainian / Українська](/i18n/README.uk.md)
 - [Vietnamese / Tiếng Việt](/i18n/README.vi-vn.md)
+- [Bangla / বাংলা](/i18n/README.bn.md)
