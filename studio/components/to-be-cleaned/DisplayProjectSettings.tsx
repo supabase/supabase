@@ -25,7 +25,6 @@ export const DisplayApiSettings = () => {
 
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
-  console.log(isNotUpdatingJwtSecret)
 
   if (!data || isJwtSecretUpdateStatusLoading)
     return (
