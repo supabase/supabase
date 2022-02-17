@@ -368,8 +368,7 @@ const FreeProjectLimitWarning = ({ limit }: { limit: number }) => {
         description={
           <div className="space-y-3">
             <p className="text-sm leading-normal">
-              {`Your account can only have a maximum of ${limit} free projects. You can only choose paid
-              pricing plan.`}
+              {`Your account can only have up to ${limit} free projects - to create another free project, you'll need to delete an existing free project first.`}
             </p>
           </div>
         }
