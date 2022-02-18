@@ -717,7 +717,7 @@ const Settings = () => {
             </>
           )}
           <Divider light />
-          {/* <ToggleField
+          <ToggleField
             name="EXTERNAL_LINKEDIN_ENABLED"
             addOns={
               externalProvidersModel.EXTERNAL_LINKEDIN_ENABLED && (
@@ -774,7 +774,7 @@ const Settings = () => {
               />
             </>
           )}
-          <Divider light /> */}
+          <Divider light />
           <ToggleField
             name="EXTERNAL_TWITCH_ENABLED"
             addOns={
