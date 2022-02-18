@@ -401,7 +401,7 @@ Write the following and click `Run`.
 
 ```sql
 create or replace function auth.user_id() returns text as $$
-  select nullif(current_setting('request.jwt.claims.userId', true), '')::text;
+  select nullif(current_setting('request.jwt.claims', true)::json->>'userId', '')::text;
 $$ language sql stable;
 ```
 
