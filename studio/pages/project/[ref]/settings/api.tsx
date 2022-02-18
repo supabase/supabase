@@ -8,9 +8,9 @@ import {
   JwtSecretUpdateError,
   JwtSecretUpdateProgress,
   JwtSecretUpdateStatus,
-  ProjectEvents,
 } from '@supabase/shared-types/out/events'
 import {
+  Alert,
   Typography,
   Input,
   IconAlertCircle,
@@ -22,19 +22,19 @@ import {
   IconPenTool,
   IconRefreshCw,
   IconChevronDown,
+  IconLoader,
 } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
-import { useStore, useJwtSecretUpdateStatus, withAuth } from 'hooks'
+import { uuidv4 } from 'lib/helpers'
 import { patch, get } from 'lib/common/fetch'
+import { useStore, useJwtSecretUpdateStatus, withAuth } from 'hooks'
 import { SettingsLayout } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
 import MultiSelectUI from 'components/to-be-cleaned/MultiSelect'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { DisplayApiSettings } from 'components/to-be-cleaned/DisplayProjectSettings'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
 import Flag from 'components/ui/Flag/Flag'
-import { uuidv4 } from 'lib/helpers'
 
 const JWT_SECRET_UPDATE_ERROR_MESSAGES = {
   [JwtSecretUpdateError.APIServicesConfigurationUpdateFailed]:
@@ -132,7 +132,6 @@ const ServiceList: FC<any> = ({ projectRef }) => {
   const isJwtSecretUpdateFailed = jwtSecretUpdateStatus === Failed
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === Updated
-  console.log(isNotUpdatingJwtSecret)
   const isUpdatingJwtSecret = jwtSecretUpdateStatus === Updating
   const jwtSecretUpdateErrorMessage =
     JWT_SECRET_UPDATE_ERROR_MESSAGES[jwtSecretUpdateError as JwtSecretUpdateError]
@@ -140,6 +139,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
     JWT_SECRET_UPDATE_PROGRESS_MESSAGES[jwtSecretUpdateProgress as JwtSecretUpdateProgress]
 
   const previousJwtSecretUpdateStatus = useRef()
+
   useEffect(() => {
     if (previousJwtSecretUpdateStatus.current === Updating) {
       switch (jwtSecretUpdateStatus) {
@@ -265,69 +265,79 @@ const ServiceList: FC<any> = ({ projectRef }) => {
               />
               <Flag name="jwtSecretUpdate">
                 <div className="space-y-3">
-                  <div className="p-3 px-6 dark:bg-bg-alt-dark bg-bg-alt-light rounded-md shadow-sm border dark:border-dark flex items-center justify-between">
+                  <div className="p-3 px-6 dark:bg-bg-alt-dark bg-bg-alt-light rounded-md shadow-sm border dark:border-dark">
                     {isJwtSecretUpdateFailed ? (
-                      <Typography.Text type="danger">
-                        Failed to update JWT secret, please contact Supabase support with the
-                        following details: <br />
+                      <Alert withIcon variant="warning" title="Failed to update JWT secret">
+                        Please contact Supabase support with the following details: <br />
                         Change tracking ID: {changeTrackingId} <br />
                         Error message: {jwtSecretUpdateErrorMessage}
-                      </Typography.Text>
+                      </Alert>
                     ) : (
                       <>
                         {isUpdatingJwtSecret ? (
-                          <Typography.Text>
-                            JWT secret update progress: {jwtSecretUpdateProgressMessage}
-                          </Typography.Text>
+                          <div className="flex items-center space-x-2">
+                            <IconLoader className="animate-spin" size={14} />
+                            <Typography.Text>
+                              Updating JWT secret: {jwtSecretUpdateProgressMessage}
+                            </Typography.Text>
+                          </div>
                         ) : (
-                          <div>
-                            <Typography.Text>Generate a new JWT secret</Typography.Text>
-                            <div>
-                              <Typography.Text type="danger">
-                                This will invalidate all existing API keys! <br />
-                                Your project will also be restarted during this process, which will
-                                terminate any existing connections.
-                              </Typography.Text>
-                              <br />
-                              <Typography.Text type="secondary">
-                                A random secret will be created, or you can create your own.
-                              </Typography.Text>
+                          <div className="w-full space-y-2">
+                            <div className="w-full flex items-center justify-between">
+                              <div className="flex flex-col space-y-1">
+                                <Typography.Text>Generate a new JWT secret</Typography.Text>
+                                <Typography.Text type="secondary">
+                                  A random secret will be created, or you can create your own.
+                                </Typography.Text>
+                              </div>
+                              <div className="flex flex-col items-end">
+                                {isUpdatingJwtSecret ? (
+                                  <Button loading type="secondary">
+                                    Updating JWT secret...
+                                  </Button>
+                                ) : (
+                                  <Dropdown
+                                    align="end"
+                                    side="bottom"
+                                    overlay={
+                                      <>
+                                        <Dropdown.Item
+                                          onClick={() => setIsGeneratingKey(true)}
+                                          icon={<IconRefreshCw size={16} />}
+                                        >
+                                          Generate a random secret
+                                        </Dropdown.Item>
+                                        <Divider light />
+                                        <Dropdown.Item
+                                          onClick={() => setIsCreatingKey(true)}
+                                          icon={<IconPenTool size={16} />}
+                                        >
+                                          Create my own secret
+                                        </Dropdown.Item>
+                                      </>
+                                    }
+                                  >
+                                    <Button
+                                      as="span"
+                                      type="secondary"
+                                      iconRight={<IconChevronDown />}
+                                    >
+                                      Generate a new secret
+                                    </Button>
+                                  </Dropdown>
+                                )}
+                              </div>
                             </div>
+                            <Alert
+                              withIcon
+                              variant="warning"
+                              title="This will invalidate all existing API keys!"
+                            >
+                              Your project will also be restarted during this process, which will
+                              terminate any existing connections.
+                            </Alert>
                           </div>
                         )}
-                        <div className="flex flex-col items-end">
-                          {isUpdatingJwtSecret ? (
-                            <Button loading type="secondary">
-                              Updating JWT secret...
-                            </Button>
-                          ) : (
-                            <Dropdown
-                              align="end"
-                              side="bottom"
-                              overlay={
-                                <>
-                                  <Dropdown.Item
-                                    onClick={() => setIsGeneratingKey(true)}
-                                    icon={<IconRefreshCw size={16} />}
-                                  >
-                                    Generate a random secret
-                                  </Dropdown.Item>
-                                  <Divider light />
-                                  <Dropdown.Item
-                                    onClick={() => setIsCreatingKey(true)}
-                                    icon={<IconPenTool size={16} />}
-                                  >
-                                    Create my own secret
-                                  </Dropdown.Item>
-                                </>
-                              }
-                            >
-                              <Button as="span" type="secondary" iconRight={<IconChevronDown />}>
-                                Generate a new secret
-                              </Button>
-                            </Dropdown>
-                          )}
-                        </div>
                       </>
                     )}
                   </div>
@@ -338,33 +348,31 @@ const ServiceList: FC<any> = ({ projectRef }) => {
         </section>
         <section>{config && <PostgrestConfig config={config} projectRef={projectRef} />}</section>
       </article>
-      <ConfirmationModal
-        danger
+      <Modal
         visible={isRegeneratingKey}
-        title="Generate new JWT secret"
-        buttonLabel="Generate new secret"
-        buttonLoadingLabel="Generating"
-        children={
-          <div>
-            <Typography.Text type="danger">
-              Are you sure you want to genereate a random new JWT secret? This action cannot be
-              undone and the old JWT secret will be lost.
-            </Typography.Text>
-            <br />
-            <Typography.Text type="danger">
-              All existing API keys will be invalidated, and any open connections will be
-              terminated.
-            </Typography.Text>
-          </div>
-        }
-        onSelectCancel={() => setIsGeneratingKey(false)}
-        onSelectConfirm={handleGenerateNewJwtToken}
-      />
+        onCancel={() => setIsGeneratingKey(false)}
+        title="Are you absolutely sure?"
+        icon={<IconAlertCircle background={'red'} />}
+        hideFooter
+        size="medium"
+        closable
+      >
+        <Typography.Text>
+          <p className="text-sm">
+            This action cannot be undone and the old JWT secret will be lost. All existing API keys
+            will be invalidated, and any open connections will be terminated.
+          </p>
+        </Typography.Text>
+        <Button onClick={handleGenerateNewJwtToken} size="small" block danger>
+          Generate new secret
+        </Button>
+      </Modal>
+
       <Modal
         closable
         title="Create a custom JWT secret"
         visible={isCreatingKey}
-        size="small"
+        size="medium"
         confirmText="Apply new JWT secret"
         variant="danger"
         alignFooter="right"
@@ -376,10 +384,11 @@ const ServiceList: FC<any> = ({ projectRef }) => {
           Create a custom JWT secret. Make sure it is a strong combination of characters that cannot
           be guessed easily.
         </Typography.Text>
-        <br />
-        <Typography.Text type="danger">
-          All existing API keys will be invalidated, and any open connections will be terminated.
-        </Typography.Text>
+        <Alert
+          withIcon
+          variant="warning"
+          title="All existing API keys will be invalidated, and any open connections will be terminated."
+        />
         <Input
           onChange={(e: any) => setCustomToken(e.target.value)}
           value={customToken}
