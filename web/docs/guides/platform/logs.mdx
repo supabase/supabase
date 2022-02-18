@@ -34,11 +34,13 @@ Advanced queries can take two forms, **WHERE queries** and **SELECT queries**.
 
 To perform advanced filtering, you add in additional `WHERE` filters into the query editor. These will be inserted and combined with the existing query. Doing so will allow you to access chronological features such as **loading older logs** and **metadata viewing**.
 
-For example, you may enter the following to query across the event message as well as the timestamp field simultaneously:
+For example, you may query the API event messages as well as the timestamp field simultaneously:
 
 ```sql
-REGEXP_CONTAINS(event_message, "/auth") AND REGEXP_CONTAINS(event_message, "400") AND timestamp < 1643971681000
+REGEXP_CONTAINS(event_message, "/auth") AND REGEXP_CONTAINS(event_message, "400") AND timestamp <  TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 10 MINUTE)
 ```
+
+![WHERE filter example](/img/guides/platform/logs/where-filter.png)
 
 ### SELECT Queries
 
@@ -47,13 +49,16 @@ REGEXP_CONTAINS(event_message, "/auth") AND REGEXP_CONTAINS(event_message, "400"
 For example, you may enter the following into the API logs dashboard to query for each user's IP address:
 
 ```sql
-SELECT timestamp,  h.x_real_ip
+SELECT timestamp, h.x_real_ip
 FROM edge_logs
   LEFT JOIN UNNEST(metadata) as m ON TRUE
   LEFT JOIN UNNEST(m.request) AS r ON TRUE
   LEFT JOIN UNNEST(r.headers) AS h ON TRUE
 WHERE h.x_real_ip IS NOT NULL
 ```
+
+![SELECT query example](/img/guides/platform/logs/select-query.png)
+
 
 You may notice that the table name reference, `edge_logs`, is required in order to formulate the SELECT query. Likewise, when querying the database logs, you would need to provide a table name reference as well.
 
@@ -66,8 +71,23 @@ Note that cross-table joining is currently not supported.
 
 #### Unnesting Arrays
 
-In the above example, in order to query the metadata field, we need to unnest the field and add it as a join. By observing the metadata field, we can see that it is actually an array of objects. In order to query any value that is an array, we would need to unnest the field and add it to the query as a join, thereby allowing us to reference the nested fields within the array.
+In the above example, in order to query the metadata field, we need to unnest the field and add it as a join. Wehn we click on an individual log, we can see that log metadata is stored as an array of objects. 
+
+In order to query any value that is an array, we would need to `UNNEST()` that field and add it to the query as a join, thereby allowing us to reference the nested fields within the array.
+
+
+#### Functions
+
+You may have also noticed from the above examples that we are able to use certain SQL functions within our queries. The querying engine currently supported is BigQuery, hence you may use [any valid BigQuery function](https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators) within your query. 
+
+
+#### Timestamp Behavior
+
+Each log timestamp is stored as a `TIMESTAMP` data type. In order to utilize the `timestamp` field in a query, you would need to use the appropriate [timestamp functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp).
 
 ### Template Queries
 
 Templates are available to help shorten the time needed to craft these queries. There are examples for each complexity level, which can serve as a foundation for your custom queries.
+
+
+![Templates](/img/guides/platform/logs/templates.png)
