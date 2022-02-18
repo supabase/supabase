@@ -82,7 +82,7 @@ const DocView: FC<any> = observer(({}) => {
 
   const { data: jsonSchema, error: jsonSchemaError } = useSWR(
     () => swaggerUrl,
-    (url) => get(url, { headers, credentials: 'omit' }).then((res) => res)
+    (url: string) => get(url, { headers, credentials: 'omit' }).then((res) => res)
   )
 
   useEffect(() => {
