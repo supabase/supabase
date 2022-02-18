@@ -36,7 +36,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
 
   return (
     <nav
-      className={`flex justify-between border-b dark:border-dark p-4 sticky top-0 z-10 bg-opacity-50 h-[72px] bg-white dark:bg-gray-800 backdrop-filter backdrop-blur  firefox:bg-opacity-90`}
+      className={`flex justify-between border-b dark:border-dark p-4 sticky top-0 z-10 h-[72px] bg-white dark:bg-gray-800 backdrop-filter backdrop-blur`}
     >
       <div className="flex items-center">
         <button className="block lg:hidden mr-2">
@@ -61,7 +61,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
             <li key={`${p.text}-${p.link}`}>
               <Link href={p.link}>
                 <a
-                  className={`${p.active ? 'text-gray-800 dark:text-gray-200' : 'text-green-400'}`}
+                  className={`${p.active ? 'text-gray-800 dark:text-gray-200' : 'text-brand-600'}`}
                 >
                   {p.text}
                 </a>
@@ -70,7 +70,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
           ))}
           <li>
             <Link href="https://app.supabase.io">
-              <a className={`text-green-400`}>Login</a>
+              <a className={`text-brand-600`}>Login</a>
             </Link>
           </li>
         </ul>
@@ -78,12 +78,12 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
       <div className={`${styles.navRight} flex items-center`}>
         <Link href="https://github.com/supabase/supabase">
           <a>
-            <IconGitHub className="text-green-400" />
+            <IconGitHub className="text-brand-600" />
           </a>
         </Link>
         <Link href="https://twitter.com/supabase">
           <a>
-            <IconTwitter className="text-green-400" />
+            <IconTwitter className="text-brand-600" />
           </a>
         </Link>
         <Input

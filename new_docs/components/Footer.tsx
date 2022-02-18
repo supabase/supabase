@@ -19,7 +19,7 @@ const Footer = (prop: Props) => {
       </h2>
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
-            <Link href="#" as="/">
+            <Link href="#">
               <a>
                 <img
                   className="w-40"
@@ -79,7 +79,7 @@ const Footer = (prop: Props) => {
               {footer.map((segment: any) => {
                 return (
                   <div key={`footer_${segment.title}`}>
-                    <h3 className="text-sm text-gray-200 dark:text-dark-400">{segment.title}</h3>
+                    <h3 className="text-sm text-gray-600 dark:text-gray-200">{segment.title}</h3>
                     <ul className="mt-4 space-y-2">
                       {segment.links.map((link: any, idx: number) => (
                         <li key={`${segment.title}_link_${idx}`}>
