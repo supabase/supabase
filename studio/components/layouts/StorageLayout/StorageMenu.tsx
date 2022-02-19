@@ -37,12 +37,12 @@ const StorageMenu: FC<Props> = () => {
   } = storageExplorerStore || {}
 
   return (
-    <div className="my-6 flex flex-col flex-grow space-y-6">
-      <div className="mx-4">
+    <Menu type="pills" className="my-6 flex flex-col flex-grow space-y-6">
+      <div className="mx-6">
         <Button
           block
+          type="default"
           icon={<IconPlus />}
-          type="text"
           style={{ justifyContent: 'start' }}
           onClick={openCreateBucketModal}
         >
@@ -85,7 +85,7 @@ const StorageMenu: FC<Props> = () => {
           )}
         </div>
       </div>
-      <div className="mx-4 flex flex-col space-y-2">
+      <div className="flex flex-col space-y-2">
         <div className="mx-4 space-y-1">
           <Typography.Text type="secondary" small>
             Settings
@@ -108,7 +108,7 @@ const StorageMenu: FC<Props> = () => {
           </Link>
         </div>
       </div>
-    </div>
+    </Menu>
   )
 }
 

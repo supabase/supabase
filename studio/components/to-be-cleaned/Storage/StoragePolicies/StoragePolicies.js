@@ -8,7 +8,7 @@ import { formatPoliciesForStorage } from '../Storage.utils'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 import StoragePoliciesBucketRow from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
-import ConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModalV2'
+import ConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
 import PolicyEditorModal from 'components/to-be-cleaned/Auth/PolicyEditorModal'
