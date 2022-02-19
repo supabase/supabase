@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import {
   Badge,
@@ -17,17 +17,15 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
+import { useTheme } from '../Providers'
+
 const supabase = createClient(
   'https://rsnibhkhsbfnncjmwnkj.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNTIxNDE1MywiZXhwIjoxOTMwNzkwMTUzfQ.OQEbAaTfgDdLCCht251P2JRD3QDnui6nsU8N-tZA_Mc'
 )
 
-type Props = {
-  darkMode: boolean
-}
-
-function AuthComponentExample(props: Props) {
-  const { darkMode } = props
+function AuthComponentExample() {
+  const { isDarkMode } = useTheme()
   const { basePath } = useRouter()
 
   // store API swiper instance
@@ -91,9 +89,9 @@ function AuthComponentExample(props: Props) {
                     <Space size={3} direction="vertical">
                       <img
                         src={
-                          darkMode
-                            ? `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
-                            : `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
+                          isDarkMode
+                            ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
+                            : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
                         }
                         width="96"
                         alt="Logo"
