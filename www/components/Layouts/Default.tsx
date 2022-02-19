@@ -13,14 +13,14 @@ const DARK_COLOR_SCHEME_CLASSNAME = 'dark'
 // Prevents flash of dark if the user is on light theme by injecting the right classname while the page loads.
 // rather than after the page hydrates. Defaults to dark.
 const setInitialTheme = `
-  function getUserPreference() {
-    try {
-      return window.localStorage.getItem('${MODE_STORAGE_KEY}') === 'true' 
-        ? '${DARK_COLOR_SCHEME_CLASSNAME}' : ''
-    } catch (err) {}
-    return '${DARK_COLOR_SCHEME_CLASSNAME}'
-  }
-  document.documentElement.className = getUserPreference()
+function getUserPreference() {
+  try {
+    return window.localStorage.getItem('${MODE_STORAGE_KEY}') === 'true' 
+      ? '${DARK_COLOR_SCHEME_CLASSNAME}' : ''
+  } catch (err) {}
+  return '${DARK_COLOR_SCHEME_CLASSNAME}'
+}
+document.documentElement.className = getUserPreference()
 `
 
 const DefaultLayout = (props: Props) => {
@@ -31,7 +31,7 @@ const DefaultLayout = (props: Props) => {
 
   const updateTheme = (isDarkMode: boolean) => {
     document.documentElement.className = isDarkMode ? DARK_COLOR_SCHEME_CLASSNAME : ''
-    window.localStorage.setItem(MODE_STORAGE_KEY, (!darkMode).toString())
+    window.localStorage.setItem(MODE_STORAGE_KEY, isDarkMode.toString())
     setDarkMode(isDarkMode)
   }
 

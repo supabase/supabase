@@ -105,7 +105,10 @@ const Footer = (props: Props) => {
           <p className="mb-0 self-center text-base text-gray-400 dark:text-dark-400">
             &copy; Supabase Inc
           </p>
-          <DarkModeToggle darkMode={darkMode} updateTheme={updateTheme} />
+          {/* Render dark mode toggle only on the client since it depends on client-only data (localStorage) */}
+          {typeof window !== 'undefined' && (
+            <DarkModeToggle darkMode={darkMode} updateTheme={updateTheme} />
+          )}
         </div>
       </SectionContainer>
     </footer>
