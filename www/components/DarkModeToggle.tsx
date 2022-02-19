@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useEffect, useReducer } from 'react'
 
 interface Props {
   darkMode: boolean
@@ -51,8 +51,15 @@ function DarkModeToggle(props: Props) {
     updateTheme(!darkMode)
   }
 
+  // Force update because the SSR-ed markup might differ from the final output
+  // if the user is on light mode.
+  const [updateCounter, forceUpdate] = useReducer((x) => x + 1, 0)
+  useEffect(() => {
+    forceUpdate()
+  }, [])
+
   return (
-    <div className="flex items-center">
+    <div className="flex items-center" key={updateCounter}>
       <SunEmoji />
       <button
         type="button"
