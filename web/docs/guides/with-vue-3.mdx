@@ -553,7 +553,7 @@ export default {
     }
 
     watch(path, () => {
-      path.value ? downloadImage() : ""
+      if (path.value) downloadImage()
     })
 
     return {
