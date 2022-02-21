@@ -5,14 +5,15 @@ import { Project } from 'types'
 
 interface Props {
   project: Project
+  rewriteHref?: string
 }
 
-const ProjectCard: FC<Props> = ({ project }) => {
+const ProjectCard: FC<Props> = ({ project, rewriteHref }) => {
   const { name, ref: projectRef, status } = project
   const desc = `${project.cloud_provider} | ${project.region}`
   return (
     <li className="col-span-1 flex shadow-sm rounded-md">
-      <Link href={`/project/${projectRef}`}>
+      <Link href={rewriteHref ?? `/project/${projectRef}`}>
         <a className="w-full col-span-3 md:col-span-1">
           <div
             className="bg-panel-header-light dark:bg-panel-header-dark hover:bg-bg-alt-light 
