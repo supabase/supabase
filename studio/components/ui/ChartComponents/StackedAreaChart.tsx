@@ -1,5 +1,3 @@
-import { TooltipContent } from '@radix-ui/react-tooltip'
-import { NoData } from 'components/to-be-cleaned/Charts/ChartRenderer'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import {
@@ -12,6 +10,7 @@ import {
   CartesianGrid,
   AreaProps,
 } from 'recharts'
+import EmptyState from './EmptyState'
 
 type Datum = {
   [key: string]: any
@@ -43,7 +42,7 @@ const StackedAreaChart: React.FC<Props> = ({
   styleMap = {},
   xAxisFormatAsDate = false,
 }) => {
-  if (!isLoading && (data === undefined || data === null)) return <NoData />
+  if (!isLoading && (data === undefined || data === null)) return <EmptyState />
   const transformed = useMemo(() => {
     if (!data) return []
     const mapping = data.reduce((acc, datum) => {
