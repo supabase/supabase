@@ -7,19 +7,24 @@
 #    docker builder prune
 
 
-FROM node:14-slim as base
-WORKDIR /usr/src/app
+FROM node:14-slim as builder
+WORKDIR /app
 # Do `npm ci` separately so we can cache `node_modules`
 # https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
 COPY package*.json ./
 RUN npm clean-install && npm cache clean --force
 COPY . .
+RUN npm run build
 
-FROM base as dev
-EXPOSE 8082
-CMD ["npm", "run", "dev"]
+# This leverages Next.js output file tracing to reduce image size:
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+FROM node:14-slim as production
+WORKDIR /app
+COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
-FROM base as production
-RUN npm run build && rm -rf .next/cache/webpack && npm prune --production
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["node", "server.js"]

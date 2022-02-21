@@ -37,6 +37,13 @@ const nextConfig = {
   },
 }
 
+const standaloneNextConfig = {
+  experimental: {
+    outputStandalone: true,
+  },
+  ...nextConfig,
+}
+
 // Export all config
 const moduleExports = withPlugins([[withBundleAnalyzer({})]], nextConfig)
 
@@ -57,4 +64,4 @@ const sentryWebpackPluginOptions = {
 // ensure that your source maps include changes from all other Webpack plugins
 module.exports = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
   ? withSentryConfig(moduleExports, sentryWebpackPluginOptions)
-  : nextConfig
+  : standaloneNextConfig
