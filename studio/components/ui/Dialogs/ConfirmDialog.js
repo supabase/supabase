@@ -29,10 +29,55 @@ const ConfirmModal = ({
   }
 
   return (
-    <Modal visible={visible} title={title} description={description} size={size}>
-      <Form onSubmit={() => console.log('submitting confirm dialog')}>
-        <p>Hello</p>
-        <Button htmlType="submit">Confirm</Button>
+    <Modal
+      header={title}
+      visible={visible}
+      title={title}
+      description={description}
+      size={size}
+      hideFooter
+      onCancel={onSelectCancel}
+    >
+      <Form
+        initialValues={{}}
+        validateOnBlur
+        onSubmit={(values, { setSubmitting }) => {
+          onConfirm()
+        }}
+        validate={() => {
+          let errors = []
+          return errors
+        }}
+      >
+        {() => {
+          return (
+            <div className="py-4 space-y-4">
+              <Modal.Content>
+                <p className="text-sm text-scale-1100">{description}</p>
+              </Modal.Content>
+              <Modal.Seperator />
+              <Modal.Content>
+                <div className="flex items-center gap-2">
+                  <Button type="default" onClick={() => onSelectCancel} block>
+                    Cancel
+                  </Button>
+                  <Button
+                    htmlType="submit"
+                    block
+                    type={danger ? 'danger' : 'primary'}
+                    loading={loading}
+                  >
+                    {buttonLoadingLabel && loading
+                      ? buttonLoadingLabel
+                      : buttonLabel
+                      ? buttonLabel
+                      : 'Confirm'}
+                  </Button>
+                </div>
+              </Modal.Content>
+            </div>
+          )
+        }}
       </Form>
     </Modal>
   )
