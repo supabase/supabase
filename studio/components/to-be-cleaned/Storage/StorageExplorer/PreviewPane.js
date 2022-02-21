@@ -1,6 +1,5 @@
 import {
   Button,
-  Space,
   IconX,
   IconLoader,
   IconClipboard,
@@ -26,10 +25,8 @@ const PreviewFile = ({ mimeType, previewUrl }) => {
   }
   if (previewUrl === 'loading') {
     return (
-      <div className="w-full h-full flex items-center justify-center">
-        <Typography.Text>
-          <IconLoader size={16} strokeWidth={2} className="animate-spin" />
-        </Typography.Text>
+      <div className="w-full h-full flex items-center justify-center text-scale-900">
+        <IconLoader size={14} strokeWidth={2} className="animate-spin" />
       </div>
     )
   }
@@ -62,7 +59,9 @@ const PreviewFile = ({ mimeType, previewUrl }) => {
       <div className="w-full h-full flex items-center justify-center px-10">
         <audio key={previewUrl} controls style={{ width: 'inherit' }}>
           <source src={previewUrl} type="audio/mpeg" />
-          <Typography.Text>Your browser does not support the audio element.</Typography.Text>
+          <p className="text-scale-1100 text-sm">
+            Your browser does not support the audio element.
+          </p>
         </audio>
       </div>
     )
@@ -72,7 +71,7 @@ const PreviewFile = ({ mimeType, previewUrl }) => {
       <div className="w-full h-full flex items-center justify-center">
         <video key={previewUrl} controls style={{ maxHeight: '100%' }}>
           <source src={previewUrl} type="video/mp4" />
-          <Typography.Text>Your browser does not support the video tag.</Typography.Text>
+          <p className="text-scale-1100 text-sm">Your browser does not support the video tag.</p>
         </video>
       </div>
     )
@@ -119,15 +118,13 @@ const PreviewPane = ({
         style={{ width }}
       >
         {/* Preview Header */}
-        <div className="w-full flex justify-end">
-          <Typography.Text type="secondary">
-            <IconX
-              className="cursor-pointer"
-              size={16}
-              strokeWidth={2}
-              onClick={onClosePreviewPane}
-            />
-          </Typography.Text>
+        <div className="w-full flex justify-end text-scale-900 hover:text-scale-1200 transition-colors">
+          <IconX
+            className="cursor-pointer"
+            size={14}
+            strokeWidth={2}
+            onClick={onClosePreviewPane}
+          />
         </div>
 
         {/* Preview Thumbnail*/}
@@ -141,17 +138,13 @@ const PreviewPane = ({
           {/* Preview Information */}
           <div className="space-y-1">
             <div className="flex items-center">
-              <Typography.Text>
-                <p className="font-bold mr-2">{file.name}</p>
-              </Typography.Text>
+              <h5 className="text-scale-1200 text-base font-bold mr-2">{file.name}</h5>
             </div>
             {mimeType && (
-              <Typography.Text type="secondary">
-                <p className="text-sm">
-                  {mimeType}
-                  {size && <span> - {size}</span>}
-                </p>
-              </Typography.Text>
+              <p className="text-sm text-scale-1100">
+                {mimeType}
+                {size && <span> - {size}</span>}
+              </p>
             )}
           </div>
 
@@ -159,46 +152,39 @@ const PreviewPane = ({
           <div className="space-y-2">
             <div>
               <Typography.Text>
-                <Typography.Text type="secondary">
-                  <p className="text-sm mb-1">Added on</p>
-                </Typography.Text>
-                <p className="text-sm">{createdAt}</p>
+                <label className="text-xs text-scale-900 mb-1">Added on</label>
+                <p className="text-sm text-scale-1100">{createdAt}</p>
               </Typography.Text>
             </div>
             <div>
               <Typography.Text>
-                <Typography.Text type="secondary">
-                  <p className="text-sm mb-1">Last modified</p>
-                </Typography.Text>
-                <p className="text-sm">{updatedAt}</p>
+                <label className="text-xs text-scale-900 mb-1">Last modified</label>
+                <p className="text-sm text-scale-1100">{updatedAt}</p>
               </Typography.Text>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="space-x-2 border-b pb-4 border-panel-border-light dark:border-panel-border-dark">
-            <Space>
-              <Button
-                type="default"
-                icon={<IconDownload size={16} strokeWidth={2} />}
-                onClick={() => onDownloadFile(file)}
-              >
-                Download
-              </Button>
-              <Button
-                type="default"
-                icon={<IconClipboard size={16} strokeWidth={2} />}
-                onClick={() => onCopyFileURL(file)}
-              >
-                Copy URL
-              </Button>
-            </Space>
+          <div className="flex space-x-2 border-b pb-4 border-panel-border-light dark:border-panel-border-dark">
+            <Button
+              type="secondary"
+              icon={<IconDownload size={16} strokeWidth={2} />}
+              onClick={() => onDownloadFile(file)}
+            >
+              Download
+            </Button>
+            <Button
+              type="default"
+              icon={<IconClipboard size={16} strokeWidth={2} />}
+              onClick={() => onCopyFileURL(file)}
+            >
+              Copy URL
+            </Button>
           </div>
           <Button
-            type="text"
+            type="default"
             shadow={false}
             size="tiny"
-            danger
             icon={<IconTrash2 size={16} strokeWidth={2} />}
             onClick={() => onSelectFileDelete(file)}
           >
