@@ -12,6 +12,7 @@ interface Props {
   imgUrl?: string
   imgAlt?: string
   onClick?: () => void
+  icon?: React.ReactNode
 }
 
 const CardButton: FC<Props> = ({
@@ -24,6 +25,7 @@ const CardButton: FC<Props> = ({
   imgUrl,
   imgAlt,
   onClick,
+  icon,
 }) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (
     <Link href={linkHref}>{children}</Link>
@@ -54,10 +56,14 @@ const CardButton: FC<Props> = ({
     ]
   }
 
+  const ImageContainer = ({ children }: { children: React.ReactNode }) => {
+    return <div className="flex flex-col mr-4">{children}</div>
+  }
+
   const contents = (
     <div className={containerClasses.join(' ')}>
       {imgUrl && (
-        <div className="flex flex-col mr-4">
+        <ImageContainer>
           <img
             className="
               transition-all
@@ -67,11 +73,12 @@ const CardButton: FC<Props> = ({
             alt={`${imgAlt}`}
             width="26"
           />
-        </div>
+        </ImageContainer>
       )}
+      {icon && <ImageContainer>{icon}</ImageContainer>}
       <div className="flex flex-col space-y-2 w-full h-full">
         <h5 className="text-scale-1200">{title}</h5>
-        <div className="flex flex-1 w-full">
+        <div className="flex flex-col flex-1 w-full">
           <p className="text-scale-1100 text-sm">{description}</p>
           <div className="w-full">{children && children}</div>
         </div>
