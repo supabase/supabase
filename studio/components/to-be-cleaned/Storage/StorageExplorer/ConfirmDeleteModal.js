@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Modal, Button, Space } from '@supabase/ui'
+import { Modal, Button, Space, Alert } from '@supabase/ui'
 
 const ConfirmDeleteModal = ({
   visible = false,
@@ -35,20 +35,28 @@ const ConfirmDeleteModal = ({
   return (
     <Modal
       visible={visible}
-      title={title}
-      description={`${description} This action cannot be undone.`}
+      header={title}
       size="small"
+      onCancel={onSelectCancel}
       customFooter={
-        <Space>
-          <Button type="secondary" onClick={onSelectCancel}>
+        <div className="flex items-center gap-2">
+          <Button type="default" onClick={onSelectCancel}>
             Cancel
           </Button>
           <Button type="primary" danger loading={deleting} onClick={onConfirmDelete}>
             {deleting ? 'Deleting' : 'Delete'}
           </Button>
-        </Space>
+        </div>
       }
-    />
+    >
+      <Modal.Content>
+        <div className="my-4">
+          <Alert withIcon variant="danger" title={`This action cannot be undone.`}>
+            {description}
+          </Alert>
+        </div>
+      </Modal.Content>
+    </Modal>
   )
 }
 

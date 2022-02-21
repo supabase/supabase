@@ -69,7 +69,9 @@ const StorageMenu: FC<Props> = () => {
               <>
                 {buckets.length === 0 && (
                   <div className="px-2">
-                    <Alert title="No buckets available">There are no tables in this schema</Alert>
+                    <Alert title="No buckets available">
+                      Buckets that you create will appear here
+                    </Alert>
                   </div>
                 )}
                 {buckets.map((bucket: any, idx: number) => {
@@ -92,18 +94,17 @@ const StorageMenu: FC<Props> = () => {
 
         <div className="">
           <Menu.Group title="Settings" />
-          <div className="dash-product-menu space-y-1">
-            <Link href={`/project/${projectRef}/storage/policies`}>
-              <Menu.Item rounded active={page === 'policies'}>
-                <Typography.Text className="truncate">Policies</Typography.Text>
-              </Menu.Item>
-            </Link>
-            <Link href={`/project/${projectRef}/storage/usage`}>
-              <Menu.Item rounded active={page === 'usage'}>
-                <Typography.Text className="truncate">Usage</Typography.Text>
-              </Menu.Item>
-            </Link>
-          </div>
+
+          <Link href={`/project/${projectRef}/storage/policies`}>
+            <Menu.Item rounded active={page === 'policies'}>
+              <Typography.Text className="truncate">Policies</Typography.Text>
+            </Menu.Item>
+          </Link>
+          <Link href={`/project/${projectRef}/storage/usage`}>
+            <Menu.Item rounded active={page === 'usage'}>
+              <Typography.Text className="truncate">Usage</Typography.Text>
+            </Menu.Item>
+          </Link>
         </div>
       </div>
     </Menu>
