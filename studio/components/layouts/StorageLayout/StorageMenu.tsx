@@ -12,10 +12,13 @@ import {
   IconPlus,
   IconLoader,
   IconMoreVertical,
+  Alert,
+  IconEdit,
 } from '@supabase/ui'
 
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { Group } from '@supabase/ui/dist/cjs/components/Menu/Menu'
 
 interface Props {}
 
@@ -37,75 +40,70 @@ const StorageMenu: FC<Props> = () => {
   } = storageExplorerStore || {}
 
   return (
-    <Menu type="pills" className="my-6 flex flex-col flex-grow space-y-6">
-      <div className="mx-6">
+    <Menu type="pills" className="my-6 flex flex-col flex-grow px-5">
+      <div className="px-2 mb-6">
         <Button
           block
           type="default"
-          icon={<IconPlus />}
+          icon={
+            <div className="text-scale-900">
+              <IconEdit size={14} />
+            </div>
+          }
           style={{ justifyContent: 'start' }}
           onClick={openCreateBucketModal}
         >
           New bucket
         </Button>
       </div>
-      <div className="mx-4 my-4 space-y-2">
-        <div className="mx-4 w-full flex">
-          <Typography.Text type="secondary" small>
-            All buckets
-          </Typography.Text>
+      <div className="space-y-6">
+        <div className="">
+          <div>
+            <Menu.Group title="All buckets" />
+            {!loaded ? (
+              <div className="py-2 px-4 flex items-center space-x-2">
+                <IconLoader className="animate-spin" size={12} strokeWidth={2} />
+                <Typography.Text type="secondary">Loading buckets</Typography.Text>
+              </div>
+            ) : (
+              <>
+                {buckets.length === 0 && (
+                  <div className="px-2">
+                    <Alert title="No buckets available">There are no tables in this schema</Alert>
+                  </div>
+                )}
+                {buckets.map((bucket: any, idx: number) => {
+                  const isSelected = bucketId === bucket.id
+                  return (
+                    <BucketRow
+                      key={`${idx}_${bucket.id}`}
+                      bucket={bucket}
+                      projectRef={ref}
+                      isSelected={isSelected}
+                      onSelectDeleteBucket={openDeleteBucketModal}
+                      onSelectToggleBucketPublic={openToggleBucketPublicModal}
+                    />
+                  )
+                })}
+              </>
+            )}
+          </div>
         </div>
-        <div className="space-y-1">
-          {!loaded ? (
-            <div className="py-2 px-4 flex items-center space-x-2">
-              <IconLoader className="animate-spin" size={12} strokeWidth={2} />
-              <Typography.Text type="secondary">Loading buckets</Typography.Text>
-            </div>
-          ) : (
-            <>
-              {buckets.length === 0 && (
-                <div className="py-2 px-4 flex items-center">
-                  <Typography.Text type="secondary">No buckets available</Typography.Text>
-                </div>
-              )}
-              {buckets.map((bucket: any, idx: number) => {
-                const isSelected = bucketId === bucket.id
-                return (
-                  <BucketRow
-                    key={`${idx}_${bucket.id}`}
-                    bucket={bucket}
-                    projectRef={ref}
-                    isSelected={isSelected}
-                    onSelectDeleteBucket={openDeleteBucketModal}
-                    onSelectToggleBucketPublic={openToggleBucketPublicModal}
-                  />
-                )
-              })}
-            </>
-          )}
-        </div>
-      </div>
-      <div className="flex flex-col space-y-2">
-        <div className="mx-4 space-y-1">
-          <Typography.Text type="secondary" small>
-            Settings
-          </Typography.Text>
-        </div>
-        <div className="dash-product-menu space-y-1">
-          <Link href={`/project/${projectRef}/storage/policies`}>
-            <a className="block">
+
+        <div className="">
+          <Menu.Group title="Settings" />
+          <div className="dash-product-menu space-y-1">
+            <Link href={`/project/${projectRef}/storage/policies`}>
               <Menu.Item rounded active={page === 'policies'}>
                 <Typography.Text className="truncate">Policies</Typography.Text>
               </Menu.Item>
-            </a>
-          </Link>
-          <Link href={`/project/${projectRef}/storage/usage`}>
-            <a className="block">
+            </Link>
+            <Link href={`/project/${projectRef}/storage/usage`}>
               <Menu.Item rounded active={page === 'usage'}>
                 <Typography.Text className="truncate">Usage</Typography.Text>
               </Menu.Item>
-            </a>
-          </Link>
+            </Link>
+          </div>
         </div>
       </div>
     </Menu>
