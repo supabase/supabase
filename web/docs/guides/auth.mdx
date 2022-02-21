@@ -128,7 +128,7 @@ let { data, error } = await supabase
 ... you can simply define a rule on your database table, `auth.uid() = user_id`, and your request will return the rows which pass the rule, even when you remove the filter from your middleware:
 
 ```js
-let user = await supabase.from('users').select('user_id, name')
+let { data, error } = await supabase.from('users').select('user_id, name')
 
 // console.log(data)
 // Still => { id: 'd0714948', name: 'Jane' }
