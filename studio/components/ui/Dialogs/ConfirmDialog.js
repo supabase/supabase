@@ -41,7 +41,7 @@ const ConfirmModal = ({
       <Form
         initialValues={{}}
         validateOnBlur
-        onSubmit={(values, { setSubmitting }) => {
+        onSubmit={() => {
           onConfirm()
         }}
         validate={() => {
