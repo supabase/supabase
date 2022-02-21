@@ -16,7 +16,7 @@
     "@radix-ui/react-portal": "^0.1.1",
     "@radix-ui/react-tooltip": "^0.1.6",
     "@sentry/browser": "^6.15.0",
-    "@sentry/nextjs": "^6.15.0",
+    "@sentry/nextjs": "^6.17.9",
     "@supabase/grid": "^2.4.3",
     "@supabase/postgres-meta": "^0.26.1",
     "@supabase/react-data-grid": "^7.1.0-beta.7",
