@@ -14,7 +14,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm clean-install && npm cache clean --force
 COPY . .
-RUN npm run build
+RUN NEXT_STANDALONE=true npm run build
 
 # This leverages Next.js output file tracing to reduce image size:
 # https://nextjs.org/docs/advanced-features/output-file-tracing
