@@ -10,7 +10,6 @@ import {
   Tooltip,
   Cell,
   ResponsiveContainer,
-  TooltipProps,
 } from 'recharts'
 
 import dayjs from 'dayjs'
@@ -18,7 +17,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { formatBytes } from 'lib/helpers'
-import { TooltipType } from 'recharts/types/util/types'
+import { CHART_COLORS } from 'components/ui/ChartComponents/Charts.constants'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(timezone)
@@ -45,7 +44,7 @@ const Header = ({
   customDateFormat,
   label,
   minimalHeader = false,
-  displayDateInUtc= false
+  displayDateInUtc = false,
 }: any) => {
   let FOCUS_FORMAT = customDateFormat
     ? customDateFormat
@@ -88,7 +87,6 @@ const Header = ({
   }
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
 
-
   const chartTitle = (
     <Typography.Text small={minimalHeader ? true : false} className="mb-0" type="secondary">
       {label ?? attribute}
@@ -109,8 +107,6 @@ const Header = ({
       )}
     </Typography.Text>
   )
-
-
 
   if (minimalHeader) {
     return (
@@ -133,7 +129,7 @@ const Header = ({
   )
 }
 
-export const NoData = () => (
+const NoData = () => (
   <div
     className="
       h-full w-full
@@ -147,21 +143,6 @@ export const NoData = () => (
     <Typography.Text>No data to show</Typography.Text>
   </div>
 )
-
-const total = (data: any, format: any, attribute: any) => {
-  let total = 0
-  data?.map((item: any) => {
-    total = total + Number(item[attribute])
-  })
-  if (format === '%') {
-    return Number(total).toFixed(2)
-  }
-  return numberWithCommas(total)
-}
-
-function numberWithCommas(x: any) {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-}
 
 export function BarChart({
   data,
@@ -239,9 +220,9 @@ export function BarChart({
                     interval={data ? data.length - 2 : 0}
                     angle={0}
                     // stroke="#4B5563"
-                    tick={{ fontSize: '0px', color: '#6B7280' }}
-                    axisLine={{ stroke: '#444444' }}
-                    tickLine={{ stroke: '#444444' }}
+                    tick={{ fontSize: '0px', color: CHART_COLORS.TICK }}
+                    axisLine={{ stroke: CHART_COLORS.AXIS }}
+                    tickLine={{ stroke: CHART_COLORS.AXIS }}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   {/* <YAxis dataKey={attribute} /> */}
@@ -249,7 +230,7 @@ export function BarChart({
                   {yAxisLimit && <YAxis type="number" domain={[0, yAxisLimit]} hide />}
                   <Bar
                     dataKey={attribute}
-                    fill="#3ecf8e"
+                    fill={CHART_COLORS.GREEN_1}
                     // barSize={2}
                     animationDuration={300}
                   >
@@ -260,7 +241,9 @@ export function BarChart({
                           onBarClick ? 'cursor-pointer' : ''
                         }`}
                         fill={
-                          focusBar === index || mouseLeave ? '#3ecf8e' : 'rgba(62, 207, 142, 0.2)'
+                          focusBar === index || mouseLeave
+                            ? CHART_COLORS.GREEN_1
+                            : CHART_COLORS.GREEN_2
                         }
                         enableBackground={12}
                         // for this, we make the hovered colour #2B5CE7, else its opacity decreases to 20%
@@ -356,8 +339,8 @@ export function AreaChart({
               >
                 <defs>
                   <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3ecf8e" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#3ecf8e" stopOpacity={0} />
+                    <stop offset="5%" stopColor={CHART_COLORS.GREEN_1} stopOpacity={0.8} />
+                    <stop offset="95%" stopColor={CHART_COLORS.GREEN_1} stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis
@@ -368,13 +351,13 @@ export function AreaChart({
                   // stroke="#4B5563"
                   tick={{
                     fontSize: '0px',
-                    color: '#6B7280',
+                    color: CHART_COLORS.TICK,
                   }}
                   axisLine={{
-                    stroke: '#444444',
+                    stroke: CHART_COLORS.AXIS,
                   }}
                   tickLine={{
-                    stroke: '#444444',
+                    stroke: CHART_COLORS.AXIS,
                   }}
                 />
                 {yAxisLimit && <YAxis type="number" domain={[0, yAxisLimit]} hide />}
@@ -382,7 +365,7 @@ export function AreaChart({
                 <Area
                   type="monotone"
                   dataKey={attribute}
-                  stroke="#3ecf8e"
+                  stroke={CHART_COLORS.GREEN_1}
                   fillOpacity={1}
                   fill="url(#colorUv)"
                 />
