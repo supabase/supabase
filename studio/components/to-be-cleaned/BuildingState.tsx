@@ -2,7 +2,7 @@ import * as React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Badge, Typography, IconArrowRight, IconLoader, Button } from '@supabase/ui'
+import { Badge, IconArrowRight, IconLoader, Button } from '@supabase/ui'
 import {
   DisplayApiSettings,
   DisplayConfigSettings,
@@ -14,8 +14,6 @@ import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/H
 import { API_URL } from 'lib/constants'
 import { useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
-
-const { Text, Title } = Typography
 
 type ProjectBuildingState = {} & any
 const ProjectBuildingState: React.FC<ProjectBuildingState> = () => {
