@@ -3,15 +3,11 @@ import FooterLinks from 'data/Footer.json'
 import SectionContainer from '../Layouts/SectionContainer'
 import DarkModeToggle from '../DarkModeToggle'
 import Link from 'next/link'
+import { useTheme } from '../Providers'
 
-type Props = {
-  darkMode: boolean
-  updateTheme: Function
-}
-
-const Footer = (props: Props) => {
+const Footer = () => {
   const { basePath } = useRouter()
-  const { darkMode, updateTheme } = props
+  const { isDarkMode } = useTheme()
 
   return (
     <footer
@@ -29,7 +25,7 @@ const Footer = (props: Props) => {
                 <img
                   className="w-40"
                   src={
-                    darkMode
+                    isDarkMode
                       ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
                       : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
                   }
@@ -120,7 +116,7 @@ const Footer = (props: Props) => {
           <p className="mb-0 self-center text-base text-gray-400 dark:text-dark-400">
             &copy; Supabase Inc
           </p>
-          <DarkModeToggle darkMode={darkMode} updateTheme={updateTheme} />
+          <DarkModeToggle />
         </div>
       </SectionContainer>
     </footer>

@@ -6,13 +6,11 @@ import { Button, Typography } from '@supabase/ui'
 
 import DefaultLayout from '../components/Layouts/Default'
 
-type Props = {
-  darkMode: boolean
-}
+import { useTheme } from '~/components/Providers'
 
-const Error404 = (props: Props) => {
+const Error404 = () => {
   const [show404, setShow404] = useState<boolean>(false)
-  const { darkMode } = props
+  const { isDarkMode } = useTheme()
 
   useEffect(() => {
     setTimeout(() => {
@@ -30,9 +28,9 @@ const Error404 = (props: Props) => {
                 <a href="/">
                   <Image
                     src={
-                      darkMode
-                        ? '/images/supabase-logo-wordmark--light.svg'
-                        : '/images/supabase-logo-wordmark--dark.svg'
+                      isDarkMode
+                        ? '/images/supabase-logo-wordmark--dark.svg'
+                        : '/images/supabase-logo-wordmark--light.svg'
                     }
                     alt=""
                     height={24}
