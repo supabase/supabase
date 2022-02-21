@@ -22,8 +22,8 @@ import { useFlag } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
 import Table from 'components/to-be-cleaned/Table'
-import StackedAreaChart from 'components/ui/ChartComponents/StackedAreaChart'
-import { USAGE_COLORS } from 'components/ui/ChartComponents/Charts.constants'
+import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'
+import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
 import { EndpointResponse, PathsDatum, StatusCodesDatum } from './ChartData.types'
 
 const CHART_INTERVALS = [

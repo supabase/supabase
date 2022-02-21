@@ -17,7 +17,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { formatBytes } from 'lib/helpers'
-import { CHART_COLORS } from 'components/ui/ChartComponents/Charts.constants'
+import { CHART_COLORS } from 'components/ui/Charts/Charts.constants'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(timezone)
