@@ -34,7 +34,7 @@ const OpenQueryItem = observer(({ tabInfo }: { tabInfo: any }) => {
 
   return (
     <Menu.Item rounded key={id} active={active} onClick={() => sqlEditorStore.selectTab(id)}>
-      <div className="flex">
+      <div className="flex items-center justify-between">
         <Typography.Text className="flex-grow truncate flex items-center">{name}</Typography.Text>
         {active && <DropdownMenu tabInfo={tabInfo} />}
       </div>
@@ -90,7 +90,12 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: any }) => {
     <div>
       {IS_PLATFORM ? (
         <Dropdown side="bottom" align="end" overlay={renderMenu()}>
-          <Button as="span" type="text" icon={<IconChevronDown />} style={{ padding: '3px' }} />
+          <Button
+            as="span"
+            type="text"
+            icon={<IconChevronDown size={12} />}
+            style={{ padding: '3px' }}
+          />
         </Dropdown>
       ) : (
         <Button as="span" type="text" style={{ padding: '3px' }} />
