@@ -12,7 +12,7 @@ async function handleRequest(request) {
       fetch: fetch.bind(globalThis), // Tell Supabase Client to use Cloudflare Workers' global `fetch` API to make requests
     }
   )
-  const { data, error } = await db.from('links').select('*')
+  const { data, error } = await db.from('YOUR_TABLE_NAME').select('*')
 
   if (error) {
     console.log(error)
