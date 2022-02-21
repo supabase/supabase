@@ -42,7 +42,6 @@ function MyApp({ Component, pageProps }: AppProps) {
         <Head>
           <title>Supabase</title>
           <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-          <link rel="stylesheet" type="text/css" href="/css/fonts.css" />
         </Head>
         <GoTrueWrapper>
           <PageTelemetry>
