@@ -1,10 +1,9 @@
 # Supabase with Cloudflare Workers
 
-Cloudflare Workers does not support `XMLHttpRequest` object and only support native `fetch`. This means this `supabase-js` client does not work on Cloudflare Workers. Supabase JS Client internally uses `cross-fetch` package to polyfill `fetch` which relies on `XMLHttpRequest`.
+`supabase-js` uses the `cross-fetch` library to make HTTP requests, but that does not work pn Cloudflare Workers.
+We're asking Supabase Client to use Cloudflare Workers' in-built `fetch` method to make HTTP requests using the `fetch` option
 
-To resolve this, we can use `patch-package` to patch `cross-fetch` package as minimal as possible.
-
-This repo contains minimal Cloudflare Workers project with the patch automatically applied.
+Source: https://supabase.com/docs/reference/javascript/initializing#custom-fetch-implementation
 
 ### Credits
 
