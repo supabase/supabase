@@ -260,7 +260,7 @@ const SidePanelEditor: FC<Props> = ({
       />
       <ConfirmationModal
         visible={isClosingPanel}
-        title="Confirm to close"
+        header="Confirm to close"
         buttonLabel="Confirm"
         onSelectCancel={() => setIsClosingPanel(false)}
         onSelectConfirm={() => {
