@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography } from '@supabase/ui'
+import { Typography, Modal } from '@supabase/ui'
 import { find, get, isEmpty, filter } from 'lodash'
 
 import { useStore } from 'hooks'
@@ -8,7 +8,7 @@ import { formatPoliciesForStorage } from '../Storage.utils'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 import StoragePoliciesBucketRow from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
-import ConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
 import PolicyEditorModal from 'components/to-be-cleaned/Auth/PolicyEditorModal'
@@ -222,14 +222,20 @@ const StoragePolicies = () => {
         onSaveSuccess={onSavePolicySuccess}
       />
 
-      <ConfirmModal
+      <ConfirmationModal
         danger
         visible={!isEmpty(selectedPolicyToDelete)}
         title="Confirm to delete policy"
-        description={`This is permanent! Are you sure you want to delete the policy "${selectedPolicyToDelete.name}"`}
+        children={
+          <Modal.Content>
+            <p className="py-4 text-sm text-scale-1100">
+              This is permanent! Are you sure you want to delete the policy "
+              {selectedPolicyToDelete.name}"
+            </p>
+          </Modal.Content>
+        }
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"
-        selectedPolicyToDelete={selectedPolicyToDelete}
         onSelectCancel={onCancelPolicyDelete}
         onSelectConfirm={onDeletePolicy}
       />
