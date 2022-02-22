@@ -12,7 +12,7 @@ import { useStore, withAuth } from 'hooks'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { Modal, SidePanel } from '@supabase/ui'
+import { Modal } from '@supabase/ui'
 
 const TableEditorPage: NextPage = () => {
   const router = useRouter()
