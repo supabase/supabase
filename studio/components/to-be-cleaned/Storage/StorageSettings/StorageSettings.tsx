@@ -7,6 +7,7 @@ import { API_URL, STORAGE_FILE_SIZE_LIMIT_MAX } from 'lib/constants'
 import { patch, get } from 'lib/common/fetch'
 import { useStore } from 'hooks'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 
 const StorageSettings: FC<any> = ({ projectRef }) => {
   const { data, error } = useSWR(`${API_URL}/projects/${projectRef}/config?app=storage`, get)
@@ -81,6 +82,13 @@ const StorageConfig = ({ config, projectRef }: any) => {
             STORAGE_FILE_SIZE_LIMIT_MAX
           )} bytes.`}
         />
+        {isFreeTier && (
+          <UpgradeToPro
+            primaryText="Free Plan has an upload file size limit of 50 MB."
+            projectRef={projectRef}
+            secondaryText="Please upgrade to Pro plan for an upload file size limit of up to 5 GB."
+          />
+        )}
       </SchemaFormPanel>
     </div>
   )
