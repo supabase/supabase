@@ -266,7 +266,7 @@ export const LogPage: NextPage = () => {
             <div className="flex flex-row justify-end items-center px-2 py-1 w-full">
               {isSelectQuery && (
                 <InformationBox
-                className="shrink mr-auto"
+                  className="shrink mr-auto"
                   block={false}
                   size="tiny"
                   icon={<IconInfo size="tiny" />}
