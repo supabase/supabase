@@ -33,7 +33,6 @@ import {
 import { uuidv4 } from 'lib/helpers'
 import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite'
 import { isUndefined } from 'lodash'
-import { useFlag } from 'hooks'
 import dayjs from 'dayjs'
 import InformationBox from 'components/ui/InformationBox'
 
@@ -49,7 +48,6 @@ import InformationBox from 'components/ui/InformationBox'
  * - `te` for timestamp start value.
  */
 export const LogPage: NextPage = () => {
-  const logsQueryParamsSyncing = useFlag('logsQueryParamsSyncing')
   const router = useRouter()
   const { ref, type, q, s, te } = router.query
   const [editorId, setEditorId] = useState<string>(uuidv4())
@@ -75,7 +73,6 @@ export const LogPage: NextPage = () => {
   }, [type])
 
   useEffect(() => {
-    if (!logsQueryParamsSyncing) return
     // on mount, set initial values
     if (q) {
       onSelectTemplate({
@@ -93,7 +90,7 @@ export const LogPage: NextPage = () => {
     } else {
       setParams((prev) => ({ ...prev, timestamp_end: '' }))
     }
-  }, [logsQueryParamsSyncing])
+  }, [])
 
   const genQueryParams = (params: { [k: string]: string }) => {
     // remove keys which are empty strings, null, or undefined
@@ -202,7 +199,6 @@ export const LogPage: NextPage = () => {
       sql: isSelectQuery ? cleanEditorValue(editorValue) : '',
       search_query: '',
     }))
-    if (!logsQueryParamsSyncing) return
     router.push({
       pathname: router.pathname,
       query: {
@@ -222,7 +218,6 @@ export const LogPage: NextPage = () => {
       where: '',
       sql: '',
     }))
-    if (!logsQueryParamsSyncing) return
     router.push({
       pathname: router.pathname,
       query: {
