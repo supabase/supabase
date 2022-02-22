@@ -19,11 +19,20 @@ You will need to have these in your environment:
 - Docker (make sure the daemon is up and running)
 - Supabase CLI (instructions [here](https://github.com/supabase/cli))
 
-### Initialize git
+### Create project folder and initialize git
 
 ```bash
+# create your project folder
+mkdir your-project
+
+# move into the new folder
+cd your-project
+
+# start a new git repository
 git init
 ```
+
+This command will create an empty folder for your project and start a new git repository.
 
 ### Initialize your project
 
@@ -33,7 +42,7 @@ supabase init
 
 This command will create a `supabase` folder which holds all the configuration for developing your project locally.
 
-### Start
+### Start Supabase
 
 ```bash
 supabase start
@@ -52,6 +61,8 @@ Started local development setup.
         anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJ9.ZopqoUt20nEV9cklpv9e3yw3PVyZLmKs5qLD6nGL1SI
 service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIn0.M2d2z4SFn5C7HlJlaSLfrzuYim9nbY_XI40uWFN3hEE
 ```
+
+Now you can open a browser and visit the Studio at [http://localhost:54323](http://localhost:54323).
 
 ### Accessing Services Directly
 
@@ -103,7 +114,16 @@ http://localhost:54321/auth/v1/           # Auth (GoTrue)
 </TabItem>
 </Tabs>
 
-### Example application
+### Stop Supabase
+
+```bash
+supabase stop
+```
+
+Stop Supabase services and let's build a real application next.
+
+
+## An example application
 
 Now that we've learned how to install and start Supabase locally, let's see how you can use it with a frontend application.
 This quick-start guide will show you, how you can configure a React app which uses the Supabase stack.
@@ -128,7 +148,7 @@ Now that your application is prepared, start the backend:
 supabase start  # Start Supabase
 ```
 
-You can use Supabase anywhere in your application. Copy this snippet into `App.js`:
+You can use Supabase anywhere in your application. Copy this snippet into `src/App.js`:
 
 ```js
 import { createClient } from '@supabase/supabase-js'
@@ -145,11 +165,15 @@ Then start the frontend in a separate terminal:
 npm start       # Start the React app
 ```
 
-If everything is working, you should have a React app running on `http://localhost:3000` and Supabase services running on `http://localhost:54321`
+If everything is working, you should have a React app running on `http://localhost:3000` and Supabase services running on `http://localhost:54321`.
 
-### Stop
+When you're finished with Supabase, send <kbd>Ctrl-C</kbd> to stop the application and run
 
-When you're finished with Supabase, send <kbd>Ctrl-C</kbd> to stop the Docker services.
+```bash
+supabase stop   # Stop Supabase
+```
+
+to stop Supabase services.
 
 ## Migrations
 
