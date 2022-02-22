@@ -33,6 +33,7 @@ const StorageSettings: FC<any> = ({ projectRef }) => {
 const StorageConfig = ({ config, projectRef }: any) => {
   const { ui } = useStore()
 
+  const { isFreeTier } = config
   const [updates, setUpdates] = useState(config)
 
   const updateConfig = async (updatedConfig: any) => {
@@ -72,7 +73,14 @@ const StorageConfig = ({ config, projectRef }: any) => {
         onSubmit={(model: any) => updateConfig(model)}
         onReset={() => setUpdates(config)}
       >
-        <AutoField name="fileSizeLimit" showInlineError errorMessage="Must be a number." />
+        <AutoField
+          disabled={isFreeTier}
+          name="fileSizeLimit"
+          showInlineError
+          errorMessage={`Must be a number up to ${new Intl.NumberFormat('en-US').format(
+            STORAGE_FILE_SIZE_LIMIT_MAX
+          )} bytes.`}
+        />
       </SchemaFormPanel>
     </div>
   )
