@@ -14,7 +14,10 @@ services:
     ports:
       - ${STUDIO_PORT}:3000/tcp
     environment:
+      # For backend access to Supabase API gateway, linked through Docker's network.
       SUPABASE_URL: ${KONG_URL}
+      # For access to Supabase API gateway outside of Docker's network.
+      EXTERNAL_SUPABASE_URL: http://localhost:${KONG_HTTP_PORT}
       STUDIO_PG_META_URL: ${META_URL}
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}

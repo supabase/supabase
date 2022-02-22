@@ -38,7 +38,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
           app: { id: 1, name: 'Auto API' },
           app_config: {
             db_schema: 'public',
-            endpoint: process.env.SUPABASE_URL,
+            endpoint: process.env.SUPABASE_URL || 'http://localhost:8000',
             realtime_enabled: true,
           },
           endpoint: process.env.SUPABASE_URL || 'http://localhost:8000',
@@ -68,11 +68,11 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       app: { id: 1, name: 'Auto API' },
       app_config: {
         db_schema: 'public',
-        endpoint: process.env.SUPABASE_URL,
+        endpoint: process.env.EXTERNAL_SUPABASE_URL || 'http://localhost:8000',
         realtime_enabled: true,
       },
-      endpoint: process.env.SUPABASE_URL,
-      restUrl: `${process.env.SUPABASE_URL}/rest/v1/`,
+      endpoint: process.env.EXTERNAL_SUPABASE_URL || 'http://localhost:8000',
+      restUrl: process.env.SUPABASE_REST_URL || 'http://localhost:8000/rest/v1/',
       defaultApiKey: process.env.SUPABASE_ANON_KEY,
       serviceApiKey: process.env.SUPABASE_SERVICE_KEY,
       internalApiKey: process.env.SUPABASE_ANON_KEY,
