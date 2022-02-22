@@ -32,7 +32,6 @@ interface Props {
 }
 
 const ProjectUsage: FC<Props> = ({ project }) => {
-  const logsTimestampFilter = useFlag('logsTimestampFilter')
   const logsUsageChartIntervals = useFlag('logsUsageChartIntervals')
   const [interval, setInterval] = useState<string>('hourly')
   const router = useRouter()
@@ -55,7 +54,6 @@ const ProjectUsage: FC<Props> = ({ project }) => {
   const charts = data?.data
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
   const handleBarClick = (v: any, search: string) => {
-    if (!logsTimestampFilter) return
     if (!v || !v.activePayload?.[0]?.payload) return
     // returns rechart internal tooltip data type
     const payload = v.activePayload[0].payload
@@ -115,7 +113,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
-                  onBarClick={(v)=> handleBarClick(v, "/rest")}
+                  onBarClick={(v) => handleBarClick(v, '/rest')}
                 />
                 <ProjectUsageMinimal
                   projectRef={project.ref}
@@ -142,7 +140,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
-                  onBarClick={(v)=> handleBarClick(v, "/auth")}
+                  onBarClick={(v) => handleBarClick(v, '/auth')}
                 />
                 <ProjectUsageMinimal
                   projectRef={project.ref}
@@ -169,7 +167,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
-                  onBarClick={(v)=> handleBarClick(v, "/storage")}
+                  onBarClick={(v) => handleBarClick(v, '/storage')}
                 />
                 <ProjectUsageMinimal
                   projectRef={project.ref}
@@ -192,7 +190,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   customDateFormat={datetimeFormat}
                   data={charts}
                   isLoading={!charts && !error ? true : false}
-                  onBarClick={(v)=> handleBarClick(v, "/realtime")}
+                  onBarClick={(v) => handleBarClick(v, '/realtime')}
                 />
                 {/* Empty space just so the cards are of the same height */}
                 <div className="py-[26px]" />
