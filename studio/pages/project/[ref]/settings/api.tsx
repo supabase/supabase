@@ -1,5 +1,14 @@
 import useSWR from 'swr'
-import { FC, createContext, useContext, useEffect, useRef, useState } from 'react'
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { indexOf } from 'lodash'
 import { useRouter } from 'next/router'
 import { AutoField } from 'uniforms-bootstrap4'
@@ -106,7 +115,8 @@ const ServiceList: FC<any> = ({ projectRef }) => {
   const [customToken, setCustomToken] = useState<string>('')
   const [isRegeneratingKey, setIsGeneratingKey] = useState<boolean>(false)
   const [isCreatingKey, setIsCreatingKey] = useState<boolean>(false)
-  const [isLoadingCreatingKey, setIsLoadingCreatingKey] = useState<boolean>(false)
+  const [isSubmittingJwtSecretUpdateRequest, setIsSubmittingJwtSecretUpdateRequest] =
+    useState<boolean>(false)
 
   const {
     data,
@@ -182,40 +192,29 @@ const ServiceList: FC<any> = ({ projectRef }) => {
   const apiService = services.find((x: any) => x.app.id == API_SERVICE_ID)
   const apiConfig = apiService?.app_config
 
-  const updateString =
-    'Successfully submitted JWT secret update request. Please wait while your project is updated.'
-  async function handleGenerateNewJwtToken() {
+  async function handleJwtSecretUpdate(
+    jwt_secret: string,
+    setModalVisibility: Dispatch<SetStateAction<boolean>>
+  ) {
+    setIsSubmittingJwtSecretUpdateRequest(true)
     try {
       const trackingId = uuidv4()
       const res = await patch(`${API_URL}/projects/${ref}/config?app=secrets`, {
-        jwt_secret: 'ROLL',
+        jwt_secret,
         change_tracking_id: trackingId,
       })
       if (res.error) throw res.error
-      setIsGeneratingKey(false)
+      setModalVisibility(false)
       mutateJwtSecretUpdateStatus()
-      ui.setNotification({ category: 'info', message: updateString })
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: error.message })
-    }
-  }
-
-  async function handleCustomNewJwtToken() {
-    setIsLoadingCreatingKey(true)
-    try {
-      const trackingId = uuidv4()
-      const res = await patch(`${API_URL}/projects/${ref}/config?app=secrets`, {
-        jwt_secret: customToken,
-        change_tracking_id: trackingId,
+      ui.setNotification({
+        category: 'info',
+        message:
+          'Successfully submitted JWT secret update request. Please wait while your project is updated.',
       })
-      if (res.error) throw res.error
-      setIsCreatingKey(false)
-      mutateJwtSecretUpdateStatus()
-      ui.setNotification({ category: 'info', message: updateString })
     } catch (error: any) {
       ui.setNotification({ category: 'error', message: error.message })
     } finally {
-      setIsLoadingCreatingKey(false)
+      setIsSubmittingJwtSecretUpdateRequest(false)
     }
   }
 
@@ -363,7 +362,13 @@ const ServiceList: FC<any> = ({ projectRef }) => {
             will be invalidated, and any open connections will be terminated.
           </p>
         </Typography.Text>
-        <Button onClick={handleGenerateNewJwtToken} size="small" block danger>
+        <Button
+          onClick={() => handleJwtSecretUpdate('ROLL', setIsGeneratingKey)}
+          size="small"
+          block
+          danger
+          loading={isSubmittingJwtSecretUpdateRequest}
+        >
           Generate new secret
         </Button>
       </Modal>
@@ -376,9 +381,9 @@ const ServiceList: FC<any> = ({ projectRef }) => {
         confirmText="Apply new JWT secret"
         variant="danger"
         alignFooter="right"
-        loading={isLoadingCreatingKey}
+        loading={isSubmittingJwtSecretUpdateRequest}
         onCancel={() => setIsCreatingKey(false)}
-        onConfirm={handleCustomNewJwtToken}
+        onConfirm={() => handleJwtSecretUpdate(customToken, setIsCreatingKey)}
       >
         <Typography.Text type="secondary">
           Create a custom JWT secret. Make sure it is a strong combination of characters that cannot
