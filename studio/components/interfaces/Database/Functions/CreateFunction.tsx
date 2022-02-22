@@ -16,11 +16,10 @@ import {
 import { Dictionary } from '@supabase/grid'
 import { makeAutoObservable } from 'mobx'
 
-import { POSTGRES_DATA_TYPES } from 'lib/constants'
 import { useStore } from 'hooks'
 import Panel from 'components/to-be-cleaned/Panel'
 import SqlEditor from 'components/to-be-cleaned/SqlEditor'
-
+import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 
 class CreateFunctionFormState {
   id: number | undefined
@@ -780,12 +779,16 @@ const SelectLanguage: FC = observer(({}) => {
         <Select.Option value="sql">sql</Select.Option>
         {
           //map through all selected extensions that start with pl
-          enabledExtensions.filter((ex:any) => {
-             return ex.name.startsWith('pl')
-          }).map(ex => (<Select.Option key={ex.name} value={ex.name}>{ex.name}</Select.Option>))
-          
+          enabledExtensions
+            .filter((ex: any) => {
+              return ex.name.startsWith('pl')
+            })
+            .map((ex) => (
+              <Select.Option key={ex.name} value={ex.name}>
+                {ex.name}
+              </Select.Option>
+            ))
         }
-        
       </Select>
     </div>
   )

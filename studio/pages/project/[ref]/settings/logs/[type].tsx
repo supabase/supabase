@@ -31,7 +31,7 @@ import {
   LOG_TYPE_LABEL_MAPPING,
 } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
-import useSWRInfinite from 'swr/infinite'
+import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite'
 import { isUndefined } from 'lodash'
 import { useFlag } from 'hooks'
 import dayjs from 'dayjs'
@@ -107,7 +107,7 @@ export const LogPage: NextPage = () => {
     return qs
   }
   // handle log fetching
-  const getKeyLogs: KeyLoader<Logs> = (_pageIndex: number, prevPageData) => {
+  const getKeyLogs: SWRInfiniteKeyLoader = (_pageIndex: number, prevPageData) => {
     let queryParams
     // if prev page data is 100 items, could possibly have more records that are not yet fetched within this interval
     if (prevPageData === null) {
@@ -268,10 +268,11 @@ export const LogPage: NextPage = () => {
                 onInputRun={handleRefresh}
               />
             </div>
-            <div className="flex flex-row justify-between items-center px-2 py-1 w-full">
+            <div className="flex flex-row justify-end items-center px-2 py-1 w-full">
               {isSelectQuery && (
                 <InformationBox
-                  block
+                className="shrink mr-auto"
+                  block={false}
                   size="tiny"
                   icon={<IconInfo size="tiny" />}
                   title={`Custom queries are restricted to a ${

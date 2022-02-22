@@ -16,16 +16,24 @@ export const TEMPLATES: LogTemplate[] = [
 
   {
     label: '10 Minutes Ago',
-    mode: 'simple',
+    mode: 'custom',
     searchString: 'timestamp < TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 10 MINUTE)',
     for: ['database', 'api'],
   },
   {
-    label: 'POST or PATCH',
+    label: 'Commits By User',
     mode: 'custom',
-    searchString:
-      "REGEXP_CONTAINS(event_message, 'POST') OR REGEXP_CONTAINS(event_message, 'PATCH')",
-    for: ['api'],
+    searchString: `SELECT
+    p.user_name, count(*) as count
+FROM postgres_logs
+  LEFT JOIN UNNEST(metadata) as m ON TRUE
+  LEFT JOIN UNNEST(m.parsed) AS p ON TRUE
+WHERE
+  REGEXP_CONTAINS(event_message, 'COMMIT')
+GROUP BY
+  p.user_name
+    `,
+    for: ['database'],
   },
   {
     label: 'Metadata IP',
@@ -37,7 +45,7 @@ FROM edge_logs
   LEFT JOIN UNNEST(r.headers) AS h ON TRUE
 WHERE h.x_real_ip IS NOT NULL
 `,
-    for: ['database'],
+    for: ['api'],
   },
   {
     label: 'Requests by Country',
@@ -51,7 +59,7 @@ FROM edge_logs
 GROUP BY
   cf.country
 ORDER BY
-  DESC count
+  count DESC
 `,
     for: ['api'],
   },

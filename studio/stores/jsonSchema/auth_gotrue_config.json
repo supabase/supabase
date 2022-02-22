@@ -391,6 +391,14 @@
         {
           "value": "messagebird",
           "label": "Messagebird"
+        },
+        {
+          "value": "vonage",
+          "label": "Vonage"
+        },
+        {
+          "value": "textlocal",
+          "label": "Textlocal"
         }
       ]
     },

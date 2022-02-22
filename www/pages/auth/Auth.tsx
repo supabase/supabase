@@ -30,13 +30,7 @@ import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import AuthProviders from '~/data/auth.json'
 
-type Props = {
-  darkMode: boolean
-}
-
-function AuthPage(props: Props) {
-  const { darkMode } = props
-
+function AuthPage() {
   // base path for images
   const { basePath } = useRouter()
 
@@ -262,7 +256,7 @@ function AuthPage(props: Props) {
         <SectionContainer>
           <div className="grid grid-cols-12 lg:gap-16">
             <div className="order-last col-span-12 lg:order-first lg:col-span-6 mt-8 lg:mt-0">
-              <AuthComponentExample darkMode={darkMode} />
+              <AuthComponentExample />
             </div>
             <div className="col-span-12 lg:col-span-6 lg:col-start-7 xl:col-span-4 xl:col-start-8">
               <Space className="mb-4">
