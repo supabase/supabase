@@ -3,7 +3,7 @@ import { FC, useState } from 'react'
 import { AutoField } from 'uniforms-bootstrap4'
 import { Typography } from '@supabase/ui'
 
-import { API_URL } from 'lib/constants'
+import { API_URL, STORAGE_FILE_SIZE_LIMIT_MAX } from 'lib/constants'
 import { patch, get } from 'lib/common/fetch'
 import { useStore } from 'hooks'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
@@ -58,9 +58,11 @@ const StorageConfig = ({ config, projectRef }: any) => {
         schema={{
           properties: {
             fileSizeLimit: {
+              help: 'The maximum size in bytes of a file that can be uploaded.',
+              maximum: STORAGE_FILE_SIZE_LIMIT_MAX,
+              minimum: 0,
               title: 'Upload file size limit',
               type: 'integer',
-              help: 'The maximum size in bytes of a file that can be uploaded.',
             },
           },
           required: ['fileSizeLimit'],
