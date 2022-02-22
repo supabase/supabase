@@ -26,6 +26,7 @@ import { useSqlStore, TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import RenameQuery from 'components/to-be-cleaned/SqlEditor/RenameQuery'
 import { createSqlSnippet } from 'components/to-be-cleaned/SqlEditor/SqlEditor.utils'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 
 const OpenQueryItem = observer(({ tabInfo }: { tabInfo: any }) => {
   const sqlEditorStore: any = useSqlStore()
@@ -51,6 +52,8 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: any }) => {
 
   const [tabId, setTabId] = useState('')
   const [renameModalOpen, setRenameModalOpen] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+
   const { id, name } = tabInfo || {}
 
   function onCloseRenameModal() {
@@ -62,24 +65,12 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: any }) => {
     setRenameModalOpen(true)
   }
 
-  async function removeQuery(e: any) {
-    confirmAlert({
-      title: 'Confirm to remove',
-      message: `Are you sure you want to remove '${name}' ?`,
-      onAsyncConfirm: async () => {
-        await contentStore.del(id)
-        await contentStore.load()
-        sqlEditorStore.closeTab(id)
-      },
-    })
-  }
-
   function renderMenu() {
     return (
       <>
         <Dropdown.Item onClick={renameQuery}>Rename query</Dropdown.Item>
         <Divider light />
-        <Dropdown.Item onClick={removeQuery} icon={<IconTrash size="tiny" />}>
+        <Dropdown.Item onClick={() => setDeleteModalOpen(true)} icon={<IconTrash size="tiny" />}>
           Remove query
         </Dropdown.Item>
       </>
@@ -108,6 +99,22 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: any }) => {
         tabId={tabId}
         onComplete={onCloseRenameModal}
       />
+
+      <ConfirmationModal
+        title="Confirm to remove"
+        buttonLabel="Confirm"
+        visible={deleteModalOpen}
+        onSelectConfirm={async () => {
+          await contentStore.del(id)
+          await contentStore.load()
+          sqlEditorStore.closeTab(id)
+        }}
+        onSelectCancel={() => setDeleteModalOpen(false)}
+      >
+        <Modal.Content>
+          <p className="text-sm text-scale-1100 py-4">{`Are you sure you want to remove '${name}' ?`}</p>
+        </Modal.Content>
+      </ConfirmationModal>
     </div>
   )
 })
