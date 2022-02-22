@@ -5,14 +5,30 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 20 Jan 2022 00:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Tue, 22 Feb 2022 00:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.com/blog/2022/02/22/supabase-beta-january-2022</guid>
+  <title>Supabase Beta January 2021</title>
+  <link>https://supabase.com/blog/2022/02/22/supabase-beta-january-2022</link>
+  <description>New crypto extension, Postgres videos, and a bunch of cool integrations.</description>
+  <pubDate>Tue, 22 Feb 2022 00:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.com/blog/2022/01/20/supabase-beta-december-2021</guid>
   <title>Supabase Beta December 2021</title>
   <link>https://supabase.com/blog/2022/01/20/supabase-beta-december-2021</link>
   <description>New crypto extension, Postgres videos, and a bunch of cool integrations.</description>
+  <pubDate>Thu, 20 Jan 2022 00:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2022/01/20/product-hunt-golden-kitty-awards-2021</guid>
+  <title>Golden Kitty Awards Ceremony Watch Party with Supabase</title>
+  <link>https://supabase.com/blog/2022/01/20/product-hunt-golden-kitty-awards-2021</link>
+  <description>Hang out with us while watching the Product Hunt Golden Kitty Awards Ceremony</description>
   <pubDate>Thu, 20 Jan 2022 00:00:00 GMT</pubDate>
 </item>
 
