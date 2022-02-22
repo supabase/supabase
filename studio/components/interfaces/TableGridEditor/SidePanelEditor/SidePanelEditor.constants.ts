@@ -2,7 +2,7 @@ import { sortBy, concat } from 'lodash'
 import { PostgresDataTypeOption } from './SidePanelEditor.types'
 
 export const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ssZ'
-export const NUMERICAL_TYPES = ['int2', 'int4', 'int8', 'float4', 'float8']
+export const NUMERICAL_TYPES = ['int2', 'int4', 'int8', 'float4', 'float8', 'numeric']
 export const JSON_TYPES = ['json', 'jsonb']
 export const TEXT_TYPES = ['text', 'varchar']
 export const TIMESTAMP_TYPES = ['date', 'time', 'timestamp', 'timetz', 'timestamptz']
@@ -35,6 +35,11 @@ export const POSTGRES_DATA_TYPE_OPTIONS: PostgresDataTypeOption[] = [
   {
     name: 'float8',
     description: 'Double precision floating-point number (8 bytes)',
+    type: 'number',
+  },
+  {
+    name: 'numeric',
+    description: 'Exact numeric of selectable precision',
     type: 'number',
   },
   {
