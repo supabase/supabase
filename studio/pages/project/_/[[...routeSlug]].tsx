@@ -7,7 +7,7 @@ import { observer } from 'mobx-react-lite'
 import { withAuth } from 'hooks'
 import BaseLayout from 'components/layouts'
 import ProjectList from 'components/interfaces/Home/ProjectList'
-import { Typography, IconChevronRight } from '@supabase/ui'
+import { Typography } from '@supabase/ui'
 
 interface Props {}
 
@@ -30,6 +30,10 @@ const Header: FC<Props> = () => {
   )
 }
 
+// [Joshen] I'd say we don't do route validation here, this page will act more
+// like a proxy to the project specific pages, and we let those pages handle
+// any route validation logic instead
+
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
   const { routeSlug } = router.query
@@ -37,19 +41,10 @@ const GenericProjectPage: NextPage = () => {
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (projectRef: string) => {
       if (!Array.isArray(slug)) {
-        return `/project/${projectRef}/settings/general`
+        return `/project/${projectRef}`
       }
 
-      if (slug[0] === 'auth') {
-        if (slug[1]) return `/project/${projectRef}/auth/${slug[1]}`
-        return `/project/${projectRef}/auth/settings`
-      }
-
-      let slugPath = ''
-      slug.forEach((s) => {
-        slugPath += `${s}/`
-      })
-
+      const slugPath = slug.reduce((a: string, b: string) => `${a}/${b}`, '').slice(1)
       return `/project/${projectRef}/${slugPath}`
     }
   }
