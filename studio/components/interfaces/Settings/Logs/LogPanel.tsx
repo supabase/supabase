@@ -152,15 +152,6 @@ const LogPanel: FC<Props> = ({
                       error={from.error}
                       className="w-72 p-3"
                       actions={[
-                        from.value && (
-                          <IconX
-                            key="reset-from"
-                            size="tiny"
-                            className="cursor-pointer mx-1"
-                            title="Reset"
-                            onClick={handleFromReset}
-                          />
-                        ),
                         <Button
                           key="set"
                           size="tiny"
