@@ -165,6 +165,7 @@ info:
           - storage.from.list()
           - storage.from.update()
           - storage.from.move()
+          - storage.from.copy()
           - storage.from.remove()
           - storage.from.createSignedUrl()
           - storage.from.createSignedUrls()
@@ -1596,6 +1597,24 @@ pages:
             .storage
             .from('avatars')
             .move('public/avatar1.png', 'private/avatar2.png')
+          ```
+
+  storage.from.copy():
+    title: 'from.copy()'
+    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.copy'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none 
+        - `objects` permissions: `update` and `select`
+    examples:
+      - name: Copy file
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .copy('public/avatar1.png', 'private/avatar2.png')
           ```
 
   storage.from.createSignedUrl():
