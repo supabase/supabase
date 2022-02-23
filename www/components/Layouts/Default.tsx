@@ -13,7 +13,12 @@ const DefaultLayout = (props: Props) => {
 
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
-    document.documentElement.className = key === 'true' ? 'dark' : ''
+    if (!key) {
+      // Default to dark mode if no preference config
+      document.documentElement.className = 'dark'
+    } else {
+      document.documentElement.className = key === 'true' ? 'dark' : ''
+    }
   }, [])
 
   return (
