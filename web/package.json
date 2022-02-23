@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@docusaurus/core": "^2.0.0-beta.6",
+    "@docusaurus/plugin-client-redirects": "^2.0.0-beta.15",
     "@docusaurus/preset-classic": "^2.0.0-beta.6",
     "@kiwicopple/prism-react-renderer": "https://github.com/kiwicopple/prism-react-renderer.git",
     "jsrsasign": "^10.4.1",

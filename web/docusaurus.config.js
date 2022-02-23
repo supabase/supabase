@@ -194,6 +194,17 @@ module.exports = {
         },
       },
     ],
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        createRedirects(existingPath) {
+          if (existingPath.includes('/blog')) {
+            return [existingPath.replace('/docs/blog', '/blog')]
+          }
+          return undefined // Return a falsy value: no redirect created
+        },
+      },
+    ],
   ],
   scripts: [{ src: '/scripts/telemetry.js' }],
   // plugins: [
