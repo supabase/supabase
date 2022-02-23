@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import { FC } from 'react'
-import { Input, Typography, IconX } from '@supabase/ui'
+import { Typography, IconX, Button, IconCopy } from '@supabase/ui'
+import { copyToClipboard } from 'lib/helpers'
 
 import { LogData } from './Logs.types'
 
@@ -43,16 +44,43 @@ const LogSelection: FC<Props> = ({ log, onClose }) => {
             <Typography.Text code className="block w-full overflow-x-auto" small>
               {log.event_message}{' '}
             </Typography.Text>
+            <div className="flex flex-row justify-end">
+              <Button
+                size="tiny"
+                type="default"
+                onClick={() => {
+                  copyToClipboard(String(log.event_message))
+                }}
+                icon={<IconCopy size={14}/>}
+              >
+                Copy
+              </Button>
+            </div>
           </div>
           <div className="space-y-2">
             <Typography.Text small>Metadata</Typography.Text>
-            <Input.TextArea
-              className="font-mono mt-4"
-              size="tiny"
-              rows={25}
-              disabled
-              value={JSON.stringify(log.metadata, null, 2)}
-            />
+
+            <Typography.Text
+              code
+              style={{ maxHeight: '30rem' }}
+              className="block whitespace-pre w-full overflow-auto"
+              small
+            >
+              {JSON.stringify(log.metadata, null, 2)}
+            </Typography.Text>
+            <div className="flex flex-row justify-end">
+              <Button
+                size="tiny"
+                type="default"
+                onClick={() => {
+                  copyToClipboard(String(log.metadata))
+                }}
+                icon={<IconCopy size={14}/>}
+
+              >
+                Copy
+              </Button>
+            </div>
           </div>
         </div>
       </div>
