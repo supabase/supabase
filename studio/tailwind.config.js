@@ -77,6 +77,16 @@ module.exports = ui({
     }),
     extend: {
       typography: ({ theme }) => ({
+        DEFAULT: {
+          css: {
+            'code::before': {
+              content: '""',
+            },
+            'code::after': {
+              content: '""',
+            },
+          },
+        },
         docs: {
           css: {
             '--tw-prose-body': theme('colors.scale[1100]'),
