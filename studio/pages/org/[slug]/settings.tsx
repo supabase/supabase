@@ -287,9 +287,11 @@ const OrgDeleteModal = observer(() => {
 
   return (
     <>
-      <Button onClick={toggle} type="danger">
-        Delete Organization
-      </Button>
+      <div className="mt-2">
+        <Button onClick={toggle} type="danger">
+          Delete organization
+        </Button>
+      </div>
       <Modal
         visible={isOpen}
         onCancel={toggle}
