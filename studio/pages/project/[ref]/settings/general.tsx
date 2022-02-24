@@ -128,11 +128,9 @@ const GeneralSettings = observer(() => {
               <div>
                 <Typography.Text className="block">Restart Server</Typography.Text>
                 <div style={{ maxWidth: '420px' }}>
-                  <Typography.Text type="secondary" className="opacity-50">
-                    <p className="opacity-50">
-                      Your project will not be available for a few minutes.
-                    </p>
-                  </Typography.Text>
+                  <p className="opacity-50 text-sm">
+                    Your project will not be available for a few minutes.
+                  </p>
                 </div>
               </div>
               <RestartServerButton projectRef={project?.ref} />
