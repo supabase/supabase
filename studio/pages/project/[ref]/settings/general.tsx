@@ -198,7 +198,7 @@ const ProjectDeleteModal = ({ project }: any) => {
   return (
     <>
       <div className="mt-2">
-        <Button onClick={toggle} danger>
+        <Button onClick={toggle} type="danger">
           Delete Project
         </Button>
       </div>

@@ -33,7 +33,7 @@ const ReferenceRowViewer: FC<Props> = ({ visible, referenceRow, closePanel }) =>
   return (
     <SidePanel
       visible={visible}
-      wide
+      size="large"
       align="right"
       // @ts-ignore
       title={

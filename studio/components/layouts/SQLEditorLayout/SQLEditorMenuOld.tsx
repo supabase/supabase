@@ -105,7 +105,7 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: any }) => {
       />
 
       <ConfirmationModal
-        title="Confirm to remove"
+        header="Confirm to remove"
         buttonLabel="Confirm"
         visible={deleteModalOpen}
         onSelectConfirm={async () => {
