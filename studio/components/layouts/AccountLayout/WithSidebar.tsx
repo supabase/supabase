@@ -104,7 +104,7 @@ const LinksWithHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
 }
 const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
   return (
-    <ul className="dash-product-menu space-y-1">
+    <ul className="space-y-1">
       {links.map((x: any, i: number) => {
         // disable active state for link with subitems
         const isActive = x.isActive && !subitems

@@ -23,10 +23,10 @@ import { useStore } from 'hooks'
 import { useProjectContentStore } from 'stores/projectContentStore'
 import { useSqlStore, TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
 
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import RenameQuery from 'components/to-be-cleaned/SqlEditor/RenameQuery'
 import { createSqlSnippet } from 'components/to-be-cleaned/SqlEditor/SqlEditor.utils'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 
 const OpenQueryItem = observer(({ tabInfo }: { tabInfo: any }) => {
   const sqlEditorStore: any = useSqlStore()
@@ -34,12 +34,13 @@ const OpenQueryItem = observer(({ tabInfo }: { tabInfo: any }) => {
   const active = sqlEditorStore.activeTab.id === id
 
   return (
-    <Menu.Item rounded key={id} active={active} onClick={() => sqlEditorStore.selectTab(id)}>
-      <div className="flex items-center justify-between">
-        <Typography.Text className="flex-grow truncate flex items-center">{name}</Typography.Text>
-        {active && <DropdownMenu tabInfo={tabInfo} />}
-      </div>
-    </Menu.Item>
+    <ProductMenuItem
+      key={id}
+      isActive={active}
+      name={name}
+      action={active && <DropdownMenu tabInfo={tabInfo} />}
+      onClick={() => sqlEditorStore.selectTab(id)}
+    />
   )
 })
 
@@ -218,19 +219,17 @@ const SideBarContent = observer(() => {
         ) : (
           <div className="space-y-6">
             {IS_PLATFORM && (
-              <div className="px-3 dash-product-menu">
+              <div className="px-3">
                 <Menu.Group title="Getting started" />
                 {getStartedTabs.map((tab: any) => {
                   const { id, name } = tab || {}
                   return (
-                    <Menu.Item
-                      rounded
+                    <ProductMenuItem
                       key={id}
-                      active={sqlEditorStore.activeTab.id === id}
+                      name={name}
+                      isActive={sqlEditorStore.activeTab.id === id}
                       onClick={() => sqlEditorStore.selectTab(id)}
-                    >
-                      <Typography.Text className="truncate">{name}</Typography.Text>
-                    </Menu.Item>
+                    />
                   )
                 })}
               </div>

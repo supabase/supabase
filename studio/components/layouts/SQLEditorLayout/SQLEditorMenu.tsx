@@ -85,7 +85,7 @@ const SqlEditorMenu: FC<Props> = ({
               Getting started
             </Typography.Text>
           </div>
-          <div className="dash-product-menu space-y-1">
+          <div className="space-y-1">
             <Link href={`/project/${projectRef}/sql/templates`}>
               <div>
                 <Menu.Item rounded active={page === 'templates'}>
@@ -106,7 +106,7 @@ const SqlEditorMenu: FC<Props> = ({
                 Favourites
               </Typography.Text>
             </div>
-            <div className="dash-product-menu space-y-1">
+            <div className="space-y-1">
               {favouriteQueries.map((query) => {
                 const id = query.id
                 const isActive = queryId === id
@@ -162,7 +162,7 @@ const SqlEditorMenu: FC<Props> = ({
               SQL snippets
             </Typography.Text>
           </div>
-          <div className="dash-product-menu space-y-1">
+          <div className="space-y-1">
             {savedQueries.map((query) => {
               const id = query.id
               const isActive = queryId === id
