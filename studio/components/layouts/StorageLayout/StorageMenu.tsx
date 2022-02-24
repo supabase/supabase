@@ -61,8 +61,8 @@ const StorageMenu: FC<Props> = () => {
             <Menu.Group title="All buckets" />
             {!loaded ? (
               <div className="py-2 px-4 flex items-center space-x-2">
-                <IconLoader className="animate-spin" size={12} strokeWidth={2} />
-                <Typography.Text type="secondary">Loading buckets</Typography.Text>
+                <IconLoader className="animate-spin" size={14} strokeWidth={2} />
+                <span className="text-sm">Loading buckets</span>
               </div>
             ) : (
               <>
