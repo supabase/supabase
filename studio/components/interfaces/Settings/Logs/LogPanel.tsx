@@ -95,15 +95,15 @@ const LogPanel: FC<Props> = ({
                 {newCount > 0 && (
                   <div
                     className={[
-                      'absolute flex items-center justify-center -top-0.5 -right-0.5',
+                      'absolute flex items-center justify-center -top-3 right-3',
                       'h-3 w-3 z-50',
                     ].join(' ')}
                   >
-                    <div className="absolute ">
-                      <Typography.Text style={{ fontSize: '0.5rem' }}>{newCount}</Typography.Text>
+                    <div className="absolute z-20">
+                      <Typography.Text style={{ fontSize: '0.7rem' }} className="opacity-80">{newCount}</Typography.Text>
                     </div>
-                    <div className="bg-green-500 rounded-full w-full h-full"></div>
-                    <div className="absolute top-0 right-0 bg-green-500 rounded-full w-full h-full animate-ping"></div>
+                    <div className="bg-green-600 rounded-full w-full h-full animate-ping opacity-40"></div>
+                    <div className="absolute  z-60 top-0 right-0 bg-green-900 opacity-60 rounded-full w-full h-full "></div>
                   </div>
                 )}
                 <IconRefreshCw />
