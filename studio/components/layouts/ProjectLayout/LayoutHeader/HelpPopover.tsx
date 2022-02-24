@@ -40,13 +40,13 @@ const HelpPopover: FC<Props> = () => {
                 hosted services.
               </p>
             </Typography.Text>
-            <div className='flex space-x-1'>
+            <div className="flex space-x-2">
               <Link href={supportUrl}>
                 <Button className="sbui-default-button--dark-white" size="tiny" icon={<IconMail />}>
                   Contact support
                 </Button>
               </Link>
-              <Link href="supabase.com/docs/">
+              <Link href="https://supabase.com/docs/">
                 <Button type="secondary" size="tiny" icon={<IconBookOpen />}>
                   Docs
                 </Button>

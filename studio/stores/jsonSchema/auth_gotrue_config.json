@@ -16,11 +16,11 @@
     "EXTERNAL_GITHUB_ENABLED",
     "EXTERNAL_GITLAB_ENABLED",
     "EXTERNAL_GOOGLE_ENABLED",
+    "EXTERNAL_LINKEDIN_ENABLED",
+    "EXTERNAL_NOTION_ENABLED",
     "EXTERNAL_TWITCH_ENABLED",
     "EXTERNAL_TWITTER_ENABLED",
     "EXTERNAL_SLACK_ENABLED",
-    "EXTERNAL_SLACK_ENABLED",
-    "EXTERNAL_SPOTIFY_ENABLED",
     "EXTERNAL_SPOTIFY_ENABLED",
     "SMS_AUTOCONFIRM",
     "SMS_MAX_FREQUENCY",
@@ -184,6 +184,30 @@
     },
     "EXTERNAL_GOOGLE_SECRET": {
       "title": "Google secret",
+      "type": "string"
+    },
+    "EXTERNAL_LINKEDIN_ENABLED": {
+      "title": "Linkedin enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_LINKEDIN_CLIENT_ID": {
+      "title": "Linkedin client ID",
+      "type": "string"
+    },
+    "EXTERNAL_LINKEDIN_SECRET": {
+      "title": "Linkedin secret",
+      "type": "string"
+    },
+    "EXTERNAL_NOTION_ENABLED": {
+      "title": "Notion enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_NOTION_CLIENT_ID": {
+      "title": "Notion client ID",
+      "type": "string"
+    },
+    "EXTERNAL_NOTION_SECRET": {
+      "title": "Notion secret",
       "type": "string"
     },
     "EXTERNAL_TWITCH_ENABLED": {
@@ -367,8 +391,25 @@
         {
           "value": "messagebird",
           "label": "Messagebird"
+        },
+        {
+          "value": "vonage",
+          "label": "Vonage"
+        },
+        {
+          "value": "textlocal",
+          "label": "Textlocal"
         }
       ]
+    },
+    "SMS_TEXTLOCAL_API_KEY": {
+      "title": "Textlocal API Key",
+      "type": "string"
+    },
+    "SMS_TEXTLOCAL_SENDER": {
+      "title": "Textlocal Sender",
+      "type": "string",
+      "help": "Textlocal sender phone number"
     },
     "SMS_TWILIO_ACCOUNT_SID": {
       "title": "Twilio Account SID",
@@ -391,6 +432,19 @@
       "title": "Messagebird originator",
       "type": "string",
       "help": "Messagebird sender name or phone number"
+    },
+    "SMS_VONAGE_API_KEY": {
+      "title": "Vonage API Key",
+      "type": "string"
+    },
+    "SMS_VONAGE_API_SECRET": {
+      "title": "Vonage API Secret",
+      "type": "string"
+    },
+    "SMS_VONAGE_FROM": {
+      "title": "Vonage Sender",
+      "type": "string",
+      "help": "Vonage sender phone number"
     },
     "SMS_TEMPLATE": {
       "title": "Body",

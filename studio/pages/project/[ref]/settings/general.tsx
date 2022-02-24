@@ -17,7 +17,7 @@ import {
 import { API_URL } from 'lib/constants'
 import { pluckJsonSchemaFields, pluckObjectFields } from 'lib/helpers'
 import { post, delete_ } from 'lib/common/fetch'
-import { useProfile, useStore, withAuth } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import { SettingsLayout } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
@@ -173,7 +173,6 @@ const GeneralSettings = observer(() => {
 
 const ProjectDeleteModal = ({ project }: any) => {
   const router = useRouter()
-  const { mutateProfile } = useProfile()
   const { ui, app } = useStore()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -190,7 +189,7 @@ const ProjectDeleteModal = ({ project }: any) => {
     try {
       const response = await delete_(`${API_URL}/projects/${project.ref}/remove`)
       if (response.error) throw response.error
-      app.onProjectDeleted(response, mutateProfile)
+      app.onProjectDeleted(response)
       ui.setNotification({ category: 'success', message: `Successfully deleted ${project.name}` })
       router.push(`/`)
     } catch (error: any) {

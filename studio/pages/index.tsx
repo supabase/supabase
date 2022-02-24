@@ -6,7 +6,7 @@ import { isUndefined } from 'lodash'
 import { Typography } from '@supabase/ui'
 
 import { Project } from 'types'
-import { useProfile, useStore, withAuth } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import { post, delete_ } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { AccountLayout } from 'components/layouts'
@@ -22,7 +22,6 @@ const Home: NextPage = () => {
   const { profile } = ui
 
   const router = useRouter()
-  const { mutateProfile } = useProfile()
 
   const [isDeletingProject, setIsDeletingProject] = useState<boolean>(false)
   const [selectedProjectToDelete, setSelectedProjectToDelete] = useState<Project>()
@@ -36,12 +35,17 @@ const Home: NextPage = () => {
       const params = new URLSearchParams(queryParams)
       if (router.query?.next?.includes('https://vercel.com')) {
         router.push(`/vercel/integrate?${params.toString()}`)
-      }
-      if (router.query?.next?.includes('new-project')) {
+      } else if (router.query?.next?.includes('new-project')) {
         router.push('/new/project')
-      }
-      if (router.query['x-amzn-marketplace-token'] != undefined) {
+      } else if (router.query['x-amzn-marketplace-token'] != undefined) {
         router.push(`/account/associate?${params.toString()}`)
+      } else if (
+        typeof router.query?.next === 'string' &&
+        router.query?.next?.startsWith('project/_/')
+      ) {
+        router.push(router.query.next as string)
+      } else {
+        router.push('/')
       }
       return <Connecting />
     }
@@ -60,7 +64,7 @@ const Home: NextPage = () => {
       return ui.setNotification({ category: 'error', message: response.error.message })
     }
 
-    app.onProjectDeleted(response, mutateProfile)
+    app.onProjectDeleted(response)
     ui.setNotification({ category: 'success', message: `Deleted ${project.name} successfully!` })
 
     setIsDeletingProject(false)

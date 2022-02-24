@@ -1,0 +1,205 @@
+---
+title: Supabase Beta January 2022
+description: New auth providers, SMS providers, and new videos.
+author: paul_copplestone
+author_url: https://github.com/kiwicopple
+author_image_url: https://github.com/kiwicopple.png
+authorURL: https://github.com/kiwicopple
+image: 2022-january/thumb.jpg
+thumb: 2022-january/thumb.jpg
+tags:
+  - release-notes
+date: '2022-02-22'
+toc_depth: 3
+---
+
+This month's beta update is more stacked than the Superbowl (Supa-bowl\*) halftime show. Here’s all of the highlights from January...
+
+## New OAuth providers
+
+![New 0Auth Providers](/images/blog/2022-january/new-auth-providers-supabase_monthly-email-jan-2022.png)
+
+We’re continually amazed by how quickly new auth providers are being added into Supabase, and last month, 2 more have been added.
+
+**Notion**
+Added by [zernonia](https://github.com/zernonia)
+_you may already know him as the maintainer of [madewithsupabase.com](https://www.madewithsupabase.com/)_
+
+**LinkedIn**
+Added by [riderx](https://github.com/riderx) (Martin DONADIEU)
+_You may already be familiar with Martin from his podcast [Indie Makers](https://podcasts.apple.com/us/podcast/indie-makers/id1488437972)_
+
+## New SMS providers
+
+![New SMS Providers](/images/blog/2022-january/new-sms-providers-supabase_monthly-email-jan-2022.png)
+
+Along with the new 0Auth providers above, last month saw the addition of two more SMS phone providers to allow you to authenticate users via an SMS OTP (One-Time Password) token.
+
+**[Vonage](https://www.vonage.com/)**
+An american based cloud communications provider
+Added by **[devkiran](https://github.com/devkiran)** (from [BoxyHQ](https://twitter.com/BoxyHQ))
+
+**[Textlocal](https://www.textlocal.com/)**
+We are now fulfilling a popular request with this Indian compliant SMS provider
+Also added by **[devkiran](https://github.com/devkiran)**
+
+And just a reminder if you don’t already know, we also have support for [Twilio](https://supabase.com/docs/guides/auth/auth-twilio) and [MessageBird](https://supabase.com/docs/guides/auth/auth-messagebird).
+
+Also, on a final note on Auth, you may have already heard, we are hiring for an [Auth Engineer](https://about.supabase.com/careers/auth-engineers).
+
+## Query logs with SQL
+
+Our logs are getting more powerful, now with the [newly added SQL querying](https://github.com/supabase/supabase/pull/4734), implemented by our very own [Ziinc](https://github.com/Ziinc), who joined Supabase only a few weeks ago.
+
+Not only that, we’ve added [Timestamp filtering](https://github.com/supabase/supabase/pull/4904), and you’ll notice our usage charts [have more time spans available](https://github.com/supabase/supabase/pull/4732) now.
+
+We’re really excited about how we can enable developers to quickly diagnose their projects with powerful logging and observability tools so, as cliché as it sounds, watch this space for more.
+
+## GraphQL v0.1.0
+
+![Graph QL v0.1.0](/images/blog/2022-january/pg_graphql_0.1.0_monthly-email-dec-2021.png)
+
+[`pg_graphql`](https://github.com/supabase/pg_graphql) development is in full-swing. Last month we released v0.1.0, which includes [Comment Directives](https://supabase.github.io/pg_graphql/configuration/#comment-directives).
+
+We haven’t released GraphQL onto the platform yet, because we are still developing and testing; but, rest assured, watch this space!
+
+Example
+
+```sql
+create table account(
+    id serial primary key
+);
+
+comment on table public.account is
+e'@graphql({ "name": "AccountHolder" })';
+
+```
+
+Result
+
+```jsx
+// Renames "Account" to "AccountHolder"
+type AccountHolder {
+  id: Int!
+}
+```
+
+## New examples
+
+**Remix Auth**
+
+[It’s all anyone seems to talk about](https://twitter.com/jkup/status/1456360115205033989), and we genuinely love what [Remix](https://remix.run/) has been doing, so it’s only right we have an example app.
+
+[Check out the new Remix Auth example](https://github.com/supabase/supabase/tree/master/examples/remix-auth), and let us know what you think.
+
+**Expo Todo List**
+
+Our React Native example has been correctly updated to be an Expo example.
+
+[Check it out here](https://github.com/supabase/supabase/tree/master/examples/expo-todo-list), let us know what you think.
+
+## New Video: API requests with Function Hooks
+
+It seems there is no stopping [Jon Meyers](https://jonmeyers.io/videos)! He’s back already with an [in-depth video on how to easily automate API requests](https://www.youtube.com/watch?v=codAs9-NeHM&feature=emb_title) using our very own Function Hooks.
+
+Learn how to listen to _any_ change in your database, then send those changes [in a payload](https://supabase.com/blog/2021/07/30/supabase-functions-updates#hook-payload) via HTTP request. The payload includes the data before _and_ after it changed.
+
+<iframe
+  className="w-full video-with-border"
+  width="640"
+  height="385"
+  src="https://www.youtube-nocookie.com/embed/codAs9-NeHM"
+  frameBorder="1"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+## Set your own support ticket priority
+
+If you didn’t already know, we have a dedicated support form that goes straight to our support inbox. We’ve been drastically improving internal processes to quicken response times and, more importantly, solve your problems faster.
+
+We know sometimes there can be the odd glitch and you really need to us how important it is, so we thought it would make sense that _you_ could set the priority of your support tickets.
+
+We also have extra “urgent” levels that can be selected for the PRO and Pay As You Go projects.
+
+And, as part of our continued commitment to Support, we are hiring [Support Engineers](https://about.supabase.com/careers/support-and-qa). If you think you’ve got what it takes, we want to hear from you. If you know of others who might be interested, please forward that link across your social accounts.
+
+## Community
+
+As always, the community has been amazing, so it’s hard to keep up with what’s going on; but let’s try and summarize what happened last month.
+
+### Supabase + Snaplet
+
+Lots of you ask about maintaining multiple environments. Snaplet helps you copy a production database and clone it into different environments.
+
+Check out the [Supabase clone environments](https://docs.snaplet.dev/tutorials/supabase-clone-environments) tutorial, and check out the video below.
+
+<iframe
+  className="w-full video-with-border"
+  width="640"
+  height="385"
+  src="https://www.youtube-nocookie.com/embed/oPtMMhdhEP4"
+  frameBorder="1"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+### Supabase + Retool
+
+Retool has put together a brilliant 10 minute admin panel setup using Supabase with Retool.
+
+Check out the video below.
+
+<iframe
+  className="w-full video-with-border"
+  width="640"
+  height="385"
+  src="https://www.youtube-nocookie.com/embed/AgB2-CSrnoI"
+  frameBorder="1"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+### Learn with Jason
+
+Jason Lengstorf managed to catch up with our very own [Jon Meyers](https://jonmeyers.io/) on his awesome show, [Learn with Jason](https://www.youtube.com/watch?v=8vqY1KT4TLU), to talk about building an app [with Supabase and NextJS](https://supabase.com/docs/guides/with-nextjs).
+
+Check out the video below.
+
+<iframe
+  className="w-full video-with-border"
+  width="640"
+  height="385"
+  src="https://www.youtube-nocookie.com/embed/8vqY1KT4TLU"
+  frameBorder="1"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+### New article highlights
+
+- Arctype published a new guide showing how to connect to your Supabase database [https://arctype.com/postgres/connect/supabase-postgres](https://arctype.com/postgres/connect/supabase-postgres)
+- https://github.com/marmelab/ra-supabase, Supabase adapter for react-admin, the frontend framework for building admin applications on top of REST/GraphQL services.
+- [https://hotgluexyz.notion.site/Supabase-and-hotglue-article-9e7f5583d27c419490ee7d536d6d269d](https://www.notion.so/Supabase-and-hotglue-article-9e7f5583d27c419490ee7d536d6d269d)
+
+### PostgREST
+
+One of Supabase’s key tools that allow a lot of our functionality has had some updates.
+
+- pg_listen was removed in favor of PostgREST’s built-in schema reloading.
+  - Also results in performance improvements because PostgREST only reloads the schema cache—it no longer cycles the connection pool.
+- postgrest db connection pool size gets scaled with instance size for better performance for certain workload shapes.
+
+## Coming Next: Launch Week IV
+
+In what seems to be the worst kept secret in developer tools, prep for launch week 4 is in full development at Supabase. We’re now a much larger team, spanning even more disciplines and skills. That in mind, we really are supa-ecstatic for what will happen in the next launch week.
+
+Of course, we can’t tell you what will happen (perhaps maybe we don’t even know yet); but you can always speculate in the community [Discord server](https://discord.supabase.com/), or even [tweet us your predictions](https://twitter.com/supabase).
+
+## Get started
+
+- Start using Supabase today: **[app.supabase.io](https://app.supabase.io/)**
+- Make sure to **[star us on GitHub](https://github.com/supabase/supabase)**
+- Follow us **[on Twitter](https://twitter.com/supabase)**
+- Subscribe to our **[YouTube channel](https://www.youtube.com/c/supabase)**
+- Become a **[sponsor](https://github.com/sponsors/supabase)**

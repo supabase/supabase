@@ -12,13 +12,11 @@ import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
 import Announcement from '~/components/Nav/Announcement'
 
-type Props = {
-  darkMode: boolean
-}
+import { useTheme } from '~/components/Providers'
 
-const Nav = (props: Props) => {
+const Nav = () => {
   const { basePath } = useRouter()
-  const { darkMode } = props
+  const { isDarkMode } = useTheme()
   const [open, setOpen] = useState(false)
 
   const [openProduct, setOpenProduct] = useState(false)
@@ -199,7 +197,7 @@ const Nav = (props: Props) => {
                       <img
                         className="block h-6 w-auto"
                         src={
-                          darkMode
+                          isDarkMode
                             ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
                             : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
                         }

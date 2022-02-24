@@ -13,9 +13,16 @@ import PausedProjectCard from './PausedProjectCard'
 interface Props {
   onSelectRestore: (project: Project) => void
   onSelectDelete: (project: Project) => void
+  showInactiveProjects?: boolean
+  rewriteHref?: (projectRef: string) => string
 }
 
-const ProjectList: FC<Props> = ({ onSelectRestore = () => {}, onSelectDelete = () => {} }) => {
+const ProjectList: FC<Props> = ({
+  onSelectRestore = () => {},
+  onSelectDelete = () => {},
+  showInactiveProjects = true,
+  rewriteHref,
+}) => {
   const router = useRouter()
   const { app } = useStore()
   const { organizations, projects } = app
@@ -48,14 +55,20 @@ const ProjectList: FC<Props> = ({ onSelectRestore = () => {}, onSelectDelete = (
               )}
               {sortedProjects?.map((project: Project) =>
                 project.status === PROJECT_STATUS.INACTIVE ? (
-                  <PausedProjectCard
+                  showInactiveProjects && (
+                    <PausedProjectCard
+                      key={makeRandomString(5)}
+                      project={project}
+                      onSelectDelete={() => onSelectDelete(project)}
+                      onSelectRestore={() => onSelectRestore(project)}
+                    />
+                  )
+                ) : (
+                  <ProjectCard
                     key={makeRandomString(5)}
                     project={project}
-                    onSelectDelete={() => onSelectDelete(project)}
-                    onSelectRestore={() => onSelectRestore(project)}
+                    rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
                   />
-                ) : (
-                  <ProjectCard key={makeRandomString(5)} project={project} />
                 )
               )}
             </ul>
