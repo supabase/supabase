@@ -13,13 +13,13 @@ const Param = ({
   return (
     <>
       <div className="flex justify-between items-center mb-4 ">
-        <code className="px-4 inline-block">{name}</code>
+        <code className="px-2 inline-block">{name}</code>
         <Badge color={required ? 'amber' : 'scale'}>{required ? 'Required' : 'Optional'}</Badge>
       </div>
       {format && format != type && (
         <div className="mb-4 flex items-center gap-2">
           <label className="uppercase text-xs font-mono text-scale-900">Format:</label>
-          <code className="p-0">{format}</code>
+          <code className="px-2">{format}</code>
           {type}
         </div>
       )}
