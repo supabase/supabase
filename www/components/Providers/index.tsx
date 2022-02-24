@@ -21,7 +21,8 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
-    setIsDarkMode(key === 'true')
+    // Default to dark mode if no preference config
+    setIsDarkMode(!key || key === 'true')
   }, [])
 
   const toggleTheme = () => {
