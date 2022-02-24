@@ -127,9 +127,11 @@ const GeneralSettings = observer(() => {
             <div className="w-full flex items-center justify-between">
               <div>
                 <Typography.Text className="block">Restart Server</Typography.Text>
-                <div style={{ maxWidth: '320px' }}>
+                <div style={{ maxWidth: '420px' }}>
                   <Typography.Text type="secondary" className="opacity-50">
-                    Restart your project server
+                    <p className="opacity-50">
+                      Your project will not be available for a few minutes.
+                    </p>
                   </Typography.Text>
                 </div>
               </div>
