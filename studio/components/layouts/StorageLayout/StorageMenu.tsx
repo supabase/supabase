@@ -9,16 +9,15 @@ import {
   Dropdown,
   Menu,
   Typography,
-  IconPlus,
   IconLoader,
   IconMoreVertical,
   Alert,
   IconEdit,
 } from '@supabase/ui'
 
+import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { Group } from '@supabase/ui/dist/cjs/components/Menu/Menu'
 
 interface Props {}
 
@@ -117,7 +116,6 @@ const BucketRow = ({
   bucket = {},
   projectRef = '',
   isSelected = false,
-  onSelectBucket = () => {},
   onSelectDeleteBucket = () => {},
   onSelectToggleBucketPublic = () => {},
 }: any) => {
@@ -131,46 +129,45 @@ const BucketRow = ({
       onClick: () => onSelectToggleBucketPublic(bucket),
     },
   ]
-  return (
-    <div className="group dash-product-menu">
-      <Menu.Item rounded active={isSelected} onClick={() => onSelectBucket(bucket)}>
-        <div className="flex items-center justify-between">
-          {/* Need to investigate, why links here are reopning the entire page */}
-          <Link href={`/project/${projectRef}/storage/buckets/${bucket.id}`}>
-            <a className="block w-full">
-              <div className="flex items-center space-x-2">
-                <Typography.Text>{bucket.name}</Typography.Text>
-                {bucket.public && <Badge color="yellow">Public</Badge>}
-              </div>
-            </a>
-          </Link>
 
-          {bucket.status === STORAGE_ROW_STATUS.LOADING && (
-            <IconLoader className="animate-spin" size={16} strokeWidth={2} />
-          )}
-          {bucket.status === STORAGE_ROW_STATUS.READY && (
-            <Dropdown
-              side="bottom"
-              align="end"
-              overlay={[
-                bucketOptions.map((option) => (
-                  <Dropdown.Item key={option.name} onClick={option.onClick}>
-                    {option.name}
-                  </Dropdown.Item>
-                )),
-              ]}
-            >
-              <Typography.Text>
-                <IconMoreVertical
-                  className="opacity-0 group-hover:opacity-100"
-                  size="tiny"
-                  strokeWidth={2}
-                />
-              </Typography.Text>
-            </Dropdown>
-          )}
+  return (
+    <ProductMenuItem
+      key={bucket.id}
+      name={
+        <div className="flex items-center space-x-2">
+          <Typography.Text>{bucket.name}</Typography.Text>
+          {bucket.public && <Badge color="yellow">Public</Badge>}
         </div>
-      </Menu.Item>
-    </div>
+      }
+      url={`/project/${projectRef}/storage/buckets/${bucket.id}`}
+      isActive={isSelected}
+      action={
+        bucket.status === STORAGE_ROW_STATUS.LOADING ? (
+          <IconLoader className="animate-spin" size={16} strokeWidth={2} />
+        ) : bucket.status === STORAGE_ROW_STATUS.READY ? (
+          <Dropdown
+            side="bottom"
+            align="end"
+            overlay={[
+              bucketOptions.map((option) => (
+                <Dropdown.Item key={option.name} onClick={option.onClick}>
+                  {option.name}
+                </Dropdown.Item>
+              )),
+            ]}
+          >
+            <Typography.Text>
+              <IconMoreVertical
+                className="opacity-0 group-hover:opacity-100"
+                size="tiny"
+                strokeWidth={2}
+              />
+            </Typography.Text>
+          </Dropdown>
+        ) : (
+          <div />
+        )
+      }
+    />
   )
 }

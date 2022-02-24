@@ -1,7 +1,7 @@
 import { FC } from 'react'
-import Link from 'next/link'
-import { Badge, Divider, Menu, Typography } from '@supabase/ui'
-import { ProductMenuItem, ProductMenuGroup } from './ProductMenu.types'
+import { Badge, Menu } from '@supabase/ui'
+import ProductMenuItem from './ProductMenuItem'
+import { ProductMenuGroupItem, ProductMenuGroup } from './ProductMenu.types'
 
 interface Props {
   page?: string
@@ -25,15 +25,16 @@ const ProductMenu: FC<Props> = ({ page, menu }) => {
                     </div>
                   }
                 />
-                <div className="dash-product-menu">
-                  {group.items.map((item: ProductMenuItem) => (
-                    <Link key={item.key} href={item.url}>
-                      <a className="block" target={item.isExternal ? '_blank' : '_self'}>
-                        <Menu.Item icon={item.icon} rounded active={page === item.key}>
-                          <Typography.Text className="truncate">{item.name}</Typography.Text>
-                        </Menu.Item>
-                      </a>
-                    </Link>
+                <div>
+                  {group.items.map((item: ProductMenuGroupItem) => (
+                    <ProductMenuItem
+                      key={item.key}
+                      url={item.url}
+                      name={item.name}
+                      icon={item.icon}
+                      isActive={page === item.key}
+                      target={item.isExternal ? '_blank' : '_self'}
+                    />
                   ))}
                 </div>
               </div>
