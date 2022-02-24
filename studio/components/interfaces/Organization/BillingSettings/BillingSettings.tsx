@@ -10,6 +10,7 @@ import {
   Input,
   IconPlus,
   IconEdit2,
+  IconLoader,
 } from '@supabase/ui'
 
 import { useStore } from 'hooks'
@@ -31,6 +32,7 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<any>(undefined)
   const [customer, setCustomer] = useState<any>(null)
+  const [taxIds, setTaxIds] = useState<any>(null)
   const [paymentMethods, setPaymentMethods] = useState<any>(null)
 
   const { stripe_customer_id, stripe_customer_object, name: orgName, slug: orgSlug } = organization
@@ -58,12 +60,22 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
     try {
       setLoading(true)
       setError(null)
-      const { paymentMethods, customer, error } = await post(`${API_URL}/stripe/customer`, {
+      const {
+        paymentMethods,
+        customer,
+        error: customerError,
+      } = await post(`${API_URL}/stripe/customer`, {
         stripe_customer_id: stripe_customer_id,
       })
-      if (error) throw error
+      if (customerError) throw customerError
       setPaymentMethods(paymentMethods)
       setCustomer(customer)
+
+      const { taxIds, error: taxIdsError } = await post(`${API_URL}/stripe/tax-ids`, {
+        stripe_customer_id: stripe_customer_id,
+      })
+      if (taxIdsError) throw taxIdsError
+      setTaxIds(taxIds)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -119,12 +131,12 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
             <div className="col-span-12 lg:col-span-7">
               <Panel
                 loading={loading}
-                title={[
+                title={
                   <div className="w-full flex items-center justify-between">
                     <div className="flex flex-col">
-                      <Typography.Title level={5}>Billing address</Typography.Title>
+                      <Typography.Title level={5}>Billing Information</Typography.Title>
                       <Typography.Text type="secondary">
-                        This will be the address reflected in all invoices
+                        These will be reflected in all invoices
                       </Typography.Text>
                     </div>
                     <Button
@@ -133,10 +145,10 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
                       icon={<IconEdit2 />}
                       onClick={() => redirectToPortal('/customer/update')}
                     >
-                      Edit address
+                      Update
                     </Button>
-                  </div>,
-                ]}
+                  </div>
+                }
               >
                 <Panel.Content className="space-y-2">
                   <Input readOnly layout="horizontal" label="Country" value={country || ''} />
@@ -145,13 +157,36 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
                   <Input readOnly layout="horizontal" label="" value={line2 || ''} />
                   <Input readOnly layout="horizontal" label="" value={postal_code || ''} />
                 </Panel.Content>
+                <Panel.Content className="space-y-2">
+                  <div className="grid grid-cols-12 gap-4">
+                    <div className="col-span-4">
+                      <Typography.Text>Tax IDs</Typography.Text>
+                    </div>
+                    <div className="col-span-8">
+                      {!taxIds ? (
+                        <div className="flex space-x-2 items-center">
+                          <IconLoader className="animate-spin" size={14} />
+                          <Typography.Text>Retrieving tax information...</Typography.Text>
+                        </div>
+                      ) : (taxIds?.data ?? []).length === 0 ? (
+                        <Typography.Text type="secondary">None</Typography.Text>
+                      ) : (
+                        <>
+                          {taxIds.data.map((taxId: any) => (
+                            <Input readOnly value={taxId.value} />
+                          ))}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </Panel.Content>
               </Panel>
             </div>
             <div className="col-span-12 lg:col-span-5">
               <Panel
                 className="!mb-4"
                 loading={loading}
-                title={[<Typography.Title level={5}>Balance</Typography.Title>]}
+                title={<Typography.Title level={5}>Balance</Typography.Title>}
               >
                 <Panel.Content>
                   {isCredit && <Badge>You have credits available</Badge>}
@@ -171,7 +206,7 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
               </Panel>
               <Panel
                 loading={loading}
-                title={[
+                title={
                   <div className="w-full flex items-center justify-between">
                     <Typography.Title level={5}>Payment methods</Typography.Title>
                     <Button
@@ -182,8 +217,8 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
                     >
                       {(paymentMethods?.data ?? []).length >= 1 ? 'Add another' : 'Add new'}
                     </Button>
-                  </div>,
-                ]}
+                  </div>
+                }
               >
                 <Panel.Content>
                   {paymentMethods && paymentMethods.data.length >= 1 ? (

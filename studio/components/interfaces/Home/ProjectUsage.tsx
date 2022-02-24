@@ -18,9 +18,13 @@ import Panel from 'components/to-be-cleaned/Panel'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 
+import { useFlag } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
-import { useFlag } from 'hooks'
+import Table from 'components/to-be-cleaned/Table'
+import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'
+import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
+import { EndpointResponse, PathsDatum, StatusCodesDatum } from './ChartData.types'
 
 const CHART_INTERVALS = [
   { key: 'minutely', label: '60 minutes', startValue: 1, startUnit: 'hour', format: 'MMM D, h:ma' },
@@ -32,19 +36,29 @@ interface Props {
 }
 
 const ProjectUsage: FC<Props> = ({ project }) => {
-  const logsTimestampFilter = useFlag('logsTimestampFilter')
+  const logsUsageCodesPaths = useFlag('logsUsageCodesPaths')
   const logsUsageChartIntervals = useFlag('logsUsageChartIntervals')
   const [interval, setInterval] = useState<string>('hourly')
   const router = useRouter()
   const { ref } = router.query
   const { data, error }: any = useSWR(
-    // only fetch when browser window is active
     `${API_URL}/projects/${ref}/log-stats?interval=${interval}`,
     get
-    // increase refresh rate x10 to 30s when focus lost
-    // conditional fetching will cause cached data to clear (not desirable)
-    // { refreshInterval: isActive ? 3000 : 30000 }
   )
+  const { data: codesData, error: codesFetchError } = useSWR<EndpointResponse<StatusCodesDatum>>(
+    logsUsageCodesPaths
+      ? `${API_URL}/projects/${ref}/analytics/endpoints/usage.api-codes?interval=${interval}`
+      : null,
+    get
+  )
+
+  const { data: pathsData, error: _pathsFetchError }: any = useSWR<EndpointResponse<PathsDatum>>(
+    logsUsageCodesPaths
+      ? `${API_URL}/projects/${ref}/analytics/endpoints/usage.api-paths?interval=${interval}`
+      : null,
+    get
+  )
+
   const selectedInterval = logsUsageChartIntervals
     ? CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
     : CHART_INTERVALS[2]
@@ -55,7 +69,6 @@ const ProjectUsage: FC<Props> = ({ project }) => {
   const charts = data?.data
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
   const handleBarClick = (v: any, search: string) => {
-    if (!logsTimestampFilter) return
     if (!v || !v.activePayload?.[0]?.payload) return
     // returns rechart internal tooltip data type
     const payload = v.activePayload[0].payload
@@ -64,9 +77,9 @@ const ProjectUsage: FC<Props> = ({ project }) => {
     if (timestampDigits < 16) {
       // pad unix timestamp with additional 0 and then forward
       const paddedTimestamp = String(timestamp) + '0'.repeat(16 - timestampDigits)
-      router.push(`/project/${ref}/settings/logs/rest?te=${paddedTimestamp}&s=${search}`)
+      router.push(`/project/${ref}/settings/logs/api?te=${paddedTimestamp}`)
     } else {
-      router.push(`/project/${ref}/settings/logs/rest?te=${timestamp}&s=${search}`)
+      router.push(`/project/${ref}/settings/logs/api?te=${timestamp}`)
     }
   }
   return (
@@ -96,114 +109,188 @@ const ProjectUsage: FC<Props> = ({ project }) => {
       </div>
       <div className="">
         {startDate && endDate && (
-          <div className="grid lg:grid-cols-4 lg:gap-8">
-            <Panel key="database-chart">
-              <Panel.Content className="space-y-4">
-                <PanelHeader
-                  icon={<IconDatabase size="small" />}
-                  title="Database"
-                  href={`/project/${ref}/editor`}
-                />
-                <ChartHandler
-                  startDate={startDate}
-                  endDate={endDate}
-                  attribute={'total_rest_requests'}
-                  label={METRICS.find((x: any) => x.key == 'total_rest_requests')?.label ?? ''}
-                  provider="log-stats"
-                  interval="1d"
-                  hideChartType
-                  customDateFormat={datetimeFormat}
-                  data={charts}
-                  isLoading={!charts && !error ? true : false}
-                  onBarClick={(v)=> handleBarClick(v, "/rest")}
-                />
-                <ProjectUsageMinimal
-                  projectRef={project.ref}
-                  subscription_id={project.subscription_id}
-                  filter="Database"
-                />
-              </Panel.Content>
-            </Panel>
-            <Panel key="auth-chart">
-              <Panel.Content className="space-y-4">
-                <PanelHeader
-                  icon={<IconKey size="small" />}
-                  title="Auth"
-                  href={`/project/${ref}/auth/users`}
-                />
-                <ChartHandler
-                  startDate={startDate}
-                  endDate={endDate}
-                  attribute={'total_auth_requests'}
-                  label={METRICS.find((x) => x.key == 'total_auth_requests')?.label ?? ''}
-                  provider="log-stats"
-                  interval="1d"
-                  hideChartType
-                  customDateFormat={datetimeFormat}
-                  data={charts}
-                  isLoading={!charts && !error ? true : false}
-                  onBarClick={(v)=> handleBarClick(v, "/auth")}
-                />
-                <ProjectUsageMinimal
-                  projectRef={project.ref}
-                  subscription_id={project.subscription_id}
-                  filter="Auth"
-                />
-              </Panel.Content>
-            </Panel>
-            <Panel key="storage-chart">
-              <Panel.Content className="space-y-4">
-                <PanelHeader
-                  icon={<IconArchive size="small" />}
-                  title="Storage"
-                  href={`/project/${ref}/storage/buckets`}
-                />
-                <ChartHandler
-                  startDate={startDate}
-                  endDate={endDate}
-                  attribute={'total_storage_requests'}
-                  label={METRICS.find((x) => x.key == 'total_storage_requests')?.label ?? ''}
-                  provider="log-stats"
-                  interval="1d"
-                  hideChartType
-                  customDateFormat={datetimeFormat}
-                  data={charts}
-                  isLoading={!charts && !error ? true : false}
-                  onBarClick={(v)=> handleBarClick(v, "/storage")}
-                />
-                <ProjectUsageMinimal
-                  projectRef={project.ref}
-                  subscription_id={project.subscription_id}
-                  filter="File storage"
-                />
-              </Panel.Content>
-            </Panel>
-            <Panel key="realtime-chart">
-              <Panel.Content className="space-y-4">
-                <PanelHeader icon={<IconZap size="small" />} title="Realtime" />
-                <ChartHandler
-                  startDate={startDate}
-                  endDate={endDate}
-                  attribute={'total_realtime_requests'}
-                  label={METRICS.find((x: any) => x.key == 'total_realtime_requests')?.label ?? ''}
-                  provider="log-stats"
-                  interval="1h"
-                  hideChartType
-                  customDateFormat={datetimeFormat}
-                  data={charts}
-                  isLoading={!charts && !error ? true : false}
-                  onBarClick={(v)=> handleBarClick(v, "/realtime")}
-                />
-                {/* Empty space just so the cards are of the same height */}
-                <div className="py-[26px]" />
-                {/* <ProjectUsageMinimal
+          <>
+            <div className="grid lg:grid-cols-4 lg:gap-8">
+              <Panel key="database-chart">
+                <Panel.Content className="space-y-4">
+                  <PanelHeader
+                    icon={<IconDatabase size="small" />}
+                    title="Database"
+                    href={`/project/${ref}/editor`}
+                  />
+                  <ChartHandler
+                    startDate={startDate}
+                    endDate={endDate}
+                    attribute={'total_rest_requests'}
+                    label={METRICS.find((x: any) => x.key == 'total_rest_requests')?.label ?? ''}
+                    provider="log-stats"
+                    interval="1d"
+                    hideChartType
+                    customDateFormat={datetimeFormat}
+                    data={charts}
+                    isLoading={!charts && !error ? true : false}
+                    onBarClick={(v) => handleBarClick(v, '/rest')}
+                  />
+                  <ProjectUsageMinimal
+                    projectRef={project.ref}
+                    subscription_id={project.subscription_id}
+                    filter="Database"
+                  />
+                </Panel.Content>
+              </Panel>
+              <Panel key="auth-chart">
+                <Panel.Content className="space-y-4">
+                  <PanelHeader
+                    icon={<IconKey size="small" />}
+                    title="Auth"
+                    href={`/project/${ref}/auth/users`}
+                  />
+                  <ChartHandler
+                    startDate={startDate}
+                    endDate={endDate}
+                    attribute={'total_auth_requests'}
+                    label={METRICS.find((x) => x.key == 'total_auth_requests')?.label ?? ''}
+                    provider="log-stats"
+                    interval="1d"
+                    hideChartType
+                    customDateFormat={datetimeFormat}
+                    data={charts}
+                    isLoading={!charts && !error ? true : false}
+                    onBarClick={(v) => handleBarClick(v, '/auth')}
+                  />
+                  <ProjectUsageMinimal
+                    projectRef={project.ref}
+                    subscription_id={project.subscription_id}
+                    filter="Auth"
+                  />
+                </Panel.Content>
+              </Panel>
+              <Panel key="storage-chart">
+                <Panel.Content className="space-y-4">
+                  <PanelHeader
+                    icon={<IconArchive size="small" />}
+                    title="Storage"
+                    href={`/project/${ref}/storage/buckets`}
+                  />
+                  <ChartHandler
+                    startDate={startDate}
+                    endDate={endDate}
+                    attribute={'total_storage_requests'}
+                    label={METRICS.find((x) => x.key == 'total_storage_requests')?.label ?? ''}
+                    provider="log-stats"
+                    interval="1d"
+                    hideChartType
+                    customDateFormat={datetimeFormat}
+                    data={charts}
+                    isLoading={!charts && !error ? true : false}
+                    onBarClick={(v) => handleBarClick(v, '/storage')}
+                  />
+                  <ProjectUsageMinimal
+                    projectRef={project.ref}
+                    subscription_id={project.subscription_id}
+                    filter="File storage"
+                  />
+                </Panel.Content>
+              </Panel>
+              <Panel key="realtime-chart">
+                <Panel.Content className="space-y-4">
+                  <PanelHeader icon={<IconZap size="small" />} title="Realtime" />
+                  <ChartHandler
+                    startDate={startDate}
+                    endDate={endDate}
+                    attribute={'total_realtime_requests'}
+                    label={
+                      METRICS.find((x: any) => x.key == 'total_realtime_requests')?.label ?? ''
+                    }
+                    provider="log-stats"
+                    interval="1h"
+                    hideChartType
+                    customDateFormat={datetimeFormat}
+                    data={charts}
+                    isLoading={!charts && !error ? true : false}
+                    onBarClick={(v) => handleBarClick(v, '/realtime')}
+                  />
+                  {/* Empty space just so the cards are of the same height */}
+                  <div className="py-[26px]" />
+                  {/* <ProjectUsageMinimal
                   projectRef={project.ref}
                   subscription_id={project.subscription_id}
                   filter="Connection requests"
                 /> */}
-              </Panel.Content>
-            </Panel>
-          </div>
+                </Panel.Content>
+              </Panel>
+            </div>
+            {logsUsageCodesPaths && (
+              <div className="grid lg:grid-cols-4 lg:gap-8">
+                <Panel
+                  key="api-status-codes"
+                  className="col-start-1 col-span-2"
+                  wrapWithLoading={false}
+                >
+                  <Panel.Content className="space-y-4">
+                    <PanelHeader title="API Status Codes" />
+                    <StackedAreaChart
+                      dateFormat={datetimeFormat}
+                      data={codesData?.result}
+                      stackKey="status_code"
+                      xAxisKey="timestamp"
+                      yAxisKey="count"
+                      isLoading={!codesData && !codesFetchError ? true : false}
+                      xAxisFormatAsDate
+                      size="large"
+                      styleMap={{
+                        200: { stroke: USAGE_COLORS['200'], fill: USAGE_COLORS['200'] },
+                        201: { stroke: USAGE_COLORS['201'], fill: USAGE_COLORS['201'] },
+                        400: { stroke: USAGE_COLORS['400'], fill: USAGE_COLORS['400'] },
+                        401: { stroke: USAGE_COLORS['401'], fill: USAGE_COLORS['401'] },
+                        404: { stroke: USAGE_COLORS['404'], fill: USAGE_COLORS['404'] },
+                        500: { stroke: USAGE_COLORS['500'], fill: USAGE_COLORS['500'] },
+                      }}
+                    />
+                  </Panel.Content>
+                </Panel>
+                <Panel
+                  key="top-routes"
+                  className="col-start-3 col-span-2 pb-0"
+                  bodyClassName="h-full"
+                  wrapWithLoading={false}
+                >
+                  <Panel.Content className="space-y-4">
+                    <PanelHeader title="Top Routes" />
+                    <Table
+                      head={
+                        <>
+                          <Table.th>Path</Table.th>
+                          <Table.th>Count</Table.th>
+                          <Table.th>Avg. Latency (ms)</Table.th>
+                        </>
+                      }
+                      body={
+                        <>
+                          {(pathsData?.result ?? []).map((row: PathsDatum) => (
+                            <Table.tr>
+                              <Table.td className="flex items-center">
+                                <div className="w-[60px]">
+                                  <Typography.Text code small>
+                                    {row.method}
+                                  </Typography.Text>
+                                </div>
+                                <Typography.Text className="font-mono" small>
+                                  {row.path}
+                                </Typography.Text>
+                              </Table.td>
+                              <Table.td>{row.count}</Table.td>
+                              <Table.td>{Number(row.avg_origin_time).toFixed(2)}</Table.td>
+                            </Table.tr>
+                          ))}
+                        </>
+                      }
+                    />
+                  </Panel.Content>
+                </Panel>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

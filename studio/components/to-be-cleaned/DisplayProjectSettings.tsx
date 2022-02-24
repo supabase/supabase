@@ -2,8 +2,10 @@ import useSWR from 'swr'
 import { FC } from 'react'
 import { useRouter } from 'next/router'
 import { get } from 'lib/common/fetch'
+import { JwtSecretUpdateStatus, ProjectEvents } from '@supabase/shared-types/out/events'
 import { IconAlertCircle, Input, Loading, Typography } from '@supabase/ui'
 
+import { useJwtSecretUpdateStatus } from 'hooks'
 import { API_URL } from 'lib/constants'
 import Panel from './Panel'
 
@@ -15,12 +17,20 @@ export const DisplayApiSettings = () => {
   const { ref } = router.query
 
   const { data, error }: any = useSWR(`${API_URL}/props/project/${ref}/settings`, get)
+  const {
+    isError: isJwtSecretUpdateStatusError,
+    isLoading: isJwtSecretUpdateStatusLoading,
+    jwtSecretUpdateStatus,
+  }: any = useJwtSecretUpdateStatus(ref)
 
-  if (!data)
+  const isNotUpdatingJwtSecret =
+    jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
+
+  if (!data || isJwtSecretUpdateStatusLoading)
     return (
       <ApiContentWrapper>
         <Panel.Content className="py-8">
-          {error ? (
+          {error || isJwtSecretUpdateStatusError ? (
             <div className="flex items-center space-x-2">
               <Typography.Text type="secondary">
                 <IconAlertCircle strokeWidth={2} />
@@ -43,7 +53,7 @@ export const DisplayApiSettings = () => {
 
   return (
     <ApiContentWrapper>
-      {!data ? (
+      {!data || isJwtSecretUpdateStatusLoading ? (
         // @ts-ignore
         <Loading active={true} />
       ) : (
@@ -74,11 +84,17 @@ export const DisplayApiSettings = () => {
                 </>
               }
               readOnly
-              copy
+              copy={isNotUpdatingJwtSecret}
               className="input-mono"
               disabled
-              reveal={x.tags !== 'anon' && true}
-              value={x.api_key}
+              reveal={x.tags !== 'anon' && isNotUpdatingJwtSecret}
+              value={
+                jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
+                  ? 'JWT secret update failed, new API key may have issues'
+                  : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
+                  ? 'Updating JWT secret...'
+                  : x.api_key
+              }
               onChange={() => {}}
               descriptionText={
                 x.tags === 'service_role'
@@ -98,12 +114,20 @@ export const DisplayConfigSettings = () => {
   const { ref } = router.query
 
   const { data, error }: any = useSWR(`${API_URL}/props/project/${ref}/settings`, get)
+  const {
+    isError: isJwtSecretUpdateStatusError,
+    isLoading: isJwtSecretUpdateStatusLoading,
+    jwtSecretUpdateStatus,
+  }: any = useJwtSecretUpdateStatus(ref)
 
-  if (!data)
+  const isNotUpdatingJwtSecret =
+    jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
+
+  if (!data || isJwtSecretUpdateStatusLoading)
     return (
       <ConfigContentWrapper>
         <Panel.Content className="py-8">
-          {error ? (
+          {error || isJwtSecretUpdateStatusError ? (
             <div className="flex items-center space-x-2">
               <Typography.Text type="secondary">
                 <IconAlertCircle strokeWidth={2} />
@@ -152,10 +176,16 @@ export const DisplayConfigSettings = () => {
           <Input
             label="JWT Secret"
             readOnly
-            copy
-            reveal
+            copy={isNotUpdatingJwtSecret}
+            reveal={isNotUpdatingJwtSecret}
             disabled
-            value={jwtSecret}
+            value={
+              jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
+                ? 'JWT secret update failed'
+                : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
+                ? 'Updating JWT secret...'
+                : jwtSecret
+            }
             className="input-mono"
             descriptionText="Used to decode your JWTs. You can also use this to mint your own JWTs."
             layout="horizontal"

@@ -10,6 +10,30 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 const nextConfig = {
+  async redirects() {
+    return [
+      {
+        source: '/project/:ref/auth',
+        destination: '/project/:ref/auth/users',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/database',
+        destination: '/project/:ref/database/tables',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage',
+        destination: '/project/:ref/storage/buckets',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings',
+        destination: '/project/:ref/settings/general',
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {
@@ -55,6 +79,7 @@ const sentryWebpackPluginOptions = {
 
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
-module.exports = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
-  ? withSentryConfig(moduleExports, sentryWebpackPluginOptions)
-  : nextConfig
+module.exports =
+  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
+    ? withSentryConfig(moduleExports, sentryWebpackPluginOptions)
+    : nextConfig

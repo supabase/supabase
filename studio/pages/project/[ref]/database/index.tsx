@@ -7,9 +7,7 @@ import { DatabaseLayout } from 'components/layouts'
 const Database: NextPage = () => {
   return (
     <DatabaseLayout title="Database">
-      <>
-        <h1>Use this as a page template for database</h1>
-      </>
+      <>{/* <h1>Use this as a page template for database</h1> */}</>
     </DatabaseLayout>
   )
 }

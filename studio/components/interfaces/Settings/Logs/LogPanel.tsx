@@ -15,7 +15,6 @@ import {
 import { LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import Flag from 'components/ui/Flag/Flag'
 interface Props {
   defaultSearchValue?: string
   defaultFromValue?: string
@@ -139,65 +138,63 @@ const LogPanel: FC<Props> = ({
         <div className="flex items-center gap-x-4">
           {!isCustomQuery && (
             <>
-              <Flag name="logsTimestampFilter">
-                <div className="flex flex-row">
-                  <Popover
-                    side="bottom"
-                    align="end"
-                    portalled
-                    overlay={
-                      <Input
-                        label="From"
-                        labelOptional="UTC"
-                        value={from.value === '' ? defaultTimestamp : from.value}
-                        onChange={handleFromChange}
-                        error={from.error}
-                        className="w-72 p-3"
-                        actions={[
-                          from.value && (
-                            <IconX
-                              key="reset-from"
-                              size="tiny"
-                              className="cursor-pointer mx-1"
-                              title="Reset"
-                              onClick={handleFromReset}
-                            />
-                          ),
-                          <Button
-                            key="set"
+              <div className="flex flex-row">
+                <Popover
+                  side="bottom"
+                  align="end"
+                  portalled
+                  overlay={
+                    <Input
+                      label="From"
+                      labelOptional="UTC"
+                      value={from.value === '' ? defaultTimestamp : from.value}
+                      onChange={handleFromChange}
+                      error={from.error}
+                      className="w-72 p-3"
+                      actions={[
+                        from.value && (
+                          <IconX
+                            key="reset-from"
                             size="tiny"
-                            title="Set"
-                            type="secondary"
-                            onClick={handleSearch}
-                          >
-                            Set
-                          </Button>,
-                        ]}
-                      />
-                    }
-                  >
-                    <Button
-                      as="span"
-                      size="tiny"
-                      className={showFromReset ? '!rounded-r-none' : ''}
-                      type={showFromReset ? 'outline' : 'text'}
-                      icon={<IconClock size="tiny" />}
-                    >
-                      {from.value ? 'Custom' : 'Now'}
-                    </Button>
-                  </Popover>
-                  {showFromReset && (
-                    <Button
-                      size="tiny"
-                      className={showFromReset ? '!rounded-l-none' : ''}
-                      icon={<IconX size="tiny" />}
-                      type="outline"
-                      title="Clear timestamp filter"
-                      onClick={handleFromReset}
+                            className="cursor-pointer mx-1"
+                            title="Reset"
+                            onClick={handleFromReset}
+                          />
+                        ),
+                        <Button
+                          key="set"
+                          size="tiny"
+                          title="Set"
+                          type="secondary"
+                          onClick={handleSearch}
+                        >
+                          Set
+                        </Button>,
+                      ]}
                     />
-                  )}
-                </div>
-              </Flag>
+                  }
+                >
+                  <Button
+                    as="span"
+                    size="tiny"
+                    className={showFromReset ? '!rounded-r-none' : ''}
+                    type={showFromReset ? 'outline' : 'text'}
+                    icon={<IconClock size="tiny" />}
+                  >
+                    {from.value ? 'Custom' : 'Now'}
+                  </Button>
+                </Popover>
+                {showFromReset && (
+                  <Button
+                    size="tiny"
+                    className={showFromReset ? '!rounded-l-none' : ''}
+                    icon={<IconX size="tiny" />}
+                    type="outline"
+                    title="Clear timestamp filter"
+                    onClick={handleFromReset}
+                  />
+                )}
+              </div>
               {!isCustomQuery && (
                 <div className="flex items-center space-x-2">
                   <Typography.Text type="secondary" small>
