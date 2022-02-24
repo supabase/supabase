@@ -18,11 +18,11 @@ const BreadcrumbsView: FC<Props> = ({ defaultValue: breadcrumbs }) => {
                   width="16"
                   height="16"
                   stroke="currentColor"
-                  stroke-width="1"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   fill="none"
-                  shape-rendering="geometricPrecision"
+                  shapeRendering="geometricPrecision"
                 >
                   <path d="M16 3.549L7.12 20.600"></path>
                 </svg>
