@@ -248,13 +248,13 @@ function BlogPostPage(props: any) {
                   <article className={blogStyles['article']}>
                     <Typography>{content}</Typography>
                   </article>
-                  <div>Share with your friends</div>
+                  <div className="text-gray-900 dark:text-white">Share with your friends</div>
                     <div className="flex space-x-4 mt-4">
                       <div>
                         <Link
                           href={`https://twitter.com/share?text=Checkout%20@supabase's%20new%20blog%20post%20%7C%20${props.blog.title}&url=https://supabase.com/blog/${props.blog.slug}`}
                         >
-                          <a target="_blank" className="text-gray-300 hover:text-gray-400">
+                          <a target="_blank" className="text-gray-300 hover:text-gray-400 dark:hover:text-gray-400">
                             <svg
                               height="26"
                               width="26"
@@ -275,7 +275,7 @@ function BlogPostPage(props: any) {
                         <Link
                           href={`https://www.linkedin.com/shareArticle?url=https://supabase.com/blog/${props.blog.slug}&title=Checkout%20@supabase's%20new%20blog%20post%20%7C%20${props.blog.title}`}
                         >
-                          <a target="_blank" className="text-gray-300 hover:text-gray-400">
+                          <a target="_blank" className="text-gray-300 hover:text-gray-400 dark:hover:text-gray-400">
                             <svg
                               width="20"
                               height="20"
@@ -291,9 +291,9 @@ function BlogPostPage(props: any) {
                         </Link>
                       </div>
 
-                      <button onClick={() => copyLink()} className="text-gray-300 hover:text-gray-400">
+                      <button onClick={() => copyLink()} className="text-gray-300 hover:text-gray-400 dark:hover:text-gray-400">
                         <svg
-                          className="h-6 w-6 fill-gray-800"
+                          className="h-6 w-6"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
