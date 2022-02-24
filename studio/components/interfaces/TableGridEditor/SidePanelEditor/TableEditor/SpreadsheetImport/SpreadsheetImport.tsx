@@ -123,15 +123,11 @@ const SpreadsheetImport: FC<Props> = ({
 
   return (
     <SidePanel
-      wide
+      size="large"
       visible={visible}
       align="right"
       header="Add content to new table"
-      onCancel={(event: any) => {
-        // Only close if specifically hit the X button, this is to have the
-        // side panel work with toast messages (clicking on toast will close the panel)
-        if (event?.target) closePanel()
-      }}
+      onCancel={() => closePanel()}
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"

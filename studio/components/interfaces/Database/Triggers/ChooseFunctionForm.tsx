@@ -175,7 +175,7 @@ const Function: React.FC<FunctionProps> = ({ id, completeStatement, name, onClic
       <div className="flex items-center space-x-3 justify-between">
         <div className="flex items-center space-x-3">
           <div className="bg-scale-1200 p-1 flex items-center justify-center rounded text-scale-100 ">
-            <IconTerminal size="small" strokeWidth={2} size={14} />
+            <IconTerminal strokeWidth={2} size={14} />
           </div>
           <Typography.Title level={5} className="mb-0">
             {name}
