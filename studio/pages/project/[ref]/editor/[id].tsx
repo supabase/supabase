@@ -170,7 +170,7 @@ const TableEditorPage: NextPage = () => {
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedColumnToDelete)}
-        title={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
+        header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
         children={
           <Modal.Content>
             <p className="py-4 text-sm text-scale-1100">
@@ -186,7 +186,7 @@ const TableEditorPage: NextPage = () => {
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedTableToDelete)}
-        title={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
+        header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
         children={
           <Modal.Content>
             <p className="py-4 text-sm text-scale-1100">

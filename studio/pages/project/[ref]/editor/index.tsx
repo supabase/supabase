@@ -78,7 +78,7 @@ const Editor: NextPage = () => {
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedTableToDelete)}
-        title={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
+        header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
         description={`Are you sure you want to delete the selected table? This action cannot be undone`}
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"

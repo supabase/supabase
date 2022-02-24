@@ -141,13 +141,11 @@ const RowEditor: FC<Props> = ({
       size="large"
       key="RowEditor"
       visible={visible}
-      // @ts-ignore
       header={<HeaderTitle isNewRecord={isNewRecord} tableName={selectedTable.name} />}
       className={`transition-all ease-in duration-100 ${
         isEditingJson || isViewingReferenceRow ? ' mr-32' : ''
       }`}
       onCancel={closePanel}
-      onConfirm={(resolve: () => void) => onSaveChanges(resolve)}
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"

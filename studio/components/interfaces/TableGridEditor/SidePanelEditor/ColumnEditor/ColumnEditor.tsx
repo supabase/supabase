@@ -132,9 +132,10 @@ const ColumnEditor: FC<Props> = ({
       key="ColumnEditor"
       visible={visible}
       // @ts-ignore
+      onConfirm={(resolve: () => void) => onSaveChanges(resolve)}
+      // @ts-ignore
       header={<HeaderTitle table={selectedTable} column={column} />}
       onCancel={closePanel}
-      onConfirm={(resolve: () => void) => onSaveChanges(resolve)}
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
