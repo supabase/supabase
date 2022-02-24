@@ -16,6 +16,7 @@ import {
   IconChevronDown,
   Loading,
   Modal,
+  IconEdit2,
 } from '@supabase/ui'
 
 import { IS_PLATFORM } from 'lib/constants'
@@ -69,7 +70,9 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: any }) => {
   function renderMenu() {
     return (
       <>
-        <Dropdown.Item onClick={renameQuery}>Rename query</Dropdown.Item>
+        <Dropdown.Item onClick={renameQuery} icon={<IconEdit2 size="tiny" />}>
+          Rename query
+        </Dropdown.Item>
         <Divider light />
         <Dropdown.Item onClick={() => setDeleteModalOpen(true)} icon={<IconTrash size="tiny" />}>
           Remove query
