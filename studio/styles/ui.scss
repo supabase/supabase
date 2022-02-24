@@ -1,19 +1,6 @@
-.editor-product-menu {
-  .sbui-typography-text {
-    @apply w-full;
-  }
-  .sbui-menu__item {
-    @apply py-0 h-[32px] flex items-center justify-between;
-  }
-}
-
 .dark .sbui-default-button--dark-white {
   @apply shadow-md text-typography-body-light border-gray-50 bg-white #{!important};
   text-shadow: none !important;
-}
-
-.dash-product-menu .sbui-menu__item {
-  @apply py-1;
 }
 
 /* Brought over from platform to be cleaned if needed */
