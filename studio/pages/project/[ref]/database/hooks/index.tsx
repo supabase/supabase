@@ -181,7 +181,7 @@ const TriggersList: FC<any> = observer(
             <div className="flex justify-between items-center px-6">
               <Input
                 placeholder="Filter by name"
-                size="tiny"
+                size="small"
                 icon={<IconSearch size="tiny" />}
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}

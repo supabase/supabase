@@ -152,7 +152,7 @@ class CreateFunctionStore implements ICreateFunctionStore {
   get title() {
     return this.formState.id
       ? `Edit '${this.formState.originalName}' function`
-      : 'Add a new Function'
+      : 'Add a new function'
   }
 
   get isEditing() {
@@ -362,26 +362,43 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
           <div className="space-y-10 mt-4">
             {_localState.isEditing ? (
               <>
-                <div className="px-6 space-y-10">
-                  <InputName />
-                  <SelectSchema />
-                </div>
+                <SidePanel.Content>
+                  <div className="space-y-4">
+                    <InputName />
+                    <SelectSchema />
+                  </div>
+                </SidePanel.Content>
                 <SidePanel.Seperator />
-                <InputMultiArguments readonly={true} />
-                <InputDefinition />
+                <SidePanel.Content>
+                  <InputMultiArguments readonly={true} />
+                </SidePanel.Content>
+                <SidePanel.Seperator />
+                <SidePanel.Content>
+                  <InputDefinition />
+                </SidePanel.Content>
               </>
             ) : (
               <div className="space-y-6">
-                <InputName />
+                <SidePanel.Content>
+                  <InputName />
+                </SidePanel.Content>
                 <SidePanel.Seperator />
-                <SelectSchema />
-                <SelectReturnType />
+                <SidePanel.Content>
+                  <div className="space-y-4">
+                    <SelectSchema />
+                    <SelectReturnType />
+                  </div>
+                </SidePanel.Content>
                 <SidePanel.Seperator />
-                <InputMultiArguments />
+                <SidePanel.Content>
+                  <InputMultiArguments />
+                </SidePanel.Content>
                 <SidePanel.Seperator />
-                <InputDefinition />
+                <SidePanel.Content>
+                  <InputDefinition />
+                </SidePanel.Content>
                 <SidePanel.Seperator />
-                <div className="px-6">
+                <SidePanel.Content>
                   <Panel>
                     <div className={`space-y-8 py-4 bg-bg-alt-light dark:bg-bg-alt-dark rounded`}>
                       <div className={`px-6`}>
@@ -395,16 +412,23 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
                       {/* advanced selections */}
                     </div>
                   </Panel>
-                </div>
+                </SidePanel.Content>
                 {_localState.advancedVisible && (
                   <>
-                    {/* <SidePanel.Seperator /> */}
-                    <SelectLanguage />
-                    <SelectBehavior />
+                    <SidePanel.Content>
+                      <div className="space-y-2">
+                        <SelectLanguage />
+                        <SelectBehavior />
+                      </div>
+                    </SidePanel.Content>
                     <SidePanel.Seperator />
-                    <InputMultiConfigParams />
+                    <SidePanel.Content>
+                      <InputMultiConfigParams />
+                    </SidePanel.Content>
                     <SidePanel.Seperator />
-                    <RadioSecurity />
+                    <SidePanel.Content>
+                      <RadioSecurity />
+                    </SidePanel.Content>
                   </>
                 )}
               </div>
@@ -456,7 +480,7 @@ const InputMultiArguments: FC<InputMultiArgumentsProps> = observer(({ readonly }
   }
 
   return (
-    <div className={'px-6'}>
+    <div>
       <div className="flex flex-col">
         <h5 className="text-base text-scale-1200">Arguments</h5>
         <p className="text-sm text-scale-1100">
@@ -530,7 +554,7 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
   }
 
   return (
-    <div className={`flex flex-row space-x-1`}>
+    <div className="flex flex-row space-x-1">
       <Input
         id={`name-${idx}`}
         className="flex-1 flex-grow"
@@ -583,7 +607,7 @@ const InputMultiConfigParams: FC = observer(({}) => {
   }
 
   return (
-    <div className={'px-6'}>
+    <div>
       <div className="flex justify-between items-center">
         <h5 className="text-base text-scale-1200">Config Params</h5>
       </div>
@@ -650,7 +674,7 @@ const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value
   }
 
   return (
-    <div className={`flex space-x-1`}>
+    <div className="flex space-x-1">
       <Input
         id={`name-${idx}`}
         className="flex-1"
@@ -685,7 +709,7 @@ const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value
 const InputDefinition: FC = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
   return (
-    <div className={`space-y-4 px-6`}>
+    <div className="space-y-4">
       <div className="flex flex-col">
         <h5 className="text-base text-scale-1200">Definition</h5>
         <p className="text-sm text-scale-1100">
@@ -751,7 +775,7 @@ const SelectLanguage: FC = observer(({}) => {
   )
 
   return (
-    <div className={`space-y-4 px-6`}>
+    <div className="space-y-4">
       <Select
         id="language"
         label="Language"
@@ -788,7 +812,7 @@ const SelectReturnType: FC = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (
-    <div className={`space-y-4 px-6`}>
+    <div className="space-y-4">
       <Select
         id="returnType"
         label="Return type"
@@ -820,7 +844,7 @@ const SelectBehavior: FC = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (
-    <div className={`space-y-4 px-6`}>
+    <div className="space-y-4">
       <Select
         id="behavior"
         label="Behavior"
@@ -847,7 +871,7 @@ const RadioSecurity: FC = observer(({}) => {
 
   return (
     <>
-      <div className={`space-y-4 px-6`}>
+      <div className="space-y-4">
         <Radio.Group
           type="cards"
           label="Type of security"
