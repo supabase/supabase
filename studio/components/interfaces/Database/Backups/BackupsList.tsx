@@ -46,9 +46,9 @@ const BackupsList: FC<Props> = ({}) => {
     return (
       <div
         className={[
-          'block w-full p-3 px-6 border rounded border-opacity-20',
+          'block w-full py-4 px-6 border rounded border-opacity-20',
           'bg-gray-100 border-gray-600',
-          'dark:bg-gray-600 dark:border-gray-500',
+          'dark:bg-gray-400 dark:border-gray-300',
         ].join(' ')}
       >
         <div className="flex space-x-3">

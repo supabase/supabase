@@ -26,7 +26,7 @@ const Extensions: FC<Props> = ({}) => {
       <div className="mb-4">
         <div className="flex">
           <Input
-            size="tiny"
+            size="small"
             placeholder={'Filter'}
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
