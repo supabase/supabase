@@ -100,7 +100,9 @@ const LogPanel: FC<Props> = ({
                     ].join(' ')}
                   >
                     <div className="absolute z-20">
-                      <Typography.Text style={{ fontSize: '0.7rem' }} className="opacity-80">{newCount}</Typography.Text>
+                      <Typography.Text style={{ fontSize: '0.7rem' }} className="opacity-80">
+                        {newCount}
+                      </Typography.Text>
                     </div>
                     <div className="bg-green-600 rounded-full w-full h-full animate-ping opacity-40"></div>
                     <div className="absolute  z-60 top-0 right-0 bg-green-900 opacity-60 rounded-full w-full h-full "></div>
@@ -129,9 +131,7 @@ const LogPanel: FC<Props> = ({
           </Dropdown>
 
           <div className="flex items-center space-x-2">
-            <Typography.Text type="secondary" small>
-              Search logs via query
-            </Typography.Text>
+            <p className="text-sm text-scale-1100">Search logs via query</p>
             <Toggle size="tiny" checked={isCustomQuery} onChange={onCustomClick} />
           </div>
         </div>
@@ -188,9 +188,7 @@ const LogPanel: FC<Props> = ({
               </div>
               {!isCustomQuery && (
                 <div className="flex items-center space-x-2">
-                  <Typography.Text type="secondary" small>
-                    Show event chart
-                  </Typography.Text>
+                  <p className="text-sm text-scale-1100">Show event chart</p>
                   <Toggle size="tiny" checked={isShowingEventChart} onChange={onToggleEventChart} />
                 </div>
               )}
