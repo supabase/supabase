@@ -32,7 +32,7 @@ const Header: FC<{
       <div>{leftComponents}</div>
       <div>
         <Input
-          size="tiny"
+          size="small"
           placeholder={filterPlaceholder}
           value={filterString}
           onChange={(e: any) => setFilterString(e.target.value)}
