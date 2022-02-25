@@ -10,7 +10,7 @@ const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV
 
 const notion = new NotionAPI()
 
-export const getStaticProps = async (context) => {
+export const getStaticProps = async (context: { params: { pageId: string } }) => {
   const pageId = context.params.pageId as string
   const recordMap = await notion.getPage(pageId)
 
@@ -31,7 +31,7 @@ export async function getStaticPaths() {
   }
 
   const rootNotionPageId = '7241763f5fc7423294e15c2f1891a954'
-  const rootNotionSpaceId = null
+  const rootNotionSpaceId = ''
 
   const pages = await getAllPagesInSpace(
     rootNotionPageId,
@@ -50,7 +50,7 @@ export async function getStaticPaths() {
   }
 }
 
-export default function NotionPage({ recordMap }) {
+export default function NotionPage({ recordMap }: any) {
   if (!recordMap) {
     return null
   }
