@@ -179,8 +179,8 @@ class CreateHookStore implements ICreateHookStore {
 
   get title() {
     return this.formState.id
-      ? `Edit '${this.formState.originalName}' Function Hook`
-      : 'Add a new Function Hook'
+      ? `Edit '${this.formState.originalName}' function hook`
+      : 'Add a new function hook'
   }
 
   get isEditing() {
@@ -883,7 +883,7 @@ const InputMultiServiceHeaders: FC = observer(({}) => {
   return (
     <div>
       <div className="flex justify-between items-center">
-        <Typography.Text>Http headers</Typography.Text>
+        <Typography.Text>HTTP Headers</Typography.Text>
       </div>
       <div className="pt-4 space-y-2">
         {_localState.formState.serviceHeaders.value.map(
@@ -994,7 +994,7 @@ const InputMultiServiceParams: FC = observer(({}) => {
   return (
     <div>
       <div className="flex justify-between items-center">
-        <Typography.Text>Http params</Typography.Text>
+        <Typography.Text>HTTP Params</Typography.Text>
       </div>
       <div className="pt-4 space-y-2">
         {_localState.formState.serviceParams.value.map(

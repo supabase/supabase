@@ -135,7 +135,7 @@ const TriggersList: FC<any> = observer(
             <div className="flex justify-between items-center px-6">
               <Input
                 placeholder="Filter by name"
-                size="tiny"
+                size="small"
                 icon={<IconSearch size="tiny" />}
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
@@ -260,11 +260,11 @@ const TriggerList: FC<TriggerListProps> = observer(
               </div>
             </Table.td>
             <Table.td className="hidden xl:table-cell">
-              <Typography.Text>
+              <div className="space-x-2">
                 {x.events.map((event: string) => (
                   <Badge key={event}>{event}</Badge>
                 ))}
-              </Typography.Text>
+              </div>
             </Table.td>
             <Table.td className="text-right">
               <Dropdown
