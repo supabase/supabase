@@ -18,7 +18,7 @@ import {
   Dropdown,
   Modal,
   IconSearch,
-  IconAlertCircle,
+  IconUser,
   Form,
 } from '@supabase/ui'
 
@@ -601,16 +601,15 @@ const OwnerDropdown = observer(({ members, member }: any) => {
         overlay={
           <>
             <Dropdown.Item onClick={() => setOwnerTransferIsVisble(!ownerTransferIsVisble)}>
-              Make owner
-              <Typography.Text type="secondary" small className="block mt-1">
-                Transfer ownership of "{orgName}"
-              </Typography.Text>
+              <div className="flex flex-col">
+                <p>Make owner</p>
+                <p className="opacity-50 block">Transfer ownership of "{orgName}"</p>
+              </div>
             </Dropdown.Item>
             <Divider light />
-            <Dropdown.Item onClick={handleMemberDelete} icon={<IconTrash size="tiny" />}>
+            <Dropdown.Item icon={<IconTrash size="tiny" />} onClick={handleMemberDelete}>
               Remove member
             </Dropdown.Item>
-            <Dropdown.Item icon={<IconTrash size="tiny" />}>Remove Member</Dropdown.Item>
           </>
         }
       >
