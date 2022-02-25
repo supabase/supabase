@@ -1,13 +1,10 @@
 import { Typography } from '@supabase/ui'
 import Link from 'next/link'
 import footer from '../data/footer.json'
+import { useTheme } from './Providers'
 
-type Props = {
-  isDarkMode: boolean
-}
-
-const Footer = (prop: Props) => {
-  const { isDarkMode } = prop
+const Footer = () => {
+  const { isDarkMode } = useTheme()
 
   return (
     <footer
@@ -23,7 +20,7 @@ const Footer = (prop: Props) => {
               <a>
                 <img
                   className="w-40"
-                  src={isDarkMode ? `/docs/supabase-light.svg` : `/docs/supabase-dark.svg`}
+                  src={isDarkMode ? `/docs/supabase-dark.svg` : `/docs/supabase-light.svg`}
                   alt="Supabase"
                 />
               </a>

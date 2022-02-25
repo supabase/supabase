@@ -1,6 +1,5 @@
 import { ReactElement, useState } from 'react'
 import Head from 'next/head'
-import styles from '../../styles/Home.module.css'
 import NavBar from '../nav/NavBar'
 import SideBar from '../nav/SideBar'
 import Footer from '../Footer'
@@ -15,7 +14,7 @@ const DocsLayout = ({
   meta: { title: string; description: string }
   children: string
   toc: any
-  menuItems
+  menuItems: any
   currentPage: string
 }) => {
   const theme = 'okaidia'

@@ -11,16 +11,13 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 import styles from '../../styles/Home.module.css'
+import { useTheme } from '../Providers'
+
 const NavBar = ({ currentPage }: { currentPage: string }) => {
   const [mounted, setMounted] = useState(false)
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return (
-      typeof window !== 'undefined' && window.localStorage.getItem('supabaseDarkMode') == 'true'
-    )
-  })
+  const { isDarkMode } = useTheme()
 
   useEffect(() => {
-    setIsDarkMode(localStorage.getItem('supabaseDarkMode') === 'true')
     setMounted(true)
   }, [isDarkMode])
 
@@ -47,7 +44,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
             <a>
               <Image
                 className="cursor-pointer"
-                src={isDarkMode ? `/docs/supabase-light.svg` : `/docs/supabase-dark.svg`}
+                src={isDarkMode ? `/docs/supabase-dark.svg` : `/docs/supabase-light.svg`}
                 width={200}
                 height={32}
                 alt="Supabase Logo"

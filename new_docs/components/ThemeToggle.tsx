@@ -1,29 +1,23 @@
-import { useEffect, useState } from 'react'
+import { useTheme } from './Providers'
 import { IconSun, IconMoon } from '@supabase/ui'
 
-const ThemeToggle = () => {
-  const [darkMode, setDarkMode] = useState<boolean>(true)
+function DarkModeToggle() {
+  const { isDarkMode, toggleTheme } = useTheme()
 
-  useEffect(() => {
-    const isDarkMode = localStorage.getItem('supabaseDarkMode')
-    if (isDarkMode) {
-      setDarkMode(isDarkMode === 'true')
-      document.documentElement.className = isDarkMode === 'true' ? 'dark' : ''
-    }
-  }, [])
+  const toggleDarkMode = () => {
+    localStorage.setItem('supabaseDarkMode', (!isDarkMode).toString())
+    toggleTheme()
 
-  const updateTheme = (isDarkMode: boolean) => {
-    document.documentElement.className = isDarkMode ? 'dark' : ''
-    setDarkMode(isDarkMode)
-    localStorage.setItem('supabaseDarkMode', (!darkMode).toString())
+    const key = localStorage.getItem('supabaseDarkMode')
+    document.documentElement.className = key === 'true' ? 'dark' : ''
   }
 
   return (
-    <button className="w-full flex justify-between" onClick={() => updateTheme(!darkMode)}>
-      {darkMode ? <span>Light Mode</span> : <span>Dark Mode</span>}
-      {darkMode ? <IconSun /> : <IconMoon />}
+    <button className="w-full flex justify-between" onClick={() => toggleDarkMode()}>
+      {isDarkMode ? <span>Dark Mode</span> : <span>Light Mode</span>}
+      {isDarkMode ? <IconMoon /> : <IconSun />}
     </button>
   )
 }
 
-export default ThemeToggle
+export default DarkModeToggle
