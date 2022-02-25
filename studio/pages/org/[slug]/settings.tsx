@@ -610,7 +610,6 @@ const OwnerDropdown = observer(({ members, member }: any) => {
             <Dropdown.Item icon={<IconTrash size="tiny" />} onClick={handleMemberDelete}>
               Remove member
             </Dropdown.Item>
-            <Dropdown.Item icon={<IconTrash size="tiny" />}>Remove Member</Dropdown.Item>
           </>
         }
       >
