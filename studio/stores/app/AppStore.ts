@@ -2,7 +2,7 @@ import { cloneDeep } from 'lodash'
 import { values } from 'mobx'
 import { Organization, Project } from 'types'
 
-import { API_URL, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import { IRootStore } from '../RootStore'
 import DatabaseStore, { IDatabaseStore } from './DatabaseStore'
 import OrganizationStore from './OrganizationStore'
