@@ -74,15 +74,15 @@ export const LogPage: NextPage = () => {
 
   useEffect(() => {
     // on mount, set initial values
-    if (q) {
+    if (q !== undefined && q !== '') {
       onSelectTemplate({
         mode: 'custom',
         searchString: q as string,
       })
-    } else if (s) {
+    } else {
       onSelectTemplate({
         mode: 'simple',
-        searchString: s as string,
+        searchString: (s || '') as string,
       })
     }
     if (te) {
@@ -90,7 +90,7 @@ export const LogPage: NextPage = () => {
     } else {
       setParams((prev) => ({ ...prev, timestamp_end: '' }))
     }
-  }, [])
+  }, [q, s, te])
 
   const genQueryParams = (params: { [k: string]: string }) => {
     // remove keys which are empty strings, null, or undefined
@@ -266,7 +266,7 @@ export const LogPage: NextPage = () => {
             <div className="flex flex-row justify-end items-center px-2 py-1 w-full">
               {isSelectQuery && (
                 <InformationBox
-                className="shrink mr-auto"
+                  className="shrink mr-auto"
                   block={false}
                   size="tiny"
                   icon={<IconInfo size="tiny" />}
