@@ -367,6 +367,7 @@ class StorageExplorerStore {
 
   copyFileURLToClipboard = async (file) => {
     const filePreview = find(this.filePreviewCache, { id: file.id })
+    console.log('Copy file URL', filePreview)
     if (filePreview) {
       // Already generated signed URL
       copyToClipboard(filePreview.url, () => {
@@ -770,6 +771,7 @@ class StorageExplorerStore {
       .createSignedUrl(formattedPathToFile, DEFAULT_EXPIRY)
 
     if (!error) {
+      console.log('fetchFilePreview', data)
       return data.signedURL
     }
 
