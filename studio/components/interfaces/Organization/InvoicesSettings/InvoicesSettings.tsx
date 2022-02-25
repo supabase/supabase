@@ -130,20 +130,20 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
                 <Table.tr key="navigation">
                   <Table.td colSpan={5}>
                     <div className="flex items-center justify-between">
-                      <Typography.Text type="secondary" small>
+                      <p className="text-sm opacity-50">
                         Showing {offset + 1} to {offset + invoices.length} out of {count} invoices
-                      </Typography.Text>
+                      </p>
                       <div className="flex items-center space-x-2">
                         <Button
                           icon={<IconChevronLeft />}
-                          type="secondary"
+                          type="default"
                           size="tiny"
                           disabled={page === 1}
                           onClick={async () => await fetchInvoices(page - 1)}
                         />
                         <Button
                           icon={<IconChevronRight />}
-                          type="secondary"
+                          type="default"
                           size="tiny"
                           disabled={page * PAGE_LIMIT >= count}
                           onClick={async () => await fetchInvoices(page + 1)}
