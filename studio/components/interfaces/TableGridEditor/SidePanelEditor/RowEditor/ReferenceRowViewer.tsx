@@ -34,9 +34,7 @@ const ReferenceRowViewer: FC<Props> = ({ visible, referenceRow, closePanel }) =>
     <SidePanel
       visible={visible}
       size="large"
-      align="right"
-      // @ts-ignore
-      title={
+      header={
         <div>
           Viewing reference row from{' '}
           <Typography.Text code>
@@ -48,30 +46,32 @@ const ReferenceRowViewer: FC<Props> = ({ visible, referenceRow, closePanel }) =>
       onCancel={closePanel}
       customFooter={<ActionBar backButtonLabel="Close" closePanel={closePanel} />}
     >
-      {loading ? (
-        <div className="flex flex-col items-center justify-center space-y-2 h-full">
-          <Typography>
-            <IconLoader className="animate-spin" />
-          </Typography>
-          <Typography.Text className="opacity-50">Loading reference row</Typography.Text>
-        </div>
-      ) : !row ? (
-        <div className="flex flex-col items-center justify-center space-y-2 h-full">
-          <Typography>
-            <IconXCircle />
-          </Typography>
-          <Typography.Text className="opacity-50">
-            Unable to find the corresponding row in {foreignKey?.target_table_schema}.
-            {foreignKey?.target_table_name}
-          </Typography.Text>
-        </div>
-      ) : (
-        <Space direction="vertical" size={6} style={{ width: '100%' }}>
-          {rowFields.map((field: RowField) => {
-            return <InputField key={field.id} field={field} isEditable={false} errors={{}} />
-          })}
-        </Space>
-      )}
+      <SidePanel.Content>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center space-y-2 h-full">
+            <Typography>
+              <IconLoader className="animate-spin" />
+            </Typography>
+            <Typography.Text className="opacity-50">Loading reference row</Typography.Text>
+          </div>
+        ) : !row ? (
+          <div className="flex flex-col items-center justify-center space-y-2 h-full">
+            <Typography>
+              <IconXCircle />
+            </Typography>
+            <Typography.Text className="opacity-50">
+              Unable to find the corresponding row in {foreignKey?.target_table_schema}.
+              {foreignKey?.target_table_name}
+            </Typography.Text>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {rowFields.map((field: RowField) => {
+              return <InputField key={field.id} field={field} isEditable={false} errors={{}} />
+            })}
+          </div>
+        )}
+      </SidePanel.Content>
     </SidePanel>
   )
 }
