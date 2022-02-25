@@ -47,6 +47,9 @@ module.exports = {
           900: '#0f0f0f',
         },
       },
+      fontSize: {
+        "tiny": "0.6rem",
+      },
       typography(theme) {
         return {
           DEFAULT: {
