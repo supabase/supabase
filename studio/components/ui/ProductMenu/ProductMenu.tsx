@@ -13,8 +13,8 @@ const ProductMenu: FC<Props> = ({ page, menu }) => {
     <div className="flex flex-col space-y-8 overflow-y-auto">
       <Menu type="pills">
         {menu.map((group: ProductMenuGroup, idx: number) => (
-          <>
-            <div key={group.title} className="space-y-8 my-6">
+          <div key={group.title}>
+            <div className="space-y-8 my-6">
               <div className="mx-3">
                 <Menu.Group
                   //@ts-ignore
@@ -40,7 +40,7 @@ const ProductMenu: FC<Props> = ({ page, menu }) => {
               </div>
             </div>
             {idx !== menu.length - 1 && <div className="bg-scale-500 h-px w-full"></div>}
-          </>
+          </div>
         ))}
       </Menu>
     </div>

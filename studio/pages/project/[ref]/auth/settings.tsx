@@ -206,32 +206,30 @@ const Settings = () => {
             descriptionText={authConfig.properties.MAILER_AUTOCONFIRM.help}
           />
 
-          <div className="form-group items-center">
-            <label className="">Enable Custom SMTP</label>
-            <div className="form-control flex items-center">
-              <Toggle
-                onToggle={(value: any) => {
-                  /*
-                   * temporary solution
-                   * clear the values of SMTP when toggling
-                   */
-                  if (!value) {
-                    onFormSubmit({
-                      SMTP_ADMIN_EMAIL: '',
-                      SMTP_HOST: '',
-                      SMTP_PORT: '',
-                      SMTP_USER: '',
-                      SMTP_PASS: '',
-                      SMTP_SENDER_NAME: '',
-                      RATE_LIMIT_EMAIL_SENT: 30,
-                    })
-                  }
-                  setCustomSMTP(!isCustomSMTPEnabled)
-                }}
-                isOn={isCustomSMTPEnabled}
-              />
-            </div>
-          </div>
+          <UIToggle
+            layout="horizontal"
+            className="mb-4"
+            label="Enable Custom SMTP"
+            checked={isCustomSMTPEnabled}
+            onChange={(value: any) => {
+              /*
+               * temporary solution
+               * clear the values of SMTP when toggling
+               */
+              if (!value) {
+                onFormSubmit({
+                  SMTP_ADMIN_EMAIL: '',
+                  SMTP_HOST: '',
+                  SMTP_PORT: '',
+                  SMTP_USER: '',
+                  SMTP_PASS: '',
+                  SMTP_SENDER_NAME: '',
+                  RATE_LIMIT_EMAIL_SENT: 30,
+                })
+              }
+              setCustomSMTP(!isCustomSMTPEnabled)
+            }}
+          />
           {isCustomSMTPEnabled && (
             <>
               <AutoField
