@@ -305,15 +305,27 @@ export const LogPage: NextPage = () => {
           </div>
         )}
         <div className="flex flex-col flex-grow relative">
-          {isValidating && (
+          {isValidating ? (
             <div
               className={[
-                'absolute top-0 w-full h-full bg-gray-800 flex items-center justify-center',
+                'absolute top-0 w-full h-full flex items-center justify-center',
                 `${isValidating ? 'bg-opacity-75 z-50' : ''}`,
               ].join(' ')}
             >
               <IconLoader className="animate-spin" />
             </div>
+          ) : (
+            <>
+              <LogTable data={logData} isCustomQuery={mode === 'custom'} />
+              {/* Footer section of log ui, appears below table */}
+              <div className="p-2">
+                {!isSelectQuery && (
+                  <Button onClick={() => setSize(size + 1)} icon={<IconRewind />} type="default">
+                    Load older
+                  </Button>
+                )}
+              </div>
+            </>
           )}
           {error && (
             <div className="flex w-full h-full justify-center items-center mx-auto">
@@ -335,20 +347,6 @@ export const LogPage: NextPage = () => {
               </Card>
             </div>
           )}
-          <LogTable data={logData} isCustomQuery={mode === 'custom'} />
-          {/* Footer section of log ui, appears below table */}
-          <div className="p-2">
-            {!isSelectQuery && (
-              <Button
-                // trigger page increase
-                onClick={() => setSize(size + 1)}
-                icon={<IconRewind />}
-                type="secondary"
-              >
-                Load older
-              </Button>
-            )}
-          </div>
         </div>
       </div>
     </SettingsLayout>
