@@ -49,6 +49,11 @@ const DatabaseTables: NextPage = () => {
     setSelectedColumnToEdit(column)
   }
 
+  const onDeleteColumn = (column: PostgresColumn) => {
+    setIsDeleting(true)
+    setSelectedColumnToDelete(column)
+  }
+
   const onColumnUpdated = async () => {
     const updatedTable = await meta.tables.loadById(selectedTable.id)
     setSelectedTable(updatedTable)
@@ -80,6 +85,31 @@ const DatabaseTables: NextPage = () => {
     }
   }
 
+  const onConfirmDeleteColumn = async () => {
+    try {
+      if (isUndefined(selectedColumnToDelete)) return
+
+      const response: any = await meta.columns.del(selectedColumnToDelete.id)
+      if (response.error) {
+        throw response.error
+      } else {
+        onColumnUpdated()
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully removed ${selectedColumnToDelete.name}.`,
+        })
+      }
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to delete ${selectedColumnToDelete?.name}: ${error.message}`,
+      })
+    } finally {
+      setIsDeleting(false)
+      setSelectedColumnToDelete(undefined)
+    }
+  }
+
   return (
     <DatabaseLayout title="Database">
       <div className="p-4">
@@ -95,8 +125,8 @@ const DatabaseTables: NextPage = () => {
             selectedTable={selectedTable}
             onAddColumn={onAddColumn}
             onEditColumn={onEditColumn}
+            onDeleteColumn={onDeleteColumn}
             onSelectBack={() => setSelectedTable(undefined)}
-            onColumnDeleted={onColumnUpdated}
           />
         )}
       </div>
@@ -115,6 +145,22 @@ const DatabaseTables: NextPage = () => {
         buttonLoadingLabel="Deleting"
         onSelectCancel={() => setIsDeleting(false)}
         onSelectConfirm={onConfirmDeleteTable}
+      />
+      <ConfirmationModal
+        danger
+        visible={isDeleting && !isUndefined(selectedColumnToDelete)}
+        header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
+        children={
+          <Modal.Content>
+            <p className="py-4 text-sm text-scale-1100">
+              Are you sure you want to delete the selected column? This action cannot be undone.
+            </p>
+          </Modal.Content>
+        }
+        buttonLabel="Delete"
+        buttonLoadingLabel="Deleting"
+        onSelectCancel={() => setIsDeleting(false)}
+        onSelectConfirm={onConfirmDeleteColumn}
       />
       <SidePanelEditor
         sidePanelKey={sidePanelKey}
