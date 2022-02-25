@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { Menu, Typography } from '@supabase/ui'
 
 interface Props {
-  key: string
   name: string | ReactNode
   isActive: boolean
   icon?: ReactNode
@@ -14,7 +13,6 @@ interface Props {
 }
 
 const ProductMenuItem: FC<Props> = ({
-  key,
   name,
   isActive,
   icon,
@@ -34,7 +32,7 @@ const ProductMenuItem: FC<Props> = ({
 
   if (url) {
     return (
-      <Link key={key} href={url}>
+      <Link href={url}>
         <a className="block" target={target}>
           {menuItem}
         </a>
