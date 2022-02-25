@@ -80,7 +80,8 @@ export const Wizard = observer(() => {
   const totalFreeProjects = subscriptionStats.total_free_projects
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
 
-  const isEmptyOrganizations = organizations.length <= 0
+  const isOrganizationOwner = currentOrg?.is_owner || !app.organizations.isInitialized
+  const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
   const isEmptyPaymentMethod = stripeCustomer
     ? stripeCustomer.paymentMethods?.data?.length <= 0
     : undefined
@@ -191,6 +192,7 @@ export const Wizard = observer(() => {
     <WizardLayout organization={currentOrg} project={null}>
       <Panel
         hideHeaderStyling
+        isLoading={app.organizations.isInitialized}
         title={
           <div key="panel-title">
             <Typography.Title level={4} className="mb-0">
@@ -218,126 +220,127 @@ export const Wizard = observer(() => {
           </div>
         }
       >
-        <>
-          <Panel.Content className="pt-0 pb-6">
-            <Typography.Text>
-              Your project will have its own dedicated instance and full postgres database.
-              <br />
-              An API will be set up so you can easily interact with your new database.
-              <br />
-            </Typography.Text>
-          </Panel.Content>
-          <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4">
+        <Panel.Content className="pt-0 pb-6">
+          <Typography.Text>
+            Your project will have its own dedicated instance and full postgres database.
+            <br />
+            An API will be set up so you can easily interact with your new database.
+            <br />
+          </Typography.Text>
+        </Panel.Content>
+        <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4">
+          {/* Listbox will throw error on empty list box item. We need to add a check */}
+          {organizations.length > 0 && (
             <Listbox
               label="Organization"
               layout="horizontal"
               value={currentOrg?.slug}
               onChange={(slug) => router.push(`/new/${slug}`)}
             >
-              {organizations.map((x: any) => (
+              {organizations?.map((x: any) => (
                 <Listbox.Option
-                  key={x.id}
-                  label={x.name}
-                  value={x.slug}
+                  key={x?.id}
+                  label={x?.name}
+                  value={x?.slug}
                   addOnBefore={() => <IconUsers />}
                 >
-                  {x.name}
+                  {x?.name}
+                </Listbox.Option>
+              ))}
+            </Listbox>
+          )}
+
+          {!isOrganizationOwner && <NotOrganizationOwnerWarning />}
+        </Panel.Content>
+
+        {canCreateProject && (
+          <>
+            <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
+              <FormField
+                // @ts-ignore
+                label="Name"
+                type="text"
+                placeholder="Project name"
+                value={projectName}
+                onChange={onProjectNameChange}
+                autoFocus
+              />
+            </Panel.Content>
+
+            <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+              <FormField
+                // @ts-ignore
+                label="Database Password"
+                type="password"
+                placeholder="Type in a strong password"
+                value={dbPass}
+                onChange={onDbPassChange}
+                description={
+                  <PasswordStrengthBar
+                    passwordStrengthScore={passwordStrengthScore}
+                    password={dbPass}
+                    passwordStrengthMessage={passwordStrengthMessage}
+                  />
+                }
+                errorMessage={passwordStrengthWarning}
+              />
+            </Panel.Content>
+
+            <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+              <FormField
+                // @ts-ignore
+                label="Region"
+                type="select"
+                choices={REGIONS}
+                value={dbRegion}
+                onChange={onDbRegionChange}
+                description="Select a region close to you for the best performance."
+              />
+            </Panel.Content>
+          </>
+        )}
+
+        {currentOrg?.is_owner && (
+          <Panel.Content className="Form section-block--body has-inputs-centered ">
+            <Listbox
+              label="Pricing Plan"
+              layout="horizontal"
+              value={dbPricingPlan}
+              onChange={onDbPricingPlanChange}
+              // @ts-ignore
+              descriptionText={
+                <>
+                  Select a plan that suits your needs.&nbsp;
+                  <a className="underline" target="_blank" href="https://supabase.com/pricing">
+                    More details
+                  </a>
+                </>
+              }
+            >
+              {Object.entries(PRICING_PLANS).map(([k, v]) => (
+                <Listbox.Option key={k} label={v} value={v}>
+                  {`${v}${v === PRICING_PLANS.PRO ? ' - $25/month' : ''}`}
                 </Listbox.Option>
               ))}
             </Listbox>
 
-            {!currentOrg?.is_owner && <NotOrganizationOwnerWarning />}
+            {isSelectFreeTier && isOverFreeProjectLimit && (
+              <FreeProjectLimitWarning limit={freeProjectsLimit} />
+            )}
+            {!isSelectFreeTier && isEmptyPaymentMethod && (
+              <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
+            )}
           </Panel.Content>
+        )}
 
-          {canCreateProject && (
-            <>
-              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                <FormField
-                  // @ts-ignore
-                  label="Name"
-                  type="text"
-                  placeholder="Project name"
-                  value={projectName}
-                  onChange={onProjectNameChange}
-                  autoFocus
-                />
-              </Panel.Content>
-
-              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                <FormField
-                  // @ts-ignore
-                  label="Database Password"
-                  type="password"
-                  placeholder="Type in a strong password"
-                  value={dbPass}
-                  onChange={onDbPassChange}
-                  description={
-                    <PasswordStrengthBar
-                      passwordStrengthScore={passwordStrengthScore}
-                      password={dbPass}
-                      passwordStrengthMessage={passwordStrengthMessage}
-                    />
-                  }
-                  errorMessage={passwordStrengthWarning}
-                />
-              </Panel.Content>
-
-              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                <FormField
-                  // @ts-ignore
-                  label="Region"
-                  type="select"
-                  choices={REGIONS}
-                  value={dbRegion}
-                  onChange={onDbRegionChange}
-                  description="Select a region close to you for the best performance."
-                />
-              </Panel.Content>
-            </>
-          )}
-
-          {currentOrg?.is_owner && (
-            <Panel.Content className="Form section-block--body has-inputs-centered ">
-              <Listbox
-                label="Pricing Plan"
-                layout="horizontal"
-                value={dbPricingPlan}
-                onChange={onDbPricingPlanChange}
-                // @ts-ignore
-                descriptionText={
-                  <>
-                    Select a plan that suits your needs.&nbsp;
-                    <a className="underline" target="_blank" href="https://supabase.com/pricing">
-                      More details
-                    </a>
-                  </>
-                }
-              >
-                {Object.entries(PRICING_PLANS).map(([k, v]) => (
-                  <Listbox.Option key={k} label={v} value={v}>
-                    {`${v}${v === PRICING_PLANS.PRO ? ' - $25/month' : ''}`}
-                  </Listbox.Option>
-                ))}
-              </Listbox>
-
-              {isSelectFreeTier && isOverFreeProjectLimit && (
-                <FreeProjectLimitWarning limit={freeProjectsLimit} />
-              )}
-              {!isSelectFreeTier && isEmptyPaymentMethod && (
-                <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
-              )}
-            </Panel.Content>
-          )}
-
-          {subscriptionStats.isLoading && (
-            <Panel.Content>
-              <div className="py-10">
-                {/* @ts-ignore */}
-                <Loading active={true} />
-              </div>
-            </Panel.Content>
-          )}
-        </>
+        {subscriptionStats.isLoading && (
+          <Panel.Content>
+            <div className="py-10">
+              {/* @ts-ignore */}
+              <Loading active={true} />
+            </div>
+          </Panel.Content>
+        )}
       </Panel>
     </WizardLayout>
   )
