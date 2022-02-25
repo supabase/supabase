@@ -1,12 +1,4 @@
-import {
-  Button,
-  IconX,
-  IconLoader,
-  IconClipboard,
-  IconDownload,
-  IconTrash2,
-  Typography,
-} from '@supabase/ui'
+import { Button, IconX, IconLoader, IconClipboard, IconDownload, IconTrash2 } from '@supabase/ui'
 import SVG from 'react-inlinesvg'
 import { formatBytes } from 'lib/helpers'
 import { Transition } from '@headlessui/react'
@@ -41,7 +33,7 @@ const PreviewFile = ({ mimeType, previewUrl }) => {
           }
         />
         <p className="text-sm text-center mt-2 w-2/5">
-          <Typography.Text>File size is too large to preview in the explorer</Typography.Text>
+          File size is too large to preview in the explorer
         </p>
       </div>
     )
@@ -138,7 +130,7 @@ const PreviewPane = ({
           {/* Preview Information */}
           <div className="space-y-1">
             <div className="flex items-center">
-              <h5 className="text-scale-1200 text-base font-bold mr-2">{file.name}</h5>
+              <h5 className="text-scale-1200 text-base font-bold mr-2 truncate">{file.name}</h5>
             </div>
             {mimeType && (
               <p className="text-sm text-scale-1100">
@@ -151,30 +143,26 @@ const PreviewPane = ({
           {/* Preview Metadata */}
           <div className="space-y-2">
             <div>
-              <Typography.Text>
-                <label className="text-xs text-scale-900 mb-1">Added on</label>
-                <p className="text-sm text-scale-1100">{createdAt}</p>
-              </Typography.Text>
+              <label className="text-xs text-scale-900 mb-1">Added on</label>
+              <p className="text-sm text-scale-1100">{createdAt}</p>
             </div>
             <div>
-              <Typography.Text>
-                <label className="text-xs text-scale-900 mb-1">Last modified</label>
-                <p className="text-sm text-scale-1100">{updatedAt}</p>
-              </Typography.Text>
+              <label className="text-xs text-scale-900 mb-1">Last modified</label>
+              <p className="text-sm text-scale-1100">{updatedAt}</p>
             </div>
           </div>
 
           {/* Actions */}
           <div className="flex space-x-2 border-b pb-4 border-panel-border-light dark:border-panel-border-dark">
             <Button
-              type="secondary"
+              type="default"
               icon={<IconDownload size={16} strokeWidth={2} />}
               onClick={() => onDownloadFile(file)}
             >
               Download
             </Button>
             <Button
-              type="default"
+              type="outline"
               icon={<IconClipboard size={16} strokeWidth={2} />}
               onClick={() => onCopyFileURL(file)}
             >
@@ -182,7 +170,7 @@ const PreviewPane = ({
             </Button>
           </div>
           <Button
-            type="default"
+            type="outline"
             shadow={false}
             size="tiny"
             icon={<IconTrash2 size={16} strokeWidth={2} />}

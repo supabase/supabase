@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { get, sum } from 'lodash'
-import { Checkbox, IconUpload, Typography } from '@supabase/ui'
+import { Checkbox, IconUpload } from '@supabase/ui'
 import { Transition } from '@headlessui/react'
 import { useContextMenu } from 'react-contexify'
 
@@ -38,9 +38,9 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }) => {
             style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
           >
             <IconUpload className="text-white pointer-events-none" size={20} strokeWidth={2} />
-            <Typography.Text className="text-center text-sm mt-2 pointer-events-none">
+            <p className="text-center text-sm mt-2 pointer-events-none">
               Drop your files to upload to this folder
-            </Typography.Text>
+            </p>
           </div>
         )}
       </div>
@@ -165,14 +165,10 @@ const FileExplorerColumn = ({
           {columnFiles.length > 0 ? (
             <>
               <SelectAllCheckbox />
-              <Typography.Text type="secondary">
-                <p className="text-sm">Select all {columnFiles.length} files</p>
-              </Typography.Text>
+              <p className="text-sm text-scale-1100">Select all {columnFiles.length} files</p>
             </>
           ) : (
-            <Typography.Text type="secondary">
-              <p className="text-sm">No files available for selection</p>
-            </Typography.Text>
+            <p className="text-sm text-scale-1100">No files available for selection</p>
           )}
         </div>
       )}
@@ -187,13 +183,21 @@ const FileExplorerColumn = ({
         "
         >
           <SelectAllCheckbox />
-          <Typography.Text style={{ width: '30%', minWidth: '250px' }}>Name</Typography.Text>
-          <Typography.Text style={{ width: '15%', minWidth: '100px' }}>Size</Typography.Text>
-          <Typography.Text style={{ width: '15%', minWidth: '100px' }}>Type</Typography.Text>
-          <Typography.Text style={{ width: '20%', minWidth: '180px' }}>Created at</Typography.Text>
-          <Typography.Text style={{ width: '20%', minWidth: '180px' }}>
+          <p className="text-sm" style={{ width: '30%', minWidth: '250px' }}>
+            Name
+          </p>
+          <p className="text-sm" style={{ width: '15%', minWidth: '100px' }}>
+            Size
+          </p>
+          <p className="text-sm" style={{ width: '15%', minWidth: '100px' }}>
+            Type
+          </p>
+          <p className="text-sm" style={{ width: '20%', minWidth: '180px' }}>
+            Created at
+          </p>
+          <p className="text-sm" style={{ width: '20%', minWidth: '180px' }}>
             Last modified at
-          </Typography.Text>
+          </p>
           <div className="w-3" />
         </div>
       )}
@@ -254,14 +258,10 @@ const FileExplorerColumn = ({
       {column.items.length === 0 && column.status !== STORAGE_ROW_STATUS.LOADING && (
         <div className="h-full w-full flex flex-col items-center justify-center">
           <img src="/img/storage-placeholder.svg" className="opacity-75" />
-          <Typography.Text>
-            <p className="my-3 opacity-75">Drop your files here</p>
-          </Typography.Text>
-          <Typography.Text type="secondary">
-            <p className="text-sm text-center w-40">
-              Or upload them via the "Upload file" button above
-            </p>
-          </Typography.Text>
+          <p className="my-3 opacity-75">Drop your files here</p>
+          <p className="text-sm text-center w-40 text-scale-1100">
+            Or upload them via the "Upload file" button above
+          </p>
         </div>
       )}
 
@@ -283,9 +283,9 @@ const FileExplorerColumn = ({
           px-4 py-2 flex items-center min-w-min sticky bottom-0 z-10
         "
         >
-          <Typography.Text small>
+          <p className="text-sm">
             {formatBytes(columnItemsSize)} for {columnItems.length} items
-          </Typography.Text>
+          </p>
         </div>
       )}
     </div>
