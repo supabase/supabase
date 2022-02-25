@@ -424,7 +424,7 @@ const TeamSettings = observer(() => {
             </div>
           ) : (
             <div>
-              <Button type="secondary" onClick={() => leaveTeam()} loading={isLeaving}>
+              <Button type="default" onClick={() => leaveTeam()} loading={isLeaving}>
                 Leave team
               </Button>
             </div>
@@ -448,7 +448,7 @@ const MembersFilterInput = observer(() => {
   return (
     <Input
       icon={<IconSearch size="tiny" />}
-      size="tiny"
+      size="small"
       value={PageState.membersFilterString}
       onChange={onFilterMemberChange}
       name="email"
