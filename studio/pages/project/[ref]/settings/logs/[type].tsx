@@ -75,15 +75,15 @@ export const LogPage: NextPage = () => {
 
   useEffect(() => {
     // on mount, set initial values
-    if (q) {
+    if (q !== undefined && q !== '') {
       onSelectTemplate({
         mode: 'custom',
         searchString: q as string,
       })
-    } else if (s) {
+    } else {
       onSelectTemplate({
         mode: 'simple',
-        searchString: s as string,
+        searchString: (s || '') as string,
       })
     }
     if (te) {
@@ -91,7 +91,7 @@ export const LogPage: NextPage = () => {
     } else {
       setParams((prev) => ({ ...prev, timestamp_end: '' }))
     }
-  }, [])
+  }, [q, s, te])
 
   const genQueryParams = (params: { [k: string]: string }) => {
     // remove keys which are empty strings, null, or undefined
