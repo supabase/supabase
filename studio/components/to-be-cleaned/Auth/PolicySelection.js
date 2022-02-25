@@ -1,6 +1,5 @@
-import { Card, IconEdit, IconGrid, Modal, Typography } from '@supabase/ui'
+import { IconEdit, IconGrid, Modal } from '@supabase/ui'
 import CardButton from 'components/ui/CardButton'
-import SVG from 'react-inlinesvg'
 
 const PolicySelection = ({
   description = '',
