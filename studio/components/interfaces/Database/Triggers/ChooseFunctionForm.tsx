@@ -8,7 +8,6 @@ import {
   IconChevronDown,
   IconHelpCircle,
   IconTerminal,
-  IconTool,
   SidePanel,
   Typography,
 } from '@supabase/ui'
@@ -118,9 +117,9 @@ const NoFunctionsState: React.FC = ({}) => {
         router.push(`/project/${ref}/database/functions`)
       }}
     >
-      <Typography.Text type="secondary">
+      <p className="text-sm text-scale-1100">
         You will need to create a trigger based function before you can add it to your trigger.
-      </Typography.Text>
+      </p>
     </ProductEmptyState>
   )
 }

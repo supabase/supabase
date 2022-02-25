@@ -120,14 +120,14 @@ const TriggersList: FC<any> = observer(
               onClickCta={() => createTrigger()}
             >
               <AlphaPreview />
-              <Typography.Text type="secondary">
+              <p className="text-sm text-scale-1100">
                 A PostgreSQL trigger is a function invoked automatically whenever an event
                 associated with a table occurs.
-              </Typography.Text>
-              <Typography.Text type="secondary">
+              </p>
+              <p className="text-sm text-scale-1100">
                 An event could be any of the following: INSERT, UPDATE, DELETE. A trigger is a
                 special user-defined function associated with a table.
-              </Typography.Text>
+              </p>
             </ProductEmptyState>
           </div>
         ) : (
