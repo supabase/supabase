@@ -12,7 +12,6 @@ import {
   IconPlayCircle,
   IconPauseCircle,
   IconTerminal,
-  IconTool,
   Badge,
   Button,
 } from '@supabase/ui'
@@ -395,9 +394,9 @@ const NoTableState: FC = ({}) => {
         router.push(`/project/${ref}/database/tables`)
       }}
     >
-      <Typography.Text type="secondary">
+      <p className="text-sm text-scale-1100">
         You will need to create a table first before you can make a trigger
-      </Typography.Text>
+      </p>
     </ProductEmptyState>
   )
 }

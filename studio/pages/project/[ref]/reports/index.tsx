@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { Typography } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { useStore, withAuth } from 'hooks'
@@ -13,8 +12,6 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 
 import { useProjectContentStore } from 'stores/projectContentStore'
 import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
-
-const { Text } = Typography
 
 const PageLayout = () => {
   const [loading, setLoading] = useState(true)
@@ -70,11 +67,11 @@ const PageLayout = () => {
               }
             }}
           >
-            <Text type="secondary">Create custom reports for your projects.</Text>
-            <Text type="secondary">
+            <p className="text-sm text-scale-1100">Create custom reports for your projects.</p>
+            <p className="text-sm text-scale-1100">
               Get a high level overview of your network traffic, user actions, and infrastructure
               health.
-            </Text>
+            </p>
           </ProductEmptyState>
         )}
       </div>

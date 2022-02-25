@@ -135,7 +135,7 @@ const TriggersList: FC<any> = observer(
               onClickCta={() => enableHooks()}
             >
               <AlphaPreview />
-              <span className="text-sm text-scale-1100">Enable hooks on your project.</span>
+              <p className="text-sm text-scale-1100">Enable hooks on your project.</p>
             </ProductEmptyState>
           )}
         </>
@@ -170,10 +170,10 @@ const TriggersList: FC<any> = observer(
               onClickCta={() => createHook()}
             >
               <AlphaPreview />
-              <span className="text-sm text-scale-1100">
+              <p className="text-sm text-scale-1100">
                 Function Hooks can be used to trigger serverless functions or send requests to an
                 HTTP endpoint.
-              </span>
+              </p>
             </ProductEmptyState>
           </div>
         ) : (
