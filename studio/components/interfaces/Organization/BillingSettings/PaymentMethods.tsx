@@ -49,7 +49,7 @@ const PaymentMethods: FC<Props> = ({ loading, paymentMethods, redirectToPortal }
                     />
                     <Input
                       readOnly
-                      size="tiny"
+                      size="small"
                       value={`•••• •••• •••• ${paymentMethod.card.last4}`}
                     />
                     <p>
