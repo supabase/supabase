@@ -48,7 +48,7 @@ const Users = () => {
       <div className="flex justify-between px-6 pt-6 pb-2">
         <div className="relative flex space-x-1">
           <Input
-            size="tiny"
+            size="small"
             value={PageState.filterInputValue}
             onChange={onFilterChange}
             onKeyDown={onFilterKeyPress}
