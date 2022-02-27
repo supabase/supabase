@@ -55,105 +55,116 @@ info:
 pages:
   supabase help:
     description: |
-      ```
       Help provides help for any command in the application.
-      Simply type supabase help [path to command] for full details.
 
-      Usage:
-        supabase help [command]
-      ```
+      Simply type supabase help `[path to command]` for full details.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase help [command]
+          ```
 
   supabase init:
     description: |
-      ```
       Initialize a project to use Supabase CLI.
-
-      Usage:
-        supabase init
-      ```
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase init
+          ```
 
   supabase start:
     description: |
-      ```
       Start the Supabase local development setup.
-
-      Usage:
-        supabase start
-      ```
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase start
+          ```
 
   supabase db branch list:
     description: |
-      ```
       List branches.
-
-      Usage:
-        supabase db branch list
-      ```
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase db branch list
+          ```
 
   supabase db branch create:
     description: |
-      ```
       Create a branch.
-
-      Usage:
-        supabase db branch create <branch name>
-      ```
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase db branch create <branch name>
+          ```
 
   supabase db branch delete:
     description: |
-      ```
       Delete a branch.
-
-      Usage:
-        supabase db branch delete <branch name>
-      ```
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase db branch delete <branch name>
+          ```
 
   supabase db switch:
     description: |
-      ```
       Switch branches.
-
-      Usage:
-        supabase db switch <branch name>
-      ```
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase db switch <branch name>
+          ```
 
   supabase db changes:
     description: |
-      ```
       Diffs the local database with current migrations, then print the diff to standard output.
-
-      Usage:
-        supabase db changes
-      ```
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase db changes
+          ```
 
   supabase db commit:
     description: |
-      ```
       Diffs the local database with current migrations, writing it as a new migration.
-
-      Usage:
-        supabase db commit <migration name>
-      ```
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase db commit <migration name>
+          ```
 
   supabase db reset:
     description: |
-      ```
       Resets the local database to reflect current migrations. Any changes on the local database that is not committed will be lost.
-
-      Usage:
-        supabase db reset
-      ```
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase db reset
+          ```
 
   supabase db remote set:
     description: |
-      ```
       Set the remote database to push migrations to.
-
-      Usage:
-        supabase db remote set <remote database connection url>
-      ```
     examples:
-      - name: "`db remote set` command"
+      - name: Usage
+        sh: |
+          ```sh
+          supabase db remote set <remote database connection url>
+          ```
+      - name: Connection string format
         sh: |
           ```sh
           supabase db remote set postgresql://postgres:[YOUR-PASSWORD]@db.azeazeiqsdiqswdsqdxc.supabase.co:5432/postgres
@@ -161,55 +172,70 @@ pages:
 
   supabase db remote commit:
     description: |
-      ```
       Commit changes on the remote database since the last pushed migration.
-
-      Usage:
-        supabase db remote commit
-      ```
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase db remote commit
+          ```
 
   supabase db push:
     description: |
-      ```
       Push new migrations to the remote database.
-
-      Usage:
-        supabase db push
-      ```
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase db push
+          ```
 
   supabase migration new:
     description: |
-      ```
       Create an empty migration.
-
-      Usage:
-        supabase migration new <migration name>
-      ```
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase migration new <migration name>
+          ```
 
   Config reference:
     description: |
       The config file resides in `supabase/config.json` after you run `supabase init`.
 
-      #### `projectId` (required)
+      ### `projectId` 
+      
+      `required`
 
       A string used to distinguish different Supabase projects on the same host. Defaults to the working directory name when running `supabase init`.
 
-      #### `ports.api` (required)
+      ### `ports.api`
+      
+      `required`
 
       Host port used for the API URL. Defaults to `54321`.
 
-      #### `ports.db` (required)
+      ### `ports.db`
+      
+      `required`
 
       Host port used for the DB URL. Defaults to `54322`.
 
-      #### `ports.studio` (required)
+      ### `ports.studio` 
+      
+      `required`
 
       Host port used for Supabase Studio. Defaults to `54323`.
 
-      #### `ports.inbucket` (optional)
+      ### `ports.inbucket` 
+      
+      `optional`
 
       Host port used for the web interface of Inbucket email testing server. When not specified, emails are automatically confirmed. When specified, emails are not sent to the recipient, but rather monitored and accessible via the web interface.
 
-      #### `dbVersion` (required)
+      ### `dbVersion` 
+      
+      `required`
 
       Server version number used for the database. This needs to match the server version number of the remote database you intend to link to with `supabase db remote set`. You can retrieve it by running `SHOW server_version_num`.
