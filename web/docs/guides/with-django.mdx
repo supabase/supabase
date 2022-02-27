@@ -1,0 +1,155 @@
+---
+id: with-django
+title: 'Quickstart: Django'
+description: Learn how to use Supabase in your Django App.
+---
+
+## Intro
+
+TODO
+
+Note: Django support is community supported and it is very much in an Alpha phase.
+
+## Project set up
+
+Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase
+and then creating a "schema" inside the database.
+
+### Create a project
+
+1. Go to [app.supabase.io](https://app.supabase.io).
+1. Click on "New Project".
+1. Enter your project details.
+1. Wait for the new database to launch.
+
+### Set up the database schema
+
+Now we are going to set up the database schema. We can use the "User Management Starter" quickstart in the SQL Editor,
+or you can just copy/paste the SQL from below and run it yourself.
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'SQL', value: 'SQL'},
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "SQL" section.
+2. Click "User Management Starter".
+3. Click "Run".
+```
+
+<video width="99%" muted playsInline controls="true">
+  <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
+</video>
+
+</TabItem>
+<TabItem value="SQL">
+
+```sql
+-- Create a table for public "profiles"
+create table profiles (
+  id uuid references auth.users not null,
+  updated_at timestamp with time zone,
+  username text unique,
+  avatar_url text,
+  website text,
+
+  primary key (id),
+  unique(username),
+  constraint username_length check (char_length(username) >= 3)
+);
+
+alter table profiles enable row level security;
+
+create policy "Public profiles are viewable by everyone."
+  on profiles for select
+  using ( true );
+
+create policy "Users can insert their own profile."
+  on profiles for insert
+  with check ( auth.uid() = id );
+
+create policy "Users can update own profile."
+  on profiles for update
+  using ( auth.uid() = id );
+
+-- Set up Realtime!
+begin;
+  drop publication if exists supabase_realtime;
+  create publication supabase_realtime;
+commit;
+alter publication supabase_realtime add table profiles;
+
+-- Set up Storage!
+insert into storage.buckets (id, name)
+values ('avatars', 'avatars');
+
+create policy "Avatar images are publicly accessible."
+  on storage.objects for select
+  using ( bucket_id = 'avatars' );
+
+create policy "Anyone can upload an avatar."
+  on storage.objects for insert
+  with check ( bucket_id = 'avatars' );
+
+```
+
+</TabItem>
+</Tabs>
+
+### Get the API Keys
+
+Now that you've created some database tables, you are ready to insert data using the auto-generated API.
+We just need to get the URL and `anon` key from the API settings.
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'}
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the "Settings" section.
+2. Click "API" in the sidebar.
+3. Find your API URL in this page.
+4. Find your "anon" and "service_role" keys on this page.
+```
+
+<video width="99%" muted playsInline controls="true">
+  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+</video>
+
+</TabItem>
+</Tabs>
+
+## Building the App
+
+Let's start building the Django from scratch.
+
+### Initialize a Django app
+
+TODO
+
+Now let's create a helper file to initialize the Supabase client.
+We need the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+These variables will be exposed on the browser, and that's completely fine since we have
+[Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
+
+### Set up a Login component
+
+TODO
+
+### Account page
+
+TODO
+
+## Next steps
+
+At this stage you have a fully functional application!
+
+- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
+- Sign in: [app.supabase.io](https://app.supabase.io)
