@@ -19,7 +19,6 @@ import styles from './styles.module.css'
 import CustomCodeBlock from '../components/CustomCodeBlock'
 import GithubCard from '../components/GithubCard'
 import HowCard from '../components/HowCard'
-//import { repos } from '../data/github' Removed as Deprecated in favour of Github API
 
 const heroExample = `
 const messages = supabase
