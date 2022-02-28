@@ -205,11 +205,11 @@ const ProjectDeleteModal = ({ project }: any) => {
       <TextConfirmModal
         visible={isOpen}
         loading={loading}
-        title={`Confirm deletion of ${project.name}`}
+        title={`Confirm deletion of ${project?.name}`}
         confirmPlaceholder="Type the project name in here"
         alert="This action cannot be undone."
-        text={`This will permanently delete the ${project.name} project and all of its data.`}
-        confirmString={project.name}
+        text={`This will permanently delete the ${project?.name} project and all of its data.`}
+        confirmString={project?.name}
         confirmLabel="I understand, delete this project"
         onConfirm={handleDeleteProject}
         onCancel={toggle}
