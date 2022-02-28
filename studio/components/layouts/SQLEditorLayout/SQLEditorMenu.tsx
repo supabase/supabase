@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 import {
   Button,
   Dropdown,
-  Divider,
   Typography,
   Menu,
   Input,
@@ -16,6 +15,7 @@ import {
   IconTrash,
   IconChevronDown,
 } from '@supabase/ui'
+import Divider from 'components/ui/Divider'
 import { partition } from 'lodash'
 
 import { useStore } from 'hooks'

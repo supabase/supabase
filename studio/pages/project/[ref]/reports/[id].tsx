@@ -13,7 +13,6 @@ import {
   Badge,
   IconSettings,
   IconArrowRight,
-  Divider,
   IconHome,
   IconChevronRight,
   IconPlus,
@@ -314,7 +313,7 @@ const Reports = () => {
                   </div>
                 </Dropdown.TriggerItem>
               </Dropdown>
-              <Divider light />
+              <Dropdown.Seperator />
             </>
           )
         })}

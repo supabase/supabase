@@ -306,7 +306,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                                         >
                                           Generate a random secret
                                         </Dropdown.Item>
-                                        <Divider light />
+                                        <Dropdown.Seperator />
                                         <Dropdown.Item
                                           onClick={() => setIsCreatingKey(true)}
                                           icon={<IconPenTool size={16} />}

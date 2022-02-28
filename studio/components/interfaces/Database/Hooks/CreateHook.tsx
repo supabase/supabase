@@ -7,7 +7,6 @@ import { Dictionary } from '@supabase/grid'
 import {
   Input,
   SidePanel,
-  Divider,
   Checkbox,
   Listbox,
   Typography,
@@ -646,7 +645,6 @@ const ListboxTable: FC = observer(({}) => {
           >
             <div className="flex flex-row items-center space-x-1">
               <Typography.Text>{x.name}</Typography.Text>
-              <Divider light type="vertical" />
               <Typography.Text type="secondary" className="opacity-50" small>
                 {x.schema}
               </Typography.Text>
