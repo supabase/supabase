@@ -4,7 +4,6 @@ import { observer } from 'mobx-react-lite'
 import {
   Button,
   Dropdown,
-  Divider,
   Menu,
   Input,
   Typography,
@@ -73,7 +72,7 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: any }) => {
         <Dropdown.Item onClick={renameQuery} icon={<IconEdit2 size="tiny" />}>
           Rename query
         </Dropdown.Item>
-        <Divider light />
+        <Dropdown.Seperator />
         <Dropdown.Item onClick={() => setDeleteModalOpen(true)} icon={<IconTrash size="tiny" />}>
           Remove query
         </Dropdown.Item>

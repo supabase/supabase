@@ -5,7 +5,6 @@ import { isEmpty, mapValues, has, without, union } from 'lodash'
 import {
   Input,
   SidePanel,
-  Divider,
   Checkbox,
   Listbox,
   Typography,
@@ -578,7 +577,6 @@ const ListboxTable: FC = observer(({}) => {
           >
             <div className="flex flex-row items-center space-x-1">
               <Typography.Text>{x.name}</Typography.Text>
-              <Divider light type="vertical" />
               <Typography.Text type="secondary" className="text-scale-900" small>
                 {x.schema}
               </Typography.Text>

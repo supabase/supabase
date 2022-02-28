@@ -1,6 +1,7 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Divider, Typography } from '@supabase/ui'
+import { Typography } from '@supabase/ui'
+import Divider from 'components/ui/Divider'
 import { AutoField } from 'uniforms-bootstrap4'
 
 import { useStore } from 'hooks'
