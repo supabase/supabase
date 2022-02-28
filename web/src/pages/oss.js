@@ -27,7 +27,6 @@ export default function Oss() {
     const reposResponse = await octokit.request("GET /orgs/{org}/repos", {
       org: "supabase",
       type: "public",
-      sort: "updated",
       per_page: 6,
       page: 1
     });
