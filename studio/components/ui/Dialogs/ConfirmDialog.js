@@ -1,8 +1,8 @@
 import { Modal, Button, Form } from '@supabase/ui'
 import { useState, useEffect } from 'react'
 
-// [Joshen] I feel like having the confirm modal as a component to import is better than firing
-// the confirmAlert helper function? We'd have the modal transitions too
+// [Joshen] As of 280222, let's just use THIS component as the one and only confirmation modal
+// deprecate all others, since it uses the Form component from the UI library as well
 
 const ConfirmModal = ({
   visible = false,
@@ -42,6 +42,7 @@ const ConfirmModal = ({
         initialValues={{}}
         validateOnBlur
         onSubmit={() => {
+          console.log('onSubmit')
           onConfirm()
         }}
         validate={() => {
@@ -58,7 +59,7 @@ const ConfirmModal = ({
               <Modal.Seperator />
               <Modal.Content>
                 <div className="flex items-center gap-2">
-                  <Button type="default" onClick={() => onSelectCancel} block>
+                  <Button htmlType="button" type="default" onClick={onSelectCancel} block>
                     Cancel
                   </Button>
                   <Button

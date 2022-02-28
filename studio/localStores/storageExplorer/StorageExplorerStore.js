@@ -2,7 +2,6 @@ import { createContext, useContext } from 'react'
 import { makeAutoObservable } from 'mobx'
 import {
   find,
-  findIndex,
   compact,
   isEqual,
   isNull,
