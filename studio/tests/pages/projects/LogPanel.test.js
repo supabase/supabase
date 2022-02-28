@@ -36,6 +36,7 @@ test('toggle event chart', async () => {
   const mockFn = jest.fn()
   const { rerender } = render(<LogPanel onToggleEventChart={mockFn} isShowingEventChart={true} />)
   const toggle = getToggleByText(/Show event chart/)
+  console.log('TOGGLE', toggle)
   userEvent.click(toggle)
   expect(mockFn).toBeCalled()
   rerender(<LogPanel isShowingEventChart={false} />)
