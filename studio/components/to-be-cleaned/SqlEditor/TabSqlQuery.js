@@ -479,9 +479,7 @@ const UtilityTabResults = observer(() => {
   if (sqlEditorStore.activeTab.isExecuting) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <Typography.Text>
-          <p className="px-6 py-4 m-0 border-0 font-mono">Running...</p>
-        </Typography.Text>
+        <p className="px-6 py-4 m-0 border-0 font-mono text-sm">Running...</p>
       </div>
     )
   } else if (sqlEditorStore.activeTab.errorResult) {
@@ -540,9 +538,7 @@ const Results = ({ results }) => {
   if (!results.length) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <Typography.Text>
-          <p className="px-6 py-4 m-0 font-mono border-0">Success. No rows returned</p>
-        </Typography.Text>
+        <p className="px-6 py-4 m-0 font-mono border-0 text-sm">Success. No rows returned</p>
       </div>
     )
   }
