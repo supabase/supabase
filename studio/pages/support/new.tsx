@@ -2,7 +2,6 @@ import { useEffect, useReducer, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import {
   Button,
-  Divider,
   IconArrowLeft,
   IconCheck,
   IconMail,
@@ -10,6 +9,8 @@ import {
   Listbox,
   Typography,
 } from '@supabase/ui'
+import Divider from 'components/ui/Divider'
+
 import SVG from 'react-inlinesvg'
 import Link from 'next/link'
 import { useRouter } from 'next/router'

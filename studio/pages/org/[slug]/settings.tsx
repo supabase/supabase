@@ -606,7 +606,7 @@ const OwnerDropdown = observer(({ members, member }: any) => {
                 <p className="opacity-50 block">Transfer ownership of "{orgName}"</p>
               </div>
             </Dropdown.Item>
-            <Divider light />
+            <Dropdown.Seperator />
             <Dropdown.Item icon={<IconTrash size="tiny" />} onClick={handleMemberDelete}>
               Remove member
             </Dropdown.Item>
