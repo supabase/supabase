@@ -165,7 +165,7 @@ const BouncerSettings: FC<Props> = ({}) => {
             />
 
             <div className="flex space-x-3">
-              <Typography.Text type="secondary">
+              <p className="text-sm text-scale-1100">
                 <p>
                   Learn more about connection strings{' '}
                   <Typography.Link href="https://supabase.com/docs/reference/postgres/connection-strings">
@@ -177,7 +177,7 @@ const BouncerSettings: FC<Props> = ({}) => {
                   </Typography.Link>
                   .
                 </p>
-              </Typography.Text>
+              </p>
             </div>
           </Panel.Content>
         </Panel>

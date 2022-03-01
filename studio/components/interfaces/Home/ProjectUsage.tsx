@@ -311,15 +311,13 @@ const PanelHeader = (props: any) => {
     <Tag href={props.href}>
       <div
         className={
-          'flex items-center space-x-3 opacity-80 ' +
-          (props.href ? 'cursor-pointer hover:opacity-100 hover:text-green-500' : '')
+          'flex items-center space-x-3 opacity-80 transition ' +
+          (props.href ? 'cursor-pointer hover:opacity-100 hover:text-gray-1200' : '')
         }
       >
         <Typography.Text>{props.icon}</Typography.Text>
         <span className="flex items-center space-x-1">
-          <Typography.Title level={4} className="mb-0">
-            {props.title}
-          </Typography.Title>
+          <h4 className="mb-0 text-lg">{props.title}</h4>
         </span>
       </div>
     </Tag>

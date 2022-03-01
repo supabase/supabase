@@ -120,8 +120,8 @@ const TableEditorMenu: FC<Props> = ({
                   </>
                 }
               >
-                <span className="text-scale-900">schema</span>{' '}
-                <span className="text-scale-1200">{schema.name}</span>
+                <span className="text-sm text-scale-900">schema</span>{' '}
+                <span className="text-sm text-scale-1200">{schema.name}</span>
               </Listbox.Option>
             ))}
           </Listbox>
@@ -151,7 +151,6 @@ const TableEditorMenu: FC<Props> = ({
         {/* Table search input */}
         <div className="block mb-2 px-3">
           <Input
-            // layout="vertical"
             className="border-none"
             icon={
               <div className="text-scale-900">
