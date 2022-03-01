@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import dayjs from 'dayjs'
 import { sum } from 'lodash'
-import { Typography, Loading } from '@supabase/ui'
+import { Loading } from '@supabase/ui'
 
 import UpgradeButton from './UpgradeButton'
 import CostBreakdownRow from './CostBreakdownRow'
@@ -54,36 +54,31 @@ const Subscription: FC<Props> = ({
         <div className="bg-panel-body-light dark:bg-panel-body-dark">
           <div className="px-6 pt-4 flex items-center justify-between">
             <div className="flex flex-col">
-              <Typography.Text>
-                {showProjectName ? project.name : 'Current subscription'}
-              </Typography.Text>
-              <Typography.Title level={3} className="mb-0">
-                {subscription?.tier.name ?? '-'}
-              </Typography.Title>
+              <p className="text-sm">{showProjectName ? project.name : 'Current subscription'}</p>
+              <h3 className="text-xl mb-0">{subscription?.tier.name ?? '-'}</h3>
             </div>
-            {/* @ts-ignore */}
             <UpgradeButton
-              subscriptionStats={subscriptionStats}
-              projectRef={project.ref}
               paid={paid}
+              projectRef={project.ref}
+              subscriptionStats={subscriptionStats}
             />
           </div>
           {paid && (
             <div className="px-6 pt-4">
-              <Typography.Text>
+              <p>
                 The next payment for this plan will be occur on{' '}
                 {dayjs.unix(currentPeriodEnd).utc().format('MMM D, YYYY')}.
-              </Typography.Text>
+              </p>
             </div>
           )}
           <div className="mt-2 px-6 pb-4">
-            <Typography.Text type="secondary">
+            <p className="text-sm text-scale-1100">
               See our{' '}
               <a href="https://supabase.com/pricing" target="_blank" className="underline">
                 pricing
               </a>{' '}
               for a more detailed analysis of what Supabase has on offer.
-            </Typography.Text>
+            </p>
           </div>
 
           {/* Cost Breakdown */}
@@ -91,16 +86,16 @@ const Subscription: FC<Props> = ({
             <>
               <div className="px-6 py-3 relative border-t border-panel-border-light dark:border-panel-border-dark flex items-center">
                 <div className="w-[40%]">
-                  <Typography.Text>Item</Typography.Text>
+                  <p className="text-sm">Item</p>
                 </div>
                 <div className="w-[20%] flex justify-end">
-                  <Typography.Text>Amount</Typography.Text>
+                  <p className="text-sm">Amount</p>
                 </div>
                 <div className="w-[20%] flex justify-end">
-                  <Typography.Text>Unit Price</Typography.Text>
+                  <p className="text-sm">Unit Price</p>
                 </div>
                 <div className="w-[20%] flex justify-end">
-                  <Typography.Text>Price</Typography.Text>
+                  <p className="text-sm">Price</p>
                 </div>
               </div>
               <CostBreakdownRow
@@ -135,16 +130,14 @@ const Subscription: FC<Props> = ({
                 )}
               <div className="px-6 py-3 relative border-t border-panel-border-light dark:border-panel-border-dark flex items-center">
                 <div className="w-[80%]">
-                  <Typography.Text>
+                  <p className="text-sm">
                     Estimated cost for {dayjs.unix(currentPeriodStart).utc().format('MMM D, YYYY')}{' '}
                     - {dayjs.unix(currentPeriodEnd).utc().format('MMM D, YYYY')} so far
-                  </Typography.Text>
+                  </p>
                 </div>
                 <div className="w-[20%] flex justify-end items-center space-x-1">
-                  <Typography.Text className="opacity-50">$</Typography.Text>
-                  <Typography.Title level={3} className="m-0">
-                    {deriveTotalCost().toFixed(2)}
-                  </Typography.Title>
+                  <p className="text-scale-1100">$</p>
+                  <h3 className="text-xl m-0">{deriveTotalCost().toFixed(2)}</h3>
                 </div>
               </div>
             </>
