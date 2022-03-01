@@ -28,15 +28,17 @@ const Associate = observer(() => {
       return
     }
     setSaving(true)
-    const { error } = await post(
+    const organization = await post(
       `${API_URL}/organizations/${organizationSlug}/associate`,
       awsMarketplace
     )
+    const { error } = organization
     if (error) {
       setError(error.message)
     }
     setSaving(false)
     if (!error) {
+      app.onOrgUpdated(organization)
       router.push('/')
     }
   }
