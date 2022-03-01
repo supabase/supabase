@@ -1,13 +1,13 @@
 ---
 id: with-react
-title: "Quickstart: React"
+title: 'Quickstart: React'
 description: Learn how to use Supabase in your React App.
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
-## Intro 
+## Intro
 
 This example provides the steps to build a simple user management app (from scratch!) using Supabase and React. It includes:
 
@@ -21,7 +21,7 @@ By the end of this guide you'll have an app which allows users to login and upda
 
 ![Supabase User Management example](/img/user-management-demo.png)
 
-<!-- ## Video demo 
+<!-- ## Video demo
 
 Coming soon.
 
@@ -29,7 +29,7 @@ Use the annotated timeline to step through this tutorial.
 
 ## Instant deploy
 
-Want to deploy a completed version of this example without following the guide? 
+Want to deploy a completed version of this example without following the guide?
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Freact-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-react-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management)
 
@@ -44,20 +44,19 @@ If you want to do it yourself, let's get started: -->
 
 ## Project set up
 
-Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase 
+Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase
 and then creating a "schema" inside the database.
 
-### Create a project 
+### Create a project
 
 1. Go to [app.supabase.io](https://app.supabase.io).
 1. Click on "New Project".
 1. Enter your project details.
 1. Wait for the new database to launch.
 
-
 ### Set up the database schema
 
-Now we are going to set up the database schema. We can use the "User Management Starter" quickstart in the SQL Editor, 
+Now we are going to set up the database schema. We can use the "User Management Starter" quickstart in the SQL Editor,
 or you can just copy/paste the SQL from below and run it yourself.
 
 <Tabs
@@ -75,7 +74,7 @@ values={[
 ```
 
 <video width="99%" muted playsInline controls="true">
-<source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
+  <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
@@ -133,11 +132,9 @@ create policy "Anyone can upload an avatar."
 </TabItem>
 </Tabs>
 
+### Get the API Keys
 
-### Get the API Keys 
-
-
-Now that you've created some database tables, you are ready to insert data using the auto-generated API. 
+Now that you've created some database tables, you are ready to insert data using the auto-generated API.
 We just need to get the URL and `anon` key from the API settings.
 
 <Tabs
@@ -155,7 +152,7 @@ values={[
 ```
 
 <video width="99%" muted playsInline controls="true">
-<source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
@@ -167,7 +164,7 @@ Let's start building the React app from scratch.
 
 ### Initialize a React app
 
-We can use [Create React App](https://create-react-app.dev/docs/getting-started/) to initialize 
+We can use [Create React App](https://create-react-app.dev/docs/getting-started/) to initialize
 an app called `supabase-react`:
 
 ```bash
@@ -181,7 +178,7 @@ Then let's install the only additional dependency: [supabase-js](https://github.
 npm install @supabase/supabase-js
 ```
 
-And finally we want to save the environment variables in a `.env`. 
+And finally we want to save the environment variables in a `.env`.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 
 ```bash title=".env"
@@ -201,7 +198,7 @@ const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
-And one optional step is to update the CSS file `src/index.css` to make the app look nice. 
+And one optional step is to update the CSS file `src/index.css` to make the app look nice.
 You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/react-user-management/src/index.css).
 
 ### Set up a Login component
@@ -234,27 +231,25 @@ export default function Auth() {
       <div className="col-6 form-widget">
         <h1 className="header">Supabase + React</h1>
         <p className="description">Sign in via magic link with your email below</p>
-        <div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleLogin(email)
+          }}
+        >
+          <label>Email</label>
           <input
+            id="email"
             className="inputField"
             type="email"
             placeholder="Your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-        </div>
-        <div>
-          <button
-            onClick={(e) => {
-              e.preventDefault()
-              handleLogin(email)
-            }}
-            className={'button block'}
-            disabled={loading}
-          >
-            {loading ? <span>Loading</span> : <span>Send magic link</span>}
-          </button>
-        </div>
+        </form>
+        <button className={'button block'} disabled={loading}>
+          {loading ? <span>Loading</span> : <span>Send magic link</span>}
+        </button>
       </div>
     </div>
   )
@@ -380,8 +375,6 @@ export default function Account({ session }) {
 }
 ```
 
-
-
 ### Launch!
 
 Now that we have all the components in place, let's update `App.js`:
@@ -420,7 +413,6 @@ npm start
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-
 ![Supabase React](/img/supabase-react-demo.png)
 
 ## Bonus: Profile photos
@@ -456,7 +448,6 @@ export default function Avatar({ url, size, onUpload }) {
     }
   }
 
-
   async function uploadAvatar(event) {
     try {
       setUploading(true)
@@ -470,9 +461,7 @@ export default function Avatar({ url, size, onUpload }) {
       const fileName = `${Math.random()}.${fileExt}`
       const filePath = `${fileName}`
 
-      let { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file)
+      let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
 
       if (uploadError) {
         throw uploadError
@@ -519,11 +508,9 @@ export default function Avatar({ url, size, onUpload }) {
 }
 ```
 
-
 ### Add the new widget
 
 And then we can add the widget to the Account page:
-
 
 ```jsx title="src/Account.js"
 // Import the new component
@@ -545,7 +532,6 @@ return (
     {/* ... */}
   </div>
 )
-
 ```
 
 ## Next steps
