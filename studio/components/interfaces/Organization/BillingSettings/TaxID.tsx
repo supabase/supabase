@@ -47,7 +47,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, redirectToPortal }) => {
             </div>
           ) : (
             <div>
-              <p className="flex items-center space-x-2 opacity-50">No tax IDs</p>
+              <p className="flex items-center space-x-2 text-sm text-scale-900">No tax IDs</p>
             </div>
           )}
         </Panel.Content>
