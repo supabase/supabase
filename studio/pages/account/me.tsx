@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconMoon, IconSun, Typography, Input, Listbox, IconTrash } from '@supabase/ui'
+import { IconMoon, IconSun, Typography, Input, Listbox } from '@supabase/ui'
 
 import { useProfile, useStore, withAuth } from 'hooks'
 import { post } from 'lib/common/fetch'
@@ -137,7 +137,7 @@ const ThemeSettings = observer(() => {
           style={{ width: '50%' }}
           icon={
             ui.themeOption === 'light' ? (
-              <IconTrash />
+              <IconSun />
             ) : ui.themeOption === 'dark' ? (
               <IconMoon />
             ) : undefined
