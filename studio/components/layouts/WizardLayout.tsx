@@ -42,9 +42,7 @@ const Header: FC<any> = ({ organization, project }) => {
               </Typography.Text>
               <Typography.Text small>
                 <a>
-                  {organization
-                    ? `Organization: ${organization.name}`
-                    : '1. Create an organization'}
+                  {organization ? `Organization: ${organization.name}` : 'Create an organization'}
                 </a>
               </Typography.Text>
               <Typography.Text type="secondary">
