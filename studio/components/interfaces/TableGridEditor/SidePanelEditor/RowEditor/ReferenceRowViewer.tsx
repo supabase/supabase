@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react'
-import { Space, SidePanel, Typography, IconLoader, IconXCircle } from '@supabase/ui'
+import { SidePanel, IconLoader, IconXCircle } from '@supabase/ui'
 import { PostgresRelationship } from '@supabase/postgres-meta'
 
 import ActionBar from '../ActionBar'
@@ -37,9 +37,9 @@ const ReferenceRowViewer: FC<Props> = ({ visible, referenceRow, closePanel }) =>
       header={
         <div>
           Viewing reference row from{' '}
-          <Typography.Text code>
+          <code className="text-sm">
             {foreignKey?.target_table_schema ?? ''}.{foreignKey?.target_table_name ?? ''}
-          </Typography.Text>
+          </code>
         </div>
       }
       hideFooter={false}
@@ -49,20 +49,16 @@ const ReferenceRowViewer: FC<Props> = ({ visible, referenceRow, closePanel }) =>
       <SidePanel.Content>
         {loading ? (
           <div className="flex flex-col items-center justify-center space-y-2 h-full">
-            <Typography>
-              <IconLoader className="animate-spin" />
-            </Typography>
-            <Typography.Text className="opacity-50">Loading reference row</Typography.Text>
+            <IconLoader className="animate-spin" />
+            <p className="text-sm text-scale-1100">Loading reference row</p>
           </div>
         ) : !row ? (
           <div className="flex flex-col items-center justify-center space-y-2 h-full">
-            <Typography>
-              <IconXCircle />
-            </Typography>
-            <Typography.Text className="opacity-50">
+            <IconXCircle />
+            <p className="text-sm text-scale-1100">
               Unable to find the corresponding row in {foreignKey?.target_table_schema}.
               {foreignKey?.target_table_name}
-            </Typography.Text>
+            </p>
           </div>
         ) : (
           <div className="space-y-6">
