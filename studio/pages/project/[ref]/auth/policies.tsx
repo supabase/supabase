@@ -86,7 +86,7 @@ const AuthPolicies = observer(() => {
         <div className="flex justify-between items-center">
           <div>
             <Input
-              size="tiny"
+              size="small"
               placeholder="Filter tables"
               className="block w-full text-sm placeholder-gray-400"
               value={PageState.policiesFilter}

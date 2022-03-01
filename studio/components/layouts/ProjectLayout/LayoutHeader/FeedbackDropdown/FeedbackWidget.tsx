@@ -69,9 +69,11 @@ const FeedbackWidget = ({ onClose, feedback, setFeedback, category, setCategory 
         <p className="text-xs text-scale-1000">
           Have a technical issue? Contact{' '}
           <Link href="/support/new">
-            <span className="cursor-pointer transition-colors text-brand-900 hover:text-brand-1200">
-              Supabase Support
-            </span>
+            <a>
+              <span className="cursor-pointer transition-colors text-brand-900 hover:text-brand-1200">
+                Supabase support
+              </span>
+            </a>
           </Link>{' '}
           or{' '}
           <a href="https://supabase.com/docs" target="_blank">

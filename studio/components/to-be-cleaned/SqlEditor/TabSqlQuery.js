@@ -327,7 +327,7 @@ const SizeToggleButton = observer(() => {
           size="tiny"
           shadow={false}
           onClick={maximizeEditor}
-          icon={<IconChevronDown className="text-gray-400" size="tiny" strokeWidth={2} />}
+          icon={<IconChevronDown className="text-gray-1100" size="tiny" strokeWidth={2} />}
           tooltip={{
             title: 'Maximize editor',
             position: 'top',
@@ -340,7 +340,7 @@ const SizeToggleButton = observer(() => {
           size="tiny"
           shadow={false}
           onClick={restorePanelSize}
-          icon={<IconChevronUp className="text-gray-400" size="tiny" strokeWidth={2} />}
+          icon={<IconChevronUp className="text-gray-1100" size="tiny" strokeWidth={2} />}
           tooltip={{
             title: 'Restore panel size',
             position: 'top',

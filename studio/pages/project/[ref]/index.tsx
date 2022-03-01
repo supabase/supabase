@@ -50,7 +50,7 @@ const Home: NextPage = () => {
             {isUndefined(usage) ? (
               <div className="w-full flex justify-center items-center space-x-2">
                 <IconLoader className="animate-spin" size={14} />
-                <Typography.Text>Retrieving project usage statistics</Typography.Text>
+                <p className="text-sm">Retrieving project usage statistics</p>
               </div>
             ) : !usage.error && hasProjectData ? (
               <ProjectUsage project={project} />
