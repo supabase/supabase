@@ -236,21 +236,11 @@ const FileExplorerRow = ({
               <p className="text-sm w-full truncate">{item.name}</p>
             ) : (
               <>
-                <p className="text-sm truncate" style={{ width: '30%', minWidth: '250px' }}>
-                  {item.name}
-                </p>
-                <p className="text-sm truncate" style={{ width: '15%', minWidth: '100px' }}>
-                  {size}
-                </p>
-                <p className="text-sm truncate" style={{ width: '15%', minWidth: '100px' }}>
-                  {mimeType}
-                </p>
-                <p className="text-sm truncate" style={{ width: '20%', minWidth: '180px' }}>
-                  {createdAt}
-                </p>
-                <p className="text-sm truncate" style={{ width: '20%', minWidth: '175px' }}>
-                  {updatedAt}
-                </p>
+                <p className="text-sm truncate w-[30%] min-w-[250px]">{item.name}</p>
+                <p className="text-sm truncate w-[15%] min-w-[100px]">{size}</p>
+                <p className="text-sm truncate w-[15%] min-w-[100px]">{mimeType}</p>
+                <p className="text-sm truncate w-[20%] min-w-[180px]">{createdAt}</p>
+                <p className="text-sm truncate w-[20%] min-w-[175px]">{updatedAt}</p>
                 {/* The 175px here is intentional due to the irregular width of the header checkbox and row icon */}
               </>
             )}

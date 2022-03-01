@@ -31,7 +31,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, redirectToPortal }) => {
           {loading && taxIds.length === 0 ? (
             <div className="flex items-center space-x-4">
               <IconLoader className="animate-spin" size={14} />
-              <p>Retrieving tax information</p>
+              <p className="text-sm">Retrieving tax information</p>
             </div>
           ) : taxIds.length >= 1 ? (
             <div className="w-full space-y-2">
