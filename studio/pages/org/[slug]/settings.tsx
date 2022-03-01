@@ -145,9 +145,7 @@ const TabsView = observer(() => {
     <>
       <div className="space-y-3">
         <section className="mt-4">
-          <Typography.Title level={3}>
-            {PageState.organization?.name || 'Organization'} settings
-          </Typography.Title>
+          <h3 className="text-xl">{PageState.organization?.name || 'Organization'} settings</h3>
         </section>
         <nav className="">
           <Tabs onChange={(id: any) => setSelectedTab(id)} type="underlined">
