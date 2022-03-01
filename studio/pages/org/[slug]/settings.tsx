@@ -18,7 +18,8 @@ import {
   Dropdown,
   Modal,
   IconSearch,
-  IconAlertCircle,
+  IconUser,
+  Form,
 } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
@@ -30,6 +31,7 @@ import { BillingSettings, InvoicesSettings } from 'components/interfaces/Organiz
 import Table from 'components/to-be-cleaned/Table'
 import Panel from 'components/to-be-cleaned/Panel'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import ConfirmDialog from 'components/ui/Dialogs/ConfirmDialog'
 import InviteMemberModal from 'components/to-be-cleaned/ModalsDeprecated/InviteMemberModal'
 import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
@@ -143,9 +145,7 @@ const TabsView = observer(() => {
     <>
       <div className="space-y-3">
         <section className="mt-4">
-          <Typography.Title level={3}>
-            {PageState.organization?.name || 'Organization'} settings
-          </Typography.Title>
+          <h3 className="text-xl">{PageState.organization?.name || 'Organization'} settings</h3>
         </section>
         <nav className="">
           <Tabs onChange={(id: any) => setSelectedTab(id)} type="underlined">
@@ -218,7 +218,12 @@ const GeneralSettings = observer(() => {
         model={formModel}
         onSubmit={(model: any) => handleUpdateOrg(pluckObjectFields(model, BASIC_FIELDS))}
       >
-        <AutoField name="name" showInlineError errorMessage="Please enter an organization name" />
+        <AutoField
+          className="auto-field"
+          name="name"
+          showInlineError
+          errorMessage="Please enter an organization name"
+        />
         <AutoField
           name="billing_email"
           showInlineError
@@ -248,15 +253,15 @@ const OrgDeletePanel = observer(() => {
           variant="danger"
           withIcon
           // @ts-ignore
-          title={[
-            <Typography.Text key="alert-title">
+          title={
+            <h5 className="text-red-900">
               Deleting this organization will also remove its projects
-            </Typography.Text>,
-          ]}
+            </h5>
+          }
         >
-          <Typography.Text className="block mb-4">
+          <p className="text-red-900">
             Make sure you have made a backup if you want to keep your data
-          </Typography.Text>
+          </p>
           <OrgDeleteModal />
         </Alert>
       </Panel.Content>
@@ -273,69 +278,102 @@ const OrgDeleteModal = observer(() => {
 
   const [isOpen, setIsOpen] = useState(false)
   const [value, setValue] = useState('')
-  const [loading, setLoading] = useState(false)
 
   function toggle() {
-    if (loading) return
     setIsOpen(!isOpen)
-  }
-
-  async function handleOrgDelete() {
-    setLoading(true)
-
-    const response = await delete_(`${API_URL}/organizations/${orgSlug}/remove`)
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete organization: ${response.error.message}`,
-      })
-      setLoading(false)
-    } else {
-      PageState.onOrgDeleted(PageState.organization)
-      router.push('/')
-    }
   }
 
   return (
     <>
-      <Button onClick={toggle} danger>
-        Delete Organization
-      </Button>
+      <div className="mt-2">
+        <Button onClick={toggle} type="danger">
+          Delete organization
+        </Button>
+      </div>
       <Modal
         visible={isOpen}
         onCancel={toggle}
-        title="Are you absolutely sure?"
-        icon={<IconAlertCircle background="red" />}
+        header={
+          <div className="flex gap-2 items-baseline">
+            <h5 className="text-sm text-scale-1200">Delete organisation</h5>
+            <span className="text-xs text-scale-900">Are you sure?</span>
+          </div>
+        }
+        size="small"
         hideFooter
-        size="medium"
         closable
       >
-        <Typography.Text>
-          <p className="text-sm">
-            This action <Typography.Text strong>cannot</Typography.Text> be undone. This will
-            permanently delete the <Typography.Text strong>{orgName}</Typography.Text> organization
-            and remove all of its projects.
-          </p>
-          <p className="text-sm">
-            Please type <Typography.Text strong>{orgSlug}</Typography.Text> to confirm.
-          </p>
-        </Typography.Text>
-        <Input
-          onChange={(e) => setValue(e.target.value)}
-          value={value}
-          placeholder="Type in the orgnaization name"
-          className="w-full"
-        />
-        <Button
-          onClick={handleOrgDelete}
-          disabled={orgSlug !== value || loading}
-          loading={loading}
-          size="small"
-          block
-          danger
+        <Form
+          initialValues={{
+            orgName: '',
+          }}
+          validateOnBlur
+          onSubmit={async (values: any, { setSubmitting }: any) => {
+            setSubmitting(true)
+            const response = await delete_(`${API_URL}/organizations/${orgSlug}/remove`)
+            if (response.error) {
+              ui.setNotification({
+                category: 'error',
+                message: `Failed to delete organization: ${response.error.message}`,
+              })
+              setSubmitting(false)
+            } else {
+              PageState.onOrgDeleted(PageState.organization)
+              setSubmitting(false)
+              router.push('/')
+            }
+          }}
+          validate={(values) => {
+            const errors: any = {}
+            if (!values.orgName) {
+              errors.orgName = 'Enter the name of the organization.'
+            }
+            if (values.orgName !== orgSlug) {
+              errors.orgName = 'Value entered does not match name of the organization.'
+            }
+            return errors
+          }}
         >
-          I understand, delete this organization
-        </Button>
+          {({ isSubmitting }: { isSubmitting: boolean }) => (
+            <div className="space-y-4 py-3">
+              <Modal.Content>
+                <p className="text-scale-900 text-sm">
+                  This action <span className="text-scale-1200">cannot</span> be undone. This will
+                  permanently delete the <span className="text-scale-1200">{orgName}</span>{' '}
+                  organization and remove all of its projects.
+                </p>
+              </Modal.Content>
+              <Modal.Seperator />
+              <Modal.Content>
+                <Input
+                  id="orgName"
+                  label={
+                    <span>
+                      Please type <Typography.Text strong>{orgSlug}</Typography.Text> to confirm
+                    </span>
+                  }
+                  onChange={(e) => setValue(e.target.value)}
+                  value={value}
+                  placeholder="Type in the orgnaization name"
+                  className="w-full"
+                />
+              </Modal.Content>
+              <Modal.Seperator />
+              <Modal.Content>
+                <Button
+                  type="danger"
+                  htmlType="submit"
+                  loading={isSubmitting}
+                  size="small"
+                  block
+                  danger
+                >
+                  I understand, delete this organization
+                </Button>
+              </Modal.Content>
+            </div>
+          )}
+        </Form>
       </Modal>
     </>
   )
@@ -384,7 +422,7 @@ const TeamSettings = observer(() => {
             </div>
           ) : (
             <div>
-              <Button type="secondary" onClick={() => leaveTeam()} loading={isLeaving}>
+              <Button type="default" onClick={() => leaveTeam()} loading={isLeaving}>
                 Leave team
               </Button>
             </div>
@@ -408,7 +446,7 @@ const MembersFilterInput = observer(() => {
   return (
     <Input
       icon={<IconSearch size="tiny" />}
-      size="tiny"
+      size="small"
       value={PageState.membersFilterString}
       onChange={onFilterMemberChange}
       name="email"
@@ -561,13 +599,13 @@ const OwnerDropdown = observer(({ members, member }: any) => {
         overlay={
           <>
             <Dropdown.Item onClick={() => setOwnerTransferIsVisble(!ownerTransferIsVisble)}>
-              Make owner
-              <Typography.Text type="secondary" small className="block mt-1">
-                Transfer ownership of "{orgName}"
-              </Typography.Text>
+              <div className="flex flex-col">
+                <p>Make owner</p>
+                <p className="opacity-50 block">Transfer ownership of "{orgName}"</p>
+              </div>
             </Dropdown.Item>
-            <Divider light />
-            <Dropdown.Item onClick={handleMemberDelete} icon={<IconTrash size="tiny" />}>
+            <Dropdown.Seperator />
+            <Dropdown.Item icon={<IconTrash size="tiny" />} onClick={handleMemberDelete}>
               Remove member
             </Dropdown.Item>
           </>

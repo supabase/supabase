@@ -17,6 +17,7 @@ import {
   DroppableProvided,
   DraggableProvided,
 } from 'react-beautiful-dnd'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
 import Column from './Column'
 import InformationBox from 'components/ui/InformationBox'
@@ -143,7 +144,7 @@ const ColumnManagement: FC<Props> = ({
             <>
               {hasImportContent ? (
                 <div className="flex items-center space-x-3">
-                  <Button type="secondary" icon={<IconEdit />} onClick={onSelectImportData}>
+                  <Button type="default" icon={<IconEdit />} onClick={onSelectImportData}>
                     Edit content
                   </Button>
                   <Button danger type="outline" icon={<IconTrash />} onClick={onClearImportContent}>
@@ -151,7 +152,7 @@ const ColumnManagement: FC<Props> = ({
                   </Button>
                 </div>
               ) : (
-                <Button type="secondary" onClick={onSelectImportData}>
+                <Button type="default" onClick={onSelectImportData}>
                   Import data via spreadsheet
                 </Button>
               )}
@@ -192,21 +193,37 @@ const ColumnManagement: FC<Props> = ({
             {/* Drag handle */}
             {isNewRecord && <div className="w-[5%]" />}
             <div className="w-[25%]">
-              <Typography.Text small>Name</Typography.Text>
+              <h5 className="text-xs text-scale-900">Name</h5>
             </div>
             <div className="w-[25%]">
-              <Typography.Text small>Type</Typography.Text>
+              <h5 className="text-xs text-scale-900">Type</h5>
             </div>
             <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
-              <Typography.Text small>Default Value</Typography.Text>
-              <div>
-                <Typography.Text>
-                  <IconHelpCircle size={15} strokeWidth={1.5} />
-                </Typography.Text>
-              </div>
+              <h5 className="text-xs text-scale-900">Default Value</h5>
+
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <h5 className="text-xs text-scale-900">
+                    <IconHelpCircle size={15} strokeWidth={1.5} />
+                  </h5>
+                </Tooltip.Trigger>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'bg-scale-100 shadow py-1 px-2 rounded leading-none', // background
+                      'border border-scale-200 ', //border
+                    ].join(' ')}
+                  >
+                    <span className="text-scale-1200 text-xs">
+                      Can be either a value or a SQL expression
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Root>
             </div>
             <div className="w-[10%]">
-              <Typography.Text small>Primary</Typography.Text>
+              <h5 className="text-xs text-scale-900">Primary</h5>
             </div>
             {/* Empty space */}
             <div className={`${hasImportContent ? 'w-[10%]' : 'w-0'}`} />
@@ -222,7 +239,7 @@ const ColumnManagement: FC<Props> = ({
                 {(droppableProvided: DroppableProvided) => (
                   <div
                     ref={droppableProvided.innerRef}
-                    className={`space-y-2 bg-gray-200 dark:bg-bg-alt-dark rounded-md px-3 py-2 ${
+                    className={`space-y-2 bg-gray-500 rounded-md px-3 py-2 ${
                       isNewRecord ? '' : '-mx-3'
                     }`}
                   >
@@ -291,7 +308,7 @@ const ColumnManagement: FC<Props> = ({
         </div>
 
         {!hasImportContent && (
-          <Button type="secondary" onClick={() => onAddColumn()}>
+          <Button type="default" onClick={() => onAddColumn()}>
             Add column
           </Button>
         )}

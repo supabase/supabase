@@ -7,7 +7,6 @@ import { Dictionary } from '@supabase/grid'
 import {
   Input,
   SidePanel,
-  Divider,
   Checkbox,
   Listbox,
   Typography,
@@ -17,6 +16,7 @@ import {
   Badge,
   IconTrash,
   IconPlus,
+  Alert,
 } from '@supabase/ui'
 
 import Image from 'next/image'
@@ -178,8 +178,8 @@ class CreateHookStore implements ICreateHookStore {
 
   get title() {
     return this.formState.id
-      ? `Edit '${this.formState.originalName}' Function Hook`
-      : 'Add a new Function Hook'
+      ? `Edit '${this.formState.originalName}' function hook`
+      : 'Add a new function hook'
   }
 
   get isEditing() {
@@ -428,13 +428,10 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
 
   return (
     <SidePanel
-      wide
+      size="large"
       visible={visible}
       onCancel={() => setVisible(!visible)}
-      // @ts-ignore
-      contentStyle={{ padding: 0 }}
-      footerBackground={true}
-      title={_localState.title}
+      header={_localState.title}
       className={
         'hooks-sidepanel transform transition-all duration-300 ease-in-out mr-0 ' + '' // (showCreateFunctionSidePanel ? 'mr-16' : '')
       }
@@ -442,9 +439,9 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
       onConfirm={handleSubmit}
     >
       <CreateHookContext.Provider value={_localState}>
-        <div className="space-y-6 mt-4 pb-8">
+        <div className="space-y-10 py-6">
           {_localState.isEditing ? (
-            <div className="px-6 space-y-6">
+            <div className="px-6 space-y-10 py-6">
               <InputName />
               <SelectEnabledMode />
             </div>
@@ -453,15 +450,15 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
               <div className="px-6">
                 <InputName />
               </div>
-              <Divider light />
+              <SidePanel.Seperator />
               <div className="px-6 space-y-6">
-                <Typography.Title level={5}>Conditions to fire hook</Typography.Title>
+                <h5 className="text-base text-scale-1200">Conditions to fire hook</h5>
                 <ListboxTable />
                 <CheckboxEvents />
               </div>
-              <Divider light />
+              <SidePanel.Seperator />
               <div className="px-6 space-y-6">
-                <Typography.Title level={5}>Type of hook</Typography.Title>
+                <h5 className="text-base text-scale-1200">Type of hook</h5>
                 <RadioGroupHookService />
               </div>
               <ServiceConfigForm />
@@ -546,18 +543,21 @@ const CheckboxEvents: FC = observer(({}) => {
     >
       <Checkbox
         value="INSERT"
+        id="INSERT"
         label="Insert"
         description={'Any insert operation on the table'}
         checked={_localState.formState.events.value.includes('INSERT')}
       />
       <Checkbox
         value="UPDATE"
+        id="UPDATE"
         label="Update"
         description="Any update operation, of any column in the table"
         checked={_localState.formState.events.value.includes('UPDATE')}
       />
       <Checkbox
         value="DELETE"
+        id="DELETE"
         label="Delete"
         description="Any deletion of a record"
         checked={_localState.formState.events.value.includes('DELETE')}
@@ -632,7 +632,7 @@ const ListboxTable: FC = observer(({}) => {
             value={x.id}
             label={x.name}
             addOnBefore={() => (
-              <div className="bg-green-600 p-1 flex items-center justify-center rounded text-typography-body-dark ">
+              <div className="bg-scale-1200 p-1 flex items-center justify-center rounded text-scale-100 ">
                 <SVG
                   src={'/img/table-editor.svg'}
                   style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
@@ -645,7 +645,6 @@ const ListboxTable: FC = observer(({}) => {
           >
             <div className="flex flex-row items-center space-x-1">
               <Typography.Text>{x.name}</Typography.Text>
-              <Divider light type="vertical" />
               <Typography.Text type="secondary" className="opacity-50" small>
                 {x.schema}
               </Typography.Text>
@@ -661,7 +660,7 @@ const hookServiceOptions: {
   id: string
   label: string
   badge: string
-  badgeType: 'green' | 'blue'
+  badgeType: 'brand' | 'amber'
   description: string
   img_url: string
 }[] = [
@@ -669,7 +668,7 @@ const hookServiceOptions: {
     id: 'http_request',
     label: 'HTTP Request',
     badge: 'Alpha',
-    badgeType: 'green',
+    badgeType: 'brand',
     description: 'Send an HTTP request to any URL.',
     img_url: 'http-request.png',
   },
@@ -677,7 +676,7 @@ const hookServiceOptions: {
     id: 'supabase_function',
     label: 'Supabase Function',
     badge: 'Coming soon',
-    badgeType: 'blue',
+    badgeType: 'amber',
     description: 'Choose a Supabase Function to run.',
     img_url: 'supabase-severless-function.png',
   },
@@ -685,7 +684,7 @@ const hookServiceOptions: {
     id: 'google_cloud_function',
     label: 'Google cloud run',
     badge: 'Coming soon',
-    badgeType: 'blue',
+    badgeType: 'amber',
     description: 'Choose a google cloud function to run',
     img_url: 'google-cloud-run.png',
   },
@@ -693,7 +692,7 @@ const hookServiceOptions: {
     id: 'aws_lambda_function',
     label: 'AWS Lambda',
     badge: 'Coming soon',
-    badgeType: 'blue',
+    badgeType: 'amber',
     description: 'Choose an AWS Lambda function to run.',
     img_url: 'aws-lambda-severless-function.png',
   },
@@ -729,7 +728,7 @@ interface RadioHookService {
   description: string
   label: string
   img_url: string
-  badgeType: 'green' | 'blue'
+  badgeType: 'brand' | 'amber'
   badge: string
 }
 
@@ -739,13 +738,12 @@ const RadioHookService: FC<RadioHookService> = observer(
     return (
       <Radio
         id={id}
-        // label={label}
         value={id}
         checked={_localState.formState.hookService.value == id}
         // @ts-ignore
         beforeLabel={
           <>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-5">
               {/* <div className="h-3 w-3"> */}
               <Image
                 src={`/img/function-providers/${img_url}`}
@@ -756,16 +754,14 @@ const RadioHookService: FC<RadioHookService> = observer(
               {/* </div> */}
               <div className="flex-col space-y-0">
                 <div className="flex space-x-1">
-                  <Typography.Text>{label}</Typography.Text>
+                  <span className="text-scale-1200">{label}</span>
                   <Badge color={badgeType}>{badge}</Badge>
                 </div>
-                <Typography.Text type="secondary">{description}</Typography.Text>
+                <span className="text-scale-900">{description}</span>
               </div>
             </div>
           </>
         }
-        // @ts-ignore
-        // description={description}
       />
     )
   }
@@ -777,7 +773,7 @@ const ServiceConfigForm: FC = observer(({}) => {
     <>
       {_localState.formState.hookService.value === 'http_request' ? (
         <>
-          <Divider light />
+          <SidePanel.Seperator />
           <div className="space-y-10">
             <div className="px-6 space-y-6">
               <Typography.Title level={5}>HTTP Request</Typography.Title>
@@ -785,18 +781,20 @@ const ServiceConfigForm: FC = observer(({}) => {
               <InputServiceUrl />
               {/* <InputServiceTimeout /> */}
             </div>
-            <Divider light />
+            <SidePanel.Seperator />
             <div className="px-6">
               <InputMultiServiceHeaders />
             </div>
-            <Divider light />
+            <SidePanel.Seperator />
             <div className="px-6">
               <InputMultiServiceParams />
             </div>
           </div>
         </>
       ) : (
-        <ServiceUnavailableBox />
+        <div className="px-6">
+          <ServiceUnavailableBox />
+        </div>
       )}
     </>
   )
@@ -883,7 +881,7 @@ const InputMultiServiceHeaders: FC = observer(({}) => {
   return (
     <div>
       <div className="flex justify-between items-center">
-        <Typography.Text>Http headers</Typography.Text>
+        <Typography.Text>HTTP Headers</Typography.Text>
       </div>
       <div className="pt-4 space-y-2">
         {_localState.formState.serviceHeaders.value.map(
@@ -994,7 +992,7 @@ const InputMultiServiceParams: FC = observer(({}) => {
   return (
     <div>
       <div className="flex justify-between items-center">
-        <Typography.Text>Http params</Typography.Text>
+        <Typography.Text>HTTP Params</Typography.Text>
       </div>
       <div className="pt-4 space-y-2">
         {_localState.formState.serviceParams.value.map(
@@ -1092,37 +1090,22 @@ const InputServiceParam: FC<InputServiceParamsProps> = observer(({ idx, name, va
 const ServiceUnavailableBox: FC = observer(({}) => {
   const _localState: any = useContext(CreateHookContext)
   return (
-    <div className="px-6">
-      <div className="block w-full bg-yellow-500 bg-opacity-5 p-3 px-6 border border-yellow-600 border-opacity-40 rounded">
-        <div className="flex space-x-3">
-          {/* <div className="mt-1">
-            <IconTool className="text-white" size="large" />
-          </div> */}
-          <div className="flex justify-between w-full items-center">
-            <div>
-              <Typography.Text>Service under development.</Typography.Text>
-              <div>
-                <Typography.Text type="secondary">
-                  We currently do not support this service.
-                </Typography.Text>
-              </div>
-            </div>
-
-            <Button
-              type="outline"
-              className="flex-grow"
-              onClick={() =>
-                _localState.onFormChange({
-                  key: 'hookService',
-                  value: 'http_request',
-                })
-              }
-            >
-              Switch to HTTP
-            </Button>
-          </div>
-        </div>
+    <Alert variant="warning" title="Service under development" withIcon>
+      <div className="space-y-4">
+        <div>We currently do not support this service.</div>
+        <Button
+          type="default"
+          className="flex-grow"
+          onClick={() =>
+            _localState.onFormChange({
+              key: 'hookService',
+              value: 'http_request',
+            })
+          }
+        >
+          Switch to HTTP
+        </Button>
       </div>
-    </div>
+    </Alert>
   )
 })

@@ -152,7 +152,7 @@ class CreateFunctionStore implements ICreateFunctionStore {
   get title() {
     return this.formState.id
       ? `Edit '${this.formState.originalName}' function`
-      : 'Add a new Function'
+      : 'Add a new function'
   }
 
   get isEditing() {
@@ -350,13 +350,10 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
   return (
     <>
       <SidePanel
-        wide
+        size="large"
         visible={visible}
         onCancel={() => setVisible(!visible)}
-        // @ts-ignore
-        contentStyle={{ padding: 0 }}
-        footerBackground={true}
-        title={_localState.title}
+        header={_localState.title}
         className="hooks-sidepanel transform transition-all duration-300 ease-in-out mr-0"
         loading={_localState.loading}
         onConfirm={handleSubmit}
@@ -365,50 +362,73 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
           <div className="space-y-10 mt-4">
             {_localState.isEditing ? (
               <>
-                <div className="px-6 space-y-6">
-                  <InputName />
-                  <SelectSchema />
-                </div>
-                <Divider light />
-                <div className="px-6 space-y-6">
+                <SidePanel.Content>
+                  <div className="space-y-4">
+                    <InputName />
+                    <SelectSchema />
+                  </div>
+                </SidePanel.Content>
+                <SidePanel.Seperator />
+                <SidePanel.Content>
                   <InputMultiArguments readonly={true} />
+                </SidePanel.Content>
+                <SidePanel.Seperator />
+                <SidePanel.Content>
                   <InputDefinition />
-                </div>
+                </SidePanel.Content>
               </>
             ) : (
               <div className="space-y-6">
-                <InputName />
-                <Divider light />
-                <SelectSchema />
-                <SelectReturnType />
-                <Divider light />
-                <InputMultiArguments />
-                <Divider light />
-                <InputDefinition />
-                <Divider light />
-                <div className="px-6">
+                <SidePanel.Content>
+                  <InputName />
+                </SidePanel.Content>
+                <SidePanel.Seperator />
+                <SidePanel.Content>
+                  <div className="space-y-4">
+                    <SelectSchema />
+                    <SelectReturnType />
+                  </div>
+                </SidePanel.Content>
+                <SidePanel.Seperator />
+                <SidePanel.Content>
+                  <InputMultiArguments />
+                </SidePanel.Content>
+                <SidePanel.Seperator />
+                <SidePanel.Content>
+                  <InputDefinition />
+                </SidePanel.Content>
+                <SidePanel.Seperator />
+                <SidePanel.Content>
                   <Panel>
-                    <div className={`space-y-8 py-4 dark:bg-bg-alt-dark rounded`}>
+                    <div className={`space-y-8 py-4 bg-bg-alt-light dark:bg-bg-alt-dark rounded`}>
                       <div className={`px-6`}>
                         <Toggle
                           onChange={() => _localState.toggleAdvancedVisible()}
                           label="Show advanced settings"
+                          checked={_localState.advancedVisible}
                           labelOptional="These are settings that might be familiar for postgres heavy users "
                         />
                       </div>
                       {/* advanced selections */}
                     </div>
                   </Panel>
-                </div>
+                </SidePanel.Content>
                 {_localState.advancedVisible && (
                   <>
-                    {/* <Divider light /> */}
-                    <SelectLanguage />
-                    <SelectBehavior />
-                    <Divider light />
-                    <InputMultiConfigParams />
-                    <Divider light />
-                    <RadioSecurity />
+                    <SidePanel.Content>
+                      <div className="space-y-2">
+                        <SelectLanguage />
+                        <SelectBehavior />
+                      </div>
+                    </SidePanel.Content>
+                    <SidePanel.Seperator />
+                    <SidePanel.Content>
+                      <InputMultiConfigParams />
+                    </SidePanel.Content>
+                    <SidePanel.Seperator />
+                    <SidePanel.Content>
+                      <RadioSecurity />
+                    </SidePanel.Content>
                   </>
                 )}
               </div>
@@ -425,24 +445,22 @@ export default observer(CreateFunction)
 const InputName: FC = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
   return (
-    <div className={'px-6'}>
-      <Input
-        id="name"
-        label="Name of function"
-        layout="horizontal"
-        placeholder="Name of function"
-        value={_localState!.formState.name.value}
-        onChange={(e) =>
-          _localState!.onFormChange({
-            key: 'name',
-            value: e.target.value,
-          })
-        }
-        size="small"
-        error={_localState!.formState.name.error}
-        descriptionText="Name will also be used for the function name in postgres"
-      />
-    </div>
+    <Input
+      id="name"
+      label="Name of function"
+      layout="horizontal"
+      placeholder="Name of function"
+      value={_localState!.formState.name.value}
+      onChange={(e) =>
+        _localState!.onFormChange({
+          key: 'name',
+          value: e.target.value,
+        })
+      }
+      size="small"
+      error={_localState!.formState.name.error}
+      descriptionText="Name will also be used for the function name in postgres"
+    />
   )
 })
 
@@ -462,18 +480,16 @@ const InputMultiArguments: FC<InputMultiArgumentsProps> = observer(({ readonly }
   }
 
   return (
-    <div className={'px-6'}>
+    <div>
       <div className="flex flex-col">
-        <Typography.Text>Arguments</Typography.Text>
-        <Typography.Text type="secondary">
+        <h5 className="text-base text-scale-1200">Arguments</h5>
+        <p className="text-sm text-scale-1100">
           Arguments can be referenced in the function body using either names or numbers.
-        </Typography.Text>
+        </p>
       </div>
       <div className="pt-4 space-y-2">
         {readonly && isEmpty(_localState!.formState.args.value) && (
-          <Typography.Text type="secondary" className="opacity-50">
-            No argument for this function
-          </Typography.Text>
+          <span className="text-scale-900">No argument for this function</span>
         )}
         {_localState!.formState.args.value.map(
           (x: { name: string; type: string; error?: string }, idx: number) => (
@@ -489,7 +505,7 @@ const InputMultiArguments: FC<InputMultiArgumentsProps> = observer(({ readonly }
         )}
         {!readonly && (
           <div className="">
-            <Button type="dashed" icon={<IconPlus />} onClick={onAddArgument} disabled={readonly}>
+            <Button type="default" icon={<IconPlus />} onClick={onAddArgument} disabled={readonly}>
               Add a new argument
             </Button>
           </div>
@@ -538,7 +554,7 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
   }
 
   return (
-    <div className={`flex flex-row space-x-1`}>
+    <div className="flex flex-row space-x-1">
       <Input
         id={`name-${idx}`}
         className="flex-1 flex-grow"
@@ -568,7 +584,7 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
         <div>
           <Button
             danger
-            type="primary"
+            type="default"
             icon={<IconTrash size="tiny" />}
             onClick={onDelete}
             size="small"
@@ -591,9 +607,9 @@ const InputMultiConfigParams: FC = observer(({}) => {
   }
 
   return (
-    <div className={'px-6'}>
+    <div>
       <div className="flex justify-between items-center">
-        <Typography.Text>Config Params</Typography.Text>
+        <h5 className="text-base text-scale-1200">Config Params</h5>
       </div>
       <div className="pt-4 space-y-2">
         {_localState!.formState.configParams.value.map(
@@ -612,7 +628,7 @@ const InputMultiConfigParams: FC = observer(({}) => {
         )}
       </div>
       <div className="pt-2">
-        <Button type="dashed" icon={<IconPlus />} onClick={onAddArgument}>
+        <Button type="default" icon={<IconPlus />} onClick={onAddArgument}>
           Add a new config
         </Button>
       </div>
@@ -658,7 +674,7 @@ const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value
   }
 
   return (
-    <div className={`flex space-x-1`}>
+    <div className="flex space-x-1">
       <Input
         id={`name-${idx}`}
         className="flex-1"
@@ -680,7 +696,7 @@ const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value
       <div>
         <Button
           danger
-          type="primary"
+          type="default"
           icon={<IconTrash size="tiny" />}
           onClick={onDelete}
           size="small"
@@ -693,15 +709,15 @@ const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value
 const InputDefinition: FC = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
   return (
-    <div className={`space-y-4 px-6`}>
+    <div className="space-y-4">
       <div className="flex flex-col">
-        <Typography.Text>Definition</Typography.Text>
-        <Typography.Text type="secondary">
+        <h5 className="text-base text-scale-1200">Definition</h5>
+        <p className="text-sm text-scale-1100">
           The language below should be written in `{_localState!.formState.language.value}`.
-        </Typography.Text>
-        <Typography.Text type="secondary">
+        </p>
+        <p className="text-sm text-scale-1100">
           Change the language in the Advanced Settings below.
-        </Typography.Text>
+        </p>
       </div>
       <div className="h-40 border dark:border-dark">
         {/* @ts-ignore */}
@@ -725,29 +741,27 @@ const SelectSchema: FC = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (
-    <div className={`space-y-4 px-6`}>
-      <Select
-        id="schema"
-        label="Schema"
-        layout="horizontal"
-        value={_localState!.formState.schema.value}
-        onChange={(e) =>
-          _localState!.onFormChange({
-            key: 'schema',
-            value: e.target.value,
-          })
-        }
-        placeholder="Pick a schema"
-        size="small"
-        descriptionText="Tables made in the table editor will be in 'public'"
-      >
-        {_localState!.schemas.map((x) => (
-          <Select.Option key={x.name} value={x.name}>
-            {x.name}
-          </Select.Option>
-        ))}
-      </Select>
-    </div>
+    <Select
+      id="schema"
+      label="Schema"
+      layout="horizontal"
+      value={_localState!.formState.schema.value}
+      onChange={(e) =>
+        _localState!.onFormChange({
+          key: 'schema',
+          value: e.target.value,
+        })
+      }
+      placeholder="Pick a schema"
+      size="small"
+      descriptionText="Tables made in the table editor will be in 'public'"
+    >
+      {_localState!.schemas.map((x) => (
+        <Select.Option key={x.name} value={x.name}>
+          {x.name}
+        </Select.Option>
+      ))}
+    </Select>
   )
 })
 
@@ -761,7 +775,7 @@ const SelectLanguage: FC = observer(({}) => {
   )
 
   return (
-    <div className={`space-y-4 px-6`}>
+    <div className="space-y-4">
       <Select
         id="language"
         label="Language"
@@ -798,7 +812,7 @@ const SelectReturnType: FC = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (
-    <div className={`space-y-4 px-6`}>
+    <div className="space-y-4">
       <Select
         id="returnType"
         label="Return type"
@@ -830,7 +844,7 @@ const SelectBehavior: FC = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (
-    <div className={`space-y-4 px-6`}>
+    <div className="space-y-4">
       <Select
         id="behavior"
         label="Behavior"
@@ -857,7 +871,7 @@ const RadioSecurity: FC = observer(({}) => {
 
   return (
     <>
-      <div className={`space-y-4 px-6`}>
+      <div className="space-y-4">
         <Radio.Group
           type="cards"
           label="Type of security"
@@ -878,7 +892,7 @@ const RadioSecurity: FC = observer(({}) => {
             label="SECURITY INVOKER"
             value="SECURITY_INVOKER"
             checked={!_localState!.formState.securityDefiner.value}
-            description="function is to be executed with the privileges of the user that calls it."
+            description="Function is to be executed with the privileges of the user that calls it."
           />
           <Radio
             id="SECURITY_DEFINER"

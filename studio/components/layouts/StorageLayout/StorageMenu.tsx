@@ -9,11 +9,13 @@ import {
   Dropdown,
   Menu,
   Typography,
-  IconPlus,
   IconLoader,
   IconMoreVertical,
+  Alert,
+  IconEdit,
 } from '@supabase/ui'
 
+import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
@@ -37,78 +39,74 @@ const StorageMenu: FC<Props> = () => {
   } = storageExplorerStore || {}
 
   return (
-    <div className="my-6 flex flex-col flex-grow space-y-6">
-      <div className="mx-4">
+    <Menu type="pills" className="my-6 flex flex-col flex-grow px-5">
+      <div className="px-2 mb-6">
         <Button
           block
-          icon={<IconPlus />}
-          type="text"
+          type="default"
+          icon={
+            <div className="text-scale-900">
+              <IconEdit size={14} />
+            </div>
+          }
           style={{ justifyContent: 'start' }}
           onClick={openCreateBucketModal}
         >
           New bucket
         </Button>
       </div>
-      <div className="mx-4 my-4 space-y-2">
-        <div className="mx-4 w-full flex">
-          <Typography.Text type="secondary" small>
-            All buckets
-          </Typography.Text>
+      <div className="space-y-6">
+        <div className="">
+          <div>
+            <Menu.Group title="All buckets" />
+            {!loaded ? (
+              <div className="py-2 px-4 flex items-center space-x-2">
+                <IconLoader className="animate-spin" size={14} strokeWidth={2} />
+                <span className="text-sm">Loading buckets</span>
+              </div>
+            ) : (
+              <>
+                {buckets.length === 0 && (
+                  <div className="px-2">
+                    <Alert title="No buckets available">
+                      Buckets that you create will appear here
+                    </Alert>
+                  </div>
+                )}
+                {buckets.map((bucket: any, idx: number) => {
+                  const isSelected = bucketId === bucket.id
+                  return (
+                    <BucketRow
+                      key={`${idx}_${bucket.id}`}
+                      bucket={bucket}
+                      projectRef={ref}
+                      isSelected={isSelected}
+                      onSelectDeleteBucket={openDeleteBucketModal}
+                      onSelectToggleBucketPublic={openToggleBucketPublicModal}
+                    />
+                  )
+                })}
+              </>
+            )}
+          </div>
         </div>
-        <div className="space-y-1">
-          {!loaded ? (
-            <div className="py-2 px-4 flex items-center space-x-2">
-              <IconLoader className="animate-spin" size={12} strokeWidth={2} />
-              <Typography.Text type="secondary">Loading buckets</Typography.Text>
-            </div>
-          ) : (
-            <>
-              {buckets.length === 0 && (
-                <div className="py-2 px-4 flex items-center">
-                  <Typography.Text type="secondary">No buckets available</Typography.Text>
-                </div>
-              )}
-              {buckets.map((bucket: any, idx: number) => {
-                const isSelected = bucketId === bucket.id
-                return (
-                  <BucketRow
-                    key={`${idx}_${bucket.id}`}
-                    bucket={bucket}
-                    projectRef={ref}
-                    isSelected={isSelected}
-                    onSelectDeleteBucket={openDeleteBucketModal}
-                    onSelectToggleBucketPublic={openToggleBucketPublicModal}
-                  />
-                )
-              })}
-            </>
-          )}
-        </div>
-      </div>
-      <div className="mx-4 flex flex-col space-y-2">
-        <div className="mx-4 space-y-1">
-          <Typography.Text type="secondary" small>
-            Settings
-          </Typography.Text>
-        </div>
-        <div className="dash-product-menu space-y-1">
+
+        <div className="">
+          <Menu.Group title="Settings" />
+
           <Link href={`/project/${projectRef}/storage/policies`}>
-            <a className="block">
-              <Menu.Item rounded active={page === 'policies'}>
-                <Typography.Text className="truncate">Policies</Typography.Text>
-              </Menu.Item>
-            </a>
+            <Menu.Item rounded active={page === 'policies'}>
+              <Typography.Text className="truncate">Policies</Typography.Text>
+            </Menu.Item>
           </Link>
           <Link href={`/project/${projectRef}/storage/usage`}>
-            <a className="block">
-              <Menu.Item rounded active={page === 'usage'}>
-                <Typography.Text className="truncate">Usage</Typography.Text>
-              </Menu.Item>
-            </a>
+            <Menu.Item rounded active={page === 'usage'}>
+              <Typography.Text className="truncate">Usage</Typography.Text>
+            </Menu.Item>
           </Link>
         </div>
       </div>
-    </div>
+    </Menu>
   )
 }
 
@@ -118,7 +116,6 @@ const BucketRow = ({
   bucket = {},
   projectRef = '',
   isSelected = false,
-  onSelectBucket = () => {},
   onSelectDeleteBucket = () => {},
   onSelectToggleBucketPublic = () => {},
 }: any) => {
@@ -132,46 +129,45 @@ const BucketRow = ({
       onClick: () => onSelectToggleBucketPublic(bucket),
     },
   ]
-  return (
-    <div className="group dash-product-menu">
-      <Menu.Item rounded active={isSelected} onClick={() => onSelectBucket(bucket)}>
-        <div className="flex items-center justify-between">
-          {/* Need to investigate, why links here are reopning the entire page */}
-          <Link href={`/project/${projectRef}/storage/buckets/${bucket.id}`}>
-            <a className="block w-full">
-              <div className="flex items-center space-x-2">
-                <Typography.Text>{bucket.name}</Typography.Text>
-                {bucket.public && <Badge color="yellow">Public</Badge>}
-              </div>
-            </a>
-          </Link>
 
-          {bucket.status === STORAGE_ROW_STATUS.LOADING && (
-            <IconLoader className="animate-spin" size={16} strokeWidth={2} />
-          )}
-          {bucket.status === STORAGE_ROW_STATUS.READY && (
-            <Dropdown
-              side="bottom"
-              align="end"
-              overlay={[
-                bucketOptions.map((option) => (
-                  <Dropdown.Item key={option.name} onClick={option.onClick}>
-                    {option.name}
-                  </Dropdown.Item>
-                )),
-              ]}
-            >
-              <Typography.Text>
-                <IconMoreVertical
-                  className="opacity-0 group-hover:opacity-100"
-                  size="tiny"
-                  strokeWidth={2}
-                />
-              </Typography.Text>
-            </Dropdown>
-          )}
+  return (
+    <ProductMenuItem
+      key={bucket.id}
+      name={
+        <div className="flex items-center space-x-2">
+          <Typography.Text>{bucket.name}</Typography.Text>
+          {bucket.public && <Badge color="yellow">Public</Badge>}
         </div>
-      </Menu.Item>
-    </div>
+      }
+      url={`/project/${projectRef}/storage/buckets/${bucket.id}`}
+      isActive={isSelected}
+      action={
+        bucket.status === STORAGE_ROW_STATUS.LOADING ? (
+          <IconLoader className="animate-spin" size={16} strokeWidth={2} />
+        ) : bucket.status === STORAGE_ROW_STATUS.READY ? (
+          <Dropdown
+            side="bottom"
+            align="end"
+            overlay={[
+              bucketOptions.map((option) => (
+                <Dropdown.Item key={option.name} onClick={option.onClick}>
+                  {option.name}
+                </Dropdown.Item>
+              )),
+            ]}
+          >
+            <Typography.Text>
+              <IconMoreVertical
+                className="opacity-0 group-hover:opacity-100"
+                size="tiny"
+                strokeWidth={2}
+              />
+            </Typography.Text>
+          </Dropdown>
+        ) : (
+          <div />
+        )
+      }
+    />
   )
 }
