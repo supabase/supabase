@@ -7,18 +7,20 @@ const Nav = () => {
   const { isDarkMode } = useTheme()
 
   return (
-    <div className="flex p-4">
-      <div className=''>
+    <div className="flex py-4 px-10 border-b border-solid justify-between">
+      <div className="flex items-center">
         <Link href="/">
-          <img src={isDarkMode ? "/supabase-logo-wordmark--dark.svg" : "/supabase-logo-wordmark--light.svg"} width="100" />
+          <a>
+            <img src={isDarkMode ? "/supabase-logo-wordmark--dark.svg" : "/supabase-logo-wordmark--light.svg"} width="120" />
+          </a>
         </Link>
       </div>
-      <div>
+      <div className="flex items-center space-x-6">
         <Link href="/about">
-          <a>About</a>
+          <a className="hover:text-brand-600">About</a>
         </Link>
         <Link href="/careers">
-          <a>Careers</a>
+          <a className="hover:text-brand-600">Careers</a>
         </Link>
         <DarkModeToggle />
       </div>
