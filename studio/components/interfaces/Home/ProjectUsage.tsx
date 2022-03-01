@@ -84,37 +84,42 @@ const ProjectUsage: FC<Props> = ({ project }) => {
   }
   return (
     <div className="mx-6 space-y-6">
-      <div className="flex flex-row justify-between align-center w-full">
-        <Typography.Title level={4}>Statistics for past {selectedInterval.label}</Typography.Title>
-
+      <div className="flex flex-row items-center gap-2">
         {logsUsageChartIntervals && (
           <Dropdown
             side="bottom"
-            align="end"
+            align="start"
             overlay={
               <Dropdown.RadioGroup value={interval} onChange={setInterval}>
                 {CHART_INTERVALS.map((i) => (
                   <Dropdown.Radio key={i.key} value={i.key}>
-                    <Typography.Text>{i.label}</Typography.Text>
+                    {i.label}
                   </Dropdown.Radio>
                 ))}
               </Dropdown.RadioGroup>
             }
           >
-            <Button type="text" iconRight={<IconChevronDown />}>
+            <Button as="span" type="default" iconRight={<IconChevronDown />}>
               {selectedInterval.label}
             </Button>
           </Dropdown>
         )}
+        <span className="text-scale-1000 text-xs">
+          Statistics for past {selectedInterval.label}
+        </span>
       </div>
       <div className="">
         {startDate && endDate && (
           <>
-            <div className="grid lg:grid-cols-4 lg:gap-8">
+            <div className="grid lg:grid-cols-2 lg:gap-8">
               <Panel key="database-chart">
                 <Panel.Content className="space-y-4">
                   <PanelHeader
-                    icon={<IconDatabase size="small" />}
+                    icon={
+                      <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                        <IconDatabase strokeWidth={2} size={16} />
+                      </div>
+                    }
                     title="Database"
                     href={`/project/${ref}/editor`}
                   />
@@ -129,7 +134,6 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     customDateFormat={datetimeFormat}
                     data={charts}
                     isLoading={!charts && !error ? true : false}
-                    onBarClick={(v) => handleBarClick(v, '/rest')}
                   />
                   <ProjectUsageMinimal
                     projectRef={project.ref}
@@ -141,7 +145,11 @@ const ProjectUsage: FC<Props> = ({ project }) => {
               <Panel key="auth-chart">
                 <Panel.Content className="space-y-4">
                   <PanelHeader
-                    icon={<IconKey size="small" />}
+                    icon={
+                      <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                        <IconKey strokeWidth={2} size={16} />
+                      </div>
+                    }
                     title="Auth"
                     href={`/project/${ref}/auth/users`}
                   />
@@ -156,7 +164,6 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     customDateFormat={datetimeFormat}
                     data={charts}
                     isLoading={!charts && !error ? true : false}
-                    onBarClick={(v) => handleBarClick(v, '/auth')}
                   />
                   <ProjectUsageMinimal
                     projectRef={project.ref}
@@ -165,10 +172,16 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   />
                 </Panel.Content>
               </Panel>
+            </div>
+            <div className="grid lg:grid-cols-2 lg:gap-8">
               <Panel key="storage-chart">
                 <Panel.Content className="space-y-4">
                   <PanelHeader
-                    icon={<IconArchive size="small" />}
+                    icon={
+                      <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                        <IconArchive strokeWidth={2} size={16} />
+                      </div>
+                    }
                     title="Storage"
                     href={`/project/${ref}/storage/buckets`}
                   />
@@ -183,7 +196,6 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     customDateFormat={datetimeFormat}
                     data={charts}
                     isLoading={!charts && !error ? true : false}
-                    onBarClick={(v) => handleBarClick(v, '/storage')}
                   />
                   <ProjectUsageMinimal
                     projectRef={project.ref}
@@ -194,7 +206,14 @@ const ProjectUsage: FC<Props> = ({ project }) => {
               </Panel>
               <Panel key="realtime-chart">
                 <Panel.Content className="space-y-4">
-                  <PanelHeader icon={<IconZap size="small" />} title="Realtime" />
+                  <PanelHeader
+                    icon={
+                      <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                        <IconZap strokeWidth={2} size={16} />
+                      </div>
+                    }
+                    title="Realtime"
+                  />
                   <ChartHandler
                     startDate={startDate}
                     endDate={endDate}
@@ -210,87 +229,75 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     isLoading={!charts && !error ? true : false}
                     onBarClick={(v) => handleBarClick(v, '/realtime')}
                   />
-                  {/* Empty space just so the cards are of the same height */}
-                  <div className="py-[26px]" />
-                  {/* <ProjectUsageMinimal
-                  projectRef={project.ref}
-                  subscription_id={project.subscription_id}
-                  filter="Connection requests"
-                /> */}
+                  <div className="py-[1.64rem]" />
                 </Panel.Content>
               </Panel>
             </div>
-            {logsUsageCodesPaths && (
-              <div className="grid lg:grid-cols-4 lg:gap-8">
-                <Panel
-                  key="api-status-codes"
-                  className="col-start-1 col-span-2"
-                  wrapWithLoading={false}
-                >
-                  <Panel.Content className="space-y-4">
-                    <PanelHeader title="API Status Codes" />
-                    <StackedAreaChart
-                      dateFormat={datetimeFormat}
-                      data={codesData?.result}
-                      stackKey="status_code"
-                      xAxisKey="timestamp"
-                      yAxisKey="count"
-                      isLoading={!codesData && !codesFetchError ? true : false}
-                      xAxisFormatAsDate
-                      size="large"
-                      styleMap={{
-                        200: { stroke: USAGE_COLORS['200'], fill: USAGE_COLORS['200'] },
-                        201: { stroke: USAGE_COLORS['201'], fill: USAGE_COLORS['201'] },
-                        400: { stroke: USAGE_COLORS['400'], fill: USAGE_COLORS['400'] },
-                        401: { stroke: USAGE_COLORS['401'], fill: USAGE_COLORS['401'] },
-                        404: { stroke: USAGE_COLORS['404'], fill: USAGE_COLORS['404'] },
-                        500: { stroke: USAGE_COLORS['500'], fill: USAGE_COLORS['500'] },
-                      }}
-                    />
-                  </Panel.Content>
-                </Panel>
-                <Panel
-                  key="top-routes"
-                  className="col-start-3 col-span-2 pb-0"
-                  bodyClassName="h-full"
-                  wrapWithLoading={false}
-                >
-                  <Panel.Content className="space-y-4">
-                    <PanelHeader title="Top Routes" />
-                    <Table
-                      head={
-                        <>
-                          <Table.th>Path</Table.th>
-                          <Table.th>Count</Table.th>
-                          <Table.th>Avg. Latency (ms)</Table.th>
-                        </>
-                      }
-                      body={
-                        <>
-                          {(pathsData?.result ?? []).map((row: PathsDatum) => (
-                            <Table.tr>
-                              <Table.td className="flex items-center">
-                                <div className="w-[60px]">
-                                  <Typography.Text code small>
-                                    {row.method}
-                                  </Typography.Text>
-                                </div>
-                                <Typography.Text className="font-mono" small>
-                                  {row.path}
-                                </Typography.Text>
-                              </Table.td>
-                              <Table.td>{row.count}</Table.td>
-                              <Table.td>{Number(row.avg_origin_time).toFixed(2)}</Table.td>
-                            </Table.tr>
-                          ))}
-                        </>
-                      }
-                    />
-                  </Panel.Content>
-                </Panel>
-              </div>
-            )}
           </>
+        )}
+        {logsUsageCodesPaths && (
+          <div className="grid lg:grid-cols-4 lg:gap-8">
+            <Panel
+              key="api-status-codes"
+              className="col-start-1 col-span-2"
+              wrapWithLoading={false}
+            >
+              <Panel.Content className="space-y-4">
+                <PanelHeader title="API Status Codes" />
+                <StackedAreaChart
+                  dateFormat={datetimeFormat}
+                  data={codesData?.result}
+                  stackKey="status_code"
+                  xAxisKey="timestamp"
+                  yAxisKey="count"
+                  isLoading={!codesData && !codesFetchError ? true : false}
+                  xAxisFormatAsDate
+                  size="large"
+                  styleMap={{
+                    200: { stroke: USAGE_COLORS['200'], fill: USAGE_COLORS['200'] },
+                    201: { stroke: USAGE_COLORS['201'], fill: USAGE_COLORS['201'] },
+                    400: { stroke: USAGE_COLORS['400'], fill: USAGE_COLORS['400'] },
+                    401: { stroke: USAGE_COLORS['401'], fill: USAGE_COLORS['401'] },
+                    404: { stroke: USAGE_COLORS['404'], fill: USAGE_COLORS['404'] },
+                    500: { stroke: USAGE_COLORS['500'], fill: USAGE_COLORS['500'] },
+                  }}
+                />
+              </Panel.Content>
+            </Panel>
+            <Panel
+              key="top-routes"
+              className="col-start-3 col-span-2 pb-0"
+              bodyClassName="h-full"
+              wrapWithLoading={false}
+            >
+              <Panel.Content className="space-y-4">
+                <PanelHeader title="Top Routes" />
+                <Table
+                  head={
+                    <>
+                      <Table.th>Path</Table.th>
+                      <Table.th>Count</Table.th>
+                      <Table.th>Avg. Latency (ms)</Table.th>
+                    </>
+                  }
+                  body={
+                    <>
+                      {(pathsData?.result ?? []).map((row: PathsDatum) => (
+                        <Table.tr>
+                          <Table.td className="flex items-center space-x-2">
+                            <p className="font-mono text-sm text-scale-1200">{row.method}</p>
+                            <p className="font-mono text-sm">{row.path}</p>
+                          </Table.td>
+                          <Table.td>{row.count}</Table.td>
+                          <Table.td>{Number(row.avg_origin_time).toFixed(2)}</Table.td>
+                        </Table.tr>
+                      ))}
+                    </>
+                  }
+                />
+              </Panel.Content>
+            </Panel>
+          </div>
         )}
       </div>
     </div>
@@ -304,15 +311,13 @@ const PanelHeader = (props: any) => {
     <Tag href={props.href}>
       <div
         className={
-          'flex items-center space-x-3 opacity-80 ' +
-          (props.href ? 'cursor-pointer hover:opacity-100 hover:text-green-500' : '')
+          'flex items-center space-x-3 opacity-80 transition ' +
+          (props.href ? 'cursor-pointer hover:opacity-100 hover:text-gray-1200' : '')
         }
       >
         <Typography.Text>{props.icon}</Typography.Text>
         <span className="flex items-center space-x-1">
-          <Typography.Title level={4} className="mb-0">
-            {props.title}
-          </Typography.Title>
+          <h4 className="mb-0 text-lg">{props.title}</h4>
         </span>
       </div>
     </Tag>

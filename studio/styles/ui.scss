@@ -1,19 +1,6 @@
-.editor-product-menu {
-  .sbui-typography-text {
-    @apply w-full;
-  }
-  .sbui-menu__item {
-    @apply py-0 h-[32px] flex items-center justify-between;
-  }
-}
-
 .dark .sbui-default-button--dark-white {
   @apply shadow-md text-typography-body-light border-gray-50 bg-white #{!important};
   text-shadow: none !important;
-}
-
-.dash-product-menu .sbui-menu__item {
-  @apply py-1;
 }
 
 /* Brought over from platform to be cleaned if needed */
@@ -44,8 +31,9 @@
   flex-wrap: wrap;
 }
 
-label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):not(.sbui-radio-container):not(.checkbox-pill) {
-  @apply inline-block text-input-label-light dark:text-input-label-dark text-sm py-2;
+// TO DO: REMOVE
+.form-group label {
+  @apply inline-block text-scale-1100 text-sm py-2;
   width: 33%;
   align-self: top;
 }
@@ -66,7 +54,7 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
 
 .Form .form-text,
 .Form .form-error {
-  @apply block text-sm text-gray-400 my-1;
+  @apply block text-sm text-scale-900 my-1;
   display: block;
   margin-left: calc(33% + 0.5rem);
   width: 100%;
@@ -74,6 +62,10 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
 
 .Form .form-error {
   @apply text-red-400;
+}
+
+.Form .text-danger {
+  @apply text-red-900;
 }
 
 .Form .form-help {
@@ -122,6 +114,7 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
 }
 
 .table-container thead th {
+  @apply text-scale-900 font-normal text-sm;
   @apply bg-table-header-light dark:bg-table-header-dark;
   @apply border-t border-b border-table-border-light dark:border-table-border-dark;
 }
@@ -149,7 +142,7 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
 }
 
 .table-container tbody td {
-  @apply border-b p-3 px-4 text-sm text-gray-300 border-table-border-light dark:border-table-border-dark;
+  @apply border-b p-3 px-4 text-sm text-gray-1100 border-table-border-light dark:border-table-border-dark;
 }
 
 .table-container tbody td:first-child {
@@ -195,37 +188,49 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
 /* Docs */
 .Docs {
   &--inner-wrapper {
-    background: linear-gradient(90deg, #ffffff 50%, #f3f4f6 50%); /* bg-white bg-coolGray-100 */
+    background: linear-gradient(
+      90deg,
+      var(--colors-scale1) 50%,
+      var(--colors-scale3) 50%
+    ); /* bg-white bg-coolGray-100 */
     width: 100%;
   }
 
   .dark &--inner-wrapper {
-    background: linear-gradient(90deg, #1f1f1f 50%, #2a2a2a 50%); /* bg-gray-700 bg-gray-600 */
+    background: linear-gradient(
+      90deg,
+      var(--colors-scale3) 50%,
+      var(--colors-scale2) 50%
+    ); /* bg-gray-700 bg-gray-600 */
   }
 
-  h1,
-  h2,
-  h3 {
-    @apply p-4 m-0;
-  }
+  // h1,
+  // h2,
+  // h3 {
+  //   @apply p-4 m-0;
+  // }
 
   .doc-heading {
-    @apply text-black dark:text-white capitalize mt-4 w-1/2;
+    @apply text-black dark:text-white capitalize mt-4 px-6 w-1/2;
     hyphens: auto;
     max-width: 50%;
   }
 
   .doc-section {
-    @apply border-b dark:border-dark text-gray-600 dark:text-gray-300 flex;
+    @apply border-b flex border-scale-500;
+  }
+
+  .doc-section article:first-child {
+    @apply prose prose-docs prose-sm max-w-none;
   }
 
   .text {
-    @apply flex-1 p-4 w-1/2;
+    @apply p-4 px-6 w-1/2;
     max-width: 50%;
 
-    a:not(.btn-primary):not(.btn-secondary) {
-      @apply text-green-500;
-    }
+    // a:not(.btn-primary):not(.btn-secondary) {
+    //   @apply text-green-500;
+    // }
 
     a:hover {
       @apply text-green-600;
@@ -237,11 +242,11 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
   }
 
   .code {
-    @apply flex-1 p-2 w-1/2 pb-4;
+    @apply flex-1 p-2 px-6 w-1/2 pb-4;
     max-width: 50%;
 
     h4 {
-      @apply uppercase font-medium m-1 p-0 text-sm;
+      @apply uppercase font-normal m-1 p-0 text-sm text-scale-1100;
     }
 
     h4:not(:first-child) {
@@ -254,19 +259,19 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
     }
 
     .is-highlighted {
-      @apply text-green-500;
+      @apply text-brand-900;
     }
   }
 }
 
 ::-moz-selection {
   /* Code for Firefox */
-  @apply bg-green-400;
+  @apply bg-brand-900;
   color: #333 !important;
 }
 
 ::selection {
-  @apply bg-green-400;
+  @apply bg-brand-900;
   color: #333 !important;
 }
 
@@ -313,7 +318,7 @@ label:not(.sbui-formlayout__label):not(.sbui-checkbox__label-container__label):n
 
 .radix-tooltip-arrow {
   polygon {
-    @apply dark:fill-[#1f1f1f];
-    fill: #eeeeee;
+    @apply fill-scale-100 dark:fill-scale-100;
+    // fill: #eeeeee;
   }
 }

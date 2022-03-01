@@ -37,28 +37,18 @@ const Header: FC<any> = ({ organization, project }) => {
                   />
                 </a>
               </Link>
-              <Typography.Text type="secondary">
-                <IconChevronRight size="small" />
-              </Typography.Text>
-              <Typography.Text small>
-                <a>
-                  {organization
-                    ? `Organization: ${organization.name}`
-                    : '1. Create an organization'}
-                </a>
-              </Typography.Text>
-              <Typography.Text type="secondary">
-                <IconChevronRight size="small" />
-              </Typography.Text>
-              <Typography.Text small type={stepNumber < 1 ? 'secondary' : 'default'}>
-                <a>{project ? project.name : 'Create a new project'}</a>
-              </Typography.Text>
-              <Typography.Text type="secondary">
-                <IconChevronRight size="small" />
-              </Typography.Text>
-              <Typography.Text small type={stepNumber < 2 ? 'secondary' : 'default'}>
-                <a>{project ? project.name : 'Extend your database'}</a>
-              </Typography.Text>
+              <IconChevronRight size="small" className="text-scale-1100" />
+              <p className="text-sm">
+                {organization ? `Organization: ${organization.name}` : 'Create an organization'}
+              </p>
+              <IconChevronRight size="small" className="text-scale-1100" />
+              <p className={`text-sm ${stepNumber < 1 ? 'text-scale-1100' : ''}`}>
+                {project ? project.name : 'Create a new project'}
+              </p>
+              <IconChevronRight size="small" className="text-scale-1100" />
+              <p className={`text-sm ${stepNumber < 2 ? 'text-scale-1100' : ''}`}>
+                {project ? project.name : 'Extend your database'}
+              </p>
             </div>
           </div>
           <div className="flex">{/* End */}</div>

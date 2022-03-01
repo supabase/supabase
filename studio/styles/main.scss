@@ -33,57 +33,73 @@ body,
   box-sizing: border-box;
 }
 
-input,
-input[type='text'],
-input[type='email'],
-input[type='url'],
-input[type='password'],
-input[type='number'],
-input[type='date'],
-input[type='datetime-local'],
-input[type='month'],
-input[type='search'],
-input[type='tel'],
-input[type='time'],
-input[type='week'],
-input[multiple],
-textarea,
-select {
-  @apply block box-border w-full rounded-md shadow-sm text-sm border border-solid transition-all;
-
-  @apply border-input-border-light dark:border-input-border-dark focus:outline-none;
-
-  @apply bg-transparent text-form-light dark:text-form-dark;
-
-  @apply focus:border-input-border-focus-light dark:focus:border-input-border-focus-dark;
-  @apply focus:ring-input-border-focus-light dark:focus:ring-input-border-focus-dark;
-
-  transition: box-shadow 0.3s ease-in-out;
+.form-group .form-text,
+.Form .form-text {
+  @apply text-scale-900;
 }
 
-input,
-select,
-textarea {
+.form-group input,
+.form-group input[type='text'],
+.form-group input[type='email'],
+.form-group input[type='url'],
+.form-group input[type='password'],
+.form-group input[type='number'],
+.form-group input[type='date'],
+.form-group input[type='datetime-local'],
+.form-group input[type='month'],
+.form-group input[type='search'],
+.form-group input[type='tel'],
+.form-group input[type='time'],
+.form-group input[type='week'],
+.form-group input[multiple],
+.form-group textarea,
+.form-group select,
+input.form-control,
+.form-control input,
+.form-control textarea {
+  @apply block;
+  @apply box-border;
+  // @apply  w-full ;
+  @apply rounded-md;
+  @apply shadow-sm;
+  @apply transition-all;
+  @apply text-scale-1200;
+  @apply border;
+  @apply focus:shadow-md;
+
+  @apply focus:border-scale-900;
+  @apply focus:ring-scale-400;
+
+  @apply bg-scale-200 dark:bg-scale-200;
+  @apply border border-scale-700;
+
+  @apply outline-none;
+  @apply focus:ring-current focus:ring-2;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
   @apply px-4 py-2;
 }
 
-input:focus,
-input[type='text']:focus,
-input[type='email']:focus,
-input[type='url']:focus,
-input[type='password']:focus,
-input[type='number']:focus,
-input[type='date']:focus,
-input[type='datetime-local']:focus,
-input[type='month']:focus,
-input[type='search']:focus,
-input[type='tel']:focus,
-input[type='time']:focus,
-input[type='week']:focus,
-input[multiple]:focus,
-textarea:focus,
-select:focus,
-input:focus {
+.form-group input:focus,
+.form-group input[type='text']:focus,
+.form-group input[type='email']:focus,
+.form-group input[type='url']:focus,
+.form-group input[type='password']:focus,
+.form-group input[type='number']:focus,
+.form-group input[type='date']:focus,
+.form-group input[type='datetime-local']:focus,
+.form-group input[type='month']:focus,
+.form-group input[type='search']:focus,
+.form-group input[type='tel']:focus,
+.form-group input[type='time']:focus,
+.form-group input[type='week']:focus,
+.form-group input[multiple]:focus,
+.form-group textarea:focus,
+.form-group select:focus,
+.form-group input:focus .form-control:focus {
   box-shadow: 0 0 0 2px rgba(62, 207, 142, 0.1);
 }
 
@@ -94,12 +110,20 @@ input:focus {
   filter: invert(0.8);
 }
 
+select {
+  // [Joshen] Color is hard-coded - I can't figure out how to use the UI library colors
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='transparent' stroke='gray' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='4 11 9 16 14 11'></polyline></svg>");
+}
+
 select option {
   @apply text-bg-primary-dark;
 }
 
 input.is-invalid {
-  @apply outline-none border-red-500;
+  @apply bg-red-100;
+  @apply border border-red-700;
+  @apply focus:ring-red-500;
+  @apply placeholder:text-red-600;
 }
 
 input[type='submit'] {
@@ -110,8 +134,8 @@ input[type='submit']:hover {
   @apply btn-primary-hover;
 }
 
-input::placeholder {
-  @apply text-input-placeholder-light dark:text-input-placeholder-dark;
+.form-group input::placeholder {
+  @apply text-scale-900;
 }
 
 .billing-input-fixed {
@@ -144,7 +168,8 @@ input[type='radio'] {
 }
 
 code {
-  @apply p-1 m-0 font-mono text-sm bg-gray-100 dark:bg-gray-600 rounded;
+  // use supabase-ui code style
+  @apply text-code;
 }
 
 div[data-radix-portal]:not(.portal--toast) {

@@ -90,9 +90,7 @@ const PageLayout = observer(() => {
 
   return (
     <AuthLayout title="Auth">
-      <div className="p-4">
-        <Users />
-      </div>
+      <Users />
     </AuthLayout>
   )
 })

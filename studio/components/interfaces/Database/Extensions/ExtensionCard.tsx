@@ -112,17 +112,17 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
           flex flex-col h-full"
       >
         <div className="p-4 px-6">
-          <Typography.Text type="secondary">
-            <span className="flex-grow capitalize-first">{extension.comment}</span>
-          </Typography.Text>
+          <p className="text-sm text-scale-1100">
+            <span className="flex-grow capitalize">{extension.comment}</span>
+          </p>
         </div>
         {isOn && extension.schema && (
           <div className="p-4 px-6">
-            <Typography.Text type="secondary" small>
-              <span className="flex-grow capitalize-first">
+            <p className="text-sm text-scale-1100">
+              <span className="flex-grow">
                 Schema: <Badge>{`${extension.schema}`}</Badge>
               </span>
-            </Typography.Text>
+            </p>
           </div>
         )}
       </div>

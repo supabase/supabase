@@ -144,9 +144,15 @@ const ThemeSettings = observer(() => {
           }
           onChange={(themeOption: any) => ui.onThemeOptionChange(themeOption)}
         >
-          <Listbox.Option label='System default' value="system">System default</Listbox.Option>
-          <Listbox.Option label='Dark' value="dark">Dark</Listbox.Option>
-          <Listbox.Option label='Light' value="light">Light</Listbox.Option>
+          <Listbox.Option label="System default" value="system">
+            System default
+          </Listbox.Option>
+          <Listbox.Option label="Dark" value="dark">
+            Dark
+          </Listbox.Option>
+          <Listbox.Option label="Light" value="light">
+            Light
+          </Listbox.Option>
         </Listbox>
       </Panel.Content>
     </Panel>

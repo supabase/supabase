@@ -85,7 +85,7 @@ export default WithSidebar
 
 const LinksWithHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
   return links.map((x: any) => (
-    <div key={x.heading} className="py-5 border-b dark:border-dark px-3">
+    <div key={x.heading} className="py-5 border-b dark:border-dark px-6">
       <Menu.Group title={x.heading} />
       {x.versionLabel && (
         <div className="px-3 mb-1">
@@ -104,7 +104,7 @@ const LinksWithHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
 }
 const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
   return (
-    <ul className="dash-product-menu space-y-1">
+    <ul className="space-y-1">
       {links.map((x: any, i: number) => {
         // disable active state for link with subitems
         const isActive = x.isActive && !subitems

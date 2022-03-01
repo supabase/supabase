@@ -120,13 +120,13 @@ const PageLayout: FC<any> = observer(
               onClickCta={() => createFunction()}
             >
               <AlphaPreview />
-              <Typography.Text type="secondary">
+              <p className="text-sm text-scale-1100">
                 PostgreSQL functions, also known as stored procedures, is a set of SQL and
                 procedural commands such as declarations, assignments, loops, flow-of-control, etc.
-              </Typography.Text>
-              <Typography.Text type="secondary">
+              </p>
+              <p className="text-sm text-scale-1100">
                 It's stored on the database server and can be invoked using the SQL interface.
-              </Typography.Text>
+              </p>
             </ProductEmptyState>
           </div>
         ) : (
@@ -134,7 +134,7 @@ const PageLayout: FC<any> = observer(
             <div className="flex justify-between items-center px-6">
               <Input
                 placeholder="Filter by name"
-                size="tiny"
+                size="small"
                 icon={<IconSearch size="tiny" />}
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
@@ -176,7 +176,7 @@ const SchemaTable: FC<SchemaTableProps> = observer(
   ({ schema, filterString, editFunction = () => {}, deleteFunction = () => {} }) => {
     return (
       <div key={schema} className="">
-        <div className="z-10 sticky top-0 backdrop-filter backdrop-blur">
+        <div className="sticky top-0 backdrop-filter backdrop-blur">
           <div className="flex space-x-1 items-baseline py-2 px-6">
             <Typography.Title level={5} className="opacity-50">
               schema

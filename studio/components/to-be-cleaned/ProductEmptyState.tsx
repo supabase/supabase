@@ -19,7 +19,7 @@ const ProductEmptyState: FC<Props> = ({
   onClickCta = () => {},
 }) => (
   <div className="flex items-center justify-center w-full h-full">
-    <div className="flex space-x-4 p-6 border rounded dark:border-dark bg-bg-secondary-light dark:bg-bg-secondary-dark shadow-md">
+    <div className="flex space-x-4 p-6 rounded border border-panel-border-light dark:border-panel-border-dark bg-panel-body-light dark:bg-panel-body-dark shadow-md">
       {/* A graphic can probably be placed here as a sibling to the div below*/}
       <div className="flex flex-col">
         <div className="w-80 space-y-4">

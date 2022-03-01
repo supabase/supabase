@@ -1,4 +1,12 @@
-import { Badge, Button, Typography } from '@supabase/ui'
+import {
+  Badge,
+  Button,
+  Dropdown,
+  IconEdit,
+  IconMoreVertical,
+  IconTrash,
+  Typography,
+} from '@supabase/ui'
 import Panel from '../Panel'
 
 const PolicyTableRowHeader = ({
@@ -36,29 +44,49 @@ const PolicyRow = ({
   onSelectDeletePolicy = () => {},
 }) => {
   return (
-    <div className="flex has-hidden-children">
-      <Panel.Content className="flex justify-between w-full py-4 border-b dark:border-dark">
-        <div className="flex-1">
-          <Typography.Text>{policy.name}</Typography.Text>
-          <Typography.Text type="secondary" className="font-mono block" small>
-            {policy.definition || policy.check}
-          </Typography.Text>
-        </div>
-        <div className="relative w-64">
-          <div className="top-0 right-0 absolute inline-block visible-child my-2">
-            <Typography.Text type="secondary" className='font-mono text-right' small>
-              {policy.command}
-            </Typography.Text>
-          </div>
-          <div className="top-0 right-0 absolute inline-block -mr-3 hidden-child">
-            <Button type="outline" className="mx-2" onClick={() => onSelectEditPolicy(policy)}>
-              Edit
-            </Button>
-            <Button type="outline" onClick={() => onSelectDeletePolicy(policy)}>
-              Delete
-            </Button>
+    <div className="group">
+      <Panel.Content className="flex gap-2 justify-between py-4 border-b border-panel-border-light dark:border-panel-border-dark">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+          <div className="font-mono text-xs text-scale-900">{policy.command}</div>
+          <div className="flex flex-col lg:flex-row gap-2">
+            <span className="text-sm text-scale-1200 truncate">{policy.name}</span>
+            <span className="text-sm text-scale-1100 truncate">
+              {policy.definition || policy.check}
+            </span>
           </div>
         </div>
+
+        <Dropdown
+          side="bottom"
+          align="end"
+          size="small"
+          overlay={
+            <>
+              <Dropdown.Item
+                icon={<IconEdit size={14} />}
+                type="outline"
+                className="mx-2"
+                onClick={() => onSelectEditPolicy(policy)}
+              >
+                Edit
+              </Dropdown.Item>
+              <Dropdown.Seperator />
+              <Dropdown.Item
+                icon={<IconTrash size={14} />}
+                type="outline"
+                onClick={() => onSelectDeletePolicy(policy)}
+              >
+                Delete
+              </Dropdown.Item>
+            </>
+          }
+        >
+          <Button
+            type="default"
+            style={{ paddingLeft: 4, paddingRight: 4 }}
+            icon={<IconMoreVertical />}
+          />
+        </Dropdown>
       </Panel.Content>
     </div>
   )
@@ -83,9 +111,7 @@ const PolicyTableRow = ({
     >
       {table.policies.length === 0 && (
         <div className="p-4 px-6">
-          <Typography.Text type="secondary" className="opacity-50">
-            No policies created yet
-          </Typography.Text>
+          <p className="text-sm text-scale-900">No policies created yet</p>
         </div>
       )}
 

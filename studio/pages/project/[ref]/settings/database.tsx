@@ -200,11 +200,9 @@ const ResetDbPassword: FC<any> = () => {
             <div>
               <Typography.Text className="block">Database password</Typography.Text>
               <div style={{ maxWidth: '420px' }}>
-                <Typography.Text type="secondary" className="opacity-50">
-                  <p className="opacity-50">
-                    You can use this password to connect directly to your Postgres database.
-                  </p>
-                </Typography.Text>
+                <p className="opacity-50 text-sm">
+                  You can use this password to connect directly to your Postgres database.
+                </p>
               </div>
             </div>
             <div className="flex items-end justify-end">
@@ -256,12 +254,10 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
           <div>
             <Typography.Text className="block">SSL Connection</Typography.Text>
             <div style={{ maxWidth: '420px' }}>
-              <Typography.Text type="secondary" className="opacity-50">
-                <p className="opacity-50">
-                  Use this cert when connecting to your database to prevent snooping and
-                  man-in-the-middle attacks.
-                </p>
-              </Typography.Text>
+              <p className="opacity-50 text-sm">
+                Use this cert when connecting to your database to prevent snooping and
+                man-in-the-middle attacks.
+              </p>
             </div>
           </div>
           <div className="flex items-end justify-end">
@@ -311,7 +307,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
     `user=${connectionInfo.db_user} password=[YOUR-PASSWORD] ` +
     `host=${connectionInfo.db_host} port=${connectionInfo.db_port.toString()}` +
     ` dbname=${connectionInfo.db_name}`
-  const psqlConnString = 
+  const psqlConnString =
     `psql -h ${connectionInfo.db_host} -p ` +
     `${connectionInfo.db_port.toString()} -d ${connectionInfo.db_name} ` +
     `-U ${connectionInfo.db_user}`

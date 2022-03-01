@@ -96,14 +96,16 @@ const LogPanel: FC<Props> = ({
                   <div
                     className={[
                       'absolute flex items-center justify-center -top-3 right-3',
-                      'h-3 w-3 z-50',
+                      'h-4 w-4 z-50',
                     ].join(' ')}
                   >
                     <div className="absolute z-20">
-                      <Typography.Text style={{ fontSize: '0.7rem' }} className="opacity-80">{newCount}</Typography.Text>
+                      <Typography.Text style={{ fontSize: '0.6rem' }} className="opacity-80">
+                        {newCount}
+                      </Typography.Text>
                     </div>
-                    <div className="bg-green-600 rounded-full w-full h-full animate-ping opacity-40"></div>
-                    <div className="absolute  z-60 top-0 right-0 bg-green-900 opacity-60 rounded-full w-full h-full "></div>
+                    <div className="bg-green-800 rounded-full w-full h-full animate-ping opacity-60"></div>
+                    <div className="absolute z-60 top-0 right-0 bg-green-900 opacity-80 rounded-full w-full h-full"></div>
                   </div>
                 )}
                 <IconRefreshCw />
@@ -129,9 +131,7 @@ const LogPanel: FC<Props> = ({
           </Dropdown>
 
           <div className="flex items-center space-x-2">
-            <Typography.Text type="secondary" small>
-              Search logs via query
-            </Typography.Text>
+            <p className="text-xs">Search logs via query</p>
             <Toggle size="tiny" checked={isCustomQuery} onChange={onCustomClick} />
           </div>
         </div>
@@ -188,9 +188,7 @@ const LogPanel: FC<Props> = ({
               </div>
               {!isCustomQuery && (
                 <div className="flex items-center space-x-2">
-                  <Typography.Text type="secondary" small>
-                    Show event chart
-                  </Typography.Text>
+                  <p className="text-xs">Show event chart</p>
                   <Toggle size="tiny" checked={isShowingEventChart} onChange={onToggleEventChart} />
                 </div>
               )}
@@ -218,7 +216,7 @@ const LogPanel: FC<Props> = ({
                       />
                     ),
 
-                    <Button key="go" size="tiny" title="Go" type="secondary" onClick={handleSearch}>
+                    <Button key="go" size="tiny" title="Go" type="default" onClick={handleSearch}>
                       <IconSearch size={16} />
                     </Button>,
                   ]}

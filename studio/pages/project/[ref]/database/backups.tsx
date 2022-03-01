@@ -1,6 +1,6 @@
 import { NextPage } from 'next'
 import { observer } from 'mobx-react-lite'
-import { Divider, Typography } from '@supabase/ui'
+import { Typography } from '@supabase/ui'
 
 import { withAuth } from 'hooks'
 import { DatabaseLayout } from 'components/layouts'
@@ -11,16 +11,13 @@ const DatabaseBackups: NextPage = () => {
     <DatabaseLayout title="Database">
       <div className="flex">
         <div className="p-4 w-full my-2 max-w-4xl mx-auto space-y-8">
-          <Typography.Title level={3} className="mb-0">
-            Backups
-          </Typography.Title>
-          <Divider light />
-          <div>
-            <Typography.Text type="secondary">
+          <h3 className="text-2xl">Backups</h3>
+          <div className="space-y-4">
+            <p className="text-sm text-scale-1100">
               Projects are backed up daily and can be restored at any time.
-            </Typography.Text>
+            </p>
+            <BackupsList />
           </div>
-          <BackupsList />
         </div>
       </div>
     </DatabaseLayout>

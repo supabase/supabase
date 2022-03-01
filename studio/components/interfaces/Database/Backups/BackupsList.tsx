@@ -42,58 +42,50 @@ const BackupsList: FC<Props> = ({}) => {
   const { backups, tierId } = projectData
   const sortedBackups = backups.sort((a: any, b: any) => b.id - a.id)
 
-  return (
-    <div className="space-y-6">
-      {/* <div className="mb-4">
-        <BackupButton backups={sortedBackups} projectRef={projectRef} />
-      </div> */}
-
-      {tierId === STRIPE_PRODUCT_IDS.FREE && (
-        <div
-          className={[
-            'block w-full p-3 px-6 border rounded border-opacity-20',
-            'bg-gray-100 border-gray-600',
-            'dark:bg-gray-600 dark:border-gray-500',
-          ].join(' ')}
-        >
-          <div className="flex space-x-3">
-            <div className="mt-1">
-              <IconClock size="large" />
-            </div>
-            <div className="flex justify-between w-full items-center">
+  if (tierId === STRIPE_PRODUCT_IDS.FREE) {
+    return (
+      <div
+        className={[
+          'block w-full py-4 px-6 border rounded border-opacity-20',
+          'bg-gray-100 border-gray-600',
+          'dark:bg-gray-400 dark:border-gray-300',
+        ].join(' ')}
+      >
+        <div className="flex space-x-3">
+          <div className="mt-1">
+            <IconClock size="large" />
+          </div>
+          <div className="flex justify-between w-full items-center">
+            <div>
+              <p>Free Plan does not include project backups.</p>
               <div>
-                <Typography.Text>Free Plan does not include project backups.</Typography.Text>
-                <div>
-                  <Typography.Text type="secondary">
-                    Please upgrade to Pro plan for up to 7 days of backups.
-                  </Typography.Text>
-                </div>
+                <p className="text-sm text-scale-1100">
+                  Please upgrade to Pro plan for up to 7 days of backups.
+                </p>
               </div>
-              <Link href={`/project/${projectRef}/settings/billing`}>
-                <Button type="primary" className="flex-grow">
-                  Upgrade to Pro
-                </Button>
-              </Link>
             </div>
+            <Link href={`/project/${projectRef}/settings/billing`}>
+              <Button type="primary">Upgrade to Pro</Button>
+            </Link>
           </div>
         </div>
-      )}
+      </div>
+    )
+  }
 
+  return (
+    <div className="space-y-6">
       {!sortedBackups.length && tierId !== STRIPE_PRODUCT_IDS.FREE ? (
         <div className="block w-full bg-green-500 bg-opacity-5 p-3 border border-green-500 border-opacity-50 rounded">
           <div className="flex space-x-3">
             <div>
               <IconInfo className="text-green-500" size="large" />
             </div>
-            <Typography.Text type="success">
-              No backups created yet. Check again tomorrow.
-            </Typography.Text>
+            <p>No backups created yet. Check again tomorrow.</p>
           </div>
         </div>
       ) : (
-        <Panel
-        // title={[<Typography.Title level={5}>Date</Typography.Title>]}
-        >
+        <Panel>
           {!sortedBackups && (
             <div className="text-center p-4">
               <img className="loading-spinner" src="/img/spinner.gif"></img>

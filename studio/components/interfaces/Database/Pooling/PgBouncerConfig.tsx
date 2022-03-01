@@ -1,6 +1,7 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Divider, Typography } from '@supabase/ui'
+import { Typography } from '@supabase/ui'
+import Divider from 'components/ui/Divider'
 import { AutoField } from 'uniforms-bootstrap4'
 
 import { useStore } from 'hooks'
@@ -102,17 +103,18 @@ const PgbouncerConfig: FC<Props> = ({ projectRef, config }) => {
                 errorMessage="You must select one of the three options"
               />
               <div className="flex !mt-1" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
-                <Typography.Text type="secondary">
+                <p className="text-sm text-scale-900">
                   Specify when a connection can be returned to the pool. To find out the most
                   suitable mode for your use case,{' '}
-                  <Typography.Link
+                  <a
+                    className="text-green-900"
                     target="_blank"
                     href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
                   >
                     click here
-                  </Typography.Link>
+                  </a>
                   .
-                </Typography.Text>
+                </p>
               </div>
               <Divider light />
               {/* <AutoField

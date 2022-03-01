@@ -285,9 +285,9 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                             <div className="w-full flex items-center justify-between">
                               <div className="flex flex-col space-y-1">
                                 <Typography.Text>Generate a new JWT secret</Typography.Text>
-                                <Typography.Text type="secondary">
+                                <p className="opacity-50 text-sm">
                                   A random secret will be created, or you can create your own.
-                                </Typography.Text>
+                                </p>
                               </div>
                               <div className="flex flex-col items-end">
                                 {isUpdatingJwtSecret ? (
@@ -306,7 +306,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                                         >
                                           Generate a random secret
                                         </Dropdown.Item>
-                                        <Divider light />
+                                        <Dropdown.Seperator />
                                         <Dropdown.Item
                                           onClick={() => setIsCreatingKey(true)}
                                           icon={<IconPenTool size={16} />}
@@ -318,7 +318,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                                   >
                                     <Button
                                       as="span"
-                                      type="secondary"
+                                      type="default"
                                       iconRight={<IconChevronDown />}
                                     >
                                       Generate a new secret

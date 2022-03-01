@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Button, Typography } from '@supabase/ui'
+import { Button } from '@supabase/ui'
 import { PostgresTable } from '@supabase/postgres-meta'
 import { useStore } from 'hooks'
 
@@ -15,7 +15,7 @@ const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
   const renderNoTablesCTA = () => {
     return (
       <div className="flex flex-col items-center justify-center space-y-4">
-        <Typography.Text>There are no tables available in this schema</Typography.Text>
+        <p className="text-sm">There are no tables available in this schema</p>
         {selectedSchema === 'public' && <Button onClick={onAddTable}>Create a new table</Button>}
       </div>
     )
@@ -27,7 +27,7 @@ const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
         renderNoTablesCTA()
       ) : (
         <div className="flex flex-col items-center space-y-4">
-          <Typography.Text>Select a table or create a new one</Typography.Text>
+          <p className="text-sm">Select a table or create a new one</p>
           <Button onClick={onAddTable}>Create a new table</Button>
         </div>
       )}

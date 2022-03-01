@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Modal, Button, Typography, IconAlertCircle, Divider, Input } from '@supabase/ui'
+import { Modal, Button, Typography, IconAlertCircle, Divider, Input, Alert } from '@supabase/ui'
 
 export default function TextConfirmModal({
   title,
@@ -26,10 +26,10 @@ export default function TextConfirmModal({
     <Modal
       size="small"
       visible={visible}
-      title={title}
+      header={title}
       customFooter={
         <>
-          <div className="space-x-2 w-full">
+          <div className="w-full">
             <Button
               danger
               disabled={confirmValue != confirmString}
@@ -48,32 +48,33 @@ export default function TextConfirmModal({
       onCancel={onCancel}
       closable
     >
-      <div className="w-full">
+      <div className="w-full py-4">
         <div className="space-y-4">
           {alert && (
-            <div className="block w-full bg-yellow-500 bg-opacity-5 p-3 border border-yellow-500 border-opacity-50 rounded">
-              <div className="flex space-x-3">
-                <div>
-                  <IconAlertCircle className="text-yellow-500" size="large" />
-                </div>
-                <Typography.Text type="warning">{alert}</Typography.Text>
-              </div>
-            </div>
+            <Modal.Content>
+              <Alert variant="warning" withIcon title={alert} />
+            </Modal.Content>
           )}
-          <Typography.Text className="block">
-            <p className="mb-2 text-sm">{text}</p>
-          </Typography.Text>
-          <Divider light />
-          <Typography.Text className="block">
-            <p className="text-sm">
-              Type <span className="dark:text-white font-medium">{confirmString}</span> to confirm.
-            </p>
-          </Typography.Text>
-          <Input
-            value={confirmValue}
-            onChange={(e) => setConfirmValue(e.target.value)}
-            placeholder={confirmPlaceholder}
-          />
+          <Modal.Content>
+            <Typography.Text className="block">
+              <p className="mb-2 text-sm">{text}</p>
+            </Typography.Text>
+          </Modal.Content>
+          <Modal.Seperator />
+          <Modal.Content>
+            <Input
+              label={
+                <>
+                  <span>
+                    Type <span className="text-scale-1200">{confirmString}</span> to confirm.
+                  </span>
+                </>
+              }
+              value={confirmValue}
+              onChange={(e) => setConfirmValue(e.target.value)}
+              placeholder={confirmPlaceholder}
+            />
+          </Modal.Content>
         </div>
       </div>
     </Modal>

@@ -29,17 +29,17 @@ const ActionBar: FC<ActionBarProps> = ({
   }
 
   return (
-    <div className="space-x-3 w-full flex justify-end px-3">
-      <Button onClick={closePanel} type="text" size="medium">
+    <div className="space-x-3 w-full flex justify-between px-3 py-4 border-t border-scale-500">
+      <Button size="small" onClick={closePanel} type="default">
         {backButtonLabel}
       </Button>
       {children}
       {applyFunction && (
         <Button
+          size="small"
           onClick={onSelectApply}
           disabled={disableApply || isRunning}
           loading={isRunning}
-          size="medium"
         >
           {applyButtonLabel}
         </Button>
