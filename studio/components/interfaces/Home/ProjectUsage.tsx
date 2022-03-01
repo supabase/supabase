@@ -235,6 +235,70 @@ const ProjectUsage: FC<Props> = ({ project }) => {
             </div>
           </>
         )}
+        {logsUsageCodesPaths && (
+          <div className="grid lg:grid-cols-4 lg:gap-8">
+            <Panel
+              key="api-status-codes"
+              className="col-start-1 col-span-2"
+              wrapWithLoading={false}
+            >
+              <Panel.Content className="space-y-4">
+                <PanelHeader title="API Status Codes" />
+                <StackedAreaChart
+                  dateFormat={datetimeFormat}
+                  data={codesData?.result}
+                  stackKey="status_code"
+                  xAxisKey="timestamp"
+                  yAxisKey="count"
+                  isLoading={!codesData && !codesFetchError ? true : false}
+                  xAxisFormatAsDate
+                  size="large"
+                  styleMap={{
+                    200: { stroke: USAGE_COLORS['200'], fill: USAGE_COLORS['200'] },
+                    201: { stroke: USAGE_COLORS['201'], fill: USAGE_COLORS['201'] },
+                    400: { stroke: USAGE_COLORS['400'], fill: USAGE_COLORS['400'] },
+                    401: { stroke: USAGE_COLORS['401'], fill: USAGE_COLORS['401'] },
+                    404: { stroke: USAGE_COLORS['404'], fill: USAGE_COLORS['404'] },
+                    500: { stroke: USAGE_COLORS['500'], fill: USAGE_COLORS['500'] },
+                  }}
+                />
+              </Panel.Content>
+            </Panel>
+            <Panel
+              key="top-routes"
+              className="col-start-3 col-span-2 pb-0"
+              bodyClassName="h-full"
+              wrapWithLoading={false}
+            >
+              <Panel.Content className="space-y-4">
+                <PanelHeader title="Top Routes" />
+                <Table
+                  head={
+                    <>
+                      <Table.th>Path</Table.th>
+                      <Table.th>Count</Table.th>
+                      <Table.th>Avg. Latency (ms)</Table.th>
+                    </>
+                  }
+                  body={
+                    <>
+                      {(pathsData?.result ?? []).map((row: PathsDatum) => (
+                        <Table.tr>
+                          <Table.td className="flex items-center space-x-2">
+                            <p className="font-mono text-sm text-scale-1200">{row.method}</p>
+                            <p className="font-mono text-sm">{row.path}</p>
+                          </Table.td>
+                          <Table.td>{row.count}</Table.td>
+                          <Table.td>{Number(row.avg_origin_time).toFixed(2)}</Table.td>
+                        </Table.tr>
+                      ))}
+                    </>
+                  }
+                />
+              </Panel.Content>
+            </Panel>
+          </div>
+        )}
       </div>
     </div>
   )
