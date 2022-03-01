@@ -96,9 +96,9 @@ language sql volatile;
   {
     id: 8,
     type: 'template',
-    title: 'Simple pg_stat_statements report',
+    title: 'pg_stat_statements report',
     description: 'Select from pg_stat_statements and view recent queries',
-    sql: `-- Simple pg_stat_statements report
+    sql: `-- pg_stat_statements report
 
 -- A limit of 100 has been added below
 
@@ -121,40 +121,6 @@ SELECT
     s.wal_records
   from pg_stat_statements as s
     join pg_authid as a on s.userid = a.oid
-  where 
-    query not like 'SELECT%FROM net.http_request_queue%'
-    and query not like 'DELETE FROM net.http_request_queue%'
-    and query <> 'SELECT version()'
-    and query <> 'BEGIN ISOLATION LEVEL READ COMMITTED READ ONLY'
-    and query <> 'COMMIT'
-    and query <> 'SET client_encoding = ''UTF8'''
-    and query <> 'SET client_min_messages TO WARNING'
-    and query not like 'select set_config(%'
-    and trim(regexp_replace(query, E'\n', ' ', 'g')) <> 'select         description       from         pg_catalog.pg_namespace n         left join pg_catalog.pg_description d on d.objoid = n.oid       where         n.nspname = $1'
-    and query <> 'LISTEN "ddl_command_end"'
-    and query <> 'LISTEN "pgrst"'
-    and query <> 'SELECT * FROM migrations ORDER BY id'
-    and query <> 'SELECT COUNT(*) = $1 FROM pg_publication WHERE pubname = $2'
-    and query <> 'SELECT COUNT(*) >= $1 FROM pg_replication_slots WHERE slot_name = $2'
-    and query <> 'SELECT EXISTS (SELECT schema_migrations.* FROM schema_migrations AS schema_migrations WHERE version = $1)'
-    and query <> 'SELECT EXISTS (SELECT schema_migrations.* FROM schema_migrations AS schema_migrations WHERE version = $1)'
-    and query <> 'SELECT current_setting($1)::integer, current_setting($2)'
-    and query <> 'SELECT pg_advisory_unlock($1)'
-    and query <> 'SELECT pg_try_advisory_lock($1)'
-    and query <> 'SELECT slot_name, pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn) FROM pg_replication_slots'
-    and query <> 'SELECT typname::text, oid::int4, typarray::int4 FROM pg_type WHERE typname IN ($1,$2) ORDER BY typname'
-    and query <> 'select * from schema_migrations'
-    and query <> 'set local schema '''''
-    and query not like '%LATERAL (SELECT * FROM pg_namespace WHERE pg_namespace.oid = other.relnamespace) AS ns2%'
-    and query not like '%LEFT JOIN (pg_collation co JOIN pg_namespace nco ON co.collnamespace = nco.oid)%'
-    and query not like '%LEFT JOIN pg_catalog.pg_description as d ON d.objoid = p.oid%'
-    and query not like '%LEFT JOIN pg_catalog.pg_description as d on d.objoid = c.oid%'
-    and query not like '%WHEN ss.contype = $3 THEN information_schema._pg_index_position(ss.conindid, ss.confkey[(ss.x).n])%'
-    and query not like '%join pg_namespace sch on sch.oid = tbl.relnamespace%'
-    and query not like '%select setdatabase, unnest(setconfig) as setting from pg_catalog.pg_db_role_setting%'
-    and trim(regexp_replace(query, E'\n', ' ', 'g')) <> 'SELECT EXISTS (   SELECT $2   FROM   pg_catalog.pg_class c   WHERE  c.relname = $1   AND    c.relkind = $3 )'
-    -- query used to sort daily backup order
-    and query <> 'SELECT SUM(pg_database_size(pg_database.datname)) / ($1 * $2) as size_mb FROM pg_database'
   ORDER BY 
     total_time DESC 
   LIMIT 
