@@ -213,7 +213,9 @@ export default function Auth() {
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState('')
 
-  const handleLogin = async (email) => {
+  const handleLogin = async (e) => {
+    e.preventDefault()
+
     try {
       setLoading(true)
       const { error } = await supabase.auth.signIn({ email })
@@ -231,12 +233,7 @@ export default function Auth() {
       <div className="col-6 form-widget">
         <h1 className="header">Supabase + React</h1>
         <p className="description">Sign in via magic link with your email below</p>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            handleLogin(email)
-          }}
-        >
+        <form onSubmit={handleLogin)}>
           <label htmlFor="email">Email</label>
           <input
             id="email"
@@ -247,7 +244,7 @@ export default function Auth() {
             onChange={(e) => setEmail(e.target.value)}
           />
         </form>
-        <button className={'button block'} disabled={loading}>
+        <button className={'button block'} disabled={loading} aria-live="polite">
           {loading ? <span>Loading</span> : <span>Send magic link</span>}
         </button>
       </div>
@@ -303,7 +300,9 @@ export default ({ session }) => {
     }
   }
 
-  const updateProfile = async ({ username, website, avatar_url }) => {
+  const updateProfile = async (e) => {
+    e.preventDefault()
+
     try {
       setLoading(true)
       const user = supabase.auth.user()
@@ -332,13 +331,7 @@ export default ({ session }) => {
 
   return (
     <>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          updateProfile({ username, website, avatar_url })
-        }}
-        className="form-widget"
-      >
+      <form onSubmit={updateProfile} className="form-widget">
         <div>Email: {session.user.email}</div>
         <div>
           <label htmlFor="username">Name</label>
