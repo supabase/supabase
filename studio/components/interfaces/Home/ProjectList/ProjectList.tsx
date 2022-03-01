@@ -37,7 +37,7 @@ const ProjectList: FC<Props> = ({
         return (
           <div className="space-y-3" key={makeRandomString(5)}>
             <Loading active={isLoading}>
-              <Typography.Title level={4}>{name}</Typography.Title>
+              <h4 className="text-lg">{name}</h4>
             </Loading>
             <ul className="grid gap-4 mx-auto grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ">
               {!isLoading && isEmpty && (
