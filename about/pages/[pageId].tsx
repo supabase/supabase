@@ -3,6 +3,8 @@ import Head from 'next/head'
 import 'react-notion-x/src/styles.css'
 
 import Nav from '../components/Nav'
+import { useTheme } from '../components/Provider'
+
 
 import { getPageTitle, getAllPagesInSpace } from 'notion-utils'
 import { NotionAPI } from 'notion-client'
@@ -53,6 +55,8 @@ export async function getStaticPaths() {
 }
 
 export default function NotionPage({ recordMap }: any) {
+  const { isDarkMode } = useTheme()
+
   if (!recordMap) {
     return null
   }
@@ -67,7 +71,7 @@ export default function NotionPage({ recordMap }: any) {
         <title>{title} | Supabase</title>
       </Head>
 
-      <NotionRenderer recordMap={recordMap} header={Nav} fullPage={true} darkMode={true} />
+      <NotionRenderer recordMap={recordMap} header={Nav} fullPage={true} darkMode={isDarkMode} />
     </>
   )
 }
