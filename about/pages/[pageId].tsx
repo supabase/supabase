@@ -2,6 +2,8 @@ import React from 'react'
 import Head from 'next/head'
 import 'react-notion-x/src/styles.css'
 
+import Nav from '../components/Nav'
+
 import { getPageTitle, getAllPagesInSpace } from 'notion-utils'
 import { NotionAPI } from 'notion-client'
 import { NotionRenderer } from 'react-notion-x'
@@ -65,7 +67,7 @@ export default function NotionPage({ recordMap }: any) {
         <title>{title} | Supabase</title>
       </Head>
 
-      <NotionRenderer recordMap={recordMap} fullPage={true} darkMode={true} />
+      <NotionRenderer recordMap={recordMap} header={Nav} fullPage={true} darkMode={true} />
     </>
   )
 }
