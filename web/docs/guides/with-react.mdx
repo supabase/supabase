@@ -237,7 +237,7 @@ export default function Auth() {
             handleLogin(email)
           }}
         >
-          <label>Email</label>
+          <label htmlFor="email">Email</label>
           <input
             id="email"
             className="inputField"
@@ -266,7 +266,7 @@ Let's create a new component for that called `Account.js`.
 import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 
-export default function Account({ session }) {
+export default ({ session }) => {
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState(null)
   const [website, setWebsite] = useState(null)
@@ -276,7 +276,7 @@ export default function Account({ session }) {
     getProfile()
   }, [session])
 
-  async function getProfile() {
+  const getProfile = async () => {
     try {
       setLoading(true)
       const user = supabase.auth.user()
@@ -303,7 +303,7 @@ export default function Account({ session }) {
     }
   }
 
-  async function updateProfile({ username, website, avatar_url }) {
+  const updateProfile = async ({ username, website, avatar_url }) => {
     try {
       setLoading(true)
       const user = supabase.auth.user()
@@ -331,46 +331,43 @@ export default function Account({ session }) {
   }
 
   return (
-    <div className="form-widget">
-      <div>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={session.user.email} disabled />
-      </div>
-      <div>
-        <label htmlFor="username">Name</label>
-        <input
-          id="username"
-          type="text"
-          value={username || ''}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="website">Website</label>
-        <input
-          id="website"
-          type="website"
-          value={website || ''}
-          onChange={(e) => setWebsite(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <button
-          className="button block primary"
-          onClick={() => updateProfile({ username, website, avatar_url })}
-          disabled={loading}
-        >
-          {loading ? 'Loading ...' : 'Update'}
-        </button>
-      </div>
-
-      <div>
-        <button className="button block" onClick={() => supabase.auth.signOut()}>
-          Sign Out
-        </button>
-      </div>
-    </div>
+    <>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          updateProfile({ username, website, avatar_url })
+        }}
+        className="form-widget"
+      >
+        <div>Email: {session.user.email}</div>
+        <div>
+          <label htmlFor="username">Name</label>
+          <input
+            id="username"
+            type="text"
+            value={username || ''}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="website">Website</label>
+          <input
+            id="website"
+            type="website"
+            value={website || ''}
+            onChange={(e) => setWebsite(e.target.value)}
+          />
+        </div>
+        <div>
+          <button className="button block primary" disabled={loading} aria-live="polite">
+            {loading ? 'Saving ...' : 'Update profile'}
+          </button>
+        </div>
+      </form>
+      <button type="button" className="button block" onClick={() => supabase.auth.signOut()}>
+        Sign Out
+      </button>
+    </>
   )
 }
 ```
@@ -386,7 +383,7 @@ import { supabase } from './supabaseClient'
 import Auth from './Auth'
 import Account from './Account'
 
-export default function Home() {
+export default () => {
   const [session, setSession] = useState(null)
 
   useEffect(() => {
@@ -426,8 +423,9 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 ```jsx title="src/Avatar.js"
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
+import VisuallyHidden from '@reach/visually-hidden'
 
-export default function Avatar({ url, size, onUpload }) {
+export default ({ url, size, onUpload }) => {
   const [avatarUrl, setAvatarUrl] = useState(null)
   const [uploading, setUploading] = useState(false)
 
@@ -435,7 +433,7 @@ export default function Avatar({ url, size, onUpload }) {
     if (url) downloadImage(url)
   }, [url])
 
-  async function downloadImage(path) {
+  const downloadImage = async (path) => {
     try {
       const { data, error } = await supabase.storage.from('avatars').download(path)
       if (error) {
@@ -448,7 +446,7 @@ export default function Avatar({ url, size, onUpload }) {
     }
   }
 
-  async function uploadAvatar(event) {
+  const uploadAvatar = async (event) => {
     try {
       setUploading(true)
 
@@ -476,33 +474,25 @@ export default function Avatar({ url, size, onUpload }) {
   }
 
   return (
-    <div>
-      {avatarUrl ? (
-        <img
-          src={avatarUrl}
-          alt="Avatar"
-          className="avatar image"
-          style={{ height: size, width: size }}
-        />
-      ) : (
-        <div className="avatar no-image" style={{ height: size, width: size }} />
-      )}
-      <div style={{ width: size }}>
-        <label className="button primary block" htmlFor="single">
-          {uploading ? 'Uploading ...' : 'Upload'}
-        </label>
+    <div style={{ width: size }}>
+      <img
+        src={avatarUrl ? avatarUrl : `https://place-hold.it/${size}x${size}`}
+        alt={avatarUrl ? 'Avatar' : 'No image'}
+        className="avatar image"
+        style={{ height: size, width: size }}
+      />
+      <label className="button primary block" htmlFor="single" aria-live="polite">
+        {uploading ? 'Uploading avatar...' : 'Upload an avatar'}
+      </label>
+      <VisuallyHidden>
         <input
-          style={{
-            visibility: 'hidden',
-            position: 'absolute',
-          }}
           type="file"
           id="single"
           accept="image/*"
           onChange={uploadAvatar}
           disabled={uploading}
         />
-      </div>
+      </VisuallyHidden>
     </div>
   )
 }
