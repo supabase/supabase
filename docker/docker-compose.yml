@@ -37,7 +37,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.5.8
+    image: supabase/gotrue:v2.5.21
     depends_on:
       - db
     restart: unless-stopped
