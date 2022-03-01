@@ -51,7 +51,7 @@ const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
   return (
     <div className="w-full px-6 py-3 flex items-center">
       <div className="w-[25%]">
-        <p>{project.name}</p>
+        <p className="text-sm">{project.name}</p>
       </div>
       {loading ? (
         <div className="w-[75%] flex items-center justify-center">
@@ -60,12 +60,12 @@ const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
       ) : (
         <>
           <div className="w-[20%]">
-            <p>{subscription?.tier.name ?? ''}</p>
+            <p className="text-sm">{subscription?.tier.name ?? ''}</p>
           </div>
           <div className="w-[40%] space-x-2 flex items-center">
-            <p>{dayjs.unix(currentPeriodStart).utc().format('MMM D, YYYY')}</p>
-            <p>-</p>
-            <p>{dayjs.unix(currentPeriodEnd).utc().format('MMM D, YYYY')}</p>
+            <p className="text-sm">{dayjs.unix(currentPeriodStart).utc().format('MMM D, YYYY')}</p>
+            <p className="text-sm">-</p>
+            <p className="text-sm">{dayjs.unix(currentPeriodEnd).utc().format('MMM D, YYYY')}</p>
           </div>
           <div className="flex items-center justify-end w-[15%]">
             <Link href={`/project/${project.ref}/settings/billing`}>
