@@ -232,13 +232,13 @@ export default function Auth() {
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Button
           title="Sign in"
-          onPress={() => signInWithEmail(email, password)}
+          onPress={() => signInWithEmail()}
         />
       </View>
       <View style={styles.verticallySpaced}>
         <Button
           title="Sign up"
-          onPress={() => signUpWithEmail(email, password)}
+          onPress={() => signUpWithEmail()}
         />
       </View>
     </View>
