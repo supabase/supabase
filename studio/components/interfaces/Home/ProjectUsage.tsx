@@ -134,6 +134,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     customDateFormat={datetimeFormat}
                     data={charts}
                     isLoading={!charts && !error ? true : false}
+                    onBarClick={(v) => handleBarClick(v, '/rest')}
                   />
                   <ProjectUsageMinimal
                     projectRef={project.ref}
@@ -164,6 +165,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     customDateFormat={datetimeFormat}
                     data={charts}
                     isLoading={!charts && !error ? true : false}
+                    onBarClick={(v) => handleBarClick(v, '/auth')}
                   />
                   <ProjectUsageMinimal
                     projectRef={project.ref}
@@ -194,6 +196,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     customDateFormat={datetimeFormat}
                     data={charts}
                     isLoading={!charts && !error ? true : false}
+                    onBarClick={(v) => handleBarClick(v, '/storage')}
                   />
                   <ProjectUsageMinimal
                     projectRef={project.ref}
