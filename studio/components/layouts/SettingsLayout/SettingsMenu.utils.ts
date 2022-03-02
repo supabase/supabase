@@ -13,6 +13,12 @@ export const generateSettingsMenu = (ref: string): ProductMenuGroup[] => {
         { name: 'API', key: 'api', url: `/project/${ref}/settings/api`, items: [] },
         { name: 'Auth Settings', key: 'auth', url: `/project/${ref}/auth/settings`, items: [] },
         {
+          name: 'Storage Settings',
+          key: 'storage',
+          url: `/project/${ref}/storage/settings`,
+          items: [],
+        },
+        {
           name: 'Billing & Usage',
           key: 'billing',
           url: `/project/${ref}/settings/billing`,
