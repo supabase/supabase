@@ -67,7 +67,7 @@ interface MenuBarWrapperProps {
 const MenuBarWrapper: FC<MenuBarWrapperProps> = observer(({ isLoading, productMenu, children }) => {
   const { ui, meta } = useStore()
   const project = ui.selectedProject
-  return <>{!isLoading && productMenu && project != undefined && meta.ready ? children : null}</>
+  return <>{!isLoading && productMenu && project !== undefined && meta.ready ? children : null}</>
 })
 
 interface ContentWrapperProps {
@@ -82,7 +82,7 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
 
   return (
     <>
-      {isLoading || project == undefined || !meta.ready ? (
+      {isLoading || project === undefined || !meta.ready ? (
         <Connecting />
       ) : requiresDbConnection ? (
         <TestConnection project={project!}>
