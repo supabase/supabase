@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Modal } from '@supabase/ui'
+import { Button, Modal } from '@supabase/ui'
 import { render, unmountComponentAtNode } from 'react-dom'
 
 function ConfirmModal({
@@ -38,15 +38,26 @@ function ConfirmModal({
       visible={true}
       size="small"
       onCancel={onCancelClick}
-      onConfirm={onConfirmClick}
+      onConfirm={onCancelClick}
       loading={loading}
-    >
-      {description && (
-        <Modal.Content>
-          <p className="text-sm text-scale-1100 py-4">{description}</p>
-        </Modal.Content>
-      )}
-    </Modal>
+      customFooter={
+        <div className="flex items-center gap-2">
+          <Button type="default" onClick={() => onCancelClick()}>
+            Cancel
+          </Button>
+          <Button type="primary" onClick={() => onConfirmClick()} loading={loading}>
+            Confirm
+          </Button>
+        </div>
+      }
+      children={
+        description && (
+          <Modal.Content>
+            <p className="text-sm text-scale-1100 py-4">{description}</p>
+          </Modal.Content>
+        )
+      }
+    />
   )
 }
 
