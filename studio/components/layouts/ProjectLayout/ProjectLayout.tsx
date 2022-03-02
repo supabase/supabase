@@ -1,10 +1,7 @@
 import Head from 'next/head'
 import { FC, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
-import { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
-
-import { Project } from 'types'
 import { useStore } from 'hooks'
 
 import Connecting from 'components/ui/Loading'
