@@ -8,7 +8,7 @@ function Panel(props: any) {
     headerClasses = [
       `
     bg-panel-header-light dark:bg-panel-header-dark
-    border-b border-panel-border-interior-light dark:border-panel-border-interior-dark`,
+    border-b border-panel-border-light dark:border-panel-border-dark`,
     ]
   } else {
     headerClasses = [
