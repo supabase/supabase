@@ -13,6 +13,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { STORAGE_ROW_STATUS } from './Storage.constants'
 
+// [Joshen] I think this file is no longer in use, double check before removing (replaced by StorageMenu.tsx)
+
 const BucketRow = ({
   bucket = {},
   projectRef = '',
@@ -137,7 +139,7 @@ const StorageSidebar = ({
           </div>
         </div>
         <div className="my-4 px-3">
-          <Menu.Group title="Config" />
+          <Menu.Group title="Configuration" />
           <div className="space-y-1">
             <div>
               <Link href={`/project/${ref}/storage/settings`}>
