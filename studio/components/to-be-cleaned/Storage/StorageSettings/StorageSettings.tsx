@@ -84,9 +84,9 @@ const StorageConfig = ({ config, projectRef }: any) => {
         />
         {isFreeTier && (
           <UpgradeToPro
-            primaryText="Free Plan has an upload file size limit of 50 MB."
+            primaryText="Free Plan has a fixed upload file size limit of 50 MB."
             projectRef={projectRef}
-            secondaryText="Please upgrade to Pro plan for an upload file size limit of up to 5 GB."
+            secondaryText="Please upgrade to Pro plan for a configurable upload file size limit of up to 5 GB."
           />
         )}
       </SchemaFormPanel>
