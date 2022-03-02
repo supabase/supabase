@@ -83,15 +83,6 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
   const project = ui.selectedProject
   const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
 
-  console.log(
-    'ProjectLayout: ',
-    project,
-    '  meta.ready:',
-    meta.ready,
-    '  content.ready:',
-    content.ready
-  )
-
   return (
     <>
       {isLoading || project == undefined || !meta.ready ? (
