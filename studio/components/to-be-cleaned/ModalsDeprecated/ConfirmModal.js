@@ -33,13 +33,20 @@ function ConfirmModal({
 
   return (
     <Modal
+      header={title}
       variant={variant}
       visible={true}
       size="small"
       onCancel={onCancelClick}
       onConfirm={onConfirmClick}
       loading={loading}
-    />
+    >
+      {description && (
+        <Modal.Content>
+          <p className="text-sm text-scale-1100 py-4">{description}</p>
+        </Modal.Content>
+      )}
+    </Modal>
   )
 }
 
