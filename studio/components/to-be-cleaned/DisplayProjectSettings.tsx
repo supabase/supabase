@@ -71,18 +71,16 @@ export const DisplayApiSettings = () => {
               label={
                 <>
                   {x.tags?.split(',').map((x: any, i: number) => (
-                    <code key={`${x}${i}`} className="text-xs  text-white px-2">
+                    <code key={`${x}${i}`} className="text-xs text-code">
                       {x}
                     </code>
                   ))}
                   {x.tags === 'service_role' && (
                     <>
-                      <code className="text-xs bg-red-900 px-2 ml-1 text-white">{'secret'}</code>
+                      <code className="text-xs bg-red-900 text-white">{'secret'}</code>
                     </>
                   )}
-                  {x.tags === 'anon' && (
-                    <code className="text-xs text-white px-2 ml-1">{'public'}</code>
-                  )}
+                  {x.tags === 'anon' && <code className="text-xs text-code">{'public'}</code>}
                 </>
               }
               readOnly
