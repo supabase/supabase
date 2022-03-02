@@ -3,7 +3,7 @@ import { FC, useState } from 'react'
 import { AutoField } from 'uniforms-bootstrap4'
 import { Typography } from '@supabase/ui'
 
-import { API_URL, STORAGE_FILE_SIZE_LIMIT_MAX } from 'lib/constants'
+import { API_URL, STORAGE_FILE_SIZE_LIMIT_MAX_BYTES } from 'lib/constants'
 import { patch, get } from 'lib/common/fetch'
 import { useStore } from 'hooks'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
@@ -61,7 +61,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
           properties: {
             fileSizeLimit: {
               help: 'The maximum size in bytes of a file that can be uploaded.',
-              maximum: STORAGE_FILE_SIZE_LIMIT_MAX,
+              maximum: STORAGE_FILE_SIZE_LIMIT_MAX_BYTES,
               minimum: 0,
               title: 'Upload file size limit',
               type: 'integer',
@@ -79,7 +79,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
           name="fileSizeLimit"
           showInlineError
           errorMessage={`Must be a number up to ${new Intl.NumberFormat('en-US').format(
-            STORAGE_FILE_SIZE_LIMIT_MAX
+            STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
           )} bytes.`}
         />
         {isFreeTier && (
