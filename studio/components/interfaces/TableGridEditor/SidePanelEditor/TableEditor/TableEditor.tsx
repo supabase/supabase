@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
-import { Badge, Checkbox, Divider, SidePanel, Space, Input, Typography } from '@supabase/ui'
+import { Badge, Checkbox, SidePanel, Input } from '@supabase/ui'
 import { PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
@@ -22,6 +22,7 @@ import {
   generateTableFieldFromPostgresTable,
   formatImportedContentToColumnFields,
 } from './TableEditor.utils'
+import SidePanelEditor from '..'
 
 interface Props {
   table?: PostgresTable
@@ -131,14 +132,14 @@ const TableEditor: FC<Props> = ({
 
   return (
     <SidePanel
-      wide
+      size="large"
       key="TableEditor"
       visible={visible}
       // @ts-ignore
-      title={<HeaderTitle table={table} isDuplicating={isDuplicating} />}
+      header={<HeaderTitle table={table} isDuplicating={isDuplicating} />}
       className={`transition-all ease-in duration-100 ${isImportingSpreadsheet ? ' mr-32' : ''}`}
       onCancel={closePanel}
-      onConfirm={(resolve: () => void) => onSaveChanges(resolve)}
+      onConfirm={() => (resolve: () => void) => onSaveChanges(resolve)}
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
@@ -148,78 +149,91 @@ const TableEditor: FC<Props> = ({
         />
       }
     >
-      <Space direction="vertical" size={6} style={{ width: '100%' }}>
-        <Input
-          label="Name"
-          layout="horizontal"
-          type="text"
-          error={errors.name}
-          value={tableFields?.name}
-          onChange={(event: any) => onUpdateField({ name: event.target.value })}
-        />
-        <Input
-          label="Description"
-          placeholder="Optional"
-          layout="horizontal"
-          type="text"
-          value={tableFields?.comment ?? ''}
-          onChange={(event: any) => onUpdateField({ comment: event.target.value })}
-        />
-        <div />
-        <Checkbox
-          id="enable-rls"
-          // @ts-ignore
-          label={
-            <div className="flex items-center space-x-2">
-              <Typography.Text>Enable Row Level Security (RLS)</Typography.Text>
-              <Badge color="green">Recommended</Badge>
-            </div>
-          }
-          description="Restrict access to your table by enabling RLS and writing Postgres policies. If RLS is not enabled, anyone with the anon key can modify and delete your data."
-          checked={tableFields?.isRLSEnabled}
-          onChange={() => onUpdateField({ isRLSEnabled: !tableFields?.isRLSEnabled })}
-          size="medium"
-        />
-        <Divider light />
-        {!isDuplicating && (
-          <ColumnManagement
-            table={{ name: tableFields.name, schema: selectedSchema }}
-            tables={tables}
-            columns={tableFields?.columns}
-            enumTypes={enumTypes}
-            isNewRecord={isNewRecord}
-            importContent={importContent}
-            onColumnsUpdated={(columns) => onUpdateField({ columns })}
-            onSelectImportData={() => setIsImportingSpreadsheet(true)}
-            onClearImportContent={() => {
-              onUpdateField({ columns: DEFAULT_COLUMNS })
-              setImportContent(undefined)
-            }}
-          />
-        )}
-        {isDuplicating && (
-          <>
+      <>
+        <SidePanel.Content>
+          <div className="space-y-10 py-6">
+            <Input
+              label="Name"
+              layout="horizontal"
+              type="text"
+              error={errors.name}
+              value={tableFields?.name}
+              onChange={(event: any) => onUpdateField({ name: event.target.value })}
+            />
+            <Input
+              label="Description"
+              placeholder="Optional"
+              layout="horizontal"
+              type="text"
+              value={tableFields?.comment ?? ''}
+              onChange={(event: any) => onUpdateField({ comment: event.target.value })}
+            />
+          </div>
+        </SidePanel.Content>
+        <SidePanel.Seperator />
+        <SidePanel.Content>
+          <div className="space-y-10 py-6">
             <Checkbox
-              id="duplicate-rows"
-              label="Duplicate table entries"
-              description="This will copy all the data in the table into the new table"
-              checked={isDuplicateRows}
-              onChange={() => setIsDuplicateRows(!isDuplicateRows)}
+              id="enable-rls"
+              // @ts-ignore
+              label={
+                <div className="flex items-center space-x-2">
+                  <span>Enable Row Level Security (RLS)</span>
+                  <Badge color="gray">Recommended</Badge>
+                </div>
+              }
+              description="Restrict access to your table by enabling RLS and writing Postgres policies"
+              checked={tableFields?.isRLSEnabled}
+              onChange={() => onUpdateField({ isRLSEnabled: !tableFields?.isRLSEnabled })}
               size="medium"
             />
-          </>
-        )}
-      </Space>
-      <SpreadsheetImport
-        visible={isImportingSpreadsheet}
-        headers={importContent?.headers}
-        rows={importContent?.rows}
-        saveContent={(prefillData: ImportContent) => {
-          setImportContent(prefillData)
-          setIsImportingSpreadsheet(false)
-        }}
-        closePanel={() => setIsImportingSpreadsheet(false)}
-      />
+          </div>
+        </SidePanel.Content>
+        <SidePanel.Seperator />
+        <SidePanel.Content>
+          <div className="space-y-10 py-6">
+            {!isDuplicating && (
+              <ColumnManagement
+                table={{ name: tableFields.name, schema: selectedSchema }}
+                tables={tables}
+                columns={tableFields?.columns}
+                enumTypes={enumTypes}
+                isNewRecord={isNewRecord}
+                importContent={importContent}
+                onColumnsUpdated={(columns) => onUpdateField({ columns })}
+                onSelectImportData={() => setIsImportingSpreadsheet(true)}
+                onClearImportContent={() => {
+                  onUpdateField({ columns: DEFAULT_COLUMNS })
+                  setImportContent(undefined)
+                }}
+              />
+            )}
+            {isDuplicating && (
+              <>
+                <Checkbox
+                  id="duplicate-rows"
+                  label="Duplicate table entries"
+                  description="This will copy all the data in the table into the new table"
+                  checked={isDuplicateRows}
+                  onChange={() => setIsDuplicateRows(!isDuplicateRows)}
+                  size="medium"
+                />
+              </>
+            )}
+
+            <SpreadsheetImport
+              visible={isImportingSpreadsheet}
+              headers={importContent?.headers}
+              rows={importContent?.rows}
+              saveContent={(prefillData: ImportContent) => {
+                setImportContent(prefillData)
+                setIsImportingSpreadsheet(false)
+              }}
+              closePanel={() => setIsImportingSpreadsheet(false)}
+            />
+          </div>
+        </SidePanel.Content>
+      </>
     </SidePanel>
   )
 }

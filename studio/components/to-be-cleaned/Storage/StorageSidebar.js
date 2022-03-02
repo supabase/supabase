@@ -110,7 +110,7 @@ const StorageSidebar = ({
                 <Typography.Text>
                   <IconLoader className="animate-spin" size="tiny" strokeWidth={2} />
                 </Typography.Text>
-                <Typography.Text>Loading buckets</Typography.Text>
+                <span className="text-xs">Loading buckets</span>
               </div>
             ) : (
               <>

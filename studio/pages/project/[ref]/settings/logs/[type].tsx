@@ -1,5 +1,5 @@
-import useSWR, { KeyLoader } from 'swr'
-import React, { useEffect, useRef, useState } from 'react'
+import useSWR from 'swr'
+import React, { useEffect, useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
@@ -11,6 +11,7 @@ import {
   Button,
   IconInfo,
   Card,
+  Loading,
 } from '@supabase/ui'
 
 import { withAuth } from 'hooks'
@@ -266,7 +267,7 @@ export const LogPage: NextPage = () => {
             <div className="flex flex-row justify-end items-center px-2 py-1 w-full">
               {isSelectQuery && (
                 <InformationBox
-                className="shrink mr-auto"
+                  className="shrink mr-auto"
                   block={false}
                   size="tiny"
                   icon={<IconInfo size="tiny" />}
@@ -308,13 +309,24 @@ export const LogPage: NextPage = () => {
           {isValidating && (
             <div
               className={[
-                'absolute top-0 w-full h-full bg-gray-800 flex items-center justify-center',
-                `${isValidating ? 'bg-opacity-75 z-50' : ''}`,
+                'absolute top-0 w-full h-full flex items-center justify-center',
+                'bg-gray-100 opacity-75 z-50',
               ].join(' ')}
             >
               <IconLoader className="animate-spin" />
             </div>
           )}
+
+          <LogTable data={logData} isCustomQuery={mode === 'custom'} />
+          {/* Footer section of log ui, appears below table */}
+          <div className="p-2">
+            {!isSelectQuery && (
+              <Button onClick={() => setSize(size + 1)} icon={<IconRewind />} type="default">
+                Load older
+              </Button>
+            )}
+          </div>
+
           {error && (
             <div className="flex w-full h-full justify-center items-center mx-auto">
               <Card className="flex flex-col gap-y-2  w-1/3">
@@ -335,20 +347,6 @@ export const LogPage: NextPage = () => {
               </Card>
             </div>
           )}
-          <LogTable data={logData} isCustomQuery={mode === 'custom'} />
-          {/* Footer section of log ui, appears below table */}
-          <div className="p-2">
-            {!isSelectQuery && (
-              <Button
-                // trigger page increase
-                onClick={() => setSize(size + 1)}
-                icon={<IconRewind />}
-                type="secondary"
-              >
-                Load older
-              </Button>
-            )}
-          </div>
         </div>
       </div>
     </SettingsLayout>
