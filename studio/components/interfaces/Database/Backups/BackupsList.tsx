@@ -1,12 +1,12 @@
-import Link from 'next/link'
 import React, { FC, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Typography, IconClock, IconInfo } from '@supabase/ui'
+import { Typography, IconInfo } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import BackupItem from './BackupItem'
 import Loading from 'components/ui/Loading'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 import Panel from 'components/to-be-cleaned/Panel'
 
 interface Props {}
@@ -44,32 +44,11 @@ const BackupsList: FC<Props> = ({}) => {
 
   if (tierId === STRIPE_PRODUCT_IDS.FREE) {
     return (
-      <div
-        className={[
-          'block w-full py-4 px-6 border rounded border-opacity-20',
-          'bg-gray-100 border-gray-600',
-          'dark:bg-gray-400 dark:border-gray-300',
-        ].join(' ')}
-      >
-        <div className="flex space-x-3">
-          <div className="mt-1">
-            <IconClock size="large" />
-          </div>
-          <div className="flex justify-between w-full items-center">
-            <div>
-              <p>Free Plan does not include project backups.</p>
-              <div>
-                <p className="text-sm text-scale-1100">
-                  Please upgrade to Pro plan for up to 7 days of backups.
-                </p>
-              </div>
-            </div>
-            <Link href={`/project/${projectRef}/settings/billing`}>
-              <Button type="primary">Upgrade to Pro</Button>
-            </Link>
-          </div>
-        </div>
-      </div>
+      <UpgradeToPro
+        primaryText="Free Plan does not include project backups."
+        projectRef={projectRef}
+        secondaryText="Please upgrade to Pro plan for up to 7 days of backups."
+      />
     )
   }
 
