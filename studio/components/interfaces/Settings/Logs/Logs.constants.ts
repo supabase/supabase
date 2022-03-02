@@ -462,3 +462,9 @@ export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
 
 export const getDefaultHelper = (helpers: DatetimeHelper[]) =>
   helpers.find((helper) => helper.default) || helpers[0]
+
+export const TIER_QUERY_LIMITS = {
+  FREE: { text: '1 day', windowSeconds: 3600 * 24 },
+  PRO: { text: '7 days', windowSeconds: 3600 * 24 * 7 },
+  PAYG: { text: '3 months', windowSeconds: 3600 * 24 * 30 * 3 },
+}
