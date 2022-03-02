@@ -24,7 +24,7 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
   useEffect(() => {
-    if (meta.ready) {
+    if (ui.selectedProject) {
       // Eventually should only load the required stores based on the pages
       meta.schemas.load()
       meta.tables.load()
@@ -34,7 +34,7 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
       meta.extensions.load()
       meta.publications.load()
     }
-  }, [meta.ready])
+  }, [ui.selectedProject])
 
   useEffect(() => {
     if (!isLoading && !loaded) {

@@ -24,10 +24,10 @@ const AuthLayout: FC<Props> = ({ title, children }) => {
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
   useEffect(() => {
-    if (meta.ready) {
+    if (ui.selectedProject) {
       meta.tables.load()
     }
-  }, [meta.ready])
+  }, [ui.selectedProject])
 
   useEffect(() => {
     if (!isLoading && !loaded) {

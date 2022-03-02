@@ -34,7 +34,7 @@ const PageConfig = () => {
     await sqlEditorStore.loadRemotePersistentData(contentStore, (user as any)?.id)
   }
 
-  if (ui.selectedProject == undefined || !meta.ready) {
+  if (ui.selectedProject === undefined) {
     return <BaseLayout children={undefined} />
   }
 
