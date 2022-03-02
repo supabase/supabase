@@ -14,31 +14,18 @@ interface Props {
 
 const SQLEditorLayout: FC<Props> = ({ title, children }) => {
   const { content } = useStore()
-  const { isInitialized, isLoading, error } = content
-
-  const [loaded, setLoaded] = useState(isInitialized)
 
   useEffect(() => {
     content.load()
   }, [])
 
-  useEffect(() => {
-    if (!isLoading && !loaded) {
-      setLoaded(true)
-    }
-  }, [isLoading])
-
-  if (error) {
-    return (
-      <ProjectLayout>
-        <Error error={error} />
-      </ProjectLayout>
-    )
-  }
-
-  return (
+  return content.error ? (
+    <ProjectLayout>
+      <Error error={content.error} />
+    </ProjectLayout>
+  ) : (
     <ProjectLayout
-      isLoading={!loaded}
+      isLoading={content.isLoading}
       title={title || 'SQL'}
       product="SQL Editor"
       productMenu={<SQLEditorMenuOld />}

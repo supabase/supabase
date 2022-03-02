@@ -73,6 +73,7 @@ export default class ProjectContentStore implements IProjectContentStore {
       this.state = LOADING
       await this.fetchData()
       this.state = LOADED
+      console.log('this.state: ', this.state)
       return this.data
     } catch (e: any) {
       console.error('Failed to load project content', e.message)
