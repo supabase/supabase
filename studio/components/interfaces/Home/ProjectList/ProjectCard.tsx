@@ -27,21 +27,23 @@ const ProjectCard: FC<Props> = ({
       <CardButton
         linkHref={rewriteHref ? rewriteHref : paused ? '' : `/project/${projectRef}`}
         title={
-          <div className="flex items-center gap-3 w-full">
-            <span>{name}</span>
+          <div className="flex flex-row gap-1 w-full justify-between w-full">
+            <span className="truncate flex-shrink">{name}</span>
             {paused && (
-              <Badge color="scale">
-                <div className="flex items-center gap-2">
-                  <IconClock size={14} strokeWidth={2} />
-                  <span>Project paused</span>
-                </div>
-              </Badge>
+              <div className="grow text-right">
+                <Badge color="scale">
+                  <div className="flex items-center gap-2">
+                    <IconClock size={14} strokeWidth={2} />
+                    <span className="truncate">Project paused</span>
+                  </div>
+                </Badge>
+              </div>
             )}
           </div>
         }
         description={''}
         footer={
-          <div className="lowercase flex items-center justify-between">
+          <div className="lowercase flex justify-between items-end">
             <span className="text-sm text-scale-900">{desc}</span>
             {paused && (
               <div className="flex items-center gap-2">
