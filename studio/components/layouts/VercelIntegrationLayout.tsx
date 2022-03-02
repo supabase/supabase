@@ -1,6 +1,6 @@
 import { FC, ReactNode } from 'react'
 import Head from 'next/head'
-import { Divider } from '@supabase/ui'
+import Divider from 'components/ui/Divider'
 
 interface Props {
   children: ReactNode
@@ -26,7 +26,7 @@ const VercelIntegrationLayout: FC<Props> = ({ children }) => {
             </div>
           </div>
         </div>
-        <Divider type="horizontal" light />
+        <Divider light />
         <div className="flex-grow">
           <div className="max-w-7xl h-full mx-auto px-4 sm:px-6">
             <div className="max-w-xl h-full mx-auto py-10">{children}</div>

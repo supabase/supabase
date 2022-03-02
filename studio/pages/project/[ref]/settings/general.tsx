@@ -4,15 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { toJS } from 'mobx'
 import { projects } from 'stores/jsonSchema'
 import { AutoField } from 'uniforms-bootstrap4'
-import {
-  Modal,
-  Alert,
-  Button,
-  Input,
-  Typography,
-  IconAlertCircle,
-  IconRefreshCcw,
-} from '@supabase/ui'
+import { Alert, Button, Input, Typography, IconRefreshCcw } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { pluckJsonSchemaFields, pluckObjectFields } from 'lib/helpers'
@@ -20,8 +12,9 @@ import { post, delete_ } from 'lib/common/fetch'
 import { useStore, withAuth } from 'hooks'
 import { SettingsLayout } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import ConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModalV2'
+import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
 
 const ProjectSettings = () => {
   return (
@@ -134,10 +127,10 @@ const GeneralSettings = observer(() => {
             <div className="w-full flex items-center justify-between">
               <div>
                 <Typography.Text className="block">Restart Server</Typography.Text>
-                <div style={{ maxWidth: '320px' }}>
-                  <Typography.Text type="secondary" className="opacity-50">
-                    Restart your project server
-                  </Typography.Text>
+                <div style={{ maxWidth: '420px' }}>
+                  <p className="opacity-50 text-sm">
+                    Your project will not be available for a few minutes.
+                  </p>
                 </div>
               </div>
               <RestartServerButton projectRef={project?.ref} />
@@ -159,10 +152,12 @@ const GeneralSettings = observer(() => {
                 </Typography.Text>
               }
             >
-              <Typography.Text className="block mb-4">
-                Make sure you have made a backup if you want to keep your data.
-              </Typography.Text>
-              <ProjectDeleteModal project={project} />
+              <div className="flex flex-col">
+                <Typography.Text className="block mb-4">
+                  Make sure you have made a backup if you want to keep your data.
+                </Typography.Text>
+                <ProjectDeleteModal project={project} />
+              </div>
             </Alert>
           </Panel.Content>
         </Panel>
@@ -176,7 +171,6 @@ const ProjectDeleteModal = ({ project }: any) => {
   const { ui, app } = useStore()
 
   const [isOpen, setIsOpen] = useState(false)
-  const [value, setValue] = useState('')
   const [loading, setLoading] = useState(false)
 
   const toggle = () => {
@@ -203,45 +197,23 @@ const ProjectDeleteModal = ({ project }: any) => {
 
   return (
     <>
-      <Button onClick={toggle} danger>
-        Delete Project
-      </Button>
-      <Modal
-        visible={isOpen}
-        onCancel={toggle}
-        title={'Are you absolutely sure?'}
-        icon={<IconAlertCircle background={'red'} />}
-        hideFooter
-        size="medium"
-        closable
-      >
-        <Typography.Text>
-          <p className="text-sm">
-            This action <Typography.Text strong>cannot</Typography.Text> be undone. This will
-            permanently delete the <Typography.Text strong>{project?.name}</Typography.Text> project
-            and all of its data.
-          </p>
-          <p className="text-sm">
-            Please type <Typography.Text strong>{project?.name}</Typography.Text> to confirm.
-          </p>
-        </Typography.Text>
-        <Input
-          onChange={(e) => setValue(e.target.value)}
-          value={value}
-          className="w-full"
-          placeholder="Type the project name in here "
-        />
-        <Button
-          onClick={handleDeleteProject}
-          loading={loading}
-          disabled={project?.name !== value || loading}
-          size="small"
-          block
-          danger
-        >
-          I understand, delete this project
+      <div className="mt-2">
+        <Button onClick={toggle} type="danger">
+          Delete Project
         </Button>
-      </Modal>
+      </div>
+      <TextConfirmModal
+        visible={isOpen}
+        loading={loading}
+        title={`Confirm deletion of ${project?.name}`}
+        confirmPlaceholder="Type the project name in here"
+        alert="This action cannot be undone."
+        text={`This will permanently delete the ${project?.name} project and all of its data.`}
+        confirmString={project?.name}
+        confirmLabel="I understand, delete this project"
+        onConfirm={handleDeleteProject}
+        onCancel={toggle}
+      />
     </>
   )
 }

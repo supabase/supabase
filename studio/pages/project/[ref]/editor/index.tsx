@@ -9,6 +9,7 @@ import { TableEditorLayout } from 'components/layouts'
 import { EmptyState, SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import router from 'next/router'
+import { SidePanel } from '@supabase/ui'
 
 const Editor: NextPage = () => {
   const { meta, ui } = useStore()
@@ -74,6 +75,16 @@ const Editor: NextPage = () => {
     >
       <EmptyState selectedSchema={selectedSchema} onAddTable={onAddTable} />
       {/* On this page it'll only handle tables */}
+      <ConfirmationModal
+        danger
+        visible={isDeleting && !isUndefined(selectedTableToDelete)}
+        header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
+        description={`Are you sure you want to delete the selected table? This action cannot be undone`}
+        buttonLabel="Delete"
+        buttonLoadingLabel="Deleting"
+        onSelectCancel={() => setIsDeleting(false)}
+        onSelectConfirm={onConfirmDeleteTable}
+      />
       <SidePanelEditor
         selectedSchema={selectedSchema}
         isDuplicating={isDuplicating}
@@ -81,16 +92,6 @@ const Editor: NextPage = () => {
         sidePanelKey={sidePanelKey}
         closePanel={onClosePanel}
         onTableCreated={(table: any) => router.push(`/project/${projectRef}/editor/${table.id}`)}
-      />
-      <ConfirmationModal
-        danger
-        visible={isDeleting && !isUndefined(selectedTableToDelete)}
-        title={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
-        description={`Are you sure you want to delete the selected table? This action cannot be undone`}
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => setIsDeleting(false)}
-        onSelectConfirm={onConfirmDeleteTable}
       />
     </TableEditorLayout>
   )

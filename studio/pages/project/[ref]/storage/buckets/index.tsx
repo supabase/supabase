@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Typography } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { withAuth, useStore } from 'hooks'
@@ -42,12 +41,12 @@ const PageLayout = ({}) => {
           infoButtonUrl="https://supabase.com/docs/guides/storage"
           onClickCta={openCreateBucketModal}
         >
-          <Typography.Text type="secondary">
+          <p className="text-sm text-scale-1100">
             Create buckets to store and serve any type of digital content.
-          </Typography.Text>
-          <Typography.Text type="secondary">
+          </p>
+          <p className="text-sm text-scale-1100">
             Make your buckets private or public depending on your security preference.
-          </Typography.Text>
+          </p>
         </ProductEmptyState>
       </div>
     </StorageLayout>

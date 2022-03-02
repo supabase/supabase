@@ -62,9 +62,9 @@ const PublicationsTableItem: FC<Props> = ({ table, selectedPublication }) => {
           {enabledForAllTables ? (
             // @ts-ignore
             <Badge
-              type="secondary"
-              className="hover:border-gray-500"
-              style={{ paddingTop: 3, paddingBottom: 3 }}
+              color="scale"
+              // className="hover:border-gray-500"
+              // style={{ paddingTop: 3, paddingBottom: 3 }}
             >
               <span>Enabled</span>
               <span className="hidden lg:inline-block">&nbsp;for all tables</span>
