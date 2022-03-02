@@ -239,7 +239,7 @@ const ColumnManagement: FC<Props> = ({
                 {(droppableProvided: DroppableProvided) => (
                   <div
                     ref={droppableProvided.innerRef}
-                    className={`space-y-2 bg-gray-500 rounded-md px-3 py-2 ${
+                    className={`space-y-2 bg-gray-400 rounded-md px-3 py-2 ${
                       isNewRecord ? '' : '-mx-3'
                     }`}
                   >
