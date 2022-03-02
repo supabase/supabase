@@ -86,7 +86,7 @@ const Column: FC<Props> = ({
             } rounded-md`}
             actions={
               <Button
-                type={!isUndefined(column.foreignKey) ? 'default' : 'outline'}
+                type={!isUndefined(column.foreignKey) ? 'secondary' : 'default'}
                 onClick={() => onEditRelation(column)}
               >
                 <IconLink size={14} strokeWidth={!isUndefined(column.foreignKey) ? 2 : 1} />
@@ -216,7 +216,7 @@ const Column: FC<Props> = ({
                     {settingsCount}
                   </div>
                 )}
-                <div className="text-scale-900 transition-colors group-hover:text-scale-1200">
+                <div className="text-scale-1100 transition-colors group-hover:text-scale-1200">
                   <IconSettings size={18} strokeWidth={1} />
                 </div>
               </div>
