@@ -137,8 +137,21 @@ const StorageSidebar = ({
           </div>
         </div>
         <div className="my-4 px-3">
-          <Menu.Group title="Settings" />
+          <Menu.Group title="Config" />
           <div className="space-y-1">
+            <div>
+              <Link href={`/project/${ref}/storage/settings`}>
+                <a>
+                  <Menu.Item
+                    key="settings"
+                    rounded
+                    active={router.pathname === '/project/[ref]/storage/settings'}
+                  >
+                    <Typography.Text>Settings</Typography.Text>
+                  </Menu.Item>
+                </a>
+              </Link>
+            </div>
             <div>
               <Link href={`/project/${ref}/storage/policies`}>
                 <a>
