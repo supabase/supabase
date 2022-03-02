@@ -147,8 +147,11 @@ a {
   text-decoration: none;
 }
 
-.input-mono input {
-  @apply font-mono;
+.input-mono {
+  input,
+  textarea {
+    @apply font-mono;
+  }
 }
 
 input[type='radio'] {
