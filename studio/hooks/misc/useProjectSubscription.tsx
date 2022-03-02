@@ -2,13 +2,14 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import useSWR from 'swr'
 
+export interface Tier {
+  name: string
+  prod_id: string
+  key: 'FREE' | 'PRO' | 'PAYG'
+  unit_amount: number
+}
 interface Data {
-  tier: {
-    name: string
-    prod_id: string
-    key: 'FREE' | 'PRO' | 'PAYG'
-    unit_amount: number
-  }
+  tier: Tier
   addons: any[]
   billing: {
     billing_cycle_anchor: number

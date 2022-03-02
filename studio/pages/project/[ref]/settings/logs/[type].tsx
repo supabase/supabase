@@ -29,6 +29,7 @@ import {
   LogData,
   LogSearchCallback,
   LOG_TYPE_LABEL_MAPPING,
+  TIER_QUERY_LIMITS,
 } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
 import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite'
@@ -70,13 +71,10 @@ export const LogPage: NextPage = () => {
     value.toLowerCase().includes('select') ? true : false
   const isSelectQuery = checkIfSelectQuery(editorValue)
   const [sub] = useProjectSubscription(ref as string)
-  const tier = sub ? sub?.tier.key : 'FREE'
-  const tierName = sub ? sub?.tier.name : 'Free tier'
-  const tierQueryWindow = {
-    FREE: '1 day',
-    PRO: '7 days',
-    PAYG: '3 months',
-  }[tier]
+  const tierData = sub && sub?.tier ? sub.tier : undefined
+  const tier = tierData ? tierData?.key : 'FREE'
+  const tierName = tierData ? sub?.tier.name : 'Free tier'
+  const tierQueryLimit = TIER_QUERY_LIMITS[tier]
 
   useEffect(() => {
     setParams({ ...params, type: type as string })
@@ -247,6 +245,7 @@ export const LogPage: NextPage = () => {
     <SettingsLayout title={title}>
       <div className="h-full flex flex-col flex-grow">
         <LogPanel
+          tier={tierData}
           isShowingEventChart={showChart}
           onToggleEventChart={() => setShowChart(!showChart)}
           isCustomQuery={mode === 'custom'}
@@ -355,7 +354,7 @@ export const LogPage: NextPage = () => {
               title={
                 <div className="flex flex-row gap-2 items-center">
                   <Typography.Text>
-                    {`${tierName} is limited to a ${tierQueryWindow} query window`}
+                    {`${tierName} is limited to a ${tierQueryLimit.text} query window`}
                   </Typography.Text>
                   {tier !== 'PAYG' && (
                     <Link href={`/project/${ref}/settings/billing`}>
