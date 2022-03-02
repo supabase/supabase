@@ -28,7 +28,7 @@ const Error404: NextPage = ({}) => {
               <a href="/">
                 <Image
                   src={theme == 'dark' ? '/img/supabase-dark.svg' : '/img/supabase-light.svg'}
-                  alt=""
+                  alt="supabase"
                   height={24}
                   width={120}
                 />
@@ -37,13 +37,10 @@ const Error404: NextPage = ({}) => {
           </div>
         </nav>
       </div>
-      <div className="absolute">
-        <Typography.Title
-          className={`select-none filter transition opacity-[5%] duration-200 ${
+      <div className={`absolute select-none filter transition opacity-[5%] duration-200 ${
             show404 ? 'blur-sm' : 'blur-none'
-          }`}
-          style={{ fontSize: '28rem' }}
-        >
+          }`}>
+        <Typography.Title style={{ fontSize: '28rem' }}>
           404
         </Typography.Title>
       </div>
@@ -52,16 +49,16 @@ const Error404: NextPage = ({}) => {
           show404 ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <div className="w-[320px] flex flex-col items-center justify-center space-y-3">
-          <Typography.Title level={3}>Looking for something? 🔍</Typography.Title>
-          <Typography.Text className="text-center">
+        <div className="w-[320px] flex flex-col items-center justify-center space-y-3 text-center">
+          <Typography.Title style={{ fontSize: '1.5rem' }}>Looking for something? 🔍</Typography.Title>
+          <Typography.Text>
             We couldn't find the page that you're looking for!
           </Typography.Text>
         </div>
         <div className="flex items-center space-x-4">
           <Link href="/">
             <a>
-              <Button>Head back</Button>
+              <Button size="small">Head back</Button>
             </a>
           </Link>
         </div>
