@@ -52,7 +52,7 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
           <div className="flex items-center">
             <div>
               <Input
-                size="tiny"
+                size="small"
                 icon={<IconSearch size="tiny" />}
                 placeholder={'Filter'}
                 value={filterString}

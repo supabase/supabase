@@ -36,6 +36,7 @@ test('toggle event chart', async () => {
   const mockFn = jest.fn()
   const { rerender } = render(<LogPanel onToggleEventChart={mockFn} isShowingEventChart={true} />)
   const toggle = getToggleByText(/Show event chart/)
+  console.log('TOGGLE', toggle)
   userEvent.click(toggle)
   expect(mockFn).toBeCalled()
   rerender(<LogPanel isShowingEventChart={false} />)
@@ -84,7 +85,6 @@ test('timestamp from filter default value', async () => {
   await screen.findByDisplayValue('2022-01-18T10:43:39+0000')
   // TODO: use screen.findByLabelText when https://github.com/supabase/ui/issues/310 is resolved
   await screen.findByText('From')
-  await screen.findByTitle('Reset')
 })
 
 test('timestamp from filter error handling', async () => {

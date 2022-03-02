@@ -1,4 +1,4 @@
-import { IconBarChart2, Loading, Typography } from '@supabase/ui'
+import { IconBarChart2, Loading } from '@supabase/ui'
 import { useState } from 'react'
 import {
   BarChart as RechartBarChart,
@@ -10,7 +10,6 @@ import {
   Tooltip,
   Cell,
   ResponsiveContainer,
-  TooltipProps,
 } from 'recharts'
 
 import dayjs from 'dayjs'
@@ -18,7 +17,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { formatBytes } from 'lib/helpers'
-import { TooltipType } from 'recharts/types/util/types'
+import { CHART_COLORS } from 'components/ui/Charts/Charts.constants'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(timezone)
@@ -45,7 +44,7 @@ const Header = ({
   customDateFormat,
   label,
   minimalHeader = false,
-  displayDateInUtc= false
+  displayDateInUtc = false,
 }: any) => {
   let FOCUS_FORMAT = customDateFormat
     ? customDateFormat
@@ -88,29 +87,30 @@ const Header = ({
   }
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
 
-
   const chartTitle = (
-    <Typography.Text small={minimalHeader ? true : false} className="mb-0" type="secondary">
+    <h3 className={'text-scale-900 ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
       {label ?? attribute}
-    </Typography.Text>
+    </h3>
   )
   const highlighted = (
-    <Typography.Title level={minimalHeader ? 5 : 3} className="my-0 font-normal">
+    <h5
+      className={
+        'text-xl text-scale-1200 font-normal ' + (minimalHeader ? 'text-base' : 'text-2xl')
+      }
+    >
       {title}
       <span className="text-lg">{format}</span>
-    </Typography.Title>
+    </h5>
   )
   const date = (
-    <Typography.Text type="secondary" className="opacity-50" small>
+    <h5 className="text-xs text-scale-900">
       {focus ? (
         data && data[focus] && day(data[focus].period_start).format(FOCUS_FORMAT)
       ) : (
         <span className="opacity-0">x</span>
       )}
-    </Typography.Text>
+    </h5>
   )
-
-
 
   if (minimalHeader) {
     return (
@@ -137,17 +137,18 @@ const NoData = () => (
   <div
     className="
       h-full w-full
-      border border-dashed dark:border-dark
+      border border-dashed border-scale-600
       flex flex-col items-center justify-center
+      space-y-2 text-center
     "
   >
-    <Typography.Text className="mb-2">
-      <IconBarChart2 />
-    </Typography.Text>
-    <Typography.Text>No data to show</Typography.Text>
+    <IconBarChart2 className="text-scale-800" />
+    <div>
+      <p className="text-scale-1100 text-xs">No data to show</p>
+      <p className="text-scale-900 text-xs">May take 24 hours for data to show</p>
+    </div>
   </div>
 )
-
 const total = (data: any, format: any, attribute: any) => {
   let total = 0
   data?.map((item: any) => {
@@ -239,9 +240,9 @@ export function BarChart({
                     interval={data ? data.length - 2 : 0}
                     angle={0}
                     // stroke="#4B5563"
-                    tick={{ fontSize: '0px', color: '#6B7280' }}
-                    axisLine={{ stroke: '#444444' }}
-                    tickLine={{ stroke: '#444444' }}
+                    tick={{ fontSize: '0px', color: CHART_COLORS.TICK }}
+                    axisLine={{ stroke: CHART_COLORS.AXIS }}
+                    tickLine={{ stroke: CHART_COLORS.AXIS }}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   {/* <YAxis dataKey={attribute} /> */}
@@ -249,7 +250,7 @@ export function BarChart({
                   {yAxisLimit && <YAxis type="number" domain={[0, yAxisLimit]} hide />}
                   <Bar
                     dataKey={attribute}
-                    fill="#3ecf8e"
+                    fill={CHART_COLORS.GREEN_1}
                     // barSize={2}
                     animationDuration={300}
                   >
@@ -260,7 +261,9 @@ export function BarChart({
                           onBarClick ? 'cursor-pointer' : ''
                         }`}
                         fill={
-                          focusBar === index || mouseLeave ? '#3ecf8e' : 'rgba(62, 207, 142, 0.2)'
+                          focusBar === index || mouseLeave
+                            ? CHART_COLORS.GREEN_1
+                            : CHART_COLORS.GREEN_2
                         }
                         enableBackground={12}
                         // for this, we make the hovered colour #2B5CE7, else its opacity decreases to 20%
@@ -270,17 +273,17 @@ export function BarChart({
                 </RechartBarChart>
               </ResponsiveContainer>
               {data && (
-                <div className="flex items-center justify-between -mt-5">
-                  <Typography.Text type="secondary" className="opacity-50" small>
+                <div className="text-xs text-scale-900 flex items-center justify-between -mt-5">
+                  <span>
                     {day(data[0].period_start).format(
                       customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME
                     )}
-                  </Typography.Text>
-                  <Typography.Text type="secondary" className="opacity-50" small>
+                  </span>
+                  <span>
                     {day(data[data?.length - 1]?.period_start).format(
                       customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME
                     )}
-                  </Typography.Text>
+                  </span>
                 </div>
               )}
             </>
@@ -356,8 +359,8 @@ export function AreaChart({
               >
                 <defs>
                   <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3ecf8e" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#3ecf8e" stopOpacity={0} />
+                    <stop offset="5%" stopColor={CHART_COLORS.GREEN_1} stopOpacity={0.8} />
+                    <stop offset="95%" stopColor={CHART_COLORS.GREEN_1} stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis
@@ -368,13 +371,13 @@ export function AreaChart({
                   // stroke="#4B5563"
                   tick={{
                     fontSize: '0px',
-                    color: '#6B7280',
+                    color: CHART_COLORS.TICK,
                   }}
                   axisLine={{
-                    stroke: '#444444',
+                    stroke: CHART_COLORS.AXIS,
                   }}
                   tickLine={{
-                    stroke: '#444444',
+                    stroke: CHART_COLORS.AXIS,
                   }}
                 />
                 {yAxisLimit && <YAxis type="number" domain={[0, yAxisLimit]} hide />}
@@ -382,24 +385,24 @@ export function AreaChart({
                 <Area
                   type="monotone"
                   dataKey={attribute}
-                  stroke="#3ecf8e"
+                  stroke={CHART_COLORS.GREEN_1}
                   fillOpacity={1}
                   fill="url(#colorUv)"
                 />
               </RechartAreaChart>
             </ResponsiveContainer>
             {data && (
-              <div className="flex items-center justify-between -mt-5">
-                <Typography.Text type="secondary" className="opacity-50" small>
+              <div className="text-scale-900 text-xs flex items-center justify-between -mt-5">
+                <span>
                   {dayjs(data[0].period_start).format(
                     customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME
                   )}
-                </Typography.Text>
-                <Typography.Text type="secondary" className="opacity-50" small>
+                </span>
+                <span>
                   {dayjs(data[data?.length - 1]?.period_start).format(
                     customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME
                   )}
-                </Typography.Text>
+                </span>
               </div>
             )}
           </>

@@ -35,12 +35,17 @@ const Home: NextPage = () => {
       const params = new URLSearchParams(queryParams)
       if (router.query?.next?.includes('https://vercel.com')) {
         router.push(`/vercel/integrate?${params.toString()}`)
-      }
-      if (router.query?.next?.includes('new-project')) {
+      } else if (router.query?.next?.includes('new-project')) {
         router.push('/new/project')
-      }
-      if (router.query['x-amzn-marketplace-token'] != undefined) {
+      } else if (router.query['x-amzn-marketplace-token'] != undefined) {
         router.push(`/account/associate?${params.toString()}`)
+      } else if (
+        typeof router.query?.next === 'string' &&
+        router.query?.next?.startsWith('project/_/')
+      ) {
+        router.push(router.query.next as string)
+      } else {
+        router.push('/')
       }
       return <Connecting />
     }

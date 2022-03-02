@@ -12,6 +12,7 @@ import { partition } from 'lodash'
 
 import { createSqlSnippet } from './SqlEditor.utils'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
+import CardButton from 'components/ui/CardButton'
 
 const TabWelcome = observer(() => {
   const router = useRouter()
@@ -50,17 +51,14 @@ const TabWelcome = observer(() => {
     <div className="block p-6 h-full overflow-y-auto space-y-8">
       <div>
         <div className="mb-4">
-          <Typography.Title level={4} className="mb-0">
-            Scripts
-          </Typography.Title>
-          <Typography.Text>
-            Quick scripts to run on your database.
-            <br />
+          <h1 className="text-scale-1200 text-xl mb-3">Scripts</h1>
+          <p className="text-sm text-scale-1100">Quick scripts to run on your database.</p>
+          <p className="text-sm text-scale-1100">
             Click on any script to fill the query box, modify the script, then click
-            <Typography.Text code>Run</Typography.Text>. More scripts coming soon!
-          </Typography.Text>
+            <span className="text-code">Run</span>.
+          </p>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
           {SQL.map((x) => (
             <SqlCard
               key={x.title}
@@ -77,18 +75,17 @@ const TabWelcome = observer(() => {
       </div>
       <div className="mb-8">
         <div className="mb-4">
-          <Typography.Title level={4} className="mb-0">
-            Quick start
-          </Typography.Title>
-          <Typography.Text>
+          <h1 className="text-scale-1200 text-xl mb-3">Quick start</h1>
+          <p className="text-sm text-scale-1100">
             While we're in beta, we want to offer a quick way to explore Supabase. While we build
             importers, check out these simple starters.
-            <br />
-            Click on any script to fill the query box, modify the script, then click{' '}
-            <Typography.Text code>Run</Typography.Text>. More coming soon!
-          </Typography.Text>
+          </p>
+          <p className="text-sm text-scale-1100">
+            Click on any script to fill the query box, modify the script, then click
+            <span className="text-code">Run</span>.
+          </p>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
           {QuickStart.map((x) => (
             <SqlCard
               key={x.title}
@@ -117,14 +114,19 @@ const SqlCard = ({ title, description, sql, onClick }) => {
     onClick(sql, title)
   }
   return (
-    <a
-      className="rounded bg-panel-header-light dark:bg-panel-header-dark transition-colors 
+    <CardButton
+      onClick={() => handleOnClick()}
+      title={title}
+      footer={<span className="text-sm text-scale-1100">{description}</span>}
+    >
+      {/* <a
+        className="rounded bg-panel-header-light dark:bg-panel-header-dark transition-colors 
       border border-panel-border-light dark:border-panel-border-dark 
       hover:border-panel-border-hover-light dark:hover:border-panel-border-hover-dark 
       cursor-pointer"
-      onClick={() => handleOnClick()}
-    >
-      <div className="px-6 py-3 border-b dark:border-dark flex items-center justify-between">
+        onClick={() => handleOnClick()}
+      > */}
+      {/* <div className="px-6 py-3 border-b dark:border-dark flex items-center justify-between">
         <Typography.Title level={6} className="m-0">
           {title}
         </Typography.Title>
@@ -138,8 +140,9 @@ const SqlCard = ({ title, description, sql, onClick }) => {
       </div>
       <p className="px-6 py-4 capitalize-first">
         <Typography.Text type="secondary">{description}</Typography.Text>
-      </p>
-    </a>
+      </p> */}
+      {/* </a> */}
+    </CardButton>
   )
 }
 

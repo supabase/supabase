@@ -275,13 +275,15 @@ export default function IndexPage() {
                           Perfect for hobby projects and experiments.
                         </Typography.Text>
                       </p>
-                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
-                        <a>
-                          <Button size="medium" type="outline" className="absolute bottom-0">
-                            Get started
-                          </Button>
-                        </a>
-                      </Link>
+                      <div className="absolute bottom-0">
+                        <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                          <a>
+                            <Button size="medium" type="outline">
+                              Get started
+                            </Button>
+                          </a>
+                        </Link>
+                      </div>
                     </div>
                   </td>
 
@@ -298,13 +300,15 @@ export default function IndexPage() {
                           Everything you need to scale your project into production.
                         </Typography.Text>
                       </p>
-                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
-                        <a>
-                          <Button size="medium" type="outline" className="absolute bottom-0">
-                            Get started
-                          </Button>
-                        </a>
-                      </Link>
+                      <div className="absolute bottom-0">
+                        <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                          <a>
+                            <Button size="medium" type="outline">
+                              Get started
+                            </Button>
+                          </a>
+                        </Link>
+                      </div>
                     </div>
                   </td>
 
@@ -321,13 +325,15 @@ export default function IndexPage() {
                           Designated support team, account manager and technical specialist.
                         </Typography.Text>
                       </p>
-                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
-                        <a>
-                          <Button size="medium" type="outline" className="absolute bottom-0">
-                            Get started
-                          </Button>
-                        </a>
-                      </Link>
+                      <div className="absolute bottom-0">
+                        <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                          <a>
+                            <Button size="medium" type="outline">
+                              Get started
+                            </Button>
+                          </a>
+                        </Link>
+                      </div>
                     </div>
                   </td>
                 </tr>

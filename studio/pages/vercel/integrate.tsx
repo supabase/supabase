@@ -6,13 +6,14 @@ import { makeAutoObservable, runInAction } from 'mobx'
 import {
   Button,
   Select,
-  Divider,
   Typography,
   IconPlusCircle,
   IconX,
   IconChevronRight,
   Listbox,
 } from '@supabase/ui'
+import Divider from 'components/ui/Divider'
+
 import { Dictionary } from '@supabase/grid'
 
 import { useStore, withAuth } from 'hooks'

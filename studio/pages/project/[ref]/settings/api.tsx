@@ -27,7 +27,6 @@ import {
   IconKey,
   Button,
   Dropdown,
-  Divider,
   IconPenTool,
   IconRefreshCw,
   IconChevronDown,
@@ -38,12 +37,15 @@ import { API_URL } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { patch, get } from 'lib/common/fetch'
 import { useStore, useJwtSecretUpdateStatus, withAuth } from 'hooks'
+
 import { SettingsLayout } from 'components/layouts'
+import Flag from 'components/ui/Flag/Flag'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+
 import Panel from 'components/to-be-cleaned/Panel'
 import MultiSelectUI from 'components/to-be-cleaned/MultiSelect'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { DisplayApiSettings } from 'components/to-be-cleaned/DisplayProjectSettings'
-import Flag from 'components/ui/Flag/Flag'
 
 const JWT_SECRET_UPDATE_ERROR_MESSAGES = {
   [JwtSecretUpdateError.APIServicesConfigurationUpdateFailed]:
@@ -226,7 +228,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
           <Panel
             title={
               <Typography.Title level={5} className="mb-0">
-                Config
+                Configuration
               </Typography.Title>
             }
           >
@@ -276,18 +278,18 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                         {isUpdatingJwtSecret ? (
                           <div className="flex items-center space-x-2">
                             <IconLoader className="animate-spin" size={14} />
-                            <Typography.Text>
+                            <p className="text-sm">
                               Updating JWT secret: {jwtSecretUpdateProgressMessage}
-                            </Typography.Text>
+                            </p>
                           </div>
                         ) : (
                           <div className="w-full space-y-2">
                             <div className="w-full flex items-center justify-between">
                               <div className="flex flex-col space-y-1">
                                 <Typography.Text>Generate a new JWT secret</Typography.Text>
-                                <Typography.Text type="secondary">
+                                <p className="opacity-50 text-sm">
                                   A random secret will be created, or you can create your own.
-                                </Typography.Text>
+                                </p>
                               </div>
                               <div className="flex flex-col items-end">
                                 {isUpdatingJwtSecret ? (
@@ -306,7 +308,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                                         >
                                           Generate a random secret
                                         </Dropdown.Item>
-                                        <Divider light />
+                                        <Dropdown.Seperator />
                                         <Dropdown.Item
                                           onClick={() => setIsCreatingKey(true)}
                                           icon={<IconPenTool size={16} />}
@@ -318,7 +320,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                                   >
                                     <Button
                                       as="span"
-                                      type="secondary"
+                                      type="default"
                                       iconRight={<IconChevronDown />}
                                     >
                                       Generate a new secret
@@ -347,62 +349,64 @@ const ServiceList: FC<any> = ({ projectRef }) => {
         </section>
         <section>{config && <PostgrestConfig config={config} projectRef={projectRef} />}</section>
       </article>
-      <Modal
+
+      <ConfirmModal
+        danger
         visible={isRegeneratingKey}
-        onCancel={() => setIsGeneratingKey(false)}
         title="Are you absolutely sure?"
-        icon={<IconAlertCircle background={'red'} />}
-        hideFooter
-        size="medium"
-        closable
-      >
-        <Typography.Text>
-          <p className="text-sm">
-            This action cannot be undone and the old JWT secret will be lost. All existing API keys
-            will be invalidated, and any open connections will be terminated.
-          </p>
-        </Typography.Text>
-        <Button
-          onClick={() => handleJwtSecretUpdate('ROLL', setIsGeneratingKey)}
-          size="small"
-          block
-          danger
-          loading={isSubmittingJwtSecretUpdateRequest}
-        >
-          Generate new secret
-        </Button>
-      </Modal>
+        description="This action cannot be undone and the old JWT secret will be lost. All existing API keys
+        will be invalidated, and any open connections will be terminated."
+        buttonLabel="Generate new secret"
+        buttonLoadingLabel="Generating"
+        onSelectCancel={() => setIsGeneratingKey(false)}
+        onSelectConfirm={() => handleJwtSecretUpdate('ROLL', setIsGeneratingKey)}
+      />
 
       <Modal
         closable
-        title="Create a custom JWT secret"
+        header="Create a custom JWT secret"
         visible={isCreatingKey}
         size="medium"
-        confirmText="Apply new JWT secret"
         variant="danger"
-        alignFooter="right"
         loading={isSubmittingJwtSecretUpdateRequest}
-        onCancel={() => setIsCreatingKey(false)}
-        onConfirm={() => handleJwtSecretUpdate(customToken, setIsCreatingKey)}
+        customFooter={
+          <div className="space-x-2">
+            <Button type="default" onClick={() => setIsCreatingKey(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              disabled={customToken.length < 32}
+              loading={isSubmittingJwtSecretUpdateRequest}
+              onClick={() => handleJwtSecretUpdate(customToken, setIsCreatingKey)}
+            >
+              Apply new JWT secret
+            </Button>
+          </div>
+        }
       >
-        <Typography.Text type="secondary">
-          Create a custom JWT secret. Make sure it is a strong combination of characters that cannot
-          be guessed easily.
-        </Typography.Text>
-        <Alert
-          withIcon
-          variant="warning"
-          title="All existing API keys will be invalidated, and any open connections will be terminated."
-        />
-        <Input
-          onChange={(e: any) => setCustomToken(e.target.value)}
-          value={customToken}
-          icon={<IconKey />}
-          type="password"
-          className="w-full text-left"
-          label="Custom JWT secret"
-          descriptionText="Must be at least 32 characters long"
-        />
+        <Modal.Content>
+          <div className="py-4 space-y-2">
+            <p className="text-sm text-scale-1100">
+              Create a custom JWT secret. Make sure it is a strong combination of characters that
+              cannot be guessed easily.
+            </p>
+            <Alert
+              withIcon
+              variant="warning"
+              title="All existing API keys will be invalidated, and any open connections will be terminated."
+            />
+            <Input
+              onChange={(e: any) => setCustomToken(e.target.value)}
+              value={customToken}
+              icon={<IconKey />}
+              type="password"
+              className="w-full text-left"
+              label="Custom JWT secret"
+              descriptionText="Must be at least 32 characters long"
+            />
+          </div>
+        </Modal.Content>
       </Modal>
     </>
   )

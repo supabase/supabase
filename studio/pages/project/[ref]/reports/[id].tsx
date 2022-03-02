@@ -13,7 +13,6 @@ import {
   Badge,
   IconSettings,
   IconArrowRight,
-  Divider,
   IconHome,
   IconChevronRight,
   IconPlus,
@@ -314,7 +313,7 @@ const Reports = () => {
                   </div>
                 </Dropdown.TriggerItem>
               </Dropdown>
-              <Divider light />
+              <Dropdown.Seperator />
             </>
           )
         })}
@@ -423,7 +422,7 @@ const GridResize = ({ startDate, endDate, interval, editableReport, setEditableR
         <div
           key={x.id}
           data-grid={{ ...x, minH: 4, maxH: 4, minW: 8 }}
-          className="relative react-grid-layout__report-item bg-white dark:bg-gray-700 border shadow-sm dark:border-dark rounded px-6 py-4 hover:border-green-600 dark:hover:border-green-600 group"
+          className="relative react-grid-layout__report-item bg-panel-body-light dark:bg-panel-body-dark border border-panel-border-light dark:border-panel-border-dark shadow-sm rounded px-6 py-4 hover:border-green-900 dark:hover:border-green-900 group"
         >
           <ChartHandler
             startDate={startDate}
@@ -436,8 +435,8 @@ const GridResize = ({ startDate, endDate, interval, editableReport, setEditableR
           />
           <div className="absolute top-3 inset-x-0 ">
             <div className="flex justify-around">
-              <div className="w-24 h-3 space-y-2 flex flex-col cursor-drag">
-                <div className="transition-all border-4 border-dotted border-green-600 h-3 w-full hidden opacity-50 group-hover:block hover:opacity-100"></div>
+              <div className="w-24 h-3 space-y-2 flex flex-col cursor-move">
+                <div className="transition-all border-4 border-dotted border-green-900 h-3 w-full hidden opacity-50 group-hover:block hover:opacity-100"></div>
               </div>
             </div>
           </div>

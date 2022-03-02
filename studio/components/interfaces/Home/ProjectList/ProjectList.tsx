@@ -13,9 +13,14 @@ import PausedProjectCard from './PausedProjectCard'
 interface Props {
   onSelectRestore: (project: Project) => void
   onSelectDelete: (project: Project) => void
+  rewriteHref?: (projectRef: string) => string
 }
 
-const ProjectList: FC<Props> = ({ onSelectRestore = () => {}, onSelectDelete = () => {} }) => {
+const ProjectList: FC<Props> = ({
+  onSelectRestore = () => {},
+  onSelectDelete = () => {},
+  rewriteHref,
+}) => {
   const router = useRouter()
   const { app } = useStore()
   const { organizations, projects } = app
@@ -32,13 +37,17 @@ const ProjectList: FC<Props> = ({ onSelectRestore = () => {}, onSelectDelete = (
         return (
           <div className="space-y-3" key={makeRandomString(5)}>
             <Loading active={isLoading}>
-              <Typography.Title level={4}>{name}</Typography.Title>
+              <h4 className="text-lg">{name}</h4>
             </Loading>
-            <ul className="grid grid-cols-1 gap-4 mx-auto sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <ul className="grid gap-4 mx-auto grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ">
               {!isLoading && isEmpty && (
                 <div className="max-w-4xl text-center col-span-4 space-y-4 border-2 border-gray-300 border-dashed rounded-lg p-6">
-                  <Typography.Title level={5}>No projects.</Typography.Title>
-                  <Typography.Text>Get started by creating a new project.</Typography.Text>
+                  <div className="space-y-1">
+                    <p>No projects</p>
+                    <p className="text-sm text-scale-1100">
+                      Get started by creating a new project.
+                    </p>
+                  </div>
                   <div>
                     <Button onClick={() => router.push(`/new/${slug}`)} icon={<IconPlus />}>
                       New Project
@@ -46,18 +55,15 @@ const ProjectList: FC<Props> = ({ onSelectRestore = () => {}, onSelectDelete = (
                   </div>
                 </div>
               )}
-              {sortedProjects?.map((project: Project) =>
-                project.status === PROJECT_STATUS.INACTIVE ? (
-                  <PausedProjectCard
-                    key={makeRandomString(5)}
-                    project={project}
-                    onSelectDelete={() => onSelectDelete(project)}
-                    onSelectRestore={() => onSelectRestore(project)}
-                  />
-                ) : (
-                  <ProjectCard key={makeRandomString(5)} project={project} />
-                )
-              )}
+              {sortedProjects?.map((project: Project) => (
+                <ProjectCard
+                  paused={project.status === PROJECT_STATUS.INACTIVE}
+                  key={makeRandomString(5)}
+                  project={project}
+                  onSelectDelete={() => onSelectDelete(project)}
+                  onSelectRestore={() => onSelectRestore(project)}
+                />
+              ))}
             </ul>
           </div>
         )

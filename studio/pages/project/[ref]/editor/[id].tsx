@@ -12,6 +12,7 @@ import { useStore, withAuth } from 'hooks'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { Modal } from '@supabase/ui'
 
 const TableEditorPage: NextPage = () => {
   const router = useRouter()
@@ -169,8 +170,14 @@ const TableEditorPage: NextPage = () => {
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedColumnToDelete)}
-        title={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
-        description={`Are you sure you want to delete the selected column? This action cannot be undone`}
+        header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
+        children={
+          <Modal.Content>
+            <p className="py-4 text-sm text-scale-1100">
+              Are you sure you want to delete the selected column? This action cannot be undone.
+            </p>
+          </Modal.Content>
+        }
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"
         onSelectCancel={() => setIsDeleting(false)}
@@ -179,8 +186,14 @@ const TableEditorPage: NextPage = () => {
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedTableToDelete)}
-        title={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
-        description={`Are you sure you want to delete the selected table? This action cannot be undone`}
+        header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
+        children={
+          <Modal.Content>
+            <p className="py-4 text-sm text-scale-1100">
+              Are you sure you want to delete the selected table? This action cannot be undone.
+            </p>
+          </Modal.Content>
+        }
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"
         onSelectCancel={() => setIsDeleting(false)}

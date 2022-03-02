@@ -1,4 +1,4 @@
-import { Badge, Button, Checkbox, Input, Typography } from '@supabase/ui'
+import { Badge, Button, Checkbox, Input, Radio, Modal } from '@supabase/ui'
 import { get } from 'lodash'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
@@ -9,8 +9,10 @@ const PolicyName = ({ name = '', onUpdatePolicyName = () => {} }) => {
   return (
     <div className="flex space-x-12">
       <div className="w-1/3 flex flex-col space-y-2">
-        <Typography.Text>Policy name</Typography.Text>
-        <Typography.Text type="secondary">A descriptive name for your policy.</Typography.Text>
+        <label className="text-base text-scale-1100" htmlFor="policy-name">
+          Policy name
+        </label>
+        <p className="text-sm text-scale-900">A descriptive name for your policy</p>
       </div>
       <div className="w-2/3 relative">
         <Input
@@ -18,10 +20,8 @@ const PolicyName = ({ name = '', onUpdatePolicyName = () => {} }) => {
           rows={1}
           limit={50}
           onChange={(e) => onUpdatePolicyName(e.target.value)}
+          actions={<span className="text-sm text-scale-900 mr-3">{name.length}/50</span>}
         />
-        <div className="absolute top-2 right-4">
-          <Typography.Text>{name.length}/50</Typography.Text>
-        </div>
       </div>
     </div>
   )
@@ -31,10 +31,12 @@ const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {}
   return (
     <div className="flex space-x-12">
       <div className="w-1/3 flex flex-col space-y-2">
-        <Typography.Text>Policy definition</Typography.Text>
-        <Typography.Text type="secondary">
+        <label className="text-base text-scale-1100" htmlFor="policy-name">
+          Policy definition
+        </label>
+        <p className="text-sm text-scale-900">
           Provide a SQL conditional expression that returns a boolean.
-        </Typography.Text>
+        </p>
       </div>
       <div className="w-2/3 h-56">
         <SqlEditor defaultValue={definition} onInputChange={onUpdatePolicyDefinition} />
@@ -48,11 +50,13 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
   return (
     <div className="flex justify-between space-x-12">
       <div className="w-1/3 flex flex-col space-y-2">
-        <Typography.Text>Allowed operations</Typography.Text>
-        <Typography.Text type="secondary">
+        <label className="text-base text-scale-1100" htmlFor="allowed-operation">
+          Allowed operation
+        </label>
+        <p className="text-sm text-scale-900">
           Based on the operations you have selected, you can use any of the highlighted functions in
           the supabase-js Javascript library
-        </Typography.Text>
+        </p>
       </div>
       <div className="w-2/3">
         <div className="flex items-center space-x-8">
@@ -93,7 +97,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
 
 const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () => {} }) => (
   <div className="px-6 py-3 w-full flex justify-end items-center space-x-4 border-t dark:border-dark">
-    <Button type="secondary" onClick={onViewTemplates}>
+    <Button type="default" onClick={onViewTemplates}>
       View templates
     </Button>
     <Button type="primary" onClick={onReviewPolicy}>
@@ -114,16 +118,24 @@ const StoragePoliciesEditor = ({
 
   return (
     <div className="">
-      <div className="px-6 space-y-8 mb-8">
-        <PolicyName name={policyFormFields.name} onUpdatePolicyName={onUpdatePolicyName} />
-        <PolicyAllowedOperations
-          allowedOperations={policyFormFields.allowedOperations}
-          onToggleOperation={onToggleOperation}
-        />
-        <PolicyDefinition
-          definition={definition}
-          onUpdatePolicyDefinition={onUpdatePolicyDefinition}
-        />
+      <div className="py-6 space-y-8 mb-8">
+        <Modal.Content>
+          <PolicyName name={policyFormFields.name} onUpdatePolicyName={onUpdatePolicyName} />
+        </Modal.Content>
+        <Modal.Seperator />
+        <Modal.Content>
+          <PolicyAllowedOperations
+            allowedOperations={policyFormFields.allowedOperations}
+            onToggleOperation={onToggleOperation}
+          />
+        </Modal.Content>
+        <Modal.Seperator />
+        <Modal.Content>
+          <PolicyDefinition
+            definition={definition}
+            onUpdatePolicyDefinition={onUpdatePolicyDefinition}
+          />
+        </Modal.Content>
       </div>
       <PolicyEditorFooter onViewTemplates={onViewTemplates} onReviewPolicy={onReviewPolicy} />
     </div>

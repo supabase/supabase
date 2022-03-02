@@ -1,4 +1,13 @@
-import { Badge, Button, IconArchive, Typography } from '@supabase/ui'
+import {
+  Badge,
+  Button,
+  IconArchive,
+  Typography,
+  Dropdown,
+  IconEdit,
+  IconTrash,
+  IconMoreVertical,
+} from '@supabase/ui'
 import { isEmpty } from 'lodash'
 import Panel from 'components/to-be-cleaned/Panel'
 
@@ -10,6 +19,49 @@ const PolicyRow = ({
   onSelectPolicyDelete = () => {},
 }) => {
   const { name, command } = policy
+  return (
+    <div className="group">
+      <Panel.Content className="flex gap-2 justify-between py-4 border-b border-panel-border-light dark:border-panel-border-dark">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+          <div className="font-mono text-xs text-scale-900">{command}</div>
+          <div className="flex flex-col lg:flex-row gap-2">
+            <span className="text-sm text-scale-1200 truncate">{name}</span>
+          </div>
+        </div>
+        <Dropdown
+          side="bottom"
+          align="end"
+          size="small"
+          overlay={
+            <>
+              <Dropdown.Item
+                icon={<IconEdit size={14} />}
+                type="outline"
+                className="mx-2"
+                onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
+              >
+                Edit
+              </Dropdown.Item>
+              <Dropdown.Seperator />
+              <Dropdown.Item
+                icon={<IconTrash size={14} />}
+                type="outline"
+                onClick={() => onSelectPolicyDelete(policy)}
+              >
+                Delete
+              </Dropdown.Item>
+            </>
+          }
+        >
+          <Button
+            type="default"
+            style={{ paddingLeft: 4, paddingRight: 4 }}
+            icon={<IconMoreVertical />}
+          />
+        </Dropdown>
+      </Panel.Content>
+    </div>
+  )
   return (
     <div className="grid grid-cols-10 p-4 px-6 group">
       <div className="col-span-4">
@@ -78,9 +130,7 @@ const StoragePoliciesBucketRow = ({
     >
       {policies.length === 0 ? (
         <div className="p-4 px-6">
-          <Typography.Text type="secondary" className="opacity-50">
-            No policies created yet
-          </Typography.Text>
+          <p className="text-sm text-scale-900">No policies created yet</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 divide-y dark:divide-dark">
@@ -96,9 +146,7 @@ const StoragePoliciesBucketRow = ({
           ))}
           {policies.length !== 0 ? (
             <div className="px-6 py-2">
-              <Typography.Text type="secondary" className="opacity-50">
-                {getFooterLabel()}
-              </Typography.Text>
+              <p className="text-scale-1100 text-sm">{getFooterLabel()}</p>
             </div>
           ) : null}
         </div>

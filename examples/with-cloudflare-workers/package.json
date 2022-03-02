@@ -7,14 +7,12 @@
   "main": "index.js",
   "scripts": {
     "dev": "wrangler dev",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "patch-package"
+    "deploy": "wrangler publish"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^1.3.3"
+    "@supabase/supabase-js": "^1.30.4"
   },
   "devDependencies": {
-    "patch-package": "^6.2.2",
-    "postinstall-postinstall": "^2.1.0"
+    "@cloudflare/wrangler": "^1.19.8"
   }
 }
