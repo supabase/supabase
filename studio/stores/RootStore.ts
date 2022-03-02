@@ -33,6 +33,14 @@ export class RootStore implements IRootStore {
     })
     this.app = new AppStore(this)
 
+    /**
+     * TODO: meta and content are not observable
+     * meaning that when meta and content object change mobx doesnt trigger new event
+     *
+     * Workaround for now
+     * we need to use ui.selectedProject along with meta and content
+     * cos whenever ui.selectedProject changes, the reaction will create new meta and content stores
+     */
     reaction(
       () => this.ui.selectedProject,
       (selectedProject) => {

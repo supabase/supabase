@@ -75,7 +75,7 @@ interface ContentWrapperProps {
 }
 
 const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children }) => {
-  const { ui, meta, content } = useStore()
+  const { ui, meta } = useStore()
   const router = useRouter()
   const project = ui.selectedProject
   const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
