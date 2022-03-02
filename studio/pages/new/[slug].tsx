@@ -83,15 +83,15 @@ export const Wizard = observer(() => {
   const isEmptyPaymentMethod = stripeCustomer
     ? stripeCustomer.paymentMethods?.data?.length <= 0
     : undefined
-  const isOverFreeProjectLimit = totalFreeProjects >= freeProjectsLimit
+  const isOverFreeProjectLimit = false //totalFreeProjects >= freeProjectsLimit
   const isInvalidSlug = isUndefined(currentOrg)
   const isSelectFreeTier = dbPricingPlan === PRICING_PLANS.FREE
 
-  const canCreateProject =
-    currentOrg?.is_owner &&
-    !subscriptionStats.isError &&
-    !subscriptionStats.isLoading &&
-    (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
+  const canCreateProject = true
+  // currentOrg?.is_owner &&
+  // !subscriptionStats.isError &&
+  // !subscriptionStats.isLoading &&
+  // (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
 
   const canSubmit =
     projectName != '' &&
