@@ -1,4 +1,4 @@
-import { configure } from 'mobx'
+import { configure, reaction } from 'mobx'
 import AppStore, { IAppStore } from './app/AppStore'
 import MetaStore, { IMetaStore } from './pgmeta/MetaStore'
 import UiStore, { IUiStore } from './UiStore'
@@ -32,17 +32,31 @@ export class RootStore implements IRootStore {
       connectionString: '',
     })
     this.app = new AppStore(this)
+
+    reaction(
+      () => this.ui.selectedProject,
+      (selectedProject) => {
+        if (selectedProject) {
+          this.content = new ProjectContentStore(this, { projectRef: selectedProject.ref })
+          this.meta = new MetaStore(this, {
+            projectRef: selectedProject.ref,
+            connectionString: selectedProject.connectionString ?? '',
+          })
+        } else {
+          this.content = new ProjectContentStore(this, { projectRef: '' })
+          this.meta = new MetaStore(this, {
+            projectRef: '',
+            connectionString: '',
+          })
+        }
+        console.log('selectedProject changed: ', selectedProject)
+      }
+    )
   }
 
   setProjectRef(value?: string) {
-    if (this.ui.selectedProject?.ref != value) {
-      this.ui.setProjectRef(value)
-      this.content = new ProjectContentStore(this, { projectRef: value || '' })
-      this.meta = new MetaStore(this, {
-        projectRef: value || '',
-        connectionString: this.ui.selectedProject?.connectionString ?? '',
-      })
-    }
+    if (this.ui.selectedProject?.ref == value) return
+    this.ui.setProjectRef(value)
   }
 
   setOrganizationSlug(value?: string) {

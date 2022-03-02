@@ -10,6 +10,7 @@ import { API_URL } from 'lib/constants'
 // but use the one under the stores folder projectContentStore first while we transition
 
 export interface IProjectContentStore {
+  ready: boolean
   isLoading: boolean
   isInitialized: boolean
   error: any
@@ -21,6 +22,7 @@ export interface IProjectContentStore {
 }
 
 export default class ProjectContentStore implements IProjectContentStore {
+  ready: boolean
   rootStore: IRootStore
 
   STATES = {
@@ -38,7 +40,7 @@ export default class ProjectContentStore implements IProjectContentStore {
 
   constructor(rootStore: IRootStore, options: { projectRef: string }) {
     const { projectRef } = options
-
+    this.ready = projectRef !== ''
     this.rootStore = rootStore
     this.baseUrl = `${API_URL}/projects/${projectRef}/content`
     makeAutoObservable(this)

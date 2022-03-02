@@ -33,9 +33,11 @@ const TableEditorLayout: FC<Props> = ({
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
   useEffect(() => {
-    meta.schemas.load()
-    meta.tables.load()
-  }, [])
+    if (meta.ready) {
+      meta.schemas.load()
+      meta.tables.load()
+    }
+  }, [meta.ready])
 
   useEffect(() => {
     let cancel = false
