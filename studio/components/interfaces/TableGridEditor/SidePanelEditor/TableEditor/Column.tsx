@@ -10,15 +10,13 @@ import {
   IconLink,
   IconSettings,
   Button,
-  Listbox,
 } from '@supabase/ui'
 
-import { ColumnField, EnumType, PostgresDataTypeOption } from '../SidePanelEditor.types'
+import { ColumnField, EnumType } from '../SidePanelEditor.types'
 import ColumnType from '../ColumnEditor/ColumnType'
 import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
 import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
-import { POSTGRES_DATA_TYPE_OPTIONS } from '../SidePanelEditor.constants'
 
 /**
  * [Joshen] For context:
@@ -85,10 +83,10 @@ const Column: FC<Props> = ({
             disabled={hasImportContent}
             className={`table-editor-columns-input bg-white dark:bg-transparent lg:gap-0 ${
               hasImportContent ? 'opacity-50' : ''
-            }`}
+            } rounded-md`}
             actions={
               <Button
-                type={!isUndefined(column.foreignKey) ? 'secondary' : 'default'}
+                type={!isUndefined(column.foreignKey) ? 'default' : 'outline'}
                 onClick={() => onEditRelation(column)}
               >
                 <IconLink size={14} strokeWidth={!isUndefined(column.foreignKey) ? 2 : 1} />
@@ -100,32 +98,6 @@ const Column: FC<Props> = ({
       </div>
       <div className="w-[25%]">
         <div className="w-[95%]">
-          {/* <Listbox onChange={() => console.log('foo')} defaultValue={1} className="lg:gap-0 ">
-            {POSTGRES_DATA_TYPE_OPTIONS.map((option: PostgresDataTypeOption, i) => {
-              if (i > 8) return
-
-              return (
-                <Listbox.Option
-                  key={option.name}
-                  value={option.name}
-                  label={option.name}
-
-                  // addOnBefore={() => inferIcon(option.type)}
-                >
-                  <div className="flex items-center space-x-4">
-                    <Typography.Text>
-                      <p>{option.name}</p>
-                    </Typography.Text>
-                    <p>
-                      <Typography.Text small className="opacity-50">
-                        {option.description}
-                      </Typography.Text>
-                    </p>
-                  </div>
-                </Listbox.Option>
-              )
-            })}
-          </Listbox> */}
           <ColumnType
             value={column.format}
             enumTypes={enumTypes}

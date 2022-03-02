@@ -1,12 +1,5 @@
 import React, { FC } from 'react'
-import {
-  IconCalendar,
-  IconType,
-  IconHash,
-  Listbox,
-  Typography,
-  IconToggleRight,
-} from '@supabase/ui'
+import { IconCalendar, IconType, IconHash, Listbox, IconToggleRight } from '@supabase/ui'
 import { POSTGRES_DATA_TYPE_OPTIONS } from '../SidePanelEditor.constants'
 import { PostgresDataTypeOption, EnumType } from '../SidePanelEditor.types'
 
@@ -59,7 +52,8 @@ const ColumnType: FC<Props> = ({
       value={value}
       size={size}
       error={error}
-      className={`${className} ${disabled ? 'column-type-disabled' : ''}`}
+      disabled={disabled}
+      className={`${className} ${disabled ? 'column-type-disabled' : ''} rounded-md`}
       onChange={(value: string) => onOptionSelect(value)}
       optionsWidth={480}
     >
