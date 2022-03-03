@@ -38,7 +38,6 @@ export default class ProjectContentStore implements IProjectContentStore {
 
   constructor(rootStore: IRootStore, options: { projectRef: string }) {
     const { projectRef } = options
-
     this.rootStore = rootStore
     this.baseUrl = `${API_URL}/projects/${projectRef}/content`
     makeAutoObservable(this)
