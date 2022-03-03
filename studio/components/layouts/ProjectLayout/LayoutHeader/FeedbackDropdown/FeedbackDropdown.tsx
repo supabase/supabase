@@ -34,7 +34,8 @@ const FeedbackDropdown = () => {
         type="default"
         icon={<IconMessageCircle size={16} strokeWidth={1.5} className="text-scale-900" />}
       >
-        Feedback on this page?
+        <span className="block md:hidden">Feedback</span>
+        <span className="hidden md:block">Feedback on this page?</span>
       </Button>
     </Popover>
   )
