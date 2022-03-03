@@ -21,9 +21,9 @@ const PlanSelection: FC<Props> = ({ visible, billingPlans, currentPlan, onSelect
       enter="transition ease-out duration-300"
       enterFrom="transform opacity-0 -translate-x-10"
       enterTo="transform opacity-100 translate-x-0"
-      leave="transition ease-in duration-75"
-      leaveFrom="transform opacity-100"
-      leaveTo="transform opacity-0 -translate-x-10"
+      // leave="transition ease-in duration-75"
+      // leaveFrom="transform opacity-100"
+      // leaveTo="transform opacity-0 -translate-x-10"
     >
       <div className="space-y-8">
         <h4 className="text-xl">Change your project's subscription</h4>

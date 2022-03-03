@@ -44,9 +44,7 @@ const BillingLayout: FC<Props> = ({ children }) => {
           </div>
         </div>
         <div className="overflow-auto">
-          <section className="mx-auto max-w-4xl relative my-10 has-slide-in slide-in">
-            {children}
-          </section>
+          <section className="mx-auto max-w-4xl relative my-10">{children}</section>
         </div>
       </div>
     </BaseLayout>
