@@ -165,8 +165,7 @@ const SpreadsheetImport: FC<Props> = ({
             <div className="flex flex-col space-y-1">
               <Typography.Text>Content Preview</Typography.Text>
               <Typography.Text type="secondary">
-                Your table will have {spreadsheetData.rowCount.toLocaleString()} rows and the
-                following {spreadsheetData.headers.length} columns.
+                Your table will have {spreadsheetData.rowCount.toLocaleString()} rows and {spreadsheetData.headers.length} columns.
                 <br />
                 Here is a preview of your table (up to the first 20 columns and first 100 rows).
               </Typography.Text>
