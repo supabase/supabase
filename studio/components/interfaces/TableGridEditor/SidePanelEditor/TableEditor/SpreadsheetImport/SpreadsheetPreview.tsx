@@ -8,10 +8,16 @@ interface Props {
   rows?: any[]
 }
 
+const MAX_ROWS = 100;
+const MAX_HEADERS = 20;
+
 const SpreadsheetPreview: FC<Props> = ({ headers = [], rows = [] }) => {
+  const previewHeaders = headers.slice(0, MAX_HEADERS);
+  const previewRows = rows.slice(0, MAX_ROWS);
+
   return (
     <DataGrid
-      columns={headers.map((header) => {
+      columns={previewHeaders.map((header) => {
         return {
           key: header,
           name: header,
@@ -29,9 +35,9 @@ const SpreadsheetPreview: FC<Props> = ({ headers = [], rows = [] }) => {
           ),
         }
       })}
-      rows={rows}
+      rows={previewRows}
       className="!border-l !border-r"
-      style={{ height: `${34 + 34 * rows.length}px` }}
+      style={{ height: `${34 + 34 * previewRows.length}px` }}
     />
   )
 }

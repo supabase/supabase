@@ -167,6 +167,8 @@ const SpreadsheetImport: FC<Props> = ({
               <Typography.Text type="secondary">
                 Your table will have {spreadsheetData.rowCount.toLocaleString()} rows and the
                 following {spreadsheetData.headers.length} columns.
+                <br />
+                Here is a preview of your table (up to the first 20 columns and first 100 rows).
               </Typography.Text>
             </div>
             <SpreadsheetPreview headers={spreadsheetData.headers} rows={spreadsheetData.rows} />
