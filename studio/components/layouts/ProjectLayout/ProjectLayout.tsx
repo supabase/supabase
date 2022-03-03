@@ -1,10 +1,7 @@
 import Head from 'next/head'
 import { FC, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
-import { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
-
-import { Project } from 'types'
 import { useStore } from 'hooks'
 
 import Connecting from 'components/ui/Loading'
@@ -32,34 +29,6 @@ const ProjectLayout: FC<Props> = ({
   hideHeader = false,
   hideIconBar = false,
 }) => {
-  const { ui } = useStore()
-  const project: Project | undefined = ui.selectedProject
-
-  const router = useRouter()
-  const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
-
-  // useEffect(() => {
-  //   if (isUndefined(project)) router.push('/404')
-  // }, [])
-
-  const renderContent = () => {
-    if (!isUndefined(project)) {
-      return requiresDbConnection ? (
-        <TestConnection project={project}>
-          {isLoading ? (
-            <Connecting />
-          ) : (
-            <div className="flex flex-col flex-1 overflow-y-auto">{children}</div>
-          )}
-        </TestConnection>
-      ) : (
-        <>{children}</>
-      )
-    } else {
-      return <>{children}</>
-    }
-  }
-
   return (
     <>
       <Head>
@@ -72,16 +41,16 @@ const ProjectLayout: FC<Props> = ({
         {!hideIconBar && <NavigationBar />}
 
         {/* Product menu bar */}
-        {productMenu && !isLoading && (
+        <MenuBarWrapper isLoading={isLoading} productMenu={productMenu}>
           <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-        )}
+        </MenuBarWrapper>
 
         <main
           style={{ maxHeight: '100vh' }}
           className="w-full flex flex-col flex-1 overflow-x-hidden"
         >
           {!hideHeader && <LayoutHeader />}
-          {renderContent()}
+          <ContentWrapper isLoading={isLoading}>{children}</ContentWrapper>
         </main>
       </div>
     </>
@@ -89,3 +58,38 @@ const ProjectLayout: FC<Props> = ({
 }
 
 export default observer(ProjectLayout)
+
+interface MenuBarWrapperProps {
+  isLoading: boolean
+  productMenu?: ReactNode
+}
+
+const MenuBarWrapper: FC<MenuBarWrapperProps> = observer(({ isLoading, productMenu, children }) => {
+  const { ui } = useStore()
+  return <>{!isLoading && productMenu && ui.selectedProject !== undefined ? children : null}</>
+})
+
+interface ContentWrapperProps {
+  isLoading: boolean
+}
+
+const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children }) => {
+  const { ui } = useStore()
+  const router = useRouter()
+  const project = ui.selectedProject
+  const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
+
+  return (
+    <>
+      {isLoading || project === undefined ? (
+        <Connecting />
+      ) : requiresDbConnection ? (
+        <TestConnection project={project!}>
+          <div className="flex flex-col flex-1 overflow-y-auto">{children}</div>
+        </TestConnection>
+      ) : (
+        <>{children}</>
+      )}
+    </>
+  )
+})
