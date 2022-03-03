@@ -88,9 +88,9 @@ function Blog(props: any) {
         <div className="bg-white dark:bg-dark-800 overflow-hidden py-12">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
             <div className="mx-auto ">
-              {props.blogs.slice(0, 1).map((blog: any, idx: any) => {
-                return FeaturedThumb(blog)
-              })}
+              {props.blogs.slice(0, 1).map((blog: any, i: number) => (
+                <FeaturedThumb key={i} {...blog} />
+              ))}
             </div>
           </div>
         </div>
@@ -102,7 +102,7 @@ function Blog(props: any) {
                 <div className="col-span-12 lg:col-span-12">
                   <Tabs scrollable size="medium" onChange={setCategory} defaultActiveId={'all'}>
                     {props.categories.map((categoryId: string) => (
-                      <Tabs.Panel id={categoryId} label={categoryId}>
+                      <Tabs.Panel id={categoryId} key={categoryId} label={categoryId}>
                         {/* <p>{categoryId}</p> */}
                         <></>
                       </Tabs.Panel>
@@ -114,8 +114,11 @@ function Blog(props: any) {
 
             <ol className="grid grid-cols-12 py-16 lg:gap-16">
               {blogs.map((blog: PostTypes, idx: number) => (
-                <div className="col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-4 mb-16">
-                  <BlogListItem blog={blog} key={idx} />
+                <div
+                  className="col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-4 mb-16"
+                  key={idx}
+                >
+                  <BlogListItem blog={blog} />
                 </div>
               ))}
             </ol>

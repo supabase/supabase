@@ -1,7 +1,8 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import { toJS } from 'mobx'
-import { Button, Divider, Dropdown, IconPlus } from '@supabase/ui'
+import { Button, Dropdown, IconPlus } from '@supabase/ui'
+import { observer } from 'mobx-react-lite'
 
 const OrganizationDropdown = ({ organizations }) => {
   const router = useRouter()
@@ -28,7 +29,7 @@ const OrganizationDropdown = ({ organizations }) => {
                 {x.name}
               </Dropdown.Item>
             ))}
-          <Divider light />
+          <Dropdown.Seperator />
           <Dropdown.Item icon={<IconPlus size="tiny" />} onClick={() => router.push(`/new`)}>
             New organization
           </Dropdown.Item>
@@ -39,4 +40,4 @@ const OrganizationDropdown = ({ organizations }) => {
     </Dropdown>
   )
 }
-export default OrganizationDropdown
+export default observer(OrganizationDropdown)

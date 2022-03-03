@@ -1,5 +1,5 @@
-import useSWR, { KeyLoader } from 'swr'
-import React, { useEffect, useRef, useState } from 'react'
+import useSWR from 'swr'
+import React, { useEffect, useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
@@ -11,29 +11,31 @@ import {
   Button,
   IconInfo,
   Card,
+  Loading,
 } from '@supabase/ui'
 
 import { withAuth } from 'hooks'
 import { get } from 'lib/common/fetch'
-import { API_URL, LOG_TYPE_LABEL_MAPPING } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts/'
 import CodeEditor from 'components/ui/CodeEditor'
 import {
   LogPanel,
   LogTable,
+  LogEventChart,
   Count,
   Logs,
   LogTemplate,
   TEMPLATES,
   LogData,
   LogSearchCallback,
+  LOG_TYPE_LABEL_MAPPING,
 } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
-import useSWRInfinite from 'swr/infinite'
+import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite'
 import { isUndefined } from 'lodash'
-import Flag from 'components/ui/Flag/Flag'
-import { useFlag } from 'hooks'
 import dayjs from 'dayjs'
+import InformationBox from 'components/ui/InformationBox'
 
 /**
  * Acts as a container component for the entire log display
@@ -44,15 +46,14 @@ import dayjs from 'dayjs'
  * params used are:
  * - `q` for the editor query.
  * - `s` for search query.
- * - `ts` for timestamp start value.
+ * - `te` for timestamp start value.
  */
 export const LogPage: NextPage = () => {
-  const logsQueryParamsSyncing = useFlag('logsQueryParamsSyncing')
-  const logsCustomSql = useFlag('logsCustomSql')
   const router = useRouter()
   const { ref, type, q, s, te } = router.query
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState('')
+  const [showChart, setShowChart] = useState(true)
   const [mode, setMode] = useState<'simple' | 'custom'>('simple')
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
   const [params, setParams] = useState({
@@ -63,15 +64,16 @@ export const LogPage: NextPage = () => {
     timestamp_start: '',
     timestamp_end: '',
   })
-  const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as string]}`
-  const isSelectQuery = logsCustomSql && editorValue.toLowerCase().includes('select') ? true : false
+  const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as keyof typeof LOG_TYPE_LABEL_MAPPING]}`
+  const checkIfSelectQuery = (value: string) =>
+    value.toLowerCase().includes('select') ? true : false
+  const isSelectQuery = checkIfSelectQuery(editorValue)
 
   useEffect(() => {
     setParams({ ...params, type: type as string })
   }, [type])
 
   useEffect(() => {
-    if (!logsQueryParamsSyncing) return
     // on mount, set initial values
     if (q) {
       onSelectTemplate({
@@ -89,7 +91,7 @@ export const LogPage: NextPage = () => {
     } else {
       setParams((prev) => ({ ...prev, timestamp_end: '' }))
     }
-  }, [logsQueryParamsSyncing])
+  }, [])
 
   const genQueryParams = (params: { [k: string]: string }) => {
     // remove keys which are empty strings, null, or undefined
@@ -103,7 +105,7 @@ export const LogPage: NextPage = () => {
     return qs
   }
   // handle log fetching
-  const getKeyLogs: KeyLoader<Logs> = (_pageIndex: number, prevPageData) => {
+  const getKeyLogs: SWRInfiniteKeyLoader = (_pageIndex: number, prevPageData) => {
     let queryParams
     // if prev page data is 100 items, could possibly have more records that are not yet fetched within this interval
     if (prevPageData === null) {
@@ -179,8 +181,12 @@ export const LogPage: NextPage = () => {
       setEditorValue(template.searchString)
       setParams((prev) => ({
         ...prev,
-        where: isSelectQuery ? '' : template.searchString,
-        sql: isSelectQuery ? template.searchString : '',
+        where: checkIfSelectQuery(template.searchString)
+          ? ''
+          : cleanEditorValue(template.searchString),
+        sql: checkIfSelectQuery(template.searchString)
+          ? cleanEditorValue(template.searchString)
+          : '',
         search_query: '',
         timestamp_end: '',
       }))
@@ -190,11 +196,10 @@ export const LogPage: NextPage = () => {
   const handleEditorSubmit = () => {
     setParams((prev) => ({
       ...prev,
-      where: isSelectQuery ? '' : editorValue,
-      sql: isSelectQuery ? editorValue : '',
+      where: isSelectQuery ? '' : cleanEditorValue(editorValue),
+      sql: isSelectQuery ? cleanEditorValue(editorValue) : '',
       search_query: '',
     }))
-    if (!logsQueryParamsSyncing) return
     router.push({
       pathname: router.pathname,
       query: {
@@ -205,16 +210,15 @@ export const LogPage: NextPage = () => {
       },
     })
   }
-  const handleSearch: LogSearchCallback = ({ query, from }) => {
-    const unixMicro = dayjs(from).valueOf() * 1000
+  const handleSearch: LogSearchCallback = ({ query, from, fromMicro }) => {
+    const unixMicro = fromMicro ? fromMicro : dayjs(from).valueOf() * 1000
     setParams((prev) => ({
       ...prev,
       search_query: query || '',
-      timestamp_end: from ? String(unixMicro) : '',
+      timestamp_end: unixMicro ? String(unixMicro) : '',
       where: '',
       sql: '',
     }))
-    if (!logsQueryParamsSyncing) return
     router.push({
       pathname: router.pathname,
       query: {
@@ -226,15 +230,20 @@ export const LogPage: NextPage = () => {
     })
     setEditorValue('')
   }
-
+  const cleanEditorValue = (value: string) => {
+    if (typeof value !== 'string') return value
+    return value.replace(/\n/g, ' ')
+  }
   return (
     <SettingsLayout title={title}>
       <div className="h-full flex flex-col flex-grow">
         <LogPanel
+          isShowingEventChart={showChart}
+          onToggleEventChart={() => setShowChart(!showChart)}
           isCustomQuery={mode === 'custom'}
           isLoading={isValidating}
           newCount={newCount}
-          templates={TEMPLATES}
+          templates={TEMPLATES.filter((template) => template.for?.includes(type as string))}
           onRefresh={handleRefresh}
           onSearch={handleSearch}
           defaultSearchValue={params.search_query}
@@ -255,19 +264,18 @@ export const LogPage: NextPage = () => {
                 onInputRun={handleRefresh}
               />
             </div>
-            <div className="flex flex-row justify-end p-2 w-full">
-              <Flag name="logsCustomSql">
-                {isSelectQuery && (
-                  <div className="flex flex-grow flex-row items-center gap-x-1">
-                    {/* // we don't have a slim Alert component yet */}
-                    <IconInfo size="tiny" />
-                    <Typography.Text small={true} type="secondary">
-                      Custom queries are restricted to a {type === 'database' ? '2 hour' : '7 day'}{' '}
-                      querying window.
-                    </Typography.Text>
-                  </div>
-                )}
-              </Flag>
+            <div className="flex flex-row justify-end items-center px-2 py-1 w-full">
+              {isSelectQuery && (
+                <InformationBox
+                  className="shrink mr-auto"
+                  block={false}
+                  size="tiny"
+                  icon={<IconInfo size="tiny" />}
+                  title={`Custom queries are restricted to a ${
+                    type === 'database' ? '2 hour' : '7 day'
+                  } querying window.`}
+                />
+              )}
               <div className="flex flex-row gap-x-2 justify-end p-2">
                 {editorValue && (
                   <Button
@@ -287,17 +295,38 @@ export const LogPage: NextPage = () => {
             </div>
           </React.Fragment>
         )}
+        {showChart && mode !== 'custom' && (
+          <div>
+            <LogEventChart
+              data={!isValidating ? logData : undefined}
+              onBarClick={(timestampMicro) => {
+                handleSearch({ query: params.search_query, fromMicro: timestampMicro })
+              }}
+            />
+          </div>
+        )}
         <div className="flex flex-col flex-grow relative">
           {isValidating && (
             <div
               className={[
-                'absolute top-0 w-full h-full bg-gray-800 flex items-center justify-center',
-                `${isValidating ? 'bg-opacity-75 z-50' : ''}`,
+                'absolute top-0 w-full h-full flex items-center justify-center',
+                'bg-gray-100 opacity-75 z-50',
               ].join(' ')}
             >
               <IconLoader className="animate-spin" />
             </div>
           )}
+
+          <LogTable data={logData} isCustomQuery={mode === 'custom'} />
+          {/* Footer section of log ui, appears below table */}
+          <div className="p-2">
+            {!isSelectQuery && (
+              <Button onClick={() => setSize(size + 1)} icon={<IconRewind />} type="default">
+                Load older
+              </Button>
+            )}
+          </div>
+
           {error && (
             <div className="flex w-full h-full justify-center items-center mx-auto">
               <Card className="flex flex-col gap-y-2  w-1/3">
@@ -318,20 +347,6 @@ export const LogPage: NextPage = () => {
               </Card>
             </div>
           )}
-          <LogTable data={logData} isCustomQuery={mode === 'custom'} />
-          {/* Footer section of log ui, appears below table */}
-          <div className="p-2">
-            {!isSelectQuery && (
-              <Button
-                // trigger page increase
-                onClick={() => setSize(size + 1)}
-                icon={<IconRewind />}
-                type="secondary"
-              >
-                Load older
-              </Button>
-            )}
-          </div>
         </div>
       </div>
     </SettingsLayout>

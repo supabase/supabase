@@ -96,7 +96,7 @@ CREATE POLICY anon_read_leaderboard ON leaderboard
 ```sql
 -- Gets the User Role from the request cookie
 create or replace function auth.role() returns text as $$
-  select nullif(current_setting('request.jwt.claim.role', true), '')::text;
+  select nullif(current_setting('request.jwt.claims', true)::json->>'role', '')::text;
 $$ language sql stable;
 ```
 

@@ -1,7 +1,7 @@
 import LogPanel from 'components/interfaces/Settings/Logs/LogPanel'
 import { render, waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { clickDropdown } from 'tests/helpers'
+import { getToggleByText } from 'tests/helpers'
 
 jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'
@@ -31,6 +31,16 @@ test('custom mode', async () => {
     expect(() => screen.getByPlaceholderText(/Search/)).toThrow()
   })
 })
+
+test('toggle event chart', async () => {
+  const mockFn = jest.fn()
+  const { rerender } = render(<LogPanel onToggleEventChart={mockFn} isShowingEventChart={true} />)
+  const toggle = getToggleByText(/Show event chart/)
+  userEvent.click(toggle)
+  expect(mockFn).toBeCalled()
+  rerender(<LogPanel isShowingEventChart={false} />)
+})
+
 test('filter input change and submit', async () => {
   const mockFn = jest.fn()
   render(<LogPanel onSearch={mockFn} />)
@@ -74,7 +84,6 @@ test('timestamp from filter default value', async () => {
   await screen.findByDisplayValue('2022-01-18T10:43:39+0000')
   // TODO: use screen.findByLabelText when https://github.com/supabase/ui/issues/310 is resolved
   await screen.findByText('From')
-  await screen.findByTitle('Reset')
 })
 
 test('timestamp from filter error handling', async () => {

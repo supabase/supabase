@@ -7,9 +7,7 @@ import { SettingsLayout } from 'components/layouts'
 const Settings: NextPage = () => {
   return (
     <SettingsLayout>
-      <div className="p-5">
-        <h1>Settings</h1>
-      </div>
+      <>{/* <h1>Use this as a page template for settings pages</h1> */}</>
     </SettingsLayout>
   )
 }

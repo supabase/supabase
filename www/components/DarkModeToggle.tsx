@@ -1,9 +1,4 @@
-import { useRouter } from 'next/router'
-
-interface Props {
-  darkMode: boolean
-  updateTheme: Function
-}
+import { useTheme } from '~/components/Providers'
 
 const SunEmoji = () => (
   <svg width="32" height="32" fill="none">
@@ -44,12 +39,15 @@ const MoonEmoji = () => (
   </svg>
 )
 
-function DarkModeToggle(props: Props) {
-  const { darkMode, updateTheme } = props
+function DarkModeToggle() {
+  const { isDarkMode, toggleTheme } = useTheme()
 
   const toggleDarkMode = () => {
-    localStorage.setItem('supabaseDarkMode', (!darkMode).toString())
-    updateTheme(!darkMode)
+    localStorage.setItem('supabaseDarkMode', (!isDarkMode).toString())
+    toggleTheme()
+
+    const key = localStorage.getItem('supabaseDarkMode')
+    document.documentElement.className = key === 'true' ? 'dark' : ''
   }
 
   return (
@@ -61,7 +59,7 @@ function DarkModeToggle(props: Props) {
         className={`
                 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer 
                 transition-colors ease-in-out duration-200 focus:outline-none ${
-                  darkMode ? 'bg-dark-500' : 'bg-gray-200'
+                  isDarkMode ? 'bg-dark-500' : 'bg-gray-200'
                 } mx-5
               `}
         onClick={() => toggleDarkMode()}
@@ -70,7 +68,9 @@ function DarkModeToggle(props: Props) {
         <span
           aria-hidden="true"
           className={`
-                  ${darkMode ? 'translate-x-5' : 'translate-x-0'} inline-block h-5 w-5 rounded-full
+                  ${
+                    isDarkMode ? 'translate-x-5' : 'translate-x-0'
+                  } inline-block h-5 w-5 rounded-full
                   bg-white dark:bg-dark-700 shadow-lg transform ring-0 transition ease-in-out duration-200
                 `}
         />
@@ -79,4 +79,5 @@ function DarkModeToggle(props: Props) {
     </div>
   )
 }
+
 export default DarkModeToggle

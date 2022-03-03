@@ -6,7 +6,7 @@ import { observer, useLocalObservable } from 'mobx-react-lite'
 import { withAuth, useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import ConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModalV2'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import PolicyTableRow from 'components/to-be-cleaned/Auth/PolicyTableRow'
 import PolicyEditorModal from 'components/to-be-cleaned/Auth/PolicyEditorModal'
 
@@ -86,7 +86,7 @@ const AuthPolicies = observer(() => {
         <div className="flex justify-between items-center">
           <div>
             <Input
-              size="tiny"
+              size="small"
               placeholder="Filter tables"
               className="block w-full text-sm placeholder-gray-400"
               value={PageState.policiesFilter}

@@ -15,17 +15,11 @@ const GetStartedPanel: FC<Props> = ({}) => {
         <div>
           <div className="flex flex-col justify-between h-full space-y-6">
             <div className="space-y-2">
-              <Typography.Title level={4} className="m-0">
-                Welcome to your new project
-              </Typography.Title>
-              <div className="lg:max-w-lg">
-                <Typography.Text className="block" type="secondary">
-                  <p>
-                    Your project has been deployed on its own instance, with its own url and API all
-                    set up and ready to use.
-                  </p>
-                </Typography.Text>
-              </div>
+              <h3 className="text-xl text-scale-1200">Welcome to your new project</h3>
+              <p className="lg:max-w-lg text-base text-scale-1000">
+                Your project has been deployed on its own instance, with its own url and API all set
+                up and ready to use.
+              </p>
             </div>
           </div>
         </div>
@@ -34,17 +28,15 @@ const GetStartedPanel: FC<Props> = ({}) => {
           <Panel>
             <Panel.Content className=" flex flex-col space-y-4 lg:h-40">
               <div className="flex items-center space-x-3">
-                <Typography.Text>
-                  <IconDatabase size="medium" />
-                </Typography.Text>
-                <Typography.Title level={5} className="mb-0">
-                  Database
-                </Typography.Title>
+                <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                  <IconDatabase strokeWidth={2} size={16} />
+                </div>
+                <h5>Database</h5>
               </div>
               <div className="flex flex-grow">
-                <Typography.Text type="secondary" className="opacity-50">
+                <p className="text-scale-1000 text-sm">
                   Supabase is built on top of Postgres, an extremely scalable Relational Database.
-                </Typography.Text>
+                </p>
               </div>
               <div className="space-x-2">
                 <Link href={`/project/${ref}/editor`}>
@@ -67,17 +59,15 @@ const GetStartedPanel: FC<Props> = ({}) => {
           <Panel className="">
             <Panel.Content className=" flex flex-col space-y-4 lg:h-40">
               <div className="flex items-center space-x-3">
-                <Typography.Text>
-                  <IconKey size="medium" />
-                </Typography.Text>
-                <Typography.Title level={5} className="mb-0">
-                  Auth
-                </Typography.Title>
+                <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                  <IconKey strokeWidth={2} size={16} />
+                </div>
+                <h5>Auth</h5>
               </div>
               <div className="flex flex-grow">
-                <Typography.Text type="secondary" className="opacity-50">
+                <p className="text-scale-1000 text-sm">
                   Supabase makes it simple to manage your users.
-                </Typography.Text>
+                </p>
               </div>
               <div className="space-x-2">
                 <Link href={`/project/${ref}/auth/users`}>
@@ -95,17 +85,15 @@ const GetStartedPanel: FC<Props> = ({}) => {
           <Panel>
             <Panel.Content className=" flex flex-col space-y-4 lg:h-40">
               <div className="flex items-center space-x-3">
-                <Typography.Text>
-                  <IconArchive size="medium" />
-                </Typography.Text>
-                <Typography.Title level={5} className="mb-0">
-                  Storage
-                </Typography.Title>
+                <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                  <IconArchive strokeWidth={2} size={16} />
+                </div>
+                <h5>Storage</h5>
               </div>
               <div className="flex flex-grow">
-                <Typography.Text type="secondary" className="opacity-50">
+                <p className="text-scale-1000 text-sm">
                   Store and serve large files from multiple buckets.
-                </Typography.Text>
+                </p>
               </div>
               <div className="space-x-2">
                 <Link href={`/project/${ref}/storage/buckets`}>

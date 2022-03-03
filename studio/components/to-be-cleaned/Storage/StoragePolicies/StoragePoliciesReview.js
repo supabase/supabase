@@ -1,4 +1,4 @@
-import { Button, Typography } from '@supabase/ui'
+import { Button, Typography, Modal } from '@supabase/ui'
 import { useState } from 'react'
 import SqlEditor from 'components/to-be-cleaned/SqlEditor'
 
@@ -22,33 +22,36 @@ const StoragePoliciesReview = ({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="px-6 space-y-8 flex items-center justify-between space-x-4">
-        <div className="flex flex-col">
-          <Typography.Text>
-            These are the SQL statements that will be used to create your policies. The suffix
-            appended to the end of your policy name (
-            <Typography.Text code>[hashString]_[number]</Typography.Text>) just functions as a
-            unique identifier for each of your policies.
-          </Typography.Text>
-        </div>
-      </div>
-      <div className="px-6 space-y-4 overflow-y-auto" style={{ maxHeight: '25rem' }}>
-        {policyStatements.length === 0 && <ReviewEmptyState />}
-        {policyStatements.map((policy, idx) => {
-          let formattedSQLStatement = policy.statement || ''
-          return (
-            <div key={`policy_${idx}`} className="space-y-2">
-              <Typography.Text>{policy.description}</Typography.Text>
-              <div className="h-40">
-                <SqlEditor readOnly defaultValue={formattedSQLStatement} />
-              </div>
+    <>
+      <Modal.Content>
+        <div className="space-y-6 py-8">
+          <div className="space-y-8 flex items-center justify-between space-x-4">
+            <div className="flex flex-col">
+              <p className="text-sm text-scale-1100">
+                These are the SQL statements that will be used to create your policies. The suffix
+                appended to the end of your policy name (<code>[hashString]_[number]</code>) just
+                functions as a unique identifier for each of your policies.
+              </p>
             </div>
-          )
-        })}
-      </div>
-      <div className="px-6 py-3 w-full flex justify-end items-center space-x-4 border-t dark:border-dark">
-        <Button type="secondary" onClick={onSelectBack}>
+          </div>
+          <div className="space-y-4 overflow-y-auto" style={{ maxHeight: '25rem' }}>
+            {policyStatements.length === 0 && <ReviewEmptyState />}
+            {policyStatements.map((policy, idx) => {
+              let formattedSQLStatement = policy.statement || ''
+              return (
+                <div key={`policy_${idx}`} className="space-y-2">
+                  <span>{policy.description}</span>
+                  <div className="h-40">
+                    <SqlEditor readOnly defaultValue={formattedSQLStatement} />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </Modal.Content>
+      <div className="px-6 py-4 w-full flex justify-end items-center gap-2 border-t dark:border-dark">
+        <Button type="default" onClick={onSelectBack}>
           Back to edit
         </Button>
         {policyStatements.length > 0 && (
@@ -57,7 +60,7 @@ const StoragePoliciesReview = ({
           </Button>
         )}
       </div>
-    </div>
+    </>
   )
 }
 

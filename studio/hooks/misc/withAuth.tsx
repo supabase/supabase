@@ -42,11 +42,14 @@ export function withAuth(
         if (!profile) {
           ui.setProfile(undefined)
         } else if (returning !== 'minimal') {
-          const { organizations, ...userProfile } = profile
-          const projects: Project[] = flatten(organizations?.map((org: any) => org.projects))
-          app.organizations.initialDataArray(organizations)
-          app.projects.initialDataArray(projects)
-          ui.setProfile(userProfile)
+          ui.setProfile(profile)
+
+          if (!app.organizations.isInitialized) {
+            app.organizations.load()
+          }
+          if (!app.projects.isInitialized) {
+            app.projects.load()
+          }
         }
       }
 

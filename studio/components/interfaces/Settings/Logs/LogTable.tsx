@@ -45,7 +45,7 @@ const LogTable = ({ isCustomQuery, data = [] }: Props) => {
           className={[
             'block whitespace-wrap font-mono',
             `${hasLogDataFormat && row.id === focusedLog?.id ? 'font-bold' : ''}`,
-            `${hasLogDataFormat && v === 'timestamp' ? 'text-green-500' : ''}`,
+            `${hasLogDataFormat && v === 'timestamp' ? 'text-green-900' : ''}`,
           ].join(' ')}
         >
           {value}

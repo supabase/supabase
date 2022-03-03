@@ -4,7 +4,7 @@ import { FC, useState, useEffect } from 'react'
 interface Props {
   visible: boolean
   danger?: boolean
-  title: string
+  header: string
   description?: string
   size?: 'small' | 'tiny' | 'medium' | 'large'
   buttonLabel: string
@@ -17,7 +17,7 @@ interface Props {
 const ConfirmationModal: FC<Props> = ({
   visible = false,
   danger = false,
-  title = '',
+  header = '',
   description = '',
   size = 'small',
   buttonLabel = '',
@@ -43,7 +43,7 @@ const ConfirmationModal: FC<Props> = ({
     <Modal
       layout="vertical"
       visible={visible}
-      title={title}
+      header={header}
       description={description}
       size={size}
       onCancel={onSelectCancel}
