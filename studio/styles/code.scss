@@ -16,13 +16,13 @@
 
   .token.imports,
   .token.property-access {
-    @apply text-blueGray-500 dark:text-blueGray-300 #{!important};
+    @apply text-scale-900 #{!important};
   }
 
   .token.keyword.module,
   .token.function {
     font-style: normal !important;
-    @apply text-gray-600 dark:text-gray-300 #{!important};
+    @apply text-scale-900 #{!important};
   }
 
   .token.plain,
@@ -35,37 +35,37 @@
   .token.doc-comment.parameter.punctuation,
   .token.doc-comment.optional-parameter.punctuation {
     font-style: normal !important;
-    @apply text-gray-600 dark:text-gray-300 #{!important};
+    @apply text-scale-1100 #{!important};
   }
 
   .token.keyword,
   .token.doc-comment.keyword {
     font-style: normal !important;
-    @apply text-blue-600 dark:text-blue-300 #{!important};
+    @apply text-blue-900 #{!important};
   }
 
   .token.string {
     font-style: normal !important;
-    @apply text-green-500 #{!important};
+    @apply text-brand-900 #{!important};
   }
 
   .token.constant {
     font-style: normal !important;
-    @apply text-blue-600 dark:text-blue-300 #{!important};
+    @apply text-blue-900 #{!important};
   }
 
   .token.comment {
     font-style: normal !important;
-    @apply text-gray-300 dark:text-gray-400 #{!important};
+    @apply text-scale-900 #{!important};
   }
 
   .token.number {
-    @apply text-green-600 dark:text-green-200 #{!important};
+    @apply text-brand-900 #{!important};
   }
 
   .token.boolean,
   .token.doc-comment.class-name {
-    @apply text-green-500 dark:text-green-500;
+    @apply text-brand-900;
   }
 
   .codeBlock {
@@ -131,7 +131,7 @@
   }
 
   .code-header {
-    @apply bg-gray-600;
+    // @apply bg-gray-600;
     color: #ccc;
     padding: 5px 15px;
     border-radius: 4px 4px 0 0;

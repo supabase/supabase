@@ -27,15 +27,17 @@ const TableEditorLayout: FC<Props> = ({
   onDuplicateTable = () => {},
   children,
 }) => {
-  const { meta } = useStore()
+  const { meta, ui } = useStore()
   const { isInitialized, isLoading, error } = meta.tables
 
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
   useEffect(() => {
-    meta.schemas.load()
-    meta.tables.load()
-  }, [])
+    if (ui.selectedProject) {
+      meta.schemas.load()
+      meta.tables.load()
+    }
+  }, [ui.selectedProject])
 
   useEffect(() => {
     let cancel = false

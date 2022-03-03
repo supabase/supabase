@@ -31,7 +31,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       rootStore.ui.setNotification({
         category: 'error',
         message:
-          'Please verify your email on Github first, then reach out to us at support@supabase.io to log into the dashboard',
+          'Please verify your email on GitHub first, then reach out to us at support@supabase.io to log into the dashboard',
       })
     }
   }, [])

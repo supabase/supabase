@@ -81,39 +81,37 @@ const ImageGrid = ({
         }
 
         return (
-          <>
-            <Container link={x.link}>
-              <div
-                key={`${x.name}-${i}`}
-                className={`
+          <Container link={x.link} key={i}>
+            <div
+              key={`${x.name}-${i}`}
+              className={`
                   col-span-1 flex items-center justify-center 
                 bg-gray-50 
                 dark:bg-gray-700
                   ${x.link && 'hover:bg-gray-100 dark:hover:bg-gray-600'}
                   p-8 ${className}`}
-              >
-                <div
-                  className={`relative overflow-auto w-full h-8
+            >
+              <div
+                className={`relative overflow-auto w-full h-8
                     ${imgPadding[padding]}
                   `}
-                >
-                  <Image
-                    layout="fill"
-                    src={`${x.image}`}
-                    alt={x.alt}
-                    objectFit="scale-down"
-                    objectPosition="center"
-                    className="
+              >
+                <Image
+                  layout="fill"
+                  src={`${x.image}`}
+                  alt={x.alt}
+                  objectFit="scale-down"
+                  objectPosition="center"
+                  className="
                       bg-no-repeat
                     filter 
                     contrast-0
                     opacity-50
                   "
-                  />
-                </div>
+                />
               </div>
-            </Container>
-          </>
+            </div>
+          </Container>
         )
       })}
     </div>

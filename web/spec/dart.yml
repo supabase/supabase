@@ -152,7 +152,7 @@ pages:
       Creates a new user.
     notes: |
       - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
-      - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
+      - If "Email Confirmations" is turned on, both a `user` and a `session` will be null
       - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
       - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
     examples:
@@ -370,6 +370,7 @@ pages:
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
       - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
+      - If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
     examples:
       - name: Getting your data
         isSpotlight: true
@@ -429,8 +430,8 @@ pages:
         description: |
           If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted 
           to select all rows in a `message` table which belong to a user with the `username` "Jane":
-        js: |
-          ```js
+        dart: |
+          ```dart
           final res = await supabase
             .from('messages')
             .select('*, users!inner(*)')
@@ -515,8 +516,7 @@ pages:
       Performs an UPDATE on the table.
     title: 'Modify data: update()'
     notes: |
-      TODO update the link to dart
-      - `update()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to update.
+      - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
     examples:
       - name: Updating your data
         isSpotlight: true
@@ -598,8 +598,7 @@ pages:
       Performs a DELETE on the table.
     title: 'Delete data: delete()'
     notes: |
-      TODO update link to dart
-      - `delete()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
+      - `delete()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to delete.
     examples:
       - name: Delete records
         isSpotlight: true

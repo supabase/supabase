@@ -90,6 +90,15 @@ const authProviders = [
     selfHosted: true,
   },
   {
+    name: 'LinkedIn',
+    // logo: '/img/libraries/dart-icon.svg',
+    href: '/docs/guides/auth/auth-linkedin',
+    official: true,
+    supporter: 'Supabase',
+    platform: true,
+    selfHosted: true,
+  },
+  {
     name: 'MessageBird',
     // logo: '/img/libraries/dart-icon.svg',
     href: '/docs/guides/auth/auth-messagebird',

@@ -19,6 +19,10 @@ const site_title = `${APP_NAME} | We are now in Beta`
 // Dark text: text-dark-400
 // Light text: text-dark-300
 
+type Props = {
+  darkMode: boolean
+}
+
 const NavFlyOutMenu = (props: any) => {
   const { scrollTo } = props
   const segments = IntroductionSegments.map((segment: any) => segment.chapters)
@@ -99,19 +103,22 @@ const SectionHeader = (props: any) => {
   )
 }
 
-const Hero = () => {
+const Hero = (props: Props) => {
   const { basePath } = useRouter()
+  const { darkMode } = props
   return (
     <div
       style={{
-        backgroundImage: `url('${basePath}/images/beta-hero.png')`,
+        backgroundImage: darkMode
+          ? `url('${basePath}/images/beta-hero.png')`
+          : `url('${basePath}/images/beta-hero-light.png')`,
         backgroundSize: '65%',
         backgroundPosition: '120% 50%',
       }}
-      className="py-16 lg:py-36 bg-dark-800 bg-no-repeat"
+      className="py-16 lg:py-36 bg-gray-50 dark:bg-dark-800 bg-no-repeat"
     >
       <div className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300">
-        <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-white">
+        <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-dark-400 dark:text-white">
           <p className="mb-10 text-4xl">Supabase is an open source Firebase alternative.</p>
           <p className="text-2xl">
             Today, we're moving to <span className="text-brand-700">Beta</span>
@@ -127,11 +134,11 @@ const Hero = () => {
 
 const Introduction = () => {
   return (
-    <div className="bg-dark-900">
+    <div className="bg-white dark:bg-dark-900">
       <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-dark-300">
         <div className="col-span-12 sm:col-span-9 xl:col-span-8">
           <p>
-            <span className="text-2xl block text-white">
+            <span className="text-2xl block text-black">
               After the launch of our{' '}
               <a
                 href="https://news.ycombinator.com/item?id=23319901"
@@ -144,7 +151,7 @@ const Introduction = () => {
             </span>
           </p>
         </div>
-        <div className="col-span-12 sm:col-span-9 xl:col-span-6 text-base mb-20">
+        <div className="col-span-12 sm:col-span-9 xl:col-span-6 text-base mb-20 text-dark-400">
           <p>
             we've been fortunate to work with thousands of early adopters on improving both our Open
             Source, and Hosted offerings. Companies like{' '}
@@ -176,7 +183,7 @@ const Introduction = () => {
         </div>
 
         <div className="col-span-12 text-base mb-10">
-          <p className="w-60 pb-2 border-b-2 border-dark-200 dark:border-dark-400">
+          <p className="w-60 pb-2 border-b-2 border-dark-200 text-dark-400 dark:border-dark-400">
             Alpha Program in Numbers
           </p>
         </div>
@@ -195,7 +202,7 @@ const Introduction = () => {
                   {stat.icon}
                 </div>
               </div>
-              <div className="col-span-7 sm-col-span-8 md:col-span-9 xl:col-span-10">
+              <div className="col-span-7 sm-col-span-8 md:col-span-9 xl:col-span-10 text-dark-400">
                 <p className="text-5xl lg:text-6xl">
                   <CountUp triggerAnimOnScroll={true} referenceElId="alphaNumbers">
                     {stat.value}
@@ -441,7 +448,7 @@ const Security = () => {
               <li className="mb-5">
                 Published a disclosure policy so that ethical hackers can help us find
                 vulnerabilities in our systems. We've received reports from this initiative already,
-                and we'll continue to formalise our bounty program throughout the Beta.
+                and we'll continue to formalize our bounty program throughout the Beta.
               </li>
               <li className="mb-5">
                 We now run an ongoing internal Capture the Flag competition, where team members are
@@ -936,9 +943,10 @@ const WhatsNext = () => (
   </div>
 )
 
-const Beta = () => {
+const Beta = (props: Props) => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
   const { basePath } = useRouter()
+  const { darkMode } = props
 
   const references: any = {
     performance: useRef<HTMLDivElement>(null),
@@ -1010,7 +1018,7 @@ const Beta = () => {
             <NavFlyOutMenu scrollTo={scrollTo} />
           </FlyOut>
         </div>
-        <Hero />
+        <Hero darkMode={darkMode} />
         <Introduction />
         <TableOfContents scrollTo={scrollTo} />
         <div ref={references['performance']}>

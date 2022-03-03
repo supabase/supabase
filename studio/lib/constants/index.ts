@@ -11,17 +11,6 @@ export const PG_META_URL = IS_PLATFORM
 
 export const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ssZ'
 
-// Data types primarily for mapping icon in editor
-
-export const NUMERICAL_TYPES = ['int2', 'int4', 'int8', 'float4', 'float8']
-export const JSON_TYPES = ['json', 'jsonb']
-export const TEXT_TYPES = ['text', 'varchar']
-export const TIMESTAMP_TYPES = ['date', 'time', 'timestamp', 'timetz', 'timestamptz']
-export const OTHER_DATA_TYPES = ['uuid', 'bool']
-export const POSTGRES_DATA_TYPES = sortBy(
-  concat(NUMERICAL_TYPES, JSON_TYPES, TEXT_TYPES, TIMESTAMP_TYPES, OTHER_DATA_TYPES)
-)
-
 // Keyboard Shortcuts Related
 export const SHORTCUT_KEYS = {
   VIEW_ALL_SHORTCUTS: 'VIEW_ALL_SHORTCUTS',
@@ -86,14 +75,6 @@ export const POLICY_MODAL_VIEWS = {
   TEMPLATES: 'TEMPLATES',
   EDITOR: 'EDITOR',
   REVIEW: 'REVIEW',
-}
-
-export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
-  rest: 'API',
-  realtime: 'Realtime',
-  auth: 'Auth',
-  storage: 'Storage',
-  database: 'Database',
 }
 
 export const GOTRUE_ERRORS = {

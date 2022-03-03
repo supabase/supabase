@@ -127,9 +127,7 @@ const TriggersList: FC<any> = observer(
       return (
         <>
           {schemas.length === 0 ? (
-            <Typography.Text className="px-6 py-4">
-              Checking if hooks are enabled...
-            </Typography.Text>
+            <span className="text-scale-1100 px-6 py-4">Checking if hooks are enabled...</span>
           ) : (
             <ProductEmptyState
               title="Hooks"
@@ -137,7 +135,7 @@ const TriggersList: FC<any> = observer(
               onClickCta={() => enableHooks()}
             >
               <AlphaPreview />
-              <Typography.Text type="secondary">Enable hooks on your project.</Typography.Text>
+              <p className="text-sm text-scale-1100">Enable hooks on your project.</p>
             </ProductEmptyState>
           )}
         </>
@@ -168,14 +166,14 @@ const TriggersList: FC<any> = observer(
           <div className="flex h-full w-full items-center justify-center">
             <ProductEmptyState
               title="Function Hooks"
-              ctaButtonLabel="Create a Function Hook"
+              ctaButtonLabel="Create Function Hook"
               onClickCta={() => createHook()}
             >
               <AlphaPreview />
-              <Typography.Text type="secondary">
+              <p className="text-sm text-scale-1100">
                 Function Hooks can be used to trigger serverless functions or send requests to an
                 HTTP endpoint.
-              </Typography.Text>
+              </p>
             </ProductEmptyState>
           </div>
         ) : (
@@ -183,7 +181,7 @@ const TriggersList: FC<any> = observer(
             <div className="flex justify-between items-center px-6">
               <Input
                 placeholder="Filter by name"
-                size="tiny"
+                size="small"
                 icon={<IconSearch size="tiny" />}
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
@@ -225,7 +223,7 @@ const SchemaTable: FC<SchemaTableProps> = observer(
   ({ schema, filterString, editHook = () => {}, deleteHook = () => {} }) => {
     return (
       <div key={schema} className="">
-        <div className="z-10 sticky top-0 backdrop-filter backdrop-blur">
+        <div className="sticky top-0 backdrop-filter backdrop-blur">
           <div className="flex space-x-1 items-baseline py-2 px-6">
             <Typography.Title level={5} className="opacity-50">
               schema

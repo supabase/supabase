@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, Typography } from '@supabase/ui'
+import { Badge, IconUser, Typography } from '@supabase/ui'
 import Table from 'components/to-be-cleaned/Table'
 
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
@@ -16,20 +16,22 @@ const UserListItem: FC<Props> = ({ user }) => {
   return (
     <Table.tr key={user.id}>
       <Table.td className="whitespace-nowrap">
-        <Typography.Text>{!user.email ? '-' : user.email}</Typography.Text>
+        <div className="flex items-center gap-2">
+          <span className="text-scale-1200">{!user.email ? '-' : user.email}</span>
+        </div>
       </Table.td>
       <Table.td className="whitespace-nowrap">
-        <Typography.Text>{!user.phone ? '-' : user.phone}</Typography.Text>
+        <span className="text-scale-1200">{!user.phone ? '-' : user.phone}</span>
       </Table.td>
       <Table.td className="hidden 2xl:table-cell">
-        <Typography.Text type="secondary" className="capitalize">
+        <span className="text-scale-1200 capitalize">
           {user?.raw_app_meta_data?.provider || user?.app_metadata?.provider}
-        </Typography.Text>
+        </span>
       </Table.td>
       <Table.td className="hidden 2xl:table-cell">
-        <Typography.Text type="secondary" small>
+        <span className="text-scale-1200">
           {dayjs(user.created_at).format('DD MMM, YYYY HH:mm')}
-        </Typography.Text>
+        </span>
       </Table.td>
       <Table.td className="hidden xl:table-cell">
         {!isUserConfirmed ? (

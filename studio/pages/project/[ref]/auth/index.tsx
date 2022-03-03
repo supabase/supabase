@@ -7,9 +7,7 @@ import { AuthLayout } from 'components/layouts'
 const Authentication: NextPage = () => {
   return (
     <AuthLayout title="Authentication">
-      <>
-        <h1>Use this as a template for authentication pages</h1>
-      </>
+      <>{/* <h1>Use this as a template for authentication pages</h1> */}</>
     </AuthLayout>
   )
 }

@@ -7,7 +7,7 @@ import { useRef, useState, useEffect } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { Button, Typography, Listbox, IconUsers, IconAlertCircle } from '@supabase/ui'
+import { Button, Listbox, IconUsers, IconAlertCircle, Input, IconLoader } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
@@ -25,11 +25,11 @@ import { useStore, withAuth } from 'hooks'
 import { WizardLayout } from 'components/layouts'
 import { getURL } from 'lib/helpers'
 
-import FormField from 'components/to-be-cleaned/forms/FormField'
 import Panel from 'components/to-be-cleaned/Panel'
 import InformationBox from 'components/ui/InformationBox'
 import { passwordStrength } from 'lib/helpers'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { useSubscriptionStats } from 'hooks'
 
 interface StripeCustomer {
   paymentMethods: any
@@ -60,6 +60,8 @@ export const Wizard = observer(() => {
   const { slug } = router.query
   const { app, ui } = useStore()
 
+  const subscriptionStats = useSubscriptionStats()
+
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
@@ -74,10 +76,11 @@ export const Wizard = observer(() => {
   const currentOrg = organizations.find((o: any) => o.slug === slug)
   const stripeCustomerId = currentOrg?.stripe_customer_id
 
-  const totalFreeProjects = ui.profile?.total_free_projects ?? 0
+  const totalFreeProjects = subscriptionStats.total_free_projects
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
 
-  const isEmptyOrganizations = organizations.length <= 0
+  const isOrganizationOwner = currentOrg?.is_owner || !app.organizations.isInitialized
+  const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
   const isEmptyPaymentMethod = stripeCustomer
     ? stripeCustomer.paymentMethods?.data?.length <= 0
     : undefined
@@ -86,7 +89,10 @@ export const Wizard = observer(() => {
   const isSelectFreeTier = dbPricingPlan === PRICING_PLANS.FREE
 
   const canCreateProject =
-    currentOrg?.is_owner && (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
+    currentOrg?.is_owner &&
+    !subscriptionStats.isError &&
+    !subscriptionStats.isLoading &&
+    (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
 
   const canSubmit =
     projectName != '' &&
@@ -94,11 +100,6 @@ export const Wizard = observer(() => {
     dbRegion != '' &&
     dbPricingPlan != '' &&
     (isSelectFreeTier || (!isSelectFreeTier && !isEmptyPaymentMethod))
-
-  const passwordErrorMessage =
-    dbPass != '' && passwordStrengthScore < DEFAULT_MINIMUM_PASSWORD_STRENGTH
-      ? 'You need a stronger password'
-      : undefined
 
   const delayedCheckPasswordStrength = useRef(
     debounce((value) => checkPasswordStrength(value), 300)
@@ -147,8 +148,8 @@ export const Wizard = observer(() => {
     } else delayedCheckPasswordStrength(value)
   }
 
-  function onDbRegionChange(e: any) {
-    setDbRegion(e.target.value)
+  function onDbRegionChange(value: string) {
+    setDbRegion(value)
   }
 
   function onDbPricingPlanChange(value: string) {
@@ -190,11 +191,10 @@ export const Wizard = observer(() => {
     <WizardLayout organization={currentOrg} project={null}>
       <Panel
         hideHeaderStyling
+        isLoading={app.organizations.isInitialized}
         title={
           <div key="panel-title">
-            <Typography.Title level={4} className="mb-0">
-              Create a new project
-            </Typography.Title>
+            <h3>Create a new project</h3>
           </div>
         }
         footer={
@@ -202,10 +202,8 @@ export const Wizard = observer(() => {
             <Button type="default" onClick={() => Router.push('/')}>
               Cancel
             </Button>
-            <div className="space-x-3">
-              <Typography.Text type="secondary" small>
-                You can rename your project later
-              </Typography.Text>
+            <div className="space-x-3 items-center">
+              <span className="text-scale-900 text-xs">You can rename your project later</span>
               <Button
                 onClick={onClickNext}
                 loading={newProjectedLoading}
@@ -219,40 +217,44 @@ export const Wizard = observer(() => {
       >
         <>
           <Panel.Content className="pt-0 pb-6">
-            <Typography.Text>
+            <p className="text-scale-900 text-sm">
               Your project will have its own dedicated instance and full postgres database.
               <br />
               An API will be set up so you can easily interact with your new database.
               <br />
-            </Typography.Text>
+            </p>
           </Panel.Content>
-          <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4">
-            <Listbox
-              label="Organization"
-              layout="horizontal"
-              value={currentOrg?.slug}
-              onChange={(slug) => router.push(`/new/${slug}`)}
-            >
-              {organizations.map((x: any) => (
-                <Listbox.Option
-                  key={x.id}
-                  label={x.name}
-                  value={x.slug}
-                  addOnBefore={() => <IconUsers />}
-                >
-                  {x.name}
-                </Listbox.Option>
-              ))}
-            </Listbox>
 
-            {!currentOrg?.is_owner && <NotOrganizationOwnerWarning />}
+          <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4">
+            {organizations.length > 0 && (
+              <Listbox
+                label="Organization"
+                layout="horizontal"
+                value={currentOrg?.slug}
+                onChange={(slug) => router.push(`/new/${slug}`)}
+              >
+                {organizations.map((x: any) => (
+                  <Listbox.Option
+                    key={x.id}
+                    label={x.name}
+                    value={x.slug}
+                    addOnBefore={() => <IconUsers />}
+                  >
+                    {x.name}
+                  </Listbox.Option>
+                ))}
+              </Listbox>
+            )}
+
+            {!isOrganizationOwner && <NotOrganizationOwnerWarning />}
           </Panel.Content>
 
           {canCreateProject && (
             <>
               <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                <FormField
-                  // @ts-ignore
+                <Input
+                  id="project-name"
+                  layout="horizontal"
                   label="Name"
                   type="text"
                   placeholder="Project name"
@@ -263,34 +265,54 @@ export const Wizard = observer(() => {
               </Panel.Content>
 
               <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                <FormField
-                  // @ts-ignore
+                <Input
+                  id="password"
+                  layout="horizontal"
                   label="Database Password"
                   type="password"
                   placeholder="Type in a strong password"
                   value={dbPass}
                   onChange={onDbPassChange}
-                  description={
+                  descriptionText={
                     <PasswordStrengthBar
                       passwordStrengthScore={passwordStrengthScore}
                       password={dbPass}
                       passwordStrengthMessage={passwordStrengthMessage}
                     />
                   }
-                  errorMessage={passwordStrengthWarning}
+                  error={passwordStrengthWarning}
                 />
               </Panel.Content>
 
               <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                <FormField
-                  // @ts-ignore
+                <Listbox
+                  layout="horizontal"
                   label="Region"
                   type="select"
-                  choices={REGIONS}
                   value={dbRegion}
-                  onChange={onDbRegionChange}
-                  description="Select a region close to you for the best performance."
-                />
+                  // @ts-ignore
+                  onChange={(value: string) => onDbRegionChange(value)}
+                  descriptionText="Select a region close to you for the best performance."
+                >
+                  {Object.keys(REGIONS).map((option: string, i) => {
+                    const label = Object.values(REGIONS)[i]
+                    return (
+                      <Listbox.Option
+                        key={option}
+                        label={label}
+                        value={label}
+                        addOnBefore={({ active, selected }: any) => (
+                          <img
+                            className="w-5 rounded-sm"
+                            src={`/img/regions/${Object.keys(REGIONS)[i]}.svg`}
+                          />
+                        )}
+                      >
+                        <span className="text-scale-1200">{label}</span>
+                      </Listbox.Option>
+                    )
+                  })}
+                </Listbox>
               </Panel.Content>
             </>
           )}
@@ -301,6 +323,7 @@ export const Wizard = observer(() => {
                 label="Pricing Plan"
                 layout="horizontal"
                 value={dbPricingPlan}
+                // @ts-ignore
                 onChange={onDbPricingPlanChange}
                 // @ts-ignore
                 descriptionText={
@@ -319,10 +342,20 @@ export const Wizard = observer(() => {
                 ))}
               </Listbox>
 
-              {isSelectFreeTier && isOverFreeProjectLimit && <FreeProjectLimitWarning />}
+              {isSelectFreeTier && isOverFreeProjectLimit && (
+                <FreeProjectLimitWarning limit={freeProjectsLimit} />
+              )}
               {!isSelectFreeTier && isEmptyPaymentMethod && (
                 <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
               )}
+            </Panel.Content>
+          )}
+
+          {subscriptionStats.isLoading && (
+            <Panel.Content>
+              <div className="py-10 flex items-center justify-center">
+                <IconLoader size={16} className="animate-spin" />
+              </div>
             </Panel.Content>
           )}
         </>
@@ -342,8 +375,8 @@ const NotOrganizationOwnerWarning = () => {
         description={
           <div className="space-y-3">
             <p className="text-sm leading-normal">
-              Only the organization owner can create new projects. Contact your organization owner to
-              create a new project for this organization.
+              Only the organization owner can create new projects. Contact your organization owner
+              to create a new project for this organization.
             </p>
           </div>
         }
@@ -352,7 +385,7 @@ const NotOrganizationOwnerWarning = () => {
   )
 }
 
-const FreeProjectLimitWarning = () => {
+const FreeProjectLimitWarning = ({ limit }: { limit: number }) => {
   return (
     <div className="mt-4">
       <InformationBox
@@ -363,8 +396,7 @@ const FreeProjectLimitWarning = () => {
         description={
           <div className="space-y-3">
             <p className="text-sm leading-normal">
-              Your account can only have a maximum of 2 free projects. You can only choose paid
-              pricing plan.
+              {`Your account can only have up to ${limit} free projects - to create another free project, you'll need to delete an existing free project first. Otherwise, you may create a project on the Pro tier instead.`}
             </p>
           </div>
         }

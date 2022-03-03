@@ -12,13 +12,11 @@ import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
 import Announcement from '~/components/Nav/Announcement'
 
-type Props = {
-  darkMode: boolean
-}
+import { useTheme } from '~/components/Providers'
 
-const Nav = (props: Props) => {
+const Nav = () => {
   const { basePath } = useRouter()
-  const { darkMode } = props
+  const { isDarkMode } = useTheme()
   const [open, setOpen] = useState(false)
 
   const [openProduct, setOpenProduct] = useState(false)
@@ -49,7 +47,7 @@ const Nav = (props: Props) => {
     const content = (
       <div className="mb-3 flex md:h-full lg:flex-col">
         <div className="flex-shrink-0">
-          <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-gray-800 text-white sm:h-12 sm:w-12">
+          <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-gray-800 text-white dark:bg-white dark:text-gray-800 sm:h-12 sm:w-12">
             {/* <!-- Heroicon name: chart-bar --> */}
             <svg
               className="h-6 w-6"
@@ -111,7 +109,7 @@ const Nav = (props: Props) => {
       onClick={() => props.toggleFlyOut()}
     >
       <button
-        className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-700"
+        className="inline-flex items-center justify-center p-2 rounded-md bg-white text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 dark:bg-gray-800 dark:hover:bg-gray-900"
         aria-expanded="false"
       >
         <span className="sr-only">Open main menu</span>
@@ -199,7 +197,7 @@ const Nav = (props: Props) => {
                       <img
                         className="block h-6 w-auto"
                         src={
-                          darkMode
+                          isDarkMode
                             ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
                             : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
                         }
@@ -278,7 +276,7 @@ const Nav = (props: Props) => {
                   <button
                     onClick={() => setOpen(false)}
                     type="button"
-                    className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 dark:bg-dark-800"
+                    className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 dark:bg-gray-700 dark:hover:bg-gray-800"
                   >
                     <span className="sr-only">Close menu</span>
                     <svg
@@ -312,39 +310,39 @@ const Nav = (props: Props) => {
                 <div className="pt-2 pb-4 space-y-1">
                   <a
                     href="/docs"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md"
                   >
                     Product
                   </a>
                   <a
                     href="/docs"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md"
                   >
                     Developers
                   </a>
                   <a
                     href="/company"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md"
                   >
                     Company
                   </a>
                   <a
                     href="/pricing"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md"
                   >
                     Pricing
                   </a>
                   <a
                     href="https://github.com/supabase/supabase"
                     target="_blank"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md"
                   >
                     GitHub
                   </a>
                   <a
                     href="/blog"
                     target="_blank"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md"
                   >
                     Blog
                   </a>

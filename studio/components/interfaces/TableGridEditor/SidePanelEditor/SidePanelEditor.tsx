@@ -9,6 +9,8 @@ import { ImportContent } from './TableEditor/TableEditor.types'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 
+import { Modal } from '@supabase/ui'
+
 interface Props {
   selectedSchema: string
   selectedTable?: PostgresTable
@@ -258,8 +260,7 @@ const SidePanelEditor: FC<Props> = ({
       />
       <ConfirmationModal
         visible={isClosingPanel}
-        title="Confirm to close"
-        description="There are unsaved changes. Are you sure you want to close the panel? Your changes will be lost."
+        header="Confirm to close"
         buttonLabel="Confirm"
         onSelectCancel={() => setIsClosingPanel(false)}
         onSelectConfirm={() => {
@@ -267,6 +268,14 @@ const SidePanelEditor: FC<Props> = ({
           setIsEdited(false)
           closePanel()
         }}
+        children={
+          <Modal.Content>
+            <p className="py-4 text-sm text-scale-1100">
+              There are unsaved changes. Are you sure you want to close the panel? Your changes will
+              be lost.
+            </p>
+          </Modal.Content>
+        }
       />
     </>
   )
