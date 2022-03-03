@@ -1,5 +1,6 @@
 import StorageExplorer from './StorageExplorer/StorageExplorer'
 import StoragePolicies from './StoragePolicies/StoragePolicies'
+import StorageSettings from './StorageSettings/StorageSettings'
 import StorageUsage from './StorageUsage/StorageUsage'
 import StorageSidebar from './StorageSidebar'
 
@@ -10,6 +11,7 @@ import ToggleBucketPublicModal from './ToggleBucketPublicModal'
 export {
   StorageExplorer,
   StoragePolicies,
+  StorageSettings,
   StorageUsage,
   StorageSidebar,
   CreateBucketModal,

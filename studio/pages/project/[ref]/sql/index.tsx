@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { useMonaco } from '@monaco-editor/react'
-
 import {
   useSqlEditorStore,
   SqlEditorContext,
@@ -13,28 +11,20 @@ import TabWelcome from 'components/to-be-cleaned/SqlEditor/TabWelcome'
 import TabSqlQuery from 'components/to-be-cleaned/SqlEditor/TabSqlQuery'
 import getPgsqlCompletionProvider from 'components/to-be-cleaned/SqlEditor/PgsqlCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/to-be-cleaned/SqlEditor/PgsqlSignatureHelpProvider'
-
 import { useProjectContentStore } from 'stores/projectContentStore'
-
 import { useStore, withAuth } from 'hooks'
 import { SQLEditorLayout } from 'components/layouts'
+import BaseLayout from 'components/layouts'
 
 const PageConfig = () => {
-  const router = useRouter()
-  const { ref } = router.query
-
   const { meta, ui } = useStore()
   const { profile: user } = ui
 
-  const contentStore: any = useProjectContentStore(ref)
-  const sqlEditorStore: any = useSqlEditorStore(ref, meta)
-
   useEffect(() => {
-    /*
-     * Load persited data
-     */
-    loadPersistantData()
-  }, [ref])
+    if (ui.selectedProject !== undefined) {
+      loadPersistantData()
+    }
+  }, [ui.selectedProject])
 
   /*
    * Load persited data
@@ -44,22 +34,23 @@ const PageConfig = () => {
     await sqlEditorStore.loadRemotePersistentData(contentStore, (user as any)?.id)
   }
 
+  if (ui.selectedProject === undefined) {
+    return <BaseLayout children={undefined} />
+  }
+
+  const contentStore: any = useProjectContentStore(ui.selectedProject.ref)
+  const sqlEditorStore: any = useSqlEditorStore(ui.selectedProject.ref, meta)
+
   return (
     <SqlEditorContext.Provider value={sqlEditorStore}>
-      <PageLayout />
+      <SQLEditorLayout title="SQL">
+        <SqlEditor />
+      </SQLEditorLayout>
     </SqlEditorContext.Provider>
   )
 }
 
 export default withAuth(observer(PageConfig))
-
-const PageLayout = observer(() => {
-  return (
-    <SQLEditorLayout title="SQL">
-      <SqlEditor />
-    </SQLEditorLayout>
-  )
-})
 
 const SqlEditor = observer(() => {
   const { meta, ui } = useStore()
