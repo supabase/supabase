@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { useMonaco } from '@monaco-editor/react'
-
 import {
   useSqlEditorStore,
   SqlEditorContext,
@@ -13,9 +11,7 @@ import TabWelcome from 'components/to-be-cleaned/SqlEditor/TabWelcome'
 import TabSqlQuery from 'components/to-be-cleaned/SqlEditor/TabSqlQuery'
 import getPgsqlCompletionProvider from 'components/to-be-cleaned/SqlEditor/PgsqlCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/to-be-cleaned/SqlEditor/PgsqlSignatureHelpProvider'
-
 import { useProjectContentStore } from 'stores/projectContentStore'
-
 import { useStore, withAuth } from 'hooks'
 import { SQLEditorLayout } from 'components/layouts'
 import BaseLayout from 'components/layouts'
@@ -25,7 +21,7 @@ const PageConfig = () => {
   const { profile: user } = ui
 
   useEffect(() => {
-    if (ui.selectedProject != undefined) {
+    if (ui.selectedProject !== undefined) {
       loadPersistantData()
     }
   }, [ui.selectedProject])
@@ -38,7 +34,7 @@ const PageConfig = () => {
     await sqlEditorStore.loadRemotePersistentData(contentStore, (user as any)?.id)
   }
 
-  if (ui.selectedProject == undefined || !meta.ready) {
+  if (ui.selectedProject === undefined) {
     return <BaseLayout children={undefined} />
   }
 

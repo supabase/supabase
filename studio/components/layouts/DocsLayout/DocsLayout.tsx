@@ -12,10 +12,10 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   const { data, isLoading, error } = meta.openApi
 
   useEffect(() => {
-    if (meta.ready) {
+    if (ui.selectedProject) {
       meta.openApi.load()
     }
-  }, [meta.ready])
+  }, [ui.selectedProject])
 
   if (error) {
     return (

@@ -226,23 +226,25 @@ export const Wizard = observer(() => {
           </Panel.Content>
 
           <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4">
-            <Listbox
-              label="Organization"
-              layout="horizontal"
-              value={currentOrg?.slug}
-              onChange={(slug) => router.push(`/new/${slug}`)}
-            >
-              {organizations.map((x: any) => (
-                <Listbox.Option
-                  key={x.id}
-                  label={x.name}
-                  value={x.slug}
-                  addOnBefore={() => <IconUsers />}
-                >
-                  {x.name}
-                </Listbox.Option>
-              ))}
-            </Listbox>
+            {organizations.length > 0 && (
+              <Listbox
+                label="Organization"
+                layout="horizontal"
+                value={currentOrg?.slug}
+                onChange={(slug) => router.push(`/new/${slug}`)}
+              >
+                {organizations.map((x: any) => (
+                  <Listbox.Option
+                    key={x.id}
+                    label={x.name}
+                    value={x.slug}
+                    addOnBefore={() => <IconUsers />}
+                  >
+                    {x.name}
+                  </Listbox.Option>
+                ))}
+              </Listbox>
+            )}
 
             {!isOrganizationOwner && <NotOrganizationOwnerWarning />}
           </Panel.Content>

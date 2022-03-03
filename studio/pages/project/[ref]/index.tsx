@@ -1,28 +1,19 @@
-import useSWR from 'swr'
 import { NextPage } from 'next'
 import { observer } from 'mobx-react-lite'
-import { isUndefined } from 'lodash'
-import { Typography, IconLoader } from '@supabase/ui'
-
-import { get } from 'lib/common/fetch'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { Typography } from '@supabase/ui'
 import { useStore, withAuth } from 'hooks'
-import BaseLayout from 'components/layouts'
-import {
-  ExampleProject,
-  ClientLibrary,
-  ProjectUsage,
-  NewProjectPanel,
-} from 'components/interfaces/Home'
+import { ExampleProject, ClientLibrary } from 'components/interfaces/Home'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
-import { FC } from 'react'
+import { IS_PLATFORM } from 'lib/constants'
+import BaseLayout from 'components/layouts'
+import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 
 const Home: NextPage = () => {
   const { ui } = useStore()
 
   const project = ui.selectedProject
   const projectName =
-    project?.ref !== 'default' && project?.name != undefined
+    project?.ref !== 'default' && project?.name !== undefined
       ? project?.name
       : 'Welcome to your project'
 
@@ -32,7 +23,7 @@ const Home: NextPage = () => {
         <div className="mx-6 flex space-x-6 items-center">
           <h1 className="text-3xl">{projectName}</h1>
         </div>
-        <ProjectUsageSection />
+        {IS_PLATFORM && <ProjectUsageSection />}
         <div className="space-y-8">
           <div className="mx-6">
             <Typography.Title level={4}>Client libraries</Typography.Title>
@@ -59,37 +50,3 @@ const Home: NextPage = () => {
 }
 
 export default withAuth(observer(Home))
-
-const ProjectUsageSection: FC = observer(({}) => {
-  const { ui } = useStore()
-
-  const project = ui.selectedProject
-  const { data: usage, error: usageError }: any = useSWR(
-    `${API_URL}/projects/${project?.ref}/usage`,
-    get
-  )
-
-  if (usageError) {
-    return <Typography.Text type="danger">Error loading data {usageError.message}</Typography.Text>
-  }
-
-  const hasProjectData =
-    usage && (usage?.bucketSize || (usage?.authUsers ?? '0') !== '0' || usage?.dbTables)
-      ? true
-      : false
-
-  return IS_PLATFORM ? (
-    <>
-      {isUndefined(usage) ? (
-        <div className="w-full flex justify-center items-center space-x-2">
-          <IconLoader className="animate-spin" size={14} />
-          <p className="text-sm">Retrieving project usage statistics</p>
-        </div>
-      ) : !usage.error && hasProjectData ? (
-        <ProjectUsage project={project} />
-      ) : (
-        <NewProjectPanel />
-      )}
-    </>
-  ) : null
-})

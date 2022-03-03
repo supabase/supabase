@@ -43,7 +43,6 @@ const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
 
 export interface IMetaStore {
-  ready: boolean
   excludedSchemas: string[]
 
   openApi: IOpenApiStore
@@ -115,7 +114,6 @@ export default class MetaStore implements IMetaStore {
   extensions: ExtensionsStore
   publications: PublicationStore
 
-  ready: boolean
   connectionString?: string
   baseUrl: string
   queryBaseUrl: string
@@ -133,7 +131,6 @@ export default class MetaStore implements IMetaStore {
 
   constructor(rootStore: IRootStore, options: { projectRef: string; connectionString: string }) {
     const { projectRef, connectionString } = options
-    this.ready = projectRef !== ''
     this.rootStore = rootStore
     this.baseUrl = `/api/pg-meta/${projectRef}`
     this.queryBaseUrl = `${API_URL}/pg-meta/${projectRef}`
