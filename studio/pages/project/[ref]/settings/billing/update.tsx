@@ -49,11 +49,6 @@ const BillingUpdate: NextPage = () => {
     }
   }
 
-  /**
-   * Existing UI bug: Transition isn't smooth between screens, next "state" is getting rendered too early
-   * Resolve later, don't wanna get stuck now lol
-   */
-
   return (
     <BillingLayout>
       <PlanSelection
