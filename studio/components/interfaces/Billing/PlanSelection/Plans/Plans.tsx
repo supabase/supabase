@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { Badge } from '@supabase/ui'
 
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { StripeSubscription } from '../index'
+import { StripeSubscription } from '../../index'
 import { BillingPlan } from './Plans.types'
 import PlanCTAButton from './PlanCTAButton'
 
@@ -48,7 +48,7 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
             {plan.id === STRIPE_PRODUCT_IDS.PRO && <AnimatedGradientBackground />}
 
             {/* Label to show current subscription */}
-            {plan.id === currentPlan?.tier.prod_id && <CurrentSubscriptionBanner />}
+            {plan.id && plan.id === currentPlan?.tier.prod_id && <CurrentSubscriptionBanner />}
 
             <div className="z-10 mb-8">
               <div className="flex items-center space-x-4">
