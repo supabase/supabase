@@ -53,7 +53,8 @@ const LogTable = ({ isCustomQuery, data = [] }: Props) => {
       )
     },
   }))
-
+  
+  const stringData = JSON.stringify(data)
   const logMap = useMemo(() => {
     if (!hasLogDataFormat) return {} as LogMap
     const logData = data as LogData[]
@@ -61,15 +62,13 @@ const LogTable = ({ isCustomQuery, data = [] }: Props) => {
       acc[d.id] = d
       return acc
     }, {}) as LogMap
-  }, [JSON.stringify(data)])
+  }, [stringData])
 
-  const stringData = JSON.stringify(data)
   useEffect(() => {
-    if (!hasLogDataFormat) return
     if (isNil(data)) return
     if (focusedLog && !(focusedLog.id in logMap)) {
       setFocusedLog(null)
-    }
+    } 
   }, [stringData])
 
   if (!data) return null
