@@ -79,7 +79,8 @@ export const Wizard = observer(() => {
   const totalFreeProjects = subscriptionStats.total_free_projects
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
 
-  const isEmptyOrganizations = organizations.length <= 0
+  const isOrganizationOwner = currentOrg?.is_owner || !app.organizations.isInitialized
+  const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
   const isEmptyPaymentMethod = stripeCustomer
     ? stripeCustomer.paymentMethods?.data?.length <= 0
     : undefined
@@ -190,6 +191,7 @@ export const Wizard = observer(() => {
     <WizardLayout organization={currentOrg} project={null}>
       <Panel
         hideHeaderStyling
+        isLoading={app.organizations.isInitialized}
         title={
           <div key="panel-title">
             <h3>Create a new project</h3>
@@ -224,25 +226,27 @@ export const Wizard = observer(() => {
           </Panel.Content>
 
           <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4">
-            <Listbox
-              label="Organization"
-              layout="horizontal"
-              value={currentOrg?.slug}
-              onChange={(slug) => router.push(`/new/${slug}`)}
-            >
-              {organizations.map((x: any) => (
-                <Listbox.Option
-                  key={x.id}
-                  label={x.name}
-                  value={x.slug}
-                  addOnBefore={() => <IconUsers />}
-                >
-                  {x.name}
-                </Listbox.Option>
-              ))}
-            </Listbox>
+            {organizations.length > 0 && (
+              <Listbox
+                label="Organization"
+                layout="horizontal"
+                value={currentOrg?.slug}
+                onChange={(slug) => router.push(`/new/${slug}`)}
+              >
+                {organizations.map((x: any) => (
+                  <Listbox.Option
+                    key={x.id}
+                    label={x.name}
+                    value={x.slug}
+                    addOnBefore={() => <IconUsers />}
+                  >
+                    {x.name}
+                  </Listbox.Option>
+                ))}
+              </Listbox>
+            )}
 
-            {!currentOrg?.is_owner && <NotOrganizationOwnerWarning />}
+            {!isOrganizationOwner && <NotOrganizationOwnerWarning />}
           </Panel.Content>
 
           {canCreateProject && (
