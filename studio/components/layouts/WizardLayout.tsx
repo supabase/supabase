@@ -1,20 +1,17 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import BaseLayout from 'components/layouts'
-import { IconChevronRight, Typography } from '@supabase/ui'
+import { IconChevronRight } from '@supabase/ui'
 
 const WizardLayout: FC<any> = ({ organization, project, children }) => {
   return (
-    <BaseLayout hideHeader hideIconBar>
-      <div className="flex flex-col h-full w-full">
-        <Header organization={organization} project={project} />
-        <div className="overflow-auto">
-          <section className="mx-auto max-w-2xl relative my-10 has-slide-in slide-in">
-            {children}
-          </section>
-        </div>
+    <div className="flex flex-col h-full w-full">
+      <Header organization={organization} project={project} />
+      <div className="overflow-auto">
+        <section className="mx-auto max-w-2xl relative my-10 has-slide-in slide-in">
+          {children}
+        </section>
       </div>
-    </BaseLayout>
+    </div>
   )
 }
 export default WizardLayout
