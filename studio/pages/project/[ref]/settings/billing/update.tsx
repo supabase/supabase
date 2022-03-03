@@ -1,17 +1,15 @@
-import Link from 'next/link'
 import { NextPage } from 'next'
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Loading } from '@supabase/ui'
 
 import { withAuth, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { BillingLayout } from 'components/layouts'
-import { Plans, StripeSubscription } from 'components/interfaces/Billing'
+import { PlanSelection, EnterpriseRequest, StripeSubscription } from 'components/interfaces/Billing'
 
-import { BillingPlan } from 'components/interfaces/Billing/Plans/Plans.types'
-import { BILLING_PLANS } from 'components/interfaces/Billing/Plans/Plans.constants'
+import { BillingPlan } from 'components/interfaces/Billing/PlanSelection/Plans/Plans.types'
+import { BILLING_PLANS } from 'components/interfaces/Billing/PlanSelection/Plans/Plans.constants'
 
 const BillingUpdate: NextPage = () => {
   const { ui } = useStore()
@@ -19,6 +17,7 @@ const BillingUpdate: NextPage = () => {
 
   const [loading, setLoading] = useState(false)
   const [subscription, setSubscription] = useState<StripeSubscription>()
+  const [selectedPlan, setSelectedPlan] = useState<BillingPlan>()
 
   useEffect(() => {
     if (projectRef) getSubscription()
@@ -50,26 +49,23 @@ const BillingUpdate: NextPage = () => {
     }
   }
 
-  const onSelectPlan = (plan: BillingPlan) => {
-    console.log('Selected plan', plan)
-  }
+  /**
+   * Existing UI bug: Transition isn't smooth between screens, next "state" is getting rendered too early
+   * Resolve later, don't wanna get stuck now lol
+   */
 
   return (
     <BillingLayout>
-      <div className="space-y-8">
-        <h4 className="text-xl">Change your project's subscription</h4>
-        {/* FE will make a call to fetch all plans first at the page level */}
-        <Loading active={loading}>
-          <Plans plans={BILLING_PLANS} currentPlan={subscription} onSelectPlan={onSelectPlan} />
-        </Loading>
-        <div className="flex justify-center items-center">
-          <Link href="https://supabase.com/pricing">
-            <a target="_blank" className="text-sm text-scale-1100 hover:text-scale-1200 transition">
-              See detailed comparisons across plans
-            </a>
-          </Link>
-        </div>
-      </div>
+      <PlanSelection
+        visible={!selectedPlan}
+        billingPlans={BILLING_PLANS}
+        currentPlan={subscription}
+        onSelectPlan={setSelectedPlan}
+      />
+      <EnterpriseRequest
+        visible={selectedPlan?.name === 'Enterprise'}
+        onSelectBack={() => setSelectedPlan(undefined)}
+      />
     </BillingLayout>
   )
 }

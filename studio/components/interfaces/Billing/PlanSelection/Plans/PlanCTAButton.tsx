@@ -3,7 +3,7 @@ import { Button, IconLoader } from '@supabase/ui'
 
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { BillingPlan } from './Plans.types'
-import { StripeSubscription } from '../index'
+import { StripeSubscription } from '../../index'
 
 interface Props {
   plan: BillingPlan
