@@ -15,6 +15,7 @@ import {
   IconEdit,
 } from '@supabase/ui'
 
+import Flag from 'components/ui/Flag/Flag'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
@@ -24,7 +25,7 @@ interface Props {}
 const StorageMenu: FC<Props> = () => {
   const router = useRouter()
   const { ref, bucketId } = router.query
-  const page = router.pathname.split('/')[4] as undefined | 'policies' | 'usage'
+  const page = router.pathname.split('/')[4] as undefined | 'policies' | 'settings' | 'usage'
 
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
@@ -92,8 +93,15 @@ const StorageMenu: FC<Props> = () => {
         </div>
 
         <div className="">
-          <Menu.Group title="Settings" />
+          <Menu.Group title="Configuration" />
 
+          <Flag name="storageSettings">
+            <Link href={`/project/${projectRef}/storage/settings`}>
+              <Menu.Item rounded active={page === 'settings'}>
+                <Typography.Text className="truncate">Settings</Typography.Text>
+              </Menu.Item>
+            </Link>
+          </Flag>
           <Link href={`/project/${projectRef}/storage/policies`}>
             <Menu.Item rounded active={page === 'policies'}>
               <Typography.Text className="truncate">Policies</Typography.Text>

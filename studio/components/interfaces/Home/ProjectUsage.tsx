@@ -111,7 +111,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
       <div className="">
         {startDate && endDate && (
           <>
-            <div className="grid lg:grid-cols-2 lg:gap-8">
+            <div className="grid grid-cols-1 md:gap-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
               <Panel key="database-chart">
                 <Panel.Content className="space-y-4">
                   <PanelHeader
@@ -134,6 +134,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     customDateFormat={datetimeFormat}
                     data={charts}
                     isLoading={!charts && !error ? true : false}
+                    onBarClick={(v) => handleBarClick(v, '/rest')}
                   />
                   <ProjectUsageMinimal
                     projectRef={project.ref}
@@ -164,6 +165,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     customDateFormat={datetimeFormat}
                     data={charts}
                     isLoading={!charts && !error ? true : false}
+                    onBarClick={(v) => handleBarClick(v, '/auth')}
                   />
                   <ProjectUsageMinimal
                     projectRef={project.ref}
@@ -172,8 +174,6 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                   />
                 </Panel.Content>
               </Panel>
-            </div>
-            <div className="grid lg:grid-cols-2 lg:gap-8">
               <Panel key="storage-chart">
                 <Panel.Content className="space-y-4">
                   <PanelHeader
@@ -196,6 +196,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     customDateFormat={datetimeFormat}
                     data={charts}
                     isLoading={!charts && !error ? true : false}
+                    onBarClick={(v) => handleBarClick(v, '/storage')}
                   />
                   <ProjectUsageMinimal
                     projectRef={project.ref}
@@ -236,7 +237,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
           </>
         )}
         {logsUsageCodesPaths && (
-          <div className="grid lg:grid-cols-4 lg:gap-8">
+          <div className="grid md:gap-4 lg:grid-cols-4 lg:gap-8">
             <Panel
               key="api-status-codes"
               className="col-start-1 col-span-2"
