@@ -1,17 +1,15 @@
 # Developing Supabase
 
-* [Development Setup](##Development-Setup)
-* [Installing Dependencies](###Installing-Dependencies)
-* [Building Supabase](##Building-Supabase)
-* [Start a Development Server](##Start-a-Development-Server)
-* [What's Next?](##What's-Next)
-* [Community Channels](##Community-Channels)
+* [Development Setup](#Development-Setup)
+* [Installing Dependencies](#Installing-Dependencies)
+* [Building Supabase](#Building-Supabase)
+* [Start a Development Server](#Start-a-Development-Server)
+* [What's Next?](#What's-Next)
+* [Community Channels](#Community-Channels)
 
 ## Development Setup
 
-First off, thanks for your interest in Supabase and for wanting to contribute!
-
-Before you begin, read the [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) and check out the [existing issues](https://github.com/supabase/supabase/issues).
+First off, thanks for your interest in Supabase and for wanting to contribute! before you begin, read the [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) and check out the [existing issues](https://github.com/supabase/supabase/issues).
 
 This document describes how to set up your development environment to build and test Supabase.
 
@@ -153,6 +151,8 @@ To debug code, and to see changes in real time, it is often useful to have a loc
     http://localhost:8082/
     ```
 
+For more information on Supabase Studio, see the [Supabase Studio readme](./studio/README.md).
+
 ## What's Next?
 
 Make your changes to the file(s) you'd like to update.
@@ -163,7 +163,7 @@ When you're done making changes and you'd like to propose them for review by ope
 
 ### Submit your PR & get it reviewed
 
-- Once you submit your PR, others from the Unleash community will review it with you. The first thing you're going to want to do is a self review.
+- Once you submit your PR, others from the Supabase community will review it with you. The first thing you're going to want to do is a self review.
 - After that, we may have questions, check back on your PR to keep up with the conversation.
 - Did you have an issue, like a merge conflict? Check out GitHub's git tutorial on how to resolve merge conflicts and other issues.
 
