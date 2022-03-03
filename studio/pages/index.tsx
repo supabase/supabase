@@ -7,15 +7,16 @@ import { Typography } from '@supabase/ui'
 
 import { Project } from 'types'
 import { useStore, withAuth } from 'hooks'
+import { auth } from 'lib/gotrue'
 import { post, delete_ } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+
+import Connecting from 'components/ui/Loading'
 import { AccountLayout } from 'components/layouts'
-import { auth } from 'lib/gotrue'
 import Landing from 'components/interfaces/Home/Landing'
 import ProjectList from 'components/interfaces/Home/ProjectList'
 import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
 import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
-import Connecting from 'components/ui/Loading'
 
 const Home: NextPage = () => {
   const { app, ui } = useStore()
@@ -88,20 +89,29 @@ const Home: NextPage = () => {
         },
       ]}
     >
-      <div className="p-4">
-        {IS_PLATFORM && (
-          <div className="my-2">
-            <div className="flex">
-              <div className="">
-                <OrganizationDropdown organizations={app.organizations} />
+      {app.organizations.isLoading ? (
+        <div className="flex h-full items-center justify-center space-x-2">
+          <Connecting />
+        </div>
+      ) : (
+        <div className="p-4">
+          {IS_PLATFORM && (
+            <div className="my-2">
+              <div className="flex">
+                <div className="">
+                  <OrganizationDropdown organizations={app.organizations} />
+                </div>
               </div>
             </div>
+          )}
+          <div className="my-8 space-y-8">
+            <ProjectList
+              onSelectDelete={onSelectDeleteProject}
+              onSelectRestore={onRestoreProject}
+            />
           </div>
-        )}
-        <div className="my-8 space-y-8">
-          <ProjectList onSelectDelete={onSelectDeleteProject} onSelectRestore={onRestoreProject} />
         </div>
-      </div>
+      )}
       <TextConfirmModal
         visible={!isUndefined(selectedProjectToDelete)}
         title="Are you absolutely sure?"
