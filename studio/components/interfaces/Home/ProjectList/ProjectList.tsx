@@ -8,6 +8,7 @@ import { Organization, Project } from 'types'
 import { makeRandomString } from 'lib/helpers'
 import { PROJECT_STATUS } from 'lib/constants'
 import ProjectCard from './ProjectCard'
+import ShimmeringCard from './ShimmeringCard'
 
 interface Props {
   onSelectRestore: (project: Project) => void
@@ -36,7 +37,12 @@ const ProjectList: FC<Props> = ({
         return (
           <div className="space-y-3" key={makeRandomString(5)}>
             <h4 className="text-lg">{name}</h4>
-            <Loading active={isLoadingProjects}>
+            {isLoadingProjects ? (
+              <ul className="grid gap-4 mx-auto grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ">
+                <ShimmeringCard />
+                <ShimmeringCard />
+              </ul>
+            ) : (
               <ul className="grid gap-4 mx-auto grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ">
                 {!isLoadingProjects && isEmpty && (
                   <div className="max-w-4xl text-center col-span-4 space-y-4 border-2 border-gray-300 border-dashed rounded-lg p-6">
@@ -64,7 +70,7 @@ const ProjectList: FC<Props> = ({
                   />
                 ))}
               </ul>
-            </Loading>
+            )}
           </div>
         )
       })}
