@@ -94,6 +94,7 @@ const OrgSettings = () => {
 export default withAuth(observer(OrgSettings))
 
 const PageLayout = observer(() => {
+  const { ui } = useStore()
   const PageState: any = useContext(PageContext)
 
   return (
@@ -107,7 +108,7 @@ const PageLayout = observer(() => {
         },
       ]}
     >
-      <OrganizationSettings />
+      {ui.selectedOrganization && <OrganizationSettings />}
     </AccountLayout>
   )
 })

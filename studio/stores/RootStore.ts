@@ -57,13 +57,12 @@ export class RootStore implements IRootStore {
             connectionString: '',
           })
         }
-        console.log('selectedProject changed: ', selectedProject)
       }
     )
   }
 
   setProjectRef(value?: string) {
-    if (this.ui.selectedProject?.ref == value) return
+    if (this.ui.selectedProject?.ref === value) return
     this.ui.setProjectRef(value)
   }
 
