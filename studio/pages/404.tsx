@@ -2,10 +2,9 @@ import { NextPage } from 'next'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Button, Typography } from '@supabase/ui'
+import { Button } from '@supabase/ui'
 
 import { useStore } from 'hooks'
-import { API_URL } from 'lib/constants'
 
 const Error404: NextPage = ({}) => {
   const { ui } = useStore()
@@ -37,23 +36,21 @@ const Error404: NextPage = ({}) => {
           </div>
         </nav>
       </div>
-      <div className={`absolute select-none filter transition opacity-[5%] duration-200 ${
-            show404 ? 'blur-sm' : 'blur-none'
-          }`}>
-        <Typography.Title style={{ fontSize: '28rem' }}>
-          404
-        </Typography.Title>
+      <div
+        className={`absolute select-none filter transition opacity-[5%] duration-200 ${
+          show404 ? 'blur-sm' : 'blur-none'
+        }`}
+      >
+        <h1 style={{ fontSize: '28rem' }}>404</h1>
       </div>
       <div
         className={`transition flex flex-col space-y-6 items-center justify-center ${
           show404 ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <div className="w-[320px] flex flex-col items-center justify-center space-y-3 text-center">
-          <Typography.Title style={{ fontSize: '1.5rem' }}>Looking for something? 🔍</Typography.Title>
-          <Typography.Text>
-            We couldn't find the page that you're looking for!
-          </Typography.Text>
+        <div className="w-[380px] flex flex-col items-center justify-center space-y-3 text-center">
+          <h3 className="text-xl">Looking for something? 🔍</h3>
+          <p className="text-scale-1100">We couldn't find the page that you're looking for!</p>
         </div>
         <div className="flex items-center space-x-4">
           <Link href="/">
