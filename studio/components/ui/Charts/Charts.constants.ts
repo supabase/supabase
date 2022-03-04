@@ -10,8 +10,8 @@ export const CHART_COLORS = {
 }
 
 export const USAGE_COLORS = {
-  200: 'var(--colors-green9)',
-  201: 'var(--colors-green8)',
+  200: 'var(--colors-brand9)',
+  201: 'var(--colors-brand8)',
   400: 'var(--colors-amber9)',
   401: 'var(--colors-amber8)',
   404: 'var(--colors-amber7)',
