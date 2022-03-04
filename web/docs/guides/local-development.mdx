@@ -64,6 +64,17 @@ service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb
 
 Now you can open a browser and visit the Studio at [http://localhost:54323](http://localhost:54323).
 
+### Configuring Auth
+After running 
+```bash
+supabase init
+```
+you should notice that a new directory, `supabase/`, was created inside of your project folder. Within this folder is a file, `config.toml`. Open this file in your text editor and scroll to the bottom. You will see comments here describing the list of OAuth providers you can run locally. Set up the same OAuth providers you have enabled for your online version of Supabase here. Take care that you do not reuse the client ID's and secrets however. For each provider, you will need to set up a *new* set of keys, and as part of that setup be sure that you supply a redirect URL of `http://localhost:54321/auth/v1/callback`.
+
+After setting up these providers, go back to the `config.toml` file, and locate the `additional_redirect_urls` key. Here you will want to again add the right redirect URL: `http://localhost:54321/auth/v1/callback`.
+
+You should be good to go now for authenticating locally using third party OAuth providers.
+
 ### Accessing Services Directly
 
 <Tabs
