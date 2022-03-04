@@ -94,10 +94,15 @@ function IntegrationPartnersPage(props: Props) {
           {/* Title */}
           <Typography.Title className="text-center">Find an Integration</Typography.Title>
           {/* Search Bar */}
-          <div className="flex">
-            <Input icon={<IconSearch />} placeholder="Search all partners" type="text" />
+          <div className="w-full md:flex md:space-x-6">
+            <Input
+              icon={<IconSearch />}
+              placeholder="Search all partners"
+              type="text"
+              className="md:w-1/2"
+            />
             <Select
-              className="font-sans"
+              className="font-sans md:w-1/2"
               onChange={(e) => {
                 router.push(`#${e.target.value}`)
               }}
