@@ -50,7 +50,7 @@ const EnterpriseRequest: FC<Props> = ({ visible, onSelectBack }) => {
               </Button>
             </div>
             <div className="space-y-1">
-              <h4 className="text-xl">Customised plans tailored for your business needs</h4>
+              <h4 className="text-lg">Customised plans tailored for your business needs</h4>
               <p className="text-scale-1100">
                 Let us know a few details and we’ll be in contact with you!
               </p>

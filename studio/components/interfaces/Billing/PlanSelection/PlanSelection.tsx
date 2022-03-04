@@ -26,7 +26,7 @@ const PlanSelection: FC<Props> = ({ visible, billingPlans, currentPlan, onSelect
       // leaveTo="transform opacity-0 -translate-x-10"
     >
       <div className="space-y-8">
-        <h4 className="text-xl">Change your project's subscription</h4>
+        <h4 className="text-lg">Change your project's subscription</h4>
         {/* FE will make a call to fetch all plans first at the page level */}
         <Loading active={!currentPlan}>
           <Plans plans={billingPlans} currentPlan={currentPlan} onSelectPlan={onSelectPlan} />
