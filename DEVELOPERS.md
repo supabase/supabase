@@ -4,7 +4,7 @@
 * [Installing Dependencies](#Installing-Dependencies)
 * [Building Supabase](#Building-Supabase)
 * [Start a Development Server](#Start-a-Development-Server)
-* [What's Next?](#What's-Next)
+* [Finally](#Finally)
 * [Community Channels](#Community-Channels)
 
 ## Development Setup
@@ -151,25 +151,10 @@ To debug code, and to see changes in real time, it is often useful to have a loc
 
 For more information on Supabase Studio, see the [Supabase Studio readme](./studio/README.md).
 
-## What's Next?
+## Finally
 
-Make your changes to the file(s) you'd like to update.
-
-### Open a pull request
-
-When you're done making changes and you'd like to propose them for review by opening a pull request.
-
-### Submit your PR & get it reviewed
-
-- Once you submit your PR, others from the Supabase community will review it with you. The first thing you're going to want to do is a self review.
-- After that, we may have questions, check back on your PR to keep up with the conversation.
-- Did you have an issue, like a merge conflict? Check out GitHub's git tutorial on how to resolve merge conflicts and other issues.
-
-### Your PR is merged!
-
-Congratulations! The whole Supabase community thanks you 🙏🏼
-
-Once your PR is merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors).
+After making your changes to the file(s) you'd like to update, it's time to open a pull request. Once you submit your pull request, others from the Supabase team/community will review it with you. 
+Did you have an issue, like a merge conflict, or don't know how to open a pull request? Check out [GitHub's pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests) tutorial on how to resolve merge conflicts and other issues. Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors)
 
 ## Community Channels
 
