@@ -55,7 +55,7 @@ const UpgradeButton: FC<Props> = ({ projectRef, paid, subscriptionStats }) => {
 
   function handleUpgradeButton() {
     if (paid) {
-      if (freeProjectsOwned >= DEFAULT_FREE_PROJECTS_LIMIT) {
+      if (freeProjectsOwned >= freeProjectsLimit) {
         setShowFreeProjectLimitWarning(true)
       } else {
         setExitSurveyVisible(true)

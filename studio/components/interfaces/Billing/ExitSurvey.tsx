@@ -58,7 +58,7 @@ const ExitSurvey: FC<Props> = ({ visible, onSelectBack }) => {
               </Button>
             </div>
             <div className="space-y-1">
-              <h4 className="text-xl">We're sad that you're leaving.</h4>
+              <h4 className="text-lg">We're sad that you're leaving.</h4>
               <p className="text-scale-1100">
                 We always strive to improve Supabase as much as we can. Please let us know the
                 reasons you are cancelling your subscription so that we can improve in the future.

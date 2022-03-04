@@ -11,6 +11,7 @@ import { BillingLayout } from 'components/layouts'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import {
   PlanSelection,
+  ProUpgrade,
   EnterpriseRequest,
   ExitSurvey,
   StripeSubscription,
@@ -32,6 +33,10 @@ const BillingUpdate: NextPage = () => {
 
   const [subscription, setSubscription] = useState<StripeSubscription>()
   const [selectedPlan, setSelectedPlan] = useState<BillingPlan>()
+
+  const showProPlanPage =
+    subscription?.tier.prod_id !== STRIPE_PRODUCT_IDS.PRO &&
+    selectedPlan?.id === STRIPE_PRODUCT_IDS.PRO
 
   useEffect(() => {
     if (projectRef) getSubscription()
@@ -80,20 +85,24 @@ const BillingUpdate: NextPage = () => {
 
   return (
     <BillingLayout>
-      <PlanSelection
-        visible={!selectedPlan || (selectedPlan && showConfirmDowngrade)}
-        billingPlans={BILLING_PLANS}
-        currentPlan={subscription}
-        onSelectPlan={onSelectPlan}
-      />
-      <EnterpriseRequest
-        visible={selectedPlan?.name === 'Enterprise'}
-        onSelectBack={() => setSelectedPlan(undefined)}
-      />
-      <ExitSurvey
-        visible={selectedPlan?.name === 'Free' && !showConfirmDowngrade}
-        onSelectBack={() => setSelectedPlan(undefined)}
-      />
+      <div className="mx-auto max-w-4xl my-10">
+        <PlanSelection
+          visible={!selectedPlan || (selectedPlan && showConfirmDowngrade)}
+          billingPlans={BILLING_PLANS}
+          currentPlan={subscription}
+          onSelectPlan={onSelectPlan}
+        />
+        <EnterpriseRequest
+          visible={selectedPlan?.name === 'Enterprise'}
+          onSelectBack={() => setSelectedPlan(undefined)}
+        />
+        <ExitSurvey
+          visible={selectedPlan?.name === 'Free' && !showConfirmDowngrade}
+          onSelectBack={() => setSelectedPlan(undefined)}
+        />
+      </div>
+
+      <ProUpgrade visible={showProPlanPage} onSelectBack={() => setSelectedPlan(undefined)} />
 
       <ConfirmModal
         danger
