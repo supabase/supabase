@@ -305,15 +305,12 @@ const Reports = () => {
                 }
               >
                 <Dropdown.TriggerItem icon={cat.icon ? cat.icon : <IconHome size="tiny" />}>
-                  <div className="flex items-center justify-between w-full">
-                    <span>{cat.label}</span>
-                    <Typography.Text type="secondary">
-                      <IconChevronRight size="small" />
-                    </Typography.Text>
-                  </div>
+                  {cat.label}
+                  <Dropdown.RightSlot>
+                    <IconChevronRight size={14} />
+                  </Dropdown.RightSlot>
                 </Dropdown.TriggerItem>
               </Dropdown>
-              <Dropdown.Seperator />
             </>
           )
         })}
