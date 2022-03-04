@@ -173,4 +173,4 @@ Once your PR is merged, you will be proudly listed as a contributor in the [cont
 
 ## Community Channels
 
-Stuck somewhere? Have any questions? please join the [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://discord.supabase.com/). We are here to help!
+Stuck somewhere? Have any questions? please join the [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
