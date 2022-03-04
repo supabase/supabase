@@ -55,13 +55,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/partners/Partners</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/partners/TileGrid</loc>
+    <loc>https://supabase.com/partners/[slug]</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -556,6 +550,12 @@
 
   <url>
     <loc>https://supabase.com/blog/2022/01/20/supabase-beta-december-2021</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2022/02/22/supabase-beta-january-2022</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>

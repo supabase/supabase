@@ -635,6 +635,11 @@ module.exports = withMDX({
         source: '/guides/auth',
         destination: '/guides/auth/intro',
       },
+      {
+        permanent: false,
+        source: '/partners',
+        destination: '/partners/integrations',
+      },
     ]
   },
 })
