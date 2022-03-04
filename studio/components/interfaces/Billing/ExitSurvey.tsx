@@ -1,4 +1,4 @@
-import { FC, useReducer } from 'react'
+import { FC, useEffect, useReducer } from 'react'
 import { includes, without } from 'lodash'
 import { Transition } from '@headlessui/react'
 import { Button, Form, Input, IconArrowLeft } from '@supabase/ui'
@@ -15,8 +15,16 @@ const ExitSurvey: FC<Props> = ({ visible, onSelectBack }) => {
   const initialValues = { message: '' }
   const [selectedCancellationReasons, dispatchSelectedCancellationReasons] = useReducer(reducer, [])
 
+  useEffect(() => {
+    if (visible) {
+      dispatchSelectedCancellationReasons('reset')
+    }
+  }, [visible])
+
   function reducer(state: any, action: any) {
-    if (includes(state, action.target.value)) {
+    if (action === 'reset') {
+      return []
+    } else if (includes(state, action.target.value)) {
       return without(state, action.target.value)
     } else {
       return [...state, action.target.value]
