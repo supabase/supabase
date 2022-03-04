@@ -9,9 +9,7 @@
 
 ## Development Setup
 
-First off, thanks for your interest in Supabase and for wanting to contribute! before you begin, read the [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) and check out the [existing issues](https://github.com/supabase/supabase/issues).
-
-This document describes how to set up your development environment to build and test Supabase.
+First off, thanks for your interest in Supabase and for wanting to contribute! before you begin, read the [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) and check out the [existing issues](https://github.com/supabase/supabase/issues). This document describes how to set up your development environment to build and test Supabase.
 
 ### Installing Dependencies
 
