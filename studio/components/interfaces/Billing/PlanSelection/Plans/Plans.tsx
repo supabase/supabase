@@ -38,6 +38,7 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
       {plans.map((plan) => {
         return (
           <div
+            key={plan.name}
             className={[
               'flex flex-col justify-between w-1/3 px-6 py-8',
               'bg-gray-300 border border-gray-500 rounded-md relative',
@@ -50,7 +51,7 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
             {/* Label to show current subscription */}
             {plan.id && plan.id === currentPlan?.tier.prod_id && <CurrentSubscriptionBanner />}
 
-            <div className="z-10 mb-8">
+            <div className="mb-8">
               <div className="flex items-center space-x-4">
                 <h3 className="text-xl">{plan.name}</h3>
                 {plan.isPopular && <Badge>Popular</Badge>}
