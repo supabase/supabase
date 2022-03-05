@@ -1,18 +1,6 @@
-@import 'tailwindcss/base';
-
-/* Write your own custom base styles here */
-
-/* Start purging... */
-@import 'tailwindcss/components';
-/* Stop purging. */
-
-/* Write you own custom component styles here */
-
-/* Start purging... */
-@import 'tailwindcss/utilities';
-/* Stop purging. */
-
-/* Your own custom utilities */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @font-face {
   font-family: 'custom-font';
@@ -39,6 +27,7 @@ h3,
 h4,
 h5,
 h6 {
+  @apply text-scale-1200;
   margin-bottom: 16px;
 }
 
@@ -75,6 +64,7 @@ h2 {
 }
 
 p {
+  @apply text-scale-1100;
   margin-bottom: 16px;
 }
 
@@ -90,7 +80,7 @@ html {
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  @apply bg-white dark:bg-gray-800;
+  @apply bg-scale-200;
 }
 
 .section--masked {

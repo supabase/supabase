@@ -5,7 +5,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import {
   Button,
-  Auth,
+  // Auth,
   Card,
   Checkbox,
   Divider,
@@ -88,13 +88,13 @@ function AuthPage() {
                               <Typography.Title level={3}>{companyName}</Typography.Title>
                             </Space>
                           </div>
-                          <Auth
+                          {/* <Auth
                             providers={socialLogins ? socials : []}
                             socialButtonSize={widgetSize}
                             socialLayout={socialLoginLayout}
                             supabaseClient={supabase}
                             socialColors={socialColors}
-                          />
+                          /> */}
                         </Space>
                       </Card>
                     </div>

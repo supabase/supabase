@@ -1,4 +1,6 @@
-module.exports = {
+const ui = require('@supabase/ui/dist/config/ui.config.js')
+
+module.exports = ui({
   purge: ['./components/**/*.tsx', './pages/**/*.tsx', './_blog/*.mdx'],
   darkMode: 'class', // 'media' or 'class'
   mode: 'jit',
@@ -38,17 +40,17 @@ module.exports = {
         'accent-7': '#333',
         success: '#0070f3',
         cyan: '#79FFE1',
-        brand: {
-          100: '#82dab0',
-          200: '#69d3a0',
-          300: '#50cb90',
-          400: '#C5F1DD',
-          500: '#9FE7C7',
-          600: '#65D9A5',
-          700: '#3ECF8E',
-          800: '#38BC81',
-          900: '#10633E',
-        },
+        // brand: {
+        //   100: '#82dab0',
+        //   200: '#69d3a0',
+        //   300: '#50cb90',
+        //   400: '#C5F1DD',
+        //   500: '#9FE7C7',
+        //   600: '#65D9A5',
+        //   700: '#3ECF8E',
+        //   800: '#38BC81',
+        //   900: '#10633E',
+        // },
         // Joshen TODO: At the end just rearrange the values
         dark: {
           100: '#eeeeee',
@@ -61,17 +63,17 @@ module.exports = {
           800: '#181818',
           900: '#0f0f0f',
         },
-        gray: {
-          100: '#eeeeee',
-          200: '#e0e0e0',
-          300: '#bbbbbb',
-          400: '#666666',
-          500: '#444444',
-          600: '#2a2a2a',
-          700: '#1f1f1f',
-          800: '#181818',
-          900: '#0f0f0f',
-        },
+        // gray: {
+        //   100: '#eeeeee',
+        //   200: '#e0e0e0',
+        //   300: '#bbbbbb',
+        //   400: '#666666',
+        //   500: '#444444',
+        //   600: '#2a2a2a',
+        //   700: '#1f1f1f',
+        //   800: '#181818',
+        //   900: '#0f0f0f',
+        // },
       },
       spacing: {
         28: '7rem',
@@ -130,4 +132,4 @@ module.exports = {
   corePlugins: {
     preflight: true,
   },
-}
+})

@@ -416,11 +416,12 @@ export default function IndexPage() {
           </Link>
           <div className="mt-16">
             <div className="grid grid-cols-2 gap-y-10 gap-x-10">
-              {pricingFaq.map((faq) => {
+              {pricingFaq.map((faq, i) => {
                 return (
                   <div>
-                    <Accordion bordered>
-                      <Accordion.Item label={faq.question}>
+                    {/* @ts-ignore */}
+                    <Accordion type="bordered" openBehaviour="multiple" size="medium">
+                      <Accordion.Item header={faq.question} id={`faq--${i.toString()}`}>
                         <Typography>
                           <ReactMarkdown>{faq.answer}</ReactMarkdown>
                         </Typography>

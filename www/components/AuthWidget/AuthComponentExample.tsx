@@ -4,7 +4,7 @@ import {
   Badge,
   Button,
   Card,
-  Auth,
+  // Auth,
   Space,
   Tabs,
   Typography,
@@ -28,31 +28,31 @@ function AuthComponentExample() {
   const { isDarkMode } = useTheme()
   const { basePath } = useRouter()
 
-  // store API swiper instance
-  const [imageSwiper, setImageSwiper] = useState(undefined)
-  const [imageSwiperActiveIndex, setImageSwiperActiveIndex] = useState(0)
+  // // store API swiper instance
+  // const [imageSwiper, setImageSwiper] = useState(undefined)
+  // const [imageSwiperActiveIndex, setImageSwiperActiveIndex] = useState(0)
 
-  function handleNavChange(e: number) {
-    console.log(e)
-    setImageSwiperActiveIndex(e)
-    // @ts-ignore
-    imageSwiper.slideTo(e)
-  }
+  // function handleNavChange(e: number) {
+  //   console.log(e)
+  //   setImageSwiperActiveIndex(e)
+  //   // @ts-ignore
+  //   imageSwiper.slideTo(e)
+  // }
 
-  const AuthContainer = (props: any) => {
-    const { user } = Auth.useUser()
-    if (user) {
-      return (
-        <>
-          <Typography.Text>Signed in: {user.email}</Typography.Text>
-          <Button block onClick={() => props.supabaseClient.auth.signOut()}>
-            Sign out
-          </Button>
-        </>
-      )
-    }
-    return props.children
-  }
+  // const AuthContainer = (props: any) => {
+  //   const { user } = Auth.useUser()
+  //   if (user) {
+  //     return (
+  //       <>
+  //         <Typography.Text>Signed in: {user.email}</Typography.Text>
+  //         <Button block onClick={() => props.supabaseClient.auth.signOut()}>
+  //           Sign out
+  //         </Button>
+  //       </>
+  //     )
+  //   }
+  //   return props.children
+  // }
 
   return (
     <div className="sbui-tabs--alt">
@@ -194,11 +194,11 @@ function AuthComponentExample() {
                     </Typography.Text>
                     <div className="w-full h-[1px] bg-gray-500" />
                   </div>
-                  <Auth.UserContextProvider supabaseClient={supabase}>
+                  {/* <Auth.UserContextProvider supabaseClient={supabase}>
                     <AuthContainer supabaseClient={supabase}>
                       <Auth supabaseClient={supabase} />
                     </AuthContainer>
-                  </Auth.UserContextProvider>
+                  </Auth.UserContextProvider> */}
                 </Space>
               </Card>
             </div>
