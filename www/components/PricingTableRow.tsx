@@ -58,9 +58,9 @@ export const PricingTableRowDesktop = (props: any) => {
             </Typography.Title>
           </Space>
         </th>
-        <td className="pricing-table__product-row bg-gray-50 dark:bg-dark-700 py-5 px-6"></td>
-        <td className="pricing-table__product-row bg-gray-50 dark:bg-dark-700 py-5 px-6"></td>
-        <td className="pricing-table__product-row bg-gray-50 dark:bg-dark-700 py-5 px-6"></td>
+        <td className="pricing-table__product-row bg-gray-50 dark:bg-scale-300 py-5 px-6"></td>
+        <td className="pricing-table__product-row bg-gray-50 dark:bg-scale-300 py-5 px-6"></td>
+        <td className="pricing-table__product-row bg-gray-50 dark:bg-scale-300 py-5 px-6"></td>
       </tr>
 
       {category.features.map((feat: any) => {

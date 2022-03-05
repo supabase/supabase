@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Button, Badge, IconStar } from '@supabase/ui'
+import { Button, Badge, IconStar, IconChevronDown } from '@supabase/ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -71,10 +71,10 @@ const Nav = () => {
                 </Badge>
               )}
             </p>
-            <p className="mt-1 text-sm text-gray-500 dark:text-dark-100">{description}</p>
+            <p className="mt-1 text-sm text-scale-1100 dark:text-dark-100">{description}</p>
           </div>
           {url && (
-            <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
+            <p className="mt-2 text-sm font-medium text-brand-900 lg:mt-4">
               Learn more <span aria-hidden="true">&rarr;</span>
             </p>
           )}
@@ -153,30 +153,26 @@ const Nav = () => {
     <div
       className={
         `
-                  inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700
-                  dark:text-dark-100 cursor-pointer
+        inline-flex items-center 
+        px-1 border-b-2 border-transparent 
+        text-sm 
+        font-medium 
+        text-scale-1100 hover:text-scale-1200
+        cursor-pointer
                 ` + props.active
       }
       onClick={props.onClick}
     >
       <>
         <span>{props.title}</span>
-        <svg
+        <div
           className={
-            'ml-2 h-5 w-5 text-gray-300 group-hover:text-gray-300 transition ease-in-out duration-150' +
-            (props.active && ' transform rotate-180')
+            'flex items-center justify-center ml-2 h-5 w-5 text-scale-900 group-hover:text-scale-900 transition ease-in-out duration-150' +
+            (props.active && ' transform transition-all duration-100 rotate-180')
           }
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          aria-hidden="true"
         >
-          <path
-            fillRule="evenodd"
-            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-            clipRule="evenodd"
-          />
-        </svg>
+          <IconChevronDown size={14} strokeWidth={2} />
+        </div>
       </>
     </div>
   )
@@ -185,7 +181,7 @@ const Nav = () => {
     <>
       <Announcement />
       <div className="sticky top-0 z-50">
-        <nav className="bg-white dark:bg-gray-800 border-b dark:border-gray-600">
+        <nav className="bg-scale-200 border-b dark:border-dark">
           {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
           <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-16 xl:px-20">
             <HamburgerButton toggleFlyOut={() => setOpen(true)} />
@@ -221,7 +217,7 @@ const Nav = () => {
                     href="/pricing"
                     className={`
                     inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                    text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
+                    text-scale-1100 hover:text-scale-1200 hover:border-scale-1200 p-5
                     dark:text-dark-100 dark:hover:border-dark-100
                   `}
                   >
@@ -231,7 +227,7 @@ const Nav = () => {
                     href="/blog"
                     className={`
                     inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                    text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
+                    text-scale-1100 hover:text-scale-1200 hover:border-scale-1200 p-5
                     dark:text-dark-100 dark:hover:border-dark-100
                   `}
                   >
@@ -239,20 +235,41 @@ const Nav = () => {
                   </a>
                 </div>
               </div>
-              <div className="hidden lg:flex items-center sm:space-x-3">
-                <a href="https://github.com/supabase/supabase" target="_blank">
-                  <Button
-                    className="sbui-btn sbui-btn-text sbui-btn--tiny sbui-btn--text-align-center"
-                    icon={<IconStar />}
-                  >
-                    Star us on GitHub
-                  </Button>
-                </a>
-                <a href="https://app.supabase.io/">
-                  <Button type="default">Sign in</Button>
-                </a>
+              <div className="flex items-center gap-2">
+                <Button
+                  as="a"
+                  className="group"
+                  // @ts-ignore
+                  href="https://github.com/supabase/supabase"
+                  target="_blank"
+                  type="default"
+                  icon={
+                    <div className="flex items-center justify-center  text-brand-800 w-4 h-4">
+                      <div
+                        className="text-scale-900 flex items-center justify-center w-3 h-3 
+                      
+                      group-hover:w-4  
+                      group-hover:h-4 
+                      group-hover:text-yellow-900 
+                      group-focus:w-4  
+                      group-focus:h-4 
+                      group-focus:text-yellow-900 
+                      
+                      transition-all"
+                      >
+                        <IconStar strokeWidth={2} />
+                      </div>
+                    </div>
+                  }
+                >
+                  Star us on GitHub
+                </Button>
+
                 <a href="https://app.supabase.io/">
                   <Button>Start your project</Button>
+                </a>
+                <a href="https://app.supabase.io/">
+                  <Button type="text">Sign in</Button>
                 </a>
               </div>
             </div>
@@ -270,7 +287,7 @@ const Nav = () => {
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <div className="p-4 md:p-8 h-screen w-screen fixed bg-white transform overflow-y-scroll -inset-y-0 z-50 dark:bg-dark-700">
+            <div className="p-4 md:p-8 h-screen w-screen fixed bg-white transform overflow-y-scroll -inset-y-0 z-50 dark:bg-scale-300">
               <div className="absolute right-4 top-4 items-center justify-between">
                 <div className="-mr-2">
                   <button

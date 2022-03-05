@@ -71,7 +71,7 @@ function DarkModeToggle() {
                   ${
                     isDarkMode ? 'translate-x-5' : 'translate-x-0'
                   } inline-block h-5 w-5 rounded-full
-                  bg-white dark:bg-dark-700 shadow-lg transform ring-0 transition ease-in-out duration-200
+                  bg-white dark:bg-scale-300 shadow-lg transform ring-0 transition ease-in-out duration-200
                 `}
         />
       </button>

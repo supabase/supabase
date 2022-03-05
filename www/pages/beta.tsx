@@ -224,11 +224,11 @@ const Introduction = () => {
 const TableOfContents = (props: any) => {
   const { scrollTo } = props
   return (
-    <div className="bg-gray-50 dark:bg-dark-700 text-dark-400 dark:text-dark-200">
+    <div className="bg-gray-50 dark:bg-scale-300 text-dark-400 dark:text-dark-200">
       <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4">
         <div className="col-span-12 text-base mb-10">
           <p className="text-2xl text-black dark:text-white">
-            Supabase <span className="text-brand-600 dark:text-brand-700">Beta</span> is starting
+            Supabase <span className="text-brand-900 dark:text-brand-700">Beta</span> is starting
             now.
           </p>
         </div>
@@ -319,7 +319,7 @@ const Performance = () => {
                       <Bar
                         color={
                           stat.name === 'Supabase'
-                            ? 'bg-brand-600 dark:bg-brand-700'
+                            ? 'bg-brand-900 dark:bg-brand-700'
                             : 'bg-dark-300 dark:bg-dark-400'
                         }
                         finalPercentage={Math.ceil((stat.value / maxValue) * 100)}
@@ -424,7 +424,7 @@ const Performance = () => {
 
 const Security = () => {
   return (
-    <div id="security" className="bg-gray-50 dark:bg-dark-700">
+    <div id="security" className="bg-gray-50 dark:bg-scale-300">
       <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-200">
         <SectionHeader sectionNumber={2} header="Security" />
 
@@ -542,7 +542,7 @@ const Reliability = () => {
 const NewFeaturesAndIntegrations = () => {
   const { basePath } = useRouter()
   return (
-    <div id="newFeaturesAndIntegrations" className="bg-gray-50 dark:bg-dark-700">
+    <div id="newFeaturesAndIntegrations" className="bg-gray-50 dark:bg-scale-300">
       <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-200">
         <SectionHeader sectionNumber={4} header="New Features & Integrations" />
 
@@ -734,7 +734,7 @@ const BetaPricing = () => (
 )
 
 const OpenSource = () => (
-  <div id="openSource" className="bg-gray-50 dark:bg-dark-700">
+  <div id="openSource" className="bg-gray-50 dark:bg-scale-300">
     <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-200">
       <SectionHeader sectionNumber={6} header="Open Source" />
 
@@ -838,7 +838,7 @@ const FundingPartners = () => (
 )
 
 const ScalingOurTeam = () => (
-  <div id="scalingOurTeam" className="bg-gray-50 dark:bg-dark-700">
+  <div id="scalingOurTeam" className="bg-gray-50 dark:bg-scale-300">
     <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-200">
       <SectionHeader sectionNumber={8} header="Scaling Our Team" />
 

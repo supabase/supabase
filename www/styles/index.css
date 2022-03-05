@@ -9,12 +9,23 @@
   font-weight: 400;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'custom-font';
   src: url(/fonts/custom/CustomFont-Medium.woff2) format('woff2'),
     url(/fonts/custom/CustomFont-Medium.woff) format('woff');
   font-weight: 500;
   font-style: normal;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-scale-200;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /*
@@ -68,19 +79,13 @@ p {
   margin-bottom: 16px;
 }
 
+small {
+  @apply text-xs text-scale-900;
+}
+
 .sbui-border-fix select {
   @apply border-solid;
   border-width: 1px;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  @apply bg-scale-200;
 }
 
 .section--masked {
@@ -129,12 +134,12 @@ body {
   @apply border border-gray-50 dark:border-gray-700;
 }
 
-a {
+/* a {
   @apply hover:text-black dark:hover:text-white;
-}
+} */
 
 .sbui-tabs--alt div[role='tablist'] .sbui-btn-primary {
-  @apply bg-gray-800 text-white dark:bg-gray-600 dark:text-white;
+  @apply bg-gray-800 text-white dark:bg-scale-300 dark:text-white;
   text-shadow: none;
   font-weight: 400;
 }
