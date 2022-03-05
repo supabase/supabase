@@ -6,7 +6,6 @@ import { groupBy, isNull } from 'lodash'
 import { toJS } from 'mobx'
 import dayjs from 'dayjs'
 import {
-  Typography,
   Dropdown,
   Button,
   IconSave,
@@ -29,7 +28,7 @@ import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 
 const ReactGridLayout = WidthProvider(RGL)
-const { Title } = Typography
+
 const LAYOUT_COLUMN_COUNT = 24
 const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
@@ -305,15 +304,12 @@ const Reports = () => {
                 }
               >
                 <Dropdown.TriggerItem icon={cat.icon ? cat.icon : <IconHome size="tiny" />}>
-                  <div className="flex items-center justify-between w-full">
-                    <span>{cat.label}</span>
-                    <Typography.Text type="secondary">
-                      <IconChevronRight size="small" />
-                    </Typography.Text>
-                  </div>
+                  {cat.label}
+                  <Dropdown.RightSlot>
+                    <IconChevronRight size={14} />
+                  </Dropdown.RightSlot>
                 </Dropdown.TriggerItem>
               </Dropdown>
-              <Dropdown.Seperator />
             </>
           )
         })}
@@ -323,9 +319,7 @@ const Reports = () => {
 
   return (
     <div className="mx-6 flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
-      <Title level={3} className="m-0">
-        Reports
-      </Title>
+      <h1 className="text-xl text-scale-1200">Reports</h1>
 
       <div className="flex mb-4 items-center space-x-3 justify-between">
         <div className="flex space-x-3 items-center">
@@ -339,15 +333,15 @@ const Reports = () => {
 
           {startDate && endDate && (
             <div className="hidden lg:flex space-x-1 items-center ">
-              <Typography.Text type="secondary">
+              <span className="text-sm text-scale-1100">
                 {dayjs(startDate).format('MMM D, YYYY')}
-              </Typography.Text>
-              <Typography.Text type="secondary" className="opacity-50">
+              </span>
+              <span className="text-scale-900">
                 <IconArrowRight size={12} />
-              </Typography.Text>
-              <Typography.Text type="secondary">
+              </span>
+              <span className="text-sm text-scale-1100">
                 {dayjs(endDate).format('MMM D, YYYY')}
-              </Typography.Text>
+              </span>
             </div>
           )}
         </div>
