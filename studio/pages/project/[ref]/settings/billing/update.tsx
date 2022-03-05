@@ -22,16 +22,19 @@ import { BILLING_PLANS } from 'components/interfaces/Billing/PlanSelection/Plans
 const BillingUpdate: NextPage = () => {
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
+  const stripeCustomerId = ui.selectedOrganization?.stripe_customer_id
 
   const subscriptionStats = useSubscriptionStats()
   const freeProjectsLimit = ui?.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
   const freeProjectsOwned = subscriptionStats.total_free_projects ?? 0
 
-  const [loading, setLoading] = useState(false)
+  const [isLoadingSubscription, setIsLoadingSubscription] = useState(false)
+  const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
   const [showConfirmDowngrade, setShowConfirmDowngrade] = useState(false)
   const [showDowngradeError, setShowDowngradeError] = useState(false)
 
   const [subscription, setSubscription] = useState<StripeSubscription>()
+  const [paymentMethods, setPaymentMethods] = useState<any>()
   const [selectedPlan, setSelectedPlan] = useState<BillingPlan>()
 
   const showProPlanPage =
@@ -42,9 +45,31 @@ const BillingUpdate: NextPage = () => {
     if (projectRef) getSubscription()
   }, [projectRef])
 
+  useEffect(() => {
+    if (stripeCustomerId) getStripeAccount()
+  }, [stripeCustomerId])
+
+  const getStripeAccount = async () => {
+    try {
+      setIsLoadingPaymentMethods(true)
+      const { paymentMethods, error: customerError } = await post(`${API_URL}/stripe/customer`, {
+        stripe_customer_id: stripeCustomerId,
+      })
+      if (customerError) throw customerError
+      setIsLoadingPaymentMethods(false)
+      setPaymentMethods(paymentMethods)
+    } catch (error: any) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to get subscription: ${error.message}`,
+      })
+    }
+  }
+
   const getSubscription = async () => {
     try {
-      setLoading(true)
+      setIsLoadingSubscription(true)
 
       if (!ui.selectedProject?.subscription_id) {
         throw new Error('Unable to get subscription ID of project')
@@ -64,7 +89,7 @@ const BillingUpdate: NextPage = () => {
         message: `Failed to get subscription: ${error.message}`,
       })
     } finally {
-      setLoading(false)
+      setIsLoadingSubscription(false)
     }
   }
 
@@ -107,6 +132,8 @@ const BillingUpdate: NextPage = () => {
           visible={showProPlanPage}
           currentPlan={subscription}
           selectedPlan={selectedPlan}
+          isLoadingPaymentMethods={isLoadingPaymentMethods}
+          paymentMethods={paymentMethods?.data ?? []}
           onSelectBack={() => setSelectedPlan(undefined)}
         />
       )}
