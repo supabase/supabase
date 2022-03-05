@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, Typography, Toggle } from '@supabase/ui'
+import { Badge, Toggle } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
