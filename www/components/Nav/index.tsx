@@ -157,7 +157,8 @@ const Nav = () => {
         px-1 border-b-2 border-transparent 
         text-sm 
         font-medium 
-        text-scale-1100 hover:text-scale-1200
+        transition-colors
+        text-scale-1200 hover:text-brand-900
         cursor-pointer
                 ` + props.active
       }
@@ -181,7 +182,8 @@ const Nav = () => {
     <>
       <Announcement />
       <div className="sticky top-0 z-50">
-        <nav className="bg-scale-200 border-b dark:border-dark">
+        <div className="absolute w-full h-full bg-scale-100 top-0 opacity-80"></div>
+        <nav className="backdrop-blur-sm border-b">
           {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
           <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-16 xl:px-20">
             <HamburgerButton toggleFlyOut={() => setOpen(true)} />
@@ -217,7 +219,7 @@ const Nav = () => {
                     href="/pricing"
                     className={`
                     inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                    text-scale-1100 hover:text-scale-1200 hover:border-scale-1200 p-5
+                    text-scale-1200 hover:text-brand-900 hover:border-brand-900 p-5
                     dark:text-dark-100 dark:hover:border-dark-100
                   `}
                   >
@@ -227,7 +229,7 @@ const Nav = () => {
                     href="/blog"
                     className={`
                     inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                    text-scale-1100 hover:text-scale-1200 hover:border-scale-1200 p-5
+                    text-scale-1200 hover:text-brand-900 hover:border-brand-900 p-5
                     dark:text-dark-100 dark:hover:border-dark-100
                   `}
                   >
