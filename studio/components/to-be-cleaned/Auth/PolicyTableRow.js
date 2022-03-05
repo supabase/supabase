@@ -55,7 +55,6 @@ const PolicyRow = ({
         dark:border-panel-border-dark
       "
     >
-      {/* <div className="flex flex-col grow lg:flex-row lg:items-center gap-3"> */}
       <div className="font-mono text-xs text-scale-900">{policy.command}</div>
       <div className="flex flex-col lg:flex-row gap-2 truncate grow">
         <span className="text-sm text-scale-1200 truncate max-w-xs">{policy.name}</span>
@@ -65,7 +64,6 @@ const PolicyRow = ({
           CHECK ( auth.email() = email );
         </span>
       </div>
-      {/* </div> */}
       <div className="">
         <Dropdown
           side="bottom"
