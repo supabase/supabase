@@ -1,4 +1,5 @@
-const ui = require('@supabase/ui/dist/config/ui.config.js')
+const ui = require('./ui.config.js')
+const svgToDataUri = require('mini-svg-data-uri')
 
 module.exports = ui({
   mode: 'JIT',
@@ -14,8 +15,8 @@ module.exports = ui({
   theme: {
     borderColor: (theme) => ({
       ...theme('colors'),
-      DEFAULT: theme('colors.scale.500', 'currentColor'),
-      dark: theme('colors.scale.400', 'currentColor'),
+      DEFAULT: theme('colors.scale.300', 'currentColor'),
+      dark: theme('colors.scale.1200', 'currentColor'),
     }),
     divideColor: (theme) => ({
       ...theme('colors'),
@@ -107,6 +108,13 @@ module.exports = ui({
       //   white: theme('colors.white'),
       //   black: theme('colors.black'),
       // }),
+      backgroundImage: (theme) => ({
+        squiggle: `url("${svgToDataUri(
+          `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 3" enable-background="new 0 0 6 3" width="6" height="3" fill="${theme(
+            'colors.yellow.400'
+          )}"><polygon points="5.5,0 2.5,3 1.1,3 4.1,0"/><polygon points="4,0 6,2 6,0.6 5.4,0"/><polygon points="0,2 1,3 2.4,3 0,0.6"/></svg>`
+        )}")`,
+      }),
     },
   },
   // variants: {
@@ -117,7 +125,4 @@ module.exports = ui({
   //   },
   // },
   plugins: [],
-  corePlugins: {
-    preflight: true,
-  },
 })
