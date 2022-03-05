@@ -17,7 +17,7 @@
     "@mdx-js/react": "^1.6.22",
     "@next/mdx": "^10.0.7",
     "@supabase/supabase-js": "^1.6.0",
-    "@supabase/ui": "v0.37.0-alpha.49",
+    "@supabase/ui": "v0.37.0-alpha.50",
     "classnames": "2.2.6",
     "date-fns": "2.10.0",
     "deepmerge": "^4.2.2",

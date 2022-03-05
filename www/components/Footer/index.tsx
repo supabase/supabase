@@ -84,24 +84,20 @@ const Footer = () => {
               {FooterLinks.map((segment: any) => {
                 return (
                   <div key={`footer_${segment.title}`}>
-                    <h3 className="text-sm text-gray-300 dark:text-dark-400">{segment.title}</h3>
+                    <h3 className="text-sm text-scale-900">{segment.title}</h3>
                     <ul className="mt-4 space-y-2">
                       {segment.links.map((link: any, idx: number) => (
                         <li key={`${segment.title}_link_${idx}`}>
                           <a
                             href={link.url}
-                            className={`text-sm ${
+                            className={`transition-colors text-sm ${
                               link.url
-                                ? 'text-gray-500 dark:text-dark-100'
-                                : 'text-gray-400 dark:text-dark-200'
-                            } hover:text-gray-900 dark:hover:text-gray-300`}
+                                ? 'text-scale-1100 hover:text-scale-1200 '
+                                : 'text-scale-900 hover:text-scale-900'
+                            } `}
                           >
                             {link.text}
-                            {!link.url && (
-                              <span className="block text-sm text-gray-300 dark:text-dark-300">
-                                Coming soon
-                              </span>
-                            )}
+                            {!link.url && <span className="ml-2 inline text-xs">Coming soon</span>}
                           </a>
                         </li>
                       ))}

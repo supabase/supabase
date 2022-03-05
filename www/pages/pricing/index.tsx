@@ -214,7 +214,7 @@ export default function IndexPage() {
                     <span className="sr-only">Feature by</span>
                     <span>Plans</span>
                     <div
-                      className="absolute bottom-0 left-0 h-0.25 w-full bg-gray-200 dark:bg-gray-600"
+                      className="absolute bottom-0 left-0 h-0.25 w-full bg-gray-200 dark:bg-scale-300"
                       style={{ height: '1px' }}
                     ></div>
                   </th>
@@ -225,7 +225,7 @@ export default function IndexPage() {
                   >
                     <Typography.Title level={4}>Free</Typography.Title>
                     <div
-                      className="absolute bottom-0 left-0 h-0.25 w-full bg-gray-200 dark:bg-gray-600"
+                      className="absolute bottom-0 left-0 h-0.25 w-full bg-gray-200 dark:bg-scale-300"
                       style={{ height: '1px' }}
                     ></div>
                   </th>
@@ -236,7 +236,7 @@ export default function IndexPage() {
                   >
                     <Typography.Title level={4}>Pro</Typography.Title>
                     <div
-                      className="absolute bottom-0 left-0 h-0.25 w-full bg-gray-200 dark:bg-gray-600"
+                      className="absolute bottom-0 left-0 h-0.25 w-full bg-gray-200 dark:bg-scale-300"
                       style={{ height: '1px' }}
                     ></div>
                   </th>
@@ -247,7 +247,7 @@ export default function IndexPage() {
                   >
                     <Typography.Title level={4}>Pay as you go</Typography.Title>
                     <div
-                      className="absolute bottom-0 left-0 h-0.25 w-full bg-gray-200 dark:bg-gray-600"
+                      className="absolute bottom-0 left-0 h-0.25 w-full bg-gray-200 dark:bg-scale-300"
                       style={{ height: '1px' }}
                     ></div>
                   </th>
