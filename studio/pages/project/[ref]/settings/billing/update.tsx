@@ -102,7 +102,14 @@ const BillingUpdate: NextPage = () => {
         />
       </div>
 
-      <ProUpgrade visible={showProPlanPage} onSelectBack={() => setSelectedPlan(undefined)} />
+      {subscription !== undefined && (
+        <ProUpgrade
+          visible={showProPlanPage}
+          currentPlan={subscription}
+          selectedPlan={selectedPlan}
+          onSelectBack={() => setSelectedPlan(undefined)}
+        />
+      )}
 
       <ConfirmModal
         danger
@@ -118,6 +125,7 @@ const BillingUpdate: NextPage = () => {
         }}
         onSelectConfirm={onConfirmDowngrade}
       />
+
       <Modal
         visible={showDowngradeError}
         size="small"

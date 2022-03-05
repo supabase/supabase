@@ -1,16 +1,27 @@
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { Badge, Button, IconArrowLeft, IconHelpCircle, Toggle } from '@supabase/ui'
 
-import { PaymentSummaryPanel } from '.'
 import Divider from 'components/ui/Divider'
+import { PaymentSummaryPanel, ComputeSizeSelection, StripeSubscription } from '.'
+import { BillingPlan } from './PlanSelection/Plans/Plans.types'
+import { COMPUTE_SIZES } from './AddOns/AddOns.constant'
 
 interface Props {
   visible: boolean
+  currentPlan: StripeSubscription
+  selectedPlan?: BillingPlan
   onSelectBack: () => void
 }
 
-const ProUpgrade: FC<Props> = ({ visible, onSelectBack }) => {
+const ProUpgrade: FC<Props> = ({ visible, currentPlan, selectedPlan, onSelectBack }) => {
+  const [isOverageEnabled, setIsOverageEnabled] = useState(false)
+  const [selectedComputeSize, setSelectedComputeSize] = useState<any>(COMPUTE_SIZES[0])
+
+  const onSelectComputeSizeOption = (option: any) => {
+    setSelectedComputeSize(option)
+  }
+
   return (
     <Transition
       show={visible}
@@ -22,7 +33,7 @@ const ProUpgrade: FC<Props> = ({ visible, onSelectBack }) => {
       {visible && (
         <>
           <div className="space-y-8 w-3/5">
-            <div className="relative ml-64 mr-20">
+            <div className="relative ml-64">
               <div className="absolute top-[2px] -left-24">
                 <Button type="text" icon={<IconArrowLeft />} onClick={onSelectBack}>
                   Back
@@ -30,41 +41,58 @@ const ProUpgrade: FC<Props> = ({ visible, onSelectBack }) => {
               </div>
               <div className="space-y-8">
                 <h4 className="text-lg">Change your project's subscription</h4>
-                <div className="space-y-1">
-                  <h3 className="text-xl">
-                    Welcome to <span className="text-green-1100">Pro</span>
-                    <p className="text-sm text-scale-1100">
-                      Your new subscription will begin immediately after payment
-                    </p>
-                  </h3>
-                </div>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <p>Enable overages</p>
-                      <IconHelpCircle
-                        size={16}
-                        strokeWidth={1.5}
-                        className="cursor-pointer opacity-50 hover:opacity-100 transition"
-                        onClick={() => {}}
-                      />
-                    </div>
-                    <p className="text-sm text-scale-1100">
-                      Additional resources will be charged on a usage basis
-                    </p>
+                <div
+                  className="space-y-8 overflow-scroll pb-8 pr-20"
+                  style={{ height: 'calc(100vh - 6.3rem - 49.5px)' }}
+                >
+                  <div className="space-y-1">
+                    <h3 className="text-xl">
+                      Welcome to <span className="text-green-1100">Pro</span>
+                      <p className="text-sm text-scale-1100">
+                        Your new subscription will begin immediately after payment
+                      </p>
+                    </h3>
                   </div>
-                  <Toggle />
-                </div>
-                <Divider light />
-                <div className="flex items-center space-x-2">
-                  <h4 className="text-lg">Extend your project with add-ons</h4>
-                  <Badge color="green">Optional</Badge>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <p>Enable overages</p>
+                        <IconHelpCircle
+                          size={16}
+                          strokeWidth={1.5}
+                          className="cursor-pointer opacity-50 hover:opacity-100 transition"
+                          onClick={() => {}}
+                        />
+                      </div>
+                      <p className="text-sm text-scale-1100">
+                        Additional resources will be charged on a usage basis
+                      </p>
+                    </div>
+                    <Toggle
+                      checked={isOverageEnabled}
+                      onChange={() => setIsOverageEnabled(!isOverageEnabled)}
+                    />
+                  </div>
+                  <Divider light />
+                  <div className="flex items-center space-x-2">
+                    <h4 className="text-lg">Extend your project with add-ons</h4>
+                    <Badge color="green">Optional</Badge>
+                  </div>
+                  <ComputeSizeSelection
+                    selectedComputeSize={selectedComputeSize}
+                    onSelectOption={onSelectComputeSizeOption}
+                  />
                 </div>
               </div>
             </div>
           </div>
           <div className="w-2/5 -mt-10">
-            <PaymentSummaryPanel />
+            <PaymentSummaryPanel
+              currentPlan={currentPlan}
+              selectedPlan={selectedPlan}
+              isOverageEnabled={isOverageEnabled}
+              selectedComputeSize={selectedComputeSize}
+            />
           </div>
         </>
       )}
