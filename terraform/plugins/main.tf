@@ -1,0 +1,3 @@
+module "PluginDefinitions" {
+  source = "./definitions"
+}

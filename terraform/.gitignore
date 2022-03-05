@@ -1,0 +1,12 @@
+dotenv.tf
+thirdpartyauth.dotenv.tf
+kong.yml
+.terraform
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.tfstate.lock.info
+.DS_Store
+
+*.cer
+*.pem

@@ -1,0 +1,393 @@
+# Rename this file to thirdpartyauth.dotenv.tf
+# That filename is in gitignore, so you won't accidentally leak your third party auth credentials
+
+// =================================================
+// APPLE THIRD PARTY AUTH CONFIG
+// =================================================
+variable "THIRD_PARTY_AUTH_APPLE_ENABLED" {
+  type      = bool
+  default   = false
+  sensitive = false
+}
+
+variable "THIRD_PARTY_AUTH_APPLE_CLIENT_ID" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_APPLE_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_APPLE_REDIRECT_URI" {
+  type      = string
+  default   = ""
+  sensitive = false
+}
+
+
+// =================================================
+// AZURE THIRD PARTY AUTH CONFIG
+// =================================================
+variable "THIRD_PARTY_AUTH_AZURE_ENABLED" {
+  type      = bool
+  default   = false
+  sensitive = false
+}
+
+variable "THIRD_PARTY_AUTH_AZURE_CLIENT_ID" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_AZURE_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_AZURE_REDIRECT_URI" {
+  type      = string
+  default   = ""
+  sensitive = false
+}
+
+
+// =================================================
+// BITBUCKET THIRD PARTY AUTH CONFIG
+// =================================================
+variable "THIRD_PARTY_AUTH_BITBUCKET_ENABLED" {
+  type      = bool
+  default   = false
+  sensitive = false
+}
+
+variable "THIRD_PARTY_AUTH_BITBUCKET_CLIENT_ID" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_BITBUCKET_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_BITBUCKET_REDIRECT_URI" {
+  type      = string
+  default   = ""
+  sensitive = false
+}
+
+
+// =================================================
+// DISCORD THIRD PARTY AUTH CONFIG
+// =================================================
+variable "THIRD_PARTY_AUTH_DISCORD_ENABLED" {
+  type      = bool
+  default   = false
+  sensitive = false
+}
+
+variable "THIRD_PARTY_AUTH_DISCORD_CLIENT_ID" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_DISCORD_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_DISCORD_REDIRECT_URI" {
+  type      = string
+  default   = ""
+  sensitive = false
+}
+
+
+// =================================================
+// FACEBOOK THIRD PARTY AUTH CONFIG
+// =================================================
+variable "THIRD_PARTY_AUTH_FACEBOOK_ENABLED" {
+  type      = bool
+  default   = false
+  sensitive = false
+}
+
+variable "THIRD_PARTY_AUTH_FACEBOOK_CLIENT_ID" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_FACEBOOK_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_FACEBOOK_REDIRECT_URI" {
+  type      = string
+  default   = ""
+  sensitive = false
+}
+
+
+// =================================================
+// GITHUB THIRD PARTY AUTH CONFIG
+// =================================================
+variable "THIRD_PARTY_AUTH_GITHUB_ENABLED" {
+  type      = bool
+  default   = false
+  sensitive = false
+}
+
+variable "THIRD_PARTY_AUTH_GITHUB_CLIENT_ID" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_GITHUB_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_GITHUB_REDIRECT_URI" {
+  type      = string
+  default   = ""
+  sensitive = false
+}
+
+
+// =================================================
+// GITLAB THIRD PARTY AUTH CONFIG
+// =================================================
+variable "THIRD_PARTY_AUTH_GITLAB_ENABLED" {
+  type      = bool
+  default   = false
+  sensitive = false
+}
+
+variable "THIRD_PARTY_AUTH_GITLAB_CLIENT_ID" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_GITLAB_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_GITLAB_REDIRECT_URI" {
+  type      = string
+  default   = ""
+  sensitive = false
+}
+
+
+// =================================================
+// GOOGLE THIRD PARTY AUTH CONFIG
+// =================================================
+variable "THIRD_PARTY_AUTH_GOOGLE_ENABLED" {
+  type      = bool
+  default   = false
+  sensitive = false
+}
+
+variable "THIRD_PARTY_AUTH_GOOGLE_CLIENT_ID" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_GOOGLE_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_GOOGLE_REDIRECT_URI" {
+  type      = string
+  default   = ""
+  sensitive = false
+}
+
+
+// =================================================
+// LINKEDIN THIRD PARTY AUTH CONFIG
+// =================================================
+variable "THIRD_PARTY_AUTH_LINKEDIN_ENABLED" {
+  type      = bool
+  default   = false
+  sensitive = false
+}
+
+variable "THIRD_PARTY_AUTH_LINKEDIN_CLIENT_ID" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_LINKEDIN_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_LINKEDIN_REDIRECT_URI" {
+  type      = string
+  default   = ""
+  sensitive = false
+}
+
+
+// =================================================
+// NOTION THIRD PARTY AUTH CONFIG
+// =================================================
+variable "THIRD_PARTY_AUTH_NOTION_ENABLED" {
+  type      = bool
+  default   = false
+  sensitive = false
+}
+
+variable "THIRD_PARTY_AUTH_NOTION_CLIENT_ID" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_NOTION_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_NOTION_REDIRECT_URI" {
+  type      = string
+  default   = ""
+  sensitive = false
+}
+
+
+// =================================================
+// SPOTIFY THIRD PARTY AUTH CONFIG
+// =================================================
+variable "THIRD_PARTY_AUTH_SPOTIFY_ENABLED" {
+  type      = bool
+  default   = false
+  sensitive = false
+}
+
+variable "THIRD_PARTY_AUTH_SPOTIFY_CLIENT_ID" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_SPOTIFY_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_SPOTIFY_REDIRECT_URI" {
+  type      = string
+  default   = ""
+  sensitive = false
+}
+
+
+// =================================================
+// SLACK THIRD PARTY AUTH CONFIG
+// =================================================
+variable "THIRD_PARTY_AUTH_SLACK_ENABLED" {
+  type      = bool
+  default   = false
+  sensitive = false
+}
+
+variable "THIRD_PARTY_AUTH_SLACK_CLIENT_ID" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_SLACK_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_SLACK_REDIRECT_URI" {
+  type      = string
+  default   = ""
+  sensitive = false
+}
+
+
+// =================================================
+// TWITCH THIRD PARTY AUTH CONFIG
+// =================================================
+variable "THIRD_PARTY_AUTH_TWITCH_ENABLED" {
+  type      = bool
+  default   = false
+  sensitive = false
+}
+
+variable "THIRD_PARTY_AUTH_TWITCH_CLIENT_ID" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_TWITCH_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_TWITCH_REDIRECT_URI" {
+  type      = string
+  default   = ""
+  sensitive = false
+}
+
+
+// =================================================
+// TWITTER THIRD PARTY AUTH CONFIG
+// =================================================
+variable "THIRD_PARTY_AUTH_TWITTER_ENABLED" {
+  type      = bool
+  default   = false
+  sensitive = false
+}
+
+variable "THIRD_PARTY_AUTH_TWITTER_CLIENT_ID" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_TWITTER_SECRET" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "THIRD_PARTY_AUTH_TWITTER_REDIRECT_URI" {
+  type      = string
+  default   = ""
+  sensitive = false
+}

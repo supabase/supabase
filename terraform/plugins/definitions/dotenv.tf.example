@@ -1,0 +1,13 @@
+# This token should be sent in requests to Watchtower HTTP API to trigger an image and container update
+# To retrieve this value, check the environmental variables of the Watchtower container
+resource "random_password" "WATCHTOWER_HTTP_API_TOKEN" {
+  length  = 128
+  special = false
+}
+
+variable "GHCR_IO_TOKEN" {
+  description = "If you're pulling images from Github Container Registry, set your token here (https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}

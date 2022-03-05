@@ -1,0 +1,174 @@
+
+# Security config
+
+# We will automatically generate a secure password for Postgres
+resource "random_password" "POSTGRES_PASSWORD" {
+  length  = 96
+  special = false
+}
+
+# We will automatically generate a JWT secret
+resource "random_password" "JWT_SECRET" {
+  length  = 64
+  special = false
+}
+
+variable "JWT_EXPIRY" {
+  type    = number
+  default = 3600
+}
+
+# API Config
+variable "ADDITIONAL_REDIRECT_URLS" {
+  type        = string
+  default     = ""
+  description = "CHANGE THIS BEFORE DEPLOYING - Comma separated list of additional redirect urls. Valid examples: https://example.com/reset-password,https://example.com/magiclink-login,https://example.com/signup-complete,myapp://some/deep/link"
+}
+
+variable "SITE_URL" {
+  type        = string
+  default     = "example.com"
+  description = "CHANGE THIS BEFORE DEPLOYING - The base domain for your site without subdomains OR protocols (e.g. example.com is correct, sub.example.com is incorrect, https://example.com is incorrect)"
+}
+
+variable "API_EXTERNAL_URL" {
+  type        = string
+  default     = "https://api.example.com"
+  description = "CHANGE THIS BEFORE DEPLOYING - What is the URL that your supabase instance is accessible at? For example, where can we access https://api.example.com/rest/v1, https://api.example.com/auth/v1, etc.?"
+}
+
+# Email config
+
+variable "SMTP_ADMIN_EMAIL" {
+  type        = string
+  default     = "admin@example.com"
+  description = "CHANGE THIS BEFORE DEPLOYING"
+}
+
+variable "SMTP_HOST" {
+  type        = string
+  default     = "smtp.example.com"
+  description = "CHANGE THIS BEFORE DEPLOYING"
+}
+
+variable "SMTP_PORT" {
+  type        = number
+  default     = 2500
+  description = "CHANGE THIS BEFORE DEPLOYING"
+}
+
+variable "SMTP_USER" {
+  type        = string
+  default     = "fake_mail_user"
+  description = "CHANGE THIS BEFORE DEPLOYING"
+}
+
+variable "SMTP_PASS" {
+  type        = string
+  default     = "fake_mail_pass"
+  description = "CHANGE THIS BEFORE DEPLOYING"
+}
+
+variable "SMTP_SENDER_NAME" {
+  type        = string
+  default     = "fake_sender"
+  description = "CHANGE THIS BEFORE DEPLOYING"
+}
+
+
+# Postgres connection config
+variable "POSTGRES_HOST" {
+  type    = string
+  default = "db"
+}
+
+variable "POSTGRES_PORT" {
+  type    = number
+  default = 5432
+}
+
+variable "POSTGRES_USER" {
+  type      = string
+  default   = "postgres"
+  sensitive = true
+}
+
+variable "POSTGRES_DB" {
+  type    = string
+  default = "postgres"
+}
+
+
+# Meta config
+variable "META_URL" {
+  type        = string
+  default     = "meta"
+  description = "Combines with META_HTTP_PORT to form the Meta URL"
+}
+
+variable "META_PORT" {
+  type    = number
+  default = 8080
+}
+
+# Studio config
+variable "STUDIO_PORT" {
+  type    = number
+  default = 3000
+}
+
+# Misc config
+variable "DISABLE_SIGNUP" {
+  type    = bool
+  default = false
+}
+
+variable "ENABLE_EMAIL_SIGNUP" {
+  type    = bool
+  default = true
+}
+
+variable "ENABLE_EMAIL_AUTOCONFIRM" {
+  type    = bool
+  default = true
+}
+
+variable "ENABLE_PHONE_SIGNUP" {
+  type    = bool
+  default = false
+}
+
+variable "ENABLE_PHONE_AUTOCONFIRM" {
+  type    = bool
+  default = false
+}
+
+variable "EMAIL_INVITE_TEMPLATE_URL" {
+  type        = string
+  default     = ""
+  description = "A URL which points towards a HTML template for inviting users"
+}
+
+variable "EMAIL_CONFIRMATION_TEMPLATE_URL" {
+  type        = string
+  default     = ""
+  description = "A URL which points towards a HTML template to allow users to confirm their account"
+}
+
+variable "EMAIL_RECOVERY_TEMPLATE_URL" {
+  type        = string
+  default     = ""
+  description = "A URL which points towards a HTML template to allow users to recover their account"
+}
+
+variable "EMAIL_MAGICLINK_TEMPLATE_URL" {
+  type        = string
+  default     = ""
+  description = "A URL which points towards a HTML template which allows users to login with a magic link"
+}
+
+variable "ENABLE_STORAGE" {
+  type        = bool
+  default     = true
+  description = "Set this to false if you don't want the Supabase storage container to be created"
+}

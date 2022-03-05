@@ -1,0 +1,3 @@
+module "Supabase" {
+  source = "./definitions"
+}
