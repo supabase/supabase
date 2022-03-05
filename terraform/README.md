@@ -4,9 +4,7 @@ This repo includes an example of starting a local copy of the Supabase stack via
 
 ### Very important notice
 
-This repo is still a work in progress - it should **NOT** be used for production deployments at this time. For example, the Terraform configuration currently created will destroy all volumes when `destroy` is called. You **WILL** lose all data.
-
-Known issues such as this will be resolved in due course.
+Terraform support is still a work in progress - it should **NOT** be used for production deployments at this time. For example, the Terraform configuration currently created will destroy all volumes when `destroy` is called. You **WILL** lose all data.
 
 ### Secure values
 
