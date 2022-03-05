@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { Badge, Button, IconArrowLeft, IconHelpCircle, Toggle } from '@supabase/ui'
 
@@ -11,16 +11,34 @@ interface Props {
   visible: boolean
   currentPlan: StripeSubscription
   selectedPlan?: BillingPlan
+  paymentMethods?: any[]
   onSelectBack: () => void
+
+  isLoadingPaymentMethods: boolean
 }
 
-const ProUpgrade: FC<Props> = ({ visible, currentPlan, selectedPlan, onSelectBack }) => {
+const ProUpgrade: FC<Props> = ({
+  visible,
+  currentPlan,
+  selectedPlan,
+  paymentMethods,
+  onSelectBack,
+  isLoadingPaymentMethods,
+}) => {
   const [isOverageEnabled, setIsOverageEnabled] = useState(false)
   const [selectedComputeSize, setSelectedComputeSize] = useState<any>(COMPUTE_SIZES[0])
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>()
 
   const onSelectComputeSizeOption = (option: any) => {
     setSelectedComputeSize(option)
   }
+
+  useEffect(() => {
+    if (!isLoadingPaymentMethods && paymentMethods && paymentMethods.length > 0) {
+      // [TODO] Figure out how to get the DEFAULT payment method
+      setSelectedPaymentMethod(paymentMethods[0])
+    }
+  }, [isLoadingPaymentMethods])
 
   return (
     <Transition
@@ -92,6 +110,10 @@ const ProUpgrade: FC<Props> = ({ visible, currentPlan, selectedPlan, onSelectBac
               selectedPlan={selectedPlan}
               isOverageEnabled={isOverageEnabled}
               selectedComputeSize={selectedComputeSize}
+              paymentMethods={paymentMethods}
+              isLoadingPaymentMethods={isLoadingPaymentMethods}
+              selectedPaymentMethod={selectedPaymentMethod}
+              onSelectPaymentMethod={setSelectedPaymentMethod}
             />
           </div>
         </>

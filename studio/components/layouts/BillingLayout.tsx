@@ -44,7 +44,6 @@ const BillingLayout: FC<Props> = ({ children }) => {
           </div>
         </div>
         <div className="overflow-auto">
-          {/* <section className="mx-auto max-w-4xl relative my-10">{children}</section> */}
           <section className="relative">{children}</section>
         </div>
       </div>

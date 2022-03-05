@@ -68,8 +68,8 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
                 )}
               </div>
               <ul className="space-y-4">
-                {plan.pointers.map((pointer: string) => (
-                  <li className="text-sm flex">
+                {plan.pointers.map((pointer: string, idx: number) => (
+                  <li key={`pointer-${idx}`} className="text-sm flex">
                     <div className="w-[15%]">
                       <svg
                         className={`h-5 w-5 text-green-900`}

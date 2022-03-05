@@ -1,13 +1,19 @@
 import { FC } from 'react'
+import { Listbox, IconLoader } from '@supabase/ui'
+
 import { StripeSubscription } from '.'
 import { BillingPlan } from './PlanSelection/Plans/Plans.types'
 
 interface Props {
   currentPlan: StripeSubscription
-  selectedPlan?: BillingPlan
   currentComputeSize?: any
+  selectedPlan?: BillingPlan
   selectedComputeSize: any
   isOverageEnabled: boolean
+  paymentMethods?: any
+  selectedPaymentMethod: any
+  isLoadingPaymentMethods: boolean
+  onSelectPaymentMethod: (method: any) => void
 }
 
 // Use case of this panel is actually only for upgrading from Free to Pro
@@ -23,6 +29,10 @@ const PaymentSummaryPanel: FC<Props> = ({
   isOverageEnabled,
   currentComputeSize,
   selectedComputeSize,
+  paymentMethods,
+  selectedPaymentMethod,
+  isLoadingPaymentMethods,
+  onSelectPaymentMethod,
 }) => {
   const isChangingPlan = selectedPlan !== undefined
   const totalMonthlyCost = (selectedPlan?.price ?? 0) + selectedComputeSize.price
@@ -85,6 +95,45 @@ const PaymentSummaryPanel: FC<Props> = ({
           <p className="text-2xl">0</p>
         </div>
       </div>
+
+      {/* Payment method selection */}
+      {isLoadingPaymentMethods ? (
+        <div className="flex items-center space-x-4">
+          <IconLoader className="animate-spin" size={14} />
+          <p className="text-sm">Retrieving payment methods</p>
+        </div>
+      ) : paymentMethods.length === 0 ? (
+        <div className="text-scale-1100">No methods</div>
+      ) : (
+        <Listbox
+          label="Select payment method"
+          value={selectedPaymentMethod?.id}
+          onChange={onSelectPaymentMethod}
+        >
+          {paymentMethods.map((method: any) => {
+            const label = `•••• •••• •••• ${method.card.last4}`
+            return (
+              <Listbox.Option
+                key={method.id}
+                label={label}
+                value={method.id}
+                addOnBefore={() => {
+                  return (
+                    <img
+                      src={`/img/payment-methods/${method.card.brand
+                        .replace(' ', '-')
+                        .toLowerCase()}.png`}
+                      width="32"
+                    />
+                  )
+                }}
+              >
+                <div>{label}</div>
+              </Listbox.Option>
+            )
+          })}
+        </Listbox>
+      )}
     </div>
   )
 }
