@@ -894,7 +894,7 @@ pages:
           ```js
           const { data: user, error } = await supabase.auth.api.updateUserById({
             uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
-            attributes: { email: 'new@email.com' } },
+            attributes: { email: 'new@email.com' },
           })
           ```
       - name: Updates a user's password.
@@ -903,7 +903,7 @@ pages:
           ```js
           const { data: user, error } = await supabase.auth.api.updateUserById({
             uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
-            attributes: { password: 'new@email.com' } },
+            attributes: { password: 'new@email.com' },
           })
           ```
       - name: Updates a user's metadata.
