@@ -23,12 +23,10 @@ function TweetCard(props: TweetCard) {
           </div>
         </div>
       </div>
-      <Typography.Text type="secondary" className="block mt-3">
-        {props.handle}
-      </Typography.Text>
-      <Typography.Text>
+      <p className="block mt-3">{props.handle}</p>
+      <p>
         <p className="text-base mt-3 text-gray-900 dark:text-white">"{props.quote}"</p>
-      </Typography.Text>
+      </p>
     </div>
   )
 }

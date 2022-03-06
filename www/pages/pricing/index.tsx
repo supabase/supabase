@@ -41,11 +41,11 @@ export default function IndexPage() {
         <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative pt-24 md:pt-24 lg:pt-24">
           <div className="text-center">
             <Typography.Title>Predictable pricing, no surprises</Typography.Title>
-            <Typography.Text>
+            <p>
               <p className="text-lg">
                 Start with a hobby project, collaborate with a team, and scale to millions of users.
               </p>
-            </Typography.Text>
+            </p>
             <div className="grid grid-cols-12 gap-8 mt-16">
               {/* <div className="col-span-12 lg:col-span-6">
                 <div className="rounded border border-green-500 dark:border-green-900 bg-green-500 bg-opacity-10 grid grid-cols-6">
@@ -56,11 +56,11 @@ export default function IndexPage() {
                       </Typography.Title>
                       <Badge dot>Limited time offer</Badge>
                     </Space>
-                    <Typography.Text>
+                    <p>
                       <p className="lg:text-lg mb-2">
                         Lock into permanent beta pricing for 2 years if you upgrade today.
                       </p>
-                    </Typography.Text>
+                    </p>
                   </div>
                 </div>
               </div> */}
@@ -72,9 +72,9 @@ export default function IndexPage() {
                   />
                   <div className="p-6 lg:col-span-6">
                     <Typography.Title level={4}>Free tshirt</Typography.Title>
-                    <Typography.Text>
+                    <p>
                       We are giving away free tshirts to anyone who signs up for the Beta Pro plan
-                    </Typography.Text>
+                    </p>
                   </div>
                 </div>
               </div> */}
@@ -92,7 +92,7 @@ export default function IndexPage() {
               <h2 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">Free</h2>
               <p className="mt-4">
                 <span className="text-4xl font-normal text-gray-900 dark:text-white">$0</span>
-                <Typography.Text type="secondary">/project /month</Typography.Text>
+                <p>/project /month</p>
               </p>
               <p className="my-4 text-sm text-gray-500">
                 Perfect for hobby projects and experiments.
@@ -129,7 +129,7 @@ export default function IndexPage() {
               <h2 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">Pro</h2>
               <p className="mt-4">
                 <span className="text-4xl font-normal text-gray-900 dark:text-white">$25</span>
-                <Typography.Text type="secondary">/project /month</Typography.Text>
+                <p>/project /month</p>
               </p>
               <p className="my-4 text-sm text-gray-500">
                 Everything you need to scale your project into production.
@@ -168,7 +168,7 @@ export default function IndexPage() {
               </h2>
               <p className="mt-4">
                 <span className="text-4xl font-normal text-gray-900 dark:text-white">$25</span>
-                <Typography.Text type="secondary">/project /month plus usage costs</Typography.Text>
+                <p>/project /month plus usage costs</p>
               </p>
               <p className="my-4 text-sm text-gray-500">
                 Designated support team, account manager and technical specialist.
@@ -268,12 +268,10 @@ export default function IndexPage() {
                         <span className="text-4xl font-normal text-gray-900 dark:text-white">
                           $0
                         </span>
-                        <Typography.Text> /project /month</Typography.Text>
+                        <p> /project /month</p>
                       </p>
                       <p className="mt-4 mb-16 ">
-                        <Typography.Text>
-                          Perfect for hobby projects and experiments.
-                        </Typography.Text>
+                        <p>Perfect for hobby projects and experiments.</p>
                       </p>
                       <div className="absolute bottom-0">
                         <Link href="https://app.supabase.io" as="https://app.supabase.io">
@@ -293,12 +291,10 @@ export default function IndexPage() {
                         <span className="text-4xl font-normal text-gray-900 dark:text-white">
                           $25
                         </span>
-                        <Typography.Text> /project /month</Typography.Text>
+                        <p> /project /month</p>
                       </p>
                       <p className="mt-4 mb-16 ">
-                        <Typography.Text>
-                          Everything you need to scale your project into production.
-                        </Typography.Text>
+                        <p>Everything you need to scale your project into production.</p>
                       </p>
                       <div className="absolute bottom-0">
                         <Link href="https://app.supabase.io" as="https://app.supabase.io">
@@ -318,12 +314,10 @@ export default function IndexPage() {
                         <span className="text-4xl font-normal text-gray-900 dark:text-white">
                           $25
                         </span>
-                        <Typography.Text> /project /month plus usage costs</Typography.Text>
+                        <p> /project /month plus usage costs</p>
                       </p>
                       <p className="mt-4 mb-16 ">
-                        <Typography.Text>
-                          Designated support team, account manager and technical specialist.
-                        </Typography.Text>
+                        <p>Designated support team, account manager and technical specialist.</p>
                       </p>
                       <div className="absolute bottom-0">
                         <Link href="https://app.supabase.io" as="https://app.supabase.io">

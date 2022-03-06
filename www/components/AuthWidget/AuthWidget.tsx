@@ -52,10 +52,10 @@ function AuthPage() {
             <Typography.Title level={2} className="mb-4">
               ReactJS Auth Widget
             </Typography.Title>
-            <Typography.Text>
+            <p>
               An API built from the groud up just for Storage.With powerful library clients coming
               soon that allow for asset optimasation and image transformation
-            </Typography.Text>
+            </p>
           </div>
           <div className="col-span-8">
             <div
@@ -142,9 +142,7 @@ function AuthPage() {
                 <Space size={12} direction="vertical">
                   <div>
                     <Typography.Title level={3}>Customise your login form</Typography.Title>
-                    <Typography.Text>
-                      Our ReactJS Auth form will help you get going even quicker{' '}
-                    </Typography.Text>
+                    <p>Our ReactJS Auth form will help you get going even quicker </p>
                   </div>
                   <Divider light />
                   <Input

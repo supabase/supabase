@@ -133,7 +133,7 @@ export const PricingTableRowMobile = (props: any) => {
               <tr className="border-t border-gray-200 dark:border-gray-600 ">
                 <th className="py-5 px-4 text-sm font-normal text-gray-500 text-left" scope="row">
                   <span>
-                    <Typography.Text type="secondary">{feat.title}</Typography.Text>
+                    <p>{feat.title}</p>
                   </span>
                 </th>
                 <td className="py-5 pr-4 text-right">

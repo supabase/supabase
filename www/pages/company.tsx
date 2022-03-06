@@ -104,13 +104,13 @@ const Team = () => {
         <SectionHeader title="Team" paragraph={<div className=""></div>} />
         <div className="grid grid-cols-2 md:grid-cols-12">
           <div className="col-span-8 ">
-            <Typography.Text>
+            <p>
               <p className="text-lg">
                 Supabase is fully remote, with a strong affinity for open source maintainers and
                 ex-Founders. Our engineering team is made up of developers from AWS, Google,
                 Palantir, Stripe, and other YC companies.
               </p>
-            </Typography.Text>
+            </p>
           </div>
           <div className=" md:text-right pt-8 md:mt-0 col-span-4">
             <a href="https://about.supabase.com/careers">
@@ -136,9 +136,9 @@ const Team = () => {
                   <Typography.Title level={5} className="mb-0">
                     {x.name}
                   </Typography.Title>
-                  <Typography.Text type="secondary" className="mb-0">
+                  <p className="mb-0">
                     {x.department}
-                  </Typography.Text>
+                  </p>
                 </div>
                 <div className="flex space-x-2 text-gray-300 dark:text-gray-500">
                   {x.twitter && (
@@ -179,12 +179,12 @@ const Community = () => {
         title={'Community'}
         paragraph={
           <>
-            <Typography.Text>
+            <p>
               <p className="text-lg">
                 Join one of the world's fastest growing open source communities. Let's build
                 together.
               </p>
-            </Typography.Text>
+            </p>
           </>
         }
       /> */}
@@ -219,16 +219,14 @@ const Community = () => {
                 <Typography.Title level={1} className="mb-0">
                   {x.stat}
                 </Typography.Title>
-                <Typography.Text type="secondary">{x.statLabel}</Typography.Text>
+                <p>{x.statLabel}</p>
               </div>
             </div>
           ))}
         </div>
         <div className="space-y-8">
           <div className="max-w-3xl">
-            <Typography.Text>
-              With developer signups from the world's leading brands.
-            </Typography.Text>
+            <p>With developer signups from the world's leading brands.</p>
           </div>
 
           <ImageGrid images={CompaniesData} />
@@ -246,12 +244,12 @@ const Investors = () => {
           title="Our investors"
           paragraph={
             <>
-              <Typography.Text>
+              <p>
                 <p className="text-lg">
                   We've raised over $36 million in funding, backed by some of the world's leading
                   investors.
                 </p>
-              </Typography.Text>
+              </p>
             </>
           }
         />
@@ -298,9 +296,7 @@ const Investors = () => {
                   <Typography.Title level={5} className="mb-0">
                     {x.name}
                   </Typography.Title>
-                  <Typography.Text type="secondary" className="mb-0">
-                    {x.title}
-                  </Typography.Text>
+                  <p className="mb-0">{x.title}</p>
                 </div>
               </div>
             </div>
@@ -322,9 +318,9 @@ const Press = () => {
             <Card key={`press_${x.href}`} hoverable>
               <Space className="justify-between h-40" direction="vertical">
                 <div>
-                  <Typography.Text small type="secondary">
+                  <p small type="secondary">
                     {x.type.toUpperCase()}
-                  </Typography.Text>
+                  </p>
                   <Typography.Title level={3}>{x.title}</Typography.Title>
                 </div>
               </Space>
@@ -338,9 +334,9 @@ const Press = () => {
             <Card key={`press_${x.href}`} hoverable>
               <Space className="justify-between h-40" direction="vertical">
                 <div>
-                  <Typography.Text small type="secondary">
+                  <p small type="secondary">
                     {x.type.toUpperCase()}
-                  </Typography.Text>
+                  </p>
                   <Typography.Title level={3}>{x.title}</Typography.Title>
                 </div>
               </Space>

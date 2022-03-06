@@ -104,11 +104,11 @@ function BlogPostPage(props: any) {
           <Card className="cursor-pointer" hoverable>
             <Space direction="vertical">
               <div>
-                <Typography.Text>{label}</Typography.Text>
+                <p>{label}</p>
               </div>
               <div>
                 <Typography.Title level={4}>{post.title}</Typography.Title>
-                <Typography.Text>{post.date}</Typography.Text>
+                <p>{post.date}</p>
               </div>
               <div>
                 {post.tags.map((tag: string) => {
@@ -136,7 +136,7 @@ function BlogPostPage(props: any) {
         </Space>
       </div>
       <div>
-        <Typography.Text type="secondary">Table of contents</Typography.Text>
+        <p>Table of contents</p>
         <Typography>
           <div className={blogStyles['toc']}>
             <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
@@ -188,7 +188,7 @@ function BlogPostPage(props: any) {
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-2 mb-2">
               {/* Back button */}
-              <Typography.Text type="secondary">
+              <p>
                 <a
                   href={'/blog'}
                   className="hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center"
@@ -196,20 +196,18 @@ function BlogPostPage(props: any) {
                   <IconChevronLeft style={{ padding: 0 }} />
                   Back
                 </a>
-              </Typography.Text>
+              </p>
             </div>
             <div className="col-span-12 lg:col-span-12 xl:col-span-10">
               {/* Title and description */}
               <div className="mb-16 space-y-8 max-w-5xl">
                 <div className="space-y-4">
-                  <Typography.Text type="success">Blog post</Typography.Text>
+                  <p type="success">Blog post</p>
                   <Typography.Title>{props.blog.title}</Typography.Title>
                   <div className="flex space-x-3">
-                    <Typography.Text>{props.blog.date}</Typography.Text>
-                    <Typography.Text type="secondary">•</Typography.Text>
-                    <Typography.Text>
-                      {generateReadingTime(props.blog.content.renderedOutput)}
-                    </Typography.Text>
+                    <p>{props.blog.date}</p>
+                    <p>•</p>
+                    <p>{generateReadingTime(props.blog.content.renderedOutput)}</p>
                   </div>
                   {author && (
                     <div className="mt-6 mb-8 lg:mb-0 w-max">
@@ -223,10 +221,8 @@ function BlogPostPage(props: any) {
                               />
                             )}
                             <Space direction="vertical" size={0}>
-                              <Typography.Text>{author.author}</Typography.Text>
-                              <Typography.Text type="secondary" small>
-                                {author.position}
-                              </Typography.Text>
+                              <p>{author.author}</p>
+                              <p small>{author.position}</p>
                             </Space>
                           </Space>
                         </a>
@@ -332,31 +328,31 @@ function BlogPostPage(props: any) {
                     <div className="hidden lg:block">{toc}</div>
                     <div>
                       <div className="mb-4">
-                        <Typography.Text type="secondary">Related articles</Typography.Text>
+                        <p>Related articles</p>
                       </div>
                       <Space direction="vertical">
                         {props.relatedPosts.map((post: any) => (
                           <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
                             <div>
-                              <Typography.Text className="cursor-pointer">
+                              <p className="cursor-pointer">
                                 <Space>
                                   <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
                                   <span className="hover:text-gray-900 dark:hover:text-white">
                                     {post.title}
                                   </span>
                                 </Space>
-                              </Typography.Text>
+                              </p>
                               <Divider light className="mt-2" />
                             </div>
                           </Link>
                         ))}
                         <Link href={`/blog`} as={`/blog`}>
                           <div>
-                            <Typography.Text type="secondary">
+                            <p>
                               <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
                                 View all posts
                               </span>
-                            </Typography.Text>
+                            </p>
                           </div>
                         </Link>
                       </Space>
@@ -395,25 +391,25 @@ function BlogPostPage(props: any) {
                       {props.relatedPosts.map((post: any) => (
                         <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
                           <div>
-                            <Typography.Text className="cursor-pointer">
+                            <p className="cursor-pointer">
                               <Space>
                                 <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
                                 <span className="hover:text-gray-900 dark:hover:text-white">
                                   {post.title}
                                 </span>
                               </Space>
-                            </Typography.Text>
+                            </p>
                             <Divider light className="mt-2" />
                           </div>
                         </Link>
                       ))}
                       <Link href={`/blog`} as={`/blog`}>
                         <div>
-                          <Typography.Text type="secondary">
+                          <p>
                             <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
                               View all posts
                             </span>
-                          </Typography.Text>
+                          </p>
                         </div>
                       </Link>
                     </Space>

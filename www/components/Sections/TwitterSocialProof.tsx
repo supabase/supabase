@@ -40,7 +40,7 @@ function TwitterSocialProof() {
       <div className="grid grid-cols-12">
         <div className="col-span-12 text-center">
           <Typography.Title level={2}>Join the community</Typography.Title>
-          <Typography.Text>
+          <p>
             <p className="lg:text-lg">
               Supported by a network of early advocates, contributors, and champions.
             </p>
@@ -56,7 +56,7 @@ function TwitterSocialProof() {
                 </a>
               </Link>
             </div>
-          </Typography.Text>
+          </p>
         </div>
       </div>
       <div className="mt-6">
@@ -111,14 +111,14 @@ function TwitterSocialProof() {
             })}
             <div className="container mx-auto hidden md:flex flex-row justify-between mt-3">
               <div ref={prevRef} className="cursor-pointer ml-4">
-                <Typography.Text>
+                <p>
                   <IconArrowLeft />
-                </Typography.Text>
+                </p>
               </div>
               <div ref={nextRef} className="cursor-pointer mr-4">
-                <Typography.Text>
+                <p>
                   <IconArrowRight />
-                </Typography.Text>
+                </p>
               </div>
             </div>
           </Swiper>

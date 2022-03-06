@@ -37,7 +37,7 @@ const data: CommunityItem[] = [
     invertImgDarkMode: true,
     detail: () => (
       <div>
-        <Typography.Text>Some growth chart?</Typography.Text>
+        <p>Some growth chart?</p>
       </div>
     ),
   },
@@ -48,7 +48,7 @@ const data: CommunityItem[] = [
     img: 'twitter.png',
     detail: () => (
       <div>
-        <Typography.Text>Some twitter callouts</Typography.Text>
+        <p>Some twitter callouts</p>
       </div>
     ),
   },
@@ -59,7 +59,7 @@ const data: CommunityItem[] = [
     img: 'discord.png',
     detail: () => (
       <div>
-        <Typography.Text>Something great</Typography.Text>
+        <p>Something great</p>
       </div>
     ),
   },

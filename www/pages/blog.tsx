@@ -143,16 +143,16 @@ function FeaturedThumb(blog: PostTypes) {
           />
           <div className="flex flex-col space-y-4">
             <div className="flex space-x-2">
-              <Typography.Text type="secondary">{blog.date}</Typography.Text>
-              <Typography.Text type="secondary">•</Typography.Text>
-              <Typography.Text type="secondary">{blog.readingTime}</Typography.Text>
+              <p>{blog.date}</p>
+              <p>•</p>
+              <p>{blog.readingTime}</p>
             </div>
 
             <div>
               <Typography.Title level={2}>{blog.title}</Typography.Title>
-              <Typography.Text className="m-0" type="secondary">
+              <p className="m-0" type="secondary">
                 <span className="text-xl">{blog.description}</span>
-              </Typography.Text>
+              </p>
             </div>
 
             {author && (
@@ -161,10 +161,8 @@ function FeaturedThumb(blog: PostTypes) {
                   <img src={author.author_image_url} className="rounded-full w-10" />
                 )}
                 <div className="flex flex-col">
-                  <Typography.Text>{author.author}</Typography.Text>
-                  <Typography.Text type="secondary" small>
-                    {author.position}
-                  </Typography.Text>
+                  <p>{author.author}</p>
+                  <p small>{author.position}</p>
                 </div>
               </div>
             )}

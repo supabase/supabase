@@ -93,7 +93,7 @@ function StoragePage() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
-              <Typography.Text>
+              <p>
                 <p className="mb-4">
                   <Space>
                     <ProductIcon icon={Solutions['storage'].icon} />
@@ -103,9 +103,9 @@ function StoragePage() {
                     <ProductIcon icon={Solutions['database'].icon} />
                   </Space>
                 </p>
-              </Typography.Text>
+              </p>
               <Typography.Title level={4}>Interoperable</Typography.Title>
-              <Typography.Text>
+              <p>
                 <p className="text-lg">
                   Integrates well with the rest of Supabase ecosystem, including Auth and Postgres.
                 </p>
@@ -113,10 +113,10 @@ function StoragePage() {
                 Familiar and easy to use permissions mean that your content is secure and accessible
                 only to the right users
               </p> */}
-              </Typography.Text>
+              </p>
             </div>
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
-              <Typography.Text>
+              <p>
                 <p>
                   <Space>
                     <ProductIcon
@@ -126,9 +126,9 @@ function StoragePage() {
                     />
                   </Space>
                 </p>
-              </Typography.Text>
+              </p>
               <Typography.Title level={4}>Lightning fast</Typography.Title>
-              <Typography.Text>
+              <p>
                 <p className="text-lg">
                   Thin API server layer that leverages Postgres' permissions and performance.
                 </p>
@@ -136,10 +136,10 @@ function StoragePage() {
                 1.3x faster than XXX, your content can be delivered anywhere in the world at the
                 speed you expect.
               </p> */}
-              </Typography.Text>
+              </p>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <Typography.Text>
+              <p>
                 <p>
                   <Space>
                     <ProductIcon
@@ -149,12 +149,12 @@ function StoragePage() {
                     />
                   </Space>
                 </p>
-              </Typography.Text>
+              </p>
               <Typography.Title level={4}>Dependable</Typography.Title>
-              <Typography.Text>
+              <p>
                 <p className="text-lg">Enterprise-level scalability and durability.</p>
                 {/* <p>A durability rating of 99.999999999%.</p> */}
-              </Typography.Text>
+              </p>
             </div>
           </div>
         </SectionContainer>
@@ -162,7 +162,7 @@ function StoragePage() {
         <SectionContainer className="pt-16">
           <div className="mb-16 block">
             <Typography.Title>Sleek dashboard for managing your media</Typography.Title>
-            <Typography.Text>
+            <p>
               <p className="text-lg">
                 A complete Object Explorer so that any of your team can use.
               </p>
@@ -170,7 +170,7 @@ function StoragePage() {
                 Drag and drop uploading, moving objects, and multiple object selection. As easy as
                 working on your desktop.
               </p>
-            </Typography.Text>
+            </p>
           </div>
           <ImageCarousel
             // @ts-ignore
@@ -258,7 +258,7 @@ function StoragePage() {
                         Integrates natively <br />
                         with Supabase Auth
                       </Typography.Title>
-                      <Typography.Text>
+                      <p>
                         <p className="">
                           Using Postgres Row Level Security to create Object access rules.
                         </p>
@@ -267,7 +267,7 @@ function StoragePage() {
                           combination of SQL, Postgres functions, and even your own metadata to
                           write policies.
                         </p>
-                      </Typography.Text>
+                      </p>
                       <Link
                         href="/docs/reference/javascript/storage-createbucket"
                         as="/docs/reference/javascript/storage-createbucket"

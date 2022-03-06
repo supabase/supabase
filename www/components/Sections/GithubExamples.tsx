@@ -37,11 +37,11 @@ function GithubExamples() {
           <Typography.Title level={2}>
             Community driven examples, libraries and guides
           </Typography.Title>
-          <Typography.Text className="block mb-6">
+          <p className="block mb-6">
             <p className="text-base lg:text-lg">
               Supported by a network of early advocates, contributors, and champions.
             </p>
-          </Typography.Text>
+          </p>
           <div className="flex space-y-1.5 flex-col lg:space-y-0 lg:space-x-1.5 lg:flex-row justify-center">
             <Link href="/docs/guides/examples#guides" as="/docs/guides/examples#guides">
               <a>
@@ -117,14 +117,14 @@ function GithubExamples() {
             })}
             <div className="container mx-auto hidden md:flex flex-row justify-between mt-3">
               <div ref={prevRef} className="cursor-pointer ml-4">
-                <Typography.Text>
+                <p>
                   <IconArrowLeft />
-                </Typography.Text>
+                </p>
               </div>
               <div ref={nextRef} className="cursor-pointer mr-4">
-                <Typography.Text>
+                <p>
                   <IconArrowRight />
-                </Typography.Text>
+                </p>
               </div>
             </div>
           </Swiper>

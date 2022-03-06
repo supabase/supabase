@@ -31,7 +31,7 @@ const ProductHeader = (props: Types) => (
           {props.h1}
         </Typography.Title>
         {props.subheader && (
-          <Typography.Text>
+          <p>
             {props.subheader.map((subheader, i) => {
               return (
                 <p className="lg:text-lg" key={i}>
@@ -39,7 +39,7 @@ const ProductHeader = (props: Types) => (
                 </p>
               )
             })}
-          </Typography.Text>
+          </p>
         )}
         <div className="mt-12 flex flex-row md:flex-row md:items-center">
           <Link href="https://app.supabase.io/" as="https://app.supabase.io/">

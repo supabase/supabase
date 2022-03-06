@@ -20,7 +20,7 @@ const Features = () => {
           </dt>
         </div>
         <div className="mt-5">
-          <Typography.Text>{description}</Typography.Text>
+          <p>{description}</p>
         </div>
         {label && (
           <div className="mt-3">

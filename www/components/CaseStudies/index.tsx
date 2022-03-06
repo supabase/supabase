@@ -30,12 +30,12 @@ const CaseStudies = () => {
             >
               <Space className="justify-between h-40" direction="vertical">
                 <div>
-                  <Typography.Text small type="secondary">
+                  <p small type="secondary">
                     Project example
-                  </Typography.Text>
+                  </p>
                   <Typography.Title level={3}>{caseStudy.title}</Typography.Title>
                 </div>
-                <Typography.Text type="default">{caseStudy.description}</Typography.Text>
+                <p type="default">{caseStudy.description}</p>
               </Space>
             </Card>
           </a>

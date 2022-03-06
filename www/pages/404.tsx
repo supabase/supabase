@@ -58,9 +58,7 @@ const Error404 = () => {
         >
           <div className="w-[320px] flex flex-col items-center justify-center space-y-3">
             <Typography.Title level={3}>Looking for something? 🔍</Typography.Title>
-            <Typography.Text className="text-center">
-              We couldn't find the page that you're looking for!
-            </Typography.Text>
+            <p className="text-center">We couldn't find the page that you're looking for!</p>
           </div>
           <div className="flex items-center space-x-4">
             <Link href="/">
