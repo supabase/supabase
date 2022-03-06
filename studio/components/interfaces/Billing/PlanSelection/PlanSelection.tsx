@@ -4,12 +4,12 @@ import { Transition } from '@headlessui/react'
 
 import Plans from './Plans/Plans'
 import { BillingPlan } from './Plans/Plans.types'
-import { StripeSubscription } from '..'
+import { StripeProduct } from '..'
 
 interface Props {
   visible: boolean
   billingPlans: BillingPlan[]
-  currentPlan?: StripeSubscription
+  currentPlan?: StripeProduct
   onSelectPlan: (plan: BillingPlan) => void
 }
 
@@ -20,9 +20,6 @@ const PlanSelection: FC<Props> = ({ visible, billingPlans, currentPlan, onSelect
       enter="transition ease-out duration-300"
       enterFrom="transform opacity-0 -translate-x-10"
       enterTo="transform opacity-100 translate-x-0"
-      // leave="transition ease-in duration-75"
-      // leaveFrom="transform opacity-100"
-      // leaveTo="transform opacity-0 -translate-x-10"
     >
       <div className="space-y-8">
         <h4 className="text-lg">Change your project's subscription</h4>

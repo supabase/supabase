@@ -1,18 +1,14 @@
 export interface StripeSubscription {
-  tier: {
-    name: string
-    prod_id: string
-    unit_amount: number
-  }
+  tier: StripeProduct
   billing: {
     current_period_end: number
     current_period_start: number
     billing_cycle_anchor: number
   }
-  addons: StripeAddon[]
+  addons: StripeProduct[]
 }
 
-export interface StripeAddon {
+export interface StripeProduct {
   name: string
   prod_id: string
   unit_amount: number

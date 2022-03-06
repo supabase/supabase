@@ -2,13 +2,13 @@ import { FC } from 'react'
 import { Badge } from '@supabase/ui'
 
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { StripeSubscription } from '../../index'
+import { StripeProduct } from '../..'
 import { BillingPlan } from './Plans.types'
 import PlanCTAButton from './PlanCTAButton'
 
 interface Props {
   plans: BillingPlan[]
-  currentPlan?: StripeSubscription
+  currentPlan?: StripeProduct
   onSelectPlan: (plan: BillingPlan) => void
 }
 
@@ -48,8 +48,13 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
             {/* [Joshen] Trying some animations here to make Pro pop, on the fence tbh */}
             {plan.id === STRIPE_PRODUCT_IDS.PRO && <AnimatedGradientBackground />}
 
-            {/* Label to show current subscription */}
-            {plan.id && plan.id === currentPlan?.tier.prod_id && <CurrentSubscriptionBanner />}
+            {/* Label to show current subscription (Pro and PAYG are treated as the same plan on the UI) */}
+            {plan.id === currentPlan?.prod_id ||
+              (plan.id === STRIPE_PRODUCT_IDS.PRO &&
+                (currentPlan?.prod_id === STRIPE_PRODUCT_IDS.PRO ||
+                  currentPlan?.prod_id === STRIPE_PRODUCT_IDS.PAYG) && (
+                  <CurrentSubscriptionBanner />
+                ))}
 
             <div className="mb-8">
               <div className="flex items-center space-x-4">

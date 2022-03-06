@@ -1,6 +1,7 @@
 import { FC } from 'react'
 import { Transition } from '@headlessui/react'
 import { Button, Form, Input, IconArrowLeft } from '@supabase/ui'
+import { useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
 
 interface Props {
@@ -9,9 +10,12 @@ interface Props {
 }
 
 const EnterpriseRequest: FC<Props> = ({ visible, onSelectBack }) => {
+  const { ui } = useStore()
+  const { profile } = ui
+
   const initialValues = {
-    name: '',
-    email: '',
+    name: `${profile?.first_name} ${profile?.last_name}`,
+    email: profile?.primary_email,
     company: '',
     message: '',
   }
@@ -33,14 +37,7 @@ const EnterpriseRequest: FC<Props> = ({ visible, onSelectBack }) => {
       enter="transition ease-out duration-300"
       enterFrom="transform opacity-0 translate-x-10"
       enterTo="transform opacity-100 translate-x-0"
-      // leave="transition ease-in duration-75"
-      // leaveFrom="transform opacity-100"
-      // leaveTo="transform opacity-0 -translate-x-10"
     >
-      {/* 
-        Fix for weird UI bug whereby transitions dont clear immediately
-        causing the UI to stack over each other for a split second
-      */}
       {visible && (
         <div className="space-y-8 w-4/5">
           <div className="relative">
@@ -63,7 +60,7 @@ const EnterpriseRequest: FC<Props> = ({ visible, onSelectBack }) => {
             >
               {({ isSubmitting }: { isSubmitting: boolean }) => (
                 <div className="space-y-12 py-16">
-                  <div className="space-y-4">
+                  <div className="space-y-4 w-3/5">
                     <Input layout="horizontal" label="Name" id="name" name="name" />
                     <Input layout="horizontal" label="Email" id="email" name="email" />
                     <Input layout="horizontal" label="Company" id="company" name="company" />

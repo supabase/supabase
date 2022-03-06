@@ -19,6 +19,12 @@ import {
 import { BillingPlan } from 'components/interfaces/Billing/PlanSelection/Plans/Plans.types'
 import { BILLING_PLANS } from 'components/interfaces/Billing/PlanSelection/Plans/Plans.constants'
 
+/**
+ * [Joshen] Right now everything is scaffolded without any API calls
+ * So maybe some prop passing down, variable creation needs relooking
+ * once I'm working with proper data
+ */
+
 const BillingUpdate: NextPage = () => {
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
@@ -28,7 +34,6 @@ const BillingUpdate: NextPage = () => {
   const freeProjectsLimit = ui?.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
   const freeProjectsOwned = subscriptionStats.total_free_projects ?? 0
 
-  const [isLoadingSubscription, setIsLoadingSubscription] = useState(false)
   const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
   const [showConfirmDowngrade, setShowConfirmDowngrade] = useState(false)
   const [showDowngradeError, setShowDowngradeError] = useState(false)
@@ -36,10 +41,6 @@ const BillingUpdate: NextPage = () => {
   const [subscription, setSubscription] = useState<StripeSubscription>()
   const [paymentMethods, setPaymentMethods] = useState<any>()
   const [selectedPlan, setSelectedPlan] = useState<BillingPlan>()
-
-  const showProPlanPage =
-    subscription?.tier.prod_id !== STRIPE_PRODUCT_IDS.PRO &&
-    selectedPlan?.id === STRIPE_PRODUCT_IDS.PRO
 
   useEffect(() => {
     if (projectRef) getSubscription()
@@ -69,8 +70,6 @@ const BillingUpdate: NextPage = () => {
 
   const getSubscription = async () => {
     try {
-      setIsLoadingSubscription(true)
-
       if (!ui.selectedProject?.subscription_id) {
         throw new Error('Unable to get subscription ID of project')
       }
@@ -88,8 +87,6 @@ const BillingUpdate: NextPage = () => {
         category: 'error',
         message: `Failed to get subscription: ${error.message}`,
       })
-    } finally {
-      setIsLoadingSubscription(false)
     }
   }
 
@@ -108,13 +105,17 @@ const BillingUpdate: NextPage = () => {
     setShowConfirmDowngrade(false)
   }
 
+  const onConfirmPayment = () => {
+    console.log('Confirm payment')
+  }
+
   return (
     <BillingLayout>
-      <div className="mx-auto max-w-4xl my-10">
+      <div className="mx-auto max-w-5xl my-10">
         <PlanSelection
           visible={!selectedPlan || (selectedPlan && showConfirmDowngrade)}
           billingPlans={BILLING_PLANS}
-          currentPlan={subscription}
+          currentPlan={subscription?.tier}
           onSelectPlan={onSelectPlan}
         />
         <EnterpriseRequest
@@ -129,12 +130,16 @@ const BillingUpdate: NextPage = () => {
 
       {subscription !== undefined && (
         <ProUpgrade
-          visible={showProPlanPage}
-          currentPlan={subscription}
+          visible={
+            selectedPlan?.id === STRIPE_PRODUCT_IDS.PRO ||
+            selectedPlan?.id === STRIPE_PRODUCT_IDS.PAYG
+          }
+          currentSubscription={subscription}
           selectedPlan={selectedPlan}
           isLoadingPaymentMethods={isLoadingPaymentMethods}
           paymentMethods={paymentMethods?.data ?? []}
           onSelectBack={() => setSelectedPlan(undefined)}
+          onConfirmPayment={onConfirmPayment}
         />
       )}
 
