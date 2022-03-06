@@ -4,9 +4,7 @@ const plugin = require('tailwindcss/plugin')
 const radixUiColors = require('@radix-ui/colors')
 const brandColors = require('./default-colors')
 
-const {
-  default: flattenColorPalette,
-} = require('tailwindcss/lib/util/flattenColorPalette')
+const { default: flattenColorPalette } = require('tailwindcss/lib/util/flattenColorPalette')
 
 // console.log(Object.keys(radixUiColors))
 
@@ -63,9 +61,7 @@ function generateColorClasses() {
         })
       ) {
         // console.log(x)
-        mappedColors[`${x}-fixed`][
-          step * 100
-        ] = `var(--colors-fixed-${x}${step})`
+        mappedColors[`${x}-fixed`][step * 100] = `var(--colors-fixed-${x}${step})`
       }
     }
   })
@@ -127,7 +123,7 @@ function generateCssVariables() {
 
 const variables = generateCssVariables()
 
-console.log(variables)
+// console.log(variables)
 
 const uiConfig = {
   theme: {
@@ -236,15 +232,11 @@ const uiConfig = {
         'fade-in': 'fadeIn 300ms',
         'fade-out': 'fadeOut 300ms',
 
-        'dropdown-content-show':
-          'overlayContentShow 100ms cubic-bezier(0.16, 1, 0.3, 1)',
-        'dropdown-content-hide':
-          'overlayContentHide 100ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'dropdown-content-show': 'overlayContentShow 100ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'dropdown-content-hide': 'overlayContentHide 100ms cubic-bezier(0.16, 1, 0.3, 1)',
 
-        'overlay-show':
-          'overlayContentShow 300ms cubic-bezier(0.16, 1, 0.3, 1)',
-        'overlay-hide':
-          'overlayContentHide 300ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'overlay-show': 'overlayContentShow 300ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'overlay-hide': 'overlayContentHide 300ms cubic-bezier(0.16, 1, 0.3, 1)',
 
         'fade-in-overlay-bg': 'fadeInOverlayBg 300ms',
         'fade-out-overlay-bg': 'fadeOutOverlayBg 300ms',
@@ -252,18 +244,13 @@ const uiConfig = {
         'slide-down': 'slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1)',
         'slide-up': 'slideUp 300ms cubic-bezier(0.87, 0, 0.13, 1)',
 
-        'slide-down-normal':
-          'slideDownNormal 300ms cubic-bezier(0.87, 0, 0.13, 1)',
+        'slide-down-normal': 'slideDownNormal 300ms cubic-bezier(0.87, 0, 0.13, 1)',
         'slide-up-normal': 'slideUpNormal 300ms cubic-bezier(0.87, 0, 0.13, 1)',
 
-        'panel-slide-left-out':
-          'panelSlideLeftOut 200ms cubic-bezier(0.87, 0, 0.13, 1)',
-        'panel-slide-left-in':
-          'panelSlideLeftIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',
-        'panel-slide-right-out':
-          'panelSlideRightOut 200ms cubic-bezier(0.87, 0, 0.13, 1)',
-        'panel-slide-right-in':
-          'panelSlideRightIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',
+        'panel-slide-left-out': 'panelSlideLeftOut 200ms cubic-bezier(0.87, 0, 0.13, 1)',
+        'panel-slide-left-in': 'panelSlideLeftIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',
+        'panel-slide-right-out': 'panelSlideRightOut 200ms cubic-bezier(0.87, 0, 0.13, 1)',
+        'panel-slide-right-in': 'panelSlideRightIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',
 
         // tailwind class for this is `animate-dropdownFadeIn`
         dropdownFadeIn: 'dropdownFadeIn 0.1s ease-out',

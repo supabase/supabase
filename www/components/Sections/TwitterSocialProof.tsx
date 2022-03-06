@@ -6,15 +6,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 // import Swiper core and required modules
 import SwiperCore, { Navigation, Pagination } from 'swiper'
 
-import {
-  Button,
-  Typography,
-  IconMessageCircle,
-  Space,
-  IconAlignLeft,
-  IconArrowLeft,
-  IconArrowRight,
-} from '@supabase/ui'
+import { Button, IconMessageCircle, IconArrowLeft, IconArrowRight } from '@supabase/ui'
 
 import Examples from '../../data/tweets/Tweets.json'
 import TweetCard from '../TweetCard'
@@ -39,21 +31,41 @@ function TwitterSocialProof() {
     <>
       <div className="grid grid-cols-12">
         <div className="col-span-12 text-center">
-          <Typography.Title level={2}>Join the community</Typography.Title>
+          <h3 className="text-3xl">Join the community</h3>
           <p>
             <p className="lg:text-lg">
               Supported by a network of early advocates, contributors, and champions.
             </p>
-            <div className="my-4">
+            <div className="my-4 flex gap-2 justify-center">
               <Link
                 href={'https://github.com/supabase/supabase/discussions'}
                 as={'https://github.com/supabase/supabase/discussions'}
               >
-                <a className="block text-sm text-gray-400 dark:text-gray-400 mt-3" target="_blank">
-                  <Button size="small" iconRight={<IconMessageCircle size="tiny" />} type="default">
-                    GitHub discussions
-                  </Button>
-                </a>
+                <Button
+                  as="a"
+                  // @ts-ignore
+                  target="_blank"
+                  size="small"
+                  iconRight={<IconMessageCircle size={14} />}
+                  type="secondary"
+                >
+                  GitHub discussions
+                </Button>
+              </Link>
+              <Link
+                href={'https://github.com/supabase/supabase/discussions'}
+                as={'https://github.com/supabase/supabase/discussions'}
+              >
+                <Button
+                  as="a"
+                  type="alternative"
+                  // @ts-ignore
+                  target="_blank"
+                  size="small"
+                  iconRight={<IconMessageCircle size={14} />}
+                >
+                  Discord
+                </Button>
               </Link>
             </div>
           </p>

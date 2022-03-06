@@ -13,11 +13,7 @@ const Features = () => {
       <div key={name} className="mb-10 md:mb-0">
         <div className="flex items-center">
           <ProductIcon icon={icon} />
-          <dt className="flex flex-row xl:flex-col ml-4">
-            <Typography.Title level={4} className="m-0">
-              {name}
-            </Typography.Title>
-          </dt>
+          <dt className="text-scale-1200 flex flex-row xl:flex-col ml-4">{name}</dt>
         </div>
         <div className="mt-5">
           <p>{description}</p>
