@@ -230,23 +230,27 @@ export default function Auth() {
 
   return (
     <div className="row flex flex-center">
-      <div className="col-6 form-widget">
+      <div className="col-6 form-widget" aria-live="polite">
         <h1 className="header">Supabase + React</h1>
         <p className="description">Sign in via magic link with your email below</p>
-        <form onSubmit={handleLogin}>
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            className="inputField"
-            type="email"
-            placeholder="Your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </form>
-        <button className={'button block'} disabled={loading} aria-live="polite">
-          {loading ? <span>Loading</span> : <span>Send magic link</span>}
-        </button>
+        {loading ? (
+          'Sending magic link...'
+        ) : (
+          <form onSubmit={handleLogin}>
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              className="inputField"
+              type="email"
+              placeholder="Your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <button className="button block" aria-live="polite">
+              Send magic link
+            </button>
+          </form>
+        )}
       </div>
     </div>
   )
@@ -263,7 +267,7 @@ Let's create a new component for that called `Account.js`.
 import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 
-export default ({ session }) => {
+const Account = ({ session }) => {
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState(null)
   const [website, setWebsite] = useState(null)
@@ -330,39 +334,45 @@ export default ({ session }) => {
   }
 
   return (
-    <>
-      <form onSubmit={updateProfile} className="form-widget">
-        <div>Email: {session.user.email}</div>
-        <div>
-          <label htmlFor="username">Name</label>
-          <input
-            id="username"
-            type="text"
-            value={username || ''}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="website">Website</label>
-          <input
-            id="website"
-            type="website"
-            value={website || ''}
-            onChange={(e) => setWebsite(e.target.value)}
-          />
-        </div>
-        <div>
-          <button className="button block primary" disabled={loading} aria-live="polite">
-            {loading ? 'Saving ...' : 'Update profile'}
-          </button>
-        </div>
-      </form>
+    <div aria-live="polite">
+      {loading ? (
+        'Saving ...'
+      ) : (
+        <form onSubmit={updateProfile} className="form-widget">
+          <div>Email: {session.user.email}</div>
+          <div>
+            <label htmlFor="username">Name</label>
+            <input
+              id="username"
+              type="text"
+              value={username || ''}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="website">Website</label>
+            <input
+              id="website"
+              type="website"
+              value={website || ''}
+              onChange={(e) => setWebsite(e.target.value)}
+            />
+          </div>
+          <div>
+            <button className="button block primary" disabled={loading}>
+              Update profile
+            </button>
+          </div>
+        </form>
+      )}
       <button type="button" className="button block" onClick={() => supabase.auth.signOut()}>
         Sign Out
       </button>
-    </>
+    </div>
   )
 }
+
+export default Account
 ```
 
 ### Launch!
@@ -467,25 +477,27 @@ export default ({ url, size, onUpload }) => {
   }
 
   return (
-    <div style={{ width: size }}>
+    <div style={{ width: size }} aria-live="polite">
       <img
         src={avatarUrl ? avatarUrl : `https://place-hold.it/${size}x${size}`}
         alt={avatarUrl ? 'Avatar' : 'No image'}
         className="avatar image"
         style={{ height: size, width: size }}
       />
-      <label className="button primary block" htmlFor="single" aria-live="polite">
-        {uploading ? 'Uploading avatar...' : 'Upload an avatar'}
-      </label>
-      <VisuallyHidden>
-        <input
-          type="file"
-          id="single"
-          accept="image/*"
-          onChange={uploadAvatar}
-          disabled={uploading}
-        />
-      </VisuallyHidden>
+      {uploading ? "Uploading..." : (
+        <label className="button primary block" htmlFor="single">
+          Upload an avatar
+        </label>
+        <VisuallyHidden>
+          <input
+            type="file"
+            id="single"
+            accept="image/*"
+            onChange={uploadAvatar}
+            disabled={uploading}
+          />
+        </VisuallyHidden>
+      )}
     </div>
   )
 }
