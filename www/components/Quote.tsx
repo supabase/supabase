@@ -23,7 +23,7 @@ export default function Quote(props: Props) {
             style={{ margin: 0 }}
           />
           <figcaption style={{ marginTop: 0 }}>
-            <Typography.Text>{caption}</Typography.Text>
+            <p>{caption}</p>
           </figcaption>
         </Space>
       </Space>

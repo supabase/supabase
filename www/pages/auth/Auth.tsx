@@ -129,40 +129,40 @@ function AuthPage() {
                 </div>
               </p>
               <Typography.Title level={4}>All the social providers</Typography.Title>
-              <Typography.Text>
+              <p>
                 <p className="text-base">
                   Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
                   Gitlab, Twitter, Discord, and Bitbucket.
                 </p>
-              </Typography.Text>
+              </p>
             </div>
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
-              <Typography.Text>
+              <p>
                 <p className="mb-4">
                   <IconLink />
                 </p>
-              </Typography.Text>
+              </p>
               <Typography.Title level={4}>Fully integrated</Typography.Title>
-              <Typography.Text>
+              <p>
                 <p className="text-base">
                   Incredibly simple Auth, without a single external authentication service. Built-in
                   Authentication, Authorization, and User Management.
                 </p>
-              </Typography.Text>
+              </p>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <Typography.Text>
+              <p>
                 <p className="mb-4">
                   <IconShield />
                 </p>
-              </Typography.Text>
+              </p>
               <Typography.Title level={4}>Own your data</Typography.Title>
-              <Typography.Text>
+              <p>
                 <p className="text-base">
                   User data stored in your Supabase database so you never have to worry about 3rd
                   party privacy issues. Host your data in 8 different locations.
                 </p>
-              </Typography.Text>
+              </p>
             </div>
           </div>
         </SectionContainer>
@@ -174,7 +174,7 @@ function AuthPage() {
             content={ApiExamples}
             size="large"
             text={[
-              <Typography.Text key={0}>
+              <p key={0}>
                 <p className="text-base lg:text-lg">
                   APIs that you can understand. With powerful libraries that work on client and
                   server-side applications.
@@ -184,7 +184,7 @@ function AuthPage() {
                   With powerful client libraries that work on both client and server-side
                   applications.
                 </p> */}
-              </Typography.Text>,
+              </p>,
             ]}
             footer={[
               <div className="grid grid-cols-12 md:gap-8 lg:gap-0 xl:gap-16 mt-8" key={0}>
@@ -228,14 +228,14 @@ function AuthPage() {
           <div className="grid grid-cols-12 lg:gap-16">
             <div className="col-span-12 lg:col-span-5 mb-8">
               <Typography.Title level={2}>User permissions without the middleware</Typography.Title>
-              <Typography.Text>
+              <p>
                 <p className="text-base lg:text-lg">
                   Supabase Auth works without any additional servers. Build Authorization rules with
                   Postgres' Row Level Security, controlling who can create, edit and delete specific
                   rows in your database.
                 </p>
                 <p>Policies can be written in SQL or using the dashboard online.</p>
-              </Typography.Text>
+              </p>
               <Link href="/docs/guides/auth#policy-examples">
                 <a>
                   <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
@@ -263,16 +263,16 @@ function AuthPage() {
                 <div className="w-8 h-8 rounded-md bg-gray-900 dark:bg-white text-white dark:text-gray-900  flex justify-center items-center">
                   <IconKey size="small" strokeWidth={1.5} />
                 </div>
-                <Typography.Text type="secondary">
+                <p>
                   <IconX />
-                </Typography.Text>
+                </p>
                 <img className="w-8" src={`${basePath}/images/product/auth/react-icon.svg`} />
               </Space>
 
               <Typography.Title level={2} className="mb-4">
                 React Auth
               </Typography.Title>
-              <Typography.Text>
+              <p>
                 <p className="text-base lg:text-lg">
                   Pre-built auth widgets to get started in minutes.
                 </p>
@@ -280,7 +280,7 @@ function AuthPage() {
                   Supabase provides React libraries which handle common scenarios, including logging
                   in, signing up, magic link and forgot password forms.
                 </p>
-              </Typography.Text>
+              </p>
               <Link
                 href="https://github.com/supabase/ui#using-supabase-ui-auth"
                 as="https://github.com/supabase/ui#using-supabase-ui-auth"

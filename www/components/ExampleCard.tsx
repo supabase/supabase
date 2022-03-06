@@ -24,7 +24,7 @@ function ExampleCard(props: any) {
           <Typography.Title level={5} className="mb-1">
             {props.title}
           </Typography.Title>
-          <Typography.Text className="block">
+          <p className="block">
             <p>{props.description}</p>
             <div className="flex flex-row items-center mb-2">
               Created by:
@@ -34,7 +34,7 @@ function ExampleCard(props: any) {
               />
               <span className="ml-2">{props.author}</span>
             </div>
-          </Typography.Text>
+          </p>
         </div>
       </div>
       <Divider light />
@@ -47,7 +47,7 @@ function ExampleCard(props: any) {
           flex flex-col justify-between
           rounded rounded-t-none"
         >
-          <Typography.Text>
+          <p>
             <Link href={props.repo_url} as={props.repo_url}>
               <a className="flex flex-row items-center" target="_blank">
                 <span>{props.repo_name}</span>
@@ -56,7 +56,7 @@ function ExampleCard(props: any) {
                 </span>
               </a>
             </Link>
-          </Typography.Text>
+          </p>
           <Space className="mt-3">
             {props.vercel_deploy_url && (
               <a target="_blank" href={props.vercel_deploy_url}>

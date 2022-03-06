@@ -48,20 +48,20 @@ function ImageCarousel(props: ImageCarouselProps) {
 
   const details = (
     <div className="h-64 bg-white">
-      <Typography.Text>
+      <p>
         <span className="block text-white mb-8">Allow fetch something</span>
-      </Typography.Text>
-      <Typography.Text type="secondary">
+      </p>
+      <p>
         <p>
           This would only allow the authenticated user access to a folder that is named after their
           own account UID. This is useful for things like profile images.
         </p>
-      </Typography.Text>
-      <Typography.Text>
+      </p>
+      <p>
         <Button type="outline" size="small" icon={<IconCornerRightUp />}>
           View documentation
         </Button>
-      </Typography.Text>
+      </p>
     </div>
   )
 
@@ -171,11 +171,11 @@ function ImageCarousel(props: ImageCarouselProps) {
               <SwiperSlide key={i}>
                 <div className="bg-white dark:bg-gray-800 p-px">
                   <Typography.Title level={4}>{content.title}</Typography.Title>
-                  <Typography.Text>
+                  <p>
                     <p className="text-base">{content.text}</p>
-                  </Typography.Text>
+                  </p>
                   {content.url && (
-                    <Typography.Text>
+                    <p>
                       <Link href={content.url} as={content.url}>
                         <a>
                           <Button
@@ -188,7 +188,7 @@ function ImageCarousel(props: ImageCarouselProps) {
                           </Button>
                         </a>
                       </Link>
-                    </Typography.Text>
+                    </p>
                   )}
                 </div>
               </SwiperSlide>

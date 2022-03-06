@@ -36,13 +36,11 @@ const BlogListItem = ({ blog }: Props) => {
                   {blog.title}
                 </Typography.Title>
               </div>
-              <Typography.Text type="secondary" small>
-                {blog.date}
-              </Typography.Text>
+              <p small>{blog.date}</p>
 
-              <Typography.Text className="m-0" type="secondary">
+              <p className="m-0" type="secondary">
                 <p className="text-base mb-0">{blog.description}</p>
-              </Typography.Text>
+              </p>
             </div>
             {author && (
               <div>
@@ -51,10 +49,8 @@ const BlogListItem = ({ blog }: Props) => {
                     <img src={author.author_image_url} className="rounded-full w-10" />
                   )}
                   <Space direction="vertical" size={0}>
-                    <Typography.Text>{author.author}</Typography.Text>
-                    <Typography.Text type="secondary" small>
-                      {author.position}
-                    </Typography.Text>
+                    <p>{author.author}</p>
+                    <p small>{author.position}</p>
                   </Space>
                 </Space>
               </div>

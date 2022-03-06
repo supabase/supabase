@@ -62,13 +62,13 @@ const Index = () => {
                 <div className="p-16">
                   <div>
                     <Typography.Title level={2}>Supabase logos</Typography.Title>
-                    <Typography.Text>
+                    <p>
                       <p>
                         Download Supabase official logos, including as SVG's, in both light and dark
                         theme.
                       </p>
                       <p>Do not use any other color for the wordmark.</p>
-                    </Typography.Text>
+                    </p>
                     <form method="get" action={`/brand-assets/supabase-logos.zip`}>
                       <Button htmlType="submit" type="default" iconRight={<IconDownload />}>
                         Download logo kit

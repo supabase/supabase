@@ -44,7 +44,7 @@ function AuthComponentExample() {
   //   if (user) {
   //     return (
   //       <>
-  //         <Typography.Text>Signed in: {user.email}</Typography.Text>
+  //         <p>Signed in: {user.email}</p>
   //         <Button block onClick={() => props.supabaseClient.auth.signOut()}>
   //           Sign out
   //         </Button>
@@ -100,7 +100,7 @@ function AuthComponentExample() {
                     </Space>
                     <Badge dot>Demo</Badge>
                   </div>
-                  <Typography.Text>Sign in with</Typography.Text>
+                  <p>Sign in with</p>
                   <div className="flex justify-evenly">
                     <Link href="https://supabase.com/docs/guides/auth/auth-facebook">
                       <Button type="default" size="large">
@@ -189,9 +189,7 @@ function AuthComponentExample() {
                   </div>
                   <div className="flex flex-row w-full items-center justify-center">
                     <div className="w-full h-[1px] bg-gray-500" />
-                    <Typography.Text type="secondary" className="w-full text-center text-gray-500">
-                      or continue with
-                    </Typography.Text>
+                    <p className="w-full text-center text-gray-500">or continue with</p>
                     <div className="w-full h-[1px] bg-gray-500" />
                   </div>
                   {/* <Auth.UserContextProvider supabaseClient={supabase}>
@@ -222,7 +220,7 @@ export default function app() {
     if (user) {
       return (
         <div>
-          <Typography.Text>Signed in: {user.email}</Typography.Text>
+          <p>Signed in: {user.email}</p>
           <Button block onClick={() => props.supabaseClient.auth.signOut()}>
             Sign out
           </Button>

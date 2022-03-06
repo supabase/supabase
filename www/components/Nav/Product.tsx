@@ -22,9 +22,9 @@ const Product = () => {
           </div>
         </div>
         <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
-          <Typography.Text>
+          <p>
             <p className="mt-1 text-sm">{description}</p>
-          </Typography.Text>
+          </p>
           {label && (
             <div>
               <Badge>{label}</Badge>
@@ -53,7 +53,7 @@ const Product = () => {
       </nav>
       <div className="col-span-6">
         <div className="m-3 mx-6">
-          <Typography.Text type="secondary">Latest case studies</Typography.Text>
+          <p>Latest case studies</p>
           <ul className="mt-6 space-y-3">
             {CaseStudiesData.map((caseStudy: any, idx: number) => {
               if (idx > 1) {
@@ -76,7 +76,7 @@ const Product = () => {
                       <Typography.Title level={5} className="mb-0">
                         {caseStudy.title}
                       </Typography.Title>
-                      <Typography.Text>{caseStudy.description}</Typography.Text>
+                      <p>{caseStudy.description}</p>
                     </div>
                   </a>
                 </li>

@@ -44,18 +44,18 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
 
   const details = (
     <div className="">
-      <Typography.Text>
+      <p>
         <span className="block text-white mb-8">Allow fetch something</span>
-      </Typography.Text>
-      <Typography.Text type="secondary">
+      </p>
+      <p>
         <p>
           This would only allow the authenticated user access to a folder that is named after their
           own account UID. This is useful for things like profile images.
         </p>
-      </Typography.Text>
-      <Typography.Text>
+      </p>
+      <p>
         <Button type="outline">View documentation</Button>
-      </Typography.Text>
+      </p>
     </div>
   )
 
@@ -116,28 +116,26 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
               return (
                 <SwiperSlide key={i}>
                   <div className="">
-                    <Typography.Text>
+                    <p>
                       <span className="block text-lg text-white mb-4">
                         {extension.detail_title}
                       </span>
-                    </Typography.Text>
-                    <Typography.Text type="secondary" className="block mb-6">
+                    </p>
+                    <p className="block mb-6">
                       <p>{extension.detail_text}</p>
-                    </Typography.Text>
+                    </p>
                     <Space className="justify-between">
                       {extension.url && (
                         <Link href={extension.url} as={extension.url}>
                           <a>
-                            <Typography.Text>
+                            <p>
                               <Button type="outline">View documentation</Button>
-                            </Typography.Text>
+                            </p>
                           </a>
                         </Link>
                       )}
                       <div>
-                        <Typography.Text type="secondary" className="mr-4">
-                          {extension.badges_label}
-                        </Typography.Text>
+                        <p className="mr-4">{extension.badges_label}</p>
                         {extension.badges &&
                           extension.badges.map((badge, i) => {
                             return <Badge key={badge}>{badge}</Badge>

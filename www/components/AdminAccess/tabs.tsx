@@ -28,7 +28,7 @@ function Tabs(props: Props) {
               <div className="mt-5">
                 <Typography.Title level={3}>{TabMarkup['tabTableEditor'].header}</Typography.Title>
                 <dd className="mt-8">
-                  <Typography.Text>{TabMarkup['tabTableEditor'].description}</Typography.Text>
+                  <p>{TabMarkup['tabTableEditor'].description}</p>
                 </dd>
               </div>
               <a href={TabMarkup['tabTableEditor'].url}>
@@ -40,7 +40,7 @@ function Tabs(props: Props) {
               <div className="mt-5">
                 <Typography.Title level={3}>{TabMarkup['tabSqlEditor'].header}</Typography.Title>
                 <dd className="mt-8">
-                  <Typography.Text>{TabMarkup['tabSqlEditor'].description}</Typography.Text>
+                  <p>{TabMarkup['tabSqlEditor'].description}</p>
                 </dd>
               </div>
               <a href={TabMarkup['tabSqlEditor'].url}>
@@ -51,7 +51,7 @@ function Tabs(props: Props) {
               <div className="mt-5">
                 <Typography.Title level={3}>{TabMarkup['tabAuthRules'].header}</Typography.Title>
                 <dd className="mt-8">
-                  <Typography.Text>{TabMarkup['tabAuthRules'].description}</Typography.Text>
+                  <p>{TabMarkup['tabAuthRules'].description}</p>
                 </dd>
               </div>
               <a href={TabMarkup['tabAuthRules'].url}>

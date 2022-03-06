@@ -3,13 +3,13 @@ import { Typography } from '@supabase/ui'
 function FeatureColumn({ icon, title, text }: any) {
   return (
     <>
-      <Typography.Text>
+      <p>
         <p>{icon}</p>
-      </Typography.Text>
+      </p>
       <Typography.Title level={4}>{title}</Typography.Title>
-      <Typography.Text>
+      <p>
         <p>{text}</p>
-      </Typography.Text>
+      </p>
     </>
   )
 }
