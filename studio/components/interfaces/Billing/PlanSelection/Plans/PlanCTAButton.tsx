@@ -3,11 +3,11 @@ import { Button, IconLoader } from '@supabase/ui'
 
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { BillingPlan } from './Plans.types'
-import { StripeSubscription } from '../../index'
+import { StripeProduct } from '../..'
 
 interface Props {
   plan: BillingPlan
-  currentPlan?: StripeSubscription
+  currentPlan?: StripeProduct
   onSelectPlan: (plan: BillingPlan) => void
 }
 
@@ -19,21 +19,24 @@ const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
     return 'primary'
   }
 
-  const getButtonText = (plan: any, currentPlan: any) => {
+  const getButtonText = (plan: any, currentPlan: StripeProduct) => {
     if (plan.name === 'Enterprise') {
       return 'Contact sales'
     }
     if (plan.id === STRIPE_PRODUCT_IDS.FREE) {
-      if (currentPlan.tier.prod_id === STRIPE_PRODUCT_IDS.FREE) {
+      if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE) {
         return 'Current plan'
       } else {
         return 'Downgrade to Free'
       }
     }
     if (plan.id === STRIPE_PRODUCT_IDS.PRO) {
-      if (currentPlan.tier.prod_id === STRIPE_PRODUCT_IDS.FREE) {
+      if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE) {
         return 'Upgrade to Pro'
-      } else if (currentPlan.tier.prod_id === STRIPE_PRODUCT_IDS.PRO) {
+      } else if (
+        currentPlan.prod_id === STRIPE_PRODUCT_IDS.PRO ||
+        currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG
+      ) {
         return 'Edit plan configuration'
       } else {
         return 'Contact sales'
@@ -53,7 +56,7 @@ const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
   const type = getButtonType(plan)
   const ctaText = getButtonText(plan, currentPlan)
   const disabled =
-    plan.id === STRIPE_PRODUCT_IDS.FREE && currentPlan.tier.prod_id === STRIPE_PRODUCT_IDS.FREE
+    plan.id === STRIPE_PRODUCT_IDS.FREE && currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE
 
   return (
     <div className="flex items-center justify-center">

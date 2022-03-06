@@ -6,27 +6,39 @@ import Divider from 'components/ui/Divider'
 import { PaymentSummaryPanel, ComputeSizeSelection, StripeSubscription } from '.'
 import { BillingPlan } from './PlanSelection/Plans/Plans.types'
 import { COMPUTE_SIZES } from './AddOns/AddOns.constant'
+import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 
 interface Props {
   visible: boolean
-  currentPlan: StripeSubscription
+  currentSubscription: StripeSubscription
   selectedPlan?: BillingPlan
   paymentMethods?: any[]
-  onSelectBack: () => void
-
   isLoadingPaymentMethods: boolean
+  onSelectBack: () => void
+  onConfirmPayment: () => void
 }
 
 const ProUpgrade: FC<Props> = ({
   visible,
-  currentPlan,
+  currentSubscription,
   selectedPlan,
   paymentMethods,
-  onSelectBack,
   isLoadingPaymentMethods,
+  onSelectBack,
+  onConfirmPayment,
 }) => {
-  const [isOverageEnabled, setIsOverageEnabled] = useState(false)
-  const [selectedComputeSize, setSelectedComputeSize] = useState<any>(COMPUTE_SIZES[0])
+  const currentComputeSize =
+    COMPUTE_SIZES.find((options) => options.id === currentSubscription?.addons[0]?.prod_id) ||
+    COMPUTE_SIZES[0]
+
+  const isManagingProSubscription =
+    currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PRO ||
+    currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
+
+  const [isOverageEnabled, setIsOverageEnabled] = useState(
+    currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
+  )
+  const [selectedComputeSize, setSelectedComputeSize] = useState<any>(currentComputeSize)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>()
 
   const onSelectComputeSizeOption = (option: any) => {
@@ -63,14 +75,25 @@ const ProUpgrade: FC<Props> = ({
                   className="space-y-8 overflow-scroll pb-8 pr-20"
                   style={{ height: 'calc(100vh - 6.3rem - 49.5px)' }}
                 >
-                  <div className="space-y-1">
-                    <h3 className="text-xl">
-                      Welcome to <span className="text-green-1100">Pro</span>
-                      <p className="text-sm text-scale-1100">
-                        Your new subscription will begin immediately after payment
-                      </p>
-                    </h3>
-                  </div>
+                  {!isManagingProSubscription ? (
+                    <div className="space-y-1">
+                      <h3 className="text-xl">
+                        Welcome to <span className="text-green-1100">Pro</span>
+                        <p className="text-sm text-scale-1100">
+                          Your new subscription will begin immediately after payment
+                        </p>
+                      </h3>
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <h3 className="text-xl">
+                        Managing your <span className="text-green-1100">Pro</span> plan
+                        <p className="text-sm text-scale-1100">
+                          Your billing cycle will reset after payment
+                        </p>
+                      </h3>
+                    </div>
+                  )}
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center space-x-2">
@@ -106,14 +129,16 @@ const ProUpgrade: FC<Props> = ({
           </div>
           <div className="w-2/5 -mt-10">
             <PaymentSummaryPanel
-              currentPlan={currentPlan}
+              currentPlan={currentSubscription.tier}
               selectedPlan={selectedPlan}
               isOverageEnabled={isOverageEnabled}
+              currentComputeSize={currentComputeSize}
               selectedComputeSize={selectedComputeSize}
               paymentMethods={paymentMethods}
               isLoadingPaymentMethods={isLoadingPaymentMethods}
               selectedPaymentMethod={selectedPaymentMethod}
               onSelectPaymentMethod={setSelectedPaymentMethod}
+              onConfirmPayment={onConfirmPayment}
             />
           </div>
         </>
