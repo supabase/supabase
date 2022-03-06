@@ -23,7 +23,7 @@ html {
 }
 
 body {
-  @apply bg-scale-100;
+  @apply bg-scale-200;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -40,6 +40,22 @@ h5,
 h6 {
   @apply text-scale-1200;
   margin-bottom: 16px;
+}
+
+h2 {
+  @apply text-3xl;
+}
+
+h3 {
+  @apply text-2xl;
+}
+
+h4 {
+  @apply text-xl;
+}
+
+h5 {
+  @apply text-xl;
 }
 
 h1,
@@ -105,7 +121,7 @@ small {
 }
 
 .section--bg {
-  @apply bg-gray-50 dark:bg-gray-800;
+  @apply bg-scale-100 dark:bg-scale-200;
   position: relative;
   height: 100%;
   width: 100%;
