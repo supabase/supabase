@@ -73,9 +73,9 @@ const StackedAreaChart: React.FC<Props> = ({
       return dayjs(value).format(dateFormat)
     }
   }
-  const minHeight = { small: '120px', normal: '160px', large: '280px' }[size]
+  const minHeight = { small: 120, normal: 160, large: 280 }[size]
   return (
-    <ResponsiveContainer height="100%" minHeight={minHeight} width="100%">
+    <ResponsiveContainer height={minHeight} minHeight={minHeight} width="100%">
       <AreaChart data={transformed} onClick={(_tooltipData: any) => {}}>
         <CartesianGrid strokeDasharray="3 3" style={{ stroke: '#444444' }} />
         <XAxis

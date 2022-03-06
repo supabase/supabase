@@ -175,7 +175,7 @@ export function BarChart({
   label,
   onBarClick,
   minimalHeader,
-  minmalChart,
+  minimalChart,
   className = '',
 }: any) {
   const hasData = data ? dataCheck(data, attribute) : true
@@ -200,6 +200,9 @@ export function BarChart({
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
 
+  // For future reference: https://github.com/supabase/supabase/pull/5311#discussion_r800852828
+  const chartHeight = minimalChart ? 96 : 160
+
   return (
     <Loading active={!data}>
       <div className={className}>
@@ -214,10 +217,10 @@ export function BarChart({
           customDateFormat={customDateFormat}
           displayDateInUtc={displayDateInUtc}
         />
-        <div style={{ width: '100%', height: minmalChart ? '96px' : '160px' }}>
+        <div style={{ width: '100%', height: `${chartHeight}px` }}>
           {hasData ? (
             <>
-              <ResponsiveContainer>
+              <ResponsiveContainer width="100%" height={chartHeight}>
                 <RechartBarChart
                   data={data}
                   margin={{
@@ -325,6 +328,9 @@ export function AreaChart({
     setMouseLeave(true)
   }
 
+  // For future reference: https://github.com/supabase/supabase/pull/5311#discussion_r800852828
+  const chartHeight = 160
+
   return (
     <Loading active={!data}>
       <Header
@@ -339,12 +345,12 @@ export function AreaChart({
       <div
         style={{
           width: '100%',
-          height: '160px',
+          height: `${chartHeight}px`,
         }}
       >
         {hasData ? (
           <>
-            <ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={chartHeight}>
               <RechartAreaChart
                 data={data}
                 margin={{
