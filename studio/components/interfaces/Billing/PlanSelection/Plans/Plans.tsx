@@ -36,6 +36,11 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
   return (
     <div className="flex justify-between space-x-4">
       {plans.map((plan) => {
+        const isCurrentPlan =
+          plan.id === currentPlan?.prod_id ||
+          (plan.id === STRIPE_PRODUCT_IDS.PRO && currentPlan?.prod_id === STRIPE_PRODUCT_IDS.PRO) ||
+          (plan.id === STRIPE_PRODUCT_IDS.PRO && currentPlan?.prod_id === STRIPE_PRODUCT_IDS.PAYG)
+
         return (
           <div
             key={plan.name}
@@ -49,12 +54,7 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
             {plan.id === STRIPE_PRODUCT_IDS.PRO && <AnimatedGradientBackground />}
 
             {/* Label to show current subscription (Pro and PAYG are treated as the same plan on the UI) */}
-            {plan.id === currentPlan?.prod_id ||
-              (plan.id === STRIPE_PRODUCT_IDS.PRO &&
-                (currentPlan?.prod_id === STRIPE_PRODUCT_IDS.PRO ||
-                  currentPlan?.prod_id === STRIPE_PRODUCT_IDS.PAYG) && (
-                  <CurrentSubscriptionBanner />
-                ))}
+            {isCurrentPlan && <CurrentSubscriptionBanner />}
 
             <div className="mb-8">
               <div className="flex items-center space-x-4">
