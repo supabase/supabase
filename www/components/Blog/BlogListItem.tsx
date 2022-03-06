@@ -1,4 +1,4 @@
-import { Space, Typography } from '@supabase/ui'
+import { Space } from '@supabase/ui'
 import authors from 'lib/authors.json'
 import React from 'react'
 import Image from 'next/image'
@@ -32,9 +32,7 @@ const BlogListItem = ({ blog }: Props) => {
               </div>
 
               <div>
-                <Typography.Title level={3} className="m-0">
-                  {blog.title}
-                </Typography.Title>
+                <h3 className="m-0">{blog.title}</h3>
               </div>
               <p small>{blog.date}</p>
 

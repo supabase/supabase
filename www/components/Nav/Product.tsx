@@ -3,7 +3,7 @@ import SolutionsData from 'data/Solutions.json'
 import CaseStudiesData from 'data/CaseStudies.json'
 import { useRouter } from 'next/router'
 import ProductIcon from '../ProductIcon'
-import { Typography, Badge } from '@supabase/ui'
+import { Badge } from '@supabase/ui'
 
 const Product = () => {
   const { basePath } = useRouter()
@@ -16,9 +16,7 @@ const Product = () => {
         <div className="flex flex-row items-center">
           <ProductIcon icon={icon} />
           <div>
-            <Typography.Title level={5} className="ml-3 mb-0">
-              {name}
-            </Typography.Title>
+            <h5 className="ml-3 mb-0">{name}</h5>
           </div>
         </div>
         <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
@@ -73,9 +71,7 @@ const Product = () => {
                       />
                     </div>
                     <div className="min-w-0 flex-1 sm:ml-8">
-                      <Typography.Title level={5} className="mb-0">
-                        {caseStudy.title}
-                      </Typography.Title>
+                      <h5 className="mb-0">{caseStudy.title}</h5>
                       <p>{caseStudy.description}</p>
                     </div>
                   </a>

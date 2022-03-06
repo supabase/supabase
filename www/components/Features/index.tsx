@@ -1,4 +1,4 @@
-import { Button, Badge, Typography, IconArrowRight } from '@supabase/ui'
+import { Button, Badge, IconArrowRight } from '@supabase/ui'
 import SectionHeader from 'components/UI/SectionHeader'
 import Solutions from 'data/Solutions.json'
 import Link from 'next/link'
@@ -30,9 +30,7 @@ const Features = () => {
 
   return (
     <SectionContainer className="pb-0">
-      <Typography.Title level={2} className="mb-16">
-        Build faster and focus on your products
-      </Typography.Title>
+      <h2 className="mb-16">Build faster and focus on your products</h2>
       <dl className="grid grid-cols-1 sm:grid-cols-2  gap-y-4 md:grid-cols-2 lg:grid-cols-4 md:gap-16 lg:gap-x-8 xl:gap-x-24">
         {IconSections}
       </dl>

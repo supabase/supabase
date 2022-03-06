@@ -24,7 +24,6 @@ import {
   IconLinkedin,
   IconTwitter,
   Space,
-  Typography,
 } from '@supabase/ui'
 import { NextSeo } from 'next-seo'
 
@@ -76,9 +75,7 @@ const Header = () => {
           mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24
           text-center"
       >
-        <Typography.Title>
-          Join one of the world's fastest growing open source communities.
-        </Typography.Title>
+        <h1>Join one of the world's fastest growing open source communities.</h1>
       </div>
     </>
   )
@@ -133,9 +130,9 @@ const Team = () => {
               </div>
               <div className="flex flex-col justify-center space-y-2">
                 <div>
-                  <Typography.Title level={5} className="mb-0">
+                  <h5 className="mb-0">
                     {x.name}
-                  </Typography.Title>
+                  </h5>
                   <p className="mb-0">
                     {x.department}
                   </p>
@@ -216,9 +213,7 @@ const Community = () => {
                 />
               </div>
               <div>
-                <Typography.Title level={1} className="mb-0">
-                  {x.stat}
-                </Typography.Title>
+                <h1 className="mb-0">{x.stat}</h1>
                 <p>{x.statLabel}</p>
               </div>
             </div>
@@ -283,7 +278,7 @@ const Investors = () => {
           </div>
         ))}
       </div>
-      <Typography.Title level={3}>Individual investors</Typography.Title>
+      <h3>Individual investors</h3>
       <div className="mt-5 mx-auto grid gap-5 grid-cols-2 lg:grid-cols-4 lg:max-w-none">
         {InvestorData.filter((x) => x.lead === false)
           .sort((a, b) => a.name.localeCompare(b.name))
@@ -293,9 +288,7 @@ const Investors = () => {
 
               <div className="flex flex-col justify-center space-y-2">
                 <div>
-                  <Typography.Title level={5} className="mb-0">
-                    {x.name}
-                  </Typography.Title>
+                  <h5 className="mb-0">{x.name}</h5>
                   <p className="mb-0">{x.title}</p>
                 </div>
               </div>
@@ -318,10 +311,8 @@ const Press = () => {
             <Card key={`press_${x.href}`} hoverable>
               <Space className="justify-between h-40" direction="vertical">
                 <div>
-                  <p small type="secondary">
-                    {x.type.toUpperCase()}
-                  </p>
-                  <Typography.Title level={3}>{x.title}</Typography.Title>
+                  <p>{x.type.toUpperCase()}</p>
+                  <h3>{x.title}</h3>
                 </div>
               </Space>
             </Card>
@@ -334,10 +325,8 @@ const Press = () => {
             <Card key={`press_${x.href}`} hoverable>
               <Space className="justify-between h-40" direction="vertical">
                 <div>
-                  <p small type="secondary">
-                    {x.type.toUpperCase()}
-                  </p>
-                  <Typography.Title level={3}>{x.title}</Typography.Title>
+                  <p>{x.type.toUpperCase()}</p>
+                  <h3>{x.title}</h3>
                 </div>
               </Space>
             </Card>

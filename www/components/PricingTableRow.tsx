@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { IconHelpCircle, IconWatch, Space, Typography } from '@supabase/ui'
+import { IconHelpCircle, IconWatch, Space } from '@supabase/ui'
 import ReactTooltip from 'react-tooltip'
 import ProductIcon from 'components/ProductIcon'
 
@@ -53,9 +53,7 @@ export const PricingTableRowDesktop = (props: any) => {
         >
           <Space size={4}>
             {props.icon && <ProductIcon icon={props.icon} />}
-            <Typography.Title className="m-0" level={4}>
-              {category.title}
-            </Typography.Title>
+            <h4 className="m-0">{category.title}</h4>
           </Space>
         </th>
         <td className="pricing-table__product-row bg-gray-50 dark:bg-scale-300 py-5 px-6"></td>
@@ -112,9 +110,7 @@ export const PricingTableRowMobile = (props: any) => {
         <caption className="bg-gray-50 dark:bg-dark-900 border-t border-gray-200 dark:border-gray-600 py-3 px-4 text-sm font-medium text-gray-900 dark:text-white text-left">
           <Space size={4}>
             {category.icon ? <ProductIcon icon={props.icon} /> : null}
-            <Typography.Title className="m-0" level={4}>
-              {category.title}
-            </Typography.Title>
+            <h4 className="m-0">{category.title}</h4>
           </Space>
         </caption>
         <thead>

@@ -1,15 +1,4 @@
-import {
-  Badge,
-  Button,
-  IconArrowUpRight,
-  IconBarChart,
-  IconCheckSquare,
-  IconShuffle,
-  IconWifi,
-  IconX,
-  Space,
-  Typography,
-} from '@supabase/ui'
+import { Badge, Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, Space } from '@supabase/ui'
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
@@ -104,7 +93,7 @@ function StoragePage() {
                   </Space>
                 </p>
               </p>
-              <Typography.Title level={4}>Interoperable</Typography.Title>
+              <h4>Interoperable</h4>
               <p>
                 <p className="text-lg">
                   Integrates well with the rest of Supabase ecosystem, including Auth and Postgres.
@@ -127,7 +116,7 @@ function StoragePage() {
                   </Space>
                 </p>
               </p>
-              <Typography.Title level={4}>Lightning fast</Typography.Title>
+              <h4>Lightning fast</h4>
               <p>
                 <p className="text-lg">
                   Thin API server layer that leverages Postgres' permissions and performance.
@@ -150,7 +139,7 @@ function StoragePage() {
                   </Space>
                 </p>
               </p>
-              <Typography.Title level={4}>Dependable</Typography.Title>
+              <h4>Dependable</h4>
               <p>
                 <p className="text-lg">Enterprise-level scalability and durability.</p>
                 {/* <p>A durability rating of 99.999999999%.</p> */}
@@ -161,7 +150,7 @@ function StoragePage() {
 
         <SectionContainer className="pt-16">
           <div className="mb-16 block">
-            <Typography.Title>Sleek dashboard for managing your media</Typography.Title>
+            <h1>Sleek dashboard for managing your media</h1>
             <p>
               <p className="text-lg">
                 A complete Object Explorer so that any of your team can use.
@@ -176,9 +165,7 @@ function StoragePage() {
             // @ts-ignore
             content={DashboardViewData}
             footer={[
-              <Typography.Title level={4} key="title">
-                Check out our example app
-              </Typography.Title>,
+              <h4 key="title">Check out our example app</h4>,
               // !! Update this example !!
               <ExampleCard
                 key="example"
@@ -254,10 +241,10 @@ function StoragePage() {
                 <SectionContainer>
                   <div className="grid grid-cols-12 lg:gap-16">
                     <div className="col-span-12 lg:col-span-5 mb-8">
-                      <Typography.Title level={2}>
+                      <h2>
                         Integrates natively <br />
                         with Supabase Auth
-                      </Typography.Title>
+                      </h2>
                       <p>
                         <p className="">
                           Using Postgres Row Level Security to create Object access rules.

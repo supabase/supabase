@@ -1,4 +1,4 @@
-import { Button, IconBookOpen, IconKey, Space, Typography } from '@supabase/ui'
+import { Button, IconBookOpen, IconKey, Space } from '@supabase/ui'
 import Link from 'next/link'
 import ProductIcon from '../ProductIcon'
 
@@ -21,15 +21,13 @@ const ProductHeader = (props: Types) => (
           <div className="flex flex-row mb-4 item-center">
             {props.icon && <ProductIcon icon={props.icon} />}
             {props.title && (
-              <Typography.Title level={4} className="ml-3" key={`product-name-${props.title}`}>
+              <h4 className="ml-3" key={`product-name-${props.title}`}>
                 {props.title}
-              </Typography.Title>
+              </h4>
             )}
           </div>
         ) : null}
-        <Typography.Title level={1} key={`h1`}>
-          {props.h1}
-        </Typography.Title>
+        <h1 key={`h1`}>{props.h1}</h1>
         {props.subheader && (
           <p>
             {props.subheader.map((subheader, i) => {

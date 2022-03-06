@@ -1,4 +1,4 @@
-import { Space, Typography } from '@supabase/ui'
+import { Space } from '@supabase/ui'
 import React from 'react'
 
 interface Props {

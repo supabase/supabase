@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/PricingTableRow'
-import { Accordion, Badge, Button, Divider, Space, Typography } from '@supabase/ui'
+import { Accordion, Button } from '@supabase/ui'
 
 import pricing from '~/data/Pricing.json'
 import pricingFaq from '~/data/PricingFAQ.json'
@@ -40,7 +40,7 @@ export default function IndexPage() {
       <div className="bg-white dark:bg-gray-800">
         <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative pt-24 md:pt-24 lg:pt-24">
           <div className="text-center">
-            <Typography.Title>Predictable pricing, no surprises</Typography.Title>
+            <h1>Predictable pricing, no surprises</h1>
             <p>
               <p className="text-lg">
                 Start with a hobby project, collaborate with a team, and scale to millions of users.
@@ -51,9 +51,9 @@ export default function IndexPage() {
                 <div className="rounded border border-green-500 dark:border-green-900 bg-green-500 bg-opacity-10 grid grid-cols-6">
                   <div className="p-6 col-span-6">
                     <Space className="mb-4">
-                      <Typography.Title level={3} className="flex gap-2">
+                      <h3 className="flex gap-2">
                         Special Beta Pricing
-                      </Typography.Title>
+                      </h3>
                       <Badge dot>Limited time offer</Badge>
                     </Space>
                     <p>
@@ -71,7 +71,7 @@ export default function IndexPage() {
                     className="col-span-6 h-30 object-cover"
                   />
                   <div className="p-6 lg:col-span-6">
-                    <Typography.Title level={4}>Free tshirt</Typography.Title>
+                    <h4>Free tshirt</h4>
                     <p>
                       We are giving away free tshirts to anyone who signs up for the Beta Pro plan
                     </p>
@@ -223,7 +223,7 @@ export default function IndexPage() {
                     className=" bg-white dark:bg-gray-800  w-1/4 pb-4 px-6 text-left font-medium"
                     scope="col"
                   >
-                    <Typography.Title level={4}>Free</Typography.Title>
+                    <h4>Free</h4>
                     <div
                       className="absolute bottom-0 left-0 h-0.25 w-full bg-gray-200 dark:bg-scale-300"
                       style={{ height: '1px' }}
@@ -234,7 +234,7 @@ export default function IndexPage() {
                     className=" bg-white dark:bg-gray-800  w-1/4 pb-4 px-6 text-lg leading-6 font-medium text-gray-900 text-left"
                     scope="col"
                   >
-                    <Typography.Title level={4}>Pro</Typography.Title>
+                    <h4>Pro</h4>
                     <div
                       className="absolute bottom-0 left-0 h-0.25 w-full bg-gray-200 dark:bg-scale-300"
                       style={{ height: '1px' }}
@@ -245,7 +245,7 @@ export default function IndexPage() {
                     className=" bg-white dark:bg-gray-800  w-1/4 pb-4 px-6 text-lg leading-6 font-medium text-gray-900 text-left"
                     scope="col"
                   >
-                    <Typography.Title level={4}>Pay as you go</Typography.Title>
+                    <h4>Pay as you go</h4>
                     <div
                       className="absolute bottom-0 left-0 h-0.25 w-full bg-gray-200 dark:bg-scale-300"
                       style={{ height: '1px' }}
@@ -391,11 +391,11 @@ export default function IndexPage() {
 
       <div className="bg-gray-50 dark:bg-gray-800 border-t dark:border-gray-600">
         <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
-          <Typography.Title level={2}>Frequently asked questions</Typography.Title>
-          <Typography className="w-5/12 mb-4">
+          <h2>Frequently asked questions</h2>
+          <h1 className="w-5/12 mb-4">
             Can&apos;t find the answer to your question, ask someone in the community either on our
             Discord or GitHub.
-          </Typography>
+          </h1>
           <Link href="https://discord.supabase.com">
             <a>
               <Button type="default" className="mr-2" size="small">
@@ -416,9 +416,7 @@ export default function IndexPage() {
                     {/* @ts-ignore */}
                     <Accordion type="bordered" openBehaviour="multiple" size="medium">
                       <Accordion.Item header={faq.question} id={`faq--${i.toString()}`}>
-                        <Typography>
-                          <ReactMarkdown>{faq.answer}</ReactMarkdown>
-                        </Typography>
+                        <ReactMarkdown>{faq.answer}</ReactMarkdown>
                       </Accordion.Item>
                     </Accordion>
                   </div>
