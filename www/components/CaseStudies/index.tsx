@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import Benchmark from 'components/CaseStudies/benchmark'
 import SectionHeader from 'components/UI/SectionHeader'
 import CaseStudiesData from 'data/CaseStudies.json'
-import { Card, Space, Typography } from '@supabase/ui'
+import { Card, Space } from '@supabase/ui'
 import SectionContainer from '../Layouts/SectionContainer'
 
 const CaseStudies = () => {
@@ -30,12 +30,10 @@ const CaseStudies = () => {
             >
               <Space className="justify-between h-40" direction="vertical">
                 <div>
-                  <p small type="secondary">
-                    Project example
-                  </p>
-                  <Typography.Title level={3}>{caseStudy.title}</Typography.Title>
+                  <p>Project example</p>
+                  <h3>{caseStudy.title}</h3>
                 </div>
-                <p type="default">{caseStudy.description}</p>
+                <p>{caseStudy.description}</p>
               </Space>
             </Card>
           </a>

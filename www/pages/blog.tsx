@@ -9,7 +9,7 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { Typography, Tabs } from '@supabase/ui'
+import { Tabs } from '@supabase/ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 
@@ -149,7 +149,7 @@ function FeaturedThumb(blog: PostTypes) {
             </div>
 
             <div>
-              <Typography.Title level={2}>{blog.title}</Typography.Title>
+              <h2>{blog.title}</h2>
               <p className="m-0" type="secondary">
                 <span className="text-xl">{blog.description}</span>
               </p>

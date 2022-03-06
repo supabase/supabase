@@ -1,4 +1,4 @@
-import { Button, Typography } from '@supabase/ui'
+import { Button } from '@supabase/ui'
 
 const CTABanner = (props: any) => {
   const { darkerBg } = props
@@ -10,10 +10,10 @@ const CTABanner = (props: any) => {
       `}
     >
       <div className="col-span-12">
-        <Typography.Title level={2}>
+        <h2>
           <span style={{ color: '#bbbbbb' }}>Build in a weekend,</span>
           <span style={{ color: '#ffffff' }}> scale to millions</span>
-        </Typography.Title>
+        </h2>
       </div>
       <div className="col-span-12 mt-4">
         <a href="https://app.supabase.io/">

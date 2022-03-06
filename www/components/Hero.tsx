@@ -1,4 +1,4 @@
-import { Button, IconBookOpen, Space, Typography } from '@supabase/ui'
+import { Button, IconBookOpen, Space } from '@supabase/ui'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SectionContainer from './Layouts/SectionContainer'

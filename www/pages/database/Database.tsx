@@ -1,13 +1,4 @@
-import {
-  Badge,
-  Button,
-  IconArrowUpRight,
-  IconShuffle,
-  IconX,
-  Space,
-  Tabs,
-  Typography,
-} from '@supabase/ui'
+import { Badge, Button, IconArrowUpRight, IconShuffle, IconX, Space, Tabs } from '@supabase/ui'
 // data
 import ApiExamplesData from 'data/products/database/api-examples'
 import ExtensionsExamplesData from 'data/products/database/extensions-examples'
@@ -122,7 +113,7 @@ function Database() {
                   </Space>
                 </p>
               </p>
-              <Typography.Title level={4}>Just Postgres</Typography.Title>
+              <h4>Just Postgres</h4>
               <p>
                 <p className="text-base lg:text-lg">
                   Every Supabase project is a dedicated Postgres database.
@@ -142,7 +133,7 @@ function Database() {
                   </Space>
                 </p>
               </p>
-              <Typography.Title level={4}>Built-in Auth</Typography.Title>
+              <h4>Built-in Auth</h4>
               <p>
                 <p className="text-base lg:text-lg">
                   Leveraging PostgreSQL's proven Row Level Security.
@@ -163,7 +154,7 @@ function Database() {
                   </Space>
                 </p>
               </p>
-              <Typography.Title level={4}>Realtime enabled</Typography.Title>
+              <h4>Realtime enabled</h4>
               <p>
                 <p className="text-base lg:text-lg">Data-change listeners over websockets.</p>
                 <p>Subscribe and react to database changes, milliseconds after they happen.</p>
@@ -176,7 +167,7 @@ function Database() {
         <SectionContainer className="text-center md:pb-0 lg:pb-0">
           <div className="grid grid-cols-12">
             <div className="col-span-12 lg:col-span-8 lg:col-start-3">
-              <Typography.Title level={2}>Easy to use dashboard</Typography.Title>
+              <h2>Easy to use dashboard</h2>
               <p>
                 <p className="text-base lg:text-lg">
                   The simplicity of a Table Editor, or the power of a SQL editor. Your choice.
@@ -320,7 +311,7 @@ function Database() {
         <SectionContainer className="lg:py-48">
           <div className="grid grid-cols-12 lg:gap-16">
             <div className="col-span-12 lg:col-span-6 xl:col-span-5 mb-8">
-              <Typography.Title level={2}>Extend your database</Typography.Title>
+              <h2>Extend your database</h2>
               <p className="block mb-8">
                 <p className="lg:text-lg">Supabase works natively with Postgres extensions.</p>
                 <p>

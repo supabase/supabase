@@ -1,12 +1,4 @@
-import {
-  Button,
-  Divider,
-  IconArrowUpRight,
-  IconGitHub,
-  IconTriangle,
-  Space,
-  Typography,
-} from '@supabase/ui'
+import { Button, Divider, IconArrowUpRight, IconGitHub, IconTriangle, Space } from '@supabase/ui'
 import Link from 'next/link'
 
 function ExampleCard(props: any) {

@@ -5,8 +5,6 @@ import Link from 'next/link'
 import DefaultLayout from '~/components/Layouts/Default'
 import BlogListItem from '~/components/Blog/BlogListItem'
 import PostTypes from '~/types/post'
-import BlogHeader from '~/components/Blog/BlogHeader'
-import { Typography } from '@supabase/ui'
 
 export async function getStaticProps({ params }: any) {
   const posts = getSortedPosts('_blog', 0, [params.tag])

@@ -2,7 +2,6 @@ import React from 'react'
 import DevelopersData from 'data/Developers.json'
 import AnnouncementsData from 'data/Announcements.json'
 import { useRouter } from 'next/router'
-import { Typography } from '@supabase/ui'
 
 type Props = {
   text: string
@@ -33,7 +32,7 @@ const Developers = () => {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icon} />
         </svg>
         <div className="ml-4">
-          <Typography.Title level={5}>{text}</Typography.Title>
+          <h5>{text}</h5>
           <p>
             <p>{description}</p>
           </p>
@@ -81,9 +80,7 @@ const Developers = () => {
                     />
                   </div>
                   <div className="min-w-0 flex-1 sm:ml-8">
-                    <Typography.Title level={5} className="mb-0">
-                      {caseStudy.title}
-                    </Typography.Title>
+                    <h5 className="mb-0">{caseStudy.title}</h5>
                     <p>{caseStudy.description}</p>
                   </div>
                 </a>

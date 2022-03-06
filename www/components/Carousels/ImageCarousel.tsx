@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Tabs, Typography, Button, IconCornerRightUp, IconArrowUpRight } from '@supabase/ui'
+import { Tabs, Button, IconCornerRightUp, IconArrowUpRight } from '@supabase/ui'
 import { useState } from 'react'
 
 // Import Swiper React components
@@ -170,7 +170,7 @@ function ImageCarousel(props: ImageCarouselProps) {
             return (
               <SwiperSlide key={i}>
                 <div className="bg-white dark:bg-gray-800 p-px">
-                  <Typography.Title level={4}>{content.title}</Typography.Title>
+                  <h4>{content.title}</h4>
                   <p>
                     <p className="text-base">{content.text}</p>
                   </p>

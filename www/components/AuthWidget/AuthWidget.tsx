@@ -13,7 +13,6 @@ import {
   Select,
   Space,
   Tabs,
-  Typography,
   Input,
   Toggle,
   IconCode,
@@ -49,9 +48,7 @@ function AuthPage() {
       <div className="container mx-auto px-8 sm:px-16 xl:px-20 relative py-32">
         <div className="grid grid-cols-12">
           <div className="col-span-8">
-            <Typography.Title level={2} className="mb-4">
-              ReactJS Auth Widget
-            </Typography.Title>
+            <h2 className="mb-4">ReactJS Auth Widget</h2>
             <p>
               An API built from the groud up just for Storage.With powerful library clients coming
               soon that allow for asset optimasation and image transformation
@@ -85,7 +82,7 @@ function AuthPage() {
                           <div>
                             <Space size={3} direction="vertical">
                               <img src="https://app.supabase.io/img/supabase-dark.svg" width="96" />
-                              <Typography.Title level={3}>{companyName}</Typography.Title>
+                              <h3>{companyName}</h3>
                             </Space>
                           </div>
                           {/* <Auth
@@ -141,7 +138,7 @@ function AuthPage() {
               <div className={`p-8`}>
                 <Space size={12} direction="vertical">
                   <div>
-                    <Typography.Title level={3}>Customise your login form</Typography.Title>
+                    <h3>Customise your login form</h3>
                     <p>Our ReactJS Auth form will help you get going even quicker </p>
                   </div>
                   <Divider light />

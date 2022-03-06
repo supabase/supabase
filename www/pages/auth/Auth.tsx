@@ -128,7 +128,7 @@ function AuthPage() {
                   })}
                 </div>
               </p>
-              <Typography.Title level={4}>All the social providers</Typography.Title>
+              <h4>All the social providers</h4>
               <p>
                 <p className="text-base">
                   Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
@@ -142,7 +142,7 @@ function AuthPage() {
                   <IconLink />
                 </p>
               </p>
-              <Typography.Title level={4}>Fully integrated</Typography.Title>
+              <h4>Fully integrated</h4>
               <p>
                 <p className="text-base">
                   Incredibly simple Auth, without a single external authentication service. Built-in
@@ -156,7 +156,7 @@ function AuthPage() {
                   <IconShield />
                 </p>
               </p>
-              <Typography.Title level={4}>Own your data</Typography.Title>
+              <h4>Own your data</h4>
               <p>
                 <p className="text-base">
                   User data stored in your Supabase database so you never have to worry about 3rd
@@ -227,7 +227,7 @@ function AuthPage() {
         <SectionContainer>
           <div className="grid grid-cols-12 lg:gap-16">
             <div className="col-span-12 lg:col-span-5 mb-8">
-              <Typography.Title level={2}>User permissions without the middleware</Typography.Title>
+              <h2>User permissions without the middleware</h2>
               <p>
                 <p className="text-base lg:text-lg">
                   Supabase Auth works without any additional servers. Build Authorization rules with
@@ -269,9 +269,7 @@ function AuthPage() {
                 <img className="w-8" src={`${basePath}/images/product/auth/react-icon.svg`} />
               </Space>
 
-              <Typography.Title level={2} className="mb-4">
-                React Auth
-              </Typography.Title>
+              <h2 className="mb-4">React Auth</h2>
               <p>
                 <p className="text-base lg:text-lg">
                   Pre-built auth widgets to get started in minutes.

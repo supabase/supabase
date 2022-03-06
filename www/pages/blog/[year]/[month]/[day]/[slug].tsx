@@ -1,4 +1,4 @@
-import { Badge, Card, Divider, IconChevronLeft, IconFile, Space, Typography } from '@supabase/ui'
+import { Badge, Card, Divider, IconChevronLeft, IconFile, Space } from '@supabase/ui'
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
 import hydrate from 'next-mdx-remote/hydrate'
@@ -107,7 +107,7 @@ function BlogPostPage(props: any) {
                 <p>{label}</p>
               </div>
               <div>
-                <Typography.Title level={4}>{post.title}</Typography.Title>
+                <h4>{post.title}</h4>
                 <p>{post.date}</p>
               </div>
               <div>
@@ -137,11 +137,11 @@ function BlogPostPage(props: any) {
       </div>
       <div>
         <p>Table of contents</p>
-        <Typography>
+        <div>
           <div className={blogStyles['toc']}>
             <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
           </div>
-        </Typography>
+        </div>
       </div>
     </Space>
   )
@@ -202,8 +202,8 @@ function BlogPostPage(props: any) {
               {/* Title and description */}
               <div className="mb-16 space-y-8 max-w-5xl">
                 <div className="space-y-4">
-                  <p type="success">Blog post</p>
-                  <Typography.Title>{props.blog.title}</Typography.Title>
+                  <p className="text-brand-900">Blog post</p>
+                  <h1>{props.blog.title}</h1>
                   <div className="flex space-x-3">
                     <p>{props.blog.date}</p>
                     <p>•</p>
@@ -241,8 +241,8 @@ function BlogPostPage(props: any) {
                       style={{ maxHeight: '520px' }}
                     />
                   )}
-                  <article className={blogStyles['article']}>
-                    <Typography>{content}</Typography>
+                  <article className={[blogStyles['article'], 'prose'].join(' ')}>
+                    {content}
                   </article>
                   <div className="text-gray-900 dark:text-white">Share with your friends</div>
                   <div className="flex space-x-4 mt-4">
@@ -384,9 +384,9 @@ function BlogPostPage(props: any) {
                 <Space direction="vertical" size={8} className="lg:mb-16 lg:top-16 lg:sticky">
                   <div className="hidden lg:block">{toc}</div>
                   <div>
-                    <Typography.Title className="mb-4" level={5}>
+                    <h5 className="mb-4">
                       Related articles
-                    </Typography.Title>
+                    </h5>
                     <Space direction="vertical">
                       {props.relatedPosts.map((post: any) => (
                         <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>

@@ -1,4 +1,4 @@
-import { IconDatabase, Typography } from '@supabase/ui'
+import { IconDatabase } from '@supabase/ui'
 
 const FeatureSection = (props: any) => {
   return (
@@ -7,7 +7,7 @@ const FeatureSection = (props: any) => {
         <p className="mb-4">
           <IconDatabase />
         </p>
-        <Typography.Title level={4}>Write less code</Typography.Title>
+        <h4>Write less code</h4>
         <p>
           <p className="lg:text-lg">
             Use media in your project without needing to reply on external services or learn new
@@ -23,7 +23,7 @@ const FeatureSection = (props: any) => {
         <p className="mb-4">
           <IconDatabase />
         </p>
-        <Typography.Title level={4}>Blazing fast</Typography.Title>
+        <h4>Blazing fast</h4>
         <p>
           <p className="lg:text-lg">
             Use media in your project without needing to reply on external services or learn new
@@ -39,7 +39,7 @@ const FeatureSection = (props: any) => {
         <p className="mb-4">
           <IconDatabase />
         </p>
-        <Typography.Title level={4}>Dependable</Typography.Title>
+        <h4>Dependable</h4>
         <p>
           <p className="lg:text-lg">
             Use media in your project without needing to reply on external services or learn new

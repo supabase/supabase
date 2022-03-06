@@ -7,15 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import SwiperCore, { Navigation, Pagination } from 'swiper'
 
 import Link from 'next/link'
-import {
-  Button,
-  Typography,
-  IconGitHub,
-  IconArrowLeft,
-  IconArrowRight,
-  Space,
-  IconBookOpen,
-} from '@supabase/ui'
+import { Button, IconGitHub, IconArrowLeft, IconArrowRight, IconBookOpen } from '@supabase/ui'
 
 import Examples from '../../data/Examples.json'
 import ExampleCard from '../ExampleCard'
@@ -34,9 +26,7 @@ function GithubExamples() {
     <>
       <div className="grid grid-cols-12">
         <div className="col-span-12 text-center">
-          <Typography.Title level={2}>
-            Community driven examples, libraries and guides
-          </Typography.Title>
+          <h2>Community driven examples, libraries and guides</h2>
           <p className="block mb-6">
             <p className="text-base lg:text-lg">
               Supported by a network of early advocates, contributors, and champions.

@@ -1,5 +1,3 @@
-import { Typography } from '@supabase/ui'
-
 const SectionHeader = (props: any) => {
   return (
     <div className={'grid grid-cols-12 gap-1 sm:gap-8 ' + props.className}>
@@ -8,12 +6,12 @@ const SectionHeader = (props: any) => {
           <span className="col-span-12 block mb-6 text-sm tracking-widest uppercase text-gray-300 font-mono dark:text-gray-300">
             {props.subtitle}
           </span>
-          <Typography.Title level={2}>
+          <h2>
             <span>{props.title}</span>
             {props.title_alt && (
               <span className="text-gray-400 dark:text-gray-300 inline">{props.title_alt}</span>
             )}
-          </Typography.Title>
+          </h2>
         </div>
         <div className="col-span-12 lg:col-span-7">
           {props.paragraph && (

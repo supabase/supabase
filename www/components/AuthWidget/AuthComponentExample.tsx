@@ -7,7 +7,6 @@ import {
   // Auth,
   Space,
   Tabs,
-  Typography,
   IconCode,
   IconSearch,
 } from '@supabase/ui'
@@ -96,7 +95,7 @@ function AuthComponentExample() {
                         width="96"
                         alt="Logo"
                       />
-                      <Typography.Title level={3}>{'Acme Company'}</Typography.Title>
+                      <h3>{'Acme Company'}</h3>
                     </Space>
                     <Badge dot>Demo</Badge>
                   </div>

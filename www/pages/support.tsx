@@ -11,7 +11,6 @@ import {
   IconX,
   Space,
   Tabs,
-  Typography,
   IconGitHub,
   Divider,
   IconMail,
@@ -61,7 +60,7 @@ const Index = ({}: Props) => {
         <Container>
           <SectionContainer className="">
             <div className="text-center">
-              <Typography.Title level={2}>Get Support</Typography.Title>
+              <h2>Get Support</h2>
               <p>
                 <p className="lg:text-lg">
                   Need a bit of help? We're here for you. Check out our current issues, GitHub
@@ -80,9 +79,7 @@ const Index = ({}: Props) => {
                     "
                 >
                   <div className="mb-4">
-                    <Typography.Title level={5} className="mb-1">
-                      GitHub Issues
-                    </Typography.Title>
+                    <h5 className="mb-1">GitHub Issues</h5>
                     <p className="block">
                       <p>
                         Have a general issue or bug that you've found? We'd love to hear about it in
@@ -129,9 +126,7 @@ const Index = ({}: Props) => {
                     "
                 >
                   <div className="mb-4">
-                    <Typography.Title level={5} className="mb-1">
-                      GitHub Discussions
-                    </Typography.Title>
+                    <h5 className="mb-1">GitHub Discussions</h5>
                     <p className="block">
                       <p>
                         For help and questions about best practices, join our GitHub discussions.
@@ -179,9 +174,7 @@ const Index = ({}: Props) => {
                     "
                 >
                   <div className="mb-4">
-                    <Typography.Title level={5} className="mb-1">
-                      Email Support
-                    </Typography.Title>
+                    <h5 className="mb-1">Email Support</h5>
                     <p className="block">
                       <p>
                         We offer email based support. If you need SLAs, guaranteed response times,
