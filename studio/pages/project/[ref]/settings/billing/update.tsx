@@ -1,5 +1,6 @@
 import { NextPage } from 'next'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Button, Modal } from '@supabase/ui'
 
@@ -12,7 +13,6 @@ import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import {
   PlanSelection,
   ProUpgrade,
-  EnterpriseRequest,
   ExitSurvey,
   StripeSubscription,
 } from 'components/interfaces/Billing'
@@ -27,6 +27,7 @@ import { BILLING_PLANS } from 'components/interfaces/Billing/PlanSelection/Plans
 
 const BillingUpdate: NextPage = () => {
   const { ui } = useStore()
+  const router = useRouter()
   const projectRef = ui.selectedProject?.ref
   const stripeCustomerId = ui.selectedOrganization?.stripe_customer_id
 
@@ -91,6 +92,10 @@ const BillingUpdate: NextPage = () => {
   }
 
   const onSelectPlan = (plan: BillingPlan) => {
+    if (plan.name === 'Enterprise') {
+      return router.push(`/project/${projectRef}/settings/billing/enterprise`)
+    }
+
     setSelectedPlan(plan)
     if (plan.id === STRIPE_PRODUCT_IDS.FREE) {
       setShowConfirmDowngrade(true)
@@ -117,10 +122,6 @@ const BillingUpdate: NextPage = () => {
           billingPlans={BILLING_PLANS}
           currentPlan={subscription?.tier}
           onSelectPlan={onSelectPlan}
-        />
-        <EnterpriseRequest
-          visible={selectedPlan?.name === 'Enterprise'}
-          onSelectBack={() => setSelectedPlan(undefined)}
         />
         <ExitSurvey
           visible={selectedPlan?.name === 'Free' && !showConfirmDowngrade}
