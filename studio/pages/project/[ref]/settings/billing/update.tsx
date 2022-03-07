@@ -160,10 +160,10 @@ const BillingUpdate: NextPage = () => {
       />
 
       <Modal
+        hideFooter
         visible={showDowngradeError}
         size="small"
         header="Free tier limit exceeded"
-        hideFooter
         onCancel={() => setShowDowngradeError(false)}
       >
         <div className="py-4 space-y-4">
