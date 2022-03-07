@@ -109,7 +109,7 @@ small {
 }
 
 ::selection {
-  @apply bg-green-300;
+  @apply bg-brand-900;
   color: #333 !important;
 }
 
