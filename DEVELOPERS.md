@@ -73,9 +73,9 @@ Before you start a development server, you must choose if you want to work on th
 
 To debug code, and to see changes in real time, it is often useful to have a local HTTP server. Click one of the three links below to choose which development server you want to start.
 
-- [Supabase Website](###Supabase-Website-Development-Server)
-- [Supabase Docs](###Supabase-Docs-Development-Server)
-- [Supabase Studio](###Supabase-Studio-Development-Server)
+- [Supabase Website](#Supabase-Website-Development-Server)
+- [Supabase Docs](#Supabase-Docs-Development-Server)
+- [Supabase Studio](#Supabase-Studio-Development-Server)
 
 ### Supabase Website Development Server
 
@@ -153,7 +153,8 @@ For more information on Supabase Studio, see the [Supabase Studio readme](./stud
 
 ## Finally
 
-After making your changes to the file(s) you'd like to update, it's time to open a pull request. Once you submit your pull request, others from the Supabase team/community will review it with you. 
+After making your changes to the file(s) you'd like to update, it's time to open a pull request. Once you submit your pull request, others from the Supabase team/community will review it with you.
+
 Did you have an issue, like a merge conflict, or don't know how to open a pull request? Check out [GitHub's pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests) tutorial on how to resolve merge conflicts and other issues. Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors)
 
 ## Community Channels
