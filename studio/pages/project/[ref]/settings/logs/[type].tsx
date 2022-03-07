@@ -282,17 +282,15 @@ export const LogPage: NextPage = () => {
                 />
               )}
               <div className="flex flex-row gap-x-2 justify-end p-2">
-                {editorValue && (
-                  <Button
-                    type="text"
-                    onClick={() => {
-                      setEditorValue('')
-                      setEditorId(uuidv4())
-                    }}
-                  >
-                    Clear
-                  </Button>
-                )}
+                <Button
+                  type="text"
+                  onClick={() => {
+                    setEditorValue(genDefaultQuery(table))
+                    setEditorId(uuidv4())
+                  }}
+                >
+                  Reset
+                </Button>
                 <Button type={editorValue ? 'secondary' : 'text'} onClick={handleEditorSubmit}>
                   Run
                 </Button>
