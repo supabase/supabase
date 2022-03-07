@@ -180,7 +180,6 @@ function BlogPostPage(props: any) {
       <DefaultLayout>
         <div
           className="
-          bg-white dark:bg-dark-800
             container px-8 sm:px-16 xl:px-20 mx-auto
             py-16
           "
@@ -203,8 +202,8 @@ function BlogPostPage(props: any) {
               <div className="mb-16 space-y-8 max-w-5xl">
                 <div className="space-y-4">
                   <p className="text-brand-900">Blog post</p>
-                  <h1>{props.blog.title}</h1>
-                  <div className="flex space-x-3">
+                  <h1 className="text-5xl">{props.blog.title}</h1>
+                  <div className="flex space-x-3 text-sm">
                     <p>{props.blog.date}</p>
                     <p>•</p>
                     <p>{generateReadingTime(props.blog.content.renderedOutput)}</p>
@@ -213,18 +212,18 @@ function BlogPostPage(props: any) {
                     <div className="mt-6 mb-8 lg:mb-0 w-max">
                       <Link href={author.author_url}>
                         <a className="cursor-pointer">
-                          <Space size={4}>
+                          <div className="flex items-center">
                             {author.author_image_url && (
                               <img
                                 src={author.author_image_url}
-                                className="rounded-full w-10 border dark:border-dark"
+                                className="rounded-full w-10 border border-scale-600 mr-4"
                               />
                             )}
                             <Space direction="vertical" size={0}>
-                              <p>{author.author}</p>
-                              <p small>{author.position}</p>
+                              <p className="text-xs m-0">{author.author}</p>
+                              <p className="text-xs m-0">{author.position}</p>
                             </Space>
-                          </Space>
+                          </div>
                         </a>
                       </Link>
                     </div>
@@ -237,14 +236,14 @@ function BlogPostPage(props: any) {
                   {props.blog.thumb && (
                     <img
                       src={'/images/blog/' + props.blog.thumb}
-                      className="object-cover mb-8 border dark:border-gray-600"
+                      className="object-cover mb-8 border dark:border-gray-600 rounded"
                       style={{ maxHeight: '520px' }}
                     />
                   )}
                   <article className={[blogStyles['article'], 'prose'].join(' ')}>
                     {content}
                   </article>
-                  <div className="text-gray-900 dark:text-white">Share with your friends</div>
+                  <div className="text-scale-900 dark:text-scale-1000">Share with your friends</div>
                   <div className="flex space-x-4 mt-4">
                     <div>
                       <Link
@@ -252,7 +251,7 @@ function BlogPostPage(props: any) {
                       >
                         <a
                           target="_blank"
-                          className="text-gray-300 hover:text-gray-400 dark:hover:text-gray-400"
+                          className="text-scale-900 hover:text-scale-1000"
                         >
                           <svg
                             height="26"
@@ -276,7 +275,7 @@ function BlogPostPage(props: any) {
                       >
                         <a
                           target="_blank"
-                          className="text-gray-300 hover:text-gray-400 dark:hover:text-gray-400"
+                          className="text-scale-900 hover:text-scale-1000"
                         >
                           <svg
                             width="20"
@@ -293,7 +292,7 @@ function BlogPostPage(props: any) {
 
                     <button
                       onClick={() => copyLink()}
-                      className="text-gray-300 hover:text-gray-400 dark:hover:text-gray-400"
+                      className="text-scale-900 hover:text-scale-1000"
                     >
                       <svg
                         className="h-6 w-6"

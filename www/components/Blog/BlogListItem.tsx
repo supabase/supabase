@@ -19,7 +19,7 @@ const BlogListItem = ({ blog }: Props) => {
           <div className="flex flex-col space-y-6">
             <div className="flex flex-col space-y-3">
               <div
-                className={`relative overflow-auto w-full h-60 border dark:border-dark shadow-sm rounded-lg mb-4`}
+                className={`relative overflow-auto w-full h-60 border border-scale-600 shadow-sm rounded-lg mb-4`}
               >
                 <Image
                   layout="fill"
@@ -34,24 +34,22 @@ const BlogListItem = ({ blog }: Props) => {
               <div>
                 <h3 className="m-0">{blog.title}</h3>
               </div>
-              <p small>{blog.date}</p>
+              <p className="text-xs">{blog.date}</p>
 
-              <p className="m-0" type="secondary">
+              <p className="m-0">
                 <p className="text-base mb-0">{blog.description}</p>
               </p>
             </div>
             {author && (
-              <div>
-                <Space size={4}>
+                <div className="flex items-center">
                   {author.author_image_url && (
-                    <img src={author.author_image_url} className="rounded-full w-10" />
+                    <img src={author.author_image_url} className="rounded-full w-10 mr-4" />
                   )}
                   <Space direction="vertical" size={0}>
-                    <p>{author.author}</p>
-                    <p small>{author.position}</p>
+                    <p className="text-sm m-0">{author.author}</p>
+                    <p className="text-xs m-0 text-scale-900">{author.position}</p>
                   </Space>
-                </Space>
-              </div>
+                </div>
             )}
           </div>
         </div>
