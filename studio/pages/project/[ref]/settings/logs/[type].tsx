@@ -138,7 +138,7 @@ export const LogPage: NextPage = () => {
   let logData: LogData[] = []
   let error: null | string | object = swrError ? swrError.message : null
   data.forEach((response) => {
-    if (!error && response && response) {
+    if (!error && response?.result) {
       logData = [...logData, ...response.result]
     }
     if (!error && response && response.error) {
