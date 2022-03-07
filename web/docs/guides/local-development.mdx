@@ -152,7 +152,7 @@ Now we have the `boarders` table in the local database, but how do we incorporat
 supabase db commit add_boarders
 ```
 
-This will create a new migration named `<timestamp>_add_boarders.sql` that represents any changes we've done to the local database since `supabase start`.
+This will create a new migration named `<timestamp>_add_boarders.sql` that represents any changes we've made to the local database since `supabase start`.
 
 It won't be interesting without sample data in the table, but instead of inserting it directly, we use the seed script in `supabase/seed.sql`. This way we don't have to run it manually every time we run `supabase start`.
 
