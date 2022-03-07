@@ -110,10 +110,6 @@ const BillingUpdate: NextPage = () => {
     setShowConfirmDowngrade(false)
   }
 
-  const onConfirmPayment = () => {
-    console.log('Confirm payment')
-  }
-
   return (
     <BillingLayout>
       <div className="mx-auto max-w-5xl my-10">
@@ -140,7 +136,6 @@ const BillingUpdate: NextPage = () => {
           isLoadingPaymentMethods={isLoadingPaymentMethods}
           paymentMethods={paymentMethods?.data ?? []}
           onSelectBack={() => setSelectedPlan(undefined)}
-          onConfirmPayment={onConfirmPayment}
         />
       )}
 
