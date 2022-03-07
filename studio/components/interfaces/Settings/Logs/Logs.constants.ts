@@ -69,3 +69,13 @@ export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
   api: 'API',
   database: 'Database',
 }
+
+export const genDefaultQuery = (table: string): string => `SELECT
+  id, timestamp, event_message, metadata
+FROM
+  ${table}
+ORDER BY
+  timestamp DESC
+`
+
+export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`

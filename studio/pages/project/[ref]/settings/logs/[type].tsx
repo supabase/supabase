@@ -31,6 +31,8 @@ import {
   LogData,
   LogSearchCallback,
   LOG_TYPE_LABEL_MAPPING,
+  genDefaultQuery,
+  genCountQuery,
 } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
 import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite'
@@ -106,23 +108,23 @@ export const LogPage: NextPage = () => {
     return qs
   }
   // handle log fetching
-  const getKeyLogs: SWRInfiniteKeyLoader = (_pageIndex: number, prevPageData) => {
+  const getKeyLogs: SWRInfiniteKeyLoader = (_pageIndex: number, prevPageData: Logs) => {
     let queryParams
     // if prev page data is 100 items, could possibly have more records that are not yet fetched within this interval
     if (prevPageData === null) {
       // reduce interval window limit by using the timestamp of the last log
       queryParams = genQueryParams(params)
-    } else if ((prevPageData?.data ?? []).length === 0) {
+    } else if ((prevPageData.result ?? []).length === 0) {
       // no rows returned, indicates that no more data to retrieve and append.
       return null
     } else {
-      const len = prevPageData.data.length
-      const { timestamp: tsLimit }: LogData = prevPageData.data[len - 1]
+      const len = prevPageData.result.length
+      const { timestamp: tsLimit }: LogData = prevPageData.result[len - 1]
       // create new key from params
       queryParams = genQueryParams({ ...params, timestamp_end: String(tsLimit) })
     }
 
-    const logUrl = `${API_URL}/projects/${ref}/logs?${queryParams}`
+    const logUrl = `${API_URL}/projects/${ref}/analytics/endpoints/logs.${type}?${queryParams}`
     return logUrl
   }
   const {
@@ -134,23 +136,23 @@ export const LogPage: NextPage = () => {
     setSize,
   } = useSWRInfinite<Logs>(getKeyLogs, get, { revalidateOnFocus: false })
   let logData: LogData[] = []
-  let error: null | string = swrError ? swrError.message : null
-  data.forEach((response: Logs) => {
-    if (!error && response && response.data) {
-      logData = [...logData, ...response.data]
+  let error: null | string | object = swrError ? swrError.message : null
+  data.forEach((response) => {
+    if (!error && response && response) {
+      logData = [...logData, ...response.result]
     }
     if (!error && response && response.error) {
       error = response.error
     }
   })
 
-  const countUrl = `${API_URL}/projects/${ref}/logs?${genQueryParams({
+  const countUrl = `${API_URL}/projects/${ref}/analytics/endpoints/logs.${type}?${genQueryParams({
     ...params,
-    count: String(true),
+    sql: genCountQuery(type === 'api' ? 'edge_logs' : 'postgres_logs'),
     period_start: String(latestRefresh),
   })}`
   const { data: countData } = useSWR<Count>(countUrl, get, { refreshInterval: 5000 })
-  const newCount = countData?.data?.[0]?.count ?? 0
+  const newCount = countData?.result?.[0]?.count ?? 0
 
   const handleRefresh = () => {
     setLatestRefresh(new Date().toISOString())
@@ -168,7 +170,10 @@ export const LogPage: NextPage = () => {
   const handleModeToggle = () => {
     if (mode === 'simple') {
       setMode('custom')
-      // setWhere(DEFAULT_QUERY)
+      onSelectTemplate({
+        mode: 'custom',
+        searchString: genDefaultQuery(type === 'api' ? 'edge_logs' : 'postgres_logs'),
+      })
     } else {
       setMode('simple')
     }
@@ -197,8 +202,7 @@ export const LogPage: NextPage = () => {
   const handleEditorSubmit = () => {
     setParams((prev) => ({
       ...prev,
-      where: isSelectQuery ? '' : cleanEditorValue(editorValue),
-      sql: isSelectQuery ? cleanEditorValue(editorValue) : '',
+      sql: editorValue,
       search_query: '',
     }))
     router.push({
