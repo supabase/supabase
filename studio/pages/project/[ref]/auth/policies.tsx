@@ -9,6 +9,7 @@ import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import PolicyTableRow from 'components/to-be-cleaned/Auth/PolicyTableRow'
 import PolicyEditorModal from 'components/to-be-cleaned/Auth/PolicyEditorModal'
+import NoTableState from 'components/to-be-cleaned/NoTableState'
 
 const PageContext = createContext(null)
 
@@ -237,8 +238,10 @@ const AuthPoliciesTables = observer(() => {
             />
           </section>
         ))
-      ) : (
+      ) : PageState.tables.length > 0 ? (
         <NoSearchResults />
+      ) : (
+        <NoTableState message="You haven't created a table on the public schema. Get started by creating a new table." />
       )}
 
       <PolicyEditorModal
