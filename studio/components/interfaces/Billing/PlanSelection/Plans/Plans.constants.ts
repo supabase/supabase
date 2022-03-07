@@ -33,7 +33,7 @@ export const BILLING_PLANS: BillingPlan[] = [
     ],
   },
   {
-    id: undefined,
+    id: 'Enterprise',
     name: 'Enterprise',
     price: null,
     description: 'Custom tailored services to suit your specific business needs',
