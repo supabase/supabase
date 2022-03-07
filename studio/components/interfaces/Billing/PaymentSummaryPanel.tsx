@@ -1,9 +1,9 @@
 import { FC } from 'react'
-import { Listbox, IconLoader, Button } from '@supabase/ui'
+import { Listbox, IconLoader, Button, IconPlus } from '@supabase/ui'
 
+import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { StripeProduct } from '.'
 import { BillingPlan } from './PlanSelection/Plans/Plans.types'
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 
 interface Props {
   currentPlan: StripeProduct
@@ -15,6 +15,7 @@ interface Props {
   selectedPaymentMethod: any
   isLoadingPaymentMethods: boolean
   onSelectPaymentMethod: (method: any) => void
+  onSelectAddNewPaymentMethod: () => void
   onConfirmPayment: () => void
 }
 
@@ -35,6 +36,7 @@ const PaymentSummaryPanel: FC<Props> = ({
   selectedPaymentMethod,
   isLoadingPaymentMethods,
   onSelectPaymentMethod,
+  onSelectAddNewPaymentMethod,
   onConfirmPayment,
 }) => {
   const isChangingPlan =
@@ -161,12 +163,21 @@ const PaymentSummaryPanel: FC<Props> = ({
                 </Listbox.Option>
               )
             })}
+            <div
+              className="py-2 px-3 flex items-center space-x-2 cursor-pointer transition group hover:bg-scale-500"
+              onClick={onSelectAddNewPaymentMethod}
+            >
+              <IconPlus size={16} />
+              <p className="text-scale-1000 transition group-hover:text-scale-1200">
+                Add new payment method
+              </p>
+            </div>
           </Listbox>
         )}
       </div>
 
       <div className="flex items-center justify-end">
-        <Button type="primary" disabled={!hasChangesToPlan} onClick={onConfirmPayment}>
+        <Button type="primary" disabled={!hasChangesToPlan} onClick={() => onConfirmPayment()}>
           Confirm payment
         </Button>
       </div>
