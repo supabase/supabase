@@ -154,7 +154,7 @@ supabase db commit add_boarders
 
 This will create a new migration named `<timestamp>_add_boarders.sql` that represents any changes we've made to the local database since `supabase start`.
 
-It won't be interesting without sample data in the table, but instead of inserting it directly, we use the seed script in `supabase/seed.sql`. This way we don't have to run it manually every time we run `supabase start`.
+Let's add some sample data into the table. To do this we can use the seed script in `supabase/seed.sql`. 
 
 ```sql
 -- in supabase/seed.sql
