@@ -63,9 +63,8 @@ LogPage.mockImplementation((props) => {
 
 import { render, fireEvent, waitFor, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { clickDropdown, getToggleByText } from '../../helpers'
+import { getToggleByText } from '../../helpers'
 import { wait } from '@testing-library/user-event/dist/utils'
-import { find } from 'lodash'
 import { logDataFixture } from '../../fixtures'
 beforeEach(() => {
   // reset mocks between tests
@@ -74,41 +73,38 @@ beforeEach(() => {
   useRouter.mockReturnValue(defaultRouterMock())
 })
 test('can display log data and metadata', async () => {
-  const data = [
-    logDataFixture({
-      event_message: 'some event happened',
-      metadata: {
-        my_key: 'something_value',
-      },
-    }),
-  ]
-  get.mockResolvedValue({ data })
-  render(<LogPage />)
-
-  await waitFor(() => screen.getByText(/happened/))
-  const row = screen.getByText(/happened/)
-  fireEvent.click(row)
-  await waitFor(() => screen.getByText(/my_key/))
-  await waitFor(() => screen.getByText(/something_value/))
-})
-
-test('Refreshpage', async () => {
-  const data = [
-    logDataFixture({
-      event_message: 'some event happened',
-      metadata: {
-        my_key: 'something_value',
-      },
-    }),
-  ]
-  get.mockImplementation((url) => {
-    if (url.includes('count')) return { count: 0 }
-    return { data }
+  get.mockResolvedValue({
+    result: [
+      logDataFixture({
+        event_message: 'some event happened',
+        metadata: {
+          my_key: 'something_value',
+        },
+      }),
+    ],
   })
   render(<LogPage />)
-  await waitFor(() => screen.getByText(/happened/))
-  get.mockResolvedValueOnce({ data: [] })
-  const row = screen.getByText(/happened/)
+  fireEvent.click(await screen.findByText(/happened/))
+  await screen.findByText(/my_key/)
+  await screen.findByText(/something_value/)
+})
+
+test('Refresh page', async () => {
+  get.mockImplementation((url) => {
+    if (url.includes('count')) return { result: { count: 0 } }
+    return {
+      result: [
+        logDataFixture({
+          event_message: 'some event happened',
+          metadata: { my_key: 'something_value' },
+        }),
+      ],
+    }
+  })
+  render(<LogPage />)
+
+  const row = await screen.findByText(/happened/)
+  get.mockResolvedValueOnce({ result: [] })
   fireEvent.click(row)
   await waitFor(() => screen.getByText(/my_key/))
 
@@ -123,10 +119,10 @@ test('Search will trigger a log refresh', async () => {
   get.mockImplementation((url) => {
     if (url.includes('search_query') && url.includes('something')) {
       return {
-        data: [logDataFixture({ event_message: 'some event happened' })],
+        result: [logDataFixture({ event_message: 'some event happened' })],
       }
     }
-    return { data: [] }
+    return { result: [] }
   })
   render(<LogPage />)
 
@@ -158,10 +154,10 @@ test('Search will trigger a log refresh', async () => {
 test('poll count for new messages', async () => {
   get.mockImplementation((url) => {
     if (url.includes('count')) {
-      return { data: [{ count: 125 }] }
+      return { result: [{ count: 125 }] }
     }
     return {
-      data: [logDataFixture({ event_message: 'something happened' })],
+      result: [logDataFixture({ event_message: 'something happened' })],
     }
   })
   render(<LogPage />)
@@ -174,14 +170,14 @@ test('poll count for new messages', async () => {
   await waitFor(() => screen.getByText(/happened/))
 })
 
-test('where clause will trigger a log refresh', async () => {
+test('where clause will build an sql query', async () => {
   get.mockImplementation((url) => {
-    if (url.includes('where') && url.includes('something')) {
+    if (url.includes('sql') && url.includes('something')) {
       return {
-        data: [logDataFixture({ event_message: 'some event happened' })],
+        result: [logDataFixture({ event_message: 'some event happened' })],
       }
     }
-    return { data: [] }
+    return { result: [] }
   })
   const { container } = render(<LogPage />)
   // fill search bar with some value, should be ignored when in custom mode
@@ -201,6 +197,9 @@ test('where clause will trigger a log refresh', async () => {
     expect(editor).toBeTruthy()
   })
   editor = container.querySelector('.monaco-editor')
+  // clear the default query
+  userEvent.type(editor, '{backspace}'.repeat(100))
+  // type where clause
   userEvent.type(editor, 'metadata.field = something')
   userEvent.click(screen.getByText('Run'))
   await waitFor(
@@ -219,13 +218,11 @@ test('where clause will trigger a log refresh', async () => {
         })
       )
 
-      // should ignore search bar value
-      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('search_value'))
-    },
-    { timeout: 1000 }
-  )
+    // should ignore search bar value
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('search_value'))
+  })
 
-  await waitFor(() => screen.getByText(/happened/))
+  await screen.findByText(/happened/)
 })
 
 test('s= query param will populate the search bar', async () => {
@@ -234,10 +231,8 @@ test('s= query param will populate the search bar', async () => {
   useRouter.mockReturnValue(router)
   render(<LogPage />)
   // should populate search input with the search param
-  screen.getByDisplayValue('someSearch')
-  await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('search_query=someSearch'))
-  })
+  await screen.findByDisplayValue('someSearch')
+  expect(get).toHaveBeenCalledWith(expect.stringContaining('search_query=someSearch'))
 })
 
 test('q= query param will populate the query input', async () => {
@@ -277,14 +272,14 @@ test('custom sql querying', async () => {
   get.mockImplementation((url) => {
     if (url.includes('sql=') && url.includes('select')) {
       return {
-        data: [
+        result: [
           {
             my_count: 12345,
           },
         ],
       }
     }
-    return { data: [] }
+    return { result: [] }
   })
   const { container } = render(<LogPage />)
   let editor = container.querySelector('.monaco-editor')
@@ -300,15 +295,18 @@ test('custom sql querying', async () => {
     expect(editor).toBeTruthy()
   })
   editor = container.querySelector('.monaco-editor')
+  // clear the default query
+  userEvent.type(editor, '{backspace}'.repeat(100))
+  // type new query
   userEvent.type(editor, 'select \ncount(*) as my_count \nfrom edge_logs')
   // should show sandbox warning alert
-  await waitFor(() => screen.getByText(/restricted to a 7 day querying window/))
+  await screen.findByText(/restricted to a 7 day querying window/)
 
   // should trigger query
-  userEvent.click(screen.getByText('Run'))
+  userEvent.click(await screen.findByText('Run'))
   await waitFor(
     () => {
-      expect(get).not.toHaveBeenCalledWith(expect.stringContaining(encodeURI('\n')))
+      expect(get).toHaveBeenCalledWith(expect.stringContaining(encodeURI('\n')))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('sql='))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'))
@@ -317,11 +315,11 @@ test('custom sql querying', async () => {
     { timeout: 1000 }
   )
 
-  await waitFor(() => screen.getByText(/my_count/)) //column header
-  await waitFor(() => screen.getByText(/12345/)) // row value
+  await screen.findByText(/my_count/) //column header
+  const rowValue = await screen.findByText(/12345/) // row value
 
   // clicking on the row value should not show log selection panel
-  userEvent.click(screen.getByText(/12345/))
+  userEvent.click(rowValue)
   await expect(screen.findByText(/Metadata/)).rejects.toThrow()
 
   // should not see chronological features
@@ -334,24 +332,22 @@ test('load older btn will fetch older logs', async () => {
       return {}
     }
     return {
-      data: [logDataFixture({ event_message: 'first event' })],
+      result: [logDataFixture({ event_message: 'first event' })],
     }
   })
   render(<LogPage />)
   // should display first log but not second
   await waitFor(() => screen.getByText('first event'))
-  expect(() => screen.getByText('second event')).toThrow()
+  await expect(screen.findByText('second event')).rejects.toThrow()
 
   get.mockResolvedValueOnce({
-    data: [logDataFixture({ event_message: 'second event' })],
+    result: [logDataFixture({ event_message: 'second event' })],
   })
   // should display first and second log
-  userEvent.click(screen.getByText('Load older'))
-  await waitFor(() => screen.getByText('first event'))
-  await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_end=1'))
-  })
-  await waitFor(() => screen.getByText('second event'))
+  userEvent.click(await screen.findByText('Load older'))
+  await screen.findByText('first event')
+  await screen.findByText('second event')
+  expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_end='))
 })
 
 test('bug: load older btn does not error out when previous page is empty', async () => {
@@ -360,11 +356,11 @@ test('bug: load older btn does not error out when previous page is empty', async
     if (url.includes('count')) {
       return {}
     }
-    return { data: [] }
+    return { result: [] }
   })
   render(<LogPage />)
 
-  userEvent.click(screen.getByText('Load older'))
+  userEvent.click(await screen.findByText('Load older'))
   // NOTE: potential race condition, since we are asserting that something DOES NOT EXIST
   // wait for 500s to make sure all ui logic is complete
   // need to wrap in act because internal react state is changing during this time.
