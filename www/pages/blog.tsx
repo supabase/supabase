@@ -85,7 +85,7 @@ function Blog(props: any) {
         ]}
       />
       <DefaultLayout>
-        <div className="bg-white dark:bg-dark-800 overflow-hidden py-12">
+        <div className="overflow-hidden py-12">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
             <div className="mx-auto ">
               {props.blogs.slice(0, 1).map((blog: any, i: number) => (
@@ -95,7 +95,7 @@ function Blog(props: any) {
           </div>
         </div>
 
-        <div className="border-t dark:border-dark">
+        <div className="border-t border-scale-600">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
             <div className="mx-auto ">
               <div className="grid grid-cols-12">
@@ -138,19 +138,19 @@ function FeaturedThumb(blog: PostTypes) {
       <a href={`/blog/${blog.url}`}>
         <a className="grid lg:grid-cols-2 gap-8 lg:gap-16">
           <img
-            className="h-96 w-full object-cover border dark:border-dark rounded-lg"
+            className="h-96 w-full object-cover border border-scale-600 rounded-lg"
             src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
           />
-          <div className="flex flex-col space-y-4">
-            <div className="flex space-x-2">
+          <div className="flex flex-col space-y-2">
+            <div className="flex space-x-2 text-sm">
               <p>{blog.date}</p>
               <p>•</p>
               <p>{blog.readingTime}</p>
             </div>
 
             <div>
-              <h2>{blog.title}</h2>
-              <p className="m-0" type="secondary">
+              <h2 className="text-4xl">{blog.title}</h2>
+              <p className="m-0">
                 <span className="text-xl">{blog.description}</span>
               </p>
             </div>
@@ -161,8 +161,8 @@ function FeaturedThumb(blog: PostTypes) {
                   <img src={author.author_image_url} className="rounded-full w-10" />
                 )}
                 <div className="flex flex-col">
-                  <p>{author.author}</p>
-                  <p small>{author.position}</p>
+                  <p className="m-0 text-sm">{author.author}</p>
+                  <p className="m-0 text-xs">{author.position}</p>
                 </div>
               </div>
             )}
