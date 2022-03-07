@@ -71,7 +71,7 @@ export const LogPage: NextPage = () => {
   const checkIfSelectQuery = (value: string) =>
     value.toLowerCase().includes('select') ? true : false
   const isSelectQuery = checkIfSelectQuery(editorValue)
-
+  const table = type === 'api' ? 'edge_logs' : 'postgres_logs'
   useEffect(() => {
     setParams({ ...params, type: type as string })
   }, [type])
@@ -148,7 +148,7 @@ export const LogPage: NextPage = () => {
 
   const countUrl = `${API_URL}/projects/${ref}/analytics/endpoints/logs.${type}?${genQueryParams({
     ...params,
-    sql: genCountQuery(type === 'api' ? 'edge_logs' : 'postgres_logs'),
+    sql: genCountQuery(table),
     period_start: String(latestRefresh),
   })}`
   const { data: countData } = useSWR<Count>(countUrl, get, { refreshInterval: 5000 })
@@ -172,7 +172,7 @@ export const LogPage: NextPage = () => {
       setMode('custom')
       onSelectTemplate({
         mode: 'custom',
-        searchString: genDefaultQuery(type === 'api' ? 'edge_logs' : 'postgres_logs'),
+        searchString: genDefaultQuery(table),
       })
     } else {
       setMode('simple')
@@ -202,7 +202,7 @@ export const LogPage: NextPage = () => {
   const handleEditorSubmit = () => {
     setParams((prev) => ({
       ...prev,
-      sql: editorValue,
+      sql: checkIfSelectQuery(editorValue) ? editorValue : genDefaultQuery(table, editorValue),
       search_query: '',
     }))
     router.push({

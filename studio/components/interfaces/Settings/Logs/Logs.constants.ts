@@ -70,10 +70,10 @@ export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
   database: 'Database',
 }
 
-export const genDefaultQuery = (table: string): string => `SELECT
+export const genDefaultQuery = (table: string, where: string = ''): string => `SELECT
   id, timestamp, event_message, metadata
 FROM
-  ${table}
+  ${table}${where ? '\nWHERE ' + where : ''}
 `
 
-export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
+export const genCountQuery = (table: string, where: string=""): string => `SELECT count(*) as count FROM ${table}${where ? '\nWHERE ' + where : ''}`
