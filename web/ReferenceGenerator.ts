@@ -169,7 +169,7 @@ function generateExamples(id: string, specExamples: any, allLanguages: any) {
     let allTabs = example.hideCodeBlock
       ? ''
       : Tabs(id, allLanguages, generateTabs(allLanguages, example))
-    return Example({ name: example.name, description: example.description, tabs: allTabs })
+    return Example({ name: example.name, description: example.description, tabs: allTabs, note: example.note })
   })
 }
 

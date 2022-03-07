@@ -94,7 +94,7 @@ const Home: NextPage = () => {
           <Connecting />
         </div>
       ) : (
-        <div className="p-4">
+        <div className="py-4 px-5">
           {IS_PLATFORM && (
             <div className="my-2">
               <div className="flex">
