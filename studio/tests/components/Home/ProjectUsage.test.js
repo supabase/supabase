@@ -77,7 +77,6 @@ test('dropdown options changes chart query', async () => {
   render(<ProjectUsage project="12345" />)
   await waitFor(() => screen.getByText(/Statistics for past 24 hours/))
   await waitFor(() => screen.getAllByRole('button', { name: '24 hours' }))
-  console.log(get.mock.calls)
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('interval=hourly'))
   })
