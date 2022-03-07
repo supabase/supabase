@@ -72,11 +72,14 @@ const ProUpgrade: FC<Props> = ({
   useEffect(() => {
     if (selectedPlan !== undefined) {
       getSubscriptionPreview()
-      if (selectedPlan.id === STRIPE_PRODUCT_IDS.PRO) {
-        setIsSpendCapEnabled(true)
-      }
     }
   }, [selectedPlan, selectedComputeSize, isSpendCapEnabled])
+
+  useEffect(() => {
+    if (selectedPlan?.id === STRIPE_PRODUCT_IDS.PRO) {
+      setIsSpendCapEnabled(true)
+    }
+  }, [selectedPlan])
 
   const onSelectComputeSizeOption = (option: any) => {
     setSelectedComputeSize(option)
@@ -250,7 +253,7 @@ const ProUpgrade: FC<Props> = ({
       >
         <div className="py-4 space-y-4">
           <Modal.Content>
-            {/* [TODO] revise wording */}
+            {/* [TODO] revise wording for "enabling spend caps" instead of overages */}
             <div className="space-y-4">
               <p className="text-sm">
                 This removes any resource limits for your project which the Pro tier has in place.
