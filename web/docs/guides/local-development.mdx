@@ -146,7 +146,7 @@ CREATE TABLE boarders(
 );
 ```
 
-Now we have the `boarders` table in the local database, but how do we incorporate this into migrations? If you've used other migration tools, you might be used to writing the migrations manually, but here we just need to run:
+Now we have the `boarders` table in the local database, but how do we incorporate this into migrations? The CLI can automatically detect changes by running:
 
 ```sh
 supabase db commit add_boarders
