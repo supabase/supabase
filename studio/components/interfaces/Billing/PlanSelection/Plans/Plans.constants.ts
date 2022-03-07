@@ -1,4 +1,4 @@
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { STRIPE_PRODUCT_IDS, STRIPE_TIER_PRICE_IDS } from 'lib/constants'
 import { BillingPlan } from './Plans.types'
 
 // [Joshen] The idea is that API fetch plans will probably receive StripeProduct[]
@@ -8,6 +8,7 @@ import { BillingPlan } from './Plans.types'
 export const BILLING_PLANS: BillingPlan[] = [
   {
     id: STRIPE_PRODUCT_IDS.FREE,
+    priceId: STRIPE_TIER_PRICE_IDS.FREE,
     name: 'Free',
     price: 0,
     description: 'Zero commitment, perfect for hobby projects and experiments',
@@ -20,6 +21,7 @@ export const BILLING_PLANS: BillingPlan[] = [
   },
   {
     id: STRIPE_PRODUCT_IDS.PRO,
+    priceId: STRIPE_TIER_PRICE_IDS.PRO,
     name: 'Pro',
     price: 25,
     description: 'Designated support team, account manager and technical specialist',
@@ -34,6 +36,7 @@ export const BILLING_PLANS: BillingPlan[] = [
   },
   {
     id: 'Enterprise',
+    priceId: '',
     name: 'Enterprise',
     price: null,
     description: 'Custom tailored services to suit your specific business needs',

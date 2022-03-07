@@ -1,22 +1,26 @@
 import { FC } from 'react'
-import { Listbox, IconLoader, Button, IconPlus } from '@supabase/ui'
+import { Listbox, IconLoader, Button, Loading, IconPlus } from '@supabase/ui'
 
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { StripeProduct } from '.'
 import { BillingPlan } from './PlanSelection/Plans/Plans.types'
+import { SubscriptionPreview } from './Billing.types'
 
 interface Props {
+  isRefreshingPreview: boolean
+  subscriptionPreview?: SubscriptionPreview
   currentPlan: StripeProduct
   currentComputeSize: any
   selectedPlan?: BillingPlan
   selectedComputeSize: any
-  isOverageEnabled: boolean
+  isSpendCapEnabled: boolean
   paymentMethods?: any
   selectedPaymentMethod: any
   isLoadingPaymentMethods: boolean
   onSelectPaymentMethod: (method: any) => void
   onSelectAddNewPaymentMethod: () => void
   onConfirmPayment: () => void
+  isSubmitting: boolean
 }
 
 // Use case of this panel is actually only for upgrading from Free to Pro
@@ -27,9 +31,11 @@ interface Props {
 // the selectedComputeSize to an addOns array. But for now, we keep it simple, don't over-engineer too early
 
 const PaymentSummaryPanel: FC<Props> = ({
+  isRefreshingPreview,
+  subscriptionPreview,
   currentPlan,
   selectedPlan,
-  isOverageEnabled,
+  isSpendCapEnabled,
   currentComputeSize,
   selectedComputeSize,
   paymentMethods,
@@ -38,17 +44,18 @@ const PaymentSummaryPanel: FC<Props> = ({
   onSelectPaymentMethod,
   onSelectAddNewPaymentMethod,
   onConfirmPayment,
+  isSubmitting,
 }) => {
   const isChangingPlan =
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && currentPlan.prod_id !== selectedPlan?.id) ||
-    (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && isOverageEnabled) ||
-    (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG && !isOverageEnabled)
+    (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && !isSpendCapEnabled) ||
+    (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG && isSpendCapEnabled)
   const isChangingComputeSize = currentComputeSize.id !== selectedComputeSize.id
   const hasChangesToPlan = isChangingPlan || isChangingComputeSize
   const totalMonthlyCost = (selectedPlan?.price ?? 0) + selectedComputeSize.price
 
   const getCurrentPlanName = () => {
-    if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG) return 'Pro tier (Overages enabled)'
+    if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG) return 'Pro tier (No spend caps)'
     else return currentPlan.name
   }
 
@@ -73,7 +80,7 @@ const PaymentSummaryPanel: FC<Props> = ({
         {isChangingPlan && (
           <div className="flex items-center justify-between">
             <p className="text-sm">
-              {selectedPlan?.name} tier {isOverageEnabled ? '(Overages enabled)' : ''}
+              {selectedPlan?.name} tier {!isSpendCapEnabled ? '(No spend caps)' : ''}
             </p>
             <p className="text-sm">${selectedPlan?.price}</p>
           </div>
@@ -107,24 +114,26 @@ const PaymentSummaryPanel: FC<Props> = ({
       <div className="h-px w-full bg-scale-600"></div>
 
       {/* Payment total */}
-      <div className="flex items-start justify-between space-x-32">
-        <div className="space-y-1">
-          <p>Amount due today</p>
-          {hasChangesToPlan && (
-            <p className="text-sm text-scale-1100">
-              You'll pay a monthly total of{' '}
-              <span className="text-scale-1200">
-                ${totalMonthlyCost} {isOverageEnabled && '+ usage fees '}
-              </span>
-              starting on 1st February 2022
-            </p>
-          )}
+      <Loading active={isRefreshingPreview}>
+        <div className="flex items-start justify-between space-x-32">
+          <div className="space-y-1">
+            <p>Amount due today</p>
+            {hasChangesToPlan && (
+              <p className="text-sm text-scale-1100">
+                You'll pay a monthly total of{' '}
+                <span className="text-scale-1200">
+                  ${totalMonthlyCost} {!isSpendCapEnabled && '+ usage fees '}
+                </span>
+                starting on 1st February 2022
+              </p>
+            )}
+          </div>
+          <div className="flex justify-end items-end relative -top-[5px]">
+            <p className="text-scale-1100 relative -top-[1px]">$</p>
+            <p className="text-2xl">{(subscriptionPreview?.amount_due_immediately ?? 0) / 100}</p>
+          </div>
         </div>
-        <div className="flex justify-end items-end relative -top-[5px]">
-          <p className="text-scale-1100 relative -top-[1px]">$</p>
-          <p className="text-2xl">0</p>
-        </div>
-      </div>
+      </Loading>
 
       {/* Payment method selection */}
       <div className="space-y-2">
@@ -177,7 +186,12 @@ const PaymentSummaryPanel: FC<Props> = ({
       </div>
 
       <div className="flex items-center justify-end">
-        <Button type="primary" disabled={!hasChangesToPlan} onClick={() => onConfirmPayment()}>
+        <Button
+          type="primary"
+          loading={isSubmitting}
+          disabled={isSubmitting || isLoadingPaymentMethods || !hasChangesToPlan}
+          onClick={() => onConfirmPayment()}
+        >
           Confirm payment
         </Button>
       </div>

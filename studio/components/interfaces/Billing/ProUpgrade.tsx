@@ -4,9 +4,9 @@ import { useRouter } from 'next/router'
 import { Badge, Button, IconArrowLeft, IconHelpCircle, Toggle, Modal } from '@supabase/ui'
 
 import { useStore } from 'hooks'
-import { getURL } from 'lib/helpers'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { getURL, timeout } from 'lib/helpers'
+import { post, patch } from 'lib/common/fetch'
+import { API_URL, STRIPE_TIER_PRICE_IDS } from 'lib/constants'
 import Divider from 'components/ui/Divider'
 import {
   PaymentSummaryPanel,
@@ -17,6 +17,7 @@ import {
 import { BillingPlan } from './PlanSelection/Plans/Plans.types'
 import { COMPUTE_SIZES } from './AddOns/AddOns.constant'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { SubscriptionPreview } from './Billing.types'
 
 interface Props {
   visible: boolean
@@ -25,7 +26,6 @@ interface Props {
   paymentMethods?: any[]
   isLoadingPaymentMethods: boolean
   onSelectBack: () => void
-  onConfirmPayment: () => void
 }
 
 const ProUpgrade: FC<Props> = ({
@@ -35,10 +35,11 @@ const ProUpgrade: FC<Props> = ({
   paymentMethods,
   isLoadingPaymentMethods,
   onSelectBack,
-  onConfirmPayment,
 }) => {
   const { ui } = useStore()
   const router = useRouter()
+
+  const projectRef = ui.selectedProject?.ref
 
   const currentComputeSize =
     COMPUTE_SIZES.find((options) => options.id === currentSubscription?.addons[0]?.prod_id) ||
@@ -48,21 +49,34 @@ const ProUpgrade: FC<Props> = ({
     currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PRO ||
     currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
 
-  const [isOverageEnabled, setIsOverageEnabled] = useState(
-    currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
+  const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(
+    currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PRO
   )
 
+  const [isRefreshingPreview, setIsRefreshingPreview] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
-  const [showOveragesHelperModal, setShowOveragesHelperModal] = useState(false)
+  const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
+
   const [selectedComputeSize, setSelectedComputeSize] = useState<any>(currentComputeSize)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>()
+  const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
 
   useEffect(() => {
     if (!isLoadingPaymentMethods && paymentMethods && paymentMethods.length > 0) {
       // [TODO] Figure out how to get the DEFAULT payment method
       setSelectedPaymentMethod(paymentMethods[0])
     }
-  }, [isLoadingPaymentMethods])
+  }, [isLoadingPaymentMethods, paymentMethods])
+
+  useEffect(() => {
+    if (selectedPlan !== undefined) {
+      getSubscriptionPreview()
+      if (selectedPlan.id === STRIPE_PRODUCT_IDS.PRO) {
+        setIsSpendCapEnabled(true)
+      }
+    }
+  }, [selectedPlan, selectedComputeSize, isSpendCapEnabled])
 
   const onSelectComputeSizeOption = (option: any) => {
     setSelectedComputeSize(option)
@@ -81,6 +95,42 @@ const ProUpgrade: FC<Props> = ({
     } catch (error: any) {
       ui.setNotification({ category: 'error', message: `Failed to redirect: ${error.message}` })
     }
+  }
+
+  const getSubscriptionPreview = async () => {
+    const tier = !isSpendCapEnabled ? STRIPE_TIER_PRICE_IDS.PAYG : selectedPlan?.priceId
+    // Small currently has no stripe product attached, so FE has a hardcoded ID just for that product
+    const addons = selectedComputeSize.name === 'Small' ? [] : [selectedComputeSize.id]
+    const proration_date = Math.floor(Date.now() / 1000)
+
+    setIsRefreshingPreview(true)
+    const preview = await post(`${API_URL}/projects/${projectRef}/subscription/preview`, {
+      tier,
+      addons,
+      proration_date,
+    })
+    setIsRefreshingPreview(false)
+    console.log('Preview retrieved', preview)
+    setSubscriptionPreview(preview)
+  }
+
+  const onConfirmPayment = async () => {
+    const tier = !isSpendCapEnabled ? STRIPE_TIER_PRICE_IDS.PAYG : selectedPlan?.priceId
+    // Small currently has no stripe product attached, so FE has a hardcoded ID just for that product
+    const addons = selectedComputeSize.name === 'Small' ? [] : [selectedComputeSize.id]
+    const paymentMethod = selectedPaymentMethod.id
+    const proration_date = Math.floor(Date.now() / 1000)
+
+    setIsSubmitting(true)
+    await timeout(1000)
+    setIsSubmitting(false)
+
+    console.log('Confirm payment', {
+      tier,
+      addons,
+      paymentMethod,
+      proration_date,
+    })
   }
 
   return (
@@ -129,21 +179,21 @@ const ProUpgrade: FC<Props> = ({
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center space-x-2">
-                          <p>Enable overages</p>
+                          <p>Enable spend caps</p>
                           <IconHelpCircle
                             size={16}
                             strokeWidth={1.5}
                             className="cursor-pointer opacity-50 hover:opacity-100 transition"
-                            onClick={() => setShowOveragesHelperModal(true)}
+                            onClick={() => setShowSpendCapHelperModal(true)}
                           />
                         </div>
                         <p className="text-sm text-scale-1100">
-                          Additional resources will be charged on a usage basis
+                          If disabled, additional resources will be charged on a per-usage basis
                         </p>
                       </div>
                       <Toggle
-                        checked={isOverageEnabled}
-                        onChange={() => setIsOverageEnabled(!isOverageEnabled)}
+                        checked={isSpendCapEnabled}
+                        onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
                       />
                     </div>
                     <Divider light />
@@ -161,9 +211,11 @@ const ProUpgrade: FC<Props> = ({
             </div>
             <div className="w-2/5 -mt-10">
               <PaymentSummaryPanel
+                isRefreshingPreview={isRefreshingPreview}
+                subscriptionPreview={subscriptionPreview}
                 currentPlan={currentSubscription.tier}
                 selectedPlan={selectedPlan}
-                isOverageEnabled={isOverageEnabled}
+                isSpendCapEnabled={isSpendCapEnabled}
                 currentComputeSize={currentComputeSize}
                 selectedComputeSize={selectedComputeSize}
                 paymentMethods={paymentMethods}
@@ -176,6 +228,7 @@ const ProUpgrade: FC<Props> = ({
                   // setShowAddPaymentMethodModal(true)
                 }}
                 onConfirmPayment={onConfirmPayment}
+                isSubmitting={isSubmitting}
               />
             </div>
           </>
@@ -187,13 +240,13 @@ const ProUpgrade: FC<Props> = ({
         onCancel={() => setShowAddPaymentMethodModal(false)}
       />
 
-      {/* Overages helper modal */}
+      {/* Spend caps helper modal */}
       <Modal
         hideFooter
-        visible={showOveragesHelperModal}
+        visible={showSpendCapHelperModal}
         size="large"
-        header="Enabling overages"
-        onCancel={() => setShowOveragesHelperModal(false)}
+        header="Enabling spend caps"
+        onCancel={() => setShowSpendCapHelperModal(false)}
       >
         <div className="py-4 space-y-4">
           <Modal.Content>
@@ -251,12 +304,7 @@ const ProUpgrade: FC<Props> = ({
           <Modal.Seperator />
           <Modal.Content>
             <div className="flex items-center gap-2">
-              <Button
-                block
-                type="primary"
-                htmlType="button"
-                onClick={() => setShowOveragesHelperModal(false)}
-              >
+              <Button block type="primary" onClick={() => setShowSpendCapHelperModal(false)}>
                 Understood
               </Button>
             </div>
