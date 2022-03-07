@@ -41,15 +41,15 @@ const BlogListItem = ({ blog }: Props) => {
               </p>
             </div>
             {author && (
-                <div className="flex items-center">
-                  {author.author_image_url && (
-                    <img src={author.author_image_url} className="rounded-full w-10 mr-4" />
-                  )}
-                  <Space direction="vertical" size={0}>
-                    <p className="text-sm m-0">{author.author}</p>
-                    <p className="text-xs m-0 text-scale-900">{author.position}</p>
-                  </Space>
-                </div>
+              <div className="flex items-center">
+                {author.author_image_url && (
+                  <img src={author.author_image_url} className="rounded-full w-10 mr-4" />
+                )}
+                <Space direction="vertical" size={0}>
+                  <p className="text-sm m-0">{author.author}</p>
+                  <p className="text-xs m-0 text-scale-900">{author.position}</p>
+                </Space>
+              </div>
             )}
           </div>
         </div>

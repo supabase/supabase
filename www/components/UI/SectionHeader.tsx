@@ -8,9 +8,7 @@ const SectionHeader = (props: any) => {
           </span>
           <h2>
             <span>{props.title}</span>
-            {props.title_alt && (
-              <span className="text-scale-900 inline">{props.title_alt}</span>
-            )}
+            {props.title_alt && <span className="text-scale-900 inline">{props.title_alt}</span>}
           </h2>
         </div>
         <div className="col-span-12 lg:col-span-7">
