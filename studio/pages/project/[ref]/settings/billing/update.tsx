@@ -143,6 +143,7 @@ const BillingUpdate: NextPage = () => {
         />
       )}
 
+      {/* [Joshen] Possible refactor, shift this into PlanSelection */}
       <ConfirmModal
         danger
         visible={showConfirmDowngrade}
