@@ -134,7 +134,7 @@ const ProUpgrade: FC<Props> = ({
                             size={16}
                             strokeWidth={1.5}
                             className="cursor-pointer opacity-50 hover:opacity-100 transition"
-                            onClick={() => {}}
+                            onClick={() => setShowOveragesHelperModal(true)}
                           />
                         </div>
                         <p className="text-sm text-scale-1100">
@@ -181,10 +181,88 @@ const ProUpgrade: FC<Props> = ({
           </>
         )}
       </Transition>
+
       <AddNewPaymentMethodModal
         visible={showAddPaymentMethodModal}
         onCancel={() => setShowAddPaymentMethodModal(false)}
       />
+
+      {/* Overages helper modal */}
+      <Modal
+        hideFooter
+        visible={showOveragesHelperModal}
+        size="large"
+        header="Enabling overages"
+        onCancel={() => setShowOveragesHelperModal(false)}
+      >
+        <div className="py-4 space-y-4">
+          <Modal.Content>
+            {/* [TODO] revise wording */}
+            <div className="space-y-4">
+              <p className="text-sm">
+                This removes any resource limits for your project which the Pro tier has in place.
+                Any resources consumed after the Pro tier limits will be charged on a per-usage
+                basis.
+              </p>
+              <p className="text-sm">
+                The table below shows an overview of which resources are chargeable, and how they
+                are charged:
+              </p>
+              <div className="border border-scale-600 bg-scale-500 rounded">
+                <div className="flex items-center px-4 pt-2 pb-1">
+                  <p className="w-[50%] text-sm text-scale-1100">Item</p>
+                  <p className="w-[25%] text-sm text-scale-1100">Limit</p>
+                  <p className="w-[25%] text-sm text-scale-1100">Rate</p>
+                </div>
+                <div className="py-1">
+                  <div className="flex items-center px-4 py-1">
+                    <p className="w-[50%] text-sm">Database space</p>
+                    <p className="w-[25%] text-sm">8GB</p>
+                    <p className="w-[25%] text-sm">$0.125/GB</p>
+                  </div>
+                  <div className="flex items-center px-4 py-1">
+                    <p className="w-[50%] text-sm">Data transfer</p>
+                    <p className="w-[25%] text-sm">50GB</p>
+                    <p className="w-[25%] text-sm">$0.09/GB</p>
+                  </div>
+                </div>
+                <div className="py-1">
+                  <div className="flex items-center px-4 py-1">
+                    <p className="w-[50%] text-sm">Auth Monthly Active Users</p>
+                    <p className="w-[25%] text-sm">10,000</p>
+                    <p className="w-[25%] text-sm">$1.50/100 users</p>
+                  </div>
+                </div>
+                <div className="py-1">
+                  <div className="flex items-center px-4 py-1">
+                    <p className="w-[50%] text-sm">Storage size</p>
+                    <p className="w-[25%] text-sm">100GB</p>
+                    <p className="w-[25%] text-sm">$0.021/GB</p>
+                  </div>
+                  <div className="flex items-center px-4 py-1">
+                    <p className="w-[50%] text-sm">Data Transfer</p>
+                    <p className="w-[25%] text-sm">50GB</p>
+                    <p className="w-[25%] text-sm">$0.09/GB</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Modal.Content>
+          <Modal.Seperator />
+          <Modal.Content>
+            <div className="flex items-center gap-2">
+              <Button
+                block
+                type="primary"
+                htmlType="button"
+                onClick={() => setShowOveragesHelperModal(false)}
+              >
+                Understood
+              </Button>
+            </div>
+          </Modal.Content>
+        </div>
+      </Modal>
     </>
   )
 }
