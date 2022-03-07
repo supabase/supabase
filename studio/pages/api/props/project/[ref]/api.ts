@@ -72,7 +72,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
         realtime_enabled: true,
       },
       endpoint: process.env.SUPABASE_URL,
-      restUrl: `${process.env.SUPABASE_URL}/rest/v1/`,
+      restUrl: process.env.SUPABASE_REST_URL,
       defaultApiKey: process.env.SUPABASE_ANON_KEY,
       serviceApiKey: process.env.SUPABASE_SERVICE_KEY,
       internalApiKey: process.env.SUPABASE_ANON_KEY,
