@@ -183,7 +183,7 @@ const Nav = () => {
       <Announcement />
       <div className="sticky top-0 z-50">
         <div className="absolute w-full h-full bg-scale-200 top-0 opacity-80"></div>
-        <nav className="backdrop-blur-sm border-b">
+        <nav className="backdrop-blur-sm border-b border-scale-900">
           {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
           <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-16 xl:px-20">
             <HamburgerButton toggleFlyOut={() => setOpen(true)} />
