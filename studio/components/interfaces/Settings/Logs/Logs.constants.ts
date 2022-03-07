@@ -76,4 +76,4 @@ FROM
   ${table}${where ? '\nWHERE ' + where : ''}
 `
 
-export const genCountQuery = (table: string, where: string=""): string => `SELECT count(*) as count FROM ${table}${where ? '\nWHERE ' + where : ''}`
+export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
