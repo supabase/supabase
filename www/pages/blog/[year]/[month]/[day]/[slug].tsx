@@ -249,10 +249,7 @@ function BlogPostPage(props: any) {
                       <Link
                         href={`https://twitter.com/share?text=Checkout%20@supabase's%20new%20blog%20post%20%7C%20${props.blog.title}&url=https://supabase.com/blog/${props.blog.slug}`}
                       >
-                        <a
-                          target="_blank"
-                          className="text-scale-900 hover:text-scale-1000"
-                        >
+                        <a target="_blank" className="text-scale-900 hover:text-scale-1000">
                           <svg
                             height="26"
                             width="26"
@@ -273,10 +270,7 @@ function BlogPostPage(props: any) {
                       <Link
                         href={`https://www.linkedin.com/shareArticle?url=https://supabase.com/blog/${props.blog.slug}&title=Checkout%20@supabase's%20new%20blog%20post%20%7C%20${props.blog.title}`}
                       >
-                        <a
-                          target="_blank"
-                          className="text-scale-900 hover:text-scale-1000"
-                        >
+                        <a target="_blank" className="text-scale-900 hover:text-scale-1000">
                           <svg
                             width="20"
                             height="20"
