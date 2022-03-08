@@ -2,9 +2,10 @@ import { FC } from 'react'
 import { Listbox, IconLoader, Button, Loading, IconPlus } from '@supabase/ui'
 
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { StripeProduct } from '.'
-import { BillingPlan } from './PlanSelection/Plans/Plans.types'
-import { SubscriptionPreview } from './Billing.types'
+import { StripeProduct } from '..'
+import { BillingPlan } from '../PlanSelection/Plans/Plans.types'
+import { SubscriptionPreview } from '../Billing.types'
+import PaymentTotal from './PaymentTotal'
 
 interface Props {
   isRefreshingPreview: boolean
@@ -52,7 +53,6 @@ const PaymentSummaryPanel: FC<Props> = ({
     (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG && isSpendCapEnabled)
   const isChangingComputeSize = currentComputeSize.id !== selectedComputeSize.id
   const hasChangesToPlan = isChangingPlan || isChangingComputeSize
-  const totalMonthlyCost = (selectedPlan?.price ?? 0) + selectedComputeSize.price
 
   const getCurrentPlanName = () => {
     if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG) return 'Pro tier (No spend caps)'
@@ -74,15 +74,15 @@ const PaymentSummaryPanel: FC<Props> = ({
             {getCurrentPlanName()}
           </p>
           <p className={`${isChangingPlan ? 'text-scale-1100 line-through' : ''} text-sm`}>
-            ${currentPlan.unit_amount / 100}
+            ${(currentPlan.unit_amount / 100).toFixed(2)}
           </p>
         </div>
         {isChangingPlan && (
           <div className="flex items-center justify-between">
             <p className="text-sm">
-              {selectedPlan?.name} tier {!isSpendCapEnabled ? '(No spend caps)' : ''}
+              {selectedPlan?.name} tier {!isSpendCapEnabled ? '(Spend cap disabled)' : ''}
             </p>
-            <p className="text-sm">${selectedPlan?.price}</p>
+            <p className="text-sm">${selectedPlan?.price?.toFixed(2)}</p>
           </div>
         )}
       </div>
@@ -99,7 +99,7 @@ const PaymentSummaryPanel: FC<Props> = ({
               Optimized database instance ({currentComputeSize.name})
             </p>
             <p className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}>
-              ${currentComputeSize.price}
+              ${currentComputeSize.price.toFixed(2)}
             </p>
           </div>
         )}
@@ -111,29 +111,14 @@ const PaymentSummaryPanel: FC<Props> = ({
         )}
       </div>
 
-      <div className="h-px w-full bg-scale-600"></div>
+      <div className="h-px w-full bg-scale-600" />
 
-      {/* Payment total */}
-      <Loading active={isRefreshingPreview}>
-        <div className="flex items-start justify-between space-x-32">
-          <div className="space-y-1">
-            <p>Amount due today</p>
-            {hasChangesToPlan && (
-              <p className="text-sm text-scale-1100">
-                You'll pay a monthly total of{' '}
-                <span className="text-scale-1200">
-                  ${totalMonthlyCost} {!isSpendCapEnabled && '+ usage fees '}
-                </span>
-                starting on 1st February 2022
-              </p>
-            )}
-          </div>
-          <div className="flex justify-end items-end relative -top-[5px]">
-            <p className="text-scale-1100 relative -top-[1px]">$</p>
-            <p className="text-2xl">{(subscriptionPreview?.amount_due_immediately ?? 0) / 100}</p>
-          </div>
-        </div>
-      </Loading>
+      <PaymentTotal
+        subscriptionPreview={subscriptionPreview}
+        isRefreshingPreview={isRefreshingPreview}
+        hasChangesToPlan={hasChangesToPlan}
+        isSpendCapEnabled={isSpendCapEnabled}
+      />
 
       {/* Payment method selection */}
       <div className="space-y-2">

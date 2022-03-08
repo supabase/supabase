@@ -58,8 +58,9 @@ const ProUpgrade: FC<Props> = ({
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
 
-  const [selectedComputeSize, setSelectedComputeSize] = useState<any>(currentComputeSize)
+  // Ignore for first iteration, just use default payment method
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>()
+  const [selectedComputeSize, setSelectedComputeSize] = useState<any>(currentComputeSize)
   const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
 
   useEffect(() => {
@@ -70,7 +71,7 @@ const ProUpgrade: FC<Props> = ({
   }, [isLoadingPaymentMethods, paymentMethods])
 
   useEffect(() => {
-    if (selectedPlan !== undefined) {
+    if (selectedPlan !== undefined && selectedPlan.id !== STRIPE_PRODUCT_IDS.FREE) {
       getSubscriptionPreview()
     }
   }, [selectedPlan, selectedComputeSize, isSpendCapEnabled])
@@ -102,7 +103,7 @@ const ProUpgrade: FC<Props> = ({
 
   const getSubscriptionPreview = async () => {
     const tier = !isSpendCapEnabled ? STRIPE_TIER_PRICE_IDS.PAYG : selectedPlan?.priceId
-    // Small currently has no stripe product attached, so FE has a hardcoded ID just for that product
+    // [TODO] Small currently has no stripe product attached, so FE has a hardcoded ID just for that product
     const addons = selectedComputeSize.name === 'Small' ? [] : [selectedComputeSize.id]
     const proration_date = Math.floor(Date.now() / 1000)
 
@@ -112,28 +113,34 @@ const ProUpgrade: FC<Props> = ({
       addons,
       proration_date,
     })
+    setSubscriptionPreview(preview)
     setIsRefreshingPreview(false)
     console.log('Preview retrieved', preview)
-    setSubscriptionPreview(preview)
   }
 
   const onConfirmPayment = async () => {
     const tier = !isSpendCapEnabled ? STRIPE_TIER_PRICE_IDS.PAYG : selectedPlan?.priceId
-    // Small currently has no stripe product attached, so FE has a hardcoded ID just for that product
+    // [TODO] Small currently has no stripe product attached, so FE has a hardcoded ID just for that product
     const addons = selectedComputeSize.name === 'Small' ? [] : [selectedComputeSize.id]
-    const paymentMethod = selectedPaymentMethod.id
     const proration_date = Math.floor(Date.now() / 1000)
 
     setIsSubmitting(true)
     await timeout(1000)
-    setIsSubmitting(false)
-
-    console.log('Confirm payment', {
-      tier,
+    const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, {
+      tier: 'asd',
       addons,
-      paymentMethod,
       proration_date,
     })
+    if (res?.error) {
+      // [TODO] probably better error handling here to guide the users
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to update subscription: ${res?.error?.message}`,
+      })
+    } else {
+      console.log('Succesfully updated subscription')
+    }
+    setIsSubmitting(false)
   }
 
   return (
@@ -182,7 +189,7 @@ const ProUpgrade: FC<Props> = ({
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center space-x-2">
-                          <p>Enable spend caps</p>
+                          <p>Enable spend cap</p>
                           <IconHelpCircle
                             size={16}
                             strokeWidth={1.5}
@@ -248,7 +255,7 @@ const ProUpgrade: FC<Props> = ({
         hideFooter
         visible={showSpendCapHelperModal}
         size="large"
-        header="Enabling spend caps"
+        header="Enabling spend cap"
         onCancel={() => setShowSpendCapHelperModal(false)}
       >
         <div className="py-4 space-y-4">
@@ -256,14 +263,17 @@ const ProUpgrade: FC<Props> = ({
             {/* [TODO] revise wording for "enabling spend caps" instead of overages */}
             <div className="space-y-4">
               <p className="text-sm">
-                This removes any resource limits for your project which the Pro tier has in place.
-                Any resources consumed after the Pro tier limits will be charged on a per-usage
-                basis.
+                A spend cap allows you to restrict your project's resource usage within the limits
+                of the Pro tier. Disabling the spend cap will then remove those limits and any
+                additional resources consumed beyond the Pro tier limits will be charged on a
+                per-usage basis
               </p>
               <p className="text-sm">
                 The table below shows an overview of which resources are chargeable, and how they
                 are charged:
               </p>
+              {/* Maybe instead of a table, show something more interactive like a spend cap playground */}
+              {/* Maybe ideate this in Figma first but this is good enough for now */}
               <div className="border border-scale-600 bg-scale-500 rounded">
                 <div className="flex items-center px-4 pt-2 pb-1">
                   <p className="w-[50%] text-sm text-scale-1100">Item</p>

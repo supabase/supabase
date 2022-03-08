@@ -10,12 +10,7 @@ import { API_URL, DEFAULT_FREE_PROJECTS_LIMIT, STRIPE_PRODUCT_IDS } from 'lib/co
 
 import { BillingLayout } from 'components/layouts'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import {
-  PlanSelection,
-  ProUpgrade,
-  ExitSurvey,
-  StripeSubscription,
-} from 'components/interfaces/Billing'
+import { PlanSelection, ProUpgrade, StripeSubscription } from 'components/interfaces/Billing'
 import { BillingPlan } from 'components/interfaces/Billing/PlanSelection/Plans/Plans.types'
 import { BILLING_PLANS } from 'components/interfaces/Billing/PlanSelection/Plans/Plans.constants'
 
@@ -93,7 +88,7 @@ const BillingUpdate: NextPage = () => {
 
   const onSelectPlan = (plan: BillingPlan) => {
     if (plan.name === 'Enterprise') {
-      return router.push(`/project/${projectRef}/settings/billing/enterprise`)
+      return router.push(`/project/${projectRef}/settings/billing/update/enterprise`)
     }
 
     setSelectedPlan(plan)
@@ -106,8 +101,9 @@ const BillingUpdate: NextPage = () => {
     if (freeProjectsOwned >= freeProjectsLimit) {
       setShowDowngradeError(true)
       setSelectedPlan(undefined)
+    } else {
+      router.push(`/project/${projectRef}/settings/billing/update/free`)
     }
-    setShowConfirmDowngrade(false)
   }
 
   return (
@@ -118,10 +114,6 @@ const BillingUpdate: NextPage = () => {
           billingPlans={BILLING_PLANS}
           currentPlan={subscription?.tier}
           onSelectPlan={onSelectPlan}
-        />
-        <ExitSurvey
-          visible={selectedPlan?.name === 'Free' && !showConfirmDowngrade}
-          onSelectBack={() => setSelectedPlan(undefined)}
         />
       </div>
 
