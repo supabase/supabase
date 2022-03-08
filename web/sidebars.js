@@ -210,6 +210,7 @@ module.exports = {
         'company/terms',
         'company/privacy',
         'company/aup',
+        'company/sla',
       ],
     },
   ],
