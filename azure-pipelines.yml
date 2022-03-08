@@ -1,0 +1,19 @@
+trigger:
+- master # or the name of your main branch
+
+steps:
+# Prepare Analysis Configuration task
+- task: SonarQubePrepare@5
+  inputs:
+    SonarQube: 'For DemoVMJoann Instance'
+    scannerMode: 'CLI'
+    configMode: 'manual'
+    cliProjectKey: 'igbins09_supabase'
+
+# Run Code Analysis task
+- task: SonarQubeAnalyze@5
+
+# Publish Quality Gate Result task
+- task: SonarQubePublish@5
+  inputs:
+    pollingTimeoutSec: '300'
