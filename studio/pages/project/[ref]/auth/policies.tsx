@@ -241,7 +241,7 @@ const AuthPoliciesTables = observer(() => {
       ) : PageState.tables.length > 0 ? (
         <NoSearchResults />
       ) : (
-        <NoTableState message="You haven't created a table on the public schema. Get started by creating a new table." />
+        <NoTableState message="A public schema table is required before you can create a row-level security policy" />
       )}
 
       <PolicyEditorModal
