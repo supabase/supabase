@@ -15,7 +15,7 @@ const NoTableState: FC<Props> = ({ message }) => {
       title="No public tables found"
       ctaButtonLabel="Create a new table"
       onClickCta={() => {
-        router.push(`/project/${ref}/database/tables`)
+        router.push(`/project/${ref}/editor`)
       }}
     >
       <p className="text-sm text-scale-1100">{message}</p>
