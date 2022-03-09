@@ -224,7 +224,6 @@ function StoragePage() {
                     title="CDN"
                     text="Serve from the edge to reduce latency."
                   />
-                  <Badge color="blue">Coming soon</Badge>
                 </div>
                 <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
