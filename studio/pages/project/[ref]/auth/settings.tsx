@@ -897,12 +897,12 @@ const Settings = () => {
           )}
           <Divider light />
           <ToggleField
-            name="EXTERNAL_SPOTIFY_ENABLED"
+            name="EXTERNAL_WORKOS_ENABLED"
             addOns={
               externalProvidersModel.EXTERNAL_WORKOS_ENABLED && (
                 <a
                   className="pl-4 text-scale-900"
-                  href="https://workos.com/"
+                  href="https://dashboard.workos.com"
                   target="_blank"
                 >
                   Create new credentials
