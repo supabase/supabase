@@ -99,21 +99,20 @@ That approach has the added benefit of allowing us to store multiple tables' aud
 
 ```sql
 create table audit.record_version(
-	id             bigserial primary key,
-	-- auditing metadata
+  id             bigserial primary key,
+  -- auditing metadata
   record_id      uuid, -- identifies a new record by it's table + primary key
-	old_record_id  uuid, -- ^
+  old_record_id  uuid, -- ^
   op             varchar(8) not null, -- INSERT/UPDATE/DELETE/TRUNCATE
   ts             timestamptz not null default now(),
-	-- table identifiers
+  -- table identifiers
   table_oid      oid not null,  -- pg internal id for a table
   table_schema   name not null, -- audited table's schema name e.g. 'public'
   table_name     name not null, -- audited table's table name e.g. 'account'
-	-- record data
+  -- record data
   record         jsonb, -- contents of the new record   
   old_record     jsonb  -- previous record contents (for UPDATE/DELETE)
 );
-
 ```
 
 <details>
@@ -146,7 +145,7 @@ create index record_version_ts
   using brin(ts);
 ```
 
-For table filtering, we've included a `table_oid` column which tracks PostgreSQL's internal `integer` identifier. We can add an index to this column instead of the `table_schema` and `table_name` columns, minimizing the index size and offering better performance.
+For table filtering, we've included a `table_oid` column which tracks PostgreSQL's internal numeric table identifier. We can add an index to this column instead of the `table_schema` and `table_name` columns, minimizing the index size and offering better performance.
 
 ```sql
 -- index table_oid for table filtering
