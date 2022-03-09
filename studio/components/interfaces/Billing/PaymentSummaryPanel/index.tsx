@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Listbox, IconLoader, Button, Loading, IconPlus } from '@supabase/ui'
+import { Listbox, IconLoader, Button, IconPlus } from '@supabase/ui'
 
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { StripeProduct } from '..'
@@ -51,7 +51,7 @@ const PaymentSummaryPanel: FC<Props> = ({
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && !isSpendCapEnabled) ||
     (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG && isSpendCapEnabled)
   const isChangingComputeSize = currentComputeSize.id !== selectedComputeSize.id
-  const hasChangesToPlan = isChangingPlan || isChangingComputeSize
+  const hasChangesToPlan = subscriptionPreview?.has_changes ?? false
 
   const getCurrentPlanName = () => {
     if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG) return 'Pro tier (No spend caps)'

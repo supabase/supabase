@@ -1,19 +1,41 @@
+import { useState, useEffect } from 'react'
 import { NextPage } from 'next'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
 import { withAuth, useStore } from 'hooks'
+import { get } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 
 import { BillingLayout } from 'components/layouts'
 import { ExitSurvey } from 'components/interfaces/Billing'
-import { useEffect } from 'react'
 
 const BillingUpdateFree: NextPage = () => {
   const { ui } = useStore()
   const router = useRouter()
   const projectRef = ui.selectedProject?.ref
 
-  // [TODO] If project is already free, redirect back to plan selection and show push notification
+  const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false)
+
+  useEffect(() => {
+    getStripeProducts()
+  }, [])
+
+  const getStripeProducts = async () => {
+    try {
+      setIsLoadingProducts(true)
+      const products = await get(`${API_URL}/stripe/products`)
+      setProducts(products)
+      setIsLoadingProducts(false)
+    } catch (error: any) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to get products: ${error.message}`,
+      })
+    }
+  }
 
   return (
     <BillingLayout>
