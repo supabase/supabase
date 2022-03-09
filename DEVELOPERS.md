@@ -4,11 +4,12 @@
 * [Installing Dependencies](#Installing-Dependencies)
 * [Building Supabase](#Building-Supabase)
 * [Start a Development Server](#Start-a-Development-Server)
-* [Build in Public](#Build-in-Public)
+* [Finally](#Finally)
+* [Community Channels](#Community-Channels)
 
 ## Development Setup
 
-This document describes how to set up your development environment to build and test Supabase.
+First off, thanks for your interest in Supabase and for wanting to contribute! before you begin, read the [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) and check out the [existing issues](https://github.com/supabase/supabase/issues). This document describes how to set up your development environment to build and test Supabase.
 
 ### Installing Dependencies
 
@@ -150,8 +151,12 @@ To debug code, and to see changes in real time, it is often useful to have a loc
 
 For more information on Supabase Studio, see the [Supabase Studio readme](./studio/README.md).
 
-## Build in Public
+## Finally
 
-Videos of building supabase made in public.
+After making your changes to the file(s) you'd like to update, it's time to open a pull request. Once you submit your pull request, others from the Supabase team/community will review it with you.
 
-- [Contributing to open source as  a beginner - Supabase](https://youtu.be/OAqhsylUuWg) - [@imskr](https://github.com/imskr)
+Did you have an issue, like a merge conflict, or don't know how to open a pull request? Check out [GitHub's pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests) tutorial on how to resolve merge conflicts and other issues. Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors)
+
+## Community Channels
+
+Stuck somewhere? Have any questions? please join the [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
