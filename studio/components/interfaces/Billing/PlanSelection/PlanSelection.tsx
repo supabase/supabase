@@ -2,18 +2,21 @@ import Link from 'next/link'
 import { FC } from 'react'
 import { Transition } from '@headlessui/react'
 
+import { StripeProduct } from '..'
 import Plans from './Plans/Plans'
 import { BillingPlan } from './Plans/Plans.types'
-import { StripeProduct } from '..'
+import { formatTierOptions } from './PlanSelection.utils'
 
 interface Props {
   visible: boolean
-  billingPlans: BillingPlan[]
+  tiers: any[]
   currentPlan?: StripeProduct
   onSelectPlan: (plan: BillingPlan) => void
 }
 
-const PlanSelection: FC<Props> = ({ visible, billingPlans, currentPlan, onSelectPlan }) => {
+const PlanSelection: FC<Props> = ({ visible, tiers, currentPlan, onSelectPlan }) => {
+  const formattedTiers = formatTierOptions(tiers)
+
   return (
     <Transition
       show={visible}
@@ -24,7 +27,7 @@ const PlanSelection: FC<Props> = ({ visible, billingPlans, currentPlan, onSelect
       <div className="space-y-8">
         <h4 className="text-lg">Change your project's subscription</h4>
         {/* FE will make a call to fetch all plans first at the page level */}
-        <Plans plans={billingPlans} currentPlan={currentPlan} onSelectPlan={onSelectPlan} />
+        <Plans plans={formattedTiers} currentPlan={currentPlan} onSelectPlan={onSelectPlan} />
         <div className="flex justify-center items-center">
           <Link href="https://supabase.com/pricing">
             <a target="_blank" className="text-sm text-scale-1100 hover:text-scale-1200 transition">

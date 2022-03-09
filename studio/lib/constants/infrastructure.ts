@@ -99,32 +99,10 @@ export const PROJECT_STATUS = {
   RESTORING: 'RESTORING',
 }
 
-// Probably should deprecate to just use price ids?
 export const STRIPE_PRODUCT_IDS = {
   FREE: process?.env?.NEXT_PUBLIC_STRIPE_FREE_TIER_ID,
   PRO: process?.env?.NEXT_PUBLIC_STRIPE_PRO_TIER_ID,
   PAYG: process?.env?.NEXT_PUBLIC_STRIPE_PAYG_TIER_ID,
-}
-
-export const STRIPE_TIER_PRICE_IDS = {
-  FREE: process?.env.NEXT_PUBLIC_STRIPE_FREE_PRICE_ID ?? 'price_1KCawmJDPojXS6LNahIn31Mr',
-  PRO: process?.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID ?? 'price_1IdYPAJDPojXS6LNRVCC1LAV',
-  PAYG: process?.env.NEXT_PUBLIC_STRIPE_PAYG_PRICE_ID ?? 'price_1KCFZCJDPojXS6LNjTEjcXgU',
-}
-
-export const STRIPE_COMPUTE_SIZE_ADD_ON_PRICE_IDS = {
-  SMALL: process?.env.NEXT_PUBLIC_STRIPE_COMPUTE_SIZE_SMALL_PRICE_ID ?? 'small',
-  MEDIUM:
-    process?.env.NEXT_PUBLIC_STRIPE_COMPUTE_SIZE_MEDIUM_PRICE_ID ??
-    'price_1KCFarJDPojXS6LNlS2pAp36',
-  LARGE:
-    process?.env.NEXT_PUBLIC_STRIPE_COMPUTE_SIZE_LARGE_PRICE_ID ?? 'price_1KCFaNJDPojXS6LNKg8Gy6pS',
-  XLARGE:
-    process?.env.NEXT_PUBLIC_STRIPE_COMPUTE_SIZE_XLARGE_PRICE_ID ??
-    'price_1Jaem9JDPojXS6LN62rrj5al',
-  XXLARGE:
-    process?.env.NEXT_PUBLIC_STRIPE_COMPUTE_SIZE_XXLARGE_PRICE_ID ??
-    'price_1KCFbVJDPojXS6LNmlyzusY8',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4

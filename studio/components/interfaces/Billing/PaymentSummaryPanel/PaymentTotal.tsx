@@ -56,7 +56,9 @@ const PaymentTotal: FC<Props> = ({
             <p>Amount due today</p>
             <div className="flex justify-end items-end relative -top-[5px]">
               <p className="text-scale-1100 relative -top-[1px]">$</p>
-              <p className="text-2xl">{amountDueImmediately.toFixed(2)}</p>
+              <p className="text-2xl">
+                {!hasChangesToPlan ? '0.00' : amountDueImmediately.toFixed(2)}
+              </p>
             </div>
           </div>
           {hasCreditsBalance && (
