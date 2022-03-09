@@ -435,6 +435,9 @@ const Settings = () => {
             'EXTERNAL_SPOTIFY_ENABLED',
             'EXTERNAL_SPOTIFY_CLIENT_ID',
             'EXTERNAL_SPOTIFY_SECRET',
+            'EXTERNAL_WORKOS_ENABLED',
+            'EXTERNAL_WORKOS_CLIENT_ID',
+            'EXTERNAL_WORKOS_SECRET',
           ])}
           model={{
             EXTERNAL_APPLE_ENABLED: model.EXTERNAL_APPLE_ENABLED,
@@ -479,6 +482,9 @@ const Settings = () => {
             EXTERNAL_SPOTIFY_ENABLED: model.EXTERNAL_SPOTIFY_ENABLED,
             EXTERNAL_SPOTIFY_CLIENT_ID: model.EXTERNAL_SPOTIFY_CLIENT_ID || undefined,
             EXTERNAL_SPOTIFY_SECRET: model.EXTERNAL_SPOTIFY_SECRET || undefined,
+            EXTERNAL_WORKOS_ENABLED: model.EXTERNAL_WORKOS_ENABLED,
+            EXTERNAL_WORKOS_CLIENT_ID: model.EXTERNAL_WORKOS_CLIENT_ID || undefined,
+            EXTERNAL_WORKOS_SECRET: model.EXTERNAL_WORKOS_SECRET || undefined,
           }}
           onChangeModel={(model) => setExternalProvidersModel(model)}
           onReset={() => onFormReset()}
@@ -884,6 +890,35 @@ const Settings = () => {
               />
               <SecretField
                 name="EXTERNAL_SPOTIFY_SECRET"
+                showInlineError
+                errorMessage="Please enter the secret."
+              />
+            </>
+          )}
+          <Divider light />
+          <ToggleField
+            name="EXTERNAL_SPOTIFY_ENABLED"
+            addOns={
+              externalProvidersModel.EXTERNAL_WORKOS_ENABLED && (
+                <a
+                  className="pl-4 text-scale-900"
+                  href="https://workos.com/"
+                  target="_blank"
+                >
+                  Create new credentials
+                </a>
+              )
+            }
+          />
+          {externalProvidersModel.EXTERNAL_WORKOS_ENABLED && (
+            <>
+              <AutoField
+                name="EXTERNAL_WORKOS_CLIENT_ID"
+                showInlineError
+                errorMessage="Please enter the client id."
+              />
+              <SecretField
+                name="EXTERNAL_WORKOS_SECRET"
                 showInlineError
                 errorMessage="Please enter the secret."
               />
