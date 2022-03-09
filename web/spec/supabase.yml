@@ -892,55 +892,55 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById({
-            uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
-            attributes: { email: 'new@email.com' } },
-          })
+          const { data: user, error } = await supabase.auth.api.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            { email: 'new@email.com' }
+          )
           ```
       - name: Updates a user's password.
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById({
-            uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
-            attributes: { password: 'new@email.com' } },
-          })
+          const { data: user, error } = await supabase.auth.api.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            { password: 'new_password' }
+          )
           ```
       - name: Updates a user's metadata.
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById({
-            uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
-            attributes: { user_metadata: { hello: 'world' } },
-          })
+          const { data: user, error } = await supabase.auth.api.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            { user_metadata: { hello: 'world' } }
+          )
           ```
       - name: Updates a user's app_metadata.
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById({
-            uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
-            attributes: { app_metadata: { plan: 'trial' } },
-          })
+          const { data: user, error } = await supabase.auth.api.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            { app_metadata: { plan: 'trial' } }
+          )
           ```
       - name: Confirms a user's email address.
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById({
-            uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
-            attributes: { email_confirm: true },
-          })
+          const { data: user, error } = await supabase.auth.api.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            { email_confirm: true }
+          )
           ```
       - name: Confirms a user's phone number.
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById({
-            uid: '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
-            attributes: { phone_number: true },
-          })
+          const { data: user, error } = await supabase.auth.api.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            { phone_number: true }
+          )
           ```
 
   select():
