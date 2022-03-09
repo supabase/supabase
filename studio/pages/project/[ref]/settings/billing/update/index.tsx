@@ -5,20 +5,22 @@ import { observer } from 'mobx-react-lite'
 import { Button, Modal } from '@supabase/ui'
 
 import { withAuth, useStore, useSubscriptionStats } from 'hooks'
-import { post } from 'lib/common/fetch'
+import { get, post } from 'lib/common/fetch'
 import { API_URL, DEFAULT_FREE_PROJECTS_LIMIT, STRIPE_PRODUCT_IDS } from 'lib/constants'
 
 import { BillingLayout } from 'components/layouts'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { PlanSelection, ProUpgrade, StripeSubscription } from 'components/interfaces/Billing'
 import { BillingPlan } from 'components/interfaces/Billing/PlanSelection/Plans/Plans.types'
-import { BILLING_PLANS } from 'components/interfaces/Billing/PlanSelection/Plans/Plans.constants'
+import Connecting from 'components/ui/Loading/Loading'
 
 /**
  * [Joshen] Right now everything is scaffolded without any API calls
  * So maybe some prop passing down, variable creation needs relooking
  * once I'm working with proper data
  */
+
+// [CURRENTLY: Hooking up products from API, and removing all the constants crap]
 
 const BillingUpdate: NextPage = () => {
   const { ui } = useStore()
@@ -30,21 +32,41 @@ const BillingUpdate: NextPage = () => {
   const freeProjectsLimit = ui?.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
   const freeProjectsOwned = subscriptionStats.total_free_projects ?? 0
 
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false)
   const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
   const [showConfirmDowngrade, setShowConfirmDowngrade] = useState(false)
   const [showDowngradeError, setShowDowngradeError] = useState(false)
 
+  const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
   const [subscription, setSubscription] = useState<StripeSubscription>()
   const [paymentMethods, setPaymentMethods] = useState<any>()
   const [selectedPlan, setSelectedPlan] = useState<BillingPlan>()
 
   useEffect(() => {
-    if (projectRef) getSubscription()
+    if (projectRef) {
+      getStripeProducts()
+      getSubscription()
+    }
   }, [projectRef])
 
   useEffect(() => {
     if (stripeCustomerId) getStripeAccount()
   }, [stripeCustomerId])
+
+  const getStripeProducts = async () => {
+    try {
+      setIsLoadingProducts(true)
+      const products = await get(`${API_URL}/stripe/products`)
+      setProducts(products)
+      setIsLoadingProducts(false)
+    } catch (error: any) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to get products: ${error.message}`,
+      })
+    }
+  }
 
   const getStripeAccount = async () => {
     try {
@@ -106,23 +128,32 @@ const BillingUpdate: NextPage = () => {
     }
   }
 
+  if (isLoadingProducts) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <Connecting />
+      </div>
+    )
+  }
+
   return (
     <BillingLayout>
       <div className="mx-auto max-w-5xl my-10">
         <PlanSelection
           visible={!selectedPlan || (selectedPlan && showConfirmDowngrade)}
-          billingPlans={BILLING_PLANS}
+          tiers={products?.tiers ?? []}
           currentPlan={subscription?.tier}
           onSelectPlan={onSelectPlan}
         />
       </div>
 
-      {subscription !== undefined && (
+      {subscription !== undefined && products !== undefined && (
         <ProUpgrade
           visible={
             selectedPlan?.id === STRIPE_PRODUCT_IDS.PRO ||
             selectedPlan?.id === STRIPE_PRODUCT_IDS.PAYG
           }
+          products={products}
           currentSubscription={subscription}
           selectedPlan={selectedPlan}
           isLoadingPaymentMethods={isLoadingPaymentMethods}

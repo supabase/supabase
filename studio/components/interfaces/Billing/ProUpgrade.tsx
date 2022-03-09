@@ -6,7 +6,7 @@ import { Badge, Button, IconArrowLeft, IconHelpCircle, Toggle, Modal } from '@su
 import { useStore } from 'hooks'
 import { getURL, timeout } from 'lib/helpers'
 import { post, patch } from 'lib/common/fetch'
-import { API_URL, STRIPE_TIER_PRICE_IDS } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import Divider from 'components/ui/Divider'
 import {
   PaymentSummaryPanel,
@@ -15,12 +15,13 @@ import {
   AddNewPaymentMethodModal,
 } from '.'
 import { BillingPlan } from './PlanSelection/Plans/Plans.types'
-import { COMPUTE_SIZES } from './AddOns/AddOns.constant'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from './Billing.types'
 
 interface Props {
   visible: boolean
+  products: { tiers: any[]; addons: any[] }
+
   currentSubscription: StripeSubscription
   selectedPlan?: BillingPlan
   paymentMethods?: any[]
@@ -30,6 +31,7 @@ interface Props {
 
 const ProUpgrade: FC<Props> = ({
   visible,
+  products,
   currentSubscription,
   selectedPlan,
   paymentMethods,
@@ -39,11 +41,12 @@ const ProUpgrade: FC<Props> = ({
   const { ui } = useStore()
   const router = useRouter()
 
+  const { tiers, addons } = products
   const projectRef = ui.selectedProject?.ref
 
   const currentComputeSize =
-    COMPUTE_SIZES.find((options) => options.id === currentSubscription?.addons[0]?.prod_id) ||
-    COMPUTE_SIZES[0]
+    addons.find((option: any) => option.id === currentSubscription?.addons[0]?.prod_id) ||
+    addons.find((option: any) => option.name.includes('[Small]'))
 
   const isManagingProSubscription =
     currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PRO ||
@@ -102,37 +105,57 @@ const ProUpgrade: FC<Props> = ({
   }
 
   const getSubscriptionPreview = async () => {
-    const tier = !isSpendCapEnabled ? STRIPE_TIER_PRICE_IDS.PAYG : selectedPlan?.priceId
+    const selectedTier = !isSpendCapEnabled
+      ? tiers.find((tier: any) => tier.id === STRIPE_PRODUCT_IDS.PAYG)
+      : tiers.find((tier: any) => tier.id === selectedPlan?.id)
+
     // [TODO] Small currently has no stripe product attached, so FE has a hardcoded ID just for that product
-    const addons = selectedComputeSize.name === 'Small' ? [] : [selectedComputeSize.id]
+    // [UPDATE] it now has, just verify if attaching a Small will mess things up
+    const addons = selectedComputeSize.name.includes('[Small]')
+      ? []
+      : [selectedComputeSize.prices[0].id]
     const proration_date = Math.floor(Date.now() / 1000)
+
+    if (!selectedTier) return
 
     setIsRefreshingPreview(true)
     const preview = await post(`${API_URL}/projects/${projectRef}/subscription/preview`, {
-      tier,
+      tier: selectedTier.prices[0].id,
       addons,
       proration_date,
     })
+    if (preview.error) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to fetch subscription preview: ${preview.error.message}`,
+      })
+    }
     setSubscriptionPreview(preview)
     setIsRefreshingPreview(false)
     console.log('Preview retrieved', preview)
   }
 
+  // Exact same thing as getSubscriptionpreview, can we make them into one
   const onConfirmPayment = async () => {
-    const tier = !isSpendCapEnabled ? STRIPE_TIER_PRICE_IDS.PAYG : selectedPlan?.priceId
+    const selectedTier = !isSpendCapEnabled
+      ? tiers.find((tier: any) => tier.id === STRIPE_PRODUCT_IDS.PAYG)
+      : tiers.find((tier: any) => tier.id === selectedPlan?.id)
+
     // [TODO] Small currently has no stripe product attached, so FE has a hardcoded ID just for that product
-    const addons = selectedComputeSize.name === 'Small' ? [] : [selectedComputeSize.id]
+    // [UPDATE] it now has, just verify if attaching a Small will mess things up
+    const addons = selectedComputeSize.name.includes('[Small]')
+      ? []
+      : [selectedComputeSize.prices[0].id]
     const proration_date = Math.floor(Date.now() / 1000)
 
     setIsSubmitting(true)
     await timeout(1000)
     const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, {
-      tier: 'asd',
+      tier: selectedTier.prices[0].id,
       addons,
       proration_date,
     })
     if (res?.error) {
-      // [TODO] probably better error handling here to guide the users
       ui.setNotification({
         category: 'error',
         message: `Failed to update subscription: ${res?.error?.message}`,
@@ -212,6 +235,7 @@ const ProUpgrade: FC<Props> = ({
                       <Badge color="green">Optional</Badge>
                     </div>
                     <ComputeSizeSelection
+                      computeSizes={addons || []}
                       selectedComputeSize={selectedComputeSize}
                       onSelectOption={onSelectComputeSizeOption}
                     />

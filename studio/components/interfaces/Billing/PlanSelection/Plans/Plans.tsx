@@ -7,7 +7,7 @@ import { BillingPlan } from './Plans.types'
 import PlanCTAButton from './PlanCTAButton'
 
 interface Props {
-  plans: BillingPlan[]
+  plans: any[]
   currentPlan?: StripeProduct
   onSelectPlan: (plan: BillingPlan) => void
 }
@@ -41,6 +41,7 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
           (plan.id === STRIPE_PRODUCT_IDS.PRO && currentPlan?.prod_id === STRIPE_PRODUCT_IDS.PRO) ||
           (plan.id === STRIPE_PRODUCT_IDS.PRO && currentPlan?.prod_id === STRIPE_PRODUCT_IDS.PAYG)
 
+        const pointers = plan.metadata.features.split('\\n').map((x: string) => x.trim())
         return (
           <div
             key={plan.name}
@@ -63,17 +64,17 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
               </div>
               <p className="text-scale-1100 text-sm mt-2">{plan.description}</p>
               <div className="py-8">
-                {plan.price === null ? (
+                {plan.prices.length === 0 ? (
                   <p className="text-2xl text-center">Contact us</p>
                 ) : (
                   <div className="flex items-end justify-center">
-                    <p className="text-3xl">${plan.price}</p>
+                    <p className="text-3xl">${plan.prices[0].unit_amount / 100}</p>
                     <p className="text-sm text-scale-1100 relative -top-[2px]"> /month</p>
                   </div>
                 )}
               </div>
               <ul className="space-y-4">
-                {plan.pointers.map((pointer: string, idx: number) => (
+                {pointers.map((pointer: string, idx: number) => (
                   <li key={`pointer-${idx}`} className="text-sm flex">
                     <div className="w-[15%]">
                       <svg

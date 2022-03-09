@@ -1,15 +1,17 @@
 import { FC } from 'react'
 import { Radio } from '@supabase/ui'
-import { COMPUTE_SIZES } from './AddOns.constant'
+import { formatComputeSizes } from './AddOns.utils'
 
 // [TODO] please type the vairables properly
 
 interface Props {
+  computeSizes: any[]
   selectedComputeSize: any
   onSelectOption: (option: any) => void
 }
 
-const ComputeSizeSelection: FC<Props> = ({ selectedComputeSize, onSelectOption }) => {
+const ComputeSizeSelection: FC<Props> = ({ computeSizes, selectedComputeSize, onSelectOption }) => {
+  const formattedComputeSizes = formatComputeSizes(computeSizes)
   return (
     <div className="space-y-4">
       <div>
@@ -19,7 +21,7 @@ const ComputeSizeSelection: FC<Props> = ({ selectedComputeSize, onSelectOption }
         </p>
       </div>
       <Radio.Group type="cards" className="billing-compute-radio">
-        {COMPUTE_SIZES.map((option: any) => (
+        {formattedComputeSizes.map((option: any) => (
           <Radio
             hidden
             key={option.id}
@@ -29,11 +31,11 @@ const ComputeSizeSelection: FC<Props> = ({ selectedComputeSize, onSelectOption }
             description={
               <div>
                 <p>{option.description}</p>
-                <p>{option.specs}</p>
+                <p>{option.metadata.features}</p>
               </div>
             }
             value={option.id}
-            optionalLabel={<div>${option.price} / month</div>}
+            optionalLabel={<div>${option.prices[0].unit_amount / 100} / month</div>}
             checked={selectedComputeSize?.id === option.id}
             onChange={() => onSelectOption(option)}
           />

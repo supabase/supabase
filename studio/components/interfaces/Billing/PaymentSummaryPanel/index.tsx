@@ -3,7 +3,6 @@ import { Listbox, IconLoader, Button, Loading, IconPlus } from '@supabase/ui'
 
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { StripeProduct } from '..'
-import { BillingPlan } from '../PlanSelection/Plans/Plans.types'
 import { SubscriptionPreview } from '../Billing.types'
 import PaymentTotal from './PaymentTotal'
 
@@ -12,7 +11,7 @@ interface Props {
   subscriptionPreview?: SubscriptionPreview
   currentPlan: StripeProduct
   currentComputeSize: any
-  selectedPlan?: BillingPlan
+  selectedPlan?: any
   selectedComputeSize: any
   isSpendCapEnabled: boolean
   paymentMethods?: any
@@ -80,9 +79,9 @@ const PaymentSummaryPanel: FC<Props> = ({
         {isChangingPlan && (
           <div className="flex items-center justify-between">
             <p className="text-sm">
-              {selectedPlan?.name} tier {!isSpendCapEnabled ? '(Spend cap disabled)' : ''}
+              {selectedPlan?.name} {!isSpendCapEnabled ? '(Spend cap disabled)' : ''}
             </p>
-            <p className="text-sm">${selectedPlan?.price?.toFixed(2)}</p>
+            <p className="text-sm">${(selectedPlan.prices[0].unit_amount / 100).toFixed(2)}</p>
           </div>
         )}
       </div>
@@ -96,17 +95,19 @@ const PaymentSummaryPanel: FC<Props> = ({
         {currentComputeSize !== undefined && (
           <div className="flex items-center justify-between">
             <p className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}>
-              Optimized database instance ({currentComputeSize.name})
+              {currentComputeSize.name}
             </p>
             <p className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}>
-              ${currentComputeSize.price.toFixed(2)}
+              ${(currentComputeSize.prices[0].unit_amount / 100).toFixed(2)}
             </p>
           </div>
         )}
         {isChangingComputeSize && (
           <div className="flex items-center justify-between">
-            <p className="text-sm">Optimized database instance ({selectedComputeSize.name})</p>
-            <p className="text-sm">${selectedComputeSize.price}</p>
+            <p className="text-sm">{selectedComputeSize.name}</p>
+            <p className="text-sm">
+              ${(selectedComputeSize.prices[0].unit_amount / 100).toFixed(2)}
+            </p>
           </div>
         )}
       </div>

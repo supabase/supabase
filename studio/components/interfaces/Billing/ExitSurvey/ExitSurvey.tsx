@@ -5,7 +5,7 @@ import { Button, Form, Input, IconArrowLeft } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
-import { API_URL, STRIPE_TIER_PRICE_IDS } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import { CANCELLATION_REASONS } from '../Billing.constants'
 import { generateFeedbackMessage } from './ExitSurvey.utils'
 
@@ -48,7 +48,8 @@ const ExitSurvey: FC<Props> = ({ onSelectBack }) => {
       // })
 
       // Trigger subscription downgrade
-      const tier = STRIPE_TIER_PRICE_IDS.FREE
+      // [TODO] please use from API please
+      const tier = 'price_1KCawmJDPojXS6LNahIn31Mr'
       const addons: string[] = []
       const proration_date = Math.floor(Date.now() / 1000)
       const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, {
