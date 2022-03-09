@@ -1,8 +1,11 @@
 import { FC } from 'react'
 import { Transition } from '@headlessui/react'
 import { Button, Form, Input, IconArrowLeft } from '@supabase/ui'
+
+import { post } from 'lib/common/fetch'
 import { useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
+import { API_URL } from 'lib/constants'
 
 interface Props {
   onSelectBack: () => void
@@ -10,7 +13,8 @@ interface Props {
 
 const EnterpriseRequest: FC<Props> = ({ onSelectBack }) => {
   const { ui } = useStore()
-  const { profile } = ui
+  const { profile, selectedProject } = ui
+  const projectRef = selectedProject?.ref
 
   const initialValues = {
     name: `${profile?.first_name} ${profile?.last_name}`,
@@ -20,13 +24,22 @@ const EnterpriseRequest: FC<Props> = ({ onSelectBack }) => {
   }
 
   const onValidate = (values: any) => {
+    // Just make sure none of the fields are empty
+    // Regex validation for email, super basic stuff, should be quick
     console.log('onValidate', values)
   }
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
-    await timeout(1000)
-    console.log('onSubmit', values)
+    const res = await post(`${API_URL}/projects/${projectRef}/subscription/enterprise`, {
+      name: values.name,
+      email: values.email,
+      company: values.company,
+      message: values.message,
+    })
+    if (!res.error) {
+      // Do something
+    }
     setSubmitting(false)
   }
 
