@@ -22,6 +22,7 @@
     "EXTERNAL_TWITTER_ENABLED",
     "EXTERNAL_SLACK_ENABLED",
     "EXTERNAL_SPOTIFY_ENABLED",
+    "EXTERNAL_ZOOM_ENABLED",
     "SMS_AUTOCONFIRM",
     "SMS_MAX_FREQUENCY",
     "SMS_OTP_EXP",
@@ -108,6 +109,10 @@
     },
     "EXTERNAL_AZURE_SECRET": {
       "title": "Azure secret",
+      "type": "string"
+    },
+    "EXTERNAL_AZURE_URL": {
+      "title": "Azure tenant URL",
       "type": "string"
     },
     "EXTERNAL_BITBUCKET_ENABLED": {
@@ -258,6 +263,18 @@
       "title": "Spotify secret",
       "type": "string"
     },
+    "EXTERNAL_ZOOM_ENABLED": {
+      "title": "Zoom enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_ZOOM_CLIENT_ID": {
+      "title": "Zoom client ID",
+      "type": "string"
+    },
+    "EXTERNAL_ZOOM_SECRET": {
+      "title": "Zoom secret",
+      "type": "string"
+    },
     "SMTP_ADMIN_EMAIL": {
       "title": "SMTP Admin Email",
       "type": "string"
@@ -374,6 +391,10 @@
     "MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT": {
       "title": "Body",
       "type": "string"
+    },
+    "PASSWORD_MIN_LENGTH": {
+      "title": "Minimum password length",
+      "type": "integer"
     },
     "SMS_AUTOCONFIRM": {
       "title": "Enable phone confirmations",
