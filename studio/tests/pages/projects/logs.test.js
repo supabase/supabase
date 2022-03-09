@@ -375,6 +375,31 @@ test('bug: load older btn does not error out when previous page is empty', async
   })
 })
 
+test('bug: log selection gets hidden when custom query is run', async () => {
+  const data = [
+    logDataFixture({
+      event_message: 'some event happened',
+      metadata: {
+        my_key: 'something_value',
+      },
+    }),
+  ]
+  get.mockResolvedValue({ data })
+  const {container} =render(<LogPage />)
+  fireEvent.click(await screen.findByText(/happened/))
+  await screen.findByDisplayValue(/something_value/)
+  get.mockResolvedValue({ data: [] })
+
+  const toggle = getToggleByText(/via query/)
+  expect(toggle).toBeTruthy()
+  userEvent.click(toggle)
+  const editor = container.querySelector('.monaco-editor')
+  userEvent.type(editor, 'select \ncount(*) as my_count \nfrom edge_logs')
+  userEvent.click(await screen.findByText('Run'))
+
+  await expect(screen.findByDisplayValue(/something_value/)).rejects.toThrow()
+})
+
 test('log event chart hide', async () => {
   render(<LogPage />)
   await screen.findByText('Events')
