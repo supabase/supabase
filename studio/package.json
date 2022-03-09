@@ -8,7 +8,7 @@
     "start": "next start",
     "test": "jest",
     "deploy:staging": "VERCEL_ORG_ID=team_E6KJ1W561hMTjon1QSwOh0WO VERCEL_PROJECT_ID=QmcmhbiAtCMFTAHCuGgQscNbke4TzgWULECctNcKmxWCoT vercel --prod -A .vercel/staging.json",
-    "storybook": "start-storybook -p 6006",
+    "storybook": "start-storybook -s ./src/static -p 6006",
     "build-storybook": "build-storybook"
   },
   "dependencies": {
@@ -71,6 +71,7 @@
     "@storybook/addon-links": "^6.4.19",
     "@storybook/react": "^6.4.19",
     "@storybook/testing-library": "^0.0.9",
+    "storybook-dark-mode": "^1.0.4",
     "@tailwindcss/typography": "^0.5.2",
     "@testing-library/dom": "^8.11.1",
     "@testing-library/react": "^12.1.2",
