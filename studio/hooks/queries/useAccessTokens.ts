@@ -4,7 +4,7 @@ import { API_URL } from 'lib/constants'
 
 export interface AccessToken {
   id: number
-  alias: string
+  token_alias: string
   name: string
   created_at: number
 }
@@ -18,33 +18,23 @@ export function useAccessTokens() {
   let { data, error } = useSWR<any>(url, get)
   const anyError = data?.error || error
 
-  // FOR DEBUG ONLY
-  if (data && data.length === 0) {
-    data = [
-      {
-        id: 1,
-        alias: 'sbp_exWf......zvHs',
-        name: 'Test Token 1',
-        created_at: 1646813699,
-      },
-      {
-        id: 2,
-        alias: 'sbp_j4Wy......dfPO',
-        name: 'Test Token 2',
-        created_at: 1600311111,
-      },
-    ]
-  }
-  // END
-
   function mutateNewToken(newToken: AccessToken, revalidate?: boolean) {
-    mutate(url, (data: any) => [...data, newToken], revalidate ?? true)
+    mutate(url, (data: AccessToken[]) => [...data, newToken], revalidate ?? true)
+  }
+
+  function mutateDeleteToken(tokenId: number, revalidate?: boolean) {
+    mutate(
+      url,
+      (data: AccessToken[]) => data.filter((x: AccessToken) => x.id === tokenId),
+      revalidate ?? true
+    )
   }
 
   return {
-    tokens: data as AccessToken[],
+    tokens: anyError ? undefined : (data as AccessToken[]),
     isLoading: !anyError && !data,
     isError: !!anyError,
     mutateNewToken,
+    mutateDeleteToken,
   }
 }
