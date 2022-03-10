@@ -39,7 +39,7 @@ const Hero = () => {
                     </div>
                     <div className="flex gap-2 items-center">
                       <Link href="https://app.supabase.io" as="https://app.supabase.io" passHref>
-                        <Button as="a" size="small">
+                        <Button as="a" size="small" className="text-white">
                           Start your project
                         </Button>
                       </Link>
