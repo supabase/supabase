@@ -438,6 +438,9 @@ const Settings = () => {
             'EXTERNAL_WORKOS_ENABLED',
             'EXTERNAL_WORKOS_CLIENT_ID',
             'EXTERNAL_WORKOS_SECRET',
+            'EXTERNAL_KEYCLOAK_ENABLED',
+            'EXTERNAL_KEYCLOAK_CLIENT_ID',
+            'EXTERNAL_KEYCLOAK_SECRET',
           ])}
           model={{
             EXTERNAL_APPLE_ENABLED: model.EXTERNAL_APPLE_ENABLED,
@@ -485,6 +488,9 @@ const Settings = () => {
             EXTERNAL_WORKOS_ENABLED: model.EXTERNAL_WORKOS_ENABLED,
             EXTERNAL_WORKOS_CLIENT_ID: model.EXTERNAL_WORKOS_CLIENT_ID || undefined,
             EXTERNAL_WORKOS_SECRET: model.EXTERNAL_WORKOS_SECRET || undefined,
+            EXTERNAL_KEYCLOAK_ENABLED: model.EXTERNAL_KEYCLOAK_ENABLED,
+            EXTERNAL_KEYCLOAK_CLIENT_ID: model.EXTERNAL_KEYCLOAK_CLIENT_ID || undefined,
+            EXTERNAL_KEYCLOAK_SECRET: model.EXTERNAL_KEYCLOAK_SECRET || undefined,
           }}
           onChangeModel={(model) => setExternalProvidersModel(model)}
           onReset={() => onFormReset()}
@@ -919,6 +925,35 @@ const Settings = () => {
               />
               <SecretField
                 name="EXTERNAL_WORKOS_SECRET"
+                showInlineError
+                errorMessage="Please enter the secret."
+              />
+            </>
+          )}
+          <Divider light />
+          <ToggleField
+            name="EXTERNAL_KEYCLOAK_ENABLED"
+            addOns={
+              externalProvidersModel.EXTERNAL_KEYCLOAK_ENABLED && (
+                <a
+                  className="pl-4 text-scale-900"
+                  href="https://www.keycloak.org/"
+                  target="_blank"
+                >
+                  Create new credentials
+                </a>
+              )
+            }
+          />
+          {externalProvidersModel.EXTERNAL_KEYCLOAK_ENABLED && (
+            <>
+              <AutoField
+                name="EXTERNAL_KEYCLOAK_CLIENT_ID"
+                showInlineError
+                errorMessage="Please enter the client id."
+              />
+              <SecretField
+                name="EXTERNAL_KEYCLOAK_SECRET"
                 showInlineError
                 errorMessage="Please enter the secret."
               />
