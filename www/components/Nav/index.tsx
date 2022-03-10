@@ -268,7 +268,7 @@ const Nav = () => {
                 </Button>
 
                 <a href="https://app.supabase.io/">
-                  <Button>Start your project</Button>
+                  <Button className="text-white">Start your project</Button>
                 </a>
                 <a href="https://app.supabase.io/">
                   <Button type="text">Sign in</Button>

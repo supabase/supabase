@@ -117,7 +117,7 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        <div className="mt-32 border-t dark:border-dark pt-8 flex justify-between">
+        <div className="mt-32 border-t dark:border-scale-600 pt-8 flex justify-between">
           <p className="mb-0 self-center text-base">&copy; Supabase Inc</p>
           <DarkModeToggle />
         </div>

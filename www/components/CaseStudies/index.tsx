@@ -27,6 +27,7 @@ const CaseStudies = () => {
               key={`caseStudy_${idx}`}
               hoverable
               cover={<img src={`${basePath}/${caseStudy.imgUrl}`} className="h-64 object-cover" />}
+              className="bg-scale-400"
             >
               <Space className="justify-between h-40" direction="vertical">
                 <div>
