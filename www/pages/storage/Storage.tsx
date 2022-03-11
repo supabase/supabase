@@ -84,11 +84,11 @@ function StoragePage() {
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
               <p>
                 <p className="mb-4 flex items-center space-x-2">
-                    <ProductIcon icon={Solutions['storage'].icon} />
-                    <IconX />
-                    <ProductIcon icon={Solutions['authentication'].icon} />
-                    <IconX />
-                    <ProductIcon icon={Solutions['database'].icon} />
+                  <ProductIcon icon={Solutions['storage'].icon} />
+                  <IconX />
+                  <ProductIcon icon={Solutions['authentication'].icon} />
+                  <IconX />
+                  <ProductIcon icon={Solutions['database'].icon} />
                 </p>
               </p>
               <h4>Interoperable</h4>

@@ -103,12 +103,9 @@ function Database() {
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
               <p>
                 <p className="mb-4 flex items-center space-x-2">
-                    <ProductIcon icon={Solutions['database'].icon} />
-                    <IconX />
-                    <img
-                      src={`${basePath}/images/product/database/postgresql-icon.svg`}
-                      width={30}
-                    />
+                  <ProductIcon icon={Solutions['database'].icon} />
+                  <IconX />
+                  <img src={`${basePath}/images/product/database/postgresql-icon.svg`} width={30} />
                 </p>
               </p>
               <h4>Just Postgres</h4>
@@ -124,9 +121,9 @@ function Database() {
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
               <p>
                 <p className="mb-4 flex items-center space-x-2">
-                    <ProductIcon icon={Solutions['database'].icon} />
-                    <IconX />
-                    <ProductIcon icon={Solutions['authentication'].icon} />
+                  <ProductIcon icon={Solutions['database'].icon} />
+                  <IconX />
+                  <ProductIcon icon={Solutions['authentication'].icon} />
                 </p>
               </p>
               <h4>Built-in Auth</h4>
@@ -143,9 +140,9 @@ function Database() {
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
               <p>
                 <p className="mb-4 flex items-center space-x-2">
-                    <ProductIcon icon={Solutions['database'].icon} />
-                    <IconX />
-                    <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
+                  <ProductIcon icon={Solutions['database'].icon} />
+                  <IconX />
+                  <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
                 </p>
               </p>
               <h4>Realtime enabled</h4>
@@ -251,23 +248,15 @@ function Database() {
             footer={[
               <div className="grid grid-cols-12" key={0}>
                 <div className="mt-0 col-span-12 lg:col-span-6 xl:col-span-12 xl:mb-8 flex">
-                    <p>
-                      <p className="m-0">Libraries coming soon:</p>
-                    </p>
-                    <div className="space-x-1 ml-1Easy to use dashboard">
-                      <Badge dot={false}>
-                        Python
-                      </Badge>
-                      <Badge dot={false}>
-                        Dart
-                      </Badge>
-                      <Badge dot={false}>
-                        C#
-                      </Badge>
-                      <Badge dot={false}>
-                        Kotlin
-                      </Badge>
-                    </div>
+                  <p>
+                    <p className="m-0">Libraries coming soon:</p>
+                  </p>
+                  <div className="space-x-1 ml-1Easy to use dashboard">
+                    <Badge dot={false}>Python</Badge>
+                    <Badge dot={false}>Dart</Badge>
+                    <Badge dot={false}>C#</Badge>
+                    <Badge dot={false}>Kotlin</Badge>
+                  </div>
                 </div>
                 <div className="col-span-12 lg:col-span-6 xl:col-span-10 hidden xl:block" key={1}>
                   {/* <TweetCard
