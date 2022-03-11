@@ -106,7 +106,7 @@ function AuthPage() {
   import { Auth } from './'
   import { createClient } from '@supabase/supabase-js'
   // @ts-ignore
-  import { Typography, Button, Space } from '../../index'
+  import { Button, Space } from '../../index'
   
   export default function app() { 
   

@@ -205,7 +205,7 @@ function AuthComponentExample() {
             <div className="p-8">
               <CodeBlock
                 children={`import React, { useState } from 'react'
-import { Auth, Typography, Button } from '@supabase/ui'
+import { Auth, Button } from '@supabase/ui'
 import { createClient } from '@supabase/supabase-js'
 
 export default function app() {
