@@ -18,11 +18,11 @@ const Developers = () => {
     const content = (
       <a
         href={url}
-        className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition ease-in-out duration-150"
+        className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50 dark:hover:bg-scale-500 transition ease-in-out duration-150"
       >
         {/* <!-- Heroicon name: support --> */}
         <svg
-          className="flex-shrink-0 h-6 w-6 stroke-gray dark:stroke-white "
+          className="flex-shrink-0 h-6 w-6 stroke-gray dark:stroke-white"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -43,7 +43,7 @@ const Developers = () => {
       <a
         key={text}
         href={url}
-        className="p-3 col-span-6 rounded hover:bg-gray-50 dark:hover:bg-dark-700 transition"
+        className="p-3 col-span-6 rounded hover:bg-gray-50 dark:hover:bg-scale-500 transition"
       >
         {content}
       </a>
@@ -70,7 +70,7 @@ const Developers = () => {
               <li className="flow-root" key={`flyout_case_${idx}`}>
                 <a
                   href={caseStudy.url}
-                  className="p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition ease-in-out duration-150 border dark:border-gray-600"
+                  className="p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition ease-in-out duration-150 border dark:border-gray-600 items-center"
                 >
                   <div className="hidden sm:block flex-shrink-0">
                     <img
@@ -80,8 +80,8 @@ const Developers = () => {
                     />
                   </div>
                   <div className="min-w-0 flex-1 sm:ml-8">
-                    <h5 className="mb-0">{caseStudy.title}</h5>
-                    <p>{caseStudy.description}</p>
+                    <h1 className="mb-0 text-normal">{caseStudy.title}</h1>
+                    <p className="text-sm">{caseStudy.description}</p>
                   </div>
                 </a>
               </li>
