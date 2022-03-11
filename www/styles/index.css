@@ -105,7 +105,7 @@ small {
 }
 
 ::selection {
-  @apply bg-brand-900;
+  background-color: #6ee7b7;
   color: #333 !important;
 }
 
