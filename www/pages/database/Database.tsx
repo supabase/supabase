@@ -251,7 +251,7 @@ function Database() {
                   <p>
                     <p className="m-0">Libraries coming soon:</p>
                   </p>
-                  <div className="space-x-1 ml-1Easy to use dashboard">
+                  <div className="space-x-1 ml-1">
                     <Badge dot={false}>Python</Badge>
                     <Badge dot={false}>Dart</Badge>
                     <Badge dot={false}>C#</Badge>

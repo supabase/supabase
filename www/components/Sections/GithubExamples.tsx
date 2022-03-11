@@ -32,28 +32,24 @@ function GithubExamples() {
               Supported by a network of early advocates, contributors, and champions.
             </p>
           </p>
-          <div className="flex space-y-1.5 flex-col lg:space-y-0 lg:space-x-1.5 lg:flex-row justify-center">
+          <div className="flex items-center space-y-1.5 flex-col lg:space-y-0 lg:space-x-1.5 lg:flex-row justify-center">
             <Link href="/docs/guides/examples#guides" as="/docs/guides/examples#guides">
-              <a>
-                <Button type="default" icon={<IconBookOpen />}>
-                  View guides
-                </Button>
-              </a>
+              <Button as="a" type="default" icon={<IconBookOpen />}>
+                View guides
+              </Button>
             </Link>
             <Link href="/docs/guides/examples" as="/docs/guides/examples">
-              <a>
-                <Button type="default">View all examples</Button>
-              </a>
+              <Button as="a" type="default">
+                View all examples
+              </Button>
             </Link>
             <Link
               href="https://github.com/supabase/supabase/tree/master/examples"
               as="https://github.com/supabase/supabase/tree/master/examples"
             >
-              <a>
-                <Button type="default" icon={<IconGitHub />}>
-                  Official GitHub library
-                </Button>
-              </a>
+              <Button as="a" type="default" icon={<IconGitHub />}>
+                Official GitHub library
+              </Button>
             </Link>
           </div>
         </div>
