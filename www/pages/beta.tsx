@@ -134,88 +134,88 @@ const Hero = (props: Props) => {
 
 const Introduction = () => {
   return (
-      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-dark-300">
-        <div className="col-span-12 sm:col-span-9 xl:col-span-8">
-          <p>
-            <span className="text-2xl block text-black">
-              After the launch of our{' '}
-              <a
-                href="https://news.ycombinator.com/item?id=23319901"
-                target="_blank"
-                className="text-brand-900 hover:text-brand-900"
-              >
-                Alpha
-              </a>{' '}
-              Program in June,
-            </span>
-          </p>
-        </div>
-        <div className="col-span-12 sm:col-span-9 xl:col-span-6 text-base mb-20 text-dark-400">
-          <p>
-            we've been fortunate to work with thousands of early adopters on improving both our Open
-            Source, and Hosted offerings. Companies like{' '}
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-dark-300">
+      <div className="col-span-12 sm:col-span-9 xl:col-span-8">
+        <p>
+          <span className="text-2xl block text-black">
+            After the launch of our{' '}
             <a
-              href="/blog/2020/12/02/case-study-xendit"
+              href="https://news.ycombinator.com/item?id=23319901"
               target="_blank"
               className="text-brand-900 hover:text-brand-900"
             >
-              Xendit
-            </a>
-            ,{' '}
-            <a
-              href="/blog/2020/12/02/case-study-monitoro"
-              target="_blank"
-              className="text-brand-900 hover:text-brand-900"
-            >
-              Monitoro
-            </a>
-            , and{' '}
-            <a
-              href="/blog/2020/12/02/case-study-tayfa"
-              target="_blank"
-              className="text-brand-900 hover:text-brand-900"
-            >
-              TAYFA
+              Alpha
             </a>{' '}
-            are using Supabase to ship more products, faster.
-          </p>
-        </div>
+            Program in June,
+          </span>
+        </p>
+      </div>
+      <div className="col-span-12 sm:col-span-9 xl:col-span-6 text-base mb-20 text-dark-400">
+        <p>
+          we've been fortunate to work with thousands of early adopters on improving both our Open
+          Source, and Hosted offerings. Companies like{' '}
+          <a
+            href="/blog/2020/12/02/case-study-xendit"
+            target="_blank"
+            className="text-brand-900 hover:text-brand-900"
+          >
+            Xendit
+          </a>
+          ,{' '}
+          <a
+            href="/blog/2020/12/02/case-study-monitoro"
+            target="_blank"
+            className="text-brand-900 hover:text-brand-900"
+          >
+            Monitoro
+          </a>
+          , and{' '}
+          <a
+            href="/blog/2020/12/02/case-study-tayfa"
+            target="_blank"
+            className="text-brand-900 hover:text-brand-900"
+          >
+            TAYFA
+          </a>{' '}
+          are using Supabase to ship more products, faster.
+        </p>
+      </div>
 
-        <div className="col-span-12 text-base mb-10">
-          <p className="w-60 pb-2 border-b-2 border-dark-200 text-dark-400 dark:border-dark-400">
-            Alpha Program in Numbers
-          </p>
-        </div>
+      <div className="col-span-12 text-base mb-10">
+        <p className="w-60 pb-2 border-b-2 border-dark-200 text-dark-400 dark:border-dark-400">
+          Alpha Program in Numbers
+        </p>
+      </div>
 
-        <div
-          id="alphaNumbers"
-          className="col-span-12 grid grid-cols-12 gap-y-12 lg:gap-y-20 mb-20 gap-x-3 sm:gap-x-0"
-        >
-          {AlphaNumbers.map((stat: any, idx: number) => (
-            <div
-              key={`stat_${idx}`}
-              className="col-span-6 sm:col-span-4 grid grid-cols-8 sm:grid-cols-12 gap-x-1 md:gap-x-0 xl:gap-x-6 items-center"
-            >
-              <div className="col-span-4 sm:col-span-4 md:col-span-3 xl:col-span-2">
-                <div className="w-12 h-12 rounded-md bg-scale-1200 flex items-center justify-center dark:bg-white">
-                  {stat.icon}
-                </div>
-              </div>
-              <div className="col-span-7 sm-col-span-8 md:col-span-9 xl:col-span-10 text-dark-400">
-                <p className="text-5xl lg:text-6xl">
-                  <CountUp triggerAnimOnScroll={true} referenceElId="alphaNumbers">
-                    {stat.value}
-                  </CountUp>
-                  {stat.unit && <span className="text-2xl ml-1">{stat.unit}</span>}
-                </p>
-              </div>
-              <div className="col-span-12 sm:col-span-9 md:col-span-10 col-start-0 sm:col-start-5 md:col-start-4 xl:col-start-3">
-                <p className="text-xs lg:text-base text-dark-300 dark:text-dark-400">{stat.name}</p>
+      <div
+        id="alphaNumbers"
+        className="col-span-12 grid grid-cols-12 gap-y-12 lg:gap-y-20 mb-20 gap-x-3 sm:gap-x-0"
+      >
+        {AlphaNumbers.map((stat: any, idx: number) => (
+          <div
+            key={`stat_${idx}`}
+            className="col-span-6 sm:col-span-4 grid grid-cols-8 sm:grid-cols-12 gap-x-1 md:gap-x-0 xl:gap-x-6 items-center"
+          >
+            <div className="col-span-4 sm:col-span-4 md:col-span-3 xl:col-span-2">
+              <div className="w-12 h-12 rounded-md bg-scale-1200 flex items-center justify-center dark:bg-white">
+                {stat.icon}
               </div>
             </div>
-          ))}
-        </div>
+            <div className="col-span-7 sm-col-span-8 md:col-span-9 xl:col-span-10 text-dark-400">
+              <p className="text-5xl lg:text-6xl">
+                <CountUp triggerAnimOnScroll={true} referenceElId="alphaNumbers">
+                  {stat.value}
+                </CountUp>
+                {stat.unit && <span className="text-2xl ml-1">{stat.unit}</span>}
+              </p>
+            </div>
+            <div className="col-span-12 sm:col-span-9 md:col-span-10 col-start-0 sm:col-start-5 md:col-start-4 xl:col-start-3">
+              <p className="text-xs lg:text-base text-dark-300 dark:text-dark-400">{stat.name}</p>
+            </div>
+          </div>
+        ))}
       </div>
+    </div>
   )
 }
 
