@@ -101,16 +101,16 @@ const Index = ({}: Props) => {
                     flex flex-col justify-between
                     rounded rounded-t-none"
                   >
-                      <Link
-                        href="https://github.com/supabase/supabase/issues"
-                        as="https://github.com/supabase/supabase/issues"
-                      >
-                        <a target="_blank">
-                          <Button size="medium" type="default" iconRight={<IconGitHub />}>
-                            Go To Issues
-                          </Button>
-                        </a>
-                      </Link>
+                    <Link
+                      href="https://github.com/supabase/supabase/issues"
+                      as="https://github.com/supabase/supabase/issues"
+                    >
+                      <a target="_blank">
+                        <Button size="medium" type="default" iconRight={<IconGitHub />}>
+                          Go To Issues
+                        </Button>
+                      </a>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -146,16 +146,16 @@ const Index = ({}: Props) => {
                     flex flex-col justify-between
                     rounded rounded-t-none"
                   >
-                      <Link
-                        href="https://github.com/supabase/supabase/discussions"
-                        as="https://github.com/supabase/supabase/discussions"
-                      >
-                        <a target="_blank">
-                          <Button size="medium" type="default" iconRight={<IconMessageCircle />}>
-                            Join The Discussion
-                          </Button>
-                        </a>
-                      </Link>
+                    <Link
+                      href="https://github.com/supabase/supabase/discussions"
+                      as="https://github.com/supabase/supabase/discussions"
+                    >
+                      <a target="_blank">
+                        <Button size="medium" type="default" iconRight={<IconMessageCircle />}>
+                          Join The Discussion
+                        </Button>
+                      </a>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -193,11 +193,11 @@ const Index = ({}: Props) => {
                     flex flex-col justify-between
                     rounded rounded-t-none"
                   >
-                      <a href="mailto:support@supabase.io">
-                        <Button size="medium" type="default" iconRight={<IconMail />}>
-                          Email Support
-                        </Button>
-                      </a>
+                    <a href="mailto:support@supabase.io">
+                      <Button size="medium" type="default" iconRight={<IconMail />}>
+                        Email Support
+                      </Button>
+                    </a>
                   </div>
                 </div>
               </div>

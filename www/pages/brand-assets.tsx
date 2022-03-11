@@ -35,10 +35,10 @@ const Index = () => {
       <Layout>
         <Container>
           <SectionContainer className="pb-0 md:pb-0 lg:pb-0">
-            <div className="grid lg:grid-cols-2">
-              <h1>Brand assets</h1>
-              <h3>Download official Supabase logos</h3>
-              <p>
+            <div className="max-w-xl">
+              <h1 className="text-5xl text-scale-1200">Brand assets</h1>
+              <p className="text-2xl text-scale-1200">Download official Supabase logos</p>
+              <p className="text-sm text-scale-1200">
                 All Supabase trademarks, logos, or other brand elements can never be modified or
                 used for any other purpose other than to represent Supabase Inc.
               </p>
@@ -56,8 +56,8 @@ const Index = () => {
               <div className="col-span-12 lg:col-span-7 flex items-center">
                 <div className="p-16">
                   <div>
-                    <h2>Supabase logos</h2>
-                    <p>
+                    <h1 className="text-4xl">Supabase logos</h1>
+                    <p className="text-sm">
                       <p>
                         Download Supabase official logos, including as SVG's, in both light and dark
                         theme.

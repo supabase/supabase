@@ -11,7 +11,7 @@ const Footer = () => {
 
   return (
     <footer
-      className="border-t border-gray-100 dark:border-gray-600"
+      className="border-t border-scale-500 dark:border-scale-600"
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
@@ -117,7 +117,7 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        <div className="mt-32 border-t dark:border-scale-600 pt-8 flex justify-between">
+        <div className="mt-32 border-t border-scale-500 dark:border-scale-600 pt-8 flex justify-between">
           <p className="mb-0 self-center text-base">&copy; Supabase Inc</p>
           <DarkModeToggle />
         </div>

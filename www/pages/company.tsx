@@ -75,7 +75,9 @@ const Header = () => {
           mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24
           text-center"
       >
-        <h1>Join one of the world's fastest growing open source communities.</h1>
+        <h1 className="text-5xl">
+          Join one of the world's fastest growing open source communities.
+        </h1>
       </div>
     </>
   )
@@ -111,7 +113,9 @@ const Team = () => {
           </div>
           <div className=" md:text-right pt-8 md:mt-0 col-span-4">
             <a href="https://about.supabase.com/careers">
-              <Button size="medium">Join the team</Button>
+              <Button size="medium" className="text-white">
+                Join the team
+              </Button>
             </a>
           </div>
         </div>
@@ -213,15 +217,15 @@ const Community = () => {
                 />
               </div>
               <div>
-                <h1 className="mb-0">{x.stat}</h1>
-                <p>{x.statLabel}</p>
+                <h1 className="mb-0 text-4xl">{x.stat}</h1>
+                <p className="text-sm">{x.statLabel}</p>
               </div>
             </div>
           ))}
         </div>
         <div className="space-y-8">
           <div className="max-w-3xl">
-            <p>With developer signups from the world's leading brands.</p>
+            <p className="text-sm">With developer signups from the world's leading brands.</p>
           </div>
 
           <ImageGrid images={CompaniesData} />
@@ -257,7 +261,7 @@ const Investors = () => {
               className="
               col-span-1 
               flex justify-center content-end items-center
-              bg-gray-50 dark:bg-gray-700 
+              bg-gray-50 dark:bg-scale-400 
               h-32"
             >
               <div className="relative overflow-auto w-full h-8">
@@ -278,7 +282,7 @@ const Investors = () => {
           </div>
         ))}
       </div>
-      <h3>Individual investors</h3>
+      <h2>Individual investors</h2>
       <div className="mt-5 mx-auto grid gap-5 grid-cols-2 lg:grid-cols-4 lg:max-w-none">
         {InvestorData.filter((x) => x.lead === false)
           .sort((a, b) => a.name.localeCompare(b.name))
@@ -288,8 +292,8 @@ const Investors = () => {
 
               <div className="flex flex-col justify-center space-y-2">
                 <div>
-                  <h5 className="mb-0">{x.name}</h5>
-                  <p className="mb-0">{x.title}</p>
+                  <h1 className="mb-0 text-base">{x.name}</h1>
+                  <p className="mb-0 text-xs">{x.title}</p>
                 </div>
               </div>
             </div>
@@ -308,7 +312,7 @@ const Press = () => {
       <div className="mt-5 mx-auto grid gap-5 lg:grid-cols-2 lg:max-w-none">
         {PressData.filter((x) => x.type == 'article').map((x) => (
           <a href={x.href} key={x.href} target="_blank">
-            <Card key={`press_${x.href}`} hoverable>
+            <Card key={`press_${x.href}`} hoverable className="bg-white dark:bg-scale-400">
               <Space className="justify-between h-40" direction="vertical">
                 <div>
                   <p>{x.type.toUpperCase()}</p>
@@ -322,7 +326,7 @@ const Press = () => {
       <div className="mt-5 mx-auto grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:max-w-none">
         {PressData.filter((x) => x.type == 'podcast').map((x) => (
           <a href={x.href} key={x.href} target="_blank">
-            <Card key={`press_${x.href}`} hoverable>
+            <Card key={`press_${x.href}`} hoverable className="bg-white dark:bg-scale-400">
               <Space className="justify-between h-40" direction="vertical">
                 <div>
                   <p>{x.type.toUpperCase()}</p>
