@@ -75,13 +75,13 @@ const Hero = () => {
                 </div>
                 <div className="flex content-center mt-16 sm:mt-24 lg:absolute lg:-right-80 lg:w-9/12 lg:mt-0 lg:col-span-6 xl:relative xl:right-0 xl:w-full">
                   <div className="flex flex-col items-center justify-center relative w-full rounded-md">
-                    <div className="w-full rounded-t-md h-5 bg-dark-700 flex items-center justify-start px-2">
-                      <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
-                      <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
-                      <div className="h-2 w-2 mr-2 rounded-full bg-dark-500" />
+                    <div className="w-full rounded-t-md h-5 bg-scale-400 flex items-center justify-start px-2">
+                      <div className="h-2 w-2 mr-2 rounded-full bg-scale-800" />
+                      <div className="h-2 w-2 mr-2 rounded-full bg-scale-800" />
+                      <div className="h-2 w-2 mr-2 rounded-full bg-scale-800" />
                     </div>
                     <div
-                      className="w-full relative bg-dark-900 shadow-lg rounded-b-md"
+                      className="w-full relative bg-scale-1000 shadow-lg rounded-b-md"
                       style={{ padding: '56.25% 0 0 0' }}
                     >
                       <iframe
