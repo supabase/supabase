@@ -71,7 +71,7 @@ const Index = ({}: Props) => {
             <div className="grid sm:grid-cols-3 md:grid-cols-12 gap-5 mt-16">
               <div className="col-span-12 lg:col-span-6 xl:col-span-4">
                 <div
-                  className="h-40 bg-white dark:bg-gray-700 
+                  className="h-40 bg-white dark:bg-scale-400 
                     border-t border-r border-l border-gray-100 dark:border-gray-600
                     p-5
                     flex flex-col justify-between
@@ -91,17 +91,16 @@ const Index = ({}: Props) => {
                     </p>
                   </div>
                 </div>
-                <Divider light />
+                <Divider type="horizontal" light orientation="center" />
                 <div>
                   <div
                     className="
-                    bg-white dark:bg-gray-800 
+                    bg-white dark:bg-scale-400 
                     border-b border-r border-l border-gray-100 dark:border-gray-600
-                    p-5
+                    p-5 pt-10
                     flex flex-col justify-between
                     rounded rounded-t-none"
                   >
-                    <Space className="">
                       <Link
                         href="https://github.com/supabase/supabase/issues"
                         as="https://github.com/supabase/supabase/issues"
@@ -112,13 +111,12 @@ const Index = ({}: Props) => {
                           </Button>
                         </a>
                       </Link>
-                    </Space>
                   </div>
                 </div>
               </div>
               <div className="col-span-12 lg:col-span-6 xl:col-span-4">
                 <div
-                  className="h-40 bg-white dark:bg-gray-700 
+                  className="h-40 bg-white dark:bg-scale-400 
                     border-t border-r border-l border-gray-100 dark:border-gray-600
                     p-5
                     flex flex-col justify-between
@@ -138,17 +136,16 @@ const Index = ({}: Props) => {
                     </p>
                   </div>
                 </div>
-                <Divider light />
+                <Divider type="horizontal" light orientation="center" />
                 <div>
                   <div
                     className="
-                    bg-white dark:bg-gray-800 
+                    bg-white dark:bg-scale-400 
                     border-b border-r border-l border-gray-100 dark:border-gray-600
-                    p-5
+                    p-5 pt-10
                     flex flex-col justify-between
                     rounded rounded-t-none"
                   >
-                    <Space className="">
                       <Link
                         href="https://github.com/supabase/supabase/discussions"
                         as="https://github.com/supabase/supabase/discussions"
@@ -159,14 +156,13 @@ const Index = ({}: Props) => {
                           </Button>
                         </a>
                       </Link>
-                    </Space>
                   </div>
                 </div>
               </div>
 
               <div className="col-span-12 lg:col-span-6 xl:col-span-4">
                 <div
-                  className="h-40 bg-white dark:bg-gray-700 
+                  className="h-40 bg-white dark:bg-scale-400 
                     border-t border-r border-l border-gray-100 dark:border-gray-600
                     p-5
                     flex flex-col justify-between
@@ -187,23 +183,21 @@ const Index = ({}: Props) => {
                     </p>
                   </div>
                 </div>
-                <Divider light />
+                <Divider type="horizontal" light orientation="center" />
                 <div>
                   <div
                     className="
-                    bg-white dark:bg-gray-800 
+                    bbg-white dark:bg-scale-400 
                     border-b border-r border-l border-gray-100 dark:border-gray-600
-                    p-5
+                    p-5 pt-10
                     flex flex-col justify-between
                     rounded rounded-t-none"
                   >
-                    <Space className="">
                       <a href="mailto:support@supabase.io">
                         <Button size="medium" type="default" iconRight={<IconMail />}>
                           Email Support
                         </Button>
                       </a>
-                    </Space>
                   </div>
                 </div>
               </div>
