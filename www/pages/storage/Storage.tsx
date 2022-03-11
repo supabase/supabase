@@ -83,14 +83,12 @@ function StoragePage() {
           <div className="grid grid-cols-12">
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
               <p>
-                <p className="mb-4">
-                  <Space>
+                <p className="mb-4 flex items-center space-x-2">
                     <ProductIcon icon={Solutions['storage'].icon} />
                     <IconX />
                     <ProductIcon icon={Solutions['authentication'].icon} />
                     <IconX />
                     <ProductIcon icon={Solutions['database'].icon} />
-                  </Space>
                 </p>
               </p>
               <h4>Interoperable</h4>
@@ -211,7 +209,6 @@ function StoragePage() {
                     title="CDN"
                     text="Serve from the edge to reduce latency."
                   />
-                  <Badge color="blue">Coming soon</Badge>
                 </div>
                 <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
@@ -219,7 +216,7 @@ function StoragePage() {
                     title="Transformations"
                     text="Resize and compress your media before you serve it."
                   />
-                  <Badge color="blue">Coming soon</Badge>
+                  <Badge>Coming soon</Badge>
                 </div>
               </div>,
             ]}
