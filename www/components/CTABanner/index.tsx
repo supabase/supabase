@@ -17,7 +17,9 @@ const CTABanner = (props: any) => {
       </div>
       <div className="col-span-12 mt-4">
         <a href="https://app.supabase.io/">
-          <Button size="medium" className="text-white">Start your project</Button>
+          <Button size="medium" className="text-white">
+            Start your project
+          </Button>
         </a>
       </div>
     </div>
