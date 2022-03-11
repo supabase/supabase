@@ -1,4 +1,4 @@
-import { Button, IconBookOpen, IconKey, Space } from '@supabase/ui'
+import { Button, IconBookOpen } from '@supabase/ui'
 import Link from 'next/link'
 import ProductIcon from '../ProductIcon'
 
@@ -42,7 +42,7 @@ const ProductHeader = (props: Types) => (
         <div className="mt-12 flex flex-row md:flex-row md:items-center">
           <Link href="https://app.supabase.io/" as="https://app.supabase.io/">
             <a>
-              <Button size="medium">Start a project</Button>
+              <Button size="medium" className="text-white">Start a project</Button>
             </a>
           </Link>
           {props.documentation_url && (
