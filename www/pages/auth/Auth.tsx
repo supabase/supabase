@@ -9,7 +9,6 @@ import {
   IconShield,
   IconX,
   Space,
-  Typography,
 } from '@supabase/ui'
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
