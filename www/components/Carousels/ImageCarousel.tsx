@@ -169,7 +169,7 @@ function ImageCarousel(props: ImageCarouselProps) {
           {props.content.map((content, i) => {
             return (
               <SwiperSlide key={i}>
-                <div className="bg-white dark:bg-gray-800 p-px">
+                <div className="ml-1">
                   <h4>{content.title}</h4>
                   <p>
                     <p className="text-base">{content.text}</p>
@@ -180,7 +180,7 @@ function ImageCarousel(props: ImageCarouselProps) {
                         <a>
                           <Button
                             className="mb-8"
-                            type="outline"
+                            type="default"
                             size="small"
                             icon={<IconArrowUpRight />}
                           >
