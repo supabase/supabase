@@ -217,7 +217,6 @@ table .thead--plans th {
 .pricing-table__product-row {
   /* @apply py-4; */
   position: sticky;
-  border-collapse: separate;
   top: 0;
   z-index: 5;
 }
