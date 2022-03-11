@@ -56,14 +56,16 @@ const Error404 = () => {
           }`}
         >
           <div className="w-[320px] flex flex-col items-center justify-center space-y-3">
-            <h3>Looking for something? 🔍</h3>
-            <p className="text-center">We couldn't find the page that you're looking for!</p>
+            <h1 className="text-2xl m-2">Looking for something? 🔍</h1>
+            <p className="text-center text-sm">
+              We couldn't find the page that you're looking for!
+            </p>
           </div>
           <div className="flex items-center space-x-4">
             <Link href="/">
-              <a>
-                <Button>Head back</Button>
-              </a>
+              <Button as="a" size="small" className="text-white">
+                Head back
+              </Button>
             </Link>
           </div>
         </div>
