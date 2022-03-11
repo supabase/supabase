@@ -258,15 +258,15 @@ function AuthPage() {
               {/* <AuthComponentExample /> */}
             </div>
             <div className="col-span-12 lg:col-span-6 lg:col-start-7 xl:col-span-4 xl:col-start-8">
-              <Space className="mb-4">
-                <div className="w-8 h-8 rounded-md bg-gray-900 dark:bg-white text-white dark:text-gray-900  flex justify-center items-center">
+              <div className="mb-4 flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-md bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex justify-center items-center">
                   <IconKey size="small" strokeWidth={1.5} />
                 </div>
-                <p>
+                <p className="m-0">
                   <IconX />
                 </p>
                 <img className="w-8" src={`${basePath}/images/product/auth/react-icon.svg`} />
-              </Space>
+              </div>
 
               <h2 className="mb-4">React Auth</h2>
               <p>
