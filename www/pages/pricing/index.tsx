@@ -382,10 +382,10 @@ export default function IndexPage() {
       <div className="border-t dark:border-scale-600">
         <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
           <h2>Frequently asked questions</h2>
-          <h1 className="w-5/12 mb-4">
+          <p className="w-2/3 lg:w-4/12 mb-4 text-base">
             Can&apos;t find the answer to your question, ask someone in the community either on our
             Discord or GitHub.
-          </h1>
+          </p>
           <Link href="https://discord.supabase.com">
             <a>
               <Button type="default" className="mr-2" size="small">
