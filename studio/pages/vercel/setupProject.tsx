@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { makeAutoObservable } from 'mobx'
 import { debounce } from 'lodash'
-import { Button, Input, Listbox, Select, Typography } from '@supabase/ui'
+import { Button, Input, Listbox, Typography } from '@supabase/ui'
 import { Dictionary } from '@supabase/grid'
 
 import { useStore } from 'hooks'
@@ -27,14 +27,6 @@ import {
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import Loading from 'components/ui/Loading'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-
-const PASSWORD_STRENGTH = {
-  0: "That's terrible.",
-  1: 'Pathetic.',
-  2: 'Weak.',
-  3: 'Not bad. Can you do better?',
-  4: "Strong. Let's get started!",
-}
 
 interface ISetupProjectStore {
   token: string
@@ -235,9 +227,7 @@ const CreateProject = observer(() => {
       const project = response
       _store.supabaseProjectRef = project.ref
 
-      // console.log('new project', project)
       const envs = prepareVercelEvns(requiredEnvs, project)
-      // console.log('envs', envs)
 
       await Promise.allSettled(
         envs.map(async (env: any) => {
@@ -265,7 +255,7 @@ const CreateProject = observer(() => {
 
   return (
     <div className="">
-      <h3 className="mb-2">Project details for integration</h3>
+      <p className="mb-2">Project details for integration</p>
       <div className="py-2">
         <Input
           autoFocus

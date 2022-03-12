@@ -1,7 +1,7 @@
 import { createContext, useEffect, useContext, useState, ChangeEvent } from 'react'
 import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { Button, Input, Select, Typography } from '@supabase/ui'
+import { Button, Input, Select } from '@supabase/ui'
 import { runInAction } from 'mobx'
 
 import { API_URL } from 'lib/constants'
@@ -110,11 +110,11 @@ const CreateOrganization = observer(({}) => {
   return (
     <div className="">
       {sortedOrganizations?.length > 0 ? (
-        <Typography.Title level={3}>Create a new organization</Typography.Title>
+        <p className="mb-2">Create a new organization</p>
       ) : (
         <>
-          <Typography.Title level={3}>You do not have an organization</Typography.Title>
-          <Typography.Text>You will need an organization to deploy this project</Typography.Text>
+          <p className="mb-2">You do not have any organization</p>
+          <p>You will need an organization to deploy this project</p>
         </>
       )}
 
