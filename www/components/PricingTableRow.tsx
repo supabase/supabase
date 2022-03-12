@@ -108,10 +108,10 @@ export const PricingTableRowMobile = (props: any) => {
     <>
       <table className="mt-8 w-full">
         <caption className="bg-scale-50 dark:bg-dark-900 border-t border-scale-200 dark:border-scale-600 py-3 px-4 text-sm font-medium text-scale-1200 dark:text-white text-left">
-          <Space size={4}>
+          <div className="flex space-x-4 items-center">
             {category.icon ? <ProductIcon icon={props.icon} /> : null}
             <h4 className="m-0">{category.title}</h4>
-          </Space>
+          </div>
         </caption>
         <thead>
           <tr>
