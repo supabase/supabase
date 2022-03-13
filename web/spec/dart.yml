@@ -1256,7 +1256,7 @@ pages:
   .not():
     description: |
       Finds all rows which doesn't satisfy the filter.
-   notes: |
+    notes: |
           - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
 
             ```dart
