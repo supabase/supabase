@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "test": "jest",
-    "deploy:staging": "VERCEL_ORG_ID=team_E6KJ1W561hMTjon1QSwOh0WO VERCEL_PROJECT_ID=QmcmhbiAtCMFTAHCuGgQscNbke4TzgWULECctNcKmxWCoT vercel --prod -A .vercel/staging.json"
+    "deploy:staging": "VERCEL_ORG_ID=team_E6KJ1W561hMTjon1QSwOh0WO VERCEL_PROJECT_ID=QmcmhbiAtCMFTAHCuGgQscNbke4TzgWULECctNcKmxWCoT vercel --prod -A .vercel/staging.json",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@headlessui/react": "^1.4.1",
@@ -62,6 +64,14 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.5",
+    "@storybook/addon-actions": "^6.4.19",
+    "@storybook/addon-essentials": "^6.4.19",
+    "@storybook/addon-interactions": "^6.4.19",
+    "@storybook/addon-links": "^6.4.19",
+    "@storybook/react": "^6.4.19",
+    "@storybook/testing-library": "^0.0.9",
+    "storybook-dark-mode": "^1.0.4",
     "@tailwindcss/typography": "^0.5.2",
     "@testing-library/dom": "^8.11.1",
     "@testing-library/react": "^12.1.2",
@@ -82,6 +92,7 @@
     "@types/sqlstring": "^2.3.0",
     "@types/zxcvbn": "^4.4.1",
     "autoprefixer": "^10.4.2",
+    "babel-loader": "^8.2.3",
     "jest": "^27.4.0",
     "jest-canvas-mock": "^2.3.1",
     "postcss": "^8.4.6",

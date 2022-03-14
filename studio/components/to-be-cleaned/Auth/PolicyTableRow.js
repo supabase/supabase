@@ -60,8 +60,6 @@ const PolicyRow = ({
         <span className="text-sm text-scale-1200 truncate max-w-xs">{policy.name}</span>
         <span className="text-sm text-scale-1100 truncate">
           {policy.definition || policy.check}
-          CREATE POLICY "policy_name" ON public.New FOR UPDATE USING ( auth.email() = email ) WITH
-          CHECK ( auth.email() = email );
         </span>
       </div>
       <div className="">
