@@ -19,7 +19,6 @@ export async function post<T = any>(
       headers,
       ...otherOptions,
     })
-    console.log('response.ok: ', response.ok, response)
     if (!response.ok) return handleResponseError(response, requestId)
     return handleResponse(response, requestId)
   } catch (error) {
