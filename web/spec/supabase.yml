@@ -2375,6 +2375,16 @@ pages:
 
   .contains():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cs'
+    notes: |
+      - `.contains()` can work on array columns or range columns.
+        It is very useful for finding rows where a tag array contains all the values in the filter array.
+
+        ```js
+        .contains('arraycol',["a","b"]) // You can use a javascript array for an array column
+        .contains('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+        .contains('rangecol','(1,2]') // Use Postgres range syntax for range column.
+        .contains('rangecol',`(${arr}]`) // You can insert an array into a string.
+        ```
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2412,6 +2422,15 @@ pages:
 
   .containedBy():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cd'
+    notes: |
+      - `.containedBy()` can work on array columns or range columns.
+
+        ```js
+        .containedBy('arraycol',["a","b"]) // You can use a javascript array for an array column
+        .containedBy('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+        .containedBy('rangecol','(1,2]') // Use Postgres range syntax for range column.
+        .containedBy('rangecol',`(${arr}]`) // You can insert an array into a string.
+        ```
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2457,7 +2476,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .rangeLt('population_range_millions', [150, 250])
+            .rangeLt('population_range_millions', '[150, 250]')
           ```
       - name: With `update()`
         js: |
@@ -2465,7 +2484,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .update({ name: 'Mordor' })
-            .rangeLt('population_range_millions', [150, 250])
+            .rangeLt('population_range_millions', '[150, 250]')
           ```
       - name: With `delete()`
         js: |
@@ -2473,7 +2492,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
-            .rangeLt('population_range_millions', [150, 250])
+            .rangeLt('population_range_millions', '[150, 250]')
           ```
       - name: With `rpc()`
         js: |
@@ -2481,7 +2500,7 @@ pages:
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
-            .rangeLt('population_range_millions', [150, 250])
+            .rangeLt('population_range_millions', '[150, 250]')
           ```
 
   .rangeGt():
@@ -2494,7 +2513,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .rangeGt('population_range_millions', [150, 250])
+            .rangeGt('population_range_millions', '[150, 250]')
           ```
       - name: With `update()`
         js: |
@@ -2502,7 +2521,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .update({ name: 'Mordor' })
-            .rangeGt('population_range_millions', [150, 250])
+            .rangeGt('population_range_millions', '[150, 250]')
           ```
       - name: With `delete()`
         js: |
@@ -2510,7 +2529,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
-            .rangeGt('population_range_millions', [150, 250])
+            .rangeGt('population_range_millions', '[150, 250]')
           ```
       - name: With `rpc()`
         js: |
@@ -2518,7 +2537,7 @@ pages:
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
-            .rangeGt('population_range_millions', [150, 250])
+            .rangeGt('population_range_millions', '[150, 250]')
           ```
 
   .rangeGte():
@@ -2531,7 +2550,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .rangeGte('population_range_millions', [150, 250])
+            .rangeGte('population_range_millions', '[150, 250]')
           ```
       - name: With `update()`
         js: |
@@ -2539,7 +2558,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .update({ name: 'Mordor' })
-            .rangeGte('population_range_millions', [150, 250])
+            .rangeGte('population_range_millions', '[150, 250]')
           ```
       - name: With `delete()`
         js: |
@@ -2547,7 +2566,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
-            .rangeGte('population_range_millions', [150, 250])
+            .rangeGte('population_range_millions', '[150, 250]')
           ```
       - name: With `rpc()`
         js: |
@@ -2555,7 +2574,7 @@ pages:
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
-            .rangeGte('population_range_millions', [150, 250])
+            .rangeGte('population_range_millions', '[150, 250]')
           ```
 
   .rangeLte():
@@ -2568,7 +2587,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .rangeLte('population_range_millions', [150, 250])
+            .rangeLte('population_range_millions', '[150, 250]')
           ```
       - name: With `update()`
         js: |
@@ -2576,7 +2595,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .update({ name: 'Mordor' })
-            .rangeLte('population_range_millions', [150, 250])
+            .rangeLte('population_range_millions', '[150, 250]')
           ```
       - name: With `delete()`
         js: |
@@ -2584,7 +2603,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
-            .rangeLte('population_range_millions', [150, 250])
+            .rangeLte('population_range_millions', '[150, 250]')
           ```
       - name: With `rpc()`
         js: |
@@ -2592,7 +2611,7 @@ pages:
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
-            .rangeLte('population_range_millions', [150, 250])
+            .rangeLte('population_range_millions', '[150, 250]')
           ```
 
   .rangeAdjacent():
@@ -2605,7 +2624,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .rangeAdjacent('population_range_millions', [70, 185])
+            .rangeAdjacent('population_range_millions', '[70, 185]')
           ```
       - name: With `update()`
         js: |
@@ -2613,7 +2632,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .update({ name: 'Mordor' })
-            .rangeAdjacent('population_range_millions', [70, 185])
+            .rangeAdjacent('population_range_millions', '[70, 185]')
           ```
       - name: With `delete()`
         js: |
@@ -2621,7 +2640,7 @@ pages:
           const { data, error } = await supabase
             .from('countries')
             .delete()
-            .rangeAdjacent('population_range_millions', [70, 185])
+            .rangeAdjacent('population_range_millions', '[70, 185]')
           ```
       - name: With `rpc()`
         js: |
@@ -2629,11 +2648,20 @@ pages:
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
             .rpc('echo_all_countries')
-            .rangeAdjacent('population_range_millions', [70, 185])
+            .rangeAdjacent('population_range_millions', '[70, 185]')
           ```
 
   .overlaps():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.ov'
+    notes: |
+      - `.overlaps()` can work on array columns or range columns.
+
+        ```js
+        .overlaps('arraycol',["a","b"]) // You can use a javascript array for an array column
+        .overlaps('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+        .overlaps('rangecol','(1,2]') // Use Postgres range syntax for range column.
+        .overlaps('rangecol',`(${arr}]`)  // You can insert an array into a string.
+        ```
     examples:
       - name: With `select()`
         isSpotlight: true
