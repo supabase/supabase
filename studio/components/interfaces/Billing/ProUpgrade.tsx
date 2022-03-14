@@ -58,6 +58,7 @@ const ProUpgrade: FC<Props> = ({
 
   const [isRefreshingPreview, setIsRefreshingPreview] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccessful, setIsSuccessful] = useState(false)
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
 
@@ -161,9 +162,18 @@ const ProUpgrade: FC<Props> = ({
         message: `Failed to update subscription: ${res?.error?.message}`,
       })
     } else {
+      setIsSuccessful(true)
+      ui.setNotification({
+        category: 'success',
+        message: 'Done',
+      })
       console.log('Succesfully updated subscription')
     }
     setIsSubmitting(false)
+  }
+
+  if (!isSubmitting && isSuccessful) {
+    return <div className="">Some success state here to be done</div>
   }
 
   return (
