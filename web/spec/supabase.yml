@@ -1882,6 +1882,14 @@ pages:
 
   .or():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.or'
+    notes: |
+      - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+        ```js
+        .or('id.in.(6,7), arraycol.cs.{"a","b"}')  // Use Postgres list () for in filter. Array {} for array column and 'cs' for contains.
+        .or(`id.in.(${arrList}),arraycol.cs.{${arr}}`)	// You can insert a javascipt array for list or array on array column.
+        .or(`id.in.(${arrList}),rangecol.cs.[${arrRange})`)	// You can insert a javascipt array for list or range on a range column.
+        ```
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1913,6 +1921,16 @@ pages:
 
   .not():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.not'
+    notes: |
+      - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+        ```js
+          .not('name','eq','Paris')
+          .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+          .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+          .not('id','in','(6,7)')  // Use Postgres list () for in filter.
+          .not('id','in',`(${arr})`)  // You can insert a javascript array.
+        ```
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2713,7 +2731,13 @@ pages:
   .filter():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.filter'
     notes: |
-      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter values, so it should only be used as an escape hatch in case other filters don't work.
+      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
+        ```js
+          .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+          .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+          .filter('id','in','(6,7)')  // Use Postgres list () for in filter.
+          .filter('id','in',`(${arr})`)  // You can insert a javascript array.
+        ```
     examples:
       - name: With `select()`
         isSpotlight: true
