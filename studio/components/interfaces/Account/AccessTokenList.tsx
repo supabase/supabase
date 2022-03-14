@@ -51,7 +51,6 @@ const AccessTokenList = observer(() => {
             ) : (
               <>
                 {tokens?.map((x: AccessToken) => {
-                  console.log('x: ', x)
                   return (
                     <Table.tr key={x.token_alias}>
                       <Table.td>{x.token_alias}</Table.td>
