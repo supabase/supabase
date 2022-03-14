@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { FC, useState } from 'react'
 import { Typography, Input, Button, Modal, Form, IconTrash } from '@supabase/ui'
 import { useStore, withAuth } from 'hooks'
 import { delete_, post } from 'lib/common/fetch'
@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite'
 import Table from 'components/to-be-cleaned/Table'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 
-const User = () => {
+const UserAccessTokens = () => {
   return (
     <AccountLayout
       title="Supabase"
@@ -30,7 +30,7 @@ const User = () => {
   )
 }
 
-export default withAuth(User)
+export default withAuth(UserAccessTokens)
 
 const NewAccessTokenButton = observer(() => {
   const { ui } = useStore()
@@ -60,13 +60,7 @@ const NewAccessTokenButton = observer(() => {
   return (
     <>
       <Button onClick={() => setIsOpen(!isOpen)}>Generate New Token</Button>
-      {newToken && (
-        <div>
-          <p>Successfully generated a new token!</p>
-          <p className="text-green-900">{newToken.token}</p>
-          <p>This token never will be displayed again.</p>
-        </div>
-      )}
+      {newToken && <NewTokenItem data={newToken} />}
       <Modal
         visible={isOpen}
         onCancel={() => setIsOpen(!isOpen)}
@@ -114,6 +108,25 @@ const NewAccessTokenButton = observer(() => {
         </Form>
       </Modal>
     </>
+  )
+})
+
+interface NewTokenItemProps {
+  data: NewAccessToken
+}
+
+const NewTokenItem: FC<NewTokenItemProps> = observer(({ data }) => {
+  return (
+    <Input
+      label="Successfully generated a new token!"
+      readOnly
+      copy={true}
+      className="input-mono max-w-xl"
+      disabled
+      value={data.token}
+      onChange={() => {}}
+      descriptionText="This token never will be displayed again."
+    />
   )
 })
 
