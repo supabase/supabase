@@ -194,7 +194,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Hungarian / Magyar](/i18n/README.hu.md)
 - [Nepali / नेपाली](/i18n/README.ne.md)
 - [Indonesian / Bahasa Indonesia](/i18n/README.id.md)
-- [Italiano / Italian](/i18n/README.it.md)
+- [Italian / Italiano](/i18n/README.it.md)
 - [Japanese / 日本語](/i18n/README.jp.md)
 - [Korean / 한국어](/i18n/README.ko.md)
 - [Malay / Bahasa Malaysia](/i18n/README.ms.md)
