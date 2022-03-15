@@ -99,7 +99,6 @@ class VercelIntegrationStore implements IVercelIntegrationStore {
 
   get isSupabaseProjectListEmpty() {
     const { app } = useStore()
-    console.log('isSupabaseProjectListEmpty', app)
     const projects = app.projects.list()
     return projects.length == 0
   }
