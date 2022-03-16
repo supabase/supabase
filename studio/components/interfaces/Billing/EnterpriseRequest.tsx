@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { Button, Form, Input, IconArrowLeft } from '@supabase/ui'
 
@@ -16,6 +16,8 @@ const EnterpriseRequest: FC<Props> = ({ onSelectBack }) => {
   const { profile, selectedProject } = ui
   const projectRef = selectedProject?.ref
 
+  const [isSuccessful, setIsSuccessful] = useState(false)
+
   const initialValues = {
     name: `${profile?.first_name} ${profile?.last_name}`,
     email: profile?.primary_email,
@@ -31,16 +33,29 @@ const EnterpriseRequest: FC<Props> = ({ onSelectBack }) => {
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
-    const res = await post(`${API_URL}/projects/${projectRef}/subscription/enterprise`, {
-      name: values.name,
-      email: values.email,
-      company: values.company,
-      message: values.message,
-    })
-    if (!res.error) {
-      // Do something
+    await timeout(1000)
+    const res = {} as any
+    // const res = await post(`${API_URL}/projects/${projectRef}/subscription/enterprise`, {
+    //   name: values.name,
+    //   email: values.email,
+    //   company: values.company,
+    //   message: values.message,
+    // })
+    if (res.error) {
+      ui.setNotification({
+        category: 'error',
+        message: `Unable to send request: ${res.error.message}`,
+        error: res.error,
+      })
+    } else {
+      console.log('Done')
+      setIsSuccessful(true)
     }
     setSubmitting(false)
+  }
+
+  if (isSuccessful) {
+    return <div>Hello</div>
   }
 
   return (

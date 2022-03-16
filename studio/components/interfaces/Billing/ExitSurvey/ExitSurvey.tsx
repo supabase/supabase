@@ -62,6 +62,7 @@ const ExitSurvey: FC<Props> = ({ onSelectBack }) => {
         ui.setNotification({
           category: 'error',
           message: `Failed to cancel subscription: ${res?.error?.message}`,
+          error: res.error,
         })
       } else {
         console.log('Succesfully updated subscription')
