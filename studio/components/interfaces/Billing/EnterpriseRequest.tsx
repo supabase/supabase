@@ -1,10 +1,10 @@
 import { FC, useState } from 'react'
+import { useRouter } from 'next/router'
 import { Transition } from '@headlessui/react'
-import { Button, Form, Input, IconArrowLeft } from '@supabase/ui'
+import { Button, Form, Input, IconArrowLeft, IconCheckCircle } from '@supabase/ui'
 
 import { post } from 'lib/common/fetch'
 import { useStore } from 'hooks'
-import { timeout } from 'lib/helpers'
 import { API_URL } from 'lib/constants'
 
 interface Props {
@@ -13,6 +13,7 @@ interface Props {
 
 const EnterpriseRequest: FC<Props> = ({ onSelectBack }) => {
   const { ui } = useStore()
+  const router = useRouter()
   const { profile, selectedProject } = ui
   const projectRef = selectedProject?.ref
 
@@ -26,21 +27,27 @@ const EnterpriseRequest: FC<Props> = ({ onSelectBack }) => {
   }
 
   const onValidate = (values: any) => {
-    // Just make sure none of the fields are empty
-    // Regex validation for email, super basic stuff, should be quick
-    console.log('onValidate', values)
+    const errors: any = {}
+    if (!values.name) errors.name = 'Please enter your name'
+    if (!values.company) errors.company = 'Please enter your company name'
+    if (!values.email) errors.email = 'Please enter your email'
+    if (!values.message)
+      errors.message = 'Please leave a message on what you intend to use Supabase for'
+
+    const emailValidateRegex =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+    if (!emailValidateRegex.test(values.email)) errors.email = 'Please enter a valid email'
+    return errors
   }
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
-    await timeout(1000)
-    const res = {} as any
-    // const res = await post(`${API_URL}/projects/${projectRef}/subscription/enterprise`, {
-    //   name: values.name,
-    //   email: values.email,
-    //   company: values.company,
-    //   message: values.message,
-    // })
+    const res = await post(`${API_URL}/projects/${projectRef}/subscription/enterprise`, {
+      name: values.name,
+      email: values.email,
+      company: values.company,
+      message: values.message,
+    })
     if (res.error) {
       ui.setNotification({
         category: 'error',
@@ -55,7 +62,32 @@ const EnterpriseRequest: FC<Props> = ({ onSelectBack }) => {
   }
 
   if (isSuccessful) {
-    return <div>Hello</div>
+    return (
+      <div
+        style={{ height: 'calc(100vh - 5rem - 49.5px)' }}
+        className="space-y-4 flex flex-col justify-center max-w-xl mx-auto"
+      >
+        <div className="flex items-center space-x-4">
+          <IconCheckCircle strokeWidth={2} />
+          <h3 className="text-xl">Thank you for your interest!</h3>
+        </div>
+        <p className="text-sm text-scale-1100">
+          We’ll be in contact with you shortly within 5 days to discuss about how we can create a
+          plan to suit exactly what your business needs. In the meantime, if you have any questions,
+          feel free to reach out to us at sales@supabase.io
+        </p>
+        <div />
+        <div className="flex items-center space-x-4">
+          <Button onClick={() => router.push(`/project/${projectRef}`)}>Back to dashboard</Button>
+          <Button
+            onClick={() => router.push(`/project/${projectRef}/settings/billing/update`)}
+            type="default"
+          >
+            Back to billing
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   return (
