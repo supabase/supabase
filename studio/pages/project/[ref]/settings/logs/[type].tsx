@@ -11,7 +11,6 @@ import {
   Button,
   IconInfo,
   Card,
-  Loading,
   Input,
 } from '@supabase/ui'
 
@@ -63,14 +62,12 @@ export const LogPage: NextPage = () => {
     type: '',
     search_query: '',
     sql: '',
-    where: '',
     timestamp_start: '',
     timestamp_end: '',
   })
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as keyof typeof LOG_TYPE_LABEL_MAPPING]}`
   const checkIfSelectQuery = (value: string) =>
     value.toLowerCase().includes('select') ? true : false
-  const isSelectQuery = checkIfSelectQuery(editorValue)
   const table = type === 'api' ? 'edge_logs' : 'postgres_logs'
   useEffect(() => {
     setParams({ ...params, type: type as string })
@@ -182,17 +179,12 @@ export const LogPage: NextPage = () => {
   const onSelectTemplate = (template: LogTemplate) => {
     setMode(template.mode)
     if (template.mode === 'simple') {
-      setParams((prev) => ({ ...prev, search_query: template.searchString, sql: '', where: '' }))
+      setParams((prev) => ({ ...prev, search_query: template.searchString, sql: '' }))
     } else {
       setEditorValue(template.searchString)
       setParams((prev) => ({
         ...prev,
-        where: checkIfSelectQuery(template.searchString)
-          ? ''
-          : cleanEditorValue(template.searchString),
-        sql: checkIfSelectQuery(template.searchString)
-          ? cleanEditorValue(template.searchString)
-          : '',
+        sql: template.searchString,
         search_query: '',
         timestamp_end: '',
       }))
@@ -200,11 +192,7 @@ export const LogPage: NextPage = () => {
     }
   }
   const handleEditorSubmit = () => {
-    setParams((prev) => ({
-      ...prev,
-      sql: checkIfSelectQuery(editorValue) ? editorValue : genDefaultQuery(table, editorValue),
-      search_query: '',
-    }))
+    setParams((prev) => ({ ...prev, sql: editorValue, search_query: '' }))
     router.push({
       pathname: router.pathname,
       query: {
@@ -221,7 +209,6 @@ export const LogPage: NextPage = () => {
       ...prev,
       search_query: query || '',
       timestamp_end: unixMicro ? String(unixMicro) : '',
-      where: '',
       sql: '',
     }))
     router.push({
@@ -270,7 +257,7 @@ export const LogPage: NextPage = () => {
               />
             </div>
             <div className="flex flex-row justify-end items-center px-2 py-1 w-full">
-              {isSelectQuery && (
+              {mode === 'custom' && (
                 <InformationBox
                   className="shrink mr-auto"
                   block={false}
@@ -321,9 +308,8 @@ export const LogPage: NextPage = () => {
           )}
 
           <LogTable data={logData} isCustomQuery={mode === 'custom'} />
-          {/* Footer section of log ui, appears below table */}
           <div className="p-2">
-            {!isSelectQuery && (
+            {mode === 'simple' && (
               <Button onClick={() => setSize(size + 1)} icon={<IconRewind />} type="default">
                 Load older
               </Button>

@@ -170,61 +170,6 @@ test('poll count for new messages', async () => {
   await waitFor(() => screen.getByText(/happened/))
 })
 
-test('where clause will build an sql query', async () => {
-  get.mockImplementation((url) => {
-    if (url.includes('sql') && url.includes('something')) {
-      return {
-        result: [logDataFixture({ event_message: 'some event happened' })],
-      }
-    }
-    return { result: [] }
-  })
-  const { container } = render(<LogPage />)
-  // fill search bar with some value, should be ignored when in custom mode
-  userEvent.type(screen.getByPlaceholderText(/Search/), 'search_value')
-  userEvent.click(screen.getByTitle('Go'))
-  // clear mock calls, for clean assertions
-  get.mockClear()
-
-  let editor = container.querySelector('.monaco-editor')
-  expect(editor).toBeFalsy()
-  // TODO: abstract this out into a toggle selection helper
-  const toggle = getToggleByText(/via query/)
-  expect(toggle).toBeTruthy()
-  userEvent.click(toggle)
-  await waitFor(() => {
-    editor = container.querySelector('.monaco-editor')
-    expect(editor).toBeTruthy()
-  })
-  editor = container.querySelector('.monaco-editor')
-  // clear the default query
-  userEvent.type(editor, '{backspace}'.repeat(100))
-  // type where clause
-  userEvent.type(editor, 'metadata.field = something')
-  userEvent.click(screen.getByText('Run'))
-  await waitFor(
-    () => {
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('metadata.field'))
-
-      // updates router query params
-      const router = useRouter()
-      expect(router.push).toHaveBeenCalledWith(
-        expect.objectContaining({
-          pathname: expect.any(String),
-          query: expect.objectContaining({
-            q: expect.stringContaining('something'),
-          }),
-        })
-      )
-
-    // should ignore search bar value
-    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('search_value'))
-  })
-
-  await screen.findByText(/happened/)
-})
-
 test('s= query param will populate the search bar', async () => {
   const router = defaultRouterMock()
   router.query = { ...router.query, type: 'api', s: 'someSearch' }
@@ -242,7 +187,7 @@ test('q= query param will populate the query input', async () => {
   render(<LogPage />)
   // should populate editor with the query param
   await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('where=some_query'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('sql=some_query'))
   })
 
   // query takes precedence of search queryparam
@@ -375,7 +320,7 @@ test('bug: load older btn does not error out when previous page is empty', async
 })
 
 test('bug: log selection gets hidden when custom query is run', async () => {
-  const data = [
+  const result = [
     logDataFixture({
       event_message: 'some event happened',
       metadata: {
@@ -383,9 +328,9 @@ test('bug: log selection gets hidden when custom query is run', async () => {
       },
     }),
   ]
-  get.mockResolvedValue({ data })
+  get.mockResolvedValue({ result })
   const {container} =render(<LogPage />)
-  fireEvent.click(await screen.findByText(/happened/))
+  userEvent.click(await screen.findByText(/happened/))
   await screen.findByDisplayValue(/something_value/)
   get.mockResolvedValue({ data: [] })
 
