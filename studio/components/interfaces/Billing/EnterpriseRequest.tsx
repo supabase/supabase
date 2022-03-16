@@ -6,6 +6,7 @@ import { Button, Form, Input, IconArrowLeft, IconCheckCircle } from '@supabase/u
 import { post } from 'lib/common/fetch'
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
+import { UpdateSuccess } from '.'
 
 interface Props {
   onSelectBack: () => void
@@ -61,34 +62,16 @@ const EnterpriseRequest: FC<Props> = ({ onSelectBack }) => {
     setSubmitting(false)
   }
 
-  if (isSuccessful) {
+  if (isSuccessful)
     return (
-      <div
-        style={{ height: 'calc(100vh - 5rem - 49.5px)' }}
-        className="space-y-4 flex flex-col justify-center max-w-xl mx-auto"
-      >
-        <div className="flex items-center space-x-4">
-          <IconCheckCircle strokeWidth={2} />
-          <h3 className="text-xl">Thank you for your interest!</h3>
-        </div>
-        <p className="text-sm text-scale-1100">
-          We’ll be in contact with you shortly within 5 days to discuss about how we can create a
-          plan to suit exactly what your business needs. In the meantime, if you have any questions,
-          feel free to reach out to us at sales@supabase.io
-        </p>
-        <div />
-        <div className="flex items-center space-x-4">
-          <Button onClick={() => router.push(`/project/${projectRef}`)}>Back to dashboard</Button>
-          <Button
-            onClick={() => router.push(`/project/${projectRef}/settings/billing/update`)}
-            type="default"
-          >
-            Back to billing
-          </Button>
-        </div>
-      </div>
+      <UpdateSuccess
+        projectRef={projectRef || ''}
+        title="Thank you for your interest!"
+        message="We’ll be in contact with you shortly within 5 days to discuss about how we can create a
+  plan to suit exactly what your business needs. In the meantime, if you have any questions,
+  feel free to reach out to us at sales@supabase.io"
+      />
     )
-  }
 
   return (
     <Transition

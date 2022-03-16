@@ -9,7 +9,7 @@ export interface SubscriptionPreview {
   // Remaining credit balance after deducting to amount due immediately
   remaining_credit_balance: number
   // Amount of credits returned as refund from a downgrade
-  returned_credits: number
+  returned_credits_for_unused_time: number
   // Amount due for each subsequent month
   base_amount_due_next_billing_cycle: number
   // Date for which bill will be enacted
