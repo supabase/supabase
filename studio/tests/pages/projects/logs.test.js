@@ -15,11 +15,14 @@ observer.mockImplementation((v) => v)
 // mock the router
 jest.mock('next/router')
 import { useRouter } from 'next/router'
-const router = jest.fn()
-router.query = { ref: '123', type: 'auth' }
-router.push = jest.fn()
-router.pathname = 'logs/path'
-useRouter.mockReturnValue(router)
+const defaultRouterMock = () => {
+  const router = jest.fn()
+  router.query = { ref: '123', type: 'auth' }
+  router.push = jest.fn()
+  router.pathname = 'logs/path'
+  return router
+}
+useRouter.mockReturnValue(defaultRouterMock())
 
 // mock monaco editor
 jest.mock('@monaco-editor/react')
@@ -67,6 +70,8 @@ import { logDataFixture } from '../../fixtures'
 beforeEach(() => {
   // reset mocks between tests
   get.mockReset()
+  useRouter.mockReset()
+  useRouter.mockReturnValue(defaultRouterMock())
 })
 test('can display log data and metadata', async () => {
   const data = [
@@ -134,6 +139,7 @@ test('Search will trigger a log refresh', async () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('something'))
 
       // updates router query params
+      const router = useRouter()
       expect(router.push).toHaveBeenCalledWith(
         expect.objectContaining({
           pathname: expect.any(String),
@@ -203,6 +209,7 @@ test('where clause will trigger a log refresh', async () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('metadata.field'))
 
       // updates router query params
+      const router = useRouter()
       expect(router.push).toHaveBeenCalledWith(
         expect.objectContaining({
           pathname: expect.any(String),
@@ -222,10 +229,9 @@ test('where clause will trigger a log refresh', async () => {
 })
 
 test('s= query param will populate the search bar', async () => {
-  useRouter.mockReturnValueOnce({
-    query: { ref: '123', type: 'api', s: 'someSearch' },
-    push: jest.fn(),
-  })
+  const router = defaultRouterMock()
+  router.query = { ...router.query, type: 'api', s: 'someSearch' }
+  useRouter.mockReturnValue(router)
   render(<LogPage />)
   // should populate search input with the search param
   screen.getByDisplayValue('someSearch')
@@ -235,10 +241,9 @@ test('s= query param will populate the search bar', async () => {
 })
 
 test('q= query param will populate the query input', async () => {
-  useRouter.mockReturnValueOnce({
-    query: { ref: '123', type: 'api', q: 'some_query', s: 'someSearch' },
-    push: jest.fn(),
-  })
+  const router = defaultRouterMock()
+  router.query = { ...router.query, type: 'api', q: 'some_query', s: 'someSearch' }
+  useRouter.mockReturnValue(router)
   render(<LogPage />)
   // should populate editor with the query param
   await waitFor(() => {
@@ -255,11 +260,9 @@ test('te= query param will populate the timestamp from input', async () => {
   newDate.setMinutes(new Date().getMinutes() - 20)
   const isoString = newDate.toISOString()
   const unixMicro = newDate.getTime() * 1000 //microseconds
-
-  useRouter.mockReturnValueOnce({
-    query: { ref: '123', type: 'api', te: unixMicro },
-    push: jest.fn(),
-  })
+  const router = defaultRouterMock()
+  router.query = { ...router.query, te: unixMicro }
+  useRouter.mockReturnValue(router)
   render(<LogPage />)
 
   await waitFor(() => {
@@ -406,4 +409,44 @@ test('log event chart hide', async () => {
   const toggle = getToggleByText(/Show event chart/)
   userEvent.click(toggle)
   await expect(screen.findByText('Events')).rejects.toThrow()
+})
+
+test('bug: nav backwards with params change results in ui changing', async () => {
+  // bugfix for https://sentry.io/organizations/supabase/issues/2903331460/?project=5459134&referrer=slack
+  get.mockImplementation((url) => {
+    if (url.includes('count')) {
+      return {}
+    }
+    return { data: [] }
+  })
+  const { container, rerender } = render(<LogPage />)
+
+  await waitFor(() => {
+    let editor = container.querySelector('.monaco-editor')
+    expect(editor).toBeFalsy()
+  })
+  await expect(screen.findByDisplayValue('simple-query')).rejects.toThrow()
+
+  // change the router values for query editor
+  const router = defaultRouterMock()
+  router.query = { ...router.query, q: 'advanced-query' }
+  useRouter.mockReturnValue(router)
+  rerender(<LogPage />)
+
+  await waitFor(() => {
+    let editor = container.querySelector('.monaco-editor')
+    expect(editor).toBeTruthy()
+  })
+  await expect(screen.findByDisplayValue('simple-query')).rejects.toThrow()
+
+  // change the router values
+  router.query = { ...router.query, q: undefined, s: 'simple-query' }
+  useRouter.mockReturnValue(router)
+  rerender(<LogPage />)
+
+  await waitFor(() => {
+    let editor = container.querySelector('.monaco-editor')
+    expect(editor).toBeFalsy()
+  })
+  await screen.findByDisplayValue('simple-query')
 })
