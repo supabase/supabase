@@ -8,6 +8,7 @@ import ExitSurvey from './ExitSurvey/ExitSurvey'
 import PaymentSummaryPanel from './PaymentSummaryPanel'
 import ComputeSizeSelection from './AddOns/ComputeSizeSelection'
 import AddNewPaymentMethodModal from './AddNewPaymentMethodModal'
+import UpdateSuccess from './UpdateSuccess'
 
 export * from './Subscription/Subscription.types'
 export * from './PAYGUsage/PAYGUsage.constants'
@@ -21,4 +22,5 @@ export {
   PaymentSummaryPanel,
   ComputeSizeSelection,
   AddNewPaymentMethodModal,
+  UpdateSuccess,
 }

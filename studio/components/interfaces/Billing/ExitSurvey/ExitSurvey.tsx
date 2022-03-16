@@ -1,4 +1,4 @@
-import { FC, useReducer } from 'react'
+import { FC, useReducer, useState, useEffect } from 'react'
 import { includes, without } from 'lodash'
 import { Transition } from '@headlessui/react'
 import { Button, Form, Input, IconArrowLeft } from '@supabase/ui'
@@ -8,17 +8,29 @@ import { post, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { CANCELLATION_REASONS } from '../Billing.constants'
 import { generateFeedbackMessage } from './ExitSurvey.utils'
+import { UpdateSuccess } from '../'
+import { SubscriptionPreview } from '../Billing.types'
 
 interface Props {
+  freeTier: any
   onSelectBack: () => void
 }
 
-const ExitSurvey: FC<Props> = ({ onSelectBack }) => {
+const ExitSurvey: FC<Props> = ({ freeTier, onSelectBack }) => {
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
 
   const initialValues = { message: '' }
   const [selectedReasons, dispatchSelectedReasons] = useReducer(reducer, [])
+
+  const [isSuccessful, setIsSuccessful] = useState(false)
+  const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
+
+  useEffect(() => {
+    if (freeTier) {
+      getSubscriptionPreview()
+    }
+  }, [freeTier])
 
   function reducer(state: any, action: any) {
     if (includes(state, action.target.value)) {
@@ -26,6 +38,16 @@ const ExitSurvey: FC<Props> = ({ onSelectBack }) => {
     } else {
       return [...state, action.target.value]
     }
+  }
+
+  const getSubscriptionPreview = async () => {
+    const proration_date = Math.floor(Date.now() / 1000)
+    const preview = await post(`${API_URL}/projects/${projectRef}/subscription/preview`, {
+      tier: freeTier.prices[0].id,
+      addons: [],
+      proration_date,
+    })
+    setSubscriptionPreview(preview)
   }
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
@@ -48,8 +70,7 @@ const ExitSurvey: FC<Props> = ({ onSelectBack }) => {
       // })
 
       // Trigger subscription downgrade
-      // [TODO] please use from API please
-      const tier = 'price_1KCawmJDPojXS6LNahIn31Mr'
+      const tier = freeTier.prices[0].id
       const addons: string[] = []
       const proration_date = Math.floor(Date.now() / 1000)
       const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, {
@@ -66,12 +87,32 @@ const ExitSurvey: FC<Props> = ({ onSelectBack }) => {
         })
       } else {
         console.log('Succesfully updated subscription')
+        setIsSuccessful(true)
       }
     } catch (error: any) {
       ui.setNotification({ category: 'error', message: `Failed to cancel subscription: ${error}` })
     } finally {
       setSubmitting(false)
     }
+  }
+
+  if (isSuccessful) {
+    const returnedAmount = (subscriptionPreview?.returned_credits_for_unused_time ?? 0) / 100
+    const billingDate = new Date((subscriptionPreview?.bill_on ?? 0) * 1000)
+    return (
+      <UpdateSuccess
+        projectRef={projectRef || ''}
+        title="Your project has been updated"
+        message={`A total of $${returnedAmount} credits will be refunded on ${billingDate.toLocaleDateString(
+          'en-US',
+          {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          }
+        )} to your balance for unused time on your resources. Do let us know if you have any other feedback at sales@supabase.io.`}
+      />
+    )
   }
 
   return (

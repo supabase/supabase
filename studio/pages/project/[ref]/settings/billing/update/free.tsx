@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 
 import { withAuth, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, STRIPE_PRODUCT_IDS } from 'lib/constants'
 
 import { BillingLayout } from 'components/layouts'
 import { ExitSurvey } from 'components/interfaces/Billing'
@@ -37,10 +37,13 @@ const BillingUpdateFree: NextPage = () => {
     }
   }
 
+  const freeTier = products?.tiers.find((tier: any) => tier.id === STRIPE_PRODUCT_IDS.FREE)
+
   return (
     <BillingLayout>
       <div className="mx-auto max-w-5xl my-10">
         <ExitSurvey
+          freeTier={freeTier}
           onSelectBack={() => router.push(`/project/${projectRef}/settings/billing/update`)}
         />
       </div>

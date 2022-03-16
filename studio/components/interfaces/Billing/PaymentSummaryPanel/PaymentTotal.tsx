@@ -19,7 +19,7 @@ const PaymentTotal: FC<Props> = ({
   const hasChanges = subscriptionPreview?.has_changes ?? false
   const hasCreditsBalance = (subscriptionPreview?.available_credit_balance ?? 0) > 0
   const availableCreditBalance = (subscriptionPreview?.available_credit_balance ?? 0) / 100
-  const returnedCredits = (subscriptionPreview?.returned_credits ?? 0) / 100
+  const returnedCredits = (subscriptionPreview?.returned_credits_for_unused_time ?? 0) / 100
   const remainingCreditBalance = (subscriptionPreview?.remaining_credit_balance ?? 0) / 100
 
   const totalMonthlyCost = (subscriptionPreview?.base_amount_due_next_billing_cycle ?? 0) / 100
