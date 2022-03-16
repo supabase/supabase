@@ -165,7 +165,7 @@ small {
   @apply border-gray-900 dark:border-white;
 }
 /* override position of tabs  */
-.dashboard-tabs > div > div > div > div {
+.dashboard-tabs > div > div {
   justify-content: center;
 }
 

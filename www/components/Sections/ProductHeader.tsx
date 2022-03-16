@@ -27,7 +27,7 @@ const ProductHeader = (props: Types) => (
             )}
           </div>
         ) : null}
-        <h1 key={`h1`}>{props.h1}</h1>
+        <h1 className="text-5xl" key={`h1`}>{props.h1}</h1>
         {props.subheader && (
           <p>
             {props.subheader.map((subheader, i) => {
