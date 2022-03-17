@@ -21,7 +21,7 @@ const OrgDropdown = () => {
           {sortedOrganizations
             .sort((a, b) => a.name.localeCompare(b.name))
             .map((x) => (
-              <Dropdown.Item key={x.slug} onClick={() => router.push(`/org/${x.slug}/settings`)}>
+              <Dropdown.Item key={x.slug} onClick={() => router.push(`/`)}>
                 {x.name}
               </Dropdown.Item>
             ))}
