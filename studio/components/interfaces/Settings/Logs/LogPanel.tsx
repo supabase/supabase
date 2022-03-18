@@ -84,9 +84,9 @@ const LogPanel: FC<Props> = ({
   const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     if (value !== '' && isNaN(Date.parse(value))) {
-      setFrom({ value, error: 'Invalid ISO 8601 timestamp' })
+      setTo({ value, error: 'Invalid ISO 8601 timestamp' })
     } else {
-      setFrom({ value, error: '' })
+      setTo({ value, error: '' })
     }
   }
   const handleReset = async () => {
