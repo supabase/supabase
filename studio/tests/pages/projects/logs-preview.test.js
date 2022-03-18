@@ -217,7 +217,6 @@ test('ts= query param will populate the timestamp from input', async () => {
   await screen.findByDisplayValue(isoString)
 })
 
-
 test('load older btn will fetch older logs', async () => {
   get.mockImplementation((url) => {
     if (url.includes('count')) {
