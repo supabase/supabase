@@ -108,6 +108,17 @@ const Usage: FC<any> = ({ project }) => {
                     provider={'infra-monitoring'}
                   />
                 )}
+
+                {dateRange && (
+                  <ChartHandler
+                    startDate={dateRange?.period_start?.date}
+                    endDate={dateRange?.period_end?.date}
+                    attribute={'disk_io_budget'}
+                    label={'Disk IO Budget'}
+                    interval={dateRange.interval}
+                    provider={'infra-monitoring'}
+                  />
+                )}
               </div>
             </Panel.Content>
           </Panel>
