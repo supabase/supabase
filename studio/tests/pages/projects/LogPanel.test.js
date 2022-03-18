@@ -78,12 +78,12 @@ test('reset search filter', async () => {
   expect(() => screen.getByDisplayValue(/something123/)).toThrow()
 })
 
-test('timestamp from filter default value', async () => {
-  render(<LogPanel defaultFromValue="2022-01-18T10:43:39+0000" />)
+test('timestamp To filter default value', async () => {
+  render(<LogPanel defaultToValue="2022-01-18T10:43:39+0000" />)
   userEvent.click(await screen.findByText('Custom'))
   await screen.findByDisplayValue('2022-01-18T10:43:39+0000')
   // TODO: use screen.findByLabelText when https://github.com/supabase/ui/issues/310 is resolved
-  await screen.findByText('From')
+  await screen.findByText('To')
 })
 
 test('timestamp from filter error handling', async () => {
@@ -99,7 +99,7 @@ test('timestamp from filter error handling', async () => {
   await screen.findByText(/[iI]nvalid ISO 8601 timestamp/)
 })
 
-test('timestamp from filter value change', async () => {
+test('timestamp To filter value change', async () => {
   const mockFn = jest.fn()
   render(<LogPanel onSearch={mockFn} />)
   userEvent.click(await screen.findByText(/Now/))

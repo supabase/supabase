@@ -40,6 +40,7 @@ import { isUndefined } from 'lodash'
 import dayjs from 'dayjs'
 import InformationBox from 'components/ui/InformationBox'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
+import useLogsQuery from 'hooks/analytics/useLogsQuery'
 
 /**
  * Acts as a container component for the entire log display
@@ -52,61 +53,40 @@ import useLogsPreview from 'hooks/analytics/useLogsPreview'
  * - `s` for search query.
  * - `te` for timestamp start value.
  */
-export const LogPage: NextPage = () => {
+export const LogsExplorerPage: NextPage = () => {
   const router = useRouter()
-  const { ref, type, s, te } = router.query
-  const [showChart, setShowChart] = useState(true)
-  const table = type === 'api' ? LogsTableName.EDGE : LogsTableName.POSTGRES
-
-  const [
-    { error, logData, params, newCount, filters, isLoading },
-    { loadOlder, setFilters, refresh, setTo },
-  ] = useLogsPreview(ref as string, table, {
-    initialFilters: { search_query: s as string },
-    whereStatementFactory: (filterObj) =>
-      `${
-        filterObj.search_query ? `REGEXP_CONTAINS(event_message, '${filterObj.search_query}')` : ''
-      }`,
-  })
-
-  const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as keyof typeof LOG_TYPE_LABEL_MAPPING]}`
-
+  const { ref, type, q } = router.query
+  const [editorId, setEditorId] = useState<string>(uuidv4())
+  const [editorValue, setEditorValue] = useState('')
+  const title = `Logs - All`
+  const [{ logData, params, error, isLoading }, { changeQuery, runQuery }] = useLogsQuery(
+    ref as string
+  )
   useEffect(() => {
-    setFilters((prev) => ({ ...prev, search_query: s as string }))
-    if (te) {
-      setTo(te as string)
-    } else {
-      setTo('')
+    // on mount, set initial values
+    if (q !== undefined && q !== '') {
+      changeQuery(q as string)
+      runQuery()
+      onSelectTemplate({
+        mode: 'custom',
+        searchString: q as string,
+      })
     }
-  }, [s, te])
+  }, [q])
 
   const onSelectTemplate = (template: LogTemplate) => {
-    setFilters((prev) => ({ ...prev, search_query: template.searchString }))
+    setEditorValue(template.searchString)
+    changeQuery(template.searchString)
+    setEditorId(uuidv4())
+    runQuery()
   }
 
-  const handleRefresh = () => {
-    refresh()
+  const handleEditorSubmit = () => {
+    changeQuery(editorValue)
+    runQuery()
     router.push({
       pathname: router.pathname,
-      query: {
-        ...router.query,
-        te: undefined,
-      },
-    })
-  }
-
-  const handleSearch: LogSearchCallback = ({ query, to, toMicro }) => {
-    const unixMicro = toMicro ? toMicro : dayjs(to).valueOf() * 1000
-    setTo(unixMicro ? String(unixMicro) : '')
-    setFilters((prev) => ({ ...prev, search_query: query || '' }))
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        q: undefined,
-        s: query || '',
-        te: unixMicro,
-      },
+      query: { ...router.query, q: editorValue },
     })
   }
 
@@ -114,35 +94,50 @@ export const LogPage: NextPage = () => {
     <SettingsLayout title={title}>
       <div className="h-full flex flex-col flex-grow">
         <LogPanel
-          isShowingEventChart={showChart}
-          onToggleEventChart={() => setShowChart(!showChart)}
-          isCustomQuery={false}
+          isShowingEventChart={false}
+          onToggleEventChart={() => null}
+          isCustomQuery={true}
           isLoading={isLoading}
-          newCount={newCount}
-          templates={TEMPLATES.filter(
-            (template) => template.for?.includes(type as string) && template.mode === 'simple'
-          )}
-          onRefresh={handleRefresh}
-          onSearch={handleSearch}
-          defaultSearchValue={filters.search_query}
+          newCount={0}
+          templates={TEMPLATES.filter((template) => template.mode === 'custom')}
+          onRefresh={() => null}
+          onSearch={() => null}
+          defaultSearchValue={''}
           defaultToValue={
-            params.timestamp_end ? dayjs(Number(params.timestamp_end) / 1000).toISOString() : ''
+            params.timestamp_end
+              ? dayjs(Number(params.timestamp_end) / 1000).toISOString()
+              : params.timestamp_end
           }
-          onCustomClick={() => {
-            router.push(`/project/${ref}/settings/logs/explorer?q=${params.rawSql}`)
-          }}
+          onCustomClick={() => null}
           onSelectTemplate={onSelectTemplate}
         />
-        {showChart && (
-          <div>
-            <LogEventChart
-              data={!isLoading ? logData : undefined}
-              onBarClick={(timestampMicro) => {
-                handleSearch({ query: filters.search_query, toMicro: timestampMicro })
-              }}
+        <React.Fragment>
+          <div className="min-h-[7rem] h-28">
+            <CodeEditor
+              id={editorId}
+              language="pgsql"
+              defaultValue={editorValue}
+              onInputChange={(v) => setEditorValue(v || '')}
+              onInputRun={handleEditorSubmit}
             />
           </div>
-        )}
+          <div className="flex flex-row justify-end items-center px-2 py-1 w-full">
+            <div className="flex flex-row gap-x-2 justify-end p-2">
+              <Button
+                type="text"
+                onClick={() => {
+                  setEditorValue('')
+                  setEditorId(uuidv4())
+                }}
+              >
+                Reset
+              </Button>
+              <Button type={editorValue ? 'secondary' : 'text'} onClick={handleEditorSubmit}>
+                Run
+              </Button>
+            </div>
+          </div>
+        </React.Fragment>
         <div className="flex flex-col flex-grow relative">
           {isLoading && (
             <div
@@ -155,12 +150,7 @@ export const LogPage: NextPage = () => {
             </div>
           )}
 
-          <LogTable data={logData} isCustomQuery={false} />
-          <div className="p-2">
-            <Button onClick={() => loadOlder()} icon={<IconRewind />} type="default">
-              Load older
-            </Button>
-          </div>
+          <LogTable data={logData} isCustomQuery={true} />
 
           {error && (
             <div className="flex w-full h-full justify-center items-center mx-auto">
@@ -186,4 +176,4 @@ export const LogPage: NextPage = () => {
   )
 }
 
-export default withAuth(observer(LogPage))
+export default withAuth(observer(LogsExplorerPage))
