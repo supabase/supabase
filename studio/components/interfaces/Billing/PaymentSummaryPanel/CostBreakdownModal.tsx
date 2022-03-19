@@ -80,10 +80,23 @@ const CostBreakdownModal: FC<Props> = ({
                 </div>
               )
             })}
-            <div className="flex items-center py-2 px-4">
-              <div className="text-sm w-[75%]">Total amount</div>
-              <div className="text-sm w-[10%] text-right"></div>
-              <div className="text-xl w-[15%] text-right">${totalDue.toFixed(2)}</div>
+            <div className="flex flex-col py-2 px-4 space-y-1">
+              <div className="flex items-center">
+                <div className="text-sm w-[75%]">Total amount</div>
+                <div className="text-sm w-[10%] text-right"></div>
+                <div className="text-xl w-[15%] text-right">
+                  ${totalDue < 0 ? 0 : totalDue.toFixed(2)}
+                </div>
+              </div>
+              {totalDue < 0 && (
+                <div className="flex items-center text-scale-1100">
+                  <div className="text-sm w-[75%]">
+                    Amount returned as credits for unused resources
+                  </div>
+                  <div className="text-sm w-[10%] text-right"></div>
+                  <div className="text-sm w-[15%] text-right">${Math.abs(totalDue).toFixed(2)}</div>
+                </div>
+              )}
             </div>
           </div>
         </Modal.Content>

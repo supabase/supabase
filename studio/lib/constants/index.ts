@@ -82,4 +82,4 @@ export const GOTRUE_ERRORS = {
 }
 
 export const STRIPE_PUBLIC_KEY =
-  process.env.STRIPE_PUBLIC_KEY || 'pk_test_XVwg5IZH3I9Gti98hZw6KRzd00v5858heG'
+  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || 'pk_test_XVwg5IZH3I9Gti98hZw6KRzd00v5858heG'

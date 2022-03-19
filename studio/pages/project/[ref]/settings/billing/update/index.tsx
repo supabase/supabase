@@ -10,7 +10,7 @@ import { API_URL, DEFAULT_FREE_PROJECTS_LIMIT, STRIPE_PRODUCT_IDS } from 'lib/co
 
 import { BillingLayout } from 'components/layouts'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import { PlanSelection, ProUpgrade, StripeSubscription } from 'components/interfaces/Billing'
+import { PlanSelection, StripeSubscription } from 'components/interfaces/Billing'
 import { BillingPlan } from 'components/interfaces/Billing/PlanSelection/Plans/Plans.types'
 import Connecting from 'components/ui/Loading/Loading'
 
@@ -26,20 +26,17 @@ const BillingUpdate: NextPage = () => {
   const { ui } = useStore()
   const router = useRouter()
   const projectRef = ui.selectedProject?.ref
-  const stripeCustomerId = ui.selectedOrganization?.stripe_customer_id
 
   const subscriptionStats = useSubscriptionStats()
   const freeProjectsLimit = ui?.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
   const freeProjectsOwned = subscriptionStats.total_free_projects ?? 0
 
   const [isLoadingProducts, setIsLoadingProducts] = useState(false)
-  const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
   const [showConfirmDowngrade, setShowConfirmDowngrade] = useState(false)
   const [showDowngradeError, setShowDowngradeError] = useState(false)
 
   const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
   const [subscription, setSubscription] = useState<StripeSubscription>()
-  const [paymentMethods, setPaymentMethods] = useState<any>()
   const [selectedPlan, setSelectedPlan] = useState<BillingPlan>()
 
   useEffect(() => {
@@ -49,10 +46,8 @@ const BillingUpdate: NextPage = () => {
     }
   }, [projectRef])
 
-  useEffect(() => {
-    if (stripeCustomerId) getStripeAccount()
-  }, [stripeCustomerId])
-
+  // [Joshen] Perhaps we shift this fetch into the global mobx tree
+  // Since all the pages require this data, makes more sense to load it once at the layout
   const getStripeProducts = async () => {
     try {
       setIsLoadingProducts(true)
@@ -64,24 +59,6 @@ const BillingUpdate: NextPage = () => {
         error,
         category: 'error',
         message: `Failed to get products: ${error.message}`,
-      })
-    }
-  }
-
-  const getStripeAccount = async () => {
-    try {
-      setIsLoadingPaymentMethods(true)
-      const { paymentMethods, error: customerError } = await post(`${API_URL}/stripe/customer`, {
-        stripe_customer_id: stripeCustomerId,
-      })
-      if (customerError) throw customerError
-      setIsLoadingPaymentMethods(false)
-      setPaymentMethods(paymentMethods)
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to get subscription: ${error.message}`,
       })
     }
   }
@@ -111,10 +88,12 @@ const BillingUpdate: NextPage = () => {
   const onSelectPlan = (plan: BillingPlan) => {
     if (plan.name === 'Enterprise') {
       return router.push(`/project/${projectRef}/settings/billing/update/enterprise`)
+    } else if (plan.id === STRIPE_PRODUCT_IDS.PRO) {
+      return router.push(`/project/${projectRef}/settings/billing/update/pro`)
     }
 
-    setSelectedPlan(plan)
     if (plan.id === STRIPE_PRODUCT_IDS.FREE) {
+      setSelectedPlan(plan)
       setShowConfirmDowngrade(true)
     }
   }
@@ -146,21 +125,6 @@ const BillingUpdate: NextPage = () => {
           onSelectPlan={onSelectPlan}
         />
       </div>
-
-      {subscription !== undefined && products !== undefined && (
-        <ProUpgrade
-          visible={
-            selectedPlan?.id === STRIPE_PRODUCT_IDS.PRO ||
-            selectedPlan?.id === STRIPE_PRODUCT_IDS.PAYG
-          }
-          products={products}
-          currentSubscription={subscription}
-          selectedPlan={selectedPlan}
-          isLoadingPaymentMethods={isLoadingPaymentMethods}
-          paymentMethods={paymentMethods?.data ?? []}
-          onSelectBack={() => setSelectedPlan(undefined)}
-        />
-      )}
 
       {/* [Joshen] Possible refactor, shift this into PlanSelection */}
       <ConfirmModal

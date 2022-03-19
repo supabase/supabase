@@ -103,7 +103,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, onSelectBack }) => {
       <UpdateSuccess
         projectRef={projectRef || ''}
         title="Your project has been updated"
-        message={`A total of $${returnedAmount} credits will be refunded on ${billingDate.toLocaleDateString(
+        message={`A total of $${returnedAmount} will be refunded as credits on ${billingDate.toLocaleDateString(
           'en-US',
           {
             day: 'numeric',

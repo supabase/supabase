@@ -1,0 +1,117 @@
+import { useState, useEffect } from 'react'
+import { NextPage } from 'next'
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+
+import { withAuth, useStore } from 'hooks'
+import { get, post } from 'lib/common/fetch'
+import { API_URL, STRIPE_PRODUCT_IDS } from 'lib/constants'
+
+import { BillingLayout } from 'components/layouts'
+import Connecting from 'components/ui/Loading/Loading'
+import { StripeSubscription } from 'components/interfaces/Billing'
+import { ProUpgrade } from 'components/interfaces/Billing'
+
+const BillingUpdatePro: NextPage = () => {
+  const { ui } = useStore()
+  const router = useRouter()
+  const projectRef = ui.selectedProject?.ref
+  const stripeCustomerId = ui.selectedOrganization?.stripe_customer_id
+
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false)
+  const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
+
+  const [subscription, setSubscription] = useState<StripeSubscription>()
+  const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
+  const [paymentMethods, setPaymentMethods] = useState<any>()
+
+  useEffect(() => {
+    // User added a new payment method
+    if (router.query.setup_intent && router.query.redirect_status) {
+      ui.setNotification({ category: 'success', message: 'Successfully added new payment method' })
+    }
+  }, [])
+
+  useEffect(() => {
+    if (projectRef) {
+      getStripeProducts()
+      getSubscription()
+    }
+  }, [projectRef])
+
+  useEffect(() => {
+    if (stripeCustomerId) getStripeAccount()
+  }, [stripeCustomerId])
+
+  const getStripeProducts = async () => {
+    try {
+      setIsLoadingProducts(true)
+      const products = await get(`${API_URL}/stripe/products`)
+      setProducts(products)
+      setIsLoadingProducts(false)
+    } catch (error: any) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to get products: ${error.message}`,
+      })
+    }
+  }
+
+  const getStripeAccount = async () => {
+    try {
+      setIsLoadingPaymentMethods(true)
+      const { paymentMethods, error: customerError } = await post(`${API_URL}/stripe/customer`, {
+        stripe_customer_id: stripeCustomerId,
+      })
+      if (customerError) throw customerError
+      setIsLoadingPaymentMethods(false)
+      setPaymentMethods(paymentMethods)
+    } catch (error: any) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to get subscription: ${error.message}`,
+      })
+    }
+  }
+
+  const getSubscription = async () => {
+    try {
+      if (!ui.selectedProject?.subscription_id) {
+        throw new Error('Unable to get subscription ID of project')
+      }
+
+      const { data: subscription, error }: { data: StripeSubscription; error: any } = await post(
+        `${API_URL}/stripe/subscription`,
+        { subscription_id: ui.selectedProject.subscription_id }
+      )
+
+      if (error) throw error
+      setSubscription(subscription)
+    } catch (error: any) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to get subscription: ${error.message}`,
+      })
+    }
+  }
+
+  // temp
+  if (!products || !subscription) return <Connecting />
+
+  return (
+    <BillingLayout>
+      <ProUpgrade
+        products={products}
+        currentSubscription={subscription}
+        isLoadingPaymentMethods={isLoadingPaymentMethods}
+        paymentMethods={paymentMethods?.data ?? []}
+        onSelectBack={() => router.push(`/project/${projectRef}/settings/billing/update`)}
+      />
+    </BillingLayout>
+  )
+}
+
+export default withAuth(observer(BillingUpdatePro))

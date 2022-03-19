@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { Badge, Button, IconArrowLeft, IconHelpCircle, Toggle, Modal } from '@supabase/ui'
 
 import { useStore } from 'hooks'
-import { getURL, timeout } from 'lib/helpers'
+import { getURL } from 'lib/helpers'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import Divider from 'components/ui/Divider'
@@ -13,35 +13,31 @@ import {
   ComputeSizeSelection,
   StripeSubscription,
   AddNewPaymentMethodModal,
-} from '.'
-import { BillingPlan } from './PlanSelection/Plans/Plans.types'
+} from '..'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { SubscriptionPreview } from './Billing.types'
+import { SubscriptionPreview } from '../Billing.types'
+import UpdateSuccess from '../UpdateSuccess'
+import { formSubscriptionUpdatePayload } from './ProUpgrade.utils'
 
 interface Props {
-  visible: boolean
   products: { tiers: any[]; addons: any[] }
-
-  currentSubscription: StripeSubscription
-  selectedPlan?: BillingPlan
   paymentMethods?: any[]
+  currentSubscription: StripeSubscription
   isLoadingPaymentMethods: boolean
   onSelectBack: () => void
 }
 
 const ProUpgrade: FC<Props> = ({
-  visible,
   products,
-  currentSubscription,
-  selectedPlan,
   paymentMethods,
+  currentSubscription,
   isLoadingPaymentMethods,
   onSelectBack,
 }) => {
   const { ui } = useStore()
   const router = useRouter()
 
-  const { tiers, addons } = products
+  const { addons } = products
   const projectRef = ui.selectedProject?.ref
 
   const currentComputeSize =
@@ -67,24 +63,20 @@ const ProUpgrade: FC<Props> = ({
   const [selectedComputeSize, setSelectedComputeSize] = useState<any>(currentComputeSize)
   const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
 
+  const selectedTier = isSpendCapEnabled
+    ? products?.tiers.find((tier: any) => tier.id === STRIPE_PRODUCT_IDS.PRO)
+    : products?.tiers.find((tier: any) => tier.id === STRIPE_PRODUCT_IDS.PAYG)
+
   useEffect(() => {
     if (!isLoadingPaymentMethods && paymentMethods && paymentMethods.length > 0) {
       // [TODO] Figure out how to get the DEFAULT payment method
-      setSelectedPaymentMethod(paymentMethods[0])
+      setSelectedPaymentMethod(paymentMethods[0].id)
     }
   }, [isLoadingPaymentMethods, paymentMethods])
 
   useEffect(() => {
-    if (selectedPlan !== undefined && selectedPlan.id !== STRIPE_PRODUCT_IDS.FREE) {
-      getSubscriptionPreview()
-    }
-  }, [selectedPlan, selectedComputeSize, isSpendCapEnabled])
-
-  useEffect(() => {
-    if (selectedPlan?.id === STRIPE_PRODUCT_IDS.PRO) {
-      setIsSpendCapEnabled(true)
-    }
-  }, [selectedPlan])
+    getSubscriptionPreview()
+  }, [selectedComputeSize, isSpendCapEnabled])
 
   const onSelectComputeSizeOption = (option: any) => {
     setSelectedComputeSize(option)
@@ -106,25 +98,16 @@ const ProUpgrade: FC<Props> = ({
   }
 
   const getSubscriptionPreview = async () => {
-    const selectedTier = !isSpendCapEnabled
-      ? tiers.find((tier: any) => tier.id === STRIPE_PRODUCT_IDS.PAYG)
-      : tiers.find((tier: any) => tier.id === selectedPlan?.id)
-
-    // [TODO] Small currently has no stripe product attached, so FE has a hardcoded ID just for that product
-    // [UPDATE] it now has, just verify if attaching a Small will mess things up
-    const addons = selectedComputeSize.name.includes('[Small]')
-      ? []
-      : [selectedComputeSize.prices[0].id]
-    const proration_date = Math.floor(Date.now() / 1000)
-
     if (!selectedTier) return
 
+    const payload = formSubscriptionUpdatePayload(
+      selectedTier,
+      selectedComputeSize,
+      selectedPaymentMethod
+    )
+
     setIsRefreshingPreview(true)
-    const preview = await post(`${API_URL}/projects/${projectRef}/subscription/preview`, {
-      tier: selectedTier.prices[0].id,
-      addons,
-      proration_date,
-    })
+    const preview = await post(`${API_URL}/projects/${projectRef}/subscription/preview`, payload)
     if (preview.error) {
       ui.setNotification({
         category: 'error',
@@ -133,29 +116,18 @@ const ProUpgrade: FC<Props> = ({
     }
     setSubscriptionPreview(preview)
     setIsRefreshingPreview(false)
-    console.log('Preview retrieved', preview)
   }
 
   // Exact same thing as getSubscriptionpreview, can we make them into one
   const onConfirmPayment = async () => {
-    const selectedTier = !isSpendCapEnabled
-      ? tiers.find((tier: any) => tier.id === STRIPE_PRODUCT_IDS.PAYG)
-      : tiers.find((tier: any) => tier.id === selectedPlan?.id)
-
-    // [TODO] Small currently has no stripe product attached, so FE has a hardcoded ID just for that product
-    // [UPDATE] it now has, just verify if attaching a Small will mess things up
-    const addons = selectedComputeSize.name.includes('[Small]')
-      ? []
-      : [selectedComputeSize.prices[0].id]
-    const proration_date = Math.floor(Date.now() / 1000)
+    const payload = formSubscriptionUpdatePayload(
+      selectedTier,
+      selectedComputeSize,
+      selectedPaymentMethod
+    )
 
     setIsSubmitting(true)
-    await timeout(1000)
-    const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, {
-      tier: selectedTier.prices[0].id,
-      addons,
-      proration_date,
-    })
+    const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, payload)
     if (res?.error) {
       ui.setNotification({
         category: 'error',
@@ -163,120 +135,120 @@ const ProUpgrade: FC<Props> = ({
       })
     } else {
       setIsSuccessful(true)
-      ui.setNotification({
-        category: 'success',
-        message: 'Done',
-      })
-      console.log('Succesfully updated subscription')
     }
     setIsSubmitting(false)
   }
 
   if (!isSubmitting && isSuccessful) {
-    return <div className="">Some success state here to be done</div>
+    return (
+      <UpdateSuccess
+        projectRef={projectRef || ''}
+        title="Your project has been updated!"
+        message="Let us know if you have any feedback at sales@supabase.io."
+      />
+    )
   }
 
   return (
     <>
       <Transition
-        show={visible}
+        show
         enter="transition ease-out duration-300"
         enterFrom="transform opacity-0 translate-x-10"
         enterTo="transform opacity-100 translate-x-0"
         className="w-full flex items-start justify-between"
       >
-        {visible && (
-          <>
-            <div className="space-y-8 w-3/5">
-              <div className="relative ml-64">
-                <div className="absolute top-[2px] -left-24">
-                  <Button type="text" icon={<IconArrowLeft />} onClick={onSelectBack}>
-                    Back
-                  </Button>
-                </div>
-                <div className="space-y-8">
-                  <h4 className="text-lg">Change your project's subscription</h4>
-                  <div
-                    className="space-y-8 overflow-scroll pb-8 pr-20"
-                    style={{ height: 'calc(100vh - 6.3rem - 49.5px)' }}
-                  >
-                    {!isManagingProSubscription ? (
-                      <div className="space-y-1">
-                        <h3 className="text-xl">
-                          Welcome to <span className="text-green-1100">Pro</span>
-                          <p className="text-sm text-scale-1100">
-                            Your new subscription will begin immediately after payment
-                          </p>
-                        </h3>
-                      </div>
-                    ) : (
-                      <div className="space-y-1">
-                        <h3 className="text-xl">
-                          Managing your <span className="text-green-1100">Pro</span> plan
-                          <p className="text-sm text-scale-1100">
-                            Your billing cycle will reset after payment
-                          </p>
-                        </h3>
-                      </div>
-                    )}
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <p>Enable spend cap</p>
-                          <IconHelpCircle
-                            size={16}
-                            strokeWidth={1.5}
-                            className="cursor-pointer opacity-50 hover:opacity-100 transition"
-                            onClick={() => setShowSpendCapHelperModal(true)}
-                          />
-                        </div>
+        <>
+          <div className="w-3/5 mt-10">
+            <div className="relative ml-64">
+              <div className="absolute top-[2px] -left-24">
+                <Button type="text" icon={<IconArrowLeft />} onClick={onSelectBack}>
+                  Back
+                </Button>
+              </div>
+              <div className="space-y-8">
+                <h4 className="text-lg">Change your project's subscription</h4>
+                <div
+                  className="space-y-8 overflow-scroll pb-8 pr-20"
+                  style={{ height: 'calc(100vh - 6.3rem - 49.5px)' }}
+                >
+                  {!isManagingProSubscription ? (
+                    <div className="space-y-1">
+                      <h3 className="text-xl">
+                        Welcome to <span className="text-green-1100">Pro</span>
                         <p className="text-sm text-scale-1100">
-                          If disabled, additional resources will be charged on a per-usage basis
+                          Your new subscription will begin immediately after payment
                         </p>
+                      </h3>
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <h3 className="text-xl">
+                        Managing your <span className="text-green-1100">Pro</span> plan
+                        <p className="text-sm text-scale-1100">
+                          Your billing cycle will reset after payment
+                        </p>
+                      </h3>
+                    </div>
+                  )}
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <p>Enable spend cap</p>
+                        <IconHelpCircle
+                          size={16}
+                          strokeWidth={1.5}
+                          className="cursor-pointer opacity-50 hover:opacity-100 transition"
+                          onClick={() => setShowSpendCapHelperModal(true)}
+                        />
                       </div>
-                      <Toggle
-                        checked={isSpendCapEnabled}
-                        onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
-                      />
+                      <p className="text-sm text-scale-1100">
+                        If disabled, additional resources will be charged on a per-usage basis
+                      </p>
                     </div>
-                    <Divider light />
-                    <div className="flex items-center space-x-2">
-                      <h4 className="text-lg">Extend your project with add-ons</h4>
-                      <Badge color="green">Optional</Badge>
-                    </div>
-                    <ComputeSizeSelection
-                      computeSizes={addons || []}
-                      selectedComputeSize={selectedComputeSize}
-                      onSelectOption={onSelectComputeSizeOption}
+                    <Toggle
+                      checked={isSpendCapEnabled}
+                      onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
                     />
                   </div>
+                  <Divider light />
+                  <div className="flex items-center space-x-2">
+                    <h4 className="text-lg">Extend your project with add-ons</h4>
+                    <Badge color="green">Optional</Badge>
+                  </div>
+                  <ComputeSizeSelection
+                    computeSizes={addons || []}
+                    selectedComputeSize={selectedComputeSize}
+                    onSelectOption={onSelectComputeSizeOption}
+                  />
                 </div>
               </div>
             </div>
-            <div className="w-2/5 -mt-10">
-              <PaymentSummaryPanel
-                isRefreshingPreview={isRefreshingPreview}
-                subscriptionPreview={subscriptionPreview}
-                currentPlan={currentSubscription.tier}
-                selectedPlan={selectedPlan}
-                isSpendCapEnabled={isSpendCapEnabled}
-                currentComputeSize={currentComputeSize}
-                selectedComputeSize={selectedComputeSize}
-                paymentMethods={paymentMethods}
-                isLoadingPaymentMethods={isLoadingPaymentMethods}
-                selectedPaymentMethod={selectedPaymentMethod}
-                onSelectPaymentMethod={setSelectedPaymentMethod}
-                onSelectAddNewPaymentMethod={() => {
-                  // [TODO] For now, use stripe's web portal to add payment method
-                  redirectToPortal('/payment-methods')
-                  // setShowAddPaymentMethodModal(true)
-                }}
-                onConfirmPayment={onConfirmPayment}
-                isSubmitting={isSubmitting}
-              />
-            </div>
-          </>
-        )}
+          </div>
+          <div className="w-2/5">
+            <PaymentSummaryPanel
+              isRefreshingPreview={isRefreshingPreview}
+              subscriptionPreview={subscriptionPreview}
+              currentPlan={currentSubscription.tier}
+              selectedPlan={selectedTier}
+              isSpendCapEnabled={isSpendCapEnabled}
+              currentComputeSize={currentComputeSize}
+              selectedComputeSize={selectedComputeSize}
+              paymentMethods={paymentMethods}
+              isLoadingPaymentMethods={isLoadingPaymentMethods}
+              selectedPaymentMethod={selectedPaymentMethod}
+              onSelectPaymentMethod={setSelectedPaymentMethod}
+              onSelectAddNewPaymentMethod={() => {
+                // [TODO] For now, use stripe's web portal to add payment method
+                // redirectToPortal('/payment-methods')
+                setShowAddPaymentMethodModal(true)
+                // onSelectAddNewPaymentMethod()
+              }}
+              onConfirmPayment={onConfirmPayment}
+              isSubmitting={isSubmitting}
+            />
+          </div>
+        </>
       </Transition>
 
       <AddNewPaymentMethodModal
