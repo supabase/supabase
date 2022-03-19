@@ -269,7 +269,6 @@ export const LogPage: NextPage = () => {
                 <InformationBox
                   className="shrink mr-auto"
                   block={false}
-                  size="tiny"
                   icon={<IconInfo size="tiny" />}
                   title={`Custom queries are restricted to a ${
                     type === 'database' ? '2 hour' : '7 day'

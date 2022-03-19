@@ -1,10 +1,11 @@
 import { FC } from 'react'
-import { Listbox, IconLoader, Button, IconPlus } from '@supabase/ui'
+import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle } from '@supabase/ui'
 
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { StripeProduct } from '..'
 import { SubscriptionPreview } from '../Billing.types'
 import PaymentTotal from './PaymentTotal'
+import InformationBox from 'components/ui/InformationBox'
 
 interface Props {
   isRefreshingPreview: boolean
@@ -110,6 +111,17 @@ const PaymentSummaryPanel: FC<Props> = ({
             </p>
           </div>
         )}
+        {isChangingComputeSize && (
+          <div className="!mt-4">
+            <InformationBox
+              hideCollapse
+              defaultVisibility
+              icon={<IconAlertCircle strokeWidth={2} />}
+              title="Changing your compute size"
+              description="It will take up to 2 minutes for changes to take place, and your project will be unavailable during that time"
+            />
+          </div>
+        )}
       </div>
 
       <div className="h-px w-full bg-scale-600" />
@@ -117,13 +129,12 @@ const PaymentSummaryPanel: FC<Props> = ({
       <PaymentTotal
         subscriptionPreview={subscriptionPreview}
         isRefreshingPreview={isRefreshingPreview}
-        hasChangesToPlan={hasChangesToPlan}
         isSpendCapEnabled={isSpendCapEnabled}
       />
 
       {/* Payment method selection */}
       <div className="space-y-2">
-        <p>Select payment method</p>
+        <p className="text-sm">Select payment method</p>
         {isLoadingPaymentMethods ? (
           <div className="flex items-center rounded-md space-x-4 px-4 py-2 bg-scale-400 border border-scale-700">
             <IconLoader className="animate-spin" size={14} />

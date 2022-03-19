@@ -2,8 +2,6 @@ import { FC } from 'react'
 import { Radio } from '@supabase/ui'
 import { formatComputeSizes } from './AddOns.utils'
 
-// [TODO] please type the vairables properly
-
 interface Props {
   computeSizes: any[]
   selectedComputeSize: any
