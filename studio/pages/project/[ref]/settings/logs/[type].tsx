@@ -20,7 +20,6 @@ import { API_URL } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts/'
 import CodeEditor from 'components/ui/CodeEditor'
 import {
-  LogPanel,
   LogTable,
   LogEventChart,
   Count,
@@ -40,6 +39,7 @@ import { isUndefined } from 'lodash'
 import dayjs from 'dayjs'
 import InformationBox from 'components/ui/InformationBox'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
+import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
 
 /**
  * Acts as a container component for the entire log display
@@ -125,8 +125,8 @@ export const LogPage: NextPage = () => {
 
   return (
     <SettingsLayout title={title}>
-      <div className="h-full flex flex-col flex-grow">
-        <LogPanel
+      <div className="h-full flex flex-col flex-grow px-5 md:px-5 xl:px-16 py-8">
+        <PreviewFilterPanel
           isShowingEventChart={showChart}
           onToggleEventChart={() => setShowChart(!showChart)}
           isCustomQuery={false}
@@ -149,7 +149,7 @@ export const LogPage: NextPage = () => {
               : ''
           }
           onCustomClick={() => {
-            router.push(`/project/${ref}/settings/logs/explorer?q=${params.rawSql}`)
+            router.push(`/project/${ref}/logs-explorer?q=${params.rawSql}`)
           }}
           onSelectTemplate={onSelectTemplate}
         />
