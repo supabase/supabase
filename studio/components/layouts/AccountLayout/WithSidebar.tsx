@@ -162,11 +162,14 @@ const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, e
   }
 
   return (
-    <Link href={href || ''}>
-      <a className="block" target={external ? '_blank' : '_self'}>
-        <button
-          className="cursor-pointer flex space-x-2 items-center outline-none focus-visible:ring-1 ring-scale-1200 focus-visible:z-10 group py-1 font-normal border-scale-500 group-hover:border-scale-900"
-          onClick={onClick || (() => {})}
+    <button
+      className="flex space-x-2 items-center outline-none focus-visible:ring-1 ring-scale-1200 focus-visible:z-10 group my-1 font-normal border-scale-500 group-hover:border-scale-900"
+      onClick={onClick || (() => {})}
+    >
+      <Link href={href || ''}>
+        <a
+          className="flex space-x-2 items-center my-1"
+          target={external ? '_blank' : '_self'}
         >
           {external && (
             <span className="transition truncate text-sm text-scale-900 group-hover:text-scale-1100">
@@ -176,8 +179,8 @@ const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, e
           <span className="transition truncate text-sm w-full text-scale-1100 group-hover:text-scale-1200">
             {isSubitem ? <p>{label}</p> : label}
           </span>
-        </button>
-      </a>
-    </Link>
+        </a>
+      </Link>
+    </button>
   )
 }
