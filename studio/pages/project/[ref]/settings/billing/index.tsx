@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography, Loading, IconArrowRight } from '@supabase/ui'
+import { Typography, Loading, IconArrowRight, Button } from '@supabase/ui'
 import { get as _get, maxBy } from 'lodash'
 import { Dictionary } from '@supabase/grid'
 
@@ -123,7 +123,6 @@ const Settings: FC<SettingsProps> = ({ project }) => {
         project={project}
         subscription={subscription}
         paygStats={paygStats}
-        subscriptionStats={subscriptionStats}
         currentPeriodStart={subscription?.billing.current_period_start}
         currentPeriodEnd={subscription?.billing.current_period_end}
       />
