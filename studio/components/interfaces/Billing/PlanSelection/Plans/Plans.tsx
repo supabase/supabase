@@ -3,13 +3,12 @@ import { Badge } from '@supabase/ui'
 
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { StripeProduct } from '../..'
-import { BillingPlan } from './Plans.types'
 import PlanCTAButton from './PlanCTAButton'
 
 interface Props {
   plans: any[]
   currentPlan?: StripeProduct
-  onSelectPlan: (plan: BillingPlan) => void
+  onSelectPlan: (plan: any) => void
 }
 
 const AnimatedGradientBackground = () => (

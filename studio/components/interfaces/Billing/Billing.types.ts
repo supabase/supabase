@@ -1,4 +1,4 @@
-// [TODO] I'm guessing this should come from the API?
+// I'm guessing this should come from the API?
 export interface SubscriptionPreview {
   // Amount due total
   amount_due: number

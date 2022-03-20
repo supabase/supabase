@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 
 import { withAuth, useStore } from 'hooks'
 import { get, post } from 'lib/common/fetch'
-import { API_URL, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 
 import { BillingLayout } from 'components/layouts'
 import Connecting from 'components/ui/Loading/Loading'
@@ -98,7 +98,6 @@ const BillingUpdatePro: NextPage = () => {
     }
   }
 
-  // temp
   if (!products || !subscription) return <Connecting />
 
   return (

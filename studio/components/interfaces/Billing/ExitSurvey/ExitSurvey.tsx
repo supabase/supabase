@@ -60,14 +60,14 @@ const ExitSurvey: FC<Props> = ({ freeTier, onSelectBack }) => {
         })
       }
 
-      // Submit feedback to Freshdesk (Disabled for local tetsing)
-      // await post(`${API_URL}/feedback/send`, {
-      //   projectRef,
-      //   subject: 'Subscription cancellation - Exit survey',
-      //   tags: ['dashboard-exitsurvey'],
-      //   category: 'Billing',
-      //   message: generateFeedbackMessage(selectedReasons, values.message),
-      // })
+      // Submit feedback to Freshdesk
+      await post(`${API_URL}/feedback/send`, {
+        projectRef,
+        subject: 'Subscription cancellation - Exit survey',
+        tags: ['dashboard-exitsurvey'],
+        category: 'Billing',
+        message: generateFeedbackMessage(selectedReasons, values.message),
+      })
 
       // Trigger subscription downgrade
       const tier = freeTier.prices[0].id

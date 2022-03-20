@@ -2,13 +2,12 @@ import { FC } from 'react'
 import { Button, IconLoader } from '@supabase/ui'
 
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { BillingPlan } from './Plans.types'
 import { StripeProduct } from '../..'
 
 interface Props {
-  plan: BillingPlan
+  plan: any
   currentPlan?: StripeProduct
-  onSelectPlan: (plan: BillingPlan) => void
+  onSelectPlan: (plan: any) => void
 }
 
 const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {

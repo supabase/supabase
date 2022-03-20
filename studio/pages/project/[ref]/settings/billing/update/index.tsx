@@ -11,16 +11,7 @@ import { API_URL, DEFAULT_FREE_PROJECTS_LIMIT, STRIPE_PRODUCT_IDS } from 'lib/co
 import { BillingLayout } from 'components/layouts'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { PlanSelection, StripeSubscription } from 'components/interfaces/Billing'
-import { BillingPlan } from 'components/interfaces/Billing/PlanSelection/Plans/Plans.types'
 import Connecting from 'components/ui/Loading/Loading'
-
-/**
- * [Joshen] Right now everything is scaffolded without any API calls
- * So maybe some prop passing down, variable creation needs relooking
- * once I'm working with proper data
- */
-
-// [CURRENTLY: Hooking up products from API, and removing all the constants crap]
 
 const BillingUpdate: NextPage = () => {
   const { ui } = useStore()
@@ -37,7 +28,7 @@ const BillingUpdate: NextPage = () => {
 
   const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
   const [subscription, setSubscription] = useState<StripeSubscription>()
-  const [selectedPlan, setSelectedPlan] = useState<BillingPlan>()
+  const [selectedPlan, setSelectedPlan] = useState<any>()
 
   useEffect(() => {
     if (projectRef) {
@@ -85,7 +76,7 @@ const BillingUpdate: NextPage = () => {
     }
   }
 
-  const onSelectPlan = (plan: BillingPlan) => {
+  const onSelectPlan = (plan: any) => {
     if (plan.name === 'Enterprise') {
       return router.push(`/project/${projectRef}/settings/billing/update/enterprise`)
     } else if (plan.id === STRIPE_PRODUCT_IDS.PRO) {
@@ -126,7 +117,6 @@ const BillingUpdate: NextPage = () => {
         />
       </div>
 
-      {/* [Joshen] Possible refactor, shift this into PlanSelection */}
       <ConfirmModal
         danger
         visible={showConfirmDowngrade}

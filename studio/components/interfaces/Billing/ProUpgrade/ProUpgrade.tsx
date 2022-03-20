@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import { Badge, Button, IconArrowLeft, IconHelpCircle, Toggle, Modal } from '@supabase/ui'
 
 import { useStore } from 'hooks'
-import { getURL } from 'lib/helpers'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import Divider from 'components/ui/Divider'
@@ -80,21 +79,6 @@ const ProUpgrade: FC<Props> = ({
 
   const onSelectComputeSizeOption = (option: any) => {
     setSelectedComputeSize(option)
-  }
-
-  const redirectToPortal = async (path: any) => {
-    try {
-      const stripeCustomerId = ui.selectedOrganization?.stripe_customer_id
-      if (!stripeCustomerId) throw new Error("Unable to get organization's Stripe ID")
-
-      let { billingPortal } = await post(`${API_URL}/stripe/billing`, {
-        stripe_customer_id: stripeCustomerId,
-        returnTo: `${getURL()}${router.asPath}`,
-      })
-      window.location.replace(billingPortal + (path ? path : null))
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: `Failed to redirect: ${error.message}` })
-    }
   }
 
   const getSubscriptionPreview = async () => {
@@ -239,10 +223,7 @@ const ProUpgrade: FC<Props> = ({
               selectedPaymentMethod={selectedPaymentMethod}
               onSelectPaymentMethod={setSelectedPaymentMethod}
               onSelectAddNewPaymentMethod={() => {
-                // [TODO] For now, use stripe's web portal to add payment method
-                // redirectToPortal('/payment-methods')
                 setShowAddPaymentMethodModal(true)
-                // onSelectAddNewPaymentMethod()
               }}
               onConfirmPayment={onConfirmPayment}
               isSubmitting={isSubmitting}
