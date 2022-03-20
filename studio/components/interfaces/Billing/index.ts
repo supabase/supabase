@@ -10,6 +10,8 @@ import ComputeSizeSelection from './AddOns/ComputeSizeSelection'
 import AddNewPaymentMethodModal from './AddNewPaymentMethodModal'
 import UpdateSuccess from './UpdateSuccess'
 
+import Invoices from './Invoices'
+
 export * from './Subscription/Subscription.types'
 export * from './PAYGUsage/PAYGUsage.constants'
 export {
@@ -23,4 +25,5 @@ export {
   ComputeSizeSelection,
   AddNewPaymentMethodModal,
   UpdateSuccess,
+  Invoices,
 }
