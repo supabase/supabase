@@ -1,14 +1,14 @@
 import dayjs from 'dayjs'
 import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography, Loading, IconArrowRight, Button } from '@supabase/ui'
+import { Typography, Loading, IconArrowRight } from '@supabase/ui'
 import { get as _get, maxBy } from 'lodash'
 import { Dictionary } from '@supabase/grid'
 
-import { API_URL } from 'lib/constants'
-import { useStore, useSubscriptionStats, withAuth } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import { post, get } from 'lib/common/fetch'
 import {
+  API_URL,
   DATE_FORMAT,
   STRIPE_PRODUCT_IDS,
   TIME_PERIODS_REPORTS,
@@ -21,6 +21,7 @@ import {
   Subscription,
   StripeSubscription,
   chargeableProducts,
+  Invoices,
 } from 'components/interfaces/Billing'
 
 import ProjectUsage from 'components/to-be-cleaned/Usage'
@@ -50,8 +51,6 @@ type SettingsProps = {
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
-
-  const subscriptionStats = useSubscriptionStats()
 
   const [loading, setLoading] = useState<boolean>(true)
   const [subscription, setSubscription] = useState<StripeSubscription>()
@@ -163,6 +162,10 @@ const Settings: FC<SettingsProps> = ({ project }) => {
       ) : (
         <ProjectUsage projectRef={project.ref} subscription_id={project.subscription_id} />
       )}
+      <div className="space-y-2">
+        <h4 className="text-lg">Invoices</h4>
+        <Invoices projectRef={ui.selectedProject?.ref ?? ''} />
+      </div>
     </div>
   )
 }

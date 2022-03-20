@@ -56,7 +56,9 @@ const Subscription: FC<Props> = ({
         <div className="bg-panel-body-light dark:bg-panel-body-dark">
           <div className="px-6 pt-4 flex items-center justify-between">
             <div className="flex flex-col">
-              <p className="text-sm">{showProjectName ? project.name : 'Current subscription'}</p>
+              <p className="text-scale-1100 text-sm">
+                {showProjectName ? project.name : 'Current subscription'}
+              </p>
               <h3 className="text-xl mb-0">{subscription?.tier.name ?? '-'}</h3>
             </div>
             {/* <UpgradeButton paid={paid} projectRef={project.ref} /> */}
