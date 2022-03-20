@@ -1,9 +1,9 @@
 import { FC } from 'react'
 import dayjs from 'dayjs'
 import { sum } from 'lodash'
-import { Loading } from '@supabase/ui'
+import { Loading, Button } from '@supabase/ui'
+import { useRouter } from 'next/router'
 
-import UpgradeButton from './UpgradeButton'
 import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
 import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'
@@ -11,12 +11,11 @@ import { chargeableProducts } from '../PAYGUsage/PAYGUsage.constants'
 import { formatBytes } from 'lib/helpers'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { Dictionary } from '@supabase/grid'
-import { SubscriptionStats } from 'hooks'
+import { SubscriptionStats, useStore } from 'hooks'
 
 interface Props {
   project: any
   subscription: StripeSubscription
-  subscriptionStats: SubscriptionStats
   paygStats?: Dictionary<number>
   loading?: boolean
   showProjectName?: boolean
@@ -27,13 +26,16 @@ interface Props {
 const Subscription: FC<Props> = ({
   project,
   subscription,
-  subscriptionStats,
   paygStats,
   loading = false,
   showProjectName = false,
   currentPeriodStart,
   currentPeriodEnd,
 }) => {
+  const router = useRouter()
+  const { ui } = useStore()
+  const isOrgOwner = ui.selectedOrganization?.is_owner
+
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
   const addOns = subscription?.addons ?? []
   const paid = subscription && subscription.tier.unit_amount > 0
@@ -57,11 +59,21 @@ const Subscription: FC<Props> = ({
               <p className="text-sm">{showProjectName ? project.name : 'Current subscription'}</p>
               <h3 className="text-xl mb-0">{subscription?.tier.name ?? '-'}</h3>
             </div>
-            <UpgradeButton
-              paid={paid}
-              projectRef={project.ref}
-              subscriptionStats={subscriptionStats}
-            />
+            {/* <UpgradeButton paid={paid} projectRef={project.ref} /> */}
+            <div className="flex flex-col items-end space-y-2">
+              <Button
+                disabled={!isOrgOwner}
+                onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
+                type="primary"
+              >
+                Change subscription
+              </Button>
+              {!isOrgOwner && (
+                <p className="text-sm text-scale-1100">
+                  Only the organization owner can amend subscriptions
+                </p>
+              )}
+            </div>
           </div>
           {paid && (
             <div className="px-6 pt-4">
