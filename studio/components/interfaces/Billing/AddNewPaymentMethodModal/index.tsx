@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import { Button, IconLoader, Modal } from '@supabase/ui'
+import { IconLoader, Modal } from '@supabase/ui'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 
@@ -21,11 +21,11 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, onCancel }) => {
 
   useEffect(() => {
     if (visible) {
-      onSelectAddNewPaymentMethod()
+      setupIntent()
     }
   }, [visible])
 
-  const onSelectAddNewPaymentMethod = async () => {
+  const setupIntent = async () => {
     setIntent(undefined)
     const orgSlug = ui.selectedOrganization?.slug ?? ''
     const customerId = ui.selectedOrganization?.stripe_customer_id ?? ''

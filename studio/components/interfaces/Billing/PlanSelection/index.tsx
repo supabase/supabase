@@ -4,14 +4,13 @@ import { Transition } from '@headlessui/react'
 
 import { StripeProduct } from '..'
 import Plans from './Plans/Plans'
-import { BillingPlan } from './Plans/Plans.types'
 import { formatTierOptions } from './PlanSelection.utils'
 
 interface Props {
   visible: boolean
   tiers: any[]
   currentPlan?: StripeProduct
-  onSelectPlan: (plan: BillingPlan) => void
+  onSelectPlan: (plan: any) => void
 }
 
 const PlanSelection: FC<Props> = ({ visible, tiers, currentPlan, onSelectPlan }) => {
