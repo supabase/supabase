@@ -607,7 +607,7 @@ pages:
           final res = await supabase
             .from('cities')
             .delete()
-            .match({ 'id': 666 })
+            .eq('id', 666)
             .execute();
           ```
 
