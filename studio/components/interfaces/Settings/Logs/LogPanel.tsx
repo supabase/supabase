@@ -11,6 +11,7 @@ import {
   IconSearch,
   IconClock,
   Popover,
+  IconPlay,
 } from '@supabase/ui'
 import { LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
@@ -29,6 +30,8 @@ interface Props {
   onSelectTemplate: (template: LogTemplate) => void
   isShowingEventChart: boolean
   onToggleEventChart: () => void
+
+  editorControls: React.ReactNode
 }
 
 dayjs.extend(utc)
@@ -50,6 +53,8 @@ const LogPanel: FC<Props> = ({
   onSelectTemplate,
   isShowingEventChart,
   onToggleEventChart,
+
+  editorControls,
 }) => {
   const [search, setSearch] = useState('')
   const [to, setTo] = useState({ value: '', error: '' })
@@ -101,8 +106,15 @@ const LogPanel: FC<Props> = ({
 
   const showReset = to.value !== '' || from.value !== ''
   return (
-    <div className="bg-panel-header-light dark:bg-panel-header-dark">
-      <div className="px-2 py-1 flex items-center justify-between w-full">
+    <div
+      className="
+    border
+    border-panel-border-light dark:border-panel-border-dark rounded rounded-bl-none rounded-br-none
+    bg-panel-header-light dark:bg-panel-header-dark
+    
+    "
+    >
+      <div className="px-5 py-2 flex items-center justify-between w-full">
         <div className="flex flex-row gap-x-4 items-center">
           {!isCustomQuery && (
             <Button
@@ -143,7 +155,7 @@ const LogPanel: FC<Props> = ({
               </Dropdown.Item>
             ))}
           >
-            <Button as="span" type="text" iconRight={<IconChevronDown />}>
+            <Button as="span" type="default" iconRight={<IconChevronDown />}>
               Templates
             </Button>
           </Dropdown>
@@ -254,6 +266,7 @@ const LogPanel: FC<Props> = ({
             </>
           )}
         </div>
+        {editorControls}
       </div>
     </div>
   )
