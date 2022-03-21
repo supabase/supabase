@@ -7,6 +7,7 @@ import 'styles/toast.scss'
 import 'styles/code.scss'
 import 'styles/monaco.scss'
 import 'styles/contextMenu.scss'
+import 'styles/react-data-grid-logs.scss'
 
 import Head from 'next/head'
 import type { AppProps } from 'next/app'
