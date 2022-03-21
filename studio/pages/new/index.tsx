@@ -37,7 +37,7 @@ const Wizard = () => {
     }
 
     setNewOrgLoading(true)
-    const response = await post(`${API_URL}/organizations/new`, {
+    const response = await post(`${API_URL}/organizations`, {
       name: orgName,
     })
 
