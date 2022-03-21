@@ -66,7 +66,7 @@ const StackedAreaChart: React.FC<Props> = ({
 
   const formatToDate = (value: string | number | any) => {
     if (!dateFormat) return value
-    if (typeof value === 'number') {
+    if (!isNaN(Number(value))) {
       const unix = String(value).length > 10 ? Number(String(value).slice(0, 10)) : value
       return dayjs.unix(unix).format(dateFormat)
     } else {
