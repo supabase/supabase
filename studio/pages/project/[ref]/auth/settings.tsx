@@ -982,7 +982,7 @@ const Settings = () => {
               externalProvidersModel.EXTERNAL_ZOOM_ENABLED && (
                 <a
                   className="pl-4 text-scale-900"
-                  href="https://marketplace.zoom.us/"
+                  href="https://developers.zoom.us/"
                   target="_blank"
                 >
                   Create new credentials
