@@ -114,7 +114,7 @@ const Usage: FC<any> = ({ project }) => {
                     startDate={dateRange?.period_start?.date}
                     endDate={dateRange?.period_end?.date}
                     attribute={'disk_io_budget'}
-                    label={'Disk IO Budget'}
+                    label={'Daily Disk IO Budget remaining'}
                     interval={dateRange.interval}
                     provider={'infra-monitoring'}
                   />
