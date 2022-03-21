@@ -125,7 +125,11 @@ export const LogPage: NextPage = () => {
 
   return (
     <SettingsLayout title={title}>
-      <div className="h-full flex flex-col flex-grow px-5 md:px-5 xl:px-16 py-8">
+      <div
+        className="h-full flex flex-col flex-grow px-5 md:px-5 xl:px-16 py-8 
+        space-y-4
+      "
+      >
         <PreviewFilterPanel
           isShowingEventChart={showChart}
           onToggleEventChart={() => setShowChart(!showChart)}
@@ -153,7 +157,7 @@ export const LogPage: NextPage = () => {
           }}
           onSelectTemplate={onSelectTemplate}
         />
-        {showChart && (
+        {/* {showChart && (
           <div>
             <LogEventChart
               data={!isLoading ? logData : undefined}
@@ -162,7 +166,7 @@ export const LogPage: NextPage = () => {
               }}
             />
           </div>
-        )}
+        )} */}
         <div className="flex flex-col flex-grow relative">
           {isLoading && (
             <div
@@ -175,7 +179,7 @@ export const LogPage: NextPage = () => {
             </div>
           )}
 
-          <LogTable data={logData} isCustomQuery={false} />
+          <LogTable data={logData} isCustomQuery={false} queryType={type} />
           <div className="p-2">
             <Button onClick={() => loadOlder()} icon={<IconRewind />} type="default">
               Load older
