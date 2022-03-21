@@ -172,20 +172,22 @@ LIMIT 100
 ]
 
 export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
-  explorer: "Explorer",
+  explorer: 'Explorer',
   api: 'API',
   database: 'Database',
 }
 
-export const genDefaultQuery = (table: string, where: string = ''): string => `SELECT 
-  id, timestamp, event_message, metadata 
-FROM
-  ${table}${where ? ' WHERE\n  ' + where : ''} 
+export const genDefaultQuery = (table: LogsTableName, where: string = '') => {
+  console.log('genDefaultQuery table', table)
+  switch (table) {
+    case 'edge_logs':
+      return `SELECT id, timestamp, event_message, metadata 
+FROM ${table}
+${where ? ' WHERE\n  ' + where : ''} 
 LIMIT 100
 `
 export const cleanQuery = (str: string) => str.replace(/\n/g, ' ')
 // .replace(/\n.*\-\-.*(\n)?$?/, "")
-
 
 export enum LogsTableName {
   EDGE = 'edge_logs',
@@ -193,7 +195,7 @@ export enum LogsTableName {
 }
 export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
 
-export const genQueryParams = (params: { [k: string ]: string }) => {
+export const genQueryParams = (params: { [k: string]: string }) => {
   // remove keys which are empty strings, null, or undefined
   for (const k in params) {
     const v = params[k]
