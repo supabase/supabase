@@ -16,9 +16,9 @@
     "@mdx-js/loader": "^1.6.22",
     "@mdx-js/react": "^1.6.22",
     "@next/mdx": "^10.0.7",
-    "@supabase/supabase-js": "^1.6.0",
+    "@supabase/supabase-js": "^1.31.1",
     "@supabase/ui": "^0.36.1",
-    "classnames": "2.2.6",
+    "classnames": "^2.3.1",
     "date-fns": "2.10.0",
     "globby": "^12.0.2",
     "gray-matter": "^4.0.2",
@@ -41,10 +41,10 @@
     "swiper": "^6.5.0",
     "swr": "^0.5.4",
     "typescript": "^4.0.3",
+    "use-debounce": "^7.0.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@types/classnames": "^2.2.10",
     "@types/jest": "^25.2.2",
     "@types/node": "^14.0.1",
     "@types/react": "^16.9.35",
