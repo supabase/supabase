@@ -32,9 +32,9 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
   }
 
   return (
-    <div id="become-a-partner">
+    <div id="become-a-partner" className="space-y-8">
       <Typography.Title level={2}>Become a Partner</Typography.Title>
-      <form onSubmit={handleFormSubmit}>
+      <form onSubmit={handleFormSubmit} className="space-y-4">
         <Select
           name="type"
           className="font-sans"
@@ -387,7 +387,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
           limit={2000}
           rows={10}
         />
-        <div className="w-full flex flex-row-reverse">
+        <div className="flex flex-row-reverse w-full">
           <Button size="xlarge" disabled={formSubmitted}>
             Send
           </Button>

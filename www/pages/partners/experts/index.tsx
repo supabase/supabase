@@ -63,9 +63,9 @@ function ExpertPartnersPage(props: Props) {
         }}
       />
       <DefaultLayout>
-        <SectionContainer>
+        <SectionContainer className="space-y-12">
           {/* Horizontal link menu */}
-          <div className="w-full flex justify-between">
+          <div className="flex justify-between w-full">
             <Typography.Title level={3}>Partners</Typography.Title>
             <div className="flex space-x-6">
               <Link href={`/partners/integrations`}>
