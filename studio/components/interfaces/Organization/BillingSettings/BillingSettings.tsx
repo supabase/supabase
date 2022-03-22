@@ -4,7 +4,7 @@ import { FC, useState, useEffect } from 'react'
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import { post } from 'lib/common/fetch'
+import { get, post } from 'lib/common/fetch'
 
 import AWSMarketplaceSubscription from './AWSMarketplaceSubscription'
 import ProjectsSummary from './ProjectsSummary'
@@ -22,14 +22,17 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
   const router = useRouter()
   const { ui } = useStore()
 
+  const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
+
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<any>(undefined)
   const [customer, setCustomer] = useState<any>(null)
   const [taxIds, setTaxIds] = useState<any>(null)
   const [paymentMethods, setPaymentMethods] = useState<any>(null)
 
-  const { stripe_customer_id, stripe_customer_object } = organization
+  const { slug, stripe_customer_id, stripe_customer_object } = organization
 
+  const defaultPaymentMethod = customer?.invoice_settings?.default_payment_method ?? ''
   const customerBalance = customer && customer.balance ? customer.balance / 100 : 0
   const isCredit = customerBalance < 0
   const isDebt = customerBalance > 0
@@ -37,6 +40,10 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
     isCredit && customerBalance !== 0
       ? customerBalance.toString().replace('-', '')
       : customerBalance
+
+  useEffect(() => {
+    getPaymentMethods()
+  }, [slug])
 
   useEffect(() => {
     if (stripe_customer_id) {
@@ -51,15 +58,10 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
     try {
       setLoading(true)
       setError(null)
-      const {
-        paymentMethods,
-        customer,
-        error: customerError,
-      } = await post(`${API_URL}/stripe/customer`, {
+      const { customer, error: customerError } = await post(`${API_URL}/stripe/customer`, {
         stripe_customer_id: stripe_customer_id,
       })
       if (customerError) throw customerError
-      setPaymentMethods(paymentMethods)
       setCustomer(customer)
 
       const { taxIds, error: taxIdsError } = await post(`${API_URL}/stripe/tax-ids`, {
@@ -75,6 +77,22 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
       setError(error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const getPaymentMethods = async () => {
+    try {
+      setIsLoadingPaymentMethods(true)
+      const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
+      if (error) throw error
+      setPaymentMethods(paymentMethods)
+      setIsLoadingPaymentMethods(false)
+    } catch (error: any) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to get organization payment methods: ${error.message}`,
+      })
     }
   }
 
@@ -107,9 +125,11 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
             <ProjectsSummary projects={projects} />
             <CreditBalance balance={balance} isCredit={isCredit} isDebt={isDebt} />
             <PaymentMethods
-              loading={loading}
-              paymentMethods={paymentMethods?.data ?? []}
-              redirectToPortal={redirectToPortal}
+              loading={loading || isLoadingPaymentMethods}
+              defaultPaymentMethod={defaultPaymentMethod}
+              paymentMethods={paymentMethods || []}
+              onDefaultMethodUpdated={() => getStripeAccount()}
+              onPaymentMethodsDeleted={() => getPaymentMethods()}
             />
             <BillingAddress
               loading={loading}

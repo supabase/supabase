@@ -3,9 +3,9 @@ import { Button, Modal } from '@supabase/ui'
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js'
 
 import { useStore } from 'hooks'
-import { getURL } from 'lib/helpers'
 
 interface Props {
+  returnUrl: string
   onCancel: () => void
 }
 
@@ -13,7 +13,7 @@ interface Props {
 // manually creating and attaching payment methods via the API
 // Small UX annoyance here, that the page will be refreshed
 
-const AddPaymentMethodForm: FC<Props> = ({ onCancel }) => {
+const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel }) => {
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref ?? ''
 
@@ -33,9 +33,7 @@ const AddPaymentMethodForm: FC<Props> = ({ onCancel }) => {
 
     await stripe.confirmSetup({
       elements,
-      confirmParams: {
-        return_url: `${getURL()}/project/${projectRef}/settings/billing/update/pro`,
-      },
+      confirmParams: { return_url: returnUrl },
     })
   }
 
