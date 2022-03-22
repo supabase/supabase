@@ -145,7 +145,7 @@ We can use [`expo`](https://docs.expo.dev/get-started/create-a-new-app/) to init
 an app called `supabaseReactNative`:
 
 ```bash
-#select the "Blank" template when prompted
+#select the "Blank (TypeScript)" template when prompted
 expo init supabaseReactNative
 
 cd supabaseReactNative
@@ -158,6 +158,7 @@ yarn add @supabase/supabase-js
 yarn add react-native-elements
 yarn add react-native-safe-area-context
 yarn add @react-native-async-storage/async-storage
+yarn add react-native-url-polyfill
 ```
 
 Now let's create a helper file to initialize the Supabase client.
@@ -165,16 +166,18 @@ We need the API URL and the `anon` key that you copied [earlier](#get-the-api-ke
 These variables will be exposed on the browser, and that's completely fine since we have
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```js title="lib/supabase.js"
-import AsyncStorage from '@react-native-async-storage/async-storage'
+```js title="lib/supabase.ts"
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
 const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  localStorage: AsyncStorage,
-})
+  localStorage: AsyncStorage as any,
+  autoRefreshToken: true,
+  persistSession: true,
+  detectSessionInUrl: false,
+});
 ```
 
 ### Set up a Login component
@@ -182,7 +185,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 Let's set up a React Native component to manage logins and sign ups.
 Users would be able to sign in with their email and password.
 
-```jsx title="components/Auth.js"
+```jsx title="components/Auth.tsx"
 import React, { useState } from 'react'
 import { Alert, StyleSheet, View } from 'react-native'
 import { supabase } from '../lib/supabase'
@@ -191,20 +194,28 @@ import { Button, Input } from 'react-native-elements'
 export default function Auth() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState('')
+  const [loading, setLoading] = useState(false)
 
   async function signInWithEmail() {
+    setLoading(true)
     const { user, error } = await supabase.auth.signIn({
       email: email,
       password: password,
     })
+
+    if (error) Alert.alert(error.message)
+    setLoading(false)
   }
 
   async function signUpWithEmail() {
+    setLoading(true)
     const { user, error } = await supabase.auth.signUp({
       email: email,
       password: password,
     })
+
+    if (error) Alert.alert(error.message)
+    setLoading(false)
   }
 
   return (
@@ -231,10 +242,10 @@ export default function Auth() {
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button title="Sign in" onPress={() => signInWithEmail()} />
+        <Button title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
       </View>
       <View style={styles.verticallySpaced}>
-        <Button title="Sign up" onPress={() => signUpWithEmail()} />
+        <Button title="Sign up" disabled={loading} onPress={() => signUpWithEmail()} />
       </View>
     </View>
   )
@@ -262,54 +273,63 @@ After a user is signed in we can allow them to edit their profile details and ma
 
 Let's create a new component for that called `Account.js`.
 
-```jsx title="components/Account.js"
-import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
-import { StyleSheet, View } from 'react-native'
+```jsx title="components/Account.tsx"
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
+import { StyleSheet, View, Alert } from "react-native";
+import { Button, Input } from "react-native-elements";
+import { ApiError, Session } from "@supabase/supabase-js";
 
-import { Button, Input } from 'react-native-elements'
-
-export default function Account({ session }) {
-  const [loading, setLoading] = useState(true)
-  const [username, setUsername] = useState(null)
-  const [website, setWebsite] = useState(null)
-  const [avatar_url, setAvatarUrl] = useState(null)
+export default function Account({ session }: { session: Session }) {
+  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState("");
+  const [website, setWebsite] = useState("");
+  const [avatar_url, setAvatarUrl] = useState("");
 
   useEffect(() => {
-    getProfile()
-  }, [session])
+    if (session) getProfile();
+  }, [session]);
 
   async function getProfile() {
     try {
-      setLoading(true)
-      const user = supabase.auth.user()
+      setLoading(true);
+      const user = supabase.auth.user();
+      if (!user) throw new Error("No user on the session!");
 
       let { data, error, status } = await supabase
-        .from('profiles')
+        .from("profiles")
         .select(`username, website, avatar_url`)
-        .eq('id', user.id)
-        .single()
-
+        .eq("id", user.id)
+        .single();
       if (error && status !== 406) {
-        throw error
+        throw error;
       }
 
       if (data) {
-        setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
+        setUsername(data.username);
+        setWebsite(data.website);
+        setAvatarUrl(data.avatar_url);
       }
     } catch (error) {
-      alert(error.message)
+      Alert.alert((error as ApiError).message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
-  async function updateProfile({ username, website, avatar_url }) {
+  async function updateProfile({
+    username,
+    website,
+    avatar_url,
+  }: {
+    username: string;
+    website: string;
+    avatar_url: string;
+  }) {
     try {
-      setLoading(true)
-      const user = supabase.auth.user()
+      setLoading(true);
+      const user = supabase.auth.user();
+      if (!user) throw new Error("No user on the session!");
 
       const updates = {
         id: user.id,
@@ -317,78 +337,88 @@ export default function Account({ session }) {
         website,
         avatar_url,
         updated_at: new Date(),
-      }
+      };
 
-      let { error } = await supabase.from('profiles').upsert(updates, {
-        returning: 'minimal', // Don't return the value after inserting
-      })
+      let { error } = await supabase
+        .from("profiles")
+        .upsert(updates, { returning: "minimal" });
 
       if (error) {
-        throw error
+        throw error;
       }
     } catch (error) {
-      alert(error.message)
+      Alert.alert((error as ApiError).message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   return (
-    <View className="form-widget">
-      <View>
-        <Input id="email" type="text" value={session.user.email} disabled />
+    <View>
+      <View style={[styles.verticallySpaced, styles.mt20]}>
+        <Input label="Email" value={session?.user?.email} disabled />
       </View>
-      <View>
+      <View style={styles.verticallySpaced}>
         <Input
-          id="username"
-          type="text"
-          value={username || ''}
-          onChange={(e) => setUsername(e.target.value)}
+          label="Username"
+          value={username || ""}
+          onChangeText={(text) => setUsername(text)}
         />
       </View>
-      <View>
-        <label htmlFor="website">Website</label>
+      <View style={styles.verticallySpaced}>
         <Input
-          id="website"
-          type="website"
-          value={website || ''}
-          onChange={(e) => setWebsite(e.target.value)}
+          label="Website"
+          value={website || ""}
+          onChangeText={(text) => setWebsite(text)}
         />
       </View>
 
-      <View>
+      <View style={[styles.verticallySpaced, styles.mt20]}>
         <Button
-          className="button block primary"
-          onClick={() => updateProfile({ username, website, avatar_url })}
+          title={loading ? "Loading ..." : "Update"}
+          onPress={() => updateProfile({ username, website, avatar_url })}
           disabled={loading}
-        >
-          {loading ? 'Loading ...' : 'Update'}
-        </Button>
+        />
       </View>
 
-      <View>
-        <Button className="button block" onClick={() => supabase.auth.signOut()}>
-          Sign Out
-        </Button>
+      <View style={styles.verticallySpaced}>
+        <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
       </View>
     </View>
-  )
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 40,
+    padding: 12,
+  },
+  verticallySpaced: {
+    paddingTop: 4,
+    paddingBottom: 4,
+    alignSelf: "stretch",
+  },
+  mt20: {
+    marginTop: 20,
+  },
+});
 ```
 
 ### Launch!
 
-Now that we have all the components in place, let's update `app.js`:
+Now that we have all the components in place, let's update `App.tsx`:
 
-```jsx title="app.js"
+```jsx title="App.tsx"
+import 'react-native-url-polyfill/auto'
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
 import Account from './components/Account'
 import { View } from 'react-native'
+import { Session } from '@supabase/supabase-js'
 
 export default function App() {
-  const [session, setSession] = useState(null)
+  const [session, setSession] = (useState < Session) | (null > null)
 
   useEffect(() => {
     setSession(supabase.auth.session())
@@ -399,8 +429,8 @@ export default function App() {
   }, [])
 
   return (
-    <View className="container">
-      {!session ? <Auth /> : <Account key={session.user.id} session={session} />}
+    <View>
+      {session && session.user ? <Account key={session.user.id} session={session} /> : <Auth />}
     </View>
   )
 }
