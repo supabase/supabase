@@ -2,7 +2,7 @@ import PAYGUsage from './PAYGUsage/PAYGUsage'
 import Subscription from './Subscription/Subscription'
 
 import PlanSelection from './PlanSelection'
-import ProUpgrade from './ProUpgrade/ProUpgrade'
+import ProUpgrade from './ProUpgrade'
 import EnterpriseRequest from './EnterpriseRequest'
 import ExitSurvey from './ExitSurvey/ExitSurvey'
 import PaymentSummaryPanel from './PaymentSummaryPanel'

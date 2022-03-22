@@ -1,6 +1,5 @@
 import { FC, useEffect, useState } from 'react'
 import { Transition } from '@headlessui/react'
-import { useRouter } from 'next/router'
 import { Badge, Button, IconArrowLeft, IconHelpCircle, Toggle, Modal } from '@supabase/ui'
 
 import { useStore } from 'hooks'
@@ -34,7 +33,6 @@ const ProUpgrade: FC<Props> = ({
   onSelectBack,
 }) => {
   const { ui } = useStore()
-  const router = useRouter()
 
   const { addons } = products
   const projectRef = ui.selectedProject?.ref
