@@ -281,7 +281,7 @@ import { Button, Input } from "react-native-elements";
 import { ApiError, Session } from "@supabase/supabase-js";
 
 export default function Account({ session }: { session: Session }) {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState("");
   const [website, setWebsite] = useState("");
   const [avatar_url, setAvatarUrl] = useState("");
