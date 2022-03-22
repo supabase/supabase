@@ -6,7 +6,13 @@ export const LogsFilter = ({ options, filtersState, dispatchFilters }: any) => {
   const [open, setOpen] = useState(false)
 
   function handleReset() {
-    dispatchFilters({ [options.key]: null })
+    // console.log('handleReset ran!')
+    const empty = {
+      [options.key]: [],
+    }
+
+    dispatchFilters({ ...empty })
+    setOpen(!open)
   }
 
   // console.log('filters', filters)
@@ -71,8 +77,9 @@ export const LogsFilter = ({ options, filtersState, dispatchFilters }: any) => {
                 })
 
                 // console.log('payload', payload)
-
+                // console.log('submit form ran')
                 dispatchFilters({ ...payload })
+                handleReset()
               }}
             >
               {({ isSubmitting }: { isSubmitting: boolean }) => (
@@ -99,7 +106,12 @@ export const LogsFilter = ({ options, filtersState, dispatchFilters }: any) => {
                 border-t border-scale-400 dark:border-scale-500
               "
                   >
-                    <Button size="tiny" type="default" onClick={() => handleReset()}>
+                    <Button
+                      size="tiny"
+                      type="default"
+                      onClick={() => handleReset()}
+                      htmlType="button"
+                    >
                       Clear
                     </Button>
                     <Button loading={isSubmitting} type="primary" htmlType="submit">

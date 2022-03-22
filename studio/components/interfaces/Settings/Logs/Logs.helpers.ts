@@ -11,7 +11,7 @@ export function filterSqlWhereBuilder(
   // console.log('raw filters', filters)
 
   // remove any filter arrays that are empty
-  const filtersSanitized: any = Object.values(filters).filter((x) => x.length > 0)
+  const filtersSanitized: any = Object.values(filters).filter((x) => x && x.length > 0)
 
   // console.log('filtersSanitized', filtersSanitized)
 
@@ -20,6 +20,8 @@ export function filterSqlWhereBuilder(
   // build array of where statements
   // first item is `where` if there are any filters
   let whereArray: string[] = filtersSanitized.length > 0 ? ['where'] : []
+
+  if (filtersSanitized.length === 0) return whereArray
 
   keys.map((x: string, i) => {
     // do not parse empty key
@@ -79,6 +81,8 @@ export function filterReducer(state: FilterObject, action: any) {
   const oldState = { ...state }
 
   const newState = { ...oldState, ...action }
+
+  console.log('newState', newState)
 
   return newState
 }
