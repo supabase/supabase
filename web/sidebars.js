@@ -139,6 +139,7 @@ module.exports = {
             'guides/auth/auth-twitch',
             'guides/auth/auth-twitter',
             'guides/auth/auth-twilio',
+            'guides/auth/auth-vonage',
             'guides/auth/auth-messagebird',
             'guides/auth/auth-zoom',
           ],
