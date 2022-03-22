@@ -36,12 +36,9 @@ const BillingUpdatePro: NextPage = () => {
     if (projectRef) {
       getStripeProducts()
       getSubscription()
+      getPaymentMethods()
     }
   }, [projectRef])
-
-  useEffect(() => {
-    if (stripeCustomerId) getStripeAccount()
-  }, [stripeCustomerId])
 
   const getStripeProducts = async () => {
     try {
@@ -58,20 +55,21 @@ const BillingUpdatePro: NextPage = () => {
     }
   }
 
-  const getStripeAccount = async () => {
+  const getPaymentMethods = async () => {
+    const orgSlug = ui.selectedOrganization?.slug ?? ''
     try {
       setIsLoadingPaymentMethods(true)
-      const { paymentMethods, error: customerError } = await post(`${API_URL}/stripe/customer`, {
-        stripe_customer_id: stripeCustomerId,
-      })
-      if (customerError) throw customerError
+      const { data: paymentMethods, error } = await get(
+        `${API_URL}/organizations/${orgSlug}/payments`
+      )
+      if (error) throw error
       setIsLoadingPaymentMethods(false)
       setPaymentMethods(paymentMethods)
     } catch (error: any) {
       ui.setNotification({
         error,
         category: 'error',
-        message: `Failed to get subscription: ${error.message}`,
+        message: `Failed to get available payment methods: ${error.message}`,
       })
     }
   }
@@ -106,7 +104,7 @@ const BillingUpdatePro: NextPage = () => {
         products={products}
         currentSubscription={subscription}
         isLoadingPaymentMethods={isLoadingPaymentMethods}
-        paymentMethods={paymentMethods?.data ?? []}
+        paymentMethods={paymentMethods || []}
         onSelectBack={() => router.push(`/project/${projectRef}/settings/billing/update`)}
       />
     </BillingLayout>

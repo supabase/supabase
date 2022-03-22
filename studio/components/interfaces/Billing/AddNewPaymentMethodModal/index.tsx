@@ -28,10 +28,7 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, onCancel }) => {
   const setupIntent = async () => {
     setIntent(undefined)
     const orgSlug = ui.selectedOrganization?.slug ?? ''
-    const customerId = ui.selectedOrganization?.stripe_customer_id ?? ''
-    const intent = await post(`${API_URL}/organizations/${orgSlug}/payment/setup-intent`, {
-      customer_id: customerId,
-    })
+    const intent = await post(`${API_URL}/organizations/${orgSlug}/payments/setup-intent`, {})
     setIntent(intent)
   }
 

@@ -141,9 +141,14 @@ const PaymentSummaryPanel: FC<Props> = ({
             <p className="text-sm text-scale-1100">Retrieving payment methods</p>
           </div>
         ) : paymentMethods.length === 0 ? (
-          // [TODO] We need some UI to allow users to add payment methods here
-          <div className="flex items-center rounded-md space-x-4 px-4 py-2 bg-scale-400 border border-scale-700">
-            <div className="text-scale-1100">No methods</div>
+          <div className="flex items-center justify-between rounded-md px-4 py-2 bg-scale-400 border border-scale-700">
+            <div className="flex items-center space-x-4">
+              <IconAlertCircle size={16} />
+              <p className="text-scale-1100 text-sm">No saved payment methods</p>
+            </div>
+            <Button type="default" icon={<IconPlus />} onClick={onSelectAddNewPaymentMethod}>
+              Add new
+            </Button>
           </div>
         ) : (
           <Listbox value={selectedPaymentMethod?.id} onChange={onSelectPaymentMethod}>
