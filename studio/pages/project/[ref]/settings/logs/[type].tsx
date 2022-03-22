@@ -91,6 +91,18 @@ export const LogPage: NextPage = () => {
     }
   }, [s, te, ts])
 
+  useEffect(() => {
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        q: undefined,
+        s: filters.search_query || '',
+        ts: params.timestamp_start,
+        te: params.timestamp_end,
+      },
+    })
+  }, [params.timestamp_end, params.timestamp_start, filters.search_query])
   const onSelectTemplate = (template: LogTemplate) => {
     setFilters((prev) => ({ ...prev, search_query: template.searchString }))
   }
