@@ -17,6 +17,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 interface Props {
   defaultSearchValue?: string
+  defaultFromValue?: string
   defaultToValue?: string
   templates?: any
   isLoading: boolean
@@ -43,6 +44,7 @@ const LogPanel: FC<Props> = ({
   onRefresh,
   onSearch = () => {},
   defaultSearchValue = '',
+  defaultFromValue = '',
   defaultToValue = '',
   onCustomClick,
   onSelectTemplate,
@@ -51,6 +53,7 @@ const LogPanel: FC<Props> = ({
 }) => {
   const [search, setSearch] = useState('')
   const [to, setTo] = useState({ value: '', error: '' })
+  const [from, setFrom] = useState({ value: '', error: '' })
   const [defaultTimestamp, setDefaultTimestamp] = useState(dayjs().utc().toISOString())
 
   // Sync local state with provided default value
@@ -64,9 +67,12 @@ const LogPanel: FC<Props> = ({
     if (to.value !== defaultToValue) {
       setTo({ value: defaultToValue, error: '' })
     }
-  }, [defaultToValue])
+    if (from.value !== defaultFromValue) {
+      setFrom({ value: defaultFromValue, error: '' })
+    }
+  }, [defaultToValue, defaultFromValue])
 
-  const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     if (value !== '' && isNaN(Date.parse(value))) {
       setTo({ value, error: 'Invalid ISO 8601 timestamp' })
@@ -74,16 +80,26 @@ const LogPanel: FC<Props> = ({
       setTo({ value, error: '' })
     }
   }
-  const handleFromReset = async () => {
+
+  const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    if (value !== '' && isNaN(Date.parse(value))) {
+      setFrom({ value, error: 'Invalid ISO 8601 timestamp' })
+    } else {
+      setFrom({ value, error: '' })
+    }
+  }
+  const handleReset = async () => {
     setTo({ value: '', error: '' })
+    setFrom({ value: '', error: '' })
     const value = dayjs().utc().toISOString()
     setDefaultTimestamp(value)
-    onSearch({ query: search, to: '' })
+    onSearch({ query: search, to: '', from: '' })
   }
 
-  const handleSearch = () => onSearch({ query: search, to: to.value })
+  const handleSearch = () => onSearch({ query: search, to: to.value, from: from.value })
 
-  const showFromReset = to.value !== ''
+  const showReset = to.value !== '' || from.value !== ''
   return (
     <div className="bg-panel-header-light dark:bg-panel-header-dark">
       <div className="px-2 py-1 flex items-center justify-between w-full">
@@ -147,14 +163,24 @@ const LogPanel: FC<Props> = ({
                   align="end"
                   portalled
                   overlay={
-                    <Input
-                      label="To"
-                      labelOptional="UTC"
-                      value={to.value === '' ? defaultTimestamp : to.value}
-                      onChange={handleFromChange}
-                      error={to.error}
-                      className="w-72 p-3"
-                      actions={[
+                    <>
+                      <Input
+                        label="From"
+                        labelOptional="UTC"
+                        value={from.value === '' ? defaultTimestamp : from.value}
+                        onChange={handleFromChange}
+                        error={from.error}
+                        className="w-72 p-3"
+                      />
+                      <Input
+                        label="To"
+                        labelOptional="UTC"
+                        value={to.value === '' ? defaultTimestamp : to.value}
+                        onChange={handleToChange}
+                        error={to.error}
+                        className="w-72 p-3"
+                      />
+                      <div className="flex flex-row justify-end pb-2 px-4">
                         <Button
                           key="set"
                           size="tiny"
@@ -163,29 +189,29 @@ const LogPanel: FC<Props> = ({
                           onClick={handleSearch}
                         >
                           Set
-                        </Button>,
-                      ]}
-                    />
+                        </Button>
+                      </div>
+                    </>
                   }
                 >
                   <Button
                     as="span"
                     size="tiny"
-                    className={showFromReset ? '!rounded-r-none' : ''}
-                    type={showFromReset ? 'outline' : 'text'}
+                    className={showReset ? '!rounded-r-none' : ''}
+                    type={showReset ? 'outline' : 'text'}
                     icon={<IconClock size="tiny" />}
                   >
-                    {to.value ? 'Custom' : 'Now'}
+                    {to.value || from.value ? 'Custom' : 'Now'}
                   </Button>
                 </Popover>
-                {showFromReset && (
+                {showReset && (
                   <Button
                     size="tiny"
-                    className={showFromReset ? '!rounded-l-none' : ''}
+                    className={showReset ? '!rounded-l-none' : ''}
                     icon={<IconX size="tiny" />}
                     type="outline"
                     title="Clear timestamp filter"
-                    onClick={handleFromReset}
+                    onClick={handleReset}
                   />
                 )}
               </div>

@@ -23,6 +23,7 @@ interface Data<T> {
   pageSize: number
   filters: T
   params: LogsEndpointParams
+  oldestTimestamp?: string
 }
 interface Handlers<T> {
   loadOlder: () => void
@@ -58,6 +59,8 @@ function useLogsPreview<Filters>(
     rawSql: genDefaultQuery(table),
     period_start: '',
     period_end: '',
+    timestamp_start: '',
+    timestamp_end: '',
   })
   const [filters, setFilters] = useState<Filters>(options.initialFilters)
 
@@ -122,9 +125,18 @@ function useLogsPreview<Filters>(
       error = response.error
     }
   })
-
+  const oldestTimestamp = logData[logData.length - 1]?.timestamp
   return [
-    { newCount, logData, isLoading: isValidating, pageSize: size, error, filters, params },
+    {
+      newCount,
+      logData,
+      isLoading: isValidating,
+      pageSize: size,
+      error,
+      filters,
+      params,
+      oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,
+    },
     {
       setFrom: (value) => setParams((prev) => ({ ...prev, timestamp_start: value })),
       setTo: (value) => setParams((prev) => ({ ...prev, timestamp_end: value })),
