@@ -1,5 +1,5 @@
 import useSWR from 'swr'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
@@ -32,6 +32,9 @@ import {
   genDefaultQuery,
   genCountQuery,
   LogsTableName,
+  filterSqlWhereBuilder,
+  FilterObject,
+  filterReducer,
 } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
 import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite'
@@ -56,18 +59,30 @@ export const LogPage: NextPage = () => {
   const router = useRouter()
   const { ref, type, s, te, ts } = router.query
   const [showChart, setShowChart] = useState(true)
+
+  const [whereFilters, dispatchWhereFilters] = useReducer(filterReducer, {})
+
   const table = type === 'api' ? LogsTableName.EDGE : LogsTableName.POSTGRES
+
+  // const [whereClauses, setWhereClauses] = useState('')
 
   const [
     { error, logData, params, newCount, filters, isLoading, oldestTimestamp },
     { loadOlder, setFilters, refresh, setTo, setFrom },
   ] = useLogsPreview(ref as string, table, {
     initialFilters: { search_query: s as string },
-    whereStatementFactory: (filterObj) =>
-      `${
-        filterObj.search_query ? `REGEXP_CONTAINS(event_message, '${filterObj.search_query}')` : ''
-      }`,
+    whereStatementFactory: (filterObj) => `${
+      filterObj.search_query
+        ? `where REGEXP_CONTAINS(event_message, '${filterObj.search_query}')`
+        : ''
+    }
+    ${filterSqlWhereBuilder(whereFilters, table, filterObj.search_query).join('\n')}`,
   })
+
+  useEffect(() => {
+    console.log('refresh happening')
+    refresh()
+  }, [whereFilters])
 
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as keyof typeof LOG_TYPE_LABEL_MAPPING]}`
 
@@ -123,6 +138,18 @@ export const LogPage: NextPage = () => {
     })
   }
 
+  useEffect(() => {
+    // console.log('useEffectFilters', whereFilters)
+
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        ...whereFilters,
+      },
+    })
+  }, [whereFilters])
+
   return (
     <SettingsLayout title={title}>
       <div
@@ -156,6 +183,9 @@ export const LogPage: NextPage = () => {
             router.push(`/project/${ref}/logs-explorer?q=${params.rawSql}`)
           }}
           onSelectTemplate={onSelectTemplate}
+          dispatchWhereFilters={dispatchWhereFilters}
+          whereFilters={whereFilters}
+          table={table}
         />
         {/* {showChart && (
           <div>
