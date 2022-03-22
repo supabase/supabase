@@ -371,30 +371,8 @@ pages:
       };
       ```
       
-      To get more from the generated types, optionally you can use [`postgrest-js-tools`](https://github.com/mzalevski/postgrest-js-tools).
+      For more advance type-support, check out [`postgrest-js-tools`](https://github.com/mzalevski/postgrest-js-tools).
 
-      Features:
-      
-      - Intellisense while selecting fields (`getShape`).
-      - Return type based on the selected fields (`typeof shape`).
-      - Auto-generated select string (`getFields`).
-
-      ```
-      import { getShape, getFields } from "postgrest-js-tools";
-
-      const shape = getShape<definitions["users"]>()({
-        id: true,
-        status: true,
-      });
-
-      export default async (req: NextApiRequest, res: NextApiResponse) => {
-        const allOnlineUsers = await supabase
-          .from<typeof shape>("users")
-          .select(getFields(shape))
-          .eq("status", "ONLINE");
-        res.status(200).json(allOnlineUsers);
-      };
-      ```
 
       ### Update types automatically with GitHub Actions
 
