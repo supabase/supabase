@@ -178,7 +178,7 @@ test('s= query param will populate the search bar', async () => {
   expect(get).toHaveBeenCalledWith(expect.stringContaining('someSearch'))
 })
 
-test('te= query param will populate the timestamp from input', async () => {
+test('te= query param will populate the timestamp to input', async () => {
   // get time 20 mins before
   const newDate = new Date()
   newDate.setMinutes(new Date().getMinutes() - 20)
@@ -197,6 +197,26 @@ test('te= query param will populate the timestamp from input', async () => {
   userEvent.click(await screen.findByText('Custom'))
   await screen.findByDisplayValue(isoString)
 })
+test('ts= query param will populate the timestamp from input', async () => {
+  // get time 20 mins before
+  const newDate = new Date()
+  newDate.setMinutes(new Date().getMinutes() - 20)
+  const isoString = newDate.toISOString()
+  const unixMicro = newDate.getTime() * 1000 //microseconds
+  const router = defaultRouterMock()
+  router.query = { ...router.query, ts: unixMicro }
+  useRouter.mockReturnValue(router)
+  render(<LogPage />)
+
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(
+      expect.stringContaining(`timestamp_start=${encodeURIComponent(unixMicro)}`)
+    )
+  })
+  userEvent.click(await screen.findByText('Custom'))
+  await screen.findByDisplayValue(isoString)
+})
+
 
 test('load older btn will fetch older logs', async () => {
   get.mockImplementation((url) => {

@@ -78,42 +78,47 @@ test('reset search filter', async () => {
   expect(() => screen.getByDisplayValue(/something123/)).toThrow()
 })
 
-test('timestamp To filter default value', async () => {
+test('timestamp to/from filter default value', async () => {
   render(<LogPanel defaultToValue="2022-01-18T10:43:39+0000" />)
   userEvent.click(await screen.findByText('Custom'))
   await screen.findByDisplayValue('2022-01-18T10:43:39+0000')
   // TODO: use screen.findByLabelText when https://github.com/supabase/ui/issues/310 is resolved
   await screen.findByText('To')
+  await screen.findByText('From')
 })
 
-test('timestamp from filter error handling', async () => {
+test('timestamp to/from filter error handling', async () => {
   const mockFn = jest.fn()
   render(<LogPanel onSearch={mockFn} />)
   userEvent.click(await screen.findByText(/Now/))
 
   // display iso timestamp
   const year = new Date().getFullYear()
-  const input = await screen.findByDisplayValue(RegExp(year))
+  const inputs = await screen.findAllByDisplayValue(RegExp(year))
+  expect(inputs.length).toBe(2)
+  const input = inputs[0]
   userEvent.clear(input)
   userEvent.type(input, '123456')
   await screen.findByText(/[iI]nvalid ISO 8601 timestamp/)
 })
 
-test('timestamp To filter value change', async () => {
+test('timestamp to/from filter value change', async () => {
   const mockFn = jest.fn()
   render(<LogPanel onSearch={mockFn} />)
   userEvent.click(await screen.findByText(/Now/))
   // display iso timestamp
   const year = new Date().getFullYear()
-  const input = await screen.findByDisplayValue(RegExp(year))
+  const inputs = await screen.findAllByDisplayValue(RegExp(year))
 
-  // replace the input's value
-  userEvent.clear(input)
+  for (const input of inputs) {
+    // replace the input's value
+    userEvent.clear(input)
 
-  // get time 20 mins before
-  const newDate = new Date()
-  newDate.setMinutes(new Date().getMinutes() - 20)
-  userEvent.type(input, newDate.toISOString())
+    // get time 20 mins before
+    const newDate = new Date()
+    newDate.setMinutes(new Date().getMinutes() - 20)
+    userEvent.type(input, newDate.toISOString())
+  }
 
   // input actions
   const set = await screen.findByRole('button', { name: 'Set' })
