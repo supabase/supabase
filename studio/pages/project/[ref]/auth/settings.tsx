@@ -985,7 +985,7 @@ const Settings = () => {
               <AutoField
                 name="EXTERNAL_WORKOS_URL"
                 showInlineError
-                errorMessage="Please enter the WorkOS tenant url."
+                errorMessage="Please enter the WorkOS url."
               />
             </>
           )}
