@@ -96,9 +96,11 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     EXTERNAL_WORKOS_ENABLED: false,
     EXTERNAL_WORKOS_CLIENT_ID: null,
     EXTERNAL_WORKOS_SECRET: null,
+    EXTERNAL_WORKOS_URL: null,
     EXTERNAL_ZOOM_ENABLED: false,
     EXTERNAL_ZOOM_CLIENT_ID: null,
     EXTERNAL_ZOOM_SECRET: null,
+    EXTERNAL_ZOOM_URL: null,
     
     MAILER_SUBJECTS_INVITE: 'You have been invited',
     MAILER_SUBJECTS_CONFIRMATION: 'Confirm Your Signup',
