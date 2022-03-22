@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Transition } from '@headlessui/react'
-import { Button, Form, Input, IconArrowLeft, IconCheckCircle } from '@supabase/ui'
+import { Button, Form, Input, IconArrowLeft } from '@supabase/ui'
 
 import { post } from 'lib/common/fetch'
 import { useStore } from 'hooks'

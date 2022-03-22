@@ -25,7 +25,7 @@ interface Props {
   loading: boolean
   defaultPaymentMethod: string
   paymentMethods: any[]
-  onDefaultMethodUpdated: () => void
+  onDefaultMethodUpdated: (updatedCustomer: any) => void
   onPaymentMethodsDeleted: () => void
 }
 
@@ -48,13 +48,13 @@ const PaymentMethods: FC<Props> = ({
   const onConfirmMakeDefaultPaymentMethod = async () => {
     try {
       setIsUpdatingPaymentMethod(true)
-      const { error } = await patch(`${API_URL}/organizations/${orgSlug}/customer`, {
+      const updatedCustomer = await patch(`${API_URL}/organizations/${orgSlug}/customer`, {
         invoice_settings: {
           default_payment_method: selectedMethodForDefault.id,
         },
       })
-      if (error) throw error
-      onDefaultMethodUpdated()
+      if (updatedCustomer.error) throw updatedCustomer.error
+      onDefaultMethodUpdated(updatedCustomer)
       setSelectedMethodForDefault(undefined)
       ui.setNotification({
         category: 'success',

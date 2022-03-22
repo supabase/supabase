@@ -22,15 +22,18 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
   const router = useRouter()
   const { ui } = useStore()
 
+  const [customer, setCustomer] = useState<any>(null)
+  const [isLoadingCustomer, setIsLoadingCustomer] = useState(false)
+
+  const [paymentMethods, setPaymentMethods] = useState<any>(null)
   const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
 
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<any>(undefined)
-  const [customer, setCustomer] = useState<any>(null)
   const [taxIds, setTaxIds] = useState<any>(null)
-  const [paymentMethods, setPaymentMethods] = useState<any>(null)
+  const [isLoadingTaxIds, setIsLoadingTaxIds] = useState(false)
 
-  const { slug, stripe_customer_id, stripe_customer_object } = organization
+  const [loading, setLoading] = useState<boolean>(false)
+
+  const { slug, stripe_customer_id } = organization
 
   const defaultPaymentMethod = customer?.invoice_settings?.default_payment_method ?? ''
   const customerBalance = customer && customer.balance ? customer.balance / 100 : 0
@@ -42,41 +45,36 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
       : customerBalance
 
   useEffect(() => {
+    getCustomerProfile()
     getPaymentMethods()
+    getTaxIds()
   }, [slug])
 
   useEffect(() => {
-    if (stripe_customer_id) {
-      getStripeAccount()
-    }
+    if (stripe_customer_id) getStripeAccount()
   }, [stripe_customer_id])
 
-  /**
-   * Get stripe account to populate page
-   */
   const getStripeAccount = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const { customer, error: customerError } = await post(`${API_URL}/stripe/customer`, {
-        stripe_customer_id: stripe_customer_id,
-      })
-      if (customerError) throw customerError
-      setCustomer(customer)
+    const { customer, error: customerError } = await post(`${API_URL}/stripe/customer`, {
+      stripe_customer_id: stripe_customer_id,
+    })
+    if (customerError) throw customerError
+    console.log('getStripeAccount', customer)
+  }
 
-      const { taxIds, error: taxIdsError } = await post(`${API_URL}/stripe/tax-ids`, {
-        stripe_customer_id: stripe_customer_id,
-      })
-      if (taxIdsError) throw taxIdsError
-      setTaxIds(taxIds)
+  const getCustomerProfile = async () => {
+    try {
+      setIsLoadingCustomer(true)
+      const customer = await get(`${API_URL}/organizations/${slug}/customer`)
+      if (customer.error) throw customer.error
+      setCustomer(customer)
+      setIsLoadingCustomer(false)
     } catch (error: any) {
       ui.setNotification({
+        error,
         category: 'error',
-        message: `Failed to get Stripe account: ${error.message}`,
+        message: `Failed to get organization information: ${error.message}`,
       })
-      setError(error)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -96,13 +94,28 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
     }
   }
 
+  const getTaxIds = async () => {
+    try {
+      setIsLoadingTaxIds(true)
+      const { data: taxIds, error } = await get(`${API_URL}/organizations/${slug}/tax-ids`)
+      if (error) throw error
+      setTaxIds(taxIds)
+      setIsLoadingTaxIds(false)
+    } catch (error: any) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to get organization tax IDs: ${error.message}`,
+      })
+    }
+  }
+
   /**
    * Get a link and then redirect them
    * path is used to determine what path inside billing portal to redirect to
    */
   const redirectToPortal = async (path: any) => {
     try {
-      setLoading(true)
       let { billingPortal } = await post(`${API_URL}/stripe/billing`, {
         stripe_customer_id,
         returnTo: `${getURL()}${router.asPath}`,
@@ -110,8 +123,6 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
       window.location.replace(billingPortal + (path ? path : null))
     } catch (error: any) {
       ui.setNotification({ category: 'error', message: `Failed to redirect: ${error.message}` })
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -125,20 +136,20 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
             <ProjectsSummary projects={projects} />
             <CreditBalance balance={balance} isCredit={isCredit} isDebt={isDebt} />
             <PaymentMethods
-              loading={loading || isLoadingPaymentMethods}
+              loading={isLoadingCustomer || isLoadingPaymentMethods}
               defaultPaymentMethod={defaultPaymentMethod}
               paymentMethods={paymentMethods || []}
-              onDefaultMethodUpdated={() => getStripeAccount()}
+              onDefaultMethodUpdated={setCustomer}
               onPaymentMethodsDeleted={() => getPaymentMethods()}
             />
             <BillingAddress
-              loading={loading}
-              address={stripe_customer_object?.address ?? {}}
-              redirectToPortal={redirectToPortal}
+              loading={isLoadingCustomer}
+              address={customer?.address ?? {}}
+              onAddressUpdated={(address: any) => setCustomer({ ...customer, address })}
             />
             <TaxID
-              loading={loading}
-              taxIds={taxIds?.data ?? []}
+              loading={isLoadingTaxIds}
+              taxIds={taxIds || []}
               redirectToPortal={redirectToPortal}
             />
           </div>
