@@ -171,6 +171,18 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Platform',
+      collapsed: false,
+      items: ['guides/platform/logs'],
+    },
+    {
+      type: 'category',
+      label: 'Self Hosting',
+      collapsed: false,
+      items: ['guides/hosting/overview', 'guides/hosting/docker'],
+    },
+    {
+      type: 'category',
       label: 'Integrations',
       collapsed: false,
       items: [
@@ -182,24 +194,6 @@ module.exports = {
         'guides/integrations/snaplet',
         'guides/integrations/vercel',
       ],
-    },
-    // {
-    //   type: 'category',
-    //   label: 'Storage',
-    //   collapsed: false,
-    //   items: ['guides/storage/storage-sample'],
-    // },
-    {
-      type: 'category',
-      label: 'Platform',
-      collapsed: false,
-      items: ['guides/platform/logs'],
-    },
-    {
-      type: 'category',
-      label: 'Self Hosting',
-      collapsed: false,
-      items: ['guides/hosting/overview', 'guides/hosting/docker'],
     },
     {
       type: 'category',
