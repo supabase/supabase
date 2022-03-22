@@ -1010,7 +1010,7 @@ pages:
           ```
       - name: Bulk create
         description: |
-          When running a bulk create the operation is handled in a single transaction. If any of the inserts fail, all other operations are 
+          When running a bulk create, the operation is handled in a single transaction. If any of the inserts fail, all other operations are 
           rolled back.
         js: |
           ```js
