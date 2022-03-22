@@ -29,8 +29,8 @@ const Hero = () => {
                     <Space>
                       <Link href="https://app.supabase.io" as="https://app.supabase.io">
                         <a className="mt-10">
-                          <Button className="py-3" size="medium">
-                            Start your project
+                          <Button className="py-3" size="large">
+                            Try Supabase now!
                           </Button>
                         </a>
                       </Link>
