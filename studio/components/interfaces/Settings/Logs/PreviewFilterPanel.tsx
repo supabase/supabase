@@ -22,7 +22,7 @@ import { LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
-import { LogsFilter } from './../Logs'
+import { LogsFilter } from './Logs.filter'
 interface Props {
   defaultSearchValue?: string
   defaultToValue?: string
@@ -222,11 +222,12 @@ const PreviewFilterPanel: FC<Props> = ({
           </Button> */}
         </div>
 
-        <div className="flex items-center gap-2 items-center">
+        <div className="flex items-center gap-2">
           {Object.values(FILTER_OPTIONS[table]).map((x) => {
             // console.log('filter option', x)
             return (
               <LogsFilter
+                key={`${x.key}-filter`}
                 options={x}
                 dispatchFilters={dispatchWhereFilters}
                 filtersState={filters}
