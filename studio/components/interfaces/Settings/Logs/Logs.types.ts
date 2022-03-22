@@ -51,3 +51,15 @@ export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge' | 'sql'
 export type Mode = 'simple' | 'custom'
 
 export type Table = 'edge_logs' | 'postgres_logs'
+
+export interface FilterObject {
+  // severity?: string[]
+  // status_code?: string[]
+
+  // `q` for the editor query.
+  q?: string
+  // `s` for search query.
+  s?: string
+  // `te` for timestamp start value.
+  te?: string
+}

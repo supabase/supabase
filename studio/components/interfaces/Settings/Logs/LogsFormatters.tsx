@@ -178,7 +178,7 @@ export function jsonSyntaxHighlight(json: string) {
   json = JSON.stringify(json, null, 2)
   json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
-  console.log('json', json)
+  // console.log('json', json)
   const newJson = json.replace(
     /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
 
