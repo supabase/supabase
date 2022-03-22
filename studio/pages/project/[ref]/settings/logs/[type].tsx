@@ -64,8 +64,6 @@ export const LogPage: NextPage = () => {
 
   const table = type === 'api' ? LogsTableName.EDGE : LogsTableName.POSTGRES
 
-  // const [whereClauses, setWhereClauses] = useState('')
-
   const [
     { error, logData, params, newCount, filters, isLoading, oldestTimestamp },
     { loadOlder, setFilters, refresh, setTo, setFrom },
@@ -78,11 +76,6 @@ export const LogPage: NextPage = () => {
     }
     ${filterSqlWhereBuilder(whereFilters, table, filterObj.search_query).join('\n')}`,
   })
-
-  useEffect(() => {
-    console.log('refresh happening')
-    refresh()
-  }, [whereFilters])
 
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as keyof typeof LOG_TYPE_LABEL_MAPPING]}`
 
@@ -101,6 +94,11 @@ export const LogPage: NextPage = () => {
   const onSelectTemplate = (template: LogTemplate) => {
     setFilters((prev) => ({ ...prev, search_query: template.searchString }))
   }
+
+  useEffect(() => {
+    // runs when any of the filters change
+    handleRefresh()
+  }, [whereFilters])
 
   const handleRefresh = () => {
     refresh()
@@ -148,7 +146,7 @@ export const LogPage: NextPage = () => {
         ...whereFilters,
       },
     })
-  }, [whereFilters])
+  }
 
   return (
     <SettingsLayout title={title}>
