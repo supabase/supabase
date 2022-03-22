@@ -14,10 +14,15 @@ import {
   IconLink,
   IconExternalLink,
   IconCalendar,
+  IconEye,
+  Checkbox,
+  Form,
 } from '@supabase/ui'
 import { LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
+import { LogsFilter } from './../Logs'
 interface Props {
   defaultSearchValue?: string
   defaultToValue?: string
@@ -31,6 +36,9 @@ interface Props {
   onSelectTemplate: (template: LogTemplate) => void
   isShowingEventChart: boolean
   onToggleEventChart: () => void
+  dispatchWhereFilters: (x: any) => void
+  whereFilters: any
+  table: LogsTableName
 }
 
 dayjs.extend(utc)
@@ -51,6 +59,9 @@ const PreviewFilterPanel: FC<Props> = ({
   onSelectTemplate,
   isShowingEventChart,
   onToggleEventChart,
+  dispatchWhereFilters,
+  whereFilters: filters,
+  table,
 }) => {
   const [search, setSearch] = useState('')
   const [to, setTo] = useState({ value: '', error: '' })
@@ -132,6 +143,8 @@ const PreviewFilterPanel: FC<Props> = ({
 
   const showFromReset = to.value !== ''
 
+  // console.log('this is what is going through', FILTER_OPTIONS[table])
+
   return (
     <div className="flex items-center justify-between w-full">
       <div className="flex flex-row gap-4 items-center">
@@ -194,24 +207,38 @@ const PreviewFilterPanel: FC<Props> = ({
             <Button
               as="span"
               type="default"
-              style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+              icon={<IconClock size={12} />}
+              // style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
             >
               Last hour
             </Button>
           </Dropdown>
-          <Button
+          {/* <Button
             type="default"
             style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
             icon={<IconCalendar size={12} />}
           >
             Custom
-          </Button>
+          </Button> */}
+        </div>
+
+        <div className="flex items-center gap-2 items-center">
+          {Object.values(FILTER_OPTIONS[table]).map((x) => {
+            // console.log('filter option', x)
+            return (
+              <LogsFilter
+                options={x}
+                dispatchFilters={dispatchWhereFilters}
+                filtersState={filters}
+              />
+            )
+          })}
         </div>
 
         {!isCustomQuery && (
           <>
-            <div className="flex flex-row">
-              {/* <Popover
+            <div className="flex flex-row gap-2">
+              <Popover
                 side="bottom"
                 align="end"
                 portalled
@@ -241,32 +268,37 @@ const PreviewFilterPanel: FC<Props> = ({
                   as="span"
                   size="tiny"
                   className={showFromReset ? '!rounded-r-none' : ''}
-                  type={showFromReset ? 'outline' : 'text'}
+                  type={showFromReset ? 'default' : 'secondary'}
                   icon={<IconClock size="tiny" />}
                 >
                   {to.value ? 'Custom' : 'Now'}
                 </Button>
-              </Popover> */}
+              </Popover>
 
               {/* Clear the filters could be here */}
-
-              {/* {showFromReset && (
-                  <Button
-                    size="tiny"
-                    className={showFromReset ? '!rounded-l-none' : ''}
-                    icon={<IconX size="tiny" />}
-                    type="outline"
-                    title="Clear timestamp filter"
-                    onClick={handleFromReset}
-                  />
-                )} */}
             </div>
+            {/* {showFromReset && ( */}
+            {/* <Button
+              size="tiny"
+              className={showFromReset ? '!rounded-l-none' : ''}
+              type="warning"
+              title="Clear timestamp filter"
+              onClick={handleFromReset}
+            >
+              Clear filter
+            </Button> */}
+            {/* )} */}
             {/* {!isCustomQuery && (
+              <>
                 <div className="flex items-center space-x-2">
                   <p className="text-xs">Show event chart</p>
                   <Toggle size="tiny" checked={isShowingEventChart} onChange={onToggleEventChart} />
                 </div>
-              )} */}
+                <Button type="default" icon={<IconEye size={12} />}>
+                  Show Histogram
+                </Button>
+              </>
+            )} */}
             {/* wrap with form so that if user presses enter, the search value will submit automatically */}
           </>
         )}

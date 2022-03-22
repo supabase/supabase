@@ -28,7 +28,7 @@ const LogTable = ({ isCustomQuery, data = [], queryType }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const columnNames = Object.keys(data[0] || {})
 
-  console.log('queryType', queryType)
+  // console.log('queryType', queryType)
 
   // console.log('focusedLog', focusedLog)
 
@@ -73,7 +73,7 @@ const LogTable = ({ isCustomQuery, data = [], queryType }: Props) => {
 
   let columns
 
-  console.log('QUERY TYPE', queryType)
+  // console.log('QUERY TYPE', queryType)
 
   switch (queryType) {
     case 'api':
@@ -82,7 +82,7 @@ const LogTable = ({ isCustomQuery, data = [], queryType }: Props) => {
         break
       }
 
-      console.log('is api, running column')
+      // console.log('is api, running column')
       columns = DatabaseApiColumnRender
 
       break
@@ -93,7 +93,7 @@ const LogTable = ({ isCustomQuery, data = [], queryType }: Props) => {
         break
       }
 
-      console.log('is api, running column')
+      // console.log('is api, running column')
       columns = DatabasePostgresColumnRender
 
       break
