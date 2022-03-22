@@ -528,6 +528,9 @@ pages:
           ```
       - name: Sign in with redirect.
         description: |
+          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by 
+          the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
+           
           Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
           any URL path on your website (the base domain must be the same as the domain in your Auth settings).
         js: |
@@ -1097,6 +1100,9 @@ pages:
             ])
           ```
       - name: Bulk create
+        description: |
+          When running a bulk create, the operation is handled in a single transaction. If any of the inserts fail, all other operations are 
+          rolled back.
         js: |
           ```js
           const { data, error } = await supabase
