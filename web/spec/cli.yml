@@ -14,13 +14,73 @@ info:
     - [ ] Generating types directly from your database schema
     - [ ] Generating API and validation schemas from your database
 
+    ## Getting started
+
+    ```bash
+    supabase help
+    ```
+
+    Follow the [Local Development guide](/docs/guides/local-development) for a quick overview of the CLI functionality.
+
     ## Installing the CLI
 
-    Installation instructions can be found [here](https://github.com/supabase/cli#install-the-cli).
+    ### macOS
+
+    Available via [Homebrew](https://brew.sh). To install:
+
+    ```sh
+    brew install supabase/tap/supabase
+    ```
+
+    To upgrade:
+
+    ```sh
+    brew upgrade supabase
+    ```
+
+    ### Windows
+
+    Available via [Scoop](https://scoop.sh). To install:
+
+    ```powershell
+    scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+    scoop install supabase
+    ```
+
+    To upgrade:
+
+    ```powershell
+    scoop update supabase
+    ```
+
+    ### Linux
+
+    Available via [Homebrew](https://brew.sh) and Linux packages.
+
+    #### via Homebrew
+
+    To install:
+
+    ```sh
+    brew install supabase/tap/supabase
+    ```
+
+    To upgrade:
+
+    ```sh
+    brew upgrade supabase
+    ```
+
+    #### via Linux packages
+
+    Linux packages are provided in [Releases](https://github.com/supabase/cli/releases).
+    To install, download the `.apk`/`.deb`/`.rpm` file depending on your package manager 
+    and run `sudo apk add --allow-untrusted <...>.apk`/`sudo dpkg -i <...>.deb`/`sudo rpm -i <...>.rpm` respectively.
 
     ## Support
 
     Report issues to our [issue tracker](https://github.com/supabase/cli/issues).
+    
   definition: spec/combined.json
   libraries:
     - name: 'sh'
