@@ -205,6 +205,10 @@
       "title": "Keycloak secret",
       "type": "string"
     },
+    "EXTERNAL_KEYCLOAK_URL": {
+      "title": "Keycloak URL",
+      "type": "string"
+    },
     "EXTERNAL_LINKEDIN_ENABLED": {
       "title": "Linkedin enabled",
       "type": "boolean"
@@ -287,6 +291,10 @@
     },
     "EXTERNAL_WORKOS_SECRET": {
       "title": "WorkOS secret",
+      "type": "string"
+    },
+    "EXTERNAL_WORKOS_URL": {
+      "title": "WorkOS URL",
       "type": "string"
     },
     "EXTERNAL_ZOOM_ENABLED": {
