@@ -370,6 +370,9 @@ pages:
         res.status(200).json(allOnlineUsers);
       };
       ```
+      
+      For more advance type-support, check out [`postgrest-js-tools`](https://github.com/mzalevski/postgrest-js-tools).
+
 
       ### Update types automatically with GitHub Actions
 
