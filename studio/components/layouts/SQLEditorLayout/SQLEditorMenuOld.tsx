@@ -217,7 +217,7 @@ const SideBarContent = observer(() => {
         {(sqlEditorStore?.tabs ?? []).length === 0 ? (
           <div className="my-4 px-7 flex items-center space-x-2">
             <IconLoader className="animate-spin" size={16} strokeWidth={2} />
-            <Typography.Text type="secondary">Loading SQL snippets</Typography.Text>
+            <p>Loading SQL snippets</p>
           </div>
         ) : (
           <div className="space-y-6">
