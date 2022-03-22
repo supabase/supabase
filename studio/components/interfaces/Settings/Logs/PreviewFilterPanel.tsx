@@ -23,6 +23,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
 import { LogsFilter } from './Logs.filter'
+import { DatePicker } from 'components/ui/DatePicker'
 interface Props {
   defaultSearchValue?: string
   defaultToValue?: string
@@ -185,10 +186,6 @@ const PreviewFilterPanel: FC<Props> = ({
           />
         </form>
 
-        <div>
-          <RefreshButton />
-        </div>
-
         <div className="flex items-center">
           <Dropdown
             size="small"
@@ -220,6 +217,11 @@ const PreviewFilterPanel: FC<Props> = ({
           >
             Custom
           </Button> */}
+          <DatePicker />
+        </div>
+
+        <div>
+          <RefreshButton />
         </div>
 
         <div className="flex items-center gap-2">
