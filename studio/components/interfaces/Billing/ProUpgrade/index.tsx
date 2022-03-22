@@ -5,6 +5,7 @@ import { Badge, Button, IconArrowLeft, IconHelpCircle, Toggle, Modal } from '@su
 import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { getURL } from 'lib/helpers'
 import Divider from 'components/ui/Divider'
 import {
   PaymentSummaryPanel,
@@ -232,6 +233,7 @@ const ProUpgrade: FC<Props> = ({
 
       <AddNewPaymentMethodModal
         visible={showAddPaymentMethodModal}
+        returnUrl={`${getURL()}/project/${projectRef}/settings/billing/update/pro`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
       />
 

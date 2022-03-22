@@ -10,12 +10,13 @@ import AddPaymentMethodForm from './AddPaymentMethodForm'
 
 interface Props {
   visible: boolean
+  returnUrl: string
   onCancel: () => void
 }
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
-const AddNewPaymentMethodModal: FC<Props> = ({ visible, onCancel }) => {
+const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) => {
   const { ui } = useStore()
   const [intent, setIntent] = useState<any>()
 
@@ -49,7 +50,7 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, onCancel }) => {
       <div className="py-4 space-y-4">
         {intent !== undefined ? (
           <Elements stripe={stripePromise} options={options}>
-            <AddPaymentMethodForm onCancel={onCancel} />
+            <AddPaymentMethodForm returnUrl={returnUrl} onCancel={onCancel} />
           </Elements>
         ) : (
           <div className="w-full flex items-center justify-center py-20">
