@@ -777,7 +777,6 @@ pages:
 
   auth.api.createUser():
     title: 'createUser()'
-    # $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
     $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
     notes: |
       - Requires a `service_role` key.
@@ -790,7 +789,8 @@ pages:
           const { data: user, error } = await supabase.auth.api.createUser({
             email: 'user@email.com',
             password: 'password',
-            data: { name: 'Yoda' }
+            data: { name: 'Yoda' },
+            email_confirm: true
           })
           ```
 
@@ -944,7 +944,7 @@ pages:
           ```js
           const { data: user, error } = await supabase.auth.api.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
-            { phone_number: true }
+            { phone_confirm: true }
           )
           ```
 
