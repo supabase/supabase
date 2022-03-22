@@ -60,12 +60,9 @@ const BillingUpdate: NextPage = () => {
         throw new Error('Unable to get subscription ID of project')
       }
 
-      const { data: subscription, error }: { data: StripeSubscription; error: any } = await post(
-        `${API_URL}/stripe/subscription`,
-        { subscription_id: ui.selectedProject.subscription_id }
-      )
+      const subscription = await get(`${API_URL}/projects/${projectRef}/subscription`)
+      if (subscription.error) throw subscription.error
 
-      if (error) throw error
       setSubscription(subscription)
     } catch (error: any) {
       ui.setNotification({
