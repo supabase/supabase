@@ -66,12 +66,12 @@ function FunctionsPage() {
           title={Solutions['functions'].name}
           h1={[
             <span key={'authentication-h1'}>
-            Run your cron jobs and custom code from Supabase!
+            Auto-scale your functions with Supabase!
             </span>,
           ]}
           subheader={[
-            'With Functions you can reduce the complexity of your application footprint with Supabase.',
-            "Unlock the ability to see the full scope of your application.",
+            'Reduce the complexity of your application footprint with serverless Supabase Functions.',
+            "Run asynchronous triggers that follow your Supabase Auth permissions.",
           ]}
           image={[
             <div className="w-full header--light block" key="light">
@@ -119,7 +119,7 @@ function FunctionsPage() {
               <Typography.Title level={4}>Go beyond Postgres Functions</Typography.Title>
               <Typography.Text>
                 <p className="text-base">
-                  Interact with third-party APIs and asynchronous tasks within Supabase. You don't need to create or manage servers to run code on Supabase.
+                  Interact with third-party APIs and asynchronous tasks within Supabase. You don't need to create or manage servers to run code with Supabase.
                 </p>
               </Typography.Text>
             </div>
@@ -202,7 +202,7 @@ function FunctionsPage() {
             </div>
           </div>
         </div>
-
+ 
         <SectionContainer>
           <div className="grid grid-cols-12 lg:gap-16">
             <div className="col-span-12 lg:col-span-5 mb-8">
@@ -212,6 +212,22 @@ function FunctionsPage() {
                   Supabase Functions give you the ability to privately connect to your database and serve your data, all without having to worry about scaling servers.
                 </p>
               </Typography.Text>
+                <div className="grid grid-cols-12 md:gap-8 lg:gap-0 xl:gap-16 mt-8" key={0}>
+                  <div className="col-span-12 sm:col-span-6 lg:col-span-12 xl:col-span-4">
+                    <FeatureColumn
+                      icon={<IconBriefcase />}
+                      title="Supabase Auth built-in"
+                      text="Your functions respect your existing Supabase Auth configuration."
+                    />
+                  </div>
+                  <div className="col-span-12 sm:col-span-6 lg:col-span-12 xl:col-span-4">
+                    <FeatureColumn
+                      icon={<IconEye />}
+                      title="Fit to your workflow"
+                      text="Work locally with secure access tokens, and deploy your functions everywhere."
+                    />
+                  </div>
+                </div>
               <Link href="/docs/guides/auth#policy-examples">
                 <a>
                   <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
