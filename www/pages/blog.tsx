@@ -161,8 +161,8 @@ function FeaturedThumb(blog: PostTypes) {
                   <img src={author.author_image_url} className="rounded-full w-10" />
                 )}
                 <div className="flex flex-col">
-                  <p className="m-0 text-sm">{author.author}</p>
-                  <p className="m-0 text-xs">{author.position}</p>
+                  <span className="m-0 text-sm text-scale-1200">{author.author}</span>
+                  <span className="m-0 text-xs text-scale-900">{author.position}</span>
                 </div>
               </div>
             )}
