@@ -10,6 +10,9 @@ export interface PathsDatum {
   count: number
   method: string
   avg_origin_time: number
+  p95: number
+  p99: number
+  sum: number
 }
 
 export interface EndpointResponse<T> {

@@ -23,14 +23,14 @@ const ProjectUsageSection: FC = observer(({}) => {
     return <Typography.Text type="danger">Error loading data {usageError.message}</Typography.Text>
   }
 
-  return (
+    return (
     <>
       {usage === undefined ? (
         <div className="w-full flex justify-center items-center space-x-2">
           <IconLoader className="animate-spin" size={14} />
           <p className="text-sm">Retrieving project usage statistics</p>
         </div>
-      ) : !usage.error && hasProjectData ? (
+      ) : !usage.error && true ? (
         <ProjectUsage project={project} />
       ) : (
         <NewProjectPanel />

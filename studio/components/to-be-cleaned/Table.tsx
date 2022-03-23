@@ -4,6 +4,7 @@ import { Typography } from '@supabase/ui'
 type TableProps = {
   body: JSX.Element | JSX.Element[]
   head?: JSX.Element | JSX.Element[]
+  headSecondRow?: JSX.Element | JSX.Element[]
   className?: string
   containerClassName?: string
   borderless?: boolean
@@ -17,6 +18,7 @@ function Table({
   containerClassName,
   borderless,
   headTrClasses,
+  headSecondRow,
 }: TableProps) {
   let containerClasses = ['table-container']
   if (containerClassName) containerClasses.push(containerClassName)
@@ -30,6 +32,7 @@ function Table({
       <table className={classes.join(' ')}>
         <thead>
           <tr className={headTrClasses}>{head}</tr>
+          {headSecondRow && <tr>{headSecondRow}</tr>}
         </thead>
         <tbody>{body}</tbody>
       </table>
@@ -37,17 +40,19 @@ function Table({
   )
 }
 
-type ThProps = {
+interface ThProps {
   children?: React.ReactNode
   className?: string
   style?: React.CSSProperties
+  colSpan?: number
+  rowSpan?: number
 }
 
-const Th: React.FC<ThProps> = ({ children, className, style }) => {
+const Th: React.FC<ThProps> = ({ children, className, style, ...rest }) => {
   const classes = ['p-3 px-4 text-left']
   if (className) classes.push(className)
   return (
-    <th className={classes.join(' ')} style={style}>
+    <th className={classes.join(' ')} style={style} {...rest}>
       <Typography.Text type="secondary">{children}</Typography.Text>
     </th>
   )

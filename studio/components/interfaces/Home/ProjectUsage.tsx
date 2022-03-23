@@ -12,6 +12,8 @@ import {
   Button,
   Dropdown,
   IconChevronDown,
+  Badge,
+  Popover,
 } from '@supabase/ui'
 
 import Panel from 'components/to-be-cleaned/Panel'
@@ -275,23 +277,66 @@ const ProjectUsage: FC<Props> = ({ project }) => {
               <Panel.Content className="space-y-4">
                 <PanelHeader title="Top Routes" />
                 <Table
-                  head={
-                    <>
-                      <Table.th>Path</Table.th>
-                      <Table.th>Count</Table.th>
-                      <Table.th>Avg. Latency (ms)</Table.th>
-                    </>
-                  }
+                  head={[
+                    <Table.th rowSpan={2}>Path</Table.th>,
+                    <Table.th rowSpan={2}>Count</Table.th>,
+                    <Table.th colSpan={3} className="text-center p-1">
+                      Latency (ms)
+                    </Table.th>,
+                  ]}
+                  headSecondRow={[
+                    <Table.th className="p-1">Avg</Table.th>,
+                    <Table.th className="p-1">p95</Table.th>,
+                    <Table.th className="p-1">p99</Table.th>,
+                  ]}
                   body={
                     <>
                       {(pathsData?.result ?? []).map((row: PathsDatum) => (
                         <Table.tr>
-                          <Table.td className="flex items-center space-x-2">
-                            <p className="font-mono text-sm text-scale-1200">{row.method}</p>
-                            <p className="font-mono text-sm">{row.path}</p>
+                          <Table.td className="flex items-center space-x-2 text-xl">
+                            <>
+                              <p className="font-mono text-xs text-scale-1200">{row.method}</p>
+                              <p className="font-mono text-xs">{row.path}</p>{' '}
+                              {row.query_params && (
+                                <Popover
+                                  align="end"
+                                  header={
+                                    <div className="flex justify-between items-center">
+                                      <h5>Query Params</h5>
+                                    </div>
+                                  }
+                                  onOpenChange={function noRefCheck() {}}
+                                  overlay={[
+                                    <>
+                                      <div className="py-6 px-2 space-y-4 max-w-sm">
+                                        <p className="font-mono text-sm whitespace-pre-line">{row.query_params}</p>
+                                      </div>
+                                    </>,
+                                  ]}
+                                  portalled
+                                  showClose
+                                  side="bottom"
+                                  size="content"
+                                >
+                                  <Badge color="scale">?...</Badge>
+                                </Popover>
+                              )}
+                            </>
                           </Table.td>
-                          <Table.td>{row.count}</Table.td>
-                          <Table.td>{Number(row.avg_origin_time).toFixed(2)}</Table.td>
+                          <Table.td>
+                            <span className="text-xs">{row.count}</span>
+                          </Table.td>
+                          <Table.td>
+                            <span className="text-xs">
+                              {Number(row.avg_origin_time).toFixed(0)}
+                            </span>
+                          </Table.td>
+                          <Table.td>
+                            <span className="text-xs">{Number(row.p95).toFixed(0)}</span>
+                          </Table.td>
+                          <Table.td>
+                            <span className="text-xs">{Number(row.p99).toFixed(0)}</span>
+                          </Table.td>
                         </Table.tr>
                       ))}
                     </>
