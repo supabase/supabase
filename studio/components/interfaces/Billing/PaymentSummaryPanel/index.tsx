@@ -59,7 +59,6 @@ const PaymentSummaryPanel: FC<Props> = ({
   const hasChangesToPlan = subscriptionPreview?.has_changes ?? false
 
   const getPlanName = (plan: any) => {
-    console.log('getPlanName', plan)
     if (plan.prod_id === STRIPE_PRODUCT_IDS.PAYG || plan.id === STRIPE_PRODUCT_IDS.PAYG) {
       return 'Pro tier (No spend caps)'
     } else return plan.name
