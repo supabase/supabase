@@ -1,17 +1,18 @@
 import { FC } from 'react'
 import dayjs from 'dayjs'
 import { sum } from 'lodash'
-import { Loading, Button } from '@supabase/ui'
 import { useRouter } from 'next/router'
+import { Loading, Button } from '@supabase/ui'
+import { Dictionary } from '@supabase/grid'
 
+import { formatBytes } from 'lib/helpers'
+import { STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { SubscriptionStats, useStore, useFlag, useSubscriptionStats } from 'hooks'
 import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
 import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'
 import { chargeableProducts } from '../PAYGUsage/PAYGUsage.constants'
-import { formatBytes } from 'lib/helpers'
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { Dictionary } from '@supabase/grid'
-import { SubscriptionStats, useStore } from 'hooks'
+import UpgradeButton from './UpgradeButton'
 
 interface Props {
   project: any
@@ -35,6 +36,9 @@ const Subscription: FC<Props> = ({
   const router = useRouter()
   const { ui } = useStore()
   const isOrgOwner = ui.selectedOrganization?.is_owner
+
+  const nativeBilling = useFlag('nativeBilling')
+  const subscriptionStats = useSubscriptionStats()
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
   const addOns = subscription?.addons ?? []
@@ -61,21 +65,28 @@ const Subscription: FC<Props> = ({
               </p>
               <h3 className="text-xl mb-0">{subscription?.tier.name ?? '-'}</h3>
             </div>
-            {/* <UpgradeButton paid={paid} projectRef={project.ref} /> */}
-            <div className="flex flex-col items-end space-y-2">
-              <Button
-                disabled={!isOrgOwner}
-                onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
-                type="primary"
-              >
-                Change subscription
-              </Button>
-              {!isOrgOwner && (
-                <p className="text-sm text-scale-1100">
-                  Only the organization owner can amend subscriptions
-                </p>
-              )}
-            </div>
+            {nativeBilling ? (
+              <div className="flex flex-col items-end space-y-2">
+                <Button
+                  disabled={!isOrgOwner}
+                  onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
+                  type="primary"
+                >
+                  Change subscription
+                </Button>
+                {!isOrgOwner && (
+                  <p className="text-sm text-scale-1100">
+                    Only the organization owner can amend subscriptions
+                  </p>
+                )}
+              </div>
+            ) : (
+              <UpgradeButton
+                paid={paid}
+                projectRef={project.ref}
+                subscriptionStats={subscriptionStats}
+              />
+            )}
           </div>
           {paid && (
             <div className="px-6 pt-4">
