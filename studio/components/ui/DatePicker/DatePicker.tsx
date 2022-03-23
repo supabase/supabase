@@ -180,19 +180,19 @@ function _DatePicker({ to, from, onChange, initialValues }: RootProps) {
                   endDate={endDate}
                 /> */}
 
-                {showTime && (
-                  <TimeSplitInput
-                    type="start"
-                    startTime={startTime}
-                    endTime={endTime}
-                    time={startTime}
-                    setTime={setStartTime}
-                    setStartTime={setStartTime}
-                    setEndTime={setEndTime}
-                    startDate={startDate}
-                    endDate={endDate}
-                  />
-                )}
+                {/* {showTime && ( */}
+                <TimeSplitInput
+                  type="start"
+                  startTime={startTime}
+                  endTime={endTime}
+                  time={startTime}
+                  setTime={setStartTime}
+                  setStartTime={setStartTime}
+                  setEndTime={setEndTime}
+                  startDate={startDate}
+                  endDate={endDate}
+                />
+                {/* )} */}
               </div>
               <div
                 className={`
@@ -233,19 +233,19 @@ function _DatePicker({ to, from, onChange, initialValues }: RootProps) {
                   startDate={startDate}
                   endDate={endDate}
                 /> */}
-                {showTime && (
-                  <TimeSplitInput
-                    type="end"
-                    startTime={startTime}
-                    endTime={endTime}
-                    time={endTime}
-                    setTime={setEndTime}
-                    setStartTime={setStartTime}
-                    setEndTime={setEndTime}
-                    startDate={startDate}
-                    endDate={endDate}
-                  />
-                )}
+                {/* {showTime && ( */}
+                <TimeSplitInput
+                  type="end"
+                  startTime={startTime}
+                  endTime={endTime}
+                  time={endTime}
+                  setTime={setEndTime}
+                  setStartTime={setStartTime}
+                  setEndTime={setEndTime}
+                  startDate={startDate}
+                  endDate={endDate}
+                />
+                {/* )} */}
               </div>
             </div>
           </>
@@ -306,14 +306,14 @@ function _DatePicker({ to, from, onChange, initialValues }: RootProps) {
                   </div>,
                 ]}
               />
-              <div className="flex items-center gap-2  pt-4">
+              {/* <div className="flex items-center gap-2  pt-4">
                 <Toggle
                   size="tiny"
                   // @ts-ignore
                   onChange={(bool: boolean) => setShowTime(bool)}
                 />
                 <span className="text-xs text-scale-1100">Show times</span>
-              </div>
+              </div> */}
               {/* <div className="flex items-center gap-2 text-scale-900 pt-4 mb-4">
                   <IconGlobe size={14} />
                   <div className="grow">
