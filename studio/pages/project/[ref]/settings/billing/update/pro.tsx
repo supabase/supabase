@@ -15,8 +15,9 @@ import { ProUpgrade } from 'components/interfaces/Billing'
 const BillingUpdatePro: NextPage = () => {
   const { ui } = useStore()
   const router = useRouter()
+
   const projectRef = ui.selectedProject?.ref
-  const stripeCustomerId = ui.selectedOrganization?.stripe_customer_id
+  const orgSlug = ui.selectedOrganization?.slug
 
   const [isLoadingProducts, setIsLoadingProducts] = useState(false)
   const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
@@ -36,9 +37,14 @@ const BillingUpdatePro: NextPage = () => {
     if (projectRef) {
       getStripeProducts()
       getSubscription()
-      getPaymentMethods()
     }
   }, [projectRef])
+
+  useEffect(() => {
+    if (orgSlug) {
+      getPaymentMethods()
+    }
+  }, [orgSlug])
 
   const getStripeProducts = async () => {
     try {

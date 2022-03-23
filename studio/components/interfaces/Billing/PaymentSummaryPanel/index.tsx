@@ -1,6 +1,7 @@
 import { FC } from 'react'
 import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle } from '@supabase/ui'
 
+import { useStore } from 'hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { StripeProduct } from '..'
 import { SubscriptionPreview } from '../Billing.types'
@@ -47,6 +48,9 @@ const PaymentSummaryPanel: FC<Props> = ({
   onConfirmPayment,
   isSubmitting,
 }) => {
+  const { ui } = useStore()
+  const projectRegion = ui.selectedProject?.region
+
   const isChangingPlan =
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && currentPlan.prod_id !== selectedPlan?.id) ||
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && !isSpendCapEnabled) ||
@@ -88,41 +92,47 @@ const PaymentSummaryPanel: FC<Props> = ({
       </div>
 
       {/* Add on details */}
-      <div className="space-y-1">
-        <p className="text-sm">Selected add-ons</p>
-        {currentComputeSize === undefined && selectedComputeSize === undefined && (
-          <p className="text-scale-1100 text-sm">No add-ons selected</p>
-        )}
-        {currentComputeSize !== undefined && (
-          <div className="flex items-center justify-between">
-            <p className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}>
-              {currentComputeSize.name}
-            </p>
-            <p className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}>
-              ${(currentComputeSize.prices[0].unit_amount / 100).toFixed(2)}
-            </p>
-          </div>
-        )}
-        {isChangingComputeSize && (
-          <div className="flex items-center justify-between">
-            <p className="text-sm">{selectedComputeSize.name}</p>
-            <p className="text-sm">
-              ${(selectedComputeSize.prices[0].unit_amount / 100).toFixed(2)}
-            </p>
-          </div>
-        )}
-        {isChangingComputeSize && (
-          <div className="!mt-4">
-            <InformationBox
-              hideCollapse
-              defaultVisibility
-              icon={<IconAlertCircle strokeWidth={2} />}
-              title="Changing your compute size"
-              description="It will take up to 2 minutes for changes to take place, and your project will be unavailable during that time"
-            />
-          </div>
-        )}
-      </div>
+      {projectRegion !== 'af-south-1' && (
+        <div className="space-y-1">
+          <p className="text-sm">Selected add-ons</p>
+          {currentComputeSize === undefined && selectedComputeSize === undefined && (
+            <p className="text-scale-1100 text-sm">No add-ons selected</p>
+          )}
+          {currentComputeSize !== undefined && (
+            <div className="flex items-center justify-between">
+              <p
+                className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
+              >
+                {currentComputeSize.name}
+              </p>
+              <p
+                className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
+              >
+                ${(currentComputeSize.prices[0].unit_amount / 100).toFixed(2)}
+              </p>
+            </div>
+          )}
+          {isChangingComputeSize && (
+            <div className="flex items-center justify-between">
+              <p className="text-sm">{selectedComputeSize.name}</p>
+              <p className="text-sm">
+                ${(selectedComputeSize.prices[0].unit_amount / 100).toFixed(2)}
+              </p>
+            </div>
+          )}
+          {isChangingComputeSize && (
+            <div className="!mt-4">
+              <InformationBox
+                hideCollapse
+                defaultVisibility
+                icon={<IconAlertCircle strokeWidth={2} />}
+                title="Changing your compute size"
+                description="It will take up to 2 minutes for changes to take place, and your project will be unavailable during that time"
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="h-px w-full bg-scale-600" />
 
