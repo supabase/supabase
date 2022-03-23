@@ -56,7 +56,6 @@ const EnterpriseRequest: FC<Props> = ({ onSelectBack }) => {
         error: res.error,
       })
     } else {
-      console.log('Done')
       setIsSuccessful(true)
     }
     setSubmitting(false)
