@@ -7,7 +7,7 @@ import { Dictionary } from '@supabase/grid'
 
 import { formatBytes } from 'lib/helpers'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { SubscriptionStats, useStore, useFlag, useSubscriptionStats } from 'hooks'
+import { useStore, useFlag, useSubscriptionStats } from 'hooks'
 import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
 import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'

@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
 import { withAuth, useStore } from 'hooks'
-import { get, post } from 'lib/common/fetch'
+import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 
 import { BillingLayout } from 'components/layouts'
