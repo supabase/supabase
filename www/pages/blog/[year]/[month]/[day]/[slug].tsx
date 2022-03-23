@@ -123,9 +123,9 @@ function BlogPostPage(props: any) {
   }
 
   const toc = props.blog.toc && (
-    <Space direction="vertical" size={8} className="py-8 lg:py-0">
+    <div className="space-y-8 py-8 lg:py-0">
       <div>
-        <Space>
+        <div className="space-x-2">
           {props.blog.tags.map((tag: string) => {
             return (
               <a href={`/blog/tags/${tag}`} key={`category-badge-${tag}`}>
@@ -133,17 +133,17 @@ function BlogPostPage(props: any) {
               </a>
             )
           })}
-        </Space>
+        </div>
       </div>
       <div>
-        <p>Table of contents</p>
+        <p className="text-scale-1200">On this page</p>
         <div>
-          <div className={blogStyles['toc']}>
+          <div className={[blogStyles['toc'], 'prose prose-toc'].join(' ')}>
             <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
           </div>
         </div>
       </div>
-    </Space>
+    </div>
   )
 
   return (
@@ -219,10 +219,10 @@ function BlogPostPage(props: any) {
                                 className="rounded-full w-10 border border-scale-600 mr-4"
                               />
                             )}
-                            <Space direction="vertical" size={0}>
-                              <p className="text-xs m-0">{author.author}</p>
-                              <p className="text-xs m-0">{author.position}</p>
-                            </Space>
+                            <div className="flex flex-col">
+                              <span className="text-xs mb-0">{author.author}</span>
+                              <span className="text-xs mb-0 text-scale-900">{author.position}</span>
+                            </div>
                           </div>
                         </a>
                       </Link>
@@ -240,16 +240,19 @@ function BlogPostPage(props: any) {
                       style={{ maxHeight: '520px' }}
                     />
                   )}
-                  <article className={[blogStyles['article'], 'prose'].join(' ')}>
+                  <article className={[blogStyles['article'], 'prose prose-docs'].join(' ')}>
                     {content}
                   </article>
-                  <div className="text-scale-900 dark:text-scale-1000">Share with your friends</div>
-                  <div className="flex space-x-4 mt-4">
-                    <div>
+                  <div className="py-16">
+                    <div className="text-sm text-scale-900 dark:text-scale-1000">
+                      Share this article
+                    </div>
+                    <div className="flex space-x-4 items-center mt-4">
                       <Link
-                        href={`https://twitter.com/share?text=Checkout%20@supabase's%20new%20blog%20post%20%7C%20${props.blog.title}&url=https://supabase.com/blog/${props.blog.slug}`}
+                        passHref
+                        href={`https://twitter.com/share?text=${props.blog.title}&url=https://supabase.com/blog/${props.blog.slug}`}
                       >
-                        <a target="_blank" className="text-scale-900 hover:text-scale-1000">
+                        <a target="_blank" className="text-scale-900 hover:text-scale-1200">
                           <svg
                             height="26"
                             width="26"
@@ -264,13 +267,12 @@ function BlogPostPage(props: any) {
                           </svg>
                         </a>
                       </Link>
-                    </div>
 
-                    <div>
                       <Link
-                        href={`https://www.linkedin.com/shareArticle?url=https://supabase.com/blog/${props.blog.slug}&title=Checkout%20@supabase's%20new%20blog%20post%20%7C%20${props.blog.title}`}
+                        passHref
+                        href={`https://www.linkedin.com/shareArticle?url=https://supabase.com/blog/${props.blog.slug}&title=${props.blog.title}`}
                       >
-                        <a target="_blank" className="text-scale-900 hover:text-scale-1000">
+                        <a target="_blank" className="text-scale-900 hover:text-scale-1200">
                           <svg
                             width="20"
                             height="20"
@@ -283,26 +285,6 @@ function BlogPostPage(props: any) {
                         </a>
                       </Link>
                     </div>
-
-                    <button
-                      onClick={() => copyLink()}
-                      className="text-scale-900 hover:text-scale-1000"
-                    >
-                      <svg
-                        className="h-6 w-6"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
-                    </button>
                   </div>
                   <div className="grid lg:grid-cols-1 gap-8 py-8">
                     <div>
@@ -317,40 +299,36 @@ function BlogPostPage(props: any) {
                 </div>
                 {/* Sidebar */}
                 <div className="col-span-12 lg:col-span-5 xl:col-span-3 xl:col-start-9 space-y-8">
-                  <Space direction="vertical" size={8} className="lg:mb-16 lg:top-16 lg:sticky">
+                  <div className="space-y-8 lg:mb-16 lg:top-16 lg:sticky">
                     <div className="hidden lg:block">{toc}</div>
                     <div>
                       <div className="mb-4">
-                        <p>Related articles</p>
+                        <p className="text-sm text-scale-1200">Related articles</p>
                       </div>
-                      <Space direction="vertical">
+                      <div className="space-y-0">
                         {props.relatedPosts.map((post: any) => (
                           <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
                             <div>
                               <p className="cursor-pointer">
-                                <Space>
+                                <div className="flex items-center gap-2">
                                   <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
-                                  <span className="hover:text-gray-900 dark:hover:text-white">
+                                  <span className="text-sm hover:text-gray-900 dark:hover:text-white">
                                     {post.title}
                                   </span>
-                                </Space>
+                                </div>
                               </p>
                               <Divider light className="mt-2" />
                             </div>
                           </Link>
                         ))}
                         <Link href={`/blog`} as={`/blog`}>
-                          <div>
-                            <p>
-                              <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
-                                View all posts
-                              </span>
-                            </p>
-                          </div>
+                          <a className="text-sm text-scale-1100 hover:text-scale-1200 cursor-pointer">
+                            View all posts
+                          </a>
                         </Link>
-                      </Space>
+                      </div>
                     </div>
-                  </Space>
+                  </div>
                 </div>
               </div>
             </div>

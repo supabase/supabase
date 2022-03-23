@@ -45,10 +45,10 @@ const BlogListItem = ({ blog }: Props) => {
                 {author.author_image_url && (
                   <img src={author.author_image_url} className="rounded-full w-10 mr-4" />
                 )}
-                <Space direction="vertical" size={0}>
-                  <p className="text-sm m-0">{author.author}</p>
-                  <p className="text-xs m-0 text-scale-900">{author.position}</p>
-                </Space>
+                <div className="flex flex-col">
+                  <span className="text-sm m-0 text-scale-1200">{author.author}</span>
+                  <span className="text-xs m-0 text-scale-900">{author.position}</span>
+                </div>
               </div>
             )}
           </div>
