@@ -3,7 +3,6 @@ import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle } from '@supabas
 
 import { useStore } from 'hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { StripeProduct } from '..'
 import { SubscriptionPreview } from '../Billing.types'
 import PaymentTotal from './PaymentTotal'
 import InformationBox from 'components/ui/InformationBox'
@@ -11,7 +10,7 @@ import InformationBox from 'components/ui/InformationBox'
 interface Props {
   isRefreshingPreview: boolean
   subscriptionPreview?: SubscriptionPreview
-  currentPlan: StripeProduct
+  currentPlan: any
   currentComputeSize: any
   selectedPlan?: any
   selectedComputeSize: any

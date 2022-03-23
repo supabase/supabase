@@ -2,14 +2,13 @@ import Link from 'next/link'
 import { FC } from 'react'
 import { Transition } from '@headlessui/react'
 
-import { StripeProduct } from '..'
 import Plans from './Plans/Plans'
 import { formatTierOptions } from './PlanSelection.utils'
 
 interface Props {
   visible: boolean
   tiers: any[]
-  currentPlan?: StripeProduct
+  currentPlan?: any
   onSelectPlan: (plan: any) => void
 }
 
