@@ -1,10 +1,8 @@
-import { useRouter } from 'next/router'
 import { FC, useState, useEffect } from 'react'
 
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
-import { getURL } from 'lib/helpers'
-import { get, post } from 'lib/common/fetch'
+import { get } from 'lib/common/fetch'
 
 import AWSMarketplaceSubscription from './AWSMarketplaceSubscription'
 import ProjectsSummary from './ProjectsSummary'
@@ -19,8 +17,8 @@ interface Props {
 }
 
 const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
-  const router = useRouter()
   const { ui } = useStore()
+  const { slug } = organization
 
   const [customer, setCustomer] = useState<any>(null)
   const [isLoadingCustomer, setIsLoadingCustomer] = useState(false)
@@ -30,10 +28,6 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
 
   const [taxIds, setTaxIds] = useState<any>(null)
   const [isLoadingTaxIds, setIsLoadingTaxIds] = useState(false)
-
-  const [loading, setLoading] = useState<boolean>(false)
-
-  const { slug, stripe_customer_id } = organization
 
   const defaultPaymentMethod = customer?.invoice_settings?.default_payment_method ?? ''
   const customerBalance = customer && customer.balance ? customer.balance / 100 : 0
@@ -49,18 +43,6 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
     getPaymentMethods()
     getTaxIds()
   }, [slug])
-
-  useEffect(() => {
-    if (stripe_customer_id) getStripeAccount()
-  }, [stripe_customer_id])
-
-  const getStripeAccount = async () => {
-    const { customer, error: customerError } = await post(`${API_URL}/stripe/customer`, {
-      stripe_customer_id: stripe_customer_id,
-    })
-    if (customerError) throw customerError
-    console.log('getStripeAccount', customer)
-  }
 
   const getCustomerProfile = async () => {
     try {
@@ -110,22 +92,6 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
     }
   }
 
-  /**
-   * Get a link and then redirect them
-   * path is used to determine what path inside billing portal to redirect to
-   */
-  const redirectToPortal = async (path: any) => {
-    try {
-      let { billingPortal } = await post(`${API_URL}/stripe/billing`, {
-        stripe_customer_id,
-        returnTo: `${getURL()}${router.asPath}`,
-      })
-      window.location.replace(billingPortal + (path ? path : null))
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: `Failed to redirect: ${error.message}` })
-    }
-  }
-
   return (
     <article className="my-4 container max-w-4xl space-y-8">
       {organization.aws_marketplace ? (
@@ -150,7 +116,7 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
             <TaxID
               loading={isLoadingTaxIds}
               taxIds={taxIds || []}
-              redirectToPortal={redirectToPortal}
+              onTaxIdsUpdated={(ids: any) => setTaxIds(ids)}
             />
           </div>
         </>
