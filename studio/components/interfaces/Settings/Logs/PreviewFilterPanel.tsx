@@ -24,6 +24,8 @@ import utc from 'dayjs/plugin/utc'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
 import { LogsFilter } from './Logs.filter'
 import { DatePicker } from 'components/ui/DatePicker'
+import DatePickers from './Logs.DatePickers'
+
 interface Props {
   defaultSearchValue?: string
   defaultToValue?: string
@@ -40,6 +42,10 @@ interface Props {
   dispatchWhereFilters: (x: any) => void
   whereFilters: any
   table: LogsTableName
+  te: { value: string; error: string }
+  ts: { value: string; error: string }
+  setTo: ({}) => void
+  setFrom: ({}) => void
 }
 
 dayjs.extend(utc)
@@ -63,6 +69,10 @@ const PreviewFilterPanel: FC<Props> = ({
   dispatchWhereFilters,
   whereFilters: filters,
   table,
+  // te: to,
+  // ts: from,
+  // setTo,
+  // setFrom,
 }) => {
   const [search, setSearch] = useState('')
 
@@ -138,6 +148,7 @@ const PreviewFilterPanel: FC<Props> = ({
 
   const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
+    console.log('value', value)
     if (value !== '' && isNaN(Date.parse(value))) {
       setTo({ value, error: 'Invalid ISO 8601 timestamp' })
     } else {
@@ -210,39 +221,13 @@ const PreviewFilterPanel: FC<Props> = ({
           />
         </form>
 
-        <div className="flex items-center">
-          <Dropdown
-            size="small"
-            side="bottom"
-            align="start"
-            overlay={
-              <>
-                <Dropdown.RadioGroup onChange={(e) => console.log(e)} value={'1_hour'}>
-                  <Dropdown.Radio value="1_hour">1 hour</Dropdown.Radio>
-                  <Dropdown.Radio value="3_hour">Last 3 hour</Dropdown.Radio>
-                  <Dropdown.Radio value="1_day">Last day</Dropdown.Radio>
-                </Dropdown.RadioGroup>
-              </>
-            }
-          >
-            <Button
-              as="span"
-              type="default"
-              icon={<IconClock size={12} />}
-              // style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
-            >
-              Last hour
-            </Button>
-          </Dropdown>
-          {/* <Button
-            type="default"
-            style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
-            icon={<IconCalendar size={12} />}
-          >
-            Custom
-          </Button> */}
-          <DatePicker />
-        </div>
+        <DatePickers
+          onChange={(e: any) => {
+            setFrom({ value: e.from, error: '' })
+            setTo({ value: e.to, error: '' })
+            handleSearch()
+          }}
+        />
 
         <div>
           <RefreshButton />
