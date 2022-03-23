@@ -65,7 +65,9 @@ const PreviewFilterPanel: FC<Props> = ({
   table,
 }) => {
   const [search, setSearch] = useState('')
+
   const [to, setTo] = useState({ value: '', error: '' })
+  const [from, setFrom] = useState({ value: '', error: '' })
   const [defaultTimestamp, setDefaultTimestamp] = useState(dayjs().utc().toISOString())
 
   const [localSearchValue, setlocalSearchValue] = useState(search)
@@ -85,14 +87,6 @@ const PreviewFilterPanel: FC<Props> = ({
     }
   }, [defaultToValue])
 
-  const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    if (value !== '' && isNaN(Date.parse(value))) {
-      setTo({ value, error: 'Invalid ISO 8601 timestamp' })
-    } else {
-      setTo({ value, error: '' })
-    }
-  }
   const handleFromReset = async () => {
     setTo({ value: '', error: '' })
     const value = dayjs().utc().toISOString()
@@ -102,12 +96,12 @@ const PreviewFilterPanel: FC<Props> = ({
 
   //   const handleSearch = () => onSearch({ query: search, to: to.value })
 
-  const handleSearch = (value: string) =>
-    onSearch({
-      query: value,
-      to: to.value,
-      // , from: from.value
-    })
+  // const handleSearch = (value: string) =>
+  //   onSearch({
+  //     query: value,
+  //     to: to.value,
+  //     // , from: from.value
+  //   })
 
   const RefreshButton = () => {
     return !isCustomQuery ? (
@@ -142,7 +136,37 @@ const PreviewFilterPanel: FC<Props> = ({
     ) : null
   }
 
+  const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    if (value !== '' && isNaN(Date.parse(value))) {
+      setTo({ value, error: 'Invalid ISO 8601 timestamp' })
+    } else {
+      setTo({ value, error: '' })
+    }
+  }
+
+  const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    if (value !== '' && isNaN(Date.parse(value))) {
+      setFrom({ value, error: 'Invalid ISO 8601 timestamp' })
+    } else {
+      setFrom({ value, error: '' })
+    }
+  }
+
+  const handleReset = async () => {
+    setTo({ value: '', error: '' })
+    setFrom({ value: '', error: '' })
+    const value = dayjs().utc().toISOString()
+    setDefaultTimestamp(value)
+    onSearch({ query: search, to: '', from: '' })
+  }
+
+  const showReset = to.value !== '' || from.value !== ''
+
   const showFromReset = to.value !== ''
+
+  const handleSearch = () => onSearch({ query: search, to: to.value, from: from.value })
 
   // console.log('this is what is going through', FILTER_OPTIONS[table])
 
@@ -238,10 +262,69 @@ const PreviewFilterPanel: FC<Props> = ({
           })}
         </div>
 
+        <div className="flex flex-row">
+          <Popover
+            side="bottom"
+            align="end"
+            portalled
+            overlay={
+              <>
+                <Input
+                  label="From"
+                  labelOptional="UTC"
+                  value={from.value === '' ? defaultTimestamp : from.value}
+                  onChange={handleFromChange}
+                  error={from.error}
+                  className="w-72 p-3"
+                />
+                <Input
+                  label="To"
+                  labelOptional="UTC"
+                  value={to.value === '' ? defaultTimestamp : to.value}
+                  onChange={handleToChange}
+                  error={to.error}
+                  className="w-72 p-3"
+                />
+                <div className="flex flex-row justify-end pb-2 px-4">
+                  <Button key="set" size="tiny" title="Set" type="secondary" onClick={handleSearch}>
+                    Set
+                  </Button>
+                </div>
+              </>
+            }
+          >
+            <Button
+              as="span"
+              size="tiny"
+              className={showReset ? '!rounded-r-none' : ''}
+              type={showReset ? 'outline' : 'text'}
+              icon={<IconClock size="tiny" />}
+            >
+              {to.value || from.value ? 'Custom' : 'Now'}
+            </Button>
+          </Popover>
+          {showReset && (
+            <Button
+              size="tiny"
+              className={showReset ? '!rounded-l-none' : ''}
+              icon={<IconX size="tiny" />}
+              type="outline"
+              title="Clear timestamp filter"
+              onClick={handleReset}
+            />
+          )}
+        </div>
+        {/* {!isCustomQuery && (
+          <div className="flex items-center space-x-2">
+            <p className="text-xs">Show event chart</p>
+            <Toggle size="tiny" checked={isShowingEventChart} onChange={onToggleEventChart} />
+          </div>
+        )} */}
+
         {!isCustomQuery && (
           <>
             <div className="flex flex-row gap-2">
-              <Popover
+              {/* <Popover
                 side="bottom"
                 align="end"
                 portalled
@@ -276,7 +359,7 @@ const PreviewFilterPanel: FC<Props> = ({
                 >
                   {to.value ? 'Custom' : 'Now'}
                 </Button>
-              </Popover>
+              </Popover> */}
 
               {/* Clear the filters could be here */}
             </div>
