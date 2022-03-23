@@ -18,9 +18,7 @@ const BlogListItem = ({ blog }: Props) => {
         <div className="inline-block min-w-full group">
           <div className="flex flex-col space-y-6">
             <div className="flex flex-col space-y-3">
-              <div
-                className={`relative overflow-auto w-full h-60 border dark:border-dark shadow-sm rounded-lg mb-4`}
-              >
+              <div className="relative overflow-auto w-full h-60 border dark:border-dark shadow-sm rounded-lg mb-4">
                 <Image
                   layout="fill"
                   src={

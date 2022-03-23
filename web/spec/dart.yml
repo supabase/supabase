@@ -1213,6 +1213,14 @@ pages:
   .or():
     description: |
       Finds all rows satisfying at least one of the filters.
+    notes: |
+      - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+        ```dart
+        .or('id.in.(6,7),arraycol.cs.{"a","b"}')  // Use Postgres list () and 'in' for in_ filter. Array {} and 'cs' for contains.
+        .or('id.in.(${mylist.join(',')}),arraycol.cs.{${mylistArray.join(',')}}')	// You can insert a Dart list for list or array column.
+        .or('id.in.(${mylist.join(',')}),rangecol.cs.(${mylistRange.join(',')}]')	// You can insert a Dart list for list or range column.
+        ```  
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1248,6 +1256,16 @@ pages:
   .not():
     description: |
       Finds all rows which doesn't satisfy the filter.
+    notes: |
+          - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+            ```dart
+            .not('name','eq','Paris')
+            .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+            .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+            .not('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
+            .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
+            ```
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2144,7 +2162,13 @@ pages:
     description: |
       Finds all rows whose `column` satisfies the filter.
     notes: |
-      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter values, so it should only be used as an escape hatch in case other filters don't work.
+      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
+        ```dart
+          .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} and 'cs' for contains.
+          .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+          .filter('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
+          .filter('id','cs','{${mylist.join(',')}}')  // You can insert a Dart array list.
+        ```
     examples:
       - name: With `select()`
         isSpotlight: true
