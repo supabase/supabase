@@ -16,15 +16,11 @@ import Table from 'components/to-be-cleaned/Table'
 
 const PAGE_LIMIT = 10
 
-/**
- * Eventually deprecate this - as we move on to show invoices by project on the organization billing page
- */
-
 interface Props {
-  organization: any
+  projectRef: string
 }
 
-const InvoicesSettings: FC<Props> = ({ organization }) => {
+const Invoices: FC<Props> = ({ projectRef }) => {
   const { ui } = useStore()
   const [loading, setLoading] = useState<any>(false)
 
@@ -32,7 +28,6 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
   const [count, setCount] = useState(0)
   const [invoices, setInvoices] = useState<any>([])
 
-  const { stripe_customer_id } = organization
   const offset = (page - 1) * PAGE_LIMIT
 
   useEffect(() => {
@@ -40,9 +35,7 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
     const page = 1
 
     const fetchInvoiceCount = async () => {
-      const res = await head(`${API_URL}/stripe/invoices?customer=${stripe_customer_id}`, [
-        'X-Total-Count',
-      ])
+      const res = await head(`${API_URL}/projects/${projectRef}/invoices`, ['X-Total-Count'])
       if (!cancel) {
         if (res.error) {
           ui.setNotification({ category: 'error', message: res.error.message })
@@ -59,7 +52,7 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
     return () => {
       cancel = true
     }
-  }, [stripe_customer_id])
+  }, [])
 
   const fetchInvoices = async (page: number) => {
     setLoading(true)
@@ -67,7 +60,7 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
 
     const offset = (page - 1) * PAGE_LIMIT
     const invoices = await get(
-      `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}`
+      `${API_URL}/projects/${projectRef}/invoices?offset=${offset}&limit=${PAGE_LIMIT}`
     )
 
     if (invoices.error) {
@@ -95,7 +88,7 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
               <Table.tr>
                 <Table.td colSpan={5} className="p-3 py-12 text-center">
                   <Typography.Text type="secondary">
-                    {loading ? 'Checking for invoices' : 'No invoices for this organization yet'}
+                    {loading ? 'Checking for invoices' : 'No invoices for this project yet'}
                   </Typography.Text>
                 </Table.td>
               </Table.tr>
@@ -113,7 +106,11 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
                         </Typography.Text>
                       </Table.td>
                       <Table.td>
-                        <Typography.Text>${x.subtotal / 100}</Typography.Text>
+                        <Typography.Text>
+                          {x.subtotal >= 0
+                            ? `$${x.subtotal / 100}`
+                            : `-$${Math.abs(x.subtotal / 100)}`}
+                        </Typography.Text>
                       </Table.td>
                       <Table.td>
                         <Typography.Text>{x.number}</Typography.Text>
@@ -165,4 +162,4 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
   )
 }
 
-export default InvoicesSettings
+export default Invoices
