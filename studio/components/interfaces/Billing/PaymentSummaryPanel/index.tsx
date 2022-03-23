@@ -58,9 +58,11 @@ const PaymentSummaryPanel: FC<Props> = ({
   const isChangingComputeSize = currentComputeSize.id !== selectedComputeSize.id
   const hasChangesToPlan = subscriptionPreview?.has_changes ?? false
 
-  const getCurrentPlanName = () => {
-    if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG) return 'Pro tier (No spend caps)'
-    else return currentPlan.name
+  const getPlanName = (plan: any) => {
+    console.log('getPlanName', plan)
+    if (plan.prod_id === STRIPE_PRODUCT_IDS.PAYG || plan.id === STRIPE_PRODUCT_IDS.PAYG) {
+      return 'Pro tier (No spend caps)'
+    } else return plan.name
   }
 
   return (
@@ -75,7 +77,7 @@ const PaymentSummaryPanel: FC<Props> = ({
         <p className="text-sm">Selected subscription</p>
         <div className="flex items-center justify-between">
           <p className={`${isChangingPlan ? 'text-scale-1100 line-through' : ''} text-sm`}>
-            {getCurrentPlanName()}
+            {getPlanName(currentPlan)}
           </p>
           <p className={`${isChangingPlan ? 'text-scale-1100 line-through' : ''} text-sm`}>
             ${(currentPlan.unit_amount / 100).toFixed(2)}
@@ -83,9 +85,7 @@ const PaymentSummaryPanel: FC<Props> = ({
         </div>
         {isChangingPlan && (
           <div className="flex items-center justify-between">
-            <p className="text-sm">
-              {selectedPlan?.name} {!isSpendCapEnabled ? '(Spend cap disabled)' : ''}
-            </p>
+            <p className="text-sm">{getPlanName(selectedPlan)}</p>
             <p className="text-sm">${(selectedPlan.prices[0].unit_amount / 100).toFixed(2)}</p>
           </div>
         )}
