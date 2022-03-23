@@ -20,6 +20,7 @@ import {
 import { format } from 'date-fns'
 
 import TimeSplitInput from './TimeSplitInput'
+import DateSplitInput from './DateSplitInput'
 import DividerSlash from './DividerSlash'
 
 import dayjs from 'dayjs'
@@ -32,6 +33,10 @@ dayjs.extend(timezone)
 
 interface RootProps {
   handleChange?: ({}) => void
+  initialValues?: {
+    to: number
+    from: number
+  }
 }
 
 const START_DATE_DEFAULT = new Date()
@@ -44,7 +49,7 @@ const TIME_NOW = format(new Date(), 'HH:mm:ss').split(':')
 const START_TIME_DEFAULT = { HH: TIME_NOW[0], mm: TIME_NOW[1], ss: TIME_NOW[2] }
 const END_TIME_DEFAULT = { HH: TIME_NOW[0], mm: TIME_NOW[1], ss: TIME_NOW[2] }
 
-function _DatePicker({ handleChange }: RootProps) {
+function _DatePicker({ handleChange, initialValues }: RootProps) {
   const [open, setOpen] = useState<boolean>(false)
 
   const [showTime, setShowTime] = useState<boolean>(true)
@@ -58,21 +63,49 @@ function _DatePicker({ handleChange }: RootProps) {
   const [startTime, setStartTime] = useState<any>(START_TIME_DEFAULT)
   const [endTime, setEndTime] = useState<any>(END_TIME_DEFAULT)
 
+  if (initialValues) {
+    const from = dayjs(initialValues.from)
+    const to = dayjs(initialValues.to)
+  }
+
+  function handleDatePickerChange(dates: [from: string, to: string]) {
+    const [from, to] = dates
+
+    console.log('start', from)
+    console.log('end', to)
+    setStartDate(from)
+    setEndDate(to)
+  }
+
   function handleSubmit() {
     setOpen(false)
 
     setAppliedStartDate(startDate)
     setAppliedEndDate(endDate)
 
-    if (handleChange)
-      handleChange({
-        from: dayjs(
-          `${format(new Date(startDate), 'yyyy-MM-dd')} ${Object.values(startTime).join(':')}`
-        ).toISOString(),
-        to: dayjs(
-          `${format(new Date(endDate), 'yyyy-MM-dd')} ${Object.values(endTime).join(':')}`
-        ).toISOString(),
-      })
+    const from = `${format(new Date(startDate), 'yyyy-MM-dd')} ${Object.values(startTime).join(
+      ':'
+    )}`
+    const to = `${format(new Date(endDate), 'yyyy-MM-dd')} ${Object.values(endTime).join(':')}`
+
+    function isoPayload() {
+      return {
+        from: dayjs(from).toISOString(),
+        to: dayjs(to).toISOString(),
+      }
+    }
+
+    function unixPayload() {
+      return {
+        from: dayjs(from).valueOf(),
+        to: dayjs(to).valueOf(),
+      }
+    }
+
+    // console.log('unixPayload', unixPayload())
+    // console.log('isoPayload', isoPayload())
+
+    if (handleChange) handleChange(unixPayload())
   }
 
   function handleClear() {
@@ -101,7 +134,7 @@ function _DatePicker({ handleChange }: RootProps) {
           <>
             <div className="flex justify-between items-stretch py-2">
               <div className="grow flex flex-col gap-1">
-                <div
+                {/* <div
                   className="
                       flex items-center justify-center gap-0
                       text-xs text-scale-1100 bg-scale-100 dark:bg-scaleA-300 border border-scale-700 h-7 rounded"
@@ -135,7 +168,15 @@ function _DatePicker({ handleChange }: RootProps) {
                     className="w-8 bg-transparent text-scale-1200 text-center"
                     value={format(new Date(startDate), 'yyyy')}
                   />
-                </div>
+                </div> */}
+
+                {/* <DateSplitInput
+                  type="start"
+                  date={startDate}
+                  setDate={(e) => setStartDate(e)}
+                  startDate={startDate}
+                  endDate={endDate}
+                /> */}
 
                 {showTime && (
                   <TimeSplitInput
@@ -163,7 +204,7 @@ function _DatePicker({ handleChange }: RootProps) {
                 <IconArrowRight strokeWidth={1.5} size={14} />
               </div>
               <div className="grow flex flex-col gap-1">
-                <div
+                {/* <div
                   className="
                       flex items-center justify-center gap-0
                       text-xs text-scale-1100 bg-scale-100 dark:bg-scaleA-300 border border-scale-700 h-7 rounded"
@@ -182,7 +223,14 @@ function _DatePicker({ handleChange }: RootProps) {
                     className="appearance-none w-8 text-scale-1200 bg-transparent text-center"
                     value={format(new Date(endDate), 'yyyy')}
                   />
-                </div>
+                </div> */}
+                {/* <DateSplitInput
+                  type="end"
+                  date={endDate}
+                  setDate={(e) => setEndDate(e)}
+                  startDate={startDate}
+                  endDate={endDate}
+                /> */}
                 {showTime && (
                   <TimeSplitInput
                     type="end"
@@ -205,13 +253,8 @@ function _DatePicker({ handleChange }: RootProps) {
             <div className="px-3 py-4">
               <DatePicker
                 selected={startDate}
-                onChange={(date) => {
-                  const [start, end] = date
-                  console.log('start', start)
-                  console.log('end', end)
-                  setStartDate(start)
-                  // setEndDate(!end ? start : end)
-                  setEndDate(end)
+                onChange={(dates) => {
+                  handleDatePickerChange(dates)
                 }}
                 dateFormat="MMMM d, yyyy h:mm aa"
                 startDate={startDate}

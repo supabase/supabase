@@ -46,28 +46,28 @@ const LogTable = ({ isCustomQuery, data = [], queryType }: Props) => {
     (v) => ({
       key: v,
       name: v,
-      width: hasLogDataFormat && v === 'timestamp' ? 210 : undefined,
+      // width: hasLogDataFormat && v === 'timestamp' ? 210 : undefined,
       resizable: true,
-      headerRenderer: () => {
-        return <div className="flex items-center text-xs font-mono h-full">{v}</div>
-      },
-      formatter: ({ row }: any) => {
-        let value = row[v]
-        if (hasLogDataFormat && v === 'timestamp') {
-          value = dayjs(Number(row['timestamp']) / 1000).toISOString()
-        }
-        return (
-          <p
-            className={[
-              'block whitespace-wrap font-mono',
-              `${hasLogDataFormat && row.id === focusedLog?.id ? 'font-bold' : ''}`,
-              `${hasLogDataFormat && v === 'timestamp' ? 'text-green-900' : ''}`,
-            ].join(' ')}
-          >
-            {value}
-          </p>
-        )
-      },
+      // headerRenderer: () => {
+      //   return <div className="flex items-center text-xs font-mono h-full">{v}</div>
+      // },
+      // formatter: ({ row }: any) => {
+      //   let value = row[v]
+      //   if (hasLogDataFormat && v === 'timestamp') {
+      //     value = dayjs(Number(row['timestamp']) / 1000).toISOString()
+      //   }
+      //   return (
+      //     <p
+      //       className={[
+      //         'block whitespace-wrap font-mono',
+      //         `${hasLogDataFormat && row.id === focusedLog?.id ? 'font-bold' : ''}`,
+      //         `${hasLogDataFormat && v === 'timestamp' ? 'text-green-900' : ''}`,
+      //       ].join(' ')}
+      //     >
+      //       {value}
+      //     </p>
+      //   )
+      // },
     })
   )
 
