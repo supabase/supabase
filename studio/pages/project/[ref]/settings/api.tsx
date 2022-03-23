@@ -317,26 +317,26 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                             )}
                           </div>
                         </div>
-                        {isJwtSecretUpdateFailed ? (
-                          <Alert withIcon variant="warning" title="Failed to update JWT secret">
-                            Please try again. If the failures persist, please contact Supabase
-                            support with the following details: <br />
-                            Change tracking ID: {changeTrackingId} <br />
-                            Error message: {jwtSecretUpdateErrorMessage}
-                          </Alert>
-                        ) : (
-                          <Alert
-                            withIcon
-                            variant="warning"
-                            title="This will invalidate all existing API keys!"
-                          >
-                            Your project will also be restarted during this process, which will
-                            terminate any existing connections.
-                          </Alert>
-                        )}
                       </div>
                     )}
                   </div>
+                  {isJwtSecretUpdateFailed ? (
+                    <Alert withIcon variant="warning" title="Failed to update JWT secret">
+                      Please try again. If the failures persist, please contact Supabase support
+                      with the following details: <br />
+                      Change tracking ID: {changeTrackingId} <br />
+                      Error message: {jwtSecretUpdateErrorMessage}
+                    </Alert>
+                  ) : (
+                    <Alert
+                      withIcon
+                      variant="warning"
+                      title="This will invalidate all existing API keys!"
+                    >
+                      Your project will also be restarted during this process, which will terminate
+                      any existing connections.
+                    </Alert>
+                  )}
                 </div>
               </Flag>
             </Panel.Content>
