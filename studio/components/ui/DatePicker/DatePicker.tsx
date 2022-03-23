@@ -32,24 +32,26 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 interface RootProps {
-  handleChange?: ({}) => void
+  onChange?: ({}) => void
   initialValues?: {
     to: number
     from: number
   }
+  to?: number
+  from?: number
 }
 
 const START_DATE_DEFAULT = new Date()
 const END_DATE_DEFAULT = new Date()
 
-console.log('START_DATE_DEFAULT', START_DATE_DEFAULT)
+// console.log('START_DATE_DEFAULT', START_DATE_DEFAULT)
 
 const TIME_NOW = format(new Date(), 'HH:mm:ss').split(':')
 
 const START_TIME_DEFAULT = { HH: TIME_NOW[0], mm: TIME_NOW[1], ss: TIME_NOW[2] }
 const END_TIME_DEFAULT = { HH: TIME_NOW[0], mm: TIME_NOW[1], ss: TIME_NOW[2] }
 
-function _DatePicker({ handleChange, initialValues }: RootProps) {
+function _DatePicker({ to, from, onChange, initialValues }: RootProps) {
   const [open, setOpen] = useState<boolean>(false)
 
   const [showTime, setShowTime] = useState<boolean>(true)
@@ -105,7 +107,7 @@ function _DatePicker({ handleChange, initialValues }: RootProps) {
     // console.log('unixPayload', unixPayload())
     // console.log('isoPayload', isoPayload())
 
-    if (handleChange) handleChange(unixPayload())
+    if (onChange) onChange(isoPayload())
   }
 
   function handleClear() {

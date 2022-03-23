@@ -196,6 +196,10 @@ export const LogPage: NextPage = () => {
           dispatchWhereFilters={dispatchWhereFilters}
           whereFilters={whereFilters}
           table={table}
+          te={te}
+          ts={ts}
+          setTo={setTo}
+          setFrom={setFrom}
         />
         {/* {showChart && (
           <div>
