@@ -100,25 +100,28 @@ const PaymentMethods: FC<Props> = ({
         <Panel
           loading={loading}
           footer={
-            <div>
-              <Button
-                key="panel-footer"
-                type="default"
-                icon={<IconPlus />}
-                onClick={() => setShowAddPaymentMethodModal(true)}
-              >
-                Add new card
-              </Button>
-            </div>
+            !loading && (
+              <div>
+                <Button
+                  key="panel-footer"
+                  type="default"
+                  icon={<IconPlus />}
+                  onClick={() => setShowAddPaymentMethodModal(true)}
+                >
+                  Add new card
+                </Button>
+              </div>
+            )
           }
         >
-          <Panel.Content>
-            {loading && paymentMethods.length === 0 ? (
-              <div className="flex items-center space-x-4">
-                <IconLoader className="animate-spin" size={14} />
-                <p className="text-sm">Retrieving payment methods</p>
-              </div>
-            ) : paymentMethods.length >= 1 ? (
+          {loading && paymentMethods.length === 0 ? (
+            <div className="flex flex-col justify-between space-y-2 py-4 px-4">
+              <div className="shimmering-loader rounded py-3 mx-1 w-2/3" />
+              <div className="shimmering-loader rounded py-3 mx-1 w-1/2" />
+              <div className="shimmering-loader rounded py-3 mx-1 w-1/3" />
+            </div>
+          ) : paymentMethods.length >= 1 ? (
+            <Panel.Content>
               <div className="space-y-2">
                 {paymentMethods.map((paymentMethod: any) => {
                   const isDefault = paymentMethod.id === defaultPaymentMethod
@@ -193,17 +196,15 @@ const PaymentMethods: FC<Props> = ({
                   )
                 })}
               </div>
-            ) : (
-              <div>
-                <p className="flex items-center space-x-2 opacity-50">
-                  <div>
-                    <IconCreditCard />
-                  </div>
-                  <div>No payment methods</div>
-                </p>
+            </Panel.Content>
+          ) : (
+            <Panel.Content>
+              <div className="flex items-center space-x-2 opacity-50">
+                <IconCreditCard />
+                <p className="text-sm">No payment methods</p>
               </div>
-            )}
-          </Panel.Content>
+            </Panel.Content>
+          )}
         </Panel>
       </div>
 

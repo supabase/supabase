@@ -8,8 +8,8 @@ import AWSMarketplaceSubscription from './AWSMarketplaceSubscription'
 import ProjectsSummary from './ProjectsSummary'
 import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods'
-import BillingAddress from './BillingAddress'
-import TaxID from './TaxID'
+import BillingAddress from './BillingAddress/BillingAddress'
+import TaxID from './TaxID/TaxID'
 
 interface Props {
   organization: any

@@ -122,75 +122,80 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
       <Panel
         loading={loading}
         footer={
-          <div className="flex items-center space-x-4">
-            <Button
-              type="default"
-              htmlType="reset"
-              disabled={!hasChanges || isSaving}
-              onClick={() => onResetTaxIds()}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={isSaving}
-              disabled={!hasChanges || isSaving}
-              onClick={() => onSaveTaxIds()}
-            >
-              Save changes
-            </Button>
-          </div>
+          !loading && (
+            <div className="flex items-center space-x-4">
+              <Button
+                type="default"
+                htmlType="reset"
+                disabled={!hasChanges || isSaving}
+                onClick={() => onResetTaxIds()}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isSaving}
+                disabled={!hasChanges || isSaving}
+                onClick={() => onSaveTaxIds()}
+              >
+                Save changes
+              </Button>
+            </div>
+          )
         }
       >
-        <Panel.Content className="w-3/5 space-y-4">
-          {loading && taxIdValues.length === 0 ? (
-            <div className="flex items-center space-x-4">
-              <IconLoader className="animate-spin" size={14} />
-              <p className="text-sm">Retrieving tax information</p>
-            </div>
-          ) : taxIdValues.length >= 1 ? (
-            <div className="w-full space-y-2">
-              {taxIdValues.map((taxId: any, idx: number) => {
-                return (
-                  <div key={`tax-id-${idx}`} className="flex items-center space-x-2">
-                    <Select
-                      value={taxId.type}
-                      onChange={(e: any) => onUpdateTaxId(taxId.id, 'type', e.target.value)}
-                    >
-                      {Object.keys(TAX_IDS).map((taxId: string) => (
-                        <Select.Option key={taxId} value={taxId}>
-                          {taxId.replace('_', ' ').toUpperCase()}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                    <Input
-                      value={taxId.value}
-                      placeholder={(TAX_IDS as any)[taxId.type].placeholder}
-                      onChange={(e: any) => onUpdateTaxId(taxId.id, 'value', e.target.value)}
-                    />
-                    <Button
-                      type="text"
-                      icon={<IconX />}
-                      onClick={() => onRemoveTaxId(taxId.id)}
-                    ></Button>
-                  </div>
-                )
-              })}
-            </div>
-          ) : (
-            <div>
-              <p className="flex items-center space-x-2 text-sm text-scale-900">No tax IDs</p>
-            </div>
-          )}
-          <div
-            className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition cursor-pointer"
-            onClick={() => onAddNewTaxId()}
-          >
-            <IconPlus size={14} />
-            <p className="text-sm">Add another ID</p>
+        {loading && taxIdValues.length === 0 ? (
+          <div className="flex flex-col justify-between space-y-2 py-4 px-4">
+            <div className="shimmering-loader rounded py-3 mx-1 w-2/3" />
+            <div className="shimmering-loader rounded py-3 mx-1 w-1/2" />
+            <div className="shimmering-loader rounded py-3 mx-1 w-1/3" />
           </div>
-        </Panel.Content>
+        ) : (
+          <Panel.Content className="w-3/5 space-y-4">
+            {taxIdValues.length >= 1 ? (
+              <div className="w-full space-y-2">
+                {taxIdValues.map((taxId: any, idx: number) => {
+                  return (
+                    <div key={`tax-id-${idx}`} className="flex items-center space-x-2">
+                      <Select
+                        value={taxId.type}
+                        onChange={(e: any) => onUpdateTaxId(taxId.id, 'type', e.target.value)}
+                      >
+                        {Object.keys(TAX_IDS).map((taxId: string) => (
+                          <Select.Option key={taxId} value={taxId}>
+                            {taxId.replace('_', ' ').toUpperCase()}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                      <Input
+                        value={taxId.value}
+                        placeholder={(TAX_IDS as any)[taxId.type].placeholder}
+                        onChange={(e: any) => onUpdateTaxId(taxId.id, 'value', e.target.value)}
+                      />
+                      <Button
+                        type="text"
+                        icon={<IconX />}
+                        onClick={() => onRemoveTaxId(taxId.id)}
+                      ></Button>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div>
+                <p className="flex items-center space-x-2 text-sm text-scale-900">No tax IDs</p>
+              </div>
+            )}
+            <div
+              className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition cursor-pointer"
+              onClick={() => onAddNewTaxId()}
+            >
+              <IconPlus size={14} />
+              <p className="text-sm">Add another ID</p>
+            </div>
+          </Panel.Content>
+        )}
       </Panel>
     </div>
   )
