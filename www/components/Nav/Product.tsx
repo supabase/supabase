@@ -15,14 +15,10 @@ const Product = () => {
       <div className="flex lg:flex-col">
         <div className="flex flex-row items-center">
           <ProductIcon icon={icon} />
-          <div>
-            <h5 className="ml-3 mb-0">{name}</h5>
-          </div>
+          <h5 className="ml-3 mb-0 text-base text-scale-1200">{name}</h5>
         </div>
-        <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
-          <p>
-            <p className="mt-1 text-sm">{description}</p>
-          </p>
+        <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 mt-3">
+          <p className="text-sm text-scale-1000">{description}</p>
           {label && (
             <div>
               <Badge>{label}</Badge>
@@ -36,7 +32,7 @@ const Product = () => {
         <a
           key={name}
           href={url}
-          className="p-3 col-span-6 rounded hover:bg-gray-50 dark:hover:bg-scale-500 transition"
+          className="p-3 col-span-6 rounded hover:bg-scale-300 dark:hover:bg-scale-500 transition"
         >
           {content}
         </a>
@@ -46,8 +42,8 @@ const Product = () => {
 
   return (
     <div className="grid grid-cols-12">
-      <nav className="col-span-6" aria-labelledby="solutionsHeading">
-        <div className="grid grid-cols-12 m-3 gap-3">{iconSections}</div>
+      <nav className="col-span-6" aria-labelledby="product">
+        <div className="grid grid-cols-12 m-3 gap-x-8 gap-y-4 py-4 pr-3">{iconSections}</div>
       </nav>
       <div className="col-span-6">
         <div className="m-3 mx-6">
@@ -61,7 +57,17 @@ const Product = () => {
                 <li className="flow-root" key={`flyout_case_${idx}`}>
                   <a
                     href={caseStudy.url}
-                    className="p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-scale-500 transition ease-in-out duration-150 border dark:border-gray-600 items-center"
+                    className="p-3 flex rounded-lg 
+                    
+                    transition ease-in-out duration-150
+
+                    hover:bg-scale-400 
+                    dark:hover:bg-scale-500 
+                    
+                    border 
+                    dark:border-scale-400
+                    
+                    items-center"
                   >
                     <div className="hidden sm:block flex-shrink-0">
                       <img
