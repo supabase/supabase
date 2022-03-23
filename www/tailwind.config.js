@@ -1,7 +1,8 @@
+const colors = require('tailwindcss/colors')
+
 module.exports = {
-  purge: ['./components/**/*.tsx', './pages/**/*.tsx', './_blog/*.mdx'],
+  content: ['./components/**/*.tsx', './pages/**/*.tsx', './_blog/*.mdx'],
   darkMode: 'class', // 'media' or 'class'
-  mode: 'jit',
   theme: {
     borderColor: (theme) => ({
       ...theme('colors'),
@@ -72,6 +73,10 @@ module.exports = {
           800: '#181818',
           900: '#0f0f0f',
         },
+        // Tailwind 3.0 upgrade aliases
+        green: colors.emerald,
+        yellow: colors.amber,
+        purple: colors.violet,
       },
       spacing: {
         28: '7rem',
@@ -126,7 +131,7 @@ module.exports = {
   //     height: ['hover'],
   //   },
   // },
-  plugins: [],
+  plugins: [require('@tailwindcss/typography')],
   corePlugins: {
     preflight: true,
   },

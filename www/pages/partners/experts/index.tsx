@@ -1,13 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
-import Link from 'next/link'
-import { Typography, IconArrowRight, Input, IconSearch, Select } from '@supabase/ui'
+import { IconArrowRight, IconSearch, Input, Select, Typography } from '@supabase/ui'
 import { NextSeo } from 'next-seo'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import BecomeAPartner from '~/components/Partners/BecomeAPartners'
 import { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
-import BecomeAPartner from '~/components/Partners/BecomeAPartners'
 
 const supabase = createClient(
   'https://obuldanrptloktxcffvn.supabase.co',
@@ -108,9 +108,9 @@ function ExpertPartnersPage(props: Props) {
               <option value="" disabled selected>
                 Category
               </option>
-              {Object.keys(partnersByCategory).map((cat) => (
-                <option value={cat.toLowerCase()} key={cat}>
-                  {cat}
+              {Object.keys(partnersByCategory).map((category) => (
+                <option key={category} value={category.toLowerCase()}>
+                  {category}
                 </option>
               ))}
               <option value="become-a-partner">Become a partner</option>
@@ -121,7 +121,7 @@ function ExpertPartnersPage(props: Props) {
             {partners.length ? (
               <TileGrid partnersByCategory={partnersByCategory} />
             ) : (
-              <Typography.Title level={2}>Coming Soon...</Typography.Title>
+              <Typography.Title level={2}>No Experts Found</Typography.Title>
             )}
           </div>
           {/* Become a partner form */}
