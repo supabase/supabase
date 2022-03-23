@@ -18,6 +18,8 @@ import { SubscriptionPreview } from '../Billing.types'
 import UpdateSuccess from '../UpdateSuccess'
 import { formSubscriptionUpdatePayload } from './ProUpgrade.utils'
 
+// Do not allow compute size changes for af-south-1
+
 interface Props {
   products: { tiers: any[]; addons: any[] }
   paymentMethods?: any[]
@@ -37,6 +39,7 @@ const ProUpgrade: FC<Props> = ({
 
   const { addons } = products
   const projectRef = ui.selectedProject?.ref
+  const projectRegion = ui.selectedProject?.region ?? ''
 
   const currentComputeSize =
     addons.find((option: any) => option.id === currentSubscription?.addons[0]?.prod_id) ||
@@ -47,7 +50,10 @@ const ProUpgrade: FC<Props> = ({
     currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
 
   const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(
-    currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PRO
+    // If project is currently free, default to enabling spend caps
+    currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.FREE ||
+      // Otherwise, Pro plan implies spend caps enabled
+      currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PRO
   )
 
   const [isRefreshingPreview, setIsRefreshingPreview] = useState(false)
@@ -86,7 +92,8 @@ const ProUpgrade: FC<Props> = ({
     const payload = formSubscriptionUpdatePayload(
       selectedTier,
       selectedComputeSize,
-      selectedPaymentMethod
+      selectedPaymentMethod,
+      projectRegion
     )
 
     setIsRefreshingPreview(true)
@@ -106,7 +113,8 @@ const ProUpgrade: FC<Props> = ({
     const payload = formSubscriptionUpdatePayload(
       selectedTier,
       selectedComputeSize,
-      selectedPaymentMethod
+      selectedPaymentMethod,
+      projectRegion
     )
 
     setIsSubmitting(true)
@@ -194,16 +202,20 @@ const ProUpgrade: FC<Props> = ({
                       onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
                     />
                   </div>
-                  <Divider light />
-                  <div className="flex items-center space-x-2">
-                    <h4 className="text-lg">Extend your project with add-ons</h4>
-                    <Badge color="green">Optional</Badge>
-                  </div>
-                  <ComputeSizeSelection
-                    computeSizes={addons || []}
-                    selectedComputeSize={selectedComputeSize}
-                    onSelectOption={onSelectComputeSizeOption}
-                  />
+                  {projectRegion !== 'af-south-1' && (
+                    <>
+                      <Divider light />
+                      <div className="flex items-center space-x-2">
+                        <h4 className="text-lg">Extend your project with add-ons</h4>
+                        <Badge color="green">Optional</Badge>
+                      </div>
+                      <ComputeSizeSelection
+                        computeSizes={addons || []}
+                        selectedComputeSize={selectedComputeSize}
+                        onSelectOption={onSelectComputeSizeOption}
+                      />
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -247,7 +259,6 @@ const ProUpgrade: FC<Props> = ({
       >
         <div className="py-4 space-y-4">
           <Modal.Content>
-            {/* [TODO] revise wording for "enabling spend caps" instead of overages */}
             <div className="space-y-4">
               <p className="text-sm">
                 A spend cap allows you to restrict your project's resource usage within the limits
