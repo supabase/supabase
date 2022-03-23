@@ -107,11 +107,12 @@ module.exports = ui({
               },
               // margin: 0,
               ul: {
-                'list-style-type': 'disc',
+                'list-style-type': 'none',
                 li: {
-                  margin: 0,
+                  marginTop: '0.2rem',
+                  marginBottom: '0.2rem',
                   'padding-left': '0 !important',
-                  'margin-left': '1.5rem',
+                  'margin-left': '0.5rem',
                 },
                 a: {
                   fontWeight: '200',

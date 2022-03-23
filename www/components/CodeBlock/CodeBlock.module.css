@@ -1,6 +1,6 @@
 .code-block {
   @apply rounded-lg;
-  @apply border border-gray-600;
+  @apply border border-scale-600;
 }
 
 .code-block::before {
