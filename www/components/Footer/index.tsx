@@ -4,6 +4,7 @@ import SectionContainer from '../Layouts/SectionContainer'
 import DarkModeToggle from '../DarkModeToggle'
 import Link from 'next/link'
 import { useTheme } from '../Providers'
+import { Badge } from '@supabase/ui'
 
 const Footer = () => {
   const { basePath } = useRouter()
@@ -36,7 +37,7 @@ const Footer = () => {
             <div className="flex space-x-5">
               <a
                 href="https://twitter.com/supabase"
-                className="text-scale-900 hover:text-scale-1000"
+                className="transition text-scale-900 hover:text-scale-1200"
               >
                 <span className="sr-only">Twitter</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -46,7 +47,7 @@ const Footer = () => {
 
               <a
                 href="https://github.com/supabase"
-                className="text-scale-900 hover:text-scale-1000"
+                className="transition text-scale-900 hover:text-scale-1200"
               >
                 <span className="sr-only">GitHub</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -60,7 +61,7 @@ const Footer = () => {
 
               <a
                 href="https://discord.supabase.com/"
-                className="text-scale-900 hover:text-scale-1000"
+                className="transition text-scale-900 hover:text-scale-1200"
               >
                 <span className="sr-only">Discord</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 71 55" aria-hidden="true">
@@ -74,7 +75,7 @@ const Footer = () => {
 
               <a
                 href="https://youtube.com/c/supabase"
-                className="text-scale-900 hover:text-scale-1000"
+                className="transition text-scale-900 hover:text-scale-1200"
               >
                 <span className="sr-only">Youtube</span>
                 <svg
@@ -93,7 +94,7 @@ const Footer = () => {
               {FooterLinks.map((segment: any) => {
                 return (
                   <div key={`footer_${segment.title}`}>
-                    <h3 className="text-sm text-scale-900">{segment.title}</h3>
+                    <h6 className="text-base text-scale-1200 overwrite">{segment.title}</h6>
                     <ul className="mt-4 space-y-2">
                       {segment.links.map((link: any, idx: number) => (
                         <li key={`${segment.title}_link_${idx}`}>
@@ -106,7 +107,13 @@ const Footer = () => {
                             } `}
                           >
                             {link.text}
-                            {!link.url && <span className="ml-2 inline text-xs">Coming soon</span>}
+                            {!link.url && (
+                              <div className="inline ml-2 xl:ml-0 xl:block 2xl:inline 2xl:ml-2 text-xs">
+                                <Badge color="scale" size="small">
+                                  Coming soon
+                                </Badge>
+                              </div>
+                            )}
                           </a>
                         </li>
                       ))}
