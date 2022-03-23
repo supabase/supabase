@@ -86,7 +86,6 @@ const ExitSurvey: FC<Props> = ({ freeTier, onSelectBack }) => {
           error: res.error,
         })
       } else {
-        console.log('Succesfully updated subscription')
         setIsSuccessful(true)
       }
     } catch (error: any) {
