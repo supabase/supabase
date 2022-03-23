@@ -24,13 +24,13 @@ export interface CountData {
   count: number
 }
 
-export interface Count {
-  data: [CountData] | []
-  error?: any
+type LFResponse<T> = {
+  result: T[]
+  error?: {
+    message: string
+  }
 }
 
-export interface Logs {
-  data: LogData[]
-  count: number
-  error: any
-}
+export type Count = LFResponse<CountData>
+
+export type Logs = LFResponse<LogData>
