@@ -178,3 +178,19 @@ code {
 div[data-radix-portal]:not(.portal--toast) {
   z-index: 2147483646 !important;
 }
+
+.billing-compute-radio {
+  label {
+    @apply items-center justify-between;
+  }
+}
+
+// [TODO] Temp fix cause Radio.Options card is messing with Modal component
+// Make overlay and modal go above anything
+div.fixed.bg-scale-300 {
+  z-index: 10 !important;
+}
+
+div.fixed.inset-0 {
+  z-index: 11 !important;
+}
