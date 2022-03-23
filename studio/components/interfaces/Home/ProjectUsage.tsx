@@ -27,7 +27,7 @@ import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
 import { EndpointResponse, PathsDatum, StatusCodesDatum } from './ChartData.types'
 
 const CHART_INTERVALS = [
-  { key: 'minutely', label: '60 minutes', startValue: 1, startUnit: 'hour', format: 'MMM D, h:ma' },
+  { key: 'minutely', label: '60 minutes', startValue: 1, startUnit: 'hour', format: 'MMM D, h:mma' },
   { key: 'hourly', label: '24 hours', startValue: 24, startUnit: 'hour', format: 'MMM D, ha' },
   { key: 'daily', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
 ]

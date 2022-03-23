@@ -109,7 +109,7 @@ const StackedAreaChart: React.FC<Props> = ({
         ))}
         <Tooltip
           labelFormatter={xAxisFormatAsDate ? formatToDate : undefined}
-          labelClassName="text-gray-100"
+          labelClassName="text-white"
           contentStyle={{ backgroundColor: '#444444', borderColor: '#444444', fontSize: '12px' }}
           wrapperClassName="bg-gray-600"
         />

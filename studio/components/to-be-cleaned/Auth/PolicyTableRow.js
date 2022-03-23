@@ -44,18 +44,25 @@ const PolicyRow = ({
   onSelectDeletePolicy = () => {},
 }) => {
   return (
-    <div className="group">
-      <Panel.Content className="flex gap-2 justify-between py-4 border-b border-panel-border-light dark:border-panel-border-dark">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
-          <div className="font-mono text-xs text-scale-900">{policy.command}</div>
-          <div className="flex flex-col lg:flex-row gap-2">
-            <span className="text-sm text-scale-1200 truncate">{policy.name}</span>
-            <span className="text-sm text-scale-1100 truncate">
-              {policy.definition || policy.check}
-            </span>
-          </div>
-        </div>
-
+    <Panel.Content
+      className="
+        w-full 
+        flex gap-2 
+        lg:items-center
+        py-4 
+        border-b 
+        border-panel-border-light 
+        dark:border-panel-border-dark
+      "
+    >
+      <div className="font-mono text-xs text-scale-900">{policy.command}</div>
+      <div className="flex flex-col lg:flex-row gap-2 truncate grow">
+        <span className="text-sm text-scale-1200 truncate max-w-xs">{policy.name}</span>
+        <span className="text-sm text-scale-1100 truncate">
+          {policy.definition || policy.check}
+        </span>
+      </div>
+      <div className="">
         <Dropdown
           side="bottom"
           align="end"
@@ -65,7 +72,6 @@ const PolicyRow = ({
               <Dropdown.Item
                 icon={<IconEdit size={14} />}
                 type="outline"
-                className="mx-2"
                 onClick={() => onSelectEditPolicy(policy)}
               >
                 Edit
@@ -87,8 +93,8 @@ const PolicyRow = ({
             icon={<IconMoreVertical />}
           />
         </Dropdown>
-      </Panel.Content>
-    </div>
+      </div>
+    </Panel.Content>
   )
 }
 
