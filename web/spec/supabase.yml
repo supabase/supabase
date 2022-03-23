@@ -370,6 +370,9 @@ pages:
         res.status(200).json(allOnlineUsers);
       };
       ```
+      
+      For more advance type-support, check out [`postgrest-js-tools`](https://github.com/mzalevski/postgrest-js-tools).
+
 
       ### Update types automatically with GitHub Actions
 
@@ -528,6 +531,9 @@ pages:
           ```
       - name: Sign in with redirect.
         description: |
+          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by 
+          the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
+           
           Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
           any URL path on your website (the base domain must be the same as the domain in your Auth settings).
         js: |
@@ -676,7 +682,7 @@ pages:
                withCredentials: true,
                credentials: 'include',
                headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
                 'Authorization': bearer, // Your own auth
                 'X-Supabase-Auth': token, // Set the Supabase user
                }
@@ -800,8 +806,7 @@ pages:
         js: |
           ```js
           const { data: user, error } = await supabase.auth.api.deleteUser(
-            '715ed5db-f090-4b8c-a067-640ecee36aa0',
-            'YOUR_SERVICE_ROLE_KEY'
+            '715ed5db-f090-4b8c-a067-640ecee36aa0'
           )
           ```
 
@@ -1098,6 +1103,9 @@ pages:
             ])
           ```
       - name: Bulk create
+        description: |
+          When running a bulk create, the operation is handled in a single transaction. If any of the inserts fail, all other operations are 
+          rolled back.
         js: |
           ```js
           const { data, error } = await supabase

@@ -13,13 +13,6 @@ export const TEMPLATES: LogTemplate[] = [
     searchString: 'COMMIT',
     for: ['database'],
   },
-
-  {
-    label: '10 Minutes Ago',
-    mode: 'custom',
-    searchString: 'timestamp < TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 10 MINUTE)',
-    for: ['database', 'api'],
-  },
   {
     label: 'Commits By User',
     mode: 'custom',
@@ -69,3 +62,12 @@ export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
   api: 'API',
   database: 'Database',
 }
+
+export const genDefaultQuery = (table: string): string => `SELECT
+  id, timestamp, event_message, metadata
+FROM
+  ${table}
+LIMIT 100
+`
+
+export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`

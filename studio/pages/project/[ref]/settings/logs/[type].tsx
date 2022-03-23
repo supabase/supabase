@@ -11,7 +11,6 @@ import {
   Button,
   IconInfo,
   Card,
-  Loading,
   Input,
 } from '@supabase/ui'
 
@@ -31,6 +30,8 @@ import {
   LogData,
   LogSearchCallback,
   LOG_TYPE_LABEL_MAPPING,
+  genDefaultQuery,
+  genCountQuery,
 } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
 import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite'
@@ -61,15 +62,13 @@ export const LogPage: NextPage = () => {
     type: '',
     search_query: '',
     sql: '',
-    where: '',
     timestamp_start: '',
     timestamp_end: '',
   })
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as keyof typeof LOG_TYPE_LABEL_MAPPING]}`
   const checkIfSelectQuery = (value: string) =>
     value.toLowerCase().includes('select') ? true : false
-  const isSelectQuery = checkIfSelectQuery(editorValue)
-
+  const table = type === 'api' ? 'edge_logs' : 'postgres_logs'
   useEffect(() => {
     setParams({ ...params, type: type as string })
   }, [type])
@@ -106,23 +105,23 @@ export const LogPage: NextPage = () => {
     return qs
   }
   // handle log fetching
-  const getKeyLogs: SWRInfiniteKeyLoader = (_pageIndex: number, prevPageData) => {
+  const getKeyLogs: SWRInfiniteKeyLoader = (_pageIndex: number, prevPageData: Logs) => {
     let queryParams
     // if prev page data is 100 items, could possibly have more records that are not yet fetched within this interval
     if (prevPageData === null) {
       // reduce interval window limit by using the timestamp of the last log
       queryParams = genQueryParams(params)
-    } else if ((prevPageData?.data ?? []).length === 0) {
+    } else if ((prevPageData.result ?? []).length === 0) {
       // no rows returned, indicates that no more data to retrieve and append.
       return null
     } else {
-      const len = prevPageData.data.length
-      const { timestamp: tsLimit }: LogData = prevPageData.data[len - 1]
+      const len = prevPageData.result.length
+      const { timestamp: tsLimit }: LogData = prevPageData.result[len - 1]
       // create new key from params
       queryParams = genQueryParams({ ...params, timestamp_end: String(tsLimit) })
     }
 
-    const logUrl = `${API_URL}/projects/${ref}/logs?${queryParams}`
+    const logUrl = `${API_URL}/projects/${ref}/analytics/endpoints/logs.${type}?${queryParams}`
     return logUrl
   }
   const {
@@ -134,23 +133,23 @@ export const LogPage: NextPage = () => {
     setSize,
   } = useSWRInfinite<Logs>(getKeyLogs, get, { revalidateOnFocus: false })
   let logData: LogData[] = []
-  let error: null | string = swrError ? swrError.message : null
-  data.forEach((response: Logs) => {
-    if (!error && response && response.data) {
-      logData = [...logData, ...response.data]
+  let error: null | string | object = swrError ? swrError.message : null
+  data.forEach((response) => {
+    if (!error && response?.result) {
+      logData = [...logData, ...response.result]
     }
     if (!error && response && response.error) {
       error = response.error
     }
   })
 
-  const countUrl = `${API_URL}/projects/${ref}/logs?${genQueryParams({
+  const countUrl = `${API_URL}/projects/${ref}/analytics/endpoints/logs.${type}?${genQueryParams({
     ...params,
-    count: String(true),
+    sql: genCountQuery(table),
     period_start: String(latestRefresh),
   })}`
   const { data: countData } = useSWR<Count>(countUrl, get, { refreshInterval: 5000 })
-  const newCount = countData?.data?.[0]?.count ?? 0
+  const newCount = countData?.result?.[0]?.count ?? 0
 
   const handleRefresh = () => {
     setLatestRefresh(new Date().toISOString())
@@ -168,7 +167,10 @@ export const LogPage: NextPage = () => {
   const handleModeToggle = () => {
     if (mode === 'simple') {
       setMode('custom')
-      // setWhere(DEFAULT_QUERY)
+      onSelectTemplate({
+        mode: 'custom',
+        searchString: genDefaultQuery(table),
+      })
     } else {
       setMode('simple')
     }
@@ -177,17 +179,12 @@ export const LogPage: NextPage = () => {
   const onSelectTemplate = (template: LogTemplate) => {
     setMode(template.mode)
     if (template.mode === 'simple') {
-      setParams((prev) => ({ ...prev, search_query: template.searchString, sql: '', where: '' }))
+      setParams((prev) => ({ ...prev, search_query: template.searchString, sql: '' }))
     } else {
       setEditorValue(template.searchString)
       setParams((prev) => ({
         ...prev,
-        where: checkIfSelectQuery(template.searchString)
-          ? ''
-          : cleanEditorValue(template.searchString),
-        sql: checkIfSelectQuery(template.searchString)
-          ? cleanEditorValue(template.searchString)
-          : '',
+        sql: template.searchString,
         search_query: '',
         timestamp_end: '',
       }))
@@ -195,12 +192,7 @@ export const LogPage: NextPage = () => {
     }
   }
   const handleEditorSubmit = () => {
-    setParams((prev) => ({
-      ...prev,
-      where: isSelectQuery ? '' : cleanEditorValue(editorValue),
-      sql: isSelectQuery ? cleanEditorValue(editorValue) : '',
-      search_query: '',
-    }))
+    setParams((prev) => ({ ...prev, sql: editorValue, search_query: '' }))
     router.push({
       pathname: router.pathname,
       query: {
@@ -217,7 +209,6 @@ export const LogPage: NextPage = () => {
       ...prev,
       search_query: query || '',
       timestamp_end: unixMicro ? String(unixMicro) : '',
-      where: '',
       sql: '',
     }))
     router.push({
@@ -266,7 +257,7 @@ export const LogPage: NextPage = () => {
               />
             </div>
             <div className="flex flex-row justify-end items-center px-2 py-1 w-full">
-              {isSelectQuery && (
+              {mode === 'custom' && (
                 <InformationBox
                   className="shrink mr-auto"
                   block={false}
@@ -278,17 +269,15 @@ export const LogPage: NextPage = () => {
                 />
               )}
               <div className="flex flex-row gap-x-2 justify-end p-2">
-                {editorValue && (
-                  <Button
-                    type="text"
-                    onClick={() => {
-                      setEditorValue('')
-                      setEditorId(uuidv4())
-                    }}
-                  >
-                    Clear
-                  </Button>
-                )}
+                <Button
+                  type="text"
+                  onClick={() => {
+                    setEditorValue(genDefaultQuery(table))
+                    setEditorId(uuidv4())
+                  }}
+                >
+                  Reset
+                </Button>
                 <Button type={editorValue ? 'secondary' : 'text'} onClick={handleEditorSubmit}>
                   Run
                 </Button>
@@ -319,9 +308,8 @@ export const LogPage: NextPage = () => {
           )}
 
           <LogTable data={logData} isCustomQuery={mode === 'custom'} />
-          {/* Footer section of log ui, appears below table */}
           <div className="p-2">
-            {!isSelectQuery && (
+            {mode === 'simple' && (
               <Button onClick={() => setSize(size + 1)} icon={<IconRewind />} type="default">
                 Load older
               </Button>
