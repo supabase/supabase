@@ -91,6 +91,9 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
                     <Input id="line2" name="line2" placeholder="Address line 2" />
                     <div className="flex items-center space-x-2">
                       <Select className="w-full" id="country" name="country" placeholder="Country">
+                        <Select.Option key="empty" value="">
+                          ---
+                        </Select.Option>
                         {Object.keys(COUNTRIES).map((code: string) => (
                           <Select.Option key={code} value={code}>
                             {(COUNTRIES as any)[code]}
