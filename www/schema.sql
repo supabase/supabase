@@ -38,10 +38,11 @@ create table partners (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   tsv tsvector generated always as (
     setweight(to_tsvector('english', title), 'A')
-      || setweight(to_tsvector('english', category), 'B')
-      || setweight(to_tsvector('english', description), 'C')
+      || setweight(to_tsvector('english', description), 'B')
+      || setweight(to_tsvector('english', overview), 'C')
+      || setweight(to_tsvector('english', category), 'D')
       || setweight(to_tsvector('english', slug), 'D')
-  ) stored
+  ) stored;
 );
 alter table partners enable row level security;
 

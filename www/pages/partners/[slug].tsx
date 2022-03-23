@@ -1,12 +1,13 @@
-import { GetStaticPaths, GetStaticProps } from 'next'
-import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
-import { Partner } from '~/types/partners'
+import { IconChevronLeft, IconExternalLink, Typography } from '@supabase/ui'
+import { marked } from 'marked'
+import { GetStaticPaths, GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
+import Link from 'next/link'
+import { Swiper, SwiperSlide } from 'swiper/react'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { Typography, IconChevronLeft, Divider, IconExternalLink } from '@supabase/ui'
-import { Swiper, SwiperSlide } from 'swiper/react'
+import { Partner } from '~/types/partners'
 import Error404 from '../404'
 
 const supabase = createClient(
@@ -34,27 +35,28 @@ function Partner({ partner }: { partner: Partner }) {
       />
       <DefaultLayout>
         <SectionContainer>
-          <div className="col-span-12 lg:col-span-2 mb-2">
+          <div className="col-span-12 mb-2 space-y-6 lg:col-span-2">
             {/* Back button */}
             <Typography.Text type="secondary">
               <a
                 href={'/partners'}
-                className="hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center"
+                className="flex items-center cursor-pointer hover:text-gray-900 dark:hover:text-white"
               >
                 <IconChevronLeft style={{ padding: 0 }} />
                 Back
               </a>
             </Typography.Text>
 
-            <div className="flex">
+            <div className="flex items-center space-x-4">
               <img
-                className="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"
+                className="flex-shrink-0 w-10 h-10 bg-gray-300 rounded-full"
                 src={partner.logo}
                 alt={partner.title}
               />
-              <Typography.Title>{partner.title}</Typography.Title>
+              <Typography.Title className="mb-0">{partner.title}</Typography.Title>
             </div>
-            <div className="mt-6">
+
+            <div className="mt-8">
               <div className={'lg:-mr-32 lg:-ml-32'}>
                 <Swiper
                   initialSlide={3}
@@ -82,7 +84,7 @@ function Partner({ partner }: { partner: Partner }) {
                   {partner.images.map((image: any, i: number) => {
                     return (
                       <SwiperSlide key={i}>
-                        <div className="mr-3 ml-3 cursor-move">
+                        <div className="ml-3 mr-3 cursor-move">
                           <img src={image} alt={partner.title} />
                         </div>
                       </SwiperSlide>
@@ -91,53 +93,75 @@ function Partner({ partner }: { partner: Partner }) {
                 </Swiper>
               </div>
             </div>
-            <div className="grid lg:grid-cols-5 gap-3">
+
+            <div className="grid gap-3 lg:grid-cols-4">
               <div className="lg:col-span-3">
-                <Typography.Title level={2}>Overview</Typography.Title>
-                <Typography.Text>{partner.overview}</Typography.Text>
+                <Typography.Title
+                  level={2}
+                  className="mt-8 mb-4 font-bold"
+                  style={{ fontSize: '1.5rem' }}
+                >
+                  Overview
+                </Typography.Title>
+
+                <div
+                  className="prose dark:prose-invert"
+                  dangerouslySetInnerHTML={{ __html: partner.overview }}
+                />
               </div>
+
               <div>
-                <Typography.Title level={2}>Details</Typography.Title>
-                <div className="flex justify-between">
-                  <Typography.Text strong>Developer</Typography.Text>
-                  <Typography.Text>{partner.developer}</Typography.Text>
-                </div>
-                <Divider />
-                <div className="flex justify-between">
-                  <Typography.Text strong>Category</Typography.Text>
-                  <Link
-                    href={`/partners/${
-                      partner.type === 'technology' ? 'integrations' : partner.type
-                    }#${partner.category.toLowerCase()}`}
-                  >
-                    <a className="text-brand-700 hover:text-brand-800">{partner.category}</a>
-                  </Link>
-                </div>
-                <Divider />
-                <div className="flex justify-between">
-                  <Typography.Text strong>Website</Typography.Text>
-                  <a
-                    href={partner.website}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-brand-700 hover:text-brand-800"
-                  >
-                    {new URL(partner.website).host}
-                  </a>
-                </div>
-                <Divider />
-                <div className="flex justify-between">
-                  <Typography.Text strong>Documentation</Typography.Text>
-                  <a
-                    href={partner.docs}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-brand-700 hover:text-brand-800"
-                  >
-                    <span className="flex">
-                      Read <IconExternalLink />
-                    </span>
-                  </a>
+                <Typography.Title
+                  level={2}
+                  className="mt-8 mb-4 font-bold"
+                  style={{ fontSize: '1.5rem' }}
+                >
+                  Details
+                </Typography.Title>
+
+                <div className="divide-y">
+                  <div className="flex justify-between py-2">
+                    <Typography.Text strong>Developer</Typography.Text>
+                    <Typography.Text>{partner.developer}</Typography.Text>
+                  </div>
+
+                  <div className="flex justify-between py-2">
+                    <Typography.Text strong>Category</Typography.Text>
+                    <Link
+                      href={`/partners/${
+                        partner.type === 'technology' ? 'integrations' : partner.type
+                      }#${partner.category.toLowerCase()}`}
+                    >
+                      <a className="text-brand-700 hover:text-brand-800">{partner.category}</a>
+                    </Link>
+                  </div>
+
+                  <div className="flex justify-between py-2">
+                    <Typography.Text strong>Website</Typography.Text>
+                    <a
+                      href={partner.website}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand-700 hover:text-brand-800"
+                    >
+                      {new URL(partner.website).host}
+                    </a>
+                  </div>
+
+                  <div className="flex justify-between py-2">
+                    <Typography.Text strong>Documentation</Typography.Text>
+                    <a
+                      href={partner.docs}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand-700 hover:text-brand-800"
+                    >
+                      <span className="flex items-center space-x-1">
+                        <span>Read</span>
+                        <IconExternalLink size="small" />
+                      </span>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -151,15 +175,17 @@ function Partner({ partner }: { partner: Partner }) {
 // This function gets called at build time
 export const getStaticPaths: GetStaticPaths = async () => {
   const { data: slugs } = await supabase.from<Partner>('partners').select('slug')
+
   const paths: {
     params: { slug: string }
     locale?: string | undefined
-  }[] = []
-  slugs?.map((slug) => ({
-    params: {
-      slug,
-    },
-  }))
+  }[] =
+    slugs?.map(({ slug }) => ({
+      params: {
+        slug,
+      },
+    })) ?? []
+
   return {
     paths,
     fallback: 'blocking',
@@ -168,11 +194,20 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 // This also gets called at build time
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const { data: partner } = await supabase
+  let { data: partner } = await supabase
     .from<Partner>('partners')
     .select('*')
     .eq('slug', params!.slug as string)
     .single()
+
+  if (!partner) {
+    return {
+      notFound: true,
+    }
+  }
+
+  // Parse markdown
+  partner.overview = marked.parse(partner.overview)
 
   return {
     props: { partner },
