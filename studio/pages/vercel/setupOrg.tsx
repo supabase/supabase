@@ -85,7 +85,7 @@ const CreateOrganization = observer(({}) => {
 
   async function onClick() {
     setLoading(true)
-    const response = await post(`${API_URL}/organizations/new`, {
+    const response = await post(`${API_URL}/organizations`, {
       name: orgName,
     })
     if (response.error) {

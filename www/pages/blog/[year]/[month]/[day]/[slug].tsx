@@ -5,6 +5,7 @@ import hydrate from 'next-mdx-remote/hydrate'
 import renderToString from 'next-mdx-remote/render-to-string'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -217,10 +218,15 @@ function BlogPostPage(props: any) {
                         <a className="cursor-pointer">
                           <Space size={4}>
                             {author.author_image_url && (
-                              <img
-                                src={author.author_image_url}
-                                className="rounded-full w-10 border dark:border-dark"
-                              />
+                              <div className="w-10">
+                                <Image
+                                  src={author.author_image_url}
+                                  className="rounded-full border dark:border-dark"
+                                  width="100%"
+                                  height="100%"
+                                  layout="responsive"
+                                />
+                              </div>
                             )}
                             <Space direction="vertical" size={0}>
                               <Typography.Text>{author.author}</Typography.Text>
@@ -239,11 +245,13 @@ function BlogPostPage(props: any) {
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-7 xl:col-span-7">
                   {props.blog.thumb && (
-                    <img
-                      src={'/images/blog/' + props.blog.thumb}
-                      className="object-cover mb-8 border dark:border-gray-600"
-                      style={{ maxHeight: '520px' }}
-                    />
+                    <div className="relative overflow-auto w-full h-96 mb-8 border dark:border-gray-600">
+                      <Image
+                        src={'/images/blog/' + props.blog.thumb}
+                        layout="fill"
+                        objectFit="cover"
+                      />
+                    </div>
                   )}
                   <article className={blogStyles['article']}>
                     <Typography>{content}</Typography>
