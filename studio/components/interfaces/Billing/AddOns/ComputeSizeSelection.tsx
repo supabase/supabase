@@ -1,6 +1,5 @@
 import { FC } from 'react'
 import { Radio } from '@supabase/ui'
-import { formatComputeSizes } from './AddOns.utils'
 
 interface Props {
   computeSizes: any[]
@@ -9,7 +8,6 @@ interface Props {
 }
 
 const ComputeSizeSelection: FC<Props> = ({ computeSizes, selectedComputeSize, onSelectOption }) => {
-  const formattedComputeSizes = formatComputeSizes(computeSizes)
   return (
     <div className="space-y-4">
       <div>
@@ -19,7 +17,7 @@ const ComputeSizeSelection: FC<Props> = ({ computeSizes, selectedComputeSize, on
         </p>
       </div>
       <Radio.Group type="cards" className="billing-compute-radio">
-        {formattedComputeSizes.map((option: any) => (
+        {computeSizes.map((option: any) => (
           <Radio
             hidden
             key={option.id}
