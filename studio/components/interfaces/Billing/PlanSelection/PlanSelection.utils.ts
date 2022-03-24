@@ -5,7 +5,7 @@ export const formatTierOptions = (tiers: any[]) => {
   const enterpriseOption = {
     id: 'Enterprise',
     name: 'Enterprise',
-    description: 'Custom tailored services to suit your specific business needs',
+    description: 'For large-scale applications managing serious workloads',
     metadata: {
       features:
         'Point in time recovery\\nDesignated Support manager & SLAs\\nSSO / SAML + SOC2\\nCustom contracts & invoicing\\n24×7×365 premium enterprise support',
